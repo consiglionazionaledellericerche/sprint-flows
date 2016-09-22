@@ -1,0 +1,353 @@
+package it.cnr.si.flows.ng.resource;
+
+import java.io.IOException;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.activiti.engine.RepositoryService;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
+import org.activiti.engine.task.Task;
+import org.activiti.rest.common.api.DataResponse;
+import org.activiti.rest.service.api.RestResponseFactory;
+import org.activiti.rest.service.api.runtime.task.TaskCollectionResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.codahale.metrics.annotation.Timed;
+
+import it.cnr.si.repository.UserRepository;
+import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.security.SecurityUtils;
+import it.cnr.si.service.UserService;
+
+
+/**
+ * @author mtrycz
+ *
+ */
+@RestController
+@RequestMapping("rest/tasks")
+public class FlowsTaskResource {
+
+    @Deprecated
+    private static final String ERRORE_PERMESSI_TASK = "ERRORE PERMESSI TASK";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlowsTaskResource.class);
+
+    @Inject
+    private UserRepository userRepository;
+    @Inject
+    private UserService userService;
+    
+    @Autowired
+    protected RestResponseFactory restResponseFactory;
+    
+    @Autowired
+    private RepositoryService repositoryService;
+    @Autowired
+    private RuntimeService runtimeService;
+
+    @Autowired
+    private TaskCollectionResource activitiTaskResource;
+    
+    @Autowired
+    private TaskService taskService;
+
+    @RequestMapping(value = "/mytasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
+    @Timed
+    public ResponseEntity<DataResponse> getMyTasks(Principal user,
+            @RequestParam Map<String, String> params) {
+
+        String username = SecurityUtils.getCurrentUserLogin();
+
+        List<Task> list = taskService.createTaskQuery()
+            .taskAssignee(username).list();
+        
+        DataResponse response = new DataResponse();
+        response.setStart(0);
+        response.setSize(list.size()); 
+        response.setTotal(list.size());
+        response.setData(list);
+        
+        return ResponseEntity.ok(response);
+    }
+    
+    @RequestMapping(value = "/mytasksavailable", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
+    @Timed
+    public ResponseEntity<DataResponse> getMyTasksAvailable(
+            @RequestParam Map<String, String> params) {
+
+        String username = SecurityUtils.getCurrentUserLogin();
+
+        List<Task> list = taskService.createTaskQuery()
+            .taskCandidateUser(username).list();
+        
+        DataResponse response = new DataResponse();
+        response.setStart(0);
+        response.setSize(list.size()); 
+        response.setTotal(list.size());
+        response.setData(list);
+        
+        return ResponseEntity.ok(response);
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<Map<String, Object>> getTaskInstance(
+            HttpServletRequest req,
+            @PathVariable("id") String id,
+            @RequestParam Map<String, String> params) {
+
+        return null;
+//      long taskId = extractId(id);
+//
+//        Task task = taskService.createTaskQuery().taskId(""+taskId).singleResult();
+//        List<Task> tasks = taskService.createTaskQuery().processInstanceId(task.getProcessInstanceId()).list();
+//        ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
+//
+//        List<Map<String, Object>> tasksMaps = tasks.stream().map(t -> mappaTaskInMap(t)).collect(Collectors.toList());
+//
+//        Map<String, Object> result = new HashMap<>();
+//        Map<String, Object> definition = new HashMap<>();
+//        definition.put("id", "cnrdsftm:validaTask");
+//
+//        Map<String, Object> mappaTaskInMap = mappaTaskInMap(task);
+//        ((Map<String, Object>) mappaTaskInMap.get("entry")).put("tasks", tasksMaps);
+//        ((Map<String, Object>) mappaTaskInMap.get("entry")).put("workflowInstance", mappaProcessInstanceInMap(pi));
+//        ((Map<String, Object>) mappaTaskInMap.get("entry")).put("definition", definition);
+//
+//
+//        result.put("data", mappaTaskInMap.get("entry"));
+//
+//
+//        return new ResponseEntity<Map<String, Object>>(result, HttpStatus.OK);
+
+//        // TODO verificare se ci possono essere parametri aggiuntivi utili//        boolean detailed = Boolean.parseBoolean(params.get("detailed"));
+//        long taskId = Utils.extractId(id);
+//        CMISUser user = cmisService.getCMISUserFromSession(req);
+//        BindingSession session = cmisService.getCurrentBindingSession(req);
+//
+//        try {
+//            Map<String, Object> taskInstance = flowsTaskService.getTask(user, session, taskId, detailed);
+//            return new ResponseEntity<Map<String,Object>>(taskInstance, HttpStatus.OK);
+//        } catch (PermissionException e) {
+//            LOGGER.error(e.getMessage(), e);
+//            return new ResponseEntity<Map<String,Object>>(HttpStatus.FORBIDDEN);
+//        } catch (IOException e) {
+//            Map<String, Object> response = new HashMap<>();
+//            response.put("error", e.getMessage());
+//            return new ResponseEntity<Map<String,Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+    }
+
+    /**
+     * Questo metodo serve per assegnare un taskInstance a un'utente o rilasciare il task al pool
+     *
+     * TODO Considerare la possibilità di modificare nome e signature Map-data in String-username
+     *
+     * @param req
+     * @param id
+     * @param params
+     * @return
+     */
+    // TODO rifattorizzare, il parametro data è confusionario
+    @RequestMapping(value = "/claim/{id}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<Map<String, Object>> claimTask(
+            HttpServletRequest req,
+            @PathVariable("id") String id) {
+
+        return null;
+//        CMISUser user = cmisService.getCMISUserFromSession(req);
+//        BindingSession session = cmisService.getCurrentBindingSession(req);
+//        String cm_owner = user.getUserName();
+//        long taskId = Utils.extractId(id);
+//
+//        LOGGER.info("Setting owner of task "+ id +" to "+ cm_owner);
+//
+//        try {
+//            Map<String, Object> taskInstance = flowsTaskService.claimTask(user, session, taskId);
+//
+//            return new ResponseEntity<Map<String,Object>>(taskInstance, HttpStatus.OK);
+//        } catch (IOException e) {
+//            Map<String, Object> response = new HashMap<>();
+//            response.put("error", e.getMessage());
+//            return new ResponseEntity<Map<String,Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+    }
+
+    @RequestMapping(value = "/unclaim/{id}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<Map<String, Object>> unclaimTask(
+            HttpServletRequest req,
+            @PathVariable("id") String id) {
+
+        return null;
+//        CMISUser user = cmisService.getCMISUserFromSession(req);
+//        BindingSession session = cmisService.getCurrentBindingSession(req);
+//        long taskId = Utils.extractId(id);
+//
+//        LOGGER.info("Unsetting owner of task "+ id);
+//
+//        try {
+//            Map<String, Object> task = flowsTaskService.getTask(user, session, taskId, true);
+//            Map<String, Object> data = (Map<String, Object>) task.get("data");
+//            Map<String, Object> owner = (Map<String, Object>) data.get("owner");
+//            String ownerName = (String) owner.get("userName");
+//
+//            if( !user.getUserName().equals(ownerName) ) {
+//                throw new PermissionException("L'utente può solo rinunciare a un task di cui è owner. Utente che ha fatto la richiesta: "+ user.getUserName() +", owner: "+ ownerName);
+//            }
+//
+//            Map<String, Object> taskInstance = flowsTaskService.unclaimTask(user, session, taskId);
+//
+//            return new ResponseEntity<Map<String,Object>>(taskInstance, HttpStatus.OK);
+//
+//        } catch (PermissionException e) {
+//            LOGGER.error(e.getMessage(), e);
+//            return new ResponseEntity<Map<String,Object>>(HttpStatus.FORBIDDEN);
+//        } catch (IOException e) {
+//            Map<String, Object> response = new HashMap<>();
+//            response.put("error", e.getMessage());
+//            return new ResponseEntity<Map<String,Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<Map<String, Object>> assignTask(
+            HttpServletRequest req,
+            @PathVariable("id") String id,
+            @RequestBody Map<String, Object> data) {
+
+        return null;
+//        CMISUser user = cmisService.getCMISUserFromSession(req);
+//        BindingSession session = cmisService.getCurrentBindingSession(req);
+//        String cm_owner = (String) data.get("cm_owner");
+//        long taskId = Utils.extractId(id);
+//
+//        LOGGER.info("Setting owner of task "+ id +" to "+ cm_owner);
+//
+//        try {
+//            Map<String, Object> taskInstance = flowsTaskService.setTaskOwner(user, session, taskId, data);
+//
+//            return new ResponseEntity<Map<String,Object>>(taskInstance, HttpStatus.OK);
+//        } catch (PermissionException e) {
+//            LOGGER.error(e.getMessage(), e);
+//            return new ResponseEntity<Map<String,Object>>(HttpStatus.FORBIDDEN);
+//        } catch (IOException e) {
+//            Map<String, Object> response = new HashMap<>();
+//            response.put("error", e.getMessage());
+//            return new ResponseEntity<Map<String,Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+    }
+
+    // TODO returns ResponseEntity<Map<String, Object>>
+    @RequestMapping(value = "variables/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<Map<String, Object>> getTaskVariables(
+            HttpServletRequest req,
+            HttpServletResponse resp,
+            @PathVariable("id") String id)
+                    throws IOException {
+
+        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> list = new HashMap<>();
+        List<Map<String, Object>> entries = new ArrayList<>();
+
+        result.put("list", list);
+        list.put("entries", entries);
+
+//        taskService.getVariables(id);
+
+        return new ResponseEntity<Map<String,Object>>(result, HttpStatus.OK);
+
+//        CMISUser user = cmisService.getCMISUserFromSession(req);
+//        LOGGER.debug("getTaskVariables user: "+ user +", id: "+id);
+//
+//        try {
+//            Map<String, Object> workflowVariables = workflowService.getTaskVariables(user, id);
+//            JSONObject res = new JSONObject(workflowVariables);
+//            PrintWriter writer = resp.getWriter();
+//            writer.write(res.toString());
+//            writer.flush();
+//            //            return new ResponseEntity<Map<String,Object>>(workflowVariables, HttpStatus.OK);
+//        } catch (IllegalAccessException e) {
+//            LOGGER.info(ERRORE_PERMESSI_TASK);
+//            LOGGER.info("L'utente ha richiesto variabili per un flusso che non deve poter vedere", e);
+//            getVariablesOldMethod(req, resp, id);
+//            //          return new ResponseEntity<Map<String,Object>>(HttpStatus.FORBIDDEN);// ;resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+//        } catch (WorkflowException e) {
+//            LOGGER.info("Errore durante il recupero di un flusso", e);
+//            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+//            //          return new ResponseEntity<Map<String,Object>>(HttpStatus.INTERNAL_SERVER_ERROR);//resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+//        }
+    }
+
+    @RequestMapping(value = "complete/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<Map<String, Object>> completeTask(
+            HttpServletRequest req,
+            @PathVariable("id") String id,
+            @RequestBody Map<String, Object> data) {
+
+        taskService.complete(id);
+
+        return new ResponseEntity<Map<String,Object>>(HttpStatus.OK);
+
+//        CMISUser user = cmisService.getCMISUserFromSession(req);
+//        BindingSession session = cmisService.getCurrentBindingSession(req);
+//        boolean userHasWriteAccessToTask = true; // TODO
+//
+//        if (userHasWriteAccessToTask) {
+//            try {
+//                workflowService.completeTask(user, id, data, session);
+//            } catch (AlfrescoResponseException e) {
+//                LOGGER.error(e.getMessage() + " " + e.getResponse(), e);
+//                return new ResponseEntity<Map<String,Object>>(e.getResponse(), HttpStatus.INTERNAL_SERVER_ERROR);
+//            } catch (PermissionException e) {
+//                LOGGER.error(e.getMessage(), e);
+//                return new ResponseEntity<Map<String,Object>>(HttpStatus.FORBIDDEN);
+//            } catch (IOException e) {
+//                LOGGER.error(e.getMessage(), e);
+//                Map<String, Object> response = new HashMap<>();
+//                response.put("error", e.getMessage());
+//                return new ResponseEntity<Map<String,Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+//            }
+//        }
+//
+//        return null;
+    }
+
+    public static long extractId(String id) throws IllegalArgumentException {
+        try {
+            if (id.contains("$"))
+                id = id.split("\\$")[1];
+            return Long.parseLong(id);
+
+        } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
+            throw new IllegalArgumentException("L'id dato non è valido", e);
+        }
+    }
+}
