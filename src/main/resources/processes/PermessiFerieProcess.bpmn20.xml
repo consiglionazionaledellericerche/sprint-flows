@@ -5,7 +5,7 @@
     <userTask id="approvazione" name="Direttore Approva o Rifiuta" activiti:candidateUsers="DirettoreSISINFO"></userTask>
     <endEvent id="endevent1" name="End"></endEvent>
     <sequenceFlow id="flow2" sourceRef="approvazione" targetRef="endevent1"></sequenceFlow>
-    <userTask id="usertask1" name="User Task" activiti:assignee="DirettoreSISINFO"></userTask>
+    <userTask id="usertask1" name="User Task" activiti:candidateUsers="user,marcinireneusz.trycz" activiti:candidateGroups="USER_ROLE"></userTask>
     <sequenceFlow id="flow3" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
     <sequenceFlow id="flow4" sourceRef="usertask1" targetRef="approvazione"></sequenceFlow>
   </process>

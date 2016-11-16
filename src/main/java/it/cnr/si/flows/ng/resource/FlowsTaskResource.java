@@ -1,5 +1,8 @@
 package it.cnr.si.flows.ng.resource;
 
+import static it.cnr.si.flows.ng.utils.Utils.isEmpty;
+import static it.cnr.si.flows.ng.utils.Utils.isNotEmpty;
+
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -14,10 +17,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
+import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.task.TaskCollectionResource;
+import org.activiti.rest.service.api.runtime.task.TaskResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,10 +63,10 @@ public class FlowsTaskResource {
     private UserRepository userRepository;
     @Inject
     private UserService userService;
-    
+
     @Autowired
     protected RestResponseFactory restResponseFactory;
-    
+
     @Autowired
     private RepositoryService repositoryService;
     @Autowired
@@ -68,7 +74,7 @@ public class FlowsTaskResource {
 
     @Autowired
     private TaskCollectionResource activitiTaskResource;
-    
+
     @Autowired
     private TaskService taskService;
 
@@ -82,33 +88,35 @@ public class FlowsTaskResource {
 
         List<Task> list = taskService.createTaskQuery()
             .taskAssignee(username).list();
-        
+
         DataResponse response = new DataResponse();
         response.setStart(0);
-        response.setSize(list.size()); 
+        response.setSize(list.size());
         response.setTotal(list.size());
-        response.setData(list);
-        
+        response.setData(list.subList(0, list.size()));
+
         return ResponseEntity.ok(response);
     }
-    
-    @RequestMapping(value = "/mytasksavailable", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+
+    @RequestMapping(value = "/availabletasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
-    public ResponseEntity<DataResponse> getMyTasksAvailable(
+    public ResponseEntity<DataResponse> getAvailableTasks(
             @RequestParam Map<String, String> params) {
 
         String username = SecurityUtils.getCurrentUserLogin();
 
-        List<Task> list = taskService.createTaskQuery()
+        List<Task> listraw = taskService.createTaskQuery()
             .taskCandidateUser(username).list();
-        
+
+        List<TaskResponse> list = restResponseFactory.createTaskResponseList(listraw);
+
         DataResponse response = new DataResponse();
         response.setStart(0);
-        response.setSize(list.size()); 
+        response.setSize(list.size());
         response.setTotal(list.size());
         response.setData(list);
-        
+
         return ResponseEntity.ok(response);
     }
 
@@ -305,16 +313,28 @@ public class FlowsTaskResource {
 //        }
     }
 
-    @RequestMapping(value = "complete/{id}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "complete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Map<String, Object>> completeTask(
+    public ResponseEntity<Object> completeTaskasd(
             HttpServletRequest req,
-            @PathVariable("id") String id,
             @RequestBody Map<String, Object> data) {
 
-        taskService.complete(id);
+        String taskId = (String) data.get("taskid");
+        String definitionId = (String) data.get("definitionId");
+        if ( isEmpty(taskId) && isEmpty(definitionId))
+            throw new IllegalArgumentException("Fornire almeno un taskId o un definitionId");
 
-        return new ResponseEntity<Map<String,Object>>(HttpStatus.OK);
+        if ( isNotEmpty(taskId) ) {
+            taskService.complete(taskId, data);
+            return new ResponseEntity<Object>(HttpStatus.OK);
+
+        } else {
+            String key = definitionId + "-" + System.currentTimeMillis();
+            ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
+            ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
+            return new ResponseEntity<Object>(response, HttpStatus.OK); // TODO verificare best practice
+        }
+
 
 //        CMISUser user = cmisService.getCMISUserFromSession(req);
 //        BindingSession session = cmisService.getCurrentBindingSession(req);

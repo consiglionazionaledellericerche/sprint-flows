@@ -22,7 +22,10 @@
           return $http.get('rest/tasks/mytasks');
         },
         myTasksAvailable : function() {
-          return $http.get('rest/tasks/mytasksavailable');
+          return $http.get('rest/tasks/availabletasks');
+        },
+        complete : function(data) {
+          return $http.post('rest/tasks/complete', data)
         }
       },
       definitions : {

@@ -8,7 +8,10 @@
   </div>
 
   <!-- /rest/processinstances/start/{processName} or start-hire-process -->
-  <form class="flows-form" name="taskForm">
+  <form novalidate class="flows-form" name="taskForm" ng-submit="submitTask()">
+    <input type="hidden" name="taskId" value="{{vm.data.taskId}}" />
+    <input type="hidden" name="definitionId" value="{{vm.data.definitionId}}" />
+
     <div class="row">
       <div class="col-md-6 col-md-offset-3">
         <ng-include src="vm.formUrl" ng-model="vm.data"/>
@@ -19,7 +22,7 @@
         <button class="btn btn-primary btn-block" type="reset">Reimposta</button>
       </div>
       <div class="col-md-2">
-        <button class="btn btn-primary btn-block" type="submit" ng-click="submitTask()">Avvia Flusso</button>
+        <button class="btn btn-primary btn-block" type="submit" ng-disabled="taskForm.$invalid">Avvia Flusso</button>
       </div>
     </div>
   </form>
