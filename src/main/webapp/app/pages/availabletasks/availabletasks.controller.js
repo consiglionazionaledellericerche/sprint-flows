@@ -3,7 +3,7 @@
 
   angular
   .module('sprintApp')
-  .controller('MainController', HomeController);
+  .controller('AvailableTasksController', HomeController);
 
   HomeController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', '$log'];
 
@@ -29,7 +29,7 @@
     function register () {
       $state.go('register');
     }
-    
+
     dataService.tasks.myTasksAvailable()
     .then(function (response) {
         vm.pooledTask = response.data.total;

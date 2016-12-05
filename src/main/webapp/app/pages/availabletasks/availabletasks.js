@@ -8,22 +8,22 @@
     stateConfig.$inject = ['$stateProvider'];
 
     function stateConfig($stateProvider) {
-        $stateProvider.state('main', {
+        $stateProvider.state('availabletasks', {
             parent: 'app',
-            url: '/main',
+            url: '/availabletasks',
             data: {
                 authorities: ['ROLE_USER']
             },
             views: {
                 'content@': {
-                    templateUrl: 'app/pages/main/main.html',
-                    controller: 'MainController',
+                    templateUrl: 'app/pages/availabletasks/availabletasks.html',
+                    controller: 'AvailableTasksController',
                     controllerAs: 'vm'
                 }
             },
             resolve: {
                 mainTranslatePartialLoader: ['$translate', '$translatePartialLoader', function ($translate,$translatePartialLoader) {
-                    $translatePartialLoader.addPart('main');
+                    $translatePartialLoader.addPart('availabletasks');
                     return $translate.refresh();
                 }]
             }
