@@ -10,18 +10,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
-import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.rest.service.api.RestResponseFactory;
-import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -230,27 +226,27 @@ public class InstanceResource {
         //        }
     }
 
-    @RequestMapping(value = "start/{id}",
-            method = RequestMethod.POST,
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
-    public ResponseEntity<Object> startWorkflowByProcessName(HttpServletRequest req,
-            @PathVariable("id") String processId,
-            @RequestBody Map<String, Object> data) {
-
-        LOGGER.info(data.toString());
-        try {
-            validateData(data);
-            String key = "";
-            ProcessInstance instance = runtimeService.startProcessInstanceById(processId, key, data);
-            ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
-            return new ResponseEntity<Object>(response, HttpStatus.OK); // TODO verificare best practice
-        } catch (Exception e) { // TODO specifi Exception
-            LOGGER.error(e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-    }
+//    @RequestMapping(value = "start/{id}",
+//            method = RequestMethod.POST,
+//            consumes = MediaType.APPLICATION_JSON_VALUE,
+//            produces = MediaType.APPLICATION_JSON_VALUE)
+//    @Timed
+//    public ResponseEntity<Object> startWorkflowByProcessName(HttpServletRequest req,
+//            @PathVariable("id") String processId,
+//            @RequestBody Map<String, Object> data) {
+//
+//        LOGGER.info(data.toString());
+//        try {
+//            validateData(data);
+//            String key = "";
+//            ProcessInstance instance = runtimeService.startProcessInstanceById(processId, key, data);
+//            ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
+//            return new ResponseEntity<Object>(response, HttpStatus.OK); // TODO verificare best practice
+//        } catch (Exception e) { // TODO specifi Exception
+//            LOGGER.error(e.getMessage(), e);
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+//        }
+//    }
 
 
     private void validateData(Map<String, Object> data) {
