@@ -87,7 +87,9 @@ public class FlowsTaskResource {
         String username = SecurityUtils.getCurrentUserLogin();
 
         List<Task> list = taskService.createTaskQuery()
-            .taskAssignee(username).list();
+            .taskAssignee(username)
+            .includeProcessVariables()
+            .list();
 
         DataResponse response = new DataResponse();
         response.setStart(0);
@@ -107,7 +109,9 @@ public class FlowsTaskResource {
         String username = SecurityUtils.getCurrentUserLogin();
 
         List<Task> listraw = taskService.createTaskQuery()
-            .taskCandidateUser(username).list();
+            .taskCandidateUser(username)
+            .includeProcessVariables()
+            .list();
 
         List<TaskResponse> list = restResponseFactory.createTaskResponseList(listraw);
 
@@ -315,7 +319,7 @@ public class FlowsTaskResource {
 
     @RequestMapping(value = "complete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Object> completeTaskasd(
+    public ResponseEntity<Object> completeTask(
             HttpServletRequest req,
             @RequestBody Map<String, Object> data) {
 
@@ -330,6 +334,8 @@ public class FlowsTaskResource {
 
         } else {
             String key = definitionId + "-" + System.currentTimeMillis();
+            data.put("title", key);
+            data.put("pippo", "pluto");
             ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
             ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
             return new ResponseEntity<Object>(response, HttpStatus.OK); // TODO verificare best practice
