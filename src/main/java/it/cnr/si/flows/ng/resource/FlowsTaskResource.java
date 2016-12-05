@@ -6,6 +6,7 @@ import static it.cnr.si.flows.ng.utils.Utils.isNotEmpty;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -323,6 +324,8 @@ public class FlowsTaskResource {
             HttpServletRequest req,
             @RequestBody Map<String, Object> data) {
 
+        String username = SecurityUtils.getCurrentUserLogin();
+
         String taskId = (String) data.get("taskid");
         String definitionId = (String) data.get("definitionId");
         if ( isEmpty(taskId) && isEmpty(definitionId))
@@ -333,9 +336,11 @@ public class FlowsTaskResource {
             return new ResponseEntity<Object>(HttpStatus.OK);
 
         } else {
-            String key = definitionId + "-" + System.currentTimeMillis();
+            String key = definitionId + "-" + "-2016-1-"+ System.currentTimeMillis();
             data.put("title", key);
             data.put("pippo", "pluto");
+            data.put("initiator", username);
+            data.put("startDate", new Date());
             ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
             ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
             return new ResponseEntity<Object>(response, HttpStatus.OK); // TODO verificare best practice
