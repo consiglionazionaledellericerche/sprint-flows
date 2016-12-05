@@ -21,7 +21,7 @@ module.exports = {
     images: images
 }
 
-var yorc = require('../.yo-rc.json')['generator-jhipster'];
+//var yorc = require('../.yo-rc.json')['generator-jhipster'];
 
 function i18n() {
     return gulp.src(config.app + 'i18n/**')
@@ -31,9 +31,10 @@ function i18n() {
 }
 
 function languages() {
-    var locales = yorc.languages.map(function (locale) {
-        return config.bower + 'angular-i18n/angular-locale_' + locale + '.js';
-    });
+//    var locales = yorc.languages.map(function (locale) {
+//        return config.bower + 'angular-i18n/angular-locale_' + locale + '.js';
+//    });
+    var locales = [config.bower + 'angular-i18n/angular-locale_' + 'it_IT' + '.js'];
     return gulp.src(locales)
         .pipe(plumber({errorHandler: handleErrors}))
         .pipe(changed(config.app + 'i18n/'))
