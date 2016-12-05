@@ -1,0 +1,27 @@
+<div class="row vertical-align-center" ng-class="{'row-slim': !advanced}" ng-repeat="task in tasks">
+  <div class="col-md-9">
+    <h5 ng-hide="metadataFields">
+      <a class="pointer" ng-click="filterProcess(task.processDefinitionId)" title="filtra per il flusso {{task.description}}">{{task.description}}</a>
+    </h5>
+    <a ng-show="completed" ui-sref="task({processDefinition: task.processDefinitionId, taskName: task.usertask1})"> <strong>{{task.message}} ({{task.title}})</strong>
+    </a> <strong ng-hide="completed">{{task.id}}: {{task.processDefinitionId}} - {{task.name}} {{task.variabili.title}}</strong> <span ng-bind-html="task.priority | priority"></span> <span ng-show="completed" ng-class="{'label-warning': task.isActive, 'label-success': !task.isActive}" class="label">{{task.isActive ? 'attivo' : 'completato'}}</span> <b ng-show="advanced">task.variable.wfcnr_wfCounterId: {{task.variable.wfcnr_wfCounterId}}</b> <br>
+    <div ng-hide="completed">
+      avviato da {{task.variabili.initiator}} il {{task.variabili.startDate | date}} <span ng-bind-html="task.endDate | dueDate"></span>
+    </div>
+    <div ng-show="completed">assegnato il {{task.startDate | date}}, completato il {{task.endDate | date}}</div>
+    <metadata-fields metadata-fields="metadataFields" workflow-variable="task.variable" label-class="'font-italic'"></metadata-fields>
+  </div>
+
+  <div class="col-md-3 pull-right" ng-show="!completed">
+    <div class="btn-group-vertical btn-block" role="group" aria-label="...">
+      <a class="btn btn-primary" ng-class="{'btn-xs': !advanced}" ng-href="#/task/{{task.id}}"> <span class="glyphicon glyphicon-cog"></span> azioni
+      </a> <a class="btn btn-default" ng-class="{'btn-xs': !advanced}" ng-if="task.globalVariable.wfvarPooledTask && task.assignee" ng-click="takeTask(task.id)"> <span class="glyphicon glyphicon-hand-down" aria-hidden="true"></span> restituisci al gruppo
+      </a> <a class="btn btn-default" ng-class="{'btn-xs': !advanced}" ng-if="task.globalVariable.wfvarPooledTask && !task.assignee" ng-click="takeTask(task.id, true)"> <span class="glyphicon glyphicon-hand-up" aria-hidden="true"></span> prendi in carico
+      </a>
+    </div>
+  </div>
+</div>
+  <pre>{{tasks | json}}</pre>
+<div class="loading-spiner-holder" style="text-align: center" data-loading>
+  <div class="loading-spiner spinner-loader"></div>
+</div>

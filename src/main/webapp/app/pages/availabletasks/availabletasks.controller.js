@@ -3,45 +3,23 @@
 
   angular
   .module('sprintApp')
-  .controller('AvailableTasksController', HomeController);
+  .controller('AvailableTasksController', AvalableTasksController);
 
-  HomeController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', '$log'];
+  AvalableTasksController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', '$log'];
 
-  function HomeController ($scope, Principal, LoginService, $state, dataService, $log) {
+  function AvalableTasksController ($scope, Principal, LoginService, $state, dataService, $log) {
     var vm = this;
-
-    vm.account = null;
-    vm.isAuthenticated = null;
-    vm.login = LoginService.open;
-    vm.register = register;
-    $scope.$on('authenticationSuccess', function() {
-      getAccount();
-    });
-
-    getAccount();
-
-    function getAccount() {
-      Principal.identity().then(function(account) {
-        vm.account = account;
-        vm.isAuthenticated = Principal.isAuthenticated;
-      });
-    }
-    function register () {
-      $state.go('register');
-    }
 
     dataService.tasks.myTasksAvailable()
     .then(function (response) {
-        vm.pooledTask = response.data.total;
+        vm.pooledTasks = response.data;
       }, function (response) {
         $log.error(response);
       });
 
     dataService.tasks.myTasks()
     .then(function (response) {
-        vm.summary = {
-            'total' : response.data.total
-        };
+        vm.myTasks = response.data
       }, function (response) {
         $log.error(response);
       });
