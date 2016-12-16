@@ -340,3 +340,13 @@ ui bootstrap tweaks
 input.ng-dirty.ng-invalid {
   border: solid 1px red;
 }
+
+.tasks .row {
+    border-bottom: 1px solid #f8f8f8;
+    box-shadow: 0 10px 35px -23px rgba(0, 0, 0, 0.35);
+    padding-bottom: 20px;
+    padding-top: 20px;
+}
+.tasks .row-slim {
+  padding-bottom: 0;
+}

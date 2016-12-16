@@ -14,9 +14,9 @@
 
   <div class="col-md-3 pull-right" ng-show="!completed">
     <div class="btn-group-vertical btn-block" role="group" aria-label="...">
-      <a class="btn btn-primary" ng-class="{'btn-xs': !advanced}" ng-href="#/task/{{task.id}}"> <span class="glyphicon glyphicon-cog"></span> azioni
-      </a> <a class="btn btn-default" ng-class="{'btn-xs': !advanced}" ng-if="task.globalVariable.wfvarPooledTask && task.assignee" ng-click="takeTask(task.id)"> <span class="glyphicon glyphicon-hand-down" aria-hidden="true"></span> restituisci al gruppo
-      </a> <a class="btn btn-default" ng-class="{'btn-xs': !advanced}" ng-if="task.globalVariable.wfvarPooledTask && !task.assignee" ng-click="takeTask(task.id, true)"> <span class="glyphicon glyphicon-hand-up" aria-hidden="true"></span> prendi in carico
+      <a class="btn btn-primary" ng-class="{'btn-xs': !advanced}" ng-href="#/task/{{task.id}}"> <span class="glyphicon glyphicon-cog"></span> azioni</a>
+      <a class="btn btn-default" ng-class="{'btn-xs': !advanced}" ng-if="task.assignee" ng-click="takeTask(task.id)"> <span class="glyphicon glyphicon-hand-down" aria-hidden="true"></span> restituisci al gruppo</a>
+      <a class="btn btn-default" ng-class="{'btn-xs': !advanced}" ng-if="!task.assignee" ng-click="takeTask(task.id, true)"> <span class="glyphicon glyphicon-hand-up" aria-hidden="true"></span> prendi in carico
       </a>
     </div>
   </div>
