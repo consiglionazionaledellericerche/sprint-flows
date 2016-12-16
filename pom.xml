@@ -42,6 +42,8 @@
         <sonar-maven-plugin.version>3.0.2</sonar-maven-plugin.version>
         <sortpom-maven-plugin.version>2.5.0</sortpom-maven-plugin.version>
         <spring-boot.version>1.4.0.RELEASE</spring-boot.version>
+        <spring.version>4.3.2.RELEASE</spring.version>
+        <spring.security.version>4.1.1.RELEASE</spring.security.version>
         <sprint.version>2.0.1</sprint.version>
         <start-class>it.cnr.si.SprintApp</start-class>
     </properties>
@@ -56,63 +58,53 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
-                <version>4.3.2.RELEASE</version>
+                <version>${spring.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
-                <version>4.3.2.RELEASE</version>
+                <version>${spring.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-tx</artifactId>
-                <version>4.3.2.RELEASE</version>
+                <version>${spring.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-web</artifactId>
-                <version>4.3.2.RELEASE</version>
+                <version>${spring.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-webmvc</artifactId>
-                <version>4.3.2.RELEASE</version>
+                <version>${spring.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-config</artifactId>
-                <version>4.1.1.RELEASE</version>
+                <version>${spring.security.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-core</artifactId>
-                <version>4.1.1.RELEASE</version>
+                <version>${spring.security.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-data</artifactId>
-                <version>4.1.1.RELEASE</version>
+                <version>${spring.security.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-ldap</artifactId>
-                <version>4.1.1.RELEASE</version>
+                <version>${spring.security.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.security</groupId>
                 <artifactId>spring-security-web</artifactId>
-                <version>4.1.1.RELEASE</version>
+                <version>${spring.security.version}</version>
             </dependency>
-            <!-- <dependency> -->
-            <!-- <groupId>com.fasterxml.jackson.core</groupId> -->
-            <!-- <artifactId>jackson-databind</artifactId> -->
-            <!-- <version>2.8.1</version> -->
-            <!-- </dependency> -->
-            <!-- <dependency> -->
-            <!-- <groupId>com.fasterxml.jackson.core</groupId> -->
-            <!-- <artifactId>jackson-core</artifactId> -->
-            <!-- <version>2.8.1</version> -->
-            <!-- </dependency> -->
         </dependencies>
     </dependencyManagement>
 
@@ -173,6 +165,13 @@
             </exclusions>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>${spring-boot.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -219,8 +218,8 @@
                         </lifecycleMappingMetadata>
                     </configuration>
                 </plugin>
-                <!-- This plugin's configuration is used to store Eclipse m2e settings 
-          only. It has no influence on the Maven build itself. Remove when the m2e 
+                <!-- This plugin's configuration is used to store Eclipse m2e settings
+          only. It has no influence on the Maven build itself. Remove when the m2e
           plugin can correctly bind to Maven lifecycle -->
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
@@ -290,7 +289,7 @@
                     <resultsFolder>target/gatling/results</resultsFolder>
                     <bodiesFolder>src/test/gatling/bodies</bodiesFolder>
                     <simulationsFolder>src/test/gatling/simulations</simulationsFolder>
-                    <!-- This will force Gatling to ask which simulation to run This 
+                    <!-- This will force Gatling to ask which simulation to run This
             is useful when you have multiple simulations -->
                     <simulationClass>*</simulationClass>
                 </configuration>
@@ -421,15 +420,15 @@
                             <goal>prepare-agent</goal>
                         </goals>
                         <configuration>
-                            <!-- Sets the path to the file which contains the execution 
+                            <!-- Sets the path to the file which contains the execution
                 data. -->
                             <destFile>${project.testresult.directory}/coverage/jacoco/jacoco.exec</destFile>
-                            <!-- Sets the name of the property containing the settings 
+                            <!-- Sets the name of the property containing the settings
                 for JaCoCo runtime agent. -->
                             <propertyName>surefireArgLine</propertyName>
                         </configuration>
                     </execution>
-                    <!-- Ensures that the code coverage report for unit tests is created 
+                    <!-- Ensures that the code coverage report for unit tests is created
             after unit tests have been run -->
                     <execution>
                         <id>post-unit-test</id>
@@ -491,7 +490,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <executable>true</executable>
-                    <!-- Enable the line below to have remote debugging of your application 
+                    <!-- Enable the line below to have remote debugging of your application
             on port 5005 <jvmArguments>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005</jvmArguments> -->
                 </configuration>
             </plugin>

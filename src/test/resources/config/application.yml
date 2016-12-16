@@ -82,3 +82,7 @@ jhipster:
         contactEmail:
         license:
         licenseUrl:
+
+ajp.port: 8009
+ajp.timeout: 120000
+cache.hazelcast.packages:
