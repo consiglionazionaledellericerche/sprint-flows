@@ -15,7 +15,6 @@
         paging: '=',
         advanced: '=',
         detailed: '=',
-        refreshProgessBar: '=',
         selectProcessDefinitionKey: '=',
         processDefinitions: '='
       },
@@ -26,6 +25,8 @@
 
         scope.pooled = [];
 
+        // trucco per dare il nome alle variabili nella mappa
+        // invece di un array di mappe
         scope.$watch('tasks', function() {
           if (scope.tasks !== undefined) {
             scope.tasks.forEach(function(task) {
@@ -36,38 +37,16 @@
             });
           }
         })
-//        scope.claimTask = function (id, take) {
-//          var user;
-//          if (take === true) {
-//            dataService.processinstances.claimTask(id).success(function (data) {
-//              $log.debug(data);
-//              scope.pooled[id] = user !== undefined;
-//              scope.refreshProgessBar = !scope.refreshProgessBar;
-//            });
-//          } else {
-//            dataService.processinstances.unclaimTask(id).success(function (data) {
-//              $log.debug(data);
-//              scope.pooled[id] = user !== undefined;
-//              scope.refreshProgessBar = !scope.refreshProgessBar;
-//            });
-//          }
-//        };
-//
-//        scope.modalTaskDiagram = function (task) {
-//          var url = dataService.urls.proxy + 'service/api/workflow-instances/' + task.processId + '/diagram';
-//          modalService.simpleModal(task.description, url);
-//        };
 
-//        scope.filterProcess = function (processDefinitionId) {
-//          var selectProcessDefinitionKey;
-//          _.each(scope.processDefinitions, function (value, key) {
-//            if (value.entry.key === processDefinitionId.substr(0, processDefinitionId.indexOf(':'))) {
-//              selectProcessDefinitionKey = value;
-//              return false;
-//            }
-//          });
-//          scope.selectProcessDefinitionKey = selectProcessDefinitionKey;
-//        };
+        scope.claimTask = function (id, take) {
+          var user;
+          var promise;
+          dataService.tasks.claim(id, take).success(function (data) {
+            $log.debug(data);
+            scope.pooled[id] = user !== undefined;
+            scope.$parent.loadTasks();
+          });
+        };
       }
     };
 

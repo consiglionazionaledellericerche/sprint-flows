@@ -25,8 +25,14 @@
           return $http.get('rest/tasks/availabletasks');
         },
         complete : function(data) {
-          return $http.post('rest/tasks/complete', data)
-        }
+          return $http.post('rest/tasks/complete', data);
+        },
+        claim: function (id, take) {
+          return $http({
+            url: 'rest/tasks/claim/'+ id,
+            method: take ? 'PUT' : 'DELETE'
+          });
+        },
       },
       definitions : {
         all : function() {

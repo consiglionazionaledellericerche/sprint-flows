@@ -87,16 +87,18 @@ public class FlowsTaskResource {
 
         String username = SecurityUtils.getCurrentUserLogin();
 
-        List<Task> list = taskService.createTaskQuery()
+        List<Task> listraw = taskService.createTaskQuery()
             .taskAssignee(username)
             .includeProcessVariables()
             .list();
+
+        List<TaskResponse> list = restResponseFactory.createTaskResponseList(listraw);
 
         DataResponse response = new DataResponse();
         response.setStart(0);
         response.setSize(list.size());
         response.setTotal(list.size());
-        response.setData(list.subList(0, list.size()));
+        response.setData(list);
 
         return ResponseEntity.ok(response);
     }
@@ -175,76 +177,37 @@ public class FlowsTaskResource {
     }
 
     /**
-     * Questo metodo serve per assegnare un taskInstance a un'utente o rilasciare il task al pool
-     *
-     * TODO Considerare la possibilità di modificare nome e signature Map-data in String-username
-     *
      * @param req
      * @param id
      * @param params
      * @return
      */
-    // TODO rifattorizzare, il parametro data è confusionario
     @RequestMapping(value = "/claim/{id}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<Map<String, Object>> claimTask(
             HttpServletRequest req,
             @PathVariable("id") String id) {
 
-        return null;
-//        CMISUser user = cmisService.getCMISUserFromSession(req);
-//        BindingSession session = cmisService.getCurrentBindingSession(req);
-//        String cm_owner = user.getUserName();
-//        long taskId = Utils.extractId(id);
-//
-//        LOGGER.info("Setting owner of task "+ id +" to "+ cm_owner);
-//
-//        try {
-//            Map<String, Object> taskInstance = flowsTaskService.claimTask(user, session, taskId);
-//
-//            return new ResponseEntity<Map<String,Object>>(taskInstance, HttpStatus.OK);
-//        } catch (IOException e) {
-//            Map<String, Object> response = new HashMap<>();
-//            response.put("error", e.getMessage());
-//            return new ResponseEntity<Map<String,Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
+        String username = SecurityUtils.getCurrentUserLogin();
+        LOGGER.info("Setting owner of task "+ id +" to "+ username);
+
+        boolean canClaim = true; // TODO
+        if (canClaim) {
+            taskService.claim(id, username);
+        }
+
+        return new ResponseEntity<Map<String,Object>>(HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/unclaim/{id}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/claim/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<Map<String, Object>> unclaimTask(
             HttpServletRequest req,
             @PathVariable("id") String id) {
 
-        return null;
-//        CMISUser user = cmisService.getCMISUserFromSession(req);
-//        BindingSession session = cmisService.getCurrentBindingSession(req);
-//        long taskId = Utils.extractId(id);
-//
-//        LOGGER.info("Unsetting owner of task "+ id);
-//
-//        try {
-//            Map<String, Object> task = flowsTaskService.getTask(user, session, taskId, true);
-//            Map<String, Object> data = (Map<String, Object>) task.get("data");
-//            Map<String, Object> owner = (Map<String, Object>) data.get("owner");
-//            String ownerName = (String) owner.get("userName");
-//
-//            if( !user.getUserName().equals(ownerName) ) {
-//                throw new PermissionException("L'utente può solo rinunciare a un task di cui è owner. Utente che ha fatto la richiesta: "+ user.getUserName() +", owner: "+ ownerName);
-//            }
-//
-//            Map<String, Object> taskInstance = flowsTaskService.unclaimTask(user, session, taskId);
-//
-//            return new ResponseEntity<Map<String,Object>>(taskInstance, HttpStatus.OK);
-//
-//        } catch (PermissionException e) {
-//            LOGGER.error(e.getMessage(), e);
-//            return new ResponseEntity<Map<String,Object>>(HttpStatus.FORBIDDEN);
-//        } catch (IOException e) {
-//            Map<String, Object> response = new HashMap<>();
-//            response.put("error", e.getMessage());
-//            return new ResponseEntity<Map<String,Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
+        taskService.unclaim(id);
+        return new ResponseEntity<Map<String,Object>>(HttpStatus.OK);
+
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
