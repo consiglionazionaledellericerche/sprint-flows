@@ -5,9 +5,9 @@
   .module('sprintApp')
   .controller('TaskController', HomeController);
 
-  HomeController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', '$log'];
+  HomeController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log'];
 
-  function HomeController ($scope, Principal, LoginService, $state, dataService, $log) {
+  function HomeController ($scope, Principal, LoginService, $state, dataService, AlertService, $log) {
     var vm = this;
     vm.data = {};
     vm.data.taskId = $state.params.taskId;
@@ -27,9 +27,20 @@
     );
 
     $scope.submitTask = function() {
+
       $log.info(vm);
       if (validate(vm.data)) {
-        dataService.tasks.complete(vm.data);
+        dataService.tasks.complete(vm.data)
+          .then(
+            function(data) {
+              $log.info(data);
+              AlertService.success("Task creato con successo");
+              $state.go('availabletasks');
+            },
+            function(err) {
+              $log.error(data);
+              AlertService.error("Creazione task non riuscita");
+            });
       }
     }
 
