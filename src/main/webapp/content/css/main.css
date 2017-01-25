@@ -227,6 +227,7 @@ Custom alerts for notification
 .alerts .toast {
     position: fixed;
     width: 100%;
+    z-index: 999;
 }
 
 .alerts .toast.left {
@@ -247,7 +248,7 @@ Custom alerts for notification
 
 @media screen and (min-width: 480px) {
     .alerts .toast {
-        width: 50%;
+        width: 500px;
     }
 }
 
