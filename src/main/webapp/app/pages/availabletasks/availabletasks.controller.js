@@ -10,19 +10,23 @@
   function AvalableTasksController ($scope, Principal, LoginService, $state, dataService, $log) {
     var vm = this;
 
-    dataService.tasks.myTasksAvailable()
-    .then(function (response) {
-        vm.pooledTasks = response.data;
-      }, function (response) {
-        $log.error(response);
-      });
+    $scope.loadTasks = function() {
+      dataService.tasks.myTasksAvailable()
+      .then(function (response) {
+          vm.pooledTasks = response.data;
+        }, function (response) {
+          $log.error(response);
+        });
+      dataService.tasks.myTasks()
+      .then(function (response) {
+          vm.myTasks = response.data
+        }, function (response) {
+          $log.error(response);
+        });
+    }
 
-    dataService.tasks.myTasks()
-    .then(function (response) {
-        vm.myTasks = response.data
-      }, function (response) {
-        $log.error(response);
-      });
-
+    $scope.loadTasks();
   }
+
+
 })();
