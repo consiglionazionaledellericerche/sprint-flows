@@ -27,55 +27,55 @@ import java.util.Optional;
 public class CounterResource {
 
     private final Logger log = LoggerFactory.getLogger(CounterResource.class);
-        
+
     @Inject
     private CounterRepository counterRepository;
 
-    /**
-     * POST  /counters : Create a new counter.
-     *
-     * @param counter the counter to create
-     * @return the ResponseEntity with status 201 (Created) and with body the new counter, or with status 400 (Bad Request) if the counter has already an ID
-     * @throws URISyntaxException if the Location URI syntax is incorrect
-     */
-    @RequestMapping(value = "/counters",
-        method = RequestMethod.POST,
-        produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
-    public ResponseEntity<Counter> createCounter(@RequestBody Counter counter) throws URISyntaxException {
-        log.debug("REST request to save Counter : {}", counter);
-        if (counter.getId() != null) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("counter", "idexists", "A new counter cannot already have an ID")).body(null);
-        }
-        Counter result = counterRepository.save(counter);
-        return ResponseEntity.created(new URI("/api/counters/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert("counter", result.getId().toString()))
-            .body(result);
-    }
+//    /**
+//     * POST  /counters : Create a new counter.
+//     *
+//     * @param counter the counter to create
+//     * @return the ResponseEntity with status 201 (Created) and with body the new counter, or with status 400 (Bad Request) if the counter has already an ID
+//     * @throws URISyntaxException if the Location URI syntax is incorrect
+//     */
+//    @RequestMapping(value = "/counters",
+//        method = RequestMethod.POST,
+//        produces = MediaType.APPLICATION_JSON_VALUE)
+//    @Timed
+//    public ResponseEntity<Counter> createCounter(@RequestBody Counter counter) throws URISyntaxException {
+//        log.debug("REST request to save Counter : {}", counter);
+//        if (counter.getId() != null) {
+//            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("counter", "idexists", "A new counter cannot already have an ID")).body(null);
+//        }
+//        Counter result = counterRepository.save(counter);
+//        return ResponseEntity.created(new URI("/api/counters/" + result.getId()))
+//            .headers(HeaderUtil.createEntityCreationAlert("counter", result.getId().toString()))
+//            .body(result);
+//    }
 
-    /**
-     * PUT  /counters : Updates an existing counter.
-     *
-     * @param counter the counter to update
-     * @return the ResponseEntity with status 200 (OK) and with body the updated counter,
-     * or with status 400 (Bad Request) if the counter is not valid,
-     * or with status 500 (Internal Server Error) if the counter couldnt be updated
-     * @throws URISyntaxException if the Location URI syntax is incorrect
-     */
-    @RequestMapping(value = "/counters",
-        method = RequestMethod.PUT,
-        produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
-    public ResponseEntity<Counter> updateCounter(@RequestBody Counter counter) throws URISyntaxException {
-        log.debug("REST request to update Counter : {}", counter);
-        if (counter.getId() == null) {
-            return createCounter(counter);
-        }
-        Counter result = counterRepository.save(counter);
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert("counter", counter.getId().toString()))
-            .body(result);
-    }
+//    /**
+//     * PUT  /counters : Updates an existing counter.
+//     *
+//     * @param counter the counter to update
+//     * @return the ResponseEntity with status 200 (OK) and with body the updated counter,
+//     * or with status 400 (Bad Request) if the counter is not valid,
+//     * or with status 500 (Internal Server Error) if the counter couldnt be updated
+//     * @throws URISyntaxException if the Location URI syntax is incorrect
+//     */
+//    @RequestMapping(value = "/counters",
+//        method = RequestMethod.PUT,
+//        produces = MediaType.APPLICATION_JSON_VALUE)
+//    @Timed
+//    public ResponseEntity<Counter> updateCounter(@RequestBody Counter counter) throws URISyntaxException {
+//        log.debug("REST request to update Counter : {}", counter);
+//        if (counter.getId() == null) {
+//            return createCounter(counter);
+//        }
+//        Counter result = counterRepository.save(counter);
+//        return ResponseEntity.ok()
+//            .headers(HeaderUtil.createEntityUpdateAlert("counter", counter.getId().toString()))
+//            .body(result);
+//    }
 
     /**
      * GET  /counters : get all the counters.
@@ -112,20 +112,20 @@ public class CounterResource {
             .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    /**
-     * DELETE  /counters/:id : delete the "id" counter.
-     *
-     * @param id the id of the counter to delete
-     * @return the ResponseEntity with status 200 (OK)
-     */
-    @RequestMapping(value = "/counters/{id}",
-        method = RequestMethod.DELETE,
-        produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
-    public ResponseEntity<Void> deleteCounter(@PathVariable Long id) {
-        log.debug("REST request to delete Counter : {}", id);
-        counterRepository.delete(id);
-        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("counter", id.toString())).build();
-    }
+//    /**
+//     * DELETE  /counters/:id : delete the "id" counter.
+//     *
+//     * @param id the id of the counter to delete
+//     * @return the ResponseEntity with status 200 (OK)
+//     */
+//    @RequestMapping(value = "/counters/{id}",
+//        method = RequestMethod.DELETE,
+//        produces = MediaType.APPLICATION_JSON_VALUE)
+//    @Timed
+//    public ResponseEntity<Void> deleteCounter(@PathVariable Long id) {
+//        log.debug("REST request to delete Counter : {}", id);
+//        counterRepository.delete(id);
+//        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("counter", id.toString())).build();
+//    }
 
 }
