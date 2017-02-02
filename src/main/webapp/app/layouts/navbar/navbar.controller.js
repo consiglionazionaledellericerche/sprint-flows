@@ -2,12 +2,12 @@
     'use strict';
 
     angular
-        .module('sprintApp')
-        .controller('NavbarController', NavbarController);
+    .module('sprintApp')
+    .controller('NavbarController', NavbarController);
 
-    NavbarController.$inject = ['$state', 'Auth', 'Principal', 'ProfileService', 'LoginService', 'dataService', '$log'];
+    NavbarController.$inject = ['$scope', '$state', 'Auth', 'Principal', 'ProfileService', 'LoginService', 'dataService', '$log'];
 
-    function NavbarController ($state, Auth, Principal, ProfileService, LoginService, dataService, $log) {
+    function NavbarController ($scope, $state, Auth, Principal, ProfileService, LoginService, dataService, $log) {
         var vm = this;
 
         vm.isNavbarCollapsed = true;
@@ -33,6 +33,7 @@
             collapseNavbar();
             Auth.logout();
             $state.go('home');
+            vm.wfDefs = [];
         }
 
         function toggleNavbar() {
@@ -42,13 +43,23 @@
         function collapseNavbar() {
             vm.isNavbarCollapsed = true;
         }
-        
-        dataService.definitions.all().then(
-            function(response) {
-              vm.wfDefs = response.data.data;
+
+        function loadAvailableDefinitions() {
+            dataService.definitions.all()
+            .then(function(response) {
+                vm.wfDefs = response.data.data;
             }, function (response) {
-              $log.error(response);
-            }
-        );
+                $log.error(response);
+            });
+        }
+
+        loadAvailableDefinitions();
+        $scope.$on('authenticationSuccess', function(event, args) {
+            $log.info(event);
+            $log.info(args);
+            loadAvailableDefinitions();
+        });
+
+
     }
 })();
