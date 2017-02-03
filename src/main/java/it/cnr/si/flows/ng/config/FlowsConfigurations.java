@@ -1,5 +1,7 @@
 package it.cnr.si.flows.ng.config;
 
+import java.util.ArrayList;
+
 import javax.annotation.PostConstruct;
 
 import org.activiti.engine.FormService;
@@ -11,11 +13,13 @@ import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.delegate.event.ActivitiEventListener;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.repository.DeploymentBuilder;
 import org.activiti.rest.common.application.ContentTypeResolver;
 import org.activiti.rest.service.api.RestResponseFactory;
+import org.activiti.rest.service.api.identity.UserResource;
 import org.activiti.spring.ProcessEngineFactoryBean;
 import org.activiti.spring.SpringProcessEngineConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +32,14 @@ import org.springframework.transaction.PlatformTransactionManager;
 import com.zaxxer.hikari.HikariDataSource;
 
 
+
 @Configuration
-@ComponentScan(basePackages = {"org.activiti.rest",}, 
-//    excludeFilters = {@ComponentScan.Filter(
-//        type = FilterType.ASSIGNABLE_TYPE,
-//        value = {UserResource.class}  
-//        )}
-//    ,
+@ComponentScan
+(basePackages = {"org.activiti.rest"},// ci assicuriamo che activiti rest non carichi le sue classi (in conflitto)
+    excludeFilters = {@ComponentScan.Filter(
+        type = FilterType.ASSIGNABLE_TYPE,
+        value = {UserResource.class}
+        )},
     includeFilters = {@ComponentScan.Filter(
         type = FilterType.ASSIGNABLE_TYPE,
         value = {RestResponseFactory.class, ContentTypeResolver.class}
@@ -43,10 +48,10 @@ import com.zaxxer.hikari.HikariDataSource;
     nameGenerator = ActivitiBeanNameGenerator.class)
 public class FlowsConfigurations {
 
-    
+
     @Autowired
     private PlatformTransactionManager transactionManager;
-    
+
     @Autowired
     private HikariDataSource dataSource;
 
@@ -56,9 +61,10 @@ public class FlowsConfigurations {
         conf.setDataSource(dataSource);
         conf.setTransactionManager(transactionManager);
         conf.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+        conf.setEventListeners(new ArrayList<ActivitiEventListener>() {{add(new ActivitiLoggingEventListener());}});
 
         conf.setHistoryLevel(HistoryLevel.FULL);
-        
+
         return conf;
     }
 
@@ -80,27 +86,27 @@ public class FlowsConfigurations {
     public RuntimeService getRuntimeService() throws Exception {
         return getProcessEngine().getRuntimeService();
     }
-    
+
     @Bean FormService getFormService() throws Exception {
         return getProcessEngine().getFormService();
     }
-    
+
     @Bean HistoryService getHistoryService() throws Exception {
         return getProcessEngine().getHistoryService();
     }
-    
+
     @Bean TaskService getTaskService() throws Exception {
         return getProcessEngine().getTaskService();
     }
-    
+
     @Bean IdentityService getIdentityService() throws Exception {
         return getProcessEngine().getIdentityService();
     }
-    
+
     @Bean ManagementService getManagementService() throws Exception {
         return getProcessEngine().getManagementService();
     }
-    
+
     @PostConstruct
     public void createDeployments() throws Exception {
         DeploymentBuilder builder = getRepositoryService().createDeployment();
