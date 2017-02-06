@@ -10,11 +10,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.activiti.engine.IdentityService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -41,9 +43,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 
+import it.cnr.si.config.ldap.CNRUser;
+import it.cnr.si.flows.ng.service.CounterService;
 import it.cnr.si.repository.UserRepository;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.SecurityUtils;
+import it.cnr.si.service.SecurityService;
 import it.cnr.si.service.UserService;
 
 
@@ -64,6 +69,11 @@ public class FlowsTaskResource {
     private UserRepository userRepository;
     @Inject
     private UserService userService;
+    @Inject
+    private CounterService counterService;
+    @Inject
+    private SecurityService securityService;
+
 
     @Autowired
     protected RestResponseFactory restResponseFactory;
@@ -72,6 +82,8 @@ public class FlowsTaskResource {
     private RepositoryService repositoryService;
     @Autowired
     private RuntimeService runtimeService;
+    @Autowired
+    private IdentityService identityService;
 
     @Autowired
     private TaskCollectionResource activitiTaskResource;
@@ -287,7 +299,11 @@ public class FlowsTaskResource {
             HttpServletRequest req,
             @RequestBody Map<String, Object> data) {
 
+        Optional<CNRUser> user = securityService.getUser();
+
         String username = SecurityUtils.getCurrentUserLogin();
+        SecurityUtils.isCurrentUserInRole("pippo");
+        identityService.setAuthenticatedUserId(username);
 
         String taskId = (String) data.get("taskid");
         String definitionId = (String) data.get("definitionId");
@@ -299,11 +315,12 @@ public class FlowsTaskResource {
             return new ResponseEntity<Object>(HttpStatus.OK);
 
         } else {
-            String key = definitionId + "-" + "-2016-1-"+ System.currentTimeMillis();
+            String key = definitionId +"-"+ counterService.getNext(definitionId) +"-"+System.currentTimeMillis();
             data.put("title", key);
             data.put("pippo", "pluto");
             data.put("initiator", username);
             data.put("startDate", new Date());
+
             ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
             ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
             return new ResponseEntity<Object>(response, HttpStatus.OK); // TODO verificare best practice
