@@ -38,7 +38,7 @@
                     </a>
                     <ul class="dropdown-menu" uib-dropdown-menu ng-repeat="wfDef in vm.wfDefs">
                       <li>
-                        <a ui-sref="task({processDefinition: wfDef.key, taskName: 'start'})" ng-click="vm.collapseNavbar()">
+                        <a ui-sref="task({processDefinitionId: wfDef.id, taskName: 'start'})" ng-click="vm.collapseNavbar()">
                           {{wfDef.name}}
                         </a>
                       </li>
@@ -56,6 +56,12 @@
                         </span>
                     </a>
                     <ul class="dropdown-menu" uib-dropdown-menu>
+                        <li ui-sref-active="active" >
+                            <a ui-sref="cnrauthority" ng-click="vm.collapseNavbar()">
+                                <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
+                                <span translate="global.menu.entities.cnrauthority">Cnrauthority</span>
+                            </a>
+                        </li>
                         <!-- jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here -->
                     </ul>
                 </li>
