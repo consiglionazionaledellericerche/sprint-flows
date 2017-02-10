@@ -33,6 +33,9 @@
             method: take ? 'PUT' : 'DELETE'
           });
         },
+        getTask: function (id) {
+            return $http.get('rest/tasks/'+ id);
+        }
       },
       definitions : {
         all : function() {

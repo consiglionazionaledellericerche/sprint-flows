@@ -10,21 +10,25 @@
   function HomeController ($scope, Principal, LoginService, $state, dataService, AlertService, $log) {
     var vm = this;
     vm.data = {};
-    vm.data.taskId = $state.params.taskId;
 
-    vm.formUrl = 'app/forms/'+ $state.params.processDefinition +'/'+ $state.params.taskName +'.html'
-    $scope.data = {};
+    $log.info($state.params.processDefinition);
 
-    dataService.definitions.get($state.params.processDefinition)
-    .then(
-        function(response) {
-          vm.definition = response.data;
-          vm.data.definitionId = vm.definition.id;
-        },
-        function(response) {
-          $log.error(response);
-        }
-    );
+    if ($state.params.taskId) {
+        $log.info("getting task ifno");
+
+        vm.data.taskId = $state.params.taskId;
+        dataService.tasks.getTask($state.params.taskId).then(
+                function(data) {
+                    vm.diagramUrl = '/runtime/process-instances/'+ data.data.processInstanceId +'/diagram';
+                    var processDefinitionKey = data.data.processDefinitionId.split(":")[0]
+                    vm.formUrl = 'app/forms/'+ processDefinitionKey +'/'+ data.data.taskDefinitionKey +'.html'
+                });
+    } else {
+        vm.data.definitionId = $state.params.processDefinitionId;
+        var processDefinitionKey = $state.params.processDefinitionId.split(":")[0];
+        vm.diagramUrl = "/rest/diagram/" + $state.params.processDefinitionId;
+        vm.formUrl = 'app/forms/'+ processDefinitionKey +'/'+ $state.params.taskName +'.html'
+    }
 
     $scope.submitTask = function() {
 
@@ -34,12 +38,12 @@
           .then(
             function(data) {
               $log.info(data);
-              AlertService.success("Task creato con successo");
+              AlertService.success("Richiesta completata con successo");
               $state.go('availabletasks');
             },
             function(err) {
               $log.error(data);
-              AlertService.error("Creazione task non riuscita");
+              AlertService.error("Richiesta non riuscita");
             });
       }
     }

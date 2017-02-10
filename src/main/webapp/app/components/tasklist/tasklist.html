@@ -38,7 +38,7 @@
     <div class="btn-group-vertical btn-block" role="group"
       aria-label="...">
       <a class="btn btn-primary" `ng-class="{'btn-xs': !advanced}"
-        ng-href="#/task/{{task.id}}"> <span
+        ui-sref="task({processDefinitionId: task.processDefinitionId,  taskId: task.id})"> <span
         class="glyphicon glyphicon-cog"></span> azioni
       </a> <a class="btn btn-default" ng-class="{'btn-xs': !advanced}"
         ng-if="task.assignee" ng-click="claimTask(task.id, false)">

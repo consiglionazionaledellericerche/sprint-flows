@@ -4,7 +4,7 @@
     <!-- intestazione -->
     <h3>{{vm.definition.name}}</h3>
     <p class="text-muted">{{vm.definition.description}}</p>
-    <img class="img-bordered" ng-src='/rest/diagram/{{vm.definition.id}}' title="{{vm.definition.name}}" style="max-width: 100%" />
+    <img class="img-bordered" ng-src='{{vm.diagramUrl}}' title="{{vm.definition.name}}" style="max-width: 100%" />
   </div>
 
   <!-- /rest/processinstances/start/{processName} or start-hire-process -->
@@ -22,7 +22,9 @@
         <button class="btn btn-primary btn-block" type="reset">Reimposta</button>
       </div>
       <div class="col-md-2">
-        <button class="btn btn-primary btn-block" type="submit" ng-disabled="taskForm.$invalid">Avvia Flusso</button>
+        <button class="btn btn-primary btn-block" type="submit" ng-disabled="taskForm.$invalid">
+          {{ vm.taskId ? "Avanti" : "Avvia Flusso"}}
+        </button>
       </div>
     </div>
   </form>
