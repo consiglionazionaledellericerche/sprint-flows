@@ -23,44 +23,44 @@ import it.cnr.si.security.AuthoritiesConstants;
 
 @RestController
 @RequestMapping("rest/processdefinitions")
-public class ProcessDefinitionResource {
+public class FlowsProcessDefinitionResource {
 
     @Autowired
     private RuntimeService runtimeService;
-    
+
     @Autowired
     private RepositoryService repositoryService;
-    
+
     @Autowired
     protected RestResponseFactory restResponseFactory;
-    
+
     @RequestMapping(value = "/all", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public Object getAllProcessDefinitions() {
-        
+
         List<ProcessDefinition> listraw = repositoryService.createProcessDefinitionQuery().latestVersion().list();
-        
+
         List<ProcessDefinitionResponse> list = restResponseFactory.createProcessDefinitionResponseList(listraw);
-        
+
         // Get result and set pagination parameters
         DataResponse response = new DataResponse();
         response.setStart(0);
-        response.setSize(list.size()); 
+        response.setSize(list.size());
         response.setTotal(list.size());
         response.setData(list);
         return response;
-        
-        
+
+
     }
-    
+
     @RequestMapping(value = "/{key}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity getProcessDefinitionById(@PathVariable String key) {
-        
+
         ProcessDefinition definitionraw = repositoryService.createProcessDefinitionQuery().processDefinitionKey(key).latestVersion().singleResult();
-        
+
         if (definitionraw != null) {
             ProcessDefinitionResponse definition = restResponseFactory.createProcessDefinitionResponse(definitionraw);
             return ResponseEntity.ok(definition);
@@ -68,5 +68,5 @@ public class ProcessDefinitionResource {
             return ResponseEntity.notFound().build();
         }
     }
-    
+
 }

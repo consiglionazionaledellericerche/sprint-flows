@@ -30,9 +30,9 @@ import it.cnr.si.service.UserService;
 
 @Controller
 @RequestMapping("rest/processinstances")
-public class InstanceResource {
+public class FlowsProcessInstanceResource {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(InstanceResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlowsProcessInstanceResource.class);
 
     @Inject
     private UserRepository userRepository;

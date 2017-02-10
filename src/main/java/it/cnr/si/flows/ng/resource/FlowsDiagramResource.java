@@ -14,7 +14,6 @@ import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.image.ProcessDiagramGenerator;
-import org.activiti.rest.service.api.runtime.task.TaskResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -27,8 +26,8 @@ import com.codahale.metrics.annotation.Timed;
 
 
 @Controller
-@RequestMapping("rest")
-public class DiagramResource {
+@RequestMapping("rest/flows")
+public class FlowsDiagramResource {
 
     @Autowired
     private RepositoryService repositoryService;
@@ -45,14 +44,13 @@ public class DiagramResource {
             HttpServletRequest request,
             HttpServletResponse response
             ) throws IOException {
-        
+
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
                 .processDefinitionId(id)
                 .singleResult();
 
         String diagramResourceName = processDefinition.getDiagramResourceName();
         InputStream resourceAsStream = repositoryService.getResourceAsStream(processDefinition.getDeploymentId(), processDefinition.getDiagramResourceName());
-
 
         response.setContentType(MediaType.IMAGE_PNG_VALUE);
         org.apache.commons.io.IOUtils.copy(resourceAsStream, response.getOutputStream());
@@ -99,8 +97,7 @@ public class DiagramResource {
 //        response.setContentType(MediaType.IMAGE_PNG_VALUE);
 //        org.apache.commons.io.IOUtils.copy(resourceAsStream, response.getOutputStream());
 
-        TaskResponse tr;
-        
+
         ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) repositoryService.createProcessDefinitionQuery()
                 .processDefinitionKey("permessiFerieProcess")
                 .latestVersion()
