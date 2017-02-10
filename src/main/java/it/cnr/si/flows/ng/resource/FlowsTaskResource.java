@@ -1,8 +1,5 @@
 package it.cnr.si.flows.ng.resource;
 
-import static it.cnr.si.flows.ng.utils.Utils.isEmpty;
-import static it.cnr.si.flows.ng.utils.Utils.isNotEmpty;
-
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -11,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -34,12 +32,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import static it.cnr.si.flows.ng.utils.Utils.*;
 
 import com.codahale.metrics.annotation.Timed;
 
@@ -79,14 +81,9 @@ public class FlowsTaskResource {
     protected RestResponseFactory restResponseFactory;
 
     @Autowired
-    private RepositoryService repositoryService;
-    @Autowired
     private RuntimeService runtimeService;
     @Autowired
     private IdentityService identityService;
-
-    @Autowired
-    private TaskCollectionResource activitiTaskResource;
 
     @Autowired
     private TaskService taskService;
@@ -122,9 +119,14 @@ public class FlowsTaskResource {
             @RequestParam Map<String, String> params) {
 
         String username = SecurityUtils.getCurrentUserLogin();
+        List<String> authorities =
+                SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
 
         List<Task> listraw = taskService.createTaskQuery()
             .taskCandidateUser(username)
+            .taskCandidateGroupIn(authorities)
             .includeProcessVariables()
             .list();
 
@@ -141,12 +143,17 @@ public class FlowsTaskResource {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Map<String, Object>> getTaskInstance(
+    public ResponseEntity<TaskResponse> getTaskInstance(
             HttpServletRequest req,
             @PathVariable("id") String id,
             @RequestParam Map<String, String> params) {
 
-        return null;
+        Task taskRaw = taskService.createTaskQuery().taskId(id).includeProcessVariables().singleResult();
+
+        TaskResponse task = restResponseFactory.createTaskResponse(taskRaw);
+
+
+        return ResponseEntity.ok(task);
 //      long taskId = extractId(id);
 //
 //        Task task = taskService.createTaskQuery().taskId(""+taskId).singleResult();
@@ -305,7 +312,7 @@ public class FlowsTaskResource {
         SecurityUtils.isCurrentUserInRole("pippo");
         identityService.setAuthenticatedUserId(username);
 
-        String taskId = (String) data.get("taskid");
+        String taskId = (String) data.get("taskId");
         String definitionId = (String) data.get("definitionId");
         if ( isEmpty(taskId) && isEmpty(definitionId))
             throw new IllegalArgumentException("Fornire almeno un taskId o un definitionId");
@@ -323,6 +330,10 @@ public class FlowsTaskResource {
 
             ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
             ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
+
+            runtimeService.getIdentityLinksForProcessInstance(instance.getId()).forEach(
+                    il -> LOGGER.info(il.toString()));
+
             return new ResponseEntity<Object>(response, HttpStatus.OK); // TODO verificare best practice
         }
 
