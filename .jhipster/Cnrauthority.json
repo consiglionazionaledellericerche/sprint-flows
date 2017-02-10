@@ -1,0 +1,33 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipName": "authority",
+            "otherEntityName": "authority",
+            "relationshipType": "one-to-one",
+            "relationshipValidateRules": [],
+            "otherEntityField": "id",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "cnrauthority"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "parentid",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "display_name",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "name",
+            "fieldType": "String"
+        }
+    ],
+    "changelogDate": "20170206085209",
+    "dto": "no",
+    "service": "serviceClass",
+    "entityTableName": "cnrauthority",
+    "pagination": "pagination"
+}

@@ -1,0 +1,25 @@
+{
+    "sprintApp": {
+        "cnrauthority" : {
+            "home": {
+                "title": "Cnrauthorities",
+                "createLabel": "Create a new Cnrauthority",
+                "createOrEditLabel": "Create or edit a Cnrauthority",
+                "search": "Search for Cnrauthority"
+            },
+            "created": "A new Cnrauthority is created with identifier {{ param }}",
+            "updated": "A Cnrauthority is updated with identifier {{ param }}",
+            "deleted": "A Cnrauthority is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Are you sure you want to delete Cnrauthority {{ id }}?"
+            },
+            "detail": {
+                "title": "Cnrauthority"
+            },
+            "parentid": "Parentid",
+            "display_name": "Display Name",
+            "name": "Name",
+            "authority": "Authority"
+        }
+    }
+}

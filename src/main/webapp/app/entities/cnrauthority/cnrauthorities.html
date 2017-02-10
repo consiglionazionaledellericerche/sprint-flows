@@ -1,0 +1,68 @@
+<div>
+    <h2 translate="sprintApp.cnrauthority.home.title">Cnrauthorities</h2>
+    <jhi-alert></jhi-alert>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-4 no-padding-left">
+                <button class="btn btn-primary" ui-sref="cnrauthority.new" >
+                    <span class="glyphicon glyphicon-plus"></span>
+                    <span  translate="sprintApp.cnrauthority.home.createLabel">
+                        Create new Cnrauthority
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <div class="table-responsive">
+        <table class="jh-table table table-striped">
+            <thead>
+                <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.transition()">
+                    <th jh-sort-by="id"><span translate="global.field.id">ID</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="parentid"><span translate="sprintApp.cnrauthority.parentid">Parentid</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="display_name"><span translate="sprintApp.cnrauthority.display_name">Display Name</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="name"><span translate="sprintApp.cnrauthority.name">Name</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="authority.id"><span translate="sprintApp.cnrauthority.authority">Authority</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="cnrauthority in vm.cnrauthorities track by cnrauthority.id">
+                    <td><a ui-sref="cnrauthority-detail({id:cnrauthority.id})">{{cnrauthority.id}}</a></td>
+                    <td>{{cnrauthority.parentid}}</td>
+                    <td>{{cnrauthority.display_name}}</td>
+                    <td>{{cnrauthority.name}}</td>
+                    <td>
+                        <a ui-sref="authority-detail({id:cnrauthority.authority.id})">{{cnrauthority.authority.id}}</a>
+                    </td>
+                    <td class="text-right">
+                        <div class="btn-group flex-btn-group-container">
+                            <button type="submit"
+                                    ui-sref="cnrauthority-detail({id:cnrauthority.id})"
+                                    class="btn btn-info btn-sm">
+                                <span class="glyphicon glyphicon-eye-open"></span>
+                                <span class="hidden-xs hidden-sm" translate="entity.action.view"></span>
+                            </button>
+                            <button type="submit"
+                                    ui-sref="cnrauthority.edit({id:cnrauthority.id})"
+                                    class="btn btn-primary btn-sm">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                                <span class="hidden-xs hidden-sm" translate="entity.action.edit"></span>
+                            </button>
+                            <button type="submit"
+                                    ui-sref="cnrauthority.delete({id:cnrauthority.id})"
+                                    class="btn btn-danger btn-sm">
+                                <span class="glyphicon glyphicon-remove-circle"></span>
+                                <span class="hidden-xs hidden-sm" translate="entity.action.delete"></span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="text-center">
+        <jhi-item-count page="vm.page" total="vm.queryCount" items-per-page="vm.itemsPerPage"></jhi-item-count>
+        <uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.page" ng-change="vm.transition()"></uib-pagination>
+    </div>
+</div>

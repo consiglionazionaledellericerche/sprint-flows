@@ -1,0 +1,35 @@
+
+<div>
+    <h2><span translate="sprintApp.cnrauthority.detail.title">Cnrauthority</span> {{vm.cnrauthority.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span translate="sprintApp.cnrauthority.parentid">Parentid</span></dt>
+        <dd>
+            <span>{{vm.cnrauthority.parentid}}</span>
+        </dd>
+        <dt><span translate="sprintApp.cnrauthority.display_name">Display Name</span></dt>
+        <dd>
+            <span>{{vm.cnrauthority.display_name}}</span>
+        </dd>
+        <dt><span translate="sprintApp.cnrauthority.name">Name</span></dt>
+        <dd>
+            <span>{{vm.cnrauthority.name}}</span>
+        </dd>
+        <dt><span translate="sprintApp.cnrauthority.authority">Authority</span></dt>
+        <dd>
+            <a ui-sref="authority-detail({id:vm.cnrauthority.authority.id})">{{vm.cnrauthority.authority.id}}</a>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            ui-sref="{{ vm.previousState }}"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span translate="entity.action.back"> Back</span>
+    </button>
+
+    <button type="button" ui-sref="cnrauthority-detail.edit({id:vm.cnrauthority.id})" class="btn btn-primary">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="hidden-xs hidden-sm" translate="entity.action.edit"> Edit</span>
+    </button>
+</div>
