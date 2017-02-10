@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -45,7 +46,7 @@
         <spring.version>4.3.2.RELEASE</spring.version>
         <spring.security.version>4.1.1.RELEASE</spring.security.version>
         <sprint.version>2.0.1</sprint.version>
-        <start-class>it.cnr.si.SprintApp</start-class>
+        <start-class>it.cnr.si.FlowsApp</start-class>
     </properties>
 
     <dependencyManagement>
@@ -120,50 +121,26 @@
             <version>${sprint.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.activiti</groupId>
-            <artifactId>activiti-rest</artifactId>
-            <version>5.21.0</version>
-            <exclusions>
-                <!-- <exclusion> -->
-                <!-- <groupId>com.fasterxml.jackson.core</groupId> -->
-                <!-- <artifactId>jackson-databind</artifactId> -->
-                <!-- </exclusion> -->
-                <!-- <exclusion> -->
-                <!-- <groupId>com.fasterxml.jackson.core</groupId> -->
-                <!-- <artifactId>jackson-annotations</artifactId> -->
-                <!-- </exclusion> -->
-                <!-- <exclusion> -->
-                <!-- <groupId>com.fasterxml.jackson.core</groupId> -->
-                <!-- <artifactId>jackson-core</artifactId> -->
-                <!-- </exclusion> -->
-                <exclusion>
-                    <artifactId>slf4j-log4j12</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.activiti/activiti-engine -->
-        <dependency>
-            <groupId>org.activiti</groupId>
-            <artifactId>activiti-spring</artifactId>
-            <version>5.21.0</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>jackson-databind</artifactId>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jackson-annotations</artifactId>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jackson-core</artifactId>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+
+<!-- https://mvnrepository.com/artifact/org.activiti/activiti-spring-boot-starter-basic -->
+<dependency>
+    <groupId>org.activiti</groupId>
+    <artifactId>activiti-spring-boot-starter-basic</artifactId>
+    <version>5.22.0</version>
+</dependency>
+<dependency>
+    <groupId>org.activiti</groupId>
+    <artifactId>activiti-spring-boot-starter-actuator</artifactId>
+    <version>5.22.0</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.activiti/activiti-spring-boot-starter-rest-api -->
+<dependency>
+    <groupId>org.activiti</groupId>
+    <artifactId>activiti-spring-boot-starter-rest-api</artifactId>
+    <version>5.22.0</version>
+</dependency>
+
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -171,7 +148,6 @@
             <version>${spring-boot.version}</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <build>
@@ -218,9 +194,9 @@
                         </lifecycleMappingMetadata>
                     </configuration>
                 </plugin>
-                <!-- This plugin's configuration is used to store Eclipse m2e settings
-          only. It has no influence on the Maven build itself. Remove when the m2e
-          plugin can correctly bind to Maven lifecycle -->
+                <!-- This plugin's configuration is used to store Eclipse
+                    m2e settings only. It has no influence on the Maven build itself. Remove
+                    when the m2e plugin can correctly bind to Maven lifecycle -->
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
@@ -289,8 +265,8 @@
                     <resultsFolder>target/gatling/results</resultsFolder>
                     <bodiesFolder>src/test/gatling/bodies</bodiesFolder>
                     <simulationsFolder>src/test/gatling/simulations</simulationsFolder>
-                    <!-- This will force Gatling to ask which simulation to run This
-            is useful when you have multiple simulations -->
+                    <!-- This will force Gatling to ask which simulation
+                        to run This is useful when you have multiple simulations -->
                     <simulationClass>*</simulationClass>
                 </configuration>
             </plugin>
@@ -317,13 +293,15 @@
                 <configuration>
                     <rules>
                         <requireMavenVersion>
-                            <message>You are running an older version of Maven.
-                JHipster requires at least Maven 3.0</message>
+                            <message>You are running an older version of
+                                Maven.
+                                JHipster requires at least Maven 3.0</message>
                             <version>[3.0.0,)</version>
                         </requireMavenVersion>
                         <requireJavaVersion>
-                            <message>You are running an older version of Java.
-                JHipster requires at least JDK ${java.version}</message>
+                            <message>You are running an older version of
+                                Java.
+                                JHipster requires at least JDK ${java.version}</message>
                             <version>[${java.version}.0,)</version>
                         </requireJavaVersion>
                     </rules>
@@ -372,9 +350,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>-Djava.security.egd=file:/dev/./urandom -Xmx256m
-            ${surefireArgLine}</argLine>
-                    <!-- Force alphabetical order to have a reproducible build -->
+                    <argLine>-Djava.security.egd=file:/dev/./urandom
+                        -Xmx256m
+                        ${surefireArgLine}</argLine>
+                    <!-- Force alphabetical order to have a reproducible
+                        build -->
                     <runOrder>alphabetical</runOrder>
                 </configuration>
             </plugin>
@@ -420,16 +400,16 @@
                             <goal>prepare-agent</goal>
                         </goals>
                         <configuration>
-                            <!-- Sets the path to the file which contains the execution
-                data. -->
+                            <!-- Sets the path to the file which contains
+                                the execution data. -->
                             <destFile>${project.testresult.directory}/coverage/jacoco/jacoco.exec</destFile>
-                            <!-- Sets the name of the property containing the settings
-                for JaCoCo runtime agent. -->
+                            <!-- Sets the name of the property containing
+                                the settings for JaCoCo runtime agent. -->
                             <propertyName>surefireArgLine</propertyName>
                         </configuration>
                     </execution>
-                    <!-- Ensures that the code coverage report for unit tests is created
-            after unit tests have been run -->
+                    <!-- Ensures that the code coverage report for unit tests
+                        is created after unit tests have been run -->
                     <execution>
                         <id>post-unit-test</id>
                         <phase>test</phase>
@@ -475,9 +455,10 @@
                     <referenceUrl>hibernate:spring:it.cnr.si.domain?dialect=&amp;hibernate.ejb.naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringNamingStrategy</referenceUrl>
                     <verbose>true</verbose>
                     <logging>debug</logging>
-                    <diffExcludeObjects>oauth_access_token, oauth_approvals,
-            oauth_client_details, oauth_client_token, oauth_code,
-            oauth_refresh_token</diffExcludeObjects>
+                    <diffExcludeObjects>oauth_access_token,
+                        oauth_approvals,
+                        oauth_client_details, oauth_client_token, oauth_code,
+                        oauth_refresh_token</diffExcludeObjects>
                 </configuration>
             </plugin>
             <plugin>
@@ -490,8 +471,8 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <executable>true</executable>
-                    <!-- Enable the line below to have remote debugging of your application
-            on port 5005 <jvmArguments>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005</jvmArguments> -->
+                    <!-- Enable the line below to have remote debugging of
+                        your application on port 5005 <jvmArguments>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005</jvmArguments> -->
                 </configuration>
             </plugin>
             <!-- jhipster-needle-maven-add-plugin -->
