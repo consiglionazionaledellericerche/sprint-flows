@@ -6,10 +6,10 @@
         <activiti:executionListener event="start" delegateExpression="${testExecutionListener}"></activiti:executionListener>
       </extensionElements>
     </startEvent>
-    <userTask id="approvazione" name="Direttore Approva o Rifiuta" activiti:candidateGroups="DIRETTORE"></userTask>
+    <userTask id="approvazione" name="Direttore Approva o Rifiuta" activiti:candidateUsers="admin" activiti:candidateGroups="DIRETTORE"></userTask>
     <endEvent id="endevent1" name="End"></endEvent>
     <sequenceFlow id="flow2" sourceRef="approvazione" targetRef="endevent1"></sequenceFlow>
-    <userTask id="usertask1" name="User Task" activiti:async="true" activiti:candidateGroups="SEGRETARIO"></userTask>
+    <userTask id="usertask1" name="User Task" activiti:candidateUsers="user" activiti:candidateGroups="SEGRETARIO,ROLE_DEPARTMENT_603240"></userTask>
     <sequenceFlow id="flow3" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
     <sequenceFlow id="flow4" sourceRef="usertask1" targetRef="approvazione"></sequenceFlow>
   </process>
