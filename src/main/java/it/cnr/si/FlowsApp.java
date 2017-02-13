@@ -8,8 +8,6 @@ import java.util.Collection;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
-import org.activiti.rest.service.api.RestResponseFactory;
-import org.activiti.rest.service.api.identity.UserResource;
 import org.activiti.spring.boot.AbstractProcessEngineAutoConfiguration;
 import org.activiti.spring.boot.DataSourceProcessEngineAutoConfiguration;
 import org.activiti.spring.boot.EndpointAutoConfiguration;
@@ -26,10 +24,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.ComponentScan.Filter;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.core.env.Environment;
 
 import it.cnr.si.config.Constants;
@@ -56,7 +51,7 @@ import it.cnr.si.config.JHipsterProperties;
 @EnableAutoConfiguration(exclude = {
         MetricFilterAutoConfiguration.class,
         MetricRepositoryAutoConfiguration.class,
-                RestApiAutoConfiguration.class,
+        RestApiAutoConfiguration.class,
         SecurityAutoConfiguration.class,
         SecurityAutoConfiguration.UserDetailsServiceConfiguration.class,
         JpaProcessEngineAutoConfiguration.class,
@@ -74,8 +69,6 @@ public class FlowsApp {
 
     @Inject
     private Environment env;
-    @Inject
-    private ApplicationContext appContext;
 
     /**
      * Initializes sprint.
