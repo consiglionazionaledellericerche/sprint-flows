@@ -1,7 +1,6 @@
 package it.cnr.si.flows.ng.config;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,19 +16,21 @@ import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
-import org.activiti.engine.identity.Group;
-import org.activiti.engine.identity.User;
 import org.activiti.engine.impl.history.HistoryLevel;
+import org.activiti.engine.repository.DeploymentBuilder;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.spring.ProcessEngineFactoryBean;
 import org.activiti.spring.SpringProcessEngineConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.zaxxer.hikari.HikariDataSource;
@@ -140,49 +141,15 @@ public class FlowsConfigurations {
     }
 
     @Bean
-    public InitializingBean usersAndGroupsInitializer(final IdentityService identityService) {
-
-        return new InitializingBean() {
-            public void afterPropertiesSet() throws Exception {
-
-                Group gruppo = identityService.createGroupQuery().groupId("user").singleResult();
-                if (gruppo == null) {
-                    Group group = identityService.newGroup("user");
-
-                    group.setName("users");
-                    group.setType("security-role");
-                    identityService.saveGroup(group);
-                }
-
-                User giulio = identityService.createUserQuery().userId("giulio").singleResult();
-                if(giulio == null) {
-                    User admin = identityService.newUser("giulio");
-                    admin.setPassword("giulio");
-                    identityService.saveUser(admin);
-                }
-            }
-        };
-    }
-
-    @Bean
     public RestResponseFactory getRestResponseFactory() {
         return new RestResponseFactory();
     }
 
     @PostConstruct
     public void createDeployments() throws Exception {
-
-        log.info("pippo");
-        log.info(""+ appContext.getBeanDefinitionCount());
-        log.info(""+ Arrays.asList(appContext.getBeanDefinitionNames()));
-        log.info(""+ Arrays.asList(appContext.getBeanDefinitionNames()));
-//        appContext.getBeanNamesForType();
-//        appContext.getBeansOfType();
-//        appContext.getBean();
-
-//        DeploymentBuilder builder = getRepositoryService().createDeployment();
-//        builder.addClasspathResource("processes/PermessiFerieProcess.bpmn20.xml");
-//        builder.deploy();
+        RepositoryService repositoryService = appContext.getBean(RepositoryService.class);
+        DeploymentBuilder builder = repositoryService.createDeployment();
+        builder.addClasspathResource("processes/PermessiFerieProcess.bpmn20.xml");
+        builder.deploy();
     }
-
 }
