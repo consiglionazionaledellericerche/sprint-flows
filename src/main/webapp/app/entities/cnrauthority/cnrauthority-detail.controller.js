@@ -5,9 +5,9 @@
         .module('sprintApp')
         .controller('CnrauthorityDetailController', CnrauthorityDetailController);
 
-    CnrauthorityDetailController.$inject = ['$scope', '$rootScope', '$stateParams', 'previousState', 'entity', 'Cnrauthority', 'Authority'];
+    CnrauthorityDetailController.$inject = ['$scope', '$rootScope', '$stateParams', 'previousState', 'entity', 'Cnrauthority'];
 
-    function CnrauthorityDetailController($scope, $rootScope, $stateParams, previousState, entity, Cnrauthority, Authority) {
+    function CnrauthorityDetailController($scope, $rootScope, $stateParams, previousState, entity, Cnrauthority) {
         var vm = this;
 
         vm.cnrauthority = entity;

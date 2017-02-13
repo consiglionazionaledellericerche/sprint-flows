@@ -22,7 +22,6 @@
                     <th jh-sort-by="parentid"><span translate="sprintApp.cnrauthority.parentid">Parentid</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="display_name"><span translate="sprintApp.cnrauthority.display_name">Display Name</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="name"><span translate="sprintApp.cnrauthority.name">Name</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th jh-sort-by="authority.id"><span translate="sprintApp.cnrauthority.authority">Authority</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th></th>
                 </tr>
             </thead>
@@ -32,9 +31,6 @@
                     <td>{{cnrauthority.parentid}}</td>
                     <td>{{cnrauthority.display_name}}</td>
                     <td>{{cnrauthority.name}}</td>
-                    <td>
-                        <a ui-sref="authority-detail({id:cnrauthority.authority.id})">{{cnrauthority.authority.id}}</a>
-                    </td>
                     <td class="text-right">
                         <div class="btn-group flex-btn-group-container">
                             <button type="submit"

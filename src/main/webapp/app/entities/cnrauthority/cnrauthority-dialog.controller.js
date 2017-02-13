@@ -5,23 +5,14 @@
         .module('sprintApp')
         .controller('CnrauthorityDialogController', CnrauthorityDialogController);
 
-    CnrauthorityDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', '$q', 'entity', 'Cnrauthority', 'Authority'];
+    CnrauthorityDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'entity', 'Cnrauthority'];
 
-    function CnrauthorityDialogController ($timeout, $scope, $stateParams, $uibModalInstance, $q, entity, Cnrauthority, Authority) {
+    function CnrauthorityDialogController ($timeout, $scope, $stateParams, $uibModalInstance, entity, Cnrauthority) {
         var vm = this;
 
         vm.cnrauthority = entity;
         vm.clear = clear;
         vm.save = save;
-        vm.authorities = Authority.query({filter: 'cnrauthority-is-null'});
-        $q.all([vm.cnrauthority.$promise, vm.authorities.$promise]).then(function() {
-            if (!vm.cnrauthority.authority || !vm.cnrauthority.authority.id) {
-                return $q.reject();
-            }
-            return Authority.get({id : vm.cnrauthority.authority.id}).$promise;
-        }).then(function(authority) {
-            vm.authorities.push(authority);
-        });
 
         $timeout(function (){
             angular.element('.form-group:eq(1)>input').focus();

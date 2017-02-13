@@ -30,10 +30,6 @@ public class Cnrauthority implements Serializable {
     @Column(name = "name")
     private String name;
 
-    @OneToOne
-    @JoinColumn(unique = true)
-    private Authority authority;
-
     public Long getId() {
         return id;
     }
@@ -79,19 +75,6 @@ public class Cnrauthority implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Authority getAuthority() {
-        return authority;
-    }
-
-    public Cnrauthority authority(Authority authority) {
-        this.authority = authority;
-        return this;
-    }
-
-    public void setAuthority(Authority authority) {
-        this.authority = authority;
     }
 
     @Override

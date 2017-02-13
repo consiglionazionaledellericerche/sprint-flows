@@ -32,12 +32,6 @@
                      />
         </div>
 
-        <div class="form-group">
-            <label translate="sprintApp.cnrauthority.authority" for="field_authority">Authority</label>
-            <select class="form-control" id="field_authority" name="authority" ng-model="vm.cnrauthority.authority" ng-options="authority as authority.id for authority in vm.authorities | orderBy:'id' track by authority.id">
-                <option value=""></option>
-            </select>
-        </div>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="vm.clear()">

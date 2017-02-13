@@ -1,16 +1,6 @@
 {
     "fluentMethods": true,
-    "relationships": [
-        {
-            "relationshipName": "authority",
-            "otherEntityName": "authority",
-            "relationshipType": "one-to-one",
-            "relationshipValidateRules": [],
-            "otherEntityField": "id",
-            "ownerSide": true,
-            "otherEntityRelationshipName": "cnrauthority"
-        }
-    ],
+    "relationships": [],
     "fields": [
         {
             "fieldName": "parentid",

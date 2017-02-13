@@ -18,8 +18,7 @@
             },
             "parentid": "Parentid",
             "display_name": "Display Name",
-            "name": "Name",
-            "authority": "Authority"
+            "name": "Name"
         }
     }
 }
