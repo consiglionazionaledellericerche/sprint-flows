@@ -18,6 +18,8 @@ import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.repository.DeploymentBuilder;
+import org.activiti.image.ProcessDiagramGenerator;
+import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.spring.ProcessEngineFactoryBean;
 import org.activiti.spring.SpringProcessEngineConfiguration;
@@ -143,6 +145,11 @@ public class FlowsConfigurations {
     @Bean
     public RestResponseFactory getRestResponseFactory() {
         return new RestResponseFactory();
+    }
+
+    @Bean
+    public ProcessDiagramGenerator getProcessDiagramGenerator(ProcessEngine processEingine) {
+        return processEingine.getProcessEngineConfiguration().getProcessDiagramGenerator();
     }
 
     @PostConstruct

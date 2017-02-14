@@ -18,15 +18,15 @@
 
         vm.data.taskId = $state.params.taskId;
         dataService.tasks.getTask($state.params.taskId).then(
-                function(data) {
-                    vm.diagramUrl = '/runtime/process-instances/'+ data.data.processInstanceId +'/diagram';
-                    var processDefinitionKey = data.data.processDefinitionId.split(":")[0]
-                    vm.formUrl = 'app/forms/'+ processDefinitionKey +'/'+ data.data.taskDefinitionKey +'.html'
+                function(response) {
+                    vm.diagramUrl = '/rest/diagram/taskInstance/'+ response.data.id;
+                    var processDefinitionKey = response.data.processDefinitionId.split(":")[0]
+                    vm.formUrl = 'app/forms/'+ processDefinitionKey +'/'+ response.data.taskDefinitionKey +'.html'
                 });
     } else {
         vm.data.definitionId = $state.params.processDefinitionId;
         var processDefinitionKey = $state.params.processDefinitionId.split(":")[0];
-        vm.diagramUrl = "/rest/diagram/" + $state.params.processDefinitionId;
+        vm.diagramUrl = "/rest/diagram/processDefinition/" + $state.params.processDefinitionId;
         vm.formUrl = 'app/forms/'+ processDefinitionKey +'/'+ $state.params.taskName +'.html'
     }
 

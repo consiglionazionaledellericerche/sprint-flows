@@ -2,20 +2,27 @@ package it.cnr.si.flows.ng.resource;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.Task;
+import org.activiti.engine.task.TaskQuery;
 import org.activiti.image.ProcessDiagramGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,55 +33,54 @@ import com.codahale.metrics.annotation.Timed;
 
 
 @Controller
-@RequestMapping("rest/flows")
+@RequestMapping("rest")
 public class FlowsDiagramResource {
 
     @Autowired
     private RepositoryService repositoryService;
     @Autowired
     private RuntimeService runtimeService;
-//    @Autowired
+    @Autowired
+    private TaskService taskService;
+    @Autowired
     private ProcessDiagramGenerator pdg;
 
-    @RequestMapping(value = "/diagram/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
+
+    @Autowired
+    private ProcessEngineConfiguration processEngineConfiguration;
+
+    @RequestMapping(value = "/diagram/processDefinition/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
     @ResponseBody
     @Timed
-    public void getDiagramForProcess(
-            @PathVariable String id,
-            HttpServletRequest request,
-            HttpServletResponse response
-            ) throws IOException {
+    public ResponseEntity<InputStreamResource>
+    getDiagramForProcess(
+            @PathVariable String id)
+                    throws IOException {
 
-        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-                .processDefinitionId(id)
-                .singleResult();
+        InputStream resourceAsStream = repositoryService.getProcessDiagram(id);
 
-        String diagramResourceName = processDefinition.getDiagramResourceName();
-        InputStream resourceAsStream = repositoryService.getResourceAsStream(processDefinition.getDeploymentId(), processDefinition.getDiagramResourceName());
-
-        response.setContentType(MediaType.IMAGE_PNG_VALUE);
-        org.apache.commons.io.IOUtils.copy(resourceAsStream, response.getOutputStream());
-
+        return ResponseEntity.ok(new InputStreamResource(resourceAsStream));
     }
 
-    @RequestMapping(value = "/diagram", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
+    @RequestMapping(value = "/diagram/taskInstance/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
     @ResponseBody
     @Timed
-    public void getDiagram(
-            HttpServletRequest request,
-            HttpServletResponse response
-            ) throws IOException {
-        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-                .processDefinitionKey("permessiFerieProcess")
-                .latestVersion()
-                .singleResult();
+    public ResponseEntity<InputStreamResource>
+    getDiagram(
+            @PathVariable String id)
+                    throws IOException {
 
-        String diagramResourceName = processDefinition.getDiagramResourceName();
-        InputStream resourceAsStream = repositoryService.getResourceAsStream(processDefinition.getDeploymentId(), processDefinition.getDiagramResourceName());
+        Task task = taskService.createTaskQuery().taskId(id).singleResult();
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
+                .processInstanceId(task.getProcessInstanceId()).singleResult();
+        ProcessDefinition pde = repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
 
+        BpmnModel bpmnModel = repositoryService.getBpmnModel(pde.getId());
+        InputStream resource = pdg.generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(processInstance.getId()),
+            Collections.<String>emptyList(), processEngineConfiguration.getActivityFontName(), processEngineConfiguration.getLabelFontName(),
+            processEngineConfiguration.getAnnotationFontName(), processEngineConfiguration.getClassLoader(), 1.0);
 
-        response.setContentType(MediaType.IMAGE_PNG_VALUE);
-        org.apache.commons.io.IOUtils.copy(resourceAsStream, response.getOutputStream());
+        return ResponseEntity.ok(new InputStreamResource(resource));
 
     }
 
@@ -85,17 +91,6 @@ public class FlowsDiagramResource {
             HttpServletRequest request,
             HttpServletResponse response
             ) throws IOException {
-//        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-//                .processDefinitionKey("permessiFerieProcess")
-//                .latestVersion()
-//                .singleResult();
-//
-//        String diagramResourceName = processDefinition.getDiagramResourceName();
-//        InputStream resourceAsStream = repositoryService.getResourceAsStream(processDefinition.getDeploymentId(), processDefinition.getDiagramResourceName());
-//
-//
-//        response.setContentType(MediaType.IMAGE_PNG_VALUE);
-//        org.apache.commons.io.IOUtils.copy(resourceAsStream, response.getOutputStream());
 
 
         ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) repositoryService.createProcessDefinitionQuery()
