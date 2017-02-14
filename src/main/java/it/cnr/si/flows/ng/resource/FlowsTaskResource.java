@@ -14,6 +14,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.activiti.engine.FormService;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
@@ -75,7 +76,8 @@ public class FlowsTaskResource {
     private CounterService counterService;
     @Inject
     private SecurityService securityService;
-
+    @Inject
+    private FormService formService;
 
     @Autowired
     protected RestResponseFactory restResponseFactory;
@@ -224,9 +226,17 @@ public class FlowsTaskResource {
             HttpServletRequest req,
             @PathVariable("id") String id) {
 
-        taskService.unclaim(id);
-        return new ResponseEntity<Map<String,Object>>(HttpStatus.OK);
+        String username = SecurityUtils.getCurrentUserLogin();
+        String assignee = taskService.createTaskQuery()
+            .taskId(id)
+            .singleResult().getAssignee();
 
+        if (username.equals(assignee)) {
+            taskService.unclaim(id);
+            return new ResponseEntity<Map<String,Object>>(HttpStatus.OK);
+        } else {
+            return new ResponseEntity<Map<String,Object>>(HttpStatus.FORBIDDEN);
+        }
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -336,6 +346,7 @@ public class FlowsTaskResource {
 
             return new ResponseEntity<Object>(response, HttpStatus.OK); // TODO verificare best practice
         }
+
 
 
 //        CMISUser user = cmisService.getCMISUserFromSession(req);

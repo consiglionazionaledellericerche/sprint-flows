@@ -166,6 +166,13 @@
                                 <span translate="global.menu.admin.database">Database</span>
                             </a>
                         </li>
+                        <!-- jhipster-needle-add-element-to-admin-menu - JHipster will add entities to the admin menu here -->
+                        <li>
+                            <a href="" ng-click="vm.switchUser()" id="switchuser">
+                                <span class="glyphicon glyphicon-log-in"></span>&nbsp;
+                                <span>Impersona Utente</span>
+                            </a>
+                        </li>
                     </ul>
                 </li>
                 <li ui-sref-active="active" uib-dropdown class="dropdown pointer" ng-controller="JhiLanguageController as languageVm">
@@ -181,6 +188,12 @@
                             <a href="" ng-click="languageVm.changeLanguage(language);vm.collapseNavbar();">{{language | findLanguageFromKey}}</a>
                         </li>
                     </ul>
+                </li>
+                <li ng-show="vm.isImpersonating">
+                    <a class="label label-warning" ui-sref="availabletasks" ng-click="vm.cancelSwitchUser()">
+                        <span class="glyphicon glyphicon-user"></span>
+                        <span>Impersonating: {{vm.account.login}}</span>
+                    </a>
                 </li>
             </ul>
         </div>

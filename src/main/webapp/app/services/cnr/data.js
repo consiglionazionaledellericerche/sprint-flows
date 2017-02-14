@@ -17,6 +17,15 @@
 
 
     return {
+
+      authentication: {
+        impersonate: function(username) {
+            return $http.get("login/impersonate?impersonate_username="+ username);
+        },
+        cancelImpersonate: function() {
+            return $http.get("/logout/impersonate");
+        }
+      },
       tasks: {
         myTasks : function() {
           return $http.get('rest/tasks/mytasks');

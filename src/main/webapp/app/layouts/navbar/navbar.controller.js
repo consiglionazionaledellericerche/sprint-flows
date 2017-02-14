@@ -5,13 +5,21 @@
     .module('sprintApp')
     .controller('NavbarController', NavbarController);
 
-    NavbarController.$inject = ['$scope', '$state', 'Auth', 'Principal', 'ProfileService', 'LoginService', 'dataService', '$log'];
+    NavbarController.$inject = ['$scope', '$state', 'Auth', 'Principal', 'ProfileService', 'LoginService', 'SwitchUserService', 'dataService', '$log'];
 
-    function NavbarController ($scope, $state, Auth, Principal, ProfileService, LoginService, dataService, $log) {
+    function NavbarController ($scope, $state, Auth, Principal, ProfileService, LoginService, SwitchUserService, dataService, $log) {
         var vm = this;
 
         vm.isNavbarCollapsed = true;
         vm.isAuthenticated = Principal.isAuthenticated;
+        Principal.identity().then(function(account) {
+            $log.info(account);
+            vm.account = account;
+        });
+
+        Principal.hasAuthority("ROLE_PREVIOUS_ADMINISTRATOR").then(function(response) {
+            vm.isImpersonating = response;
+        });
 
         ProfileService.getProfileInfo().then(function(response) {
             vm.inProduction = response.inProduction;
@@ -20,9 +28,25 @@
 
         vm.login = login;
         vm.logout = logout;
+        vm.switchUser = switchUser;
+        vm.cancelSwitchUser = cancelSwitchUser;
         vm.toggleNavbar = toggleNavbar;
         vm.collapseNavbar = collapseNavbar;
         vm.$state = $state;
+
+        function switchUser() {
+            collapseNavbar();
+            SwitchUserService.open();
+        }
+
+        function cancelSwitchUser() {
+            collapseNavbar();
+            dataService.authentication.cancelImpersonate().then(function() {
+              //$state.go('home');
+              $window.location.reload();
+            })
+
+        }
 
         function login() {
             collapseNavbar();
@@ -33,7 +57,7 @@
             collapseNavbar();
             Auth.logout();
             $state.go('home');
-            vm.wfDefs = [];
+            vm.wfDefs = []; // TODO la logica e' che gli oggetti non vanno svuotati qui
         }
 
         function toggleNavbar() {
