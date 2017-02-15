@@ -8,11 +8,16 @@
     -->
     <changeSet id="20170206085209-2" author="jhipster">
         
-        <addForeignKeyConstraint baseColumnNames="authority_id"
-                                 baseTableName="cnrauthority"
-                                 constraintName="fk_cnrauthority_authority_id"
+        <addForeignKeyConstraint baseColumnNames="cnrauthorities_id"
+                                 baseTableName="cnrauthority_cnrauthorityparent"
+                                 constraintName="fk_cnrauthority_cnrauthorityparent_cnrauthorities_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="authority"/>
-
+                                 referencedTableName="cnrauthority"/>
+        <addForeignKeyConstraint baseColumnNames="cnrauthorityparents_id"
+                                 baseTableName="cnrauthority_cnrauthorityparent"
+                                 constraintName="fk_cnrauthority_cnrauthorityparent_cnrauthorityparents_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="cnrauthority"/>
+        
     </changeSet>
 </databaseChangeLog>

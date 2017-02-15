@@ -58,7 +58,7 @@ public class CnrauthorityService {
     @Transactional(readOnly = true) 
     public Cnrauthority findOne(Long id) {
         log.debug("Request to get Cnrauthority : {}", id);
-        Cnrauthority cnrauthority = cnrauthorityRepository.findOne(id);
+        Cnrauthority cnrauthority = cnrauthorityRepository.findOneWithEagerRelationships(id);
         return cnrauthority;
     }
 

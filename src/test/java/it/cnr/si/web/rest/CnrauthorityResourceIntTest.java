@@ -37,8 +37,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = SprintApp.class)
 public class CnrauthorityResourceIntTest {
-    private static final String DEFAULT_PARENTID = "AAAAA";
-    private static final String UPDATED_PARENTID = "BBBBB";
     private static final String DEFAULT_DISPLAY_NAME = "AAAAA";
     private static final String UPDATED_DISPLAY_NAME = "BBBBB";
     private static final String DEFAULT_NAME = "AAAAA";
@@ -82,7 +80,6 @@ public class CnrauthorityResourceIntTest {
     public static Cnrauthority createEntity(EntityManager em) {
         Cnrauthority cnrauthority = new Cnrauthority();
         cnrauthority = new Cnrauthority()
-                .parentid(DEFAULT_PARENTID)
                 .display_name(DEFAULT_DISPLAY_NAME)
                 .name(DEFAULT_NAME);
         return cnrauthority;
@@ -109,7 +106,6 @@ public class CnrauthorityResourceIntTest {
         List<Cnrauthority> cnrauthorities = cnrauthorityRepository.findAll();
         assertThat(cnrauthorities).hasSize(databaseSizeBeforeCreate + 1);
         Cnrauthority testCnrauthority = cnrauthorities.get(cnrauthorities.size() - 1);
-        assertThat(testCnrauthority.getParentid()).isEqualTo(DEFAULT_PARENTID);
         assertThat(testCnrauthority.getDisplay_name()).isEqualTo(DEFAULT_DISPLAY_NAME);
         assertThat(testCnrauthority.getName()).isEqualTo(DEFAULT_NAME);
     }
@@ -125,7 +121,6 @@ public class CnrauthorityResourceIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(cnrauthority.getId().intValue())))
-                .andExpect(jsonPath("$.[*].parentid").value(hasItem(DEFAULT_PARENTID.toString())))
                 .andExpect(jsonPath("$.[*].display_name").value(hasItem(DEFAULT_DISPLAY_NAME.toString())))
                 .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())));
     }
@@ -141,7 +136,6 @@ public class CnrauthorityResourceIntTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(cnrauthority.getId().intValue()))
-            .andExpect(jsonPath("$.parentid").value(DEFAULT_PARENTID.toString()))
             .andExpect(jsonPath("$.display_name").value(DEFAULT_DISPLAY_NAME.toString()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()));
     }
@@ -165,7 +159,6 @@ public class CnrauthorityResourceIntTest {
         // Update the cnrauthority
         Cnrauthority updatedCnrauthority = cnrauthorityRepository.findOne(cnrauthority.getId());
         updatedCnrauthority
-                .parentid(UPDATED_PARENTID)
                 .display_name(UPDATED_DISPLAY_NAME)
                 .name(UPDATED_NAME);
 
@@ -178,7 +171,6 @@ public class CnrauthorityResourceIntTest {
         List<Cnrauthority> cnrauthorities = cnrauthorityRepository.findAll();
         assertThat(cnrauthorities).hasSize(databaseSizeBeforeUpdate);
         Cnrauthority testCnrauthority = cnrauthorities.get(cnrauthorities.size() - 1);
-        assertThat(testCnrauthority.getParentid()).isEqualTo(UPDATED_PARENTID);
         assertThat(testCnrauthority.getDisplay_name()).isEqualTo(UPDATED_DISPLAY_NAME);
         assertThat(testCnrauthority.getName()).isEqualTo(UPDATED_NAME);
     }

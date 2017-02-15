@@ -13,6 +13,7 @@
         vm.cnrauthority = entity;
         vm.clear = clear;
         vm.save = save;
+        vm.cnrauthorities = Cnrauthority.query();
 
         $timeout(function (){
             angular.element('.form-group:eq(1)>input').focus();

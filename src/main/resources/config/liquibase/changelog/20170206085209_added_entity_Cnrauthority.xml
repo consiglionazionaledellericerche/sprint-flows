@@ -21,10 +21,6 @@
             <column name="id" type="bigint" autoIncrement="${autoIncrement}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="parentid" type="varchar(255)">
-                <constraints nullable="true" />
-            </column>
-            
             <column name="display_name" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
@@ -35,6 +31,17 @@
             
             <!-- jhipster-needle-liquibase-add-column - Jhipster will add columns here, do not remove-->
         </createTable>
+        
+        <createTable tableName="cnrauthority_cnrauthorityparent">
+            <column name="cnrauthorityparents_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cnrauthorities_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="cnrauthorities_id, cnrauthorityparents_id" tableName="cnrauthority_cnrauthorityparent"/>
         
     </changeSet>
 </databaseChangeLog>

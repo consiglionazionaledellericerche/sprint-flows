@@ -16,9 +16,9 @@
             "detail": {
                 "title": "Cnrauthority"
             },
-            "parentid": "Parentid",
             "display_name": "Display Name",
-            "name": "Name"
+            "name": "Name",
+            "cnrauthorityparent": "Cnrauthorityparent"
         }
     }
 }

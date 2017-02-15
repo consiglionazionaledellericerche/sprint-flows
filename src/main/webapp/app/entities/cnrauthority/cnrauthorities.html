@@ -19,7 +19,6 @@
             <thead>
                 <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.transition()">
                     <th jh-sort-by="id"><span translate="global.field.id">ID</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th jh-sort-by="parentid"><span translate="sprintApp.cnrauthority.parentid">Parentid</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="display_name"><span translate="sprintApp.cnrauthority.display_name">Display Name</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="name"><span translate="sprintApp.cnrauthority.name">Name</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th></th>
@@ -28,7 +27,6 @@
             <tbody>
                 <tr ng-repeat="cnrauthority in vm.cnrauthorities track by cnrauthority.id">
                     <td><a ui-sref="cnrauthority-detail({id:cnrauthority.id})">{{cnrauthority.id}}</a></td>
-                    <td>{{cnrauthority.parentid}}</td>
                     <td>{{cnrauthority.display_name}}</td>
                     <td>{{cnrauthority.name}}</td>
                     <td class="text-right">

@@ -80,7 +80,7 @@ class CnrauthorityGatlingTest extends Simulation {
             .exec(http("Create new cnrauthority")
             .post("/api/cnrauthorities")
             .headers(headers_http_authenticated)
-            .body(StringBody("""{"id":null, "parentid":"SAMPLE_TEXT", "display_name":"SAMPLE_TEXT", "name":"SAMPLE_TEXT"}""")).asJSON
+            .body(StringBody("""{"id":null, "display_name":"SAMPLE_TEXT", "name":"SAMPLE_TEXT"}""")).asJSON
             .check(status.is(201))
             .check(headerRegex("Location", "(.*)").saveAs("new_cnrauthority_url"))).exitHereIfFailed
             .pause(10)

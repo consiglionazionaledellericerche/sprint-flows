@@ -14,12 +14,6 @@
                     ng-model="vm.cnrauthority.id" readonly />
         </div>
         <div class="form-group">
-            <label class="control-label" translate="sprintApp.cnrauthority.parentid" for="field_parentid">Parentid</label>
-            <input type="text" class="form-control" name="parentid" id="field_parentid"
-                    ng-model="vm.cnrauthority.parentid"
-                     />
-        </div>
-        <div class="form-group">
             <label class="control-label" translate="sprintApp.cnrauthority.display_name" for="field_display_name">Display Name</label>
             <input type="text" class="form-control" name="display_name" id="field_display_name"
                     ng-model="vm.cnrauthority.display_name"
@@ -32,6 +26,10 @@
                      />
         </div>
 
+        <div class="form-group">
+            <label translate="sprintApp.cnrauthority.cnrauthorityparent" for="field_cnrauthorityparent">Cnrauthorityparent</label>
+            <select class="form-control" id="field_cnrauthorityparent" multiple name="cnrauthorityparent" ng-model="vm.cnrauthority.cnrauthorityparents" ng-options="cnrauthority as cnrauthority.name for cnrauthority in vm.cnrauthorities track by cnrauthority.id"></select>
+        </div>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="vm.clear()">

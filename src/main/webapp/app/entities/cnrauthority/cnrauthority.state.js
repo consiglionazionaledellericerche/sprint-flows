@@ -124,7 +124,6 @@
                     resolve: {
                         entity: function () {
                             return {
-                                parentid: null,
                                 display_name: null,
                                 name: null,
                                 id: null

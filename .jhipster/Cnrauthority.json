@@ -1,11 +1,16 @@
 {
     "fluentMethods": true,
-    "relationships": [],
-    "fields": [
+    "relationships": [
         {
-            "fieldName": "parentid",
-            "fieldType": "String"
-        },
+            "relationshipName": "cnrauthorityparent",
+            "otherEntityName": "cnrauthority",
+            "relationshipType": "many-to-many",
+            "otherEntityField": "name",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "cnrauthorityparent"
+        }
+    ],
+    "fields": [
         {
             "fieldName": "display_name",
             "fieldType": "String"

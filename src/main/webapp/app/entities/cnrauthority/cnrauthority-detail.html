@@ -4,10 +4,6 @@
     <hr>
     <jhi-alert-error></jhi-alert-error>
     <dl class="dl-horizontal jh-entity-details">
-        <dt><span translate="sprintApp.cnrauthority.parentid">Parentid</span></dt>
-        <dd>
-            <span>{{vm.cnrauthority.parentid}}</span>
-        </dd>
         <dt><span translate="sprintApp.cnrauthority.display_name">Display Name</span></dt>
         <dd>
             <span>{{vm.cnrauthority.display_name}}</span>
@@ -15,6 +11,12 @@
         <dt><span translate="sprintApp.cnrauthority.name">Name</span></dt>
         <dd>
             <span>{{vm.cnrauthority.name}}</span>
+        </dd>
+        <dt><span translate="sprintApp.cnrauthority.cnrauthorityparent">Cnrauthorityparent</span></dt>
+        <dd>
+            <span ng-repeat="cnrauthorityparent in vm.cnrauthority.cnrauthorityparents">
+                <a ui-sref="cnrauthority-detail({id: cnrauthorityparent.id})">{{cnrauthorityparent.name}}</a>{{$last ? '' : ', '}}
+            </span>
         </dd>
     </dl>
 

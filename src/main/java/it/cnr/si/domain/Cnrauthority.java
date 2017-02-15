@@ -5,6 +5,8 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Objects;
 
 /**
@@ -21,14 +23,18 @@ public class Cnrauthority implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "parentid")
-    private String parentid;
-
     @Column(name = "display_name")
     private String display_name;
 
     @Column(name = "name")
     private String name;
+
+    @ManyToMany
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    @JoinTable(name = "cnrauthority_cnrauthorityparent",
+               joinColumns = @JoinColumn(name="cnrauthorities_id", referencedColumnName="ID"),
+               inverseJoinColumns = @JoinColumn(name="cnrauthorityparents_id", referencedColumnName="ID"))
+    private Set<Cnrauthority> cnrauthorityparents = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -36,19 +42,6 @@ public class Cnrauthority implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getParentid() {
-        return parentid;
-    }
-
-    public Cnrauthority parentid(String parentid) {
-        this.parentid = parentid;
-        return this;
-    }
-
-    public void setParentid(String parentid) {
-        this.parentid = parentid;
     }
 
     public String getDisplay_name() {
@@ -77,6 +70,31 @@ public class Cnrauthority implements Serializable {
         this.name = name;
     }
 
+    public Set<Cnrauthority> getCnrauthorityparents() {
+        return cnrauthorityparents;
+    }
+
+    public Cnrauthority cnrauthorityparents(Set<Cnrauthority> cnrauthorities) {
+        this.cnrauthorityparents = cnrauthorities;
+        return this;
+    }
+
+    public Cnrauthority addCnrauthority(Cnrauthority cnrauthority) {
+        cnrauthorityparents.add(cnrauthority);
+        cnrauthority.getCnrauthorityparents().add(this);
+        return this;
+    }
+
+    public Cnrauthority removeCnrauthority(Cnrauthority cnrauthority) {
+        cnrauthorityparents.remove(cnrauthority);
+        cnrauthority.getCnrauthorityparents().remove(this);
+        return this;
+    }
+
+    public void setCnrauthorityparents(Set<Cnrauthority> cnrauthorities) {
+        this.cnrauthorityparents = cnrauthorities;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -101,7 +119,6 @@ public class Cnrauthority implements Serializable {
     public String toString() {
         return "Cnrauthority{" +
             "id=" + id +
-            ", parentid='" + parentid + "'" +
             ", display_name='" + display_name + "'" +
             ", name='" + name + "'" +
             '}';
