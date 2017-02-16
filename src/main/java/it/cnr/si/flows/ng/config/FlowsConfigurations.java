@@ -2,6 +2,7 @@ package it.cnr.si.flows.ng.config;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -18,8 +19,8 @@ import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.repository.DeploymentBuilder;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.image.ProcessDiagramGenerator;
-import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.spring.ProcessEngineFactoryBean;
 import org.activiti.spring.SpringProcessEngineConfiguration;
@@ -29,10 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
+import org.springframework.core.io.Resource;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.zaxxer.hikari.HikariDataSource;
@@ -72,16 +70,16 @@ public class FlowsConfigurations {
         beans.put("testExecutionListener", bean);
         conf.setBeans(beans);
 
-//        conf.setDbIdentityUsed(false);
+        //        conf.setDbIdentityUsed(false);
 
         conf.setHistoryLevel(HistoryLevel.AUDIT);
 
         return conf;
     }
 
-//    @Bean(name= {"processEngine", "engine", "pluto"})
+    //    @Bean(name= {"processEngine", "engine", "pluto"})
     @Bean
-//    @Primary
+    //    @Primary
     public ProcessEngine getProcessEngine(
             SpringProcessEngineConfiguration conf) throws Exception {
         ProcessEngineFactoryBean bean = new ProcessEngineFactoryBean();
@@ -89,7 +87,7 @@ public class FlowsConfigurations {
         bean.setProcessEngineConfiguration(conf);
 
         return bean.getObject();
-//        return processEngineConfiguration.buildProcessEngine();
+        //        return processEngineConfiguration.buildProcessEngine();
     }
 
     //    @Bean(name= {"processEngine", "engine"})
@@ -155,8 +153,20 @@ public class FlowsConfigurations {
     @PostConstruct
     public void createDeployments() throws Exception {
         RepositoryService repositoryService = appContext.getBean(RepositoryService.class);
-        DeploymentBuilder builder = repositoryService.createDeployment();
-        builder.addClasspathResource("processes/PermessiFerieProcess.bpmn20.xml");
-        builder.deploy();
+        //        repositoryService.createProcessDefinitionQuery().processDefinitionKey(processDefinitionKey);
+
+        for (Resource resource : appContext.getResources("classpath:processes/*.bpmn20.xml")) {
+
+            List<ProcessDefinition> processes = repositoryService.createProcessDefinitionQuery()
+                    .processDefinitionKeyLike("%"+ resource.getFilename().split("[.]")[0] +"%")
+                    .list();
+
+            if (processes.size() == 0) {
+                DeploymentBuilder builder = repositoryService.createDeployment();
+                builder.addInputStream(resource.getFilename(), resource.getInputStream());
+                builder.deploy();
+            }
+        }
     }
+
 }
