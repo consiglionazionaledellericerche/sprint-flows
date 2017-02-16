@@ -156,9 +156,9 @@ public class FormResource {
 
         Form form = formRepository.findOneByProcessDefinitionKeyAndVersionAndTaskId(processDefinitionKey, version, taskId);
 
-        return Optional.ofNullable(form.getForm())
+        return Optional.ofNullable(form)
             .map(result -> new ResponseEntity<>(
-                result,
+                result.getForm(),
                 HttpStatus.OK))
             .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
