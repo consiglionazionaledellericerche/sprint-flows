@@ -6,6 +6,11 @@ import it.cnr.si.domain.Form;
 import it.cnr.si.repository.FormRepository;
 import it.cnr.si.web.rest.util.HeaderUtil;
 import it.cnr.si.web.rest.util.PaginationUtil;
+
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
+import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -34,6 +39,10 @@ public class FormResource {
 
     @Inject
     private FormRepository formRepository;
+    @Inject
+    private RuntimeService runtimeService;
+    @Inject
+    private TaskService taskService;
 
     /**
      * POST  /forms : Create a new form.
@@ -136,12 +145,6 @@ public class FormResource {
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("form", id.toString())).build();
     }
 
-    /**
-     * GET  /forms/:id : get the "id" form.
-     *
-     * @param id the id of the form to retrieve
-     * @return the ResponseEntity with status 200 (OK) and with body the form, or with status 404 (Not Found)
-     */
     @RequestMapping(value = "/forms/{processDefinitionKey}/{version}/{taskId}.html",
         method = RequestMethod.GET,
         produces = MediaType.TEXT_HTML_VALUE)
@@ -161,6 +164,24 @@ public class FormResource {
                 result.getForm(),
                 HttpStatus.OK))
             .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    @RequestMapping(value = "/forms/{taskId}.html",
+        method = RequestMethod.GET,
+        produces = MediaType.TEXT_HTML_VALUE)
+    @Timed
+    public ResponseEntity<String> getFormByTaskId(
+            @PathVariable String taskId) {
+
+        log.debug("REST request to get Form : {}/{}/{}",  taskId);
+
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        ProcessInstance process = runtimeService.createProcessInstanceQuery().processDefinitionId(task.getProcessDefinitionId()).singleResult();
+
+        return getFormByTrittico(
+                process.getProcessDefinitionKey(),
+                process.getProcessDefinitionVersion().toString(),
+                task.getTaskDefinitionKey());
     }
 
 }

@@ -21,7 +21,7 @@
                 function(response) {
                     vm.diagramUrl = '/rest/diagram/taskInstance/'+ response.data.id;
                     var processDefinitionKey = response.data.processDefinitionId.split(":")[0]
-                    vm.formUrl = 'api/forms/'+ processDefinitionKey +'/'+ response.data.taskDefinitionKey +'.html'
+                    vm.formUrl = 'api/forms/'+ response.data.id +'.html'
                 });
     } else {
         vm.data.definitionId = $state.params.processDefinitionId;
