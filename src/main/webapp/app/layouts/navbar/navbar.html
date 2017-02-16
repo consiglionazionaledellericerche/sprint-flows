@@ -38,7 +38,7 @@
                     </a>
                     <ul class="dropdown-menu" uib-dropdown-menu>
                       <li ng-repeat="wfDef in vm.wfDefs">
-                        <a ui-sref="task({processDefinitionId: wfDef.id, taskName: 'start'})" ng-click="vm.collapseNavbar()">
+                        <a ui-sref="task({processDefinitionId: wfDef.id, taskName: 'start', taskId: undefined})" ng-click="vm.collapseNavbar()">
                           {{wfDef.name}}
                         </a>
                       </li>
