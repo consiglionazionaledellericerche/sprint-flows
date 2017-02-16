@@ -145,7 +145,7 @@ public class FormResource {
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("form", id.toString())).build();
     }
 
-    @RequestMapping(value = "/forms/{processDefinitionKey}/{version}/{taskId}.html",
+    @RequestMapping(value = "/forms/{processDefinitionKey}/{version}/{taskId}",
         method = RequestMethod.GET,
         produces = MediaType.TEXT_HTML_VALUE)
     @Timed
@@ -166,14 +166,14 @@ public class FormResource {
             .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @RequestMapping(value = "/forms/{taskId}.html",
+    @RequestMapping(value = "/forms/task/{taskId}",
         method = RequestMethod.GET,
         produces = MediaType.TEXT_HTML_VALUE)
     @Timed
     public ResponseEntity<String> getFormByTaskId(
             @PathVariable String taskId) {
 
-        log.debug("REST request to get Form : {}/{}/{}",  taskId);
+        log.debug("REST request to get Form for task: {}",  taskId);
 
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         ProcessInstance process = runtimeService.createProcessInstanceQuery().processDefinitionId(task.getProcessDefinitionId()).singleResult();

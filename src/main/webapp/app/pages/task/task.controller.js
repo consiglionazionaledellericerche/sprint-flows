@@ -21,14 +21,14 @@
                 function(response) {
                     vm.diagramUrl = '/rest/diagram/taskInstance/'+ response.data.id;
                     var processDefinitionKey = response.data.processDefinitionId.split(":")[0]
-                    vm.formUrl = 'api/forms/'+ response.data.id +'.html'
+                    vm.formUrl = 'api/forms/task/'+ response.data.id
                 });
     } else {
         vm.data.definitionId = $state.params.processDefinitionId;
         var processDefinitionKey = $state.params.processDefinitionId.split(":")[0];
         var processVersion       = $state.params.processDefinitionId.split(":")[1];
         vm.diagramUrl = "/rest/diagram/processDefinition/" + $state.params.processDefinitionId;
-        vm.formUrl = 'api/forms/'+ processDefinitionKey + "/" + processVersion + "/" + $state.params.taskName +'.html'
+        vm.formUrl = 'api/forms/'+ processDefinitionKey + "/" + processVersion + "/" + $state.params.taskName
     }
 
     $scope.submitTask = function() {
