@@ -341,8 +341,8 @@ public class FlowsTaskResource {
             ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
             ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
 
-            runtimeService.getIdentityLinksForProcessInstance(instance.getId()).forEach(
-                    il -> LOGGER.info(il.toString()));
+//            runtimeService.getIdentityLinksForProcessInstance(instance.getId()).forEach(
+//                    il -> LOGGER.info(il.toString()));
 
             return new ResponseEntity<Object>(response, HttpStatus.OK); // TODO verificare best practice
         }

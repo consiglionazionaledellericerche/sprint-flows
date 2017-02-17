@@ -53,7 +53,7 @@ public class FlowsDiagramResource {
     @ResponseBody
     @Timed
     public ResponseEntity<InputStreamResource>
-    getDiagramForProcess(
+    getDiagramForProcessDefinition(
             @PathVariable String id)
                     throws IOException {
 
@@ -61,56 +61,39 @@ public class FlowsDiagramResource {
 
         return ResponseEntity.ok(new InputStreamResource(resourceAsStream));
     }
+    
+    @RequestMapping(value = "/diagram/processInstance/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
+    @ResponseBody
+    @Timed
+    public ResponseEntity<InputStreamResource>
+    getDiagramForProcessInstance(
+            @PathVariable String id)
+                    throws IOException {
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
+                .processInstanceId(id).singleResult();
+        ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
+
+        BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinition.getId());
+        InputStream resource = pdg.generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(processInstance.getId()),
+            Collections.<String>emptyList(), processEngineConfiguration.getActivityFontName(), processEngineConfiguration.getLabelFontName(),
+            processEngineConfiguration.getAnnotationFontName(), processEngineConfiguration.getClassLoader(), 1.0);
+        
+        return ResponseEntity.ok(new InputStreamResource(resource));
+    }
 
     @RequestMapping(value = "/diagram/taskInstance/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
     @ResponseBody
     @Timed
     public ResponseEntity<InputStreamResource>
-    getDiagram(
+    getDiagramPerTaskInstanceId(
             @PathVariable String id)
                     throws IOException {
 
         Task task = taskService.createTaskQuery().taskId(id).singleResult();
-        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
-                .processInstanceId(task.getProcessInstanceId()).singleResult();
-        ProcessDefinition pde = repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
 
-        BpmnModel bpmnModel = repositoryService.getBpmnModel(pde.getId());
-        InputStream resource = pdg.generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(processInstance.getId()),
-            Collections.<String>emptyList(), processEngineConfiguration.getActivityFontName(), processEngineConfiguration.getLabelFontName(),
-            processEngineConfiguration.getAnnotationFontName(), processEngineConfiguration.getClassLoader(), 1.0);
-
-        return ResponseEntity.ok(new InputStreamResource(resource));
+        return getDiagramForProcessInstance(task.getProcessInstanceId());
 
     }
 
-    @RequestMapping(value = "/diagram2", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
-    @ResponseBody
-    @Timed
-    public void getDiagram2(
-            HttpServletRequest request,
-            HttpServletResponse response
-            ) throws IOException {
-
-
-        ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) repositoryService.createProcessDefinitionQuery()
-                .processDefinitionKey("permessiFerieProcess")
-                .latestVersion()
-                .singleResult();
-
-
-        ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
-
-
-        if (processDefinition != null && processDefinition.isGraphicalNotationDefined()) {
-          BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinition.getId());
-          InputStream resource = pdg.generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(processInstance.getId()));
-
-          response.setContentType(MediaType.IMAGE_PNG_VALUE);
-          org.apache.commons.io.IOUtils.copy(resource, response.getOutputStream());
-
-        } else {
-          throw new ActivitiIllegalArgumentException("Process instance with id '" + processInstance.getId() + "' has no graphical notation defined.");
-        }
-    }
 }
