@@ -9,6 +9,7 @@
                 "main": "Entities",
                 "cnrauthority": "Cnrauthority",
                 "form": "Form",
+                "cnrgroup": "Cnrgroup",
                 "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
             },
             "account": {

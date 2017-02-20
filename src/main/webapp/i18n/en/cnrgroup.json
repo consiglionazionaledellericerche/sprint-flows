@@ -1,0 +1,25 @@
+{
+    "sprintApp": {
+        "cnrgroup" : {
+            "home": {
+                "title": "Cnrgroups",
+                "createLabel": "Create a new Cnrgroup",
+                "createOrEditLabel": "Create or edit a Cnrgroup",
+                "search": "Search for Cnrgroup"
+            },
+            "created": "A new Cnrgroup is created with identifier {{ param }}",
+            "updated": "A Cnrgroup is updated with identifier {{ param }}",
+            "deleted": "A Cnrgroup is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Are you sure you want to delete Cnrgroup {{ id }}?"
+            },
+            "detail": {
+                "title": "Cnrgroup"
+            },
+            "name": "Name",
+            "displayName": "Display Name",
+            "parents": "Parents",
+            "memberUsers": "Member Users"
+        }
+    }
+}

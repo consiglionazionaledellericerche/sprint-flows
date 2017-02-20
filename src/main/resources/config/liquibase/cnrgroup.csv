@@ -1,0 +1,26 @@
+id;name;display_name
+1;root;Root
+2;gestori_flussi;Gestori Flussi
+3;gestori_flusso_ferie;Gestori Flusso Ferie
+4;responsabile_flusso_ferie;Responsabile Flusso Ferie
+5;supervisore_flusso_ferie;Supervisore Flusso Ferie
+6;gestiori_flussi_acquisti;Gestori Flusso Acquisti
+7;responsabile_flusso_acquisti;Responsabile Flusso Acquisti
+8;supervisore_flusso_acquisti;Supervisore Flusso Acquisti
+10;gestori_strutture;Gestori Strutture
+11;sisinfo;SISIFNO
+12;gedoc;GEDOC
+13;sisinfo_direttore;SISINFO - Direttore
+14;sisinfo_segreteria;SISINFO - Segreteria
+15;sisinfo_rt;SISINFO - RT
+16;sisinfo_sfd;SISIDFO - SFD
+17;sisinfo_ra;SISINFO - RA
+18;sisinfo_responsabile_flusso_acquisti;SISINFO - Responsabile Flusso Acquisti
+19;sisinfo_supervisore_flusso_acquisti;SISINFO - Supervisore Flusso Acquisti
+20;gedoc_direttore;GEDOC - Direttore
+21;gedoc_segreteria;GEDOC - Segreteria
+22;gedoc_rt;GEDOC - RT
+23;gedoc_sfd;SISIDFO - SFD
+24;gedoc_ra;GEDOC - RA
+25;gedoc_responsabile_flusso_acquisti;GEDOC - Responsabile Flusso Acquisti
+26;gedoc_supervisore_flusso_acquisti;GEDOC - Supervisore Flusso Acquisti
