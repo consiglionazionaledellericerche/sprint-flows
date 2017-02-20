@@ -70,6 +70,8 @@ public class FlowsConfigurations {
         beans.put("testExecutionListener", bean);
         conf.setBeans(beans);
 
+        conf.setAsyncExecutorActivate(true);
+
         //        conf.setDbIdentityUsed(false);
 
         conf.setHistoryLevel(HistoryLevel.AUDIT);
