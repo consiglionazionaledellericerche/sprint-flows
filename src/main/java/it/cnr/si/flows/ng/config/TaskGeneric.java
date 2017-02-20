@@ -20,7 +20,7 @@ public class TaskGeneric implements ExecutionListener {
 		LOGGER.info("TaskGeneric - sceltaUtente: " + execution.getVariable(nomeVariabileScelta));
 		Integer currentValue = (Integer) execution.getVariable("valore");
 		Integer nextValue = new Integer(currentValue.intValue() + 1);
-		execution.setVariable("valore", nextValue);
+		execution.setVariable("valore: ", nextValue);
 		LOGGER.info("valore corrente: " + nextValue);
 	}
 
