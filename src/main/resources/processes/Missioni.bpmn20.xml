@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="missioni" name="MISSIONI" isExecutable="true">
+    <callActivity id="ORDINE_MISSIONE" name="ORDINE MISSIONE" calledElement="flussoScrivo1">
+      <extensionElements>
+        <activiti:in source="RimborsiDaRichiedere" target="valore1"></activiti:in>
+        <activiti:out source="valore1" target="RimborsiDaRichiedere"></activiti:out>
+      </extensionElements>
+    </callActivity>
+    <startEvent id="startevent1" name="Start"></startEvent>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="ORDINE_MISSIONE"></sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <callActivity id="RIMBORSO_MISSIONE" name="RIMBORSO MISSIONE" calledElement="flussoScrivo2">
+      <extensionElements>
+        <activiti:in source="RimborsiDaRichiedere" target="valore2"></activiti:in>
+        <activiti:out source="valore2" target="RimborsiDaRichiedere"></activiti:out>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false" activiti:collection="listaCollection">
+        <completionCondition>${RimborsiDaRichiedere == 0}</completionCondition>
+      </multiInstanceLoopCharacteristics>
+    </callActivity>
+    <userTask id="RICHIESTA_RIMBORSO" name="RICHIESTA RIMBORSO" activiti:candidateGroups="ROLE_USER">
+      <extensionElements>
+        <activiti:executionListener event="start" class="it.cnr.si.flows.ng.config.SettaMultiInstanceCollection"></activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow2" sourceRef="ORDINE_MISSIONE" targetRef="RICHIESTA_RIMBORSO"></sequenceFlow>
+    <sequenceFlow id="flow6" sourceRef="RIMBORSO_MISSIONE" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow7" sourceRef="RICHIESTA_RIMBORSO" targetRef="RIMBORSO_MISSIONE"></sequenceFlow>
+    <dataObject id="RimborsiDaRichiedere" name="RimborsiDaRichiedere" itemSubjectRef="xsd:int">
+      <extensionElements>
+        <activiti:value>5</activiti:value>
+      </extensionElements>
+    </dataObject>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_missioni">
+    <bpmndi:BPMNPlane bpmnElement="missioni" id="BPMNPlane_missioni">
+      <bpmndi:BPMNShape bpmnElement="ORDINE_MISSIONE" id="BPMNShape_ORDINE_MISSIONE">
+        <omgdc:Bounds height="55.0" width="105.0" x="130.0" y="220.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="50.0" y="230.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="690.0" y="228.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="RIMBORSO_MISSIONE" id="BPMNShape_RIMBORSO_MISSIONE">
+        <omgdc:Bounds height="55.0" width="125.0" x="470.0" y="218.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="RICHIESTA_RIMBORSO" id="BPMNShape_RICHIESTA_RIMBORSO">
+        <omgdc:Bounds height="71.0" width="105.0" x="301.0" y="212.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="85.0" y="247.0"></omgdi:waypoint>
+        <omgdi:waypoint x="130.0" y="247.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="235.0" y="247.0"></omgdi:waypoint>
+        <omgdi:waypoint x="301.0" y="247.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="595.0" y="245.0"></omgdi:waypoint>
+        <omgdi:waypoint x="690.0" y="245.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="406.0" y="247.0"></omgdi:waypoint>
+        <omgdi:waypoint x="470.0" y="245.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
