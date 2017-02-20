@@ -46,6 +46,11 @@
             return $http.get('rest/tasks/'+ id);
         }
       },
+      processInstances: {
+        byProcessInstanceId : function(processInstanceId) {
+            return $http.get('rest/processInstances?processInstanceId=' + processInstanceId);
+        }
+      },
       definitions : {
         all : function() {
           return $http.get('rest/processdefinitions/all');

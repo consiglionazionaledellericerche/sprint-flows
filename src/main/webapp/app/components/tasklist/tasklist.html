@@ -40,14 +40,23 @@
       <a class="btn btn-primary" `ng-class="{'btn-xs': !advanced}"
         ui-sref="task({processDefinitionId: task.processDefinitionId,  taskId: task.id})"> <span
         class="glyphicon glyphicon-cog"></span> azioni
-      </a> <a class="btn btn-default" ng-class="{'btn-xs': !advanced}"
+      </a>
+      <a class="btn btn-default" ng-class="{'btn-xs': !advanced}"
         ng-if="task.assignee" ng-click="claimTask(task.id, false)">
         <span class="glyphicon glyphicon-hand-down" aria-hidden="true"></span>
         restituisci al gruppo
-      </a> <a class="btn btn-default" ng-class="{'btn-xs': !advanced}"
+      </a>
+      <a class="btn btn-default" ng-class="{'btn-xs': !advanced}"
         ng-if="!task.assignee" ng-click="claimTask(task.id, true)">
         <span class="glyphicon glyphicon-hand-up" aria-hidden="true"></span>
         prendi in carico
+      </a>
+
+      <!--ui-sref="details({processInstanceId: task.id})"> <span-->
+      <a class="btn btn-primary" `ng-class="{'btn-xs': !advanced}"
+         ui-sref="details({processInstanceId: task.processInstanceId, taskId: task.id})"> <span
+              class="glyphicon glyphicon-cog"></span>
+        Dettagli
       </a>
     </div>
   </div>

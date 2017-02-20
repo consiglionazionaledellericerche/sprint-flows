@@ -1,0 +1,19 @@
+<h4>Cronologia</h4>
+<!--todo: da finire?-->
+<div class="task-history" ng-repeat="task in tasks | orderBy:'startTime'">
+  <h5>
+    <task-details task="task"></task-details>
+    {{task.activityName}}
+  </h5>
+  <span ng-hide="task.id !== undefined"> <b>Task id </b>: {{task.id}} <br>  </span>
+  <span ng-show="task.assignee !== null"> <b>Assegnatario</b>: {{task.assignee}} </span>
+  <!--<span ng-show="task.state !== 'IN_PROGRESS' && task.isPooled"> <b>utente</b>: {{task.owner.firstName}} {{task.owner.lastName}} ({{task.properties.bpm_pooledActors[0] | groupName}}) </span>-->
+  <!--<span ng-show="!task.isPooled"> <b>utente</b>: {{task.owner.firstName}} {{task.owner.lastName}}</span> <br>-->
+  <b>Nome Attività</b>: {{task.activityName}} <br>
+  <b>Tipo Attività</b>: {{task.activityType}} <br>
+  <b>data di assegnazione</b>: {{task.startTime | date}} <br>
+  <span ng-hide="task.endTime !== null">
+    <!--<span ng-show="task.properties.wfcnr_reviewOutcome"> <b>con scelta:</b> {{task.properties.wfcnr_reviewOutcome}} <br> </span>-->
+    <b>con data di completamento:</b> {{task.endTime | date}} ({{task.durationInMillis}} millisecondi)
+  </span>
+</div>
