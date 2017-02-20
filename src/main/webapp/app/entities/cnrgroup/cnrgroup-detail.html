@@ -1,0 +1,39 @@
+
+<div>
+    <h2><span translate="sprintApp.cnrgroup.detail.title">Cnrgroup</span> {{vm.cnrgroup.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span translate="sprintApp.cnrgroup.name">Name</span></dt>
+        <dd>
+            <span>{{vm.cnrgroup.name}}</span>
+        </dd>
+        <dt><span translate="sprintApp.cnrgroup.displayName">Display Name</span></dt>
+        <dd>
+            <span>{{vm.cnrgroup.displayName}}</span>
+        </dd>
+        <dt><span translate="sprintApp.cnrgroup.parents">Parents</span></dt>
+        <dd>
+            <span ng-repeat="parents in vm.cnrgroup.parents">
+                <a ui-sref="cnrgroup-detail({id: parents.id})">{{parents.name}}</a>{{$last ? '' : ', '}}
+            </span>
+        </dd>
+        <dt><span translate="sprintApp.cnrgroup.memberUsers">Member Users</span></dt>
+        <dd>
+            <span ng-repeat="memberUsers in vm.cnrgroup.memberUsers">
+                {{memberUsers.login}}{{$last ? '' : ', '}}
+            </span>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            ui-sref="{{ vm.previousState }}"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span translate="entity.action.back"> Back</span>
+    </button>
+
+    <button type="button" ui-sref="cnrgroup-detail.edit({id:vm.cnrgroup.id})" class="btn btn-primary">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="hidden-xs hidden-sm" translate="entity.action.edit"> Edit</span>
+    </button>
+</div>

@@ -1,0 +1,62 @@
+
+<form name="editForm" role="form" novalidate ng-submit="vm.save()" show-validation>
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+                ng-click="vm.clear()">&times;</button>
+        <h4 class="modal-title" id="myCnrgroupLabel" translate="sprintApp.cnrgroup.home.createOrEditLabel">Create or edit a Cnrgroup</h4>
+    </div>
+    <div class="modal-body">
+        <jhi-alert-error></jhi-alert-error>
+        <div class="form-group" ng-show="vm.cnrgroup.id">
+            <label for="id" translate="global.field.id">ID</label>
+            <input type="text" class="form-control" id="id" name="id"
+                    ng-model="vm.cnrgroup.id" readonly />
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="sprintApp.cnrgroup.name" for="field_name">Name</label>
+            <input type="text" class="form-control" name="name" id="field_name"
+                    ng-model="vm.cnrgroup.name"
+                    required ng-pattern="/^[a-zA-Z0-9_]*$/" />
+            <div ng-show="editForm.name.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.name.$error.required" translate="entity.validation.required">
+                    This field is required.
+                </p>
+                <p class="help-block"
+                    ng-show="editForm.name.$error.pattern" translate="entity.validation.pattern" translate-value-pattern="^[a-zA-Z0-9_]*$">
+                    This field should follow pattern "^[a-zA-Z0-9_]*$".
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="sprintApp.cnrgroup.displayName" for="field_displayName">Display Name</label>
+            <input type="text" class="form-control" name="displayName" id="field_displayName"
+                    ng-model="vm.cnrgroup.displayName"
+                    required />
+            <div ng-show="editForm.displayName.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.displayName.$error.required" translate="entity.validation.required">
+                    This field is required.
+                </p>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label translate="sprintApp.cnrgroup.parents" for="field_parents">Parents</label>
+            <select class="form-control" id="field_parents" multiple name="parents" ng-model="vm.cnrgroup.parents" ng-options="cnrgroup as cnrgroup.name for cnrgroup in vm.cnrgroups track by cnrgroup.id"></select>
+        </div>
+        <div class="form-group">
+            <label translate="sprintApp.cnrgroup.memberUsers" for="field_memberUsers">Member Users</label>
+            <select class="form-control" id="field_memberUsers" multiple name="memberUsers" ng-model="vm.cnrgroup.memberUsers" ng-options="user as user.login for user in vm.users track by user.id"></select>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="vm.clear()">
+            <span class="glyphicon glyphicon-ban-circle"></span>&nbsp;<span translate="entity.action.cancel">Cancel</span>
+        </button>
+        <button type="submit" ng-disabled="editForm.$invalid || vm.isSaving" class="btn btn-primary">
+            <span class="glyphicon glyphicon-save"></span>&nbsp;<span translate="entity.action.save">Save</span>
+        </button>
+    </div>
+</form>
