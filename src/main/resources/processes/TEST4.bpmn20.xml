@@ -5,7 +5,11 @@
     <endEvent id="endevent1" name="End"></endEvent>
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="scrivo2"></sequenceFlow>
     <sequenceFlow id="flow2" sourceRef="scrivo2" targetRef="endevent1"></sequenceFlow>
-    <userTask id="scrivo2" name="scrivo2" activiti:candidateGroups="ROLE_USER"></userTask>
+    <userTask id="scrivo2" name="SCRIVO2" activiti:candidateGroups="ROLE_USER">
+      <extensionElements>
+        <activiti:executionListener event="start" class="it.cnr.si.flows.ng.config.CalcolaOrdini2"></activiti:executionListener>
+      </extensionElements>
+    </userTask>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_flussoScrivo2">
     <bpmndi:BPMNPlane bpmnElement="flussoScrivo2" id="BPMNPlane_flussoScrivo2">

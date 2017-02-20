@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="ACQUISTI-SUB" name="ACQUISTI-SUB" isExecutable="true">
+    <startEvent id="startevent1" name="Start"></startEvent>
+    <subProcess id="SUB-VALIDA" name="SUB-VALIDA">
+      <userTask id="usertask1" name="VALIDA" activiti:candidateGroups="ROLE_USER">
+        <extensionElements>
+          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.config.ValidaAcquisti"></activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <startEvent id="startevent2" name="Start"></startEvent>
+      <endEvent id="endevent1" name="End"></endEvent>
+      <sequenceFlow id="flow2" sourceRef="startevent2" targetRef="usertask1"></sequenceFlow>
+      <sequenceFlow id="flow3" sourceRef="usertask1" targetRef="endevent1"></sequenceFlow>
+    </subProcess>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="SUB-VALIDA"></sequenceFlow>
+    <subProcess id="SUB-FIRMA" name="SUB-FIRMA">
+      <startEvent id="startevent3" name="Start"></startEvent>
+      <endEvent id="endevent2" name="End"></endEvent>
+      <userTask id="FIRMA" name="FIRMA" activiti:candidateGroups="ROLE_USER">
+        <extensionElements>
+          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.config.FirmaAcquisti"></activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <sequenceFlow id="flow4" sourceRef="startevent3" targetRef="FIRMA"></sequenceFlow>
+      <sequenceFlow id="flow5" sourceRef="FIRMA" targetRef="endevent2"></sequenceFlow>
+    </subProcess>
+    <sequenceFlow id="flow6" sourceRef="SUB-VALIDA" targetRef="SUB-FIRMA"></sequenceFlow>
+    <endEvent id="endevent3" name="End"></endEvent>
+    <sequenceFlow id="flow7" sourceRef="SUB-FIRMA" targetRef="endevent3"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_ACQUISTI-SUB">
+    <bpmndi:BPMNPlane bpmnElement="ACQUISTI-SUB" id="BPMNPlane_ACQUISTI-SUB">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="443.0" y="35.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="SUB-VALIDA" id="BPMNShape_SUB-VALIDA">
+        <omgdc:Bounds height="205.0" width="721.0" x="100.0" y="100.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="410.0" y="177.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="startevent2" id="BPMNShape_startevent2">
+        <omgdc:Bounds height="35.0" width="35.0" x="140.0" y="187.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="740.0" y="187.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="SUB-FIRMA" id="BPMNShape_SUB-FIRMA">
+        <omgdc:Bounds height="205.0" width="731.0" x="95.0" y="331.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="startevent3" id="BPMNShape_startevent3">
+        <omgdc:Bounds height="35.0" width="35.0" x="125.0" y="418.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent2" id="BPMNShape_endevent2">
+        <omgdc:Bounds height="35.0" width="35.0" x="745.0" y="418.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="FIRMA" id="BPMNShape_FIRMA">
+        <omgdc:Bounds height="55.0" width="105.0" x="405.0" y="408.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent3" id="BPMNShape_endevent3">
+        <omgdc:Bounds height="35.0" width="35.0" x="443.0" y="560.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="175.0" y="204.0"></omgdi:waypoint>
+        <omgdi:waypoint x="410.0" y="204.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="515.0" y="204.0"></omgdi:waypoint>
+        <omgdi:waypoint x="740.0" y="204.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="460.0" y="70.0"></omgdi:waypoint>
+        <omgdi:waypoint x="460.0" y="100.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="160.0" y="435.0"></omgdi:waypoint>
+        <omgdi:waypoint x="405.0" y="435.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="510.0" y="435.0"></omgdi:waypoint>
+        <omgdi:waypoint x="745.0" y="435.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="460.0" y="305.0"></omgdi:waypoint>
+        <omgdi:waypoint x="460.0" y="331.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="460.0" y="536.0"></omgdi:waypoint>
+        <omgdi:waypoint x="460.0" y="560.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
