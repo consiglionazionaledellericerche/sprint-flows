@@ -1,5 +1,6 @@
 package it.cnr.si.flows.ng.config;
 
+import java.awt.GraphicsEnvironment;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,6 +66,18 @@ public class FlowsConfigurations {
             add(new FlowsVisibilitySetter());
         }});
 
+
+        String fonts[] =
+                GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+
+        for ( int i = 0; i < fonts.length; i++ )
+        {
+            System.out.println(fonts[i]);
+        }
+        conf.setActivityFontName("Open Sans");
+        conf.setAnnotationFontName("Open Sans");
+        conf.setLabelFontName("Open Sans");
+
         Map<Object, Object> beans = new HashMap<>();
         TestExecutionListener bean = appContext.getBean(TestExecutionListener.class);
         beans.put("testExecutionListener", bean);
@@ -72,16 +85,12 @@ public class FlowsConfigurations {
 
         conf.setAsyncExecutorActivate(true);
 
-        //        conf.setDbIdentityUsed(false);
-
         conf.setHistoryLevel(HistoryLevel.AUDIT);
 
         return conf;
     }
 
-    //    @Bean(name= {"processEngine", "engine", "pluto"})
     @Bean
-    //    @Primary
     public ProcessEngine getProcessEngine(
             SpringProcessEngineConfiguration conf) throws Exception {
         ProcessEngineFactoryBean bean = new ProcessEngineFactoryBean();
@@ -158,7 +167,7 @@ public class FlowsConfigurations {
         //        repositoryService.createProcessDefinitionQuery().processDefinitionKey(processDefinitionKey);
 
         for (Resource resource : appContext.getResources("classpath:processes/*.bpmn20.xml")) {
-        	log.info("\n ------- definition " + resource.getFilename());
+            log.info("\n ------- definition " + resource.getFilename());
             List<ProcessDefinition> processes = repositoryService.createProcessDefinitionQuery()
                     .processDefinitionKeyLike("%"+ resource.getFilename().split("[.]")[0] +"%")
                     .list();
