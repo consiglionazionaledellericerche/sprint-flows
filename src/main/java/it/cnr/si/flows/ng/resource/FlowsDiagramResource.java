@@ -61,24 +61,27 @@ public class FlowsDiagramResource {
 
         return ResponseEntity.ok(new InputStreamResource(resourceAsStream));
     }
-    
+
     @RequestMapping(value = "/diagram/processInstance/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
     @ResponseBody
     @Timed
     public ResponseEntity<InputStreamResource>
     getDiagramForProcessInstance(
-            @PathVariable String id)
+            @PathVariable String id, String font)
                     throws IOException {
 
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
                 .processInstanceId(id).singleResult();
         ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
 
+        if (font == null || font.equals("") )
+            font = "Arial";
+
         BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinition.getId());
         InputStream resource = pdg.generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(processInstance.getId()),
-            Collections.<String>emptyList(), processEngineConfiguration.getActivityFontName(), processEngineConfiguration.getLabelFontName(),
-            processEngineConfiguration.getAnnotationFontName(), processEngineConfiguration.getClassLoader(), 1.0);
-        
+            Collections.<String>emptyList(), font, font,
+            font, processEngineConfiguration.getClassLoader(), 1.0);
+
         return ResponseEntity.ok(new InputStreamResource(resource));
     }
 
@@ -92,7 +95,22 @@ public class FlowsDiagramResource {
 
         Task task = taskService.createTaskQuery().taskId(id).singleResult();
 
-        return getDiagramForProcessInstance(task.getProcessInstanceId());
+        return getDiagramForProcessInstance(task.getProcessInstanceId(), null);
+
+    }
+
+    @RequestMapping(value = "/diagram/taskInstance/{id}/{font}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
+    @ResponseBody
+    @Timed
+    public ResponseEntity<InputStreamResource>
+    getDiagramPerTaskInstanceId(
+            @PathVariable String id,
+            @PathVariable String font)
+                    throws IOException {
+
+        Task task = taskService.createTaskQuery().taskId(id).singleResult();
+
+        return getDiagramForProcessInstance(task.getProcessInstanceId(), font);
 
     }
 
