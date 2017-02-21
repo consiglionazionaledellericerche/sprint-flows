@@ -185,11 +185,7 @@
         <activiti:value>1</activiti:value>
       </extensionElements>
     </dataObject>
-    <dataObject id="sceltaUtente" name="sceltaUtente" itemSubjectRef="xsd:string">
-      <extensionElements>
-        <activiti:value></activiti:value>
-      </extensionElements>
-    </dataObject>
+    <dataObject id="sceltaUtente" name="sceltaUtente" itemSubjectRef="xsd:string"></dataObject>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_ACQUISTI-TRASPARENZA">
     <bpmndi:BPMNPlane bpmnElement="ACQUISTI-TRASPARENZA" id="BPMNPlane_ACQUISTI-TRASPARENZA">

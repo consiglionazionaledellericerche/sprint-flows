@@ -6,3 +6,5 @@
 /.settings/
 /.classpath
 /DB-H2/
+/.xml/
+/.bpmn/

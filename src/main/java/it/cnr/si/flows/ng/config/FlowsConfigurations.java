@@ -158,7 +158,7 @@ public class FlowsConfigurations {
         //        repositoryService.createProcessDefinitionQuery().processDefinitionKey(processDefinitionKey);
 
         for (Resource resource : appContext.getResources("classpath:processes/*.bpmn20.xml")) {
-
+        	log.info("\n ------- definition " + resource.getFilename());
             List<ProcessDefinition> processes = repositoryService.createProcessDefinitionQuery()
                     .processDefinitionKeyLike("%"+ resource.getFilename().split("[.]")[0] +"%")
                     .list();
