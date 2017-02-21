@@ -137,6 +137,11 @@ public class FlowsTaskResource {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Restituisce i tasks attivi per delle schermate di amministrazione.
+     *
+     * @return the active tasks
+     */
     @RequestMapping(value = "/activeTasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<DataResponse> getActiveTasks() {
