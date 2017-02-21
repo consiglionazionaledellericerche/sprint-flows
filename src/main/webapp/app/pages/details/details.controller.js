@@ -18,6 +18,7 @@
         vm.data.processInstanceId = $state.params.processInstanceId;
         dataService.processInstances.byProcessInstanceId($state.params.processInstanceId).then(
                 function(response) {
+//                    todo: la stessa cosa viene fatta in tasklist.directive.js: uniformare i metodi con uno di utilità
                     //sposto le properties dall'array variables(che cancello) in entity
                     response.data.entity.variables.map( function(el){
                        response.data.entity[el.name] = el.value;

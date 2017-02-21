@@ -44,6 +44,9 @@
         },
         getTask: function (id) {
             return $http.get('rest/tasks/'+ id);
+        },
+        getActiveTasks: function () {
+            return $http.get('rest/tasks/activeTasks/');
         }
       },
       processInstances: {

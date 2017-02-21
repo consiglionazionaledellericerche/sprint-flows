@@ -1,22 +1,15 @@
 package it.cnr.si.flows.ng.resource;
 
-import java.io.IOException;
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.codahale.metrics.annotation.Timed;
+import it.cnr.si.config.ldap.CNRUser;
+import it.cnr.si.flows.ng.service.CounterService;
+import it.cnr.si.repository.UserRepository;
+import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.security.SecurityUtils;
+import it.cnr.si.service.SecurityService;
+import it.cnr.si.service.UserService;
 import org.activiti.engine.FormService;
 import org.activiti.engine.IdentityService;
-import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -24,7 +17,6 @@ import org.activiti.engine.task.Task;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
-import org.activiti.rest.service.api.runtime.task.TaskCollectionResource;
 import org.activiti.rest.service.api.runtime.task.TaskResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,24 +27,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import static it.cnr.si.flows.ng.utils.Utils.*;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.security.Principal;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import com.codahale.metrics.annotation.Timed;
-
-import it.cnr.si.config.ldap.CNRUser;
-import it.cnr.si.flows.ng.service.CounterService;
-import it.cnr.si.repository.UserRepository;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.security.SecurityUtils;
-import it.cnr.si.service.SecurityService;
-import it.cnr.si.service.UserService;
+import static it.cnr.si.flows.ng.utils.Utils.isEmpty;
+import static it.cnr.si.flows.ng.utils.Utils.isNotEmpty;
 
 
 /**
@@ -67,7 +53,8 @@ public class FlowsTaskResource {
     private static final String ERRORE_PERMESSI_TASK = "ERRORE PERMESSI TASK";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsTaskResource.class);
-
+    @Autowired
+    protected RestResponseFactory restResponseFactory;
     @Inject
     private UserRepository userRepository;
     @Inject
@@ -78,10 +65,6 @@ public class FlowsTaskResource {
     private SecurityService securityService;
     @Inject
     private FormService formService;
-
-    @Autowired
-    protected RestResponseFactory restResponseFactory;
-
     @Autowired
     private RuntimeService runtimeService;
     @Autowired
@@ -90,18 +73,29 @@ public class FlowsTaskResource {
     @Autowired
     private TaskService taskService;
 
+    public static long extractId(String id) throws IllegalArgumentException {
+        try {
+            if (id.contains("$"))
+                id = id.split("\\$")[1];
+            return Long.parseLong(id);
+
+        } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
+            throw new IllegalArgumentException("L'id dato non è valido", e);
+        }
+    }
+
     @RequestMapping(value = "/mytasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<DataResponse> getMyTasks(Principal user,
-            @RequestParam Map<String, String> params) {
+                                                   @RequestParam Map<String, String> params) {
 
         String username = SecurityUtils.getCurrentUserLogin();
 
         List<Task> listraw = taskService.createTaskQuery()
-            .taskAssignee(username)
-            .includeProcessVariables()
-            .list();
+                .taskAssignee(username)
+                .includeProcessVariables()
+                .list();
 
         List<TaskResponse> list = restResponseFactory.createTaskResponseList(listraw);
 
@@ -123,14 +117,14 @@ public class FlowsTaskResource {
         String username = SecurityUtils.getCurrentUserLogin();
         List<String> authorities =
                 SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.toList());
 
         List<Task> listraw = taskService.createTaskQuery()
-            .taskCandidateUser(username)
-            .taskCandidateGroupIn(authorities)
-            .includeProcessVariables()
-            .list();
+                .taskCandidateUser(username)
+                .taskCandidateGroupIn(authorities)
+                .includeProcessVariables()
+                .list();
 
         List<TaskResponse> list = restResponseFactory.createTaskResponseList(listraw);
 
@@ -141,6 +135,17 @@ public class FlowsTaskResource {
         response.setData(list);
 
         return ResponseEntity.ok(response);
+    }
+
+    @RequestMapping(value = "/activeTasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<DataResponse> getActiveTasks() {
+
+        List<Task> listraw = taskService.createTaskQuery()
+                .includeProcessVariables()
+                .list();
+
+        return getDataResponseResponseEntity(listraw);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -228,8 +233,8 @@ public class FlowsTaskResource {
 
         String username = SecurityUtils.getCurrentUserLogin();
         String assignee = taskService.createTaskQuery()
-            .taskId(id)
-            .singleResult().getAssignee();
+                .taskId(id)
+                .singleResult().getAssignee();
 
         if (username.equals(assignee)) {
             taskService.unclaim(id);
@@ -275,7 +280,7 @@ public class FlowsTaskResource {
             HttpServletRequest req,
             HttpServletResponse resp,
             @PathVariable("id") String id)
-                    throws IOException {
+            throws IOException {
 
         Map<String, Object> result = new HashMap<>();
         Map<String, Object> list = new HashMap<>();
@@ -373,14 +378,15 @@ public class FlowsTaskResource {
 //        return null;
     }
 
-    public static long extractId(String id) throws IllegalArgumentException {
-        try {
-            if (id.contains("$"))
-                id = id.split("\\$")[1];
-            return Long.parseLong(id);
+    private ResponseEntity<DataResponse> getDataResponseResponseEntity(List<Task> listraw) {
+        List<TaskResponse> list = restResponseFactory.createTaskResponseList(listraw);
 
-        } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
-            throw new IllegalArgumentException("L'id dato non è valido", e);
-        }
+        DataResponse response = new DataResponse();
+        response.setStart(0);
+        response.setSize(list.size());
+        response.setTotal(list.size());
+        response.setData(list);
+
+        return ResponseEntity.ok(response);
     }
 }

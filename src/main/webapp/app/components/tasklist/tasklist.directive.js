@@ -16,10 +16,13 @@
         advanced: '=',
         detailed: '=',
         selectProcessDefinitionKey: '=',
-        processDefinitions: '='
+        processDefinitions: '=',
+        activeFlows: '='
       },
       templateUrl: 'app/components/tasklist/tasklist.html',
       link: function (scope, element, attrs) {
+
+        scope.activeFlows = attrs.activeFlows
 
         scope.completed = attrs.completed;
 
