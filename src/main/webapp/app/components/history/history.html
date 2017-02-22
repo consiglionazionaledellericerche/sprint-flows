@@ -12,7 +12,7 @@
   <b>Nome Attività</b>: {{task.activityName}} <br>
   <b>Tipo Attività</b>: {{task.activityType}} <br>
   <b>data di assegnazione</b>: {{task.startTime | date}} <br>
-  <span ng-hide="task.endTime !== null">
+    <span ng-hide="task.endTime === null">
     <!--<span ng-show="task.properties.wfcnr_reviewOutcome"> <b>con scelta:</b> {{task.properties.wfcnr_reviewOutcome}} <br> </span>-->
     <b>con data di completamento:</b> {{task.endTime | date}} ({{task.durationInMillis}} millisecondi)
   </span>
