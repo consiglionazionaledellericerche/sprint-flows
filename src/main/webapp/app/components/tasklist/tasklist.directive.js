@@ -16,13 +16,12 @@
         advanced: '=',
         detailed: '=',
         selectProcessDefinitionKey: '=',
-        processDefinitions: '=',
-        activeFlows: '='
+        processDefinitions: '='
       },
       templateUrl: 'app/components/tasklist/tasklist.html',
       link: function (scope, element, attrs) {
 
-        scope.activeFlows = attrs.activeFlows
+        scope.isActiveFlows = attrs.isActiveFlows
 
         scope.completed = attrs.completed;
 
