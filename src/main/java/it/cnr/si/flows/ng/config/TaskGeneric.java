@@ -18,6 +18,7 @@ public class TaskGeneric implements ExecutionListener {
 		String nomeVariabileScelta = "sceltaUtente";
 		LOGGER.info("TaskGeneric - processId: " + execution.getId());
 		LOGGER.info("TaskGeneric - sceltaUtente: " + execution.getVariable(nomeVariabileScelta));
+		LOGGER.info("TaskGeneric - valore: " + execution.getVariable("valore"));
 		Integer currentValue = (Integer) execution.getVariable("valore");
 		Integer nextValue = new Integer(currentValue.intValue() + 1);
 		execution.setVariable("valore: ", nextValue);
