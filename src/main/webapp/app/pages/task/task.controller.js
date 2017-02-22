@@ -49,6 +49,11 @@
       }
     }
 
+    $scope.reloadImg = function() {
+        $log.info(vm.font);
+        vm.diagramUrl = '/rest/diagram/taskInstance/'+ $state.params.taskId +'/'+ vm.font +'?' + new Date().getTime();
+    }
+
     function validate(data) {
       $log.debug("validation not implemented yet");
       return true;
