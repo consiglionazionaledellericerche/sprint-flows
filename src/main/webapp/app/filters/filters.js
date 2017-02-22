@@ -2,6 +2,11 @@
   'use strict';
 
   angular.module('sprintApp')
+  .filter('date', function () {
+    return function(d) {
+        return d ? moment(d).format('DD/MM/YYYY HH:mm') : null;
+    };
+  })
   .filter('dueDate', function () {
     return function (dueDate) {
       var s = null;
