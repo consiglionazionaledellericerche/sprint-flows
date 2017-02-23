@@ -62,12 +62,12 @@ public class FlowsDiagramResource {
         return ResponseEntity.ok(new InputStreamResource(resourceAsStream));
     }
 
-    @RequestMapping(value = "/diagram/processInstance/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
+    @RequestMapping(value = "/diagram/processInstance/{id}/{font}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
     @ResponseBody
     @Timed
     public ResponseEntity<InputStreamResource>
     getDiagramForProcessInstance(
-            @PathVariable String id, String font)
+            @PathVariable String id, @PathVariable String font)
                     throws IOException {
 
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
@@ -75,12 +75,13 @@ public class FlowsDiagramResource {
         ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
 
         if (font == null || font.equals("") )
-            font = "Arial";
+            font = processEngineConfiguration.getActivityFontName();
 
         BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinition.getId());
         InputStream resource = pdg.generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(processInstance.getId()),
-            Collections.<String>emptyList(), font, font,
-            font, processEngineConfiguration.getClassLoader(), 1.0);
+            Collections.<String>emptyList(),
+            font, font, font,
+            processEngineConfiguration.getClassLoader(), 1.2);
 
         return ResponseEntity.ok(new InputStreamResource(resource));
     }

@@ -10,6 +10,10 @@
   function DetailsController ($scope, Principal, LoginService, $state, dataService, AlertService, $log) {
     var vm = this;
     vm.data = {};
+    $scope.reloadImg = function() {
+        $log.info(vm.font);
+        vm.diagramUrl = '/rest/diagram/processInstance/'+ $state.params.taskId +'/'+ vm.font +'?' + new Date().getTime();
+    }
 
     $log.info($state.params.processInstanceId);
     if ($state.params.processInstanceId) {
@@ -25,6 +29,7 @@
                     })
                     delete response.data.entity.variables;
                     vm.data = response.data;
+                    vm.diagramUrl = '/rest/diagram/processInstance/'+ vm.data.entity.id;
                 });
     }
   }

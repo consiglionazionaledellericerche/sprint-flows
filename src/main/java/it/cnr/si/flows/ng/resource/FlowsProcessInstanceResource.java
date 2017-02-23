@@ -44,7 +44,7 @@ public class FlowsProcessInstanceResource {
     @Autowired
     private RuntimeService runtimeService;
     @Autowired
-    IdentityService identityService;
+    private IdentityService identityService;
 
     private static final String ERRORE_PERMESSI_WORKFLOW = "ERRORE PERMESSI WORKFLOW";
     @Autowired
