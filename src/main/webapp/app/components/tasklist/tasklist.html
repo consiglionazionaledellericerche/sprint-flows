@@ -38,17 +38,17 @@
     <div class="btn-group-vertical btn-block" role="group"
       aria-label="...">
         <a class="btn btn-primary" `ng-class="{'btn-xs': !advanced}"
-           ng-if="!isActiveFlows"
+           ng-show="!!isActiveFlows"
            ui-sref="task({processDefinitionId: task.processDefinitionId,  taskId: task.id})"> <span
                 class="glyphicon glyphicon-cog"></span> azioni
         </a>
         <a class="btn btn-default" ng-class="{'btn-xs': !advanced}"
-           ng-if="task.assignee&&!isActiveFlows" ng-click="claimTask(task.id, false)">
+           ng-hide="!task.assignee && isActiveFlows" ng-click="claimTask(task.id, false)">
             <span class="glyphicon glyphicon-hand-down" aria-hidden="true"></span>
             restituisci al gruppo
         </a>
         <a class="btn btn-default" ng-class="{'btn-xs': !advanced}"
-           ng-if="!task.assignee&&!isActiveFlows" ng-click="claimTask(task.id, true)">
+           ng-hide="task.assignee && isActiveFlows" ng-click="claimTask(task.id, true)">
             <span class="glyphicon glyphicon-hand-up" aria-hidden="true"></span>
             prendi in carico
         </a>
