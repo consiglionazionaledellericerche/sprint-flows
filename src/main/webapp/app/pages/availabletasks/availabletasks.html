@@ -7,7 +7,7 @@
         </h3>
       </a>
     </li>
-    <li role="presentation" ng-class="{'active-info': !assegnatiAMe}">
+    <li role="presentation" ng-class="{'active': !assegnatiAMe}">
       <a class="pointer" ng-click="active = 'available'">
         <h3>
           <i class="glyphicon glyphicon-user"></i> Compiti di gruppo<br>da prendere in carico: {{vm.pooledTasks.total}}
@@ -17,14 +17,17 @@
   </ul>
   <br>
   <div class="tab-content">
-    <div class="col-md-6">
+    <div class="col-md-12">
       <div class="progress">
-        <div class="progress-bar progress-bar-primary progress-bar-striped" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width: {{100* vm.myTasks.total/(vm.pooledTasks.total+ vm.myTasks.total)}}%"></div>
-      </div>
-    </div>
-    <div class="col-md-6">
-      <div class="progress">
-        <div class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width: {{100* vm.pooledTasks.total/(vm.pooledTasks.total+ vm.myTasks.total)}}%"></div>
+<!--         <div class="progress-bar progress-bar-primary progress-bar-striped" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width: {{100* vm.myTasks.total/(vm.pooledTasks.total+ vm.myTasks.total)}}%"></div> -->
+        <uib-progress>
+          <uib-bar class="progress-striped" value="100* vm.myTasks.total/(vm.pooledTasks.total+ vm.myTasks.total)" type="primary">
+            <span>{{100* vm.myTasks.total/(vm.pooledTasks.total+ vm.myTasks.total)}}%</span>
+          </uib-bar>
+          <uib-barclass="active" value="100* vm.pooledTasks.total/(vm.pooledTasks.total+ vm.myTasks.total)" type="info">
+            <span>{{100* vm.pooledTasks.total/(vm.pooledTasks.total+ vm.myTasks.total))}}%</span>
+          </uib-bar>
+        </uib-progress>
       </div>
     </div>
     <div class="col-md-3">
@@ -39,7 +42,7 @@
     </div>
     <div class="col-md-9" ng-show="active == 'assignedToMe'">
       <h3>
-        <span class="label" class="assegnatiAMe">
+        <span class="label label-primary" class="assegnatiAMe">
           <i class="glyphicon-inbox"></i> Lista dei compiti assegnati a me
         </span>
       </h3>
@@ -54,7 +57,7 @@
     </div>
     <div class="col-md-9"  ng-show="active == 'available'">
       <h3>
-        <span class="label" ng-class="label-info">
+        <span class="label label-info" ng-class="label-info">
           <i class="glyphicon glyphicon-user"></i>Lista dei compiti di gruppo da prendere in carico
         </span>
       </h3>

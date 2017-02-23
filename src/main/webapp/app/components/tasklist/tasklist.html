@@ -37,7 +37,7 @@
   <div class="col-md-3 pull-right" ng-show="!completed">
     <div class="btn-group-vertical btn-block" role="group"
       aria-label="...">
-        <a class="btn btn-primary" `ng-class="{'btn-xs': !advanced}"
+        <a class="btn btn-primary" ng-class="{'btn-xs': !advanced}"
            ng-show="!!isActiveFlows"
            ui-sref="task({processDefinitionId: task.processDefinitionId,  taskId: task.id})"> <span
                 class="glyphicon glyphicon-cog"></span> azioni
@@ -54,7 +54,7 @@
         </a>
 
       <!--ui-sref="details({processInstanceId: task.id})"> <span-->
-      <a class="btn btn-primary" `ng-class="{'btn-xs': !advanced}"
+      <a class="btn btn-primary" ng-class="{'btn-xs': !advanced}"
          ui-sref="details({processInstanceId: task.processInstanceId, taskId: task.id})"> <span
               class="glyphicon glyphicon-cog"></span>
         Dettagli
