@@ -137,21 +137,6 @@ public class FlowsTaskResource {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Restituisce i tasks attivi per delle schermate di amministrazione.
-     *
-     * @return the active tasks
-     */
-    @RequestMapping(value = "/activeTasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
-    public ResponseEntity<DataResponse> getActiveTasks() {
-
-        List<Task> listraw = taskService.createTaskQuery()
-                .includeProcessVariables()
-                .list();
-
-        return getDataResponseResponseEntity(listraw);
-    }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
@@ -381,17 +366,5 @@ public class FlowsTaskResource {
 //        }
 //
 //        return null;
-    }
-
-    private ResponseEntity<DataResponse> getDataResponseResponseEntity(List<Task> listraw) {
-        List<TaskResponse> list = restResponseFactory.createTaskResponseList(listraw);
-
-        DataResponse response = new DataResponse();
-        response.setStart(0);
-        response.setSize(list.size());
-        response.setTotal(list.size());
-        response.setData(list);
-
-        return ResponseEntity.ok(response);
     }
 }

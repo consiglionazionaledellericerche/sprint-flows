@@ -44,14 +44,14 @@
         },
         getTask: function (id) {
             return $http.get('rest/tasks/'+ id);
-        },
-        getActiveTasks: function () {
-            return $http.get('rest/tasks/activeTasks/');
         }
       },
       processInstances: {
         byProcessInstanceId : function(processInstanceId) {
             return $http.get('rest/processInstances?processInstanceId=' + processInstanceId);
+        },
+        getActives: function(processInstanceId) {
+            return $http.get('rest/processInstances/actives');
         }
       },
       definitions : {

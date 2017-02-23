@@ -9,8 +9,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -21,7 +19,6 @@ import java.util.Map;
 
 import static it.cnr.si.web.rest.TestUtil.login;
 import static it.cnr.si.web.rest.TestUtil.logout;
-import static org.junit.Assert.assertEquals;
 
 
 @SpringBootTest
@@ -62,16 +59,6 @@ public class FlowsTaskResourceTest {
         //TODO: Test goes here...
     }
 
-    @Test
-    public void testGetActiveTasks() {
-        ResponseEntity<DataResponse> ret = flowsTaskResource.getActiveTasks();
-        assertEquals(ret.getStatusCode(), HttpStatus.OK);
-
-        DataResponse resp = ret.getBody();
-        assertEquals(resp.getSize(), 1);
-        assertEquals(resp.getTotal(), 1);
-        assertEquals(((ArrayList) resp.getData()).size(), resp.getSize());
-    }
 
     @Test
     public void testGetTaskInstance() {

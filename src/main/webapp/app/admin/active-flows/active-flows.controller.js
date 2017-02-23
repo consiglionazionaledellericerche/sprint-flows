@@ -5,14 +5,14 @@
         .module('sprintApp')
         .controller('ActiveFlowsController', ActiveFlowsController);
 
-    ActiveFlowsController.$inject = ['dataService', '$log'];
+    ActiveFlowsController.$inject = ['dataService', '$log', 'utils'];
 
-    function ActiveFlowsController (dataService, $log) {
+    function ActiveFlowsController (dataService, $log, utils) {
         var vm = this;
 
-          dataService.tasks.getActiveTasks()
+          dataService.processInstances.getActives()
           .then(function (response) {
-              vm.tasks = response.data;
+              vm.processesInstances = response;
             }, function (response) {
               $log.error(response);
             });

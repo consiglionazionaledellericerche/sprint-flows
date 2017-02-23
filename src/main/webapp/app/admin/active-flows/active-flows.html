@@ -3,7 +3,8 @@
         <li role="presentation" ng-class="{'active': assegnatiAMe}">
             <a class="pointer" ng-click="active = 'assignedToMe'">
                 <h3>
-                    <i class="glyphicon glyphicon-inbox"></i> Flussi ancora attivi: {{vm.tasks.total}}
+                    <i class="glyphicon glyphicon-inbox"></i> Flussi ancora attivi:
+                    {{vm.processesInstances.data.entities.length}}
                 </h3>
             </a>
         </li>
@@ -56,14 +57,10 @@
               <i class="glyphicon glyphicon-user"></i>Lista dei compiti Attivi
             </span>
             </h3>
-            <tasklist tasks="vm.tasks.data"
-                      advanced="advanced"
-                      paging="paging"
-                      class="tasks"
-                      detailed="detailed"
-                      select-process-definition-key="selectProcessDefinitionKey"
-                      process-definitions="processDefinitions"
-                      is-active-flows="true"/>
+            <process-list processes="vm.processesInstances.data.entities"
+                          paging="paging"
+                          is-active-flows="true">
+            </process-list>
         </div>
 
     </div>
