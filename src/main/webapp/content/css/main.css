@@ -1,7 +1,21 @@
 body {
-    background: #fafafa;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    color: #333;
+    background: #ddd;
+    font-family: "Helvetica Neue", Helvetica, "Open Sans", "Droid Sans", "Roboto", "Segoe", "Arial", sans-serif;
+    color: #222;
+}
+
+.container {
+	background-color: #fff;
+	box-shadow: inset 0 1px 0 rgba(255,255,255,.55),0 1px 15px rgba(0,0,0,.25);
+}
+
+.maincontent {
+  margin: 15px;
+}
+
+.footer {
+  color: #777;
+  text-align: center;
 }
 
 /* ==========================================================================
@@ -47,6 +61,10 @@ Developement Ribbon
     pointer-events: none;
 }
 
+.navbar {
+  padding-left: 15px;
+  padding-right: 15px;
+}
 /* ==========================================================================
 Version number in navbar
 ========================================================================== */
@@ -355,4 +373,11 @@ input.ng-dirty.ng-invalid {
 .task-history {
   border-top: 2px solid #EEE;
   padding-bottom: 10px;
+}
+
+.nav-pills > li.active-info > a,
+.nav-pills > li.active-info > a:hover,
+.nav-pills > li.active-info > a:focus {
+  color: #fff;
+  background-color: #5bc0de!important;
 }

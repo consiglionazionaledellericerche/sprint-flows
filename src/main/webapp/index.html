@@ -25,13 +25,16 @@
     <page-ribbon></page-ribbon>
     <div ui-view="navbar" ng-cloak></div>
     <jhi-alert></jhi-alert>
-    <div class="container" style="margin-top: 65px;">
-        <div class="well" ui-view="content">
+    <div class="container">
+        <div class="row">
+          <img class="img-responsive" src="content/images/flows-banner.png" title="Scrivania Digitale CNR">
+        </div>
+        <div class="maincontent" ui-view="content">
             <!-- Angular views -->
         </div>
 
         <div class="footer" ng-cloak>
-            <p translate="footer">This is your footer</p>
+            <p>copyright ©2015-2017 Consiglio Nazionale delle Ricerche v{{VERSION}}</p>
         </div>
     </div>
 
