@@ -37,8 +37,8 @@
   <div class="col-md-3 pull-right" ng-show="!completed">
     <div class="btn-group-vertical btn-block" role="group"
       aria-label="...">
-        <a class="btn btn-primary" ng-class="{'btn-xs': !advanced}"
-           ng-show="!!actionButtons"
+        <a class="btn btn-primary" `ng-class="{'btn-xs': !advanced}"
+           ng-if="!isActiveFlows"
            ui-sref="task({processDefinitionId: task.processDefinitionId,  taskId: task.id})"> <span
                 class="glyphicon glyphicon-cog"></span> azioni
         </a>

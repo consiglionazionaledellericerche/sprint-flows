@@ -1,10 +1,13 @@
 <div ng-cloak>
 
+  <input type="text" ng-model="vm.font" />
+  <button ng-click="reloadImg()">Reload</button>
+
   <!-- intestazione -->
   <div class="row text-center">
       <h3>{{vm.data.entity.processDefinitionKey}} ({{vm.data.entity.processDefinitionId}})</h3>
     <p class="text-muted">{{vm.definition.description}}</p>
-    <img class="img-bordered" ng-src='/rest/diagram/processInstance/{{vm.data.entity.id}}' title="{{vm.data.entity.processDefinitionKey}}" style="max-width: 100%" />
+    <img class="img-bordered" ng-src='{{vm.diagramUrl}}' title="{{vm.data.entity.processDefinitionKey}}" style="max-width: 100%" />
   </div>
 
 

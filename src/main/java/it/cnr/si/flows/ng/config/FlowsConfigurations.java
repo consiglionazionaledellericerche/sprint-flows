@@ -74,6 +74,7 @@ public class FlowsConfigurations {
         {
             System.out.println(fonts[i]);
         }
+
         conf.setActivityFontName("Open Sans");
         conf.setAnnotationFontName("Open Sans");
         conf.setLabelFontName("Open Sans");

@@ -79,8 +79,9 @@ public class FlowsDiagramResource {
 
         BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinition.getId());
         InputStream resource = pdg.generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(processInstance.getId()),
-            Collections.<String>emptyList(), font, font,
-            font, processEngineConfiguration.getClassLoader(), 1.2);
+            Collections.<String>emptyList(),
+            font, font, font,
+            processEngineConfiguration.getClassLoader(), 1.2);
 
         return ResponseEntity.ok(new InputStreamResource(resource));
     }

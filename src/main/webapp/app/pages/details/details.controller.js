@@ -5,9 +5,9 @@
   .module('sprintApp')
   .controller('DetailsController', DetailsController);
 
-  DetailsController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log', 'utils'];
+  DetailsController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log'];
 
-  function DetailsController ($scope, Principal, LoginService, $state, dataService, AlertService, $log, utils) {
+  function DetailsController ($scope, Principal, LoginService, $state, dataService, AlertService, $log) {
     var vm = this;
     vm.data = {};
 
@@ -20,6 +20,7 @@
                 function(response) {
                     vm.data.entity = utils.refactoringVariables([response.data.entity])[0];
                     vm.data.history = response.data.history;
+                    vm.diagramUrl = '/rest/diagram/processInstance/'+ vm.data.entity.id;
                 });
     }
   }
