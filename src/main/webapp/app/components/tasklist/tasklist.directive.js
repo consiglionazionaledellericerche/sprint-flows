@@ -21,7 +21,7 @@
       templateUrl: 'app/components/tasklist/tasklist.html',
       link: function (scope, element, attrs) {
 
-        scope.isActiveFlows = attrs.isActiveFlows
+        scope.actionButtons = attrs.actionButtons
 
         scope.completed = attrs.completed;
 

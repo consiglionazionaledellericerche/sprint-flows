@@ -12,8 +12,7 @@
           restrict: 'E',
           scope: {
             processes: '=',
-            paging: '=',
-            isActiveFlows: '='
+            paging: '='
           },
           templateUrl: 'app/components/process-list/process-list.html'
         };
