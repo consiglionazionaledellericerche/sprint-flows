@@ -381,3 +381,20 @@ input.ng-dirty.ng-invalid {
   color: #fff;
   background-color: #5bc0de!important;
 }
+
+.nav-pills > li.available.active > a, .nav-pills > li.available.active > a:hover, .nav-pills > li.available.active > a:focus {
+    color: #fff;
+    background-color: #5bc0de;
+}
+
+.nav-pills{
+    display: flex;
+}
+.nav-pills li {
+    display: flex;
+    flex: 1;
+}
+
+.nav-pills li  a {
+    flex: 1;
+}

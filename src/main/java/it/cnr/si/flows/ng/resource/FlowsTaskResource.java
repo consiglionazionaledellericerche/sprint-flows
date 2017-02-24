@@ -10,8 +10,10 @@ import it.cnr.si.service.SecurityService;
 import it.cnr.si.service.UserService;
 import org.activiti.engine.FormService;
 import org.activiti.engine.IdentityService;
+import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.activiti.rest.common.api.DataResponse;
@@ -64,7 +66,7 @@ public class FlowsTaskResource {
     @Inject
     private SecurityService securityService;
     @Inject
-    private FormService formService;
+    private RepositoryService repositoryService;
     @Autowired
     private RuntimeService runtimeService;
     @Autowired
@@ -327,7 +329,11 @@ public class FlowsTaskResource {
             return new ResponseEntity<Object>(HttpStatus.OK);
 
         } else {
-            String key = definitionId +"-"+ counterService.getNext(definitionId) +"-"+System.currentTimeMillis();
+
+            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitionId).singleResult();
+
+            String counterId = processDefinition.getName() +"-"+ Calendar.getInstance().get(Calendar.YEAR);
+            String key =  counterId +"-"+ counterService.getNext(counterId);
             data.put("title", key);
             data.put("pippo", "pluto");
             data.put("initiator", username);
@@ -335,9 +341,6 @@ public class FlowsTaskResource {
 
             ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
             ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
-
-//            runtimeService.getIdentityLinksForProcessInstance(instance.getId()).forEach(
-//                    il -> LOGGER.info(il.toString()));
 
             return new ResponseEntity<Object>(response, HttpStatus.OK); // TODO verificare best practice
         }

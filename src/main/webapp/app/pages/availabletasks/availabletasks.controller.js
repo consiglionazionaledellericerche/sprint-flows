@@ -9,6 +9,8 @@
 
   function AvalableTasksController ($scope, Principal, LoginService, $state, dataService, $log) {
     var vm = this;
+    vm.myTasks = {total: 0};
+    vm.pooledTasks = {total: 0};
 
     $scope.loadTasks = function() {
       dataService.tasks.myTasksAvailable()
@@ -26,6 +28,10 @@
     }
 
     $scope.loadTasks();
+
+    $scope.setActiveContent = function(choice) {
+        $scope.activeContent = choice;
+    }
   }
 
 

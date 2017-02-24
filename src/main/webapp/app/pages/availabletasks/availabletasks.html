@@ -1,38 +1,38 @@
 <div ng-cloak>
-  <ul class="nav nav-pills nav-justified" ng-init="active = 'available'">
-    <li role="presentation" ng-class="{'active': assegnatiAMe}">
-      <a class="pointer" ng-click="active = 'assignedToMe'">
+  <div class="row form-group">
+    <div class="col-md-12">
+      <uib-tabset active="activePill" justified="true" type="pills" ng-init="activeContent = 'available'"> <uib-tab index="0" select="setActiveContent('assignedToMe')"> <uib-tab-heading>
         <h3>
-          <i class="glyphicon glyphicon-inbox"></i> Compiti assegnati a me: {{vm.myTasks.total}}
+          <i class="glyphicon glyphicon-inbox"></i>
+          Compiti assegnati a me: {{vm.myTasks.total}}
         </h3>
-      </a>
-    </li>
-    <li role="presentation" ng-class="{'active': !assegnatiAMe}">
-      <a class="pointer" ng-click="active = 'available'">
+      </uib-tab-heading> </uib-tab> <uib-tab index="1" classes="available" select="setActiveContent('available')"> <uib-tab-heading>
         <h3>
-          <i class="glyphicon glyphicon-user"></i> Compiti di gruppo<br>da prendere in carico: {{vm.pooledTasks.total}}
+          <i class="glyphicon glyphicon-user"></i>
+          Compiti di gruppo <br> da prendere in carico: {{vm.pooledTasks.total}}
         </h3>
-      </a>
-    </li>
-  </ul>
-  <br>
-  <div class="tab-content">
+      </uib-tab-heading> </uib-tab> </uib-tabset>
+    </div>
+  </div>
+
+  <div class="row">
     <div class="col-md-12">
       <div class="progress">
-<!--         <div class="progress-bar progress-bar-primary progress-bar-striped" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width: {{100* vm.myTasks.total/(vm.pooledTasks.total+ vm.myTasks.total)}}%"></div> -->
         <uib-progress>
-          <uib-bar class="progress-striped" value="100* vm.myTasks.total/(vm.pooledTasks.total+ vm.myTasks.total)" type="primary">
-            <span>{{100* vm.myTasks.total/(vm.pooledTasks.total+ vm.myTasks.total)}}%</span>
+          <uib-bar class="progress-bar-striped" value="100* vm.myTasks.total/(vm.pooledTasks.total+ vm.myTasks.total)" type="primary">
+            <span>{{vm.myTasks.total}}</span>
           </uib-bar>
-          <uib-barclass="active" value="100* vm.pooledTasks.total/(vm.pooledTasks.total+ vm.myTasks.total)" type="info">
-            <span>{{100* vm.pooledTasks.total/(vm.pooledTasks.total+ vm.myTasks.total))}}%</span>
+          <uib-bar class="progress-bar-striped" value="100* vm.pooledTasks.total/(vm.pooledTasks.total+ vm.myTasks.total)" type="info">
+            <span>{{vm.pooledTasks.total}}</span>
           </uib-bar>
         </uib-progress>
       </div>
     </div>
+
     <div class="col-md-3">
       <button class="btn btn-default btn-block margin-top-20" ng-click="advanced = !advanced">
-        <span class="glyphicon" ng-class="{'glyphicon-wrench': !advanced, 'glyphicon-tasks': advanced}"></span> modalità {{advanced ? 'semplice' : 'avanzata'}}
+        <span class="glyphicon" ng-class="{'glyphicon-wrench': !advanced, 'glyphicon-tasks': advanced}"></span>
+        modalità {{advanced ? 'semplice' : 'avanzata'}}
       </button>
 
       <div ng-show="advanced">
@@ -40,41 +40,29 @@
         <workflow-types criteria="criteria" filters="true" reset-filters="resetFilters" select-process-definition-key="selectProcessDefinitionKey" process-definitions="processDefinitions"></workflow-types>
       </div>
     </div>
-    <div class="col-md-9" ng-show="active == 'assignedToMe'">
+
+    <div class="col-md-9" ng-show="activeContent == 'assignedToMe'">
       <h3>
         <span class="label label-primary" class="assegnatiAMe">
-          <i class="glyphicon-inbox"></i> Lista dei compiti assegnati a me
+          <i class="glyphicon-inbox"></i>
+          Lista dei compiti assegnati a me
         </span>
       </h3>
-        <tasklist tasks="vm.myTasks.data"
-                  advanced="advanced"
-                  paging="paging"
-                  class="tasks"
-                  detailed="detailed"
-                  select-process-definition-key="selectProcessDefinitionKey"
-                  process-definitions="processDefinitions"
-                  is-active-flows="false"/>
+      <tasklist tasks="vm.myTasks.data" advanced="advanced" paging="paging" class="tasks" detailed="detailed" select-process-definition-key="selectProcessDefinitionKey" process-definitions="processDefinitions" is-active-flows="false" />
     </div>
-    <div class="col-md-9"  ng-show="active == 'available'">
+    <div class="col-md-9" ng-show="activeContent == 'available'">
       <h3>
         <span class="label label-info" ng-class="label-info">
-          <i class="glyphicon glyphicon-user"></i>Lista dei compiti di gruppo da prendere in carico
+          <i class="glyphicon glyphicon-user"></i>
+          Lista dei compiti di gruppo da prendere in carico
         </span>
       </h3>
-        <tasklist tasks="vm.pooledTasks.data"
-                  advanced="advanced"
-                  paging="paging"
-                  class="tasks"
-                  detailed="detailed"
-                  select-process-definition-key="selectProcessDefinitionKey"
-                  process-definitions="processDefinitions"
-                  is-active-flows="false"/>
+      <tasklist tasks="vm.pooledTasks.data" advanced="advanced" paging="paging" class="tasks" detailed="detailed" select-process-definition-key="selectProcessDefinitionKey" process-definitions="processDefinitions" is-active-flows="false" />
     </div>
-
   </div>
-
-  <pre ng-show="development">
-    {{tasks | json}}
-  </pre>
-  <pre>{{vm | json}}</pre>
+</div>
+<pre ng-show="development">
+  {{tasks | json}}
+</pre>
+<pre>{{vm | json}}</pre>
 </div>
