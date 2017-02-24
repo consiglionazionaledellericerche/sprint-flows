@@ -8,10 +8,10 @@
                 <strong>Avviato il </strong> {{variable.value | date}}
             </div>
             <div ng-switch-when="initiator">
-                <strong>Aviato da </strong> {{variable.value | date}}
+                <strong>Aviato da </strong> {{variable.value}}
             </div>
             <div ng-switch-when="taskId">
-                <strong>Id del task: </strong> {{variable.value | date}}
+                <strong>Id del task: </strong> {{variable.value}}
             </div>
             <div ng-switch-default>
                 <strong>{{variable.name}}:</strong> {{variable.value}}
