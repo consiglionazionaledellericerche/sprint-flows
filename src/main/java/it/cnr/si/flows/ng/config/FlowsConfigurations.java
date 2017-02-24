@@ -66,14 +66,6 @@ public class FlowsConfigurations {
             add(new FlowsVisibilitySetter());
         }});
 
-
-        String fonts[] =
-                GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
-
-        for ( int i = 0; i < fonts.length; i++ )
-        {
-            System.out.println(fonts[i]);
-        }
         conf.setActivityFontName("Open Sans");
         conf.setAnnotationFontName("Open Sans");
         conf.setLabelFontName("Open Sans");
