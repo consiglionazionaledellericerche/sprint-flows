@@ -7,8 +7,6 @@ import it.cnr.si.service.UserService;
 import org.activiti.engine.*;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.rest.service.api.RestResponseFactory;
-import org.activiti.rest.service.api.engine.variable.RestVariable;
-import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,15 +28,16 @@ import java.util.*;
 public class FlowsProcessInstanceResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsProcessInstanceResource.class);
-
+    @Autowired
+    protected RestResponseFactory restResponseFactory;
+    @Autowired
+    HistoryService historyService;
+    @Autowired
+    IdentityService identityService;
     @Inject
     private UserRepository userRepository;
     @Inject
     private UserService userService;
-
-    @Autowired
-    protected RestResponseFactory restResponseFactory;
-
     @Autowired
     private RepositoryService repositoryService;
     @Autowired
@@ -223,6 +222,30 @@ public class FlowsProcessInstanceResource {
     }
 
 
+    /**
+     * Restituisce le Process Instances attive.
+     *
+     * @param req the req
+     * @return the process instances actives
+     */
+    @RequestMapping(value = "/actives", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @Secured(AuthoritiesConstants.USER)
+    @Timed
+    public ResponseEntity<Map<String, Object>> getProcessInstancesActives(HttpServletRequest req) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+//      entity
+            List processInstance = runtimeService.createProcessInstanceQuery().includeProcessVariables().list();
+            result.put("entities", restResponseFactory.createProcessInstanceResponseList(processInstance));
+//      history
+            List historyQuery = historyService.createHistoricActivityInstanceQuery().list();
+            result.put("history", restResponseFactory.createHistoricActivityInstanceResponseList(historyQuery));
+        } catch (Exception e) {
+            LOGGER.error("Errore: ", e);
+        }
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
 
     // TODO returns ResponseEntity<Map<String, Object>>
     @RequestMapping(value = "variables/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

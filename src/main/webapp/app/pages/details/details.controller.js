@@ -5,9 +5,9 @@
   .module('sprintApp')
   .controller('DetailsController', DetailsController);
 
-  DetailsController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log'];
+  DetailsController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log', 'utils'];
 
-  function DetailsController ($scope, Principal, LoginService, $state, dataService, AlertService, $log) {
+  function DetailsController ($scope, Principal, LoginService, $state, dataService, AlertService, $log, utils) {
     var vm = this;
     vm.data = {};
 
