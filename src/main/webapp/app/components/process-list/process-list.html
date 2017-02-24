@@ -3,7 +3,8 @@
         <div class="col-md-10">
             <!--todo: da fare il filtro?-->
             <!--<a class="pointer" ng-click="filterProcess(process.processDefinitionId)" title="filtra per il flusso {{process.title}}"><strong>{{process.title}}</strong></a>-->
-            <a ng-href="{{process.url}}" title="dettagli del flusso {{process.processDefinitionId}}">
+            <a ng-href="#/details?processInstanceId={{process.id}}"
+               title="dettagli del flusso {{process.processDefinitionId}}">
                 <small class="label"
                        ng-class="{'label-info' : !process.completed, 'label-primary' : process.completed}">
                     {{process.processDefinitionId}}
