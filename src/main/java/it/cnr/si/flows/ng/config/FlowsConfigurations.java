@@ -13,6 +13,7 @@ import org.activiti.spring.SpringProcessEngineConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,6 +33,9 @@ import java.util.Map;
 public class FlowsConfigurations {
 
     private static final Logger log = LoggerFactory.getLogger(FlowsConfigurations.class);
+
+    @Value("${cnr.activiti.diagram-font}")
+    private String diagramFont;
 
     @Autowired
     private PlatformTransactionManager transactionManager;
@@ -56,18 +60,9 @@ public class FlowsConfigurations {
             add(new FlowsVisibilitySetter());
         }});
 
-
-        String fonts[] =
-                GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
-
-        for ( int i = 0; i < fonts.length; i++ )
-        {
-            System.out.println(fonts[i]);
-        }
-
-        conf.setActivityFontName("Open Sans");
-        conf.setAnnotationFontName("Open Sans");
-        conf.setLabelFontName("Open Sans");
+        conf.setActivityFontName(diagramFont);
+        conf.setAnnotationFontName(diagramFont);
+        conf.setLabelFontName(diagramFont);
 
         Map<Object, Object> beans = new HashMap<>();
         TestExecutionListener bean = appContext.getBean(TestExecutionListener.class);
