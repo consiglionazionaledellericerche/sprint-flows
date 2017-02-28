@@ -1,6 +1,7 @@
 package it.cnr.si.flows.ng.resource;
 
 import it.cnr.si.FlowsApp;
+import it.cnr.si.web.rest.TestUtil;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.repository.ProcessDefinitionResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
@@ -21,8 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static it.cnr.si.web.rest.TestUtil.login;
-import static it.cnr.si.web.rest.TestUtil.logout;
 import static org.junit.Assert.assertEquals;
 
 
@@ -35,8 +34,8 @@ public class FlowsProcessInstanceResourceTest {
     FlowsTaskResource flowsTaskResource;
     @Autowired
     FlowsProcessInstanceResource flowsProcessInstanceResource;
-
-
+    @Autowired
+    TestUtil util;
     @Autowired
     FlowsProcessDefinitionResource flowsProcessDefinitionResource;
     private String processDefinitionKey;
@@ -44,7 +43,7 @@ public class FlowsProcessInstanceResourceTest {
 
     @Before
     public void setUp() throws Exception {
-        login();
+        util.loginAdmin();
         DataResponse ret = (DataResponse) flowsProcessDefinitionResource.getAllProcessDefinitions();
 
         Map<String, Object> data = new HashMap();
@@ -55,7 +54,7 @@ public class FlowsProcessInstanceResourceTest {
 
     @After
     public void tearDown() {
-        logout();
+        util.logout();
 //        super.tearDown();
     }
 

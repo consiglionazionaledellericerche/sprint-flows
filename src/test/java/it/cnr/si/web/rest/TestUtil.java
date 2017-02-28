@@ -62,12 +62,25 @@ public class TestUtil {
         return byteArray;
     }
 
-    public static void login() {
-        SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken("admin", "admin"));
+    public void loginAdmin() {
+        login("admin", "admin");
     }
 
-    public static void logout() {
+    public void loginSpaclient() {
+        login("spaclient", "sp@si@n0");
+    }
+
+    public void loginUser() {
+        login("user", "user");
+    }
+
+
+    private void login(String user, String psw) {
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(user, psw));
+    }
+
+    public void logout() {
         SecurityContextHolder.clearContext();
     }
 }

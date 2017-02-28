@@ -13,6 +13,7 @@ import org.activiti.engine.IdentityService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.Task;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
@@ -69,7 +70,6 @@ public class FlowsTaskResource {
     private RuntimeService runtimeService;
     @Autowired
     private IdentityService identityService;
-
     @Autowired
     private TaskService taskService;
 
@@ -205,11 +205,22 @@ public class FlowsTaskResource {
             @PathVariable("id") String id) {
 
         String username = SecurityUtils.getCurrentUserLogin();
-        LOGGER.info("Setting owner of task "+ id +" to "+ username);
+        LOGGER.info("Setting owner of task {} to {}", id, username);
 
-        boolean canClaim = true; // TODO
+        List<IdentityLink> list = taskService.getIdentityLinksForTask(id);
+        String groupCandidate = null;
+        for (IdentityLink link : list) {
+            if (link.getType().equals("candidate")) {
+                groupCandidate = link.getGroupId();
+                break;
+            }
+        }
+        boolean canClaim = SecurityUtils.isCurrentUserInRole(groupCandidate);
+
         if (canClaim) {
             taskService.claim(id, username);
+        } else {
+            return new ResponseEntity<Map<String, Object>>(HttpStatus.FORBIDDEN);
         }
 
         return new ResponseEntity<Map<String,Object>>(HttpStatus.OK);
