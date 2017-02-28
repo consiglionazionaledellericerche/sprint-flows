@@ -1,4 +1,4 @@
-package it.cnr.si.web.rest;
+package it.cnr.si.flows.ng;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.ZonedDateTimeSerializer;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -20,6 +21,7 @@ import static it.cnr.si.config.JacksonConfiguration.ISO_FIXED_FORMAT;
 /**
  * Utility class for testing REST controllers.
  */
+@Service
 public class TestUtil {
 
     /** MediaType for JSON UTF8 */

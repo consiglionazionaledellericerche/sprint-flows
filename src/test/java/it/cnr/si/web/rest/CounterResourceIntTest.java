@@ -2,17 +2,16 @@ package it.cnr.si.web.rest;
 
 import it.cnr.si.SprintApp;
 import it.cnr.si.domain.Counter;
+import it.cnr.si.flows.ng.TestUtil;
 import it.cnr.si.repository.CounterRepository;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import static org.hamcrest.Matchers.hasItem;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,6 +24,7 @@ import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -58,16 +58,6 @@ public class CounterResourceIntTest {
 
     private Counter counter;
 
-    @PostConstruct
-    public void setup() {
-        MockitoAnnotations.initMocks(this);
-        CounterResource counterResource = new CounterResource();
-        ReflectionTestUtils.setField(counterResource, "counterRepository", counterRepository);
-        this.restCounterMockMvc = MockMvcBuilders.standaloneSetup(counterResource)
-            .setCustomArgumentResolvers(pageableArgumentResolver)
-            .setMessageConverters(jacksonMessageConverter).build();
-    }
-
     /**
      * Create an entity for this test.
      *
@@ -80,6 +70,16 @@ public class CounterResourceIntTest {
                 .name(DEFAULT_NAME)
                 .value(DEFAULT_VALUE);
         return counter;
+    }
+
+    @PostConstruct
+    public void setup() {
+        MockitoAnnotations.initMocks(this);
+        CounterResource counterResource = new CounterResource();
+        ReflectionTestUtils.setField(counterResource, "counterRepository", counterRepository);
+        this.restCounterMockMvc = MockMvcBuilders.standaloneSetup(counterResource)
+                .setCustomArgumentResolvers(pageableArgumentResolver)
+                .setMessageConverters(jacksonMessageConverter).build();
     }
 
     @Before

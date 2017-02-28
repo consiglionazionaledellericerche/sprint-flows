@@ -1,7 +1,7 @@
 package it.cnr.si.flows.ng.resource;
 
 import it.cnr.si.FlowsApp;
-import it.cnr.si.web.rest.TestUtil;
+import it.cnr.si.flows.ng.TestUtil;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.repository.ProcessDefinitionResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;

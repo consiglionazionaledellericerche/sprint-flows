@@ -8,7 +8,6 @@ import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.SecurityUtils;
 import it.cnr.si.service.SecurityService;
 import it.cnr.si.service.UserService;
-import org.activiti.engine.FormService;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
@@ -196,20 +195,20 @@ public class FlowsTaskResource {
 
     /**
      * @param req
-     * @param id
+     * @param taskId
      * @param params
      * @return
      */
-    @RequestMapping(value = "/claim/{id}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/claim/{taskId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<Map<String, Object>> claimTask(
             HttpServletRequest req,
-            @PathVariable("id") String id) {
+            @PathVariable("taskId") String taskId) {
 
         String username = SecurityUtils.getCurrentUserLogin();
-        LOGGER.info("Setting owner of task {} to {}", id, username);
+        LOGGER.info("Setting owner of task {} to {}", taskId, username);
 
-        List<IdentityLink> list = taskService.getIdentityLinksForTask(id);
+        List<IdentityLink> list = taskService.getIdentityLinksForTask(taskId);
         String groupCandidate = null;
         for (IdentityLink link : list) {
             if (link.getType().equals("candidate")) {
@@ -217,13 +216,13 @@ public class FlowsTaskResource {
                 break;
             }
         }
-        boolean canClaim = SecurityUtils.isCurrentUserInRole(groupCandidate);
+        String finalGroupCandidate = groupCandidate;
+        boolean canClaim = userService.getUserWithAuthorities().getAuthorities().stream().anyMatch(autority -> autority.getName().equals(finalGroupCandidate));
 
-        if (canClaim) {
-            taskService.claim(id, username);
-        } else {
+        if (canClaim)
+            taskService.claim(taskId, username);
+        else
             return new ResponseEntity<Map<String, Object>>(HttpStatus.FORBIDDEN);
-        }
 
         return new ResponseEntity<Map<String,Object>>(HttpStatus.OK);
     }

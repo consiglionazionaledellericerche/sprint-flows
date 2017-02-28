@@ -40,10 +40,10 @@
           }
         })
 
-        scope.claimTask = function (id, take) {
+        scope.claimTask = function (taskId, take) {
           var user;
           var promise;
-          dataService.tasks.claim(id, take).success(function (data) {
+          dataService.tasks.claim(taskId, take).success(function (data) {
             $log.debug(data);
             scope.pooled[id] = user !== undefined;
             scope.$parent.loadTasks();

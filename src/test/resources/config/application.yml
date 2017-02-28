@@ -82,6 +82,9 @@ jhipster:
         contactEmail:
         license:
         licenseUrl:
+cnr:
+    activiti:
+        diagram-font: Open Sans
 
 ajp.port: 8009
 ajp.timeout: 120000
