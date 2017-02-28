@@ -30,6 +30,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -307,17 +308,19 @@ public class FlowsTaskResource {
 //        }
     }
 
-    @RequestMapping(value = "complete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "complete", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<Object> completeTask(
             HttpServletRequest req,
-            @RequestBody Map<String, Object> data) {
+            @RequestPart(value = "documentiPrincipali", required = true) List<MultipartFile> documentiPrincipali) {
 
         Optional<CNRUser> user = securityService.getUser();
 
         String username = SecurityUtils.getCurrentUserLogin();
         SecurityUtils.isCurrentUserInRole("pippo");
         identityService.setAuthenticatedUserId(username);
+
+        Map<String, Object> data = new HashMap<>();
 
         String taskId = (String) data.get("taskId");
         String definitionId = (String) data.get("definitionId");

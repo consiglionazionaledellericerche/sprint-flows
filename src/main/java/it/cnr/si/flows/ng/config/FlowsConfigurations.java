@@ -152,7 +152,7 @@ public class FlowsConfigurations {
         RepositoryService repositoryService = appContext.getBean(RepositoryService.class);
         //        repositoryService.createProcessDefinitionQuery().processDefinitionKey(processDefinitionKey);
 
-        for (Resource resource : appContext.getResources("classpath:processes/*.bpmn20.xml")) {
+        for (Resource resource : appContext.getResources("classpath:processes/*.bpmn*")) {
             log.info("\n ------- definition " + resource.getFilename());
             List<ProcessDefinition> processes = repositoryService.createProcessDefinitionQuery()
                     .processDefinitionKeyLike("%"+ resource.getFilename().split("[.]")[0] +"%")

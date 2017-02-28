@@ -33,8 +33,13 @@
         myTasksAvailable : function() {
           return $http.get('rest/tasks/availabletasks');
         },
-        complete : function(data) {
-          return $http.post('rest/tasks/complete', data);
+        complete : function(payload) {
+          return $http({
+              url: 'rest/tasks/complete',
+              method: 'POST',
+              headers: {"Content-Type": undefined},
+              transformRequest: angular.identity,
+              data: payload});
         },
         claim: function (id, take) {
           return $http({
