@@ -1,17 +1,24 @@
 <div ng-cloak>
   <div class="row form-group">
     <div class="col-md-12">
-      <uib-tabset active="activePill" justified="true" type="pills" ng-init="activeContent = 'available'"> <uib-tab index="0" select="setActiveContent('assignedToMe')"> <uib-tab-heading>
-        <h3>
-          <i class="glyphicon glyphicon-inbox"></i>
-          Compiti assegnati a me: {{vm.myTasks.total}}
-        </h3>
-      </uib-tab-heading> </uib-tab> <uib-tab index="1" classes="available" select="setActiveContent('available')"> <uib-tab-heading>
-        <h3>
-          <i class="glyphicon glyphicon-user"></i>
-          Compiti di gruppo <br> da prendere in carico: {{vm.pooledTasks.total}}
-        </h3>
-      </uib-tab-heading> </uib-tab> </uib-tabset>
+      <uib-tabset active="1" justified="true" type="pills">
+        <uib-tab index="0" select="setActiveContent('assignedToMe')">
+          <uib-tab-heading>
+            <h3>
+              <i class="glyphicon glyphicon-inbox"></i>
+              Compiti assegnati a me: {{vm.myTasks.total}}
+            </h3>
+          </uib-tab-heading>
+        </uib-tab>
+        <uib-tab index="1" classes="available" select="setActiveContent('available')">
+          <uib-tab-heading>
+            <h3>
+              <i class="glyphicon glyphicon-user"></i>
+              Compiti di gruppo <br> da prendere in carico: {{vm.pooledTasks.total}}
+            </h3>
+          </uib-tab-heading>
+        </uib-tab>
+      </uib-tabset>
     </div>
   </div>
 
