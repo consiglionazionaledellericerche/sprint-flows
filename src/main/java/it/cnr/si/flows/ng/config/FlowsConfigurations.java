@@ -1,22 +1,7 @@
 package it.cnr.si.flows.ng.config;
 
-import java.awt.GraphicsEnvironment;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-
-import org.activiti.engine.FormService;
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.ManagementService;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
+import com.zaxxer.hikari.HikariDataSource;
+import org.activiti.engine.*;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.repository.DeploymentBuilder;
@@ -34,7 +19,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import com.zaxxer.hikari.HikariDataSource;
+import javax.annotation.PostConstruct;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 
@@ -65,6 +55,15 @@ public class FlowsConfigurations {
             add(loggingListener);
             add(new FlowsVisibilitySetter());
         }});
+
+
+        String fonts[] =
+                GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+
+        for ( int i = 0; i < fonts.length; i++ )
+        {
+            System.out.println(fonts[i]);
+        }
 
         conf.setActivityFontName("Open Sans");
         conf.setAnnotationFontName("Open Sans");

@@ -23,21 +23,17 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
 
-/**
- * The type Flows process instance resource.
- */
 @Controller
 @RequestMapping("rest/processInstances")
 public class FlowsProcessInstanceResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsProcessInstanceResource.class);
-    private static final String ERRORE_PERMESSI_WORKFLOW = "ERRORE PERMESSI WORKFLOW";
     @Autowired
     protected RestResponseFactory restResponseFactory;
     @Autowired
-    IdentityService identityService;
-    @Autowired
     HistoryService historyService;
+    @Autowired
+    IdentityService identityService;
     @Inject
     private UserRepository userRepository;
     @Inject
@@ -115,13 +111,6 @@ public class FlowsProcessInstanceResource {
         //        }
     }
 
-    /**
-     * Gets processes.
-     *
-     * @param req    the req
-     * @param params the params
-     * @return the processes
-     */
     @RequestMapping(value = "/processes", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<Map<String, Object>> getProcesses(HttpServletRequest req,
@@ -169,12 +158,12 @@ public class FlowsProcessInstanceResource {
     /**
      * Questo deve funzionare solo per il supervisor!!!
      *
-     * @param req            the req
-     * @param skipCount      the skip count
-     * @param maxItems       the max items
-     * @param where          the where
-     * @param definitionName the definition name
-     * @return workflow instances
+     * @param req
+     * @param skipCount
+     * @param maxItems
+     * @param where
+     * @param definitionName
+     * @return
      */
     @RequestMapping(value = "workflowInstances/{definitionName}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -210,13 +199,6 @@ public class FlowsProcessInstanceResource {
     }
 
 
-    /**
-     * Gets process instance by id.
-     *
-     * @param req               the req
-     * @param processInstanceId the process instance id
-     * @return the process instance by id
-     */
     @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured(AuthoritiesConstants.USER)
@@ -265,16 +247,7 @@ public class FlowsProcessInstanceResource {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-
-    /**
-     * Gets workflow variables.
-     *
-     * @param req  the req
-     * @param resp the resp
-     * @param id   the id
-     * @throws IOException the io exception
-     */
-// TODO returns ResponseEntity<Map<String, Object>>
+    // TODO returns ResponseEntity<Map<String, Object>>
     @RequestMapping(value = "variables/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public void getWorkflowVariables(HttpServletRequest req, HttpServletResponse resp, @PathVariable("id") String id)
@@ -334,13 +307,6 @@ public class FlowsProcessInstanceResource {
         // TODO throw exeption if invalid
     }
 
-    /**
-     * Delete response entity.
-     *
-     * @param req        the req
-     * @param workflowId the workflow id
-     * @return the response entity
-     */
     @RequestMapping(value = "deleteWorkflow", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Timed

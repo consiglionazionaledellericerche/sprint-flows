@@ -1,23 +1,14 @@
 package it.cnr.si.flows.ng.resource;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collections;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.codahale.metrics.annotation.Timed;
 import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
-import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
-import org.activiti.engine.task.TaskQuery;
 import org.activiti.image.ProcessDiagramGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -29,7 +20,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.codahale.metrics.annotation.Timed;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
 
 
 @Controller
@@ -79,8 +72,9 @@ public class FlowsDiagramResource {
 
         BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinition.getId());
         InputStream resource = pdg.generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(processInstance.getId()),
-            Collections.<String>emptyList(), font, font,
-            font, processEngineConfiguration.getClassLoader(), 1.2);
+                                                   Collections.<String>emptyList(),
+                                                   font, font, font,
+                                                   processEngineConfiguration.getClassLoader(), 1.2);
 
         return ResponseEntity.ok(new InputStreamResource(resource));
     }

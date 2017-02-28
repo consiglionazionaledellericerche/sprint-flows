@@ -7,14 +7,14 @@
 
   function Utils () {
     return {
-        refactoringVariables : function(collections){
-            collections.data.entities.forEach(function(entity) {
+        refactoringVariables : function(entities){
+            entities.forEach(function(entity) {
                 entity.variables.map( function(el){
                     entity[el.name] = el.value;
                 });
                 delete entity.variables;
             })
-            return collections
+            return entities;
         }
     };
   }
