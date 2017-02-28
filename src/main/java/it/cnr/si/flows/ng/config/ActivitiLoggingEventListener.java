@@ -33,7 +33,6 @@ public class ActivitiLoggingEventListener implements ActivitiEventListener {
             break;
 
         default:
-            System.out.println("Event received: " + event.getType());
         }
     }
 
