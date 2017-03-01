@@ -23,17 +23,6 @@ public class ActivitiLoggingEventListener implements ActivitiEventListener {
         if (event.getExecutionId() != null)
             log.info(""+ event.getEngineServices().getRuntimeService().getVariable(event.getExecutionId(), "titolo"));
 
-        switch (event.getType()) {
-        case JOB_EXECUTION_SUCCESS:
-            System.out.println("A job well done!");
-            break;
-
-        case JOB_EXECUTION_FAILURE:
-            System.out.println("A job has failed...");
-            break;
-
-        default:
-        }
     }
 
     @Override
