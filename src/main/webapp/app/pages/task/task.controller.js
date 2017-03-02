@@ -39,7 +39,7 @@
 
                 Upload.upload({
                     url: 'rest/tasks/complete',
-                    data: {data: vm.data},
+                    data: vm.data,
                 }).then(function (response) {
 //                    $timeout(function () {
 //                        file.result = response.data;

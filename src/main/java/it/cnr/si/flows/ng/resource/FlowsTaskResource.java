@@ -327,8 +327,8 @@ public class FlowsTaskResource {
         Map<String, Object> data = new HashMap<>();
         String username = SecurityUtils.getCurrentUserLogin();
 
-        String taskId = (String) req.getParameter("data[taskId]");
-        String definitionId = (String) req.getParameter("data[definitionId]");
+        String taskId = (String) req.getParameter("taskId");
+        String definitionId = (String) req.getParameter("definitionId");
 
         if ( isEmpty(taskId) && isEmpty(definitionId))
             return ResponseEntity.badRequest().body("Fornire almeno un taskId o un definitionId");
