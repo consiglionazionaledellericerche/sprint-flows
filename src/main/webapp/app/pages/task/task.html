@@ -15,37 +15,17 @@
     <input type="hidden" name="taskId" value="{{vm.data.taskId}}" />
     <input type="hidden" name="definitionId" value="{{vm.data.definitionId}}" />
 
-    <input type="file"
-      ngf-select
-      ng-model="vm.data.decisioneAContrattare"
-      name="file"
-      accept="application/pdf"
-      ngf-max-size="2MB"
-      required
-      ngf-model-invalid="errorFile">
-
-    <input type="file"
-      ngf-select
-      ng-model="vm.data.allegato"
-      name="file"
-      accept="image/*"
-      ngf-max-size="2MB"
-      ngf-multiple="true"
-      ngf-max-files="3"
-      required
-      ngf-model-invalid="errorFile">
-
     <div class="row">
       <label for="titolo">Titolo</label>
       <input type="text" ng-model="vm.data.titolo" name="titolo" id="titolo" class="form-control" required>
     </div>
 
 
-    <!--     <div class="row"> -->
-    <!--       <div class="col-md-6 col-md-offset-3"> -->
-    <!--         <ng-include src="vm.formUrl" ng-model="vm.data"/> -->
-    <!--       </div> -->
-    <!--     </div> -->
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        <ng-include src="vm.formUrl" ng-model="vm.data" />
+      </div>
+    </div>
     <div class="row">
       <div class="col-md-2 col-md-offset-4">
         <button class="btn btn-primary btn-block" type="reset">Reimposta</button>
