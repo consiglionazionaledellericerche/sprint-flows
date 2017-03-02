@@ -52,6 +52,9 @@
         },
         getActive: function(processInstanceId) {
             return $http.get('rest/processInstances/active');
+        },
+        attachments: function(processInstanceId) {
+            return $http.get('rest/processInstances/'+ processInstanceId +'/attachments');
         }
       },
       definitions : {

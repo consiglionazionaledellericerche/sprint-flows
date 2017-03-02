@@ -76,14 +76,16 @@ public class FlowsConfigurations {
         return conf;
     }
 
-    @Bean
+
+    @Bean(name = "processEngine")
     public ProcessEngine getProcessEngine(
             SpringProcessEngineConfiguration conf) throws Exception {
-        ProcessEngineFactoryBean bean = new ProcessEngineFactoryBean();
-        bean.setApplicationContext(appContext);
-        bean.setProcessEngineConfiguration(conf);
 
-        return bean.getObject();
+        ProcessEngineFactoryBean factory = new ProcessEngineFactoryBean();
+        factory.setApplicationContext(appContext);
+        factory.setProcessEngineConfiguration(conf);
+
+        return factory.getObject();
         //        return processEngineConfiguration.buildProcessEngine();
     }
 
@@ -152,7 +154,7 @@ public class FlowsConfigurations {
         RepositoryService repositoryService = appContext.getBean(RepositoryService.class);
         //        repositoryService.createProcessDefinitionQuery().processDefinitionKey(processDefinitionKey);
 
-        for (Resource resource : appContext.getResources("classpath:processes/*.bpmn20.xml")) {
+        for (Resource resource : appContext.getResources("classpath:processes/*.bpmn*")) {
             log.info("\n ------- definition " + resource.getFilename());
             List<ProcessDefinition> processes = repositoryService.createProcessDefinitionQuery()
                     .processDefinitionKeyLike("%"+ resource.getFilename().split("[.]")[0] +"%")

@@ -1,78 +1,46 @@
 <div ng-cloak>
 
-  <!-- intestazione -->
   <div class="row text-center">
-      <h3>{{vm.data.entity.processDefinitionKey}} ({{vm.data.entity.processDefinitionId}})</h3>
+    <h3>{{vm.data.entity.processDefinitionKey}} ({{vm.data.entity.processDefinitionId}})</h3>
     <p class="text-muted">{{vm.definition.description}}</p>
-    <img class="img-bordered" ng-src='/rest/diagram/processInstance/{{vm.data.entity.id}}'
-         title="{{vm.data.entity.processDefinitionKey}}" style="max-width: 100%"/>
+    <img class="img-bordered" ng-src='/rest/diagram/processInstance/{{vm.data.entity.id}}' title="{{vm.data.entity.processDefinitionKey}}" style="max-width: 100%" />
   </div>
 
 
   <div class="col-md-7">
-    <!--todo: da completare-->
+
     <h4>{{vm.data.entity.title}} ({{vm.data.entity.id}})</h4>
-      <!-- Button madale di cancellazione del workflow-->
-    <!--<span ng-show="canReassign && !vm.data.entity.completed">-->
-      <!--<span ng-show="canReassign && !vm.data.entity.completed && activeTask.owner" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modaleRilasciaTask">-->
-        <!--Rilascia-->
-      <!--</span>-->
-      <!--<span ng-show="canReassign && !vm.data.entity.completed  && !activeTask.owner" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modaleAssegnaTask">-->
-        <!--Assegna-->
-      <!--</span>-->
-    <!--</span>-->
-    <!--<span ng-show="canDelete(user.groups) && !vm.data.entity.completed ">-->
-      <!--<button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modalForDelete">-->
-        <!--Cancella Flusso-->
-      <!--</button>-->
-    <!--</span>-->
-    <br><br>
-    <!--<span ng-bind-html="workflow.data.priority | priority"></span>-->
+
     <span ng-class="{'label-warning': !vm.data.entity.completed , 'label-success': vm.data.entity.completed }" class="label">{{!vm.data.entity.completed ? 'attivo' : 'completato'}}</span>
-    <br><br>
-    <b>Titolo</b>: {{vm.data.entity.title}}
-    <br>
+    <b>Titolo</b>
+    : {{vm.data.entity.title}}
     <b>Avviato da:</b>
-    {{vm.data.entity.initiator}}
-    il {{vm.data.entity.startDate | date}}
-    <br>
-    <span ng-hide="!vm.data.entity.completed"><b>completato il:</b> {{vm.data.entity.endDate | date}}</span>
+    {{vm.data.entity.initiator}} il {{vm.data.entity.startDate | date}}
+    <span ng-hide="!vm.data.entity.completed">
+      <b>completato il:</b>
+      {{vm.data.entity.endDate | date}}
+    </span>
     <span ng-show="!vm.data.entity.completed">
       <!--<b>Percentuale di completamento: </b> {{activeTask.properties.bpm_percentComplete}}&#37;-->
       <br>
-      <b>Fase: </b> {{vm.data.entity.activityId}}
+      <b>Fase: </b>
+      {{vm.data.entity.activityId}}
     </span>
-    <!--<div>-->
-      <!--<span ng-hide="!activeTask.owner">-->
-        <!--<b>in carico a</b>: {{activeTask.owner.lastName}} {{activeTask.owner.firstName}}-->
-      <!--</span>-->
-    <!--</div>-->
-    <!--<metadata-fields metadata-fields="metadataFields" workflow-variable="workflowVariable" label-class="'font-bold'" print-tables="true"></metadata-fields>-->
 
-    <!--<links links="links"></links>-->
 
-    <!--<hr>-->
-    <!--<h4>Documenti</h4>-->
+    <h4>Documenti</h4>
+    <attachments process-instance-id="49"></attachments>
 
-    <!--<attachments aux="aux" main="main" updated="updated" upload-content="uploadContent"></attachments>-->
-    <!--<span ng-show="aux.length === 0 && main.length === 0">nessun documento</span>-->
+
   </div>
-    <!--<div class="col-md-1"></div>-->
-    <!--todo: implementare il pdfService-->
-    <!--<a ng-href="/rest/summaryPdf?archive=false&workflowId={{(workflow.data.id ? workflow.data.id: '')| split:'$':1}}&startTaskDefinitionType={{workflow.data.definition.startTaskDefinitionType}}">-->
-        <!--<button class="btn btn-default">Export Summary</button>-->
-    <!--</a>-->
 
-  <!--history-->
   <button class="btn btn-default" ng-click="chronology = true" ng-hide="chronology">Visualizza Cronologia</button>
-    <div ng-if="chronology" class="col-md-4 ng-scope">
-      <history tasks="vm.data.history" />
-    </div>
-  <!--<hr>-->
+  <div ng-if="chronology" class="col-md-4 ng-scope">
+    <history tasks="vm.data.history" />
+  </div>
 
-    <br>
 </div>
 <div class="col-md-10">
-    <pre>{{scope | json}}</pre>
-    <pre>{{vm | json}}</pre>
+  <pre>{{scope | json}}</pre>
+  <pre>{{vm | json}}</pre>
 </div>

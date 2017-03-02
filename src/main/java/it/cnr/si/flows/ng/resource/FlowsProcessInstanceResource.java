@@ -199,6 +199,7 @@ public class FlowsProcessInstanceResource {
     }
 
 
+    // TODO refactor in path param
     @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured(AuthoritiesConstants.USER)
