@@ -176,7 +176,7 @@ public class FormResource {
         log.debug("REST request to get Form for task: {}",  taskId);
 
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-        ProcessInstance process = runtimeService.createProcessInstanceQuery().processDefinitionId(task.getProcessDefinitionId()).singleResult();
+        ProcessInstance process = runtimeService.createProcessInstanceQuery().processDefinitionId(task.getProcessDefinitionId()).list().get(0);
 
         return getFormByTrittico(
                 process.getProcessDefinitionKey(),
