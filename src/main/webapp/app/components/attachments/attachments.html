@@ -1,0 +1,6 @@
+<h1>Attachments</h1>
+<ul>
+  <li ng-repeat="attachment in attachments">
+    <strong>{{attachment.type}}:</strong> <a ng-href="/rest/processInstances/attachments/{{attachment.id}}" >{{attachment.name}}</a>
+  </li>
+</ul>
