@@ -228,23 +228,13 @@ public class FlowsProcessInstanceResource {
      * @param req the req
      * @return the process instances actives
      */
-    @RequestMapping(value = "/actives", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/active", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured(AuthoritiesConstants.USER)
     @Timed
-    public ResponseEntity<Map<String, Object>> getProcessInstancesActives(HttpServletRequest req) {
-        Map<String, Object> result = new HashMap<>();
-        try {
-//      entity
-            List processInstance = runtimeService.createProcessInstanceQuery().includeProcessVariables().list();
-            result.put("entities", restResponseFactory.createProcessInstanceResponseList(processInstance));
-//      history
-            List historyQuery = historyService.createHistoricActivityInstanceQuery().list();
-            result.put("history", restResponseFactory.createHistoricActivityInstanceResponseList(historyQuery));
-        } catch (Exception e) {
-            LOGGER.error("Errore: ", e);
-        }
-        return new ResponseEntity<>(result, HttpStatus.OK);
+    public ResponseEntity getActiveProcessInstances(HttpServletRequest req) {
+        List<ProcessInstance> processInstance = runtimeService.createProcessInstanceQuery().includeProcessVariables().list();
+        return new ResponseEntity<>(restResponseFactory.createProcessInstanceResponseList(processInstance), HttpStatus.OK);
     }
 
     // TODO returns ResponseEntity<Map<String, Object>>

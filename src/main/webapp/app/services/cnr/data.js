@@ -50,8 +50,8 @@
         byProcessInstanceId : function(processInstanceId) {
             return $http.get('rest/processInstances?processInstanceId=' + processInstanceId);
         },
-        getActives: function(processInstanceId) {
-            return $http.get('rest/processInstances/actives');
+        getActive: function(processInstanceId) {
+            return $http.get('rest/processInstances/active');
         }
       },
       definitions : {

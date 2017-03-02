@@ -19,7 +19,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -79,14 +78,14 @@ public class FlowsProcessInstanceResourceTest {
     }
 
     @Test
-    public void testGetProcessInstancesActives() throws Exception {
-        ResponseEntity<Map<String, Object>> ret = flowsProcessInstanceResource.getProcessInstancesActives(new MockHttpServletRequest());
+    public void testGetProcessInstancesActives() {
+        ResponseEntity ret = flowsProcessInstanceResource.getActiveProcessInstances(new MockHttpServletRequest());
 
         assertEquals(ret.getStatusCode(), HttpStatus.OK);
 
-        Map resp = ret.getBody();
-        ProcessInstanceResponse entity = (ProcessInstanceResponse) ((List) resp.get("entities")).get(0);
-        assertEquals(entity.getProcessDefinitionId(), processDefinitionKey);
+        ArrayList<ProcessInstanceResponse> entities = (ArrayList<ProcessInstanceResponse>) ret.getBody();
+        assertEquals(entities.size(), 1);
+        assertEquals(entities.get(0).getProcessDefinitionId(), processDefinitionKey);
     }
 
 
