@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -61,7 +62,9 @@ public class FlowsTaskResourceTest {
             }
         }
         data.put("definitionId", processDefinitionMissioni);
-        ResponseEntity<Object> response = flowsTaskResource.completeTask(new MockHttpServletRequest(), data);
+        MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
+        req.setParameter("definitionId", processDefinitionMissioni);
+        ResponseEntity<Object> response = flowsTaskResource.completeTask(req);
         Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
 //        Recupero il taskId
         taskId = taskService.createTaskQuery().singleResult().getId();

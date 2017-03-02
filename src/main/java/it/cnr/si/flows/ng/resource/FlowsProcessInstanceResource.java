@@ -6,7 +6,6 @@ import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.UserService;
 import org.activiti.engine.*;
 import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Attachment;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.websocket.server.PathParam;
-
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 
 @Controller
@@ -233,24 +229,13 @@ public class FlowsProcessInstanceResource {
      * @param req the req
      * @return the process instances actives
      */
-    // TODO refactor nome metodo
-    @RequestMapping(value = "/actives", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/active", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured(AuthoritiesConstants.USER)
     @Timed
-    public ResponseEntity<Map<String, Object>> getProcessInstancesActives(HttpServletRequest req) {
-        Map<String, Object> result = new HashMap<>();
-        try {
-//      entity
-            List processInstance = runtimeService.createProcessInstanceQuery().includeProcessVariables().list();
-            result.put("entities", restResponseFactory.createProcessInstanceResponseList(processInstance));
-//      history
-            List historyQuery = historyService.createHistoricActivityInstanceQuery().list();
-            result.put("history", restResponseFactory.createHistoricActivityInstanceResponseList(historyQuery));
-        } catch (Exception e) {
-            LOGGER.error("Errore: ", e);
-        }
-        return new ResponseEntity<>(result, HttpStatus.OK);
+    public ResponseEntity getActiveProcessInstances(HttpServletRequest req) {
+        List<ProcessInstance> processInstance = runtimeService.createProcessInstanceQuery().includeProcessVariables().list();
+        return new ResponseEntity<>(restResponseFactory.createProcessInstanceResponseList(processInstance), HttpStatus.OK);
     }
 
     // TODO returns ResponseEntity<Map<String, Object>>
@@ -351,24 +336,5 @@ public class FlowsProcessInstanceResource {
 
     /* ----------- */
 
-    @RequestMapping(value = "/{processInstanceId}/attachments", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    @Secured(AuthoritiesConstants.USER)
-    @Timed
-    public ResponseEntity<List<Attachment>> getAttachmentsByProcessId(@PathVariable("processInstanceId") String processInstanceId) {
 
-        List<Attachment> att = processEngine.getTaskService().getProcessInstanceAttachments(processInstanceId);
-        return ResponseEntity.ok(att);
-    }
-
-    @RequestMapping(value = "/attachments/{attachmentId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    @Secured(AuthoritiesConstants.USER)
-    @Timed
-    public ResponseEntity<InputStream> getAttachmentById(@PathVariable("attachmentId") String attachmentId) {
-
-        InputStream attachmentContent = processEngine.getTaskService().getAttachmentContent(attachmentId);
-
-        return ResponseEntity.ok(attachmentContent);
-    }
 }

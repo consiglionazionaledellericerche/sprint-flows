@@ -10,7 +10,7 @@
     function ActiveFlowsController (dataService, $log, utils) {
         var vm = this;
 
-          dataService.processInstances.getActives()
+          dataService.processInstances.getActive()
           .then(function (response) {
               vm.processesInstances = response;
             }, function (response) {

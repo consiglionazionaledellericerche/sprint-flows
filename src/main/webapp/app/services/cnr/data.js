@@ -33,13 +33,8 @@
         myTasksAvailable : function() {
           return $http.get('rest/tasks/availabletasks');
         },
-        complete : function(payload) {
-          return $http({
-              url: 'rest/tasks/complete',
-              method: 'POST',
-              headers: {"Content-Type": undefined},
-              transformRequest: angular.identity,
-              data: payload});
+        complete : function(data) {
+          return $http.post('rest/tasks/complete', data);
         },
         claim: function (id, take) {
           return $http({
@@ -55,8 +50,8 @@
         byProcessInstanceId : function(processInstanceId) {
             return $http.get('rest/processInstances?processInstanceId=' + processInstanceId);
         },
-        getActives: function(processInstanceId) {
-            return $http.get('rest/processInstances/actives');
+        getActive: function(processInstanceId) {
+            return $http.get('rest/processInstances/active');
         },
         attachments: function(processInstanceId) {
             return $http.get('rest/processInstances/'+ processInstanceId +'/attachments');

@@ -4,7 +4,7 @@
             <a class="pointer" ng-click="active = 'assignedToMe'">
                 <h3>
                     <i class="glyphicon glyphicon-inbox"></i> Flussi ancora attivi:
-                    {{vm.processesInstances.data.entities.length}}
+                    {{vm.processesInstances.data.length}}
                 </h3>
             </a>
         </li>
@@ -57,9 +57,7 @@
               <i class="glyphicon glyphicon-user"></i>Lista dei compiti Attivi
             </span>
             </h3>
-            <process-list processes="vm.processesInstances.data.entities"
-                          paging="paging">
-            </process-list>
+            <process-list processes="vm.processesInstances.data" paging="paging"></process-list>
         </div>
 
     </div>
