@@ -231,7 +231,7 @@ public class FlowsProcessInstanceResource {
      */
     @RequestMapping(value = "/active", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    @Secured(AuthoritiesConstants.USER)
+    @Secured({AuthoritiesConstants.USER, AuthoritiesConstants.ADMIN})
     @Timed
     public ResponseEntity getActiveProcessInstances(HttpServletRequest req) {
         List<ProcessInstance> processInstance = runtimeService.createProcessInstanceQuery().includeProcessVariables().list();
