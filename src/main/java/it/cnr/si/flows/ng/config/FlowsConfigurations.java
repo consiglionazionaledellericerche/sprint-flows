@@ -76,14 +76,16 @@ public class FlowsConfigurations {
         return conf;
     }
 
-    @Bean
+
+    @Bean(name = "processEngine")
     public ProcessEngine getProcessEngine(
             SpringProcessEngineConfiguration conf) throws Exception {
-        ProcessEngineFactoryBean bean = new ProcessEngineFactoryBean();
-        bean.setApplicationContext(appContext);
-        bean.setProcessEngineConfiguration(conf);
 
-        return bean.getObject();
+        ProcessEngineFactoryBean factory = new ProcessEngineFactoryBean();
+        factory.setApplicationContext(appContext);
+        factory.setProcessEngineConfiguration(conf);
+
+        return factory.getObject();
         //        return processEngineConfiguration.buildProcessEngine();
     }
 
