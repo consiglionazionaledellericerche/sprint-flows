@@ -31,6 +31,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -91,7 +92,7 @@ public class FlowsTaskResource {
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<DataResponse> getMyTasks(Principal user,
-                                                   @RequestParam Map<String, String> params) {
+            @RequestParam Map<String, String> params) {
 
         String username = SecurityUtils.getCurrentUserLogin();
 
@@ -120,8 +121,8 @@ public class FlowsTaskResource {
         String username = SecurityUtils.getCurrentUserLogin();
         List<String> authorities =
                 SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .collect(Collectors.toList());
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
 
         List<Task> listraw = taskService.createTaskQuery()
                 .taskCandidateUser(username)
@@ -154,45 +155,45 @@ public class FlowsTaskResource {
 
 
         return ResponseEntity.ok(task);
-//      long taskId = extractId(id);
-//
-//        Task task = taskService.createTaskQuery().taskId(""+taskId).singleResult();
-//        List<Task> tasks = taskService.createTaskQuery().processInstanceId(task.getProcessInstanceId()).list();
-//        ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
-//
-//        List<Map<String, Object>> tasksMaps = tasks.stream().map(t -> mappaTaskInMap(t)).collect(Collectors.toList());
-//
-//        Map<String, Object> result = new HashMap<>();
-//        Map<String, Object> definition = new HashMap<>();
-//        definition.put("id", "cnrdsftm:validaTask");
-//
-//        Map<String, Object> mappaTaskInMap = mappaTaskInMap(task);
-//        ((Map<String, Object>) mappaTaskInMap.get("entry")).put("tasks", tasksMaps);
-//        ((Map<String, Object>) mappaTaskInMap.get("entry")).put("workflowInstance", mappaProcessInstanceInMap(pi));
-//        ((Map<String, Object>) mappaTaskInMap.get("entry")).put("definition", definition);
-//
-//
-//        result.put("data", mappaTaskInMap.get("entry"));
-//
-//
-//        return new ResponseEntity<Map<String, Object>>(result, HttpStatus.OK);
+        //      long taskId = extractId(id);
+        //
+        //        Task task = taskService.createTaskQuery().taskId(""+taskId).singleResult();
+        //        List<Task> tasks = taskService.createTaskQuery().processInstanceId(task.getProcessInstanceId()).list();
+        //        ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
+        //
+        //        List<Map<String, Object>> tasksMaps = tasks.stream().map(t -> mappaTaskInMap(t)).collect(Collectors.toList());
+        //
+        //        Map<String, Object> result = new HashMap<>();
+        //        Map<String, Object> definition = new HashMap<>();
+        //        definition.put("id", "cnrdsftm:validaTask");
+        //
+        //        Map<String, Object> mappaTaskInMap = mappaTaskInMap(task);
+        //        ((Map<String, Object>) mappaTaskInMap.get("entry")).put("tasks", tasksMaps);
+        //        ((Map<String, Object>) mappaTaskInMap.get("entry")).put("workflowInstance", mappaProcessInstanceInMap(pi));
+        //        ((Map<String, Object>) mappaTaskInMap.get("entry")).put("definition", definition);
+        //
+        //
+        //        result.put("data", mappaTaskInMap.get("entry"));
+        //
+        //
+        //        return new ResponseEntity<Map<String, Object>>(result, HttpStatus.OK);
 
-//        // TODO verificare se ci possono essere parametri aggiuntivi utili//        boolean detailed = Boolean.parseBoolean(params.get("detailed"));
-//        long taskId = Utils.extractId(id);
-//        CMISUser user = cmisService.getCMISUserFromSession(req);
-//        BindingSession session = cmisService.getCurrentBindingSession(req);
-//
-//        try {
-//            Map<String, Object> taskInstance = flowsTaskService.getTask(user, session, taskId, detailed);
-//            return new ResponseEntity<Map<String,Object>>(taskInstance, HttpStatus.OK);
-//        } catch (PermissionException e) {
-//            LOGGER.error(e.getMessage(), e);
-//            return new ResponseEntity<Map<String,Object>>(HttpStatus.FORBIDDEN);
-//        } catch (IOException e) {
-//            Map<String, Object> response = new HashMap<>();
-//            response.put("error", e.getMessage());
-//            return new ResponseEntity<Map<String,Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
+        //        // TODO verificare se ci possono essere parametri aggiuntivi utili//        boolean detailed = Boolean.parseBoolean(params.get("detailed"));
+        //        long taskId = Utils.extractId(id);
+        //        CMISUser user = cmisService.getCMISUserFromSession(req);
+        //        BindingSession session = cmisService.getCurrentBindingSession(req);
+        //
+        //        try {
+        //            Map<String, Object> taskInstance = flowsTaskService.getTask(user, session, taskId, detailed);
+        //            return new ResponseEntity<Map<String,Object>>(taskInstance, HttpStatus.OK);
+        //        } catch (PermissionException e) {
+        //            LOGGER.error(e.getMessage(), e);
+        //            return new ResponseEntity<Map<String,Object>>(HttpStatus.FORBIDDEN);
+        //        } catch (IOException e) {
+        //            Map<String, Object> response = new HashMap<>();
+        //            response.put("error", e.getMessage());
+        //            return new ResponseEntity<Map<String,Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        //        }
     }
 
     /**
@@ -245,25 +246,25 @@ public class FlowsTaskResource {
             @RequestBody Map<String, Object> data) {
 
         return null;
-//        CMISUser user = cmisService.getCMISUserFromSession(req);
-//        BindingSession session = cmisService.getCurrentBindingSession(req);
-//        String cm_owner = (String) data.get("cm_owner");
-//        long taskId = Utils.extractId(id);
-//
-//        LOGGER.info("Setting owner of task "+ id +" to "+ cm_owner);
-//
-//        try {
-//            Map<String, Object> taskInstance = flowsTaskService.setTaskOwner(user, session, taskId, data);
-//
-//            return new ResponseEntity<Map<String,Object>>(taskInstance, HttpStatus.OK);
-//        } catch (PermissionException e) {
-//            LOGGER.error(e.getMessage(), e);
-//            return new ResponseEntity<Map<String,Object>>(HttpStatus.FORBIDDEN);
-//        } catch (IOException e) {
-//            Map<String, Object> response = new HashMap<>();
-//            response.put("error", e.getMessage());
-//            return new ResponseEntity<Map<String,Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
+        //        CMISUser user = cmisService.getCMISUserFromSession(req);
+        //        BindingSession session = cmisService.getCurrentBindingSession(req);
+        //        String cm_owner = (String) data.get("cm_owner");
+        //        long taskId = Utils.extractId(id);
+        //
+        //        LOGGER.info("Setting owner of task "+ id +" to "+ cm_owner);
+        //
+        //        try {
+        //            Map<String, Object> taskInstance = flowsTaskService.setTaskOwner(user, session, taskId, data);
+        //
+        //            return new ResponseEntity<Map<String,Object>>(taskInstance, HttpStatus.OK);
+        //        } catch (PermissionException e) {
+        //            LOGGER.error(e.getMessage(), e);
+        //            return new ResponseEntity<Map<String,Object>>(HttpStatus.FORBIDDEN);
+        //        } catch (IOException e) {
+        //            Map<String, Object> response = new HashMap<>();
+        //            response.put("error", e.getMessage());
+        //            return new ResponseEntity<Map<String,Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        //        }
     }
 
     // TODO returns ResponseEntity<Map<String, Object>>
@@ -273,7 +274,7 @@ public class FlowsTaskResource {
             HttpServletRequest req,
             HttpServletResponse resp,
             @PathVariable("id") String id)
-            throws IOException {
+                    throws IOException {
 
         Map<String, Object> result = new HashMap<>();
         Map<String, Object> list = new HashMap<>();
@@ -282,50 +283,45 @@ public class FlowsTaskResource {
         result.put("list", list);
         list.put("entries", entries);
 
-//        taskService.getVariables(id);
+        //        taskService.getVariables(id);
 
         return new ResponseEntity<Map<String,Object>>(result, HttpStatus.OK);
 
-//        CMISUser user = cmisService.getCMISUserFromSession(req);
-//        LOGGER.debug("getTaskVariables user: "+ user +", id: "+id);
-//
-//        try {
-//            Map<String, Object> workflowVariables = workflowService.getTaskVariables(user, id);
-//            JSONObject res = new JSONObject(workflowVariables);
-//            PrintWriter writer = resp.getWriter();
-//            writer.write(res.toString());
-//            writer.flush();
-//            //            return new ResponseEntity<Map<String,Object>>(workflowVariables, HttpStatus.OK);
-//        } catch (IllegalAccessException e) {
-//            LOGGER.info(ERRORE_PERMESSI_TASK);
-//            LOGGER.info("L'utente ha richiesto variabili per un flusso che non deve poter vedere", e);
-//            getVariablesOldMethod(req, resp, id);
-//            //          return new ResponseEntity<Map<String,Object>>(HttpStatus.FORBIDDEN);// ;resp.sendError(HttpServletResponse.SC_FORBIDDEN);
-//        } catch (WorkflowException e) {
-//            LOGGER.info("Errore durante il recupero di un flusso", e);
-//            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-//            //          return new ResponseEntity<Map<String,Object>>(HttpStatus.INTERNAL_SERVER_ERROR);//resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-//        }
+        //        CMISUser user = cmisService.getCMISUserFromSession(req);
+        //        LOGGER.debug("getTaskVariables user: "+ user +", id: "+id);
+        //
+        //        try {
+        //            Map<String, Object> workflowVariables = workflowService.getTaskVariables(user, id);
+        //            JSONObject res = new JSONObject(workflowVariables);
+        //            PrintWriter writer = resp.getWriter();
+        //            writer.write(res.toString());
+        //            writer.flush();
+        //            //            return new ResponseEntity<Map<String,Object>>(workflowVariables, HttpStatus.OK);
+        //        } catch (IllegalAccessException e) {
+        //            LOGGER.info(ERRORE_PERMESSI_TASK);
+        //            LOGGER.info("L'utente ha richiesto variabili per un flusso che non deve poter vedere", e);
+        //            getVariablesOldMethod(req, resp, id);
+        //            //          return new ResponseEntity<Map<String,Object>>(HttpStatus.FORBIDDEN);// ;resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+        //        } catch (WorkflowException e) {
+        //            LOGGER.info("Errore durante il recupero di un flusso", e);
+        //            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+        //            //          return new ResponseEntity<Map<String,Object>>(HttpStatus.INTERNAL_SERVER_ERROR);//resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+        //        }
     }
 
     @RequestMapping(value = "complete", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<Object> completeTask(
-            HttpServletRequest req,
-            @RequestPart(value = "documentiPrincipali", required = true) List<MultipartFile> documentiPrincipali) {
-
-        Optional<CNRUser> user = securityService.getUser();
-
-        String username = SecurityUtils.getCurrentUserLogin();
-        SecurityUtils.isCurrentUserInRole("pippo");
-        identityService.setAuthenticatedUserId(username);
+            MultipartHttpServletRequest req) {
 
         Map<String, Object> data = new HashMap<>();
+        String username = SecurityUtils.getCurrentUserLogin();
 
-        String taskId = (String) data.get("taskId");
-        String definitionId = (String) data.get("definitionId");
+        String taskId = (String) req.getParameter("data[taskId]");
+        String definitionId = (String) req.getParameter("data[definitionId]");
+
         if ( isEmpty(taskId) && isEmpty(definitionId))
-            throw new IllegalArgumentException("Fornire almeno un taskId o un definitionId");
+            return ResponseEntity.badRequest().body("Fornire almeno un taskId o un definitionId");
 
         if ( isNotEmpty(taskId) ) {
             taskService.complete(taskId, data);
@@ -333,44 +329,85 @@ public class FlowsTaskResource {
 
         } else {
 
-            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitionId).singleResult();
+            try {
+                ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitionId).singleResult();
 
-            String counterId = processDefinition.getName() +"-"+ Calendar.getInstance().get(Calendar.YEAR);
-            String key =  counterId +"-"+ counterService.getNext(counterId);
-            data.put("title", key);
-            data.put("pippo", "pluto");
-            data.put("initiator", username);
-            data.put("startDate", new Date());
+                String counterId = processDefinition.getName() +"-"+ Calendar.getInstance().get(Calendar.YEAR);
+                String key =  counterId +"-"+ counterService.getNext(counterId);
+                data.put("title", key);
+                data.put("pippo", "pluto");
+                data.put("initiator", username);
+                data.put("startDate", new Date());
 
-            ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
-            ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
+                Iterator<String> i = req.getFileNames();
+                while (i.hasNext()) {
+                    String fileName = i.next();
+                    LOGGER.debug("inserisco come variabile il file "+ fileName);
+                    if (fileName.endsWith("[]")) { // multiple
 
-            return new ResponseEntity<Object>(response, HttpStatus.OK); // TODO verificare best practice
+                    } else {
+                        MultipartFile file = req.getFile(fileName);
+                        data.put(fileName, file.getBytes());
+                        data.put(fileName+"_name", file.getOriginalFilename());
+                        data.put(fileName+"_user", username);
+                    }
+                }
+
+                ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
+
+
+                i = req.getFileNames();
+                while (i.hasNext()) {
+                    String fileName = i.next();
+                    if (fileName.endsWith("[]")) { // multiple
+
+                    } else {
+                        MultipartFile file = req.getFile(fileName);
+                        taskService.createAttachment(
+                                fileName,
+                                null,
+                                instance.getId(),
+                                file.getOriginalFilename(),
+                                null,
+                                file.getInputStream());
+                    }
+                }
+
+                LOGGER.debug("Avviata istanza di processo "+ key +", id: "+ instance.getId());
+
+                ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
+                return new ResponseEntity<Object>(response, HttpStatus.OK);
+
+
+
+            } catch (IOException e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore nel processare i files");
+            }
         }
 
 
 
-//        CMISUser user = cmisService.getCMISUserFromSession(req);
-//        BindingSession session = cmisService.getCurrentBindingSession(req);
-//        boolean userHasWriteAccessToTask = true; // TODO
-//
-//        if (userHasWriteAccessToTask) {
-//            try {
-//                workflowService.completeTask(user, id, data, session);
-//            } catch (AlfrescoResponseException e) {
-//                LOGGER.error(e.getMessage() + " " + e.getResponse(), e);
-//                return new ResponseEntity<Map<String,Object>>(e.getResponse(), HttpStatus.INTERNAL_SERVER_ERROR);
-//            } catch (PermissionException e) {
-//                LOGGER.error(e.getMessage(), e);
-//                return new ResponseEntity<Map<String,Object>>(HttpStatus.FORBIDDEN);
-//            } catch (IOException e) {
-//                LOGGER.error(e.getMessage(), e);
-//                Map<String, Object> response = new HashMap<>();
-//                response.put("error", e.getMessage());
-//                return new ResponseEntity<Map<String,Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-//            }
-//        }
-//
-//        return null;
+        //        CMISUser user = cmisService.getCMISUserFromSession(req);
+        //        BindingSession session = cmisService.getCurrentBindingSession(req);
+        //        boolean userHasWriteAccessToTask = true; // TODO
+        //
+        //        if (userHasWriteAccessToTask) {
+        //            try {
+        //                workflowService.completeTask(user, id, data, session);
+        //            } catch (AlfrescoResponseException e) {
+        //                LOGGER.error(e.getMessage() + " " + e.getResponse(), e);
+        //                return new ResponseEntity<Map<String,Object>>(e.getResponse(), HttpStatus.INTERNAL_SERVER_ERROR);
+        //            } catch (PermissionException e) {
+        //                LOGGER.error(e.getMessage(), e);
+        //                return new ResponseEntity<Map<String,Object>>(HttpStatus.FORBIDDEN);
+        //            } catch (IOException e) {
+        //                LOGGER.error(e.getMessage(), e);
+        //                Map<String, Object> response = new HashMap<>();
+        //                response.put("error", e.getMessage());
+        //                return new ResponseEntity<Map<String,Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        //            }
+        //        }
+        //
+        //        return null;
     }
 }
