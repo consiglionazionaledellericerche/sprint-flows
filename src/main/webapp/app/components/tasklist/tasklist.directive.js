@@ -45,7 +45,7 @@
           var promise;
           dataService.tasks.claim(taskId, take).success(function (data) {
             $log.debug(data);
-            scope.pooled[id] = user !== undefined;
+            scope.pooled[taskId] = user !== undefined;
             scope.$parent.loadTasks();
           });
         };
