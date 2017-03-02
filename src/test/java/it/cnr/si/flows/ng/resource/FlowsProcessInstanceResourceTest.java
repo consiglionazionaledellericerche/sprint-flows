@@ -14,12 +14,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -45,10 +44,12 @@ public class FlowsProcessInstanceResourceTest {
         util.loginAdmin();
         DataResponse ret = (DataResponse) flowsProcessDefinitionResource.getAllProcessDefinitions();
 
-        Map<String, Object> data = new HashMap();
+//        Map<String, Object> data = new HashMap();
         processDefinitionKey = ((ProcessDefinitionResponse) ((ArrayList) ret.getData()).get(8)).getId();
-        data.put("definitionId", processDefinitionKey);
-        flowsTaskResource.completeTask(new MockHttpServletRequest(), data);
+//        data.put("definitionId", processDefinitionKey);
+        MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
+        req.setParameter("definitionId", processDefinitionKey);
+        flowsTaskResource.completeTask(req);
     }
 
     @After
