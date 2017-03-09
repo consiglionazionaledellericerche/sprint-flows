@@ -3,11 +3,14 @@ package it.cnr.si.flows.ng.resource;
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.config.ldap.CNRUser;
 import it.cnr.si.flows.ng.service.CounterService;
+import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.repository.UserRepository;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.SecurityUtils;
 import it.cnr.si.service.SecurityService;
 import it.cnr.si.service.UserService;
+
+import org.activiti.engine.FormService;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
@@ -75,6 +78,11 @@ public class FlowsTaskResource {
     private IdentityService identityService;
     @Autowired
     private TaskService taskService;
+    @Autowired
+    private FormService formService;
+    @Autowired
+    private FlowsAttachmentService attachmentService;
+
 
     public static long extractId(String id) throws IllegalArgumentException {
         try {
@@ -321,103 +329,61 @@ public class FlowsTaskResource {
 
     @RequestMapping(value = "complete", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Object> completeTask(
-            MultipartHttpServletRequest req) {
+    public ResponseEntity<Object> completeTask(MultipartHttpServletRequest req) {
 
-        Map<String, Object> data = new HashMap<>();
-        String username = SecurityUtils.getCurrentUserLogin();
+        try {
+            String username = SecurityUtils.getCurrentUserLogin();
 
-        String taskId = (String) req.getParameter("taskId");
-        String definitionId = (String) req.getParameter("definitionId");
+            Map<String, Object> data = extractParameters(req);
+            data.putAll(attachmentService.extractAttachmentsVariables(req));
 
-        if ( isEmpty(taskId) && isEmpty(definitionId))
-            return ResponseEntity.badRequest().body("Fornire almeno un taskId o un definitionId");
+            String taskId = (String) req.getParameter("taskId");
+            String definitionId = (String) req.getParameter("definitionId");
 
-        if ( isNotEmpty(taskId) ) {
-            taskService.complete(taskId, data);
-            return new ResponseEntity<Object>(HttpStatus.OK);
 
-        } else {
+            if ( isEmpty(taskId) && isEmpty(definitionId))
+                return ResponseEntity.badRequest().body("Fornire almeno un taskId o un definitionId");
 
-            try {
+            if ( isNotEmpty(taskId) ) {
+                taskService.setVariablesLocal(taskId, data);
+                taskService.complete(taskId, data);
+                return new ResponseEntity<Object>(HttpStatus.OK);
+
+            } else {
                 ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitionId).singleResult();
 
                 String counterId = processDefinition.getName() +"-"+ Calendar.getInstance().get(Calendar.YEAR);
                 String key =  counterId +"-"+ counterService.getNext(counterId);
+
                 data.put("title", key);
                 data.put("pippo", "pluto");
                 data.put("initiator", username);
                 data.put("startDate", new Date());
 
-                Iterator<String> i = req.getFileNames();
-                while (i.hasNext()) {
-                    String fileName = i.next();
-                    LOGGER.debug("inserisco come variabile il file "+ fileName);
-                    if (fileName.endsWith("[]")) { // multiple
-
-                    } else {
-                        MultipartFile file = req.getFile(fileName);
-                        data.put(fileName, file.getBytes());
-                        data.put(fileName+"_name", file.getOriginalFilename());
-                        data.put(fileName+"_user", username);
-                    }
-                }
-
                 ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
-
-
-                i = req.getFileNames();
-                while (i.hasNext()) {
-                    String fileName = i.next();
-                    if (fileName.endsWith("[]")) { // multiple
-
-                    } else {
-                        MultipartFile file = req.getFile(fileName);
-                        taskService.createAttachment(
-                                fileName,
-                                null,
-                                instance.getId(),
-                                file.getOriginalFilename(),
-                                null,
-                                file.getInputStream());
-                    }
-                }
 
                 LOGGER.debug("Avviata istanza di processo "+ key +", id: "+ instance.getId());
 
                 ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
                 return new ResponseEntity<Object>(response, HttpStatus.OK);
-
-
-
-            } catch (IOException e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore nel processare i files");
             }
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore nel processare i files");
+        }
+    }
+
+    // TODO magari un giorno avremo degli array, ma per adesso ce lo facciamo andare bene cosi'
+    public static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
+
+        Map<String, Object> data = new HashMap<>();
+
+        Enumeration<String> parameterNames = req.getParameterNames();
+        while (parameterNames.hasMoreElements()) {
+            String paramName = parameterNames.nextElement();
+            data.put(paramName, req.getParameter(paramName));
         }
 
+        return data;
 
-
-        //        CMISUser user = cmisService.getCMISUserFromSession(req);
-        //        BindingSession session = cmisService.getCurrentBindingSession(req);
-        //        boolean userHasWriteAccessToTask = true; // TODO
-        //
-        //        if (userHasWriteAccessToTask) {
-        //            try {
-        //                workflowService.completeTask(user, id, data, session);
-        //            } catch (AlfrescoResponseException e) {
-        //                LOGGER.error(e.getMessage() + " " + e.getResponse(), e);
-        //                return new ResponseEntity<Map<String,Object>>(e.getResponse(), HttpStatus.INTERNAL_SERVER_ERROR);
-        //            } catch (PermissionException e) {
-        //                LOGGER.error(e.getMessage(), e);
-        //                return new ResponseEntity<Map<String,Object>>(HttpStatus.FORBIDDEN);
-        //            } catch (IOException e) {
-        //                LOGGER.error(e.getMessage(), e);
-        //                Map<String, Object> response = new HashMap<>();
-        //                response.put("error", e.getMessage());
-        //                return new ResponseEntity<Map<String,Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        //            }
-        //        }
-        //
-        //        return null;
     }
 }

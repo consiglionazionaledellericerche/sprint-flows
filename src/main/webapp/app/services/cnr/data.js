@@ -54,7 +54,10 @@
             return $http.get('rest/processInstances/active');
         },
         attachments: function(processInstanceId) {
-            return $http.get('rest/processInstances/'+ processInstanceId +'/attachments');
+            return $http.get('api/attachments/'+ processInstanceId);
+        },
+        attachmentHistory: function(processInstaceId, attachmentName) {
+            return $http.get('api/attachments/history/'+ processInstaceId +'/'+ attachmentName);
         }
       },
       definitions : {

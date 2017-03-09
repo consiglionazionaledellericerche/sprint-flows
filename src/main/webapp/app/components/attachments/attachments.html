@@ -1,6 +1,32 @@
-<h1>Attachments</h1>
+<h4>Documenti</h4>
 <ul>
   <li ng-repeat="attachment in attachments">
-    <strong>{{attachment.type}}:</strong> <a ng-href="/rest/processInstances/attachments/{{attachment.id}}" >{{attachment.name}}</a>
+    <strong>{{attachment.name}}:</strong>
+    <a href ng-click="downloadFile('/api/attachments/'+ processInstanceId +'/'+ attachment.name +'/data', attachment.filename, attachment.mimetype)" >
+      {{attachment.filename}}
+    </a>
+    <a href ng-click="showFileHistory(attachment.name)"><span class="glyphicon glyphicon-time" title="Cronologia"></span></a>
   </li>
 </ul>
+
+<script type="text/ng-template" id="fileHistoryModal.html">
+<div class="modal-header">
+    <h4 class="modal-title">Storia del file {{name}}</h4>
+</div>
+<div class="modal-body">
+
+  <ul>
+  	<li ng-repeat="file in fileHistory">
+    	<strong>{{file.time | date}}:</strong> <br>
+		L'utente <strong>{{file.username}}</strong> <br>
+		<span ng-if="file.metadati.azione">ha compiuto l'azione <strong>{{file.metadati.azione}}</strong><br></span>
+		sul file <a href ng-click="downloadFile(file.url, file.filename, file.mimetype)">{{file.filename}}</a>
+		<span ng-repeat="state in file.metadati.stati" class="badge badge-{{state}}" >{{state}}</span> <br>
+		nell'ambito del task <strong>{{file.taskName}}</strong>
+  	</li>
+  </ul>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-click="$dismiss()">Chiudi</button>
+</div>
+</script>

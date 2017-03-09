@@ -1,27 +1,30 @@
 (function() {
-  'use strict';
+    'use strict';
 
-  angular
-  .module('sprintApp')
-  .controller('DetailsController', DetailsController);
+    angular
+    .module('sprintApp')
+    .controller('DetailsController', DetailsController);
 
-  DetailsController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log', 'utils'];
+    DetailsController.$inject = ['$scope', '$state', 'dataService', '$log', 'utils', '$uibModal'];
 
-  function DetailsController ($scope, Principal, LoginService, $state, dataService, AlertService, $log, utils) {
-    var vm = this;
-    vm.data = {};
+    function DetailsController ($scope, $state, dataService, $log, utils, $uibModal) {
+        var vm = this;
+        var processInstanceId = $state.params.processInstanceId;
+        $scope.processInstanceId = $state.params.processInstanceId;
+        vm.data = {};
 
-    $log.info($state.params.processInstanceId);
-    if ($state.params.processInstanceId) {
-        $log.info("getting task info");
+        if (processInstanceId) {
+            $log.info("getting task info");
 
-        vm.data.processInstanceId = $state.params.processInstanceId;
-        dataService.processInstances.byProcessInstanceId($state.params.processInstanceId).then(
-                function(response) {
-                    vm.data.entity = utils.refactoringVariables([response.data.entity])[0];
-                    vm.data.history = response.data.history;
-                    vm.diagramUrl = '/rest/diagram/processInstance/'+ vm.data.entity.id;
-                });
+            vm.data.processInstanceId = processInstanceId;
+            dataService.processInstances.byProcessInstanceId(processInstanceId).then(
+                    function(response) {
+                        vm.data.entity = utils.refactoringVariables([response.data.entity])[0];
+                        vm.data.history = response.data.history;
+                        vm.data.attachments = response.data.attachments;
+                        vm.diagramUrl = '/rest/diagram/processInstance/'+ vm.data.entity.id;
+                    });
+
+        }
     }
-  }
 })();
