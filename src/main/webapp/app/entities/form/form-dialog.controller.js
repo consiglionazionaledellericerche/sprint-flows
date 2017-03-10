@@ -19,24 +19,26 @@
                 mode: 'html'
         };
         var tidyOpts = {
-            "doctype": "omit",
-            "omit-optional-tags": true,
+//            "doctype": "omit",
+//            "omit-optional-tags": true,
             "indent": "auto",
             "indent-spaces": 2,
-//            "markup": true,
-            "output-xml": false,
-            "output-html": false,
-            "numeric-entities": true,
-            "quote-marks": true,
-            "quote-nbsp": false,
-            "show-body-only": false,
-            "quote-ampersand": false,
-            "break-before-br": true,
-            "uppercase-tags": false,
-            "uppercase-attributes": false,
-            "drop-font-tags": true,
+            "quiet": true,
             "tidy-mark": false,
-            "wrap": 100
+//            "markup": true,
+//            "output-xml": false,
+//            "output-html": false,
+//            "numeric-entities": true,
+//            "quote-marks": true,
+//            "quote-nbsp": false,
+            "show-body-only": "auto",
+//            "quote-ampersand": false,
+//            "break-before-br": true,
+//            "uppercase-tags": false,
+//            "uppercase-attributes": false,
+//            "drop-font-tags": true,
+//            "tidy-mark": false,
+//            "wrap": 100
           }
         vm.preview = "";
 
@@ -68,7 +70,7 @@
         }
 
         vm.runTidy = function() {
-            vm.form.form = tidy_html5(vm.form.form, tidyOpts);
+            vm.form.form = html_beautify(vm.form.form, tidyOpts);
             if (vm.form.form.startsWith("<title></title>") )
                 vm.form.form = vm.form.form.substring(15);
         }
