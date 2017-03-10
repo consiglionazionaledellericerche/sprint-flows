@@ -70,9 +70,8 @@
         }
 
         vm.runTidy = function() {
-            vm.form.form = html_beautify(vm.form.form, tidyOpts);
-            if (vm.form.form.startsWith("<title></title>") )
-                vm.form.form = vm.form.form.substring(15);
+            vm.form.form = html_beautify(vm.form.form);
+            vm.reloadHtml();
         }
         vm.reloadHtml = function() {
             vm.preview = $sce.trustAsHtml(vm.form.form);
