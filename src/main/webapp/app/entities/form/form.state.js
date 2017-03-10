@@ -95,7 +95,7 @@
                     controller: 'FormDialogController',
                     controllerAs: 'vm',
                     backdrop: 'static',
-                    size: 'lg',
+                    size: 'xl',
                     resolve: {
                         entity: ['Form', function(Form) {
                             return Form.get({id : $stateParams.id}).$promise;
@@ -120,7 +120,7 @@
                     controller: 'FormDialogController',
                     controllerAs: 'vm',
                     backdrop: 'static',
-                    size: 'lg',
+                    size: 'xl',
                     resolve: {
                         entity: function () {
                             return {
@@ -151,7 +151,7 @@
                     controller: 'FormDialogController',
                     controllerAs: 'vm',
                     backdrop: 'static',
-                    size: 'lg',
+                    size: 'xl',
                     resolve: {
                         entity: ['Form', function(Form) {
                             return Form.get({id : $stateParams.id}).$promise;

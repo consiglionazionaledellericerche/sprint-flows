@@ -398,3 +398,15 @@ input.ng-dirty.ng-invalid {
 .nav-pills li  a {
     flex: 1;
 }
+
+
+
+/* CSS per editor ACE */
+.ace_editor {
+  height: 200px;
+}
+
+/* big fat modal */
+.modal-xl {
+    width: 1150px;
+}
