@@ -1,7 +1,6 @@
 package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
-import it.cnr.si.config.ldap.CNRUser;
 import it.cnr.si.flows.ng.service.CounterService;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.repository.UserRepository;
@@ -9,20 +8,19 @@ import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.SecurityUtils;
 import it.cnr.si.service.SecurityService;
 import it.cnr.si.service.UserService;
-
-import org.activiti.engine.FormService;
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
+import org.activiti.engine.*;
+import org.activiti.engine.impl.util.json.JSONArray;
+import org.activiti.engine.impl.util.json.JSONObject;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.Task;
+import org.activiti.engine.task.TaskQuery;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.task.TaskResponse;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +31,6 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.inject.Inject;
@@ -44,8 +41,7 @@ import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static it.cnr.si.flows.ng.utils.Utils.isEmpty;
-import static it.cnr.si.flows.ng.utils.Utils.isNotEmpty;
+import static it.cnr.si.flows.ng.utils.Utils.*;
 
 
 /**
@@ -83,16 +79,19 @@ public class FlowsTaskResource {
     @Autowired
     private FlowsAttachmentService attachmentService;
 
+    // TODO magari un giorno avremo degli array, ma per adesso ce lo facciamo andare bene cosi'
+    public static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
 
-    public static long extractId(String id) throws IllegalArgumentException {
-        try {
-            if (id.contains("$"))
-                id = id.split("\\$")[1];
-            return Long.parseLong(id);
+        Map<String, Object> data = new HashMap<>();
 
-        } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
-            throw new IllegalArgumentException("L'id dato non è valido", e);
+        Enumeration<String> parameterNames = req.getParameterNames();
+        while (parameterNames.hasMoreElements()) {
+            String paramName = parameterNames.nextElement();
+            data.put(paramName, req.getParameter(paramName));
         }
+
+        return data;
+
     }
 
     @RequestMapping(value = "/mytasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -147,7 +146,6 @@ public class FlowsTaskResource {
 
         return ResponseEntity.ok(response);
     }
-
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
@@ -372,30 +370,14 @@ public class FlowsTaskResource {
         }
     }
 
-    // TODO magari un giorno avremo degli array, ma per adesso ce lo facciamo andare bene cosi'
-    public static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
-
-        Map<String, Object> data = new HashMap<>();
-
-        Enumeration<String> parameterNames = req.getParameterNames();
-        while (parameterNames.hasMoreElements()) {
-            String paramName = parameterNames.nextElement();
-            data.put(paramName, req.getParameter(paramName));
-        }
-
-        return data;
-
-    }
-
-
     /**
-     * Search response entity.
+     * Funzionalità di Ricerca delle Process Instances.
      *
      * @param req               the req
-     * @param processInstanceId the process instance id
-     * @param active            the active
-     * @param order             the order
-     * @return the response entity
+     * @param processInstanceId Il processInstanceId della ricerca
+     * @param active            Boolean che indica se ricercare le Process Insrtances attive o terminate
+     * @param order             L'ordine in cui vogliamo i risltati ('ASC' o 'DESC')
+     * @return le response entity frutto della ricerca
      */
     @RequestMapping(value = "/search/{processInstanceId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
@@ -406,44 +388,42 @@ public class FlowsTaskResource {
             @RequestParam("order") String order) {
 
         List tasks = new ArrayList();
+        String jsonString = "";
         try {
-            String jsonString = IOUtils.toString(req.getReader());
-            JSONArray params = new JSONObject(jsonString).getJSONArray("params");
-
-            TaskQuery taskQuery = taskService.createTaskQuery().processDefinitionKey(processInstanceId);
-
-            if (active)
-                taskQuery.active();
-            else
-                taskQuery.suspended();
-
-            for (int i = 0; i < params.length(); i++) {
-                JSONObject appo = params.optJSONObject(i);
-                String key = appo.names().getString(0);
-                //wildcard ("%") di default ma non a TUTTI i campi
-                switch (key) {
-                    case "initiator":
-                        taskQuery.processVariableValueLikeIgnoreCase(key, appo.getString(key));
-                        break;
-                    default:
-                        taskQuery.processVariableValueLikeIgnoreCase(key, "%" + appo.getString(key) + "%");
-                        break;
-                }
-            }
-            if (order.equals(ASC))
-                taskQuery.orderByTaskCreateTime().asc();
-            else if (order.equals(DESC))
-                taskQuery.orderByTaskCreateTime().desc();
-
-            List taskRaw = taskQuery
-                    .includeProcessVariables().list();
-            tasks = restResponseFactory.createTaskResponseList(taskRaw);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
+            jsonString = IOUtils.toString(req.getReader());
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Errore nella letture dello stream della request", e);
         }
+        JSONArray params = new JSONObject(jsonString).getJSONArray("params");
+
+        TaskQuery taskQuery = taskService.createTaskQuery().processDefinitionKey(processInstanceId);
+
+        if (active)
+            taskQuery.active();
+        else
+            taskQuery.suspended();
+
+        for (int i = 0; i < params.length(); i++) {
+            JSONObject appo = params.optJSONObject(i);
+            String key = appo.names().getString(0);
+            //wildcard ("%") di default ma non a TUTTI i campi
+            switch (key) {
+                case "initiator":
+                    taskQuery.processVariableValueLikeIgnoreCase(key, appo.getString(key));
+                    break;
+                default:
+                    taskQuery.processVariableValueLikeIgnoreCase(key, "%" + appo.getString(key) + "%");
+                    break;
+            }
+        }
+        if (order.equals(ASC))
+            taskQuery.orderByTaskCreateTime().asc();
+        else if (order.equals(DESC))
+            taskQuery.orderByTaskCreateTime().desc();
+
+        List taskRaw = taskQuery
+                .includeProcessVariables().list();
+        tasks = restResponseFactory.createTaskResponseList(taskRaw);
 
         return ResponseEntity.ok(tasks);
     }
