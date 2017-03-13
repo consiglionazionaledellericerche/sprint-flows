@@ -5,9 +5,9 @@
     .module('sprintApp')
     .controller('TaskController', HomeController);
 
-    HomeController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log', '$http', 'Upload'];
+    HomeController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log', '$http', 'Upload', 'utils'];
 
-    function HomeController ($scope, Principal, LoginService, $state, dataService, AlertService, $log, $http, Upload) {
+    function HomeController ($scope, Principal, LoginService, $state, dataService, AlertService, $log, $http, Upload, utils) {
         var vm = this;
         vm.data = {};
 
@@ -16,12 +16,13 @@
         if ($state.params.taskId) {
             $log.info("getting task ifno");
 
-            vm.data.taskId = $state.params.taskId;
             dataService.tasks.getTask($state.params.taskId).then(
                     function(response) {
+                        vm.data = utils.refactoringVariables(response.data).variabili;
+                        vm.data.taskId = $state.params.taskId;
                         vm.diagramUrl = '/rest/diagram/taskInstance/'+ response.data.id;
-                        var processDefinitionKey = response.data.processDefinitionId.split(":")[0]
-                        vm.formUrl = 'api/forms/task/'+ response.data.id
+                        var processDefinitionKey = response.data.processDefinitionId.split(":")[0];
+                        vm.formUrl = 'api/forms/task/'+ response.data.id;
                     });
         } else {
             vm.data.definitionId = $state.params.processDefinitionId;
@@ -41,9 +42,9 @@
                     url: 'rest/tasks/complete',
                     data: vm.data,
                 }).then(function (response) {
-//                    $timeout(function () {
-//                        file.result = response.data;
-//                    });
+//                  $timeout(function () {
+//                  file.result = response.data;
+//                  });
 
                     $log.info(response);
                     AlertService.success("Richiesta completata con successo");

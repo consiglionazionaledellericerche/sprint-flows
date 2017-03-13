@@ -9,6 +9,7 @@
     <p class="text-muted">{{vm.definition.description}}</p>
     <img class="img-bordered" ng-src='{{vm.diagramUrl}}' title="{{vm.definition.name}}" style="max-width: 100%" />
   </div>
+  <hr>
 
   <!-- /rest/processinstances/start/{processName} or start-hire-process -->
   <form novalidate class="flows-form" name="taskForm" ng-submit="submitTask(picFile)">
@@ -20,6 +21,8 @@
         <ng-include src="vm.formUrl" ng-model="vm.data" />
       </div>
     </div>
+    <hr>
+
     <div class="row">
       <div class="col-md-2 col-md-offset-4">
         <button class="btn btn-primary btn-block" type="reset">Reimposta</button>

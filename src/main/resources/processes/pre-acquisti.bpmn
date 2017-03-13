@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
-  <process id="pre_acquisti" name="Pre Acquisti" isExecutable="true">
+  <process id="pre-acquisti" name="Pre Acquisti" isExecutable="true">
     <userTask id="visto_relazione" name="Visto Relazione" activiti:candidateGroups="ROLE_USER">
       <extensionElements>
         <activiti:executionListener event="start" class="it.cnr.si.flows.ng.config.TaskGeneric"></activiti:executionListener>
@@ -32,19 +32,15 @@
     <sequenceFlow id="flow6" sourceRef="modifica_relazione" targetRef="visto_relazione"></sequenceFlow>
     <sequenceFlow id="flow7" name="valida" sourceRef="exclusivegateway1" targetRef="valida_relazione"></sequenceFlow>
     <sequenceFlow id="flow8" name="approva" sourceRef="exclusivegateway2" targetRef="endevent1"></sequenceFlow>
-    <dataObject id="sceltaUtente" name="sceltaUtente" itemSubjectRef="xsd:string">
-      <extensionElements>
-        <activiti:value></activiti:value>
-      </extensionElements>
-    </dataObject>
+    <dataObject id="sceltaUtente" name="sceltaUtente" itemSubjectRef="xsd:string"></dataObject>
     <dataObject id="valore" name="valore" itemSubjectRef="xsd:int">
       <extensionElements>
         <activiti:value>18</activiti:value>
       </extensionElements>
     </dataObject>
   </process>
-  <bpmndi:BPMNDiagram id="BPMNDiagram_pre_acquisti">
-    <bpmndi:BPMNPlane bpmnElement="pre_acquisti" id="BPMNPlane_pre_acquisti">
+  <bpmndi:BPMNDiagram id="BPMNDiagram_pre-acquisti">
+    <bpmndi:BPMNPlane bpmnElement="pre-acquisti" id="BPMNPlane_pre-acquisti">
       <bpmndi:BPMNShape bpmnElement="visto_relazione" id="BPMNShape_visto_relazione">
         <omgdc:Bounds height="55.0" width="105.0" x="100.0" y="70.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
@@ -83,7 +79,7 @@
         <omgdi:waypoint x="479.0" y="187.0"></omgdi:waypoint>
         <omgdi:waypoint x="205.0" y="187.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="432.0" y="117.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="40.0" x="432.0" y="117.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
@@ -102,14 +98,14 @@
         <omgdi:waypoint x="280.0" y="97.0"></omgdi:waypoint>
         <omgdi:waypoint x="310.0" y="97.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="269.0" y="104.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="28.0" x="269.0" y="104.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
         <omgdi:waypoint x="500.0" y="97.0"></omgdi:waypoint>
         <omgdi:waypoint x="550.0" y="97.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="499.0" y="104.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="40.0" x="499.0" y="104.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>

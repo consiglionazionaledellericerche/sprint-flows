@@ -63,5 +63,8 @@
   },
   "scripts": {
     "test": "gulp test"
+  },
+  "dependencies": {
+    "file-saver": "^1.3.3"
   }
 }

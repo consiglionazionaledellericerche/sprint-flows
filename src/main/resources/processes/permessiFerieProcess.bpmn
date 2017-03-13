@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
-  <process id="permessi-ferie" name="Permessi Ferie" isExecutable="true">
+  <process id="permessiFerieProcess" name="Permessi Ferie Process" isExecutable="true">
     <startEvent id="startevent1" name="Start" activiti:async="true" activiti:initiator="initiator">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${testExecutionListener}"></activiti:executionListener>
@@ -22,8 +22,8 @@
     </sequenceFlow>
     <sequenceFlow id="flow6" sourceRef="correggi" targetRef="usertask1"></sequenceFlow>
   </process>
-  <bpmndi:BPMNDiagram id="BPMNDiagram_permessi-ferie">
-    <bpmndi:BPMNPlane bpmnElement="permessi-ferie" id="BPMNPlane_permessi-ferie">
+  <bpmndi:BPMNDiagram id="BPMNDiagram_permessiFerieProcess">
+    <bpmndi:BPMNPlane bpmnElement="permessiFerieProcess" id="BPMNPlane_permessiFerieProcess">
       <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
         <omgdc:Bounds height="35.0" width="35.0" x="180.0" y="260.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>

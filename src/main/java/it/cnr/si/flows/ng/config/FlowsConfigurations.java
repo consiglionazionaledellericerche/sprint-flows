@@ -46,32 +46,38 @@ public class FlowsConfigurations {
 
     @Bean
     public SpringProcessEngineConfiguration getProcessEngineConfiguration(
-            ActivitiLoggingEventListener loggingListener
-            ) {
+            ActivitiLoggingEventListener loggingListener) {
+
         SpringProcessEngineConfiguration conf = new SpringProcessEngineConfiguration();
 
+        // ci assicuriamo che l'engine sia nel contesto giusto (senno' se ne crea uno suo)
         conf.setApplicationContext(appContext);
+
+        // il DataSource configurato da JHipster/Sprint
         conf.setDataSource(dataSource);
         conf.setTransactionManager(transactionManager);
         conf.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
 
+        // Event listeners generici
         conf.setEventListeners(new ArrayList<ActivitiEventListener>() {{
             add(loggingListener);
             add(new FlowsVisibilitySetter());
         }});
-
-        conf.setActivityFontName(diagramFont);
-        conf.setAnnotationFontName(diagramFont);
-        conf.setLabelFontName(diagramFont);
-
         Map<Object, Object> beans = new HashMap<>();
         TestExecutionListener bean = appContext.getBean(TestExecutionListener.class);
         beans.put("testExecutionListener", bean);
         conf.setBeans(beans);
 
+        // configurare il font in cnr.activiti.diagram-font
+        conf.setActivityFontName(diagramFont);
+        conf.setAnnotationFontName(diagramFont);
+        conf.setLabelFontName(diagramFont);
+
+        // async migliora le prestazioni, in particolare con tanti utenti
         conf.setAsyncExecutorActivate(true);
 
-        conf.setHistoryLevel(HistoryLevel.AUDIT);
+        // FULL serve per la storia dei documenti
+        conf.setHistoryLevel(HistoryLevel.FULL);
 
         return conf;
     }
@@ -152,7 +158,6 @@ public class FlowsConfigurations {
     @PostConstruct
     public void createDeployments() throws Exception {
         RepositoryService repositoryService = appContext.getBean(RepositoryService.class);
-        //        repositoryService.createProcessDefinitionQuery().processDefinitionKey(processDefinitionKey);
 
         for (Resource resource : appContext.getResources("classpath:processes/*.bpmn*")) {
             log.info("\n ------- definition " + resource.getFilename());

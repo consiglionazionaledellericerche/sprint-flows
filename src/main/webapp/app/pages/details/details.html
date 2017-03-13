@@ -27,9 +27,11 @@
       {{vm.data.entity.activityId}}
     </span>
 
+	<div ng-repeat="variable in vm.data.entity.variables">
+		<strong>{{variable.name}}:</strong> {{variable.value}}
+	</div>
 
-    <h4>Documenti</h4>
-    <attachments process-instance-id="49"></attachments>
+    <attachments ></attachments>
 
 
   </div>

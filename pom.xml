@@ -121,26 +121,28 @@
             <version>${sprint.version}</version>
         </dependency>
 
-
-
-<!-- https://mvnrepository.com/artifact/org.activiti/activiti-spring-boot-starter-basic -->
-<dependency>
-    <groupId>org.activiti</groupId>
-    <artifactId>activiti-spring-boot-starter-basic</artifactId>
-    <version>5.22.0</version>
-</dependency>
-<dependency>
-    <groupId>org.activiti</groupId>
-    <artifactId>activiti-spring-boot-starter-actuator</artifactId>
-    <version>5.22.0</version>
-</dependency>
-<!-- https://mvnrepository.com/artifact/org.activiti/activiti-spring-boot-starter-rest-api -->
-<dependency>
-    <groupId>org.activiti</groupId>
-    <artifactId>activiti-spring-boot-starter-rest-api</artifactId>
-    <version>5.22.0</version>
-</dependency>
-
+        <!-- https://mvnrepository.com/artifact/org.activiti/activiti-spring-boot-starter-basic -->
+        <dependency>
+            <groupId>org.activiti</groupId>
+            <artifactId>activiti-spring-boot-starter-basic</artifactId>
+            <version>5.22.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.activiti</groupId>
+            <artifactId>activiti-spring-boot-starter-actuator</artifactId>
+            <version>5.22.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.activiti/activiti-spring-boot-starter-rest-api -->
+        <dependency>
+            <groupId>org.activiti</groupId>
+            <artifactId>activiti-spring-boot-starter-rest-api</artifactId>
+            <version>5.22.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+            <version>1.13</version>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
