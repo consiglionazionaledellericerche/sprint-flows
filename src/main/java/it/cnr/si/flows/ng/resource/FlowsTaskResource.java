@@ -1,7 +1,6 @@
 package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
-import it.cnr.si.config.ldap.CNRUser;
 import it.cnr.si.flows.ng.service.CounterService;
 import it.cnr.si.repository.UserRepository;
 import it.cnr.si.security.AuthoritiesConstants;
@@ -16,10 +15,15 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.Task;
+import org.activiti.engine.task.TaskQuery;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.task.TaskResponse;
+import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +45,7 @@ import java.security.Principal;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static it.cnr.si.flows.ng.utils.Utils.isEmpty;
-import static it.cnr.si.flows.ng.utils.Utils.isNotEmpty;
+import static it.cnr.si.flows.ng.utils.Utils.*;
 
 
 /**
@@ -57,6 +60,7 @@ public class FlowsTaskResource {
     private static final String ERRORE_PERMESSI_TASK = "ERRORE PERMESSI TASK";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsTaskResource.class);
+
     @Autowired
     protected RestResponseFactory restResponseFactory;
     @Inject
@@ -90,7 +94,8 @@ public class FlowsTaskResource {
     @RequestMapping(value = "/mytasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
-    public ResponseEntity<DataResponse> getMyTasks(Principal user,
+    public ResponseEntity<DataResponse> getMyTasks(
+            Principal user,
             @RequestParam Map<String, String> params) {
 
         String username = SecurityUtils.getCurrentUserLogin();
@@ -120,8 +125,8 @@ public class FlowsTaskResource {
         String username = SecurityUtils.getCurrentUserLogin();
         List<String> authorities =
                 SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.toList());
 
         List<Task> listraw = taskService.createTaskQuery()
                 .taskCandidateUser(username)
@@ -226,7 +231,7 @@ public class FlowsTaskResource {
         else
             return new ResponseEntity<Map<String, Object>>(HttpStatus.FORBIDDEN);
 
-        return new ResponseEntity<Map<String,Object>>(HttpStatus.OK);
+        return new ResponseEntity<Map<String, Object>>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/claim/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -242,9 +247,9 @@ public class FlowsTaskResource {
 
         if (username.equals(assignee)) {
             taskService.unclaim(id);
-            return new ResponseEntity<Map<String,Object>>(HttpStatus.OK);
+            return new ResponseEntity<Map<String, Object>>(HttpStatus.OK);
         } else {
-            return new ResponseEntity<Map<String,Object>>(HttpStatus.FORBIDDEN);
+            return new ResponseEntity<Map<String, Object>>(HttpStatus.FORBIDDEN);
         }
     }
 
@@ -284,7 +289,7 @@ public class FlowsTaskResource {
             HttpServletRequest req,
             HttpServletResponse resp,
             @PathVariable("id") String id)
-                    throws IOException {
+            throws IOException {
 
         Map<String, Object> result = new HashMap<>();
         Map<String, Object> list = new HashMap<>();
@@ -295,7 +300,7 @@ public class FlowsTaskResource {
 
         //        taskService.getVariables(id);
 
-        return new ResponseEntity<Map<String,Object>>(result, HttpStatus.OK);
+        return new ResponseEntity<Map<String, Object>>(result, HttpStatus.OK);
 
         //        CMISUser user = cmisService.getCMISUserFromSession(req);
         //        LOGGER.debug("getTaskVariables user: "+ user +", id: "+id);
@@ -330,10 +335,10 @@ public class FlowsTaskResource {
         String taskId = (String) req.getParameter("taskId");
         String definitionId = (String) req.getParameter("definitionId");
 
-        if ( isEmpty(taskId) && isEmpty(definitionId))
+        if (isEmpty(taskId) && isEmpty(definitionId))
             return ResponseEntity.badRequest().body("Fornire almeno un taskId o un definitionId");
 
-        if ( isNotEmpty(taskId) ) {
+        if (isNotEmpty(taskId)) {
             taskService.complete(taskId, data);
             return new ResponseEntity<Object>(HttpStatus.OK);
 
@@ -342,8 +347,8 @@ public class FlowsTaskResource {
             try {
                 ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitionId).singleResult();
 
-                String counterId = processDefinition.getName() +"-"+ Calendar.getInstance().get(Calendar.YEAR);
-                String key =  counterId +"-"+ counterService.getNext(counterId);
+                String counterId = processDefinition.getName() + "-" + Calendar.getInstance().get(Calendar.YEAR);
+                String key = counterId + "-" + counterService.getNext(counterId);
                 data.put("title", key);
                 data.put("pippo", "pluto");
                 data.put("initiator", username);
@@ -352,14 +357,14 @@ public class FlowsTaskResource {
                 Iterator<String> i = req.getFileNames();
                 while (i.hasNext()) {
                     String fileName = i.next();
-                    LOGGER.debug("inserisco come variabile il file "+ fileName);
+                    LOGGER.debug("inserisco come variabile il file " + fileName);
                     if (fileName.endsWith("[]")) { // multiple
 
                     } else {
                         MultipartFile file = req.getFile(fileName);
                         data.put(fileName, file.getBytes());
-                        data.put(fileName+"_name", file.getOriginalFilename());
-                        data.put(fileName+"_user", username);
+                        data.put(fileName + "_name", file.getOriginalFilename());
+                        data.put(fileName + "_user", username);
                     }
                 }
 
@@ -383,18 +388,16 @@ public class FlowsTaskResource {
                     }
                 }
 
-                LOGGER.debug("Avviata istanza di processo "+ key +", id: "+ instance.getId());
+                LOGGER.debug("Avviata istanza di processo " + key + ", id: " + instance.getId());
 
                 ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
                 return new ResponseEntity<Object>(response, HttpStatus.OK);
-
 
 
             } catch (IOException e) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore nel processare i files");
             }
         }
-
 
 
         //        CMISUser user = cmisService.getCMISUserFromSession(req);
@@ -419,5 +422,66 @@ public class FlowsTaskResource {
         //        }
         //
         //        return null;
+    }
+
+
+    /**
+     * Search response entity.
+     *
+     * @param req               the req
+     * @param processInstanceId the process instance id
+     * @param active            the active
+     * @param order             the order
+     * @return the response entity
+     */
+    @RequestMapping(value = "/search/{processInstanceId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<Object> search(
+            HttpServletRequest req,
+            @PathVariable("processInstanceId") String processInstanceId,
+            @RequestParam("active") boolean active,
+            @RequestParam("order") String order) {
+
+        List tasks = new ArrayList();
+        try {
+            String jsonString = IOUtils.toString(req.getReader());
+            JSONArray params = new JSONObject(jsonString).getJSONArray("params");
+
+            TaskQuery taskQuery = taskService.createTaskQuery().processDefinitionKey(processInstanceId);
+
+            if (active)
+                taskQuery.active();
+            else
+                taskQuery.suspended();
+
+            for (int i = 0; i < params.length(); i++) {
+                JSONObject appo = params.optJSONObject(i);
+                String key = appo.names().getString(0);
+                //wildcard ("%") di default ma non a TUTTI i campi
+                switch (key) {
+                    case "initiator":
+                        taskQuery.processVariableValueLikeIgnoreCase(key, appo.getString(key));
+                        break;
+                    default:
+                        taskQuery.processVariableValueLikeIgnoreCase(key, "%" + appo.getString(key) + "%");
+                        break;
+                }
+            }
+            if (order.equals(ASC))
+                taskQuery.orderByTaskCreateTime().asc();
+            else if (order.equals(DESC))
+                taskQuery.orderByTaskCreateTime().desc();
+
+            List taskRaw = taskQuery
+                    .includeProcessVariables().list();
+            tasks = restResponseFactory.createTaskResponseList(taskRaw);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return ResponseEntity.ok(tasks);
     }
 }

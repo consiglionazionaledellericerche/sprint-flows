@@ -1,0 +1,65 @@
+<br>
+<ul class="nav nav-pills nav-justified">
+    <li role="presentation" ng-class="{'active': vm.active}"><a class="pointer" ng-click="showWorkflows(current, true)"
+                                                                data-toggle="tab"><h4>
+        <i class="glyphicon glyphicon-edit"></i> flussi attivi
+    </h4>
+        <small>seleziona per avere la lista completa dei flussi attivi</small>
+    </a></li>
+    <li role="presentation" ng-class="{'active-info': !vm.active}"><a class="pointer"
+                                                                      ng-click="showWorkflows(current, false)"
+                                                                      data-toggle="tab"><h4>
+        <i class="glyphicon glyphicon-check"></i> flussi completati
+    </h4>
+        <small>seleziona per avere la lista completa dei flussi completati</small>
+    </a></li>
+</ul>
+<br>
+<div class="row">
+    <div class="col-md-3 padding-top">
+        <br>
+        <div>
+            <h4>Ordinamento</h4>
+            <div class="btn-group" uib-dropdown is-open="status.isopen">
+                <button id="order" type="button" class="btn btn-default btn-sm dropdown-toggle ng-binding"
+                        uib-dropdown-toggle ng-disabled="disabled"></button>
+                <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
+                    <li role="menuitem"><a ng-click="orderSearchFlows(current, 'ASC')">Crescente</a></li>
+                    <li role="menuitem"><a ng-click="orderSearchFlows(current, 'DESC')">Decrescente</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <br>
+        <h4>Tipologie</h4>
+        <workflow-types
+                processes="processes"
+                prefix="'workflow'"
+                paging="paging"
+                metadata-fields="metadataFields"
+                process-definitions="wfDefs">
+        </workflow-types>
+        <br>
+        <br>
+        <button ng-click="search(current)" ng-class="btn-default" class="btn btn-default btn-xs">Filtra</button>
+    </div>
+
+
+    <div class="col-md-9">
+        <h3>Flussi {{vm.active ? 'attivi' : 'completati'}}</h3>
+        <tasklist
+                tasks="vm.tasks"
+                advanced="advanced"
+                paging="paging"
+                class="tasks"
+                detailed="detailed"
+                select-process-definition-key="selectProcessDefinitionKey"
+                process-definitions="processDefinitions"
+                action-buttons="false">
+        </tasklist>
+
+        <pre ng-show="development">
+      {{workflows.data | json}}
+    </pre>
+    </div>
+</div>

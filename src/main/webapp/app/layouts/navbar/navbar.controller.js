@@ -5,9 +5,9 @@
     .module('sprintApp')
     .controller('NavbarController', NavbarController);
 
-    NavbarController.$inject = ['$scope', '$state', 'Auth', 'Principal', 'ProfileService', 'LoginService', 'SwitchUserService', 'dataService', '$log'];
+    NavbarController.$inject = ['$rootScope', '$scope', '$state', 'Auth', 'Principal', 'ProfileService', 'LoginService', 'SwitchUserService', 'dataService', '$log'];
 
-    function NavbarController ($scope, $state, Auth, Principal, ProfileService, LoginService, SwitchUserService, dataService, $log) {
+    function NavbarController ($rootScope, $scope, $state, Auth, Principal, ProfileService, LoginService, SwitchUserService, dataService, $log) {
         var vm = this;
 
         vm.isNavbarCollapsed = true;
@@ -72,6 +72,7 @@
             dataService.definitions.all()
             .then(function(response) {
                 vm.wfDefs = response.data.data;
+                $rootScope.wfDefs = response.data.data;
             }, function (response) {
                 $log.error(response);
             });
