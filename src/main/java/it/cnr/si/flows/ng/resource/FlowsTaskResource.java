@@ -387,11 +387,10 @@ public class FlowsTaskResource {
             @RequestParam("active") boolean active,
             @RequestParam("order") String order) {
 
-        List tasks = new ArrayList();
         String jsonString = "";
         try {
             jsonString = IOUtils.toString(req.getReader());
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOGGER.error("Errore nella letture dello stream della request", e);
         }
         JSONArray params = new JSONObject(jsonString).getJSONArray("params");
@@ -407,13 +406,19 @@ public class FlowsTaskResource {
             JSONObject appo = params.optJSONObject(i);
             String key = appo.names().getString(0);
             //wildcard ("%") di default ma non a TUTTI i campi
-            switch (key) {
-                case "initiator":
-                    taskQuery.processVariableValueLikeIgnoreCase(key, appo.getString(key));
-                    break;
-                default:
+            if (key.equals("initiator")) {
+//                variabili senza wildcard
+                taskQuery.processVariableValueLikeIgnoreCase(key, appo.getString(key));
+            } else {
+//                gestione variabili booleane
+                if (appo.getString(key).equals("true")) {
+                    taskQuery.processVariableValueEquals(key, true);
+                } else if (appo.getString(key).equals("false")) {
+                    taskQuery.processVariableValueEquals(key, false);
+                } else {
+//                    default con la wildcard
                     taskQuery.processVariableValueLikeIgnoreCase(key, "%" + appo.getString(key) + "%");
-                    break;
+                }
             }
         }
         if (order.equals(ASC))
@@ -421,9 +426,8 @@ public class FlowsTaskResource {
         else if (order.equals(DESC))
             taskQuery.orderByTaskCreateTime().desc();
 
-        List taskRaw = taskQuery
-                .includeProcessVariables().list();
-        tasks = restResponseFactory.createTaskResponseList(taskRaw);
+        List<Task> taskRaw = taskQuery.includeProcessVariables().list();
+        List tasks = restResponseFactory.createTaskResponseList(taskRaw);
 
         return ResponseEntity.ok(tasks);
     }
