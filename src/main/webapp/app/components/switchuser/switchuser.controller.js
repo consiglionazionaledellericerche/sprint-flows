@@ -5,9 +5,9 @@
         .module('sprintApp')
         .controller('SwitchUserController', SwitchUserController);
 
-    SwitchUserController.$inject = ['$rootScope', '$state', '$timeout', 'dataService', '$uibModalInstance', '$window'];
+    SwitchUserController.$inject = ['$rootScope', '$state', '$timeout', 'dataService', '$uibModalInstance', '$window', 'Principal'];
 
-    function SwitchUserController ($rootScope, $state, $timeout, dataService, $uibModalInstance, $window) {
+    function SwitchUserController ($rootScope, $state, $timeout, dataService, $uibModalInstance, $window, Principal) {
         var vm = this;
 
         vm.impersonationError = false;
@@ -33,10 +33,11 @@
                 vm.impersonationError = false;
                 $uibModalInstance.close();
 
-//                $state.go('home');
                 $rootScope.$broadcast('impersonationSuccess');
-                $window.location.reload();
-                $state.reload();
+                Principal.authenticate(null);
+                Principal.identity(true).then(function(account) {
+                    $state.go('home');
+                });
             }, function(response) {
                 vm.impersonationError = true;
             })

@@ -12,14 +12,6 @@
 
         vm.isNavbarCollapsed = true;
         vm.isAuthenticated = Principal.isAuthenticated;
-        Principal.identity().then(function(account) {
-            $log.info(account);
-            vm.account = account;
-        });
-
-        Principal.hasAuthority("ROLE_PREVIOUS_ADMINISTRATOR").then(function(response) {
-            vm.isImpersonating = response;
-        });
 
         ProfileService.getProfileInfo().then(function(response) {
             vm.inProduction = response.inProduction;
@@ -42,10 +34,11 @@
         function cancelSwitchUser() {
             collapseNavbar();
             dataService.authentication.cancelImpersonate().then(function() {
-              //$state.go('home');
-              $window.location.reload();
+                Principal.authenticate(null);
+                Principal.identity(true).then(function(account) {
+                    $state.go('home');
+                });
             })
-
         }
 
         function login() {
@@ -84,6 +77,12 @@
             loadAvailableDefinitions();
         });
 
-
+        $scope.$watch(function() {
+            return Principal.isAuthenticated();
+        }, function() {
+            Principal.identity().then(function(account) {
+                vm.account = account;
+            })
+        });
     }
 })();

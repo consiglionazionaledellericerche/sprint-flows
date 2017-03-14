@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AccountStatusUserDetailsChecker;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -31,8 +30,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsChecker;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.ldap.userdetails.LdapUserDetails;
-import org.springframework.security.ldap.userdetails.LdapUserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.security.web.authentication.switchuser.AuthenticationSwitchUserEvent;
 import org.springframework.security.web.authentication.switchuser.SwitchUserAuthorityChanger;
@@ -46,7 +43,6 @@ public class OAuthCookieSwithUserFilter extends SwitchUserFilter {
     private String exitUserUrl = "/logout/impersonate";
     private String usernameParameter = "impersonate_username";
     private UserDetailsService userDetailsService;
-//    private LdapUserDetailsService ldapUserDetailsService;
     private UserDetailsChecker userDetailsChecker = new AccountStatusUserDetailsChecker();
     private String switchAuthorityRole = ROLE_PREVIOUS_ADMINISTRATOR;
     private ApplicationEventPublisher eventPublisher;
@@ -58,50 +54,65 @@ public class OAuthCookieSwithUserFilter extends SwitchUserFilter {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
 
-        // check for switch or exit request
-        if (requiresSetCookie(request)) {
-            Authentication targetUser = attemptSwitchUser(request);
-            Cookie cookie = new Cookie(CNR_IMPERSONATE, targetUser.getName());
-            cookie.setPath("/");
-            response.addCookie(cookie);
+        // if you're just logging in, clear any previous cookie
+        if (loggingIn(request))
+            clearImpersonationCookie(response);
 
-            // update the current context to the new target user
-            SecurityContextHolder.getContext().setAuthentication(targetUser);
-            response.setStatus(HttpStatus.OK.value());
+        // if exit impersonation, just return an empty OK 
+        if (requiresExitUser(request)) {
+            clearImpersonationCookie(response);
+            response.setStatus(HttpServletResponse.SC_OK);
             return;
-        }
-        else if (requiresSwitchUser(request)) {
-            // if set, attempt switch and store original
-            try {
+            
+        } else {
 
+            // User has requested to impersonate
+            if (requiresSetCookie(request)) {
                 Authentication targetUser = attemptSwitchUser(request);
+                Cookie cookie = new Cookie(CNR_IMPERSONATE, targetUser.getName());
+                cookie.setPath("/");
+                response.addCookie(cookie);
 
                 // update the current context to the new target user
                 SecurityContextHolder.getContext().setAuthentication(targetUser);
-
+                response.setStatus(HttpServletResponse.SC_OK);
+                return;
             }
-            catch (AuthenticationException e) {
-                this.logger.debug("Switch User failed", e);
+            
+            // any other normal request; check if the principal needs to be switched
+            else if (requiresSwitchUser(request)) {
+                // if set, attempt switch and store original
+                try {
+                    Authentication targetUser = attemptSwitchUser(request);
+                    // update the current context to the new target user
+                    SecurityContextHolder.getContext().setAuthentication(targetUser);
+                }
+                catch (AuthenticationException e) {
+                    this.logger.debug("Switch User failed", e);
+                }
             }
-
+            chain.doFilter(request, response);
         }
-        else if (requiresExitUser(request)) {
+    }
 
-            Cookie cookie = new Cookie(CNR_IMPERSONATE, "");
-            cookie.setPath("/");
-            cookie.setMaxAge(0);
-            response.addCookie(cookie);
-        }
-
-        chain.doFilter(request, response);
+    private void clearImpersonationCookie(HttpServletResponse response) {
+        Cookie cookie = new Cookie(CNR_IMPERSONATE, "");
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
     }
 
     protected boolean requiresExitUser(HttpServletRequest request) {
         String uri = stripUri(request);
 
         return uri.endsWith(request.getContextPath() + this.exitUserUrl) ||
-                uri.endsWith(request.getContextPath() + "oauth/token") ||
                 uri.endsWith(request.getContextPath() + "logout") ;
+    }
+
+    protected boolean loggingIn(HttpServletRequest request) {
+        String uri = stripUri(request);
+        return uri.endsWith(request.getContextPath() + "oauth/token");
+
     }
 
     /**
@@ -140,11 +151,8 @@ public class OAuthCookieSwithUserFilter extends SwitchUserFilter {
         }
 
         UserDetails targetUser;
-//        try {
         targetUser = this.userDetailsService.loadUserByUsername(username);
-//        } catch (UsernameNotFoundException e) {
-//            targetUser = (LdapUserDetails) this.ldapUserDetailsService.loadUserByUsername(username);
-//        }
+
         this.userDetailsChecker.check(targetUser);
 
         // OK, create the switch user token
@@ -267,8 +275,4 @@ public class OAuthCookieSwithUserFilter extends SwitchUserFilter {
         this.userDetailsService = userDetailsService;
         super.setUserDetailsService(userDetailsService);
     }
-
-//    public void setLdapUserDetailsService(LdapUserDetailsService ldapUserDetailsService) {
-//        this.ldapUserDetailsService = ldapUserDetailsService;
-//    }
 }

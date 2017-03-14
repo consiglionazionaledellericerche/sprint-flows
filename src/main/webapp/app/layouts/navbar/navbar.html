@@ -206,10 +206,10 @@
                     </li>
                 </ul>
             </li>
-            <li ng-show="vm.isImpersonating">
-                <a class="label label-warning" ui-sref="availabletasks" ng-click="vm.cancelSwitchUser()">
-                    <span class="glyphicon glyphicon-user"></span>
-                    <span>Impersonating: {{vm.account.login}}</span>
+            <li ng-switch-when="true" has-authority="ROLE_PREVIOUS_ADMINISTRATOR">
+                <a ui-sref="availabletasks" ng-click="vm.cancelSwitchUser()">
+                    <span class="glyphicon glyphicon-user label label-warning"></span>
+                    <span class="label label-warning" >Impersonating: {{vm.account.login}}</span>
                 </a>
             </li>
         </ul>

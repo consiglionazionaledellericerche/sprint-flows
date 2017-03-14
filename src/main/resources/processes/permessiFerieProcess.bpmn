@@ -9,7 +9,7 @@
     <userTask id="approvazione" name="Direttore Approva o Rifiuta" activiti:candidateGroups="ROLE_ADMIN"></userTask>
     <endEvent id="endevent1" name="End"></endEvent>
     <sequenceFlow id="flow2" sourceRef="approvazione" targetRef="exclusivegateway1"></sequenceFlow>
-    <userTask id="usertask1" name="User Task" activiti:candidateGroups="SEGRETARIO,ROLE_DEPARTMENT_603240,ROLE_ADMIN"></userTask>
+    <userTask id="usertask1" name="User Task" activiti:candidateGroups="USER"></userTask>
     <sequenceFlow id="flow3" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
     <sequenceFlow id="flow4" sourceRef="usertask1" targetRef="approvazione"></sequenceFlow>
     <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>

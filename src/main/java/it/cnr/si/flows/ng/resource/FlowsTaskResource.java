@@ -1,14 +1,22 @@
 package it.cnr.si.flows.ng.resource;
 
-import com.codahale.metrics.annotation.Timed;
-import it.cnr.si.config.ldap.CNRUser;
-import it.cnr.si.flows.ng.service.CounterService;
-import it.cnr.si.flows.ng.service.FlowsAttachmentService;
-import it.cnr.si.repository.UserRepository;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.security.SecurityUtils;
-import it.cnr.si.service.SecurityService;
-import it.cnr.si.service.UserService;
+import static it.cnr.si.flows.ng.utils.Utils.isEmpty;
+import static it.cnr.si.flows.ng.utils.Utils.isNotEmpty;
+
+import java.io.IOException;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.activiti.engine.FormService;
 import org.activiti.engine.IdentityService;
@@ -32,20 +40,23 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.security.Principal;
-import java.util.*;
-import java.util.stream.Collectors;
+import com.codahale.metrics.annotation.Timed;
 
-import static it.cnr.si.flows.ng.utils.Utils.isEmpty;
-import static it.cnr.si.flows.ng.utils.Utils.isNotEmpty;
+import it.cnr.si.flows.ng.service.CounterService;
+import it.cnr.si.flows.ng.service.FlowsAttachmentService;
+import it.cnr.si.repository.UserRepository;
+import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.security.SecurityUtils;
+import it.cnr.si.service.SecurityService;
+import it.cnr.si.service.UserService;
 
 
 /**
@@ -129,6 +140,7 @@ public class FlowsTaskResource {
         List<String> authorities =
                 SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
+                .map(FlowsTaskResource::removeLeadingRole)
                 .collect(Collectors.toList());
 
         List<Task> listraw = taskService.createTaskQuery()
@@ -146,6 +158,12 @@ public class FlowsTaskResource {
         response.setData(list);
 
         return ResponseEntity.ok(response);
+    }
+
+    private static String removeLeadingRole(String s) {
+        if(s.startsWith("ROLE_"))
+            s = s.substring(5);
+        return s;
     }
 
 
