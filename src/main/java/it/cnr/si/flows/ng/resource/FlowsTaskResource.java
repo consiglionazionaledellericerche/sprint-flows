@@ -1,6 +1,6 @@
 package it.cnr.si.flows.ng.resource;
 
-import static it.cnr.si.flows.ng.utils.Utils.isEmpty;
+import static it.cnr.si.flows.ng.utils.Utils.*;
 import static it.cnr.si.flows.ng.utils.Utils.isNotEmpty;
 
 import java.io.IOException;
@@ -27,10 +27,14 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.Task;
+import org.activiti.engine.task.TaskQuery;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.task.TaskResponse;
+import org.apache.commons.io.IOUtils;
+import org.activiti.engine.impl.util.json.JSONArray;
+import org.activiti.engine.impl.util.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -404,7 +408,7 @@ public class FlowsTaskResource {
         return data;
 
     }
-    
+
         /**
      * Funzionalità di Ricerca delle Process Instances.
      *
