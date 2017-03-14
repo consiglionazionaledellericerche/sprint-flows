@@ -411,10 +411,8 @@ public class FlowsTaskResource {
                 taskQuery.processVariableValueLikeIgnoreCase(key, appo.getString(key));
             } else {
 //                gestione variabili booleane
-                if (appo.getString(key).equals("true")) {
-                    taskQuery.processVariableValueEquals(key, true);
-                } else if (appo.getString(key).equals("false")) {
-                    taskQuery.processVariableValueEquals(key, false);
+                if (appo.getString(key).equals("true") || appo.getString(key).equals("false")) {
+                    taskQuery.processVariableValueEquals(key, Boolean.valueOf(appo.getString(key)));
                 } else {
 //                    default con la wildcard
                     taskQuery.processVariableValueLikeIgnoreCase(key, "%" + appo.getString(key) + "%");
