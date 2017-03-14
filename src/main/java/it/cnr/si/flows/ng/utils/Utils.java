@@ -11,6 +11,10 @@ import java.util.List;
 
 public final class Utils {
 
+
+    public static final String ASC = "ASC";
+    public static final String DESC = "DESC";
+
     @Autowired
     static
     RestResponseFactory restResponseFactory;

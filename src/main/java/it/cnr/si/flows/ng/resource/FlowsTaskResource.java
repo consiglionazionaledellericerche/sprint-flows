@@ -404,4 +404,64 @@ public class FlowsTaskResource {
         return data;
 
     }
+    
+        /**
+     * Funzionalità di Ricerca delle Process Instances.
+     *
+     * @param req               the req
+     * @param processInstanceId Il processInstanceId della ricerca
+     * @param active            Boolean che indica se ricercare le Process Insrtances attive o terminate
+     * @param order             L'ordine in cui vogliamo i risltati ('ASC' o 'DESC')
+     * @return le response entity frutto della ricerca
+     */
+    @RequestMapping(value = "/search/{processInstanceId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<Object> search(
+            HttpServletRequest req,
+            @PathVariable("processInstanceId") String processInstanceId,
+            @RequestParam("active") boolean active,
+            @RequestParam("order") String order) {
+
+        String jsonString = "";
+        try {
+            jsonString = IOUtils.toString(req.getReader());
+        } catch (Exception e) {
+            LOGGER.error("Errore nella letture dello stream della request", e);
+        }
+        JSONArray params = new JSONObject(jsonString).getJSONArray("params");
+
+        TaskQuery taskQuery = taskService.createTaskQuery().processDefinitionKey(processInstanceId);
+
+        if (active)
+            taskQuery.active();
+        else
+            taskQuery.suspended();
+
+        for (int i = 0; i < params.length(); i++) {
+            JSONObject appo = params.optJSONObject(i);
+            String key = appo.names().getString(0);
+            //wildcard ("%") di default ma non a TUTTI i campi
+            if (key.equals("initiator")) {
+//                variabili senza wildcard
+                taskQuery.processVariableValueLikeIgnoreCase(key, appo.getString(key));
+            } else {
+//                gestione variabili booleane
+                if (appo.getString(key).equals("true") || appo.getString(key).equals("false")) {
+                    taskQuery.processVariableValueEquals(key, Boolean.valueOf(appo.getString(key)));
+                } else {
+//                    default con la wildcard
+                    taskQuery.processVariableValueLikeIgnoreCase(key, "%" + appo.getString(key) + "%");
+                }
+            }
+        }
+        if (order.equals(ASC))
+            taskQuery.orderByTaskCreateTime().asc();
+        else if (order.equals(DESC))
+            taskQuery.orderByTaskCreateTime().desc();
+
+        List<Task> taskRaw = taskQuery.includeProcessVariables().list();
+        List tasks = restResponseFactory.createTaskResponseList(taskRaw);
+
+        return ResponseEntity.ok(tasks);
+    }
 }

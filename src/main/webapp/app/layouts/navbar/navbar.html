@@ -19,6 +19,13 @@
                     <span class="hidden-sm" translate="global.menu.home">Home</span>
                 </a>
             </li>
+            <!--todo: solo per ROLE_ADMIN?-->
+            <li ui-sref-active="active" has-authority="ROLE_USER">
+                <a ui-sref="search" ng-click="vm.collapseNavbar()">
+                    <span class="glyphicon glyphicon-search"></span>
+                    <span class="hidden-sm">Ricerca</span>
+                </a>
+            </li>
             <li ui-sref-active="active" has-authority="ROLE_USER">
                 <a ui-sref="availabletasks" ng-click="vm.collapseNavbar()">
                     <span class="glyphicon glyphicon-import"></span>
@@ -37,6 +44,7 @@
                 </a>
                 <ul class="dropdown-menu" uib-dropdown-menu>
                   <li ng-repeat="wfDef in vm.wfDefs">
+                      <!--<li ng-repeat="wfDef in wfDefs">-->
                     <a ui-sref="task({processDefinitionId: wfDef.id, taskName: 'start', taskId: undefined})" ng-click="vm.collapseNavbar()">
                       {{wfDef.name}}
                     </a>
