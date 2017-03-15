@@ -1,13 +1,9 @@
 <div>
-    <!--<div class="dropdown md-menu-origin">-->
     <div class="dropdown md-menu-origin">
-        <!--<ul class="nav navbar-nav navbar-right">-->
-
         <ul>
             <li ui-sref-active="active" uib-dropdown class="dropdown pointer">
                 <a class="dropdown-toggle" uib-dropdown-toggle href="" id="definitions-menu">
                             <span>
-                                <!--<span class="glyphicon glyphicon-transfer"></span>-->
                                 <span class="hidden-sm">
                                     {{$root.current.key || 'Process Definition'}}
                                 </span>
@@ -24,10 +20,7 @@
             </li>
         </ul>
     </div>
-
-
     <div>
-        <!--<ng-include src="vm.formUrl" ng-model="vm.data" />-->
         <ng-include id="searchFields" src="formUrl"></ng-include>
     </div>
 </div>
