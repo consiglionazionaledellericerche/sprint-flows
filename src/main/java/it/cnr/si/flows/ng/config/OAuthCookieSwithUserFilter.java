@@ -58,12 +58,12 @@ public class OAuthCookieSwithUserFilter extends SwitchUserFilter {
         if (loggingIn(request))
             clearImpersonationCookie(response);
 
-        // if exit impersonation, just return an empty OK 
+        // if exit impersonation, just return an empty OK
         if (requiresExitUser(request)) {
             clearImpersonationCookie(response);
             response.setStatus(HttpServletResponse.SC_OK);
             return;
-            
+
         } else {
 
             // User has requested to impersonate
@@ -78,7 +78,7 @@ public class OAuthCookieSwithUserFilter extends SwitchUserFilter {
                 response.setStatus(HttpServletResponse.SC_OK);
                 return;
             }
-            
+
             // any other normal request; check if the principal needs to be switched
             else if (requiresSwitchUser(request)) {
                 // if set, attempt switch and store original
@@ -135,10 +135,7 @@ public class OAuthCookieSwithUserFilter extends SwitchUserFilter {
         String username = request.getParameter(this.usernameParameter);
 
         if (username == null) {
-            for (Cookie cookie : request.getCookies()) {
-                if (cookie.getName().equals(CNR_IMPERSONATE))
-                    username = cookie.getValue();
-            }
+            username = getImpersonationCookieValue(request);
         }
 
         if (username == null) {
@@ -245,12 +242,19 @@ public class OAuthCookieSwithUserFilter extends SwitchUserFilter {
         if (uri.contains("oauth/token") || uri.endsWith("logout"))
             return false;
 
-        for (Cookie cookie : request.getCookies() ) {
-            if (cookie.getName().equals(CNR_IMPERSONATE)) {
-                return cookie.getValue() != null && !cookie.getValue().equals("");
+        return getImpersonationCookieValue(request) != null;
+    }
+
+    private String getImpersonationCookieValue(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies ) {
+                if (cookie.getName().equals(CNR_IMPERSONATE)) {
+                    return cookie.getValue();
+                }
             }
         }
-        return false;
+        return null;
     }
 
 
