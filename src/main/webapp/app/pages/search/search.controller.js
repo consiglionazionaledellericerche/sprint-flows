@@ -22,7 +22,9 @@
     $scope.orderSearchFlows = function(processDefinition, order) {
         order === 'ASC' ? $('#order').text('Crescente') : $('#order').text('Decrescente');
         vm.order = order;
-        $scope.search(processDefinition);
+        if(processDefinition !== undefined){
+            $scope.search(processDefinition);
+        }
     };
 
     $scope.showWorkflows = function (processDefinition, active) {
@@ -38,12 +40,14 @@
         var fields = Array.from($("input[id^='searchFields']")),
           params = [];
 
-        if(vm.active !== undefined && vm.order !== undefined && processDefinition !== undefined){
-            //popolo params con gli id dei campi ed i valori sottomessi nei campi di ricerca
+        if(vm.order !== undefined && processDefinition !== undefined){
+            //popolo params con gli id, i valori sottomessi e il "type" dei campi di ricerca
             fields.forEach(function (field){
                 var fieldName = field.getAttribute('id').replace('searchFields.', ''), appo = {};
                     if(field.value  !== ""){
-                        appo[fieldName] = field.value;
+                        appo["key"] = fieldName;
+                        appo["value"] = field.value;
+                        appo["type"] = field.getAttribute("type");
                         params.push(appo);
                     }
             });
@@ -57,7 +61,11 @@
             });
 
         } else {
-//            todo: modale per definire l'ordine, i processi attivi e lo process definition?'
+            if(vm.order === undefined) {
+                AlertService.error("Definire se visualizzare i risultani in ordine \"Crescente\" o \"Decrescente\"");
+            } else if(processDefinition === undefined){
+                AlertService.error("Definire un Process Definition di cui ricercare le istanze");
+            }
         }
     }
   }

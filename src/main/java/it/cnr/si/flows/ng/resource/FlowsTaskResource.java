@@ -1,28 +1,16 @@
 package it.cnr.si.flows.ng.resource;
 
-import static it.cnr.si.flows.ng.utils.Utils.*;
-import static it.cnr.si.flows.ng.utils.Utils.isNotEmpty;
-
-import java.io.IOException;
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.activiti.engine.FormService;
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
+import com.codahale.metrics.annotation.Timed;
+import it.cnr.si.flows.ng.service.CounterService;
+import it.cnr.si.flows.ng.service.FlowsAttachmentService;
+import it.cnr.si.repository.UserRepository;
+import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.security.SecurityUtils;
+import it.cnr.si.service.SecurityService;
+import it.cnr.si.service.UserService;
+import org.activiti.engine.*;
+import org.activiti.engine.impl.util.json.JSONArray;
+import org.activiti.engine.impl.util.json.JSONObject;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.IdentityLink;
@@ -33,8 +21,6 @@ import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.task.TaskResponse;
 import org.apache.commons.io.IOUtils;
-import org.activiti.engine.impl.util.json.JSONArray;
-import org.activiti.engine.impl.util.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,23 +30,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import com.codahale.metrics.annotation.Timed;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.security.Principal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import it.cnr.si.flows.ng.service.CounterService;
-import it.cnr.si.flows.ng.service.FlowsAttachmentService;
-import it.cnr.si.repository.UserRepository;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.security.SecurityUtils;
-import it.cnr.si.service.SecurityService;
-import it.cnr.si.service.UserService;
+import static it.cnr.si.flows.ng.utils.Utils.*;
 
 
 /**
@@ -97,6 +80,7 @@ public class FlowsTaskResource {
     private FormService formService;
     @Autowired
     private FlowsAttachmentService attachmentService;
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
 
     public static long extractId(String id) throws IllegalArgumentException {
@@ -110,11 +94,32 @@ public class FlowsTaskResource {
         }
     }
 
+    private static String removeLeadingRole(String s) {
+        if (s.startsWith("ROLE_"))
+            s = s.substring(5);
+        return s;
+    }
+
+    // TODO magari un giorno avremo degli array, ma per adesso ce lo facciamo andare bene cosi'
+    public static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
+
+        Map<String, Object> data = new HashMap<>();
+
+        Enumeration<String> parameterNames = req.getParameterNames();
+        while (parameterNames.hasMoreElements()) {
+            String paramName = parameterNames.nextElement();
+            data.put(paramName, req.getParameter(paramName));
+        }
+
+        return data;
+
+    }
+
     @RequestMapping(value = "/mytasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<DataResponse> getMyTasks(Principal user,
-            @RequestParam Map<String, String> params) {
+                                                   @RequestParam Map<String, String> params) {
 
         String username = SecurityUtils.getCurrentUserLogin();
 
@@ -143,9 +148,9 @@ public class FlowsTaskResource {
         String username = SecurityUtils.getCurrentUserLogin();
         List<String> authorities =
                 SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .map(FlowsTaskResource::removeLeadingRole)
-                .collect(Collectors.toList());
+                        .map(GrantedAuthority::getAuthority)
+                        .map(FlowsTaskResource::removeLeadingRole)
+                        .collect(Collectors.toList());
 
         List<Task> listraw = taskService.createTaskQuery()
                 .taskCandidateUser(username)
@@ -163,13 +168,6 @@ public class FlowsTaskResource {
 
         return ResponseEntity.ok(response);
     }
-
-    private static String removeLeadingRole(String s) {
-        if(s.startsWith("ROLE_"))
-            s = s.substring(5);
-        return s;
-    }
-
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
@@ -314,7 +312,7 @@ public class FlowsTaskResource {
             HttpServletRequest req,
             HttpServletResponse resp,
             @PathVariable("id") String id)
-                    throws IOException {
+            throws IOException {
 
         Map<String, Object> result = new HashMap<>();
         Map<String, Object> list = new HashMap<>();
@@ -394,22 +392,7 @@ public class FlowsTaskResource {
         }
     }
 
-    // TODO magari un giorno avremo degli array, ma per adesso ce lo facciamo andare bene cosi'
-    public static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
-
-        Map<String, Object> data = new HashMap<>();
-
-        Enumeration<String> parameterNames = req.getParameterNames();
-        while (parameterNames.hasMoreElements()) {
-            String paramName = parameterNames.nextElement();
-            data.put(paramName, req.getParameter(paramName));
-        }
-
-        return data;
-
-    }
-
-        /**
+    /**
      * Funzionalità di Ricerca delle Process Instances.
      *
      * @param req               the req
@@ -443,19 +426,25 @@ public class FlowsTaskResource {
 
         for (int i = 0; i < params.length(); i++) {
             JSONObject appo = params.optJSONObject(i);
-            String key = appo.names().getString(0);
+            String key = appo.getString("key");
+            String value = appo.getString("value");
+            String type = appo.getString("type");
             //wildcard ("%") di default ma non a TUTTI i campi
-            if (key.equals("initiator")) {
-//                variabili senza wildcard
-                taskQuery.processVariableValueLikeIgnoreCase(key, appo.getString(key));
-            } else {
-//                gestione variabili booleane
-                if (appo.getString(key).equals("true") || appo.getString(key).equals("false")) {
-                    taskQuery.processVariableValueEquals(key, Boolean.valueOf(appo.getString(key)));
-                } else {
-//                    default con la wildcard
-                    taskQuery.processVariableValueLikeIgnoreCase(key, "%" + appo.getString(key) + "%");
-                }
+            switch (type) {
+                case "textEqual":
+                    taskQuery.processVariableValueEquals(key, value);
+                    break;
+                case "boolean":
+                    // gestione variabili booleane
+                    taskQuery.processVariableValueEquals(key, Boolean.valueOf(value));
+                    break;
+                case "date":
+                    processDate(taskQuery, key, value);
+                    break;
+                default:
+                    //variabili con la wildcard  (%value%)
+                    taskQuery.processVariableValueLikeIgnoreCase(key, "%" + value + "%");
+                    break;
             }
         }
         if (order.equals(ASC))
@@ -467,5 +456,18 @@ public class FlowsTaskResource {
         List tasks = restResponseFactory.createTaskResponseList(taskRaw);
 
         return ResponseEntity.ok(tasks);
+    }
+
+    private void processDate(TaskQuery taskQuery, String key, String value) {
+        try {
+            Date date = sdf.parse(value);
+
+            if (key.contains("Less")) {
+                taskQuery.processVariableValueLessThanOrEqual(key, date);
+            } else if (key.contains("Great"))
+                taskQuery.processVariableValueGreaterThanOrEqual(key, date);
+        } catch (ParseException e) {
+            LOGGER.error("Errore nel parsing della data {} - ", value, e);
+        }
     }
 }

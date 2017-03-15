@@ -21,6 +21,12 @@ spring:
         name:
         username:
         password:
+    ldap:
+        userSearchBase: o=cnr, c=it
+        userSearchFilter: uid={0}
+        url: ldap://virtest1.si.cnr.it:389
+        managerDn: cn=mastercnrapp2,ou=account,o=cnr,c=it
+        managerPassword: pippa
     jpa:
         database-platform: it.cnr.si.domain.util.FixedH2Dialect
         database: H2
