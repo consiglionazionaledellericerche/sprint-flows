@@ -6,7 +6,7 @@
 
   workflowTypesDirective.$inject = ['$rootScope', 'dataService', 'Form', '$sessionStorage', '$log'];
 
-  function workflowTypesDirective(rootScope, dataService, Form, $sessionStorage, $log) {
+  function workflowTypesDirective(rootScope) {
 
     return {
             restrict: 'E',
@@ -19,9 +19,8 @@
                 changed: '='
             },
             templateUrl: 'app/components/workflow-types/workflow-types.html',
-            link: function (scope, element, attrs) {
-                var vm = this,
-                    processVersion = '1';
+            link: function (scope) {
+                var processVersion = '1';
 
                 scope.selectForm = function(processDefinition) {
                     rootScope.current = processDefinition;

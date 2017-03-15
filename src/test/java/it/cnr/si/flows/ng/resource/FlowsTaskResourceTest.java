@@ -135,7 +135,7 @@ public class FlowsTaskResourceTest {
 
         String searchField1 = "wfvarValidazioneSpesa";
         String searchField2 = "initiator";
-        String payload = "{params: [{" + searchField1 + " : true} , {" + searchField2 + ": \"admin\"}]}";
+        String payload = "{params: [{key: " + searchField1 + ", value: true, type: boolean} , {key: " + searchField2 + ", value: \"admin\", type: textEqual}]}";
         req.setContent(payload.getBytes());
         req.setContentType("application/json");
 
@@ -162,7 +162,7 @@ public class FlowsTaskResourceTest {
 
 
         //parametri sbagliati (0 risultati)
-        payload = "{params: [{wfvarValidazioneSpesa : false} , {initiator: \"admin\"}]}";
+        payload = "{params: [{key: " + searchField1 + ", value: false, type: boolean} , {key: initiator, value: \"admin\", type: textEqual}]}";
         req.setContent(payload.getBytes());
         req.setContentType("application/json");
 
