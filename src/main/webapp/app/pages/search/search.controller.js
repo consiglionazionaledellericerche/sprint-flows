@@ -18,7 +18,6 @@
 
     $log.info($state.params.processDefinition);
 
-
     $scope.orderSearchFlows = function(processDefinition, order) {
         order === 'ASC' ? $('#order').text('Crescente') : $('#order').text('Decrescente');
         vm.order = order;
@@ -33,10 +32,7 @@
     };
 
 
-
-
     $scope.search = function(processDefinition){
-
         var fields = Array.from($("input[id^='searchFields']")),
           params = [];
 
@@ -62,9 +58,9 @@
 
         } else {
             if(vm.order === undefined) {
-                AlertService.error("Definire se visualizzare i risultani in ordine \"Crescente\" o \"Decrescente\"");
+                AlertService.warning("Scegliere un ordine in cui visualizzare i risultani della ricerca");
             } else if(processDefinition === undefined){
-                AlertService.error("Definire un Process Definition di cui ricercare le istanze");
+                AlertService.warning("Definire un Process Definition di cui ricercare le istanze");
             }
         }
     }
