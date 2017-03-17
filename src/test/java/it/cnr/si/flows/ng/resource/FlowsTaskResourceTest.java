@@ -138,14 +138,15 @@ public class FlowsTaskResourceTest {
         String payload = "{params: [{key: " + searchField1 + ", value: true, type: boolean} , {key: " + searchField2 + ", value: \"admin\", type: textEqual}]}";
         req.setContent(payload.getBytes());
         req.setContentType("application/json");
-
-        ResponseEntity<Object> response = flowsTaskResource.search(req, processDefinitionMissioni.split(":")[0], true, ASC);
+        //verifico la richiesta normale
+        ResponseEntity<Object> response = flowsTaskResource.search(req, processDefinitionMissioni.split(":")[0], true, ASC, 0, 10);
         assertEquals(response.getStatusCode(), HttpStatus.OK);
         ArrayList responseList = (ArrayList) response.getBody();
         assertEquals(responseList.size(), 1);
         TaskResponse taskresponse = ((TaskResponse) responseList.get(0));
         assertTrue(taskresponse.getProcessDefinitionId().contains(processDefinitionMissioni));
-//        verifico che la Process Instance restituita rispetti i parametri della ricerca
+
+        //verifico che la Process Instance restituita rispetti i parametri della ricerca
         List<RestVariable> variables = taskresponse.getVariables();
         RestVariable variable = variables.stream().filter(v -> v.getName().equals(searchField1)).collect(Collectors.toList()).get(0);
         assertEquals(variable.getValue(), true);
@@ -153,20 +154,18 @@ public class FlowsTaskResourceTest {
         variable = variables.stream().filter(v -> v.getName().equals(searchField2)).collect(Collectors.toList()).get(0);
         assertEquals(variable.getValue(), "admin");
 
-
         //cerco le Process Instance completate (0 risultati)
-        response = flowsTaskResource.search(req, processDefinitionMissioni.split(":")[0], false, ASC);
+        response = flowsTaskResource.search(req, processDefinitionMissioni.split(":")[0], false, ASC, 0, 10);
         assertEquals(response.getStatusCode(), HttpStatus.OK);
         responseList = (ArrayList) response.getBody();
         assertEquals(responseList.size(), 0);
-
 
         //parametri sbagliati (0 risultati)
         payload = "{params: [{key: " + searchField1 + ", value: false, type: boolean} , {key: initiator, value: \"admin\", type: textEqual}]}";
         req.setContent(payload.getBytes());
         req.setContentType("application/json");
 
-        response = flowsTaskResource.search(req, processDefinitionMissioni.split(":")[0], true, ASC);
+        response = flowsTaskResource.search(req, processDefinitionMissioni.split(":")[0], true, ASC, 0, 10);
         assertEquals(response.getStatusCode(), HttpStatus.OK);
         responseList = (ArrayList) response.getBody();
         assertEquals(responseList.size(), 0);

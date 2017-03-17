@@ -407,9 +407,13 @@ public class FlowsTaskResource {
             HttpServletRequest req,
             @PathVariable("processInstanceId") String processInstanceId,
             @RequestParam("active") boolean active,
-            @RequestParam("order") String order) {
+            @RequestParam("order") String order,
+            @RequestParam("firstResult") int firstResult,
+            @RequestParam("maxResults") int maxResults) {
 
         String jsonString = "";
+        Map<String, Object> result = new HashMap<>();
+
         try {
             jsonString = IOUtils.toString(req.getReader());
         } catch (Exception e) {
@@ -452,10 +456,14 @@ public class FlowsTaskResource {
         else if (order.equals(DESC))
             taskQuery.orderByTaskCreateTime().desc();
 
-        List<Task> taskRaw = taskQuery.includeProcessVariables().list();
-        List tasks = restResponseFactory.createTaskResponseList(taskRaw);
+        long totalItems = taskQuery.includeProcessVariables().count();
+        result.put("totalItems", totalItems);
 
-        return ResponseEntity.ok(tasks);
+        List<Task> taskRaw = taskQuery.includeProcessVariables().listPage(firstResult, maxResults);
+        List tasks = restResponseFactory.createTaskResponseList(taskRaw);
+        result.put("tasks", tasks);
+
+        return ResponseEntity.ok(result);
     }
 
     private void processDate(TaskQuery taskQuery, String key, String value) {
@@ -463,9 +471,9 @@ public class FlowsTaskResource {
             Date date = sdf.parse(value);
 
             if (key.contains("Less")) {
-                taskQuery.processVariableValueLessThanOrEqual(key, date);
+                taskQuery.processVariableValueLessThanOrEqual(key.replace("Less", ""), date);
             } else if (key.contains("Great"))
-                taskQuery.processVariableValueGreaterThanOrEqual(key, date);
+                taskQuery.processVariableValueGreaterThanOrEqual(key.replace("Great", ""), date);
         } catch (ParseException e) {
             LOGGER.error("Errore nel parsing della data {} - ", value, e);
         }
