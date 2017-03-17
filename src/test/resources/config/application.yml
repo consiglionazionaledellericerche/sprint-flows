@@ -48,6 +48,8 @@ spring:
             enabled: false
     thymeleaf:
         mode: XHTML
+    ldap:
+        userSearchFilter: uid={0}
 
 liquibase:
     contexts: test
@@ -92,6 +94,7 @@ cnr:
     activiti:
         diagram-font: Open Sans
 
-ajp.port: 8009
+cache.hazelcast.port: 5504
+ajp.port: 8010
 ajp.timeout: 120000
 cache.hazelcast.packages:

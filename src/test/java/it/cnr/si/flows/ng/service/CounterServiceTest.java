@@ -11,10 +11,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import it.cnr.si.FlowsApp;
 import it.cnr.si.SprintApp;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = SprintApp.class)
+@SpringBootTest(classes = FlowsApp.class)
 @EnableTransactionManagement
 public class CounterServiceTest {
 

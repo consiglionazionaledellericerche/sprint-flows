@@ -37,7 +37,7 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
         .and()
         .addFilterAfter(switchUserFilter(), FilterSecurityInterceptor.class);
     };
-    
+
     @Bean public LdapUserDetailsManager getLdapUserDetailsManager(LdapContextSource ctx) {
         return new LdapUserDetailsManager(ctx);
     }
@@ -60,11 +60,12 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
 
     @Bean
     public LdapContextSource getLdapContextSource(Environment env) {
+        PropertyResolver p = new RelaxedPropertyResolver(env, "spring.ldap.");
         LdapContextSource contextSource= new LdapContextSource();
-        contextSource.setUrl(env.getRequiredProperty("spring.ldap.url"));
-        contextSource.setBase(env.getRequiredProperty("spring.ldap.userSearchBase"));
-        contextSource.setUserDn(env.getRequiredProperty("spring.ldap.managerDn"));
-        contextSource.setPassword(env.getRequiredProperty("spring.ldap.managerPassword"));
+        contextSource.setUrl(p.getProperty("spring.ldap.url"));
+        contextSource.setBase(p.getProperty("spring.ldap.userSearchBase"));
+        contextSource.setUserDn(p.getProperty("spring.ldap.managerDn"));
+        contextSource.setPassword(p.getProperty("spring.ldap.managerPassword"));
         return contextSource;
     }
 
