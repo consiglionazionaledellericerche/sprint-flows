@@ -53,14 +53,11 @@ public class FlowsUserDetailsService extends UserDetailsService {
                 return new org.springframework.security.core.userdetails.User(lowercaseLogin,
                     user.getPassword(),
                     grantedAuthorities);
-            }).orElseThrow(() -> new UsernameNotFoundException("User " + lowercaseLogin + " was not found in the " +
-            "database"));
+            }).get();
         else {
 
-//            ldapUserMapper.mapUserFromContext(dirContextOperations, username, grantedAuthorities);
 
             UserDetails userFromLdap = ldapUserDetailsService.loadUserByUsername(login);
-//            UserDetails loadUserByUsername = ldapUserDetailsManager.loadUserByUsername(login);
 
             if (userFromLdap != null)
                 return userFromLdap;

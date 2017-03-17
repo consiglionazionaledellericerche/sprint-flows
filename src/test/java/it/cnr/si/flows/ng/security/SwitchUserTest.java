@@ -28,6 +28,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import it.cnr.si.FlowsApp;
+import it.cnr.si.flows.ng.config.SwitchUserSecurityConfiguration;
+
 import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.DEFINED_PORT)
@@ -39,14 +41,14 @@ public class SwitchUserTest {
     private String SERVER;
     private static final String LOGIN_URL = "/oauth/token";
     private static final String ACCOUNT_URL = "/api/ldap-account";
-    private static final String IMPERSONATE_URL = "/login/impersonate";
+    private static final String IMPERSONATE_URL = SwitchUserSecurityConfiguration.IMPERSONATE_START_URL;
 
     @Autowired
     private TestRestTemplate template;
 
 
     @Test
-    public void testAdminAbleToSwitch() throws URISyntaxException {
+    public void testAdminAbleToSwitchToDatabaseUser() throws URISyntaxException {
 
         SERVER = "http://localhost:"+ port + "/";
 
@@ -55,12 +57,34 @@ public class SwitchUserTest {
         assertThat(account).containsEntry("login", "admin");
 
         ResponseEntity<Void> impersonateResponse = impersonate(token, "user");
-        assertThat(impersonateResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(impersonateResponse.getStatusCode())
+        .isEqualTo(HttpStatus.OK);
         assertThat(impersonateResponse.getHeaders().get("Set-Cookie")).contains("cnr_impersonate=user;path=/");
 
         Map<String, Object> impersonatedAccount = getAccount(token, "user");
         assertThat(impersonatedAccount).containsEntry("login", "user");
         assertThat(impersonatedAccount.get("authorities")).asList().contains("ROLE_PREVIOUS_ADMINISTRATOR");
+
+    }
+
+
+    @Test
+    public void testAdminAbleToSwitchToLdapUser() throws URISyntaxException {
+
+        SERVER = "http://localhost:"+ port + "/";
+
+        String token = "Bearer " + loginAs("admin");
+        Map<String, Object> account = getAccount(token, null);
+        assertThat(account).containsEntry("login", "admin");
+
+        ResponseEntity<Void> impersonateResponse = impersonate(token, "marcinireneusz.trycz");
+        assertThat(impersonateResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(impersonateResponse.getHeaders().get("Set-Cookie")).contains("cnr_impersonate=marcinireneusz.trycz;path=/");
+
+        Map<String, Object> impersonatedAccount = getAccount(token, "marcinireneusz.trycz");
+        assertThat(impersonatedAccount).containsEntry("login", "marcinireneusz.trycz");
+        assertThat(impersonatedAccount.get("authorities")).asList().contains("ROLE_PREVIOUS_ADMINISTRATOR")
+        .contains("ROLE_DEPARTMENT_XXXXXX");
 
     }
 
@@ -75,11 +99,12 @@ public class SwitchUserTest {
 
         ResponseEntity<Void> impersonateResponse = impersonate(token, "admin");
 //        assertThat(impersonateResponse.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
-//        assertThat(impersonateResponse.getHeaders().get("Set-Cookie")).doesNotContain("cnr_impersonate=user;path=/");
+        assertThat(impersonateResponse.getHeaders().get("Set-Cookie")).doesNotContain("cnr_impersonate=admin;path=/");
 
         Map<String, Object> impersonatedAccount = getAccount(token, "admin");
+        assertThat(impersonateResponse.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
         assertThat(impersonatedAccount).doesNotContainEntry("login", "admin");
-        assertThat(impersonatedAccount.get("authorities")).asList().doesNotContain("ROLE_PREVIOUS_ADMINISTRATOR");
+        assertThat(impersonatedAccount.get("authorities")).isNull();
     }
 
     private ResponseEntity<Void> impersonate(String token, String user) throws URISyntaxException {

@@ -25,15 +25,19 @@ import it.cnr.si.config.ldap.CustomAuthoritiesPopulator;
 @Order(202)
 public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
+    public static final String IMPERSONATE_EXIT_URL = "/impersonate/exit";
+    public static final String IMPERSONATE_START_URL = "/impersonate/start";
+
     @Autowired
     private UserDetailsService userDetailsService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+        .antMatcher("/impersonate/**")
         .authorizeRequests()
-        .antMatchers("/login/impersonate*").hasRole("ADMIN")
-        .antMatchers("/logout/impersonate*").hasRole("PREVIOUS_ADMINISTRATOR")
+        .antMatchers(IMPERSONATE_START_URL).hasRole("ADMIN")
+        .antMatchers(IMPERSONATE_EXIT_URL).hasRole("PREVIOUS_ADMINISTRATOR")
         .and()
         .addFilterAfter(switchUserFilter(), FilterSecurityInterceptor.class);
     };
@@ -60,12 +64,13 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
 
     @Bean
     public LdapContextSource getLdapContextSource(Environment env) {
-        PropertyResolver p = new RelaxedPropertyResolver(env, "spring.ldap.");
-        LdapContextSource contextSource= new LdapContextSource();
-        contextSource.setUrl(p.getProperty("spring.ldap.url"));
-        contextSource.setBase(p.getProperty("spring.ldap.userSearchBase"));
-        contextSource.setUserDn(p.getProperty("spring.ldap.managerDn"));
-        contextSource.setPassword(p.getProperty("spring.ldap.managerPassword"));
+        PropertyResolver p = new RelaxedPropertyResolver(env, "spring.ldap."); //
+
+        LdapContextSource contextSource = new LdapContextSource();
+        contextSource.setUrl(p.getProperty("url"));
+        contextSource.setBase(p.getProperty("userSearchBase"));
+        contextSource.setUserDn(p.getProperty("managerDn"));
+        contextSource.setPassword(p.getProperty("managerPassword"));
         return contextSource;
     }
 
@@ -74,8 +79,8 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
             ) {
         OAuthCookieSwithUserFilter filter = new OAuthCookieSwithUserFilter();
         filter.setUserDetailsService(userDetailsService);
-        filter.setSwitchUserUrl("/login/impersonate");
-        filter.setExitUserUrl("/logout/impersonate");
+        filter.setSwitchUserUrl(IMPERSONATE_START_URL);
+        filter.setExitUserUrl(IMPERSONATE_EXIT_URL);
         filter.setTargetUrl("/");
         return filter;
     }
