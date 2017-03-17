@@ -20,13 +20,11 @@
             },
             templateUrl: 'app/components/workflow-types/workflow-types.html',
             link: function (scope) {
-                var processVersion = '1';
-
                 scope.selectForm = function(processDefinition) {
                     rootScope.current = processDefinition;
 
                     if (processDefinition) {
-                         scope.formUrl = 'api/forms/'+ processDefinition.key + '/' + processVersion + '/search';
+                         scope.formUrl = 'api/forms/'+ processDefinition.key + '/1/search';
                     }
                 };
             }
