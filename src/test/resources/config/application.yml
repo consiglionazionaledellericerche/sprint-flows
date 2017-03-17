@@ -48,8 +48,6 @@ spring:
             enabled: false
     thymeleaf:
         mode: XHTML
-    ldap:
-        userSearchFilter: uid={0}
 
 liquibase:
     contexts: test

@@ -21,12 +21,13 @@ import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static it.cnr.si.flows.ng.utils.Utils.ASC;
+import static it.cnr.si.flows.ng.utils.Utils.DESC;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -51,6 +52,8 @@ public class FlowsTaskResourceTest {
     @Autowired
     private RestResponseFactory restResponseFactory;
     private String processDefinitionMissioni;
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
 
 
     @Before
@@ -129,36 +132,33 @@ public class FlowsTaskResourceTest {
     }
 
     @Test
-    public void testSearchTask() {
+    public void testSearchTask() throws ParseException {
         util.loginAdmin();
         MockHttpServletRequest req = new MockHttpServletRequest();
 
         String searchField1 = "wfvarValidazioneSpesa";
         String searchField2 = "initiator";
-        String payload = "{params: [{key: " + searchField1 + ", value: true, type: boolean} , {key: " + searchField2 + ", value: \"admin\", type: textEqual}]}";
+//        String payload = "{params: [{key: " + searchField1 + ", value: true, type: boolean} , {key: " + searchField2 + ", value: \"admin\", type: textEqual}]}";
+        final Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, +1);
+        Date tomorrow = cal.getTime();
+        cal.add(Calendar.DATE, -2);
+        Date yesterday = cal.getTime();
+        String payload = "{params: [{key: " + searchField1 + ", value: true, type: boolean}, " +
+                "{key: initiator, value: \"admin\", type: textEqual}, " +
+                "{key: \"startDateGreat\", value: \"" + sdf.format(yesterday) + "\", type: \"date\"}," +
+                "{key: \"startDateLess\", value: \"" + sdf.format(tomorrow) + "\", type: \"date\"}]}";
         req.setContent(payload.getBytes());
         req.setContentType("application/json");
         //verifico la richiesta normale
         ResponseEntity<Object> response = flowsTaskResource.search(req, processDefinitionMissioni.split(":")[0], true, ASC, 0, 10);
         assertEquals(response.getStatusCode(), HttpStatus.OK);
-        ArrayList responseList = (ArrayList) response.getBody();
-        assertEquals(responseList.size(), 1);
-        TaskResponse taskresponse = ((TaskResponse) responseList.get(0));
-        assertTrue(taskresponse.getProcessDefinitionId().contains(processDefinitionMissioni));
-
-        //verifico che la Process Instance restituita rispetti i parametri della ricerca
-        List<RestVariable> variables = taskresponse.getVariables();
-        RestVariable variable = variables.stream().filter(v -> v.getName().equals(searchField1)).collect(Collectors.toList()).get(0);
-        assertEquals(variable.getValue(), true);
-
-        variable = variables.stream().filter(v -> v.getName().equals(searchField2)).collect(Collectors.toList()).get(0);
-        assertEquals(variable.getValue(), "admin");
+        verifyResponse(response, 1, searchField1, searchField2);
 
         //cerco le Process Instance completate (0 risultati)
-        response = flowsTaskResource.search(req, processDefinitionMissioni.split(":")[0], false, ASC, 0, 10);
+        response = flowsTaskResource.search(req, processDefinitionMissioni.split(":")[0], false, DESC, 0, 10);
         assertEquals(response.getStatusCode(), HttpStatus.OK);
-        responseList = (ArrayList) response.getBody();
-        assertEquals(responseList.size(), 0);
+        verifyResponse(response, 0, searchField1, searchField2);
 
         //parametri sbagliati (0 risultati)
         payload = "{params: [{key: " + searchField1 + ", value: false, type: boolean} , {key: initiator, value: \"admin\", type: textEqual}]}";
@@ -167,7 +167,25 @@ public class FlowsTaskResourceTest {
 
         response = flowsTaskResource.search(req, processDefinitionMissioni.split(":")[0], true, ASC, 0, 10);
         assertEquals(response.getStatusCode(), HttpStatus.OK);
-        responseList = (ArrayList) response.getBody();
-        assertEquals(responseList.size(), 0);
+        verifyResponse(response, 0, searchField1, searchField2);
+    }
+
+    private void verifyResponse(ResponseEntity<Object> response, int expectedTotalItems, String searchField1, String searchField2) {
+        HashMap body = (HashMap) response.getBody();
+        ArrayList responseList = (ArrayList) body.get("tasks");
+        assertEquals(responseList.size(), ((Long) body.get("totalItems")).intValue());
+        assertEquals(((Long) body.get("totalItems")).intValue(), expectedTotalItems);
+
+        if (responseList.size() > 0) {
+            TaskResponse taskresponse = ((TaskResponse) responseList.get(0));
+            assertTrue(taskresponse.getProcessDefinitionId().contains(processDefinitionMissioni));
+            //verifico che la Process Instance restituita rispetti i parametri della ricerca
+            List<RestVariable> variables = taskresponse.getVariables();
+            RestVariable variable = variables.stream().filter(v -> v.getName().equals(searchField1)).collect(Collectors.toList()).get(0);
+            assertEquals(variable.getValue(), true);
+
+            variable = variables.stream().filter(v -> v.getName().equals(searchField2)).collect(Collectors.toList()).get(0);
+            assertEquals(variable.getValue(), "admin");
+        }
     }
 }
