@@ -15,14 +15,6 @@
 
     $rootScope.development = development;
 
-    var conf = _.extend({
-      url: base + url
-    }, defaults, settings);
-
-    $log.debug(conf);
-
-    return $http(conf);
-  }
 
     return {
 
