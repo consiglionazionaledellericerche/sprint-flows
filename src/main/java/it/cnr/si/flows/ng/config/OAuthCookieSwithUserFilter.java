@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AccountStatusUserDetailsChecker;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -39,8 +40,8 @@ import org.springframework.security.web.authentication.switchuser.SwitchUserGran
 public class OAuthCookieSwithUserFilter extends SwitchUserFilter {
 
     private static final String CNR_IMPERSONATE = "cnr_impersonate";
-    private String switchUserUrl = "/login/impersonate";
-    private String exitUserUrl = "/logout/impersonate";
+    private String switchUserUrl = SwitchUserSecurityConfiguration.IMPERSONATE_START_URL;
+    private String exitUserUrl = SwitchUserSecurityConfiguration.IMPERSONATE_EXIT_URL;
     private String usernameParameter = "impersonate_username";
     private UserDetailsService userDetailsService;
     private UserDetailsChecker userDetailsChecker = new AccountStatusUserDetailsChecker();
@@ -54,8 +55,8 @@ public class OAuthCookieSwithUserFilter extends SwitchUserFilter {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
 
-        // if you're just logging in, clear any previous cookie
-        if (loggingIn(request))
+        // if you're just logging in or , clear any previous cookie
+        if (loggingIn(request)) // || loggingOut(); ?
             clearImpersonationCookie(response);
 
         // if exit impersonation, just return an empty OK
@@ -68,6 +69,13 @@ public class OAuthCookieSwithUserFilter extends SwitchUserFilter {
 
             // User has requested to impersonate
             if (requiresSetCookie(request)) {
+                // forbid any requests from non-admins
+                if(!request.isUserInRole("ADMIN")) {
+                    clearImpersonationCookie(response);
+                    response.sendError(HttpStatus.FORBIDDEN.value());
+                    return;
+                }
+
                 Authentication targetUser = attemptSwitchUser(request);
                 Cookie cookie = new Cookie(CNR_IMPERSONATE, targetUser.getName());
                 cookie.setPath("/");
@@ -81,6 +89,13 @@ public class OAuthCookieSwithUserFilter extends SwitchUserFilter {
 
             // any other normal request; check if the principal needs to be switched
             else if (requiresSwitchUser(request)) {
+                // forbid any requests from non-admins
+                if(!request.isUserInRole("ADMIN")) {
+                    clearImpersonationCookie(response);
+                    response.sendError(HttpStatus.FORBIDDEN.value());
+                    return;
+                }
+
                 // if set, attempt switch and store original
                 try {
                     Authentication targetUser = attemptSwitchUser(request);
@@ -233,9 +248,6 @@ public class OAuthCookieSwithUserFilter extends SwitchUserFilter {
 
     protected boolean requiresSwitchUser(HttpServletRequest request) {
         if (request.getUserPrincipal() == null)
-            return false;
-
-        if (!request.isUserInRole("ADMIN"))
             return false;
 
         String uri = request.getRequestURI();

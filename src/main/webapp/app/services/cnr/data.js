@@ -20,10 +20,10 @@
 
       authentication: {
         impersonate: function(username) {
-            return $http.get("login/impersonate?impersonate_username="+ username);
+            return $http.get("impersonate/start?impersonate_username="+ username);
         },
         cancelImpersonate: function() {
-            return $http.get("/logout/impersonate");
+            return $http.get("impersonate/exit");
         }
       },
       tasks: {
