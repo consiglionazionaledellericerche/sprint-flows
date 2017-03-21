@@ -55,7 +55,14 @@
           Lista dei compiti assegnati a me
         </span>
       </h3>
-      <tasklist tasks="vm.myTasks.data" advanced="advanced" paging="paging" class="tasks" detailed="detailed" select-process-definition-key="selectProcessDefinitionKey" process-definitions="processDefinitions" action-buttons="false" />
+        <tasklist tasks="vm.myTasks.data"
+                  advanced="advanced"
+                  paging="paging"
+                  class="tasks"
+                  detailed="detailed"
+                  select-process-definition-key="selectProcessDefinitionKey"
+                  process-definitions="processDefinitions"
+                  action-buttons="true"/>
     </div>
     <div class="col-md-9" ng-show="activeContent == 'available'">
       <h3>
@@ -64,7 +71,14 @@
           Lista dei compiti di gruppo da prendere in carico
         </span>
       </h3>
-      <tasklist tasks="vm.pooledTasks.data" advanced="advanced" paging="paging" class="tasks" detailed="detailed" select-process-definition-key="selectProcessDefinitionKey" process-definitions="processDefinitions" action-buttons="false" />
+        <tasklist tasks="vm.pooledTasks.data"
+                  advanced="advanced"
+                  paging="paging"
+                  class="tasks"
+                  detailed="detailed"
+                  select-process-definition-key="selectProcessDefinitionKey"
+                  process-definitions="processDefinitions"
+                  action-buttons="true"/>
     </div>
   </div>
 </div>
