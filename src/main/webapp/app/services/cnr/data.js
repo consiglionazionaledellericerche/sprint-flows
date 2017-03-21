@@ -15,23 +15,6 @@
 
     $rootScope.development = development;
 
-  function ajax (url, settings) {
-    var defaults = {
-        method: 'GET',
-        headers: {
-          'X-CNR-Client': 'flowsApp',
-          'X-alfresco-ticket': $sessionStorage.ticket
-        }
-    };
-
-    var conf = _.extend({
-      url: base + url
-    }, defaults, settings);
-
-    $log.debug(conf);
-
-    return $http(conf);
-  }
 
     return {
 
@@ -62,15 +45,19 @@
         getTask: function (id) {
             return $http.get('rest/tasks/'+ id);
         },
-        searchTask: function (processInstanceId, active, params, order) {
-            return $http.post('rest/tasks/search/' + processInstanceId + '?active=' + active + '&order=' + order, params);
+        searchTask: function (processInstanceId, active, params, order, firstResult, maxResults) {
+            return $http.post('rest/tasks/search/' + processInstanceId +
+                '?active=' + active +
+                '&order=' + order +
+                '&firstResult=' + firstResult +
+                '&maxResults=' + maxResults, params);
         }
       },
       processInstances: {
         byProcessInstanceId : function(processInstanceId) {
             return $http.get('rest/processInstances?processInstanceId=' + processInstanceId);
         },
-        getActive: function(processInstanceId) {
+        getActive: function() {
             return $http.get('rest/processInstances/active');
         },
         attachments: function(processInstanceId) {

@@ -23,9 +23,8 @@
             },
             resolve: {
                 mainTranslatePartialLoader: ['$translate', '$translatePartialLoader', function ($translate,$translatePartialLoader) {
-//todo: risolvere
-//                    $translatePartialLoader.addPart('search');
-//                    return $translate.refresh();
+                    $translatePartialLoader.addPart('global');
+                    return $translate.refresh();
                 }]
             },
         });

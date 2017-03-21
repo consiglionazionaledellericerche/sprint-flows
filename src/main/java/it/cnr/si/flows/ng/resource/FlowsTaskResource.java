@@ -37,7 +37,6 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.security.Principal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -118,8 +117,7 @@ public class FlowsTaskResource {
     @RequestMapping(value = "/mytasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
-    public ResponseEntity<DataResponse> getMyTasks(Principal user,
-                                                   @RequestParam Map<String, String> params) {
+    public ResponseEntity<DataResponse> getMyTasks() {
 
         String username = SecurityUtils.getCurrentUserLogin();
 
@@ -142,14 +140,13 @@ public class FlowsTaskResource {
     @RequestMapping(value = "/availabletasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
-    public ResponseEntity<DataResponse> getAvailableTasks(
-            @RequestParam Map<String, String> params) {
+    public ResponseEntity<DataResponse> getAvailableTasks() {
 
         String username = SecurityUtils.getCurrentUserLogin();
         List<String> authorities =
                 SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)
-                        .map(FlowsTaskResource::removeLeadingRole)
+//                        .map(FlowsTaskResource::removeLeadingRole) //todo: vedere con Martin (le authorities sono ROLE_USER (come ora) o USER (come prima))
                         .collect(Collectors.toList());
 
         List<Task> listraw = taskService.createTaskQuery()
@@ -172,9 +169,7 @@ public class FlowsTaskResource {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<TaskResponse> getTaskInstance(
-            HttpServletRequest req,
-            @PathVariable("id") String id,
-            @RequestParam Map<String, String> params) {
+            @PathVariable("id") String id) {
 
         Task taskRaw = taskService.createTaskQuery().taskId(id).includeProcessVariables().singleResult();
 
@@ -382,12 +377,13 @@ public class FlowsTaskResource {
 
                 ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
 
-                LOGGER.debug("Avviata istanza di processo "+ key +", id: "+ instance.getId());
+                LOGGER.debug("Avviata istanza di processo {}, id: {}", key, instance.getId());
 
                 ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
                 return new ResponseEntity<Object>(response, HttpStatus.OK);
             }
         } catch (IOException e) {
+            LOGGER.error("Errore nel processare i files:", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore nel processare i files");
         }
     }
@@ -407,9 +403,13 @@ public class FlowsTaskResource {
             HttpServletRequest req,
             @PathVariable("processInstanceId") String processInstanceId,
             @RequestParam("active") boolean active,
-            @RequestParam("order") String order) {
+            @RequestParam("order") String order,
+            @RequestParam("firstResult") int firstResult,
+            @RequestParam("maxResults") int maxResults) {
 
         String jsonString = "";
+        Map<String, Object> result = new HashMap<>();
+
         try {
             jsonString = IOUtils.toString(req.getReader());
         } catch (Exception e) {
@@ -452,10 +452,14 @@ public class FlowsTaskResource {
         else if (order.equals(DESC))
             taskQuery.orderByTaskCreateTime().desc();
 
-        List<Task> taskRaw = taskQuery.includeProcessVariables().list();
-        List tasks = restResponseFactory.createTaskResponseList(taskRaw);
+        long totalItems = taskQuery.includeProcessVariables().count();
+        result.put("totalItems", totalItems);
 
-        return ResponseEntity.ok(tasks);
+        List<Task> taskRaw = taskQuery.includeProcessVariables().listPage(firstResult, maxResults);
+        List tasks = restResponseFactory.createTaskResponseList(taskRaw);
+        result.put("tasks", tasks);
+
+        return ResponseEntity.ok(result);
     }
 
     private void processDate(TaskQuery taskQuery, String key, String value) {
@@ -463,9 +467,9 @@ public class FlowsTaskResource {
             Date date = sdf.parse(value);
 
             if (key.contains("Less")) {
-                taskQuery.processVariableValueLessThanOrEqual(key, date);
+                taskQuery.processVariableValueLessThanOrEqual(key.replace("Less", ""), date);
             } else if (key.contains("Great"))
-                taskQuery.processVariableValueGreaterThanOrEqual(key, date);
+                taskQuery.processVariableValueGreaterThanOrEqual(key.replace("Great", ""), date);
         } catch (ParseException e) {
             LOGGER.error("Errore nel parsing della data {} - ", value, e);
         }

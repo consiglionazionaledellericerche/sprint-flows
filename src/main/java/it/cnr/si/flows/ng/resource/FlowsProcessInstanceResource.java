@@ -7,11 +7,11 @@ import it.cnr.si.service.UserService;
 import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Attachment;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.AttachmentResponse;
+import org.activiti.rest.service.api.runtime.process.ProcessInstanceResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +20,19 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -40,6 +46,8 @@ public class FlowsProcessInstanceResource {
     HistoryService historyService;
     @Autowired
     IdentityService identityService;
+    @Autowired
+    ProcessInstanceResource processInstanceResource;
     @Inject
     private UserRepository userRepository;
     @Inject
@@ -192,13 +200,16 @@ public class FlowsProcessInstanceResource {
         // TODO throw exeption if invalid
     }
 
-    @RequestMapping(value = "deleteWorkflow", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "deleteProcessInstance", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
+    @Secured({AuthoritiesConstants.ADMIN})
     @Timed
-    public ResponseEntity<Map<String, Object>> delete (
-            HttpServletRequest req,
-            @RequestParam(value = "workflowId", required = true) long workflowId) {
-        return null;
+    public HttpServletResponse delete(
+            HttpServletResponse response,
+            @RequestParam(value = "processInstanceId", required = true) String processInstanceId,
+            @RequestParam(value = "deleteReason", required = true) String deleteReason) {
+        processInstanceResource.deleteProcessInstance(processInstanceId, deleteReason, response);
+        return response;
 
     }
 
