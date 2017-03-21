@@ -1,9 +1,21 @@
 package it.cnr.si.web.rest;
 
-import it.cnr.si.SprintApp;
-import it.cnr.si.domain.Form;
-import it.cnr.si.flows.ng.TestUtil;
-import it.cnr.si.repository.FormRepository;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,15 +30,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import it.cnr.si.FlowsApp;
+import it.cnr.si.domain.Form;
+import it.cnr.si.flows.ng.TestUtil;
+import it.cnr.si.repository.FormRepository;
 
 /**
  * Test class for the FormResource REST controller.
@@ -34,7 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see FormResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = SprintApp.class)
+@SpringBootTest(classes = FlowsApp.class)
 public class FormResourceIntTest {
     private static final String DEFAULT_PROCESS_DEFINITION_KEY = "AAAAA";
     private static final String UPDATED_PROCESS_DEFINITION_KEY = "BBBBB";

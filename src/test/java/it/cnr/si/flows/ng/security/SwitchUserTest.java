@@ -1,28 +1,27 @@
 package it.cnr.si.flows.ng.security;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.codec.binary.Base64;
-import org.assertj.core.api.Condition;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.annotation.DirtiesContext.MethodMode;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -30,13 +29,10 @@ import org.springframework.util.MultiValueMap;
 import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.config.SwitchUserSecurityConfiguration;
 
-import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.DEFINED_PORT)
+@SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
+@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 public class SwitchUserTest {
-
-    @Value("${server.port}")
-    private String port;
 
     private String SERVER;
     private static final String LOGIN_URL = "/oauth/token";
@@ -44,11 +40,15 @@ public class SwitchUserTest {
     private static final String IMPERSONATE_URL = SwitchUserSecurityConfiguration.IMPERSONATE_START_URL;
     private static final String EXIT_IMPERSONATE_URL = SwitchUserSecurityConfiguration.IMPERSONATE_EXIT_URL;
 
+    @LocalServerPort
+    private String port;
+
     @Autowired
     private TestRestTemplate template;
 
 
     @Test
+    @DirtiesContext(methodMode = MethodMode.BEFORE_METHOD)
     public void testAdminAbleToSwitchToDatabaseUser() throws URISyntaxException {
 
         SERVER = "http://localhost:"+ port + "/";
@@ -69,11 +69,11 @@ public class SwitchUserTest {
         ResponseEntity<Void> exitImpersonateResponse = exitImpersonate(token, "user");
         assertThat(exitImpersonateResponse.getStatusCode())
         .isEqualTo(HttpStatus.OK);
-        assertThat(exitImpersonateResponse.getHeaders().get("Set-Cookie")).contains("cnr_impersonate=;path=/");
+        assertThat(exitImpersonateResponse.getHeaders().get("Set-Cookie")).contains("cnr_impersonate=;Max-Age=0;path=/");
 
         Map<String, Object> exitAccount = getAccount(token);
         assertThat(exitAccount).containsEntry("login", "admin");
-        assertThat(exitAccount.get("authorities")).asList().contains("ROLE_PREVIOUS_ADMINISTRATOR");
+        assertThat(exitAccount.get("authorities")).asList().doesNotContain("ROLE_PREVIOUS_ADMINISTRATOR");
     }
 
 
@@ -98,7 +98,7 @@ public class SwitchUserTest {
 
         Map<String, Object> exitAccount = getAccount(token);
         assertThat(exitAccount).containsEntry("login", "admin");
-        assertThat(exitAccount.get("authorities")).asList().contains("ROLE_PREVIOUS_ADMINISTRATOR");
+        assertThat(exitAccount.get("authorities")).asList().doesNotContain("ROLE_PREVIOUS_ADMINISTRATOR");
     }
 
     @Test

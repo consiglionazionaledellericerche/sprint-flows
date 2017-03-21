@@ -19,6 +19,8 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -35,9 +37,9 @@ import static org.junit.Assert.assertTrue;
 import static org.springframework.http.HttpStatus.*;
 
 
-@SpringBootTest
-@ContextConfiguration(classes = {FlowsApp.class})
+@SpringBootTest(classes = FlowsApp.class)
 @RunWith(SpringRunner.class)
+@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 public class FlowsTaskResourceTest {
 
     public static final String TASK_NAME = "Firma UO";

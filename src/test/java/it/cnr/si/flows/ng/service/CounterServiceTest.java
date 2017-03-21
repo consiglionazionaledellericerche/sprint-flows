@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.stream.IntStream;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +23,6 @@ public class CounterServiceTest {
     @Autowired
     private CounterService counter;
 
-    @Test
-    //@Ignore // Questo test non ha senso eseguirlo con H2, ma solo in locale con un postgres
     /**
          Per testare il corretto funzionamento, aggiungere nel'application.yml
     datasource:
@@ -38,6 +37,8 @@ public class CounterServiceTest {
         open-in-view: false
         show-sql: true
      */
+    @Test
+    @Ignore // Questo test non ha senso eseguirlo con H2, ma solo in locale con un postgres
     public void testIncrement() throws InterruptedException {
 
         System.out.println(counter.getNext("pippo"));
