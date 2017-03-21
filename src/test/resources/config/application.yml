@@ -17,9 +17,9 @@ spring:
         serialization.write_dates_as_timestamps: false
     datasource:
         type: com.zaxxer.hikari.HikariDataSource
-        url: jdbc:h2:mem:sprint;DB_CLOSE_DELAY=-1
+        url: jdbc:h2:mem:flows-test;DB_CLOSE_DELAY=-1
         name:
-        username:
+        username: flows
         password:
     ldap:
         userSearchBase: o=cnr, c=it
