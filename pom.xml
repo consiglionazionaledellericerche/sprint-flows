@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -12,7 +11,7 @@
     <groupId>it.cnr.si.flows</groupId>
     <artifactId>sprint-flows</artifactId>
     <version>0.2.0-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 
     <name>sprint-flows</name>
 
@@ -43,8 +42,8 @@
         <sonar-maven-plugin.version>3.0.2</sonar-maven-plugin.version>
         <sortpom-maven-plugin.version>2.5.0</sortpom-maven-plugin.version>
         <spring-boot.version>1.4.0.RELEASE</spring-boot.version>
-        <spring.version>4.3.2.RELEASE</spring.version>
         <spring.security.version>4.1.1.RELEASE</spring.security.version>
+        <spring.version>4.3.2.RELEASE</spring.version>
         <sprint.version>2.0.1</sprint.version>
         <start-class>it.cnr.si.FlowsApp</start-class>
     </properties>
@@ -120,16 +119,16 @@
             <artifactId>sprint-ldap</artifactId>
             <version>${sprint.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.activiti</groupId>
+            <artifactId>activiti-spring-boot-starter-actuator</artifactId>
+            <version>5.22.0</version>
+        </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.activiti/activiti-spring-boot-starter-basic -->
         <dependency>
             <groupId>org.activiti</groupId>
             <artifactId>activiti-spring-boot-starter-basic</artifactId>
-            <version>5.22.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.activiti</groupId>
-            <artifactId>activiti-spring-boot-starter-actuator</artifactId>
             <version>5.22.0</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.activiti/activiti-spring-boot-starter-rest-api -->
