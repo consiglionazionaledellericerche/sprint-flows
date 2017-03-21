@@ -7,6 +7,8 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +23,6 @@ import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.annotation.DirtiesContext.MethodMode;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -31,7 +32,8 @@ import it.cnr.si.flows.ng.config.SwitchUserSecurityConfiguration;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
+//@Ignore
 public class SwitchUserTest {
 
     private String SERVER;
@@ -42,16 +44,21 @@ public class SwitchUserTest {
 
     @LocalServerPort
     private String port;
-
     @Autowired
     private TestRestTemplate template;
 
 
+    @Before
+    public void setUp() {}
+
+    // TODO brutto hack
     @Test
-    @DirtiesContext(methodMode = MethodMode.BEFORE_METHOD)
+    public void aaaFailAndEmptyContext() {}
+
+    @Test
     public void testAdminAbleToSwitchToDatabaseUser() throws URISyntaxException {
 
-        SERVER = "http://localhost:"+ port + "/";
+        SERVER = "http://localhost:"+ port;
 
         String token = "Bearer " + loginAs("admin");
         Map<String, Object> account = getAccount(token, null);
@@ -184,7 +191,7 @@ public class SwitchUserTest {
 
         Map<String, String> response = new HashMap<>();
         ResponseEntity<Map<String, String>> responseEntity = (ResponseEntity<Map<String, String>>)
-                template.postForEntity( LOGIN_URL, request , response.getClass() );
+                template.postForEntity( SERVER + LOGIN_URL, request , response.getClass() );
 
         return responseEntity.getBody().get("access_token");
 
