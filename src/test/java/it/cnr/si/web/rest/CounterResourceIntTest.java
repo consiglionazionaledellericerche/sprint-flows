@@ -45,8 +45,7 @@ import it.cnr.si.repository.CounterRepository;
  * @see CounterResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = FlowsApp.class)
-@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+@SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 public class CounterResourceIntTest {
     private static final String DEFAULT_NAME = "AAAAA";
     private static final String UPDATED_NAME = "BBBBB";

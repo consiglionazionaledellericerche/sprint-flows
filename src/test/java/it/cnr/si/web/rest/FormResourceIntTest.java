@@ -42,7 +42,7 @@ import it.cnr.si.repository.FormRepository;
  * @see FormResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = FlowsApp.class)
+@SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 public class FormResourceIntTest {
     private static final String DEFAULT_PROCESS_DEFINITION_KEY = "AAAAA";
     private static final String UPDATED_PROCESS_DEFINITION_KEY = "BBBBB";

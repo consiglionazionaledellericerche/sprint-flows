@@ -17,7 +17,7 @@ import it.cnr.si.FlowsApp;
 import it.cnr.si.SprintApp;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = FlowsApp.class)
+@SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @EnableTransactionManagement
 public class CounterServiceTest {
 
