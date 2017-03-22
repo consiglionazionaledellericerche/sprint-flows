@@ -45,8 +45,14 @@
         getTask: function (id) {
             return $http.get('rest/tasks/'+ id);
         },
-        searchTask: function (processInstanceId, active, params, order, firstResult, maxResults) {
-            return $http.post('rest/tasks/search/' + processInstanceId +
+        searchTask: function (processInstance, active, params, order, firstResult, maxResults) {
+            var processInstaceId;
+            if(processInstance !== undefined){
+                processInstaceId = processInstance.key;
+            } else {
+                processInstaceId = 'all';
+            }
+            return $http.post('rest/tasks/search/' + processInstaceId+
                 '?active=' + active +
                 '&order=' + order +
                 '&firstResult=' + firstResult +
