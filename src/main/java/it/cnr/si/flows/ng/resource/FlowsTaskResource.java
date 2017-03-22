@@ -57,6 +57,7 @@ public class FlowsTaskResource {
     private static final String ERRORE_PERMESSI_TASK = "ERRORE PERMESSI TASK";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsTaskResource.class);
+    private static final String ALL_PROCESS_INSTANCES = "all";
     @Autowired
     protected RestResponseFactory restResponseFactory;
     @Inject
@@ -417,7 +418,10 @@ public class FlowsTaskResource {
         }
         JSONArray params = new JSONObject(jsonString).getJSONArray("params");
 
-        TaskQuery taskQuery = taskService.createTaskQuery().processDefinitionKey(processInstanceId);
+        TaskQuery taskQuery = taskService.createTaskQuery();
+
+        if (!processInstanceId.equals(ALL_PROCESS_INSTANCES))
+            taskQuery.processDefinitionKey(processInstanceId);
 
         if (active)
             taskQuery.active();

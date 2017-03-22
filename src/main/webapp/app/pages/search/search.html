@@ -1,16 +1,17 @@
 <br>
 <ul class="nav nav-pills nav-justified">
-    <li role="presentation" ng-class="{'active': vm.active}"><a class="pointer" ng-click="showWorkflows(current, true)"
-                                                                data-toggle="tab"><h4>
-        <i class="glyphicon glyphicon-edit"></i> flussi attivi
-    </h4>
+    <li role="presentation" ng-class="{'active': vm.active}">
+        <a class="pointer" ng-click="showProcessInstances(true)" data-toggle="tab">
+            <h4>
+                <i class="glyphicon glyphicon-edit"></i> flussi attivi
+            </h4>
         <small>seleziona per avere la lista completa dei flussi attivi</small>
     </a></li>
-    <li role="presentation" ng-class="{'active-info': !vm.active}"><a class="pointer"
-                                                                      ng-click="showWorkflows(current, false)"
-                                                                      data-toggle="tab"><h4>
-        <i class="glyphicon glyphicon-check"></i> flussi completati
-    </h4>
+    <li role="presentation" ng-class="{'active-info': !vm.active}">
+        <a class="pointer" ng-click="showProcessInstances(false)" data-toggle="tab">
+            <h4>
+                <i class="glyphicon glyphicon-check"></i> flussi completati
+            </h4>
         <small>seleziona per avere la lista completa dei flussi completati</small>
     </a></li>
 </ul>
@@ -19,29 +20,27 @@
     <div class="col-md-3 padding-top">
         <br>
         <div>
-            <h4>Ordinamento</h4>
-            <div class="btn-group" uib-dropdown is-open="status.isopen">
-                <button id="order" type="button" class="btn btn-default btn-sm dropdown-toggle ng-binding"
-                        uib-dropdown-toggle ng-disabled="disabled"></button>
-                <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
-                    <li role="menuitem"><a ng-click="orderSearchFlows(current, 'ASC')">Crescente</a></li>
-                    <li role="menuitem"><a ng-click="orderSearchFlows(current, 'DESC')">Decrescente</a></li>
-                </ul>
+            <h4>Ordinamento temporale</h4>
+            <div>
+                <button class="btn btn-default btn-block margin-top-20"
+                        ng-click="vm.order ===  'ASC' ?  vm.order='DESC' : vm.order = 'ASC'">
+                    <span class="glyphicon glyphicon-sort"></span>
+                    {{vm.order === 'ASC' ? 'Crescente' : 'Descrescente'}}
+                </button>
             </div>
         </div>
 
         <br>
         <h4>Tipologie</h4>
-        <workflow-types
-                processes="processes"
-                prefix="'workflow'"
-                paging="paging"
-                metadata-fields="metadataFields"
-                process-definitions="wfDefs">
+        <workflow-types processes="processes"
+                        prefix="'workflow'"
+                        paging="paging"
+                        metadata-fields="metadataFields"
+                        process-definitions="wfDefs">
         </workflow-types>
         <br>
         <br>
-        <button ng-click="search(current)" ng-class="btn-default" class="btn btn-default btn-xs">Filtra</button>
+        <button ng-click="search()" class="btn btn-primary">Filtra</button>
     </div>
 
 

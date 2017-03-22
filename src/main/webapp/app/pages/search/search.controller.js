@@ -11,7 +11,7 @@
     var vm = this;
 
     vm.availableFilter = $rootScope.availableFilter;
-    vm.order;
+    vm.order = 'ASC';
     vm.active = true;
     //serve per resettare la label della tipologia di Process Definition scelta in caso di passaggio "temporaneo" in un'altra pagina
     $rootScope.current = undefined;
@@ -23,54 +23,44 @@
 
     $log.info($state.params.processDefinition);
 
-    $scope.orderSearchFlows = function(processDefinition, order) {
-        order === 'ASC' ? $('#order').text('Crescente') : $('#order').text('Decrescente');
-        vm.order = order;
-        if(processDefinition !== undefined){
-            $scope.search(processDefinition);
-        }
-    };
+    // Reload ricerca in caso di modifica dell'ordine di visualizzazione (crescente/decrescente)
+    $scope.$watchGroup(['vm.order'], function () {
+        $scope.search();
+    });
 
-    $scope.showWorkflows = function (processDefinition, active) {
+
+    $scope.showProcessInstances = function (active) {
         vm.active = active;
-        $scope.search(processDefinition);
+        $scope.search();
     };
 
 
-    $scope.search = function(processDefinition){
+    $scope.search = function(){
         var fields = Array.from($("input[id^='searchFields']")), params = [], firstResult,
            maxResults = vm.itemsPerPage;
         firstResult = vm.itemsPerPage * (vm.page - 1)
 
-        if(vm.order !== undefined && processDefinition !== undefined){
-            //popolo params con gli id, i valori sottomessi e il "type" dei campi di ricerca
-            fields.forEach(function (field){
-                var fieldName = field.getAttribute('id').replace('searchFields.', ''), appo = {};
-                    if(field.value  !== ""){
-                        appo["key"] = fieldName;
-                        appo["value"] = field.value;
-                        appo["type"] = field.getAttribute("type");
-                        params.push(appo);
-                    }
-            });
-            var paramsJson = {"params": params};
+        //popolo params con gli id, i valori sottomessi e il "type" dei campi di ricerca
+        fields.forEach(function (field){
+            var fieldName = field.getAttribute('id').replace('searchFields.', ''), appo = {};
+                if(field.value  !== ""){
+                    appo["key"] = fieldName;
+                    appo["value"] = field.value;
+                    appo["type"] = field.getAttribute("type");
+                    params.push(appo);
+                }
+        });
+        var paramsJson = {"params": params};
 
-            dataService.tasks.searchTask(processDefinition.key, vm.active, paramsJson, vm.order, firstResult, maxResults)
-                .then(function (response) {
-                    vm.tasks = response.data.tasks;
-                    // variabili per la gestione della paginazione
-                    vm.totalItems = response.data.totalItems;
-                    vm.queryCount = vm.totalItems;
-                }, function (response) {
-                    $log.error(response);
-                });
-        } else {
-            if(vm.order === undefined) {
-                AlertService.warning("Scegliere un ordine in cui visualizzare i risultani della ricerca");
-            } else if(processDefinition === undefined){
-                AlertService.warning("Definire un Process Definition di cui ricercare le istanze");
-            }
-        }
+        dataService.tasks.searchTask($scope.current, vm.active, paramsJson, vm.order, firstResult, maxResults)
+            .then(function (response) {
+                vm.tasks = response.data.tasks;
+                // variabili per la gestione della paginazione
+                vm.totalItems = response.data.totalItems;
+                vm.queryCount = vm.totalItems;
+            }, function (response) {
+                $log.error(response);
+            });
     }
 
     //funzione richiamata quando si chiede una nuova "pagina"
