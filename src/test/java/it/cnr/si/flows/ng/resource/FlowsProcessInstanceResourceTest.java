@@ -11,10 +11,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -23,8 +26,7 @@ import java.util.ArrayList;
 import static org.junit.Assert.assertEquals;
 
 
-@SpringBootTest
-@ContextConfiguration(classes = {FlowsApp.class})
+@SpringBootTest(classes = FlowsApp.class)
 @RunWith(SpringRunner.class)
 public class FlowsProcessInstanceResourceTest {
 
@@ -41,21 +43,13 @@ public class FlowsProcessInstanceResourceTest {
 
     @Before
     public void setUp() throws Exception {
-        util.loginAdmin();
-        DataResponse ret = (DataResponse) flowsProcessDefinitionResource.getAllProcessDefinitions();
 
-//        Map<String, Object> data = new HashMap();
-        processDefinitionKey = ((ProcessDefinitionResponse) ((ArrayList) ret.getData()).get(8)).getId();
-//        data.put("definitionId", processDefinitionKey);
-        MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
-        req.setParameter("definitionId", processDefinitionKey);
-        flowsTaskResource.completeTask(req);
     }
 
     @After
     public void tearDown() {
         util.logout();
-//        super.tearDown();
+        //        super.tearDown();
     }
 
     @Test
@@ -79,7 +73,20 @@ public class FlowsProcessInstanceResourceTest {
     }
 
     @Test
-    public void testGetProcessInstancesActives() {
+    public void testGetActiveProcessInstances() {
+
+        {
+            util.loginAdmin();
+            DataResponse ret = (DataResponse) flowsProcessDefinitionResource.getAllProcessDefinitions();
+
+            //        Map<String, Object> data = new HashMap();
+            processDefinitionKey = ((ProcessDefinitionResponse) ((ArrayList) ret.getData()).get(8)).getId();
+            //        data.put("definitionId", processDefinitionKey);
+            MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
+            req.setParameter("definitionId", processDefinitionKey);
+            flowsTaskResource.completeTask(req);
+        }
+
         ResponseEntity ret = flowsProcessInstanceResource.getActiveProcessInstances(new MockHttpServletRequest());
 
         assertEquals(ret.getStatusCode(), HttpStatus.OK);

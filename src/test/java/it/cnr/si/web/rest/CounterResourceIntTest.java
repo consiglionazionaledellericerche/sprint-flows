@@ -1,32 +1,43 @@
 package it.cnr.si.web.rest;
 
-import it.cnr.si.SprintApp;
-import it.cnr.si.domain.Counter;
-import it.cnr.si.flows.ng.TestUtil;
-import it.cnr.si.repository.CounterRepository;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import it.cnr.si.FlowsApp;
+import it.cnr.si.domain.Counter;
+import it.cnr.si.flows.ng.TestUtil;
+import it.cnr.si.flows.ng.service.CounterService;
+import it.cnr.si.repository.CounterRepository;
 
 /**
  * Test class for the CounterResource REST controller.
@@ -34,7 +45,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see CounterResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = SprintApp.class)
+@SpringBootTest(classes = FlowsApp.class)
+@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 public class CounterResourceIntTest {
     private static final String DEFAULT_NAME = "AAAAA";
     private static final String UPDATED_NAME = "BBBBB";
@@ -44,6 +56,8 @@ public class CounterResourceIntTest {
 
     @Inject
     private CounterRepository counterRepository;
+    @Inject
+    private CounterService counterService;
 
     @Inject
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -76,7 +90,7 @@ public class CounterResourceIntTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         CounterResource counterResource = new CounterResource();
-        ReflectionTestUtils.setField(counterResource, "counterRepository", counterRepository);
+        ReflectionTestUtils.setField(counterResource, "counterService", counterService);
         this.restCounterMockMvc = MockMvcBuilders.standaloneSetup(counterResource)
                 .setCustomArgumentResolvers(pageableArgumentResolver)
                 .setMessageConverters(jacksonMessageConverter).build();
@@ -97,14 +111,8 @@ public class CounterResourceIntTest {
         restCounterMockMvc.perform(post("/api/counters")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
                 .content(TestUtil.convertObjectToJsonBytes(counter)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isMethodNotAllowed());
 
-        // Validate the Counter in the database
-        List<Counter> counters = counterRepository.findAll();
-        assertThat(counters).hasSize(databaseSizeBeforeCreate + 1);
-        Counter testCounter = counters.get(counters.size() - 1);
-        assertThat(testCounter.getName()).isEqualTo(DEFAULT_NAME);
-        assertThat(testCounter.getValue()).isEqualTo(DEFAULT_VALUE);
     }
 
     @Test
@@ -130,11 +138,7 @@ public class CounterResourceIntTest {
 
         // Get the counter
         restCounterMockMvc.perform(get("/api/counters/{id}", counter.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.id").value(counter.getId().intValue()))
-            .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
-            .andExpect(jsonPath("$.value").value(DEFAULT_VALUE.intValue()));
+            .andExpect(status().isNotFound());
     }
 
     @Test
@@ -161,14 +165,7 @@ public class CounterResourceIntTest {
         restCounterMockMvc.perform(put("/api/counters")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
                 .content(TestUtil.convertObjectToJsonBytes(updatedCounter)))
-                .andExpect(status().isOk());
-
-        // Validate the Counter in the database
-        List<Counter> counters = counterRepository.findAll();
-        assertThat(counters).hasSize(databaseSizeBeforeUpdate);
-        Counter testCounter = counters.get(counters.size() - 1);
-        assertThat(testCounter.getName()).isEqualTo(UPDATED_NAME);
-        assertThat(testCounter.getValue()).isEqualTo(UPDATED_VALUE);
+                .andExpect(status().isMethodNotAllowed());
     }
 
     @Test
@@ -181,10 +178,10 @@ public class CounterResourceIntTest {
         // Get the counter
         restCounterMockMvc.perform(delete("/api/counters/{id}", counter.getId())
                 .accept(TestUtil.APPLICATION_JSON_UTF8))
-                .andExpect(status().isOk());
+                .andExpect(status().isNotFound());
 
         // Validate the database is empty
         List<Counter> counters = counterRepository.findAll();
-        assertThat(counters).hasSize(databaseSizeBeforeDelete - 1);
+        assertThat(counters).hasSize(databaseSizeBeforeDelete);
     }
 }
