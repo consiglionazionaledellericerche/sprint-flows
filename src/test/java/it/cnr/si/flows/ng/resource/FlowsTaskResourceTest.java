@@ -194,7 +194,11 @@ public class FlowsTaskResourceTest {
         ResponseEntity<Object> response = flowsTaskResource.search(req, processDefinitionMissioni.split(":")[0], true, ASC, 0, 10);
         verifyResponse(response, 1, searchField1, searchField2);
 
-        //cerco le Process Instance completate (0 risultati)
+        //verifico la richiesta su tutte le Process Definition
+        response = flowsTaskResource.search(req, "all", true, ASC, 0, 10);
+        verifyResponse(response, 1, searchField1, searchField2);
+
+        //cerco le Process Instance completate (active = false  ==>  0 risultati)
         response = flowsTaskResource.search(req, processDefinitionMissioni.split(":")[0], false, DESC, 0, 10);
         verifyResponse(response, 0, searchField1, searchField2);
 
