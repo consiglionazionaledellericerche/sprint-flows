@@ -48,17 +48,18 @@ public class FlowsTaskResourceTest {
     FlowsTaskResource flowsTaskResource;
 
     @Autowired
-    FlowsProcessDefinitionResource flowsProcessDefinitionResource;
+    private FlowsProcessDefinitionResource flowsProcessDefinitionResource;
     @Autowired
-    TestUtil util;
+    private TestUtil util;
     @Autowired
-    FlowsProcessInstanceResource flowsProcessInstanceResource;
-    private String taskId;
+    private FlowsProcessInstanceResource flowsProcessInstanceResource;
     @Autowired
     private TaskService taskService;
     @Autowired
     private RestResponseFactory restResponseFactory;
+
     private String processDefinitionMissioni;
+    private String taskId;
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
 
