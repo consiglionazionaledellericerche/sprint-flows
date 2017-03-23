@@ -9,3 +9,4 @@
 /.xml/
 /.bpmn/
 /node/
+/${project.testresult.directory}/
