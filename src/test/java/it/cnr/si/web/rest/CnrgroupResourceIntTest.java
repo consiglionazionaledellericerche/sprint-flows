@@ -43,7 +43,7 @@ import it.cnr.si.service.CnrgroupService;
  * @see CnrgroupResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = FlowsApp.class)
+@SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 public class CnrgroupResourceIntTest {
     private static final String DEFAULT_NAME = "AAAAA";
     private static final String UPDATED_NAME = "BBBBB";

@@ -32,8 +32,6 @@ import it.cnr.si.flows.ng.config.SwitchUserSecurityConfiguration;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
-//@Ignore
 public class SwitchUserTest {
 
     private String SERVER;
