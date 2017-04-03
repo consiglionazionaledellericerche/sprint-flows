@@ -2,10 +2,12 @@ package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
 import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
+import org.activiti.engine.*;
+import org.activiti.engine.history.HistoricActivityInstance;
+import org.activiti.engine.history.HistoricActivityInstanceQuery;
+import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.history.HistoricProcessInstanceQuery;
+import org.activiti.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
@@ -24,6 +26,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 
+import static org.activiti.bpmn.constants.BpmnXMLConstants.ELEMENT_EVENT_END;
+
 
 @Controller
 @RequestMapping("rest")
@@ -41,6 +45,8 @@ public class FlowsDiagramResource {
 
     @Autowired
     private ProcessEngineConfiguration processEngineConfiguration;
+    @Autowired
+    private HistoryService historyService;
 
     @RequestMapping(value = "/diagram/processDefinition/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
     @ResponseBody
@@ -48,7 +54,7 @@ public class FlowsDiagramResource {
     public ResponseEntity<InputStreamResource>
     getDiagramForProcessDefinition(
             @PathVariable String id)
-                    throws IOException {
+            throws IOException {
 
         InputStream resourceAsStream = repositoryService.getProcessDiagram(id);
 
@@ -58,24 +64,39 @@ public class FlowsDiagramResource {
     @RequestMapping(value = "/diagram/processInstance/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
     @ResponseBody
     @Timed
-    public ResponseEntity<InputStreamResource>
-    getDiagramForProcessInstance(
+    public ResponseEntity<InputStreamResource> getDiagramForProcessInstance(
             @PathVariable String id, String font)
-                    throws IOException {
-
+            throws IOException {
+        InputStream resource;
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
                 .processInstanceId(id).singleResult();
-        ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
 
-        if (font == null || font.equals("") )
+        if (font == null || font.isEmpty())
             font = "Arial";
 
-        BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinition.getId());
-        InputStream resource = pdg.generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(processInstance.getId()),
-                                                   Collections.<String>emptyList(),
-                                                   font, font, font,
-                                                   processEngineConfiguration.getClassLoader(), 1.2);
+        if (processInstance != null) {
+            ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
 
+            BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinition.getId());
+            resource = pdg.generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(processInstance.getId()),
+                                           Collections.<String>emptyList(),
+                                           font, font, font,
+                                           processEngineConfiguration.getClassLoader(), 1.2);
+        } else {
+            HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
+            HistoricProcessInstance hpi = historicProcessInstanceQuery.processInstanceId(id).singleResult();
+
+            BpmnModel bpmnModel = repositoryService.getBpmnModel(hpi.getProcessDefinitionId());
+            HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
+            HistoricActivityInstance endActivity = query
+                    .activityType(ELEMENT_EVENT_END)
+                    .processInstanceId(((HistoricProcessInstanceEntity) hpi).getProcessInstanceId())
+                    .singleResult();
+            resource = pdg.generateDiagram(bpmnModel, "png", Collections.singletonList(endActivity.getActivityId()),
+                                           Collections.<String>emptyList(),
+                                           font, font, font,
+                                           processEngineConfiguration.getClassLoader(), 1.2);
+        }
         return ResponseEntity.ok(new InputStreamResource(resource));
     }
 
@@ -85,7 +106,7 @@ public class FlowsDiagramResource {
     public ResponseEntity<InputStreamResource>
     getDiagramPerTaskInstanceId(
             @PathVariable String id)
-                    throws IOException {
+            throws IOException {
 
         Task task = taskService.createTaskQuery().taskId(id).singleResult();
 
@@ -100,7 +121,7 @@ public class FlowsDiagramResource {
     getDiagramPerTaskInstanceId(
             @PathVariable String id,
             @PathVariable String font)
-                    throws IOException {
+            throws IOException {
 
         Task task = taskService.createTaskQuery().taskId(id).singleResult();
 
