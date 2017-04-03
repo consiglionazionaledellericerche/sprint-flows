@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="test-firma" name="Test Firma" isExecutable="true">
+    <startEvent id="startevent1" name="Start"></startEvent>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <userTask id="firma" name="Firma" activiti:candidateGroups="ROLE_USER">
+      <extensionElements>
+        <activiti:taskListener event="complete" class="it.cnr.si.flows.ng.tasks.FirmaTask">
+          <activiti:field name="nomeFileDaFirmare">
+            <activiti:string><![CDATA[decisioneacontrattare]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="usertask1" name="User Task" activiti:candidateGroups="ROLE_USER"></userTask>
+    <sequenceFlow id="flow3" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="usertask1" targetRef="firma"></sequenceFlow>
+    <userTask id="usertask2" name="User Task" activiti:candidateGroups="ROLE_USER"></userTask>
+    <sequenceFlow id="flow5" sourceRef="firma" targetRef="usertask2"></sequenceFlow>
+    <sequenceFlow id="flow6" sourceRef="usertask2" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_test-firma">
+    <bpmndi:BPMNPlane bpmnElement="test-firma" id="BPMNPlane_test-firma">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="100.0" y="220.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="610.0" y="220.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="firma" id="BPMNShape_firma">
+        <omgdc:Bounds height="55.0" width="105.0" x="320.0" y="210.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="180.0" y="210.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
+        <omgdc:Bounds height="55.0" width="105.0" x="470.0" y="210.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="135.0" y="237.0"></omgdi:waypoint>
+        <omgdi:waypoint x="180.0" y="237.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="285.0" y="237.0"></omgdi:waypoint>
+        <omgdi:waypoint x="320.0" y="237.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="425.0" y="237.0"></omgdi:waypoint>
+        <omgdi:waypoint x="470.0" y="237.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="575.0" y="237.0"></omgdi:waypoint>
+        <omgdi:waypoint x="610.0" y="237.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

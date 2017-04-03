@@ -1,18 +1,10 @@
 package it.cnr.si.flows.ng.resource;
 
-import static it.cnr.si.flows.ng.service.FlowsAttachmentService.ATTACHMENT_PREFIX;
-import static it.cnr.si.flows.ng.service.FlowsAttachmentService.FILENAME_SUFFIX;
-import static it.cnr.si.flows.ng.service.FlowsAttachmentService.MIMETYPE_SUFFIX;
-import static it.cnr.si.flows.ng.service.FlowsAttachmentService.STATO_SUFFIX;
-import static it.cnr.si.flows.ng.service.FlowsAttachmentService.USER_SUFFIX;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletOutputStream;
@@ -20,10 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
-import org.activiti.engine.history.HistoricActivityInstance;
-import org.activiti.engine.history.HistoricDetail;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -96,7 +84,7 @@ public class FlowsAttachmentResource {
                     .list()
                     .stream()
                     .map(h -> (HistoricDetailVariableInstanceUpdateEntity) h)
-                    .filter(h -> h.getName().equals(ATTACHMENT_PREFIX + attachmentName))
+                    .filter(h -> h.getName().equals(attachmentName))
                     .map(h -> {
                         FlowsAttachment a = (FlowsAttachment) h.getValue();
                         a.setUrl("api/attachments/"+ h.getId() +"/data");
@@ -114,14 +102,14 @@ public class FlowsAttachmentResource {
 
     @RequestMapping(value = "{processInstanceId}/{attachmentName}/data", method = RequestMethod.GET)
     @ResponseBody
-    //    @Secured(AuthoritiesConstants.USER)
+    @Secured(AuthoritiesConstants.USER)
     @Timed
     public void getAttachment(
             HttpServletResponse response,
             @PathVariable("processInstanceId") String processInstanceId,
             @PathVariable("attachmentName") String attachmentName) throws IOException {
 
-        FlowsAttachment attachment = runtimeService.getVariable(processInstanceId, ATTACHMENT_PREFIX + attachmentName, FlowsAttachment.class);
+        FlowsAttachment attachment = runtimeService.getVariable(processInstanceId, attachmentName, FlowsAttachment.class);
 
         response.setContentLength(attachment.getBytes().length);
 
@@ -133,7 +121,7 @@ public class FlowsAttachmentResource {
 
     @RequestMapping(value = "{variableId}/data", method = RequestMethod.GET)
     @ResponseBody
-    //    @Secured(AuthoritiesConstants.USER)
+    @Secured(AuthoritiesConstants.USER)
     @Timed
     public void getHistoricAttachment(
             HttpServletResponse response,
