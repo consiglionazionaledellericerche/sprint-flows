@@ -18,7 +18,7 @@
 
             dataService.tasks.getTask($state.params.taskId).then(
                     function(response) {
-                        vm.data = utils.refactoringVariables(response.data).variabili;
+//                        vm.data = utils.refactoringVariables(response.data).variabili;
                         vm.data.taskId = $state.params.taskId;
                         vm.diagramUrl = '/rest/diagram/taskInstance/'+ response.data.id;
                         var processDefinitionKey = response.data.processDefinitionId.split(":")[0];
