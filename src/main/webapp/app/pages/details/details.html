@@ -8,9 +8,9 @@
        	ng-src='/rest/diagram/processInstance/{{vm.data.entity.superProcessInstanceId}}'
     	title="{{vm.data.entity.processDefinitionKey}}"
     	style="max-width: 30%"  />
-    <hr>
+    <hr ng-if="vm.data.entity.superProcessInstanceId">
     <img class="img-bordered"
-    	ng-src='/rest/diagram/processInstance/{{vm.data.entity.id}}'
+    	ng-src='{{vm.diagramUrl}}'
     	title="{{vm.data.entity.processDefinitionKey}}"
     	style="max-width: 100%" />
   </div>
