@@ -1,18 +1,11 @@
 package it.cnr.si.flows.ng.resource;
 
-import static org.junit.Assert.assertEquals;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
-
-import java.util.ArrayList;
-
-import javax.servlet.http.HttpServletResponse;
-
-import org.activiti.engine.TaskService;
+import it.cnr.si.FlowsApp;
+import it.cnr.si.flows.ng.TestUtil;
+import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.repository.ProcessDefinitionResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
-import org.activiti.rest.service.api.runtime.task.TaskResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -20,8 +13,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -29,17 +20,18 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import it.cnr.si.FlowsApp;
-import it.cnr.si.flows.ng.TestUtil;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.junit.Assert.assertEquals;
+import static org.springframework.http.HttpStatus.OK;
 
 
-@SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = FlowsApp.class)
 @RunWith(SpringRunner.class)
-@Ignore
 public class FlowsProcessInstanceResourceTest {
 
-    @Autowired
-    private TestRestTemplate template;
     @Autowired
     private FlowsTaskResource flowsTaskResource;
     @Autowired
@@ -47,79 +39,119 @@ public class FlowsProcessInstanceResourceTest {
     @Autowired
     private TestUtil util;
     @Autowired
-    private TaskService taskService;
+    private FlowsProcessDefinitionResource flowsProcessDefinitionResource;
+    private ProcessInstanceResponse processInstance;
 
-    private String processDefinitionMissioni;
-    private String taskId;
 
-    @SuppressWarnings("unchecked")
     @Before
     public void setUp() throws Exception {
-        util.loginAdmin();
-
-        DataResponse ret = template.getForObject("/rest/processdefinitions/all", DataResponse.class);
-
-        ArrayList<ProcessDefinitionResponse> processDefinitions = (ArrayList<ProcessDefinitionResponse>) ret.getData();
-        for (ProcessDefinitionResponse pd : processDefinitions) {
-            if (pd.getId().contains("missioni")) {
-                processDefinitionMissioni = pd.getId();
-                break;
-            }
-        }
-        MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
-        req.setParameter("definitionId", processDefinitionMissioni);
-        ResponseEntity<Object> response = flowsTaskResource.completeTask(req);
-        assertEquals(response.getStatusCode(), OK);
-//        Recupero il taskId
-        taskId = taskService.createTaskQuery().singleResult().getId();
+        processInstance = util.mySetUp("missioni");
     }
 
     @After
     public void tearDown() {
-        //        cancello la Process Instance creata all'inizio del test'
-        TaskResponse taskResponse = flowsTaskResource.getTaskInstance(taskId).getBody();
-        HttpServletResponse res = new MockHttpServletResponse();
-        flowsProcessInstanceResource.delete(res, taskResponse.getProcessInstanceId(), "");
-        assertEquals(NO_CONTENT.value(), res.getStatus());
-        util.logout();
+        util.myTearDown();
+//        util.logout();
     }
 
     @Test
+    public void testGetMyProcesses() {
+        String processInstanceID = verifyMyProcesses(1, 0);
+        // testo che, anche se una Process Instance viene sospesa, la vedo ugualmente
+        flowsProcessInstanceResource.suspend(new MockHttpServletRequest(), processInstanceID);
+        processInstanceID = verifyMyProcesses(1, 0);
+        //testo che eliminando una Process Instances NON la vedo tra i processi avviati da me
+        flowsProcessInstanceResource.delete(new MockHttpServletResponse(), processInstanceID, "TEST");
+        verifyMyProcesses(0, 0);
+    }
+
+
+    @Test
+    @Ignore
     public void testGetMyTasks() {
         //TODO: Test goes here...
     }
 
     @Test
+    @Ignore
     public void testGetAvailableTasks() {
         //TODO: Test goes here...
     }
 
     @Test
+    @Ignore
     public void testGetWorkflowInstances() throws Exception {
         //TODO: Test goes here...
     }
 
     @Test
+    @Ignore
     public void testGetProcessInstanceById() throws Exception {
         //TODO: Test goes here...
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testGetActiveProcessInstances() {
+        //Recupero la Process Definition per permessi ferie
+        util.loginUser();
+        DataResponse appo = (DataResponse) flowsProcessDefinitionResource.getAllProcessDefinitions();
+        String permessiFeriePD = ((ArrayList<ProcessDefinitionResponse>) appo.getData()).stream()
+                .filter(h -> h.getKey().contains("permessi-ferie"))
+                .collect(Collectors.toList()).get(0).getId();
+        //User crea una seconda Process Instance
+        MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
+        req.setParameter("definitionId", permessiFeriePD);
+        flowsTaskResource.completeTask(req);
+        util.logout();
 
-        ResponseEntity<?> ret = flowsProcessInstanceResource.getActiveProcessInstances();
-
-        assertEquals(ret.getStatusCode(), HttpStatus.OK);
-
+        //Verifico che Admin veda entrambe le Process Instances create
+        util.loginAdmin();
+        ResponseEntity ret = flowsProcessInstanceResource.getActiveProcessInstances(new MockHttpServletRequest());
+        assertEquals(HttpStatus.OK, ret.getStatusCode());
         ArrayList<ProcessInstanceResponse> entities = (ArrayList<ProcessInstanceResponse>) ret.getBody();
-        assertEquals(entities.size(), 1);
-        assertEquals(entities.get(0).getProcessDefinitionId(), processDefinitionMissioni);
+        //vedo sia la Process Instance avviata da admin che quella avviata da User
+        assertEquals(2, entities.size());
+        assertEquals(util.getProcessDefinition(), entities.get(0).getProcessDefinitionId());
+        assertEquals(permessiFeriePD, entities.get(1).getProcessDefinitionId());
     }
 
 
     @Test
+    @Ignore
     public void testGetWorkflowVariables() throws Exception {
         //TODO: Test goes here...
     }
+
+    @Test
+    public void testSuspend() throws Exception {
+
+        assertEquals(false, processInstance.isSuspended());
+        ProcessInstanceResponse response = flowsProcessInstanceResource.suspend(new MockHttpServletRequest(), processInstance.getId());
+        assertEquals(true, response.isSuspended());
+    }
+
+
+    private String verifyMyProcesses(int startedByAdmin, int startedBySpaclient) {
+        String proceeeInstanceID = null;
+        // Admin vede la Process Instance che ha avviato
+        ResponseEntity<DataResponse> response = flowsProcessInstanceResource.getMyProcessInstances(true);
+        assertEquals(OK, response.getStatusCode());
+        assertEquals(startedByAdmin, response.getBody().getSize());
+        List processInstances = ((List) response.getBody().getData());
+        assertEquals(startedByAdmin, processInstances.size());
+        if (processInstances.size() > 0)
+            proceeeInstanceID = ((HistoricProcessInstance) processInstances.get(0)).getId();
+        util.logout();
+
+        // Spaclient NON vede la Process Instance avviata da Admin
+        util.loginSpaclient();
+        response = flowsProcessInstanceResource.getMyProcessInstances(true);
+        assertEquals(OK, response.getStatusCode());
+        assertEquals(startedBySpaclient, response.getBody().getSize());
+        assertEquals(startedBySpaclient, ((List) response.getBody().getData()).size());
+        util.logout();
+        util.loginAdmin();
+        return proceeeInstanceID;
+    }
+
 }

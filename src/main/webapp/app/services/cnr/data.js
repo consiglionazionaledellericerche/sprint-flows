@@ -66,6 +66,9 @@
         getActive: function() {
             return $http.get('rest/processInstances/active');
         },
+        myProcessInstances:  function(active) {
+            return $http.get('rest/processInstances/myProcessInstances?active=' + active);
+        },
         getCompleted: function() {
             return $http.get('rest/processInstances/completed');
         },

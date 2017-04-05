@@ -1,43 +1,31 @@
-<div ng-cloak>
+<div class="col-md-12" ng-cloak>
 
   <div class="row text-center">
     <h3>{{vm.data.entity.processDefinitionKey}} ({{vm.data.entity.processDefinitionId}})</h3>
     <p class="text-muted">{{vm.definition.description}}</p>
-    <img class="img-bordered"
-        ng-if="vm.data.entity.superProcessInstanceId"
-       	ng-src='/rest/diagram/processInstance/{{vm.data.entity.superProcessInstanceId}}'
-    	title="{{vm.data.entity.processDefinitionKey}}"
-    	style="max-width: 30%"  />
-    <hr ng-if="vm.data.entity.superProcessInstanceId">
-    <img class="img-bordered"
-    	ng-src='{{vm.diagramUrl}}'
-    	title="{{vm.data.entity.processDefinitionKey}}"
-    	style="max-width: 100%" />
+      <img class="img-bordered" ng-src='/rest/diagram/processInstance/{{vm.data.entity.id}}'
+           title="{{vm.data.entity.processDefinitionKey}}" style="max-width: 100%"/>
   </div>
 
 
-  <div class="col-md-7">
+  <div class="col-md-8">
 
-    <h4>{{vm.data.entity.title}} ({{vm.data.entity.id}})</h4>
+      <h4>{{vm.data.entity.title ? vm.data.entity.title : vm.data.entity.variabili.title}} ({{vm.data.entity.id}})</h4>
+      <br>
 
     <span ng-class="{'label-warning': !vm.data.entity.completed , 'label-success': vm.data.entity.completed }" class="label">{{!vm.data.entity.completed ? 'attivo' : 'completato'}}</span>
-    <b>Titolo</b>
-    : {{vm.data.entity.title}}
-    <b>Avviato da:</b>
-    {{vm.data.entity.initiator}} il {{vm.data.entity.startDate | date}}
+      <b>Avviato da: </b>{{vm.data.entity.initiator}} il {{vm.data.entity.startDate | date}} <br>
     <span ng-hide="!vm.data.entity.completed">
-      <b>completato il:</b>
-      {{vm.data.entity.endDate | date}}
+      <b>completato il:</b>{{vm.data.entity.endDate | date}} <br>
     </span>
     <span ng-show="!vm.data.entity.completed">
       <!--<b>Percentuale di completamento: </b> {{activeTask.properties.bpm_percentComplete}}&#37;-->
-      <br>
-      <b>Fase: </b>
-      {{vm.data.entity.activityId}}
+      <b>Fase: </b>{{vm.data.entity.activityId}}<br>
     </span>
 
 	<div ng-repeat="variable in vm.data.entity.variables">
-		<strong>{{variable.name}}:</strong> {{variable.value}}
+
+        <strong>{{variable.name}}:</strong> {{variable.value}} <br>
 	</div>
 
     <attachments ></attachments>

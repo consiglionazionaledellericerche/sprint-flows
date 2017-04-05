@@ -1,0 +1,90 @@
+<div ng-cloak>
+    <div class="row form-group">
+        <div class="col-md-12">
+            <uib-tabset active="1" justified="true" type="pills">
+                <uib-tab index="0" select="setActiveContent('active')">
+                    <uib-tab-heading>
+                        <h3>
+                            <i class="glyphicon glyphicon-inbox"></i>
+                            ATTIVI: {{vm.myProcessInstancesActive.total}}
+                        </h3>
+                    </uib-tab-heading>
+                </uib-tab>
+                <uib-tab index="1" select="setActiveContent('terminated')">
+                    <uib-tab-heading>
+                        <h3>
+                            <i class="glyphicon glyphicon-user"></i>
+                            TERMINATI: {{vm.myProcessInstancesTerminated.total}}
+                        </h3>
+                    </uib-tab-heading>
+                </uib-tab>
+            </uib-tabset>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="progress">
+                <uib-progress animate="false">
+                    <uib-bar class="progress-bar-striped"
+                             value="100* vm.myProcessInstancesActive.total/(vm.myProcessInstancesTerminated.total+ vm.myProcessInstancesActive.total)"
+                             type="primary">
+                        <span>{{vm.myProcessInstancesActive.total}}</span>
+                    </uib-bar>
+                    <uib-bar class="progress-bar-striped"
+                             value="100* vm.myProcessInstancesTerminated.total/(vm.myProcessInstancesTerminated.total+ vm.myProcessInstancesActive.total)"
+                             type="info">
+                        <span>{{vm.myProcessInstancesTerminated.total}}</span>
+                    </uib-bar>
+                </uib-progress>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <button class="btn btn-default btn-block margin-top-20" ng-click="advanced = !advanced">
+                <span class="glyphicon" ng-class="{'glyphicon-wrench': !advanced, 'glyphicon-tasks': advanced}"></span>
+                modalità {{advanced ? 'semplice' : 'avanzata'}}
+            </button>
+
+            <div ng-show="advanced">
+                <h4>Tipologie</h4>
+                <workflow-types criteria="criteria"
+                                filters="true"
+                                reset-filters="resetFilters"
+                                select-process-definition-key="selectProcessDefinitionKey"
+                                process-definitions="processDefinitions">
+                </workflow-types>
+            </div>
+        </div>
+
+        <div class="col-md-9" ng-show="activeContent == 'active'">
+            <h3>
+        <span class="label label-primary">
+          <i class="glyphicon-inbox"></i>
+          Process Instances avviate da me ed ancora ATTIVE
+        </span>
+            </h3>
+            <process-list
+                    processes="vm.myProcessInstancesActive.data"
+                    paging="paging">
+            </process-list>
+        </div>
+        <div class="col-md-9" ng-show="activeContent == 'terminated'">
+            <h3>
+        <span class="label label-info" ng-class="label-info">
+          <i class="glyphicon glyphicon-user"></i>
+          Process Instances avviate da me e TERMINATE
+        </span>
+            </h3>
+            <process-list
+                    processes="vm.myProcessInstancesTerminated.data"
+                    paging="paging">
+            </process-list>
+        </div>
+    </div>
+</div>
+<pre ng-show="development">
+  {{tasks | json}}
+</pre>
+<pre>{{vm | json}}</pre>
+</div>
