@@ -5,18 +5,36 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.ZonedDateTimeSerializer;
+import it.cnr.si.flows.ng.resource.FlowsProcessDefinitionResource;
+import it.cnr.si.flows.ng.resource.FlowsProcessInstanceResource;
+import it.cnr.si.flows.ng.resource.FlowsTaskResource;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
+import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.rest.common.api.DataResponse;
+import org.activiti.rest.service.api.repository.ProcessDefinitionResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static it.cnr.si.config.JacksonConfiguration.ISO_DATE_OPTIONAL_TIME;
 import static it.cnr.si.config.JacksonConfiguration.ISO_FIXED_FORMAT;
+import static org.junit.Assert.assertEquals;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 
 /**
  * Utility class for testing REST controllers.
@@ -24,10 +42,23 @@ import static it.cnr.si.config.JacksonConfiguration.ISO_FIXED_FORMAT;
 @Service
 public class TestUtil {
 
+
     /** MediaType for JSON UTF8 */
     public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(
             MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
+    @Autowired
+    FlowsProcessInstanceResource flowsProcessInstanceResource;
+    private String taskId;
+    private String processDefinition;
+    @Autowired
+    private FlowsProcessDefinitionResource flowsProcessDefinitionResource;
+    @Autowired
+    private TaskService taskService;
+    @Autowired
+    private RuntimeService runtimeService;
+    @Autowired
+    private FlowsTaskResource flowsTaskResource;
 
     /**
      * Convert an object to JSON byte array.
@@ -84,5 +115,44 @@ public class TestUtil {
 
     public void logout() {
         SecurityContextHolder.clearContext();
+    }
+
+    public String mySetUp(String processDefinitionId) {
+        loginAdmin();
+        DataResponse ret = (DataResponse) flowsProcessDefinitionResource.getAllProcessDefinitions();
+
+        ArrayList<ProcessDefinitionResponse> processDefinitions = (ArrayList) ret.getData();
+        for (ProcessDefinitionResponse pd : processDefinitions) {
+            if (pd.getId().contains(processDefinitionId)) {
+                processDefinition = pd.getId();
+                break;
+            }
+        }
+        MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
+        req.setParameter("definitionId", processDefinition);
+        ResponseEntity<Object> response = flowsTaskResource.completeTask(req);
+        assertEquals(response.getStatusCode(), OK);
+//        Recupero il taskId
+        taskId = taskService.createTaskQuery().singleResult().getId();
+        return processDefinition;
+    }
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public String getProcessDefinition() {
+        return processDefinition;
+    }
+
+    public void myTearDown() {
+        //cancello le Process Instance creata all'inizio del test'
+        List<ProcessInstance> list = runtimeService.createProcessInstanceQuery().list();
+        HttpServletResponse res = new MockHttpServletResponse();
+        for (ProcessInstance pi : list) {
+            flowsProcessInstanceResource.delete(res, pi.getProcessInstanceId(), "TEST");
+            assertEquals(NO_CONTENT.value(), res.getStatus());
+        }
+        logout();
     }
 }

@@ -2,14 +2,8 @@ package it.cnr.si.flows.ng.resource;
 
 import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.TestUtil;
-
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.rest.common.api.DataResponse;
-import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
-import org.activiti.rest.service.api.repository.ProcessDefinitionResponse;
 import org.activiti.rest.service.api.runtime.task.TaskResponse;
 import org.junit.After;
 import org.junit.Before;
@@ -18,20 +12,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.RequestContextListener;
 
-import javax.servlet.http.HttpServletResponse;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -41,62 +28,39 @@ import static it.cnr.si.flows.ng.utils.Utils.ASC;
 import static it.cnr.si.flows.ng.utils.Utils.DESC;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.OK;
 
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@Ignore //TODO
+@SpringBootTest(classes = FlowsApp.class)
+@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 public class FlowsTaskResourceTest {
 
     public static final String TASK_NAME = "Firma UO";
     @Autowired
-    private FlowsTaskResource flowsTaskResource;
-
+    FlowsTaskResource flowsTaskResource;
     @Autowired
-    private RepositoryService repositoryService;
+    TestUtil util;
     @Autowired
-    private TestUtil util;
-    @Autowired
-    private FlowsProcessInstanceResource flowsProcessInstanceResource;
-    @Autowired
-    private TaskService taskService;
-
-    private String processDefinitionMissioni;
-    private String taskId;
+    FlowsProcessInstanceResource flowsProcessInstanceResource;
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-
 
     @Before
     public void setUp() throws Exception {
-        util.loginAdmin();
-        List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().latestVersion().list();
-        for (ProcessDefinition pd : processDefinitions) {
-            if (pd.getId().contains("missioni")) {
-                processDefinitionMissioni = pd.getId();
-                break;
-            }
-        }
-        MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
-        req.setParameter("definitionId", processDefinitionMissioni);
-
-        ResponseEntity<Object> response = flowsTaskResource.completeTask(req);
-        assertEquals(response.getStatusCode(), OK);
-        // Recupero il taskId
-        taskId = taskService.createTaskQuery().singleResult().getId();
+        util.mySetUp("missioni");
     }
+
+
 
     @After
     public void tearDown() {
-        //        cancello la Process Instance creata all'inizio del test'
-        TaskResponse taskResponse = flowsTaskResource.getTaskInstance(taskId).getBody();
-        HttpServletResponse res = new MockHttpServletResponse();
-        flowsProcessInstanceResource.delete(res, taskResponse.getProcessInstanceId(), "");
-        assertEquals(NO_CONTENT.value(), res.getStatus());
-        util.logout();
+        util.myTearDown();
     }
 
+
     @Test
+    @Ignore
     public void testGetMyTasks() {
         //TODO: trovare un flusso che assegni un task ad un utente specifico
     }
@@ -126,50 +90,54 @@ public class FlowsTaskResourceTest {
 
     @Test
     public void testGetTaskInstance() {
-        ResponseEntity<TaskResponse> response = flowsTaskResource.getTaskInstance(taskId);
+        ResponseEntity<TaskResponse> response = flowsTaskResource.getTaskInstance(util.getTaskId());
         assertEquals(OK, response.getStatusCode());
         assertEquals(TASK_NAME, ((TaskResponse) response.getBody()).getName());
     }
 
     @Test
+    @Ignore
     public void testGetTaskVariables() {
         //TODO: Test goes here...
-        //        flowsTaskResource.getTaskVariables()
+//        flowsTaskResource.getTaskVariables()
     }
 
     @Test
+    @Ignore
     public void testCompleteTask() {
         //TODO: Test goes here...
-        //        MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
-        //        req.setParameter("taskId", taskId);
-        //        req.setParameter("definitionId", processDefinitionMissioni);
-        //        ResponseEntity<Object> response = flowsTaskResource.completeTask(req);
-        //        assertEquals(OK, response.getStatusCode());
+//        MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
+//        req.setParameter("taskId", taskId);
+//        req.setParameter("definitionId", processDefinitionMissioni);
+//        ResponseEntity<Object> response = flowsTaskResource.completeTask(req);
+//        assertEquals(OK, response.getStatusCode());
     }
 
     @Test
+    @Ignore
     public void testAssignTask() {
         //TODO: Test goes here...
-        //        flowsTaskResource.assignTask();
+//        flowsTaskResource.assignTask();
     }
 
     @Test
+    @Ignore
     public void testUnclaimTask() {
         //TODO: Test goes here...
-        //        flowsTaskResource.unclaimTask();
+//        flowsTaskResource.unclaimTask();
     }
 
     @Test
     public void testClaimTask() {
-        //      admin ha ROLE_ADMIN E ROLE_USER quindi può richiamare il metodo
+//      admin ha ROLE_ADMIN E ROLE_USER quindi può richiamare il metodo
         util.loginAdmin();
-        ResponseEntity<Map<String, Object>> response = flowsTaskResource.claimTask(new MockHttpServletRequest(), taskId);
+        ResponseEntity<Map<String, Object>> response = flowsTaskResource.claimTask(new MockHttpServletRequest(), util.getTaskId());
         assertEquals(OK, response.getStatusCode());
         util.logout();
 
-        //      spaclient ha solo ROLE_ADMIN quindi NON può richiamare il metodo
+//      spaclient ha solo ROLE_ADMIN quindi NON può richiamare il metodo
         util.loginSpaclient();
-        response = flowsTaskResource.claimTask(new MockHttpServletRequest(), taskId);
+        response = flowsTaskResource.claimTask(new MockHttpServletRequest(), util.getTaskId());
         assertEquals(FORBIDDEN, response.getStatusCode());
     }
 
@@ -180,7 +148,7 @@ public class FlowsTaskResourceTest {
 
         String searchField1 = "wfvarValidazioneSpesa";
         String searchField2 = "initiator";
-        //        String payload = "{params: [{key: " + searchField1 + ", value: true, type: boolean} , {key: " + searchField2 + ", value: \"admin\", type: textEqual}]}";
+//        String payload = "{params: [{key: " + searchField1 + ", value: true, type: boolean} , {key: " + searchField2 + ", value: \"admin\", type: textEqual}]}";
         final Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, +1);
         Date tomorrow = cal.getTime();
@@ -193,7 +161,7 @@ public class FlowsTaskResourceTest {
         req.setContent(payload.getBytes());
         req.setContentType("application/json");
         //verifico la richiesta normale
-        ResponseEntity<Object> response = flowsTaskResource.search(req, processDefinitionMissioni.split(":")[0], true, ASC, 0, 10);
+        ResponseEntity<Object> response = flowsTaskResource.search(req, util.getProcessDefinition().split(":")[0], true, ASC, 0, 10);
         verifyResponse(response, 1, searchField1, searchField2);
 
         //verifico la richiesta su tutte le Process Definition
@@ -201,7 +169,7 @@ public class FlowsTaskResourceTest {
         verifyResponse(response, 1, searchField1, searchField2);
 
         //cerco le Process Instance completate (active = false  ==>  0 risultati)
-        response = flowsTaskResource.search(req, processDefinitionMissioni.split(":")[0], false, DESC, 0, 10);
+        response = flowsTaskResource.search(req, util.getProcessDefinition().split(":")[0], false, DESC, 0, 10);
         verifyResponse(response, 0, searchField1, searchField2);
 
         //parametri sbagliati (0 risultati)
@@ -209,7 +177,7 @@ public class FlowsTaskResourceTest {
         req.setContent(payload.getBytes());
         req.setContentType("application/json");
 
-        response = flowsTaskResource.search(req, processDefinitionMissioni.split(":")[0], true, ASC, 0, 10);
+        response = flowsTaskResource.search(req, util.getProcessDefinition().split(":")[0], true, ASC, 0, 10);
         verifyResponse(response, 0, searchField1, searchField2);
     }
 
@@ -222,7 +190,7 @@ public class FlowsTaskResourceTest {
 
         if (responseList.size() > 0) {
             TaskResponse taskresponse = ((TaskResponse) responseList.get(0));
-            assertTrue(taskresponse.getProcessDefinitionId().contains(processDefinitionMissioni));
+            assertTrue(taskresponse.getProcessDefinitionId().contains(util.getProcessDefinition()));
             //verifico che la Process Instance restituita rispetti i parametri della ricerca
             List<RestVariable> variables = taskresponse.getVariables();
             RestVariable variable = variables.stream().filter(v -> v.getName().equals(searchField1)).collect(Collectors.toList()).get(0);
