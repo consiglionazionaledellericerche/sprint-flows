@@ -19,6 +19,12 @@
                     <span class="hidden-sm" translate="global.menu.home">Home</span>
                 </a>
             </li>
+            <li ui-sref-active="active" has-authority="ROLE_USER">
+                <a ui-sref="my-process-instances" ng-click="vm.collapseNavbar()">
+                    <span class="glyphicon glyphicon-fire"></span>
+                    <span class="hidden-sm">Process Instances avviati da me</span>
+                </a>
+            </li>
             <!--todo: solo per ROLE_ADMIN?-->
             <li ui-sref-active="active" has-authority="ROLE_USER">
                 <a ui-sref="search" ng-click="vm.collapseNavbar()">

@@ -977,5 +977,3 @@ public class FlowsProcessDiagramGenerator extends DefaultProcessDiagramGenerator
     }
 
 }
-
-
