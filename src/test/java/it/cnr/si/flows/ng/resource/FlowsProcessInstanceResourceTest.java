@@ -51,7 +51,6 @@ public class FlowsProcessInstanceResourceTest {
     @After
     public void tearDown() {
         util.myTearDown();
-//        util.logout();
     }
 
     @Test

@@ -1,7 +1,11 @@
 package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
+import it.cnr.si.flows.ng.service.FlowsProcessDiagramGenerator;
 import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.GraphicInfo;
+import org.activiti.bpmn.model.SubProcess;
 import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.history.HistoricActivityInstanceQuery;
@@ -11,7 +15,6 @@ import org.activiti.engine.impl.persistence.entity.HistoricProcessInstanceEntity
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
-import org.activiti.image.ProcessDiagramGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
@@ -40,9 +43,7 @@ public class FlowsDiagramResource {
     @Autowired
     private TaskService taskService;
     @Autowired
-    private ProcessDiagramGenerator pdg;
-
-
+    private FlowsProcessDiagramGenerator pdg;
     @Autowired
     private ProcessEngineConfiguration processEngineConfiguration;
     @Autowired
@@ -78,6 +79,13 @@ public class FlowsDiagramResource {
             ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
 
             BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinition.getId());
+            for (FlowElement fe : bpmnModel.getProcesses().get(0).getFlowElements()) {
+                GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(fe.getId());
+                if (fe instanceof SubProcess) {
+                    graphicInfo.setExpanded(containsActiveTasks((SubProcess) fe, processInstance.getId()));
+                }
+            }
+            ;
             resource = pdg.generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(processInstance.getId()),
                                            Collections.<String>emptyList(),
                                            font, font, font,
@@ -92,6 +100,13 @@ public class FlowsDiagramResource {
                     .activityType(ELEMENT_EVENT_END)
                     .processInstanceId(((HistoricProcessInstanceEntity) hpi).getProcessInstanceId())
                     .singleResult();
+            for (FlowElement fe : bpmnModel.getProcesses().get(0).getFlowElements()) {
+                GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(fe.getId());
+                if (fe instanceof SubProcess) {
+                    graphicInfo.setExpanded(containsActiveTasks((SubProcess) fe, hpi.getId()));
+                }
+            }
+            ;
             resource = pdg.generateDiagram(bpmnModel, "png", Collections.singletonList(endActivity.getActivityId()),
                                            Collections.<String>emptyList(),
                                            font, font, font,
@@ -129,4 +144,12 @@ public class FlowsDiagramResource {
 
     }
 
+
+    private boolean containsActiveTasks(SubProcess sp, String processInstanceId) {
+        for (FlowElement fe : sp.getFlowElements()) {
+            if (runtimeService.getActiveActivityIds(processInstanceId).contains(fe.getId()))
+                return true;
+        }
+        return false;
+    }
 }
