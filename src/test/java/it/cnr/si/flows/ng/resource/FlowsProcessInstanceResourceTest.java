@@ -1,7 +1,12 @@
 package it.cnr.si.flows.ng.resource;
 
-import it.cnr.si.FlowsApp;
-import it.cnr.si.flows.ng.TestUtil;
+import static org.junit.Assert.assertEquals;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+
+import java.util.ArrayList;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.activiti.engine.TaskService;
 import org.activiti.rest.common.api.DataResponse;
@@ -22,18 +27,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.ArrayList;
-
-import javax.servlet.http.HttpServletResponse;
-
-import static org.junit.Assert.assertEquals;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
+import it.cnr.si.FlowsApp;
+import it.cnr.si.flows.ng.TestUtil;
 
 
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -51,19 +48,18 @@ public class FlowsProcessInstanceResourceTest {
     private TestUtil util;
     @Autowired
     private TaskService taskService;
-    @Autowired
-    private FlowsProcessDefinitionResource flowsProcessDefinitionResource;
 
     private String processDefinitionMissioni;
     private String taskId;
 
+    @SuppressWarnings("unchecked")
     @Before
     public void setUp() throws Exception {
         util.loginAdmin();
 
         DataResponse ret = template.getForObject("/rest/processdefinitions/all", DataResponse.class);
 
-        ArrayList<ProcessDefinitionResponse> processDefinitions = (ArrayList) ret.getData();
+        ArrayList<ProcessDefinitionResponse> processDefinitions = (ArrayList<ProcessDefinitionResponse>) ret.getData();
         for (ProcessDefinitionResponse pd : processDefinitions) {
             if (pd.getId().contains("missioni")) {
                 processDefinitionMissioni = pd.getId();
@@ -108,10 +104,11 @@ public class FlowsProcessInstanceResourceTest {
         //TODO: Test goes here...
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testGetActiveProcessInstances() {
 
-        ResponseEntity ret = flowsProcessInstanceResource.getActiveProcessInstances(new MockHttpServletRequest());
+        ResponseEntity<?> ret = flowsProcessInstanceResource.getActiveProcessInstances();
 
         assertEquals(ret.getStatusCode(), HttpStatus.OK);
 
