@@ -1,17 +1,15 @@
 <div ng-show="processes" class="margin-bottom-helper tasks">
     <div class="row vertical-align-center" ng-repeat="process in processes">
         <div class="col-md-10">
-            <!--todo: da fare il filtro?-->
-            <!--<a class="pointer" ng-click="filterProcess(process.processDefinitionId)" title="filtra per il flusso {{process.title}}"><strong>{{process.title}}</strong></a>-->
             <a ng-href="#/details?processInstanceId={{process.id}}"
                title="dettagli del flusso {{process.processDefinitionId}}">
                 <small class="label"
-                       ng-class="{'label-info' : !process.completed, 'label-primary' : process.completed}">
+                       ng-class="{'label-info' : process.endTime, 'label-primary' : !process.endTime}">
                     {{process.processDefinitionId}}
                 </small>
                 <br>
             </a>
-            <variables variables="process.variables" label-class="'font-italic'"></variables>
+            <variables variables="selectVariables(process)" label-class="'font-italic'"></variables>
         </div>
         <div class="col-md-2 text-right vertical-align-center">
             <div class="btn-group" role="group" aria-label="Left Align">
