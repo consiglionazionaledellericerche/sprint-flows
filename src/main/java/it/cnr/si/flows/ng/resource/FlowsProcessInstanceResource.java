@@ -1,20 +1,26 @@
 package it.cnr.si.flows.ng.resource;
 
-import com.codahale.metrics.annotation.Timed;
-import it.cnr.si.repository.UserRepository;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.security.SecurityUtils;
-import it.cnr.si.service.UserService;
-import org.activiti.engine.*;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.activiti.engine.HistoryService;
+import org.activiti.engine.IdentityService;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Attachment;
-import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.AttachmentResponse;
-import org.activiti.rest.service.api.runtime.process.ProcessInstanceActionRequest;
+import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResource;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.slf4j.Logger;
@@ -30,13 +36,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import com.codahale.metrics.annotation.Timed;
+
+import it.cnr.si.security.AuthoritiesConstants;
 
 @Controller
 @RequestMapping("rest/processInstances")
@@ -51,84 +53,83 @@ public class FlowsProcessInstanceResource {
     IdentityService identityService;
     @Autowired
     ProcessInstanceResource processInstanceResource;
-    @Inject
-    private UserRepository userRepository;
-    @Inject
-    private UserService userService;
-    @Autowired
-    private RepositoryService repositoryService;
     @Autowired
     private RuntimeService runtimeService;
     @Autowired
-    private ProcessEngine processEngine;
-    @Autowired
     private TaskService taskService;
 
-
     /**
-     * Restituisce le Processs Instances avviate dall'utente loggato
+     * Gets my instances.
      *
-     * @param active booleano che indica se recuperare le MIE Process Instancess attive o quelle terminate (o sospese)
-     * @return the my processes
+     * @param skipCount the skip count
+     * @param maxItems  the max items
+     * @param where     the where
+     * @param req       the req
+     * @return the my instances
+     * @throws IOException the io exception
      */
-    @RequestMapping(value = "myProcessInstances", method = RequestMethod.GET)
+    @RequestMapping(value = "myinstances", method = RequestMethod.GET)
     @ResponseBody
     @Timed
-    public ResponseEntity<DataResponse> getMyProcessInstances(
-            @RequestParam boolean active) {
+    public ResponseEntity<Map<String, Object>> getMyInstances(
+            @RequestParam Optional<Integer> skipCount,
+            @RequestParam Optional<Integer> maxItems,
+            @RequestParam Optional<String> where,
+            HttpServletRequest req) throws IOException {
 
-        String username = SecurityUtils.getCurrentUserLogin();
-        List list;
-        HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
-        if (active) {
-            list = historicProcessInstanceQuery.variableValueEquals("initiator", username)
-                    .unfinished()
-                    .includeProcessVariables().list();
-        } else {
-            list = historicProcessInstanceQuery.variableValueEquals("initiator", username)
-                    .finished()
-                    .includeProcessVariables().list();
-        }
+//        ProcessEngine processEngine = ProcessEngines.getDefaultProcessEngine();
+//
+//        RuntimeService runtimeService = processEngine.getRuntimeService();
+//        RepositoryService repositoryService = processEngine.getRepositoryService();
+//        TaskService taskService = processEngine.getTaskService();
+//        ManagementService managementService = processEngine.getManagementService();
+//        IdentityService identityService = processEngine.getIdentityService();
+//        HistoryService historyService = processEngine.getHistoryService();
+//        FormService formService = processEngine.getFormService();
+//        ProcessInstanceBuilder processInstanceBuilder = runtimeService.createProcessInstanceBuilder();
+//
+////        todo: serve sicuramente PersistenceAuditEventRepository fare myInstance
+//        List<ProcessInstance> list = runtimeService.createProcessInstanceQuery().involvedUser().processInstanceName().list();
+//            List<ProcessInstanceResponse> definition = restResponseFactory.createProcessInstanceResponseList(list);
+//            DataResponse response = new DataResponse();
+//            response.setStart(0);
+//            response.setSize(list.size());
+//            response.setTotal(list.size());
+//            response.setData(list);
+//
+//            return ResponseEntity.ok(response);
 
-        DataResponse response = new DataResponse();
-        response.setStart(0);
-        response.setSize(list.size());
-        response.setTotal(list.size());
-        response.setData(list);
+//        IdentityLinkType.
+//        repositoryService.createProcessDefinitionQuery().
+//                repositoryService.
 
-        return ResponseEntity.ok(response);
-    }
-
-    @RequestMapping(value = "/processes", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
-    public ResponseEntity<Map<String, Object>> getProcesses(HttpServletRequest req,
-                                                            @RequestParam Map<String, String> params) {
+//                List < Group > authorizedGroups = identityService.createGroupQuery().potentialStarter("processDefinitionId").list();
 
         return null;
-        //        CMISUser user = cmisService.getCMISUserFromSession(req);
-        //        BindingSession session = cmisService.getCurrentBindingSession(req);
-        //
         //        try {
-        //            return new ResponseEntity<Map<String,Object>>(workflowService.getProcesses(user, session, params), HttpStatus.OK);
+        //
+        //            Map<String, Object> result = workflowService.getFilteredResults( skipCount.orElse(0),
+        //                                                                             maxItems.orElse(5),
+        //                                                                             where.orElse(""),
+        //                                                                             user);
+        //
+        //            return new ResponseEntity<Map<String,Object>>(result, HttpStatus.OK);
+        //
         //        } catch (IOException e) {
-        //            LOGGER.error(e.getMessage(), e);
-        //            Map<String, Object> response = new HashMap<>();
-        //            response.put("error", e.getMessage());
-        //            return new ResponseEntity<Map<String,Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        //        } catch (AlfrescoResponseException e) {
-        //            LOGGER.error(e.getMessage() + " " + e.getResponse(), e);
-        //            return new ResponseEntity<Map<String,Object>>(e.getResponse(), HttpStatus.INTERNAL_SERVER_ERROR);
+        //            Map<String, Object> result = new HashMap<>();
+        //            LOGGER.error("Sending error response", e);
+        //            result.put("error", true);
+        //            result.put("success", false);
+        //            return new ResponseEntity<Map<String,Object>>(result, HttpStatus.INTERNAL_SERVER_ERROR);
         //        }
     }
-
 
     // TODO refactor in path param
     @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured(AuthoritiesConstants.USER)
     @Timed
-    public ResponseEntity<Map<String, Object>> getProcessInstanceById(HttpServletRequest req,
-                                                                      @RequestParam("processInstanceId") String processInstanceId) {
+    public ResponseEntity<Map<String, Object>> getProcessInstanceById(@RequestParam("processInstanceId") String processInstanceId) {
         Map<String, Object> result = new HashMap<>();
         try {
             HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).includeProcessVariables().singleResult();
@@ -155,21 +156,29 @@ public class FlowsProcessInstanceResource {
     /**
      * Restituisce le Process Instances attive.
      *
-     * @param req the req
      * @return the process instances actives
      */
     @RequestMapping(value = "/active", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({AuthoritiesConstants.USER, AuthoritiesConstants.ADMIN})
     @Timed
-    public ResponseEntity getActiveProcessInstances(HttpServletRequest req) {
+    public ResponseEntity<List<ProcessInstanceResponse>> getActiveProcessInstances() {
         List<ProcessInstance> processInstance = runtimeService.createProcessInstanceQuery().includeProcessVariables().list();
         return new ResponseEntity<>(restResponseFactory.createProcessInstanceResponseList(processInstance), HttpStatus.OK);
     }
 
-
-    private void validateData(Map<String, Object> data) {
-        // TODO throw exeption if invalid
+    /**
+     * Restituisce le Process Instances completate.
+     *
+     * @return the completed process instances
+     */
+    @RequestMapping(value = "/completed", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @Secured({AuthoritiesConstants.USER, AuthoritiesConstants.ADMIN})
+    @Timed
+    public ResponseEntity<List<HistoricProcessInstanceResponse>> getCompletedProcessInstances() {
+        List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery().finished().includeProcessVariables().list();
+        return new ResponseEntity<>(restResponseFactory.createHistoricProcessInstanceResponseList(processInstances), HttpStatus.OK);
     }
 
     @RequestMapping(value = "deleteProcessInstance", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -182,22 +191,6 @@ public class FlowsProcessInstanceResource {
             @RequestParam(value = "deleteReason", required = true) String deleteReason) {
         processInstanceResource.deleteProcessInstance(processInstanceId, deleteReason, response);
         return response;
+
     }
-
-
-    @RequestMapping(value = "suspendProcessInstance", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    @Secured({AuthoritiesConstants.ADMIN})
-    @Timed
-    public ProcessInstanceResponse suspend(
-            HttpServletRequest request,
-            @RequestParam(value = "processInstanceId", required = true) String processInstanceId) {
-        ProcessInstanceActionRequest action = new ProcessInstanceActionRequest();
-        action.setAction(ProcessInstanceActionRequest.ACTION_SUSPEND);
-        return processInstanceResource.performProcessInstanceAction(processInstanceId, action, request);
-    }
-
-    /* ----------- */
-
-
 }
