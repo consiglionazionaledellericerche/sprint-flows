@@ -71,7 +71,7 @@ public class FlowsProcessInstanceResource {
      * @param active booleano che indica se recuperare le MIE Process Instancess attive o quelle terminate
      * @return the my processes
      */
-    @RequestMapping(value = "myProcessInstances", method = RequestMethod.GET)
+    @RequestMapping(value = "/myProcessInstances", method = RequestMethod.GET)
     @ResponseBody
     @Timed
     public ResponseEntity<DataResponse> getMyProcessInstances(
