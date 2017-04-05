@@ -13,6 +13,7 @@ import org.activiti.engine.TaskService;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.repository.ProcessDefinitionResponse;
+import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -49,8 +50,6 @@ public class TestUtil {
             MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
     @Autowired
     FlowsProcessInstanceResource flowsProcessInstanceResource;
-    private String taskId;
-    private String processDefinition;
     @Autowired
     private FlowsProcessDefinitionResource flowsProcessDefinitionResource;
     @Autowired
@@ -59,6 +58,10 @@ public class TestUtil {
     private RuntimeService runtimeService;
     @Autowired
     private FlowsTaskResource flowsTaskResource;
+
+    private String taskId;
+    private String processDefinition;
+//    private ProcessInstanceResponse processInstance;
 
     /**
      * Convert an object to JSON byte array.
@@ -117,7 +120,7 @@ public class TestUtil {
         SecurityContextHolder.clearContext();
     }
 
-    public String mySetUp(String processDefinitionId) {
+    public ProcessInstanceResponse mySetUp(String processDefinitionId) {
         loginAdmin();
         DataResponse ret = (DataResponse) flowsProcessDefinitionResource.getAllProcessDefinitions();
 
@@ -132,18 +135,13 @@ public class TestUtil {
         req.setParameter("definitionId", processDefinition);
         ResponseEntity<Object> response = flowsTaskResource.completeTask(req);
         assertEquals(response.getStatusCode(), OK);
-//        Recupero il taskId
+        // Recupero il taskId
         taskId = taskService.createTaskQuery().singleResult().getId();
-        return processDefinition;
+        //Recupero la ProcessInstance
+//        processInstance = (ProcessInstanceResponse) response.getBody();
+        return (ProcessInstanceResponse) response.getBody();
     }
 
-    public String getTaskId() {
-        return taskId;
-    }
-
-    public String getProcessDefinition() {
-        return processDefinition;
-    }
 
     public void myTearDown() {
         //cancello le Process Instance creata all'inizio del test'
@@ -154,5 +152,17 @@ public class TestUtil {
             assertEquals(NO_CONTENT.value(), res.getStatus());
         }
         logout();
+    }
+
+    public String getProcessDefinition() {
+        return processDefinition;
+    }
+
+//    public ProcessInstanceResponse getProcessInstance() {
+//        return processInstance;
+//    }
+
+    public String getTaskId() {
+        return taskId;
     }
 }

@@ -33,19 +33,19 @@ import static org.springframework.http.HttpStatus.OK;
 public class FlowsProcessInstanceResourceTest {
 
     @Autowired
-    FlowsTaskResource flowsTaskResource;
+    private FlowsTaskResource flowsTaskResource;
     @Autowired
-    FlowsProcessInstanceResource flowsProcessInstanceResource;
+    private FlowsProcessInstanceResource flowsProcessInstanceResource;
     @Autowired
-    TestUtil util;
+    private TestUtil util;
     @Autowired
-    FlowsProcessDefinitionResource flowsProcessDefinitionResource;
-    private String processDefinitionKey;
+    private FlowsProcessDefinitionResource flowsProcessDefinitionResource;
+    private ProcessInstanceResponse processInstance;
 
 
     @Before
     public void setUp() throws Exception {
-        processDefinitionKey = util.mySetUp("missioni");
+        processInstance = util.mySetUp("missioni");
     }
 
     @After
@@ -111,7 +111,7 @@ public class FlowsProcessInstanceResourceTest {
         ArrayList<ProcessInstanceResponse> entities = (ArrayList<ProcessInstanceResponse>) ret.getBody();
         //vedo sia la Process Instance avviata da admin che quella avviata da User
         assertEquals(2, entities.size());
-        assertEquals(processDefinitionKey, entities.get(0).getProcessDefinitionId());
+        assertEquals(util.getProcessDefinition(), entities.get(0).getProcessDefinitionId());
         assertEquals(permessiFeriePD, entities.get(1).getProcessDefinitionId());
     }
 
@@ -120,6 +120,14 @@ public class FlowsProcessInstanceResourceTest {
     @Ignore
     public void testGetWorkflowVariables() throws Exception {
         //TODO: Test goes here...
+    }
+
+    @Test
+    public void testSuspend() throws Exception {
+
+        assertEquals(false, processInstance.isSuspended());
+        ProcessInstanceResponse response = flowsProcessInstanceResource.suspend(new MockHttpServletRequest(), processInstance.getId());
+        assertEquals(true, response.isSuspended());
     }
 
 
