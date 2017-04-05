@@ -1,17 +1,28 @@
 package it.cnr.si.flows.ng.resource;
 
-import com.codahale.metrics.annotation.Timed;
-import it.cnr.si.repository.UserRepository;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.service.UserService;
-import org.activiti.engine.*;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.activiti.engine.HistoryService;
+import org.activiti.engine.IdentityService;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Attachment;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.AttachmentResponse;
+import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResource;
+import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,15 +36,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import com.codahale.metrics.annotation.Timed;
+
+import it.cnr.si.security.AuthoritiesConstants;
 
 @Controller
 @RequestMapping("rest/processInstances")
@@ -48,16 +53,8 @@ public class FlowsProcessInstanceResource {
     IdentityService identityService;
     @Autowired
     ProcessInstanceResource processInstanceResource;
-    @Inject
-    private UserRepository userRepository;
-    @Inject
-    private UserService userService;
-    @Autowired
-    private RepositoryService repositoryService;
     @Autowired
     private RuntimeService runtimeService;
-    @Autowired
-    private ProcessEngine processEngine;
     @Autowired
     private TaskService taskService;
 
@@ -127,36 +124,12 @@ public class FlowsProcessInstanceResource {
         //        }
     }
 
-    @RequestMapping(value = "/processes", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
-    public ResponseEntity<Map<String, Object>> getProcesses(HttpServletRequest req,
-                                                            @RequestParam Map<String, String> params) {
-
-        return null;
-        //        CMISUser user = cmisService.getCMISUserFromSession(req);
-        //        BindingSession session = cmisService.getCurrentBindingSession(req);
-        //
-        //        try {
-        //            return new ResponseEntity<Map<String,Object>>(workflowService.getProcesses(user, session, params), HttpStatus.OK);
-        //        } catch (IOException e) {
-        //            LOGGER.error(e.getMessage(), e);
-        //            Map<String, Object> response = new HashMap<>();
-        //            response.put("error", e.getMessage());
-        //            return new ResponseEntity<Map<String,Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        //        } catch (AlfrescoResponseException e) {
-        //            LOGGER.error(e.getMessage() + " " + e.getResponse(), e);
-        //            return new ResponseEntity<Map<String,Object>>(e.getResponse(), HttpStatus.INTERNAL_SERVER_ERROR);
-        //        }
-    }
-
-
     // TODO refactor in path param
     @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured(AuthoritiesConstants.USER)
     @Timed
-    public ResponseEntity<Map<String, Object>> getProcessInstanceById(HttpServletRequest req,
-                                                                      @RequestParam("processInstanceId") String processInstanceId) {
+    public ResponseEntity<Map<String, Object>> getProcessInstanceById(@RequestParam("processInstanceId") String processInstanceId) {
         Map<String, Object> result = new HashMap<>();
         try {
             HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).includeProcessVariables().singleResult();
@@ -183,21 +156,29 @@ public class FlowsProcessInstanceResource {
     /**
      * Restituisce le Process Instances attive.
      *
-     * @param req the req
      * @return the process instances actives
      */
     @RequestMapping(value = "/active", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured({AuthoritiesConstants.USER, AuthoritiesConstants.ADMIN})
     @Timed
-    public ResponseEntity getActiveProcessInstances(HttpServletRequest req) {
+    public ResponseEntity<List<ProcessInstanceResponse>> getActiveProcessInstances() {
         List<ProcessInstance> processInstance = runtimeService.createProcessInstanceQuery().includeProcessVariables().list();
         return new ResponseEntity<>(restResponseFactory.createProcessInstanceResponseList(processInstance), HttpStatus.OK);
     }
 
-
-    private void validateData(Map<String, Object> data) {
-        // TODO throw exeption if invalid
+    /**
+     * Restituisce le Process Instances completate.
+     *
+     * @return the completed process instances
+     */
+    @RequestMapping(value = "/completed", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @Secured({AuthoritiesConstants.USER, AuthoritiesConstants.ADMIN})
+    @Timed
+    public ResponseEntity<List<HistoricProcessInstanceResponse>> getCompletedProcessInstances() {
+        List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery().finished().includeProcessVariables().list();
+        return new ResponseEntity<>(restResponseFactory.createHistoricProcessInstanceResponseList(processInstances), HttpStatus.OK);
     }
 
     @RequestMapping(value = "deleteProcessInstance", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -212,8 +193,4 @@ public class FlowsProcessInstanceResource {
         return response;
 
     }
-
-    /* ----------- */
-
-
 }
