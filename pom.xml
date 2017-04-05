@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -46,6 +47,7 @@
         <spring.security.version>4.1.1.RELEASE</spring.security.version>
         <spring.version>4.3.2.RELEASE</spring.version>
         <sprint.version>2.0.1</sprint.version>
+        <firmadigitale.version>1.6</firmadigitale.version>
         <start-class>it.cnr.si.FlowsApp</start-class>
     </properties>
 
@@ -142,6 +144,12 @@
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-core</artifactId>
             <version>1.13</version>
+        </dependency>
+
+        <dependency>
+            <groupId>it.cnr.commons</groupId>
+            <artifactId>firmadigitale</artifactId>
+            <version>${firmadigitale.version}</version>
         </dependency>
 
         <dependency>
@@ -298,13 +306,15 @@
                         <requireMavenVersion>
                             <message>You are running an older version of
                                 Maven.
-                                JHipster requires at least Maven 3.0</message>
+                                JHipster requires at least Maven
+                                3.0</message>
                             <version>[3.0.0,)</version>
                         </requireMavenVersion>
                         <requireJavaVersion>
                             <message>You are running an older version of
                                 Java.
-                                JHipster requires at least JDK ${java.version}</message>
+                                JHipster requires at least JDK
+                                ${java.version}</message>
                             <version>[${java.version}.0,)</version>
                         </requireJavaVersion>
                     </rules>
@@ -461,7 +471,8 @@
                     <logging>debug</logging>
                     <diffExcludeObjects>oauth_access_token,
                         oauth_approvals,
-                        oauth_client_details, oauth_client_token, oauth_code,
+                        oauth_client_details,
+                        oauth_client_token, oauth_code,
                         oauth_refresh_token</diffExcludeObjects>
                 </configuration>
             </plugin>

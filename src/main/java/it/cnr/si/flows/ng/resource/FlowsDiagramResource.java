@@ -1,15 +1,21 @@
 package it.cnr.si.flows.ng.resource;
 
-import com.codahale.metrics.annotation.Timed;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
+
 import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.GraphicInfo;
+import org.activiti.bpmn.model.SubProcess;
 import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.repository.ProcessDefinition;
+import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
-import org.activiti.image.ProcessDiagramGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
@@ -20,9 +26,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collections;
+import com.codahale.metrics.annotation.Timed;
+
+import it.cnr.si.flows.ng.service.FlowsProcessDiagramGenerator;
 
 
 @Controller
@@ -36,9 +42,7 @@ public class FlowsDiagramResource {
     @Autowired
     private TaskService taskService;
     @Autowired
-    private ProcessDiagramGenerator pdg;
-
-
+    private FlowsProcessDiagramGenerator pdg;
     @Autowired
     private ProcessEngineConfiguration processEngineConfiguration;
 
@@ -55,6 +59,7 @@ public class FlowsDiagramResource {
         return ResponseEntity.ok(new InputStreamResource(resourceAsStream));
     }
 
+
     @RequestMapping(value = "/diagram/processInstance/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
     @ResponseBody
     @Timed
@@ -63,21 +68,31 @@ public class FlowsDiagramResource {
             @PathVariable String id, String font)
                     throws IOException {
 
-        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
-                .processInstanceId(id).singleResult();
+        Execution execution = runtimeService.createExecutionQuery().executionId(id).singleResult();
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(execution.getProcessInstanceId()).singleResult();
         ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
 
+
         if (font == null || font.equals("") )
-            font = "Arial";
+            font = processEngineConfiguration.getActivityFontName();
 
         BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinition.getId());
+
+        for (FlowElement fe : bpmnModel.getProcesses().get(0).getFlowElements() ) {
+            GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(fe.getId());
+            if (fe instanceof SubProcess) {
+                graphicInfo.setExpanded(containsActiveTasks((SubProcess) fe, processInstance.getId()));
+            }
+        };
+
         InputStream resource = pdg.generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(processInstance.getId()),
-                                                   Collections.<String>emptyList(),
-                                                   font, font, font,
-                                                   processEngineConfiguration.getClassLoader(), 1.2);
+                Collections.<String>emptyList(),
+                font, font, font,
+                processEngineConfiguration.getClassLoader(), 1.0, false);
 
         return ResponseEntity.ok(new InputStreamResource(resource));
     }
+
 
     @RequestMapping(value = "/diagram/taskInstance/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
     @ResponseBody
@@ -88,6 +103,7 @@ public class FlowsDiagramResource {
                     throws IOException {
 
         Task task = taskService.createTaskQuery().taskId(id).singleResult();
+        Execution execution = runtimeService.createExecutionQuery().executionId(task.getExecutionId()).singleResult();
 
         return getDiagramForProcessInstance(task.getProcessInstanceId(), null);
 
@@ -108,4 +124,12 @@ public class FlowsDiagramResource {
 
     }
 
+
+    private boolean containsActiveTasks(SubProcess sp, String processInstanceId) {
+        for (FlowElement fe : sp.getFlowElements()) {
+            if (runtimeService.getActiveActivityIds(processInstanceId).contains(fe.getId()))
+                return true;
+        }
+        return false;
+    }
 }

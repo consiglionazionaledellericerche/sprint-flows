@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.activiti.engine.TaskService;
 import org.slf4j.Logger;
@@ -25,7 +24,6 @@ import it.cnr.si.security.SecurityUtils;
 @Service
 public class FlowsAttachmentService {
 
-    public static final String ATTACHMENT_PREFIX = "file_";
     public static final String USER_SUFFIX = "_username";
     public static final String STATO_SUFFIX = "_stato";
     public static final String FILENAME_SUFFIX = "_filename";
@@ -75,7 +73,7 @@ public class FlowsAttachmentService {
                 att.addStato(Stato.Protocollato);
             }
 
-            attachments.put(ATTACHMENT_PREFIX + fileName, att);
+            attachments.put(fileName, att);
         }
 
         return attachments;
