@@ -1,9 +1,9 @@
-(function() {
+(function () {
     'use strict';
 
     angular
-        .module('sprintApp')
-        .config(stateConfig);
+            .module('sprintApp')
+            .config(stateConfig);
 
     stateConfig.$inject = ['$stateProvider'];
 
@@ -22,10 +22,10 @@
                 }
             },
             resolve: {
-                mainTranslatePartialLoader: ['$translate', '$translatePartialLoader', function ($translate,$translatePartialLoader) {
-                    $translatePartialLoader.addPart('global');
-                    return $translate.refresh();
-                }]
+                mainTranslatePartialLoader: ['$translate', '$translatePartialLoader', function ($translate, $translatePartialLoader) {
+                        $translatePartialLoader.addPart('global');
+                        return $translate.refresh();
+                    }]
             }
         });
     }

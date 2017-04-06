@@ -59,10 +59,10 @@
 
         <div class="col-md-9" ng-show="activeContent == 'active'">
             <h3>
-        <span class="label label-primary">
-          <i class="glyphicon-inbox"></i>
-          Process Instances avviate da me ed ancora ATTIVE
-        </span>
+                <span class="label label-primary">
+                    <i class="glyphicon-inbox"></i>
+                    Process Instances avviate da me ed ancora ATTIVE
+                </span>
             </h3>
             <process-list
                     processes="vm.myProcessInstancesActive.data"
@@ -71,10 +71,10 @@
         </div>
         <div class="col-md-9" ng-show="activeContent == 'terminated'">
             <h3>
-        <span class="label label-info" ng-class="label-info">
-          <i class="glyphicon glyphicon-user"></i>
-          Process Instances avviate da me e TERMINATE
-        </span>
+                <span class="label label-info" ng-class="label - info">
+                    <i class="glyphicon glyphicon-user"></i>
+                    Process Instances avviate da me e TERMINATE
+                </span>
             </h3>
             <process-list
                     processes="vm.myProcessInstancesTerminated.data"
@@ -84,7 +84,6 @@
     </div>
 </div>
 <pre ng-show="development">
-  {{tasks | json}}
+  {{tasks| json}}
 </pre>
-<pre>{{vm | json}}</pre>
-</div>
+<pre>{{vm| json}}</pre>
