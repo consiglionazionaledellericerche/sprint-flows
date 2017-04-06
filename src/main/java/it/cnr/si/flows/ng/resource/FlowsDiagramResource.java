@@ -85,7 +85,6 @@ public class FlowsDiagramResource {
                     graphicInfo.setExpanded(containsActiveTasks((SubProcess) fe, processInstance.getId()));
                 }
             }
-            ;
             resource = pdg.generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(processInstance.getId()),
                                            Collections.<String>emptyList(),
                                            font, font, font,
@@ -106,9 +105,7 @@ public class FlowsDiagramResource {
                     graphicInfo.setExpanded(containsActiveTasks((SubProcess) fe, hpi.getId()));
                 }
             }
-            ;
-            resource = pdg.generateDiagram(bpmnModel, "png", Collections.singletonList(endActivity.getActivityId()),
-                                           Collections.<String>emptyList(),
+            resource = pdg.generateDiagram(bpmnModel, "png",
                                            font, font, font,
                                            processEngineConfiguration.getClassLoader(), 1.2);
         }
