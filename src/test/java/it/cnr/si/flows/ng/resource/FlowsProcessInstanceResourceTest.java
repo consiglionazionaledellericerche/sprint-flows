@@ -105,7 +105,7 @@ public class FlowsProcessInstanceResourceTest {
 
         //Verifico che Admin veda entrambe le Process Instances create
         util.loginAdmin();
-        ResponseEntity ret = flowsProcessInstanceResource.getActiveProcessInstances(new MockHttpServletRequest());
+        ResponseEntity ret = flowsProcessInstanceResource.getActiveProcessInstances();
         assertEquals(HttpStatus.OK, ret.getStatusCode());
         ArrayList<ProcessInstanceResponse> entities = (ArrayList<ProcessInstanceResponse>) ret.getBody();
         //vedo sia la Process Instance avviata da admin che quella avviata da User
