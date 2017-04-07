@@ -1,0 +1,24 @@
+version: '2'
+services:
+    sprint-flows:
+        image: sprint-flows-test
+        external_links:
+            - sprint-flows-postgresql:postgresql
+        environment:
+            - SPRING_PROFILES_ACTIVE=cnr,swagger,test
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/activiti
+            - SPRING_DATASOURCE_USERNAME=activiti
+            - SPRING_DATASOURCE_PASSWORD=acitvitipw
+            - JHIPSTER_SLEEP=10 # gives time for the database to boot before the application
+        ports:
+            - 8080:8080
+    sprint-flows-postgresql:
+        container_name: sprint-flows-postgresql
+        image: postgres:9.5.3
+        # volumes:
+        #     - ~/volumes/jhipster/sprint/postgresql/:/var/lib/postgresql/
+        environment:
+            - POSTGRES_USER=activiti
+            - POSTGRES_PASSWORD=acitvitipw
+        ports:
+            - 54327:5432
