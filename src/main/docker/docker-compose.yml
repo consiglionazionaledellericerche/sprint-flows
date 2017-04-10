@@ -1,9 +1,9 @@
 version: '2'
 services:
-    sprint-flows:
-        image: sprint-flows-test
+    sprint-flows-test:
+        image: docker.si.cnr.it/sprint-flows-test
         external_links:
-            - sprint-flows-postgresql:postgresql
+            - sprint-flows-pg:postgresql
         environment:
             - SPRING_PROFILES_ACTIVE=cnr,swagger,test
             - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/activiti
@@ -12,9 +12,9 @@ services:
             - JHIPSTER_SLEEP=10 # gives time for the database to boot before the application
         ports:
             - 8080:8080
-    sprint-flows-postgresql:
-        container_name: sprint-flows-postgresql
-        image: postgres:9.5.3
+    sprint-flows-pg:
+        container_name: sprint-flows-pg
+        image: postgres:9.6.1
         # volumes:
         #     - ~/volumes/jhipster/sprint/postgresql/:/var/lib/postgresql/
         environment:
