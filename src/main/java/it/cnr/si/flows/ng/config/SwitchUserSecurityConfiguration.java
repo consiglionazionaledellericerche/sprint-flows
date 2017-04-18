@@ -14,11 +14,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
 import org.springframework.security.ldap.search.LdapUserSearch;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsManager;
-import org.springframework.security.ldap.userdetails.LdapUserDetailsService;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
 
 import it.cnr.si.config.ldap.CustomAuthoritiesPopulator;
+import it.cnr.si.security.FlowsLdapUserDetailsService;
+import it.cnr.si.service.MembershipService;
 
 
 @Configuration
@@ -46,9 +47,9 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
         return new LdapUserDetailsManager(ctx);
     }
 
-    @Bean public LdapUserDetailsService getLdapUserDetailsService(LdapUserSearch search) {
+    @Bean public FlowsLdapUserDetailsService getLdapUserDetailsService(LdapUserSearch search, MembershipService membershipService) {
         CustomAuthoritiesPopulator cap = new CustomAuthoritiesPopulator();
-        return new LdapUserDetailsService(search, cap);
+        return new FlowsLdapUserDetailsService(search, cap, membershipService);
     }
 
 
@@ -84,8 +85,4 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
         filter.setTargetUrl("/");
         return filter;
     }
-
-
-
-
 }

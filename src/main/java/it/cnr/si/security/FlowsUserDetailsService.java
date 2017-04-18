@@ -1,8 +1,12 @@
 package it.cnr.si.security;
 
-import it.cnr.si.config.ldap.LdapUserMapper;
-import it.cnr.si.domain.User;
-import it.cnr.si.repository.UserRepository;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Primary;
@@ -10,15 +14,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.ldap.userdetails.LdapUserDetailsImpl;
-import org.springframework.security.ldap.userdetails.LdapUserDetailsManager;
-import org.springframework.security.ldap.userdetails.LdapUserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
-import java.util.*;
-import java.util.stream.Collectors;
+import it.cnr.si.domain.User;
+import it.cnr.si.repository.UserRepository;
+import it.cnr.si.service.MembershipService;
 
 /**
  * Authenticate a user from the database.
@@ -32,7 +33,9 @@ public class FlowsUserDetailsService extends UserDetailsService {
     @Inject
     private UserRepository userRepository;
     @Inject
-    private LdapUserDetailsService ldapUserDetailsService;
+    private FlowsLdapUserDetailsService ldapUserDetailsService;
+    @Inject
+    private MembershipService membershipService;
 
 
 
@@ -50,6 +53,14 @@ public class FlowsUserDetailsService extends UserDetailsService {
                 List<GrantedAuthority> grantedAuthorities = user.getAuthorities().stream()
                         .map(authority -> new SimpleGrantedAuthority(authority.getName()))
                     .collect(Collectors.toList());
+
+                verificare che qui non aggiungo le cose due volte
+                
+                grantedAuthorities.addAll(
+                        membershipService.getGroupsForUser(login).stream()
+                        .map(groupname -> new SimpleGrantedAuthority(groupname))
+                        .collect(Collectors.toList()));
+
                 return new org.springframework.security.core.userdetails.User(lowercaseLogin,
                     user.getPassword(),
                     grantedAuthorities);
