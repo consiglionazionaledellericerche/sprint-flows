@@ -1,41 +1,34 @@
 package it.cnr.si.web.rest;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
+import it.cnr.si.SprintApp;
+import it.cnr.si.domain.Cnrgroup;
+import it.cnr.si.flows.ng.TestUtil;
+import it.cnr.si.repository.CnrgroupRepository;
+import it.cnr.si.service.CnrgroupService;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import static org.hamcrest.Matchers.hasItem;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import it.cnr.si.FlowsApp;
-import it.cnr.si.domain.Cnrgroup;
-import it.cnr.si.flows.ng.TestUtil;
-import it.cnr.si.repository.CnrgroupRepository;
-import it.cnr.si.service.CnrgroupService;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Test class for the CnrgroupResource REST controller.
@@ -43,7 +36,7 @@ import it.cnr.si.service.CnrgroupService;
  * @see CnrgroupResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = SprintApp.class)
 public class CnrgroupResourceIntTest {
     private static final String DEFAULT_NAME = "AAAAA";
     private static final String UPDATED_NAME = "BBBBB";
@@ -69,6 +62,16 @@ public class CnrgroupResourceIntTest {
 
     private Cnrgroup cnrgroup;
 
+    @PostConstruct
+    public void setup() {
+        MockitoAnnotations.initMocks(this);
+        CnrgroupResource cnrgroupResource = new CnrgroupResource();
+        ReflectionTestUtils.setField(cnrgroupResource, "cnrgroupService", cnrgroupService);
+        this.restCnrgroupMockMvc = MockMvcBuilders.standaloneSetup(cnrgroupResource)
+            .setCustomArgumentResolvers(pageableArgumentResolver)
+            .setMessageConverters(jacksonMessageConverter).build();
+    }
+
     /**
      * Create an entity for this test.
      *
@@ -81,16 +84,6 @@ public class CnrgroupResourceIntTest {
                 .name(DEFAULT_NAME)
                 .displayName(DEFAULT_DISPLAY_NAME);
         return cnrgroup;
-    }
-
-    @PostConstruct
-    public void setup() {
-        MockitoAnnotations.initMocks(this);
-        CnrgroupResource cnrgroupResource = new CnrgroupResource();
-        ReflectionTestUtils.setField(cnrgroupResource, "cnrgroupService", cnrgroupService);
-        this.restCnrgroupMockMvc = MockMvcBuilders.standaloneSetup(cnrgroupResource)
-                .setCustomArgumentResolvers(pageableArgumentResolver)
-                .setMessageConverters(jacksonMessageConverter).build();
     }
 
     @Before

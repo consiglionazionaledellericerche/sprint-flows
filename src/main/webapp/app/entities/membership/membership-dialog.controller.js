@@ -3,17 +3,16 @@
 
     angular
         .module('sprintApp')
-        .controller('CnrgroupDialogController', CnrgroupDialogController);
+        .controller('MembershipDialogController', MembershipDialogController);
 
-    CnrgroupDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'entity', 'Cnrgroup'];
+    MembershipDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'entity', 'Membership'];
 
-    function CnrgroupDialogController ($timeout, $scope, $stateParams, $uibModalInstance, entity, Cnrgroup) {
+    function MembershipDialogController ($timeout, $scope, $stateParams, $uibModalInstance, entity, Membership) {
         var vm = this;
 
-        vm.cnrgroup = entity;
+        vm.membership = entity;
         vm.clear = clear;
         vm.save = save;
-        vm.cnrgroups = Cnrgroup.query();
 
         $timeout(function (){
             angular.element('.form-group:eq(1)>input').focus();
@@ -25,15 +24,15 @@
 
         function save () {
             vm.isSaving = true;
-            if (vm.cnrgroup.id !== null) {
-                Cnrgroup.update(vm.cnrgroup, onSaveSuccess, onSaveError);
+            if (vm.membership.id !== null) {
+                Membership.update(vm.membership, onSaveSuccess, onSaveError);
             } else {
-                Cnrgroup.save(vm.cnrgroup, onSaveSuccess, onSaveError);
+                Membership.save(vm.membership, onSaveSuccess, onSaveError);
             }
         }
 
         function onSaveSuccess (result) {
-            $scope.$emit('sprintApp:cnrgroupUpdate', result);
+            $scope.$emit('sprintApp:membershipUpdate', result);
             $uibModalInstance.close(result);
             vm.isSaving = false;
         }

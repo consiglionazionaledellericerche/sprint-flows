@@ -46,10 +46,6 @@
             <label translate="sprintApp.cnrgroup.parents" for="field_parents">Parents</label>
             <select class="form-control" id="field_parents" multiple name="parents" ng-model="vm.cnrgroup.parents" ng-options="cnrgroup as cnrgroup.name for cnrgroup in vm.cnrgroups track by cnrgroup.id"></select>
         </div>
-        <div class="form-group">
-            <label translate="sprintApp.cnrgroup.memberUsers" for="field_memberUsers">Member Users</label>
-            <select class="form-control" id="field_memberUsers" multiple name="memberUsers" ng-model="vm.cnrgroup.memberUsers" ng-options="user as user.login for user in vm.users track by user.id"></select>
-        </div>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="vm.clear()">

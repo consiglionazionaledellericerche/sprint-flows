@@ -40,13 +40,6 @@ public class Cnrgroup implements Serializable {
                inverseJoinColumns = @JoinColumn(name="parents_id", referencedColumnName="ID"))
     private Set<Cnrgroup> parents = new HashSet<>();
 
-    @ManyToMany
-    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    @JoinTable(name = "cnrgroup_member_users",
-               joinColumns = @JoinColumn(name="cnrgroups_id", referencedColumnName="ID"),
-               inverseJoinColumns = @JoinColumn(name="member_users_id", referencedColumnName="ID"))
-    private Set<User> memberUsers = new HashSet<>();
-
     public Long getId() {
         return id;
     }
@@ -104,29 +97,6 @@ public class Cnrgroup implements Serializable {
 
     public void setParents(Set<Cnrgroup> cnrgroups) {
         this.parents = cnrgroups;
-    }
-
-    public Set<User> getMemberUsers() {
-        return memberUsers;
-    }
-
-    public Cnrgroup memberUsers(Set<User> users) {
-        this.memberUsers = users;
-        return this;
-    }
-
-    public Cnrgroup addUser(User user) {
-        memberUsers.add(user);
-        return this;
-    }
-
-    public Cnrgroup removeUser(User user) {
-        memberUsers.remove(user);
-        return this;
-    }
-
-    public void setMemberUsers(Set<User> users) {
-        this.memberUsers = users;
     }
 
     @Override
