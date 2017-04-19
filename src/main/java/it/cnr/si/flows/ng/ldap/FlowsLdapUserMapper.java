@@ -30,33 +30,13 @@ public class FlowsLdapUserMapper extends LdapUserMapper {
 
     @Override
     public UserDetails mapUserFromContext(DirContextOperations dirContextOperations, String username, Collection<? extends GrantedAuthority> grantedAuthorities) {
+        CNRUser user = (CNRUser) super.mapUserFromContext(dirContextOperations, username, grantedAuthorities);
 
-        String matricola = dirContextOperations.getStringAttribute(MATRICOLA);
-        String email = dirContextOperations.getStringAttribute(MAIL);
-
-        String departmentNumber = dirContextOperations.getStringAttribute("departmentNumber");
-        String lastName = dirContextOperations.getStringAttribute("cnrcognome");
-        String firstName = dirContextOperations.getStringAttribute("cnrnome");
-
-        List<GrantedAuthority> fullGrantedAuthorities = membershipService.getGroupsForUser(username).stream()
-                .map(g-> new SimpleGrantedAuthority(g))
-                .collect(Collectors.toList());
+        List<GrantedAuthority> fullGrantedAuthorities = membershipService.getAllAdditionalAuthoritiesForUser(username);
         fullGrantedAuthorities.addAll(grantedAuthorities);
-        log.info("user {}, matricola {}, email {}, groups {}", username, matricola, email, fullGrantedAuthorities.stream().map(s -> s.getAuthority()).collect(Collectors.joining(", ")));
+        log.info("Full Groups, including from local membership {}", fullGrantedAuthorities);
 
-
-
-        CNRUser user = new CNRUser();
-
-        user.setUsername(username);
-        user.setMatricola(matricola);
         user.setAuthorities(fullGrantedAuthorities);
-        user.setEmail(email);
-
-        user.setDepartmentNumber(departmentNumber);
-        user.setLastName(lastName);
-        user.setFirstName(firstName);
-
         return user;
     }
 }

@@ -141,7 +141,9 @@ public class FlowsProcessInstanceResource {
                     .list();
 
             result.put("history", restResponseFactory.createHistoricActivityInstanceResponseList(historyQuery));
-        } catch (Exception e){
+            
+            
+        } catch (Exception e) {
             LOGGER.error("Errore: ", e);
         }
         return new ResponseEntity<>(result, HttpStatus.OK);

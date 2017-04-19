@@ -14,6 +14,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.ldap.userdetails.LdapUserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +34,7 @@ public class FlowsUserDetailsService extends UserDetailsService {
     @Inject
     private UserRepository userRepository;
     @Inject
-    private FlowsLdapUserDetailsService ldapUserDetailsService;
+    private LdapUserDetailsService ldapUserDetailsService;
     @Inject
     private MembershipService membershipService;
 
@@ -42,38 +43,34 @@ public class FlowsUserDetailsService extends UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(final String login) {
+        UserDetails userDetails;
+
         log.debug("Loading User {}", login);
         String lowercaseLogin = login.toLowerCase(Locale.ENGLISH);
         Optional<User> userFromDatabase = userRepository.findOneByLogin(lowercaseLogin);
-        if (userFromDatabase.isPresent())
-            return userFromDatabase.map(user -> {
+        if (userFromDatabase.isPresent()) {
+            userDetails = userFromDatabase.map(user -> {
                 if (!user.getActivated()) {
                     throw new UserNotActivatedException("User " + lowercaseLogin + " was not activated");
                 }
                 List<GrantedAuthority> grantedAuthorities = user.getAuthorities().stream()
                         .map(authority -> new SimpleGrantedAuthority(authority.getName()))
-                    .collect(Collectors.toList());
-
-                verificare che qui non aggiungo le cose due volte
-                
-                grantedAuthorities.addAll(
-                        membershipService.getGroupsForUser(login).stream()
-                        .map(groupname -> new SimpleGrantedAuthority(groupname))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toList());
+                grantedAuthorities.addAll(membershipService.getAllAdditionalAuthoritiesForUser(lowercaseLogin));
 
                 return new org.springframework.security.core.userdetails.User(lowercaseLogin,
-                    user.getPassword(),
-                    grantedAuthorities);
+                        user.getPassword(),
+                        grantedAuthorities);
             }).get();
-        else {
-
-
-            UserDetails userFromLdap = ldapUserDetailsService.loadUserByUsername(login);
-
-            if (userFromLdap != null)
-                return userFromLdap;
-            else throw new UsernameNotFoundException("User " + lowercaseLogin + " was not found in the " +
-                    "database or LDAP");
+        } else {
+            userDetails = ldapUserDetailsService.loadUserByUsername(login);
         }
+
+        if (userDetails == null)
+            throw new UsernameNotFoundException("User " + lowercaseLogin + " was not found in the " +
+                    "database or LDAP");
+        else
+            return userDetails;
     }
+
 }

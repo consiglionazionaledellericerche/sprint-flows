@@ -6,13 +6,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Service Implementation for managing Membership.
@@ -76,5 +81,18 @@ public class MembershipService {
 
     public Set<String> getGroupsForUser(String username) {
         return membershipRepository.findGroupsForUsername(username);
+    }
+
+    public List<GrantedAuthority> getAllAdditionalAuthoritiesForUser(String username) {
+        return Stream.concat(getGroupsForUser(username).stream(), getACEGroupsForUser(username).stream())
+                .distinct()
+                .map(g -> g.startsWith("ROLE_") ? g : "ROLE_"+g)
+                .map(g -> new SimpleGrantedAuthority(g))
+                .collect(Collectors.toList());
+    }
+
+    private Set<String> getACEGroupsForUser(String username) {
+        // TODO Qui inseriremo i gruppi provenienti da ACE
+        return new HashSet<String>();
     }
 }
