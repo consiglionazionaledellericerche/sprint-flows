@@ -22,6 +22,7 @@
                         vm.data.entity = utils.refactoringVariables([response.data.entity])[0];
                         vm.data.history = response.data.history;
                         vm.data.attachments = response.data.attachments;
+                        vm.data.identityLinks = response.data.identityLinks;
                         vm.diagramUrl = '/rest/diagram/processInstance/'+ vm.data.entity.id;
                     });
 
