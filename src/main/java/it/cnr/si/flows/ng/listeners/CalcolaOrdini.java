@@ -1,9 +1,7 @@
 package it.cnr.si.flows.ng.listeners;
 
 import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.DelegateTask;
 import org.activiti.engine.delegate.ExecutionListener;
-import org.activiti.engine.delegate.TaskListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +17,7 @@ public class CalcolaOrdini implements ExecutionListener {
 		Integer currentValue = (Integer) execution.getVariable("valore1");
 		Integer nextValue = new Integer(currentValue.intValue() - 1);
 		LOGGER.info("valore corrente: " + nextValue);
-		execution.setVariable("valore1", nextValue);	
+		execution.setVariable("valore1", nextValue);
 	}
 
 }

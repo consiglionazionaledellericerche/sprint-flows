@@ -10,7 +10,6 @@ import java.util.List;
 /**
  * Spring Data JPA repository for the Cnrgroup entity.
  */
-@SuppressWarnings("unused")
 public interface CnrgroupRepository extends JpaRepository<Cnrgroup,Long> {
 
     @Query("select distinct cnrgroup from Cnrgroup cnrgroup left join fetch cnrgroup.parents")

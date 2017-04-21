@@ -1,12 +1,21 @@
 package it.cnr.si.flows.ng.config;
 
-import com.zaxxer.hikari.HikariDataSource;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import it.cnr.si.flows.ng.listeners.ActivitiLoggingEventListener;
-import it.cnr.si.flows.ng.listeners.FlowsVisibilitySetter;
-import it.cnr.si.flows.ng.listeners.TestExecutionListener;
+import javax.annotation.PostConstruct;
 
-import org.activiti.engine.*;
+import org.activiti.engine.FormService;
+import org.activiti.engine.HistoryService;
+import org.activiti.engine.IdentityService;
+import org.activiti.engine.ManagementService;
+import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.ProcessEngineConfiguration;
+import org.activiti.engine.RepositoryService;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.repository.DeploymentBuilder;
@@ -25,14 +34,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import javax.annotation.PostConstruct;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.zaxxer.hikari.HikariDataSource;
 
-
+import it.cnr.si.flows.ng.listeners.ActivitiLoggingEventListener;
+import it.cnr.si.flows.ng.listeners.FlowsVisibilitySetter;
+import it.cnr.si.flows.ng.listeners.TestExecutionListener;
 
 @Configuration
 public class FlowsConfigurations {
@@ -49,6 +55,7 @@ public class FlowsConfigurations {
     @Autowired
     private ApplicationContext appContext;
 
+    @SuppressWarnings("serial")
     @Bean
     public SpringProcessEngineConfiguration getProcessEngineConfiguration(
             ActivitiLoggingEventListener loggingListener) {
@@ -97,33 +104,12 @@ public class FlowsConfigurations {
         factory.setProcessEngineConfiguration(conf);
 
         return factory.getObject();
-        //        return processEngineConfiguration.buildProcessEngine();
     }
-
-    //    @Bean(name= {"processEngine", "engine"})
-    //    public ProcessEngine processEngine throws Exception {
-    //        SpringProcessEngineConfiguration conf = new SpringProcessEngineConfiguration();
-    //
-    //        conf.setDataSource(dataSource);
-    //        conf.setTransactionManager(transactionManager);
-    //        conf.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
-    //        conf.setEventListeners(new ArrayList<ActivitiEventListener>() {{
-    //            add(new ActivitiLoggingEventListener());
-    //            add(new FlowsVisibilitySetter());
-    //        }});
-    //
-    //        conf.setHistoryLevel(HistoryLevel.AUDIT);
-    //
-    //        conf.getApplicationContext();
-    //        return conf.buildProcessEngine();
-    //    }
 
     @Bean
     public RepositoryService getRepositoryService(ProcessEngine processEngine) throws Exception {
         return processEngine.getRepositoryService();
-
     }
-
 
     @Bean
     public RuntimeService getRuntimeService(ProcessEngine processEngine) throws Exception {

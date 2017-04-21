@@ -3,7 +3,6 @@ package it.cnr.si.flows.ng.resource;
 import java.util.List;
 
 import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
@@ -24,9 +23,6 @@ import it.cnr.si.security.AuthoritiesConstants;
 @RestController
 @RequestMapping("rest/processdefinitions")
 public class FlowsProcessDefinitionResource {
-
-    @Autowired
-    private RuntimeService runtimeService;
 
     @Autowired
     private RepositoryService repositoryService;

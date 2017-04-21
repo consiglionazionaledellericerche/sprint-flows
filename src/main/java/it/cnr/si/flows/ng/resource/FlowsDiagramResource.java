@@ -1,17 +1,20 @@
 package it.cnr.si.flows.ng.resource;
 
-import com.codahale.metrics.annotation.Timed;
-import it.cnr.si.flows.ng.service.FlowsProcessDiagramGenerator;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
+
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.GraphicInfo;
 import org.activiti.bpmn.model.SubProcess;
-import org.activiti.engine.*;
-import org.activiti.engine.history.HistoricActivityInstance;
-import org.activiti.engine.history.HistoricActivityInstanceQuery;
+import org.activiti.engine.HistoryService;
+import org.activiti.engine.ProcessEngineConfiguration;
+import org.activiti.engine.RepositoryService;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
-import org.activiti.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
@@ -25,11 +28,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collections;
+import com.codahale.metrics.annotation.Timed;
 
-import static org.activiti.bpmn.constants.BpmnXMLConstants.ELEMENT_EVENT_END;
+import it.cnr.si.flows.ng.service.FlowsProcessDiagramGenerator;
 
 
 @Controller
@@ -94,11 +95,13 @@ public class FlowsDiagramResource {
             HistoricProcessInstance hpi = historicProcessInstanceQuery.processInstanceId(id).singleResult();
 
             BpmnModel bpmnModel = repositoryService.getBpmnModel(hpi.getProcessDefinitionId());
-            HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
-            HistoricActivityInstance endActivity = query
-                    .activityType(ELEMENT_EVENT_END)
-                    .processInstanceId(((HistoricProcessInstanceEntity) hpi).getProcessInstanceId())
-                    .singleResult();
+            // per cerchiare l'endEvent con cui un processo e' eventualmente terminato
+//            HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
+//            HistoricActivityInstance endActivity = query
+//                    .activityType(ELEMENT_EVENT_END)
+//                    .processInstanceId(((HistoricProcessInstanceEntity) hpi).getProcessInstanceId())
+//                    .singleResult();
+
             for (FlowElement fe : bpmnModel.getProcesses().get(0).getFlowElements()) {
                 GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(fe.getId());
                 if (fe instanceof SubProcess) {

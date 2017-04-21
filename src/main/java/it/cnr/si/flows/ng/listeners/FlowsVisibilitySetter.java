@@ -1,4 +1,4 @@
-package it.cnr.si.flows.ng.listeners;
+    package it.cnr.si.flows.ng.listeners;
 
 import java.util.List;
 import java.util.Map;
@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 public class FlowsVisibilitySetter implements ActivitiEventListener {
 
+    @SuppressWarnings("unused")
     private final Logger log = LoggerFactory.getLogger(FlowsVisibilitySetter.class);
 
     @Override
@@ -22,7 +23,7 @@ public class FlowsVisibilitySetter implements ActivitiEventListener {
 
             String processDefinitionId = null;
             String currentTaskKey = null;
-            String eventType;
+            // String eventType = null;
 
             // TODO default e finire
 

@@ -29,6 +29,7 @@ public class FirmaTask implements ExecutionListener {
 
         String nomeVariabileFile = (String) nomeFileDaFirmare.getValue(execution);
 
+        // TODO: validare presenza di queste tre variabili
         String username = (String) execution.getVariable("username");
         String password = (String) execution.getVariable("password");
         String otp = (String) execution.getVariable("otp");

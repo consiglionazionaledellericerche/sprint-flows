@@ -10,7 +10,6 @@ import java.util.List;
 /**
  * Spring Data JPA repository for the Cnrauthority entity.
  */
-@SuppressWarnings("unused")
 public interface CnrauthorityRepository extends JpaRepository<Cnrauthority,Long> {
 
     @Query("select distinct cnrauthority from Cnrauthority cnrauthority left join fetch cnrauthority.cnrauthorityparents")

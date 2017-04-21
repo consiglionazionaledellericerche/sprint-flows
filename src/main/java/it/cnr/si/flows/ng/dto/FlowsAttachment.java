@@ -30,6 +30,7 @@ public class FlowsAttachment implements Serializable {
 
     private static final long serialVersionUID = -1794306306586001492L;
 
+    @SuppressWarnings("unused")
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsAttachment.class);
 
     public static final String PUBBLICAZIONE_FLAG = "Pubblicazione";
@@ -133,9 +134,9 @@ private String name;
     public void setAzione(Azione a) {
         this.getMetadati().put("azione", a);
     }
-    
+
     public void setMetadato(String nome, Object valore) {
     	getMetadati().put(nome, valore);
     }
-    
+
 }

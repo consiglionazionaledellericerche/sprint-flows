@@ -1,9 +1,7 @@
 package it.cnr.si.flows.ng.listeners;
 
 import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.DelegateTask;
 import org.activiti.engine.delegate.ExecutionListener;
-import org.activiti.engine.delegate.TaskListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -32,21 +32,6 @@ import it.cnr.si.config.DefaultProfileUtil;
 import it.cnr.si.config.JHipsterProperties;
 
 @ComponentScan
-(
-//        basePackages = "it.cnr.si"
-        //(// ci assicuriamo che activiti rest non carichi le sue classi (in conflitto)
-        //
-//        includeFilters = {@Filter(
-//                type = FilterType.ASSIGNABLE_TYPE,
-//                classes = {RestResponseFactory.class}
-//                )},
-//
-//        excludeFilters = {@ComponentScan.Filter(
-//                type = FilterType.ASPECTJ,
-//                pattern = "org.activiti.rest.service.api.runtime.*"
-//                )}
-        //
-        )
 @SpringBootApplication
 @EnableAutoConfiguration(exclude = {
         MetricFilterAutoConfiguration.class,

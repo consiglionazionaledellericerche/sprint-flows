@@ -1,14 +1,30 @@
 package it.cnr.si.flows.ng.resource;
 
-import com.codahale.metrics.annotation.Timed;
-import it.cnr.si.flows.ng.service.CounterService;
-import it.cnr.si.flows.ng.service.FlowsAttachmentService;
-import it.cnr.si.repository.UserRepository;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.security.SecurityUtils;
-import it.cnr.si.service.SecurityService;
-import it.cnr.si.service.UserService;
-import org.activiti.engine.*;
+import static it.cnr.si.flows.ng.utils.Utils.ASC;
+import static it.cnr.si.flows.ng.utils.Utils.DESC;
+import static it.cnr.si.flows.ng.utils.Utils.isEmpty;
+import static it.cnr.si.flows.ng.utils.Utils.isNotEmpty;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.activiti.engine.HistoryService;
+import org.activiti.engine.RepositoryService;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.impl.util.json.JSONArray;
@@ -32,19 +48,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
+import com.codahale.metrics.annotation.Timed;
 
-import static it.cnr.si.flows.ng.utils.Utils.*;
+import it.cnr.si.flows.ng.service.CounterService;
+import it.cnr.si.flows.ng.service.FlowsAttachmentService;
+import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.security.SecurityUtils;
+import it.cnr.si.service.UserService;
 
 
 /**
@@ -56,31 +73,21 @@ import static it.cnr.si.flows.ng.utils.Utils.*;
 public class FlowsTaskResource {
 
     public static final String TASK_EXECUTOR = "esecutore";
-    @Deprecated
-    private static final String ERRORE_PERMESSI_TASK = "ERRORE PERMESSI TASK";
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsTaskResource.class);
     private static final String ALL_PROCESS_INSTANCES = "all";
     @Autowired
     protected RestResponseFactory restResponseFactory;
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     @Inject
-    private UserRepository userRepository;
-    @Inject
     private UserService userService;
     @Inject
     private CounterService counterService;
-    @Inject
-    private SecurityService securityService;
     @Inject
     private RepositoryService repositoryService;
     @Autowired
     private RuntimeService runtimeService;
     @Autowired
-    private IdentityService identityService;
-    @Autowired
     private TaskService taskService;
-    @Autowired
-    private FormService formService;
     @Autowired
     private FlowsAttachmentService attachmentService;
     @Autowired
@@ -448,7 +455,7 @@ public class FlowsTaskResource {
         result.put("totalItems", totalItems);
 
         List<Task> taskRaw = taskQuery.includeProcessVariables().listPage(firstResult, maxResults);
-        List tasks = restResponseFactory.createTaskResponseList(taskRaw);
+        List<TaskResponse> tasks = restResponseFactory.createTaskResponseList(taskRaw);
         result.put("tasks", tasks);
         return ResponseEntity.ok(result);
     }
