@@ -9,6 +9,8 @@ import it.cnr.si.security.SecurityUtils;
 import it.cnr.si.service.SecurityService;
 import it.cnr.si.service.UserService;
 import org.activiti.engine.*;
+import org.activiti.engine.history.HistoricIdentityLink;
+import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.impl.util.json.JSONArray;
 import org.activiti.engine.impl.util.json.JSONObject;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -53,13 +55,14 @@ import static it.cnr.si.flows.ng.utils.Utils.*;
 @RequestMapping("rest/tasks")
 public class FlowsTaskResource {
 
+    public static final String TASK_EXECUTOR = "esecutore";
     @Deprecated
     private static final String ERRORE_PERMESSI_TASK = "ERRORE PERMESSI TASK";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsTaskResource.class);
     private static final String ALL_PROCESS_INSTANCES = "all";
     @Autowired
     protected RestResponseFactory restResponseFactory;
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     @Inject
     private UserRepository userRepository;
     @Inject
@@ -80,7 +83,8 @@ public class FlowsTaskResource {
     private FormService formService;
     @Autowired
     private FlowsAttachmentService attachmentService;
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    @Autowired
+    private HistoryService historyService;
 
 
     public static long extractId(String id) throws IllegalArgumentException {
@@ -272,33 +276,20 @@ public class FlowsTaskResource {
         }
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/{id}/{user}", method = RequestMethod.PUT)
     @Timed
     public ResponseEntity<Map<String, Object>> assignTask(
             HttpServletRequest req,
             @PathVariable("id") String id,
-            @RequestBody Map<String, Object> data) {
+            @PathVariable("user") String user) {
 
-        return null;
-        //        CMISUser user = cmisService.getCMISUserFromSession(req);
-        //        BindingSession session = cmisService.getCurrentBindingSession(req);
-        //        String cm_owner = (String) data.get("cm_owner");
-        //        long taskId = Utils.extractId(id);
-        //
-        //        LOGGER.info("Setting owner of task "+ id +" to "+ cm_owner);
-        //
-        //        try {
-        //            Map<String, Object> taskInstance = flowsTaskService.setTaskOwner(user, session, taskId, data);
-        //
-        //            return new ResponseEntity<Map<String,Object>>(taskInstance, HttpStatus.OK);
-        //        } catch (PermissionException e) {
-        //            LOGGER.error(e.getMessage(), e);
-        //            return new ResponseEntity<Map<String,Object>>(HttpStatus.FORBIDDEN);
-        //        } catch (IOException e) {
-        //            Map<String, Object> response = new HashMap<>();
-        //            response.put("error", e.getMessage());
-        //            return new ResponseEntity<Map<String,Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        //        }
+//    todo: test
+//    todo: chi può asegnare un task?
+//        String username = SecurityUtils.getCurrentUserLogin();
+
+        taskService.setAssignee(id, user);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     // TODO returns ResponseEntity<Map<String, Object>>
@@ -361,10 +352,13 @@ public class FlowsTaskResource {
                 return ResponseEntity.badRequest().body("Fornire almeno un taskId o un definitionId");
 
             if ( isNotEmpty(taskId) ) {
+                // aggiungo l'identityLink che indica l'utente che esegue il task
+                taskService.addUserIdentityLink(taskId, username, TASK_EXECUTOR);
+
                 taskService.setVariablesLocal(taskId, data);
                 taskService.complete(taskId, data);
-                return new ResponseEntity<Object>(HttpStatus.OK);
 
+                return new ResponseEntity<>(HttpStatus.OK);
             } else {
                 ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitionId).singleResult();
 
@@ -381,7 +375,7 @@ public class FlowsTaskResource {
                 LOGGER.debug("Avviata istanza di processo {}, id: {}", key, instance.getId());
 
                 ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
-                return new ResponseEntity<Object>(response, HttpStatus.OK);
+                return new ResponseEntity<>(response, HttpStatus.OK);
             }
         } catch (IOException e) {
             LOGGER.error("Errore nel processare i files:", e);
@@ -462,9 +456,36 @@ public class FlowsTaskResource {
         List<Task> taskRaw = taskQuery.includeProcessVariables().listPage(firstResult, maxResults);
         List tasks = restResponseFactory.createTaskResponseList(taskRaw);
         result.put("tasks", tasks);
-
         return ResponseEntity.ok(result);
     }
+
+
+    @RequestMapping(value = "/taskCompleted", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<Object> getTasksCompletedForMe(
+            HttpServletRequest req,
+            @RequestParam("firstResult") int firstResult,
+            @RequestParam("maxResults") int maxResults) {
+
+        Map<String, Object> result = new HashMap<>();
+        String username = SecurityUtils.getCurrentUserLogin();
+
+        List<HistoricTaskInstance> response = new ArrayList<>();
+        List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().taskInvolvedUser(username)
+                .includeProcessVariables().includeTaskLocalVariables()
+                .list();
+
+        for (HistoricTaskInstance task : tasks) {
+            List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForTask(task.getId());
+            for (HistoricIdentityLink hil : identityLinks) {
+                if (hil.getType().equals(TASK_EXECUTOR) && hil.getUserId().equals(username))
+                    response.add(task);
+            }
+        }
+        result.put("tasks", response);
+        return ResponseEntity.ok(result);
+    }
+
 
     private void processDate(TaskQuery taskQuery, String key, String value) {
         try {

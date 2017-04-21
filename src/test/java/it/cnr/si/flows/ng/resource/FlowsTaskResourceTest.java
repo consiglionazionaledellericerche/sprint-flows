@@ -2,8 +2,11 @@ package it.cnr.si.flows.ng.resource;
 
 import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.TestUtil;
+import org.activiti.engine.TaskService;
+import org.activiti.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
+import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.task.TaskResponse;
 import org.junit.After;
 import org.junit.Before;
@@ -14,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
@@ -45,10 +49,13 @@ public class FlowsTaskResourceTest {
     @Autowired
     FlowsProcessInstanceResource flowsProcessInstanceResource;
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    private ProcessInstanceResponse processInstance;
+    @Autowired
+    private TaskService taskService;
 
     @Before
     public void setUp() throws Exception {
-        util.mySetUp("missioni");
+        processInstance = util.mySetUp("missioni");
     }
 
 
@@ -90,7 +97,7 @@ public class FlowsTaskResourceTest {
 
     @Test
     public void testGetTaskInstance() {
-        ResponseEntity<TaskResponse> response = flowsTaskResource.getTaskInstance(util.getTaskId());
+        ResponseEntity<TaskResponse> response = flowsTaskResource.getTaskInstance(util.getFirstTaskId());
         assertEquals(OK, response.getStatusCode());
         assertEquals(TASK_NAME, ((TaskResponse) response.getBody()).getName());
     }
@@ -131,13 +138,13 @@ public class FlowsTaskResourceTest {
     public void testClaimTask() {
 //      admin ha ROLE_ADMIN E ROLE_USER quindi può richiamare il metodo
         util.loginAdmin();
-        ResponseEntity<Map<String, Object>> response = flowsTaskResource.claimTask(new MockHttpServletRequest(), util.getTaskId());
+        ResponseEntity<Map<String, Object>> response = flowsTaskResource.claimTask(new MockHttpServletRequest(), util.getFirstTaskId());
         assertEquals(OK, response.getStatusCode());
         util.logout();
 
 //      spaclient ha solo ROLE_ADMIN quindi NON può richiamare il metodo
         util.loginSpaclient();
-        response = flowsTaskResource.claimTask(new MockHttpServletRequest(), util.getTaskId());
+        response = flowsTaskResource.claimTask(new MockHttpServletRequest(), util.getFirstTaskId());
         assertEquals(FORBIDDEN, response.getStatusCode());
     }
 
@@ -179,6 +186,44 @@ public class FlowsTaskResourceTest {
 
         response = flowsTaskResource.search(req, util.getProcessDefinition().split(":")[0], true, ASC, 0, 10);
         verifyResponse(response, 0, searchField1, searchField2);
+    }
+
+    @Test
+    public void testGetTasksCompletedForMe() {
+        //completo il primo task
+        util.loginSpaclient();
+        MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
+        req.setParameter("taskId", util.getFirstTaskId());
+        ResponseEntity<Object> response = flowsTaskResource.completeTask(req);
+        assertEquals(OK, response.getStatusCode());
+
+        //assegno il task a spaclient
+        flowsTaskResource.assignTask(req, taskService.createTaskQuery().singleResult().getId(), "spaclient");
+        //Setto spaclient come owner dello stesso task
+        taskService.setOwner(taskService.createTaskQuery().singleResult().getId(), "spaclient");
+
+        //Recupero solo il flusso completato da spaclient e non quello assegnatogli né quello di cui è owner
+        response = flowsTaskResource.getTasksCompletedForMe(new MockHttpServletRequest(), 0, 1000);
+        assertEquals(OK, response.getStatusCode());
+        assertEquals(util.getFirstTaskId(), ((HistoricTaskInstanceEntity) ((ArrayList) ((Map) response.getBody()).get("tasks")).get(0)).getId());
+
+        //Verifico che il metodo funzioni anche con admin
+        util.logout();
+        util.loginAdmin();
+        response = flowsTaskResource.getTasksCompletedForMe(new MockHttpServletRequest(), 0, 1000);
+        assertEquals(OK, response.getStatusCode());
+        assertEquals("Admin non deve vedere task perchè non l'ha ANCORA completato ma ha solo avviato il flusso", 0, ((ArrayList) ((Map) response.getBody()).get("tasks")).size());
+
+        //completo un altro task con admin
+        req = new MockMultipartHttpServletRequest();
+        req.setParameter("taskId", taskService.createTaskQuery().singleResult().getId());
+        response = flowsTaskResource.completeTask(req);
+        assertEquals(OK, response.getStatusCode());
+
+        //Admin vede solo il task che ha completato
+        response = flowsTaskResource.getTasksCompletedForMe(new MockHttpServletRequest(), 0, 1000);
+        assertEquals(OK, response.getStatusCode());
+        assertEquals("Admin non vede il task che ha appena completato", 1, ((ArrayList) ((Map) response.getBody()).get("tasks")).size());
     }
 
     private void verifyResponse(ResponseEntity<Object> response, int expectedTotalItems, String searchField1, String searchField2) {

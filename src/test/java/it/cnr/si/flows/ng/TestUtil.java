@@ -59,7 +59,7 @@ public class TestUtil {
     @Autowired
     private FlowsTaskResource flowsTaskResource;
 
-    private String taskId;
+    private String firstTaskId;
     private String processDefinition;
 //    private ProcessInstanceResponse processInstance;
 
@@ -135,8 +135,8 @@ public class TestUtil {
         req.setParameter("definitionId", processDefinition);
         ResponseEntity<Object> response = flowsTaskResource.completeTask(req);
         assertEquals(response.getStatusCode(), OK);
-        // Recupero il taskId
-        taskId = taskService.createTaskQuery().singleResult().getId();
+        // Recupero il TaskId del primo task del flusso
+        firstTaskId = taskService.createTaskQuery().singleResult().getId();
         //Recupero la ProcessInstance
 //        processInstance = (ProcessInstanceResponse) response.getBody();
         return (ProcessInstanceResponse) response.getBody();
@@ -162,7 +162,7 @@ public class TestUtil {
 //        return processInstance;
 //    }
 
-    public String getTaskId() {
-        return taskId;
+    public String getFirstTaskId() {
+        return firstTaskId;
     }
 }
