@@ -42,16 +42,4 @@ public class ActivitiRestApiConfiguration {
         // Hence, this 'dummy' configuration
 
     }
-
-    public class ActivitiBeanNameGenerator extends AnnotationBeanNameGenerator {
-
-        public ActivitiBeanNameGenerator() {
-            super();
-        }
-
-        @Override
-        public String generateBeanName(BeanDefinition definition, BeanDefinitionRegistry registry) {
-            return "activiti"+super.generateBeanName(definition, registry);
-        }
-    }
 }
