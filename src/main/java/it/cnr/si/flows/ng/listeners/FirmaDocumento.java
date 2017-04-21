@@ -11,11 +11,11 @@ import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.exception.TaskFailedException;
 import it.cnr.si.flows.ng.service.FirmaService;
 
-public class FirmaTask implements ExecutionListener {
+public class FirmaDocumento implements ExecutionListener {
 
     private static final long serialVersionUID = -56001764662303256L;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FirmaTask.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FirmaDocumento.class);
 
     private FirmaService firmaService = new FirmaService();
     private Expression nomeFileDaFirmare;
