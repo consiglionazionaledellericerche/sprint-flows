@@ -8,6 +8,7 @@ import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.repository.ProcessDefinitionResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -53,15 +54,15 @@ public class FlowsProcessDefinitionResource {
     @RequestMapping(value = "/{key}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
-    public ResponseEntity getProcessDefinitionById(@PathVariable String key) {
+    public ResponseEntity<ProcessDefinitionResponse> getProcessDefinitionById(@PathVariable String key) {
 
         ProcessDefinition definitionraw = repositoryService.createProcessDefinitionQuery().processDefinitionKey(key).latestVersion().singleResult();
 
         if (definitionraw != null) {
             ProcessDefinitionResponse definition = restResponseFactory.createProcessDefinitionResponse(definitionraw);
-            return ResponseEntity.ok(definition);
+            return new ResponseEntity<ProcessDefinitionResponse>(definition, HttpStatus.OK);
         } else {
-            return ResponseEntity.notFound().build();
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
