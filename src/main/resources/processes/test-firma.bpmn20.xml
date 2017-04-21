@@ -10,7 +10,7 @@
     <userTask id="usertask2" name="User Task" activiti:candidateGroups="ROLE_USER"></userTask>
     <sequenceFlow id="flow5" sourceRef="firma" targetRef="usertask2">
       <extensionElements>
-        <activiti:executionListener event="take" class="it.cnr.si.flows.ng.tasks.FirmaTask">
+        <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.FirmaTask">
           <activiti:field name="nomeFileDaFirmare">
             <activiti:string><![CDATA[decisioneacontrattare]]></activiti:string>
           </activiti:field>

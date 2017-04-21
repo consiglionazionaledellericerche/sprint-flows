@@ -1,6 +1,11 @@
 package it.cnr.si.flows.ng.config;
 
 import com.zaxxer.hikari.HikariDataSource;
+
+import it.cnr.si.flows.ng.listeners.ActivitiLoggingEventListener;
+import it.cnr.si.flows.ng.listeners.FlowsVisibilitySetter;
+import it.cnr.si.flows.ng.listeners.TestExecutionListener;
+
 import org.activiti.engine.*;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
 import org.activiti.engine.impl.history.HistoryLevel;

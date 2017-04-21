@@ -1,4 +1,4 @@
-package it.cnr.si.flows.ng.config;
+package it.cnr.si.flows.ng.listeners;
 
 import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
