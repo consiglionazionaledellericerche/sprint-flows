@@ -3,20 +3,20 @@
   <process id="test-firma" name="Test Firma" isExecutable="true">
     <startEvent id="startevent1" name="Start"></startEvent>
     <endEvent id="endevent1" name="End"></endEvent>
-    <userTask id="firma" name="Firma" activiti:candidateGroups="ROLE_USER">
-      <extensionElements>
-        <activiti:taskListener event="complete" class="it.cnr.si.flows.ng.tasks.FirmaTask">
-          <activiti:field name="nomeFileDaFirmare">
-            <activiti:string><![CDATA[decisioneacontrattare]]></activiti:string>
-          </activiti:field>
-        </activiti:taskListener>
-      </extensionElements>
-    </userTask>
+    <userTask id="firma" name="Firma" activiti:candidateGroups="ROLE_USER"></userTask>
     <userTask id="usertask1" name="User Task" activiti:candidateGroups="ROLE_USER"></userTask>
     <sequenceFlow id="flow3" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
     <sequenceFlow id="flow4" sourceRef="usertask1" targetRef="firma"></sequenceFlow>
     <userTask id="usertask2" name="User Task" activiti:candidateGroups="ROLE_USER"></userTask>
-    <sequenceFlow id="flow5" sourceRef="firma" targetRef="usertask2"></sequenceFlow>
+    <sequenceFlow id="flow5" sourceRef="firma" targetRef="usertask2">
+      <extensionElements>
+        <activiti:executionListener event="take" class="it.cnr.si.flows.ng.tasks.FirmaTask">
+          <activiti:field name="nomeFileDaFirmare">
+            <activiti:string><![CDATA[decisioneacontrattare]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </sequenceFlow>
     <sequenceFlow id="flow6" sourceRef="usertask2" targetRef="endevent1"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_test-firma">
