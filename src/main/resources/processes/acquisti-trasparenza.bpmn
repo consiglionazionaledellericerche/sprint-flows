@@ -5,7 +5,7 @@
     <subProcess id="DECISIONE-CONTRATTARE" name="DECISIONE A CONTRATTARE">
       <userTask id="predisposizione-decisione" name="Predisposizione Decisione" activiti:candidateGroups="ROLE_USER">
         <extensionElements>
-          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.config.TaskGeneric"></activiti:executionListener>
+          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.config.TaskPredisposizioneDecisione"></activiti:executionListener>
         </extensionElements>
       </userTask>
       <startEvent id="startevent2" name="Start"></startEvent>
