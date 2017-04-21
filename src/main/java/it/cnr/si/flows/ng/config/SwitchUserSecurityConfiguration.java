@@ -84,8 +84,4 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
         filter.setTargetUrl("/");
         return filter;
     }
-
-
-
-
 }

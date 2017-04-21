@@ -30,7 +30,15 @@
 
     <attachments ></attachments>
 
-
+	<!-- <identity-links></identity-links> -->
+	<h4>Identity Links</h4>
+	<span ng-repeat="(taskId, link) in vm.data.identityLinks">
+	    TaskId - <strong>{{ taskId }}:</strong>  <br>
+	    (Assignee: {{link.assignee || null}}, Candidate Users: {{link.candidateUsers}}, Candidate Groups: {{link.candidateGroups}}) <br>
+        <span ng-repeat="actualLink in link.links">
+            <strong>{{ actualLink.type }}:</strong> {{ actualLink.user || actualLink.group }} <br>
+        </span>
+	</span>
   </div>
 
   <button class="btn btn-default" ng-click="chronology = true" ng-hide="chronology">Visualizza Cronologia</button>
@@ -40,6 +48,5 @@
 
 </div>
 <div class="col-md-10">
-  <pre>{{scope | json}}</pre>
   <pre>{{vm | json}}</pre>
 </div>

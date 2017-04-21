@@ -1,4 +1,4 @@
-package it.cnr.si.service;
+package it.cnr.si.security;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import it.cnr.si.config.ldap.CNRUser;
-import it.cnr.si.security.LdapSecurityUtils;
+import it.cnr.si.service.LdapAccountService;
 import it.cnr.si.web.rest.dto.CNRUserDTO;
 
 /**

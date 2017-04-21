@@ -18,12 +18,6 @@
                 <a ui-sref="cnrgroup-detail({id: parents.id})">{{parents.name}}</a>{{$last ? '' : ', '}}
             </span>
         </dd>
-        <dt><span translate="sprintApp.cnrgroup.memberUsers">Member Users</span></dt>
-        <dd>
-            <span ng-repeat="memberUsers in vm.cnrgroup.memberUsers">
-                {{memberUsers.login}}{{$last ? '' : ', '}}
-            </span>
-        </dd>
     </dl>
 
     <button type="submit"

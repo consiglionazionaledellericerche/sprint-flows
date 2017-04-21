@@ -98,12 +98,6 @@ public class FlowsTaskResource {
         }
     }
 
-    private static String removeLeadingRole(String s) {
-        if (s.startsWith("ROLE_"))
-            s = s.substring(5);
-        return s;
-    }
-
     // TODO magari un giorno avremo degli array, ma per adesso ce lo facciamo andare bene cosi'
     public static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
 

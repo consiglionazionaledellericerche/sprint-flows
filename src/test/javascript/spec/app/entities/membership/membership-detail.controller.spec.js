@@ -2,9 +2,9 @@
 
 describe('Controller Tests', function() {
 
-    describe('Cnrgroup Management Detail Controller', function() {
+    describe('Membership Management Detail Controller', function() {
         var $scope, $rootScope;
-        var MockEntity, MockPreviousState, MockCnrgroup;
+        var MockEntity, MockPreviousState, MockMembership;
         var createController;
 
         beforeEach(inject(function($injector) {
@@ -12,7 +12,7 @@ describe('Controller Tests', function() {
             $scope = $rootScope.$new();
             MockEntity = jasmine.createSpy('MockEntity');
             MockPreviousState = jasmine.createSpy('MockPreviousState');
-            MockCnrgroup = jasmine.createSpy('MockCnrgroup');
+            MockMembership = jasmine.createSpy('MockMembership');
             
 
             var locals = {
@@ -20,17 +20,17 @@ describe('Controller Tests', function() {
                 '$rootScope': $rootScope,
                 'entity': MockEntity,
                 'previousState': MockPreviousState,
-                'Cnrgroup': MockCnrgroup
+                'Membership': MockMembership
             };
             createController = function() {
-                $injector.get('$controller')("CnrgroupDetailController", locals);
+                $injector.get('$controller')("MembershipDetailController", locals);
             };
         }));
 
 
         describe('Root Scope Listening', function() {
             it('Unregisters root scope listener upon scope destruction', function() {
-                var eventType = 'sprintApp:cnrgroupUpdate';
+                var eventType = 'sprintApp:membershipUpdate';
 
                 createController();
                 expect($rootScope.$$listenerCount[eventType]).toEqual(1);

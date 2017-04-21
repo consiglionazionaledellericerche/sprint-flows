@@ -8,12 +8,6 @@
             "otherEntityField": "name",
             "ownerSide": true,
             "otherEntityRelationshipName": "memberGroups"
-        },
-        {
-            "relationshipName": "memberUsers",
-            "otherEntityName": "user",
-            "relationshipType": "many-to-many",
-            "ownerSide": true
         }
     ],
     "fields": [

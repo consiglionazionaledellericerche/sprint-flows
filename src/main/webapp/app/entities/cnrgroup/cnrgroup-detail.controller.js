@@ -5,9 +5,9 @@
         .module('sprintApp')
         .controller('CnrgroupDetailController', CnrgroupDetailController);
 
-    CnrgroupDetailController.$inject = ['$scope', '$rootScope', '$stateParams', 'previousState', 'entity', 'Cnrgroup', 'User'];
+    CnrgroupDetailController.$inject = ['$scope', '$rootScope', '$stateParams', 'previousState', 'entity', 'Cnrgroup'];
 
-    function CnrgroupDetailController($scope, $rootScope, $stateParams, previousState, entity, Cnrgroup, User) {
+    function CnrgroupDetailController($scope, $rootScope, $stateParams, previousState, entity, Cnrgroup) {
         var vm = this;
 
         vm.cnrgroup = entity;
