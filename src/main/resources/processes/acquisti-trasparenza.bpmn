@@ -5,7 +5,7 @@
     <subProcess id="DECISIONE-CONTRATTARE" name="DECISIONE A CONTRATTARE">
       <userTask id="predisposizione-decisione" name="Predisposizione Decisione" activiti:candidateGroups="ROLE_USER">
         <extensionElements>
-          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.config.TaskPredisposizioneDecisione"></activiti:executionListener>
+          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
         </extensionElements>
       </userTask>
       <startEvent id="startevent2" name="Start"></startEvent>
@@ -44,7 +44,15 @@
           <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
         </extensionElements>
       </userTask>
-      <sequenceFlow id="flow14" name="Firma" sourceRef="exclusivegateway2" targetRef="protocollo-decisione"></sequenceFlow>
+      <sequenceFlow id="flow14" name="Firma" sourceRef="exclusivegateway2" targetRef="protocollo-decisione">
+        <extensionElements>
+          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.FirmaDocumento">
+            <activiti:field name="nomeFileDaValidare">
+              <activiti:string><![CDATA[decisioneContrattare]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </sequenceFlow>
       <sequenceFlow id="flow15" sourceRef="protocollo-decisione" targetRef="endevent1"></sequenceFlow>
       <userTask id="revoca-decisione" name="Revoca Decisione" activiti:candidateGroups="ROLE_USER">
         <extensionElements>
@@ -569,7 +577,7 @@
         <omgdi:waypoint x="560.0" y="177.0"></omgdi:waypoint>
         <omgdi:waypoint x="662.0" y="210.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="26.0" x="567.0" y="200.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="100.0" x="567.0" y="200.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow15" id="BPMNEdge_flow15">
