@@ -6,6 +6,7 @@ import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
+import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.task.TaskResponse;
 import org.junit.After;
@@ -234,7 +235,7 @@ public class FlowsTaskResourceTest {
         assertEquals(expectedTotalItems, ((Long) body.get("totalItems")).intValue());
 
         if (responseList.size() > 0) {
-            TaskResponse taskresponse = ((TaskResponse) responseList.get(0));
+            HistoricTaskInstanceResponse taskresponse = ((HistoricTaskInstanceResponse) responseList.get(0));
             assertTrue(taskresponse.getProcessDefinitionId().contains(util.getProcessDefinition()));
             //verifico che la Process Instance restituita rispetti i parametri della ricerca
             List<RestVariable> variables = taskresponse.getVariables();
