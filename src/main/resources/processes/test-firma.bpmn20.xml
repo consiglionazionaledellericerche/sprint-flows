@@ -4,9 +4,17 @@
     <startEvent id="startevent1" name="Start"></startEvent>
     <endEvent id="endevent1" name="End"></endEvent>
     <userTask id="firma" name="Firma" activiti:candidateGroups="ROLE_USER"></userTask>
-    <userTask id="usertask1" name="User Task" activiti:candidateGroups="ROLE_USER"></userTask>
+    <userTask id="usertask1" name="Valida" activiti:candidateGroups="ROLE_USER"></userTask>
     <sequenceFlow id="flow3" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
-    <sequenceFlow id="flow4" sourceRef="usertask1" targetRef="firma"></sequenceFlow>
+    <sequenceFlow id="flow4" name="valida" sourceRef="usertask1" targetRef="firma">
+      <extensionElements>
+        <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.ValidaDocumento">
+          <activiti:field name="nomeFileDaValidare">
+            <activiti:string><![CDATA[decisioneacontrattare]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </sequenceFlow>
     <userTask id="usertask2" name="User Task" activiti:candidateGroups="ROLE_USER"></userTask>
     <sequenceFlow id="flow5" name="Firma" sourceRef="exclusivegateway1" targetRef="usertask2">
       <extensionElements>
@@ -54,12 +62,15 @@
       <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
         <omgdi:waypoint x="286.0" y="199.0"></omgdi:waypoint>
         <omgdi:waypoint x="330.0" y="199.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="286.0" y="199.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
         <omgdi:waypoint x="512.0" y="199.0"></omgdi:waypoint>
         <omgdi:waypoint x="545.0" y="199.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="512.0" y="199.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="26.0" x="512.0" y="199.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
@@ -76,7 +87,7 @@
         <omgdi:waypoint x="233.0" y="115.0"></omgdi:waypoint>
         <omgdi:waypoint x="233.0" y="172.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="501.0" y="141.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="40.0" x="501.0" y="141.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
@@ -85,7 +96,7 @@
         <omgdi:waypoint x="707.0" y="293.0"></omgdi:waypoint>
         <omgdi:waypoint x="707.0" y="217.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="500.0" y="259.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="36.0" x="500.0" y="259.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
