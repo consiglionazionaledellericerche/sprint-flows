@@ -66,14 +66,11 @@
         byProcessInstanceId : function(processInstanceId) {
             return $http.get('rest/processInstances?processInstanceId=' + processInstanceId);
         },
-        getActive: function() {
-            return $http.get('rest/processInstances/active');
-        },
         myProcessInstances:  function(active) {
             return $http.get('rest/processInstances/myProcessInstances?active=' + active);
         },
-        getCompleted: function() {
-            return $http.get('rest/processInstances/completed');
+        getProcessInstance: function(active) {
+            return $http.get('rest/processInstances/getProcessInstances?active=' + active);
         },
         attachments: function(processInstanceId) {
             return $http.get('api/attachments/'+ processInstanceId);

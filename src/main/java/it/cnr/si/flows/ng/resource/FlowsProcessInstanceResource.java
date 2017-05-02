@@ -19,7 +19,6 @@ import org.activiti.engine.task.IdentityLink;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.AttachmentResponse;
-import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceActionRequest;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResource;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
@@ -148,31 +147,17 @@ public class FlowsProcessInstanceResource {
     }
 
 
-//    todo: riunire i metodi getActiveProcessInstances e getCompletedProcessInstances in un unico metodo
-    /**
-     * Restituisce le Process Instances attive.
-     *
-     * @return the process instances actives
-     */
-    @RequestMapping(value = "/active", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    //    todo: testare con active=false
+    @RequestMapping(value = "/getProcessInstances", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured({AuthoritiesConstants.ADMIN})
     @Timed
-    public ResponseEntity getActiveProcessInstances() {
-        List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery().unfinished().includeProcessVariables().list();
-        return new ResponseEntity<>(restResponseFactory.createHistoricProcessInstanceResponseList(processInstances), HttpStatus.OK);
-    }
-
-    /**
-     /**
-     * Restituisce le Process Instances completate.
-     *
-     * @return the completed process instances
-     */
-    @RequestMapping(value = "/completed", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured({AuthoritiesConstants.ADMIN})
-    @Timed
-    public ResponseEntity<List<HistoricProcessInstanceResponse>> getCompletedProcessInstances() {
-        List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery().finished().includeProcessVariables().list();
+    public ResponseEntity getProcessInstances(@RequestParam("active") boolean active) {
+        List<HistoricProcessInstance> processInstances;
+        if (active) {
+            processInstances = historyService.createHistoricProcessInstanceQuery().unfinished().includeProcessVariables().list();
+        } else {
+            processInstances = historyService.createHistoricProcessInstanceQuery().finished().includeProcessVariables().list();
+        }
         return new ResponseEntity<>(restResponseFactory.createHistoricProcessInstanceResponseList(processInstances), HttpStatus.OK);
     }
 

@@ -13,13 +13,13 @@
             vm.activeContent = choice;
         }
 
-        dataService.processInstances.getActive()
+        dataService.processInstances.getProcessInstance(true)
         .then(function (response) {
             vm.activeInstances = response;
         }, function (response) {
             $log.error(response);
         });
-        dataService.processInstances.getCompleted()
+        dataService.processInstances.getProcessInstance(false)
         .then(function (response) {
             vm.completedInstances = response;
         }, function (response) {
