@@ -410,3 +410,9 @@ input.ng-dirty.ng-invalid {
 .modal-xl {
     width: 1150px;
 }
+
+.cnr-descrizione-task {
+    border: 1px solid lightblue;
+    padding: 15px;
+    margin: 10px;
+}

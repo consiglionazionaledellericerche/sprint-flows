@@ -10,3 +10,4 @@
 /.bpmn/
 /node/
 /${project.testresult.directory}/
+/as1dock_2.backup.sql
