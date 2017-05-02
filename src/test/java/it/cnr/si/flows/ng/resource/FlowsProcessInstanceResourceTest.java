@@ -4,6 +4,7 @@ import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.TestUtil;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.rest.common.api.DataResponse;
+import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.repository.ProcessDefinitionResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.junit.After;
@@ -107,7 +108,7 @@ public class FlowsProcessInstanceResourceTest {
         util.loginAdmin();
         ResponseEntity ret = flowsProcessInstanceResource.getActiveProcessInstances();
         assertEquals(HttpStatus.OK, ret.getStatusCode());
-        ArrayList<ProcessInstanceResponse> entities = (ArrayList<ProcessInstanceResponse>) ret.getBody();
+        ArrayList<HistoricProcessInstanceResponse> entities = (ArrayList<HistoricProcessInstanceResponse>) ret.getBody();
         //vedo sia la Process Instance avviata da admin che quella avviata da User
         assertEquals(2, entities.size());
         assertEquals(util.getProcessDefinition(), entities.get(0).getProcessDefinitionId());
@@ -142,8 +143,8 @@ public class FlowsProcessInstanceResourceTest {
             proceeeInstanceID = ((HistoricProcessInstance) processInstances.get(0)).getId();
         util.logout();
 
-        // Spaclient NON vede la Process Instance avviata da Admin
-        util.loginSpaclient();
+        // User NON vede la Process Instance avviata da Admin
+        util.loginUser();
         response = flowsProcessInstanceResource.getMyProcessInstances(true);
         assertEquals(OK, response.getStatusCode());
         assertEquals(startedBySpaclient, response.getBody().getSize());
