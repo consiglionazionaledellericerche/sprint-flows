@@ -147,7 +147,12 @@ public class FlowsProcessInstanceResource {
     }
 
 
-    //    todo: testare con active=false
+    /**
+     * Restituisce le Process Instances attive o terminate.
+     *
+     * @param active boolean active
+     * @return le process Instance attive o terminate
+     */
     @RequestMapping(value = "/getProcessInstances", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured({AuthoritiesConstants.ADMIN})
     @Timed

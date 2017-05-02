@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 
@@ -91,7 +92,7 @@ public class FlowsProcessInstanceResourceTest {
     }
 
     @Test
-    public void testGetActiveProcessInstances() {
+    public void testGetProcessInstances() {
         //Recupero la Process Definition per permessi ferie
         util.loginUser();
         DataResponse appo = (DataResponse) flowsProcessDefinitionResource.getAllProcessDefinitions();
@@ -113,6 +114,23 @@ public class FlowsProcessInstanceResourceTest {
         assertEquals(2, entities.size());
         assertEquals(util.getProcessDefinition(), entities.get(0).getProcessDefinitionId());
         assertEquals(permessiFeriePD, entities.get(1).getProcessDefinitionId());
+
+        //cancello un processo
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        String notActiveId = entities.get(0).getId();
+        String activeId = entities.get(1).getId();
+        flowsProcessInstanceResource.delete(response, notActiveId, "test");
+        assertEquals(response.getStatus(), NO_CONTENT.value());
+        // verifico che Admin veda il processo 1 terminato
+        ret = flowsProcessInstanceResource.getProcessInstances(false);
+        entities = (ArrayList<HistoricProcessInstanceResponse>) ret.getBody();
+        assertEquals(entities.size(), 1);
+        assertEquals(entities.get(0).getId(), notActiveId);
+        // .. e 1 processo ancora attivo VERIFICANDO CHE GLI ID COINCIDANO
+        ret = flowsProcessInstanceResource.getProcessInstances(true);
+        entities = (ArrayList<HistoricProcessInstanceResponse>) ret.getBody();
+        assertEquals(entities.size(), 1);
+        assertEquals(entities.get(0).getId(), activeId);
     }
 
 

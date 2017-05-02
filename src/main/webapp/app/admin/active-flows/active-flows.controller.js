@@ -5,9 +5,9 @@
     .module('sprintApp')
     .controller('ActiveFlowsController', ActiveFlowsController);
 
-    ActiveFlowsController.$inject = ['$scope', 'dataService', '$log', 'utils'];
+    ActiveFlowsController.$inject = ['$scope', 'dataService', '$log'];
 
-    function ActiveFlowsController ($scope, dataService, $log, utils) {
+    function ActiveFlowsController ($scope, dataService, $log) {
         var vm = this;
         $scope.setActiveContent = function(choice) {
             vm.activeContent = choice;
