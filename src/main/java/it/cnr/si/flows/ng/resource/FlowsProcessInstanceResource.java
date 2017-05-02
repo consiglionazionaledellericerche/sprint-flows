@@ -1,13 +1,8 @@
 package it.cnr.si.flows.ng.resource;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.codahale.metrics.annotation.Timed;
+import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.security.SecurityUtils;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
@@ -19,7 +14,6 @@ import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.pvm.PvmActivity;
 import org.activiti.engine.impl.pvm.ReadOnlyProcessDefinition;
 import org.activiti.engine.impl.task.TaskDefinition;
-import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Attachment;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.rest.common.api.DataResponse;
@@ -41,10 +35,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.codahale.metrics.annotation.Timed;
-
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.security.SecurityUtils;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("rest/processInstances")
@@ -152,6 +148,7 @@ public class FlowsProcessInstanceResource {
     }
 
 
+//    todo: riunire i metodi getActiveProcessInstances e getCompletedProcessInstances in un unico metodo
     /**
      * Restituisce le Process Instances attive.
      *
@@ -160,12 +157,13 @@ public class FlowsProcessInstanceResource {
     @RequestMapping(value = "/active", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured({AuthoritiesConstants.ADMIN})
     @Timed
-    public ResponseEntity<List<ProcessInstanceResponse>> getActiveProcessInstances() {
-        List<ProcessInstance> processInstance = runtimeService.createProcessInstanceQuery().includeProcessVariables().list();
-        return new ResponseEntity<>(restResponseFactory.createProcessInstanceResponseList(processInstance), HttpStatus.OK);
+    public ResponseEntity getActiveProcessInstances() {
+        List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery().unfinished().includeProcessVariables().list();
+        return new ResponseEntity<>(restResponseFactory.createHistoricProcessInstanceResponseList(processInstances), HttpStatus.OK);
     }
 
     /**
+     /**
      * Restituisce le Process Instances completate.
      *
      * @return the completed process instances

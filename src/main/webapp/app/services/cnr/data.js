@@ -45,6 +45,9 @@
         getTask: function (id) {
             return $http.get('rest/tasks/'+ id);
         },
+        getTaskCompleted: function (firstResult, maxResults) {
+            return $http.get('rest/tasks/taskCompleted?firstResult=' + firstResult + '&maxResults=' + maxResults);
+        },
         searchTask: function (processInstance, active, params, order, firstResult, maxResults) {
             var processInstaceId;
             if(processInstance !== undefined){
