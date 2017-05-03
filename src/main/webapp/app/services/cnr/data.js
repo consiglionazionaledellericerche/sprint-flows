@@ -86,6 +86,11 @@
         get: function(id) {
           return $http.get('rest/processdefinitions/', id);
         }
+      },
+      dynamiclist : {
+        byName: function(name) {
+          return $http.get('api/dynamiclists/byname/'+ name);
+        }
       }
     };
   }

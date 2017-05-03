@@ -249,11 +249,11 @@ Custom alerts for notification
 }
 
 .alerts .toast.left {
-    left: 5px;
+    left: 10px;
 }
 
 .alerts .toast.right {
-    right: 5px;
+    right: 10px;
 }
 
 .alerts .toast.top {
@@ -415,4 +415,23 @@ input.ng-dirty.ng-invalid {
     border: 1px solid lightblue;
     padding: 15px;
     margin: 10px;
+}
+
+.alerts .alert {
+  box-shadow: 4px 4px 10px -3px rgba(0,0,0,0.75);
+}
+
+.alert-success {
+  border-color: #b5c8a5;
+}
+.alert-danger {
+  border-color: #d3b4b9;
+}
+
+
+
+.jstree-bootstrap{
+  overflow: scroll;
+  max-height: 334px;
+  box-shadow: 0px 0px 5px #ccc;
 }

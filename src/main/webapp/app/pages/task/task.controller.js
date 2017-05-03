@@ -11,6 +11,55 @@
         var vm = this;
         vm.data = {};
 
+        vm.treeConfig = {
+                core : {
+                    multiple : false,
+                    animation: true,
+                    error : function(error) {
+                        $log.error('treeCtrl: error from js tree - ' + angular.toJson(error));
+                    },
+                    check_callback : true,
+                    worker : true
+                },
+                types : {
+                    default : {
+                        icon : 'glyphicon glyphicon-flash'
+                    },
+                    star : {
+                        icon : 'glyphicon glyphicon-star'
+                    },
+                    cloud : {
+                        icon : 'glyphicon glyphicon-cloud'
+                    }
+                },
+                version : 1,
+                plugins : ['types']
+    };
+
+        vm.treeModel = [{
+            "id": "ajson1",
+            "parent": "#",
+            "text": "Simple root node"
+          }, {
+            "id": "ajson2",
+            "parent": "#",
+            "text": "Root node 2"
+          }, {
+            "id": "ajson3",
+            "parent": "ajson2",
+            "text": "Child 1"
+          }, {
+            "id": "ajson4",
+            "parent": "ajson2",
+            "text": "Child 2"
+          }]
+
+        dataService.dynamiclist.byName('capitolo').then(
+          function(response) {
+              vm.treeModel = response.data;
+          }
+        );
+
         $log.info($state.params.processDefinition);
 
         if ($state.params.taskId) {
@@ -31,7 +80,7 @@
             vm.diagramUrl = "/rest/diagram/processDefinition/" + $state.params.processDefinitionId;
             vm.formUrl = 'api/forms/'+ processDefinitionKey + "/" + processVersion + "/" + $state.params.taskName
         }
-
+        $scope.select_node = function (discard, selection) {console.log("select node");};
         $scope.submitTask = function(file) {
 
             $log.info(vm);

@@ -11,6 +11,7 @@
                 "form": "Form",
                 "cnrgroup": "Cnrgroup",
                 "membership": "Membership",
+                "dynamiclist": "Dynamiclist",
                 "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
             },
             "account": {
