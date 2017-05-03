@@ -45,6 +45,9 @@
         getTask: function (id) {
             return $http.get('rest/tasks/'+ id);
         },
+        getTaskCompleted: function (firstResult, maxResults) {
+            return $http.get('rest/tasks/taskCompleted?firstResult=' + firstResult + '&maxResults=' + maxResults);
+        },
         searchTask: function (processInstance, active, params, order, firstResult, maxResults) {
             var processInstaceId;
             if(processInstance !== undefined){
@@ -63,14 +66,11 @@
         byProcessInstanceId : function(processInstanceId) {
             return $http.get('rest/processInstances?processInstanceId=' + processInstanceId);
         },
-        getActive: function() {
-            return $http.get('rest/processInstances/active');
-        },
         myProcessInstances:  function(active) {
             return $http.get('rest/processInstances/myProcessInstances?active=' + active);
         },
-        getCompleted: function() {
-            return $http.get('rest/processInstances/completed');
+        getProcessInstance: function(active) {
+            return $http.get('rest/processInstances/getProcessInstances?active=' + active);
         },
         attachments: function(processInstanceId) {
             return $http.get('api/attachments/'+ processInstanceId);

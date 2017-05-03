@@ -4,6 +4,7 @@ import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.TestUtil;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.rest.common.api.DataResponse;
+import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.repository.ProcessDefinitionResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.junit.After;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 
@@ -90,7 +92,7 @@ public class FlowsProcessInstanceResourceTest {
     }
 
     @Test
-    public void testGetActiveProcessInstances() {
+    public void testGetProcessInstances() {
         //Recupero la Process Definition per permessi ferie
         util.loginUser();
         DataResponse appo = (DataResponse) flowsProcessDefinitionResource.getAllProcessDefinitions();
@@ -105,13 +107,30 @@ public class FlowsProcessInstanceResourceTest {
 
         //Verifico che Admin veda entrambe le Process Instances create
         util.loginAdmin();
-        ResponseEntity ret = flowsProcessInstanceResource.getActiveProcessInstances();
+        ResponseEntity ret = flowsProcessInstanceResource.getProcessInstances(true);
         assertEquals(HttpStatus.OK, ret.getStatusCode());
-        ArrayList<ProcessInstanceResponse> entities = (ArrayList<ProcessInstanceResponse>) ret.getBody();
+        ArrayList<HistoricProcessInstanceResponse> entities = (ArrayList<HistoricProcessInstanceResponse>) ret.getBody();
         //vedo sia la Process Instance avviata da admin che quella avviata da User
         assertEquals(2, entities.size());
         assertEquals(util.getProcessDefinition(), entities.get(0).getProcessDefinitionId());
         assertEquals(permessiFeriePD, entities.get(1).getProcessDefinitionId());
+
+        //cancello un processo
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        String notActiveId = entities.get(0).getId();
+        String activeId = entities.get(1).getId();
+        flowsProcessInstanceResource.delete(response, notActiveId, "test");
+        assertEquals(response.getStatus(), NO_CONTENT.value());
+        // verifico che Admin veda il processo 1 terminato
+        ret = flowsProcessInstanceResource.getProcessInstances(false);
+        entities = (ArrayList<HistoricProcessInstanceResponse>) ret.getBody();
+        assertEquals(entities.size(), 1);
+        assertEquals(entities.get(0).getId(), notActiveId);
+        // .. e 1 processo ancora attivo VERIFICANDO CHE GLI ID COINCIDANO
+        ret = flowsProcessInstanceResource.getProcessInstances(true);
+        entities = (ArrayList<HistoricProcessInstanceResponse>) ret.getBody();
+        assertEquals(entities.size(), 1);
+        assertEquals(entities.get(0).getId(), activeId);
     }
 
 
@@ -142,8 +161,8 @@ public class FlowsProcessInstanceResourceTest {
             proceeeInstanceID = ((HistoricProcessInstance) processInstances.get(0)).getId();
         util.logout();
 
-        // Spaclient NON vede la Process Instance avviata da Admin
-        util.loginSpaclient();
+        // User NON vede la Process Instance avviata da Admin
+        util.loginUser();
         response = flowsProcessInstanceResource.getMyProcessInstances(true);
         assertEquals(OK, response.getStatusCode());
         assertEquals(startedBySpaclient, response.getBody().getSize());

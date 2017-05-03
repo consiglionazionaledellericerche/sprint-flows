@@ -459,7 +459,7 @@ public class FlowsTaskResource {
         List<HistoricTaskInstance> response = new ArrayList<>();
         List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().taskInvolvedUser(username)
                 .includeProcessVariables().includeTaskLocalVariables()
-                .list();
+                .listPage(firstResult, maxResults);
 
         for (HistoricTaskInstance task : tasks) {
             List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForTask(task.getId());
