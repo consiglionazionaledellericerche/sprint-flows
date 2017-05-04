@@ -13,7 +13,8 @@
                 listName: '@',
                 cdsuo: '@?',
                 label: '@',
-                ngModel: '='
+                ngModel: '=',
+                ngModelid: '='
             },
             templateUrl: 'app/components/jstree/jstree.html',
 
@@ -41,6 +42,7 @@
                 scope.select_node = function (discard, selection) {
                     if (selection.node.children.length === 0) {
                         scope.ngModel = selection.node.text;
+                        scope.ngModelid = selection.node.id;
                     } else {
                         scope.treeInstance.jstree(true).deselect_all({});
                     }

@@ -1,0 +1,24 @@
+{
+    "sprintApp": {
+        "view" : {
+            "home": {
+                "title": "Views",
+                "createLabel": "Create a new View",
+                "createOrEditLabel": "Create or edit a View",
+                "search": "Search for View"
+            },
+            "created": "A new View is created with identifier {{ param }}",
+            "updated": "A View is updated with identifier {{ param }}",
+            "deleted": "A View is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Are you sure you want to delete View {{ id }}?"
+            },
+            "detail": {
+                "title": "View"
+            },
+            "processId": "Process Id",
+            "type": "Type",
+            "view": "View"
+        }
+    }
+}

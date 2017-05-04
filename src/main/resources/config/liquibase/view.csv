@@ -1,0 +1,2 @@
+ID;PROCESS_ID;TYPE;VIEW
+1;permessi-ferie;detail;<metadatum label="Titolo" value="{{$parent.vm.data.entity.variabili.titolo}}" type="" ></metadatum> <br> <metadatum label="Capitolo" value="{{$parent.vm.data.entity.variabili.capitolo}}" type="" ></metadatum> <br> <metadatum label="CapitoloId" value="{{$parent.vm.data.entity.variabili.capitoloid}}" type="" ></metadatum> <br> <metadatum label="Pippo" value="Pluto" type="" ></metadatum> <br>

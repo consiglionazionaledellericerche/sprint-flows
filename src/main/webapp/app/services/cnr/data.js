@@ -91,6 +91,9 @@
         byName: function(name) {
           return $http.get('api/dynamiclists/byname/'+ name);
         }
+      },
+      view: function(processid, type) {
+        return $http.get('api/views/'+ processid +'/'+ type);
       }
     };
   }

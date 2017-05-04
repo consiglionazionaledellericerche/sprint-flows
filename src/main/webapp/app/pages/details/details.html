@@ -23,12 +23,9 @@
       <b>Fase: </b>{{vm.data.entity.activityId}}<br>
     </span>
 
-	<div ng-repeat="variable in vm.data.entity.variables">
+	<ng-include src="vm.detailsView" />
 
-        <strong>{{variable.name}}:</strong> {{variable.value}} <br>
-	</div>
-
-    <attachments ></attachments>
+    <attachments />
 
 	<!-- <identity-links></identity-links> -->
 	<h4>Identity Links</h4>
