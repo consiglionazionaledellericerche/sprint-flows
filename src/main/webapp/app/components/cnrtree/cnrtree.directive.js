@@ -16,7 +16,7 @@
                 ngModel: '=',
                 ngModelid: '='
             },
-            templateUrl: 'app/components/jstree/jstree.html',
+            templateUrl: 'app/components/cnrtree/cnrtree.html',
 
 
             link: function link(scope) {
