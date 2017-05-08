@@ -25,6 +25,7 @@ public class FlowsAttachment implements Serializable {
         Firma,
         Controfirma,
         Pubblicazione,
+        Protocollo,
         Validazione
     }
 
@@ -33,7 +34,8 @@ public class FlowsAttachment implements Serializable {
     @SuppressWarnings("unused")
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsAttachment.class);
 
-    public static final String PUBBLICAZIONE_FLAG = "Pubblicazione";
+	public static final String PUBBLICAZIONE_FLAG = null;
+
 
 private String name;
     private String filename;
