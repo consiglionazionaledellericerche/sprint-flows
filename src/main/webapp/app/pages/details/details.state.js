@@ -10,7 +10,7 @@
     function stateConfig($stateProvider) {
         $stateProvider.state('details', {
             parent: 'app',
-            url: '/details?processInstanceId',
+            url: '/details?processInstanceId&taskId',
             data: {
                 authorities: ['ROLE_USER']
             },
@@ -23,7 +23,7 @@
             },
             resolve: {
                 mainTranslatePartialLoader: ['$translate', '$translatePartialLoader', function ($translate,$translatePartialLoader) {
-//                todo: da risolvere (internazionalizzazione?)
+//                TODO: da risolvere (internazionalizzazione?)
 //                    $translatePartialLoader.addPart('details');
                     return $translate.refresh();
                 }]

@@ -10,64 +10,14 @@
     function HomeController ($scope, Principal, LoginService, $state, dataService, AlertService, $log, $http, Upload, utils) {
         var vm = this;
         vm.data = {};
-
-        vm.treeConfig = {
-                core : {
-                    multiple : false,
-                    animation: true,
-                    error : function(error) {
-                        $log.error('treeCtrl: error from js tree - ' + angular.toJson(error));
-                    },
-                    check_callback : true,
-                    worker : true
-                },
-                types : {
-                    default : {
-                        icon : 'glyphicon glyphicon-flash'
-                    },
-                    star : {
-                        icon : 'glyphicon glyphicon-star'
-                    },
-                    cloud : {
-                        icon : 'glyphicon glyphicon-cloud'
-                    }
-                },
-                version : 1,
-                plugins : ['types']
-    };
-
-        vm.treeModel = [{
-            "id": "ajson1",
-            "parent": "#",
-            "text": "Simple root node"
-          }, {
-            "id": "ajson2",
-            "parent": "#",
-            "text": "Root node 2"
-          }, {
-            "id": "ajson3",
-            "parent": "ajson2",
-            "text": "Child 1"
-          }, {
-            "id": "ajson4",
-            "parent": "ajson2",
-            "text": "Child 2"
-          }]
-
-        dataService.dynamiclist.byName('capitolo').then(
-          function(response) {
-              vm.treeModel = response.data;
-          }
-        );
-
-        $log.info($state.params.processDefinition);
+        vm.taskId = $state.params.taskId;
 
         if ($state.params.taskId) {
             $log.info("getting task ifno");
 
             dataService.tasks.getTask($state.params.taskId).then(
                     function(response) {
-//                        vm.data = utils.refactoringVariables(response.data).variabili;
+//                      vm.data = utils.refactoringVariables(response.data).variabili;
                         vm.data.taskId = $state.params.taskId;
                         vm.diagramUrl = '/rest/diagram/taskInstance/'+ response.data.id;
                         var processDefinitionKey = response.data.processDefinitionId.split(":")[0];
