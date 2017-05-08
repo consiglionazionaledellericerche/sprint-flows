@@ -3,14 +3,12 @@ package it.cnr.si.flows.ng.resource;
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.SecurityUtils;
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.history.HistoricActivityInstance;
+import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
+import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.impl.RepositoryServiceImpl;
+import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.pvm.PvmActivity;
 import org.activiti.engine.impl.pvm.ReadOnlyProcessDefinition;
 import org.activiti.engine.impl.task.TaskDefinition;
@@ -58,6 +56,12 @@ public class FlowsProcessInstanceResource {
     private RuntimeService runtimeService;
     @Autowired
     private TaskService taskService;
+    @Autowired
+    protected ProcessEngineConfigurationImpl processEngineConfiguration;
+    @Autowired
+    ManagementService managementService;
+
+
 
 
     /**
@@ -100,49 +104,45 @@ public class FlowsProcessInstanceResource {
     @Timed
     public ResponseEntity<Map<String, Object>> getProcessInstanceById(@RequestParam("processInstanceId") String processInstanceId) {
         Map<String, Object> result = new HashMap<>();
-        try {
-            // PrecessInstance metadata
-            HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).includeProcessVariables().singleResult();
-            result.put("entity", restResponseFactory.createHistoricProcessInstanceResponse(processInstance));
 
-            // ProcessDefinition (static) metadata
-            ReadOnlyProcessDefinition processDefinition = ((RepositoryServiceImpl)repositoryService).getDeployedProcessDefinition(processInstance.getProcessDefinitionId());
+        // PrecessInstance metadata
+        HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).includeProcessVariables().singleResult();
+        result.put("entity", restResponseFactory.createHistoricProcessInstanceResponse(processInstance));
 
-            // Attachments
-            List<Attachment> processInstanceAttachments = taskService.getProcessInstanceAttachments(processInstanceId);
-            List<AttachmentResponse> collect = processInstanceAttachments.stream().map(a -> restResponseFactory.createAttachmentResponse(a)).collect(Collectors.toList());
-            result.put("attachments", collect);
+        // ProcessDefinition (static) metadata
+        ReadOnlyProcessDefinition processDefinition = ((RepositoryServiceImpl) repositoryService).getDeployedProcessDefinition(processInstance.getProcessDefinitionId());
 
-            // IdentityLinks (candidate groups)
-            final Map<String, Object> identityLinks = new HashMap<>();
-            taskService.createTaskQuery().processInstanceId(processInstanceId).active().list().forEach(
-                    task -> {
-                        Map<String, Object> identityLink = new HashMap<>();
-                        String taskDefinitionKey = task.getTaskDefinitionKey();
-                        PvmActivity taskDefinition = processDefinition.findActivity(taskDefinitionKey);
-                        TaskDefinition taskDef = (TaskDefinition) taskDefinition.getProperty("taskDefinition");
-                        List<IdentityLink> links = taskService.getIdentityLinksForTask(task.getId());
+        // Attachments
+        List<Attachment> processInstanceAttachments = taskService.getProcessInstanceAttachments(processInstanceId);
+        List<AttachmentResponse> collect = processInstanceAttachments.stream().map(a -> restResponseFactory.createAttachmentResponse(a)).collect(Collectors.toList());
+        result.put("attachments", collect);
 
-                        identityLink.put("links", restResponseFactory.createRestIdentityLinks(links));
-                        identityLink.put("assignee", taskDef.getAssigneeExpression());
-                        identityLink.put("candidateGroups", taskDef.getCandidateGroupIdExpressions());
-                        identityLink.put("candidateUsers", taskDef.getCandidateUserIdExpressions());
+        // IdentityLinks (candidate groups)
+        final Map<String, Object> identityLinks = new HashMap<>();
+        taskService.createTaskQuery().processInstanceId(processInstanceId).active().list().forEach(
+                task -> {
+                    Map<String, Object> identityLink = new HashMap<>();
+                    String taskDefinitionKey = task.getTaskDefinitionKey();
+                    PvmActivity taskDefinition = processDefinition.findActivity(taskDefinitionKey);
+                    TaskDefinition taskDef = (TaskDefinition) taskDefinition.getProperty("taskDefinition");
+                    List<IdentityLink> links = taskService.getIdentityLinksForTask(task.getId());
 
-                        identityLinks.put(task.getId(), identityLink);
-                    });
-            result.put("identityLinks", identityLinks);
+                    identityLink.put("links", restResponseFactory.createRestIdentityLinks(links));
+                    identityLink.put("assignee", taskDef.getAssigneeExpression());
+                    identityLink.put("candidateGroups", taskDef.getCandidateGroupIdExpressions());
+                    identityLink.put("candidateUsers", taskDef.getCandidateUserIdExpressions());
 
-            // History
-            List<HistoricActivityInstance> historyQuery = historyService.createHistoricActivityInstanceQuery()
-                    .processInstanceId(processInstanceId)
-                    .orderByHistoricActivityInstanceStartTime()
-                    .asc()
-                    .list();
-            result.put("history", restResponseFactory.createHistoricActivityInstanceResponseList(historyQuery));
+                    identityLinks.put(task.getId(), identityLink);
+                });
+        result.put("identityLinks", identityLinks);
 
-        } catch (Exception e) { // TODO
-            LOGGER.error("Errore: ", e);
-        }
+        List<HistoricTaskInstance> historyList = historyService.createHistoricTaskInstanceQuery()
+                .includeTaskLocalVariables()
+                .processInstanceId(processInstanceId)
+                .list();
+
+        result.put("history", restResponseFactory.createHistoricTaskInstanceResponseList(historyList));
+
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

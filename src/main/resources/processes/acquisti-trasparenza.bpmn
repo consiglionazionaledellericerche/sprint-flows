@@ -35,13 +35,21 @@
       <sequenceFlow id="flow14" name="Firma" sourceRef="exclusivegateway2" targetRef="protocollo-decisione">
         <extensionElements>
           <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.FirmaDocumento">
-            <activiti:field name="nomeFileDaValidare">
+            <activiti:field name="nomeFileDaFirmare">
               <activiti:string><![CDATA[decisioneContrattare]]></activiti:string>
             </activiti:field>
           </activiti:executionListener>
         </extensionElements>
       </sequenceFlow>
-      <sequenceFlow id="flow15" sourceRef="protocollo-decisione" targetRef="endevent1"></sequenceFlow>
+      <sequenceFlow id="flow15" sourceRef="protocollo-decisione" targetRef="endevent1">
+        <extensionElements>
+          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.ProtocollaDocumento">
+            <activiti:field name="nomeFileDaProtocollare">
+              <activiti:string><![CDATA[decisioneContrattare]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </sequenceFlow>
       <userTask id="revoca-decisione" name="Revoca Decisione" activiti:candidateGroups="ROLE_USER">
         <extensionElements>
           <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
@@ -246,14 +254,12 @@
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaConProvvedimento'}]]></conditionExpression>
       </sequenceFlow>
     </subProcess>
-    <exclusiveGateway id="exclusivegateway15" name="Exclusive Gateway" default="flow119"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway15" name="Exclusive Gateway" default="flow81"></exclusiveGateway>
     <sequenceFlow id="flow78" sourceRef="espletamento-procedura" targetRef="exclusivegateway15"></sequenceFlow>
     <sequenceFlow id="flow79" sourceRef="exclusivegateway15" targetRef="PROVVEDIMENTO-AGGIUDICAZIONE">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == '1'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${strumentoAcquisizioneId == '23'}]]></conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="flow81" sourceRef="exclusivegateway15" targetRef="ordine-mepa">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == '3'}]]></conditionExpression>
-    </sequenceFlow>
+    <sequenceFlow id="flow81" sourceRef="exclusivegateway15" targetRef="ordine-mepa"></sequenceFlow>
     <exclusiveGateway id="exclusivegateway16" name="Exclusive Gateway" default="flow84"></exclusiveGateway>
     <sequenceFlow id="flow84" sourceRef="exclusivegateway16" targetRef="consuntivo"></sequenceFlow>
     <sequenceFlow id="flow85" sourceRef="exclusivegateway16" targetRef="REVOCA">
@@ -323,7 +329,9 @@
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaConProvvedimento'}]]></conditionExpression>
       </sequenceFlow>
     </subProcess>
-    <sequenceFlow id="flow119" sourceRef="exclusivegateway15" targetRef="ordine-fuori-mepa"></sequenceFlow>
+    <sequenceFlow id="flow119" sourceRef="exclusivegateway15" targetRef="ordine-fuori-mepa">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${strumentoAcquisizioneId == '12'}]]></conditionExpression>
+    </sequenceFlow>
     <sequenceFlow id="flow120" sourceRef="ordine-fuori-mepa" targetRef="exclusivegateway22"></sequenceFlow>
     <sequenceFlow id="flow122" sourceRef="exclusivegateway20" targetRef="ordine-fuori-mepa"></sequenceFlow>
     <endEvent id="endevent17" name="End"></endEvent>
@@ -954,7 +962,7 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow128" id="BPMNEdge_flow128">
         <omgdi:waypoint x="986.0" y="127.0"></omgdi:waypoint>
-        <omgdi:waypoint x="1057.0" y="133.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1057.0" y="127.0"></omgdi:waypoint>
         <omgdi:waypoint x="1057.0" y="1180.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow133" id="BPMNEdge_flow133">
