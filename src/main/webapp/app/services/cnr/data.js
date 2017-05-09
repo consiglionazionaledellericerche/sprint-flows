@@ -10,8 +10,6 @@
   function Data ($http, $location, $rootScope, $log, $sessionStorage) {
 
     var development = $location.$$port === 9000; //GRUNT PORT;
-    var proxy = 'proxy';
-    var base = 'rest/';
 
     $rootScope.development = development;
 
@@ -28,25 +26,25 @@
       },
       tasks: {
         myTasks : function() {
-          return $http.get('rest/tasks/mytasks');
+          return $http.get('api/tasks/mytasks');
         },
         myTasksAvailable : function() {
-          return $http.get('rest/tasks/availabletasks');
+          return $http.get('api/tasks/availabletasks');
         },
         complete : function(data) {
-          return $http.post('rest/tasks/complete', data);
+          return $http.post('api/tasks/complete', data);
         },
         claim: function (id, take) {
           return $http({
-            url: 'rest/tasks/claim/'+ id,
+            url: 'api/tasks/claim/'+ id,
             method: take ? 'PUT' : 'DELETE'
           });
         },
         getTask: function (id) {
-            return $http.get('rest/tasks/'+ id);
+            return $http.get('api/tasks/'+ id);
         },
         getTaskCompleted: function (firstResult, maxResults) {
-            return $http.get('rest/tasks/taskCompleted?firstResult=' + firstResult + '&maxResults=' + maxResults);
+            return $http.get('api/tasks/taskCompleted?firstResult=' + firstResult + '&maxResults=' + maxResults);
         },
         searchTask: function (processInstance, active, params, order, firstResult, maxResults) {
             var processInstaceId;
@@ -55,7 +53,7 @@
             } else {
                 processInstaceId = 'all';
             }
-            return $http.post('rest/tasks/search/' + processInstaceId+
+            return $http.post('api/tasks/search/' + processInstaceId+
                 '?active=' + active +
                 '&order=' + order +
                 '&firstResult=' + firstResult +
@@ -64,13 +62,13 @@
       },
       processInstances: {
         byProcessInstanceId : function(processInstanceId) {
-            return $http.get('rest/processInstances?processInstanceId=' + processInstanceId);
+            return $http.get('api/processInstances?processInstanceId=' + processInstanceId);
         },
         myProcessInstances:  function(active) {
-            return $http.get('rest/processInstances/myProcessInstances?active=' + active);
+            return $http.get('api/processInstances/myProcessInstances?active=' + active);
         },
         getProcessInstance: function(active) {
-            return $http.get('rest/processInstances/getProcessInstances?active=' + active);
+            return $http.get('api/processInstances/getProcessInstances?active=' + active);
         },
         attachments: function(processInstanceId) {
             return $http.get('api/attachments/'+ processInstanceId);
@@ -81,10 +79,10 @@
       },
       definitions : {
         all : function() {
-          return $http.get('rest/processdefinitions/all');
+          return $http.get('api/processDefinitions/all');
         },
         get: function(id) {
-          return $http.get('rest/processdefinitions/', id);
+          return $http.get('api/processDefinitions/', id);
         }
       },
       dynamiclist : {

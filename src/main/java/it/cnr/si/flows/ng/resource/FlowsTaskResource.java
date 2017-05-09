@@ -1,6 +1,8 @@
 package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
+
+import it.cnr.si.flows.ng.exception.FlowsPermissionException;
 import it.cnr.si.flows.ng.service.CounterService;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.security.AuthoritiesConstants;
@@ -54,7 +56,7 @@ import static it.cnr.si.flows.ng.utils.Utils.*;
  *
  */
 @RestController
-@RequestMapping("rest/tasks")
+@RequestMapping("api/tasks")
 public class FlowsTaskResource {
 
     public static final String TASK_EXECUTOR = "esecutore";
@@ -136,9 +138,9 @@ public class FlowsTaskResource {
         String username = SecurityUtils.getCurrentUserLogin();
         List<String> authorities =
                 SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                        .map(GrantedAuthority::getAuthority)
-//                        .map(FlowsTaskResource::removeLeadingRole) //todo: vedere con Martin (le authorities sono ROLE_USER (come ora) o USER (come prima))
-                        .collect(Collectors.toList());
+                .map(GrantedAuthority::getAuthority)
+                //                        .map(FlowsTaskResource::removeLeadingRole) //todo: vedere con Martin (le authorities sono ROLE_USER (come ora) o USER (come prima))
+                .collect(Collectors.toList());
 
         List<Task> listraw = taskService.createTaskQuery()
                 .taskCandidateUser(username)
@@ -232,7 +234,7 @@ public class FlowsTaskResource {
                 break;
             }
         }
-        String finalGroupCandidate = groupCandidate;
+        final String finalGroupCandidate = groupCandidate;
         boolean canClaim = userService.getUserWithAuthorities().getAuthorities().stream().anyMatch(autority -> autority.getName().equals(finalGroupCandidate));
 
         if (canClaim)
@@ -269,9 +271,9 @@ public class FlowsTaskResource {
             @PathVariable("id") String id,
             @PathVariable("user") String user) {
 
-//    todo: test
-//    todo: chi può asegnare un task?
-//        String username = SecurityUtils.getCurrentUserLogin();
+        //    todo: test
+        //    todo: chi può asegnare un task?
+        //        String username = SecurityUtils.getCurrentUserLogin();
 
         taskService.setAssignee(id, user);
 
@@ -285,7 +287,7 @@ public class FlowsTaskResource {
             HttpServletRequest req,
             HttpServletResponse resp,
             @PathVariable("id") String id)
-            throws IOException {
+                    throws IOException {
 
         Map<String, Object> result = new HashMap<>();
         Map<String, Object> list = new HashMap<>();
@@ -320,24 +322,55 @@ public class FlowsTaskResource {
         //        }
     }
 
+    // TODO verificare almeno che l'utente abbia i gruppi necessari
+    @RequestMapping(value = "canComplete/{taskId}/{user}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
+    @Timed
+    public boolean canCompleteTask(
+            @PathVariable("taskId") String taskId,
+            @PathVariable("username") Optional<String> user) {
+
+
+        List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
+        String username = user.orElse(SecurityUtils.getCurrentUserLogin());
+
+        // TODO get authorities from username NOT currentuser
+        List<String> authorities =
+                SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                //                        .map(FlowsTaskResource::removeLeadingRole) //todo: vedere con Martin (le authorities sono ROLE_USER (come ora) o USER (come prima))
+                .collect(Collectors.toList());
+
+        if ( username.equals(taskService.createTaskQuery().taskId(taskId).singleResult().getAssignee()) )
+            return true;
+        else
+            return identityLinks.stream()
+                    .filter(l -> l.getType().equals("candidate"))
+                    .anyMatch(l -> authorities.contains(l.getGroupId()) );
+    }
+
+
+    // TODO verificare almeno che l'utente abbia i gruppi necessari
     @RequestMapping(value = "complete", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<Object> completeTask(MultipartHttpServletRequest req) {
 
-        try {
-            String username = SecurityUtils.getCurrentUserLogin();
+        String username = SecurityUtils.getCurrentUserLogin();
 
+        String taskId = (String) req.getParameter("taskId");
+        String definitionId = (String) req.getParameter("definitionId");
+        if ( isEmpty(taskId) && isEmpty(definitionId) )
+            return ResponseEntity.badRequest().body("Fornire almeno un taskId o un definitionId");
+
+        try {
             Map<String, Object> data = extractParameters(req);
             data.putAll(attachmentService.extractAttachmentsVariables(req));
 
-            String taskId = (String) req.getParameter("taskId");
-            String definitionId = (String) req.getParameter("definitionId");
-
-
-            if ( isEmpty(taskId) && isEmpty(definitionId))
-                return ResponseEntity.badRequest().body("Fornire almeno un taskId o un definitionId");
-
             if ( isNotEmpty(taskId) ) {
+                if (!canCompleteTask(taskId, Optional.of(username)))
+                    throw new FlowsPermissionException();
+
                 // aggiungo l'identityLink che indica l'utente che esegue il task
                 taskService.addUserIdentityLink(taskId, username, TASK_EXECUTOR);
 
@@ -345,6 +378,7 @@ public class FlowsTaskResource {
                 taskService.complete(taskId, data);
 
                 return new ResponseEntity<>(HttpStatus.OK);
+
             } else {
                 ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitionId).singleResult();
 
@@ -366,6 +400,9 @@ public class FlowsTaskResource {
         } catch (IOException e) {
             LOGGER.error("Errore nel processare i files:", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore nel processare i files");
+        } catch (FlowsPermissionException e) {
+            LOGGER.error("L'utente {} non e' abilitato a completare il task {} / avviare il flusso {}", username, taskId, definitionId);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("L'utente non e' abilitato ad eseguire l'azione richiesta");
         }
     }
 
@@ -415,20 +452,20 @@ public class FlowsTaskResource {
             String type = appo.getString("type");
             //wildcard ("%") di default ma non a TUTTI i campi
             switch (type) {
-                case "textEqual":
-                    taskQuery.processVariableValueEquals(key, value);
-                    break;
-                case "boolean":
-                    // gestione variabili booleane
-                    taskQuery.processVariableValueEquals(key, Boolean.valueOf(value));
-                    break;
-                case "date":
-                    processDate(taskQuery, key, value);
-                    break;
-                default:
-                    //variabili con la wildcard  (%value%)
-                    taskQuery.processVariableValueLikeIgnoreCase(key, "%" + value + "%");
-                    break;
+            case "textEqual":
+                taskQuery.processVariableValueEquals(key, value);
+                break;
+            case "boolean":
+                // gestione variabili booleane
+                taskQuery.processVariableValueEquals(key, Boolean.valueOf(value));
+                break;
+            case "date":
+                processDate(taskQuery, key, value);
+                break;
+            default:
+                //variabili con la wildcard  (%value%)
+                taskQuery.processVariableValueLikeIgnoreCase(key, "%" + value + "%");
+                break;
             }
         }
         if (order.equals(ASC))

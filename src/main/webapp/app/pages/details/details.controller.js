@@ -19,7 +19,7 @@
                         vm.data.history = response.data.history;
                         vm.data.attachments = response.data.attachments;
                         vm.data.identityLinks = response.data.identityLinks;
-                        vm.diagramUrl = '/rest/diagram/processInstance/'+ vm.data.entity.id;
+                        vm.diagramUrl = '/api/diagram/processInstance/'+ vm.data.entity.id;
 
                         var processDefinitionId = response.data.entity.processDefinitionId.split(":")[0];
                         vm.detailsView = 'api/views/'+ processDefinitionId +'/detail';

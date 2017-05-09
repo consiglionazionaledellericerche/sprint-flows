@@ -34,7 +34,7 @@ import it.cnr.si.flows.ng.service.FlowsProcessDiagramGenerator;
 
 
 @Controller
-@RequestMapping("rest")
+@RequestMapping("api")
 public class FlowsDiagramResource {
 
     @Autowired

@@ -22,7 +22,7 @@ import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.security.AuthoritiesConstants;
 
 @RestController
-@RequestMapping("rest/processdefinitions")
+@RequestMapping("api/processDefinitions")
 public class FlowsProcessDefinitionResource {
 
     @Autowired

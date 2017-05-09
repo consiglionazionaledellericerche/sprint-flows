@@ -19,7 +19,7 @@
                     function(response) {
 //                      vm.data = utils.refactoringVariables(response.data).variabili;
                         vm.data.taskId = $state.params.taskId;
-                        vm.diagramUrl = '/rest/diagram/taskInstance/'+ response.data.id;
+                        vm.diagramUrl = '/api/diagram/taskInstance/'+ response.data.id;
                         var processDefinitionKey = response.data.processDefinitionId.split(":")[0];
                         vm.formUrl = 'api/forms/task/'+ response.data.id;
                     });
@@ -27,7 +27,7 @@
             vm.data.definitionId = $state.params.processDefinitionId;
             var processDefinitionKey = $state.params.processDefinitionId.split(":")[0];
             var processVersion       = $state.params.processDefinitionId.split(":")[1];
-            vm.diagramUrl = "/rest/diagram/processDefinition/" + $state.params.processDefinitionId;
+            vm.diagramUrl = "/api/diagram/processDefinition/" + $state.params.processDefinitionId;
             vm.formUrl = 'api/forms/'+ processDefinitionKey + "/" + processVersion + "/" + $state.params.taskName
         }
         $scope.select_node = function (discard, selection) {console.log("select node");};
@@ -77,7 +77,7 @@
 
         $scope.reloadImg = function() {
             $log.info(vm.font);
-            vm.diagramUrl = '/rest/diagram/taskInstance/'+ $state.params.taskId +'/'+ vm.font +'?' + new Date().getTime();
+            vm.diagramUrl = '/api/diagram/taskInstance/'+ $state.params.taskId +'/'+ vm.font +'?' + new Date().getTime();
         }
 
         function validate(data) {
