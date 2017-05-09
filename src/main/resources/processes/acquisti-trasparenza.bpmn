@@ -144,12 +144,28 @@
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaConProvvedimento'}]]></conditionExpression>
       </sequenceFlow>
       <exclusiveGateway id="exclusivegateway26" name="Exclusive Gateway" default="flow140"></exclusiveGateway>
-      <sequenceFlow id="flow137" sourceRef="protocollo-provvedimento-aggiudicazione" targetRef="exclusivegateway26"></sequenceFlow>
+      <sequenceFlow id="flow137" sourceRef="protocollo-provvedimento-aggiudicazione" targetRef="exclusivegateway26">
+        <extensionElements>
+          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.ProtocollaDocumento">
+            <activiti:field name="nomeFileDaProtocollare">
+              <activiti:string><![CDATA[provvedimentoAggiudicazione]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </sequenceFlow>
       <sequenceFlow id="flow138" sourceRef="exclusivegateway26" targetRef="endevent4">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${verificheRequisitiLegge == 'Soddisfatte'}]]></conditionExpression>
       </sequenceFlow>
       <userTask id="usertask1" name="Verifica Requisiti"></userTask>
-      <sequenceFlow id="flow53" sourceRef="exclusivegateway11" targetRef="protocollo-provvedimento-aggiudicazione"></sequenceFlow>
+      <sequenceFlow id="flow53" sourceRef="exclusivegateway11" targetRef="protocollo-provvedimento-aggiudicazione">
+        <extensionElements>
+          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.FirmaDocumento">
+            <activiti:field name="nomeFileDaFirmare">
+              <activiti:string><![CDATA[provvedimentoAggiudicazione]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </sequenceFlow>
       <exclusiveGateway id="exclusivegateway27" name="Exclusive Gateway" default="flow143"></exclusiveGateway>
       <sequenceFlow id="flow140" sourceRef="exclusivegateway26" targetRef="usertask1"></sequenceFlow>
       <sequenceFlow id="flow141" sourceRef="usertask1" targetRef="exclusivegateway27"></sequenceFlow>
@@ -600,7 +616,7 @@
         <omgdi:waypoint x="567.0" y="125.0"></omgdi:waypoint>
         <omgdi:waypoint x="669.0" y="158.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="560.0" y="205.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="26.0" x="560.0" y="205.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow15" id="BPMNEdge_flow15">
