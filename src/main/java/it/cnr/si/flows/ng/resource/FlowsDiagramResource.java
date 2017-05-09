@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,10 +32,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.codahale.metrics.annotation.Timed;
 
 import it.cnr.si.flows.ng.service.FlowsProcessDiagramGenerator;
+import it.cnr.si.security.AuthoritiesConstants;
 
 
 @Controller
-@RequestMapping("api")
+@RequestMapping("rest")
 public class FlowsDiagramResource {
 
     @Autowired
@@ -50,7 +52,7 @@ public class FlowsDiagramResource {
     @Autowired
     private HistoryService historyService;
 
-    @RequestMapping(value = "/diagram/processDefinition/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
+    @RequestMapping(value = "diagram/processDefinition/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
     @ResponseBody
     @Timed
     public ResponseEntity<InputStreamResource>
@@ -63,7 +65,7 @@ public class FlowsDiagramResource {
         return ResponseEntity.ok(new InputStreamResource(resourceAsStream));
     }
 
-    @RequestMapping(value = "/diagram/processInstance/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
+    @RequestMapping(value = "diagram/processInstance/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
     @ResponseBody
     @Timed
     public ResponseEntity<InputStreamResource> getDiagramForProcessInstance(
@@ -115,7 +117,7 @@ public class FlowsDiagramResource {
         return ResponseEntity.ok(new InputStreamResource(resource));
     }
 
-    @RequestMapping(value = "/diagram/taskInstance/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
+    @RequestMapping(value = "diagram/taskInstance/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
     @ResponseBody
     @Timed
     public ResponseEntity<InputStreamResource>
