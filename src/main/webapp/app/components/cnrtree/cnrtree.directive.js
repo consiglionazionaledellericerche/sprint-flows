@@ -32,7 +32,6 @@
                             var lists = JSON.parse(response.data.listjson);
                             var type = (scope.cdsuo !== undefined && scope.cdsuo !== '') ? scope.cdsuo : 'default';
                             scope.jsonlist = lists[type];
-                            $log.info(scope.jsonlist);
                             scope.treeConfig.version++;
                         }, function(response) {
                             $log.error(response);
