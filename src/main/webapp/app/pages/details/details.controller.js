@@ -11,6 +11,7 @@
         var vm = this;
         vm.data = {};
         vm.taskId = $state.params.taskId;
+        $scope.processInstanceId = $state.params.processInstanceId; // mi torna comodo per gli attachments -martin
 
         if ($state.params.processInstanceId) {
             dataService.processInstances.byProcessInstanceId($state.params.processInstanceId).then(
