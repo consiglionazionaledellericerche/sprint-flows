@@ -38,7 +38,7 @@
             if (validate(vm.data)) {
 
                 Upload.upload({
-                    url: 'rest/tasks/complete',
+                    url: 'api/tasks/complete',
                     data: vm.data,
                 }).then(function (response) {
 //                  $timeout(function () {
