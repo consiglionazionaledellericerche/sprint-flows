@@ -35,6 +35,8 @@
               task.variabili = {};
               task.variables.forEach(function (variable) {
                 task.variabili[variable.name] = variable.value;
+                var processDefinitionId = task.processDefinitionId.split(":")[0];
+                task.searchView = 'api/views/'+ processDefinitionId +'/search'
               });
             });
           }

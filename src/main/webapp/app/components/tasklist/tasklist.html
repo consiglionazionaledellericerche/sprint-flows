@@ -10,28 +10,23 @@
     <div ng-show="completed">
       assegnato il {{task.startDate | date}}, completato il {{task.endDate | date}}
     </div>
-    <div ng-show="advanced" ng-repeat="variable in task.variables">
-      <strong>{{variable.name}}:</strong> {{variable.value}}
+    <div ng-show="advanced">
+      <ng-include src="task.searchView" />
     </div>
-    <metadata-fields metadata-fields="metadataFields" workflow-variable="task.variable" label-class="'font-italic'"></metadata-fields>
   </div>
+
   <div class="col-md-3 pull-right" ng-show="!completed">
     <div class="btn-group-vertical btn-block" role="group">
-        <a class="btn btn-primary" ng-class="{'btn-xs': !advanced}" ng-show="{{actionButtons}}"
-           ui-sref="task({processDefinitionId: task.processDefinitionId, taskId: task.id})">
-        <span class="glyphicon glyphicon-cog"></span> Azioni
-      </a>
-        <a class="btn btn-default" ng-class="{'btn-xs': !advanced}" ng-show="{{task.assignee !== null&&actionButtons}}"
-           ng-click="claimTask(task.id, false)">
-        <span class="glyphicon glyphicon-hand-down" aria-hidden="true"></span> Restituisci al gruppo
-      </a>
-        <a class="btn btn-default" ng-class="{'btn-xs': !advanced}" ng-show="{{task.assignee === null&&actionButtons}}"
-           ng-click="claimTask(task.id, true)">
-        <span class="glyphicon glyphicon-hand-up" aria-hidden="true"></span> Prendi in carico
-      </a>
-      <!--ui-sref="details({processInstanceId: task.id})"> <span-->
       <a class="btn btn-primary" ng-class="{'btn-xs': !advanced}" ui-sref="details({processInstanceId: task.processInstanceId, taskId: task.id})">
         <span class="glyphicon glyphicon-th-list"></span> Dettagli
+      </a>
+      <a class="btn btn-default" ng-class="{'btn-xs': !advanced}" ng-if="task.assignee !== null&&actionButtons"
+         ng-click="claimTask(task.id, false)">
+      <span class="glyphicon glyphicon-hand-down" aria-hidden="true"></span> Restituisci al gruppo
+      </a>
+        <a class="btn btn-default" ng-class="{'btn-xs': !advanced}" ng-if="task.assignee === null&&actionButtons"
+           ng-click="claimTask(task.id, true)">
+        <span class="glyphicon glyphicon-hand-up" aria-hidden="true"></span> Prendi in carico
       </a>
     </div>
   </div>

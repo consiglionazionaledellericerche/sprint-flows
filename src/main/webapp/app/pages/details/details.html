@@ -1,49 +1,78 @@
 <div class="col-md-12" ng-cloak>
 
-  <div class="row text-center">
-    <h3>{{vm.data.entity.processDefinitionKey}} ({{vm.data.entity.processDefinitionId}})</h3>
-    <p class="text-muted">{{vm.definition.description}}</p>
-      <img class="img-bordered" ng-src='/rest/diagram/processInstance/{{vm.data.entity.id}}'
-           title="{{vm.data.entity.processDefinitionKey}}" style="max-width: 100%"/>
-  </div>
+  <div class="row">
+    <div class="col-md-8">
 
-
-  <div class="col-md-8">
-
-      <h4>{{vm.data.entity.title ? vm.data.entity.title : vm.data.entity.variabili.title}} ({{vm.data.entity.id}})</h4>
+      <h4>{{vm.data.entity.title ? vm.data.entity.title : vm.data.entity.variabili.title}}</h4>
       <br>
 
-    <span ng-class="{'label-warning': !vm.data.entity.completed , 'label-success': vm.data.entity.completed }" class="label">{{!vm.data.entity.completed ? 'attivo' : 'completato'}}</span>
-      <b>Avviato da: </b>{{vm.data.entity.initiator}} il {{vm.data.entity.startDate | date}} <br>
-    <span ng-hide="!vm.data.entity.completed">
-      <b>completato il:</b>{{vm.data.entity.endDate | date}} <br>
-    </span>
-    <span ng-show="!vm.data.entity.completed">
-      <!--<b>Percentuale di completamento: </b> {{activeTask.properties.bpm_percentComplete}}&#37;-->
-      <b>Fase: </b>{{vm.data.entity.activityId}}<br>
-    </span>
+      <span ng-class="{'label-warning': !vm.data.entity.completed , 'label-success': vm.data.entity.completed }" class="label">{{!vm.data.entity.completed ? 'attivo' : 'completato'}}</span>
+      <b>Avviato da: </b>
+      {{vm.data.entity.initiator}} il {{vm.data.entity.startDate | date}}
+      <br>
+      <span ng-hide="!vm.data.entity.completed">
+        <b>completato il:</b>
+        {{vm.data.entity.endDate | date}}
+        <br>
+      </span>
+      <span ng-show="!vm.data.entity.completed">
+        <!--<b>Percentuale di completamento: </b> {{activeTask.properties.bpm_percentComplete}}&#37;-->
+        <b>Fase: </b>
+        {{vm.data.entity.activityId}}
+        <br>
+      </span>
 
-	<ng-include src="vm.detailsView" />
+      <ng-include src="vm.detailsView" />
 
-    <attachments />
+      <attachments />
 
-	<!-- <identity-links></identity-links> -->
-	<h4>Identity Links</h4>
-	<span ng-repeat="(taskId, link) in vm.data.identityLinks">
-	    TaskId - <strong>{{ taskId }}:</strong>  <br>
-	    (Assignee: {{link.assignee || null}}, Candidate Users: {{link.candidateUsers}}, Candidate Groups: {{link.candidateGroups}}) <br>
+      <!-- <identity-links></identity-links> -->
+      <div ng-if="isAdmin">
+      <h4>Identity Links</h4>
+      <span ng-repeat="(taskId, link) in vm.data.identityLinks">
+        TaskId -
+        <strong>{{ taskId }}:</strong>
+        <br>
+        (Assignee: {{link.assignee || null}}, Candidate Users: {{link.candidateUsers}}, Candidate Groups: {{link.candidateGroups}})
+        <br>
         <span ng-repeat="actualLink in link.links">
-            <strong>{{ actualLink.type }}:</strong> {{ actualLink.user || actualLink.group }} <br>
+          <strong>{{ actualLink.type }}:</strong>
+          {{ actualLink.user || actualLink.group }}
+          <br>
         </span>
-	</span>
+      </span>
+      </div>
+
+      <div class="row text-center">
+        <h3>{{vm.data.entity.processDefinitionKey}} ({{vm.data.entity.processDefinitionId}})</h3>
+        <p class="text-muted">{{vm.definition.description}}</p>
+        <img class="img-bordered" ng-src='/rest/diagram/processInstance/{{vm.data.entity.id}}' title="{{vm.data.entity.processDefinitionKey}}" style="max-width: 100%" />
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <button class="btn btn-default btn-block" ng-hide="chronology" ng-click="chronology = true"><span class="glyphicon glyphicon-time"></span> Visualizza Cronologia</button>
+        <history tasks="vm.data.history" start="vm.data.startEvent"></history>
+    </div>
   </div>
 
-  <button class="btn btn-default" ng-click="chronology = true" ng-hide="chronology">Visualizza Cronologia</button>
-  <div ng-if="chronology" class="col-md-4 ng-scope">
-      <history tasks="vm.data.history" start="vm.data.startEvent"></history>
+  <hr>
+
+  <div class="row">
+    <div class="col-md-4 col-md-offset-4">
+      <div class="btn-group btn-group-justified" role="group">
+        <a class="btn btn-primary" back><span class="glyphicon glyphicon-arrow-left"></span> Ritorna</a>
+        <a class="btn btn-primary" ng-if="vm.taskId" ui-sref="task({processDefinitionId: vm.data.entity.processDefinitionId, taskId: vm.taskId})">
+          <span class="glyphicon glyphicon-cog"></span> Azioni <span class="glyphicon glyphicon-arrow-right"></span>
+        </a>
+      </div>
+    </div>
   </div>
 
-</div>
-<div class="col-md-10">
-  <pre>{{vm | json}}</pre>
+  <div class="row dev">
+    <hr>
+    <div class="col-md-12" >
+      <pre>{{vm | json}}</pre>
+    </div>
+  </div>
 </div>

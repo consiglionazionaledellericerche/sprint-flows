@@ -5,19 +5,16 @@
     .module('sprintApp')
     .controller('DetailsController', DetailsController);
 
-    DetailsController.$inject = ['$scope', '$state', 'dataService', '$log', 'utils', '$uibModal'];
+    DetailsController.$inject = ['$scope', '$state', 'dataService', '$log', 'utils', '$uibModal', '$window'];
 
-    function DetailsController ($scope, $state, dataService, $log, utils, $uibModal) {
+    function DetailsController ($scope, $state, dataService, $log, utils, $uibModal, $window) {
         var vm = this;
-        var processInstanceId = $state.params.processInstanceId;
-        $scope.processInstanceId = $state.params.processInstanceId;
         vm.data = {};
+        vm.taskId = $state.params.taskId;
+        $scope.processInstanceId = $state.params.processInstanceId; // mi torna comodo per gli attachments -martin
 
-        if (processInstanceId) {
-            $log.info("getting task info");
-
-            vm.data.processInstanceId = processInstanceId;
-            dataService.processInstances.byProcessInstanceId(processInstanceId).then(
+        if ($state.params.processInstanceId) {
+            dataService.processInstances.byProcessInstanceId($state.params.processInstanceId).then(
                     function(response) {
                         vm.data.entity = utils.refactoringVariables([response.data.entity])[0];
                         vm.data.history = response.data.history;
@@ -29,8 +26,8 @@
 
                         var processDefinitionId = response.data.entity.processDefinitionId.split(":")[0];
                         vm.detailsView = 'api/views/'+ processDefinitionId +'/detail';
-                    });
 
+                    });
         }
     }
 })();

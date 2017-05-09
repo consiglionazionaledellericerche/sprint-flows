@@ -366,9 +366,6 @@ input.ng-dirty.ng-invalid {
     padding-bottom: 20px;
     padding-top: 20px;
 }
-.tasks .row-slim {
-  padding-bottom: 0;
-}
 
 .task-history {
   border-top: 2px solid #EEE;
