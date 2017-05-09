@@ -1,12 +1,28 @@
 <h4>Cronologia</h4>
+<div class="task-history" id="startEvent">
+    <b>Flusso {{start.title}}</b> <br>
+    <b>Avviato da </b>: {{start.initiator}} <br>
+    <b>In data </b>: {{start.startDate | date}} <br>
+</div>
 <div class="task-history" ng-repeat="task in tasks | orderBy:'startTime'">
   <h5>
     <task-details task="task"></task-details>
-    <b>{{task.name}} </b>
+      <b>{{task.historyTask.name}} </b>
   </h5>
-  <span ng-show="task.assignee !== null"> <b>Assegnatario</b>: {{task.assignee}} </span>
-  <b>data di assegnazione</b>: {{task.startTime | date}} <br>
+    <div ng-repeat="identityLink in task.historyIdentityLink">
+        <div ng-switch="identityLink.type">
+            <div ng-switch-when="candidate">
+                <span ng-show="identityLink.userId !== null"> <b>Utente Assegnatario</b>: {{identityLink.userId}} </span>
+                <br>
+                <span ng-show="identityLink.groupId !== null"> <b>Gruppo Assegnatario</b>: {{identityLink.groupId}} </span><br>
+            </div>
+            <div ng-switch-when="esecutore">
+                <span ng-show="identityLink.userId !== null"> <b>Eseguito dall'Utente</b>: {{identityLink.userId}} </span><br>
+            </div>
+        </div>
+    </div>
+    <b>Data di assegnazione</b>: {{task.historyTask.startTime | date}} <br>
   <span ng-hide="task.endTime === null">
-    <b>con data di completamento:</b> {{task.endTime | date}} ({{task.durationInMillis}} millisecondi)
+    <b>Con data di completamento:</b> {{task.historyTask.endTime | date}} ({{task.historyTask.durationInMillis}} millisecondi)
   </span>
 </div>

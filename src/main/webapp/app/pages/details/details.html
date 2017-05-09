@@ -40,7 +40,7 @@
 
   <button class="btn btn-default" ng-click="chronology = true" ng-hide="chronology">Visualizza Cronologia</button>
   <div ng-if="chronology" class="col-md-4 ng-scope">
-    <history tasks="vm.data.history" />
+      <history tasks="vm.data.history" start="vm.data.startEvent"></history>
   </div>
 
 </div>

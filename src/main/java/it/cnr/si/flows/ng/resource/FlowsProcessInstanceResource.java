@@ -3,12 +3,13 @@ package it.cnr.si.flows.ng.resource;
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.SecurityUtils;
-import org.activiti.engine.*;
+import org.activiti.engine.HistoryService;
+import org.activiti.engine.RepositoryService;
+import org.activiti.engine.TaskService;
+import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
-import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.impl.RepositoryServiceImpl;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.pvm.PvmActivity;
 import org.activiti.engine.impl.pvm.ReadOnlyProcessDefinition;
 import org.activiti.engine.impl.task.TaskDefinition;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,13 +55,8 @@ public class FlowsProcessInstanceResource {
     @Autowired
     private RepositoryService repositoryService;
     @Autowired
-    private RuntimeService runtimeService;
-    @Autowired
     private TaskService taskService;
-    @Autowired
-    protected ProcessEngineConfigurationImpl processEngineConfiguration;
-    @Autowired
-    ManagementService managementService;
+
 
 
 
@@ -136,12 +133,21 @@ public class FlowsProcessInstanceResource {
                 });
         result.put("identityLinks", identityLinks);
 
-        List<HistoricTaskInstance> historyList = historyService.createHistoricTaskInstanceQuery()
+        //History
+        ArrayList<Map> history = new ArrayList<>();
+        historyService.createHistoricTaskInstanceQuery()
                 .includeTaskLocalVariables()
                 .processInstanceId(processInstanceId)
-                .list();
-
-        result.put("history", restResponseFactory.createHistoricTaskInstanceResponseList(historyList));
+                .list()
+                .forEach(
+                        task -> {
+                            List<HistoricIdentityLink> links = historyService.getHistoricIdentityLinksForTask(task.getId());
+                            HashMap<String, Object> entity = new HashMap<>();
+                            entity.put("historyTask", restResponseFactory.createHistoricTaskInstanceResponse(task));
+                            entity.put("historyIdentityLink", restResponseFactory.createHistoricIdentityLinkResponseList(links));
+                            history.add(entity);
+                        });
+        result.put("history", history);
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
