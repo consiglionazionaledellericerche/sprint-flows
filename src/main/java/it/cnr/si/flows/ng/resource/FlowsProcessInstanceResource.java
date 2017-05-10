@@ -13,14 +13,18 @@ import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.pvm.PvmActivity;
 import org.activiti.engine.impl.pvm.ReadOnlyProcessDefinition;
 import org.activiti.engine.impl.task.TaskDefinition;
+import org.activiti.engine.impl.util.json.JSONArray;
+import org.activiti.engine.impl.util.json.JSONObject;
 import org.activiti.engine.task.Attachment;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.AttachmentResponse;
+import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceActionRequest;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResource;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,23 +33,28 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static it.cnr.si.flows.ng.utils.Utils.ASC;
+import static it.cnr.si.flows.ng.utils.Utils.DESC;
 
 @Controller
 @RequestMapping("api/processInstances")
 public class FlowsProcessInstanceResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsProcessInstanceResource.class);
+    private static final String ALL_PROCESS_INSTANCES = "all";
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     @Autowired
     private RestResponseFactory restResponseFactory;
     @Autowired
@@ -165,9 +174,13 @@ public class FlowsProcessInstanceResource {
     public ResponseEntity getProcessInstances(@RequestParam("active") boolean active) {
         List<HistoricProcessInstance> processInstances;
         if (active) {
-            processInstances = historyService.createHistoricProcessInstanceQuery().unfinished().includeProcessVariables().list();
+            processInstances = historyService.createHistoricProcessInstanceQuery()
+                    .unfinished()
+                    .includeProcessVariables().list();
         } else {
-            processInstances = historyService.createHistoricProcessInstanceQuery().finished().includeProcessVariables().list();
+            processInstances = historyService.createHistoricProcessInstanceQuery()
+                    .finished().or().deleted()
+                    .includeProcessVariables().list();
         }
         return new ResponseEntity<>(restResponseFactory.createHistoricProcessInstanceResponseList(processInstances), HttpStatus.OK);
     }
@@ -195,6 +208,115 @@ public class FlowsProcessInstanceResource {
         return processInstanceResource.performProcessInstanceAction(processInstanceId, action, request);
     }
 
+    /**
+     * Funzionalità di Ricerca delle Process Instances.
+     *
+     * @param req               the req
+     * @param processInstanceId Il processInstanceId della ricerca
+     * @param active            Boolean che indica se ricercare le Process Insrtances attive o terminate
+     * @param order             L'ordine in cui vogliamo i risltati ('ASC' o 'DESC')
+     * @return le response entity frutto della ricerca
+     */
+    @RequestMapping(value = "/search/{processInstanceId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<Object> search(
+            HttpServletRequest req,
+            @PathVariable("processInstanceId") String processInstanceId,
+            @RequestParam("active") boolean active,
+            @RequestParam("order") String order,
+            @RequestParam("firstResult") int firstResult,
+            @RequestParam("maxResults") int maxResults) {
+
+        String jsonString = "";
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            jsonString = IOUtils.toString(req.getReader());
+        } catch (Exception e) {
+            LOGGER.error("Errore nella letture dello stream della request", e);
+        }
+        JSONArray params = new JSONObject(jsonString).getJSONArray("params");
+
+//        HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery();
+        HistoricProcessInstanceQuery processQuery = historyService.createHistoricProcessInstanceQuery();
+
+        if (!processInstanceId.equals(ALL_PROCESS_INSTANCES))
+            processQuery.processDefinitionKey(processInstanceId);
+
+        if (active)
+            processQuery.unfinished();
+        else
+            processQuery.finished();
+
+        for (int i = 0; i < params.length(); i++) {
+            JSONObject appo = params.optJSONObject(i);
+            String key = appo.getString("key");
+            String value = appo.getString("value");
+            String type = appo.getString("type");
+            //wildcard ("%") di default ma non a TUTTI i campi
+            switch (type) {
+                case "textEqual":
+//                taskQuery.processVariableValueEquals(key, value);
+                    processQuery.variableValueEquals(key, value);
+                    break;
+                case "boolean":
+                    // gestione variabili booleane
+//                taskQuery.processVariableValueEquals(key, Boolean.valueOf(value));
+                    processQuery.variableValueEquals(key, Boolean.valueOf(value));
+                    break;
+                case "date":
+                    processDate(processQuery, key, value);
+                    break;
+                default:
+                    //variabili con la wildcard  (%value%)
+//                taskQuery.processVariableValueLikeIgnoreCase(key, "%" + value + "%");
+                    processQuery.variableValueLikeIgnoreCase(key, "%" + value + "%");
+                    break;
+            }
+        }
+        if (order.equals(ASC)) {
+//            taskQuery.orderByTaskCreateTime().asc();
+            processQuery.orderByProcessInstanceStartTime().asc();
+        } else if (order.equals(DESC)) {
+//            taskQuery.orderByTaskCreateTime().desc();
+            processQuery.orderByProcessInstanceStartTime().desc();
+        }
+        long totalItems = processQuery.includeProcessVariables().count();
+        result.put("totalItems", totalItems);
+
+//        List<HistoricTaskInstance> taskRaw = taskQuery.includeProcessVariables().listPage(firstResult, maxResults);
+//        List<HistoricTaskInstanceResponse> tasks = restResponseFactory.createHistoricTaskInstanceResponseList(taskRaw);
+        List<HistoricProcessInstance> taskRaw = processQuery.includeProcessVariables().listPage(firstResult, maxResults);
+        List<HistoricProcessInstanceResponse> tasks = restResponseFactory.createHistoricProcessInstanceResponseList(taskRaw);
+        result.put("processInstances", tasks);
+        return ResponseEntity.ok(result);
+    }
+
+
+    //    private void processDate(HistoricTaskInstanceQuery taskQuery, String key, String value) {
+//        try {
+//            Date date = sdf.parse(value);
+//
+//            if (key.contains("Less")) {
+//                taskQuery.processVariableValueLessThanOrEqual(key.replace("Less", ""), date);
+//            } else if (key.contains("Great"))
+//                taskQuery.processVariableValueGreaterThanOrEqual(key.replace("Great", ""), date);
+//        } catch (ParseException e) {
+//            LOGGER.error("Errore nel parsing della data {} - ", value, e);
+//        }
+//    }
+    private void processDate(HistoricProcessInstanceQuery taskQuery, String key, String value) {
+        try {
+            Date date = sdf.parse(value);
+
+            if (key.contains("Less")) {
+                taskQuery.variableValueLessThanOrEqual(key.replace("Less", ""), date);
+            } else if (key.contains("Great"))
+                taskQuery.variableValueGreaterThanOrEqual(key.replace("Great", ""), date);
+        } catch (ParseException e) {
+            LOGGER.error("Errore nel parsing della data {} - ", value, e);
+        }
+    }
     /* ----------- */
 
 

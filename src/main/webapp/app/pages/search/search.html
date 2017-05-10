@@ -46,16 +46,20 @@
 
     <div class="col-md-9">
         <h3>Flussi {{vm.active ? 'attivi' : 'completati'}}</h3>
-        <tasklist
-                tasks="vm.tasks"
-                advanced="advanced"
-                paging="paging"
-                class="tasks"
-                detailed="detailed"
-                select-process-definition-key="selectProcessDefinitionKey"
-                process-definitions="processDefinitions"
-                action-buttons="false">
-        </tasklist>
+        <!--<tasklist-->
+        <!--tasks="vm.tasks"-->
+        <!--advanced="advanced"-->
+        <!--paging="paging"-->
+        <!--class="tasks"-->
+        <!--detailed="detailed"-->
+        <!--select-process-definition-key="selectProcessDefinitionKey"-->
+        <!--process-definitions="processDefinitions"-->
+        <!--action-buttons="false">-->
+        <!--</tasklist>-->
+        <process-list
+                processes="vm.processInstances"
+                paging="paging">
+        </process-list>
 
         <pre ng-show="development">
       {{workflows.data | json}}

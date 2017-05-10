@@ -52,9 +52,9 @@
         });
         var paramsJson = {"params": params};
 
-        dataService.tasks.searchTask($scope.current, vm.active, paramsJson, vm.order, firstResult, maxResults)
+        dataService.processInstances.search($scope.current, vm.active, paramsJson, vm.order, firstResult, maxResults)
             .then(function (response) {
-                vm.tasks = response.data.tasks;
+                vm.processInstances = response.data.processInstances;
                 // variabili per la gestione della paginazione
                 vm.totalItems = response.data.totalItems;
                 vm.queryCount = vm.totalItems;

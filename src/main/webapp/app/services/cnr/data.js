@@ -45,19 +45,6 @@
         },
         getTaskCompleted: function (firstResult, maxResults) {
             return $http.get('api/tasks/taskCompleted?firstResult=' + firstResult + '&maxResults=' + maxResults);
-        },
-        searchTask: function (processInstance, active, params, order, firstResult, maxResults) {
-            var processInstaceId;
-            if(processInstance !== undefined){
-                processInstaceId = processInstance.key;
-            } else {
-                processInstaceId = 'all';
-            }
-            return $http.post('api/tasks/search/' + processInstaceId+
-                '?active=' + active +
-                '&order=' + order +
-                '&firstResult=' + firstResult +
-                '&maxResults=' + maxResults, params);
         }
       },
       processInstances: {
@@ -75,6 +62,19 @@
         },
         attachmentHistory: function(processInstaceId, attachmentName) {
             return $http.get('api/attachments/history/'+ processInstaceId +'/'+ attachmentName);
+        },
+        search: function (processInstance, active, params, order, firstResult, maxResults) {
+            var processInstaceId;
+            if(processInstance !== undefined){
+                processInstaceId = processInstance.key;
+            } else {
+                processInstaceId = 'all';
+            }
+            return $http.post('api/processInstances/search/' + processInstaceId+
+                '?active=' + active +
+                '&order=' + order +
+                '&firstResult=' + firstResult +
+                '&maxResults=' + maxResults, params);
         }
       },
       definitions : {
