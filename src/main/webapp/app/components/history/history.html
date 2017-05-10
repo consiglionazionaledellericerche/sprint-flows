@@ -4,7 +4,7 @@
     <b>Avviato da </b>: {{start.initiator}} <br>
     <b>In data </b>: {{start.startDate | date}} <br>
 </div>
-<div class="task-history" ng-repeat="task in tasks | orderBy:'startTime'">
+<div class="task-history" ng-repeat="task in tasks | orderBy:'historyTask.startTime'">
   <h5>
     <task-details task="task"></task-details>
       <b>{{task.historyTask.name}} </b>
