@@ -70,7 +70,6 @@ public class FlowsAttachmentService {
                 att.setAzione(Azione.Caricamento);
             else {
                 att.setAzione(Azione.Aggiornamento);
-                att.addStato(Stato.Protocollato);
             }
 
             attachments.put(fileName, att);

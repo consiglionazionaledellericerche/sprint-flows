@@ -154,9 +154,13 @@
         </extensionElements>
       </sequenceFlow>
       <sequenceFlow id="flow138" sourceRef="exclusivegateway26" targetRef="endevent4">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${verificheRequisitiLegge == 'Soddisfatte'}]]></conditionExpression>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${verificheRequisitiLegge == 'tipologia1'}]]></conditionExpression>
       </sequenceFlow>
-      <userTask id="usertask1" name="Verifica Requisiti"></userTask>
+      <userTask id="verifica-requisiti" name="Verifica Requisiti" activiti:candidateGroups="ROLE_USER">
+        <extensionElements>
+          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
+        </extensionElements>
+      </userTask>
       <sequenceFlow id="flow53" sourceRef="exclusivegateway11" targetRef="protocollo-provvedimento-aggiudicazione">
         <extensionElements>
           <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.FirmaDocumento">
@@ -167,10 +171,10 @@
         </extensionElements>
       </sequenceFlow>
       <exclusiveGateway id="exclusivegateway27" name="Exclusive Gateway" default="flow143"></exclusiveGateway>
-      <sequenceFlow id="flow140" sourceRef="exclusivegateway26" targetRef="usertask1"></sequenceFlow>
-      <sequenceFlow id="flow141" sourceRef="usertask1" targetRef="exclusivegateway27"></sequenceFlow>
+      <sequenceFlow id="flow140" sourceRef="exclusivegateway26" targetRef="verifica-requisiti"></sequenceFlow>
+      <sequenceFlow id="flow141" sourceRef="verifica-requisiti" targetRef="exclusivegateway27"></sequenceFlow>
       <sequenceFlow id="flow142" sourceRef="exclusivegateway27" targetRef="endevent4">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${verificheRequisitiLegge == 'Soddisfatte'}]]></conditionExpression>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${verificheRequisitiLegge == 'tipologia1'}]]></conditionExpression>
       </sequenceFlow>
       <sequenceFlow id="flow143" sourceRef="exclusivegateway27" targetRef="predisposizione-provvedimento-aggiudicazione"></sequenceFlow>
     </subProcess>
@@ -457,7 +461,7 @@
       <bpmndi:BPMNShape bpmnElement="exclusivegateway26" id="BPMNShape_exclusivegateway26">
         <omgdc:Bounds height="40.0" width="40.0" x="750.0" y="464.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+      <bpmndi:BPMNShape bpmnElement="verifica-requisiti" id="BPMNShape_verifica-requisiti">
         <omgdc:Bounds height="67.0" width="105.0" x="796.0" y="504.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="exclusivegateway27" id="BPMNShape_exclusivegateway27">

@@ -8,10 +8,8 @@ import org.activiti.engine.delegate.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import it.cnr.jada.firma.arss.ArubaSignServiceException;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.exception.TaskFailedException;
-import it.cnr.si.flows.ng.service.FirmaService;
 
 public class ProtocollaDocumento implements ExecutionListener {
 
