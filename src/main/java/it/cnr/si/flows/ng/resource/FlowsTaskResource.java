@@ -362,11 +362,10 @@ public class FlowsTaskResource {
                 if (!canCompleteTask(taskId, Optional.of(username)))
                     throw new FlowsPermissionException();
 
-                // aggiungo l'identityLink che indica l'utente che esegue il task
-                taskService.addUserIdentityLink(taskId, username, TASK_EXECUTOR);
-
                 taskService.setVariablesLocal(taskId, data);
                 taskService.complete(taskId, data);
+                //Aggiungo l'identityLink che indica l'utente che esegue il task SOLO se il task viene effettivamente eseguito
+                taskService.addUserIdentityLink(taskId, username, TASK_EXECUTOR);
 
                 return new ResponseEntity<>(HttpStatus.OK);
 
