@@ -96,7 +96,7 @@
       <sequenceFlow id="flow21" sourceRef="exclusivegateway3" targetRef="modifica-provvedimento-aggiudicazione">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Modifica'}]]></conditionExpression>
       </sequenceFlow>
-      <userTask id="protocollo-provvedimento-aggiudicazione" name="Protocollo Provvedimento Aggiudicazione" activiti:async="true" activiti:candidateGroups="ROLE_USER">
+      <userTask id="protocollo-provvedimento-aggiudicazione" name="Protocollo Provvedimento Aggiudicazione" activiti:candidateGroups="ROLE_USER">
         <extensionElements>
           <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
         </extensionElements>
