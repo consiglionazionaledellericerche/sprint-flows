@@ -8,11 +8,11 @@
                     <b>Flusso {{variable.value}}</b><br><br>
                 </h5>
             </div>
-            <div ng-switch-when="initiator">
-                <b>Avviato da:</b> {{variable.value}} <br>
-            </div>
             <div ng-switch-when="startDate">
-                <b>In data:</b> {{variable.value | date}} <br>
+                <b>IAvviato il </b> {{variable.value | date}} <br>
+            </div>
+            <div ng-switch-when="initiator">
+                <b>Dall'utente </b> {{variable.value}} <br>
             </div>
         </div>
     </div>
