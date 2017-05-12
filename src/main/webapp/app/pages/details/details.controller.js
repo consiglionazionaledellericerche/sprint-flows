@@ -18,8 +18,8 @@
                     function(response) {
                         vm.data.entity = utils.refactoringVariables([response.data.entity])[0];
                         vm.data.history = response.data.history;
-                        //in response.data.entity.variabili ci sono anche le properties della Process Instance (initiator, startdate, ecc.)
-                        vm.data.startEvent = response.data.entity.variabili;
+                        //in response.data.entity.variables ci sono anche le properties della Process Instance (initiator, startdate, ecc.)
+                        vm.data.startEvent = response.data.entity.variables;
                         vm.data.attachments = response.data.attachments;
                         vm.data.identityLinks = response.data.identityLinks;
                         vm.diagramUrl = '/rest/diagram/processInstance/'+ vm.data.entity.id;

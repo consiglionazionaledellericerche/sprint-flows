@@ -12,7 +12,7 @@
       restrict: 'E',
       scope: {
         tasks: '=',
-        start: '='
+        startTask: '='
       },
       templateUrl: 'app/components/history/history.html'
     };
