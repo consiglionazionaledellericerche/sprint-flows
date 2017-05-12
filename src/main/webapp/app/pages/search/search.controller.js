@@ -36,13 +36,14 @@
 
 
     $scope.search = function(){
-        var fields = Array.from($("input[id^='searchFields']")), params = [], firstResult,
+        var fields = Array.from($("input[id^='searchField-']")), params = [], firstResult,
            maxResults = vm.itemsPerPage;
         firstResult = vm.itemsPerPage * (vm.page - 1)
 
         //popolo params con gli id, i valori sottomessi e il "type" dei campi di ricerca
         fields.forEach(function (field){
-            var fieldName = field.getAttribute('id').replace('searchFields.', ''), appo = {};
+            var fieldName = field.getAttribute('id').replace('searchField-', ''),
+             appo = {};
                 if(field.value  !== ""){
                     appo["key"] = fieldName;
                     appo["value"] = field.value;
@@ -63,7 +64,7 @@
             });
     }
 
-    //funzione richiamata quando si chiede una nuova "pagina"
+    //funzione richiamata quando si chiede una nuova "pagina" dei risultati
     function transition (current) {
         $scope.search(current);
     }
