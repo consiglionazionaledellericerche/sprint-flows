@@ -237,7 +237,6 @@ public class FlowsProcessInstanceResource {
         }
         JSONArray params = new JSONObject(jsonString).getJSONArray("params");
 
-//        HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery();
         HistoricProcessInstanceQuery processQuery = historyService.createHistoricProcessInstanceQuery();
 
         if (!processInstanceId.equals(ALL_PROCESS_INSTANCES))
@@ -256,12 +255,10 @@ public class FlowsProcessInstanceResource {
             //wildcard ("%") di default ma non a TUTTI i campi
             switch (type) {
                 case "textEqual":
-//                taskQuery.processVariableValueEquals(key, value);
                     processQuery.variableValueEquals(key, value);
                     break;
                 case "boolean":
                     // gestione variabili booleane
-//                taskQuery.processVariableValueEquals(key, Boolean.valueOf(value));
                     processQuery.variableValueEquals(key, Boolean.valueOf(value));
                     break;
                 case "date":
@@ -269,23 +266,18 @@ public class FlowsProcessInstanceResource {
                     break;
                 default:
                     //variabili con la wildcard  (%value%)
-//                taskQuery.processVariableValueLikeIgnoreCase(key, "%" + value + "%");
                     processQuery.variableValueLikeIgnoreCase(key, "%" + value + "%");
                     break;
             }
         }
-        if (order.equals(ASC)) {
-//            taskQuery.orderByTaskCreateTime().asc();
+        if (order.equals(ASC))
             processQuery.orderByProcessInstanceStartTime().asc();
-        } else if (order.equals(DESC)) {
-//            taskQuery.orderByTaskCreateTime().desc();
+        else if (order.equals(DESC))
             processQuery.orderByProcessInstanceStartTime().desc();
-        }
+
         long totalItems = processQuery.includeProcessVariables().count();
         result.put("totalItems", totalItems);
 
-//        List<HistoricTaskInstance> taskRaw = taskQuery.includeProcessVariables().listPage(firstResult, maxResults);
-//        List<HistoricTaskInstanceResponse> tasks = restResponseFactory.createHistoricTaskInstanceResponseList(taskRaw);
         List<HistoricProcessInstance> taskRaw = processQuery.includeProcessVariables().listPage(firstResult, maxResults);
         List<HistoricProcessInstanceResponse> tasks = restResponseFactory.createHistoricProcessInstanceResponseList(taskRaw);
         result.put("processInstances", tasks);
