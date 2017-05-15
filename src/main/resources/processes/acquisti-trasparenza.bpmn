@@ -245,7 +245,15 @@
       </userTask>
       <sequenceFlow id="flow73" sourceRef="startevent9" targetRef="carica-ordine-mepa"></sequenceFlow>
       <sequenceFlow id="flow74" sourceRef="carica-ordine-mepa" targetRef="exclusivegateway18"></sequenceFlow>
-      <sequenceFlow id="flow75" sourceRef="protocollo-ordine-mepa" targetRef="invio-ordine-mepa"></sequenceFlow>
+      <sequenceFlow id="flow75" sourceRef="protocollo-ordine-mepa" targetRef="invio-ordine-mepa">
+        <extensionElements>
+          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.ProtocollaDocumento">
+            <activiti:field name="nomeFileDaProtocollare">
+              <activiti:string><![CDATA[ordineMepa]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </sequenceFlow>
       <exclusiveGateway id="exclusivegateway18" name="Exclusive Gateway" default="flow90"></exclusiveGateway>
       <sequenceFlow id="flow90" sourceRef="exclusivegateway18" targetRef="protocollo-ordine-mepa"></sequenceFlow>
       <userTask id="revoca-ordine-mepa" name="Revoca Ordine Mepa" activiti:candidateGroups="ROLE_USER">
@@ -294,7 +302,7 @@
     <sequenceFlow id="flow101" sourceRef="exclusivegateway22" targetRef="REVOCA">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaConProvvedimento'}]]></conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="flow102" sourceRef="exclusivegateway22" targetRef="ordine-mepa"></sequenceFlow>
+    <sequenceFlow id="flow102" sourceRef="exclusivegateway22" targetRef="consuntivo"></sequenceFlow>
     <sequenceFlow id="flow103" sourceRef="ordine-mepa" targetRef="exclusivegateway16"></sequenceFlow>
     <subProcess id="ordine-fuori-mepa" name="ORDINE FUORI MEPA">
       <startEvent id="startevent10" name="Start"></startEvent>
@@ -508,10 +516,10 @@
         <omgdc:Bounds height="40.0" width="40.0" x="946.0" y="107.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="consuntivo" id="BPMNShape_consuntivo">
-        <omgdc:Bounds height="71.0" width="105.0" x="892.0" y="884.0"></omgdc:Bounds>
+        <omgdc:Bounds height="71.0" width="105.0" x="893.0" y="749.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="endevent8" id="BPMNShape_endevent8">
-        <omgdc:Bounds height="35.0" width="35.0" x="927.0" y="994.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="928.0" y="850.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="ordine-mepa" id="BPMNShape_ordine-mepa">
         <omgdc:Bounds height="202.0" width="626.0" x="107.0" y="819.0"></omgdc:Bounds>
@@ -820,8 +828,8 @@
         <omgdi:waypoint x="622.0" y="1137.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow71" id="BPMNEdge_flow71">
-        <omgdi:waypoint x="944.0" y="955.0"></omgdi:waypoint>
-        <omgdi:waypoint x="944.0" y="994.0"></omgdi:waypoint>
+        <omgdi:waypoint x="945.0" y="820.0"></omgdi:waypoint>
+        <omgdi:waypoint x="945.0" y="850.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow73" id="BPMNEdge_flow73">
         <omgdi:waypoint x="167.0" y="898.0"></omgdi:waypoint>
@@ -887,8 +895,9 @@
         <omgdi:waypoint x="107.0" y="920.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow84" id="BPMNEdge_flow84">
-        <omgdi:waypoint x="847.0" y="919.0"></omgdi:waypoint>
-        <omgdi:waypoint x="892.0" y="919.0"></omgdi:waypoint>
+        <omgdi:waypoint x="827.0" y="899.0"></omgdi:waypoint>
+        <omgdi:waypoint x="827.0" y="784.0"></omgdi:waypoint>
+        <omgdi:waypoint x="893.0" y="784.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow85" id="BPMNEdge_flow85">
         <omgdi:waypoint x="827.0" y="939.0"></omgdi:waypoint>
@@ -914,8 +923,8 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow102" id="BPMNEdge_flow102">
         <omgdi:waypoint x="944.0" y="723.0"></omgdi:waypoint>
-        <omgdi:waypoint x="943.0" y="815.0"></omgdi:waypoint>
-        <omgdi:waypoint x="733.0" y="920.0"></omgdi:waypoint>
+        <omgdi:waypoint x="943.0" y="742.0"></omgdi:waypoint>
+        <omgdi:waypoint x="945.0" y="749.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow103" id="BPMNEdge_flow103">
         <omgdi:waypoint x="733.0" y="920.0"></omgdi:waypoint>
@@ -1014,9 +1023,8 @@
         <omgdi:waypoint x="1057.0" y="1180.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow135" id="BPMNEdge_flow135">
-        <omgdi:waypoint x="827.0" y="899.0"></omgdi:waypoint>
-        <omgdi:waypoint x="827.0" y="861.0"></omgdi:waypoint>
-        <omgdi:waypoint x="1057.0" y="861.0"></omgdi:waypoint>
+        <omgdi:waypoint x="847.0" y="919.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1057.0" y="918.0"></omgdi:waypoint>
         <omgdi:waypoint x="1057.0" y="1180.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
