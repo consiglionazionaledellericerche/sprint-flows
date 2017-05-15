@@ -317,7 +317,7 @@
           <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
         </extensionElements>
       </userTask>
-      <userTask id="modifica-ordine" name="Modifica Ordina" activiti:candidateGroups="ROLE_USER">
+      <userTask id="modifica-ordine" name="Modifica Ordine" activiti:candidateGroups="ROLE_USER">
         <extensionElements>
           <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
         </extensionElements>
@@ -334,7 +334,15 @@
           <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
         </extensionElements>
       </userTask>
-      <sequenceFlow id="flow111" sourceRef="exclusivegateway23" targetRef="protocollo-ordine"></sequenceFlow>
+      <sequenceFlow id="flow111" sourceRef="exclusivegateway23" targetRef="protocollo-ordine">
+        <extensionElements>
+          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.FirmaDocumento">
+            <activiti:field name="nomeFileDaFirmare">
+              <activiti:string><![CDATA[ordine]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </sequenceFlow>
       <endEvent id="endevent13" name="End"></endEvent>
       <exclusiveGateway id="exclusivegateway25" name="Exclusive Gateway" default="flow117"></exclusiveGateway>
       <sequenceFlow id="flow116" sourceRef="revoca-ordine" targetRef="exclusivegateway25"></sequenceFlow>
@@ -343,7 +351,15 @@
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Annulla'}]]></conditionExpression>
       </sequenceFlow>
       <endEvent id="endevent14" name="End"></endEvent>
-      <sequenceFlow id="flow123" sourceRef="protocollo-ordine" targetRef="endevent14"></sequenceFlow>
+      <sequenceFlow id="flow123" sourceRef="protocollo-ordine" targetRef="endevent14">
+        <extensionElements>
+          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.ProtocollaDocumento">
+            <activiti:field name="nomeFileDaProtocollare">
+              <activiti:string><![CDATA[ordine]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </sequenceFlow>
       <endEvent id="endevent20" name="End"></endEvent>
       <sequenceFlow id="flow132" name="Revoca con Provvedimento" sourceRef="exclusivegateway25" targetRef="endevent20">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaConProvvedimento'}]]></conditionExpression>
