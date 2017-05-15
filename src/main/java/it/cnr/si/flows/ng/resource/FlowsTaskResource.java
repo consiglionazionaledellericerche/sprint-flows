@@ -7,10 +7,7 @@ import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.SecurityUtils;
 import it.cnr.si.service.UserService;
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
+import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -363,10 +360,14 @@ public class FlowsTaskResource {
                     throw new FlowsPermissionException();
 
                 taskService.setVariablesLocal(taskId, data);
-                taskService.complete(taskId, data);
-                //Aggiungo l'identityLink che indica l'utente che esegue il task SOLO se il task viene effettivamente eseguito
+                //Aggiungo l'identityLink che indica l'utente che esegue il task
                 taskService.addUserIdentityLink(taskId, username, TASK_EXECUTOR);
-
+                try {
+                    taskService.complete(taskId, data);
+                } catch (ActivitiObjectNotFoundException e) {
+                    LOGGER.error("Errore nel completamento del task {}: {}", taskId, e);
+                    taskService.deleteUserIdentityLink(taskId, username, TASK_EXECUTOR);
+                }
                 return new ResponseEntity<>(HttpStatus.OK);
 
             } else {
