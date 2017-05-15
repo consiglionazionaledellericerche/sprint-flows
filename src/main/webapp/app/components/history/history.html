@@ -39,9 +39,6 @@
     <div ng-hide="task.historyTask.endTime === null">
         <b>Con data di completamento:</b> {{task.historyTask.endTime | date}}
     </div>
-    <div ng-hide="task.historyTask.endTime === null">
-        <b>Con data di completamento:</b> {{task.historyTask.endTime | date}}
-    </div>
     <!--scelta utente-->
     <div ng-repeat="variable in task.historyTask.variables">
         <div ng-switch="variable.name">
