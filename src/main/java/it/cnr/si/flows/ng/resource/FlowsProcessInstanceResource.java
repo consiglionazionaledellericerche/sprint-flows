@@ -285,18 +285,6 @@ public class FlowsProcessInstanceResource {
     }
 
 
-    //    private void processDate(HistoricTaskInstanceQuery taskQuery, String key, String value) {
-//        try {
-//            Date date = sdf.parse(value);
-//
-//            if (key.contains("Less")) {
-//                taskQuery.processVariableValueLessThanOrEqual(key.replace("Less", ""), date);
-//            } else if (key.contains("Great"))
-//                taskQuery.processVariableValueGreaterThanOrEqual(key.replace("Great", ""), date);
-//        } catch (ParseException e) {
-//            LOGGER.error("Errore nel parsing della data {} - ", value, e);
-//        }
-//    }
     private void processDate(HistoricProcessInstanceQuery taskQuery, String key, String value) {
         try {
             Date date = sdf.parse(value);
