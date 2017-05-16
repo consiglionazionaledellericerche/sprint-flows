@@ -4,8 +4,9 @@
     angular.module('sprintApp')
     .factory('utils', Utils);
 
+    Utils.$inject = ['$log', '$http'];
 
-    function Utils () {
+    function Utils ($log, $http) {
 
         function swap(entity) {
             entity.variabili = {};
@@ -23,6 +24,16 @@
                 } else {
                     return swap(input);
                 }
+            },
+
+            downloadFile : function(url, filename, mimetype) {
+                $log.info(url);
+                $http.get(url, { responseType: 'arraybuffer' })
+                .success(function(data) {
+                    var file = new Blob([data], { type: mimetype });
+                    $log.info(file, filename);
+                    saveAs(file, filename);
+                });
             }
         };
     }

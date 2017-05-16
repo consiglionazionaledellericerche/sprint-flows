@@ -1,13 +1,26 @@
 package it.cnr.si.flows.ng.resource;
 
-import com.codahale.metrics.annotation.Timed;
+import static it.cnr.si.flows.ng.utils.Utils.ASC;
+import static it.cnr.si.flows.ng.utils.Utils.DESC;
+import static it.cnr.si.flows.ng.utils.Utils.isEmpty;
+import static it.cnr.si.flows.ng.utils.Utils.isNotEmpty;
 
-import it.cnr.si.flows.ng.exception.FlowsPermissionException;
-import it.cnr.si.flows.ng.service.CounterService;
-import it.cnr.si.flows.ng.service.FlowsAttachmentService;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.security.SecurityUtils;
-import it.cnr.si.service.UserService;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
@@ -36,19 +49,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
+import com.codahale.metrics.annotation.Timed;
 
-import static it.cnr.si.flows.ng.utils.Utils.*;
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.exception.FlowsPermissionException;
+import it.cnr.si.flows.ng.service.CounterService;
+import it.cnr.si.flows.ng.service.FlowsAttachmentService;
+import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.security.SecurityUtils;
+import it.cnr.si.service.UserService;
 
 
 /**
@@ -79,33 +95,8 @@ public class FlowsTaskResource {
     private FlowsAttachmentService attachmentService;
     @Autowired
     private HistoryService historyService;
-
-
-    public static long extractId(String id) throws IllegalArgumentException {
-        try {
-            if (id.contains("$"))
-                id = id.split("\\$")[1];
-            return Long.parseLong(id);
-
-        } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
-            throw new IllegalArgumentException("L'id dato non è valido", e);
-        }
-    }
-
-    // TODO magari un giorno avremo degli array, ma per adesso ce lo facciamo andare bene cosi'
-    public static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
-
-        Map<String, Object> data = new HashMap<>();
-
-        Enumeration<String> parameterNames = req.getParameterNames();
-        while (parameterNames.hasMoreElements()) {
-            String paramName = parameterNames.nextElement();
-            data.put(paramName, req.getParameter(paramName));
-        }
-
-        return data;
-
-    }
+    @Inject
+    private FlowsAttachmentResource attachmentResource;
 
     @RequestMapping(value = "/mytasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
@@ -161,54 +152,23 @@ public class FlowsTaskResource {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<TaskResponse> getTaskInstance(
-            @PathVariable("id") String id) {
+    public ResponseEntity<Map<String, Object>> getTask(@PathVariable("id") String taskId) {
 
-        Task taskRaw = taskService.createTaskQuery().taskId(id).includeProcessVariables().singleResult();
+        Map<String, Object> response = new HashMap<>();
+        Task taskRaw = taskService.createTaskQuery().taskId(taskId).includeProcessVariables().singleResult();
 
+        // task + variables
         TaskResponse task = restResponseFactory.createTaskResponse(taskRaw);
+        response.put("task", task);
 
+        // attachments
+        ResponseEntity<List<FlowsAttachment>> attachementsEntity = attachmentResource.getAttachementsForTask(taskId);
+        Map<String, Object> attachments = new HashMap<>();
+        attachementsEntity.getBody().stream().forEach(
+                a -> attachments.put(a.getName(), a));
+        response.put("attachments", attachments);
 
-        return ResponseEntity.ok(task);
-        //      long taskId = extractId(id);
-        //
-        //        Task task = taskService.createTaskQuery().taskId(""+taskId).singleResult();
-        //        List<Task> tasks = taskService.createTaskQuery().processInstanceId(task.getProcessInstanceId()).list();
-        //        ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
-        //
-        //        List<Map<String, Object>> tasksMaps = tasks.stream().map(t -> mappaTaskInMap(t)).collect(Collectors.toList());
-        //
-        //        Map<String, Object> result = new HashMap<>();
-        //        Map<String, Object> definition = new HashMap<>();
-        //        definition.put("id", "cnrdsftm:validaTask");
-        //
-        //        Map<String, Object> mappaTaskInMap = mappaTaskInMap(task);
-        //        ((Map<String, Object>) mappaTaskInMap.get("entry")).put("tasks", tasksMaps);
-        //        ((Map<String, Object>) mappaTaskInMap.get("entry")).put("workflowInstance", mappaProcessInstanceInMap(pi));
-        //        ((Map<String, Object>) mappaTaskInMap.get("entry")).put("definition", definition);
-        //
-        //
-        //        result.put("data", mappaTaskInMap.get("entry"));
-        //
-        //
-        //        return new ResponseEntity<Map<String, Object>>(result, HttpStatus.OK);
-
-        //        // TODO verificare se ci possono essere parametri aggiuntivi utili//        boolean detailed = Boolean.parseBoolean(params.get("detailed"));
-        //        long taskId = Utils.extractId(id);
-        //        CMISUser user = cmisService.getCMISUserFromSession(req);
-        //        BindingSession session = cmisService.getCurrentBindingSession(req);
-        //
-        //        try {
-        //            Map<String, Object> taskInstance = flowsTaskService.getTask(user, session, taskId, detailed);
-        //            return new ResponseEntity<Map<String,Object>>(taskInstance, HttpStatus.OK);
-        //        } catch (PermissionException e) {
-        //            LOGGER.error(e.getMessage(), e);
-        //            return new ResponseEntity<Map<String,Object>>(HttpStatus.FORBIDDEN);
-        //        } catch (IOException e) {
-        //            Map<String, Object> response = new HashMap<>();
-        //            response.put("error", e.getMessage());
-        //            return new ResponseEntity<Map<String,Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        //        }
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -280,48 +240,6 @@ public class FlowsTaskResource {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    // TODO returns ResponseEntity<Map<String, Object>>
-    @RequestMapping(value = "variables/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
-    public ResponseEntity<Map<String, Object>> getTaskVariables(
-            HttpServletRequest req,
-            HttpServletResponse resp,
-            @PathVariable("id") String id)
-                    throws IOException {
-
-        Map<String, Object> result = new HashMap<>();
-        Map<String, Object> list = new HashMap<>();
-        List<Map<String, Object>> entries = new ArrayList<>();
-
-        result.put("list", list);
-        list.put("entries", entries);
-
-        //        taskService.getVariables(id);
-
-        return new ResponseEntity<Map<String,Object>>(result, HttpStatus.OK);
-
-        //        CMISUser user = cmisService.getCMISUserFromSession(req);
-        //        LOGGER.debug("getTaskVariables user: "+ user +", id: "+id);
-        //
-        //        try {
-        //            Map<String, Object> workflowVariables = workflowService.getTaskVariables(user, id);
-        //            JSONObject res = new JSONObject(workflowVariables);
-        //            PrintWriter writer = resp.getWriter();
-        //            writer.write(res.toString());
-        //            writer.flush();
-        //            //            return new ResponseEntity<Map<String,Object>>(workflowVariables, HttpStatus.OK);
-        //        } catch (IllegalAccessException e) {
-        //            LOGGER.info(ERRORE_PERMESSI_TASK);
-        //            LOGGER.info("L'utente ha richiesto variabili per un flusso che non deve poter vedere", e);
-        //            getVariablesOldMethod(req, resp, id);
-        //            //          return new ResponseEntity<Map<String,Object>>(HttpStatus.FORBIDDEN);// ;resp.sendError(HttpServletResponse.SC_FORBIDDEN);
-        //        } catch (WorkflowException e) {
-        //            LOGGER.info("Errore durante il recupero di un flusso", e);
-        //            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-        //            //          return new ResponseEntity<Map<String,Object>>(HttpStatus.INTERNAL_SERVER_ERROR);//resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-        //        }
-    }
-
     // TODO verificare almeno che l'utente abbia i gruppi necessari
     @RequestMapping(value = "canComplete/{taskId}/{user}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
@@ -329,7 +247,6 @@ public class FlowsTaskResource {
     public boolean canCompleteTask(
             @PathVariable("taskId") String taskId,
             @PathVariable("username") Optional<String> user) {
-
 
         List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
         String username = user.orElse(SecurityUtils.getCurrentUserLogin());
@@ -359,9 +276,9 @@ public class FlowsTaskResource {
         String username = SecurityUtils.getCurrentUserLogin();
 
         String taskId = (String) req.getParameter("taskId");
-        String definitionId = (String) req.getParameter("definitionId");
+        String definitionId = (String) req.getParameter("processDefinitionId");
         if ( isEmpty(taskId) && isEmpty(definitionId) )
-            return ResponseEntity.badRequest().body("Fornire almeno un taskId o un definitionId");
+            return ResponseEntity.badRequest().body("{'success': false, 'message': 'Fornire almeno un taskId o un definitionId'}");
 
         try {
             Map<String, Object> data = extractParameters(req);
@@ -386,7 +303,6 @@ public class FlowsTaskResource {
                 String key =  counterId +"-"+ counterService.getNext(counterId);
 
                 data.put("title", key);
-                data.put("pippo", "pluto");
                 data.put("initiator", username);
                 data.put("startDate", new Date());
 
@@ -521,5 +437,20 @@ public class FlowsTaskResource {
         } catch (ParseException e) {
             LOGGER.error("Errore nel parsing della data {} - ", value, e);
         }
+    }
+
+    // TODO magari un giorno avremo degli array, ma per adesso ce lo facciamo andare bene cosi'
+    private static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
+
+        Map<String, Object> data = new HashMap<>();
+
+        Enumeration<String> parameterNames = req.getParameterNames();
+        while (parameterNames.hasMoreElements()) {
+            String paramName = parameterNames.nextElement();
+            data.put(paramName, req.getParameter(paramName));
+        }
+
+        return data;
+
     }
 }

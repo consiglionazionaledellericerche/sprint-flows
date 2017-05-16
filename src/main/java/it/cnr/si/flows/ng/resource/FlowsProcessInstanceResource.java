@@ -1,6 +1,8 @@
 package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
+
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.SecurityUtils;
 import org.activiti.engine.HistoryService;
@@ -52,6 +54,8 @@ public class FlowsProcessInstanceResource {
     private HistoryService historyService;
     @Autowired
     private ProcessInstanceResource processInstanceResource;
+    @Autowired
+    private FlowsAttachmentResource attachmentResource;
     @Autowired
     private RepositoryService repositoryService;
     @Autowired
@@ -110,9 +114,8 @@ public class FlowsProcessInstanceResource {
         ReadOnlyProcessDefinition processDefinition = ((RepositoryServiceImpl) repositoryService).getDeployedProcessDefinition(processInstance.getProcessDefinitionId());
 
         // Attachments
-        List<Attachment> processInstanceAttachments = taskService.getProcessInstanceAttachments(processInstanceId);
-        List<AttachmentResponse> collect = processInstanceAttachments.stream().map(a -> restResponseFactory.createAttachmentResponse(a)).collect(Collectors.toList());
-        result.put("attachments", collect);
+        ResponseEntity<List<FlowsAttachment>> attachements = attachmentResource.getAttachementsForProcessInstance(processInstanceId);
+        result.put("attachments", attachements.getBody());
 
         // IdentityLinks (candidate groups)
         final Map<String, Object> identityLinks = new HashMap<>();

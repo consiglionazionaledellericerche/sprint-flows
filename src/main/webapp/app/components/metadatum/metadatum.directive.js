@@ -19,8 +19,7 @@
             link: function ($scope, element, attrs) {
 
                 $scope.type = $scope.type | "text";
-//                $log.info($scope.$parent.vm.data);
-//                $scope.value = $scope.$parent.vm.data.variabili[name];
+                $scope.attrs = attrs;
             }
         }
 

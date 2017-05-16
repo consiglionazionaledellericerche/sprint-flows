@@ -1,8 +1,5 @@
 <div ng-cloak>
 
-  <!--   <input type="text" ng-model="vm.font" /> -->
-  <!--   <button ng-click="reloadImg()">Reload</button> -->
-
   <div class="row text-center">
     <!-- intestazione -->
     <h3>{{vm.definition.name}}</h3>
@@ -14,11 +11,30 @@
   <!-- /rest/processinstances/start/{processName} or start-hire-process -->
   <form novalidate class="flows-form" name="taskForm" ng-submit="submitTask(picFile)">
     <input type="hidden" name="taskId" value="{{vm.data.taskId}}" />
-    <input type="hidden" name="definitionId" value="{{vm.data.definitionId}}" />
+    <input type="hidden" name="processDefinitionId" value="{{vm.data.processDefinitionId}}" />
+
+<!--        <label for="pippo">Pippo</label> -->
+<!--        <a -->
+<!--           href -->
+<!--           ng-click="downloadFile('/api/attachments/task/'+ vm.data.taskId +'/'+ vm.attachments.pippo.name +'/data', vm.attachments.pippo.filename, vm.attachments.pippo.mimetype)" > -->
+<!--             {{vm.attachments.pippo.filename}} -->
+<!--        </a> -->
+<!--        <div class="btn btn-info" type="file" -->
+<!--               ngf-select -->
+<!--               ng-model="vm.data.pippo" -->
+<!--               name="pippo" -->
+<!--               accept="application/pdf" -->
+<!--               ngf-max-size="2MB" -->
+<!--               ngf-multiple="false" -->
+<!--               required -->
+<!--               ngf-model-invalid="errorFile" >Aggiorna</div> -->
+
 
     <div class="row">
       <div class="col-md-6 col-md-offset-3">
-        <ng-include src="vm.formUrl" onload="autofill()" autoscroll="true" />
+         <div class="form-group"><fileinput ng-model="pluto" label="Pluto" accept="image/jpeg" required ngf-multiple=false /></div>
+         <div class="form-group"><fileinput ng-model="paperino" label="Paperino" accept="image/jpeg" required ngf-multiple=false /></div>
+         <ng-include src="vm.formUrl" onload="autofill()" />
       </div>
     </div>
     <hr>
@@ -33,7 +49,7 @@
               <button class="btn btn-primary" type="reset"><span class="glyphicon glyphicon-refresh"> Reimposta</button>
             </div>
             <div class="btn-group" role="group">
-              <button class="btn btn-primary" type="submit" ng-disabled="taskForm.$invalid">{{ vm.taskId ? "Avanti" : "Avvia Flusso"}} <span class="glyphicon glyphicon-arrow-right"></span></button>
+              <button class="btn btn-primary" type="submit" ng-disabled="taskForm.$invalid">{{ vm.taskId ? "Invia" : "Avvia Flusso"}} <span class="glyphicon glyphicon-arrow-right"></span></button>
             </div>
         </div>
       </div>
@@ -41,5 +57,6 @@
   </form>
 
   <hr>
+  <pre>{{taskForm | json}}</pre>
   <pre>{{vm | json}}</pre>
 </div>

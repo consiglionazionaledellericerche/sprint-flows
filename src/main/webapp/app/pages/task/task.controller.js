@@ -11,77 +11,65 @@
         var vm = this;
         vm.data = {};
         vm.taskId = $state.params.taskId;
-        var formPromise = $q.defer(), dataPromise = $q.defer();
-        $log.info(formPromise);
-        $log.info(dataPromise);
+        vm.data.processDefinitionId = $state.params.processDefinitionId;
+        var processDefinitionKey = vm.data.processDefinitionId.split(":")[0];
+        var processVersion       = vm.data.processDefinitionId.split(":")[1];
 
         // Ho bisogno di caricare piu' risorse contemporaneamente (form e data);
         // quando sono finite entrambe, autofillo la form
-        $q.all([formPromise.promise, dataPromise.promise]).then( function(value) {
+        var formPromise = $q.defer(), dataPromise = $q.defer();
+        $scope.autofill = function() {formPromise.resolve(2);};
+
+        $q.all([formPromise.promise, dataPromise.promise])
+        .then(function(value) {
             angular.forEach(taskForm, function(el) {
                 if (el.attributes.autofill)
                     vm.data[el.id] = vm.taskVariables[el.id];
             });
-        }, function(err) {
-            $log.error(err);
-        })
+        });
+
 
         if ($state.params.taskId) {
             dataService.tasks.getTask($state.params.taskId).then(
-                    function(response) {
-                        dataPromise.resolve();
-                        vm.taskVariables = utils.refactoringVariables(response.data).variabili;
-//                        vm.data = utils.refactoringVariables(response.data).variabili;
-                        vm.data.taskId = $state.params.taskId;
-                        vm.diagramUrl = '/rest/diagram/taskInstance/'+ response.data.id;
-                        var processDefinitionKey = response.data.processDefinitionId.split(":")[0];
-                        vm.formUrl = 'api/forms/task/'+ response.data.id;
-                    });
+                function(response) {
+                    dataPromise.resolve();
+                    vm.data.taskId = $state.params.taskId;
+
+                    vm.taskVariables = utils.refactoringVariables(response.data.task).variabili;
+                    vm.attachments = response.data.attachments;
+                    vm.diagramUrl = '/rest/diagram/taskInstance/'+ vm.data.taskId;
+                    vm.formUrl = 'api/forms/task/'+ vm.data.taskId;
+            });
         } else {
-            dataPromise.reject();
-            vm.data.definitionId = $state.params.processDefinitionId;
-            var processDefinitionKey = $state.params.processDefinitionId.split(":")[0];
-            var processVersion       = $state.params.processDefinitionId.split(":")[1];
+            dataPromise.reject("");
+
             vm.diagramUrl = "/rest/diagram/processDefinition/" + $state.params.processDefinitionId;
             vm.formUrl = 'api/forms/'+ processDefinitionKey + "/" + processVersion + "/" + $state.params.taskName
         }
 
-        $scope.select_node = function (discard, selection) {console.log("select node");};
-
         $scope.submitTask = function(file) {
-            $log.info(vm);
-            if (validate(vm.data)) {
 
-                Upload.upload({
-                    url: 'api/tasks/complete',
-                    data: vm.data,
-                }).then(function (response) {
+            $log.info(Object.keys(vm.data));
 
-                    $log.info(response);
-                    AlertService.success("Richiesta completata con successo");
-                    $state.go('availabletasks');
+            Upload.upload({
+                url: 'api/tasks/complete',
+                data: vm.data,
+            }).then(function (response) {
 
-                }, function (response) {
-                    $log.error(err);
-                    AlertService.error("Richiesta non riuscita");
-                    if (response.status > 0)
-                        $scope.errorMsg = response.status + ': ' + response.data;
-                });
-            }
+                $log.info(response);
+                AlertService.success("Richiesta completata con successo");
+                $state.go('availabletasks');
+
+            }, function (response) {
+                $log.error(err);
+                AlertService.error("Richiesta non riuscita");
+                if (response.status > 0)
+                    $scope.errorMsg = response.status + ': ' + response.data;
+            });
         }
 
-        $scope.reloadImg = function() {
-            $log.info(vm.font);
-            vm.diagramUrl = '/rest/diagram/taskInstance/'+ $state.params.taskId +'/'+ vm.font +'?' + new Date().getTime();
-        }
-
-        $scope.autofill = function() {
-            formPromise.resolve(2);
-        }
-
-        function validate(data) {
-            $log.debug("validation not implemented yet");
-            return true;
+        $scope.downloadFile = function(url, filename, mimetype) {
+            utils.downloadFile(url, filename, mimetype);
         }
     }
 })();

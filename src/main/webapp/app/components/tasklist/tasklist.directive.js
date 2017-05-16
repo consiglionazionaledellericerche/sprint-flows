@@ -29,6 +29,7 @@
 
         // trucco per dare il nome alle variabili nella mappa
         // invece di un array di mappe
+        // TODO rifattorizare in Utils
         scope.$watch('tasks', function() {
           if (scope.tasks !== undefined) {
             scope.tasks.forEach(function(task) {
