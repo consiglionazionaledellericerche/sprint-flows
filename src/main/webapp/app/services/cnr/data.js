@@ -43,16 +43,16 @@
         getTask: function (id) {
             return $http.get('api/tasks/'+ id);
         },
-        getTaskCompleted: function (firstResult, maxResults) {
-            return $http.get('api/tasks/taskCompleted?firstResult=' + firstResult + '&maxResults=' + maxResults);
+        getTaskCompletedByMe: function (firstResult, maxResults) {
+            return $http.get('api/tasks/taskCompletedByMe?firstResult=' + firstResult + '&maxResults=' + maxResults);
         }
       },
       processInstances: {
         byProcessInstanceId : function(processInstanceId) {
             return $http.get('api/processInstances?processInstanceId=' + processInstanceId);
         },
-        myProcessInstances:  function(active) {
-            return $http.get('api/processInstances/myProcessInstances?active=' + active);
+        myProcessInstances:  function(active, processDefinition, order) {
+            return $http.get('api/processInstances/myProcessInstances?active=' + active + '&processDefinition=' + (processDefinition ? processDefinition.key : 'all') + '&order=' + order);
         },
         getProcessInstance: function(active) {
             return $http.get('api/processInstances/getProcessInstances?active=' + active);

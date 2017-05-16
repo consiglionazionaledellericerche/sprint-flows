@@ -2,7 +2,6 @@ package it.cnr.si.flows.ng.resource;
 
 import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.TestUtil;
-import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
@@ -39,6 +38,7 @@ import static org.springframework.http.HttpStatus.OK;
 @RunWith(SpringRunner.class)
 public class FlowsProcessInstanceResourceTest {
 
+    private static int processDeleted = 0;
     @Autowired
     private FlowsTaskResource flowsTaskResource;
     @Autowired
@@ -48,7 +48,6 @@ public class FlowsProcessInstanceResourceTest {
     @Autowired
     private FlowsProcessDefinitionResource flowsProcessDefinitionResource;
     private ProcessInstanceResponse processInstance;
-    private static int processDeleted = 0;
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
 
@@ -220,21 +219,21 @@ public class FlowsProcessInstanceResourceTest {
     private String verifyMyProcesses(int startedByAdmin, int startedBySpaclient) {
         String proceeeInstanceID = null;
         // Admin vede la Process Instance che ha avviato
-        ResponseEntity<DataResponse> response = flowsProcessInstanceResource.getMyProcessInstances(true);
+        ResponseEntity<DataResponse> response = flowsProcessInstanceResource.getMyProcessInstances(true, "all", ASC);
         assertEquals(OK, response.getStatusCode());
         assertEquals(startedByAdmin, response.getBody().getSize());
-        List processInstances = ((List) response.getBody().getData());
+        List<HistoricProcessInstanceResponse> processInstances = ((List<HistoricProcessInstanceResponse>) response.getBody().getData());
         assertEquals(startedByAdmin, processInstances.size());
         if (processInstances.size() > 0)
-            proceeeInstanceID = ((HistoricProcessInstance) processInstances.get(0)).getId();
+            proceeeInstanceID = processInstances.get(0).getId();
         util.logout();
 
         // User NON vede la Process Instance avviata da Admin
         util.loginUser();
-        response = flowsProcessInstanceResource.getMyProcessInstances(true);
+        response = flowsProcessInstanceResource.getMyProcessInstances(true, "all", ASC);
         assertEquals(OK, response.getStatusCode());
         assertEquals(startedBySpaclient, response.getBody().getSize());
-        assertEquals(startedBySpaclient, ((List) response.getBody().getData()).size());
+        assertEquals(startedBySpaclient, ((List<HistoricProcessInstanceResponse>) response.getBody().getData()).size());
         util.logout();
         util.loginAdmin();
         return proceeeInstanceID;

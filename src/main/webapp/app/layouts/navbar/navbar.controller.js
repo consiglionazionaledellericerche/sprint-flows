@@ -66,6 +66,7 @@
             .then(function(response) {
                 vm.wfDefs = response.data.data;
                 $rootScope.wfDefs = response.data.data;
+                $rootScope.wfDefs.push({key:"all", name: "ALL"});
             }, function (response) {
                 $log.error(response);
             });

@@ -80,26 +80,40 @@ public class FlowsProcessInstanceResource {
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<DataResponse> getMyProcessInstances(
-            @RequestParam boolean active) {
+            @RequestParam boolean active,
+            @RequestParam String processDefinition,
+            @RequestParam String order) {
 
         String username = SecurityUtils.getCurrentUserLogin();
         List<HistoricProcessInstance> list;
         HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
+
+        if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
+            historicProcessInstanceQuery.processDefinitionKey(processDefinition);
+
         if (active) {
-            list = historicProcessInstanceQuery.variableValueEquals("initiator", username)
+            historicProcessInstanceQuery.variableValueEquals("initiator", username)
                     .unfinished()
-                    .includeProcessVariables().list();
+                    .includeProcessVariables();
         } else {
-            list = historicProcessInstanceQuery.variableValueEquals("initiator", username)
+            historicProcessInstanceQuery.variableValueEquals("initiator", username)
                     .finished()
-                    .includeProcessVariables().list();
+                    .includeProcessVariables();
         }
+
+        if (order.equals(ASC))
+            historicProcessInstanceQuery.orderByProcessInstanceStartTime().asc();
+        else
+            historicProcessInstanceQuery.orderByProcessInstanceStartTime().desc();
+
+        list = historicProcessInstanceQuery.list();
 
         DataResponse response = new DataResponse();
         response.setStart(0);
         response.setSize(list.size());
         response.setTotal(list.size());
         response.setData(restResponseFactory.createHistoricProcessInstanceResponseList(list));
+        response.setOrder(order);
 
         return ResponseEntity.ok(response);
     }
