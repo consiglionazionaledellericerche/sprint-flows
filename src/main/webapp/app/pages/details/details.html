@@ -8,11 +8,12 @@
 
       <span ng-class="{'label-warning': !vm.data.entity.completed , 'label-success': vm.data.entity.completed }" class="label">{{!vm.data.entity.completed ? 'attivo' : 'completato'}}</span>
       <b>Avviato da: </b>
-      {{vm.data.entity.initiator}} il {{vm.data.entity.startDate | date}}
+        {{vm.data.entity.variabili.initiator}} il {{vm.data.entity.variabili.startDate | date}}
       <br>
-      <span ng-hide="!vm.data.entity.completed">
+        {{vm.data.entity.variabili}}
+        <span ng-hide="!vm.data.entity.variabili.completed">
         <b>completato il:</b>
-        {{vm.data.entity.endDate | date}}
+        {{vm.data.entity.variabili.endDate | date}}
         <br>
       </span>
       <span ng-show="!vm.data.entity.completed">
@@ -26,7 +27,7 @@
 
       <attachments />
 
-      <!-- <identity-links></identity-links> -->
+        <!-- <identity-links></identity-links> -->
       <div ng-if="isAdmin">
           <h4>Identity Links</h4>
           <span ng-repeat="(taskId, link) in vm.data.identityLinks">
