@@ -99,7 +99,7 @@ public class FlowsProcessInstanceResource {
         response.setStart(0);
         response.setSize(list.size());
         response.setTotal(list.size());
-        response.setData(list);
+        response.setData(restResponseFactory.createHistoricProcessInstanceResponseList(list));
 
         return ResponseEntity.ok(response);
     }
