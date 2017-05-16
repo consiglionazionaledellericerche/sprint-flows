@@ -7,12 +7,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
+import org.activiti.rest.service.api.runtime.task.TaskResource;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,10 +40,12 @@ public class FlowsAttachmentResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsAttachmentResource.class);
 
-    @Autowired
+    @Inject
     private HistoryService historyService;
-    @Autowired
+    @Inject
     private RuntimeService runtimeService;
+    @Inject
+    private TaskService taskService;
 
     @RequestMapping(value = "{processInstanceId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -61,6 +66,17 @@ public class FlowsAttachmentResource {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(result);
+    }
+
+    @RequestMapping(value = "task/{taskId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @Secured(AuthoritiesConstants.USER)
+    @Timed
+    public ResponseEntity<List<FlowsAttachment>> getAttachementsForTask(
+            @PathVariable("taskId") String taskId) {
+
+        String processInstanceId = taskService.createTaskQuery().taskId(taskId).singleResult().getProcessInstanceId();
+        return getAttachementsForProcessInstance(processInstanceId);
     }
 
     @RequestMapping(value = "/history/{processInstanceId}/{attachmentName}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -140,4 +156,16 @@ public class FlowsAttachmentResource {
         IOUtils.copy(baos, output);
     }
 
+    @RequestMapping(value = "task/{taskId}/{attachmentName}/data", method = RequestMethod.GET)
+    @ResponseBody
+    @Secured(AuthoritiesConstants.USER)
+    @Timed
+    public void getAttachmentForTask(
+            HttpServletResponse response,
+            @PathVariable("taskId") String taskId,
+            @PathVariable("attachmentName") String attachmentName) throws IOException {
+
+        String processInstanceId = taskService.createTaskQuery().taskId(taskId).singleResult().getProcessInstanceId();
+        getAttachment(response, processInstanceId, attachmentName);
+    }
 }

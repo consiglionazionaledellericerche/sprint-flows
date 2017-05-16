@@ -1,0 +1,13 @@
+<label for="attrs.id">{{attrs.label}}</label>
+<a
+  href
+  ng-click="downloadFile('/api/attachments/task/'+ vm.data.taskId +'/'+ vm.attachments[ngModel].name +'/data', vm.attachments[ngModel].filename, vm.attachments[ngModel].mimetype)" >
+    {{vm.attachments[ngModel].filename}}
+</a>
+<input type="file"
+      ng-model="vm.data[ngModel]"
+      ngf-select
+      name="vm.data[ngModel]"
+      accept="{{attrs.accept}}"
+      ngf-multiple="{{attrs.ngfMultiple}}"
+      ng-required="attrs['required']" />

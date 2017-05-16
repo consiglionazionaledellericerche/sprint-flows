@@ -90,7 +90,7 @@ public class FlowsTaskResourceTest {
 
     @Test
     public void testGetTaskInstance() {
-        ResponseEntity<TaskResponse> response = flowsTaskResource.getTaskInstance(util.getFirstTaskId());
+        ResponseEntity<TaskResponse> response = flowsTaskResource.getTask(util.getFirstTaskId());
         assertEquals(OK, response.getStatusCode());
         assertEquals(TASK_NAME, ((TaskResponse) response.getBody()).getName());
     }

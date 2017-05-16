@@ -25,7 +25,7 @@
 		L'utente <strong>{{file.username}}</strong> <br>
 		<span ng-if="file.metadati.azione">ha compiuto l'azione <strong>{{file.metadati.azione}}</strong><br></span>
 		sul file <a href ng-click="downloadFile(file.url, file.filename, file.mimetype)">{{file.filename}}</a>
-		<span ng-repeat="state in file.metadati.stati" class="badge badge-{{state}}" >{{state}}</span> <br>
+		<span ng-repeat="state in file.metadati.stati" class="label label-primary label-{{state}}" >{{state}}</span> <br>
 		nell'ambito del task <strong>{{file.taskName}}</strong>
   	</li>
   </ul>
