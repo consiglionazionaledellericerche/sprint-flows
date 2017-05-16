@@ -66,7 +66,6 @@ import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.SecurityUtils;
 import it.cnr.si.service.UserService;
 
-
 /**
  * @author mtrycz
  *

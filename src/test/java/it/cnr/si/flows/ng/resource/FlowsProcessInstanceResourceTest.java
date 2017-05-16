@@ -4,6 +4,7 @@ import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.TestUtil;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.rest.common.api.DataResponse;
+import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.repository.ProcessDefinitionResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
@@ -21,11 +22,15 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import static it.cnr.si.flows.ng.utils.Utils.ASC;
+import static it.cnr.si.flows.ng.utils.Utils.DESC;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -43,6 +48,8 @@ public class FlowsProcessInstanceResourceTest {
     @Autowired
     private FlowsProcessDefinitionResource flowsProcessDefinitionResource;
     private ProcessInstanceResponse processInstance;
+    private static int processDeleted = 0;
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
 
     @Before
@@ -53,6 +60,7 @@ public class FlowsProcessInstanceResourceTest {
     @After
     public void tearDown() {
         util.myTearDown();
+        processDeleted++;
     }
 
     @Test
@@ -121,11 +129,10 @@ public class FlowsProcessInstanceResourceTest {
         String activeId = entities.get(1).getId();
         flowsProcessInstanceResource.delete(response, notActiveId, "test");
         assertEquals(response.getStatus(), NO_CONTENT.value());
-        // verifico che Admin veda il processo 1 terminato
+        // verifico che Admin veda UN processo terminato/cancellato in più (quello appena concellato + quelli cancellati nel tearDown dei test precedenti)
         ret = flowsProcessInstanceResource.getProcessInstances(false);
         entities = (ArrayList<HistoricProcessInstanceResponse>) ret.getBody();
-        assertEquals(entities.size(), 1);
-        assertEquals(entities.get(0).getId(), notActiveId);
+        assertEquals(entities.size(), processDeleted + 1);
         // .. e 1 processo ancora attivo VERIFICANDO CHE GLI ID COINCIDANO
         ret = flowsProcessInstanceResource.getProcessInstances(true);
         entities = (ArrayList<HistoricProcessInstanceResponse>) ret.getBody();
@@ -146,6 +153,67 @@ public class FlowsProcessInstanceResourceTest {
         assertEquals(false, processInstance.isSuspended());
         ProcessInstanceResponse response = flowsProcessInstanceResource.suspend(new MockHttpServletRequest(), processInstance.getId());
         assertEquals(true, response.isSuspended());
+    }
+
+    @Test
+    public void testSearchProcessInstances() throws ParseException {
+        util.loginAdmin();
+        MockHttpServletRequest req = new MockHttpServletRequest();
+
+        String searchField1 = "wfvarValidazioneSpesa";
+        String searchField2 = "initiator";
+//        String payload = "{params: [{key: " + searchField1 + ", value: true, type: boolean} , {key: " + searchField2 + ", value: \"admin\", type: textEqual}]}";
+        final Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, +1);
+        Date tomorrow = cal.getTime();
+        cal.add(Calendar.DATE, -2);
+        Date yesterday = cal.getTime();
+        String payload = "{params: [{key: " + searchField1 + ", value: true, type: boolean}, " +
+                "{key: " + searchField2 + ", value: \"admin\", type: textEqual}, " +
+                "{key: \"startDateGreat\", value: \"" + sdf.format(yesterday) + "\", type: \"date\"}," +
+                "{key: \"startDateLess\", value: \"" + sdf.format(tomorrow) + "\", type: \"date\"}]}";
+        req.setContent(payload.getBytes());
+        req.setContentType("application/json");
+
+        //verifico la richiesta normale
+        ResponseEntity<Object> response = flowsProcessInstanceResource.search(req, util.getProcessDefinition().split(":")[0], true, ASC, 0, 10);
+        verifyResponse(response, 1, searchField1, searchField2);
+
+        //verifico la richiesta su tutte le Process Definition
+        response = flowsProcessInstanceResource.search(req, "all", true, ASC, 0, 10);
+        verifyResponse(response, 1, searchField1, searchField2);
+
+        //cerco le Process Instance completate (active = false  ==>  #(processDeleted) risultati)
+        response = flowsProcessInstanceResource.search(req, util.getProcessDefinition().split(":")[0], false, DESC, 0, 10);
+        verifyResponse(response, processDeleted, searchField1, searchField2);
+
+        //parametri sbagliati (0 risultati)
+        payload = "{params: [{key: " + searchField1 + ", value: false, type: boolean} , {key: initiator, value: \"admin\", type: textEqual}]}";
+        req.setContent(payload.getBytes());
+        req.setContentType("application/json");
+
+        response = flowsProcessInstanceResource.search(req, util.getProcessDefinition().split(":")[0], true, ASC, 0, 10);
+        verifyResponse(response, 0, searchField1, searchField2);
+    }
+
+    private void verifyResponse(ResponseEntity<Object> response, int expectedTotalItems, String searchField1, String searchField2) {
+        assertEquals(OK, response.getStatusCode());
+        HashMap body = (HashMap) response.getBody();
+        ArrayList responseList = (ArrayList) body.get("processInstances");
+        assertEquals(responseList.size(), ((Long) body.get("totalItems")).intValue());
+        assertEquals(expectedTotalItems, ((Long) body.get("totalItems")).intValue());
+
+        if (responseList.size() > 0) {
+            HistoricProcessInstanceResponse taskresponse = ((HistoricProcessInstanceResponse) responseList.get(0));
+            assertTrue(taskresponse.getProcessDefinitionId().contains(util.getProcessDefinition()));
+            //verifico che la Process Instance restituita rispetti i parametri della ricerca
+            List<RestVariable> variables = taskresponse.getVariables();
+            RestVariable variable = variables.stream().filter(v -> v.getName().equals(searchField1)).collect(Collectors.toList()).get(0);
+            assertEquals(true, variable.getValue());
+
+            variable = variables.stream().filter(v -> v.getName().equals(searchField2)).collect(Collectors.toList()).get(0);
+            assertEquals("admin", variable.getValue());
+        }
     }
 
 

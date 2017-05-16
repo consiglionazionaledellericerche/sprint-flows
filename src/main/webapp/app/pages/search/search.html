@@ -5,15 +5,15 @@
             <h4>
                 <i class="glyphicon glyphicon-edit"></i> flussi attivi
             </h4>
-        <small>seleziona per avere la lista completa dei flussi attivi</small>
-    </a></li>
+            <small>seleziona per avere la lista completa dei flussi attivi</small>
+        </a></li>
     <li role="presentation" ng-class="{'active-info': !vm.active}">
         <a class="pointer" ng-click="showProcessInstances(false)" data-toggle="tab">
             <h4>
                 <i class="glyphicon glyphicon-check"></i> flussi completati
             </h4>
-        <small>seleziona per avere la lista completa dei flussi completati</small>
-    </a></li>
+            <small>seleziona per avere la lista completa dei flussi completati</small>
+        </a></li>
 </ul>
 <br>
 <div class="row">
@@ -46,16 +46,10 @@
 
     <div class="col-md-9">
         <h3>Flussi {{vm.active ? 'attivi' : 'completati'}}</h3>
-        <tasklist
-                tasks="vm.tasks"
-                advanced="advanced"
-                paging="paging"
-                class="tasks"
-                detailed="detailed"
-                select-process-definition-key="selectProcessDefinitionKey"
-                process-definitions="processDefinitions"
-                action-buttons="false">
-        </tasklist>
+        <process-list
+                processes="vm.processInstances"
+                paging="paging">
+        </process-list>
 
         <pre ng-show="development">
       {{workflows.data | json}}

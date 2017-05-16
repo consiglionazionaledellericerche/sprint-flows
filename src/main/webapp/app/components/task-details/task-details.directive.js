@@ -11,21 +11,25 @@
     return {
       restrict: 'E',
       scope: {
-        task: '='
+        variables: '=',
+        title: '='
       },
       templateUrl: 'app/components/task-details/task-details.html',
       link: function (scope) {
 
-        scope.modalTaskMetadata = function (task) {
-          $log.info(task);
+        scope.modalTaskMetadata = function (variables, title) {
+          $log.info(variables);
             $uibModal.open({
                 templateUrl: 'app/components/task-details/detailModal.html',
                 controllerAs: 'vm',
                 controller: 'DetailModalController',
                 size: 'md',
                 resolve: {
-                    task: function() {
-                        return task;
+                    variables: function() {
+                        return variables;
+                    },
+                    title: function() {
+                        return title;
                     }
                 }
             });

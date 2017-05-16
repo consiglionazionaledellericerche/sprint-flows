@@ -4,14 +4,14 @@
     angular.module('sprintApp')
         .controller('DetailModalController', DetailModalController);
 
-    DetailModalController.$inject = ['$uibModalInstance', 'task'];
+    DetailModalController.$inject = ['$uibModalInstance', 'variables', 'title'];
 
-    function DetailModalController ($uibModalInstance, task) {
+    function DetailModalController ($uibModalInstance, variables, title) {
         var vm = this;
 
         vm.cancel = cancel;
-        vm.baseName = task.name;
-        vm.task = task;
+        vm.baseName = title;
+        vm.variables = variables;
 
         function cancel() {
             $uibModalInstance.dismiss('cancel');

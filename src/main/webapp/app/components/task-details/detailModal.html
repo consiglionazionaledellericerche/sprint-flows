@@ -1,14 +1,14 @@
 <div class="modal-header">
-    <button aria-label="Close" data-dismiss="modal" class="close" type="button" ng-click="vm.cancel()"><span
-            aria-hidden="true">&times;</span>
+    <button aria-label="Close" data-dismiss="modal" class="close" type="button" ng-click="vm.cancel()">
+        <span aria-hidden="true">&times;</span>
     </button>
     <h4 class="modal-title" id="showHealthLabel">
-        <b>{{vm.task.name}}</b>
+        <b>{{vm.baseName}}</b>
     </h4>
 </div>
 <div class="modal-body pad">
-    <div ng-show="vm.task.variables">
-        <div ng-repeat="variable in vm.task.variables">
+    <div ng-show="vm.variables">
+        <div ng-repeat="variable in vm.variables">
             <b>{{variable.name}}:</b> {{variable.value}}
         </div>
     </div>
