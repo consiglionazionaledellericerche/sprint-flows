@@ -51,8 +51,12 @@
         byProcessInstanceId : function(processInstanceId) {
             return $http.get('api/processInstances?processInstanceId=' + processInstanceId);
         },
-        myProcessInstances:  function(active, processDefinition, order) {
-            return $http.get('api/processInstances/myProcessInstances?active=' + active + '&processDefinition=' + (processDefinition ? processDefinition.key : 'all') + '&order=' + order);
+        myProcessInstances:  function(active, processDefinition, order, firstResult, maxResults) {
+            return $http.get('api/processInstances/myProcessInstances?active=' + active +
+                '&processDefinition=' + (processDefinition ? processDefinition.key : 'all') +
+                 '&order=' + order +
+                 '&firstResult=' + firstResult +
+                 '&maxResults=' + maxResults);
         },
         getProcessInstance: function(active) {
             return $http.get('api/processInstances/getProcessInstances?active=' + active);

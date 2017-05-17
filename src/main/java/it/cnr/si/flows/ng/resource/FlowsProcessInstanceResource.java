@@ -1,7 +1,6 @@
 package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
-
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.SecurityUtils;
@@ -17,11 +16,9 @@ import org.activiti.engine.impl.pvm.ReadOnlyProcessDefinition;
 import org.activiti.engine.impl.task.TaskDefinition;
 import org.activiti.engine.impl.util.json.JSONArray;
 import org.activiti.engine.impl.util.json.JSONObject;
-import org.activiti.engine.task.Attachment;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
-import org.activiti.rest.service.api.engine.AttachmentResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceActionRequest;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResource;
@@ -45,7 +42,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static it.cnr.si.flows.ng.utils.Utils.ASC;
 import static it.cnr.si.flows.ng.utils.Utils.DESC;
@@ -86,7 +82,9 @@ public class FlowsProcessInstanceResource {
     public ResponseEntity<DataResponse> getMyProcessInstances(
             @RequestParam boolean active,
             @RequestParam String processDefinition,
-            @RequestParam String order) {
+            @RequestParam String order,
+            @RequestParam int firstResult,
+            @RequestParam int maxResults) {
 
         String username = SecurityUtils.getCurrentUserLogin();
         List<HistoricProcessInstance> list;
@@ -110,12 +108,12 @@ public class FlowsProcessInstanceResource {
         else
             historicProcessInstanceQuery.orderByProcessInstanceStartTime().desc();
 
-        list = historicProcessInstanceQuery.list();
+        list = historicProcessInstanceQuery.listPage(firstResult, maxResults);
 
         DataResponse response = new DataResponse();
         response.setStart(0);
         response.setSize(list.size());
-        response.setTotal(list.size());
+        response.setTotal(historicProcessInstanceQuery.count());
         response.setData(restResponseFactory.createHistoricProcessInstanceResponseList(list));
         response.setOrder(order);
 
