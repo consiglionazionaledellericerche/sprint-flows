@@ -1,26 +1,13 @@
 package it.cnr.si.flows.ng.resource;
 
-import static it.cnr.si.flows.ng.utils.Utils.ASC;
-import static it.cnr.si.flows.ng.utils.Utils.DESC;
-import static it.cnr.si.flows.ng.utils.Utils.isEmpty;
-import static it.cnr.si.flows.ng.utils.Utils.isNotEmpty;
-
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-
+import com.codahale.metrics.annotation.Timed;
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.exception.FlowsPermissionException;
+import it.cnr.si.flows.ng.service.CounterService;
+import it.cnr.si.flows.ng.service.FlowsAttachmentService;
+import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.security.SecurityUtils;
+import it.cnr.si.service.UserService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
@@ -49,22 +36,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import com.codahale.metrics.annotation.Timed;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.exception.FlowsPermissionException;
-import it.cnr.si.flows.ng.service.CounterService;
-import it.cnr.si.flows.ng.service.FlowsAttachmentService;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.security.SecurityUtils;
-import it.cnr.si.service.UserService;
+import static it.cnr.si.flows.ng.utils.Utils.*;
 
 /**
  * @author mtrycz
@@ -76,7 +59,6 @@ public class FlowsTaskResource {
 
     public static final String TASK_EXECUTOR = "esecutore";
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsTaskResource.class);
-    private static final String ALL_PROCESS_INSTANCES = "all";
     @Autowired
     protected RestResponseFactory restResponseFactory;
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -96,6 +78,21 @@ public class FlowsTaskResource {
     private HistoryService historyService;
     @Inject
     private FlowsAttachmentResource attachmentResource;
+
+    // TODO magari un giorno avremo degli array, ma per adesso ce lo facciamo andare bene cosi'
+    private static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
+
+        Map<String, Object> data = new HashMap<>();
+
+        Enumeration<String> parameterNames = req.getParameterNames();
+        while (parameterNames.hasMoreElements()) {
+            String paramName = parameterNames.nextElement();
+            data.put(paramName, req.getParameter(paramName));
+        }
+
+        return data;
+
+    }
 
     @RequestMapping(value = "/mytasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
@@ -128,9 +125,9 @@ public class FlowsTaskResource {
         String username = SecurityUtils.getCurrentUserLogin();
         List<String> authorities =
                 SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                //                        .map(FlowsTaskResource::removeLeadingRole) //todo: vedere con Martin (le authorities sono ROLE_USER (come ora) o USER (come prima))
-                .collect(Collectors.toList());
+                        .map(GrantedAuthority::getAuthority)
+                        //                        .map(FlowsTaskResource::removeLeadingRole) //todo: vedere con Martin (le authorities sono ROLE_USER (come ora) o USER (come prima))
+                        .collect(Collectors.toList());
 
         List<Task> listraw = taskService.createTaskQuery()
                 .taskCandidateUser(username)
@@ -253,9 +250,9 @@ public class FlowsTaskResource {
         // TODO get authorities from username NOT currentuser
         List<String> authorities =
                 SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                //                        .map(FlowsTaskResource::removeLeadingRole) //todo: vedere con Martin (le authorities sono ROLE_USER (come ora) o USER (come prima))
-                .collect(Collectors.toList());
+                        .map(GrantedAuthority::getAuthority)
+                        //                        .map(FlowsTaskResource::removeLeadingRole) //todo: vedere con Martin (le authorities sono ROLE_USER (come ora) o USER (come prima))
+                        .collect(Collectors.toList());
 
         if ( username.equals(taskService.createTaskQuery().taskId(taskId).singleResult().getAssignee()) )
             return true;
@@ -264,7 +261,6 @@ public class FlowsTaskResource {
                     .filter(l -> l.getType().equals("candidate"))
                     .anyMatch(l -> authorities.contains(l.getGroupId()) );
     }
-
 
     // TODO verificare almeno che l'utente abbia i gruppi necessari
     @RequestMapping(value = "complete", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -367,20 +363,20 @@ public class FlowsTaskResource {
             String type = appo.getString("type");
             //wildcard ("%") di default ma non a TUTTI i campi
             switch (type) {
-            case "textEqual":
-                taskQuery.processVariableValueEquals(key, value);
-                break;
-            case "boolean":
-                // gestione variabili booleane
-                taskQuery.processVariableValueEquals(key, Boolean.valueOf(value));
-                break;
-            case "date":
-                processDate(taskQuery, key, value);
-                break;
-            default:
-                //variabili con la wildcard  (%value%)
-                taskQuery.processVariableValueLikeIgnoreCase(key, "%" + value + "%");
-                break;
+                case "textEqual":
+                    taskQuery.processVariableValueEquals(key, value);
+                    break;
+                case "boolean":
+                    // gestione variabili booleane
+                    taskQuery.processVariableValueEquals(key, Boolean.valueOf(value));
+                    break;
+                case "date":
+                    processDate(taskQuery, key, value);
+                    break;
+                default:
+                    //variabili con la wildcard  (%value%)
+                    taskQuery.processVariableValueLikeIgnoreCase(key, "%" + value + "%");
+                    break;
             }
         }
         if (order.equals(ASC))
@@ -397,33 +393,52 @@ public class FlowsTaskResource {
         return ResponseEntity.ok(result);
     }
 
-
-    @RequestMapping(value = "/taskCompleted", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/taskCompletedByMe", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Object> getTasksCompletedForMe(
+    public ResponseEntity<Object> getTasksCompletedByMe(
             HttpServletRequest req,
+            @RequestParam("processDefinition") String processDefinition,
             @RequestParam("firstResult") int firstResult,
-            @RequestParam("maxResults") int maxResults) {
+            @RequestParam("maxResults") int maxResults,
+            @RequestParam("order") String order) {
 
-        Map<String, Object> result = new HashMap<>();
         String username = SecurityUtils.getCurrentUserLogin();
 
-        List<HistoricTaskInstance> response = new ArrayList<>();
-        List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().taskInvolvedUser(username)
-                .includeProcessVariables().includeTaskLocalVariables()
-                .listPage(firstResult, maxResults);
+        HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery().taskInvolvedUser(username)
+                .includeProcessVariables().includeTaskLocalVariables();
 
-        for (HistoricTaskInstance task : tasks) {
+        if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
+            query.processDefinitionKey(processDefinition);
+
+        if (order.equals(ASC))
+            query.orderByTaskCreateTime().asc();
+        else if (order.equals(DESC))
+            query.orderByTaskCreateTime().desc();
+
+//        List<HistoricTaskInstance> tasks = query.list();
+//                .listPage(firstResult, maxResults);
+
+        List<HistoricTaskInstance> taskList = new ArrayList<>();
+//        for (HistoricTaskInstance task : tasks) {
+        for (HistoricTaskInstance task : query.list()) {
             List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForTask(task.getId());
             for (HistoricIdentityLink hil : identityLinks) {
                 if (hil.getType().equals(TASK_EXECUTOR) && hil.getUserId().equals(username))
-                    response.add(task);
+                    taskList.add(task);
             }
         }
-        result.put("tasks", response);
-        return ResponseEntity.ok(result);
-    }
+//        List<HistoricTaskInstanceResponse> list = restResponseFactory.createHistoricTaskInstanceResponseList(taskList);
+        List<HistoricTaskInstanceResponse> resultList = restResponseFactory.createHistoricTaskInstanceResponseList(
+                taskList.subList(firstResult, (firstResult + maxResults <= taskList.size()) ? firstResult + maxResults : taskList.size()));
 
+        DataResponse response = new DataResponse();
+        response.setStart(firstResult);
+        response.setSize(resultList.size());// numero di task restituiti
+        response.setTotal(taskList.size()); //numero totale di task avviati da me
+        response.setData(resultList);
+
+        return ResponseEntity.ok(response);
+    }
 
     private void processDate(HistoricTaskInstanceQuery taskQuery, String key, String value) {
         try {
@@ -436,20 +451,5 @@ public class FlowsTaskResource {
         } catch (ParseException e) {
             LOGGER.error("Errore nel parsing della data {} - ", value, e);
         }
-    }
-
-    // TODO magari un giorno avremo degli array, ma per adesso ce lo facciamo andare bene cosi'
-    private static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
-
-        Map<String, Object> data = new HashMap<>();
-
-        Enumeration<String> parameterNames = req.getParameterNames();
-        while (parameterNames.hasMoreElements()) {
-            String paramName = parameterNames.nextElement();
-            data.put(paramName, req.getParameter(paramName));
-        }
-
-        return data;
-
     }
 }
