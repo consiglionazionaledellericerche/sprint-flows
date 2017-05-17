@@ -151,14 +151,14 @@ public class FlowsTaskResourceTest {
         taskService.setOwner(taskService.createTaskQuery().singleResult().getId(), "user");
 
         //Recupero solo il flusso completato da user e non quello assegnatogli né quello di cui è owner
-        response = flowsTaskResource.getTasksCompletedForMe(new MockHttpServletRequest(), 0, 1000);
+        response = flowsTaskResource.getTasksCompletedByMe(new MockHttpServletRequest(), 0, 1000);
         assertEquals(OK, response.getStatusCode());
         assertEquals(util.getFirstTaskId(), ((HistoricTaskInstanceEntity) ((ArrayList) ((Map) response.getBody()).get("tasks")).get(0)).getId());
 
         //Verifico che il metodo funzioni anche con admin
         util.logout();
         util.loginAdmin();
-        response = flowsTaskResource.getTasksCompletedForMe(new MockHttpServletRequest(), 0, 1000);
+        response = flowsTaskResource.getTasksCompletedByMe(new MockHttpServletRequest(), 0, 1000);
         assertEquals(OK, response.getStatusCode());
         assertEquals("Admin non deve vedere task perchè non l'ha ANCORA completato ma ha solo avviato il flusso", 0, ((ArrayList) ((Map) response.getBody()).get("tasks")).size());
 
@@ -169,7 +169,7 @@ public class FlowsTaskResourceTest {
         assertEquals(OK, response.getStatusCode());
 
         //Admin vede solo il task che ha completato
-        response = flowsTaskResource.getTasksCompletedForMe(new MockHttpServletRequest(), 0, 1000);
+        response = flowsTaskResource.getTasksCompletedByMe(new MockHttpServletRequest(), 0, 1000);
         assertEquals(OK, response.getStatusCode());
         assertEquals("Admin non vede il task che ha appena completato", 1, ((ArrayList) ((Map) response.getBody()).get("tasks")).size());
     }
