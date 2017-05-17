@@ -43,15 +43,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static it.cnr.si.flows.ng.utils.Utils.ASC;
-import static it.cnr.si.flows.ng.utils.Utils.DESC;
+import static it.cnr.si.flows.ng.utils.Utils.*;
 
 @Controller
 @RequestMapping("api/processInstances")
 public class FlowsProcessInstanceResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsProcessInstanceResource.class);
-    private static final String ALL_PROCESS_INSTANCES = "all";
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     @Autowired
     private RestResponseFactory restResponseFactory;
@@ -90,8 +88,7 @@ public class FlowsProcessInstanceResource {
         List<HistoricProcessInstance> list;
         HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
 
-        if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
-            historicProcessInstanceQuery.processDefinitionKey(processDefinition);
+
 
         if (active) {
             historicProcessInstanceQuery.variableValueEquals("initiator", username)
@@ -103,6 +100,8 @@ public class FlowsProcessInstanceResource {
                     .includeProcessVariables();
         }
 
+        if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
+            historicProcessInstanceQuery.processDefinitionKey(processDefinition);
         if (order.equals(ASC))
             historicProcessInstanceQuery.orderByProcessInstanceStartTime().asc();
         else
