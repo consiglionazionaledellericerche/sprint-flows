@@ -32,12 +32,7 @@
 
         <br>
         <h4>Tipologie</h4>
-        <workflow-types processes="processes"
-                        prefix="'workflow'"
-                        paging="paging"
-                        metadata-fields="metadataFields"
-                        process-definitions="wfDefs">
-        </workflow-types>
+        <workflow-types process-definitions="wfDefs" filters="true"></workflow-types>
         <br>
         <br>
         <button ng-click="search()" class="btn btn-primary">Filtra</button>

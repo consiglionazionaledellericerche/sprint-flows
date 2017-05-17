@@ -5,14 +5,17 @@
             .module('sprintApp')
             .controller('TaskCompletedController', TaskCompletedController);
 
-    TaskCompletedController.$inject = ['$scope', '$state', 'dataService', '$log'];
+    TaskCompletedController.$inject = ['$scope', '$state', 'dataService', 'utils', '$log'];
 
-    function TaskCompletedController($scope, $state, dataService, $log) {
+    function TaskCompletedController($scope, $state, dataService, utils, $log) {
         var vm = this,
         loadTaskCompleted = function () {
-            dataService.tasks.getTaskCompleted(0, 1000)
+            dataService.tasks.getTaskCompletedByMe(0, 1000)
                 .then(function (response) {
-                    vm.taskCompletedForMe = response.data.tasks;
+                    response.data.data.forEach( function (task){
+                        utils.refactoringVariables(task);
+                    });
+                    vm.taskCompletedForMe = response.data.data;
                 }, function (error) {
                     $log.error(error);
                 });
