@@ -90,17 +90,11 @@ public class FlowsTaskResourceTest {
 
     @Test
     public void testGetTaskInstance() {
-        ResponseEntity<TaskResponse> response = flowsTaskResource.getTask(util.getFirstTaskId());
+        ResponseEntity<Map<String, Object>> response = flowsTaskResource.getTask(util.getFirstTaskId());
         assertEquals(OK, response.getStatusCode());
-        assertEquals(TASK_NAME, ((TaskResponse) response.getBody()).getName());
+        assertEquals(TASK_NAME, ((TaskResponse) response.getBody().get("task")).getName());
     }
 
-    @Test
-    @Ignore
-    public void testGetTaskVariables() {
-        //TODO: Test goes here...
-//        flowsTaskResource.getTaskVariables()
-    }
 
     @Test
     @Ignore
