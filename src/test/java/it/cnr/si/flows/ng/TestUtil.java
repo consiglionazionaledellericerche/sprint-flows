@@ -132,9 +132,9 @@ public class TestUtil {
             }
         }
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
-        req.setParameter("definitionId", processDefinition);
+        req.setParameter("processDefinitionId", processDefinition);
         ResponseEntity<Object> response = flowsTaskResource.completeTask(req);
-        assertEquals(response.getStatusCode(), OK);
+        assertEquals(OK, response.getStatusCode());
         // Recupero il TaskId del primo task del flusso
         firstTaskId = taskService.createTaskQuery().singleResult().getId();
         //Recupero la ProcessInstance
