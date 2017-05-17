@@ -111,9 +111,9 @@ public class FlowsProcessInstanceResource {
         list = historicProcessInstanceQuery.listPage(firstResult, maxResults);
 
         DataResponse response = new DataResponse();
-        response.setStart(0);
-        response.setSize(list.size());
-        response.setTotal(historicProcessInstanceQuery.count());
+        response.setStart(firstResult);
+        response.setSize(list.size()); //numero flussi restituito
+        response.setTotal(historicProcessInstanceQuery.count()); //totale Flussi
         response.setData(restResponseFactory.createHistoricProcessInstanceResponseList(list));
         response.setOrder(order);
 
