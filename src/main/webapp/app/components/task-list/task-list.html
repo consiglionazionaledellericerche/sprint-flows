@@ -2,7 +2,6 @@
     <div class="col-md-9">
         <strong>{{task.variabili.title}}</strong> <br>
         Flusso avviato da {{task.variabili.initiator}} il {{task.variabili.startDate | date}}
-        <span ng-bind-html="task.endDate | dueDate"></span>
 
         <span ng-bind-html="task.priority | priority"></span>
         <div ng-show="task.variabili.titoloIstanzaFlusso">
@@ -11,16 +10,9 @@
         <div ng-show="task.name">
             <strong>Fase:</strong> {{task.name}}</span> <br>
         </div>
-        <div ng-show="task.id">
-            <strong>Id:</strong> {{task.id}} <br>
-        </div>
+
         <div ng-show="task.variabili.sceltaUtente">
             <strong>Scelta utente:</strong> {{task.variabili.sceltaUtente}} <br>
-        </div>
-
-        <!--<div ng-show="completed">-->
-        <div ng-show="task.startTime">
-            <strong>Task assegnato il</strong> {{task.startTime | date}}
         </div>
         <div ng-show="task.endTime">
             <strong>Task completato il </strong>{{task.endTime | date}}
@@ -34,7 +26,7 @@
         <div class="btn-group-vertical btn-block" role="group">
             <a class="btn btn-primary" ng-class="{'btn-xs': !advanced}"
                ui-sref="details({processInstanceId: task.processInstanceId, taskId: task.id})">
-                <span class="glyphicon glyphicon-th-list"></span> Dettagli
+                <span class="glyphicon glyphicon-th-list"></span> Dettagli Flusso
             </a>
             <a class="btn btn-default" ng-class="{'btn-xs': !advanced}" ng-if="task.assignee !== null&&actionButtons"
                ng-click="claimTask(task.id, false)">
