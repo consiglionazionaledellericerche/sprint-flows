@@ -43,11 +43,11 @@
         getTask: function (id) {
             return $http.get('api/tasks/'+ id);
         },
-        getTaskCompletedByMe: function (processDefinition, firstResult, maxResults, order) {
-            return $http.get('api/tasks/taskCompletedByMe?processDefinition=' + (processDefinition ? processDefinition.key : 'all') +
+        getTaskCompletedByMe: function (processDefinition, firstResult, maxResults, order, params) {
+            return $http.post('api/tasks/taskCompletedByMe?processDefinition=' + (processDefinition ? processDefinition.key : 'all') +
                 '&firstResult=' + firstResult +
                 '&maxResults=' + maxResults +
-                '&order=' + order);
+                '&order=' + order, params);
         }
       },
       processInstances: {
