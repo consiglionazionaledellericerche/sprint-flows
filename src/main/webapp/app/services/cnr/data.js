@@ -43,16 +43,23 @@
         getTask: function (id) {
             return $http.get('api/tasks/'+ id);
         },
-        getTaskCompletedByMe: function (firstResult, maxResults) {
-            return $http.get('api/tasks/taskCompletedByMe?firstResult=' + firstResult + '&maxResults=' + maxResults);
+        getTaskCompletedByMe: function (processDefinition, firstResult, maxResults, order) {
+            return $http.get('api/tasks/taskCompletedByMe?processDefinition=' + (processDefinition ? processDefinition.key : 'all') +
+                '&firstResult=' + firstResult +
+                '&maxResults=' + maxResults +
+                '&order=' + order);
         }
       },
       processInstances: {
         byProcessInstanceId : function(processInstanceId) {
             return $http.get('api/processInstances?processInstanceId=' + processInstanceId);
         },
-        myProcessInstances:  function(active, processDefinition, order) {
-            return $http.get('api/processInstances/myProcessInstances?active=' + active + '&processDefinition=' + (processDefinition ? processDefinition.key : 'all') + '&order=' + order);
+        myProcessInstances:  function(active, processDefinition, order, firstResult, maxResults) {
+            return $http.get('api/processInstances/myProcessInstances?active=' + active +
+                '&processDefinition=' + (processDefinition ? processDefinition.key : 'all') +
+                 '&order=' + order +
+                 '&firstResult=' + firstResult +
+                 '&maxResults=' + maxResults);
         },
         getProcessInstance: function(active) {
             return $http.get('api/processInstances/getProcessInstances?active=' + active);

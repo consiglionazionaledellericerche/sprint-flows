@@ -5,22 +5,40 @@
             .module('sprintApp')
             .controller('TaskCompletedController', TaskCompletedController);
 
-    TaskCompletedController.$inject = ['$scope', '$state', 'dataService', 'utils', '$log'];
+    TaskCompletedController.$inject = ['$scope', '$rootScope', '$state', 'dataService', 'utils', 'paginationConstants', '$log'];
 
-    function TaskCompletedController($scope, $state, dataService, utils, $log) {
-        var vm = this,
+    function TaskCompletedController($scope, $rootScope, $state, dataService, utils, paginationConstants, $log) {
+        var vm = this, firstResult, maxResults, loadTaskCompleted;
+         //variabili usate nella paginazione
+        vm.itemsPerPage = paginationConstants.itemsPerPage;
+        vm.page = 1;
+        vm.totalItems = vm.itemsPerPage * vm.page;
+        vm.order = 'ASC';
+
+        $scope.$watchGroup(['vm.order', 'current'], function () {
+                loadTaskCompleted();
+        });
+
         loadTaskCompleted = function () {
-            dataService.tasks.getTaskCompletedByMe(0, 1000)
+            var  maxResults = vm.itemsPerPage,
+                firstResult = vm.itemsPerPage * (vm.page - 1);
+            dataService.tasks.getTaskCompletedByMe($rootScope.current, firstResult, maxResults, vm.order)
                 .then(function (response) {
                     response.data.data.forEach( function (task){
                         utils.refactoringVariables(task);
                     });
                     vm.taskCompletedForMe = response.data.data;
+                    // variabili per la gestione della paginazione
+                    vm.totalItems = response.data.total;
+                    vm.queryCount = vm.totalItems;
                 }, function (error) {
                     $log.error(error);
                 });
         };
 
-        loadTaskCompleted();
+        //funzione richiamata quando si chiede una nuova "pagina" dei risultati
+        vm.transition = function transition () {
+            loadTaskCompleted()
+        }
     }
 })();

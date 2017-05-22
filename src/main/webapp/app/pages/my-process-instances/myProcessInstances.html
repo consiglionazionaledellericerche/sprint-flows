@@ -66,6 +66,13 @@
                     processes="vm.myProcessInstancesActive.data"
                     paging="paging">
             </process-list>
+            <!--paginazione Flussi Attivi-->
+            <div class="text-center">
+                <jhi-item-count page="vm.pageActive" total="vm.queryCountActive"
+                                items-per-page="vm.itemsPerPage"></jhi-item-count>
+                <uib-pagination class="pagination-sm" total-items="vm.totalItemsActive" ng-model="vm.pageActive"
+                                ng-change="vm.transition()"></uib-pagination>
+            </div>
         </div>
         <div class="col-md-9" ng-show="activeContent == 'terminated'">
             <h3>
@@ -78,7 +85,15 @@
                     processes="vm.myProcessInstancesTerminated.data"
                     paging="paging">
             </process-list>
+            <!--paginazione Flussi Terminati-->
+            <div class="text-center">
+                <jhi-item-count page="vm.pageTerminated" total="vm.queryCountTerminated"
+                                items-per-page="vm.itemsPerPage"></jhi-item-count>
+                <uib-pagination class="pagination-sm" total-items="vm.totalItemsTerminated" ng-model="vm.pageTerminated"
+                                ng-change="vm.transition()"></uib-pagination>
+            </div>
         </div>
+
     </div>
 </div>
 <pre ng-show="development">

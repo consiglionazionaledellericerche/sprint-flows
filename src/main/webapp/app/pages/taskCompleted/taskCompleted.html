@@ -2,19 +2,18 @@
 <div ng-cloak>
     <div class="row">
         <div class="col-md-3">
-            <button class="btn btn-default btn-block margin-top-20" ng-click="advanced = !advanced">
-                <span class="glyphicon" ng-class="{'glyphicon-wrench': !advanced, 'glyphicon-tasks': advanced}"></span>
-                modalità {{advanced ? 'semplice' : 'avanzata'}}
-            </button>
-            <div ng-show="advanced">
-                <h4>Tipologie</h4>
-                <workflow-types criteria="criteria"
-                                filters="true"
-                                reset-filters="resetFilters"
-                                select-process-definition-key="selectProcessDefinitionKey"
-                                process-definitions="wfDefs">
-                </workflow-types>
+            <div>
+                <h4>Ordinamento temporale</h4>
+                <div>
+                    <button class="btn btn-default btn-block margin-top-20"
+                            ng-click="vm.order ===  'ASC' ?  vm.order='DESC' : vm.order = 'ASC'">
+                        <span class="glyphicon glyphicon-sort"></span>
+                        {{vm.order === 'ASC' ? 'Crescente' : 'Descrescente'}}
+                    </button>
+                </div>
             </div>
+            <h4>Tipologie</h4>
+            <workflow-types process-definitions="wfDefs" filters="false"></workflow-types>
         </div>
 
         <div class="col-md-9">
@@ -31,10 +30,17 @@
                 </div>
             </div>
             <task-list tasks="vm.taskCompletedForMe"></task-list>
+
+            <!--paginazione-->
+            <div class="text-center">
+                <jhi-item-count page="vm.page" total="vm.queryCount" items-per-page="vm.itemsPerPage"></jhi-item-count>
+                <uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.page"
+                                ng-change="vm.transition(current)"></uib-pagination>
+            </div>
+
             <pre ng-show="development">
               {{vm.taskCompletedForMe | json}}
             </pre>
         </div>
     </div>
-
 </div>

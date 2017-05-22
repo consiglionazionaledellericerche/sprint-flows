@@ -108,7 +108,7 @@ public class FlowsProcessInstanceResourceTest {
                 .collect(Collectors.toList()).get(0).getId();
         //User crea una seconda Process Instance
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
-        req.setParameter("definitionId", permessiFeriePD);
+        req.setParameter("processDefinitionId", permessiFeriePD);
         flowsTaskResource.completeTask(req);
         util.logout();
 
@@ -219,7 +219,7 @@ public class FlowsProcessInstanceResourceTest {
     private String verifyMyProcesses(int startedByAdmin, int startedBySpaclient) {
         String proceeeInstanceID = null;
         // Admin vede la Process Instance che ha avviato
-        ResponseEntity<DataResponse> response = flowsProcessInstanceResource.getMyProcessInstances(true, "all", ASC);
+        ResponseEntity<DataResponse> response = flowsProcessInstanceResource.getMyProcessInstances(true, "all", ASC, 0, 100);
         assertEquals(OK, response.getStatusCode());
         assertEquals(startedByAdmin, response.getBody().getSize());
         List<HistoricProcessInstanceResponse> processInstances = ((List<HistoricProcessInstanceResponse>) response.getBody().getData());
@@ -230,7 +230,7 @@ public class FlowsProcessInstanceResourceTest {
 
         // User NON vede la Process Instance avviata da Admin
         util.loginUser();
-        response = flowsProcessInstanceResource.getMyProcessInstances(true, "all", ASC);
+        response = flowsProcessInstanceResource.getMyProcessInstances(true, "all", ASC, 0, 100);
         assertEquals(OK, response.getStatusCode());
         assertEquals(startedBySpaclient, response.getBody().getSize());
         assertEquals(startedBySpaclient, ((List<HistoricProcessInstanceResponse>) response.getBody().getData()).size());

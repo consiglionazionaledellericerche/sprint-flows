@@ -1,15 +1,21 @@
 <div class="row vertical-align-center well" ng-class="{'row-slim': !advanced}" ng-repeat="task in tasks">
     <div class="col-md-9">
-        <strong>
-            {{task.variabili.title}}
-        </strong>
+        <strong>{{task.variabili.title}}</strong> <br>
+        Flusso avviato da {{task.variabili.initiator}} il {{task.variabili.startDate | date}}
+
         <span ng-bind-html="task.priority | priority"></span>
-        <div ng-hide="completed">
-            avviato da {{task.variabili.initiator}} il {{task.variabili.startDate | date}} <span
-                ng-bind-html="task.endDate | dueDate"></span>
+        <div ng-show="task.variabili.titoloIstanzaFlusso">
+            <strong>Titolo:</strong> {{task.variabili.titoloIstanzaFlusso}} <br>
         </div>
-        <div ng-show="completed">
-            assegnato il {{task.startDate | date}}, completato il {{task.endDate | date}}
+        <div ng-show="task.name">
+            <strong>Fase:</strong> {{task.name}}</span> <br>
+        </div>
+
+        <div ng-show="task.variabili.sceltaUtente">
+            <strong>Scelta utente:</strong> {{task.variabili.sceltaUtente}} <br>
+        </div>
+        <div ng-show="task.endTime">
+            <strong>Task completato il </strong>{{task.endTime | date}}
         </div>
         <div ng-show="advanced">
             <ng-include src="task.searchView"/>
@@ -20,7 +26,7 @@
         <div class="btn-group-vertical btn-block" role="group">
             <a class="btn btn-primary" ng-class="{'btn-xs': !advanced}"
                ui-sref="details({processInstanceId: task.processInstanceId, taskId: task.id})">
-                <span class="glyphicon glyphicon-th-list"></span> Dettagli
+                <span class="glyphicon glyphicon-th-list"></span> Dettagli Flusso
             </a>
             <a class="btn btn-default" ng-class="{'btn-xs': !advanced}" ng-if="task.assignee !== null&&actionButtons"
                ng-click="claimTask(task.id, false)">
@@ -37,4 +43,4 @@
     <div class="loading-spiner spinner-loader"></div>
 </div>
 
-<span ng-show="tasks.length == 0">nessun workflow</span>
+<span ng-show="tasks.length == 0">nessun Task</span>

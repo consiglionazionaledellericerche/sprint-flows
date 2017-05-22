@@ -1,7 +1,6 @@
 package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
-
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.SecurityUtils;
@@ -17,11 +16,9 @@ import org.activiti.engine.impl.pvm.ReadOnlyProcessDefinition;
 import org.activiti.engine.impl.task.TaskDefinition;
 import org.activiti.engine.impl.util.json.JSONArray;
 import org.activiti.engine.impl.util.json.JSONObject;
-import org.activiti.engine.task.Attachment;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
-import org.activiti.rest.service.api.engine.AttachmentResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceActionRequest;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResource;
@@ -45,17 +42,14 @@ import javax.servlet.http.HttpServletResponse;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static it.cnr.si.flows.ng.utils.Utils.ASC;
-import static it.cnr.si.flows.ng.utils.Utils.DESC;
+import static it.cnr.si.flows.ng.utils.Utils.*;
 
 @Controller
 @RequestMapping("api/processInstances")
 public class FlowsProcessInstanceResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsProcessInstanceResource.class);
-    private static final String ALL_PROCESS_INSTANCES = "all";
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     @Autowired
     private RestResponseFactory restResponseFactory;
@@ -86,14 +80,15 @@ public class FlowsProcessInstanceResource {
     public ResponseEntity<DataResponse> getMyProcessInstances(
             @RequestParam boolean active,
             @RequestParam String processDefinition,
-            @RequestParam String order) {
+            @RequestParam String order,
+            @RequestParam int firstResult,
+            @RequestParam int maxResults) {
 
         String username = SecurityUtils.getCurrentUserLogin();
         List<HistoricProcessInstance> list;
         HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
 
-        if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
-            historicProcessInstanceQuery.processDefinitionKey(processDefinition);
+
 
         if (active) {
             historicProcessInstanceQuery.variableValueEquals("initiator", username)
@@ -105,17 +100,19 @@ public class FlowsProcessInstanceResource {
                     .includeProcessVariables();
         }
 
+        if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
+            historicProcessInstanceQuery.processDefinitionKey(processDefinition);
         if (order.equals(ASC))
             historicProcessInstanceQuery.orderByProcessInstanceStartTime().asc();
         else
             historicProcessInstanceQuery.orderByProcessInstanceStartTime().desc();
 
-        list = historicProcessInstanceQuery.list();
+        list = historicProcessInstanceQuery.listPage(firstResult, maxResults);
 
         DataResponse response = new DataResponse();
-        response.setStart(0);
-        response.setSize(list.size());
-        response.setTotal(list.size());
+        response.setStart(firstResult);
+        response.setSize(list.size()); //numero flussi restituito
+        response.setTotal(historicProcessInstanceQuery.count()); //totale Flussi
         response.setData(restResponseFactory.createHistoricProcessInstanceResponseList(list));
         response.setOrder(order);
 

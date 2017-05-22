@@ -3,8 +3,8 @@ package it.cnr.si.flows.ng.resource;
 import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.TestUtil;
 import org.activiti.engine.TaskService;
-import org.activiti.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.activiti.rest.common.api.DataResponse;
+import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.task.TaskResponse;
 import org.junit.After;
@@ -25,6 +25,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.ArrayList;
 import java.util.Map;
 
+import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
+import static it.cnr.si.flows.ng.utils.Utils.ASC;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.OK;
@@ -151,16 +153,18 @@ public class FlowsTaskResourceTest {
         taskService.setOwner(taskService.createTaskQuery().singleResult().getId(), "user");
 
         //Recupero solo il flusso completato da user e non quello assegnatogli né quello di cui è owner
-        response = flowsTaskResource.getTasksCompletedForMe(new MockHttpServletRequest(), 0, 1000);
+        response = flowsTaskResource.getTasksCompletedByMe(new MockHttpServletRequest(), ALL_PROCESS_INSTANCES, 0, 1000, ASC);
         assertEquals(OK, response.getStatusCode());
-        assertEquals(util.getFirstTaskId(), ((HistoricTaskInstanceEntity) ((ArrayList) ((Map) response.getBody()).get("tasks")).get(0)).getId());
+        assertEquals(util.getFirstTaskId(),
+                     ((ArrayList<HistoricTaskInstanceResponse>) ((DataResponse) response.getBody()).getData()).get(0).getId());
 
         //Verifico che il metodo funzioni anche con admin
         util.logout();
         util.loginAdmin();
-        response = flowsTaskResource.getTasksCompletedForMe(new MockHttpServletRequest(), 0, 1000);
+        response = flowsTaskResource.getTasksCompletedByMe(new MockHttpServletRequest(), ALL_PROCESS_INSTANCES, 0, 1000, ASC);
         assertEquals(OK, response.getStatusCode());
-        assertEquals("Admin non deve vedere task perchè non l'ha ANCORA completato ma ha solo avviato il flusso", 0, ((ArrayList) ((Map) response.getBody()).get("tasks")).size());
+        assertEquals("Admin non deve vedere task perchè non l'ha ANCORA completato ma ha solo avviato il flusso",
+                     0, ((ArrayList<HistoricTaskInstanceResponse>) ((DataResponse) response.getBody()).getData()).size());
 
         //completo un altro task con admin
         req = new MockMultipartHttpServletRequest();
@@ -169,8 +173,9 @@ public class FlowsTaskResourceTest {
         assertEquals(OK, response.getStatusCode());
 
         //Admin vede solo il task che ha completato
-        response = flowsTaskResource.getTasksCompletedForMe(new MockHttpServletRequest(), 0, 1000);
+        response = flowsTaskResource.getTasksCompletedByMe(new MockHttpServletRequest(), ALL_PROCESS_INSTANCES, 0, 1000, ASC);
         assertEquals(OK, response.getStatusCode());
-        assertEquals("Admin non vede il task che ha appena completato", 1, ((ArrayList) ((Map) response.getBody()).get("tasks")).size());
+        assertEquals("Admin non vede il task che ha appena completato",
+                     1, ((ArrayList<HistoricTaskInstanceResponse>) ((DataResponse) response.getBody()).getData()).size());
     }
 }
