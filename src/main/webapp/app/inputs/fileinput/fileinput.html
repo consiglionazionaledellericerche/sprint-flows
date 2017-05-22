@@ -1,15 +1,41 @@
-<label for="attrs.id">{{attrs.label}}</label>
-<a
-  href
-  ng-click="downloadFile('/api/attachments/task/'+ vm.data.taskId +'/'+ vm.attachments[attrs.name].name +'/data', vm.attachments[attrs.name].name, vm.attachments[attrs.name].mimetype)" >
-    {{vm.attachments[attrs.name].filename}}
-</a>
-<input type="file"
-      ng-model="$parent.vm.data[attrs.name]"
-      ngf-select
-      name="$parent.vm.data[attrs.name]"
-      accept="{{attrs.accept}}"
-      ngf-multiple="{{attrs.ngfMultiple}}"
-      ng-required="attrs['required']" />
+<div class="well" ng-if="attrs.ngfMultiple == 'false'">
+  <label for="attrs.id">{{attrs.label}}</label>
+  <a
+    href
+    ng-click="downloadFile('/api/attachments/task/'+ vm.data.taskId +'/'+ vm.attachments[attrs.name].name +'/data', vm.attachments[attrs.name].name, vm.attachments[attrs.name].mimetype)" >
+      {{vm.attachments[attrs.name].filename}}
+  </a>
+  <input type="file"
+        ng-model="$parent.vm.data[attrs.name]"
+        ngf-select
+        name="$parent.vm.data[attrs.name]"
+        accept="{{attrs.accept}}"
+        ngf-multiple="false"
+        ng-required="attrs['required']" />
+</div>
 
-<!-- <pre>{{attrs|json}}</pre> -->
+<div class="well" ng-if="attrs.ngfMultiple == 'true'">
+  <div ng-repeat="attachment in vm.attachmentsList | filter: filterNames">
+    <label for="attrs.id">{{attrs.label +' '+ $index }}</label>
+    <a
+      href
+      ng-click="downloadFile('/api/attachments/task/'+ vm.data.taskId +'/'+ attachment.name +'/data', attachment.name,attachment.mimetype)" >
+        {{attachment.filename}}
+    </a>
+    <input type="file"
+          ng-model="$parent.vm.data[attachment.name]"
+          ngf-select
+          name="$parent.vm.data[attachment.name]"
+          accept="{{attrs.accept}}"
+          ngf-multiple="false"
+          ng-required="attrs['required']" />
+  </div>
+    <label for="attrs.id">Altri {{attrs.label}}</label>
+    <input type="file"
+        ng-model="$parent.vm.data['__new__'+attrs.name]"
+        ngf-select
+        name="$parent.vm.data['__new__'+attrs.name]"
+        accept="{{attrs.accept}}"
+        ngf-multiple="true"
+        ng-required="attrs['required']" />
+</div>

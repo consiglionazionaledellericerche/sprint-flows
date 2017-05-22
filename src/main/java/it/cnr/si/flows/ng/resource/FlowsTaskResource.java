@@ -169,6 +169,7 @@ public class FlowsTaskResource {
             .forEach(
                 a -> attachments.put(a.getName(), a));
         response.put("attachments", attachments);
+        response.put("attachmentsList", attachementsEntity.getBody());
 
         return ResponseEntity.ok(response);
     }
