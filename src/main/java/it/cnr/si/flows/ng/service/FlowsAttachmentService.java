@@ -52,8 +52,9 @@ public class FlowsAttachmentService {
         Iterator<String> i = req.getFileNames();
         while (i.hasNext()) {
             String fileName = i.next();
+            boolean nuovo = taskId.equals("start") || taskService.getVariable(taskId, fileName) == null;
 
-            LOGGER.trace("inserisco come variabile il file "+ fileName);
+            LOGGER.info("inserisco come variabile il file "+ fileName);
             FlowsAttachment att = new FlowsAttachment();
 
             MultipartFile file = req.getFile(fileName);
@@ -66,9 +67,9 @@ public class FlowsAttachmentService {
             att.setMimetype(getMimetype(file));
             att.setBytes(file.getBytes());
 
-            if (taskId.equals("start"))
+            if (nuovo) {
                 att.setAzione(Azione.Caricamento);
-            else {
+            } else {
                 att.setAzione(Azione.Aggiornamento);
             }
 

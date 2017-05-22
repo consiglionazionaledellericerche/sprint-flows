@@ -11,10 +11,7 @@
         return {
             restrict: 'E',
             templateUrl: 'app/inputs/fileinput/fileinput.html',
-            scope: {
-                ngModel: '=',
-                vm: '='
-            },
+            scope: true,
             link: function ($scope, element, attrs) {
                 $scope.attrs = attrs;
                 $scope.model = attrs.model;

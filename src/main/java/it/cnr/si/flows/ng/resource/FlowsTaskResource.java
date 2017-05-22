@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -162,8 +163,10 @@ public class FlowsTaskResource {
 
         // attachments
         ResponseEntity<List<FlowsAttachment>> attachementsEntity = attachmentResource.getAttachementsForTask(taskId);
-        Map<String, Object> attachments = new HashMap<>();
-        attachementsEntity.getBody().stream().forEach(
+        Map<String, Object> attachments = new TreeMap<>();
+        attachementsEntity.getBody().stream()
+            .sorted( (a1, a2) -> a1.getName().compareTo(a2.getName()) )
+            .forEach(
                 a -> attachments.put(a.getName(), a));
         response.put("attachments", attachments);
 

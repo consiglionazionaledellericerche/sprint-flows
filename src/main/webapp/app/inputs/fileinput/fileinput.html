@@ -1,13 +1,15 @@
 <label for="attrs.id">{{attrs.label}}</label>
 <a
   href
-  ng-click="downloadFile('/api/attachments/task/'+ vm.data.taskId +'/'+ vm.attachments[ngModel].name +'/data', vm.attachments[ngModel].filename, vm.attachments[ngModel].mimetype)" >
-    {{vm.attachments[ngModel].filename}}
+  ng-click="downloadFile('/api/attachments/task/'+ vm.data.taskId +'/'+ vm.attachments[attrs.name].name +'/data', vm.attachments[attrs.name].name, vm.attachments[attrs.name].mimetype)" >
+    {{vm.attachments[attrs.name].filename}}
 </a>
 <input type="file"
-      ng-model="vm.data[ngModel]"
+      ng-model="$parent.vm.data[attrs.name]"
       ngf-select
-      name="vm.data[ngModel]"
+      name="$parent.vm.data[attrs.name]"
       accept="{{attrs.accept}}"
       ngf-multiple="{{attrs.ngfMultiple}}"
       ng-required="attrs['required']" />
+
+<!-- <pre>{{attrs|json}}</pre> -->
