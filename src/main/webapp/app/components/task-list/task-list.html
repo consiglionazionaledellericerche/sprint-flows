@@ -1,7 +1,7 @@
 <div class="row vertical-align-center well" ng-class="{'row-slim': !advanced}" ng-repeat="task in tasks">
     <div class="col-md-9">
         <strong>{{task.variabili.title}}</strong> <br>
-        Flusso avviato da {{task.variabili.initiator}} il {{task.variabili.startDate | date}}
+        Flusso avviato da <em>{{task.variabili.initiator}}</em> il <em>{{task.variabili.startDate | date}}</em>
 
         <span ng-bind-html="task.priority | priority"></span>
         <div ng-show="task.variabili.titoloIstanzaFlusso">
