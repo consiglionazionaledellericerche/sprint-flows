@@ -345,15 +345,7 @@ public class FlowsTaskResource {
             @RequestParam("firstResult") int firstResult,
             @RequestParam("maxResults") int maxResults) {
 
-        String jsonString = "";
         Map<String, Object> result = new HashMap<>();
-
-        try {
-            jsonString = IOUtils.toString(req.getReader());
-        } catch (Exception e) {
-            LOGGER.error("Errore nella letture dello stream della request", e);
-        }
-        JSONArray params = new JSONObject(jsonString).getJSONArray("params");
 
         HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery();
 
@@ -364,6 +356,7 @@ public class FlowsTaskResource {
             taskQuery.unfinished();
         else
             taskQuery.finished();
+        String jsonString = "";
 
         try {
             jsonString = IOUtils.toString(req.getReader());
