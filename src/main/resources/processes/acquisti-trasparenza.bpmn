@@ -201,8 +201,24 @@
           <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
         </extensionElements>
       </userTask>
-      <sequenceFlow id="flow42" sourceRef="exclusivegateway9" targetRef="protocollo-revoca"></sequenceFlow>
-      <sequenceFlow id="flow43" sourceRef="protocollo-revoca" targetRef="endevent5"></sequenceFlow>
+      <sequenceFlow id="flow42" sourceRef="exclusivegateway9" targetRef="protocollo-revoca">
+        <extensionElements>
+          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.FirmaDocumento">
+            <activiti:field name="nomeFileDaFirmare">
+              <activiti:string><![CDATA[provvedimentoRevoca]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </sequenceFlow>
+      <sequenceFlow id="flow43" sourceRef="protocollo-revoca" targetRef="endevent5">
+        <extensionElements>
+          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.ProtocollaDocumento">
+            <activiti:field name="nomeFileDaProtocollare">
+              <activiti:string><![CDATA[provvedimentoRevoca]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </sequenceFlow>
       <sequenceFlow id="flow129" sourceRef="startevent7" targetRef="firma-revoca"></sequenceFlow>
       <sequenceFlow id="flow130" sourceRef="modifica-revoca" targetRef="firma-revoca"></sequenceFlow>
     </subProcess>
