@@ -72,5 +72,13 @@
         $scope.downloadFile = function(url, filename, mimetype) {
             utils.downloadFile(url, filename, mimetype);
         }
+
+
+
+
+        $scope.addFileToData = function(files, nameInScope, multiple) {
+            $log.info(files);
+            vm.data[nameInScope] = files[0];
+        }
     }
 })();

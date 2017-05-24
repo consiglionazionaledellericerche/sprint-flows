@@ -167,8 +167,10 @@ public class FlowsTaskResource {
         Map<String, Object> attachments = new TreeMap<>();
         attachementsEntity.getBody().stream()
             .sorted( (a1, a2) -> a1.getName().compareTo(a2.getName()) )
-            .forEach(
-                a -> attachments.put(a.getName(), a));
+            .forEach(a -> {
+                a.setBytes(null);
+                attachments.put(a.getName(), a);
+            });
         response.put("attachments", attachments);
         response.put("attachmentsList", attachementsEntity.getBody());
 
@@ -443,20 +445,20 @@ public class FlowsTaskResource {
             String type = appo.getString("type");
             //wildcard ("%") di default ma non a TUTTI i campi
             switch (type) {
-                case "textEqual":
-                    taskQuery.processVariableValueEquals(key, value);
-                    break;
-                case "boolean":
-                    // gestione variabili booleane
-                    taskQuery.processVariableValueEquals(key, Boolean.valueOf(value));
-                    break;
-                case "date":
-                    processDate(taskQuery, key, value);
-                    break;
-                default:
-                    //variabili con la wildcard  (%value%)
-                    taskQuery.processVariableValueLikeIgnoreCase(key, "%" + value + "%");
-                    break;
+            case "textEqual":
+                taskQuery.processVariableValueEquals(key, value);
+                break;
+            case "boolean":
+                // gestione variabili booleane
+                taskQuery.processVariableValueEquals(key, Boolean.valueOf(value));
+                break;
+            case "date":
+                processDate(taskQuery, key, value);
+                break;
+            default:
+                //variabili con la wildcard  (%value%)
+                taskQuery.processVariableValueLikeIgnoreCase(key, "%" + value + "%");
+                break;
             }
         }
     }
@@ -472,34 +474,34 @@ public class FlowsTaskResource {
 
             try {
                 switch (key) {
-                    case "Fase":
-                        taskQuery.taskNameLikeIgnoreCase("%" + value + "%");
+                case "Fase":
+                    taskQuery.taskNameLikeIgnoreCase("%" + value + "%");
+                    break;
+                case "taskCompletedGreat":
+                    taskQuery.taskCompletedAfter(sdf.parse(value));
+                    break;
+                case "taskCompletedLess":
+                    taskQuery.taskCompletedBefore(sdf.parse(value));
+                    break;
+                default:
+                    //wildcard ("%") di default ma non a TUTTI i campi
+                    switch (type) {
+                    case "textEqual":
+                        taskQuery.taskVariableValueEquals(key, value);
                         break;
-                    case "taskCompletedGreat":
-                        taskQuery.taskCompletedAfter(sdf.parse(value));
+                    case "boolean":
+                        // gestione variabili booleane
+                        taskQuery.taskVariableValueEquals(key, Boolean.valueOf(value));
                         break;
-                    case "taskCompletedLess":
-                        taskQuery.taskCompletedBefore(sdf.parse(value));
+                    case "date":
+                        taskDate(taskQuery, key, value);
                         break;
                     default:
-                        //wildcard ("%") di default ma non a TUTTI i campi
-                        switch (type) {
-                            case "textEqual":
-                                taskQuery.taskVariableValueEquals(key, value);
-                                break;
-                            case "boolean":
-                                // gestione variabili booleane
-                                taskQuery.taskVariableValueEquals(key, Boolean.valueOf(value));
-                                break;
-                            case "date":
-                                taskDate(taskQuery, key, value);
-                                break;
-                            default:
-                                //variabili con la wildcard  (%value%)
-                                taskQuery.taskVariableValueLikeIgnoreCase(key, "%" + value + "%");
-                                break;
-                        }
+                        //variabili con la wildcard  (%value%)
+                        taskQuery.taskVariableValueLikeIgnoreCase(key, "%" + value + "%");
                         break;
+                    }
+                    break;
                 }
             } catch (ParseException e) {
                 LOGGER.error(ERRORE_NEL_PARSING_DELLA_DATA, value, e);

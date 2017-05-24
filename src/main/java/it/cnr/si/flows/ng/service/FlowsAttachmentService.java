@@ -112,14 +112,19 @@ public class FlowsAttachmentService {
             LOGGER.info("index gia' in tabella, restituisco {}", index);
             return index;
         } else {
-            index = 0;
-            String variableName = fileName + "[" + index + "]";
-            while ( taskService.hasVariable(taskId, variableName) == true ) {
-                variableName = fileName + "[" + (++index) + "]";
+            if (taskId.equals("start")) {
+                nextIndexTable.put(fileName, 1);
+                return 0;
+            } else {
+                index = 0;
+                String variableName = fileName + "[" + index + "]";
+                while ( taskService.hasVariable(taskId, variableName) == true ) {
+                    variableName = fileName + "[" + (++index) + "]";
+                }
+                nextIndexTable.put(fileName, index+1);
+                LOGGER.info("index non ancora in tabella, restituisco {}", index);
+                return index;
             }
-            nextIndexTable.put(fileName, index+1);
-            LOGGER.info("index non ancora in tabella, restituisco {}", index);
-            return index;
         }
     }
 }

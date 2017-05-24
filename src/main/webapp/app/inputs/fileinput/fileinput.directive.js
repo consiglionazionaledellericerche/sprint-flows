@@ -27,10 +27,16 @@
 
                 $log.info("widget for "+ attrs.name);
 
+                $scope.addFileToData = function(files, name, multiple) {
+                    if (multiple)
+                        $scope.$parent.vm.data[name] = files;
+                    else
+                        $scope.$parent.vm.data[name] = files[0];
+                }
+
                 $scope.filterNames = function(value) {
                     var reg = "^"+$scope.attrs.name+"\\[\\d+\\]";
                     var tester = new RegExp(reg, 'g');
-                    $log.info("testing "+ value.name +"")
                     return tester.test(value.name);
                 }
             }
