@@ -63,7 +63,6 @@
                 $log.error(response);
             });
     }
-//todo: togliere current?
     //funzione richiamata quando si chiede una nuova "pagina" dei risultati
     function transition () {
         $scope.search();
