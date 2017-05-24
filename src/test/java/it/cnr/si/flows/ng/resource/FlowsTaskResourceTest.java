@@ -70,7 +70,7 @@ public class FlowsTaskResourceTest {
     @Test(expected = AccessDeniedException.class)
     public void testGetAvailableTasks() {
         //QADMIN ha sia ROLE_ADMIN che ROLE_USER (quindi può vedere il task istanziato)
-        ResponseEntity<DataResponse> response = flowsTaskResource.getAvailableTasks();
+        ResponseEntity<DataResponse> response = flowsTaskResource.getAvailableTasks(new MockHttpServletRequest(), ALL_PROCESS_INSTANCES, 0, 1000, ASC);
         assertEquals(OK, response.getStatusCode());
         assertEquals(1, response.getBody().getSize());
         assertEquals(1, ((ArrayList) response.getBody().getData()).size());
@@ -78,7 +78,7 @@ public class FlowsTaskResourceTest {
 
         //USER è solo ROLE_USER (quindi può vedere il task istanziato)
         util.loginUser();
-        response = flowsTaskResource.getAvailableTasks();
+        response = flowsTaskResource.getAvailableTasks(new MockHttpServletRequest(), ALL_PROCESS_INSTANCES, 0, 1000, ASC);
         assertEquals(OK, response.getStatusCode());
         assertEquals(1, response.getBody().getSize());
         assertEquals(1, ((ArrayList) response.getBody().getData()).size());
@@ -86,7 +86,7 @@ public class FlowsTaskResourceTest {
 
         //spaclient è solo ROLE_ADMIN (quindi non può accedere al servizio - AccessDeniedException)
         util.loginSpaclient();
-        flowsTaskResource.getAvailableTasks();
+        flowsTaskResource.getAvailableTasks(new MockHttpServletRequest(), ALL_PROCESS_INSTANCES, 0, 1000, ASC);
     }
 
 

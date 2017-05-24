@@ -21,6 +21,8 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.Task;
+import org.activiti.engine.task.TaskInfoQuery;
+import org.activiti.engine.task.TaskQuery;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
@@ -59,6 +61,11 @@ public class FlowsTaskResource {
 
     public static final String TASK_EXECUTOR = "esecutore";
     public static final String ERRORE_NEL_PARSING_DELLA_DATA = "Errore nel parsing della data {} - ";
+    public static final String TASK_PARAMS = "taskParams";
+    public static final String PROCESS_PARAMS = "processParams";
+    public static final String ERRORE_NELLA_LETTURE_DELLO_STREAM_DELLA_REQUEST = "Errore nella letture dello stream della request";
+    public static final String GREAT = "Great";
+    public static final String LESS = "Less";
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsTaskResource.class);
     @Autowired
     protected RestResponseFactory restResponseFactory;
@@ -95,33 +102,49 @@ public class FlowsTaskResource {
 
     }
 
-    @RequestMapping(value = "/mytasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/mytasks", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
-    public ResponseEntity<DataResponse> getMyTasks() {
+    public ResponseEntity<DataResponse> getMyTasks(
+            @RequestParam("processDefinition") String processDefinition,
+            @RequestParam("firstResult") int firstResult,
+            @RequestParam("maxResults") int maxResults,
+            @RequestParam("order") String order) {
 
         String username = SecurityUtils.getCurrentUserLogin();
 
-        List<Task> listraw = taskService.createTaskQuery()
+        TaskQuery taskQuery = taskService.createTaskQuery()
                 .taskAssignee(username)
-                .includeProcessVariables()
-                .list();
+                .includeProcessVariables();
 
-        List<TaskResponse> list = restResponseFactory.createTaskResponseList(listraw);
+        if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
+            taskQuery.processDefinitionKey(processDefinition);
+
+        if (order.equals(ASC))
+            taskQuery.orderByTaskCreateTime().asc();
+        else if (order.equals(DESC))
+            taskQuery.orderByTaskCreateTime().desc();
+
+        List<TaskResponse> list = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
 
         DataResponse response = new DataResponse();
-        response.setStart(0);
+        response.setStart(firstResult);
         response.setSize(list.size());
-        response.setTotal(list.size());
+        response.setTotal(taskQuery.count());
         response.setData(list);
 
         return ResponseEntity.ok(response);
     }
 
-    @RequestMapping(value = "/availabletasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/availabletasks", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
-    public ResponseEntity<DataResponse> getAvailableTasks() {
+    public ResponseEntity<DataResponse> getAvailableTasks(
+            HttpServletRequest req,
+            @RequestParam("processDefinition") String processDefinition,
+            @RequestParam("firstResult") int firstResult,
+            @RequestParam("maxResults") int maxResults,
+            @RequestParam("order") String order) {
 
         String username = SecurityUtils.getCurrentUserLogin();
         List<String> authorities =
@@ -130,22 +153,41 @@ public class FlowsTaskResource {
                         //                        .map(FlowsTaskResource::removeLeadingRole) //todo: vedere con Martin (le authorities sono ROLE_USER (come ora) o USER (come prima))
                         .collect(Collectors.toList());
 
-        List<Task> listraw = taskService.createTaskQuery()
+        TaskQuery taskQuery = taskService.createTaskQuery()
                 .taskCandidateUser(username)
                 .taskCandidateGroupIn(authorities)
-                .includeProcessVariables()
-                .list();
+                .includeProcessVariables();
 
-        List<TaskResponse> list = restResponseFactory.createTaskResponseList(listraw);
+        try {
+            JSONObject json = new JSONObject(IOUtils.toString(req.getReader()));
+
+            if (json.has(PROCESS_PARAMS))
+                extractProcessSearchParams(taskQuery, json.getJSONArray(PROCESS_PARAMS));
+            if (json.has(TASK_PARAMS))
+                extractTaskSearchParams(taskQuery, json.getJSONArray(TASK_PARAMS));
+        } catch (Exception e) {
+            LOGGER.error(ERRORE_NELLA_LETTURE_DELLO_STREAM_DELLA_REQUEST, e);
+        }
+
+        if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
+            taskQuery.processDefinitionKey(processDefinition);
+
+        if (order.equals(ASC))
+            taskQuery.orderByTaskCreateTime().asc();
+        else if (order.equals(DESC))
+            taskQuery.orderByTaskCreateTime().desc();
+
+        List<TaskResponse> list = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
 
         DataResponse response = new DataResponse();
-        response.setStart(0);
+        response.setStart(firstResult);
         response.setSize(list.size());
-        response.setTotal(list.size());
+        response.setTotal(taskQuery.count());
         response.setData(list);
 
         return ResponseEntity.ok(response);
     }
+
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
@@ -354,15 +396,12 @@ public class FlowsTaskResource {
         try {
             jsonString = IOUtils.toString(req.getReader());
         } catch (Exception e) {
-            LOGGER.error("Errore nella letture dello stream della request", e);
+            LOGGER.error(ERRORE_NELLA_LETTURE_DELLO_STREAM_DELLA_REQUEST, e);
         }
 
-        extractProcessSearchParams(taskQuery, new JSONObject(jsonString).getJSONArray("processParams"));
+        extractProcessSearchParams(taskQuery, new JSONObject(jsonString).getJSONArray(PROCESS_PARAMS));
 
-        if (order.equals(ASC))
-            taskQuery.orderByTaskCreateTime().asc();
-        else if (order.equals(DESC))
-            taskQuery.orderByTaskCreateTime().desc();
+        order(order, taskQuery);
 
         long totalItems = taskQuery.includeProcessVariables().count();
         result.put("totalItems", totalItems);
@@ -390,21 +429,18 @@ public class FlowsTaskResource {
         try {
             JSONObject json = new JSONObject(IOUtils.toString(req.getReader()));
 
-            if (json.has("processParams"))
-                extractProcessSearchParams(query, json.getJSONArray("processParams"));
-            if (json.has("taskParams"))
-                extractTaskSearchParams(query, json.getJSONArray("taskParams"));
+            if (json.has(PROCESS_PARAMS))
+                extractProcessSearchParams(query, json.getJSONArray(PROCESS_PARAMS));
+            if (json.has(TASK_PARAMS))
+                extractTaskSearchParams(query, json.getJSONArray(TASK_PARAMS));
         } catch (Exception e) {
-            LOGGER.error("Errore nella letture dello stream della request", e);
+            LOGGER.error(ERRORE_NELLA_LETTURE_DELLO_STREAM_DELLA_REQUEST, e);
         }
 
         if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
             query.processDefinitionKey(processDefinition);
 
-        if (order.equals(ASC))
-            query.orderByTaskCreateTime().asc();
-        else if (order.equals(DESC))
-            query.orderByTaskCreateTime().desc();
+        order(order, query);
 
         List<HistoricTaskInstance> taskList = new ArrayList<>();
         for (HistoricTaskInstance task : query.list()) {
@@ -426,7 +462,15 @@ public class FlowsTaskResource {
         return ResponseEntity.ok(response);
     }
 
-    private void extractProcessSearchParams(HistoricTaskInstanceQuery taskQuery, JSONArray params) {
+    private void order(String order, HistoricTaskInstanceQuery query) {
+        if (order.equals(ASC))
+            query.orderByTaskCreateTime().asc();
+        else if (order.equals(DESC))
+            query.orderByTaskCreateTime().desc();
+    }
+
+
+    private void extractProcessSearchParams(TaskInfoQuery taskQuery, JSONArray params) {
 
         for (int i = 0; i < params.length(); i++) {
             JSONObject appo = params.optJSONObject(i);
@@ -443,7 +487,7 @@ public class FlowsTaskResource {
                     taskQuery.processVariableValueEquals(key, Boolean.valueOf(value));
                     break;
                 case "date":
-                    processDate(taskQuery, key, value);
+                    historicProcesskDate(taskQuery, key, value);
                     break;
                 default:
                     //variabili con la wildcard  (%value%)
@@ -454,7 +498,7 @@ public class FlowsTaskResource {
     }
 
 
-    private void extractTaskSearchParams(HistoricTaskInstanceQuery taskQuery, JSONArray taskParams) {
+    private void extractTaskSearchParams(TaskInfoQuery taskQuery, JSONArray taskParams) {
 
         for (int i = 0; i < taskParams.length(); i++) {
             JSONObject appo = taskParams.optJSONObject(i);
@@ -462,64 +506,68 @@ public class FlowsTaskResource {
             String value = appo.getString("value");
             String type = appo.getString("type");
 
-            try {
-                switch (key) {
-                    case "Fase":
-                        taskQuery.taskNameLikeIgnoreCase("%" + value + "%");
+            //solo per le HistoricTaskInstanceQuery si fa la query in base alla data di completamento del task
+            if (taskQuery instanceof HistoricTaskInstanceQuery) {
+                try {
+                    if (key.equals("taskCompletedGreat")) {
+                        ((HistoricTaskInstanceQuery) taskQuery).taskCompletedAfter(sdf.parse(value));
                         break;
-                    case "taskCompletedGreat":
-                        taskQuery.taskCompletedAfter(sdf.parse(value));
+                    }
+                    if (key.equals("taskCompletedLess")) {
+                        ((HistoricTaskInstanceQuery) taskQuery).taskCompletedBefore(sdf.parse(value));
                         break;
-                    case "taskCompletedLess":
-                        taskQuery.taskCompletedBefore(sdf.parse(value));
+                    }
+                } catch (ParseException e) {
+                    LOGGER.error(ERRORE_NEL_PARSING_DELLA_DATA, value, e);
+                }
+            }
+
+            //la "Fase" equivale al nome del task - quindi bisogna fare una ricerca "a parte" (non in base al "type")
+            if (key.equals("Fase")) {
+                taskQuery.taskNameLikeIgnoreCase("%" + value + "%");
+            } else {
+                //wildcard ("%") di default ma non a TUTTI i campi
+                switch (type) {
+                    case "textEqual":
+                        taskQuery.taskVariableValueEquals(key, value);
+                        break;
+                    case "boolean":
+                        // gestione variabili booleane
+                        taskQuery.taskVariableValueEquals(key, Boolean.valueOf(value));
+                        break;
+                    case "date":
+                        historicTaskDate(taskQuery, key, value);
                         break;
                     default:
-                        //wildcard ("%") di default ma non a TUTTI i campi
-                        switch (type) {
-                            case "textEqual":
-                                taskQuery.taskVariableValueEquals(key, value);
-                                break;
-                            case "boolean":
-                                // gestione variabili booleane
-                                taskQuery.taskVariableValueEquals(key, Boolean.valueOf(value));
-                                break;
-                            case "date":
-                                taskDate(taskQuery, key, value);
-                                break;
-                            default:
-                                //variabili con la wildcard  (%value%)
-                                taskQuery.taskVariableValueLikeIgnoreCase(key, "%" + value + "%");
-                                break;
-                        }
+                        //variabili con la wildcard  (%value%)
+                        taskQuery.taskVariableValueLikeIgnoreCase(key, "%" + value + "%");
                         break;
                 }
-            } catch (ParseException e) {
-                LOGGER.error(ERRORE_NEL_PARSING_DELLA_DATA, value, e);
             }
         }
     }
 
-    private void processDate(HistoricTaskInstanceQuery taskQuery, String key, String value) {
+    private void historicProcesskDate(TaskInfoQuery taskQuery, String key, String value) {
         try {
             Date date = sdf.parse(value);
 
-            if (key.contains("Less")) {
-                taskQuery.processVariableValueLessThanOrEqual(key.replace("Less", ""), date);
-            } else if (key.contains("Great"))
-                taskQuery.processVariableValueGreaterThanOrEqual(key.replace("Great", ""), date);
+            if (key.contains(LESS)) {
+                taskQuery.processVariableValueLessThanOrEqual(key.replace(LESS, ""), date);
+            } else if (key.contains(GREAT))
+                taskQuery.processVariableValueGreaterThanOrEqual(key.replace(GREAT, ""), date);
         } catch (ParseException e) {
             LOGGER.error(ERRORE_NEL_PARSING_DELLA_DATA, value, e);
         }
     }
 
-    private void taskDate(HistoricTaskInstanceQuery taskQuery, String key, String value) {
+    private void historicTaskDate(TaskInfoQuery taskQuery, String key, String value) {
         try {
             Date date = sdf.parse(value);
 
-            if (key.contains("Less")) {
-                taskQuery.taskVariableValueLessThanOrEqual(key.replace("Less", ""), date);
-            } else if (key.contains("Great"))
-                taskQuery.taskVariableValueGreaterThanOrEqual(key.replace("Great", ""), date);
+            if (key.contains(LESS)) {
+                taskQuery.taskVariableValueLessThanOrEqual(key.replace(LESS, ""), date);
+            } else if (key.contains(GREAT))
+                taskQuery.taskVariableValueGreaterThanOrEqual(key.replace(GREAT, ""), date);
         } catch (ParseException e) {
             LOGGER.error(ERRORE_NEL_PARSING_DELLA_DATA, value, e);
         }
