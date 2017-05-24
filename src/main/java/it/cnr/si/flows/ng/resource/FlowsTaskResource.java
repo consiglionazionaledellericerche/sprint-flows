@@ -56,10 +56,7 @@ import static it.cnr.si.flows.ng.utils.Utils.*;
 @RequestMapping("api/tasks")
 public class FlowsTaskResource {
 
-    public static final String TASK_EXECUTOR = "esecutore";
-    public static final String TASK_PARAMS = "taskParams";
-    public static final String PROCESS_PARAMS = "processParams";
-    public static final String ERRORE_NELLA_LETTURE_DELLO_STREAM_DELLA_REQUEST = "Errore nella letture dello stream della request";
+    private static final String TASK_EXECUTOR = "esecutore";
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsTaskResource.class);
     @Autowired
     protected RestResponseFactory restResponseFactory;
@@ -152,16 +149,7 @@ public class FlowsTaskResource {
                 .taskCandidateGroupIn(authorities)
                 .includeProcessVariables();
 
-        try {
-            JSONObject json = new JSONObject(IOUtils.toString(req.getReader()));
-
-            if (json.has(PROCESS_PARAMS))
-                taskQuery = (TaskQuery) utils.extractProcessSearchParams(taskQuery, json.getJSONArray(PROCESS_PARAMS));
-            if (json.has(TASK_PARAMS))
-                taskQuery = (TaskQuery) utils.extractTaskSearchParams(taskQuery, json.getJSONArray(TASK_PARAMS));
-        } catch (Exception e) {
-            LOGGER.error(ERRORE_NELLA_LETTURE_DELLO_STREAM_DELLA_REQUEST, e);
-        }
+        taskQuery = (TaskQuery) utils.extractSearchParams(req, taskQuery);
 
         if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
             taskQuery.processDefinitionKey(processDefinition);
@@ -379,7 +367,6 @@ public class FlowsTaskResource {
 
         Map<String, Object> result = new HashMap<>();
 
-
         HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery();
 
         if (!processInstanceId.equals(ALL_PROCESS_INSTANCES))
@@ -422,16 +409,8 @@ public class FlowsTaskResource {
 
         HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery().taskInvolvedUser(username)
                 .includeProcessVariables().includeTaskLocalVariables();
-        try {
-            JSONObject json = new JSONObject(IOUtils.toString(req.getReader()));
 
-            if (json.has(PROCESS_PARAMS))
-                query = (HistoricTaskInstanceQuery) utils.extractProcessSearchParams(query, json.getJSONArray(PROCESS_PARAMS));
-            if (json.has(TASK_PARAMS))
-                query = (HistoricTaskInstanceQuery) utils.extractTaskSearchParams(query, json.getJSONArray(TASK_PARAMS));
-        } catch (Exception e) {
-            LOGGER.error(ERRORE_NELLA_LETTURE_DELLO_STREAM_DELLA_REQUEST, e);
-        }
+        query = (HistoricTaskInstanceQuery) utils.extractSearchParams(req, query);
 
         if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
             query.processDefinitionKey(processDefinition);
