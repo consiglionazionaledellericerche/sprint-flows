@@ -29,15 +29,18 @@ public class FlowsVisibilitySetter implements ActivitiEventListener {
 
             List<String> groups = VisibilityMapping.GroupVisibilityMappingForProcessInstance.get(processDefinitionId +"-"+ currentTaskKey);
 
-            for (String group : groups) {
-                event.getEngineServices().getRuntimeService().addGroupIdentityLink(processInstanceId, group, "visualizzatore");
-            }
+            if (groups != null)
+                for (String group : groups) {
+                    event.getEngineServices().getRuntimeService().addGroupIdentityLink(processInstanceId, group, "visualizzatore");
+                }
 
             List<String> users = VisibilityMapping.UserVisibilityMappingForProcessInstance.get(processDefinitionId +"-"+ currentTaskKey);
 
-            for (String user : users) {
-                event.getEngineServices().getRuntimeService().addGroupIdentityLink(processInstanceId, user, "visualizzatore");
-            }
+            if (users != null)
+                for (String user : users) {
+                    event.getEngineServices().getRuntimeService().addGroupIdentityLink(processInstanceId, user, "visualizzatore");
+                }
+
         }
 
     }
