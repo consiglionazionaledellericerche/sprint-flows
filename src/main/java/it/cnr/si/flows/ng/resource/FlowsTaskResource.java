@@ -201,12 +201,15 @@ public class FlowsTaskResource {
 
         // attachments
         ResponseEntity<List<FlowsAttachment>> attachementsEntity = attachmentResource.getAttachementsForTask(taskId);
-        Map<String, Object> attachments = new HashMap<>();
-        attachementsEntity.getBody().stream().forEach(a -> {
-            a.setBytes(null);
-            attachments.put(a.getName(), a);
-        });
+        Map<String, Object> attachments = new TreeMap<>();
+        attachementsEntity.getBody().stream()
+                .sorted((a1, a2) -> a1.getName().compareTo(a2.getName()))
+                .forEach(a -> {
+                    a.setBytes(null);
+                    attachments.put(a.getName(), a);
+                });
         response.put("attachments", attachments);
+        response.put("attachmentsList", attachementsEntity.getBody());
 
         return ResponseEntity.ok(response);
     }
