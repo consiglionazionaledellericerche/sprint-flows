@@ -87,6 +87,21 @@ public class FlowsTaskResource {
     @Inject
     private FlowsAttachmentResource attachmentResource;
 
+    // TODO magari un giorno avremo degli array, ma per adesso ce lo facciamo andare bene cosi'
+    private static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
+
+        Map<String, Object> data = new HashMap<>();
+
+        Enumeration<String> parameterNames = req.getParameterNames();
+        while (parameterNames.hasMoreElements()) {
+            String paramName = parameterNames.nextElement();
+            data.put(paramName, req.getParameter(paramName));
+        }
+
+        return data;
+
+    }
+
     @RequestMapping(value = "/mytasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
@@ -172,7 +187,6 @@ public class FlowsTaskResource {
 
         return ResponseEntity.ok(response);
     }
-
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
@@ -397,7 +411,6 @@ public class FlowsTaskResource {
         return ResponseEntity.ok(result);
     }
 
-
     @RequestMapping(value = "/taskCompletedByMe", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<Object> getTasksCompletedByMe(
@@ -454,7 +467,6 @@ public class FlowsTaskResource {
             query.orderByTaskCreateTime().desc();
     }
 
-
     private void extractProcessSearchParams(TaskInfoQuery taskQuery, JSONArray params) {
 
         for (int i = 0; i < params.length(); i++) {
@@ -482,8 +494,7 @@ public class FlowsTaskResource {
         }
     }
 
-
-    private void extractTaskSearchParams(HistoricTaskInstanceQuery taskQuery, JSONArray taskParams) {
+    private void extractTaskSearchParams(TaskInfoQuery taskQuery, JSONArray taskParams) {
 
         for (int i = 0; i < taskParams.length(); i++) {
             JSONObject appo = taskParams.optJSONObject(i);
@@ -556,20 +567,5 @@ public class FlowsTaskResource {
         } catch (ParseException e) {
             LOGGER.error(ERRORE_NEL_PARSING_DELLA_DATA, value, e);
         }
-    }
-
-    // TODO magari un giorno avremo degli array, ma per adesso ce lo facciamo andare bene cosi'
-    private static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
-
-        Map<String, Object> data = new HashMap<>();
-
-        Enumeration<String> parameterNames = req.getParameterNames();
-        while (parameterNames.hasMoreElements()) {
-            String paramName = parameterNames.nextElement();
-            data.put(paramName, req.getParameter(paramName));
-        }
-
-        return data;
-
     }
 }
