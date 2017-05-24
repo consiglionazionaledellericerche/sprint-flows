@@ -2,19 +2,19 @@
   <div class="row form-group">
     <div class="col-md-12">
       <uib-tabset active="1" justified="true" type="pills">
-        <uib-tab index="0" select="setActiveContent('assignedToMe')">
+          <uib-tab index="0" select="setActiveContent('myTasks')">
           <uib-tab-heading>
             <h3>
-              <i class="glyphicon glyphicon-inbox"></i>
+                <i class=" glyphicon glyphicon-edit"></i>
               Compiti assegnati a me: {{vm.myTasks.total}}
             </h3>
           </uib-tab-heading>
         </uib-tab>
-        <uib-tab index="1" classes="available" select="setActiveContent('available')">
+          <uib-tab index="1" classes="available" select="setActiveContent('availables')">
           <uib-tab-heading>
             <h3>
-              <i class="glyphicon glyphicon-user"></i>
-              Compiti di gruppo <br> da prendere in carico: {{vm.pooledTasks.total}}
+                <i class="glyphicon glyphicon-check"></i>
+                Compiti di gruppo <br> da prendere in carico: {{vm.availableTasks.total}}
             </h3>
           </uib-tab-heading>
         </uib-tab>
@@ -26,31 +26,58 @@
     <div class="col-md-12">
       <div class="progress">
         <uib-progress animate="false">
-          <uib-bar class="progress-bar-striped" value="100* vm.myTasks.total/(vm.pooledTasks.total+ vm.myTasks.total)" type="primary">
+            <uib-bar class="progress-bar-striped"
+                     value="100* vm.myTasks.total/(vm.availableTasks.total+ vm.myTasks.total)" type="primary">
             <span>{{vm.myTasks.total}}</span>
           </uib-bar>
-          <uib-bar class="progress-bar-striped" value="100* vm.pooledTasks.total/(vm.pooledTasks.total+ vm.myTasks.total)" type="info">
-            <span>{{vm.pooledTasks.total}}</span>
+            <uib-bar class="progress-bar-striped"
+                     value="100* vm.availableTasks.total/(vm.availableTasks.total+ vm.myTasks.total)" type="info">
+                <span>{{vm.availableTasks.total}}</span>
           </uib-bar>
         </uib-progress>
       </div>
     </div>
-
     <div class="col-md-3">
-      <button class="btn btn-default btn-block margin-top-20" ng-click="advanced = !advanced">
-        <span class="glyphicon" ng-class="{'glyphicon-wrench': !advanced, 'glyphicon-tasks': advanced}"></span>
-        modalità {{advanced ? 'semplice' : 'avanzata'}}
-      </button>
-
-      <div ng-show="advanced">
+        <div>
+            <h4>Ordinamento temporale</h4>
+            <div>
+                <button class="btn btn-default btn-block margin-top-20"
+                        ng-click="vm.order ===  'ASC' ?  vm.order='DESC' : vm.order = 'ASC'">
+                    <span class="glyphicon glyphicon-sort"></span>
+                    {{vm.order === 'ASC' ? 'Crescente' : 'Descrescente'}}
+                </button>
+            </div>
+        </div>
+        <br>
+        <br>
         <h4>Tipologie</h4>
-        <workflow-types criteria="criteria" filters="true" reset-filters="resetFilters"
-                        select-process-definition-key="selectProcessDefinitionKey"
-                        process-definitions="wfDefs"></workflow-types>
+        <workflow-types process-definitions="wfDefs" filters="false"></workflow-types>
+        <br>
+        <br>
+        <div class="ng-scope" style="">
+            <strong class="ng-binding">Parole Chiavi nel Titolo</strong>
+            <div>
+                <input id="searchField-titoloIstanzaFlusso" type="text">
+            </div>
       </div>
+        <div class="ng-scope" style="">
+            <strong class="ng-binding">Parole Chiavi nella Fase</strong>
+            <div>
+                <input id="searchField-Fase">
+            </div>
+        </div>
+        <div class="ng-scope" style="">
+            <strong class="ng-binding">Utente che ha avviato il flusso</strong>
+            <div>
+                <input id="searchField-initiator" type="textEqual">
+            </div>
+        </div>
+        <br>
+        <div>
+            <button ng-click="loadAvailableTasks()" class="btn btn-primary">Filtra</button>
+        </div>
     </div>
-
-    <div class="col-md-9" ng-show="activeContent == 'assignedToMe'">
+      <div class="col-md-9" ng-show="vm.activeContent == 'myTasks'">
       <h3>
         <span class="label label-primary" class="assegnatiAMe">
           <i class="glyphicon-inbox"></i>
@@ -58,20 +85,35 @@
         </span>
       </h3>
       <task-list tasks="vm.myTasks.data"></task-list>
+
+          <!--paginazione myTasks-->
+          <div class="text-center">
+              <jhi-item-count page="vm.myPage" total="vm.myQueryCount"
+                              items-per-page="vm.itemsPerPage"></jhi-item-count>
+              <uib-pagination class="pagination-sm" total-items="vm.myTotalItems" ng-model="vm.myPage"
+                              ng-change="vm.transition()"></uib-pagination>
+          </div>
     </div>
-    <div class="col-md-9" ng-show="activeContent == 'available'">
+      <div class="col-md-9" ng-show="vm.activeContent == 'availables'">
       <h3>
         <span class="label label-info" ng-class="label-info">
           <i class="glyphicon glyphicon-user"></i>
           Lista dei compiti di gruppo da prendere in carico
         </span>
       </h3>
-      <task-list tasks="vm.pooledTasks.data"></task-list>
-    </div>
+          <task-list tasks="vm.availableTasks.data"></task-list>
+
+          <!--paginazione availabletasks-->
+          <div class="text-center">
+              <jhi-item-count page="vm.availablePage" total="vm.availableQueryCount"
+                              items-per-page="vm.itemsPerPage"></jhi-item-count>
+              <uib-pagination class="pagination-sm" total-items="vm.availableTotalItems" ng-model="vm.availablePage"
+                              ng-change="vm.transition()"></uib-pagination>
+          </div>
+      </div>
   </div>
-</div>
-<pre ng-show="development">
+    <pre ng-show="development">
   {{tasks | json}}
 </pre>
-<pre>{{vm | json}}</pre>
+    <pre>{{vm | json}}</pre>
 </div>

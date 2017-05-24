@@ -37,6 +37,7 @@
 
                     vm.taskVariables = utils.refactoringVariables(response.data.task).variabili;
                     vm.attachments = response.data.attachments;
+                    vm.attachmentsList = response.data.attachmentsList;
                     vm.diagramUrl = '/rest/diagram/taskInstance/'+ vm.data.taskId;
                     vm.formUrl = 'api/forms/task/'+ vm.data.taskId;
             });
@@ -70,6 +71,14 @@
 
         $scope.downloadFile = function(url, filename, mimetype) {
             utils.downloadFile(url, filename, mimetype);
+        }
+
+
+
+
+        $scope.addFileToData = function(files, nameInScope, multiple) {
+            $log.info(files);
+            vm.data[nameInScope] = files[0];
         }
     }
 })();

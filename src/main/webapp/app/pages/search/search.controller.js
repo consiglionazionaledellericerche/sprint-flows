@@ -63,10 +63,9 @@
                 $log.error(response);
             });
     }
-
     //funzione richiamata quando si chiede una nuova "pagina" dei risultati
-    function transition (current) {
-        $scope.search(current);
+    function transition () {
+        $scope.search();
     }
   }
 })();

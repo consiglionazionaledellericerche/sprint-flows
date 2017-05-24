@@ -25,11 +25,17 @@
         }
       },
       tasks: {
-        myTasks : function() {
-          return $http.get('api/tasks/mytasks');
+        myTasks : function(processDefinition, firstResult, maxResults, order, params) {
+          return $http.post('api/tasks/mytasks?processDefinition=' + (processDefinition ? processDefinition.key : 'all') +
+              '&firstResult=' + firstResult +
+              '&maxResults=' + maxResults +
+              '&order=' + order, params);
         },
-        myTasksAvailable : function() {
-          return $http.get('api/tasks/availabletasks');
+        myTasksAvailable : function(processDefinition, firstResult, maxResults, order, params) {
+          return $http.post('api/tasks/availabletasks?processDefinition=' + (processDefinition ? processDefinition.key : 'all') +
+            '&firstResult=' + firstResult +
+            '&maxResults=' + maxResults +
+            '&order=' + order, params);
         },
         complete : function(data) {
           return $http.post('api/tasks/complete', data);

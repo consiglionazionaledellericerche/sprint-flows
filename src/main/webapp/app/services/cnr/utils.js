@@ -34,7 +34,29 @@
                     $log.info(file, filename);
                     saveAs(file, filename);
                 });
-            }
+            },
+
+            populateParams: function(fields) {
+                        var
+//                        fields = Array.from($("input[id^='searchField-']")),
+                         processParams = [], taskParams = [];
+
+                        fields.forEach(function (field){
+                            var fieldName = field.getAttribute('id').replace('searchField-', ''),
+                             appo = {};
+                                if(field.value  !== ""){
+                                    appo["key"] = fieldName;
+                                    appo["value"] = field.value;
+                                    appo["type"] = field.getAttribute("type");
+                                    if(field.id.includes("initiator") || field.id.includes("titoloIstanzaFlusso")){
+                                        processParams.push(appo);
+                                    } else {
+                                        taskParams.push(appo);
+                                    }
+                                }
+                        });
+                        return {"processParams": processParams, "taskParams": taskParams};
+                    }
         };
     }
 })();
