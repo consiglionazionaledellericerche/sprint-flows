@@ -202,8 +202,10 @@ public class FlowsTaskResource {
         // attachments
         ResponseEntity<List<FlowsAttachment>> attachementsEntity = attachmentResource.getAttachementsForTask(taskId);
         Map<String, Object> attachments = new HashMap<>();
-        attachementsEntity.getBody().stream().forEach(
-                a -> attachments.put(a.getName(), a));
+        attachementsEntity.getBody().stream().forEach(a -> {
+            a.setBytes(null);
+            attachments.put(a.getName(), a);
+        });
         response.put("attachments", attachments);
 
         return ResponseEntity.ok(response);
