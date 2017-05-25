@@ -8,7 +8,6 @@ import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.task.TaskResponse;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,6 +24,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.ArrayList;
 import java.util.Map;
 
+import static it.cnr.si.flows.ng.TestUtil.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
 import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
 import static it.cnr.si.flows.ng.utils.Utils.ASC;
 import static org.junit.Assert.assertEquals;
@@ -48,27 +48,55 @@ public class FlowsTaskResourceTest {
     @Autowired
     private TaskService taskService;
 
-    @Before
-    public void setUp() throws Exception {
-        processInstance = util.mySetUp("missioni");
-    }
-
-
 
     @After
     public void tearDown() {
         util.myTearDown();
     }
 
+    //    todo: fare i test del service search
+
 
     @Test
-    @Ignore
     public void testGetMyTasks() {
-        //TODO: trovare un flusso che assegni un task ad un utente specifico
+        processInstance = util.mySetUp("acquisti-trasparenza");
+//       all'inizio del test non ho task assegnati'
+        ResponseEntity<DataResponse> response = flowsTaskResource.getMyTasks(new MockHttpServletRequest(), ALL_PROCESS_INSTANCES, 0, 100, ASC);
+        assertEquals(OK, response.getStatusCode());
+        assertEquals(0, response.getBody().getSize());
+        ArrayList myTasks = (ArrayList) response.getBody().getData();
+        assertEquals(0, myTasks.size());
+
+        flowsTaskResource.claimTask(new MockHttpServletRequest(), util.getFirstTaskId());
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        String content = "{\"processParams\":" +
+                "[{\"key\":\"titoloIstanzaFlusso\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
+                "{\"key\":\"initiator\",\"value\":\"admin\",\"type\":\"textEqual\"}]," +
+                "\"taskParams\":" +
+                "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
+        request.setContent(content.getBytes());
+        response = flowsTaskResource.getMyTasks(request, ALL_PROCESS_INSTANCES, 0, 100, ASC);
+        myTasks = (ArrayList) response.getBody().getData();
+        assertEquals(1, response.getBody().getSize());
+        assertEquals(1, myTasks.size());
+        assertEquals(util.getFirstTaskId(), ((TaskResponse) myTasks.get(0)).getId());
+
+        verifyBadSearchParams(request);
+
+        //verifico che non prenda nessun risultato ( DOPO CHE IL TASK VIENE DISASSEGNATO)
+        flowsTaskResource.unclaimTask(new MockHttpServletRequest(), util.getFirstTaskId());
+
+        assertEquals(OK, response.getStatusCode());
+        assertEquals(0, response.getBody().getSize());
+        myTasks = (ArrayList) response.getBody().getData();
+        assertEquals(0, myTasks.size());
     }
+
 
     @Test(expected = AccessDeniedException.class)
     public void testGetAvailableTasks() {
+        processInstance = util.mySetUp("missioni");
         //QADMIN ha sia ROLE_ADMIN che ROLE_USER (quindi può vedere il task istanziato)
         ResponseEntity<DataResponse> response = flowsTaskResource.getAvailableTasks(new MockHttpServletRequest(), ALL_PROCESS_INSTANCES, 0, 1000, ASC);
         assertEquals(OK, response.getStatusCode());
@@ -92,6 +120,7 @@ public class FlowsTaskResourceTest {
 
     @Test
     public void testGetTaskInstance() {
+        processInstance = util.mySetUp("missioni");
         ResponseEntity<Map<String, Object>> response = flowsTaskResource.getTask(util.getFirstTaskId());
         assertEquals(OK, response.getStatusCode());
         assertEquals(TASK_NAME, ((TaskResponse) response.getBody().get("task")).getName());
@@ -125,6 +154,7 @@ public class FlowsTaskResourceTest {
 
     @Test
     public void testClaimTask() {
+        processInstance = util.mySetUp("missioni");
 //      admin ha ROLE_ADMIN E ROLE_USER quindi può richiamare il metodo
         util.loginAdmin();
         ResponseEntity<Map<String, Object>> response = flowsTaskResource.claimTask(new MockHttpServletRequest(), util.getFirstTaskId());
@@ -140,6 +170,7 @@ public class FlowsTaskResourceTest {
 
     @Test
     public void testGetTasksCompletedForMe() {
+        processInstance = util.mySetUp("missioni");
         //completo il primo task
         util.loginUser();
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
@@ -177,5 +208,41 @@ public class FlowsTaskResourceTest {
         assertEquals(OK, response.getStatusCode());
         assertEquals("Admin non vede il task che ha appena completato",
                      1, ((ArrayList<HistoricTaskInstanceResponse>) ((DataResponse) response.getBody()).getData()).size());
+    }
+
+
+    private void verifyBadSearchParams(MockHttpServletRequest request) {
+        String content;
+        ResponseEntity<DataResponse> response;//verifico che non prenda nessun elemento (SEARCH PARAMS SBAGLIATI)
+        //titolo flusso sbagliato
+        content = "{\"processParams\":" +
+                "[{\"key\":\"titoloIstanzaFlusso\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "AAA\",\"type\":\"text\"}," +
+                "{\"key\":\"initiator\",\"value\":\"admin\",\"type\":\"textEqual\"}]," +
+                "\"taskParams\":" +
+                "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
+        request.setContent(content.getBytes());
+        response = flowsTaskResource.getMyTasks(request, ALL_PROCESS_INSTANCES, 0, 100, ASC);
+        assertEquals(0, response.getBody().getSize());
+        assertEquals(0, ((ArrayList) response.getBody().getData()).size());
+        //initiator sbaliato
+        content = "{\"processParams\":" +
+                "[{\"key\":\"titoloIstanzaFlusso\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
+                "{\"key\":\"initiator\",\"value\":\"admi\",\"type\":\"textEqual\"}]," +
+                "\"taskParams\":" +
+                "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
+        request.setContent(content.getBytes());
+        response = flowsTaskResource.getMyTasks(request, ALL_PROCESS_INSTANCES, 0, 100, ASC);
+        assertEquals(0, response.getBody().getSize());
+        assertEquals(0, ((ArrayList) response.getBody().getData()).size());
+        //Fase sbaliata
+        content = "{\"processParams\":" +
+                "[{\"key\":\"titoloIstanzaFlusso\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
+                "{\"key\":\"initiator\",\"value\":\"admin\",\"type\":\"textEqual\"}]," +
+                "\"taskParams\":" +
+                "[{\"key\":\"Fase\",\"value\":\"Verifica DecisioneEEEEE\",\"type\":null}]}";
+        request.setContent(content.getBytes());
+        response = flowsTaskResource.getMyTasks(request, ALL_PROCESS_INSTANCES, 0, 100, ASC);
+        assertEquals(0, response.getBody().getSize());
+        assertEquals(0, ((ArrayList) response.getBody().getData()).size());
     }
 }

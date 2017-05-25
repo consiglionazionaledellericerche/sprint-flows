@@ -48,6 +48,7 @@ public class TestUtil {
     public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(
             MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
+    public static final String TITOLO_DELL_ISTANZA_DEL_FLUSSO = "titolo dell'istanza del flusso";
     @Autowired
     FlowsProcessInstanceResource flowsProcessInstanceResource;
     @Autowired
@@ -120,19 +121,28 @@ public class TestUtil {
         SecurityContextHolder.clearContext();
     }
 
-    public ProcessInstanceResponse mySetUp(String processDefinitionId) {
+    public ProcessInstanceResponse mySetUp(String processDefinitionKey) {
         loginAdmin();
         DataResponse ret = (DataResponse) flowsProcessDefinitionResource.getAllProcessDefinitions();
 
         ArrayList<ProcessDefinitionResponse> processDefinitions = (ArrayList) ret.getData();
         for (ProcessDefinitionResponse pd : processDefinitions) {
-            if (pd.getId().contains(processDefinitionId)) {
+            if (pd.getId().contains(processDefinitionKey)) {
                 processDefinition = pd.getId();
                 break;
             }
         }
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
         req.setParameter("processDefinitionId", processDefinition);
+        if (processDefinitionKey.equals("acquisti-trasparenza")) {
+            req.setParameter("titoloIstanzaFlusso", TITOLO_DELL_ISTANZA_DEL_FLUSSO);
+            req.setParameter("descrizioneAcquisizione", "descrizione");
+            req.setParameter("tipologiaAcquisizioneI", "procedura aperta");
+            req.setParameter("tipologiaAcquisizioneId", "11");
+            req.setParameter("strumentoAcquisizione", "AFFIDAMENTO DIRETTO - MEPA o CONSIP\n");
+            req.setParameter("strumentoAcquisizioneId", "11");
+            req.setParameter("priorita", "Alta");
+        }
         ResponseEntity<Object> response = flowsTaskResource.completeTask(req);
         assertEquals(OK, response.getStatusCode());
         // Recupero il TaskId del primo task del flusso
