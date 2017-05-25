@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
   <process id="acquisti-trasparenza" name="Acquisti Trasparenza" isExecutable="true">
+    <extensionElements>
+      <activiti:executionListener event="start" delegateExpression="${startAcquistiSetGroupsPrototipoSenzaAce}"></activiti:executionListener>
+    </extensionElements>
     <startEvent id="startevent1" name="Predisposizione Decisione"></startEvent>
     <subProcess id="DECISIONE-CONTRATTARE" name="DECISIONE A CONTRATTARE">
       <endEvent id="endevent1" name="End"></endEvent>
-      <userTask id="verifica-decisione" name="Verifica Decisione" activiti:candidateGroups="ROLE_USER">
+      <userTask id="verifica-decisione" name="Verifica Decisione" activiti:candidateGroups="${gruppoSFD}">
         <extensionElements>
           <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
         </extensionElements>
       </userTask>
-      <userTask id="firma-decisione" name="Firma Decisione" activiti:candidateGroups="ROLE_USER"></userTask>
+      <userTask id="firma-decisione" name="Firma Decisione" activiti:candidateGroups="{$gruppoDirettore}"></userTask>
       <sequenceFlow id="flow8" sourceRef="verifica-decisione" targetRef="exclusivegateway1"></sequenceFlow>
-      <userTask id="modifica-decisione" name="Modifica Decisione" activiti:candidateGroups="ROLE_USER">
+      <userTask id="modifica-decisione" name="Modifica Decisione" activiti:candidateGroups="{$gruppoRT}">
         <extensionElements>
           <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
         </extensionElements>
@@ -27,7 +30,7 @@
       <sequenceFlow id="flow13" sourceRef="exclusivegateway2" targetRef="modifica-decisione">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Modifica'}]]></conditionExpression>
       </sequenceFlow>
-      <userTask id="protocollo-decisione" name="Protocollo Decisione" activiti:candidateGroups="ROLE_USER">
+      <userTask id="protocollo-decisione" name="Protocollo Decisione" activiti:candidateGroups="{$gruppoRA}">
         <extensionElements>
           <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
         </extensionElements>
@@ -50,7 +53,7 @@
           </activiti:executionListener>
         </extensionElements>
       </sequenceFlow>
-      <userTask id="revoca-decisione" name="Revoca Decisione" activiti:candidateGroups="ROLE_USER">
+      <userTask id="revoca-decisione" name="Revoca Decisione" activiti:candidateGroups="{$gruppoRA}">
         <extensionElements>
           <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
         </extensionElements>
@@ -73,7 +76,7 @@
       </sequenceFlow>
     </subProcess>
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="DECISIONE-CONTRATTARE"></sequenceFlow>
-    <userTask id="espletamento-procedura" name="Espletamento Procedura" activiti:candidateGroups="ROLE_USER">
+    <userTask id="espletamento-procedura" name="Espletamento Procedura" activiti:assignee="${rup}">
       <extensionElements>
         <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
       </extensionElements>
@@ -222,13 +225,6 @@
       <sequenceFlow id="flow129" sourceRef="startevent7" targetRef="firma-revoca"></sequenceFlow>
       <sequenceFlow id="flow130" sourceRef="modifica-revoca" targetRef="firma-revoca"></sequenceFlow>
     </subProcess>
-    <dataObject id="valore" name="valore" itemSubjectRef="xsd:int">
-      <extensionElements>
-        <activiti:value>1</activiti:value>
-      </extensionElements>
-    </dataObject>
-    <dataObject id="sceltaUtente" name="sceltaUtente" itemSubjectRef="xsd:string"></dataObject>
-    <dataObject id="sceltaPercorso" name="sceltaPercorso" itemSubjectRef="xsd:string"></dataObject>
     <exclusiveGateway id="exclusivegateway13" name="Exclusive Gateway" default="flow61"></exclusiveGateway>
     <sequenceFlow id="flow60" sourceRef="DECISIONE-CONTRATTARE" targetRef="exclusivegateway13"></sequenceFlow>
     <sequenceFlow id="flow61" sourceRef="exclusivegateway13" targetRef="espletamento-procedura"></sequenceFlow>
@@ -408,6 +404,13 @@
     <sequenceFlow id="flow135" sourceRef="exclusivegateway16" targetRef="endevent17">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaSemplice'}]]></conditionExpression>
     </sequenceFlow>
+    <dataObject id="valore" name="valore" itemSubjectRef="xsd:int">
+      <extensionElements>
+        <activiti:value>1</activiti:value>
+      </extensionElements>
+    </dataObject>
+    <dataObject id="sceltaUtente" name="sceltaUtente" itemSubjectRef="xsd:string"></dataObject>
+    <dataObject id="sceltaPercorso" name="sceltaPercorso" itemSubjectRef="xsd:string"></dataObject>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_acquisti-trasparenza">
     <bpmndi:BPMNPlane bpmnElement="acquisti-trasparenza" id="BPMNPlane_acquisti-trasparenza">

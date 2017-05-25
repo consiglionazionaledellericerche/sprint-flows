@@ -39,6 +39,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import it.cnr.si.flows.ng.listeners.ActivitiLoggingEventListener;
 import it.cnr.si.flows.ng.listeners.FlowsVisibilitySetter;
 import it.cnr.si.flows.ng.listeners.TestExecutionListener;
+import it.cnr.si.flows.ng.listeners.acquistitrasparenza.StartAcquistiSetGroupsPrototipoSenzaAce;
 
 @Configuration
 public class FlowsConfigurations {
@@ -78,6 +79,7 @@ public class FlowsConfigurations {
         Map<Object, Object> beans = new HashMap<>();
         TestExecutionListener bean = appContext.getBean(TestExecutionListener.class);
         beans.put("testExecutionListener", bean);
+        beans.put("startAcquistiSetGroupsPrototipoSenzaAce", getStartAcquistiSetGroupsPrototipoSenzaAce());
         conf.setBeans(beans);
 
         // configurare il font in cnr.activiti.diagram-font
@@ -94,6 +96,12 @@ public class FlowsConfigurations {
         return conf;
     }
 
+    @Bean(name = "startAcquistiSetGroupsPrototipoSenzaAce")
+    public StartAcquistiSetGroupsPrototipoSenzaAce getStartAcquistiSetGroupsPrototipoSenzaAce() {
+        StartAcquistiSetGroupsPrototipoSenzaAce bean = new StartAcquistiSetGroupsPrototipoSenzaAce();
+        appContext.getAutowireCapableBeanFactory().autowireBean(bean);
+        return bean;
+    }
 
     @Bean(name = "processEngine")
     public ProcessEngine getProcessEngine(
