@@ -1,5 +1,6 @@
 package it.cnr.si.flows.ng.utils;
 
+import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.impl.util.json.JSONArray;
 import org.activiti.engine.impl.util.json.JSONObject;
@@ -57,13 +58,21 @@ public final class Utils {
         return ResponseEntity.ok(response);
     }
 
-    public HistoricTaskInstanceQuery order(String order, HistoricTaskInstanceQuery query) {
+    public TaskInfoQuery orderTasks(String order, TaskInfoQuery query) {
         if (order.equals(ASC))
             query.orderByTaskCreateTime().asc();
         else if (order.equals(DESC))
             query.orderByTaskCreateTime().desc();
 
         return query;
+    }
+
+    public HistoricProcessInstanceQuery orderProcess(String order, HistoricProcessInstanceQuery historicProcessQuery) {
+        if (order.equals(ASC))
+            historicProcessQuery.orderByProcessInstanceStartTime().asc();
+        else if (order.equals(DESC))
+            historicProcessQuery.orderByProcessInstanceStartTime().desc();
+        return historicProcessQuery;
     }
 
     public TaskInfoQuery extractSearchParams(HttpServletRequest req, TaskInfoQuery query) {
