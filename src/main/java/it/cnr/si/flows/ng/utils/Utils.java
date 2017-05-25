@@ -8,11 +8,13 @@ import org.activiti.engine.task.TaskInfoQuery;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.runtime.task.TaskResponse;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -20,11 +22,13 @@ import java.util.List;
 
 public final class Utils {
 
-
+    public static final String PROCESS_PARAMS = "processParams";
     public static final String ASC = "ASC";
     public static final String DESC = "DESC";
     public static final String ALL_PROCESS_INSTANCES = "all";
     public static final String LESS = "Less";
+    public static final String ERRORE_NELLA_LETTURE_DELLO_STREAM_DELLA_REQUEST = "Errore nella letture dello stream della request";
+    private static final String TASK_PARAMS = "taskParams";
     private static final String GREAT = "Great";
     private static final String ERRORE_NEL_PARSING_DELLA_DATA = "Errore nel parsing della data {} - ";
     private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
@@ -59,6 +63,20 @@ public final class Utils {
         else if (order.equals(DESC))
             query.orderByTaskCreateTime().desc();
 
+        return query;
+    }
+
+    public TaskInfoQuery extractSearchParams(HttpServletRequest req, TaskInfoQuery query) {
+        try {
+            JSONObject json = new JSONObject(IOUtils.toString(req.getReader()));
+
+            if (json.has(PROCESS_PARAMS))
+                query = extractProcessSearchParams(query, json.getJSONArray(PROCESS_PARAMS));
+            if (json.has(TASK_PARAMS))
+                query = extractTaskSearchParams(query, json.getJSONArray(TASK_PARAMS));
+        } catch (Exception e) {
+            LOGGER.error(ERRORE_NELLA_LETTURE_DELLO_STREAM_DELLA_REQUEST, e);
+        }
         return query;
     }
 
