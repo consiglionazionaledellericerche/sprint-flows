@@ -4,6 +4,7 @@ import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.impl.util.json.JSONArray;
 import org.activiti.engine.impl.util.json.JSONObject;
+import org.activiti.engine.query.Query;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskInfoQuery;
 import org.activiti.rest.common.api.DataResponse;
@@ -75,7 +76,7 @@ public final class Utils {
         return historicProcessQuery;
     }
 
-    public TaskInfoQuery extractSearchParams(HttpServletRequest req, TaskInfoQuery query) {
+    public TaskInfoQuery searchParamsForTasks(HttpServletRequest req, TaskInfoQuery query) {
         try {
             JSONObject json = new JSONObject(IOUtils.toString(req.getReader()));
 
@@ -87,6 +88,42 @@ public final class Utils {
             LOGGER.error(ERRORE_NELLA_LETTURE_DELLO_STREAM_DELLA_REQUEST, e);
         }
         return query;
+    }
+
+    public Query searchParamsForProcess(HttpServletRequest req, HistoricProcessInstanceQuery processQuery) {
+        try {
+            JSONArray processParams = new JSONObject(IOUtils.toString(req.getReader())).getJSONArray("processParams");
+
+            for (int i = 0; i < processParams.length(); i++) {
+                JSONObject appo = processParams.optJSONObject(i);
+                String key = appo.getString("key");
+                String value = appo.getString("value");
+                String type = appo.getString("type");
+                //wildcard ("%") di default ma non a TUTTI i campi
+                switch (type) {
+                    case "textEqual":
+                    case "boolean":
+                        // gestione variabili booleane e dei valori testuali "perfettamente uguali"
+                        processQuery.variableValueEquals(key, value);
+                        break;
+                    case "date":
+                        Date date = sdf.parse(value);
+
+                        if (key.contains(LESS)) {
+                            processQuery.variableValueLessThanOrEqual(key.replace(LESS, ""), date);
+                        } else if (key.contains(GREAT))
+                            processQuery.variableValueGreaterThanOrEqual(key.replace(GREAT, ""), date);
+                        break;
+                    default:
+                        //variabili con la wildcard  (%value%)
+                        processQuery.variableValueLike(key, "%" + value + "%");
+                        break;
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error(ERRORE_NELLA_LETTURE_DELLO_STREAM_DELLA_REQUEST, e);
+        }
+        return processQuery;
     }
 
     public TaskInfoQuery extractProcessSearchParams(TaskInfoQuery taskQuery, JSONArray params) {
@@ -106,7 +143,15 @@ public final class Utils {
                     taskQuery.processVariableValueEquals(key, Boolean.valueOf(value));
                     break;
                 case "date":
-                    taskQuery = historicProcesskDate(taskQuery, key, value);
+                    try {
+                        Date date = sdf.parse(value);
+                        if (key.contains(LESS)) {
+                            taskQuery.processVariableValueLessThanOrEqual(key.replace(LESS, ""), date);
+                        } else if (key.contains(GREAT))
+                            taskQuery.processVariableValueGreaterThanOrEqual(key.replace(GREAT, ""), date);
+                    } catch (ParseException e) {
+                        LOGGER.error(ERRORE_NEL_PARSING_DELLA_DATA, value, e);
+                    }
                     break;
                 default:
                     //variabili con la wildcard  (%value%)
@@ -167,19 +212,6 @@ public final class Utils {
         return taskQuery;
     }
 
-    private TaskInfoQuery historicProcesskDate(TaskInfoQuery taskQuery, String key, String value) {
-        try {
-            Date date = sdf.parse(value);
-
-            if (key.contains(LESS)) {
-                taskQuery.processVariableValueLessThanOrEqual(key.replace(LESS, ""), date);
-            } else if (key.contains(GREAT))
-                taskQuery.processVariableValueGreaterThanOrEqual(key.replace(GREAT, ""), date);
-        } catch (ParseException e) {
-            LOGGER.error(ERRORE_NEL_PARSING_DELLA_DATA, value, e);
-        }
-        return taskQuery;
-    }
 
     private TaskInfoQuery historicTaskDate(TaskInfoQuery taskQuery, String key, String value) {
         try {
