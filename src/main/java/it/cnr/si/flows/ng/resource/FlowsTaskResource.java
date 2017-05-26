@@ -112,7 +112,7 @@ public class FlowsTaskResource {
         if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
             taskQuery.processDefinitionKey(processDefinition);
 
-        taskQuery = (TaskQuery) utils.extractSearchParams(req, taskQuery);
+        taskQuery = (TaskQuery) utils.searchParamsForTasks(req, taskQuery);
 
         utils.orderTasks(order, taskQuery);
 
@@ -149,7 +149,7 @@ public class FlowsTaskResource {
                 .taskCandidateGroupIn(authorities)
                 .includeProcessVariables();
 
-        taskQuery = (TaskQuery) utils.extractSearchParams(req, taskQuery);
+        taskQuery = (TaskQuery) utils.searchParamsForTasks(req, taskQuery);
 
         if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
             taskQuery.processDefinitionKey(processDefinition);
@@ -410,7 +410,7 @@ public class FlowsTaskResource {
         HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery().taskInvolvedUser(username)
                 .includeProcessVariables().includeTaskLocalVariables();
 
-        query = (HistoricTaskInstanceQuery) utils.extractSearchParams(req, query);
+        query = (HistoricTaskInstanceQuery) utils.searchParamsForTasks(req, query);
 
         if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
             query.processDefinitionKey(processDefinition);
