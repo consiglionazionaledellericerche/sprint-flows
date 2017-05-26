@@ -29,7 +29,7 @@
             myFirstResult = vm.itemsPerPage * (vm.myPage - 1);
             myMaxResults = vm.itemsPerPage;
 
-            dataService.tasks.myTasks($scope.current, myFirstResult, myMaxResults, vm.order, utils.populateParams(Array.from($("input[id^='searchField-']"))))
+            dataService.tasks.myTasks($scope.current, myFirstResult, myMaxResults, vm.order, utils.populateTaskParams(Array.from($("input[id^='searchField-']"))))
                 .then(function(response) {
                     utils.refactoringVariables(response.data.data);
                     vm.myTasks = response.data;
@@ -49,7 +49,7 @@
             vm.availableTotalItems = vm.itemsPerPage * vm.availablePage;
             firstResultAvailable = vm.itemsPerPage * (vm.availablePage - 1);
             maxResultsAvailable = vm.itemsPerPage;
-            dataService.tasks.myTasksAvailable($scope.current, firstResultAvailable, maxResultsAvailable, vm.order, utils.populateParams(Array.from($("input[id^='searchField-']"))))
+            dataService.tasks.myTasksAvailable($scope.current, firstResultAvailable, maxResultsAvailable, vm.order, utils.populateTaskParams(Array.from($("input[id^='searchField-']"))))
                 .then(function(response) {
                     utils.refactoringVariables(response.data.data);
                     vm.availableTasks = response.data;
