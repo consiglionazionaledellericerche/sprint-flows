@@ -73,7 +73,7 @@ public class FlowsConfigurations {
 
         // Event listeners generici
         conf.setEventListeners(new ArrayList<ActivitiEventListener>() {{
-            add(loggingListener);
+//            add(loggingListener); NO SPAM!!
             add(new FlowsVisibilitySetter());
         }});
         Map<Object, Object> beans = new HashMap<>();
