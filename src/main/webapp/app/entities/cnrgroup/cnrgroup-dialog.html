@@ -17,15 +17,15 @@
             <label class="control-label" translate="sprintApp.cnrgroup.name" for="field_name">Name</label>
             <input type="text" class="form-control" name="name" id="field_name"
                     ng-model="vm.cnrgroup.name"
-                    required ng-pattern="/^[a-zA-Z0-9_]*$/" />
+                    required ng-pattern="/^[a-zA-Z0-9_-@#]*$/" />
             <div ng-show="editForm.name.$invalid">
                 <p class="help-block"
                     ng-show="editForm.name.$error.required" translate="entity.validation.required">
                     This field is required.
                 </p>
                 <p class="help-block"
-                    ng-show="editForm.name.$error.pattern" translate="entity.validation.pattern" translate-value-pattern="^[a-zA-Z0-9_]*$">
-                    This field should follow pattern "^[a-zA-Z0-9_]*$".
+                    ng-show="editForm.name.$error.pattern" translate="entity.validation.pattern" translate-value-pattern="^[a-zA-Z0-9_-@#]*$">
+                    This field should follow pattern "^[a-zA-Z0-9_-@#]*$".
                 </p>
             </div>
         </div>

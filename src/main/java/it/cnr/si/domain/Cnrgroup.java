@@ -25,7 +25,7 @@ public class Cnrgroup implements Serializable {
     private Long id;
 
     @NotNull
-    @Pattern(regexp = "^[a-zA-Z0-9_]*$")
+    @Pattern(regexp = "^[a-zA-Z0-9_@-#]*$")
     @Column(name = "name", nullable = false)
     private String name;
 
