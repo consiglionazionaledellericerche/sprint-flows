@@ -29,8 +29,7 @@
             myFirstResult = vm.itemsPerPage * (vm.myPage - 1);
             myMaxResults = vm.itemsPerPage;
 
-//            dataService.tasks.myTasks($scope.current, myFirstResult, myMaxResults, vm.order, populateParams())
-            dataService.tasks.myTasks($scope.current, myFirstResult, myMaxResults, vm.order, utils.populateParams(Array.from($("input[id^='searchField-']"))))
+            dataService.tasks.myTasks($scope.current, myFirstResult, myMaxResults, vm.order, utils.populateTaskParams(Array.from($("input[id^='searchField-']"))))
                 .then(function(response) {
                     utils.refactoringVariables(response.data.data);
                     vm.myTasks = response.data;
@@ -50,8 +49,7 @@
             vm.availableTotalItems = vm.itemsPerPage * vm.availablePage;
             firstResultAvailable = vm.itemsPerPage * (vm.availablePage - 1);
             maxResultsAvailable = vm.itemsPerPage;
-//            dataService.tasks.myTasksAvailable($scope.current, firstResultAvailable, maxResultsAvailable, vm.order, populateParams())
-            dataService.tasks.myTasksAvailable($scope.current, firstResultAvailable, maxResultsAvailable, vm.order, utils.populateParams(Array.from($("input[id^='searchField-']"))))
+            dataService.tasks.myTasksAvailable($scope.current, firstResultAvailable, maxResultsAvailable, vm.order, utils.populateTaskParams(Array.from($("input[id^='searchField-']"))))
                 .then(function(response) {
                     utils.refactoringVariables(response.data.data);
                     vm.availableTasks = response.data;
@@ -65,28 +63,8 @@
 
         };
 
-//        function populateParams() {
-//            var fields = Array.from($("input[id^='searchField-']")), processParams = [], taskParams = [];
-//
-//            fields.forEach(function (field){
-//                var fieldName = field.getAttribute('id').replace('searchField-', ''),
-//                 appo = {};
-//                    if(field.value  !== ""){
-//                        appo["key"] = fieldName;
-//                        appo["value"] = field.value;
-//                        appo["type"] = field.getAttribute("type");
-//                        if(field.id.includes("initiator") || field.id.includes("titoloIstanzaFlusso")){
-//                            processParams.push(appo);
-//                        } else {
-//                            taskParams.push(appo);
-//                        }
-//                    }
-//            });
-//            return {"processParams": processParams, "taskParams": taskParams};
-//        }
-
         $scope.showProcessInstances = function(requestedPage) {
-        //se non ho ancora effettuato query carico entrambe le "viste" ("i miei tas" e " i task di gruppo"
+        //se non ho ancora effettuato query carico entrambe le "viste" ("i miei task" ed i "task di gruppo")
             if ((vm.availableTasks.total === 0 && vm.myTasks.total === 0)) {
                 $scope.loadMyTasks();
                 $scope.loadAvailableTasks();
