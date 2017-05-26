@@ -67,8 +67,12 @@
                  '&firstResult=' + firstResult +
                  '&maxResults=' + maxResults);
         },
-        getProcessInstance: function(active) {
-            return $http.get('api/processInstances/getProcessInstances?active=' + active);
+        getProcessInstances: function(processDefinition, active, firstResult, maxResults, order, params) {
+            return $http.post('api/processInstances/getProcessInstances?active=' + active +
+            '&processDefinition=' + (processDefinition ? processDefinition.key : 'all') +
+            '&order=' + order +
+            '&firstResult=' + firstResult +
+            '&maxResults=' + maxResults, params);
         },
         attachments: function(processInstanceId) {
             return $http.get('api/attachments/'+ processInstanceId);
@@ -83,7 +87,7 @@
             } else {
                 processInstaceId = 'all';
             }
-            return $http.post('api/processInstances/search/' + processInstaceId+
+            return $http.post('api/processInstances/search/' + processInstaceId +
                 '?active=' + active +
                 '&order=' + order +
                 '&firstResult=' + firstResult +

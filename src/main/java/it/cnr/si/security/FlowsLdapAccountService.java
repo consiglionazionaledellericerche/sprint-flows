@@ -56,7 +56,7 @@ public class FlowsLdapAccountService extends LdapAccountService {
         String username = user.getUsername();
         log.info(username);
 
-        List<String> roles = getRoles(LdapSecurityUtils.getAuthentication().getAuthorities());
+        List<String> roles = getRoles(LdapSecurityUtils.getAuthentication().getAuthorities()); // Meglio cambiare il file in sprint-ldap?
 
         log.info(roles.toString());
 

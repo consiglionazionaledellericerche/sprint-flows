@@ -19,7 +19,7 @@
             var maxResults = vm.itemsPerPage,
                 firstResult = vm.itemsPerPage * (vm.page - 1);
 
-            dataService.tasks.getTaskCompletedByMe($rootScope.current, firstResult, maxResults, vm.order, utils.populateParams(Array.from($("input[id^='searchField-']"))))
+            dataService.tasks.getTaskCompletedByMe($rootScope.current, firstResult, maxResults, vm.order, utils.populateTaskParams(Array.from($("input[id^='searchField-']"))))
                 .then(function(response) {
                     response.data.data.forEach(function(task) {
                         utils.refactoringVariables(task);

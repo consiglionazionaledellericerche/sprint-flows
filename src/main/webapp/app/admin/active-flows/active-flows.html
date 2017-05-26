@@ -1,33 +1,66 @@
 <div ng-cloak>
-  <div class="row">
-    <div class="col-lg-12">
-      <uib-tabset active="0" justified="true" type="pills"> <uib-tab index="0" select="setActiveContent('active')"> <uib-tab-heading>
-      <h3>
-        <i class="glyphicon glyphicon-time"></i>
-        Flussi Attivi: {{vm.activeInstances.data.length}}
-      </h3>
-      </uib-tab-heading> </uib-tab> <uib-tab index="1" classes="available" select="setActiveContent('completed')"> <uib-tab-heading>
-      <h3>
-        <i class="glyphicon glyphicon-ok"></i>
-        Flussi Completati: {{vm.completedInstances.data.length}}
-      </h3>
-      </uib-tab-heading> </uib-tab> </uib-tabset>
+    <div class="row form-group">
+        <div class="col-md-12">
+            <uib-tabset active="1" justified="true" type="pills">
+                <uib-tab index="0" select="setActiveContent('active')">
+                    <uib-tab-heading>
+                        <h3>
+                            <i class="glyphicon glyphicon-edit"></i>
+                            Flussi attivi: {{vm.activeProcess.length}}
+                        </h3>
+                    </uib-tab-heading>
+                </uib-tab>
+                <uib-tab index="1" select="setActiveContent('terminated')">
+                    <uib-tab-heading>
+                        <h3>
+                            <i class="glyphicon glyphicon-check"></i>
+                            Flussi terminati: {{vm.terminatedProcess.length}}
+                        </h3>
+                    </uib-tab-heading>
+                </uib-tab>
+            </uib-tabset>
     </div>
   </div>
   <hr>
 
   <div class="row">
     <div class="col-md-3">
-      <button class="btn btn-default btn-block margin-top-20" ng-click="advanced = !advanced">
-        <span class="glyphicon" ng-class="{'glyphicon-wrench': !advanced, 'glyphicon-tasks': advanced}"></span>
-        modalità {{advanced ? 'semplice' : 'avanzata'}}
-      </button>
-
-      <div ng-show="advanced">
+        <div>
+            <h4>Ordinamento temporale</h4>
+            <div>
+                <button class="btn btn-default btn-block margin-top-20"
+                        ng-click="vm.order ===  'ASC' ?  vm.order='DESC' : vm.order = 'ASC'">
+                    <span class="glyphicon glyphicon-sort"></span>
+                    {{vm.order === 'ASC' ? 'Crescente' : 'Descrescente'}}
+                </button>
+            </div>
+        </div>
+        <br>
+        <br>
         <h4>Tipologie</h4>
-        <workflow-types criteria="criteria" filters="true" reset-filters="resetFilters"
-                        select-process-definition-key="selectProcessDefinitionKey"
-                        process-definitions="wfDefs"></workflow-types>
+        <workflow-types process-definitions="wfDefs" filters="false"></workflow-types>
+        <br>
+        <br>
+        <div class="ng-scope" style="">
+            <strong class="ng-binding">Parole Chiavi nel Titolo</strong>
+            <div>
+                <input id="searchField-titoloIstanzaFlusso" type="text">
+            </div>
+        </div>
+        <div class="ng-scope" style="">
+            <strong class="ng-binding">Utente che ha avviato il flusso</strong>
+            <div>
+                <input id="searchField-initiator" type="textEqual">
+            </div>
+        </div>
+        <div>
+            <label for="datada">Flusso avviato dopo</label>
+            <input id="searchField-startDateGreat" type="date" ng-model="datada" id="datada"
+                   class="form-control ng-pristine ng-valid ng-empty ng-touched" aria-invalid="false">
+        </div>
+        <br>
+        <div>
+            <button ng-click="showProcessInstances()" class="btn btn-primary">Filtra</button>
       </div>
     </div>
 
@@ -38,17 +71,33 @@
           Lista dei processi attivi
         </span>
       </h3>
-      <process-list processes="vm.activeInstances.data" paging="paging"></process-list>
+        <process-list processes="vm.activeProcess" paging="paging"></process-list>
+
+        <!--paginazione tasks attivi-->
+        <div class="text-center">
+            <jhi-item-count page="vm.activePage" total="vm.activeQueryCount"
+                            items-per-page="vm.itemsPerPage"></jhi-item-count>
+            <uib-pagination class="pagination-sm" total-items="vm.activeTotalItems" ng-model="vm.activePage"
+                            ng-change="vm.transition()"></uib-pagination>
+        </div>
     </div>
 
-    <div class="col-md-9" ng-show="vm.activeContent == 'completed'">
+      <div class="col-md-9" ng-show="vm.activeContent == 'terminated'">
       <h3>
         <span class="label" ng-class="label-info">
           <i class="glyphicon glyphicon-user"></i>
           Lista dei processi completati
         </span>
       </h3>
-      <process-list processes="vm.completedInstances.data" paging="paging"></process-list>
+          <process-list processes="vm.terminatedProcess" paging="paging"></process-list>
+
+          <!--paginazione task terminati-->
+          <div class="text-center">
+              <jhi-item-count page="vm.terminatedPage" total="vm.terminatedQueryCount"
+                              items-per-page="vm.itemsPerPage"></jhi-item-count>
+              <uib-pagination class="pagination-sm" total-items="vm.terminatedTotalItems" ng-model="vm.terminatedPage"
+                              ng-change="vm.transition()"></uib-pagination>
+          </div>
     </div>
 
   </div>

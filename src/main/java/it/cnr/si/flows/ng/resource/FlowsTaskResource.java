@@ -112,7 +112,7 @@ public class FlowsTaskResource {
         if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
             taskQuery.processDefinitionKey(processDefinition);
 
-        taskQuery = (TaskQuery) utils.extractSearchParams(req, taskQuery);
+        taskQuery = (TaskQuery) utils.searchParamsForTasks(req, taskQuery);
 
         utils.orderTasks(order, taskQuery);
 
@@ -140,16 +140,16 @@ public class FlowsTaskResource {
         String username = SecurityUtils.getCurrentUserLogin();
         List<String> authorities =
                 SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                        .map(GrantedAuthority::getAuthority)
-                        //                        .map(FlowsTaskResource::removeLeadingRole) //todo: vedere con Martin (le authorities sono ROLE_USER (come ora) o USER (come prima))
-                        .collect(Collectors.toList());
+                .map(GrantedAuthority::getAuthority)
+                .map(FlowsTaskResource::removeLeadingRole)
+                .collect(Collectors.toList());
 
         TaskQuery taskQuery = taskService.createTaskQuery()
                 .taskCandidateUser(username)
                 .taskCandidateGroupIn(authorities)
                 .includeProcessVariables();
 
-        taskQuery = (TaskQuery) utils.extractSearchParams(req, taskQuery);
+        taskQuery = (TaskQuery) utils.searchParamsForTasks(req, taskQuery);
 
         if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
             taskQuery.processDefinitionKey(processDefinition);
@@ -185,11 +185,11 @@ public class FlowsTaskResource {
         ResponseEntity<List<FlowsAttachment>> attachementsEntity = attachmentResource.getAttachementsForTask(taskId);
         Map<String, Object> attachments = new TreeMap<>();
         attachementsEntity.getBody().stream()
-                .sorted((a1, a2) -> a1.getName().compareTo(a2.getName()))
-                .forEach(a -> {
-                    a.setBytes(null);
-                    attachments.put(a.getName(), a);
-                });
+        .sorted((a1, a2) -> a1.getName().compareTo(a2.getName()))
+        .forEach(a -> {
+            a.setBytes(null);
+            attachments.put(a.getName(), a);
+        });
         response.put("attachments", attachments);
         response.put("attachmentsList", attachementsEntity.getBody());
 
@@ -279,9 +279,9 @@ public class FlowsTaskResource {
         // TODO get authorities from username NOT currentuser
         List<String> authorities =
                 SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                        .map(GrantedAuthority::getAuthority)
-                        //                        .map(FlowsTaskResource::removeLeadingRole) //todo: vedere con Martin (le authorities sono ROLE_USER (come ora) o USER (come prima))
-                        .collect(Collectors.toList());
+                .map(GrantedAuthority::getAuthority)
+                .map(FlowsTaskResource::removeLeadingRole) //todo: vedere con Martin (le authorities sono ROLE_USER (come ora) o USER (come prima))
+                .collect(Collectors.toList());
 
         if ( username.equals(taskService.createTaskQuery().taskId(taskId).singleResult().getAssignee()) )
             return true;
@@ -410,7 +410,7 @@ public class FlowsTaskResource {
         HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery().taskInvolvedUser(username)
                 .includeProcessVariables().includeTaskLocalVariables();
 
-        query = (HistoricTaskInstanceQuery) utils.extractSearchParams(req, query);
+        query = (HistoricTaskInstanceQuery) utils.searchParamsForTasks(req, query);
 
         if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
             query.processDefinitionKey(processDefinition);
@@ -435,5 +435,9 @@ public class FlowsTaskResource {
         response.setData(resultList);
 
         return ResponseEntity.ok(response);
+    }
+
+    public static String removeLeadingRole(String in) {
+        return in.startsWith("ROLE_") ? in.substring(5) : in;
     }
 }

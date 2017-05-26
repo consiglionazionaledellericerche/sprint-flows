@@ -2,6 +2,7 @@ package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.SecurityUtils;
 import org.activiti.engine.HistoryService;
@@ -63,6 +64,7 @@ public class FlowsProcessInstanceResource {
     private RepositoryService repositoryService;
     @Autowired
     private TaskService taskService;
+    private Utils utils = new Utils();
 
 
 
@@ -87,8 +89,6 @@ public class FlowsProcessInstanceResource {
         String username = SecurityUtils.getCurrentUserLogin();
         List<HistoricProcessInstance> list;
         HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
-
-
 
         if (active) {
             historicProcessInstanceQuery.variableValueEquals("initiator", username)
@@ -182,21 +182,39 @@ public class FlowsProcessInstanceResource {
      * @param active boolean active
      * @return le process Instance attive o terminate
      */
-    @RequestMapping(value = "/getProcessInstances", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/getProcessInstances", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured({AuthoritiesConstants.ADMIN})
     @Timed
-    public ResponseEntity getProcessInstances(@RequestParam("active") boolean active) {
-        List<HistoricProcessInstance> processInstances;
+    public ResponseEntity getProcessInstances(
+            HttpServletRequest req,
+            @RequestParam("active") boolean active,
+            @RequestParam("processDefinition") String processDefinition,
+            @RequestParam("firstResult") int firstResult,
+            @RequestParam("maxResults") int maxResults,
+            @RequestParam("order") String order) {
+        HistoricProcessInstanceQuery historicProcessQuery = historyService.createHistoricProcessInstanceQuery().includeProcessVariables();
+
+        historicProcessQuery = utils.orderProcess(order, historicProcessQuery);
+
+        historicProcessQuery = (HistoricProcessInstanceQuery) utils.searchParamsForProcess(req, historicProcessQuery);
+        if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
+            historicProcessQuery.processDefinitionKey(processDefinition);
+
         if (active) {
-            processInstances = historyService.createHistoricProcessInstanceQuery()
-                    .unfinished()
-                    .includeProcessVariables().list();
+            historicProcessQuery.unfinished();
         } else {
-            processInstances = historyService.createHistoricProcessInstanceQuery()
-                    .finished().or().deleted()
-                    .includeProcessVariables().list();
+            historicProcessQuery.finished().or().deleted();
         }
-        return new ResponseEntity<>(restResponseFactory.createHistoricProcessInstanceResponseList(processInstances), HttpStatus.OK);
+
+        List<HistoricProcessInstance> processInstances = historicProcessQuery.listPage(firstResult, maxResults);
+
+        DataResponse response = new DataResponse();
+        response.setStart(firstResult);
+        response.setSize(processInstances.size());// numero di task restituiti
+        response.setTotal(historicProcessQuery.count()); //numero totale di task avviati da me
+        response.setData(restResponseFactory.createHistoricProcessInstanceResponseList(processInstances));
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @RequestMapping(value = "deleteProcessInstance", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
