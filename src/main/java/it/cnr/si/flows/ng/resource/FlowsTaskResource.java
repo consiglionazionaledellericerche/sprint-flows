@@ -93,10 +93,11 @@ public class FlowsTaskResource {
 
     }
 
-    @RequestMapping(value = "/mytasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/mytasks", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<DataResponse> getMyTasks(
+            HttpServletRequest req,
             @RequestParam("processDefinition") String processDefinition,
             @RequestParam("firstResult") int firstResult,
             @RequestParam("maxResults") int maxResults,
@@ -111,10 +112,9 @@ public class FlowsTaskResource {
         if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
             taskQuery.processDefinitionKey(processDefinition);
 
-        if (order.equals(ASC))
-            taskQuery.orderByTaskCreateTime().asc();
-        else if (order.equals(DESC))
-            taskQuery.orderByTaskCreateTime().desc();
+        taskQuery = (TaskQuery) utils.extractSearchParams(req, taskQuery);
+
+        utils.orderTasks(order, taskQuery);
 
         List<TaskResponse> list = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
 
@@ -385,7 +385,7 @@ public class FlowsTaskResource {
         }
 
         taskQuery = (HistoricTaskInstanceQuery) utils.extractProcessSearchParams(taskQuery, new JSONObject(jsonString).getJSONArray(PROCESS_PARAMS));
-        taskQuery = utils.order(order, taskQuery);
+        taskQuery = (HistoricTaskInstanceQuery) utils.orderTasks(order, taskQuery);
 
         long totalItems = taskQuery.includeProcessVariables().count();
         result.put("totalItems", totalItems);
@@ -415,7 +415,7 @@ public class FlowsTaskResource {
         if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
             query.processDefinitionKey(processDefinition);
 
-        query = utils.order(order, query);
+        query = (HistoricTaskInstanceQuery) utils.orderTasks(order, query);
 
         List<HistoricTaskInstance> taskList = new ArrayList<>();
         for (HistoricTaskInstance task : query.list()) {

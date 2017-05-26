@@ -61,11 +61,9 @@
                 AlertService.success("Richiesta completata con successo");
                 $state.go('availabletasks');
 
-            }, function (response) {
+            }, function (err) {
                 $log.error(err);
-                AlertService.error("Richiesta non riuscita");
-                if (response.status > 0)
-                    $scope.errorMsg = response.status + ': ' + response.data;
+                AlertService.error("Richiesta non riuscita<br>"+ err.data.message);
             });
         }
 
@@ -73,12 +71,5 @@
             utils.downloadFile(url, filename, mimetype);
         }
 
-
-
-
-        $scope.addFileToData = function(files, nameInScope, multiple) {
-            $log.info(files);
-            vm.data[nameInScope] = files[0];
-        }
     }
 })();
