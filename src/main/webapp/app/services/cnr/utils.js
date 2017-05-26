@@ -76,8 +76,7 @@
                     }
                 });
                 return {
-                    "processParams": processParams,
-                    "taskParams": taskParams
+                    "processParams": processParams
                 };
             }
         };
