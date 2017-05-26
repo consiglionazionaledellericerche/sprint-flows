@@ -9,7 +9,7 @@
           ng-model="$parent.vm.data[attrs.name]"
           ngf-select
           name="$parent.vm.data[attrs.name]"
-          accept="image/*"
+          accept="{{attrs.accept}}"
           ngf-multiple="false"
           ng-required="attrs['cnrRequired'] == 'true'" >
             <span ng-show="!vm.attachments[attrs.name]" class="glyphicon glyphicon-upload"></span>
@@ -32,7 +32,7 @@
           ng-model="$parent.vm.data[attachment.name]"
           ngf-select
           name="$parent.vm.data[attachment.name]"
-          accept="image/*"
+          accept="{{attrs.accept}}"
           ngf-multiple="false"
           ng-required="attrs['cnrRequired'] == 'true'" >
             <span class="glyphicon glyphicon-repeat"></span> Aggiorna
@@ -44,7 +44,7 @@
           ng-model="$parent.vm.data['__new__'+attrs.name]"
           ngf-select
           name="$parent.vm.data['__new__'+attrs.name]"
-          accept="image/*"
+          accept="{{attrs.accept}}"
           ngf-multiple="true"
           ng-required="attrs['cnrRequired'] == 'true'" >
             <span class="glyphicon glyphicon-upload"></span>

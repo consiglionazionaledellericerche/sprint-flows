@@ -14,6 +14,8 @@ public class VisibilityMapping {
     static {
         GroupVisibilityMappingForProcessInstance = new HashMap<>();
         GroupVisibilityMappingForProcessInstance.put("acquistiTrasparenza-predisposizioneDecisione", listOf("${direttore}", "ADMIN", "sisinfo_rt"));
+        UserVisibilityMappingForProcessInstance = new HashMap<>();
+        UserVisibilityMappingForProcessInstance.put("acquistiTrasparenza-modificaDecisione", listOf("${iniziator}"));
     }
 
     public static List<String> listOf(String... in) {
