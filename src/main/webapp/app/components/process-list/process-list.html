@@ -12,7 +12,8 @@
             <div>
                 <div ng-switch on="process.variables">
                     <div ng-switch-when-expr="process.variables.title">
-                        <strong>Titolo:</strong> {{process.variables.title}}
+                        <strong>Titolo:</strong> {{process.variables.titoloIstanzaFlusso}}
+                                                 <!--<strong>Titolo:</strong> {{process.variables.title}}-->
                     </div>
                     <div ng-switch-when-expr="process.variables.startDate">
                         <strong>Avviato il </strong> {{process.variables.startDate | date}}
@@ -20,9 +21,9 @@
                     <div ng-switch-when-expr="process.variables.initiator">
                         <strong>Aviato da </strong> {{process.variables.initiator}}
                     </div>
-                    <div ng-switch-when-expr="process.variables.taskId">
-                        <strong>Id del task:</strong> {{process.variables.taskId}}
-                    </div>
+                    <!--<div ng-switch-when-expr="process.variables.taskId">-->
+                    <!--<strong>Id del task:</strong> {{process.variables.taskId}}-->
+                    <!--</div>-->
                 </div>
             </div>
         </div>
