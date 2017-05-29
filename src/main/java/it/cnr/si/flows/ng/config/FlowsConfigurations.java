@@ -45,7 +45,7 @@ import it.cnr.si.flows.ng.listeners.acquistitrasparenza.StartAcquistiSetGroupsPr
 @Configuration
 public class FlowsConfigurations {
 
-    private static final Logger log = LoggerFactory.getLogger(FlowsConfigurations.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlowsConfigurations.class);
 
     @Value("${cnr.activiti.diagram-font}")
     private String diagramFont;
@@ -87,9 +87,12 @@ public class FlowsConfigurations {
         if ( Arrays.asList(java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames())
                 .stream()
                 .anyMatch(f -> f.equals(diagramFont))) {
+            LOGGER.info("Font {} trovato, imposto per i diagrammi", diagramFont);
             conf.setActivityFontName(diagramFont);
             conf.setAnnotationFontName(diagramFont);
             conf.setLabelFontName(diagramFont);
+        } else {
+            LOGGER.warn("Font {} non trovato, torno al default", diagramFont);
         }
 
         // async migliora le prestazioni, in particolare con tanti utenti
@@ -164,7 +167,7 @@ public class FlowsConfigurations {
         RepositoryService repositoryService = appContext.getBean(RepositoryService.class);
 
         for (Resource resource : appContext.getResources("classpath:processes/*.bpmn*")) {
-            log.info("\n ------- definition " + resource.getFilename());
+            LOGGER.info("\n ------- definition " + resource.getFilename());
             List<ProcessDefinition> processes = repositoryService.createProcessDefinitionQuery()
                     .processDefinitionKeyLike("%"+ resource.getFilename().split("[.]")[0] +"%")
                     .list();
