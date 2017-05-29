@@ -226,4 +226,12 @@ public final class Utils {
         }
         return taskQuery;
     }
+
+    public static String removeLeadingRole(String in) {
+        return in.startsWith("ROLE_") ? in.substring(5) : in;
+    }
+
+    public static String addLeadingRole(String in) {
+        return in.startsWith("ROLE_") ? in : "ROLE_"+ in;
+    }
 }

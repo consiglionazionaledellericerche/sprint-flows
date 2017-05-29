@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
+import it.cnr.si.flows.ng.resource.FlowsTaskResource;
+import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.service.MembershipService;
 
 @Component
@@ -22,43 +24,40 @@ public class StartAcquistiSetGroupsPrototipoSenzaAce implements ExecutionListene
     @Autowired
     private MembershipService membershipService;
 
-//    public StartAcquistiSetGroupsPrototipoSenzaAce() {
-//        applicationContext.getAutowireCapableBeanFactory().autowireBean(this);
-//    }
-
     @Override
     public void notify(DelegateExecution execution) throws Exception {
 
-        try {
-            String initiator = (String) execution.getVariable("initiator");
-            List<GrantedAuthority> authorities = membershipService.getAllAdditionalAuthoritiesForUser(initiator);
+        String initiator = (String) execution.getVariable("initiator");
+        LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
 
-            List<GrantedAuthority> groups = authorities.stream().filter(a -> a.getAuthority().endsWith("_rt")).collect(Collectors.toList());
-            if ( groups.size() == 0 )
-                throw new BpmnError("403", "L'utente non e' abilitato ad avviare questo flusso");
-            else if ( groups.size() > 1 )
-                throw new BpmnError("500", "L'utente appartiene a piu' di un gruppo Responsabile Tecnico");
-            else {
-                GrantedAuthority groupRT = groups.get(0);
-                String struttura = groupRT.getAuthority().substring(0, groupRT.getAuthority().lastIndexOf('_'));
+        List<GrantedAuthority> authorities = membershipService.getAllAdditionalAuthoritiesForUser(initiator);
 
-                String gruppoRT = groupRT.getAuthority();
-                String gruppoDirettore = struttura +"_direttore";
-                String gruppoRA = struttura +"_ra";
-                String gruppoSFD = struttura +"_sfd";
+        List<String> groups = authorities.stream()
+                .map(a -> a.getAuthority())
+                .map(Utils::removeLeadingRole)
+                .filter(g -> g.startsWith("rt@"))
+                .collect(Collectors.toList());
 
-                execution.setVariable("gruppoRT", gruppoRT);
-                execution.setVariable("gruppoDirettore", gruppoDirettore);
-                execution.setVariable("gruppoRA", gruppoRA);
-                execution.setVariable("gruppoSFD", gruppoSFD);
-            }
-        }catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+        if ( groups.size() == 0 )
+            throw new BpmnError("403", "L'utente non e' abilitato ad avviare questo flusso");
+        else if ( groups.size() > 1 )
+            throw new BpmnError("500", "L'utente appartiene a piu' di un gruppo Responsabile Tecnico");
+        else {
 
-            execution.setVariable("gruppoRT", "sisinfo_rt");
-            execution.setVariable("gruppoDirettore", "sisinfo_direttore");
-            execution.setVariable("gruppoRA", "sisinfo_ra");
-            execution.setVariable("gruppoSFD", "sisinfo_sfd");
+            String gruppoRT = groups.get(0);
+            String struttura = gruppoRT.substring(gruppoRT.lastIndexOf('@') +1);
+
+            String gruppoDirettore = "direttore@"+ struttura;
+            String gruppoRA = "ra@"+ struttura;
+            String gruppoSFD = "sfd@"+ struttura;
+
+            LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoRT, gruppoSFD, gruppoRA, gruppoDirettore);
+
+            execution.setVariable("gruppoRT", gruppoRT);
+            execution.setVariable("gruppoDirettore", gruppoDirettore);
+            execution.setVariable("gruppoRA", gruppoRA);
+            execution.setVariable("gruppoSFD", gruppoSFD);
         }
+
     }
 }

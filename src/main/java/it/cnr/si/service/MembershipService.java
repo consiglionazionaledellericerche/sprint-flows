@@ -1,6 +1,7 @@
 package it.cnr.si.service;
 
 import it.cnr.si.domain.Membership;
+import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.MembershipRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +87,7 @@ public class MembershipService {
     public List<GrantedAuthority> getAllAdditionalAuthoritiesForUser(String username) {
         return Stream.concat(getGroupsForUser(username).stream(), getACEGroupsForUser(username).stream())
                 .distinct()
-                .map(g -> g.startsWith("ROLE_") ? g : "ROLE_"+g)
+                .map(Utils::addLeadingRole)
                 .map(g -> new SimpleGrantedAuthority(g))
                 .collect(Collectors.toList());
     }
