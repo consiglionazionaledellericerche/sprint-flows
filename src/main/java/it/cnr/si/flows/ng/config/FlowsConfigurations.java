@@ -1,6 +1,7 @@
 package it.cnr.si.flows.ng.config;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,10 +83,14 @@ public class FlowsConfigurations {
         beans.put("startAcquistiSetGroupsPrototipoSenzaAce", getStartAcquistiSetGroupsPrototipoSenzaAce());
         conf.setBeans(beans);
 
-        // configurare il font in cnr.activiti.diagram-font
-        conf.setActivityFontName(diagramFont);
-        conf.setAnnotationFontName(diagramFont);
-        conf.setLabelFontName(diagramFont);
+        // configurare il font in cnr.activiti.diagram-font, solo se e' installato
+        if ( Arrays.asList(java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames())
+                .stream()
+                .anyMatch(f -> f.equals(diagramFont))) {
+            conf.setActivityFontName(diagramFont);
+            conf.setAnnotationFontName(diagramFont);
+            conf.setLabelFontName(diagramFont);
+        }
 
         // async migliora le prestazioni, in particolare con tanti utenti
         conf.setAsyncExecutorActivate(true);
