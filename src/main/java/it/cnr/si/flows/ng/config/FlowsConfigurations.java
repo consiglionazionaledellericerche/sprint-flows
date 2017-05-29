@@ -84,9 +84,13 @@ public class FlowsConfigurations {
                 .stream()
                 .anyMatch(f -> f.equals(diagramFont))) {
             LOGGER.info("Font {} trovato, imposto per i diagrammi", diagramFont);
-            conf.setActivityFontName(diagramFont);
-            conf.setAnnotationFontName(diagramFont);
-            conf.setLabelFontName(diagramFont);
+            try {
+                conf.setActivityFontName(diagramFont);
+                conf.setAnnotationFontName(diagramFont);
+                conf.setLabelFontName(diagramFont);
+            } catch (Exception e) {
+                LOGGER.warn("Settaggio del Font {} ha dato errore", diagramFont);
+            }
         } else {
             LOGGER.warn("Font {} non trovato, torno al default", diagramFont);
         }
