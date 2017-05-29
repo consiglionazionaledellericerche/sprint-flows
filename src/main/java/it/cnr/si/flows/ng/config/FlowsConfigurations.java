@@ -57,7 +57,6 @@ public class FlowsConfigurations {
     @Autowired
     private ApplicationContext appContext;
 
-    @SuppressWarnings("serial")
     @Bean
     public SpringProcessEngineConfiguration getProcessEngineConfiguration(
             ActivitiLoggingEventListener loggingListener) {
@@ -73,10 +72,7 @@ public class FlowsConfigurations {
         conf.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
 
         // Event listeners generici
-        conf.setEventListeners(new ArrayList<ActivitiEventListener>() {{
-//            add(loggingListener); NO SPAM!!
-            add(new FlowsVisibilitySetter());
-        }});
+        conf.setEventListeners(Arrays.asList(new FlowsVisibilitySetter()));
         Map<Object, Object> beans = new HashMap<>();
         TestExecutionListener bean = appContext.getBean(TestExecutionListener.class);
         beans.put("testExecutionListener", bean);
