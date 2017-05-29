@@ -6,7 +6,7 @@
                     <uib-tab-heading>
                         <h3>
                             <i class="glyphicon glyphicon-edit"></i>
-                            Flussi attivi: {{vm.myProcessInstancesActive.total}}
+                            Flussi attivi: {{vm.myProcessInstancesActive.length}}
                         </h3>
                     </uib-tab-heading>
                 </uib-tab>
@@ -14,7 +14,7 @@
                     <uib-tab-heading>
                         <h3>
                             <i class="glyphicon glyphicon-check"></i>
-                            Flussi terminati: {{vm.myProcessInstancesTerminated.total}}
+                            Flussi terminati: {{vm.myProcessInstancesTerminated.length}}
                         </h3>
                     </uib-tab-heading>
                 </uib-tab>
@@ -27,14 +27,14 @@
             <div class="progress">
                 <uib-progress animate="false">
                     <uib-bar class="progress-bar-striped"
-                             value="100* vm.myProcessInstancesActive.total/(vm.myProcessInstancesTerminated.total+ vm.myProcessInstancesActive.total)"
+                             value="100* vm.myProcessInstancesActive.length/(vm.myProcessInstancesTerminated.length+ vm.myProcessInstancesActive.length)"
                              type="primary">
-                        <span>{{vm.myProcessInstancesActive.total}}</span>
+                        <span>{{vm.myProcessInstancesActive.length}}</span>
                     </uib-bar>
                     <uib-bar class="progress-bar-striped"
-                             value="100* vm.myProcessInstancesTerminated.total/(vm.myProcessInstancesTerminated.total+ vm.myProcessInstancesActive.total)"
+                             value="100* vm.myProcessInstancesTerminated.length/(vm.myProcessInstancesTerminated.length + vm.myProcessInstancesActive.length)"
                              type="info">
-                        <span>{{vm.myProcessInstancesTerminated.total}} </span>
+                        <span>{{vm.myProcessInstancesTerminated.length}} </span>
                     </uib-bar>
                 </uib-progress>
             </div>
@@ -63,7 +63,7 @@
                 </span>
             </h3>
             <process-list
-                    processes="vm.myProcessInstancesActive.data"
+                    processes="vm.myProcessInstancesActive"
                     paging="paging">
             </process-list>
             <!--paginazione Flussi Attivi-->
@@ -82,7 +82,7 @@
                 </span>
             </h3>
             <process-list
-                    processes="vm.myProcessInstancesTerminated.data"
+                    processes="vm.myProcessInstancesTerminated"
                     paging="paging">
             </process-list>
             <!--paginazione Flussi Terminati-->
