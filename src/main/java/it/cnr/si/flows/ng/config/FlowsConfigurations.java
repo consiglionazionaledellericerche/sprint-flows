@@ -58,8 +58,7 @@ public class FlowsConfigurations {
     private ApplicationContext appContext;
 
     @Bean
-    public SpringProcessEngineConfiguration getProcessEngineConfiguration(
-            ActivitiLoggingEventListener loggingListener) {
+    public SpringProcessEngineConfiguration getProcessEngineConfiguration() {
 
         SpringProcessEngineConfiguration conf = new SpringProcessEngineConfiguration();
 
