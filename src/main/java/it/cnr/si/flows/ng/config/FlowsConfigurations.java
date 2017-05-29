@@ -80,10 +80,10 @@ public class FlowsConfigurations {
         conf.setBeans(beans);
 
         // configurare il font in cnr.activiti.diagram-font, solo se e' installato
-        if ( Arrays.asList(java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames())
-                .stream()
-                .anyMatch(f -> f.equals(diagramFont))) {
-            LOGGER.info("Font {} trovato, imposto per i diagrammi", diagramFont);
+//        if ( Arrays.asList(java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames())
+//                .stream()
+//                .anyMatch(f -> f.equals(diagramFont))) {
+//            LOGGER.info("Font {} trovato, imposto per i diagrammi", diagramFont);
             try {
                 conf.setActivityFontName(diagramFont);
                 conf.setAnnotationFontName(diagramFont);
@@ -91,9 +91,9 @@ public class FlowsConfigurations {
             } catch (Exception e) {
                 LOGGER.warn("Settaggio del Font {} ha dato errore", diagramFont);
             }
-        } else {
-            LOGGER.warn("Font {} non trovato, torno al default", diagramFont);
-        }
+//        } else {
+//            LOGGER.warn("Font {} non trovato, torno al default", diagramFont);
+//        }
 
         // async migliora le prestazioni, in particolare con tanti utenti
         conf.setAsyncExecutorActivate(true);
