@@ -5,9 +5,9 @@
             .module('sprintApp')
             .controller('MyProcessInstancesController', MyProcessInstancesController);
 
-    MyProcessInstancesController.$inject = ['$scope', '$rootScope', 'dataService', 'paginationConstants', '$log'];
+    MyProcessInstancesController.$inject = ['$scope', '$rootScope', 'dataService', 'paginationConstants', 'utils', '$log'];
 
-    function MyProcessInstancesController($scope, $rootScope, dataService, paginationConstants, $log) {
+    function MyProcessInstancesController($scope, $rootScope, dataService, paginationConstants, utils, $log) {
         var vm = this;
 
         //variabili usate nella paginazione
@@ -34,7 +34,7 @@
 
             dataService.processInstances.myProcessInstances(true, $rootScope.current, vm.order, firstResultActive, maxResultsActive)
                     .then(function (response) {
-                        vm.myProcessInstancesActive = response.data;
+                        vm.myProcessInstancesActive = utils.refactoringVariables(response.data.data);
                         vm.totalItemsActive = response.data.total;
                         vm.queryCountActive = vm.totalItemsActive;
                     }, function (error) {
@@ -43,7 +43,7 @@
 
             dataService.processInstances.myProcessInstances(false, $rootScope.current, vm.order, firstResultTerminated, maxResultsTerminated)
                     .then(function (response) {
-                        vm.myProcessInstancesTerminated = response.data;
+                        vm.myProcessInstancesTerminated = utils.refactoringVariables(response.data.data);
                         vm.totalItemsTerminated = response.data.total;
                         vm.queryCountTerminated = vm.totalItemsTerminated;
                     }, function (response) {
