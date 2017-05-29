@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
+import it.cnr.si.flows.ng.resource.FlowsTaskResource;
+import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.service.MembershipService;
 
 @Component
@@ -30,16 +32,21 @@ public class StartAcquistiSetGroupsPrototipoSenzaAce implements ExecutionListene
 
         List<GrantedAuthority> authorities = membershipService.getAllAdditionalAuthoritiesForUser(initiator);
 
-        List<GrantedAuthority> groups = authorities.stream().filter(a -> a.getAuthority().startsWith("rt@")).collect(Collectors.toList());
+        List<String> groups = authorities.stream()
+                .map(a -> a.getAuthority())
+                .map(Utils::removeLeadingRole)
+                .filter(g -> g.startsWith("rt@"))
+                .collect(Collectors.toList());
+
         if ( groups.size() == 0 )
             throw new BpmnError("403", "L'utente non e' abilitato ad avviare questo flusso");
         else if ( groups.size() > 1 )
             throw new BpmnError("500", "L'utente appartiene a piu' di un gruppo Responsabile Tecnico");
         else {
-            GrantedAuthority groupRT = groups.get(0);
-            String struttura = groupRT.getAuthority().substring(groupRT.getAuthority().lastIndexOf('@') +1);
 
-            String gruppoRT = groupRT.getAuthority();
+            String gruppoRT = groups.get(0);
+            String struttura = gruppoRT.substring(gruppoRT.lastIndexOf('@') +1);
+
             String gruppoDirettore = "direttore@"+ struttura;
             String gruppoRA = "ra@"+ struttura;
             String gruppoSFD = "sfd@"+ struttura;

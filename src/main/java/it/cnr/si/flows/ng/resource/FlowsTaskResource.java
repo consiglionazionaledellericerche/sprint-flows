@@ -141,7 +141,7 @@ public class FlowsTaskResource {
         List<String> authorities =
                 SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .map(FlowsTaskResource::removeLeadingRole)
+                .map(Utils::removeLeadingRole)
                 .collect(Collectors.toList());
 
         TaskQuery taskQuery = taskService.createTaskQuery()
@@ -280,7 +280,7 @@ public class FlowsTaskResource {
         List<String> authorities =
                 SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .map(FlowsTaskResource::removeLeadingRole) //todo: vedere con Martin (le authorities sono ROLE_USER (come ora) o USER (come prima))
+                .map(Utils::removeLeadingRole)
                 .collect(Collectors.toList());
 
         if ( username.equals(taskService.createTaskQuery().taskId(taskId).singleResult().getAssignee()) )
@@ -435,9 +435,5 @@ public class FlowsTaskResource {
         response.setData(resultList);
 
         return ResponseEntity.ok(response);
-    }
-
-    public static String removeLeadingRole(String in) {
-        return in.startsWith("ROLE_") ? in.substring(5) : in;
     }
 }
