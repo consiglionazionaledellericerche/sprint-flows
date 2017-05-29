@@ -7,7 +7,7 @@
         Added the constraints for entity Cnrgroup.
     -->
     <changeSet id="20170220121351-2" author="jhipster">
-        
+
         <addForeignKeyConstraint baseColumnNames="cnrgroups_id"
                                  baseTableName="cnrgroup_parents"
                                  constraintName="fk_cnrgroup_parents_cnrgroups_id"
@@ -18,17 +18,6 @@
                                  constraintName="fk_cnrgroup_parents_parents_id"
                                  referencedColumnNames="id"
                                  referencedTableName="cnrgroup"/>
-        
-        <addForeignKeyConstraint baseColumnNames="cnrgroups_id"
-                                 baseTableName="cnrgroup_member_users"
-                                 constraintName="fk_cnrgroup_member_users_cnrgroups_id"
-                                 referencedColumnNames="id"
-                                 referencedTableName="cnrgroup"/>
-        <addForeignKeyConstraint baseColumnNames="member_users_id"
-                                 baseTableName="cnrgroup_member_users"
-                                 constraintName="fk_cnrgroup_member_users_member_users_id"
-                                 referencedColumnNames="id"
-                                 referencedTableName="jhi_user"/>
-        
+
     </changeSet>
 </databaseChangeLog>

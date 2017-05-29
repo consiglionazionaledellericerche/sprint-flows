@@ -4,9 +4,9 @@
     angular.module('sprintApp')
     .directive('attachments', attachmentsDirective);
 
-    attachmentsDirective.$inject = ['dataService', '$sessionStorage', '$log', '$http', '$uibModal'];
+    attachmentsDirective.$inject = ['dataService', '$sessionStorage', '$log', '$http', '$uibModal', 'utils'];
 
-    function attachmentsDirective(dataService, $sessionStorage, $log, $http, $uibModal) {
+    function attachmentsDirective(dataService, $sessionStorage, $log, $http, $uibModal, utils) {
 
         return {
             restrict: 'E',
@@ -24,13 +24,7 @@
                 });
 
                 $scope.downloadFile = function(url, filename, mimetype) {
-                    $log.info(url);
-                    $http.get(url, { responseType: 'arraybuffer' })
-                    .success(function(data) {
-                        var file = new Blob([data], { type: mimetype });
-                        $log.info(file, filename);
-                        saveAs(file, filename);
-                    });
+                    utils.downloadFile(url, filename, mimetype);
                 }
 
                 $scope.showFileHistory = function(attachmentName) {

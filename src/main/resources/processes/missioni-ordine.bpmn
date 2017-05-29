@@ -4,22 +4,22 @@
     <startEvent id="startevent1" name="Start"></startEvent>
     <userTask id="firma-uo" name="Firma UO" activiti:candidateGroups="ROLE_USER">
       <extensionElements>
-        <activiti:executionListener event="start" class="it.cnr.si.flows.ng.config.TaskGeneric"></activiti:executionListener>
+        <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
       </extensionElements>
     </userTask>
     <userTask id="firma-spesa" name="Firma Spesa" activiti:candidateGroups="ROLE_USER">
       <extensionElements>
-        <activiti:executionListener event="start" class="it.cnr.si.flows.ng.config.TaskGeneric"></activiti:executionListener>
+        <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
       </extensionElements>
     </userTask>
     <userTask id="respinto-uo" name="Respinto UO" activiti:candidateGroups="ROLE_USER">
       <extensionElements>
-        <activiti:executionListener event="start" class="it.cnr.si.flows.ng.config.TaskGeneric"></activiti:executionListener>
+        <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
       </extensionElements>
     </userTask>
     <userTask id="respinto-spesa" name="Respinto Spesa" activiti:candidateGroups="ROLE_USER">
       <extensionElements>
-        <activiti:executionListener event="start" class="it.cnr.si.flows.ng.config.TaskGeneric"></activiti:executionListener>
+        <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
       </extensionElements>
     </userTask>
     <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway" default="flow9"></exclusiveGateway>

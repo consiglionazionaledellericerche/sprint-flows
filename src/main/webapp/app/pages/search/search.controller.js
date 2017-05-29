@@ -36,13 +36,14 @@
 
 
     $scope.search = function(){
-        var fields = Array.from($("input[id^='searchFields']")), params = [], firstResult,
+        var fields = Array.from($("input[id^='searchField-']")), params = [], firstResult,
            maxResults = vm.itemsPerPage;
         firstResult = vm.itemsPerPage * (vm.page - 1)
 
         //popolo params con gli id, i valori sottomessi e il "type" dei campi di ricerca
         fields.forEach(function (field){
-            var fieldName = field.getAttribute('id').replace('searchFields.', ''), appo = {};
+            var fieldName = field.getAttribute('id').replace('searchField-', ''),
+             appo = {};
                 if(field.value  !== ""){
                     appo["key"] = fieldName;
                     appo["value"] = field.value;
@@ -52,9 +53,9 @@
         });
         var paramsJson = {"params": params};
 
-        dataService.tasks.searchTask($scope.current, vm.active, paramsJson, vm.order, firstResult, maxResults)
+        dataService.processInstances.search($scope.current, vm.active, paramsJson, vm.order, firstResult, maxResults)
             .then(function (response) {
-                vm.tasks = response.data.tasks;
+                vm.processInstances = response.data.processInstances;
                 // variabili per la gestione della paginazione
                 vm.totalItems = response.data.totalItems;
                 vm.queryCount = vm.totalItems;
@@ -62,10 +63,9 @@
                 $log.error(response);
             });
     }
-
-    //funzione richiamata quando si chiede una nuova "pagina"
-    function transition (current) {
-        $scope.search(current);
+    //funzione richiamata quando si chiede una nuova "pagina" dei risultati
+    function transition () {
+        $scope.search();
     }
   }
 })();

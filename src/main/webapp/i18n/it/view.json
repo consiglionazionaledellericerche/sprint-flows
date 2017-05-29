@@ -1,0 +1,24 @@
+{
+    "sprintApp": {
+        "view" : {
+            "home": {
+                "title": "Views",
+                "createLabel": "Genera un nuovo View",
+                "createOrEditLabel": "Genera o modifica un View",
+                "search": "Cerca View"
+            },
+            "created": "&Egrave; stato generato un nuovo View con identificatore { param }}",
+            "updated": "&Egrave; stato aggiornato View identificato da {{ param }}",
+            "deleted": "&Egrave; stato eliminato View con identificatore {{ param }}",
+            "delete": {
+                "question": "Sei sicuro di volere eliminare View {{ id }}?"
+            },
+            "detail": {
+                "title": "View"
+            },
+            "processId": "Process Id",
+            "type": "Type",
+            "view": "View"
+        }
+    }
+}

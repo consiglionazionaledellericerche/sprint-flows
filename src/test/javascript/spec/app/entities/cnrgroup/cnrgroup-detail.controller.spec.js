@@ -4,7 +4,7 @@ describe('Controller Tests', function() {
 
     describe('Cnrgroup Management Detail Controller', function() {
         var $scope, $rootScope;
-        var MockEntity, MockPreviousState, MockCnrgroup, MockUser;
+        var MockEntity, MockPreviousState, MockCnrgroup;
         var createController;
 
         beforeEach(inject(function($injector) {
@@ -13,7 +13,6 @@ describe('Controller Tests', function() {
             MockEntity = jasmine.createSpy('MockEntity');
             MockPreviousState = jasmine.createSpy('MockPreviousState');
             MockCnrgroup = jasmine.createSpy('MockCnrgroup');
-            MockUser = jasmine.createSpy('MockUser');
             
 
             var locals = {
@@ -21,8 +20,7 @@ describe('Controller Tests', function() {
                 '$rootScope': $rootScope,
                 'entity': MockEntity,
                 'previousState': MockPreviousState,
-                'Cnrgroup': MockCnrgroup,
-                'User': MockUser
+                'Cnrgroup': MockCnrgroup
             };
             createController = function() {
                 $injector.get('$controller')("CnrgroupDetailController", locals);

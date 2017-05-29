@@ -5,16 +5,15 @@
         .module('sprintApp')
         .controller('CnrgroupDialogController', CnrgroupDialogController);
 
-    CnrgroupDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'entity', 'Cnrgroup', 'User'];
+    CnrgroupDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'entity', 'Cnrgroup'];
 
-    function CnrgroupDialogController ($timeout, $scope, $stateParams, $uibModalInstance, entity, Cnrgroup, User) {
+    function CnrgroupDialogController ($timeout, $scope, $stateParams, $uibModalInstance, entity, Cnrgroup) {
         var vm = this;
 
         vm.cnrgroup = entity;
         vm.clear = clear;
         vm.save = save;
         vm.cnrgroups = Cnrgroup.query();
-        vm.users = User.query();
 
         $timeout(function (){
             angular.element('.form-group:eq(1)>input').focus();

@@ -18,8 +18,7 @@
             },
             "name": "Name",
             "displayName": "Display Name",
-            "parents": "Parents",
-            "memberUsers": "Member Users"
+            "parents": "Parents"
         }
     }
 }

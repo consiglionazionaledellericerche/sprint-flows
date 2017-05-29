@@ -1,7 +1,9 @@
 package it.cnr.si.flows.ng.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.oauth2.authserver.AuthorizationServerProperties;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -11,6 +13,8 @@ import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
+import org.springframework.security.ldap.authentication.LdapAuthenticator;
 import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
 import org.springframework.security.ldap.search.LdapUserSearch;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsManager;
@@ -19,6 +23,7 @@ import org.springframework.security.web.access.intercept.FilterSecurityIntercept
 import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
 
 import it.cnr.si.config.ldap.CustomAuthoritiesPopulator;
+import it.cnr.si.flows.ng.ldap.FlowsAuthoritiesPopulator;
 
 
 @Configuration
@@ -46,12 +51,15 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
         return new LdapUserDetailsManager(ctx);
     }
 
-    @Bean public LdapUserDetailsService getLdapUserDetailsService(LdapUserSearch search) {
-        CustomAuthoritiesPopulator cap = new CustomAuthoritiesPopulator();
-        return new LdapUserDetailsService(search, cap);
+    @Bean public LdapUserDetailsService getLdapUserDetailsService(LdapUserSearch search, FlowsAuthoritiesPopulator fap) {
+        return new LdapUserDetailsService(search, fap);
     }
 
-
+    @Bean public FlowsAuthoritiesPopulator getFlowsAuthoritiesPopulator(ApplicationContext appContext) {
+        FlowsAuthoritiesPopulator cap = new FlowsAuthoritiesPopulator();
+        appContext.getAutowireCapableBeanFactory().autowireBean(cap);
+        return cap;
+    }
 
     @Bean
     public LdapUserSearch getLdapUserSearch(Environment env, LdapContextSource ctx) {
@@ -84,8 +92,4 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
         filter.setTargetUrl("/");
         return filter;
     }
-
-
-
-
 }

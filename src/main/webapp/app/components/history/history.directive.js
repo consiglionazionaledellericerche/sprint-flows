@@ -12,19 +12,9 @@
       restrict: 'E',
       scope: {
         tasks: '=',
-        paging: '=',
-        advanced: '=',
-        detailed: '=',
-        selectProcessDefinitionKey: '=',
-        processDefinitions: '='
+        startTask: '='
       },
-      templateUrl: 'app/components/history/history.html',
-      link: function (scope, element, attrs) {
-
-        scope.$watch(attrs, function(oldValue, newValue) {
-            $log.debug('value changed from '+ oldValue +' to '+ newValue);
-        });
-      }
+      templateUrl: 'app/components/history/history.html'
     };
   }
 })();

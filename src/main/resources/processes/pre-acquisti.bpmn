@@ -3,7 +3,7 @@
   <process id="pre-acquisti" name="Pre Acquisti" isExecutable="true">
     <userTask id="visto_relazione" name="Visto Relazione" activiti:candidateGroups="ROLE_USER">
       <extensionElements>
-        <activiti:executionListener event="start" class="it.cnr.si.flows.ng.config.TaskGeneric"></activiti:executionListener>
+        <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
       </extensionElements>
     </userTask>
     <startEvent id="startevent1" name="Start"></startEvent>
@@ -12,12 +12,12 @@
     <sequenceFlow id="flow2" sourceRef="visto_relazione" targetRef="exclusivegateway1"></sequenceFlow>
     <userTask id="valida_relazione" name="Valida Relazione" activiti:candidateGroups="ROLE_USER">
       <extensionElements>
-        <activiti:executionListener event="start" class="it.cnr.si.flows.ng.config.TaskGeneric"></activiti:executionListener>
+        <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
       </extensionElements>
     </userTask>
     <userTask id="modifica_relazione" name="Modifica Relazione" activiti:candidateGroups="ROLE_USER">
       <extensionElements>
-        <activiti:executionListener event="start" class="it.cnr.si.flows.ng.config.TaskGeneric"></activiti:executionListener>
+        <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
       </extensionElements>
     </userTask>
     <endEvent id="endevent1" name="End"></endEvent>
@@ -87,7 +87,7 @@
         <omgdi:waypoint x="259.0" y="187.0"></omgdi:waypoint>
         <omgdi:waypoint x="205.0" y="187.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="212.0" y="117.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="40.0" x="212.0" y="117.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">

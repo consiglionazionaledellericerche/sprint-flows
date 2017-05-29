@@ -1,15 +1,21 @@
 package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.exception.FlowsPermissionException;
 import it.cnr.si.flows.ng.service.CounterService;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
-import it.cnr.si.repository.UserRepository;
+import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.SecurityUtils;
-import it.cnr.si.service.SecurityService;
 import it.cnr.si.service.UserService;
-import org.activiti.engine.*;
-import org.activiti.engine.impl.util.json.JSONArray;
+import org.activiti.engine.HistoryService;
+import org.activiti.engine.RepositoryService;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
+import org.activiti.engine.history.HistoricIdentityLink;
+import org.activiti.engine.history.HistoricTaskInstance;
+import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.impl.util.json.JSONObject;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -18,6 +24,7 @@ import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
+import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.task.TaskResponse;
 import org.apache.commons.io.IOUtils;
@@ -35,73 +42,44 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static it.cnr.si.flows.ng.utils.Utils.*;
-
 
 /**
  * @author mtrycz
  *
  */
 @RestController
-@RequestMapping("rest/tasks")
+@RequestMapping("api/tasks")
 public class FlowsTaskResource {
 
-    @Deprecated
-    private static final String ERRORE_PERMESSI_TASK = "ERRORE PERMESSI TASK";
-
+    private static final String TASK_EXECUTOR = "esecutore";
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsTaskResource.class);
-    private static final String ALL_PROCESS_INSTANCES = "all";
     @Autowired
     protected RestResponseFactory restResponseFactory;
-    @Inject
-    private UserRepository userRepository;
+    Utils utils = new Utils();
     @Inject
     private UserService userService;
     @Inject
     private CounterService counterService;
     @Inject
-    private SecurityService securityService;
-    @Inject
     private RepositoryService repositoryService;
     @Autowired
     private RuntimeService runtimeService;
     @Autowired
-    private IdentityService identityService;
-    @Autowired
     private TaskService taskService;
     @Autowired
-    private FormService formService;
-    @Autowired
     private FlowsAttachmentService attachmentService;
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-
-
-    public static long extractId(String id) throws IllegalArgumentException {
-        try {
-            if (id.contains("$"))
-                id = id.split("\\$")[1];
-            return Long.parseLong(id);
-
-        } catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
-            throw new IllegalArgumentException("L'id dato non è valido", e);
-        }
-    }
-
-    private static String removeLeadingRole(String s) {
-        if (s.startsWith("ROLE_"))
-            s = s.substring(5);
-        return s;
-    }
+    @Autowired
+    private HistoryService historyService;
+    @Inject
+    private FlowsAttachmentResource attachmentResource;
 
     // TODO magari un giorno avremo degli array, ma per adesso ce lo facciamo andare bene cosi'
-    public static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
+    private static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
 
         Map<String, Object> data = new HashMap<>();
 
@@ -115,53 +93,78 @@ public class FlowsTaskResource {
 
     }
 
-    @RequestMapping(value = "/mytasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/mytasks", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
-    public ResponseEntity<DataResponse> getMyTasks() {
+    public ResponseEntity<DataResponse> getMyTasks(
+            HttpServletRequest req,
+            @RequestParam("processDefinition") String processDefinition,
+            @RequestParam("firstResult") int firstResult,
+            @RequestParam("maxResults") int maxResults,
+            @RequestParam("order") String order) {
 
         String username = SecurityUtils.getCurrentUserLogin();
 
-        List<Task> listraw = taskService.createTaskQuery()
+        TaskQuery taskQuery = taskService.createTaskQuery()
                 .taskAssignee(username)
-                .includeProcessVariables()
-                .list();
+                .includeProcessVariables();
 
-        List<TaskResponse> list = restResponseFactory.createTaskResponseList(listraw);
+        if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
+            taskQuery.processDefinitionKey(processDefinition);
+
+        taskQuery = (TaskQuery) utils.searchParamsForTasks(req, taskQuery);
+
+        utils.orderTasks(order, taskQuery);
+
+        List<TaskResponse> list = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
 
         DataResponse response = new DataResponse();
-        response.setStart(0);
+        response.setStart(firstResult);
         response.setSize(list.size());
-        response.setTotal(list.size());
+        response.setTotal(taskQuery.count());
         response.setData(list);
 
         return ResponseEntity.ok(response);
     }
 
-    @RequestMapping(value = "/availabletasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/availabletasks", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
-    public ResponseEntity<DataResponse> getAvailableTasks() {
+    public ResponseEntity<DataResponse> getAvailableTasks(
+            HttpServletRequest req,
+            @RequestParam("processDefinition") String processDefinition,
+            @RequestParam("firstResult") int firstResult,
+            @RequestParam("maxResults") int maxResults,
+            @RequestParam("order") String order) {
 
         String username = SecurityUtils.getCurrentUserLogin();
         List<String> authorities =
                 SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                        .map(GrantedAuthority::getAuthority)
-//                        .map(FlowsTaskResource::removeLeadingRole) //todo: vedere con Martin (le authorities sono ROLE_USER (come ora) o USER (come prima))
-                        .collect(Collectors.toList());
+                .map(GrantedAuthority::getAuthority)
+                .map(Utils::removeLeadingRole)
+                .collect(Collectors.toList());
 
-        List<Task> listraw = taskService.createTaskQuery()
+        TaskQuery taskQuery = taskService.createTaskQuery()
                 .taskCandidateUser(username)
                 .taskCandidateGroupIn(authorities)
-                .includeProcessVariables()
-                .list();
+                .includeProcessVariables();
 
-        List<TaskResponse> list = restResponseFactory.createTaskResponseList(listraw);
+        taskQuery = (TaskQuery) utils.searchParamsForTasks(req, taskQuery);
+
+        if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
+            taskQuery.processDefinitionKey(processDefinition);
+
+        if (order.equals(ASC))
+            taskQuery.orderByTaskCreateTime().asc();
+        else if (order.equals(DESC))
+            taskQuery.orderByTaskCreateTime().desc();
+
+        List<TaskResponse> list = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
 
         DataResponse response = new DataResponse();
-        response.setStart(0);
+        response.setStart(firstResult);
         response.setSize(list.size());
-        response.setTotal(list.size());
+        response.setTotal(taskQuery.count());
         response.setData(list);
 
         return ResponseEntity.ok(response);
@@ -169,54 +172,28 @@ public class FlowsTaskResource {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<TaskResponse> getTaskInstance(
-            @PathVariable("id") String id) {
+    public ResponseEntity<Map<String, Object>> getTask(@PathVariable("id") String taskId) {
 
-        Task taskRaw = taskService.createTaskQuery().taskId(id).includeProcessVariables().singleResult();
+        Map<String, Object> response = new HashMap<>();
+        Task taskRaw = taskService.createTaskQuery().taskId(taskId).includeProcessVariables().singleResult();
 
+        // task + variables
         TaskResponse task = restResponseFactory.createTaskResponse(taskRaw);
+        response.put("task", task);
 
+        // attachments
+        ResponseEntity<List<FlowsAttachment>> attachementsEntity = attachmentResource.getAttachementsForTask(taskId);
+        Map<String, Object> attachments = new TreeMap<>();
+        attachementsEntity.getBody().stream()
+        .sorted((a1, a2) -> a1.getName().compareTo(a2.getName()))
+        .forEach(a -> {
+            a.setBytes(null);
+            attachments.put(a.getName(), a);
+        });
+        response.put("attachments", attachments);
+        response.put("attachmentsList", attachementsEntity.getBody());
 
-        return ResponseEntity.ok(task);
-        //      long taskId = extractId(id);
-        //
-        //        Task task = taskService.createTaskQuery().taskId(""+taskId).singleResult();
-        //        List<Task> tasks = taskService.createTaskQuery().processInstanceId(task.getProcessInstanceId()).list();
-        //        ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
-        //
-        //        List<Map<String, Object>> tasksMaps = tasks.stream().map(t -> mappaTaskInMap(t)).collect(Collectors.toList());
-        //
-        //        Map<String, Object> result = new HashMap<>();
-        //        Map<String, Object> definition = new HashMap<>();
-        //        definition.put("id", "cnrdsftm:validaTask");
-        //
-        //        Map<String, Object> mappaTaskInMap = mappaTaskInMap(task);
-        //        ((Map<String, Object>) mappaTaskInMap.get("entry")).put("tasks", tasksMaps);
-        //        ((Map<String, Object>) mappaTaskInMap.get("entry")).put("workflowInstance", mappaProcessInstanceInMap(pi));
-        //        ((Map<String, Object>) mappaTaskInMap.get("entry")).put("definition", definition);
-        //
-        //
-        //        result.put("data", mappaTaskInMap.get("entry"));
-        //
-        //
-        //        return new ResponseEntity<Map<String, Object>>(result, HttpStatus.OK);
-
-        //        // TODO verificare se ci possono essere parametri aggiuntivi utili//        boolean detailed = Boolean.parseBoolean(params.get("detailed"));
-        //        long taskId = Utils.extractId(id);
-        //        CMISUser user = cmisService.getCMISUserFromSession(req);
-        //        BindingSession session = cmisService.getCurrentBindingSession(req);
-        //
-        //        try {
-        //            Map<String, Object> taskInstance = flowsTaskService.getTask(user, session, taskId, detailed);
-        //            return new ResponseEntity<Map<String,Object>>(taskInstance, HttpStatus.OK);
-        //        } catch (PermissionException e) {
-        //            LOGGER.error(e.getMessage(), e);
-        //            return new ResponseEntity<Map<String,Object>>(HttpStatus.FORBIDDEN);
-        //        } catch (IOException e) {
-        //            Map<String, Object> response = new HashMap<>();
-        //            response.put("error", e.getMessage());
-        //            return new ResponseEntity<Map<String,Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        //        }
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -242,7 +219,7 @@ public class FlowsTaskResource {
                 break;
             }
         }
-        String finalGroupCandidate = groupCandidate;
+        final String finalGroupCandidate = groupCandidate;
         boolean canClaim = userService.getUserWithAuthorities().getAuthorities().stream().anyMatch(autority -> autority.getName().equals(finalGroupCandidate));
 
         if (canClaim)
@@ -272,98 +249,76 @@ public class FlowsTaskResource {
         }
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/{id}/{user}", method = RequestMethod.PUT)
     @Timed
     public ResponseEntity<Map<String, Object>> assignTask(
             HttpServletRequest req,
             @PathVariable("id") String id,
-            @RequestBody Map<String, Object> data) {
+            @PathVariable("user") String user) {
 
-        return null;
-        //        CMISUser user = cmisService.getCMISUserFromSession(req);
-        //        BindingSession session = cmisService.getCurrentBindingSession(req);
-        //        String cm_owner = (String) data.get("cm_owner");
-        //        long taskId = Utils.extractId(id);
-        //
-        //        LOGGER.info("Setting owner of task "+ id +" to "+ cm_owner);
-        //
-        //        try {
-        //            Map<String, Object> taskInstance = flowsTaskService.setTaskOwner(user, session, taskId, data);
-        //
-        //            return new ResponseEntity<Map<String,Object>>(taskInstance, HttpStatus.OK);
-        //        } catch (PermissionException e) {
-        //            LOGGER.error(e.getMessage(), e);
-        //            return new ResponseEntity<Map<String,Object>>(HttpStatus.FORBIDDEN);
-        //        } catch (IOException e) {
-        //            Map<String, Object> response = new HashMap<>();
-        //            response.put("error", e.getMessage());
-        //            return new ResponseEntity<Map<String,Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        //        }
+        //    todo: test
+        //    todo: chi può asegnare un task?
+        //        String username = SecurityUtils.getCurrentUserLogin();
+
+        taskService.setAssignee(id, user);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    // TODO returns ResponseEntity<Map<String, Object>>
-    @RequestMapping(value = "variables/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    // TODO verificare almeno che l'utente abbia i gruppi necessari
+    @RequestMapping(value = "canComplete/{taskId}/{user}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
     @Timed
-    public ResponseEntity<Map<String, Object>> getTaskVariables(
-            HttpServletRequest req,
-            HttpServletResponse resp,
-            @PathVariable("id") String id)
-            throws IOException {
+    public boolean canCompleteTask(
+            @PathVariable("taskId") String taskId,
+            @PathVariable("username") Optional<String> user) {
 
-        Map<String, Object> result = new HashMap<>();
-        Map<String, Object> list = new HashMap<>();
-        List<Map<String, Object>> entries = new ArrayList<>();
+        List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
+        String username = user.orElse(SecurityUtils.getCurrentUserLogin());
 
-        result.put("list", list);
-        list.put("entries", entries);
+        // TODO get authorities from username NOT currentuser
+        List<String> authorities =
+                SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .map(Utils::removeLeadingRole)
+                .collect(Collectors.toList());
 
-        //        taskService.getVariables(id);
-
-        return new ResponseEntity<Map<String,Object>>(result, HttpStatus.OK);
-
-        //        CMISUser user = cmisService.getCMISUserFromSession(req);
-        //        LOGGER.debug("getTaskVariables user: "+ user +", id: "+id);
-        //
-        //        try {
-        //            Map<String, Object> workflowVariables = workflowService.getTaskVariables(user, id);
-        //            JSONObject res = new JSONObject(workflowVariables);
-        //            PrintWriter writer = resp.getWriter();
-        //            writer.write(res.toString());
-        //            writer.flush();
-        //            //            return new ResponseEntity<Map<String,Object>>(workflowVariables, HttpStatus.OK);
-        //        } catch (IllegalAccessException e) {
-        //            LOGGER.info(ERRORE_PERMESSI_TASK);
-        //            LOGGER.info("L'utente ha richiesto variabili per un flusso che non deve poter vedere", e);
-        //            getVariablesOldMethod(req, resp, id);
-        //            //          return new ResponseEntity<Map<String,Object>>(HttpStatus.FORBIDDEN);// ;resp.sendError(HttpServletResponse.SC_FORBIDDEN);
-        //        } catch (WorkflowException e) {
-        //            LOGGER.info("Errore durante il recupero di un flusso", e);
-        //            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-        //            //          return new ResponseEntity<Map<String,Object>>(HttpStatus.INTERNAL_SERVER_ERROR);//resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-        //        }
+        if ( username.equals(taskService.createTaskQuery().taskId(taskId).singleResult().getAssignee()) )
+            return true;
+        else
+            return identityLinks.stream()
+                    .filter(l -> l.getType().equals("candidate"))
+                    .anyMatch(l -> authorities.contains(l.getGroupId()) );
     }
 
+    // TODO verificare almeno che l'utente abbia i gruppi necessari
     @RequestMapping(value = "complete", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<Object> completeTask(MultipartHttpServletRequest req) {
 
-        try {
-            String username = SecurityUtils.getCurrentUserLogin();
+        String username = SecurityUtils.getCurrentUserLogin();
 
+        String taskId = (String) req.getParameter("taskId");
+        String definitionId = (String) req.getParameter("processDefinitionId");
+        if ( isEmpty(taskId) && isEmpty(definitionId) )
+            return ResponseEntity.badRequest().body("{'success': false, 'message': 'Fornire almeno un taskId o un definitionId'}");
+
+        try {
             Map<String, Object> data = extractParameters(req);
             data.putAll(attachmentService.extractAttachmentsVariables(req));
 
-            String taskId = (String) req.getParameter("taskId");
-            String definitionId = (String) req.getParameter("definitionId");
-
-
-            if ( isEmpty(taskId) && isEmpty(definitionId))
-                return ResponseEntity.badRequest().body("Fornire almeno un taskId o un definitionId");
-
             if ( isNotEmpty(taskId) ) {
+                if (!canCompleteTask(taskId, Optional.of(username)))
+                    throw new FlowsPermissionException();
+
+                // aggiungo l'identityLink che indica l'utente che esegue il task
+                taskService.addUserIdentityLink(taskId, username, TASK_EXECUTOR);
+
                 taskService.setVariablesLocal(taskId, data);
                 taskService.complete(taskId, data);
-                return new ResponseEntity<Object>(HttpStatus.OK);
+
+                return new ResponseEntity<>(HttpStatus.OK);
 
             } else {
                 ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitionId).singleResult();
@@ -372,7 +327,6 @@ public class FlowsTaskResource {
                 String key =  counterId +"-"+ counterService.getNext(counterId);
 
                 data.put("title", key);
-                data.put("pippo", "pluto");
                 data.put("initiator", username);
                 data.put("startDate", new Date());
 
@@ -381,11 +335,14 @@ public class FlowsTaskResource {
                 LOGGER.debug("Avviata istanza di processo {}, id: {}", key, instance.getId());
 
                 ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
-                return new ResponseEntity<Object>(response, HttpStatus.OK);
+                return new ResponseEntity<>(response, HttpStatus.OK);
             }
         } catch (IOException e) {
             LOGGER.error("Errore nel processare i files:", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore nel processare i files");
+        } catch (FlowsPermissionException e) {
+            LOGGER.error("L'utente {} non e' abilitato a completare il task {} / avviare il flusso {}", username, taskId, definitionId);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("L'utente non e' abilitato ad eseguire l'azione richiesta");
         }
     }
 
@@ -408,74 +365,75 @@ public class FlowsTaskResource {
             @RequestParam("firstResult") int firstResult,
             @RequestParam("maxResults") int maxResults) {
 
-        String jsonString = "";
         Map<String, Object> result = new HashMap<>();
 
-        try {
-            jsonString = IOUtils.toString(req.getReader());
-        } catch (Exception e) {
-            LOGGER.error("Errore nella letture dello stream della request", e);
-        }
-        JSONArray params = new JSONObject(jsonString).getJSONArray("params");
-
-        TaskQuery taskQuery = taskService.createTaskQuery();
+        HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery();
 
         if (!processInstanceId.equals(ALL_PROCESS_INSTANCES))
             taskQuery.processDefinitionKey(processInstanceId);
 
         if (active)
-            taskQuery.active();
+            taskQuery.unfinished();
         else
-            taskQuery.suspended();
+            taskQuery.finished();
+        String jsonString = "";
 
-        for (int i = 0; i < params.length(); i++) {
-            JSONObject appo = params.optJSONObject(i);
-            String key = appo.getString("key");
-            String value = appo.getString("value");
-            String type = appo.getString("type");
-            //wildcard ("%") di default ma non a TUTTI i campi
-            switch (type) {
-                case "textEqual":
-                    taskQuery.processVariableValueEquals(key, value);
-                    break;
-                case "boolean":
-                    // gestione variabili booleane
-                    taskQuery.processVariableValueEquals(key, Boolean.valueOf(value));
-                    break;
-                case "date":
-                    processDate(taskQuery, key, value);
-                    break;
-                default:
-                    //variabili con la wildcard  (%value%)
-                    taskQuery.processVariableValueLikeIgnoreCase(key, "%" + value + "%");
-                    break;
-            }
+        try {
+            jsonString = IOUtils.toString(req.getReader());
+        } catch (Exception e) {
+            LOGGER.error(ERRORE_NELLA_LETTURE_DELLO_STREAM_DELLA_REQUEST, e);
         }
-        if (order.equals(ASC))
-            taskQuery.orderByTaskCreateTime().asc();
-        else if (order.equals(DESC))
-            taskQuery.orderByTaskCreateTime().desc();
+
+        taskQuery = (HistoricTaskInstanceQuery) utils.extractProcessSearchParams(taskQuery, new JSONObject(jsonString).getJSONArray(PROCESS_PARAMS));
+        taskQuery = (HistoricTaskInstanceQuery) utils.orderTasks(order, taskQuery);
 
         long totalItems = taskQuery.includeProcessVariables().count();
         result.put("totalItems", totalItems);
 
-        List<Task> taskRaw = taskQuery.includeProcessVariables().listPage(firstResult, maxResults);
-        List tasks = restResponseFactory.createTaskResponseList(taskRaw);
+        List<HistoricTaskInstance> taskRaw = taskQuery.includeProcessVariables().listPage(firstResult, maxResults);
+        List<HistoricTaskInstanceResponse> tasks = restResponseFactory.createHistoricTaskInstanceResponseList(taskRaw);
         result.put("tasks", tasks);
-
         return ResponseEntity.ok(result);
     }
 
-    private void processDate(TaskQuery taskQuery, String key, String value) {
-        try {
-            Date date = sdf.parse(value);
+    @RequestMapping(value = "/taskCompletedByMe", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<Object> getTasksCompletedByMe(
+            HttpServletRequest req,
+            @RequestParam("processDefinition") String processDefinition,
+            @RequestParam("firstResult") int firstResult,
+            @RequestParam("maxResults") int maxResults,
+            @RequestParam("order") String order) {
 
-            if (key.contains("Less")) {
-                taskQuery.processVariableValueLessThanOrEqual(key.replace("Less", ""), date);
-            } else if (key.contains("Great"))
-                taskQuery.processVariableValueGreaterThanOrEqual(key.replace("Great", ""), date);
-        } catch (ParseException e) {
-            LOGGER.error("Errore nel parsing della data {} - ", value, e);
+        String username = SecurityUtils.getCurrentUserLogin();
+
+        HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery().taskInvolvedUser(username)
+                .includeProcessVariables().includeTaskLocalVariables();
+
+        query = (HistoricTaskInstanceQuery) utils.searchParamsForTasks(req, query);
+
+        if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
+            query.processDefinitionKey(processDefinition);
+
+        query = (HistoricTaskInstanceQuery) utils.orderTasks(order, query);
+
+        List<HistoricTaskInstance> taskList = new ArrayList<>();
+        for (HistoricTaskInstance task : query.list()) {
+            List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForTask(task.getId());
+            for (HistoricIdentityLink hil : identityLinks) {
+                if (hil.getType().equals(TASK_EXECUTOR) && hil.getUserId().equals(username))
+                    taskList.add(task);
+            }
         }
+        List<HistoricTaskInstanceResponse> resultList = restResponseFactory.createHistoricTaskInstanceResponseList(
+                taskList.subList(firstResult, (firstResult + maxResults <= taskList.size()) ? firstResult + maxResults : taskList.size()));
+
+        DataResponse response = new DataResponse();
+        response.setStart(firstResult);
+        response.setSize(resultList.size());// numero di task restituiti
+        response.setTotal(taskList.size()); //numero totale di task avviati da me
+        response.setData(resultList);
+
+        return ResponseEntity.ok(response);
     }
 }

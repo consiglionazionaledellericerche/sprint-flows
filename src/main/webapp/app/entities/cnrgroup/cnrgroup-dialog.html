@@ -17,15 +17,15 @@
             <label class="control-label" translate="sprintApp.cnrgroup.name" for="field_name">Name</label>
             <input type="text" class="form-control" name="name" id="field_name"
                     ng-model="vm.cnrgroup.name"
-                    required ng-pattern="/^[a-zA-Z0-9_]*$/" />
+                    required ng-pattern="/^[a-zA-Z0-9_-@#]*$/" />
             <div ng-show="editForm.name.$invalid">
                 <p class="help-block"
                     ng-show="editForm.name.$error.required" translate="entity.validation.required">
                     This field is required.
                 </p>
                 <p class="help-block"
-                    ng-show="editForm.name.$error.pattern" translate="entity.validation.pattern" translate-value-pattern="^[a-zA-Z0-9_]*$">
-                    This field should follow pattern "^[a-zA-Z0-9_]*$".
+                    ng-show="editForm.name.$error.pattern" translate="entity.validation.pattern" translate-value-pattern="^[a-zA-Z0-9_-@#]*$">
+                    This field should follow pattern "^[a-zA-Z0-9_-@#]*$".
                 </p>
             </div>
         </div>
@@ -45,10 +45,6 @@
         <div class="form-group">
             <label translate="sprintApp.cnrgroup.parents" for="field_parents">Parents</label>
             <select class="form-control" id="field_parents" multiple name="parents" ng-model="vm.cnrgroup.parents" ng-options="cnrgroup as cnrgroup.name for cnrgroup in vm.cnrgroups track by cnrgroup.id"></select>
-        </div>
-        <div class="form-group">
-            <label translate="sprintApp.cnrgroup.memberUsers" for="field_memberUsers">Member Users</label>
-            <select class="form-control" id="field_memberUsers" multiple name="memberUsers" ng-model="vm.cnrgroup.memberUsers" ng-options="user as user.login for user in vm.users track by user.id"></select>
         </div>
     </div>
     <div class="modal-footer">

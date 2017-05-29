@@ -1,16 +1,16 @@
 package it.cnr.si.service;
 
-import it.cnr.si.domain.Cnrauthority;
-import it.cnr.si.repository.CnrauthorityRepository;
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
-import java.util.List;
+import it.cnr.si.domain.Cnrauthority;
+import it.cnr.si.repository.CnrauthorityRepository;
 
 /**
  * Service Implementation for managing Cnrauthority.
@@ -20,7 +20,7 @@ import java.util.List;
 public class CnrauthorityService {
 
     private final Logger log = LoggerFactory.getLogger(CnrauthorityService.class);
-    
+
     @Inject
     private CnrauthorityRepository cnrauthorityRepository;
 
@@ -38,11 +38,11 @@ public class CnrauthorityService {
 
     /**
      *  Get all the cnrauthorities.
-     *  
+     *
      *  @param pageable the pagination information
      *  @return the list of entities
      */
-    @Transactional(readOnly = true) 
+    @Transactional(readOnly = true)
     public Page<Cnrauthority> findAll(Pageable pageable) {
         log.debug("Request to get all Cnrauthorities");
         Page<Cnrauthority> result = cnrauthorityRepository.findAll(pageable);
@@ -55,7 +55,7 @@ public class CnrauthorityService {
      *  @param id the id of the entity
      *  @return the entity
      */
-    @Transactional(readOnly = true) 
+    @Transactional(readOnly = true)
     public Cnrauthority findOne(Long id) {
         log.debug("Request to get Cnrauthority : {}", id);
         Cnrauthority cnrauthority = cnrauthorityRepository.findOneWithEagerRelationships(id);

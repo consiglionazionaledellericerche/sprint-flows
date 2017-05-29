@@ -9,7 +9,6 @@ import it.cnr.si.domain.Counter;
 /**
  * Spring Data JPA repository for the Counter entity.
  */
-@SuppressWarnings("unused")
 public interface CounterRepository extends JpaRepository<Counter,Long> {
 
     @Query("SELECT c from Counter c where c.name = :name")

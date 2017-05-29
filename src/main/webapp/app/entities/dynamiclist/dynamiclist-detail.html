@@ -1,0 +1,27 @@
+
+<div>
+    <h2><span translate="sprintApp.dynamiclist.detail.title">Dynamiclist</span> {{vm.dynamiclist.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span translate="sprintApp.dynamiclist.name">Name</span></dt>
+        <dd>
+            <span>{{vm.dynamiclist.name}}</span>
+        </dd>
+        <dt><span translate="sprintApp.dynamiclist.listjson">Listjson</span></dt>
+        <dd>
+            <span>{{vm.dynamiclist.listjson}}</span>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            ui-sref="{{ vm.previousState }}"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span translate="entity.action.back"> Back</span>
+    </button>
+
+    <button type="button" ui-sref="dynamiclist-detail.edit({id:vm.dynamiclist.id})" class="btn btn-primary">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="hidden-xs hidden-sm" translate="entity.action.edit"> Edit</span>
+    </button>
+</div>

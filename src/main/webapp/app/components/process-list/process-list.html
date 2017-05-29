@@ -2,14 +2,30 @@
     <div class="row vertical-align-center" ng-repeat="process in processes">
         <div class="col-md-10">
             <a ng-href="#/details?processInstanceId={{process.id}}"
-               title="dettagli del flusso {{process.processDefinitionId}}">
+               title="dettagli del flusso {{process.id}}">
                 <small class="label"
                        ng-class="{'label-info' : process.endTime, 'label-primary' : !process.endTime}">
                     {{process.processDefinitionId}}
                 </small>
                 <br>
             </a>
-            <variables variables="selectVariables(process)" label-class="'font-italic'"></variables>
+            <div>
+                <div ng-switch on="process.variables">
+                    <div ng-switch-when-expr="process.variables.title">
+                        <strong>Titolo:</strong> {{process.variables.titoloIstanzaFlusso}}
+                                                 <!--<strong>Titolo:</strong> {{process.variables.title}}-->
+                    </div>
+                    <div ng-switch-when-expr="process.variables.startDate">
+                        <strong>Avviato il </strong> {{process.variables.startDate | date}}
+                    </div>
+                    <div ng-switch-when-expr="process.variables.initiator">
+                        <strong>Aviato da </strong> {{process.variables.initiator}}
+                    </div>
+                    <!--<div ng-switch-when-expr="process.variables.taskId">-->
+                    <!--<strong>Id del task:</strong> {{process.variables.taskId}}-->
+                    <!--</div>-->
+                </div>
+            </div>
         </div>
         <div class="col-md-2 text-right vertical-align-center">
             <div class="btn-group" role="group" aria-label="Left Align">
@@ -26,4 +42,4 @@
 <div ng-show="paging" style="text-align: center">
     <paginator paging="paging"></paginator>
 </div>
-<span ng-show="processes.length == 0">nessuna Process Instance avviata</span>
+<span ng-show="processes.length == 0">nessun Flusso</span>

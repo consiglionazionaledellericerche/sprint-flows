@@ -5,15 +5,13 @@
             <h4>
                 <i class="glyphicon glyphicon-edit"></i> flussi attivi
             </h4>
-        <small>seleziona per avere la lista completa dei flussi attivi</small>
-    </a></li>
+        </a></li>
     <li role="presentation" ng-class="{'active-info': !vm.active}">
         <a class="pointer" ng-click="showProcessInstances(false)" data-toggle="tab">
             <h4>
                 <i class="glyphicon glyphicon-check"></i> flussi completati
             </h4>
-        <small>seleziona per avere la lista completa dei flussi completati</small>
-    </a></li>
+        </a></li>
 </ul>
 <br>
 <div class="row">
@@ -32,12 +30,7 @@
 
         <br>
         <h4>Tipologie</h4>
-        <workflow-types processes="processes"
-                        prefix="'workflow'"
-                        paging="paging"
-                        metadata-fields="metadataFields"
-                        process-definitions="wfDefs">
-        </workflow-types>
+        <workflow-types process-definitions="wfDefs" filters="true"></workflow-types>
         <br>
         <br>
         <button ng-click="search()" class="btn btn-primary">Filtra</button>
@@ -46,16 +39,10 @@
 
     <div class="col-md-9">
         <h3>Flussi {{vm.active ? 'attivi' : 'completati'}}</h3>
-        <tasklist
-                tasks="vm.tasks"
-                advanced="advanced"
-                paging="paging"
-                class="tasks"
-                detailed="detailed"
-                select-process-definition-key="selectProcessDefinitionKey"
-                process-definitions="processDefinitions"
-                action-buttons="false">
-        </tasklist>
+        <process-list
+                processes="vm.processInstances"
+                paging="paging">
+        </process-list>
 
         <pre ng-show="development">
       {{workflows.data | json}}
@@ -66,6 +53,6 @@
     <div class="text-center">
         <jhi-item-count page="vm.page" total="vm.queryCount" items-per-page="vm.itemsPerPage"></jhi-item-count>
         <uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.page"
-                        ng-change="vm.transition(current)"></uib-pagination>
+                        ng-change="vm.transition()"></uib-pagination>
     </div>
 </div>

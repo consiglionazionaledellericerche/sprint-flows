@@ -8,12 +8,6 @@
             "otherEntityField": "name",
             "ownerSide": true,
             "otherEntityRelationshipName": "memberGroups"
-        },
-        {
-            "relationshipName": "memberUsers",
-            "otherEntityName": "user",
-            "relationshipType": "many-to-many",
-            "ownerSide": true
         }
     ],
     "fields": [
@@ -24,7 +18,7 @@
                 "required",
                 "pattern"
             ],
-            "fieldValidateRulesPattern": "^[a-zA-Z0-9_]*$"
+            "fieldValidateRulesPattern": "^[a-zA-Z0-9_-@#]*$"
         },
         {
             "fieldName": "displayName",

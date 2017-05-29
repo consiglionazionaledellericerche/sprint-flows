@@ -24,14 +24,14 @@
             <column name="name" type="varchar(255)">
                 <constraints nullable="false" />
             </column>
-
+            
             <column name="display_name" type="varchar(255)">
                 <constraints nullable="false" />
             </column>
-
+            
             <!-- jhipster-needle-liquibase-add-column - Jhipster will add columns here, do not remove-->
         </createTable>
-
+        
         <createTable tableName="cnrgroup_parents">
             <column name="parents_id" type="bigint">
                 <constraints nullable="false"/>
@@ -42,17 +42,6 @@
         </createTable>
 
         <addPrimaryKey columnNames="cnrgroups_id, parents_id" tableName="cnrgroup_parents"/>
-
-        <createTable tableName="cnrgroup_member_users">
-            <column name="member_users_id" type="bigint">
-                <constraints nullable="false"/>
-            </column>
-            <column name="cnrgroups_id" type="bigint">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-
-        <addPrimaryKey columnNames="cnrgroups_id, member_users_id" tableName="cnrgroup_member_users"/>
 
         <loadData encoding="UTF-8"
                   file="config/liquibase/cnrgroup.csv"

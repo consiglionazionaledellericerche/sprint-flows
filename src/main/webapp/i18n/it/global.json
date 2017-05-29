@@ -10,6 +10,9 @@
                 "cnrauthority": "Cnrauthority",
                 "form": "Form",
                 "cnrgroup": "Cnrgroup",
+                "membership": "Membership",
+                "dynamiclist": "Dynamiclist",
+                "view": "View",
                 "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
             },
             "account": {
