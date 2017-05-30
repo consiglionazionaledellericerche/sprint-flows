@@ -96,4 +96,13 @@ public class MembershipService {
         // TODO Qui inseriremo i gruppi provenienti da ACE
         return new HashSet<String>();
     }
+
+    public List<String> findMembersInGroup(String groupName) {
+
+        List<String> result = membershipRepository.findMembersInGroup(groupName);
+
+        // TODO Recuperare utenti di un gruppo ACE (quando ci sara')
+
+        return result;
+    }
 }

@@ -2,6 +2,7 @@ package it.cnr.si.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.domain.Membership;
+import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.MembershipService;
 import it.cnr.si.web.rest.util.HeaderUtil;
 import it.cnr.si.web.rest.util.PaginationUtil;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -27,10 +29,11 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping("/api")
+@Secured(AuthoritiesConstants.ADMIN)
 public class MembershipResource {
 
     private final Logger log = LoggerFactory.getLogger(MembershipResource.class);
-        
+
     @Inject
     private MembershipService membershipService;
 
@@ -135,4 +138,21 @@ public class MembershipResource {
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("membership", id.toString())).build();
     }
 
+
+    /**
+     * GET  /memberships : get all the memberships.
+     *
+     * @param pageable the pagination information
+     * @return the ResponseEntity with status 200 (OK) and the list of memberships in body
+     * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
+     */
+    @RequestMapping(value = "/members/{groupName}",
+        method = RequestMethod.GET,
+        produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<List<String>> getMembersInGroup(@PathVariable String groupName) {
+        log.debug("REST request to get Members in Group");
+        List<String> result = membershipService.findMembersInGroup(groupName);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
 }
