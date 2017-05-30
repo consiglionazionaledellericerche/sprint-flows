@@ -1,9 +1,11 @@
 FROM java:openjdk-8-jre-alpine
 
+LABEL maintainer "marcinireneusz.trycz@cnr.it"
+
 ENV JHIPSTER_SLEEP 0
 
+# Activiti genera i diagrammi, e' importante installare i font (legato ad aopplication.yml)
 RUN apk update
-RUN apk add fontconfig
 RUN apk add ttf-dejavu
 
 
