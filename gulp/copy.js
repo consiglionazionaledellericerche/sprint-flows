@@ -18,7 +18,8 @@ module.exports = {
     fonts: fonts,
     common: common,
     swagger: swagger,
-    images: images
+    images: images,
+    jstree: jstree
 }
 
 //var yorc = require('../.yo-rc.json')['generator-jhipster'];
@@ -64,6 +65,12 @@ function fonts() {
         }))
         .pipe(gulp.dest(config.dist))
     );
+}
+
+function jstree() {
+    return gulp.src(config.bower + 'bootstrap-jstree-theme/dist/themes/bootstrap/*.{png,gif}')
+        .pipe(plumber({errorHandler: handleErrors}))
+        .pipe(gulp.dest(config.dist + 'content/css/'));
 }
 
 function common() {
