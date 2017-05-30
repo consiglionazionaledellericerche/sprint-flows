@@ -48,7 +48,9 @@ public class TestUtil {
     public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(
             MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
-    public static final String TITOLO_DELL_ISTANZA_DEL_FLUSSO = "titolo dell'istanza del flusso";
+
+    public static final String TITOLO_DELL_ISTANZA_DEL_FLUSSO = "titolo dell'istanza del flusso JUnit";
+
     @Autowired
     FlowsProcessInstanceResource flowsProcessInstanceResource;
     @Autowired
@@ -125,7 +127,7 @@ public class TestUtil {
         loginAdmin();
         DataResponse ret = (DataResponse) flowsProcessDefinitionResource.getAllProcessDefinitions();
 
-        ArrayList<ProcessDefinitionResponse> processDefinitions = (ArrayList) ret.getData();
+        ArrayList<ProcessDefinitionResponse> processDefinitions = (ArrayList<ProcessDefinitionResponse>) ret.getData();
         for (ProcessDefinitionResponse pd : processDefinitions) {
             if (pd.getId().contains(processDefinitionKey)) {
                 processDefinition = pd.getId();
