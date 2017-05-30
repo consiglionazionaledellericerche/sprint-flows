@@ -3,13 +3,13 @@
     <li role="presentation" ng-class="{'active': vm.active}">
         <a class="pointer" ng-click="showProcessInstances(true)" data-toggle="tab">
             <h4>
-                <i class="glyphicon glyphicon-edit"></i> flussi attivi
+                <i class="glyphicon glyphicon-edit"></i> Flussi attivi
             </h4>
         </a></li>
     <li role="presentation" ng-class="{'active-info': !vm.active}">
         <a class="pointer" ng-click="showProcessInstances(false)" data-toggle="tab">
             <h4>
-                <i class="glyphicon glyphicon-check"></i> flussi completati
+                <i class="glyphicon glyphicon-check"></i> Flussi terminati
             </h4>
         </a></li>
 </ul>
@@ -38,7 +38,7 @@
 
 
     <div class="col-md-9">
-        <h3>Flussi {{vm.active ? 'attivi' : 'completati'}}</h3>
+        <h3>Flussi {{vm.active ? 'attivi' : 'terminati'}}</h3>
         <process-list
                 processes="vm.processInstances"
                 paging="paging">

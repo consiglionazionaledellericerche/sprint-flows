@@ -1,25 +1,15 @@
 package it.cnr.si.flows.ng.resource;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
-
+import com.codahale.metrics.annotation.Timed;
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.security.AuthoritiesConstants;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
-import org.activiti.rest.service.api.runtime.task.TaskResource;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -29,10 +19,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.codahale.metrics.annotation.Timed;
-
-import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.security.AuthoritiesConstants;
+import javax.inject.Inject;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("api/attachments")
@@ -54,7 +49,7 @@ public class FlowsAttachmentResource {
     public ResponseEntity<List<FlowsAttachment>> getAttachementsForProcessInstance(
             @PathVariable("processInstanceId") String processInstanceId) {
 
-        Map<String, Object> processVariables = runtimeService.createProcessInstanceQuery()
+        Map<String, Object> processVariables = historyService.createHistoricProcessInstanceQuery()
                 .processInstanceId(processInstanceId)
                 .includeProcessVariables()
                 .singleResult()
