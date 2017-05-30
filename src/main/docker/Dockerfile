@@ -2,6 +2,11 @@ FROM java:openjdk-8-jre-alpine
 
 ENV JHIPSTER_SLEEP 0
 
+RUN apk update
+RUN apk add fontconfig
+RUN apk add ttf-dejavu
+
+
 # add directly the war
 ADD *.war /app.war
 
