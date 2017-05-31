@@ -90,7 +90,7 @@ jhipster:
         licenseUrl:
 cnr:
     activiti:
-        diagram-font: Open Sans
+        diagram-font: DejaVu Sans
 
 cache.hazelcast.port: 5504
 ajp.port: 8010
