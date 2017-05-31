@@ -1,3 +1,7 @@
 id;username;groupname
 1;admin;sisinfo_direttore
 2;marcinireneusz.trycz;sisinfo_segreteria
+3;responsabileacquisti;ra@sisinfo
+4;responsabiletecnico;rt@sisinfo
+5;direttore;direttore@sisinfo
+6;supportofunzionidirigenziali;sfd@sisinfo
