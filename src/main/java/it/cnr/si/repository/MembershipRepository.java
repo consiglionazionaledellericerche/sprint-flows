@@ -17,4 +17,7 @@ public interface MembershipRepository extends JpaRepository<Membership,Long> {
 
     @Query("select groupname from Membership membership where membership.username =:username")
     Set<String> findGroupsForUsername(@Param("username") String username);
+
+    @Query("select username from Membership membership where membership.groupname =:groupname")
+    List<String> findMembersInGroup(@Param("groupname") String groupname);
 }

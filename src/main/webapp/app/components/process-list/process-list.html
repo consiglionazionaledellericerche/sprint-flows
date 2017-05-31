@@ -10,20 +10,17 @@
                 <br>
             </a>
             <div>
-                <div ng-switch on="process.variables">
-                    <div ng-switch-when-expr="process.variables.title">
-                        <strong>Titolo:</strong> {{process.variables.titoloIstanzaFlusso}}
-                                                 <!--<strong>Titolo:</strong> {{process.variables.title}}-->
-                    </div>
-                    <div ng-switch-when-expr="process.variables.startDate">
-                        <strong>Avviato il </strong> {{process.variables.startDate | date}}
-                    </div>
-                    <div ng-switch-when-expr="process.variables.initiator">
-                        <strong>Aviato da </strong> {{process.variables.initiator}}
-                    </div>
-                    <!--<div ng-switch-when-expr="process.variables.taskId">-->
-                    <!--<strong>Id del task:</strong> {{process.variables.taskId}}-->
-                    <!--</div>-->
+                <div ng-show="process.variabili.title">
+                    <strong>Identificativo flusso:</strong> {{process.variabili.title}} <br>
+                </div>
+                <div ng-show="process.variabili.startDate">
+                    <strong>Avviato il </strong> {{process.variabili.startDate | date}} <br>
+                </div>
+                <div ng-show="process.variabili.initiator">
+                    <strong>Aviato da </strong> {{process.variabili.initiator}} <br>
+                </div>
+                <div ng-show="process.variabili.taskId">
+                    <strong>Id del compito in esecuzione:</strong> {{process.variabili.taskId}} <br>
                 </div>
             </div>
         </div>

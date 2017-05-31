@@ -15,7 +15,7 @@
             <strong>Scelta utente:</strong> {{task.variabili.sceltaUtente}} <br>
         </div>
         <div ng-show="task.endTime">
-            <strong>Task completato il </strong>{{task.endTime | date}}
+            <strong>Compito completato il </strong>{{task.endTime | date}}
         </div>
         <div ng-show="advanced">
             <ng-include src="task.searchView"/>
@@ -43,4 +43,4 @@
     <div class="loading-spiner spinner-loader"></div>
 </div>
 
-<span ng-show="tasks.length == 0">nessun Task</span>
+<span ng-show="tasks.length == 0">nessun Compito</span>
