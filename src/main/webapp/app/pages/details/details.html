@@ -52,6 +52,9 @@
 
     <div class="col-md-4">
       <button class="btn btn-default btn-block" ng-hide="chronology" ng-click="chronology = true"><span class="glyphicon glyphicon-time"></span> Visualizza Cronologia</button>
+        <button class="btn btn-default btn-block" ng-hide="!chronology" ng-click="chronology = false"><span
+                class="glyphicon glyphicon-time"></span> Nascondi la cronologia Cronologia
+        </button>
         <div ng-if="chronology">
           <history tasks="vm.data.history" start-task="vm.data.startEvent"></history>
         </div>
