@@ -17,6 +17,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
@@ -42,7 +43,8 @@ import it.cnr.si.repository.FormRepository;
  * @see FormResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = FlowsApp.class)
+@Ignore
 public class FormResourceIntTest {
     private static final String DEFAULT_PROCESS_DEFINITION_KEY = "AAAAA";
     private static final String UPDATED_PROCESS_DEFINITION_KEY = "BBBBB";
