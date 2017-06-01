@@ -43,15 +43,16 @@
         </span>
       </span>
       </div>
-
-      <div class="row text-center">
-        <h3>{{vm.data.entity.processDefinitionKey}} ({{vm.data.entity.processDefinitionId}})</h3>
-        <p class="text-muted">{{vm.definition.description}}</p>
-        <img class="img-bordered" ng-src='/rest/diagram/processInstance/{{vm.data.entity.id}}' title="{{vm.data.entity.processDefinitionKey}}" style="max-width: 100%" />
-      </div>
     </div>
 
     <div class="col-md-4">
+      <div class="row text-center">
+        <a ng-click="openDiagramModal('/rest/diagram/processInstance/'+ vm.data.entity.id)">
+          <img class="img-bordered" ng-src='/rest/diagram/processInstance/{{vm.data.entity.id}}' title="{{vm.data.entity.processDefinitionKey}}" style="max-width: 100%" />
+        </a>
+      </div>
+      <hr>
+
       <button class="btn btn-default btn-block" ng-hide="chronology" ng-click="chronology = true"><span class="glyphicon glyphicon-time"></span> Visualizza Cronologia</button>
         <button class="btn btn-default btn-block" ng-hide="!chronology" ng-click="chronology = false"><span
                 class="glyphicon glyphicon-time"></span> Nascondi la cronologia Cronologia

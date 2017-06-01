@@ -18,14 +18,19 @@
             // jhipster-needle-angularjs-add-module JHipster will add new module here
             'angular-loading-bar',
             'ui.ace',
-            'ngJsTree'
+            'ngJsTree',
+            'bootstrapLightbox'
         ])
         .run(run);
 
-    run.$inject = ['stateHandler', 'translationHandler'];
+    run.$inject = ['stateHandler', 'translationHandler', '$rootScope', 'Lightbox'];
 
-    function run(stateHandler, translationHandler) {
+    function run(stateHandler, translationHandler, $rootScope, Lightbox) {
         stateHandler.initialize();
         translationHandler.initialize();
+
+        $rootScope.openDiagramModal = function(url) {
+            Lightbox.openModal([url], 0);
+        }
     }
 })();

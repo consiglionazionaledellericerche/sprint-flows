@@ -4,9 +4,11 @@
   <div class="row text-center" ng-if="vm.taskId">
     <h3>{{vm.definition.name}}</h3>
     <p class="text-muted">{{vm.definition.description}}</p>
-    <div class="col-xs-4">
-      <img class="img-bordered" ng-src='{{vm.diagramUrl}}' title="{{vm.definition.name}}" style="max-width: 100%" />
-    </div>
+    <a ng-click="openDiagramModal(vm.diagramUrl)">
+      <div class="col-xs-4">
+        <img class="img-bordered" ng-src='{{vm.diagramUrl}}' title="{{vm.definition.name}}" style="max-width: 100%" />
+      </div>
+    </a>
     <div class="col-xs-4">
       Metadati
     </div>
