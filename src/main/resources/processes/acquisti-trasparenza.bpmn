@@ -177,9 +177,15 @@
       <sequenceFlow id="flow140" sourceRef="exclusivegateway26" targetRef="verifica-requisiti"></sequenceFlow>
       <sequenceFlow id="flow141" sourceRef="verifica-requisiti" targetRef="exclusivegateway27"></sequenceFlow>
       <sequenceFlow id="flow142" sourceRef="exclusivegateway27" targetRef="endevent4">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${verificheRequisitiid == '1'}]]></conditionExpression>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Invia'}]]></conditionExpression>
       </sequenceFlow>
       <sequenceFlow id="flow143" sourceRef="exclusivegateway27" targetRef="predisposizione-provvedimento-aggiudicazione"></sequenceFlow>
+      <sequenceFlow id="flow144" sourceRef="exclusivegateway27" targetRef="endevent19">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaConProvvedimento'}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="flow145" sourceRef="exclusivegateway27" targetRef="endevent7">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaSemplice'}]]></conditionExpression>
+      </sequenceFlow>
     </subProcess>
     <subProcess id="REVOCA" name="REVOCA">
       <startEvent id="startevent7" name="Start"></startEvent>
@@ -478,7 +484,7 @@
         <omgdc:Bounds height="89.0" width="105.0" x="591.0" y="437.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="endevent4" id="BPMNShape_endevent4">
-        <omgdc:Bounds height="35.0" width="35.0" x="893.0" y="464.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="836.0" y="464.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="revoca-proposta-aggiudicazione" id="BPMNShape_revoca-proposta-aggiudicazione">
         <omgdc:Bounds height="81.0" width="105.0" x="683.0" y="350.0"></omgdc:Bounds>
@@ -493,22 +499,22 @@
         <omgdc:Bounds height="81.0" width="105.0" x="293.0" y="350.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="endevent7" id="BPMNShape_endevent7">
-        <omgdc:Bounds height="35.0" width="35.0" x="893.0" y="373.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="923.0" y="373.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="firma-provvedimento-aggiudicazione" id="BPMNShape_firma-provvedimento-aggiudicazione">
         <omgdc:Bounds height="81.0" width="105.0" x="490.0" y="350.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="endevent19" id="BPMNShape_endevent19">
-        <omgdc:Bounds height="35.0" width="35.0" x="836.0" y="422.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="893.0" y="437.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="exclusivegateway26" id="BPMNShape_exclusivegateway26">
         <omgdc:Bounds height="40.0" width="40.0" x="723.0" y="461.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="verifica-requisiti" id="BPMNShape_verifica-requisiti">
-        <omgdc:Bounds height="67.0" width="105.0" x="769.0" y="496.0"></omgdc:Bounds>
+        <omgdc:Bounds height="67.0" width="105.0" x="763.0" y="512.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="exclusivegateway27" id="BPMNShape_exclusivegateway27">
-        <omgdc:Bounds height="40.0" width="40.0" x="890.0" y="512.0"></omgdc:Bounds>
+        <omgdc:Bounds height="40.0" width="40.0" x="890.0" y="525.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="REVOCA" id="BPMNShape_REVOCA">
         <omgdc:Bounds height="195.0" width="508.0" x="119.0" y="1040.0"></omgdc:Bounds>
@@ -714,7 +720,7 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow48" id="BPMNEdge_flow48">
         <omgdi:waypoint x="873.0" y="390.0"></omgdi:waypoint>
-        <omgdi:waypoint x="893.0" y="390.0"></omgdi:waypoint>
+        <omgdi:waypoint x="923.0" y="390.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow52" id="BPMNEdge_flow52">
         <omgdi:waypoint x="663.0" y="390.0"></omgdi:waypoint>
@@ -743,7 +749,7 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow131" id="BPMNEdge_flow131">
         <omgdi:waypoint x="853.0" y="410.0"></omgdi:waypoint>
-        <omgdi:waypoint x="853.0" y="422.0"></omgdi:waypoint>
+        <omgdi:waypoint x="910.0" y="437.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow137" id="BPMNEdge_flow137">
         <omgdi:waypoint x="696.0" y="481.0"></omgdi:waypoint>
@@ -751,7 +757,7 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow138" id="BPMNEdge_flow138">
         <omgdi:waypoint x="763.0" y="481.0"></omgdi:waypoint>
-        <omgdi:waypoint x="893.0" y="481.0"></omgdi:waypoint>
+        <omgdi:waypoint x="836.0" y="481.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow53" id="BPMNEdge_flow53">
         <omgdi:waypoint x="643.0" y="410.0"></omgdi:waypoint>
@@ -759,22 +765,31 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow140" id="BPMNEdge_flow140">
         <omgdi:waypoint x="743.0" y="501.0"></omgdi:waypoint>
-        <omgdi:waypoint x="742.0" y="528.0"></omgdi:waypoint>
-        <omgdi:waypoint x="769.0" y="529.0"></omgdi:waypoint>
+        <omgdi:waypoint x="742.0" y="544.0"></omgdi:waypoint>
+        <omgdi:waypoint x="763.0" y="545.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow141" id="BPMNEdge_flow141">
-        <omgdi:waypoint x="874.0" y="529.0"></omgdi:waypoint>
-        <omgdi:waypoint x="890.0" y="532.0"></omgdi:waypoint>
+        <omgdi:waypoint x="868.0" y="545.0"></omgdi:waypoint>
+        <omgdi:waypoint x="890.0" y="545.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow142" id="BPMNEdge_flow142">
-        <omgdi:waypoint x="910.0" y="512.0"></omgdi:waypoint>
-        <omgdi:waypoint x="910.0" y="499.0"></omgdi:waypoint>
+        <omgdi:waypoint x="910.0" y="525.0"></omgdi:waypoint>
+        <omgdi:waypoint x="853.0" y="499.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow143" id="BPMNEdge_flow143">
-        <omgdi:waypoint x="910.0" y="552.0"></omgdi:waypoint>
+        <omgdi:waypoint x="910.0" y="565.0"></omgdi:waypoint>
         <omgdi:waypoint x="910.0" y="581.0"></omgdi:waypoint>
         <omgdi:waypoint x="222.0" y="581.0"></omgdi:waypoint>
         <omgdi:waypoint x="222.0" y="431.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow144" id="BPMNEdge_flow144">
+        <omgdi:waypoint x="910.0" y="525.0"></omgdi:waypoint>
+        <omgdi:waypoint x="910.0" y="472.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow145" id="BPMNEdge_flow145">
+        <omgdi:waypoint x="930.0" y="545.0"></omgdi:waypoint>
+        <omgdi:waypoint x="940.0" y="544.0"></omgdi:waypoint>
+        <omgdi:waypoint x="940.0" y="408.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow39" id="BPMNEdge_flow39">
         <omgdi:waypoint x="314.0" y="1099.0"></omgdi:waypoint>
