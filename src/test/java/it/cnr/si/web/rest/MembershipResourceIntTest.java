@@ -7,6 +7,7 @@ import it.cnr.si.repository.MembershipRepository;
 import it.cnr.si.service.MembershipService;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.hamcrest.Matchers.hasItem;
@@ -37,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = SprintApp.class)
+@Ignore
 public class MembershipResourceIntTest {
     private static final String DEFAULT_USERNAME = "AAAAA";
     private static final String UPDATED_USERNAME = "BBBBB";

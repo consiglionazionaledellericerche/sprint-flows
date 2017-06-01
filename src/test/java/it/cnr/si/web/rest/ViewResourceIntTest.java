@@ -6,6 +6,7 @@ import it.cnr.si.flows.ng.TestUtil;
 import it.cnr.si.repository.ViewRepository;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.hamcrest.Matchers.hasItem;
@@ -36,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = SprintApp.class)
+@Ignore
 public class ViewResourceIntTest {
     private static final String DEFAULT_PROCESS_ID = "AAAAA";
     private static final String UPDATED_PROCESS_ID = "BBBBB";
