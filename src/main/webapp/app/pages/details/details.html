@@ -23,14 +23,22 @@
         {{vm.data.entity.activityId}}
         <br>
       </span>
+
       <ul class="list-unstyled">
         <ng-include src="vm.detailsView" />
       </ul>
 
       <attachments />
 
+      <div has-authority="ROLE_ADMIN">
+        <h4>Tutte le variabili</h4>
+        <ul>
+          <li ng-repeat="metadatum in vm.data.entity.variables">{{metadatum.name}}: {{metadatum.value}}</li>
+        </ul>
+      </div>
+
         <!-- <identity-links></identity-links> -->
-      <div ng-if="isAdmin">
+      <div has-authority="ROLE_ADMIN">
           <h4>Identity Links</h4>
           <span ng-repeat="(taskId, link) in vm.data.identityLinks">
         TaskId -
