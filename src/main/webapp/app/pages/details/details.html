@@ -3,10 +3,12 @@
   <div class="row">
     <div class="col-md-8">
 
-      <h4>{{vm.data.entity.title ? vm.data.entity.title : vm.data.entity.variabili.title}}</h4>
-      <br>
+      <h4>{{vm.data.entity.title ? vm.data.entity.title : vm.data.entity.variabili.title}}
+        <span ng-class="{'label-warning': !vm.data.entity.completed , 'label-success': vm.data.entity.completed }" class="label">
+          {{!vm.data.entity.completed ? 'attivo' : 'completato'}}
+        </span>
+      </h4>
 
-      <span ng-class="{'label-warning': !vm.data.entity.completed , 'label-success': vm.data.entity.completed }" class="label">{{!vm.data.entity.completed ? 'attivo' : 'completato'}}</span>
       <b>Avviato da: </b>
         {{vm.data.entity.variabili.initiator}} il {{vm.data.entity.variabili.startDate | date}}
       <br>

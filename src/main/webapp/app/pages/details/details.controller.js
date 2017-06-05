@@ -5,9 +5,9 @@
     .module('sprintApp')
     .controller('DetailsController', DetailsController);
 
-    DetailsController.$inject = ['$scope', '$state', 'dataService', '$log', 'utils', '$uibModal', '$window'];
+    DetailsController.$inject = ['$scope', '$state', 'dataService', '$log', 'utils', '$uibModal', '$window', 'Lightbox'];
 
-    function DetailsController ($scope, $state, dataService, $log, utils, $uibModal, $window) {
+    function DetailsController ($scope, $state, dataService, $log, utils, $uibModal, $window, Lightbox) {
         var vm = this;
         vm.data = {};
         vm.taskId = $state.params.taskId;
@@ -28,6 +28,10 @@
                         vm.detailsView = 'api/views/'+ processDefinitionId +'/detail';
 
                     });
+        }
+
+        $scope.openDiagramModal = function() {
+            Lightbox.openModal(['/rest/diagram/processInstance/'+vm.data.entity.id], 0);
         }
     }
 })();
