@@ -16,7 +16,9 @@ public class FlowsAttachment implements Serializable {
         Validato,
         Protocollato,
         Firmato,
-        Controfirmato
+        Controfirmato,
+        Annullato,
+        Sostituito
     }
 
     public enum Azione {
@@ -26,7 +28,9 @@ public class FlowsAttachment implements Serializable {
         Controfirma,
         Pubblicazione,
         Protocollo,
-        Validazione
+        Validazione,
+        Annullo,
+        Sostituzione
     }
 
     private static final long serialVersionUID = -1794306306586001492L;
@@ -131,6 +135,18 @@ private String name;
             this.getMetadati().put("stati", new ArrayList<Stato>());
 
         ((List<Stato>) this.getMetadati().get("stati")).add(s);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public void removeStato(Stato s) {
+        if (this.getMetadati().get("stati") == null)
+            this.getMetadati().put("stati", new ArrayList<Stato>());
+        List<Stato> stato = (List<Stato>) this.getMetadati().get("stati");
+        stato.remove(s);       
+    }
+
+    public void clearStato() {
+        this.getMetadati().put("stati", new ArrayList<Stato>());
     }
 
     public void setAzione(Azione a) {
