@@ -13,11 +13,14 @@
                 <div ng-show="process.variabili.title">
                     <strong>Identificativo flusso:</strong> {{process.variabili.title}} <br>
                 </div>
-                <div ng-show="process.variabili.startDate">
-                    <strong>Avviato il </strong> {{process.variabili.startDate | date}} <br>
+                <div ng-show="process.variabili.titoloIstanzaFlusso">
+                    <strong>Titolo flusso:</strong> {{process.variabili.titoloIstanzaFlusso}} <br>
                 </div>
-                <div ng-show="process.variabili.initiator">
-                    <strong>Aviato da </strong> {{process.variabili.initiator}} <br>
+                <div ng-show="process.variabili.startDate">
+                    <strong>Avviato da </strong>
+                    <em> {{process.variabili.initiator}} </em>
+                    <strong> il </strong>
+                    <em>{{process.variabili.startDate | date}}</em> <br>
                 </div>
                 <div ng-show="process.variabili.taskId">
                     <strong>Id del compito in esecuzione:</strong> {{process.variabili.taskId}} <br>
