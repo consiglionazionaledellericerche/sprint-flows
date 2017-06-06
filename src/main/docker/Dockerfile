@@ -10,7 +10,7 @@ RUN apk add ttf-dejavu
 
 
 # add directly the war
-ADD *.war /app.war
+ADD app.war /app.war
 
 RUN sh -c 'touch /app.war'
 VOLUME /tmp
