@@ -12,8 +12,8 @@
         vm.data = {};
         vm.taskId = $state.params.taskId;
         vm.data.processDefinitionId = $state.params.processDefinitionId;
-        var processDefinitionKey = vm.data.processDefinitionId.split(":")[0];
-        var processVersion       = vm.data.processDefinitionId.split(":")[1];
+        vm.processDefinitionKey = vm.data.processDefinitionId.split(":")[0];
+        vm.processVersion       = vm.data.processDefinitionId.split(":")[1];
 
         // Ho bisogno di caricare piu' risorse contemporaneamente (form e data);
         // quando sono finite entrambe, autofillo la form
@@ -27,7 +27,6 @@
                     vm.data[el.id] = vm.taskVariables[el.id];
             });
         });
-
 
         if ($state.params.taskId) {
             dataService.tasks.getTask($state.params.taskId).then(
@@ -45,7 +44,7 @@
             dataPromise.reject("");
 
             vm.diagramUrl = "/rest/diagram/processDefinition/" + $state.params.processDefinitionId;
-            vm.formUrl = 'api/forms/'+ processDefinitionKey + "/" + processVersion + "/" + $state.params.taskName
+            vm.formUrl = 'api/forms/'+ vm.processDefinitionKey + "/" + vm.processVersion + "/" + $state.params.taskName
         }
 
         $scope.submitTask = function(file) {
@@ -70,6 +69,5 @@
         $scope.downloadFile = function(url, filename, mimetype) {
             utils.downloadFile(url, filename, mimetype);
         }
-
     }
 })();

@@ -36,7 +36,7 @@
                 $rootScope.$broadcast('impersonationSuccess');
                 Principal.authenticate(null);
                 Principal.identity(true).then(function(account) {
-                    $state.go('home');
+                    $state.reload();
                 });
             }, function(response) {
                 vm.impersonationError = true;

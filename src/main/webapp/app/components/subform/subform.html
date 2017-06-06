@@ -1,0 +1,16 @@
+<fieldset>
+  <legend>{{label}}<span class="glyphicon glyphicon-question-sign" ng-show="item.placeholder" data-toggle="tooltip" data-placement="top" title="{{item.placeholder}}"></span>
+    <span class="pull-right" ng-if="multiple">
+      <button type="button" class="btn btn-success btn-xs"  ng-click="addRow()">
+        <span class="glyphicon glyphicon-plus"></span>
+      </button>
+      <button type="button" class="btn btn-danger btn-xs" ng-click="removeRow()">
+        <span class="glyphicon glyphicon-minus"></span>
+      </button>
+    </span>
+  </legend>
+  <div ng-repeat="row in ngModel track by $index">
+    <ng-include src="subform.formUrl" />
+    <hr>
+  </div>
+</fieldset>

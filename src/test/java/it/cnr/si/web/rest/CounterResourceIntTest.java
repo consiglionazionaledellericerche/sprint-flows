@@ -17,6 +17,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
@@ -45,7 +46,8 @@ import it.cnr.si.repository.CounterRepository;
  * @see CounterResource
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = FlowsApp.class)
+@Ignore
 public class CounterResourceIntTest {
     private static final String DEFAULT_NAME = "AAAAA";
     private static final String UPDATED_NAME = "BBBBB";

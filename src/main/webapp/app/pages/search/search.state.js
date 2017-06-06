@@ -12,7 +12,7 @@
             parent: 'app',
             url: '/search?',
             data: {
-                authorities: ['ROLE_USER'] //todo: solo per ROLE_ADMIN?
+                authorities: ['ROLE_USER']
             },
             views: {
                 'content@': {

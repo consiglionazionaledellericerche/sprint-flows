@@ -56,7 +56,6 @@
                     <span class="hidden-sm">Flussi avviati da me</span>
                 </a>
             </li>
-            <!--todo: solo per ROLE_ADMIN?-->
             <li ui-sref-active="active" has-authority="ROLE_USER">
                 <a ui-sref="search" ng-click="vm.collapseNavbar()">
                     <span class="glyphicon glyphicon-search"></span>
@@ -215,10 +214,16 @@
                             <span translate="global.menu.admin.database">Database</span>
                         </a>
                     </li>
-                    <li ng-hide="vm.inProduction">
+                    <li ui-sref-active="active">
                         <a ui-sref="activeFlows" ng-click="vm.collapseNavbar()">
                             <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
                             <span translate="global.menu.admin.activeFlows">Flussi Attivi</span>
+                        </a>
+                    </li>
+                    <li ui-sref-active="active">
+                        <a ui-sref="manageprocessdefinitions" ng-click="vm.collapseNavbar()">
+                            <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
+                            <span>Gestisci Process Definition</span>
                         </a>
                     </li>
                     <!-- jhipster-needle-add-element-to-admin-menu - JHipster will add entities to the admin menu here -->

@@ -35,7 +35,7 @@ public class StartAcquistiSetGroupsPrototipoSenzaAce implements ExecutionListene
         List<String> groups = authorities.stream()
                 .map(a -> a.getAuthority())
                 .map(Utils::removeLeadingRole)
-                .filter(g -> g.startsWith("rt@"))
+                .filter(g -> g.startsWith("ra@"))
                 .collect(Collectors.toList());
 
         if ( groups.size() == 0 )

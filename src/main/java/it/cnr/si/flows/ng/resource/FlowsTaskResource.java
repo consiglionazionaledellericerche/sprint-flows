@@ -8,9 +8,11 @@ import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.SecurityUtils;
-import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.UserService;
-import org.activiti.engine.*;
+import org.activiti.engine.HistoryService;
+import org.activiti.engine.RepositoryService;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
@@ -154,9 +156,9 @@ public class FlowsTaskResource {
         String username = SecurityUtils.getCurrentUserLogin();
         List<String> authorities =
                 SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .map(Utils::removeLeadingRole)
-                        .collect(Collectors.toList());
+                .map(GrantedAuthority::getAuthority)
+                .map(Utils::removeLeadingRole)
+                .collect(Collectors.toList());
 
         TaskQuery taskQuery = taskService.createTaskQuery()
                 .taskCandidateUser(username)
@@ -186,74 +188,6 @@ public class FlowsTaskResource {
         return ResponseEntity.ok(response);
     }
 
-
-    @RequestMapping(value = "/taskAssignedInMyGroups", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured(AuthoritiesConstants.USER)
-    @Timed
-    public ResponseEntity<DataResponse> taskAssignedInMyGroups(
-            HttpServletRequest req,
-            @RequestParam("processDefinition") String processDefinition,
-            @RequestParam("firstResult") int firstResult,
-            @RequestParam("maxResults") int maxResults,
-            @RequestParam("order") String order) {
-
-        String username = SecurityUtils.getCurrentUserLogin();
-
-        TaskQuery taskQuery = (TaskQuery) utils.searchParamsForTasks(req, taskService.createTaskQuery().includeProcessVariables());
-
-        if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
-            taskQuery.processDefinitionKey(processDefinition);
-
-
-        utils.orderTasks(order, taskQuery);
-
-        //filtro (in "members") gli utenti che appartengono agli stessi gruppi dell'utente loggato
-        List<String> myGroups = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .map(Utils::removeLeadingRole)
-                .collect(Collectors.toList());
-        List<String> members = new ArrayList();
-        for (String myGroup : myGroups) {
-            List<String> userWithMyMembership = membershipService.findMembersInGroup(myGroup);
-            userWithMyMembership.remove(username);
-            members.addAll(userWithMyMembership);
-        }
-////PROCEDIMENTO DI SELEZIONE NORMALE (NON FUNZIONA QUINDI VIENE FATTO A MANO)
-//        // verifico che i task siano assegnati ALMENO ad uno dei "members"
-//        taskQuery.or();
-//        for(int i = 0; i < members.size() - 1; i++){
-//            taskQuery = taskQuery
-////                    .or()
-//                    .taskAssignee(members.get(i));
-////                    .endOr();
-//        }
-//        taskQuery = taskQuery
-////                .or()
-//                .taskAssignee(members.get(members.size() - 1))
-//                .endOr();
-
-//        List<TaskResponse> list = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
-
-        List<TaskResponse> appo = restResponseFactory.createTaskResponseList(taskQuery.list());
-        List<TaskResponse> list = new ArrayList<>();
-
-        for (TaskResponse task : appo) {
-            if (members.contains(task.getAssignee())) {
-                list.add(task);
-            }
-        }
-        List<TaskResponse> responseList = list.subList(firstResult <= list.size() ? firstResult : list.size(),
-                                                       maxResults <= list.size() ? maxResults : list.size());
-
-        DataResponse response = new DataResponse();
-        response.setStart(firstResult);
-        response.setSize(responseList.size());
-        response.setTotal(list.size());
-        response.setData(responseList);
-
-        return ResponseEntity.ok(response);
-    }
-
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<Map<String, Object>> getTask(@PathVariable("id") String taskId) {
@@ -269,11 +203,11 @@ public class FlowsTaskResource {
         ResponseEntity<List<FlowsAttachment>> attachementsEntity = attachmentResource.getAttachementsForTask(taskId);
         Map<String, Object> attachments = new TreeMap<>();
         attachementsEntity.getBody().stream()
-                .sorted((a1, a2) -> a1.getName().compareTo(a2.getName()))
-                .forEach(a -> {
-                    a.setBytes(null);
-                    attachments.put(a.getName(), a);
-                });
+        .sorted((a1, a2) -> a1.getName().compareTo(a2.getName()))
+        .forEach(a -> {
+            a.setBytes(null);
+            attachments.put(a.getName(), a);
+        });
         response.put("attachments", attachments);
         response.put("attachmentsList", attachementsEntity.getBody());
 
@@ -363,9 +297,9 @@ public class FlowsTaskResource {
         // TODO get authorities from username NOT currentuser
         List<String> authorities =
                 SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .map(Utils::removeLeadingRole)
-                        .collect(Collectors.toList());
+                .map(GrantedAuthority::getAuthority)
+                .map(Utils::removeLeadingRole)
+                .collect(Collectors.toList());
 
         if ( username.equals(taskService.createTaskQuery().taskId(taskId).singleResult().getAssignee()) )
             return true;

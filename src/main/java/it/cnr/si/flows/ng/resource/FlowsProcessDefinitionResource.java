@@ -34,6 +34,7 @@ public class FlowsProcessDefinitionResource {
     @RequestMapping(value = "/all", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
+    // TODO refactor
     public Object getAllProcessDefinitions() {
 
         List<ProcessDefinition> listraw = repositoryService.createProcessDefinitionQuery().latestVersion().list();

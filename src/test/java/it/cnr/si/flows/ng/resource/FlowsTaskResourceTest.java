@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
@@ -33,8 +34,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = FlowsApp.class)
-@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
+@SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 public class FlowsTaskResourceTest {
 
     public static final String TASK_NAME = "Firma UO";

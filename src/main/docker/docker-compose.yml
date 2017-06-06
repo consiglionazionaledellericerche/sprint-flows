@@ -1,7 +1,7 @@
 version: '2'
 services:
     sprint-flows-test:
-        image: sprint-flows-test
+        image: docker.si.cnr.it/sprint-flows-test
         external_links:
             - sprint-flows-test-pg:postgresql
         environment:
