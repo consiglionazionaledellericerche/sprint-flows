@@ -8,6 +8,7 @@ import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.SecurityUtils;
+import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.UserService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
@@ -61,6 +62,8 @@ public class FlowsTaskResource {
     @Autowired
     protected RestResponseFactory restResponseFactory;
     Utils utils = new Utils();
+    @Autowired
+    MembershipService membershipService;
     @Inject
     private UserService userService;
     @Inject
@@ -163,6 +166,74 @@ public class FlowsTaskResource {
         response.setSize(list.size());
         response.setTotal(taskQuery.count());
         response.setData(list);
+
+        return ResponseEntity.ok(response);
+    }
+
+
+    @RequestMapping(value = "/taskAssignedInMyGroups", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
+    @Timed
+    public ResponseEntity<DataResponse> taskAssignedInMyGroups(
+            HttpServletRequest req,
+            @RequestParam("processDefinition") String processDefinition,
+            @RequestParam("firstResult") int firstResult,
+            @RequestParam("maxResults") int maxResults,
+            @RequestParam("order") String order) {
+
+        String username = SecurityUtils.getCurrentUserLogin();
+
+        TaskQuery taskQuery = (TaskQuery) utils.searchParamsForTasks(req, taskService.createTaskQuery().includeProcessVariables());
+
+        if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
+            taskQuery.processDefinitionKey(processDefinition);
+
+
+        utils.orderTasks(order, taskQuery);
+
+        //filtro (in "members") gli utenti che appartengono agli stessi gruppi dell'utente loggato
+        List<String> myGroups = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .map(Utils::removeLeadingRole)
+                .collect(Collectors.toList());
+        List<String> members = new ArrayList();
+        for (String myGroup : myGroups) {
+            List<String> userWithMyMembership = membershipService.findMembersInGroup(myGroup);
+            userWithMyMembership.remove(username);
+            members.addAll(userWithMyMembership);
+        }
+////PROCEDIMENTO DI SELEZIONE NORMALE (NON FUNZIONA QUINDI VIENE FATTO A MANO)
+//        // verifico che i task siano assegnati ALMENO ad uno dei "members"
+//        taskQuery.or();
+//        for(int i = 0; i < members.size() - 1; i++){
+//            taskQuery = taskQuery
+////                    .or()
+//                    .taskAssignee(members.get(i));
+////                    .endOr();
+//        }
+//        taskQuery = taskQuery
+////                .or()
+//                .taskAssignee(members.get(members.size() - 1))
+//                .endOr();
+
+//        List<TaskResponse> list = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
+
+        List<TaskResponse> appo = restResponseFactory.createTaskResponseList(taskQuery.list());
+        List<TaskResponse> list = new ArrayList<>();
+
+        for (TaskResponse task : appo) {
+            if (members.contains(task.getAssignee())) {
+                list.add(task);
+            }
+        }
+        List<TaskResponse> responseList = list.subList(firstResult <= list.size() ? firstResult : list.size(),
+                                                       maxResults <= list.size() ? maxResults : list.size());
+
+        DataResponse response = new DataResponse();
+        response.setStart(firstResult);
+        response.setSize(responseList.size());
+        response.setTotal(list.size());
+        response.setData(responseList);
 
         return ResponseEntity.ok(response);
     }
