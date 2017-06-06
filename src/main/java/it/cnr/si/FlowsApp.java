@@ -25,7 +25,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import it.cnr.si.config.Constants;
 import it.cnr.si.config.DefaultProfileUtil;
@@ -48,6 +50,7 @@ import it.cnr.si.config.JHipsterProperties;
         SprintApp.class
 })
 @EnableConfigurationProperties({ JHipsterProperties.class, LiquibaseProperties.class })
+@EnableAspectJAutoProxy(proxyTargetClass=true)
 public class FlowsApp {
 
     private static final Logger log = LoggerFactory.getLogger(FlowsApp.class);

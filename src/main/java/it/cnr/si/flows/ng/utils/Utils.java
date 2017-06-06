@@ -258,8 +258,8 @@ public final class Utils {
         return getStatus(parseInt(errCode));
     }
 
-    public static Object mapOf(String key, String value) {
-        HashMap<String, String> result = new HashMap<>();
+    public static HashMap<String, Object> mapOf(String key, String value) {
+        HashMap<String, Object> result = new HashMap<>();
         result.put(key, value);
         return result;
     }

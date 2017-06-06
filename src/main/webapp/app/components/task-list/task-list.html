@@ -1,14 +1,16 @@
 <div class="row vertical-align-center well" ng-class="{'row-slim': !advanced}" ng-repeat="task in tasks">
     <div class="col-md-9">
         <strong>{{task.variabili.title}}</strong> <br>
-        Flusso avviato da <em>{{task.variabili.initiator}}</em> il <em>{{task.variabili.startDate | date}}</em>
-
+        <strong>Flusso avviato da</strong>
+        <em>{{task.variabili.initiator}}</em>
+        <strong>il</strong>
+        <em>{{task.variabili.startDate | date}}</em>
         <span ng-bind-html="task.priority | priority"></span>
         <div ng-show="task.variabili.titoloIstanzaFlusso">
             <strong>Titolo:</strong> {{task.variabili.titoloIstanzaFlusso}} <br>
         </div>
         <div ng-show="task.name">
-            <strong>Fase:</strong> {{task.name}}</span> <br>
+            <strong>Stato:</strong> {{task.name}}</span> <br>
         </div>
 
         <div ng-show="task.variabili.sceltaUtente">
@@ -28,11 +30,11 @@
                ui-sref="details({processInstanceId: task.processInstanceId, taskId: task.id})">
                 <span class="glyphicon glyphicon-th-list"></span> Dettagli Flusso
             </a>
-            <a class="btn btn-default" ng-class="{'btn-xs': !advanced}" ng-if="task.assignee !== null&&actionButtons"
+            <a class="btn btn-default" ng-class="{'btn-xs': !advanced}" ng-if="actionButtons && task.assignee !== null"
                ng-click="claimTask(task.id, false)">
                 <span class="glyphicon glyphicon-hand-down" aria-hidden="true"></span> Restituisci al gruppo
             </a>
-            <a class="btn btn-default" ng-class="{'btn-xs': !advanced}" ng-if="task.assignee === null&&actionButtons"
+            <a class="btn btn-default" ng-class="{'btn-xs': !advanced}" ng-if="actionButtons && task.assignee === null"
                ng-click="claimTask(task.id, true)">
                 <span class="glyphicon glyphicon-hand-up" aria-hidden="true"></span> Prendi in carico
             </a>

@@ -7,13 +7,15 @@ import it.cnr.si.flows.ng.service.CounterService;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.security.FlowsUserDetailsService;
 import it.cnr.si.security.SecurityUtils;
+import it.cnr.si.security.UserDetailsService;
+import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.UserService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
-import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
@@ -44,7 +46,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -62,9 +63,13 @@ public class FlowsTaskResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsTaskResource.class);
     @Autowired
     protected RestResponseFactory restResponseFactory;
-    Utils utils = new Utils();
-    @Inject
-    private UserService userService;
+
+    private Utils utils = new Utils();
+
+    @Autowired
+    private MembershipService membershipService;
+    @Autowired
+    private FlowsUserDetailsService flowsUserDetailsService;
     @Inject
     private CounterService counterService;
     @Inject
@@ -156,10 +161,7 @@ public class FlowsTaskResource {
         if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
             taskQuery.processDefinitionKey(processDefinition);
 
-        if (order.equals(ASC))
-            taskQuery.orderByTaskCreateTime().asc();
-        else if (order.equals(DESC))
-            taskQuery.orderByTaskCreateTime().desc();
+        utils.orderTasks(order, taskQuery);
 
         List<TaskResponse> list = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
 
@@ -168,6 +170,74 @@ public class FlowsTaskResource {
         response.setSize(list.size());
         response.setTotal(taskQuery.count());
         response.setData(list);
+
+        return ResponseEntity.ok(response);
+    }
+
+
+    @RequestMapping(value = "/taskAssignedInMyGroups", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
+    @Timed
+    public ResponseEntity<DataResponse> taskAssignedInMyGroups(
+            HttpServletRequest req,
+            @RequestParam("processDefinition") String processDefinition,
+            @RequestParam("firstResult") int firstResult,
+            @RequestParam("maxResults") int maxResults,
+            @RequestParam("order") String order) {
+
+        String username = SecurityUtils.getCurrentUserLogin();
+
+        TaskQuery taskQuery = (TaskQuery) utils.searchParamsForTasks(req, taskService.createTaskQuery().includeProcessVariables());
+
+        if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
+            taskQuery.processDefinitionKey(processDefinition);
+
+
+        utils.orderTasks(order, taskQuery);
+
+        //filtro (in "members") gli utenti che appartengono agli stessi gruppi dell'utente loggato
+        List<String> myGroups = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .map(Utils::removeLeadingRole)
+                .collect(Collectors.toList());
+        List<String> members = new ArrayList<>();
+        for (String myGroup : myGroups) {
+            List<String> userWithMyMembership = membershipService.findMembersInGroup(myGroup);
+            userWithMyMembership.remove(username);
+            members.addAll(userWithMyMembership);
+        }
+        ////PROCEDIMENTO DI SELEZIONE NORMALE (NON FUNZIONA QUINDI VIENE FATTO A MANO)
+        //        // verifico che i task siano assegnati ALMENO ad uno dei "members"
+        //        taskQuery.or();
+        //        for(int i = 0; i < members.size() - 1; i++){
+        //            taskQuery = taskQuery
+        ////                    .or()
+        //                    .taskAssignee(members.get(i));
+        ////                    .endOr();
+        //        }
+        //        taskQuery = taskQuery
+        ////                .or()
+        //                .taskAssignee(members.get(members.size() - 1))
+        //                .endOr();
+
+        //        List<TaskResponse> list = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
+
+        List<TaskResponse> appo = restResponseFactory.createTaskResponseList(taskQuery.list());
+        List<TaskResponse> list = new ArrayList<>();
+
+        for (TaskResponse task : appo) {
+            if (members.contains(task.getAssignee())) {
+                list.add(task);
+            }
+        }
+        List<TaskResponse> responseList = list.subList(firstResult <= list.size() ? firstResult : list.size(),
+                maxResults <= list.size() ? maxResults : list.size());
+
+        DataResponse response = new DataResponse();
+        response.setStart(firstResult);
+        response.setSize(responseList.size());
+        response.setTotal(list.size());
+        response.setData(responseList);
 
         return ResponseEntity.ok(response);
     }
@@ -206,37 +276,44 @@ public class FlowsTaskResource {
      */
     @RequestMapping(value = "/claim/{taskId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Map<String, Object>> claimTask(
-            HttpServletRequest req,
-            @PathVariable("taskId") String taskId) {
+    public ResponseEntity<Map<String, Object>> claimTask(@PathVariable("taskId") String taskId) {
 
         String username = SecurityUtils.getCurrentUserLogin();
-        LOGGER.info("Setting owner of task {} to {}", taskId, username);
+        LOGGER.info("Do in carico il task {} a {}", taskId, username);
 
-        List<IdentityLink> list = taskService.getIdentityLinksForTask(taskId);
-        String groupCandidate = null;
-        for (IdentityLink link : list) {
-            if (link.getType().equals("candidate")) {
-                groupCandidate = link.getGroupId();
-                break;
+        String assignee = taskService.createTaskQuery()
+                .taskId(taskId)
+                .singleResult().getAssignee();
+
+        if (assignee != null) {
+            LOGGER.error("L'utente {} ha tentato di prendere in carico il  task {}, ma il task e' gia' in carico ad altri", username, taskId);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("message", "Il task e' gia' in carico ad altri"));
+
+        } else {
+            List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
+            List<String> authorities =
+                    flowsUserDetailsService.loadUserByUsername(username).getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .map(Utils::removeLeadingRole)
+                    .collect(Collectors.toList());
+
+            boolean isInCandidates = identityLinks.stream()
+                    .filter(l -> l.getType().equals("candidate"))
+                    .anyMatch(l -> authorities.contains(l.getGroupId()) );
+
+            if (isInCandidates) {
+                taskService.claim(taskId, username);
+                return new ResponseEntity<Map<String,Object>>(HttpStatus.OK);
+            } else {
+                LOGGER.error("L'utente {} ha tentato di prendere in carico il  task {}", username, taskId);
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("message", "L'utente non e' abilitato ad eseguire l'azione richiesta"));
             }
         }
-        final String finalGroupCandidate = groupCandidate;
-        boolean canClaim = userService.getUserWithAuthorities().getAuthorities().stream().anyMatch(autority -> autority.getName().equals(finalGroupCandidate));
-
-        if (canClaim)
-            taskService.claim(taskId, username);
-        else
-            return new ResponseEntity<Map<String, Object>>(HttpStatus.FORBIDDEN);
-
-        return new ResponseEntity<Map<String,Object>>(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/claim/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Map<String, Object>> unclaimTask(
-            HttpServletRequest req,
-            @PathVariable("id") String id) {
+    public ResponseEntity<Map<String, Object>> unclaimTask(@PathVariable("id") String id) {
 
         String username = SecurityUtils.getCurrentUserLogin();
         String assignee = taskService.createTaskQuery()
@@ -267,7 +344,6 @@ public class FlowsTaskResource {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    // TODO verificare almeno che l'utente abbia i gruppi necessari
     @RequestMapping(value = "canComplete/{taskId}/{user}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
@@ -275,22 +351,28 @@ public class FlowsTaskResource {
             @PathVariable("taskId") String taskId,
             @PathVariable("username") Optional<String> user) {
 
-        List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
         String username = user.orElse(SecurityUtils.getCurrentUserLogin());
+        String assignee = taskService.createTaskQuery()
+                .taskId(taskId)
+                .singleResult().getAssignee();
 
-        // TODO get authorities from username NOT currentuser
-        List<String> authorities =
-                SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .map(Utils::removeLeadingRole)
-                .collect(Collectors.toList());
+        if (assignee != null) {
+            // Se un assegnatario c'e', l'utente puo' completare il task se e' lui l'assegnatario
+            return assignee.equals(username);
 
-        if ( username.equals(taskService.createTaskQuery().taskId(taskId).singleResult().getAssignee()) )
-            return true;
-        else
+        } else {
+            // Se l'assegnatario non c'e', L'utente deve essere nei gruppi candidati
+            List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
+            List<String> authorities =
+                    flowsUserDetailsService.loadUserByUsername(username).getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .map(Utils::removeLeadingRole)
+                    .collect(Collectors.toList());
+
             return identityLinks.stream()
                     .filter(l -> l.getType().equals("candidate"))
                     .anyMatch(l -> authorities.contains(l.getGroupId()) );
+        }
     }
 
     // TODO verificare almeno che l'utente abbia i gruppi necessari
@@ -339,21 +421,12 @@ public class FlowsTaskResource {
                 ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
                 return new ResponseEntity<>(response, HttpStatus.OK);
             }
-
-        } catch (BpmnError e) {
-            LOGGER.error("L'utente {} ha cercato di a completare il task {} / avviare il flusso {}, ma c'e' stato un errore: {}", username, taskId, definitionId, e.getMessage());
-            return ResponseEntity.status(Utils.getStatus(e.getErrorCode())).body(Utils.mapOf("message", e.getMessage()));
         } catch (IOException e) {
             LOGGER.error("Errore nel processare i files:", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore nel processare i files");
         } catch (FlowsPermissionException e) {
             LOGGER.error("L'utente {} non e' abilitato a completare il task {} / avviare il flusso {}", username, taskId, definitionId);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("L'utente non e' abilitato ad eseguire l'azione richiesta");
-        } catch (Exception e) {
-            // catch all con info per il debug
-            long rif = Instant.now().toEpochMilli();
-            LOGGER.error("(Riferimento "+ rif +") Errore non gestito con messaggio "+ e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore non gestito. Contattare gli amminstratori specificando il numero di riferimento: "+ rif);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("message", "L'utente non e' abilitato ad eseguire l'azione richiesta"));
         }
     }
 

@@ -76,9 +76,7 @@
                                 ng-change="vm.transition(current)"></uib-pagination>
             </div>
 
-            <pre ng-show="development">
-              {{vm.taskCompletedForMe | json}}
-            </pre>
+            <pre ng-if="global.ribbon.dev">{{vm.taskCompletedForMe | json}}</pre>
         </div>
     </div>
 </div>
