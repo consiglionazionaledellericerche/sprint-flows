@@ -67,7 +67,7 @@ public class FlowsTaskResourceTest {
         ArrayList myTasks = (ArrayList) response.getBody().getData();
         assertEquals(0, myTasks.size());
 
-        flowsTaskResource.claimTask(new MockHttpServletRequest(), util.getFirstTaskId());
+        flowsTaskResource.claimTask(util.getFirstTaskId());
 
         MockHttpServletRequest request = new MockHttpServletRequest();
         String content = "{\"processParams\":" +
@@ -85,7 +85,7 @@ public class FlowsTaskResourceTest {
         verifyBadSearchParams(request);
 
         //verifico che non prenda nessun risultato ( DOPO CHE IL TASK VIENE DISASSEGNATO)
-        flowsTaskResource.unclaimTask(new MockHttpServletRequest(), util.getFirstTaskId());
+        flowsTaskResource.unclaimTask(util.getFirstTaskId());
 
         assertEquals(OK, response.getStatusCode());
         assertEquals(0, response.getBody().getSize());
@@ -164,13 +164,13 @@ public class FlowsTaskResourceTest {
         processInstance = util.mySetUp("missioni");
 //      admin ha ROLE_ADMIN E ROLE_USER quindi può richiamare il metodo
         util.loginAdmin();
-        ResponseEntity<Map<String, Object>> response = flowsTaskResource.claimTask(new MockHttpServletRequest(), util.getFirstTaskId());
+        ResponseEntity<Map<String, Object>> response = flowsTaskResource.claimTask(util.getFirstTaskId());
         assertEquals(OK, response.getStatusCode());
         util.logout();
 
 //      spaclient ha solo ROLE_ADMIN quindi NON può richiamare il metodo
         util.loginSpaclient();
-        response = flowsTaskResource.claimTask(new MockHttpServletRequest(), util.getFirstTaskId());
+        response = flowsTaskResource.claimTask(util.getFirstTaskId());
         assertEquals(FORBIDDEN, response.getStatusCode());
     }
 

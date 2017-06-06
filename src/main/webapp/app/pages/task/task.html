@@ -30,21 +30,22 @@
         <input type="hidden" name="taskId" value="{{vm.data.taskId}}" />
         <input type="hidden" name="processDefinitionId" value="{{vm.data.processDefinitionId}}" />
 
-        <ng-include src="vm.formUrl" onload="autofill()" />
+        <ng-include src="vm.formUrl" onload="autofill()" ></ng-include>
+
         <hr>
 
         <div class="row">
           <div class="col-md-12">
             <div class="btn-group btn-group-justified" role="group">
-                <div class="btn-group" role="group">
-                  <button class="btn btn-primary" back><span class="glyphicon glyphicon-arrow-left"></span> Ritorna</button>
-                </div>
-                <div class="btn-group" role="group">
-                  <button class="btn btn-primary" type="reset"><span class="glyphicon glyphicon-refresh"> Reimposta</button>
-                </div>
-                <div class="btn-group" role="group">
-                  <button class="btn btn-primary" type="submit" ng-disabled="taskForm.$invalid">{{ vm.taskId ? "Invia" : "Avvia Flusso"}} <span class="glyphicon glyphicon-arrow-right"></span></button>
-                </div>
+              <div class="btn-group" role="group">
+                <button class="btn btn-primary" back><span class="glyphicon glyphicon-arrow-left"></span> Ritorna</button>
+              </div>
+              <div class="btn-group" role="group">
+                <button class="btn btn-primary" type="reset"><span class="glyphicon glyphicon-refresh"> Reimposta</button>
+              </div>
+              <div class="btn-group" role="group">
+                <button class="btn btn-primary" type="submit" ng-disabled="taskForm.$invalid">{{ vm.taskId ? "Invia" : "Avvia Flusso"}} <span class="glyphicon glyphicon-arrow-right"></span></button>
+              </div>
             </div>
           </div>
         </div>
@@ -53,5 +54,5 @@
   </div>
   <hr>
 <!--   <pre>{{taskForm | json}}</pre> -->
-  <pre>{{vm | json}}</pre>
+  <pre ng-if="global.ribbon.dev">{{vm | json}}</pre>
 </div>

@@ -5,7 +5,7 @@
                 <uib-tab index="0" select="setActiveContent('myTasks')">
                     <uib-tab-heading>
                         <h3>
-                            <i class=" glyphicon glyphicon-edit"></i>
+                            <i class=" glyphicon glyphicon-inbox"></i>
                             Compiti assegnati a me: {{vm.myTasks.total}}
                         </h3>
                     </uib-tab-heading>
@@ -13,16 +13,16 @@
                 <uib-tab index="1" classes="available" select="setActiveContent('availables')">
                     <uib-tab-heading>
                         <h3>
-                            <i class="glyphicon glyphicon-check"></i>
+                            <i class="glyphicon glyphicon-user"></i>
                             Compiti di gruppo <br> da prendere in carico: {{vm.availableTasks.total}}
                         </h3>
                     </uib-tab-heading>
                 </uib-tab>
                 </uib-tab>
-                <uib-tab index="1" classes="available" select="setActiveContent('taskAssignedInMyGroups')">
+                <uib-tab index="2" classes="available" select="setActiveContent('taskAssignedInMyGroups')">
                     <uib-tab-heading>
                         <h3>
-                            <i class="glyphicon glyphicon-check"></i>
+                            <i class="glyphicon glyphicon-tasks"></i>
                             Compiti di gruppo presi <br> in carico da altri: {{vm.taskAssignedInMyGroups.total}}
                         </h3>
                     </uib-tab-heading>
@@ -91,11 +91,11 @@
         <div class="col-md-9" ng-show="vm.activeContent == 'myTasks'">
             <h3>
         <span class="label label-primary" class="assegnatiAMe">
-          <i class="glyphicon-inbox"></i>
+          <i class="glyphicon glyphicon-inbox"></i>
           Lista dei compiti assegnati a me
         </span>
             </h3>
-            <task-list tasks="vm.myTasks.data"></task-list>
+            <task-list tasks="vm.myTasks.data" action-buttons="true"></task-list>
 
             <!--paginazione myTasks-->
             <div class="text-center">
@@ -142,8 +142,6 @@
             </div>
         </div>
     </div>
-    <pre ng-show="development">
-  {{tasks | json}}
-</pre>
-    <pre>{{vm | json}}</pre>
+    <pre ng-if="global.ribbon.dev">{{tasks | json}}</pre>
+    <pre ng-if="global.ribbon.dev">{{vm | json}}</pre>
 </div>

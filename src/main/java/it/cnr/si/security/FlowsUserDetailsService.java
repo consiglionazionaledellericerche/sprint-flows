@@ -29,9 +29,9 @@ import it.cnr.si.service.MembershipService;
  */
 @Component("flowsUserDetailsService")
 @Primary
-public class FlowsUserDetailsService extends UserDetailsService {
+public class FlowsUserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
 
-    private final Logger log = LoggerFactory.getLogger(UserDetailsService.class);
+    private final Logger log = LoggerFactory.getLogger(FlowsUserDetailsService.class);
 
     @Inject
     private UserRepository userRepository;

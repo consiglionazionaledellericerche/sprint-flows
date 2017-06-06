@@ -4,9 +4,9 @@
   angular.module('sprintApp')
   .directive('taskList', taskListDirective);
 
-  taskListDirective.$inject = ['dataService', '$log'];
+  taskListDirective.$inject = ['dataService', '$log', 'AlertService'];
 
-  function taskListDirective(dataService, $log) {
+  function taskListDirective(dataService, $log, AlertService) {
 
     return {
       restrict: 'E',
@@ -24,10 +24,13 @@
 
         scope.claimTask = function (taskId, take) {
           var user;
-          dataService.tasks.claim(taskId, take).success(function (data) {
+          dataService.tasks.claim(taskId, take).then(function (data) {
             $log.debug(data);
             scope.pooled[taskId] = user !== undefined;
             scope.$parent.loadTasks();
+          }, function (err) {
+            $log.error(err);
+            AlertService.error("Richiesta non riuscita<br>"+ err.data.message);
           });
         };
       }
