@@ -14,12 +14,14 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 public final class Utils {
@@ -233,5 +235,32 @@ public final class Utils {
 
     public static String addLeadingRole(String in) {
         return in.startsWith("ROLE_") ? in : "ROLE_"+ in;
+    }
+
+    public static Integer parseInt(String in) {
+        try {
+            return Integer.parseInt(in);
+        } catch (Exception e) {
+            return null;
+        }
+
+    }
+
+    public static HttpStatus getStatus(Integer errCode) {
+        try {
+            return HttpStatus.valueOf(errCode);
+        } catch (Exception e) {
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+    }
+
+    public static HttpStatus getStatus(String errCode) {
+        return getStatus(parseInt(errCode));
+    }
+
+    public static Object mapOf(String key, String value) {
+        HashMap<String, String> result = new HashMap<>();
+        result.put(key, value);
+        return result;
     }
 }

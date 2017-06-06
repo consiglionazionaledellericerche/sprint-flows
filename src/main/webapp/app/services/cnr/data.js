@@ -54,6 +54,12 @@
                 '&firstResult=' + firstResult +
                 '&maxResults=' + maxResults +
                 '&order=' + order, params);
+        },
+        taskAssignedInMyGroups: function (processDefinition, firstResult, maxResults, order, params) {
+            return $http.post('api/tasks/taskAssignedInMyGroups?processDefinition=' + (processDefinition ? processDefinition.key : 'all') +
+                '&firstResult=' + firstResult +
+                '&maxResults=' + maxResults +
+                '&order=' + order, params);
         }
       },
       processInstances: {
