@@ -13,7 +13,6 @@ import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
-import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
@@ -44,7 +43,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -156,10 +154,7 @@ public class FlowsTaskResource {
         if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
             taskQuery.processDefinitionKey(processDefinition);
 
-        if (order.equals(ASC))
-            taskQuery.orderByTaskCreateTime().asc();
-        else if (order.equals(DESC))
-            taskQuery.orderByTaskCreateTime().desc();
+        utils.orderTasks(order, taskQuery);
 
         List<TaskResponse> list = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
 
@@ -339,21 +334,12 @@ public class FlowsTaskResource {
                 ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
                 return new ResponseEntity<>(response, HttpStatus.OK);
             }
-
-        } catch (BpmnError e) {
-            LOGGER.error("L'utente {} ha cercato di a completare il task {} / avviare il flusso {}, ma c'e' stato un errore: {}", username, taskId, definitionId, e.getMessage());
-            return ResponseEntity.status(Utils.getStatus(e.getErrorCode())).body(Utils.mapOf("message", e.getMessage()));
         } catch (IOException e) {
             LOGGER.error("Errore nel processare i files:", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore nel processare i files");
         } catch (FlowsPermissionException e) {
             LOGGER.error("L'utente {} non e' abilitato a completare il task {} / avviare il flusso {}", username, taskId, definitionId);
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("L'utente non e' abilitato ad eseguire l'azione richiesta");
-        } catch (Exception e) {
-            // catch all con info per il debug
-            long rif = Instant.now().toEpochMilli();
-            LOGGER.error("(Riferimento "+ rif +") Errore non gestito con messaggio "+ e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore non gestito. Contattare gli amminstratori specificando il numero di riferimento: "+ rif);
         }
     }
 

@@ -153,6 +153,13 @@ public class FlowsTaskResourceTest {
     }
 
     @Test
+    @Ignore
+    public void testTaskAssignedInMyGroups() {
+        //TODO: Test goes here...
+//        flowsTaskResource.taskAssignedInMyGroups();
+    }
+
+    @Test
     public void testClaimTask() {
         processInstance = util.mySetUp("missioni");
 //      admin ha ROLE_ADMIN E ROLE_USER quindi può richiamare il metodo

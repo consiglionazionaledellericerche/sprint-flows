@@ -11,13 +11,17 @@
         var vm = this;
         vm.order = 'ASC';
         //variabili per la paginazione delle due pagine (availableTask e myTask)
-        vm.availablePage = 1;
         vm.myPage = 1;
+        vm.availablePage = 1;
+        vm.TAIMGPage = 1;
         // JSON che conterrà i risultati delle due query
         vm.myTasks = {
             total: 0
         };
         vm.availableTasks = {
+            total: 0
+        };
+        vm.taskAssignedInMyGroups = {
             total: 0
         };
 
@@ -59,8 +63,26 @@
                 }, function(response) {
                     $log.error(response);
                 });
+        };
 
 
+        $scope.loadTaskAssignedInMyGroups = function() {
+            //variabili usate nella paginazione
+            var firstResultTAIMG, maxResultsTAIMG;
+            vm.itemsPerPage = paginationConstants.itemsPerPage;
+            vm.TAIMGTotalItems = vm.itemsPerPage * vm.availablePage;
+            firstResultTAIMG = vm.itemsPerPage * (vm.availablePage - 1);
+            maxResultsTAIMG = vm.itemsPerPage;
+            dataService.tasks.taskAssignedInMyGroups($scope.current, firstResultTAIMG, maxResultsTAIMG, vm.order, utils.populateTaskParams(Array.from($("input[id^='searchField-']"))))
+                .then(function(response) {
+                    utils.refactoringVariables(response.data.data);
+                    vm.taskAssignedInMyGroups = response.data;
+                    // variabili per la gestione della paginazione
+                    vm.TAIMGTotalItems = response.data.total;
+                    vm.TAIMGQueryCount = vm.TAIMGTotalItems;
+                }, function(response) {
+                    $log.error(response);
+                });
         };
 
         $scope.showProcessInstances = function(requestedPage) {
@@ -68,11 +90,18 @@
             if ((vm.availableTasks.total === 0 && vm.myTasks.total === 0)) {
                 $scope.loadMyTasks();
                 $scope.loadAvailableTasks();
+                $scope.loadTaskAssignedInMyGroups();
             } else {
-                if (vm.activeContent == 'myTasks') {
-                    $scope.loadMyTasks();
-                } else if (vm.activeContent == 'availables') {
-                    $scope.loadAvailableTasks();
+                switch(wm.activeContent){
+                    case 'myTasks':
+                        $scope.loadMyTasks();
+                        break;
+                    case 'availables':
+                        $scope.loadAvailableTasks();
+                        break;
+                    case 'taskAssignedInMyGroups':
+                        $scope.loadTaskAssignedInMyGroups();
+                        break;
                 }
             }
         };
