@@ -88,9 +88,7 @@
         $scope.showProcessInstances = function(requestedPage) {
         //se non ho ancora effettuato query carico entrambe le "viste" ("i miei task" ed i "task di gruppo")
             if ((vm.availableTasks.total === 0 && vm.myTasks.total === 0)) {
-                $scope.loadMyTasks();
-                $scope.loadAvailableTasks();
-                $scope.loadTaskAssignedInMyGroups();
+                $scope.loadTasks();
             } else {
                 switch(wm.activeContent){
                     case 'myTasks':
@@ -105,6 +103,12 @@
                 }
             }
         };
+
+        $scope.loadTasks = function() {
+            $scope.loadMyTasks();
+            $scope.loadAvailableTasks();
+            $scope.loadTaskAssignedInMyGroups();
+        }
 
         $scope.setActiveContent = function(choice) {
             vm.activeContent = choice;

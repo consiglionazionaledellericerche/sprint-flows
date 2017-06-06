@@ -30,11 +30,11 @@
                ui-sref="details({processInstanceId: task.processInstanceId, taskId: task.id})">
                 <span class="glyphicon glyphicon-th-list"></span> Dettagli Flusso
             </a>
-            <a class="btn btn-default" ng-class="{'btn-xs': !advanced}" ng-if="task.assignee !== null&&actionButtons"
+            <a class="btn btn-default" ng-class="{'btn-xs': !advanced}" ng-if="actionButtons && task.assignee !== null"
                ng-click="claimTask(task.id, false)">
                 <span class="glyphicon glyphicon-hand-down" aria-hidden="true"></span> Restituisci al gruppo
             </a>
-            <a class="btn btn-default" ng-class="{'btn-xs': !advanced}" ng-if="task.assignee === null&&actionButtons"
+            <a class="btn btn-default" ng-class="{'btn-xs': !advanced}" ng-if="actionButtons && task.assignee === null"
                ng-click="claimTask(task.id, true)">
                 <span class="glyphicon glyphicon-hand-up" aria-hidden="true"></span> Prendi in carico
             </a>
