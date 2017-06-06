@@ -19,7 +19,8 @@ module.exports = {
     common: common,
     swagger: swagger,
     images: images,
-    jstree: jstree
+    jstree: jstree,
+    ace: ace
 }
 
 //var yorc = require('../.yo-rc.json')['generator-jhipster'];
@@ -71,6 +72,12 @@ function jstree() {
     return gulp.src(config.bower + 'bootstrap-jstree-theme/dist/themes/bootstrap/*.{png,gif}')
         .pipe(plumber({errorHandler: handleErrors}))
         .pipe(gulp.dest(config.dist + 'content/css/'));
+}
+
+function ace() {
+    return gulp.src(config.app + 'content/js/ace/*.js')
+        .pipe(plumber({errorHandler: handleErrors}))
+        .pipe(gulp.dest(config.dist + 'content/js/ace/'));
 }
 
 function common() {

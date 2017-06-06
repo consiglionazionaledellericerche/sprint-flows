@@ -30,7 +30,7 @@ gulp.task('clean', function () {
     return del([config.dist], { dot: true });
 });
 
-gulp.task('copy', ['copy:i18n', 'copy:fonts', 'copy:common', 'copy:jstree']);
+gulp.task('copy', ['copy:i18n', 'copy:fonts', 'copy:common', 'copy:jstree', 'copy:ace']);
 
 gulp.task('copy:i18n', copy.i18n);
 
@@ -46,6 +46,7 @@ gulp.task('copy:images', copy.images);
 
 // custom Martin
 gulp.task('copy:jstree', copy.jstree);
+gulp.task('copy:ace', copy.ace);
 
 gulp.task('images', function () {
     return gulp.src(config.app + 'content/images/**')
