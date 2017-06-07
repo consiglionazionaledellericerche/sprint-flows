@@ -3,7 +3,6 @@ package it.cnr.si.flows.ng.resource;
 import it.cnr.jada.firma.arss.ArubaSignServiceException;
 import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.TestUtil;
-import it.cnr.si.flows.ng.service.FirmaService;
 import org.activiti.engine.TaskService;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
@@ -11,7 +10,6 @@ import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.task.TaskResponse;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +26,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 import static it.cnr.si.flows.ng.TestUtil.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
@@ -42,15 +41,14 @@ import static org.springframework.http.HttpStatus.OK;
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 public class FlowsTaskResourceTest {
 
-    public static final String TASK_NAME = "Verifica Decisione";
+    public static final String FIRST_TASK_NAME = "Verifica Decisione";
+    private static final String SECOND_TASK_NAME = "Firma Decisione";
     @Autowired
     FlowsTaskResource flowsTaskResource;
     @Autowired
     TestUtil util;
     @Autowired
     FlowsProcessInstanceResource flowsProcessInstanceResource;
-    @Autowired
-    FirmaService firmaService;
     private ProcessInstanceResponse processInstance;
     @Autowired
     private TaskService taskService;
@@ -98,7 +96,7 @@ public class FlowsTaskResourceTest {
 
         verifyBadSearchParams(request);
 
-        //verifico che non prenda nessun risultato ( DOPO CHE IL TASK VIENE DISASSEGNATO)
+//        verifico che non prenda nessun risultato ( DOPO CHE IL TASK VIENE DISASSEGNATO)
         flowsTaskResource.unclaimTask(util.getFirstTaskId());
 
         response = flowsTaskResource.getMyTasks(request, ALL_PROCESS_INSTANCES, 0, 100, ASC);
@@ -140,40 +138,50 @@ public class FlowsTaskResourceTest {
         processInstance = util.mySetUp("acquisti-trasparenza");
         ResponseEntity<Map<String, Object>> response = flowsTaskResource.getTask(util.getFirstTaskId());
         assertEquals(OK, response.getStatusCode());
-        assertEquals(TASK_NAME, ((TaskResponse) response.getBody().get("task")).getName());
+        assertEquals(FIRST_TASK_NAME, ((TaskResponse) response.getBody().get("task")).getName());
     }
 
 
     @Test
-    @Ignore
     public void testCompleteTask() {
-        //TODO: Test goes here...
-//        MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
-//        req.setParameter("taskId", taskId);
-//        req.setParameter("definitionId", processDefinitionMissioni);
-//        ResponseEntity<Object> response = flowsTaskResource.completeTask(req);
-//        assertEquals(OK, response.getStatusCode());
+        processInstance = util.mySetUp("acquisti-trasparenza");
+        //completo il primo task
+        util.loginSfd();
+        MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
+        req.setParameter("taskId", util.getFirstTaskId());
+        assertEquals(OK, flowsTaskResource.completeTask(req).getStatusCode());
+
+        //verifico che il task completato sia avanzato
+        String content = "{\"processParams\":[],\"taskParams\":[]}";
+        MockMultipartHttpServletRequest searchRequest = new MockMultipartHttpServletRequest();
+        searchRequest.setContent(content.getBytes());
+        ResponseEntity<Object> response = flowsTaskResource.search(searchRequest, ALL_PROCESS_INSTANCES, true, ASC, 0, 100);
+        assertEquals(OK, response.getStatusCode());
+        assertEquals(SECOND_TASK_NAME, ((ArrayList<HistoricTaskInstanceResponse>) ((HashMap) response.getBody()).get("tasks")).get(0).getName());
     }
 
-    @Test
-    @Ignore
-    public void testAssignTask() {
-        //TODO: Test goes here...
-//        flowsTaskResource.assignTask();
-    }
 
     @Test
-    @Ignore
-    public void testUnclaimTask() {
-        //TODO: Test goes here...
-//        flowsTaskResource.unclaimTask();
-    }
-
-    @Test
-    @Ignore
     public void testSearch() {
-        //    todo: fare i test del service search
-//        flowsTaskResource.search();
+        processInstance = util.mySetUp("acquisti-trasparenza");
+
+        util.logout();
+        util.loginSfd();
+        //verifico che la ricerca recuperi il primo task della process instance appena avviata
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        String content = "{\"processParams\":" +
+                "[{\"key\":\"titoloIstanzaFlusso\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
+                "{\"key\":\"initiator\",\"value\":\"admin\",\"type\":\"textEqual\"}]," +
+                "\"taskParams\":" +
+                "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
+        request.setContent(content.getBytes());
+        ResponseEntity response = flowsTaskResource.search(request, ALL_PROCESS_INSTANCES, true, ASC, 0, 100);
+        ArrayList<HistoricTaskInstanceResponse> tasks = (ArrayList<HistoricTaskInstanceResponse>) ((HashMap) response.getBody()).get("tasks");
+        assertEquals(Long.valueOf("1"), ((HashMap) response.getBody()).get("totalItems"));
+        assertEquals(1, tasks.size());
+        assertEquals(util.getFirstTaskId(), ((HistoricTaskInstanceResponse) tasks.get(0)).getId());
+        //verifico che con parametri di ricerca sbagliati non abbia task nel searchResult
+        verifyBadSearchParams(request);
     }
 
     @Test
