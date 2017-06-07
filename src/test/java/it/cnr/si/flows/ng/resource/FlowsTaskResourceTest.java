@@ -1,13 +1,16 @@
 package it.cnr.si.flows.ng.resource;
 
+import it.cnr.jada.firma.arss.ArubaSignServiceException;
 import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.TestUtil;
+import it.cnr.si.flows.ng.service.FirmaService;
 import org.activiti.engine.TaskService;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.task.TaskResponse;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,11 +21,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 import static it.cnr.si.flows.ng.TestUtil.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
@@ -37,30 +42,39 @@ import static org.springframework.http.HttpStatus.OK;
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 public class FlowsTaskResourceTest {
 
-    public static final String TASK_NAME = "Firma UO";
+    public static final String TASK_NAME = "Verifica Decisione";
     @Autowired
     FlowsTaskResource flowsTaskResource;
     @Autowired
     TestUtil util;
     @Autowired
     FlowsProcessInstanceResource flowsProcessInstanceResource;
+    @Autowired
+    FirmaService firmaService;
     private ProcessInstanceResponse processInstance;
     @Autowired
     private TaskService taskService;
 
+    @Before
+    public void setUp() {
+        HttpServletRequest mockRequest = new MockHttpServletRequest();
+        ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(mockRequest);
+        RequestContextHolder.setRequestAttributes(servletRequestAttributes);
+    }
 
     @After
     public void tearDown() {
         util.myTearDown();
     }
 
-    //    todo: fare i test del service search
 
 
     @Test
     public void testGetMyTasks() {
         processInstance = util.mySetUp("acquisti-trasparenza");
-//       all'inizio del test non ho task assegnati'
+//       all'inizio del test SFD non ha task assegnati'
+        util.logout();
+        util.loginSfd();
         ResponseEntity<DataResponse> response = flowsTaskResource.getMyTasks(new MockHttpServletRequest(), ALL_PROCESS_INSTANCES, 0, 100, ASC);
         assertEquals(OK, response.getStatusCode());
         assertEquals(0, response.getBody().getSize());
@@ -87,6 +101,7 @@ public class FlowsTaskResourceTest {
         //verifico che non prenda nessun risultato ( DOPO CHE IL TASK VIENE DISASSEGNATO)
         flowsTaskResource.unclaimTask(util.getFirstTaskId());
 
+        response = flowsTaskResource.getMyTasks(request, ALL_PROCESS_INSTANCES, 0, 100, ASC);
         assertEquals(OK, response.getStatusCode());
         assertEquals(0, response.getBody().getSize());
         myTasks = (ArrayList) response.getBody().getData();
@@ -96,23 +111,25 @@ public class FlowsTaskResourceTest {
 
     @Test(expected = AccessDeniedException.class)
     public void testGetAvailableTasks() {
-        processInstance = util.mySetUp("missioni");
-        //QADMIN ha sia ROLE_ADMIN che ROLE_USER (quindi può vedere il task istanziato)
+        processInstance = util.mySetUp("acquisti-trasparenza");
+        //SFD è sfd@sisinfo (quindi può vedere il task istanziato)
+        util.logout();
+        util.loginSfd();
         ResponseEntity<DataResponse> response = flowsTaskResource.getAvailableTasks(new MockHttpServletRequest(), ALL_PROCESS_INSTANCES, 0, 1000, ASC);
         assertEquals(OK, response.getStatusCode());
         assertEquals(1, response.getBody().getSize());
         assertEquals(1, ((ArrayList) response.getBody().getData()).size());
         util.logout();
 
-        //USER è solo ROLE_USER (quindi può vedere il task istanziato)
+        //USER NON è sfd@sisinfo (quindi può vedere il task istanziato)
         util.loginUser();
         response = flowsTaskResource.getAvailableTasks(new MockHttpServletRequest(), ALL_PROCESS_INSTANCES, 0, 1000, ASC);
         assertEquals(OK, response.getStatusCode());
-        assertEquals(1, response.getBody().getSize());
-        assertEquals(1, ((ArrayList) response.getBody().getData()).size());
+        assertEquals(0, response.getBody().getSize());
+        assertEquals(0, ((ArrayList) response.getBody().getData()).size());
         util.logout();
 
-        //spaclient è solo ROLE_ADMIN (quindi non può accedere al servizio - AccessDeniedException)
+        //spaclient ha solo ROLE_ADMIN e non ha ROLE_USER(quindi non può accedere al servizio - AccessDeniedException)
         util.loginSpaclient();
         flowsTaskResource.getAvailableTasks(new MockHttpServletRequest(), ALL_PROCESS_INSTANCES, 0, 1000, ASC);
     }
@@ -120,7 +137,7 @@ public class FlowsTaskResourceTest {
 
     @Test
     public void testGetTaskInstance() {
-        processInstance = util.mySetUp("missioni");
+        processInstance = util.mySetUp("acquisti-trasparenza");
         ResponseEntity<Map<String, Object>> response = flowsTaskResource.getTask(util.getFirstTaskId());
         assertEquals(OK, response.getStatusCode());
         assertEquals(TASK_NAME, ((TaskResponse) response.getBody().get("task")).getName());
@@ -154,21 +171,54 @@ public class FlowsTaskResourceTest {
 
     @Test
     @Ignore
+    public void testSearch() {
+        //    todo: fare i test del service search
+//        flowsTaskResource.search();
+    }
+
+    @Test
     public void testTaskAssignedInMyGroups() {
-        //TODO: Test goes here...
-//        flowsTaskResource.taskAssignedInMyGroups();
+        processInstance = util.mySetUp("acquisti-trasparenza");
+
+        //verifico che all'inizio del test sfd2 NON veda nessun task
+        util.logout();
+        util.loginSfd2();
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        ResponseEntity<DataResponse> response = flowsTaskResource.taskAssignedInMyGroups(request, ALL_PROCESS_INSTANCES, 0, 100, ASC);
+        assertEquals(OK, response.getStatusCode());
+        assertEquals(0, (new ArrayList((Collection) response.getBody().getData())).size());
+
+        //sfd non deve vedere NESSUN Task né prima né dopo l'assegnazione del task
+        util.logout();
+        util.loginSfd();
+        response = flowsTaskResource.taskAssignedInMyGroups(request, ALL_PROCESS_INSTANCES, 0, 100, ASC);
+        assertEquals(OK, response.getStatusCode());
+        assertEquals(0, (new ArrayList((Collection) response.getBody().getData())).size());
+        //assegno il task a sfd
+        ResponseEntity<Map<String, Object>> resp = flowsTaskResource.claimTask(util.getFirstTaskId());
+        assertEquals(OK, resp.getStatusCode());
+        response = flowsTaskResource.taskAssignedInMyGroups(request, ALL_PROCESS_INSTANCES, 0, 100, ASC);
+        assertEquals(OK, response.getStatusCode());
+        assertEquals(0, (new ArrayList((Collection) response.getBody().getData())).size());
+
+        //verifico che sfd2 veda il task assegnato ad sfd PERCHÈ HANNO LA STESSA MEMBERSHIP (sfd@sisinfo)
+        util.logout();
+        util.loginSfd2();
+        response = flowsTaskResource.taskAssignedInMyGroups(request, ALL_PROCESS_INSTANCES, 0, 100, ASC);
+        assertEquals(OK, response.getStatusCode());
+        assertEquals(1, (new ArrayList((Collection) response.getBody().getData())).size());
     }
 
     @Test
     public void testClaimTask() {
-        processInstance = util.mySetUp("missioni");
-//      admin ha ROLE_ADMIN E ROLE_USER quindi può richiamare il metodo
-        util.loginAdmin();
+        processInstance = util.mySetUp("acquisti-trasparenza");
+//      sfd è sfd@sisinfo quindi può prendere in carico iln flusso
+        util.loginSfd();
         ResponseEntity<Map<String, Object>> response = flowsTaskResource.claimTask(util.getFirstTaskId());
         assertEquals(OK, response.getStatusCode());
         util.logout();
 
-//      spaclient ha solo ROLE_ADMIN quindi NON può richiamare il metodo
+//      spaclient NON è sfd@sisinfo quindi NON può richiamare il metodo
         util.loginSpaclient();
         response = flowsTaskResource.claimTask(util.getFirstTaskId());
         assertEquals(FORBIDDEN, response.getStatusCode());
@@ -176,10 +226,10 @@ public class FlowsTaskResourceTest {
 
 
     @Test
-    public void testGetTasksCompletedForMe() {
-        processInstance = util.mySetUp("missioni");
+    public void testGetTasksCompletedForMe() throws ArubaSignServiceException {
+        processInstance = util.mySetUp("acquisti-trasparenza");
         //completo il primo task
-        util.loginUser();
+        util.loginSfd();
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
         req.setParameter("taskId", util.getFirstTaskId());
         ResponseEntity<Object> response = flowsTaskResource.completeTask(req);
@@ -196,25 +246,13 @@ public class FlowsTaskResourceTest {
         assertEquals(util.getFirstTaskId(),
                      ((ArrayList<HistoricTaskInstanceResponse>) ((DataResponse) response.getBody()).getData()).get(0).getId());
 
-        //Verifico che il metodo funzioni anche con admin
+        //Verifico che il metodo funzioni anche con ADMIN
         util.logout();
         util.loginAdmin();
         response = flowsTaskResource.getTasksCompletedByMe(new MockHttpServletRequest(), ALL_PROCESS_INSTANCES, 0, 1000, ASC);
         assertEquals(OK, response.getStatusCode());
-        assertEquals("Admin non deve vedere task perchè non l'ha ANCORA completato ma ha solo avviato il flusso",
+        assertEquals("ADMIN non deve vedere task perchè NON NE HA COMPLETATO NESSUNO ma ha solo avviato il flusso",
                      0, ((ArrayList<HistoricTaskInstanceResponse>) ((DataResponse) response.getBody()).getData()).size());
-
-        //completo un altro task con admin
-        req = new MockMultipartHttpServletRequest();
-        req.setParameter("taskId", taskService.createTaskQuery().singleResult().getId());
-        response = flowsTaskResource.completeTask(req);
-        assertEquals(OK, response.getStatusCode());
-
-        //Admin vede solo il task che ha completato
-        response = flowsTaskResource.getTasksCompletedByMe(new MockHttpServletRequest(), ALL_PROCESS_INSTANCES, 0, 1000, ASC);
-        assertEquals(OK, response.getStatusCode());
-        assertEquals("Admin non vede il task che ha appena completato",
-                     1, ((ArrayList<HistoricTaskInstanceResponse>) ((DataResponse) response.getBody()).getData()).size());
     }
 
 
