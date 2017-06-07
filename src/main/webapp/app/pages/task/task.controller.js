@@ -37,13 +37,13 @@
                     vm.taskVariables = utils.refactoringVariables(response.data.task).variabili;
                     vm.attachments = response.data.attachments;
                     vm.attachmentsList = response.data.attachmentsList;
-                    vm.diagramUrl = '/rest/diagram/taskInstance/'+ vm.data.taskId;
+                    vm.diagramUrl = '/rest/diagram/taskInstance/'+ vm.data.taskId +"?"+ new Date().getTime();
                     vm.formUrl = 'api/forms/task/'+ vm.data.taskId;
             });
         } else {
             dataPromise.reject("");
 
-            vm.diagramUrl = "/rest/diagram/processDefinition/" + $state.params.processDefinitionId;
+            vm.diagramUrl = "/rest/diagram/processDefinition/" + $state.params.processDefinitionId +"?"+ new Date().getTime();
             vm.formUrl = 'api/forms/'+ vm.processDefinitionKey + "/" + vm.processVersion + "/" + $state.params.taskName
         }
 

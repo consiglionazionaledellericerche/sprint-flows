@@ -21,7 +21,11 @@
       </userTask>
       <sequenceFlow id="flow9" sourceRef="modifica-decisione" targetRef="verifica-decisione"></sequenceFlow>
       <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway" default="flow10"></exclusiveGateway>
-      <sequenceFlow id="flow10" sourceRef="exclusivegateway1" targetRef="firma-decisione"></sequenceFlow>
+      <sequenceFlow id="flow10" sourceRef="exclusivegateway1" targetRef="firma-decisione">
+        <extensionElements>
+          <activiti:executionListener event="take" delegateExpression="${firmaDecisione}"></activiti:executionListener>
+        </extensionElements>
+      </sequenceFlow>
       <sequenceFlow id="flow11" sourceRef="exclusivegateway1" targetRef="modifica-decisione">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Modifica'}]]></conditionExpression>
       </sequenceFlow>
@@ -69,7 +73,11 @@
       </sequenceFlow>
       <endEvent id="endevent6" name="End"></endEvent>
       <startEvent id="startevent11" name="Start Decisione a Contrattare"></startEvent>
-      <sequenceFlow id="flow126" sourceRef="startevent11" targetRef="verifica-decisione"></sequenceFlow>
+      <sequenceFlow id="flow126" sourceRef="startevent11" targetRef="verifica-decisione">
+        <extensionElements>
+          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.acquistitrasparenza.CalcolaTotaleImpegniAcquisti"></activiti:executionListener>
+        </extensionElements>
+      </sequenceFlow>
       <endEvent id="endevent18" name="End"></endEvent>
       <sequenceFlow id="flow127" sourceRef="exclusivegateway5" targetRef="endevent18">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaConProvvedimento'}]]></conditionExpression>

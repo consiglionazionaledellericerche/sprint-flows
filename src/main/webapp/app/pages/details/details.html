@@ -57,8 +57,8 @@
 
     <div class="col-md-4">
       <div class="row text-center">
-        <a ng-click="openDiagramModal('/rest/diagram/processInstance/'+ vm.data.entity.id)">
-          <img class="img-bordered" ng-src='/rest/diagram/processInstance/{{vm.data.entity.id}}' title="{{vm.data.entity.processDefinitionKey}}" style="max-width: 100%" />
+        <a ng-click="openDiagramModal(vm.diagramUrl)">
+          <img class="img-bordered" ng-src='{{vm.diagramUrl}}' title="{{vm.data.entity.processDefinitionKey}}" style="max-width: 100%" />
         </a>
       </div>
       <hr>
