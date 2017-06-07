@@ -9,13 +9,12 @@ import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.FlowsUserDetailsService;
 import it.cnr.si.security.SecurityUtils;
-import it.cnr.si.security.UserDetailsService;
 import it.cnr.si.service.MembershipService;
-import it.cnr.si.service.UserService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
@@ -46,6 +45,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -421,12 +421,20 @@ public class FlowsTaskResource {
                 ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
                 return new ResponseEntity<>(response, HttpStatus.OK);
             }
+        } catch (BpmnError e) {
+            LOGGER.error("L'utente {} ha cercato di a completare il task {} / avviare il flusso {}, ma c'e' stato un errore: {}", username, taskId, definitionId, e.getMessage());
+            return ResponseEntity.status(Utils.getStatus(e.getErrorCode())).body(Utils.mapOf("message", e.getMessage()));
         } catch (IOException e) {
             LOGGER.error("Errore nel processare i files:", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore nel processare i files");
         } catch (FlowsPermissionException e) {
             LOGGER.error("L'utente {} non e' abilitato a completare il task {} / avviare il flusso {}", username, taskId, definitionId);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("message", "L'utente non e' abilitato ad eseguire l'azione richiesta"));
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("L'utente non e' abilitato ad eseguire l'azione richiesta");
+        } catch (Exception e) {
+            // catch all con info per il debug
+            long rif = Instant.now().toEpochMilli();
+            LOGGER.error("(Riferimento " + rif + ") Errore non gestito con messaggio " + e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore non gestito. Contattare gli amminstratori specificando il numero di riferimento: " + rif);
         }
     }
 
