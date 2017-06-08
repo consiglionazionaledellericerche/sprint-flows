@@ -40,6 +40,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import it.cnr.si.flows.ng.listeners.ActivitiLoggingEventListener;
 import it.cnr.si.flows.ng.listeners.FlowsVisibilitySetter;
 import it.cnr.si.flows.ng.listeners.TestExecutionListener;
+import it.cnr.si.flows.ng.listeners.acquistitrasparenza.FirmaDecisione;
 import it.cnr.si.flows.ng.listeners.acquistitrasparenza.StartAcquistiSetGroupsPrototipoSenzaAce;
 
 @Configuration
@@ -76,6 +77,7 @@ public class FlowsConfigurations {
         TestExecutionListener bean = appContext.getBean(TestExecutionListener.class);
         beans.put("testExecutionListener", bean);
         beans.put("startAcquistiSetGroupsPrototipoSenzaAce", getStartAcquistiSetGroupsPrototipoSenzaAce());
+        beans.put("firmaDecisione", getFirmaDecisione());
         conf.setBeans(beans);
 
         //         configurare il font in cnr.activiti.diagram-font, solo se e' installato
@@ -103,7 +105,14 @@ public class FlowsConfigurations {
         return conf;
     }
 
-    @Bean(name = "startAcquistiSetGroupsPrototipoSenzaAce")
+	@Bean(name = "firmaDecisione")
+    public Object getFirmaDecisione() {
+    	FirmaDecisione bean = new FirmaDecisione();
+        appContext.getAutowireCapableBeanFactory().autowireBean(bean);
+        return bean;
+	}
+
+	@Bean(name = "startAcquistiSetGroupsPrototipoSenzaAce")
     public StartAcquistiSetGroupsPrototipoSenzaAce getStartAcquistiSetGroupsPrototipoSenzaAce() {
         StartAcquistiSetGroupsPrototipoSenzaAce bean = new StartAcquistiSetGroupsPrototipoSenzaAce();
         appContext.getAutowireCapableBeanFactory().autowireBean(bean);

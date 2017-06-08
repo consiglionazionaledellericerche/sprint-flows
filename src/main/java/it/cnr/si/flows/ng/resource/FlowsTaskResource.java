@@ -291,8 +291,7 @@ public class FlowsTaskResource {
 
         } else {
             List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
-            List<String> authorities =
-                    flowsUserDetailsService.loadUserByUsername(username).getAuthorities().stream()
+            List<String> authorities = flowsUserDetailsService.loadUserByUsername(username).getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .map(Utils::removeLeadingRole)
                     .collect(Collectors.toList());
