@@ -1,4 +1,4 @@
-(function() {
+ (function() {
     'use strict';
 
     angular
@@ -50,20 +50,29 @@
         $scope.submitTask = function(file) {
 
             $log.info(Object.keys(vm.data));
+            if ($scope.taskForm.$invalid) {
+                angular.forEach($scope.taskForm.$error, function (field) {
+                    angular.forEach(field, function(errorField){
+                        errorField.$setTouched();
+                    });
+                });
+                AlertService.warning("Inserire tutti i valori obbligatori.");
+            } else {
 
-            Upload.upload({
-                url: 'api/tasks/complete',
-                data: vm.data,
-            }).then(function (response) {
+                Upload.upload({
+                    url: 'api/tasks/complete',
+                    data: vm.data,
+                }).then(function (response) {
 
-                $log.info(response);
-                AlertService.success("Richiesta completata con successo");
-                $state.go('availabletasks');
+                    $log.info(response);
+                    AlertService.success("Richiesta completata con successo");
+                    $state.go('availabletasks');
 
-            }, function (err) {
-                $log.error(err);
-                AlertService.error("Richiesta non riuscita<br>"+ err.data.message);
-            });
+                }, function (err) {
+                    $log.error(err);
+                    AlertService.error("Richiesta non riuscita<br>"+ err.data.message);
+                });
+            }
         }
 
         $scope.downloadFile = function(url, filename, mimetype) {

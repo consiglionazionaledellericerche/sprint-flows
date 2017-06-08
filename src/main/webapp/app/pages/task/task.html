@@ -44,7 +44,7 @@
                 <button class="btn btn-primary" type="reset"><span class="glyphicon glyphicon-refresh"> Reimposta</button>
               </div>
               <div class="btn-group" role="group">
-                <button class="btn btn-primary" type="submit" ng-disabled="taskForm.$invalid">{{ vm.taskId ? "Invia" : "Avvia Flusso"}} <span class="glyphicon glyphicon-arrow-right"></span></button>
+                <button class="btn btn-primary" type="submit" ng-class="{'btn-warning': taskForm.$invalid}">{{ vm.taskId ? "Invia" : "Avvia Flusso"}} <span class="glyphicon glyphicon-arrow-right"></span></button>
               </div>
             </div>
           </div>
@@ -54,5 +54,5 @@
   </div>
   <hr>
 <!--   <pre>{{taskForm | json}}</pre> -->
-  <pre ng-if="global.ribbon.dev">{{vm | json}}</pre>
+  <pre ng-if="development">{{vm | json}}</pre>
 </div>
