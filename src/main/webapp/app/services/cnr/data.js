@@ -5,14 +5,9 @@
   .factory('dataService', Data);
 
 
-  Data.$inject = ['$http', '$location', '$rootScope', '$log', '$sessionStorage'];
+  Data.$inject = ['$http'];
 
-  function Data ($http, $location, $rootScope, $log, $sessionStorage) {
-
-    var development = $location.$$port === 9000; //GRUNT PORT;
-
-    $rootScope.development = development;
-
+  function Data ($http) {
 
     return {
 

@@ -19,7 +19,11 @@
           <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
         </extensionElements>
       </userTask>
-      <sequenceFlow id="flow9" sourceRef="modifica-decisione" targetRef="verifica-decisione"></sequenceFlow>
+      <sequenceFlow id="flow9" sourceRef="modifica-decisione" targetRef="verifica-decisione">
+        <extensionElements>
+          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.acquistitrasparenza.CalcolaTotaleImpegniAcquisti"></activiti:executionListener>
+        </extensionElements>
+      </sequenceFlow>
       <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway" default="flow10"></exclusiveGateway>
       <sequenceFlow id="flow10" sourceRef="exclusivegateway1" targetRef="firma-decisione">
         <extensionElements>

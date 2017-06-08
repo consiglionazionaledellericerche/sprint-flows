@@ -46,6 +46,9 @@
                     $state.go('home');
                 }
 
+                if ($state.current.name === 'home')
+                    $state.go('availabletasks');
+
                 $rootScope.$broadcast('authenticationSuccess');
 
                 // previousState was set in the authExpiredInterceptor before being redirected to login modal.
