@@ -1,62 +1,14 @@
 <div class="col-md-12" ng-cloak>
-    <div class="row">
-        <div class="col-md-8">
-            <h4>{{vm.data.entity.title ? vm.data.entity.title : vm.data.entity.variabili.title}}
-                <span ng-class="{'label-warning': !vm.data.entity.completed , 'label-success': vm.data.entity.completed }"
-                      class="label">
-                  {{!vm.data.entity.completed ? 'attivo' : 'completato'}}
-                </span>
-            </h4>
-            <b>Avviato da: </b> {{vm.data.entity.variabili.initiator}} il {{vm.data.entity.variabili.startDate | date}}
-            <br> <br>
-            <span ng-hide="!vm.data.entity.variabili.completed">
-                <b>completato il:</b> {{vm.data.entity.variabili.endDate | date}} <br>
-            </span>
-            <span ng-show="!vm.data.entity.completed">
-                <!--CICLO SUGLI HISTORY-TASK PER TROVARE IL TASK ATTIVO (quello con endTime = null)-->
-                <div ng-repeat="task in vm.data.history | orderBy:'historyTask.startTime'">
-                    <span ng-if="task.historyTask.endTime === null">
-                        <b>Fase: </b>{{task.historyTask.name}} <br>
-                    </span>
-                </div>
-                <br>
-            </span>
 
-            <ul class="list-unstyled">
-                <ng-include src="vm.detailsView"/>
-            </ul>
-            <div has-authority="ROLE_ADMIN">
-                <h4>Tutte le variabili</h4>
-                <ul>
-                    <li ng-repeat="metadatum in vm.data.entity.variables">{{metadatum.name}}: {{metadatum.value}}</li>
-                </ul>
-            </div>
-                                <!-- <identity-links></identity-links> -->
-            <div has-authority="ROLE_ADMIN">
-                <h4>Identity Links</h4>
-                <span ng-repeat="(taskId, link) in vm.data.identityLinks">
-                    TaskId - <strong>{{ taskId }}:</strong> <br>
-                (Assignee: {{link.assignee || null}}, Candidate Users: {{link.candidateUsers}}, Candidate Groups: {{link.candidateGroups}})
-                <br>
-                    <span ng-repeat="actualLink in link.links">
-                      <strong>{{ actualLink.type }}:</strong>
-                      {{ actualLink.user || actualLink.group }}
-                      <br>
-                    </span>
-                </span>
-            </div>
-        </div>
+  <div class="row">
+    <div class="col-md-8">
 
-        <div class="col-md-4">
-            <div class="row text-center">
-                <a ng-click="openDiagramModal(vm.diagramUrl)">
-                    <img class="img-bordered" ng-src="{{vm.diagramUrl}}" title="{{vm.data.entity.processDefinitionKey}}"
-                         style="max-width: 100%"/>
-                </a>
-            </div>
-            <hr>
+      <h4>{{vm.data.entity.title ? vm.data.entity.title : vm.data.entity.variabili.title}}
+        <span ng-class="{'label-warning': !vm.data.entity.completed , 'label-success': vm.data.entity.completed }" class="label">
+          {{!vm.data.entity.completed ? 'attivo' : 'completato'}}
+        </span>
+      </h4>
 
-<<<<<<< HEAD
       <b>Avviato da: </b>
         {{vm.data.entity.variabili.initiator}} il {{vm.data.entity.variabili.startDate | date}}
       <br>
@@ -111,17 +63,6 @@
             <img class="img-bordered" ng-src='{{vm.diagramUrl}}' title="{{vm.data.entity.processDefinitionKey}}" style="max-width: 100%" />
           </a>
           <hr>
-=======
-            <button class="btn btn-default btn-block" ng-hide="chronology" ng-click="chronology = true"><span
-                    class="glyphicon glyphicon-time"></span> Visualizza Cronologia
-            </button>
-            <button class="btn btn-default btn-block" ng-hide="!chronology" ng-click="chronology = false"><span
-                    class="glyphicon glyphicon-time"></span> Nascondi la cronologia Cronologia
-            </button>
-            <div ng-if="chronology">
-                <history tasks="vm.data.history" start-task="vm.data.startEvent"></history>
-            </div>
->>>>>>> branch 'dev' of git@git.si.cnr.it:documentale/sprint-flows.git
         </div>
         <div class="col-sm-6 col-md-12">
           <button class="btn btn-default btn-block" ng-hide="chronology" ng-click="chronology = true"><span class="glyphicon glyphicon-time"></span> Visualizza Cronologia</button>
@@ -134,26 +75,25 @@
         </div>
       </div>
     </div>
+  </div>
 
+  <hr>
+
+  <div class="row">
+    <div class="col-md-4 col-md-offset-4">
+      <div class="btn-group btn-group-justified" role="group">
+        <a class="btn btn-primary" back><span class="glyphicon glyphicon-arrow-left"></span> Ritorna</a>
+        <a class="btn btn-primary" ng-if="vm.taskId" ui-sref="task({processDefinitionId: vm.data.entity.processDefinitionId, taskId: vm.taskId})">
+          <span class="glyphicon glyphicon-cog"></span> Azioni <span class="glyphicon glyphicon-arrow-right"></span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="row dev">
     <hr>
-
-    <div class="row">
-        <div class="col-md-4 col-md-offset-4">
-            <div class="btn-group btn-group-justified" role="group">
-                <a class="btn btn-primary" back><span class="glyphicon glyphicon-arrow-left"></span> Ritorna</a>
-                <a class="btn btn-primary" ng-if="vm.taskId"
-                   ui-sref="task({processDefinitionId: vm.data.entity.processDefinitionId, taskId: vm.taskId})">
-                    <span class="glyphicon glyphicon-cog"></span> Azioni <span
-                        class="glyphicon glyphicon-arrow-right"></span>
-                </a>
-            </div>
-        </div>
+    <div class="col-md-12" >
+      <pre ng-if="global.ribbon.dev">{{vm | json}}</pre>
     </div>
-
-    <div class="row dev">
-        <hr>
-        <div class="col-md-12">
-            <pre ng-if="global.ribbon.dev">{{vm | json}}</pre>
-        </div>
-    </div>
+  </div>
 </div>
