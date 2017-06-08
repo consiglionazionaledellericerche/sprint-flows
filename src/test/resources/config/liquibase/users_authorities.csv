@@ -11,4 +11,5 @@ user_id;authority_name
 7;ROLE_USER
 8;ROLE_ADMIN
 9;ROLE_ADMIN
+9;ROLE_USER
 10;ROLE_ADMIN

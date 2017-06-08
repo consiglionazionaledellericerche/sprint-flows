@@ -121,6 +121,10 @@ public class TestUtil {
         login("supportofunzionidirigenziali2", "supportofunzionidirigenziali2");
     }
 
+    public void loginResponsabileAcquisti() {
+        login("responsabileacquisti", "responsabileacquisti");
+    }
+
 
     private void login(String user, String psw) {
         SecurityContextHolder.getContext().setAuthentication(
