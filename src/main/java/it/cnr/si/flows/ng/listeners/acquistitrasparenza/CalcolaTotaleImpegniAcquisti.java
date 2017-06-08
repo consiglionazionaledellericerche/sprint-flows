@@ -2,6 +2,7 @@ package it.cnr.si.flows.ng.listeners.acquistitrasparenza;
 
 import java.util.List;
 
+import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.slf4j.Logger;
@@ -23,13 +24,18 @@ public class CalcolaTotaleImpegniAcquisti implements ExecutionListener {
 		for(int i = 0; i<=100; i=i+1) {
 			String Elemento = "impegni[" +  i + "][importo]";
 			if(execution.getVariable(Elemento) != null){
-				double importo = Double.parseDouble((String) execution.getVariable(Elemento));
-				importoTotale = importoTotale + importo;
+				String importoImpegnoSingolo = (String) execution.getVariable(Elemento);
+				try {
+					double importo = Double.parseDouble(importoImpegnoSingolo);
+					importoTotale = importoTotale + importo;
+				} catch (NumberFormatException e ){
+					LOGGER.error("Formato Impegno Non Valido {} nel flusso {} - {}", importoImpegnoSingolo, execution.getId(), execution.getVariable("title"));
+					throw new BpmnError("400", "Formato Impegno Non Valido: " + importoImpegnoSingolo);
+				}			
 			} else {
 				break;
 			}
 			execution.setVariable("importoTotale", importoTotale);
 		}
-
 	}
 }
