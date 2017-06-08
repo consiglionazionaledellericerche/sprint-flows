@@ -11,21 +11,45 @@
         return {
             restrict: 'E',
             templateUrl: 'app/components/attachments/attachments.html',
+            scope: {
+              processInstanceId: '@?',
+              taskId: '@?',
+              showHistory: '@?'
+            },
             link: function ($scope, element, attrs) {
 
-                $log.info("id in attachments "+ $scope.processInstanceId);
+                $scope.showHistory = $scope.showHistory === undefined ? true : $scope.showHistory;
 
-                dataService.processInstances.attachments($scope.processInstanceId)
-                .then(function(response) {
-                    $log.info(response);
+                function setResponse (response) {
                     $scope.attachments = response.data;
-                }, function(response) {
-                    $log.info(response);
-                });
+                }
+                function logError(response) {
+                    $log.error(response);
+                }
+
+
+                if ($scope.processInstanceId !== undefined) {
+                    $log.info("id in attachments "+ $scope.processInstanceId);
+                    dataService.processInstances.getAttachments($scope.processInstanceId)
+                    .then(setResponse, logError);
+
+                } else {
+                    if ($scope.taskId !== undefined) {
+                        $log.info("id in attachments "+ $scope.taskId);
+                        dataService.tasks.getAttachments($scope.taskId)
+                        .then(setResponse, logError);
+
+                    } else {
+                        $log.error("processInstanceId e taskId non possono essere entrambi nulli!");
+                    }
+                }
+
+
 
                 $scope.downloadFile = function(url, filename, mimetype) {
                     utils.downloadFile(url, filename, mimetype);
                 }
+
 
                 $scope.showFileHistory = function(attachmentName) {
                     $scope.fileHistory = [];

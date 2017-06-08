@@ -14,6 +14,7 @@
         vm.data.processDefinitionId = $state.params.processDefinitionId;
         vm.processDefinitionKey = vm.data.processDefinitionId.split(":")[0];
         vm.processVersion       = vm.data.processDefinitionId.split(":")[1];
+        vm.detailsView = 'api/views/'+ vm.processDefinitionKey +'/detail';
 
         // Ho bisogno di caricare piu' risorse contemporaneamente (form e data);
         // quando sono finite entrambe, autofillo la form

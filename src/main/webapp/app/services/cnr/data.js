@@ -55,7 +55,10 @@
                 '&firstResult=' + firstResult +
                 '&maxResults=' + maxResults +
                 '&order=' + order, params);
-        }
+        },
+        getAttachments: function(taskId) {
+            return $http.get('api/attachments/task/'+ taskId);
+        },
       },
       processInstances: {
         byProcessInstanceId : function(processInstanceId) {
@@ -75,7 +78,7 @@
             '&firstResult=' + firstResult +
             '&maxResults=' + maxResults, params);
         },
-        attachments: function(processInstanceId) {
+        getAttachments: function(processInstanceId) {
             return $http.get('api/attachments/'+ processInstanceId);
         },
         attachmentHistory: function(processInstaceId, attachmentName) {
