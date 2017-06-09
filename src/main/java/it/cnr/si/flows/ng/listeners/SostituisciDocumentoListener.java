@@ -1,5 +1,7 @@
 package it.cnr.si.flows.ng.listeners;
 
+import java.util.Date;
+
 import javax.inject.Inject;
 
 import org.activiti.engine.delegate.DelegateExecution;
@@ -11,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.dto.FlowsAttachment.Azione;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 
 @Component
@@ -41,11 +44,18 @@ public class SostituisciDocumentoListener implements ExecutionListener {
 
         LOGGER.debug("Ricarico il file {} originale, ma con gli stati puliti", nomeVariabileFile);
         originale.clearStato();
+        originale.setAzione(Azione.Sostituzione);
+        originale.setTaskId(null);
+        originale.setTaskName(null);
+        originale.setTime(new Date());
         execution.setVariable(nomeVariabileFile, originale);
 
-        LOGGER.debug("Salvo una copia tra gli allegati per futuro riferimento");
+        LOGGER.debug("Salvo una copia per futuro riferimento");
         copia.setAzione(FlowsAttachment.Azione.Sostituzione);
         copia.addStato(FlowsAttachment.Stato.Sostituito);
+        copia.setTaskId(null);
+        copia.setTaskName(null);
+        copia.setTime(new Date());
         copia.setName("Provvedimento di Aggiudicazione Sostiutito");
         int nextIndex = attachmentService.getNextIndexByProcessInstanceId(executionId, "provvedimentiRespinti");
         execution.setVariable("provvedimentiRespinti["+ nextIndex +"]", copia);

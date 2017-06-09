@@ -103,6 +103,7 @@ public class FlowsAttachmentResource {
                         a.setUrl("api/attachments/"+ h.getId() +"/data");
                         return a;
                     })
+                    .sorted( (l, r) -> l.getTime().compareTo(r.getTime()) )
                     .map(h -> {h.setBytes(null); return h;})
                     .collect(Collectors.toList());
 

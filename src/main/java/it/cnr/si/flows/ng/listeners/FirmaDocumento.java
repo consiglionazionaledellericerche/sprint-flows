@@ -49,6 +49,8 @@ public class FirmaDocumento implements ExecutionListener {
             att.setFilename(getSignedFilename(att.getFilename()));
             att.setAzione(FlowsAttachment.Azione.Firma);
             att.addStato(FlowsAttachment.Stato.Firmato);
+            att.setTaskId(null);
+            att.setTaskName(null);
             att.setTime(new Date());
 
             execution.setVariable(nomeVariabileFile, att);
