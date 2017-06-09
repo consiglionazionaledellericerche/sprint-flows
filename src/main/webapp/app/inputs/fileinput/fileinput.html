@@ -21,8 +21,8 @@
 </div>
 
 <div class="form-group" ng-if="attrs.multiple == 'true'">
-  <div ng-repeat="attachment in vm.attachmentsList | filter: filterNames">
-    <label for="attrs.id">{{attrs.label +' '+ $index }}</label><br>
+  <div ng-repeat="(name, attachment) in vm.attachments" ng-if="filterNames(attachment)">
+    <label for="attrs.id">{{attrs.label}}</label><br>
     <a
       href
       ng-click="downloadFile('/api/attachments/task/'+ vm.data.taskId +'/'+ attachment.name +'/data', attachment.name,attachment.mimetype)" >

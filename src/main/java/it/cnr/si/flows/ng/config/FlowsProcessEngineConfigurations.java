@@ -2,7 +2,6 @@ package it.cnr.si.flows.ng.config;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
@@ -33,12 +32,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.zaxxer.hikari.HikariDataSource;
-
-import it.cnr.si.flows.ng.listeners.FlowsVisibilitySetter;
-import it.cnr.si.flows.ng.listeners.SostituisciDocumentoListener;
-import it.cnr.si.flows.ng.listeners.TestExecutionListener;
-import it.cnr.si.flows.ng.listeners.acquistitrasparenza.FirmaDecisione;
-import it.cnr.si.flows.ng.listeners.acquistitrasparenza.StartAcquistiSetGroupsPrototipoSenzaAce;
 
 @Configuration
 public class FlowsProcessEngineConfigurations {

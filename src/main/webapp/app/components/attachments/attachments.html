@@ -1,7 +1,7 @@
 <ul class="list-unstyled">
-  <li ng-repeat="attachment in attachments">
+  <li ng-repeat="(name, attachment) in attachments">
     <strong>{{attachment.name}}:</strong>
-    <a href ng-click="downloadFile('/api/attachments/'+ processInstanceId +'/'+ attachment.name +'/data', attachment.filename, attachment.mimetype)" >
+    <a href ng-click="downloadFile('/api/attachments/'+ processInstanceId +'/'+ name +'/data', attachment.filename, attachment.mimetype)" >
       {{attachment.filename}}
     </a>
     <a href ng-if="showHistory === true" ng-click="showFileHistory(attachment.name)"><span class="glyphicon glyphicon-time" title="Cronologia"></span></a>

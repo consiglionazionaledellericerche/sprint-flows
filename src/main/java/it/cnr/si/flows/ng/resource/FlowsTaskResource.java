@@ -254,16 +254,10 @@ public class FlowsTaskResource {
         response.put("task", task);
 
         // attachments
-        ResponseEntity<List<FlowsAttachment>> attachementsEntity = attachmentResource.getAttachementsForTask(taskId);
-        Map<String, Object> attachments = new TreeMap<>();
-        attachementsEntity.getBody().stream()
-        .sorted((a1, a2) -> a1.getName().compareTo(a2.getName()))
-        .forEach(a -> {
-            a.setBytes(null);
-            attachments.put(a.getName(), a);
-        });
+        ResponseEntity<Map<String, FlowsAttachment>> attachementsEntity = attachmentResource.getAttachementsForTask(taskId);
+        Map<String, FlowsAttachment> attachments = attachementsEntity.getBody();
+        attachments.values().stream().forEach(e -> e.setBytes(null)); // il contenuto dei file non mi serve, e rallenta l'UI
         response.put("attachments", attachments);
-        response.put("attachmentsList", attachementsEntity.getBody());
 
         return ResponseEntity.ok(response);
     }
@@ -422,18 +416,18 @@ public class FlowsTaskResource {
             }
         } catch (BpmnError e) {
             LOGGER.error("L'utente {} ha cercato di a completare il task {} / avviare il flusso {}, ma c'e' stato un errore: {}", username, taskId, definitionId, e.getMessage());
-            return ResponseEntity.status(Utils.getStatus(e.getErrorCode())).body(Utils.mapOf("message", e.getMessage()));
+            return ResponseEntity.status(Utils.getStatus(e.getErrorCode())).body(Utils.mapOf("message", e.getMessage()) );
         } catch (IOException e) {
             LOGGER.error("Errore nel processare i files:", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore nel processare i files");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Utils.mapOf("message", "Errore nel processare i files") );
         } catch (FlowsPermissionException e) {
             LOGGER.error("L'utente {} non e' abilitato a completare il task {} / avviare il flusso {}", username, taskId, definitionId);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("L'utente non e' abilitato ad eseguire l'azione richiesta");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Utils.mapOf("message", "L'utente non e' abilitato ad eseguire l'azione richiesta") );
         } catch (Exception e) {
             // catch all con info per il debug
             long rif = Instant.now().toEpochMilli();
             LOGGER.error("(Riferimento " + rif + ") Errore non gestito con messaggio " + e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore non gestito. Contattare gli amminstratori specificando il numero di riferimento: " + rif);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Utils.mapOf("message", "Errore non gestito. Contattare gli amminstratori specificando il numero di riferimento: " + rif) );
         }
     }
 

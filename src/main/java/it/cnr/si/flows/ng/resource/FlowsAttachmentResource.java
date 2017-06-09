@@ -1,8 +1,16 @@
 package it.cnr.si.flows.ng.resource;
 
-import com.codahale.metrics.annotation.Timed;
-import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.security.AuthoritiesConstants;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -19,15 +27,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.inject.Inject;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import com.codahale.metrics.annotation.Timed;
+
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.security.AuthoritiesConstants;
 
 @Controller
 @RequestMapping("api/attachments")
@@ -46,7 +49,7 @@ public class FlowsAttachmentResource {
     @ResponseBody
     @Secured(AuthoritiesConstants.USER)
     @Timed
-    public ResponseEntity<List<FlowsAttachment>> getAttachementsForProcessInstance(
+    public ResponseEntity<Map<String, FlowsAttachment>> getAttachementsForProcessInstance(
             @PathVariable("processInstanceId") String processInstanceId) {
 
         Map<String, Object> processVariables = historyService.createHistoricProcessInstanceQuery()
@@ -55,10 +58,9 @@ public class FlowsAttachmentResource {
                 .singleResult()
                 .getProcessVariables();
 
-        List<FlowsAttachment> result = processVariables.entrySet().stream()
+        Map<String, FlowsAttachment> result = processVariables.entrySet().stream()
                 .filter(e -> e.getValue() instanceof FlowsAttachment)
-                .map(e -> (FlowsAttachment) e.getValue())
-                .collect(Collectors.toList());
+                .collect(Collectors.toMap(k -> k.getKey(), v -> ((FlowsAttachment)v.getValue()) ));
 
         return ResponseEntity.ok(result);
     }
@@ -67,7 +69,7 @@ public class FlowsAttachmentResource {
     @ResponseBody
     @Secured(AuthoritiesConstants.USER)
     @Timed
-    public ResponseEntity<List<FlowsAttachment>> getAttachementsForTask(
+    public ResponseEntity<Map<String, FlowsAttachment>> getAttachementsForTask(
             @PathVariable("taskId") String taskId) {
 
         String processInstanceId = taskService.createTaskQuery().taskId(taskId).singleResult().getProcessInstanceId();
