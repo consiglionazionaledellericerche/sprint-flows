@@ -104,7 +104,7 @@ public class FlowsAttachmentService {
      * invece se ne sto caricando uno nuovo, ho bisogno di sapere l'ultimo indice non ancora utilizzato
      */
 
-    private int getNextIndex(String taskId, String fileName, Map<String, Integer> nextIndexTable) {
+    public int getNextIndex(String taskId, String fileName, Map<String, Integer> nextIndexTable) {
 
         Integer index = nextIndexTable.get(fileName);
         if (index != null) {
