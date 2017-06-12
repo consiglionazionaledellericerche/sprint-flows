@@ -105,7 +105,7 @@ public class FlowsProcessInstanceResourceTest {
         assertEquals(processInstance.getId(), ((HistoricTaskInstanceResponse) history.get("historyTask")).getProcessInstanceId());
         assertEquals(1, ((ArrayList) history.get("historyIdentityLink")).size());
 
-        ArrayList attachments = (ArrayList) ((HashMap) response.getBody()).get("attachments");
+        HashMap attachments = (HashMap) ((HashMap) response.getBody()).get("attachments");
         assertEquals(0, attachments.size());
     }
 
