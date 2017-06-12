@@ -20,6 +20,13 @@
             <div ng-show="!vm.data.entity.completed">
                 <b>Fase: </b>{{vm.data.fase}} <br><br>
             </div>
+            <!--gruppo/utente assegnatario del task in esecuzione-->
+            <div ng-show="vm.data.groupCandidate">
+                <b>Gruppo Assegnatario: </b>{{vm.data.groupCandidate}} <br><br>
+            </div>
+            <div ng-show="vm.data.userCandidate">
+                <b>Utente Assegnatario: </b>{{vm.data.userCandidate}} <br><br>
+            </div>
 
             <ul class="list-unstyled">
                 <ng-include src="vm.detailsView"/>

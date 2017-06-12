@@ -26,10 +26,20 @@
 
                     var processDefinitionId = response.data.entity.processDefinitionId.split(":")[0];
                     vm.detailsView = 'api/views/' + processDefinitionId + '/detail';
-                    //recupero la fase
                     vm.data.history.forEach(function(el) {
-                        if (el.historyTask.endTime === null)
+                        //recupero l'ultimo task (quello ancora da eseguire)
+                        if (el.historyTask.endTime === null){
+                            //recupero la fase
                             vm.data.fase = el.historyTask.name;
+                            //recupero il gruppo/l'utente assegnatario del task
+                            el.historyIdentityLink.forEach(function(il){
+                              if(il.type === "candidate")
+                                if(il.groupId !== null)
+                            		vm.data.groupCandidate = il.groupId;
+                            	else
+                            	    vm.data.userCandidate = il.userId
+                            })
+                        }
                     });
                 });
         }
