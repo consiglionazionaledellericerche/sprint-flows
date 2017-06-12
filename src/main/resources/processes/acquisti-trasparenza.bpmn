@@ -193,7 +193,7 @@
       </sequenceFlow>
       <sequenceFlow id="flow143" sourceRef="exclusivegateway27" targetRef="predisposizione-provvedimento-aggiudicazione">
         <extensionElements>
-          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.SostituisciDocumento">
+          <activiti:executionListener event="take" delegateExpression="${sostituisciDocumentoListener}">
             <activiti:field name="nomeFileDaSostituire">
               <activiti:string><![CDATA[provvedimentoAggiudicazione]]></activiti:string>
             </activiti:field>
@@ -412,7 +412,7 @@
       </sequenceFlow>
     </subProcess>
     <sequenceFlow id="flow119" sourceRef="exclusivegateway15" targetRef="ordine-fuori-mepa">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${strumentoAcquisizioneId == '12'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${strumentoAcquisizioneId == '12'  || strumentoAcquisizioneId == '13}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow120" sourceRef="ordine-fuori-mepa" targetRef="exclusivegateway22"></sequenceFlow>
     <sequenceFlow id="flow122" sourceRef="exclusivegateway20" targetRef="ordine-fuori-mepa"></sequenceFlow>

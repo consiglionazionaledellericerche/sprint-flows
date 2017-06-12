@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,13 +137,13 @@ private String name;
 
         ((List<Stato>) this.getMetadati().get("stati")).add(s);
     }
-    
+
     @SuppressWarnings("unchecked")
     public void removeStato(Stato s) {
         if (this.getMetadati().get("stati") == null)
             this.getMetadati().put("stati", new ArrayList<Stato>());
         List<Stato> stato = (List<Stato>) this.getMetadati().get("stati");
-        stato.remove(s);       
+        stato.remove(s);
     }
 
     public void clearStato() {
@@ -156,5 +157,29 @@ private String name;
     public void setMetadato(String nome, Object valore) {
     	getMetadati().put(nome, valore);
     }
+
+//    public FlowsAttachment clone() {
+//        FlowsAttachment clone = new FlowsAttachment();
+//
+//        HashMap<String, Object> metadati = (HashMap<String, Object>) getMetadati();
+//
+//        clone.setFilename(getFilename());
+//        clone.setUsername(getUsername());
+//        clone.setUrl(getUrl());
+//        clone.setMimetype(getMimetype());
+//        clone.setTime(getTime());
+//        clone.setName(getName());
+//        clone.setBytes(getBytes());
+//        clone.setTaskName(getTaskName());
+//        clone.setMetadati(
+//                getMetadati().entrySet().stream().collect(Collectors.toMap(
+//                        k -> k.clone(),
+//                        v -> v.clone())
+//                        )
+//                );
+//
+//
+//        return clone;
+//    }
 
 }

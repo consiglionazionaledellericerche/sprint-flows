@@ -1,23 +1,29 @@
 package it.cnr.si.flows.ng.listeners;
 
+import java.util.Date;
+
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import it.cnr.jada.firma.arss.ArubaSignServiceException;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.exception.TaskFailedException;
 import it.cnr.si.flows.ng.service.FirmaService;
 
+@Component
 public class FirmaDocumento implements ExecutionListener {
 
     private static final long serialVersionUID = -56001764662303256L;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FirmaDocumento.class);
 
-    private FirmaService firmaService = new FirmaService();
+    @Autowired
+    private FirmaService firmaService;
     private Expression nomeFileDaFirmare;
 
     @Override
@@ -43,6 +49,9 @@ public class FirmaDocumento implements ExecutionListener {
             att.setFilename(getSignedFilename(att.getFilename()));
             att.setAzione(FlowsAttachment.Azione.Firma);
             att.addStato(FlowsAttachment.Stato.Firmato);
+            att.setTaskId(null);
+            att.setTaskName(null);
+            att.setTime(new Date());
 
             execution.setVariable(nomeVariabileFile, att);
 

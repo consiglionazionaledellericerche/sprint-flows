@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +19,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.dto.FlowsAttachment.Azione;
-import it.cnr.si.flows.ng.dto.FlowsAttachment.Stato;
 import it.cnr.si.security.SecurityUtils;
 
 @Service
@@ -37,6 +37,8 @@ public class FlowsAttachmentService {
 
     @Autowired
     private TaskService taskService;
+    @Autowired
+    private RuntimeService runtimeService;
 
     /**
      * Servizio che trasforma i multipart file in FlowsAttachment
@@ -45,8 +47,8 @@ public class FlowsAttachmentService {
      * IMPORTANTE: gli <input file multiple> devono avere il prefisso NEW_ATTACHMENT_PREFIX
      * (dovrebbe essere automatizzato nel componente, e non riguardare l'API pubblica)
      */
-    public Map<String, Object> extractAttachmentsVariables(MultipartHttpServletRequest req) throws IOException {
-        Map<String, Object> attachments = new HashMap<>();
+    public Map<String, FlowsAttachment> extractAttachmentsVariables(MultipartHttpServletRequest req) throws IOException {
+        Map<String, FlowsAttachment> attachments = new HashMap<>();
         Map<String, Integer> nextIndexTable = new HashMap<>();
         String taskId, taskName;
 
@@ -104,7 +106,7 @@ public class FlowsAttachmentService {
      * invece se ne sto caricando uno nuovo, ho bisogno di sapere l'ultimo indice non ancora utilizzato
      */
 
-    private int getNextIndex(String taskId, String fileName, Map<String, Integer> nextIndexTable) {
+    public int getNextIndex(String taskId, String fileName, Map<String, Integer> nextIndexTable) {
 
         Integer index = nextIndexTable.get(fileName);
         if (index != null) {
@@ -126,5 +128,14 @@ public class FlowsAttachmentService {
                 return index;
             }
         }
+    }
+
+    public int getNextIndexByProcessInstanceId(String processInstanceId, String fileName) {
+        int index = 0;
+        String variableName = fileName + "[" + index + "]";
+        while ( runtimeService.hasVariable(processInstanceId, variableName) == true ) {
+            variableName = fileName + "[" + (++index) + "]";
+        }
+        return index;
     }
 }
