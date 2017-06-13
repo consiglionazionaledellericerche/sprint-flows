@@ -14,6 +14,7 @@ import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.delegate.event.ActivitiEventType;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.repository.DeploymentBuilder;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -25,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,6 +34,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.zaxxer.hikari.HikariDataSource;
+
+import it.cnr.si.flows.ng.listeners.SaveSummaryAtProcessCompletion;
 
 @Configuration
 public class FlowsProcessEngineConfigurations {
@@ -138,7 +142,12 @@ public class FlowsProcessEngineConfigurations {
     }
 
     @PostConstruct
-    public void createDeployments() throws Exception {
+    public void init() throws Exception {
+        createDeployments();
+        addGlobalListeners();
+    }
+
+    private void createDeployments() throws Exception {
         RepositoryService repositoryService = appContext.getBean(RepositoryService.class);
 
         for (Resource resource : appContext.getResources("classpath:processes/*.bpmn*")) {
@@ -153,6 +162,16 @@ public class FlowsProcessEngineConfigurations {
                 builder.deploy();
             }
         }
+    }
+
+    private void addGlobalListeners() {
+        RuntimeService runtimeService = appContext.getBean(RuntimeService.class);
+        LOGGER.info("Adding Flows Listeners");
+
+        SaveSummaryAtProcessCompletion processEndListener = (SaveSummaryAtProcessCompletion)
+                appContext.getAutowireCapableBeanFactory().createBean(SaveSummaryAtProcessCompletion.class,
+                        AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
+        runtimeService.addEventListener(processEndListener, ActivitiEventType.PROCESS_COMPLETED);
     }
 
 }
