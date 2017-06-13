@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.dto.FlowsAttachment.Azione;
+import it.cnr.si.flows.ng.ldap.FlowsAuthoritiesPopulator;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 
 @Component
@@ -35,8 +36,6 @@ public class SostituisciDocumentoListener implements ExecutionListener {
         if (nomeFileDaSostituire.getValue(execution) == null)
             throw new IllegalStateException("Questo Listener ha bisogno del campo 'nomeFileDaSostituire' nella process definition (nel Task Listener - Fields).");
 
-        String executionId = execution.getId();
-
         String nomeVariabileFile = (String) nomeFileDaSostituire.getValue(execution);
 
         FlowsAttachment originale = (FlowsAttachment) execution.getVariable(nomeVariabileFile);
@@ -45,20 +44,13 @@ public class SostituisciDocumentoListener implements ExecutionListener {
         LOGGER.debug("Ricarico il file {} originale, ma con gli stati puliti", nomeVariabileFile);
         originale.clearStato();
         originale.setAzione(Azione.Sostituzione);
-        originale.setTaskId(null);
-        originale.setTaskName(null);
-        originale.setTime(new Date());
-        execution.setVariable(nomeVariabileFile, originale);
+        attachmentService.saveAttachment(execution, nomeVariabileFile, originale);
 
         LOGGER.debug("Salvo una copia per futuro riferimento");
         copia.setAzione(FlowsAttachment.Azione.Sostituzione);
         copia.addStato(FlowsAttachment.Stato.Sostituito);
-        copia.setTaskId(null);
-        copia.setTaskName(null);
-        copia.setTime(new Date());
         copia.setName("Provvedimento di Aggiudicazione Sostiutito");
-        int nextIndex = attachmentService.getNextIndexByProcessInstanceId(executionId, "provvedimentiRespinti");
-        execution.setVariable("provvedimentiRespinti["+ nextIndex +"]", copia);
+        attachmentService.saveAttachmentInArray(execution, "provvedimentiRespinti", copia);
 
     }
 

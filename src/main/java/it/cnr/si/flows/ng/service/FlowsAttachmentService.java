@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,6 +97,26 @@ public class FlowsAttachmentService {
         }
 
         return attachments;
+    }
+
+    public void saveAttachment(DelegateExecution execution, String variableName, FlowsAttachment att) {
+
+        att.setTime(new Date());
+        att.setTaskName(execution.getCurrentActivityName());
+        att.setTaskId( (String) execution.getVariable("taskId"));
+
+        execution.setVariable(variableName, att);
+    }
+
+    public void saveAttachmentInArray(DelegateExecution execution, String arrayName, FlowsAttachment att) {
+
+        att.setTime(new Date());
+        att.setTaskName(execution.getCurrentActivityName());
+        att.setTaskId( (String) execution.getVariable("taskId"));
+
+        int nextIndex = getNextIndexByProcessInstanceId(execution.getId(), arrayName);
+
+        execution.setVariable(arrayName +"["+ nextIndex +"]", att);
     }
 
     /**

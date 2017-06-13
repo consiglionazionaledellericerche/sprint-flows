@@ -1,7 +1,5 @@
 package it.cnr.si.flows.ng.listeners;
 
-import java.util.Date;
-
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
@@ -14,6 +12,7 @@ import it.cnr.jada.firma.arss.ArubaSignServiceException;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.exception.TaskFailedException;
 import it.cnr.si.flows.ng.service.FirmaService;
+import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 
 @Component
 public class FirmaDocumento implements ExecutionListener {
@@ -24,6 +23,10 @@ public class FirmaDocumento implements ExecutionListener {
 
     @Autowired
     private FirmaService firmaService;
+    @Autowired
+    private FlowsAttachmentService attachmentService;
+
+
     private Expression nomeFileDaFirmare;
 
     @Override
@@ -49,20 +52,12 @@ public class FirmaDocumento implements ExecutionListener {
             att.setFilename(getSignedFilename(att.getFilename()));
             att.setAzione(FlowsAttachment.Azione.Firma);
             att.addStato(FlowsAttachment.Stato.Firmato);
-            att.setTaskId(null);
-            att.setTaskName(null);
-            att.setTime(new Date());
 
-            execution.setVariable(nomeVariabileFile, att);
+            attachmentService.saveAttachment(execution, nomeVariabileFile, att);
 
         } catch (ArubaSignServiceException e) {
             LOGGER.error("firma non riuscita", e);
             throw new TaskFailedException(e);
-        }
-
-        String isError = (String) execution.getVariable("error");
-        if ("true".equals(isError)) {
-            throw new IllegalStateException("L'utente ha selezionato l'opzione errore. Rollback.");
         }
 
     }
