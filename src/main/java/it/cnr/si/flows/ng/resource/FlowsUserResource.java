@@ -3,6 +3,7 @@ package it.cnr.si.flows.ng.resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
@@ -32,7 +33,7 @@ public class FlowsUserResource {
     @Autowired
     private LdapTemplate ldapTemplate;
 
-    @RequestMapping(value = "/search/{username:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/{username:.+}/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<Map<String, Object>> getMyTasks(@PathVariable String username) {
@@ -48,7 +49,7 @@ public class FlowsUserResource {
         });
 
         response.put("more", search.size() > 10);
-        response.put("results", search.subList(0, 10));
+        response.put("results", search.stream().limit(10).collect(Collectors.toList()));
 
         return ResponseEntity.ok(response);
     }

@@ -79,5 +79,6 @@
         $scope.downloadFile = function(url, filename, mimetype) {
             utils.downloadFile(url, filename, mimetype);
         }
+
     }
 })();
