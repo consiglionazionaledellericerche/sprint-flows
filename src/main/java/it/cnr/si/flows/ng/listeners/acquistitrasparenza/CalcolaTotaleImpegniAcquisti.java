@@ -19,23 +19,24 @@ public class CalcolaTotaleImpegniAcquisti implements ExecutionListener {
 
 	@Override
 	public void notify(DelegateExecution execution) throws Exception {
+	    throw new BpmnError("500", "Questo Listener va rifattorizzato con il nuovo JSON degli impegni");
 
-		double importoTotale = 0.0;	
-		for(int i = 0; i<=100; i=i+1) {
-			String Elemento = "impegni[" +  i + "][importo]";
-			if(execution.getVariable(Elemento) != null){
-				String importoImpegnoSingolo = (String) execution.getVariable(Elemento);
-				try {
-					double importo = Double.parseDouble(importoImpegnoSingolo);
-					importoTotale = importoTotale + importo;
-				} catch (NumberFormatException e ){
-					LOGGER.error("Formato Impegno Non Valido {} nel flusso {} - {}", importoImpegnoSingolo, execution.getId(), execution.getVariable("title"));
-					throw new BpmnError("400", "Formato Impegno Non Valido: " + importoImpegnoSingolo);
-				}			
-			} else {
-				break;
-			}
-			execution.setVariable("importoTotale", importoTotale);
-		}
+//		double importoTotale = 0.0;
+//		for(int i = 0; i<=100; i=i+1) {
+//			String Elemento = "impegni[" +  i + "][importo]";
+//			if(execution.getVariable(Elemento) != null){
+//				String importoImpegnoSingolo = (String) execution.getVariable(Elemento);
+//				try {
+//					double importo = Double.parseDouble(importoImpegnoSingolo);
+//					importoTotale = importoTotale + importo;
+//				} catch (NumberFormatException e ){
+//					LOGGER.error("Formato Impegno Non Valido {} nel flusso {} - {}", importoImpegnoSingolo, execution.getId(), execution.getVariable("title"));
+//					throw new BpmnError("400", "Formato Impegno Non Valido: " + importoImpegnoSingolo);
+//				}
+//			} else {
+//				break;
+//			}
+//			execution.setVariable("importoTotale", importoTotale);
+//		}
 	}
 }
