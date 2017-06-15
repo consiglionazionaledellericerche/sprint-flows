@@ -108,6 +108,16 @@
                 <artifactId>spring-security-web</artifactId>
                 <version>${spring.security.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.pdfbox</groupId>
+                <artifactId>pdfbox</artifactId>
+                <version>1.8.12</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.ralfstuckert.pdfbox-layout</groupId>
+                <artifactId>pdfbox1-layout</artifactId>
+                <version>0.8.1</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
