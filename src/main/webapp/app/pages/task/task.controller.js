@@ -1,4 +1,4 @@
-(function() {
+ (function() {
     'use strict';
 
     angular
@@ -14,6 +14,7 @@
         vm.data.processDefinitionId = $state.params.processDefinitionId;
         vm.processDefinitionKey = vm.data.processDefinitionId.split(":")[0];
         vm.processVersion       = vm.data.processDefinitionId.split(":")[1];
+        vm.detailsView = 'api/views/'+ vm.processDefinitionKey +'/detail';
 
         // Ho bisogno di caricare piu' risorse contemporaneamente (form e data);
         // quando sono finite entrambe, autofillo la form
@@ -37,37 +38,47 @@
                     vm.taskVariables = utils.refactoringVariables(response.data.task).variabili;
                     vm.attachments = response.data.attachments;
                     vm.attachmentsList = response.data.attachmentsList;
-                    vm.diagramUrl = '/rest/diagram/taskInstance/'+ vm.data.taskId;
+                    vm.diagramUrl = '/rest/diagram/taskInstance/'+ vm.data.taskId +"?"+ new Date().getTime();
                     vm.formUrl = 'api/forms/task/'+ vm.data.taskId;
             });
         } else {
             dataPromise.reject("");
 
-            vm.diagramUrl = "/rest/diagram/processDefinition/" + $state.params.processDefinitionId;
+            vm.diagramUrl = "/rest/diagram/processDefinition/" + $state.params.processDefinitionId +"?"+ new Date().getTime();
             vm.formUrl = 'api/forms/'+ vm.processDefinitionKey + "/" + vm.processVersion + "/" + $state.params.taskName
         }
 
         $scope.submitTask = function(file) {
 
             $log.info(Object.keys(vm.data));
+            if ($scope.taskForm.$invalid) {
+                angular.forEach($scope.taskForm.$error, function (field) {
+                    angular.forEach(field, function(errorField){
+                        errorField.$setTouched();
+                    });
+                });
+                AlertService.warning("Inserire tutti i valori obbligatori.");
+            } else {
 
-            Upload.upload({
-                url: 'api/tasks/complete',
-                data: vm.data,
-            }).then(function (response) {
+                Upload.upload({
+                    url: 'api/tasks/complete',
+                    data: vm.data,
+                }).then(function (response) {
 
-                $log.info(response);
-                AlertService.success("Richiesta completata con successo");
-                $state.go('availabletasks');
+                    $log.info(response);
+                    AlertService.success("Richiesta completata con successo");
+                    $state.go('availabletasks');
 
-            }, function (err) {
-                $log.error(err);
-                AlertService.error("Richiesta non riuscita<br>"+ err.data.message);
-            });
+                }, function (err) {
+                    $log.error(err);
+                    AlertService.error("Richiesta non riuscita<br>"+ err.data.message);
+                });
+            }
         }
 
         $scope.downloadFile = function(url, filename, mimetype) {
             utils.downloadFile(url, filename, mimetype);
         }
+
     }
 })();

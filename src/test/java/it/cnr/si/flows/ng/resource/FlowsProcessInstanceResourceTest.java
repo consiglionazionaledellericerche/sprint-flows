@@ -5,11 +5,12 @@ import it.cnr.si.flows.ng.TestUtil;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
+import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
 import org.activiti.rest.service.api.repository.ProcessDefinitionResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.joda.time.DateTime;
 import org.junit.After;
-import org.junit.Ignore;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,10 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -29,8 +33,7 @@ import java.util.stream.Collectors;
 
 import static it.cnr.si.flows.ng.TestUtil.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
 import static it.cnr.si.flows.ng.utils.Utils.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -52,6 +55,13 @@ public class FlowsProcessInstanceResourceTest {
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
 
+    @Before
+    public void setUp() {
+        HttpServletRequest mockRequest = new MockHttpServletRequest();
+        ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(mockRequest);
+        RequestContextHolder.setRequestAttributes(servletRequestAttributes);
+    }
+
     @After
     public void tearDown() {
         util.myTearDown();
@@ -60,7 +70,7 @@ public class FlowsProcessInstanceResourceTest {
 
     @Test
     public void testGetMyProcesses() {
-        processInstance = util.mySetUp("missioni");
+        processInstance = util.mySetUp("acquisti-trasparenza");
         String processInstanceID = verifyMyProcesses(1, 0);
         // testo che, anche se una Process Instance viene sospesa, la vedo ugualmente
         flowsProcessInstanceResource.suspend(new MockHttpServletRequest(), processInstanceID);
@@ -72,39 +82,45 @@ public class FlowsProcessInstanceResourceTest {
 
 
     @Test
-    @Ignore
-    public void testGetMyTasks() {
-        //TODO: Test goes here...
-    }
-
-    @Test
-    @Ignore
-    public void testGetAvailableTasks() {
-        //TODO: Test goes here...
-    }
-
-    @Test
-    @Ignore
-    public void testGetWorkflowInstances() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    @Test
-    @Ignore
     public void testGetProcessInstanceById() throws Exception {
-        //TODO: Test goes here...
+        processInstance = util.mySetUp("acquisti-trasparenza");
+
+        ResponseEntity<Map<String, Object>> response = flowsProcessInstanceResource.getProcessInstanceById(processInstance.getId());
+        assertEquals(OK, response.getStatusCode());
+
+        HistoricProcessInstanceResponse entity = (HistoricProcessInstanceResponse) ((HashMap) response.getBody()).get("entity");
+        assertEquals(processInstance.getId(), entity.getId());
+        assertEquals(processInstance.getBusinessKey(), entity.getBusinessKey());
+        assertEquals(processInstance.getProcessDefinitionId(), entity.getProcessDefinitionId());
+
+        HashMap appo = (HashMap) ((HashMap) response.getBody()).get("identityLinks");
+        assertEquals(1, appo.size());
+        HashMap identityLinks = (HashMap) appo.get(appo.keySet().toArray()[0]);
+        assertEquals("[${gruppoSFD}]", identityLinks.get("candidateGroups").toString());
+        assertEquals(((HashSet) identityLinks.get("candidateUsers")).size(), 0);
+        assertEquals(((ArrayList) identityLinks.get("links")).size(), 1);
+        assertNull(identityLinks.get("assignee"));
+
+        HashMap history = (HashMap) ((ArrayList) ((HashMap) response.getBody()).get("history")).get(0);
+        assertEquals(processInstance.getId(), ((HistoricTaskInstanceResponse) history.get("historyTask")).getProcessInstanceId());
+        assertEquals(1, ((ArrayList) history.get("historyIdentityLink")).size());
+
+        HashMap attachments = (HashMap) ((HashMap) response.getBody()).get("attachments");
+        assertEquals(0, attachments.size());
     }
 
     @Test
     public void testGetProcessInstances() {
         processInstance = util.mySetUp("acquisti-trasparenza");
-        //Recupero la Process Definition per permessi ferie
+        //Recupero la Process Definition per acquisti-trasparenza
         util.loginUser();
         DataResponse appo = (DataResponse) flowsProcessDefinitionResource.getAllProcessDefinitions();
         String acquistiTrasparenzaId = ((ArrayList<ProcessDefinitionResponse>) appo.getData()).stream()
                 .filter(h -> h.getKey().contains("acquisti-trasparenza"))
                 .collect(Collectors.toList()).get(0).getId();
-        //User crea una seconda Process Instance di acquisti-trasparenza con suffisso "2"
+        //responsabileacquisti crea una seconda Process Instance di acquisti-trasparenza con suffisso "2" nel titoloIstanzaFlusso
+        util.logout();
+        util.loginResponsabileAcquisti();
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
         req.setParameter("processDefinitionId", acquistiTrasparenzaId);
         req.setParameter("titoloIstanzaFlusso", TITOLO_DELL_ISTANZA_DEL_FLUSSO + "2");
@@ -114,7 +130,8 @@ public class FlowsProcessInstanceResourceTest {
         req.setParameter("strumentoAcquisizione", "AFFIDAMENTO DIRETTO - MEPA o CONSIP\n");
         req.setParameter("strumentoAcquisizioneId", "11");
         req.setParameter("priorita", "Alta");
-        flowsTaskResource.completeTask(req);
+        ResponseEntity<Object> resp = flowsTaskResource.completeTask(req);
+        assertEquals(OK, resp.getStatusCode());
         util.logout();
 
         //Verifico che Admin veda entrambe le Process Instances create
@@ -128,7 +145,7 @@ public class FlowsProcessInstanceResourceTest {
         ResponseEntity<DataResponse> ret = flowsProcessInstanceResource.getProcessInstances(request, true, ALL_PROCESS_INSTANCES, 0, 1000, ASC);
         assertEquals(HttpStatus.OK, ret.getStatusCode());
         ArrayList<HistoricProcessInstanceResponse> entities = (ArrayList<HistoricProcessInstanceResponse>) ret.getBody().getData();
-        //vedo sia la Process Instance avviata da admin che quella avviata da User
+        //vedo sia la Process Instance avviata da admin che quella avviata da responsabileacquisti
         assertEquals(2, entities.size());
         assertEquals(util.getProcessDefinition(), entities.get(0).getProcessDefinitionId());
         assertEquals(acquistiTrasparenzaId, entities.get(1).getProcessDefinitionId());
@@ -155,14 +172,8 @@ public class FlowsProcessInstanceResourceTest {
 
 
     @Test
-    @Ignore
-    public void testGetWorkflowVariables() throws Exception {
-        //TODO: Test goes here...
-    }
-
-    @Test
     public void testSuspend() throws Exception {
-        processInstance = util.mySetUp("missioni");
+        processInstance = util.mySetUp("acquisti-trasparenza");
         assertEquals(false, processInstance.isSuspended());
         ProcessInstanceResponse response = flowsProcessInstanceResource.suspend(new MockHttpServletRequest(), processInstance.getId());
         assertEquals(true, response.isSuspended());
@@ -170,19 +181,21 @@ public class FlowsProcessInstanceResourceTest {
 
     @Test
     public void testSearchProcessInstances() throws ParseException {
-        processInstance = util.mySetUp("missioni");
+        processInstance = util.mySetUp("acquisti-trasparenza");
         util.loginAdmin();
         MockHttpServletRequest req = new MockHttpServletRequest();
 
-        String searchField1 = "wfvarValidazioneSpesa";
+        String searchField1 = "strumentoAcquisizioneId";
+        String searchValue1 = "11";
         String searchField2 = "initiator";
+        String searchValue2 = "admin";
         final Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, +1);
         Date tomorrow = cal.getTime();
         cal.add(Calendar.DATE, -2);
         Date yesterday = cal.getTime();
-        String payload = "{params: [{key: " + searchField1 + ", value: true, type: boolean}, " +
-                "{key: " + searchField2 + ", value: \"admin\", type: textEqual}, " +
+        String payload = "{params: [{key: " + searchField1 + ", value: \"" + searchValue1 + "\", type: textEqual}, " +
+                "{key: " + searchField2 + ", value: \"" + searchValue2 + "\", type: text}, " +
                 "{key: \"startDateGreat\", value: \"" + sdf.format(yesterday) + "\", type: \"date\"}," +
                 "{key: \"startDateLess\", value: \"" + sdf.format(tomorrow) + "\", type: \"date\"}]}";
         req.setContent(payload.getBytes());
@@ -190,26 +203,26 @@ public class FlowsProcessInstanceResourceTest {
 
         //verifico la richiesta normale
         ResponseEntity<Object> response = flowsProcessInstanceResource.search(req, util.getProcessDefinition().split(":")[0], true, ASC, 0, 10);
-        verifyResponse(response, 1, searchField1, searchField2);
+        verifySearchResponse(response, 1, searchField1, searchValue1, searchField2, searchValue2);
 
         //verifico la richiesta su tutte le Process Definition
         response = flowsProcessInstanceResource.search(req, "all", true, ASC, 0, 10);
-        verifyResponse(response, 1, searchField1, searchField2);
+        verifySearchResponse(response, 1, searchField1, searchValue1, searchField2, searchValue2);
 
         //cerco le Process Instance completate (active = false  ==>  #(processDeleted) risultati)
         response = flowsProcessInstanceResource.search(req, util.getProcessDefinition().split(":")[0], false, DESC, 0, 10);
-        verifyResponse(response, processDeleted, searchField1, searchField2);
+        verifySearchResponse(response, processDeleted, searchField1, searchValue1, searchField2, searchValue2);
 
-        //parametri sbagliati (0 risultati)
-        payload = "{params: [{key: " + searchField1 + ", value: false, type: boolean} , {key: initiator, value: \"admin\", type: textEqual}]}";
+        //parametri sbagliati (strumentoAcquisizioneId 12 invece di 11) ==> 0 risultati
+        payload = "{params: [{key: " + searchField1 + ", value: \"12\", type: textEqual} , {key: initiator, value: \"admin\", type: text}]}";
         req.setContent(payload.getBytes());
         req.setContentType("application/json");
 
         response = flowsProcessInstanceResource.search(req, util.getProcessDefinition().split(":")[0], true, ASC, 0, 10);
-        verifyResponse(response, 0, searchField1, searchField2);
+        verifySearchResponse(response, 0, searchField1, searchValue1, searchField2, searchValue2);
     }
 
-    private void verifyResponse(ResponseEntity<Object> response, int expectedTotalItems, String searchField1, String searchField2) {
+    private void verifySearchResponse(ResponseEntity<Object> response, int expectedTotalItems, String searchField1, String searchValue1, String searchField2, String searchValue2) {
         assertEquals(OK, response.getStatusCode());
         HashMap body = (HashMap) response.getBody();
         ArrayList responseList = (ArrayList) body.get("processInstances");
@@ -222,10 +235,10 @@ public class FlowsProcessInstanceResourceTest {
             //verifico che la Process Instance restituita rispetti i parametri della ricerca
             List<RestVariable> variables = taskresponse.getVariables();
             RestVariable variable = variables.stream().filter(v -> v.getName().equals(searchField1)).collect(Collectors.toList()).get(0);
-            assertEquals(true, variable.getValue());
+            assertEquals(searchValue1, variable.getValue());
 
             variable = variables.stream().filter(v -> v.getName().equals(searchField2)).collect(Collectors.toList()).get(0);
-            assertEquals("admin", variable.getValue());
+            assertEquals(searchValue2, variable.getValue());
         }
     }
 
@@ -233,7 +246,7 @@ public class FlowsProcessInstanceResourceTest {
     private String verifyMyProcesses(int startedByAdmin, int startedBySpaclient) {
         String proceeeInstanceID = null;
         // Admin vede la Process Instance che ha avviato
-        ResponseEntity<DataResponse> response = flowsProcessInstanceResource.getMyProcessInstances(true, "all", ASC, 0, 100);
+        ResponseEntity<DataResponse> response = flowsProcessInstanceResource.getMyProcessInstances(true, ALL_PROCESS_INSTANCES, ASC, 0, 100);
         assertEquals(OK, response.getStatusCode());
         assertEquals(startedByAdmin, response.getBody().getSize());
         List<HistoricProcessInstanceResponse> processInstances = ((List<HistoricProcessInstanceResponse>) response.getBody().getData());

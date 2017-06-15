@@ -5,14 +5,9 @@
   .factory('dataService', Data);
 
 
-  Data.$inject = ['$http', '$location', '$rootScope', '$log', '$sessionStorage'];
+  Data.$inject = ['$http'];
 
-  function Data ($http, $location, $rootScope, $log, $sessionStorage) {
-
-    var development = $location.$$port === 9000; //GRUNT PORT;
-
-    $rootScope.development = development;
-
+  function Data ($http) {
 
     return {
 
@@ -60,7 +55,10 @@
                 '&firstResult=' + firstResult +
                 '&maxResults=' + maxResults +
                 '&order=' + order, params);
-        }
+        },
+        getAttachments: function(taskId) {
+            return $http.get('api/attachments/task/'+ taskId);
+        },
       },
       processInstances: {
         byProcessInstanceId : function(processInstanceId) {
@@ -80,7 +78,7 @@
             '&firstResult=' + firstResult +
             '&maxResults=' + maxResults, params);
         },
-        attachments: function(processInstanceId) {
+        getAttachments: function(processInstanceId) {
             return $http.get('api/attachments/'+ processInstanceId);
         },
         attachmentHistory: function(processInstaceId, attachmentName) {
@@ -115,6 +113,9 @@
       },
       view: function(processid, type) {
         return $http.get('api/views/'+ processid +'/'+ type);
+      },
+      users: function(filter) {
+        return $http.get('api/users/'+ filter +"/search");
       }
     };
   }

@@ -5,19 +5,28 @@ import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import it.cnr.jada.firma.arss.ArubaSignServiceException;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.exception.TaskFailedException;
 import it.cnr.si.flows.ng.service.FirmaService;
+import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 
+@Component
 public class FirmaDocumento implements ExecutionListener {
 
     private static final long serialVersionUID = -56001764662303256L;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FirmaDocumento.class);
 
-    private FirmaService firmaService = new FirmaService();
+    @Autowired
+    private FirmaService firmaService;
+    @Autowired
+    private FlowsAttachmentService attachmentService;
+
+
     private Expression nomeFileDaFirmare;
 
     @Override
@@ -44,16 +53,11 @@ public class FirmaDocumento implements ExecutionListener {
             att.setAzione(FlowsAttachment.Azione.Firma);
             att.addStato(FlowsAttachment.Stato.Firmato);
 
-            execution.setVariable(nomeVariabileFile, att);
+            attachmentService.saveAttachment(execution, nomeVariabileFile, att);
 
         } catch (ArubaSignServiceException e) {
             LOGGER.error("firma non riuscita", e);
             throw new TaskFailedException(e);
-        }
-
-        String isError = (String) execution.getVariable("error");
-        if ("true".equals(isError)) {
-            throw new IllegalStateException("L'utente ha selezionato l'opzione errore. Rollback.");
         }
 
     }

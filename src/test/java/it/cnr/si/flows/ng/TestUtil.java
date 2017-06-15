@@ -113,6 +113,18 @@ public class TestUtil {
         login("user", "user");
     }
 
+    public void loginSfd() {
+        login("supportofunzionidirigenziali", "supportofunzionidirigenziali");
+    }
+
+    public void loginSfd2() {
+        login("supportofunzionidirigenziali2", "supportofunzionidirigenziali2");
+    }
+
+    public void loginResponsabileAcquisti() {
+        login("responsabileacquisti", "responsabileacquisti");
+    }
+
 
     private void login(String user, String psw) {
         SecurityContextHolder.getContext().setAuthentication(
@@ -150,7 +162,6 @@ public class TestUtil {
         // Recupero il TaskId del primo task del flusso
         firstTaskId = taskService.createTaskQuery().singleResult().getId();
         //Recupero la ProcessInstance
-//        processInstance = (ProcessInstanceResponse) response.getBody();
         return (ProcessInstanceResponse) response.getBody();
     }
 
@@ -169,10 +180,6 @@ public class TestUtil {
     public String getProcessDefinition() {
         return processDefinition;
     }
-
-//    public ProcessInstanceResponse getProcessInstance() {
-//        return processInstance;
-//    }
 
     public String getFirstTaskId() {
         return firstTaskId;

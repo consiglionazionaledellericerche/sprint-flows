@@ -23,14 +23,10 @@
         ])
         .run(run);
 
-    run.$inject = ['stateHandler', 'translationHandler', '$rootScope', 'Lightbox'];
+    run.$inject = ['stateHandler', 'translationHandler'];
 
-    function run(stateHandler, translationHandler, $rootScope, Lightbox) {
+    function run(stateHandler, translationHandler) {
         stateHandler.initialize();
         translationHandler.initialize();
-
-        $rootScope.openDiagramModal = function(url) {
-            Lightbox.openModal([url], 0);
-        }
     }
 })();

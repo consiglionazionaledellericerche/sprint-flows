@@ -1,10 +1,7 @@
 package it.cnr.si.flows.ng.config;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
@@ -17,7 +14,7 @@ import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
-import org.activiti.engine.delegate.event.ActivitiEventListener;
+import org.activiti.engine.delegate.event.ActivitiEventType;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.repository.DeploymentBuilder;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -29,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,15 +35,12 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import com.zaxxer.hikari.HikariDataSource;
 
-import it.cnr.si.flows.ng.listeners.ActivitiLoggingEventListener;
-import it.cnr.si.flows.ng.listeners.FlowsVisibilitySetter;
-import it.cnr.si.flows.ng.listeners.TestExecutionListener;
-import it.cnr.si.flows.ng.listeners.acquistitrasparenza.StartAcquistiSetGroupsPrototipoSenzaAce;
+import it.cnr.si.flows.ng.listeners.SaveSummaryAtProcessCompletion;
 
 @Configuration
-public class FlowsConfigurations {
+public class FlowsProcessEngineConfigurations {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FlowsConfigurations.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlowsProcessEngineConfigurations.class);
 
     @Value("${cnr.activiti.diagram-font}")
     private String diagramFont;
@@ -69,14 +64,6 @@ public class FlowsConfigurations {
         conf.setDataSource(dataSource);
         conf.setTransactionManager(transactionManager);
         conf.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
-
-        // Event listeners generici
-        conf.setEventListeners(Arrays.asList(new FlowsVisibilitySetter()));
-        Map<Object, Object> beans = new HashMap<>();
-        TestExecutionListener bean = appContext.getBean(TestExecutionListener.class);
-        beans.put("testExecutionListener", bean);
-        beans.put("startAcquistiSetGroupsPrototipoSenzaAce", getStartAcquistiSetGroupsPrototipoSenzaAce());
-        conf.setBeans(beans);
 
         //         configurare il font in cnr.activiti.diagram-font, solo se e' installato
         if ( Arrays.asList(java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames())
@@ -103,13 +90,6 @@ public class FlowsConfigurations {
         return conf;
     }
 
-    @Bean(name = "startAcquistiSetGroupsPrototipoSenzaAce")
-    public StartAcquistiSetGroupsPrototipoSenzaAce getStartAcquistiSetGroupsPrototipoSenzaAce() {
-        StartAcquistiSetGroupsPrototipoSenzaAce bean = new StartAcquistiSetGroupsPrototipoSenzaAce();
-        appContext.getAutowireCapableBeanFactory().autowireBean(bean);
-        return bean;
-    }
-
     @Bean(name = "processEngine")
     public ProcessEngine getProcessEngine(
             SpringProcessEngineConfiguration conf) throws Exception {
@@ -131,23 +111,23 @@ public class FlowsConfigurations {
         return processEngine.getRuntimeService();
     }
 
-    @Bean FormService getFormService(ProcessEngine processEngine) throws Exception {
+    @Bean public FormService getFormService(ProcessEngine processEngine) throws Exception {
         return processEngine.getFormService();
     }
 
-    @Bean HistoryService getHistoryService(ProcessEngine processEngine) throws Exception {
+    @Bean public HistoryService getHistoryService(ProcessEngine processEngine) throws Exception {
         return processEngine.getHistoryService();
     }
 
-    @Bean TaskService getTaskService(ProcessEngine processEngine) throws Exception {
+    @Bean public TaskService getTaskService(ProcessEngine processEngine) throws Exception {
         return processEngine.getTaskService();
     }
 
-    @Bean IdentityService getIdentityService(ProcessEngine processEngine) throws Exception {
+    @Bean public IdentityService getIdentityService(ProcessEngine processEngine) throws Exception {
         return processEngine.getIdentityService();
     }
 
-    @Bean ManagementService getManagementService(ProcessEngine processEngine) throws Exception {
+    @Bean public ManagementService getManagementService(ProcessEngine processEngine) throws Exception {
         return processEngine.getManagementService();
     }
 
@@ -162,7 +142,12 @@ public class FlowsConfigurations {
     }
 
     @PostConstruct
-    public void createDeployments() throws Exception {
+    public void init() throws Exception {
+        createDeployments();
+        addGlobalListeners();
+    }
+
+    private void createDeployments() throws Exception {
         RepositoryService repositoryService = appContext.getBean(RepositoryService.class);
 
         for (Resource resource : appContext.getResources("classpath:processes/*.bpmn*")) {
@@ -177,6 +162,16 @@ public class FlowsConfigurations {
                 builder.deploy();
             }
         }
+    }
+
+    private void addGlobalListeners() {
+        RuntimeService runtimeService = appContext.getBean(RuntimeService.class);
+        LOGGER.info("Adding Flows Listeners");
+
+        SaveSummaryAtProcessCompletion processEndListener = (SaveSummaryAtProcessCompletion)
+                appContext.getAutowireCapableBeanFactory().createBean(SaveSummaryAtProcessCompletion.class,
+                        AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
+        runtimeService.addEventListener(processEndListener, ActivitiEventType.PROCESS_COMPLETED);
     }
 
 }

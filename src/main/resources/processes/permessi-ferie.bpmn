@@ -6,18 +6,33 @@
         <activiti:executionListener event="start" delegateExpression="${testExecutionListener}"></activiti:executionListener>
       </extensionElements>
     </startEvent>
-    <userTask id="approvazione" name="Direttore Approva o Rifiuta" activiti:candidateGroups="ROLE_ADMIN"></userTask>
+    <userTask id="approvazione" name="Direttore Approva o Rifiuta" activiti:candidateGroups="ADMIN"></userTask>
     <endEvent id="endevent1" name="End"></endEvent>
     <sequenceFlow id="flow2" sourceRef="approvazione" targetRef="exclusivegateway1"></sequenceFlow>
     <userTask id="usertask1" name="User Task" activiti:candidateGroups="SEGRETARIO,DEPARTMENT_603240"></userTask>
     <sequenceFlow id="flow3" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
-    <sequenceFlow id="flow4" sourceRef="usertask1" targetRef="approvazione"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="usertask1" targetRef="approvazione">
+      <extensionElements>
+        <activiti:executionListener event="take" delegateExpression="${firmaDocumento}">
+          <activiti:field name="nomeFileDaFirmare">
+            <activiti:string><![CDATA[provvedimentoAggiudicazione]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </sequenceFlow>
     <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
     <sequenceFlow id="fine" sourceRef="exclusivegateway1" targetRef="endevent1">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approvato == true}]]></conditionExpression>
     </sequenceFlow>
     <userTask id="correggi" name="Correggi" activiti:assignee="${initiator}"></userTask>
     <sequenceFlow id="flow5" sourceRef="exclusivegateway1" targetRef="correggi">
+      <extensionElements>
+        <activiti:executionListener event="take" delegateExpression="${sostituisciDocumentoListener}">
+          <activiti:field name="nomeFileDaSostituire">
+            <activiti:string><![CDATA[provvedimentoAggiudicazione]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approvato == false}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow6" sourceRef="correggi" targetRef="usertask1"></sequenceFlow>

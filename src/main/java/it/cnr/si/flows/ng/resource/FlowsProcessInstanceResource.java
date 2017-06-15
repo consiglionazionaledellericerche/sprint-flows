@@ -134,7 +134,7 @@ public class FlowsProcessInstanceResource {
         ReadOnlyProcessDefinition processDefinition = ((RepositoryServiceImpl) repositoryService).getDeployedProcessDefinition(processInstance.getProcessDefinitionId());
 
         // Attachments
-        ResponseEntity<List<FlowsAttachment>> attachements = attachmentResource.getAttachementsForProcessInstance(processInstanceId);
+        ResponseEntity<Map<String, FlowsAttachment>> attachements = attachmentResource.getAttachementsForProcessInstance(processInstanceId);
         result.put("attachments", attachements.getBody());
 
         // IdentityLinks (candidate groups)
