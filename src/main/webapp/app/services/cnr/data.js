@@ -96,6 +96,9 @@
                 '&order=' + order +
                 '&firstResult=' + firstResult +
                 '&maxResults=' + maxResults, params);
+        },
+        exportSummary: function (processInstaceId) {
+            return $http.get('api/summaryPdf?processInstanceId='+ processInstaceId);
         }
       },
       definitions : {

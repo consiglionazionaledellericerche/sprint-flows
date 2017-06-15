@@ -1,38 +1,23 @@
 package it.cnr.si.flows.ng.resource;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collections;
-
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.GraphicInfo;
-import org.activiti.bpmn.model.SubProcess;
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.history.HistoricProcessInstanceQuery;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.ProcessInstance;
+import com.codahale.metrics.annotation.Timed;
+import it.cnr.si.flows.ng.service.FlowsProcessDiagramGenerator;
+import it.cnr.si.flows.ng.service.FlowsProcessDiagramService;
+import org.activiti.engine.*;
 import org.activiti.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.codahale.metrics.annotation.Timed;
-
-import it.cnr.si.flows.ng.service.FlowsProcessDiagramGenerator;
-import it.cnr.si.security.AuthoritiesConstants;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.io.InputStream;
 
 
 @Controller
@@ -51,6 +36,8 @@ public class FlowsDiagramResource {
     private ProcessEngineConfiguration processEngineConfiguration;
     @Autowired
     private HistoryService historyService;
+    @Inject
+    private FlowsProcessDiagramService flowsProcessDiagramService;
 
     @RequestMapping(value = "diagram/processDefinition/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
     @ResponseBody
@@ -71,51 +58,10 @@ public class FlowsDiagramResource {
     public ResponseEntity<InputStreamResource> getDiagramForProcessInstance(
             @PathVariable String id, String font)
             throws IOException {
-        InputStream resource;
-        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
-                .processInstanceId(id).singleResult();
-
-        if (font == null || font.isEmpty())
-            font = "Arial";
-
-        if (processInstance != null) {
-            ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId());
-
-            BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinition.getId());
-            for (FlowElement fe : bpmnModel.getProcesses().get(0).getFlowElements()) {
-                GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(fe.getId());
-                if (fe instanceof SubProcess) {
-                    graphicInfo.setExpanded(containsActiveTasks((SubProcess) fe, processInstance.getId()));
-                }
-            }
-            resource = pdg.generateDiagram(bpmnModel, "png", runtimeService.getActiveActivityIds(processInstance.getId()),
-                                           Collections.<String>emptyList(),
-                                           font, font, font,
-                                           processEngineConfiguration.getClassLoader(), 1.2);
-        } else {
-            HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
-            HistoricProcessInstance hpi = historicProcessInstanceQuery.processInstanceId(id).singleResult();
-
-            BpmnModel bpmnModel = repositoryService.getBpmnModel(hpi.getProcessDefinitionId());
-            // per cerchiare l'endEvent con cui un processo e' eventualmente terminato
-//            HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
-//            HistoricActivityInstance endActivity = query
-//                    .activityType(ELEMENT_EVENT_END)
-//                    .processInstanceId(((HistoricProcessInstanceEntity) hpi).getProcessInstanceId())
-//                    .singleResult();
-
-            for (FlowElement fe : bpmnModel.getProcesses().get(0).getFlowElements()) {
-                GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(fe.getId());
-                if (fe instanceof SubProcess) {
-                    graphicInfo.setExpanded(containsActiveTasks((SubProcess) fe, hpi.getId()));
-                }
-            }
-            resource = pdg.generateDiagram(bpmnModel, "png",
-                                           font, font, font,
-                                           processEngineConfiguration.getClassLoader(), 1.2);
-        }
+        InputStream resource = flowsProcessDiagramService.getDiagramForProcessInstance(id, font);
         return ResponseEntity.ok(new InputStreamResource(resource));
     }
+
 
     @RequestMapping(value = "diagram/taskInstance/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
     @ResponseBody
@@ -144,14 +90,5 @@ public class FlowsDiagramResource {
 
         return getDiagramForProcessInstance(task.getProcessInstanceId(), font);
 
-    }
-
-
-    private boolean containsActiveTasks(SubProcess sp, String processInstanceId) {
-        for (FlowElement fe : sp.getFlowElements()) {
-            if (runtimeService.getActiveActivityIds(processInstanceId).contains(fe.getId()))
-                return true;
-        }
-        return false;
     }
 }

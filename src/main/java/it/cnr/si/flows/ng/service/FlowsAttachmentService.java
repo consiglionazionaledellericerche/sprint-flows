@@ -1,13 +1,9 @@
 package it.cnr.si.flows.ng.service;
 
-import static it.cnr.si.flows.ng.utils.MimetypeUtils.getMimetype;
-
-import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.dto.FlowsAttachment.Azione;
+import it.cnr.si.security.SecurityUtils;
+import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.DelegateExecution;
@@ -15,12 +11,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.dto.FlowsAttachment.Azione;
-import it.cnr.si.security.SecurityUtils;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static it.cnr.si.flows.ng.utils.MimetypeUtils.getMimetype;
 
 @Service
 public class FlowsAttachmentService {
@@ -40,6 +43,8 @@ public class FlowsAttachmentService {
     private TaskService taskService;
     @Autowired
     private RuntimeService runtimeService;
+    @Inject
+    private HistoryService historyService;
 
     /**
      * Servizio che trasforma i multipart file in FlowsAttachment
@@ -159,4 +164,17 @@ public class FlowsAttachmentService {
         }
         return index;
     }
+
+    public Map<String, FlowsAttachment> getAttachementsForProcessInstance(@PathVariable("processInstanceId") String processInstanceId) {
+        Map<String, Object> processVariables = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .includeProcessVariables()
+                .singleResult()
+                .getProcessVariables();
+
+        return processVariables.entrySet().stream()
+                .filter(e -> e.getValue() instanceof FlowsAttachment)
+                .collect(Collectors.toMap(k -> k.getKey(), v -> ((FlowsAttachment) v.getValue())));
+    }
+
 }

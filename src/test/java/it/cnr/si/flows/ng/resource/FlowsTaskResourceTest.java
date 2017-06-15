@@ -2,7 +2,7 @@ package it.cnr.si.flows.ng.resource;
 
 import it.cnr.jada.firma.arss.ArubaSignServiceException;
 import it.cnr.si.FlowsApp;
-import it.cnr.si.flows.ng.TestUtil;
+import it.cnr.si.flows.ng.TestServices;
 import org.activiti.engine.TaskService;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
@@ -29,7 +29,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static it.cnr.si.flows.ng.TestUtil.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
+import static it.cnr.si.flows.ng.TestServices.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
 import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
 import static it.cnr.si.flows.ng.utils.Utils.ASC;
 import static org.junit.Assert.assertEquals;
@@ -44,11 +44,11 @@ public class FlowsTaskResourceTest {
     public static final String FIRST_TASK_NAME = "Verifica Decisione";
     private static final String SECOND_TASK_NAME = "Firma Decisione";
     @Autowired
-    FlowsTaskResource flowsTaskResource;
+    private FlowsTaskResource flowsTaskResource;
     @Autowired
-    TestUtil util;
+    private TestServices util;
     @Autowired
-    FlowsProcessInstanceResource flowsProcessInstanceResource;
+    private FlowsProcessInstanceResource flowsProcessInstanceResource;
     private ProcessInstanceResponse processInstance;
     @Autowired
     private TaskService taskService;

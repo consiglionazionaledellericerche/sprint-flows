@@ -74,6 +74,10 @@
                     <div ng-if="chronology">
                         <history tasks="vm.data.history" start-task="vm.data.startEvent"></history>
                     </div>
+                    <br>
+                    <button ng-click="exportSummary('/api/summaryPdf?processInstanceId=' + processInstanceId, 'Summary_' + vm.data.entity.variabili.title)"
+                            class="btn btn-primary">Export Summary
+                    </button>
                 </div>
             </div>
         </div>

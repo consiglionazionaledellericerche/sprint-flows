@@ -43,5 +43,9 @@
                     });
                 });
         }
+
+        $scope.exportSummary = function(url, filename) {
+            utils.downloadFile(url, filename, 'application/pdf');
+        };
     }
 })();
