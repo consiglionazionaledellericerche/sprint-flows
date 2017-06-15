@@ -51,6 +51,10 @@
         $scope.submitTask = function(file) {
 
             $log.info(Object.keys(vm.data));
+
+            vm.data.impegniVeri = JSON.stringify(vm.data.impegni);
+            vm.data.impegni = undefined;
+
             if ($scope.taskForm.$invalid) {
                 angular.forEach($scope.taskForm.$error, function (field) {
                     angular.forEach(field, function(errorField){
