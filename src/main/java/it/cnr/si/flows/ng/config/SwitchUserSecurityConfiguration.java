@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertyResolver;
+import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -80,6 +81,11 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
         contextSource.setUserDn(p.getProperty("managerDn"));
         contextSource.setPassword(p.getProperty("managerPassword"));
         return contextSource;
+    }
+
+    @Bean
+    public LdapTemplate getLdapTemplate(LdapContextSource contextSource) {
+        return new LdapTemplate(contextSource);
     }
 
     @Bean

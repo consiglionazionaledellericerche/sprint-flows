@@ -116,6 +116,9 @@
       },
       view: function(processid, type) {
         return $http.get('api/views/'+ processid +'/'+ type);
+      },
+      users: function(filter) {
+        return $http.get('api/users/'+ filter +"/search");
       }
     };
   }
