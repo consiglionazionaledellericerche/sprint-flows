@@ -84,6 +84,7 @@ public class SummaryPdfServiceTest {
 
         //metto il contenuto dell'outputStream in un summary fisico'
         File summary = new File("./src/test/resources/summary-test/summaryCreato.pdf");
+
         FileOutputStream fop = new FileOutputStream(summary);
         byte[] byteArray = outputStream.toByteArray();
         fop.write(byteArray);
