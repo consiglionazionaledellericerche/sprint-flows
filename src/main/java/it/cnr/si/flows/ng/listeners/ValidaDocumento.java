@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import it.cnr.jada.firma.arss.ArubaSignServiceException;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.exception.TaskFailedException;
-import it.cnr.si.flows.ng.service.FirmaService;
+import it.cnr.si.flows.ng.service.FlowsFirmaService;
 
 public class ValidaDocumento implements ExecutionListener {
 
