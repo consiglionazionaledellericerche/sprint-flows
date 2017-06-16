@@ -9,9 +9,10 @@ import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import it.cnr.si.flows.ng.service.CounterService;
-
+@Component
 public class FirmaDecisione implements ExecutionListener {
 
 	private static final long serialVersionUID = -56001764662303256L;

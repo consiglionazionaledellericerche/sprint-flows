@@ -3,7 +3,8 @@ package it.cnr.si.flows.ng.utils;
 public enum Actions {
 
     revoca("Revoca"),
-    revocaSemplice("RevocaSemplice");
+    revocaSemplice("RevocaSemplice"),
+	RevocaConProvvedimento("RevocaConProvvedimento");
 
     private String value;
 
