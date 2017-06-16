@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
   <process id="permessi-ferie" name="Permessi Ferie" isExecutable="true">
-    <startEvent id="startevent1" name="Start" activiti:async="true" activiti:initiator="initiator">
-      <extensionElements>
-        <activiti:executionListener event="start" delegateExpression="${testExecutionListener}"></activiti:executionListener>
-      </extensionElements>
-    </startEvent>
+    <startEvent id="startevent1" name="Start" activiti:async="true" activiti:initiator="initiator"></startEvent>
     <userTask id="approvazione" name="Direttore Approva o Rifiuta" activiti:candidateGroups="USER"></userTask>
     <endEvent id="endevent1" name="End"></endEvent>
     <sequenceFlow id="flow2" sourceRef="approvazione" targetRef="exclusivegateway1"></sequenceFlow>
-    <userTask id="usertask1" name="User Task" activiti:candidateGroups="USER"></userTask>
+    <userTask id="usertask1" name="User Task" activiti:candidateGroups="USER">
+      <extensionElements>
+        <activiti:executionListener event="start" expression="${execution.setVariable(&quot;martin&quot;, &quot;pluot&quot;)}"></activiti:executionListener>
+      </extensionElements>
+    </userTask>
     <sequenceFlow id="flow3" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
     <sequenceFlow id="flow4" sourceRef="usertask1" targetRef="approvazione">
       <extensionElements>
