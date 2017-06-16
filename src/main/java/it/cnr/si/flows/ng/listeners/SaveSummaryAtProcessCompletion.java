@@ -31,15 +31,12 @@ public class SaveSummaryAtProcessCompletion implements ActivitiEventListener {
             RuntimeService runtimeService = event.getEngineServices().getRuntimeService();
             LOGGER.info("Processo {} con nome {} completato. Salvo il summary.",
                         event.getExecutionId(),
-                        runtimeService.getVariable(event.getExecutionId(), "titolo"));
-//todo:testare
-
-            ByteArrayOutputStream outputStream = null;
+                        runtimeService.getVariable(event.getExecutionId(), "title"));
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             String fileName = null;
             try {
                 fileName = summaryPdfService.createPdf(event.getProcessInstanceId(), outputStream);
             } catch (IOException | ParseException e) {
-                e.printStackTrace();
                 LOGGER.error("Errore nella creazione del summary pdf FINALE per la Process Instance {}. \n" +
                                      "Errore: {}", event.getProcessInstanceId(), e.getMessage());
             }
@@ -47,11 +44,10 @@ public class SaveSummaryAtProcessCompletion implements ActivitiEventListener {
             FlowsAttachment pdfToDB = new FlowsAttachment();
             pdfToDB.setBytes(outputStream.toByteArray());
             pdfToDB.setAzione(FlowsAttachment.Azione.Caricamento);
-//            pdfToDB.addStato(FlowsAttachment.Stato.Sostituito);
             pdfToDB.setTaskId(null);
             pdfToDB.setTaskName(null);
             pdfToDB.setTime(new Date());
-            pdfToDB.setName("Summary");
+            pdfToDB.setName(fileName);
             pdfToDB.setFilename(fileName);
             pdfToDB.setMimetype(MediaType.PDF.toString());
 

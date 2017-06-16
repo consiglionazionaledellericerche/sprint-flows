@@ -90,6 +90,13 @@ public class SummaryPdfService {
                 .findFirst();
         if (variable.isPresent())
             titolo += variable.get().getValue() + "\n\n";
+        else {
+            variables.stream()
+                    .filter(a -> (a.getName()).equals("title"))
+                    .findFirst();
+
+            titolo += variable.get().getValue() + "\n\n";
+        }
         paragraphField.addText(titolo, TITLE_SIZE, HELVETICA_BOLD);
 
         for (RestVariable var : variables) {
