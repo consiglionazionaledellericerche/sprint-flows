@@ -32,6 +32,7 @@ public class TestServices {
 
 
     public static final String TITOLO_DELL_ISTANZA_DEL_FLUSSO = "titolo dell'istanza del flusso JUnit";
+    public static final String JUNIT_TEST = " JUnit test";
 
 
     @Inject
@@ -71,6 +72,10 @@ public class TestServices {
 
     public void loginResponsabileAcquisti() {
         login("responsabileacquisti", "responsabileacquisti");
+    }
+
+    public void loginDirettore() {
+        login("direttore", "direttore");
     }
 
 
