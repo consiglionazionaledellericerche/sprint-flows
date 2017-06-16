@@ -9,8 +9,8 @@
       </button>
     </span>
   </legend>
-  <div ng-repeat="row in ngModel track by $index">
+  <div class="well" ng-repeat="row in ngModel track by $index">
     <ng-include src="subform.formUrl" />
-    <hr>
   </div>
 </fieldset>
+<hr>
