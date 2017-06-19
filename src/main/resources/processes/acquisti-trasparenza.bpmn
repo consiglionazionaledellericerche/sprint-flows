@@ -33,7 +33,7 @@
       <userTask id="protocollo-decisione" name="Protocollo Decisione" activiti:candidateGroups="${gruppoRA}"></userTask>
       <sequenceFlow id="flow14" sourceRef="exclusivegateway2" targetRef="protocollo-decisione">
         <extensionElements>
-          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.FirmaDocumento">
+          <activiti:executionListener event="take" delegateExpression="${firmaDocumento}">
             <activiti:field name="nomeFileDaFirmare">
               <activiti:string><![CDATA[decisioneContrattare]]></activiti:string>
             </activiti:field>
@@ -42,7 +42,7 @@
       </sequenceFlow>
       <sequenceFlow id="flow15" sourceRef="protocollo-decisione" targetRef="endevent1">
         <extensionElements>
-          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.ProtocollaDocumento">
+          <activiti:executionListener event="take" delegateExpression="${protocollaDocumento}">
             <activiti:field name="nomeFileDaProtocollare">
               <activiti:string><![CDATA[decisioneContrattare]]></activiti:string>
             </activiti:field>
@@ -121,7 +121,7 @@
       <exclusiveGateway id="exclusivegateway26" name="Exclusive Gateway" default="flow140"></exclusiveGateway>
       <sequenceFlow id="flow137" sourceRef="protocollo-provvedimento-aggiudicazione" targetRef="exclusivegateway26">
         <extensionElements>
-          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.ProtocollaDocumento">
+          <activiti:executionListener event="take" delegateExpression="${protocollaDocumento}">
             <activiti:field name="nomeFileDaProtocollare">
               <activiti:string><![CDATA[provvedimentoAggiudicazione]]></activiti:string>
             </activiti:field>
@@ -134,7 +134,7 @@
       <userTask id="verifica-requisiti" name="Verifica Requisiti" activiti:assignee="${rup}"></userTask>
       <sequenceFlow id="flow53" sourceRef="exclusivegateway11" targetRef="protocollo-provvedimento-aggiudicazione">
         <extensionElements>
-          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.FirmaDocumento">
+          <activiti:executionListener event="take" delegateExpression="${firmaDocumento}">
             <activiti:field name="nomeFileDaFirmare">
               <activiti:string><![CDATA[provvedimentoAggiudicazione]]></activiti:string>
             </activiti:field>
@@ -176,7 +176,7 @@
       <userTask id="protocollo-revoca" name="Protocollo Revoca" activiti:candidateGroups="{$gruppoRA}"></userTask>
       <sequenceFlow id="flow42" sourceRef="exclusivegateway9" targetRef="protocollo-revoca">
         <extensionElements>
-          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.FirmaDocumento">
+          <activiti:executionListener event="take" delegateExpression="${firmaDocumento}">
             <activiti:field name="nomeFileDaFirmare">
               <activiti:string><![CDATA[provvedimentoRevoca]]></activiti:string>
             </activiti:field>
@@ -185,7 +185,7 @@
       </sequenceFlow>
       <sequenceFlow id="flow43" sourceRef="protocollo-revoca" targetRef="endevent5">
         <extensionElements>
-          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.ProtocollaDocumento">
+          <activiti:executionListener event="take" delegateExpression="${protocollaDocumento}">
             <activiti:field name="nomeFileDaProtocollare">
               <activiti:string><![CDATA[provvedimentoRevoca]]></activiti:string>
             </activiti:field>
@@ -213,7 +213,7 @@
       <sequenceFlow id="flow74" sourceRef="carica-ordine-mepa" targetRef="exclusivegateway18"></sequenceFlow>
       <sequenceFlow id="flow75" sourceRef="protocollo-ordine-mepa" targetRef="invio-ordine-mepa">
         <extensionElements>
-          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.ProtocollaDocumento">
+          <activiti:executionListener event="take" delegateExpression="${protocollaDocumento}">
             <activiti:field name="nomeFileDaProtocollare">
               <activiti:string><![CDATA[ordineMepa]]></activiti:string>
             </activiti:field>
@@ -286,7 +286,7 @@
       <userTask id="protocollo-ordine" name="Protocollo Ordine" activiti:candidateGroups="${gruppoRA}"></userTask>
       <sequenceFlow id="flow111" sourceRef="exclusivegateway23" targetRef="protocollo-ordine">
         <extensionElements>
-          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.FirmaDocumento">
+          <activiti:executionListener event="take" delegateExpression="${firmaDocumento}">
             <activiti:field name="nomeFileDaFirmare">
               <activiti:string><![CDATA[ordine]]></activiti:string>
             </activiti:field>
@@ -307,7 +307,7 @@
       <endEvent id="endevent14" name="End"></endEvent>
       <sequenceFlow id="flow123" sourceRef="protocollo-ordine" targetRef="endevent14">
         <extensionElements>
-          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.ProtocollaDocumento">
+          <activiti:executionListener event="take" delegateExpression="${protocollaDocumento}">
             <activiti:field name="nomeFileDaProtocollare">
               <activiti:string><![CDATA[ordine]]></activiti:string>
             </activiti:field>
