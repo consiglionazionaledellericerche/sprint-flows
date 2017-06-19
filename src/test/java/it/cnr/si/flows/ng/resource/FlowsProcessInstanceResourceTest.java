@@ -130,6 +130,9 @@ public class FlowsProcessInstanceResourceTest {
         req.setParameter("strumentoAcquisizione", "AFFIDAMENTO DIRETTO - MEPA o CONSIP\n");
         req.setParameter("strumentoAcquisizioneId", "11");
         req.setParameter("priorita", "Alta");
+        req.setParameter("rup", "spaclient");
+        req.setParameter("impegniVeri", "[{\"numero\":\"1\",\"importo\":100,\"descrizione\":\"descrizione impegno\",\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"gae\":\"spaclient\"}]");
+
         ResponseEntity<Object> resp = flowsTaskResource.completeTask(req);
         assertEquals(OK, resp.getStatusCode());
         util.logout();

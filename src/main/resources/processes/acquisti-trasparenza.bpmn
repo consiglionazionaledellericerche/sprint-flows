@@ -7,18 +7,10 @@
     <startEvent id="startevent1" name="Predisposizione Decisione"></startEvent>
     <subProcess id="DECISIONE-CONTRATTARE" name="DECISIONE A CONTRATTARE">
       <endEvent id="endevent1" name="End"></endEvent>
-      <userTask id="verifica-decisione" name="Verifica Decisione" activiti:candidateGroups="${gruppoSFD}">
-        <extensionElements>
-          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
-        </extensionElements>
-      </userTask>
+      <userTask id="verifica-decisione" name="Verifica Decisione" activiti:candidateGroups="${gruppoSFD}"></userTask>
       <userTask id="firma-decisione" name="Firma Decisione" activiti:candidateGroups="${gruppoDirettore}"></userTask>
       <sequenceFlow id="flow8" sourceRef="verifica-decisione" targetRef="exclusivegateway1"></sequenceFlow>
-      <userTask id="modifica-decisione" name="Modifica Decisione" activiti:candidateGroups="${gruppoRA}">
-        <extensionElements>
-          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
-        </extensionElements>
-      </userTask>
+      <userTask id="modifica-decisione" name="Modifica Decisione" activiti:candidateGroups="${gruppoRA}"></userTask>
       <sequenceFlow id="flow9" sourceRef="modifica-decisione" targetRef="verifica-decisione">
         <extensionElements>
           <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.acquistitrasparenza.CalcolaTotaleImpegniAcquisti"></activiti:executionListener>
@@ -38,14 +30,10 @@
       <sequenceFlow id="flow13" sourceRef="exclusivegateway2" targetRef="modifica-decisione">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Modifica'}]]></conditionExpression>
       </sequenceFlow>
-      <userTask id="protocollo-decisione" name="Protocollo Decisione" activiti:candidateGroups="${gruppoRA}">
-        <extensionElements>
-          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
-        </extensionElements>
-      </userTask>
+      <userTask id="protocollo-decisione" name="Protocollo Decisione" activiti:candidateGroups="${gruppoRA}"></userTask>
       <sequenceFlow id="flow14" sourceRef="exclusivegateway2" targetRef="protocollo-decisione">
         <extensionElements>
-          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.FirmaDocumento">
+          <activiti:executionListener event="take" delegateExpression="${firmaDocumento}">
             <activiti:field name="nomeFileDaFirmare">
               <activiti:string><![CDATA[decisioneContrattare]]></activiti:string>
             </activiti:field>
@@ -54,18 +42,14 @@
       </sequenceFlow>
       <sequenceFlow id="flow15" sourceRef="protocollo-decisione" targetRef="endevent1">
         <extensionElements>
-          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.ProtocollaDocumento">
+          <activiti:executionListener event="take" delegateExpression="${protocollaDocumento}">
             <activiti:field name="nomeFileDaProtocollare">
               <activiti:string><![CDATA[decisioneContrattare]]></activiti:string>
             </activiti:field>
           </activiti:executionListener>
         </extensionElements>
       </sequenceFlow>
-      <userTask id="revoca-decisione" name="Revoca Decisione" activiti:candidateGroups="${gruppoRA}">
-        <extensionElements>
-          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
-        </extensionElements>
-      </userTask>
+      <userTask id="revoca-decisione" name="Revoca Decisione" activiti:candidateGroups="${gruppoRA}"></userTask>
       <sequenceFlow id="flow28" sourceRef="exclusivegateway2" targetRef="revoca-decisione">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Revoca'}]]></conditionExpression>
       </sequenceFlow>
@@ -75,7 +59,11 @@
       <sequenceFlow id="flow31" sourceRef="exclusivegateway5" targetRef="firma-decisione">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Annulla'}]]></conditionExpression>
       </sequenceFlow>
-      <endEvent id="endevent6" name="End"></endEvent>
+      <endEvent id="endevent6" name="End">
+        <extensionElements>
+          <activiti:executionListener event="start" expression="${execution.setVariable(&quot;sceltaPercorso&quot;, &quot;RevocaSemplice&quot;)}"></activiti:executionListener>
+        </extensionElements>
+      </endEvent>
       <startEvent id="startevent11" name="Start Decisione a Contrattare"></startEvent>
       <sequenceFlow id="flow126" sourceRef="startevent11" targetRef="verifica-decisione">
         <extensionElements>
@@ -88,40 +76,20 @@
       </sequenceFlow>
     </subProcess>
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="DECISIONE-CONTRATTARE"></sequenceFlow>
-    <userTask id="espletamento-procedura" name="Espletamento Procedura" activiti:assignee="${rup}">
-      <extensionElements>
-        <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
-      </extensionElements>
-    </userTask>
+    <userTask id="espletamento-procedura" name="Espletamento Procedura" activiti:assignee="${rup}"></userTask>
     <subProcess id="PROVVEDIMENTO-AGGIUDICAZIONE" name="PROVVEDIMENTO DI AGGIUDICAZIONE">
-      <userTask id="predisposizione-provvedimento-aggiudicazione" name="Predisposizione Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoRA}">
-        <extensionElements>
-          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
-        </extensionElements>
-      </userTask>
+      <userTask id="predisposizione-provvedimento-aggiudicazione" name="Predisposizione Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoRA}"></userTask>
       <startEvent id="startevent6" name="Start"></startEvent>
       <sequenceFlow id="flow17" sourceRef="startevent6" targetRef="predisposizione-provvedimento-aggiudicazione"></sequenceFlow>
       <exclusiveGateway id="exclusivegateway3" name="Exclusive Gateway" default="flow20"></exclusiveGateway>
       <sequenceFlow id="flow20" sourceRef="exclusivegateway3" targetRef="firma-provvedimento-aggiudicazione"></sequenceFlow>
-      <userTask id="modifica-provvedimento-aggiudicazione" name="Modifica Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoRA}">
-        <extensionElements>
-          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
-        </extensionElements>
-      </userTask>
+      <userTask id="modifica-provvedimento-aggiudicazione" name="Modifica Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoRA}"></userTask>
       <sequenceFlow id="flow21" sourceRef="exclusivegateway3" targetRef="modifica-provvedimento-aggiudicazione">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Modifica'}]]></conditionExpression>
       </sequenceFlow>
-      <userTask id="protocollo-provvedimento-aggiudicazione" name="Protocollo Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoRA}">
-        <extensionElements>
-          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
-        </extensionElements>
-      </userTask>
+      <userTask id="protocollo-provvedimento-aggiudicazione" name="Protocollo Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoRA}"></userTask>
       <endEvent id="endevent4" name="End"></endEvent>
-      <userTask id="revoca-proposta-aggiudicazione" name="Revoca Proposta Aggiudicazione" activiti:candidateGroups="${gruppoRA}">
-        <extensionElements>
-          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
-        </extensionElements>
-      </userTask>
+      <userTask id="revoca-proposta-aggiudicazione" name="Revoca Proposta Aggiudicazione" activiti:candidateGroups="${gruppoRA}"></userTask>
       <exclusiveGateway id="exclusivegateway6" name="Exclusive Gateway" default="flow48"></exclusiveGateway>
       <sequenceFlow id="flow33" sourceRef="revoca-proposta-aggiudicazione" targetRef="exclusivegateway6"></sequenceFlow>
       <sequenceFlow id="flow34" sourceRef="exclusivegateway6" targetRef="firma-provvedimento-aggiudicazione">
@@ -135,24 +103,16 @@
       <sequenceFlow id="flow54" sourceRef="exclusivegateway11" targetRef="modifica-provvedimento-aggiudicazione">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Modifica'}]]></conditionExpression>
       </sequenceFlow>
-      <userTask id="verifica-provvedimento-aggiudicazione" name="Verifica Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoSFD}">
-        <extensionElements>
-          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
-        </extensionElements>
-      </userTask>
+      <userTask id="verifica-provvedimento-aggiudicazione" name="Verifica Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoSFD}"></userTask>
       <sequenceFlow id="flow55" sourceRef="predisposizione-provvedimento-aggiudicazione" targetRef="verifica-provvedimento-aggiudicazione"></sequenceFlow>
       <sequenceFlow id="flow56" sourceRef="verifica-provvedimento-aggiudicazione" targetRef="exclusivegateway3"></sequenceFlow>
       <sequenceFlow id="flow57" sourceRef="modifica-provvedimento-aggiudicazione" targetRef="verifica-provvedimento-aggiudicazione"></sequenceFlow>
       <endEvent id="endevent7" name="End">
         <extensionElements>
-          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.config.SceltaPercorso"></activiti:executionListener>
+          <activiti:executionListener event="start" expression="${execution.setVariable(&quot;sceltaPercorso&quot;, &quot;RevocaSemplice&quot;)}"></activiti:executionListener>
         </extensionElements>
       </endEvent>
-      <userTask id="firma-provvedimento-aggiudicazione" name="Firma Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoDirettore}">
-        <extensionElements>
-          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
-        </extensionElements>
-      </userTask>
+      <userTask id="firma-provvedimento-aggiudicazione" name="Firma Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoDirettore}"></userTask>
       <sequenceFlow id="flow51" sourceRef="firma-provvedimento-aggiudicazione" targetRef="exclusivegateway11"></sequenceFlow>
       <endEvent id="endevent19" name="End"></endEvent>
       <sequenceFlow id="flow131" sourceRef="exclusivegateway6" targetRef="endevent19">
@@ -161,7 +121,7 @@
       <exclusiveGateway id="exclusivegateway26" name="Exclusive Gateway" default="flow140"></exclusiveGateway>
       <sequenceFlow id="flow137" sourceRef="protocollo-provvedimento-aggiudicazione" targetRef="exclusivegateway26">
         <extensionElements>
-          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.ProtocollaDocumento">
+          <activiti:executionListener event="take" delegateExpression="${protocollaDocumento}">
             <activiti:field name="nomeFileDaProtocollare">
               <activiti:string><![CDATA[provvedimentoAggiudicazione]]></activiti:string>
             </activiti:field>
@@ -171,14 +131,10 @@
       <sequenceFlow id="flow138" sourceRef="exclusivegateway26" targetRef="endevent4">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${verificheRequisitiid == '1'}]]></conditionExpression>
       </sequenceFlow>
-      <userTask id="verifica-requisiti" name="Verifica Requisiti" activiti:assignee="${rup}">
-        <extensionElements>
-          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
-        </extensionElements>
-      </userTask>
+      <userTask id="verifica-requisiti" name="Verifica Requisiti" activiti:assignee="${rup}"></userTask>
       <sequenceFlow id="flow53" sourceRef="exclusivegateway11" targetRef="protocollo-provvedimento-aggiudicazione">
         <extensionElements>
-          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.FirmaDocumento">
+          <activiti:executionListener event="take" delegateExpression="${firmaDocumento}">
             <activiti:field name="nomeFileDaFirmare">
               <activiti:string><![CDATA[provvedimentoAggiudicazione]]></activiti:string>
             </activiti:field>
@@ -210,29 +166,17 @@
     <subProcess id="REVOCA" name="REVOCA">
       <startEvent id="startevent7" name="Start"></startEvent>
       <endEvent id="endevent5" name="End"></endEvent>
-      <userTask id="firma-revoca" name="Firma Revoca" activiti:candidateGroups="${gruppoDirettore}">
-        <extensionElements>
-          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
-        </extensionElements>
-      </userTask>
-      <userTask id="modifica-revoca" name="Modifica Revoca" activiti:candidateGroups="{$gruppoRA}">
-        <extensionElements>
-          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
-        </extensionElements>
-      </userTask>
+      <userTask id="firma-revoca" name="Firma Revoca" activiti:candidateGroups="${gruppoDirettore}"></userTask>
+      <userTask id="modifica-revoca" name="Modifica Revoca" activiti:candidateGroups="{$gruppoRA}"></userTask>
       <exclusiveGateway id="exclusivegateway9" name="Exclusive Gateway" default="flow42"></exclusiveGateway>
       <sequenceFlow id="flow39" sourceRef="firma-revoca" targetRef="exclusivegateway9"></sequenceFlow>
       <sequenceFlow id="flow40" sourceRef="exclusivegateway9" targetRef="modifica-revoca">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Modifica'}]]></conditionExpression>
       </sequenceFlow>
-      <userTask id="protocollo-revoca" name="Protocollo Revoca" activiti:candidateGroups="{$gruppoRA}">
-        <extensionElements>
-          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
-        </extensionElements>
-      </userTask>
+      <userTask id="protocollo-revoca" name="Protocollo Revoca" activiti:candidateGroups="{$gruppoRA}"></userTask>
       <sequenceFlow id="flow42" sourceRef="exclusivegateway9" targetRef="protocollo-revoca">
         <extensionElements>
-          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.FirmaDocumento">
+          <activiti:executionListener event="take" delegateExpression="${firmaDocumento}">
             <activiti:field name="nomeFileDaFirmare">
               <activiti:string><![CDATA[provvedimentoRevoca]]></activiti:string>
             </activiti:field>
@@ -241,7 +185,7 @@
       </sequenceFlow>
       <sequenceFlow id="flow43" sourceRef="protocollo-revoca" targetRef="endevent5">
         <extensionElements>
-          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.ProtocollaDocumento">
+          <activiti:executionListener event="take" delegateExpression="${protocollaDocumento}">
             <activiti:field name="nomeFileDaProtocollare">
               <activiti:string><![CDATA[provvedimentoRevoca]]></activiti:string>
             </activiti:field>
@@ -257,35 +201,19 @@
     <sequenceFlow id="flow62" sourceRef="exclusivegateway13" targetRef="REVOCA">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaConProvvedimento'}]]></conditionExpression>
     </sequenceFlow>
-    <userTask id="consuntivo" name="Consuntivo" activiti:assignee="${rup}">
-      <extensionElements>
-        <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
-      </extensionElements>
-    </userTask>
+    <userTask id="consuntivo" name="Consuntivo" activiti:assignee="${rup}"></userTask>
     <endEvent id="endevent8" name="End"></endEvent>
     <sequenceFlow id="flow71" sourceRef="consuntivo" targetRef="endevent8"></sequenceFlow>
     <subProcess id="ordine-mepa" name="ORDINE MEPA">
       <startEvent id="startevent9" name="Start"></startEvent>
-      <userTask id="carica-ordine-mepa" name="Carica Ordine Mepa" activiti:candidateGroups="${gruppoDirettore}">
-        <extensionElements>
-          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
-        </extensionElements>
-      </userTask>
-      <userTask id="protocollo-ordine-mepa" name="Protocollo Ordine Mepa" activiti:candidateGroups="${gruppoRA}">
-        <extensionElements>
-          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
-        </extensionElements>
-      </userTask>
-      <userTask id="invio-ordine-mepa" name="Invio Ordine Mepa" activiti:candidateGroups="${gruppoDirettore}">
-        <extensionElements>
-          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
-        </extensionElements>
-      </userTask>
+      <userTask id="carica-ordine-mepa" name="Carica Ordine Mepa" activiti:candidateGroups="${gruppoDirettore}"></userTask>
+      <userTask id="protocollo-ordine-mepa" name="Protocollo Ordine Mepa" activiti:candidateGroups="${gruppoRA}"></userTask>
+      <userTask id="invio-ordine-mepa" name="Invio Ordine Mepa" activiti:candidateGroups="${gruppoDirettore}"></userTask>
       <sequenceFlow id="flow73" sourceRef="startevent9" targetRef="carica-ordine-mepa"></sequenceFlow>
       <sequenceFlow id="flow74" sourceRef="carica-ordine-mepa" targetRef="exclusivegateway18"></sequenceFlow>
       <sequenceFlow id="flow75" sourceRef="protocollo-ordine-mepa" targetRef="invio-ordine-mepa">
         <extensionElements>
-          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.ProtocollaDocumento">
+          <activiti:executionListener event="take" delegateExpression="${protocollaDocumento}">
             <activiti:field name="nomeFileDaProtocollare">
               <activiti:string><![CDATA[ordineMepa]]></activiti:string>
             </activiti:field>
@@ -294,11 +222,7 @@
       </sequenceFlow>
       <exclusiveGateway id="exclusivegateway18" name="Exclusive Gateway" default="flow90"></exclusiveGateway>
       <sequenceFlow id="flow90" sourceRef="exclusivegateway18" targetRef="protocollo-ordine-mepa"></sequenceFlow>
-      <userTask id="revoca-ordine-mepa" name="Revoca Ordine Mepa" activiti:candidateGroups="${gruppoRA}">
-        <extensionElements>
-          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
-        </extensionElements>
-      </userTask>
+      <userTask id="revoca-ordine-mepa" name="Revoca Ordine Mepa" activiti:candidateGroups="${gruppoRA}"></userTask>
       <exclusiveGateway id="exclusivegateway19" name="Exclusive Gateway" default="flow94"></exclusiveGateway>
       <sequenceFlow id="flow91" sourceRef="revoca-ordine-mepa" targetRef="exclusivegateway19"></sequenceFlow>
       <sequenceFlow id="flow92" sourceRef="exclusivegateway19" targetRef="carica-ordine-mepa">
@@ -309,7 +233,7 @@
       </sequenceFlow>
       <endEvent id="endevent12" name="End">
         <extensionElements>
-          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.config.SceltaPercorso"></activiti:executionListener>
+          <activiti:executionListener event="start" expression="${execution.setVariable(&quot;sceltaPercorso&quot;, &quot;RevocaSemplice&quot;)}"></activiti:executionListener>
         </extensionElements>
       </endEvent>
       <sequenceFlow id="flow94" sourceRef="exclusivegateway19" targetRef="endevent12"></sequenceFlow>
@@ -344,30 +268,14 @@
     <sequenceFlow id="flow103" sourceRef="ordine-mepa" targetRef="exclusivegateway16"></sequenceFlow>
     <subProcess id="ordine-fuori-mepa" name="ORDINE FUORI MEPA">
       <startEvent id="startevent10" name="Start"></startEvent>
-      <userTask id="predisposizione-ordine" name="Predisposizione Ordine" activiti:candidateGroups="${gruppoRA}">
-        <extensionElements>
-          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
-        </extensionElements>
-      </userTask>
-      <userTask id="firma-ordine" name="Firma Ordine" activiti:candidateGroups="${gruppoDirettore}">
-        <extensionElements>
-          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
-        </extensionElements>
-      </userTask>
+      <userTask id="predisposizione-ordine" name="Predisposizione Ordine" activiti:candidateGroups="${gruppoRA}"></userTask>
+      <userTask id="firma-ordine" name="Firma Ordine" activiti:candidateGroups="${gruppoDirettore}"></userTask>
       <exclusiveGateway id="exclusivegateway23" name="Exclusive Gateway" default="flow111"></exclusiveGateway>
       <sequenceFlow id="flow105" sourceRef="startevent10" targetRef="predisposizione-ordine"></sequenceFlow>
       <sequenceFlow id="flow106" sourceRef="predisposizione-ordine" targetRef="firma-ordine"></sequenceFlow>
       <sequenceFlow id="flow107" sourceRef="firma-ordine" targetRef="exclusivegateway23"></sequenceFlow>
-      <userTask id="revoca-ordine" name="Revoca Ordine" activiti:candidateGroups="${gruppoRA}">
-        <extensionElements>
-          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
-        </extensionElements>
-      </userTask>
-      <userTask id="modifica-ordine" name="Modifica Ordine" activiti:candidateGroups="{$gruppoRA}">
-        <extensionElements>
-          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
-        </extensionElements>
-      </userTask>
+      <userTask id="revoca-ordine" name="Revoca Ordine" activiti:candidateGroups="${gruppoRA}"></userTask>
+      <userTask id="modifica-ordine" name="Modifica Ordine" activiti:candidateGroups="{$gruppoRA}"></userTask>
       <sequenceFlow id="flow108" sourceRef="exclusivegateway23" targetRef="modifica-ordine">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Modifica'}]]></conditionExpression>
       </sequenceFlow>
@@ -375,21 +283,21 @@
       <sequenceFlow id="flow110" sourceRef="exclusivegateway23" targetRef="revoca-ordine">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Revoca'}]]></conditionExpression>
       </sequenceFlow>
-      <userTask id="protocollo-ordine" name="Protocollo Ordine" activiti:candidateGroups="${gruppoRA}">
-        <extensionElements>
-          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
-        </extensionElements>
-      </userTask>
+      <userTask id="protocollo-ordine" name="Protocollo Ordine" activiti:candidateGroups="${gruppoRA}"></userTask>
       <sequenceFlow id="flow111" sourceRef="exclusivegateway23" targetRef="protocollo-ordine">
         <extensionElements>
-          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.FirmaDocumento">
+          <activiti:executionListener event="take" delegateExpression="${firmaDocumento}">
             <activiti:field name="nomeFileDaFirmare">
               <activiti:string><![CDATA[ordine]]></activiti:string>
             </activiti:field>
           </activiti:executionListener>
         </extensionElements>
       </sequenceFlow>
-      <endEvent id="endevent13" name="End"></endEvent>
+      <endEvent id="endevent13" name="End">
+        <extensionElements>
+          <activiti:executionListener event="start" expression="${execution.setVariable(&quot;sceltaPercorso&quot;, &quot;RevocaSemplice&quot;)}"></activiti:executionListener>
+        </extensionElements>
+      </endEvent>
       <exclusiveGateway id="exclusivegateway25" name="Exclusive Gateway" default="flow117"></exclusiveGateway>
       <sequenceFlow id="flow116" sourceRef="revoca-ordine" targetRef="exclusivegateway25"></sequenceFlow>
       <sequenceFlow id="flow117" sourceRef="exclusivegateway25" targetRef="endevent13"></sequenceFlow>
@@ -399,7 +307,7 @@
       <endEvent id="endevent14" name="End"></endEvent>
       <sequenceFlow id="flow123" sourceRef="protocollo-ordine" targetRef="endevent14">
         <extensionElements>
-          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.ProtocollaDocumento">
+          <activiti:executionListener event="take" delegateExpression="${protocollaDocumento}">
             <activiti:field name="nomeFileDaProtocollare">
               <activiti:string><![CDATA[ordine]]></activiti:string>
             </activiti:field>
