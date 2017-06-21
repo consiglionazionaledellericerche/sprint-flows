@@ -22,6 +22,13 @@
             "fieldValidateRules": [
                 "required"
             ]
+        },
+        {
+            "fieldName": "eventType",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
         }
     ],
     "changelogDate": "20170621121602",

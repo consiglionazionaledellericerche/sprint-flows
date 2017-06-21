@@ -127,6 +127,7 @@
                                 processId: null,
                                 taskName: null,
                                 groups: null,
+                                eventType: null,
                                 id: null
                             };
                         }

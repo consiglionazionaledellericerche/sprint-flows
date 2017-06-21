@@ -34,6 +34,10 @@ public class NotificationRule implements Serializable {
     @Column(name = "groups", nullable = false)
     private String groups;
 
+    @NotNull
+    @Column(name = "event_type", nullable = false)
+    private String eventType;
+
     public Long getId() {
         return id;
     }
@@ -81,6 +85,19 @@ public class NotificationRule implements Serializable {
         this.groups = groups;
     }
 
+    public String getEventType() {
+        return eventType;
+    }
+
+    public NotificationRule eventType(String eventType) {
+        this.eventType = eventType;
+        return this;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -108,6 +125,7 @@ public class NotificationRule implements Serializable {
             ", processId='" + processId + "'" +
             ", taskName='" + taskName + "'" +
             ", groups='" + groups + "'" +
+            ", eventType='" + eventType + "'" +
             '}';
     }
 }

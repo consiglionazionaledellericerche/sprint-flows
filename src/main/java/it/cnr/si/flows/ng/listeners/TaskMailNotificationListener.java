@@ -1,9 +1,9 @@
 package it.cnr.si.flows.ng.listeners;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
@@ -19,12 +19,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import it.cnr.si.flows.ng.service.FlowsMailService;
+import it.cnr.si.repository.NotificationRuleRepository;
 import it.cnr.si.service.MembershipService;
 
 @Component
-public class MailNotificationListener  implements ActivitiEventListener {
+public class TaskMailNotificationListener  implements ActivitiEventListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MailNotificationListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskMailNotificationListener.class);
 
     @Inject
     private FlowsMailService mailService;
@@ -32,6 +33,8 @@ public class MailNotificationListener  implements ActivitiEventListener {
     private RuntimeService runtimeService;
     @Inject
     private MembershipService membershipService;
+    @Inject
+    private NotificationRuleRepository notificationService;
 
     @Override
     public void onEvent(ActivitiEvent event) {
@@ -41,18 +44,16 @@ public class MailNotificationListener  implements ActivitiEventListener {
             Map<String, Object> variables = runtimeService.getVariables(event.getExecutionId());
             Set<IdentityLink> candidates = ((TaskEntity)taskEvent.getEntity()).getCandidates();
 
+            // Scenario predefinito: I membri dei gruppi assegnatari vengono notificati di un compito
             candidates.forEach(c -> {
                 if (c.getGroupId() != null) {
-
                     List<String> members = membershipService.findMembersInGroup(c.getGroupId());
-
                     members.forEach(m -> {
                         mailService.sendTaskAvailableNotification(variables, task.getName(), m, c.getGroupId());
                     });
-
-
                 }
             });
+        } else {
 
         }
     }

@@ -18,7 +18,8 @@
             },
             "processId": "Process Id",
             "taskName": "Task Name",
-            "groups": "Groups"
+            "groups": "Groups",
+            "eventType": "Event Type"
         }
     }
 }

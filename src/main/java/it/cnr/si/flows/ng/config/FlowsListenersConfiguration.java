@@ -1,6 +1,6 @@
 package it.cnr.si.flows.ng.config;
 
-import it.cnr.si.flows.ng.listeners.MailNotificationListener;
+import it.cnr.si.flows.ng.listeners.TaskMailNotificationListener;
 import it.cnr.si.flows.ng.listeners.SaveSummaryAtProcessCompletion;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
@@ -68,10 +68,10 @@ public class FlowsListenersConfiguration {
         runtimeService.addEventListener(processEndListener, ActivitiEventType.PROCESS_COMPLETED);
 
 
-        MailNotificationListener mailSender = (MailNotificationListener)
-                appContext.getAutowireCapableBeanFactory().createBean(MailNotificationListener.class,
+        TaskMailNotificationListener mailSender = (TaskMailNotificationListener)
+                appContext.getAutowireCapableBeanFactory().createBean(TaskMailNotificationListener.class,
                                                                       AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
-        runtimeService.addEventListener(mailSender, ActivitiEventType.TASK_CREATED);
+        runtimeService.addEventListener(mailSender);
 
 
     }

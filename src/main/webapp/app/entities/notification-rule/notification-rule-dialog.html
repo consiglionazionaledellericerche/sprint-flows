@@ -49,6 +49,18 @@
                 </p>
             </div>
         </div>
+        <div class="form-group">
+            <label class="control-label" translate="sprintApp.notificationRule.eventType" for="field_eventType">Event Type</label>
+            <input type="text" class="form-control" name="eventType" id="field_eventType"
+                    ng-model="vm.notificationRule.eventType"
+                    required />
+            <div ng-show="editForm.eventType.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.eventType.$error.required" translate="entity.validation.required">
+                    This field is required.
+                </p>
+            </div>
+        </div>
 
     </div>
     <div class="modal-footer">
