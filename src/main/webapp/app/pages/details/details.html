@@ -12,10 +12,10 @@
             </h4>
             <div>
                 <b>Avviato da: </b>{{vm.data.entity.variabili.initiator}} il {{vm.data.entity.variabili.startDate |
-                                   date}} <br><br>
+                                   data}} <br><br>
             </div>
             <div ng-hide="!vm.data.entity.variabili.completed">
-                <b>completato il:</b>{{vm.data.entity.variabili.endDate | date}}<br><br>
+                <b>completato il:</b>{{vm.data.entity.variabili.endDate | data}}<br><br>
             </div>
             <div ng-show="!vm.data.entity.completed">
                 <b>Fase: </b>{{vm.data.fase}} <br><br>
