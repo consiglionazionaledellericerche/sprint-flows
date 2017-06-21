@@ -1,0 +1,62 @@
+
+<form name="editForm" role="form" novalidate ng-submit="vm.save()" show-validation>
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+                ng-click="vm.clear()">&times;</button>
+        <h4 class="modal-title" id="myNotificationRuleLabel" translate="sprintApp.notificationRule.home.createOrEditLabel">Create or edit a Notification Rule</h4>
+    </div>
+    <div class="modal-body">
+        <jhi-alert-error></jhi-alert-error>
+        <div class="form-group" ng-show="vm.notificationRule.id">
+            <label for="id" translate="global.field.id">ID</label>
+            <input type="text" class="form-control" id="id" name="id"
+                    ng-model="vm.notificationRule.id" readonly />
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="sprintApp.notificationRule.processId" for="field_processId">Process Id</label>
+            <input type="text" class="form-control" name="processId" id="field_processId"
+                    ng-model="vm.notificationRule.processId"
+                    required />
+            <div ng-show="editForm.processId.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.processId.$error.required" translate="entity.validation.required">
+                    This field is required.
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="sprintApp.notificationRule.taskName" for="field_taskName">Task Name</label>
+            <input type="text" class="form-control" name="taskName" id="field_taskName"
+                    ng-model="vm.notificationRule.taskName"
+                    required />
+            <div ng-show="editForm.taskName.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.taskName.$error.required" translate="entity.validation.required">
+                    This field is required.
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="sprintApp.notificationRule.groups" for="field_groups">Groups</label>
+            <input type="text" class="form-control" name="groups" id="field_groups"
+                    ng-model="vm.notificationRule.groups"
+                    required />
+            <div ng-show="editForm.groups.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.groups.$error.required" translate="entity.validation.required">
+                    This field is required.
+                </p>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="vm.clear()">
+            <span class="glyphicon glyphicon-ban-circle"></span>&nbsp;<span translate="entity.action.cancel">Cancel</span>
+        </button>
+        <button type="submit" ng-disabled="editForm.$invalid || vm.isSaving" class="btn btn-primary">
+            <span class="glyphicon glyphicon-save"></span>&nbsp;<span translate="entity.action.save">Save</span>
+        </button>
+    </div>
+</form>

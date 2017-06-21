@@ -13,6 +13,7 @@
                 "membership": "Membership",
                 "dynamiclist": "Dynamiclist",
                 "view": "View",
+                "notificationRule": "Notification Rule",
                 "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
             },
             "account": {

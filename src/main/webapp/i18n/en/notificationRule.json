@@ -1,0 +1,24 @@
+{
+    "sprintApp": {
+        "notificationRule" : {
+            "home": {
+                "title": "Notification Rules",
+                "createLabel": "Create a new Notification Rule",
+                "createOrEditLabel": "Create or edit a Notification Rule",
+                "search": "Search for Notification Rule"
+            },
+            "created": "A new Notification Rule is created with identifier {{ param }}",
+            "updated": "A Notification Rule is updated with identifier {{ param }}",
+            "deleted": "A Notification Rule is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Are you sure you want to delete Notification Rule {{ id }}?"
+            },
+            "detail": {
+                "title": "Notification Rule"
+            },
+            "processId": "Process Id",
+            "taskName": "Task Name",
+            "groups": "Groups"
+        }
+    }
+}
