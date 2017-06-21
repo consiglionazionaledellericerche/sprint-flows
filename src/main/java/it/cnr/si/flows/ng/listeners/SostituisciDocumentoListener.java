@@ -50,6 +50,7 @@ public class SostituisciDocumentoListener implements ExecutionListener {
         copia.setAzione(FlowsAttachment.Azione.Sostituzione);
         copia.addStato(FlowsAttachment.Stato.Sostituito);
         copia.setName("Provvedimento di Aggiudicazione Sostiutito");
+        // TODO il nome "provvedimentiRespinti" dovrebbe sempre essere un Expression
         attachmentService.saveAttachmentInArray(execution, "provvedimentiRespinti", copia);
 
     }

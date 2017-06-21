@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import it.cnr.jada.firma.arss.ArubaSignServiceException;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.exception.TaskFailedException;
-import it.cnr.si.flows.ng.service.FirmaService;
+import it.cnr.si.flows.ng.service.FlowsFirmaService;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 
 @Component
@@ -22,7 +22,7 @@ public class FirmaDocumento implements ExecutionListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(FirmaDocumento.class);
 
     @Autowired
-    private FirmaService firmaService;
+    private FlowsFirmaService firmaService;
     @Autowired
     private FlowsAttachmentService attachmentService;
 

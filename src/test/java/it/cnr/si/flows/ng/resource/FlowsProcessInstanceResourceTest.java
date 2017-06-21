@@ -1,7 +1,7 @@
 package it.cnr.si.flows.ng.resource;
 
 import it.cnr.si.FlowsApp;
-import it.cnr.si.flows.ng.TestUtil;
+import it.cnr.si.flows.ng.TestServices;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
@@ -31,7 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static it.cnr.si.flows.ng.TestUtil.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
+import static it.cnr.si.flows.ng.TestServices.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
 import static it.cnr.si.flows.ng.utils.Utils.*;
 import static org.junit.Assert.*;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -48,7 +48,7 @@ public class FlowsProcessInstanceResourceTest {
     @Autowired
     private FlowsProcessInstanceResource flowsProcessInstanceResource;
     @Autowired
-    private TestUtil util;
+    private TestServices util;
     @Autowired
     private FlowsProcessDefinitionResource flowsProcessDefinitionResource;
     private ProcessInstanceResponse processInstance;
@@ -130,6 +130,9 @@ public class FlowsProcessInstanceResourceTest {
         req.setParameter("strumentoAcquisizione", "AFFIDAMENTO DIRETTO - MEPA o CONSIP\n");
         req.setParameter("strumentoAcquisizioneId", "11");
         req.setParameter("priorita", "Alta");
+        req.setParameter("rup", "spaclient");
+        req.setParameter("impegniVeri", "[{\"numero\":\"1\",\"importo\":100,\"descrizione\":\"descrizione impegno\",\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"gae\":\"spaclient\"}]");
+
         ResponseEntity<Object> resp = flowsTaskResource.completeTask(req);
         assertEquals(OK, resp.getStatusCode());
         util.logout();
