@@ -2,6 +2,7 @@ package it.cnr.si.flows.ng.resource;
 
 import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.TestServices;
+import it.cnr.si.flows.ng.utils.Utils;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
@@ -27,7 +28,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -52,7 +52,7 @@ public class FlowsProcessInstanceResourceTest {
     @Autowired
     private FlowsProcessDefinitionResource flowsProcessDefinitionResource;
     private ProcessInstanceResponse processInstance;
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    private Utils utils = new Utils();
 
 
     @Before
@@ -142,7 +142,7 @@ public class FlowsProcessInstanceResourceTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         String content = "{\"processParams\":" +
                 "[{\"key\":\"titoloIstanzaFlusso\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
-                "{\"key\":\"startDateGreat\",\"value\":\"" + sdf.format(new Date()) + "\",\"type\":\"date\"}]}";
+                "{\"key\":\"startDateGreat\",\"value\":\"" + utils.sdf.format(new Date()) + "\",\"type\":\"date\"}]}";
         request.setContent(content.getBytes());
 
         ResponseEntity<DataResponse> ret = flowsProcessInstanceResource.getProcessInstances(request, true, ALL_PROCESS_INSTANCES, 0, 1000, ASC);
@@ -199,8 +199,8 @@ public class FlowsProcessInstanceResourceTest {
         Date yesterday = cal.getTime();
         String payload = "{params: [{key: " + searchField1 + ", value: \"" + searchValue1 + "\", type: textEqual}, " +
                 "{key: " + searchField2 + ", value: \"" + searchValue2 + "\", type: text}, " +
-                "{key: \"startDateGreat\", value: \"" + sdf.format(yesterday) + "\", type: \"date\"}," +
-                "{key: \"startDateLess\", value: \"" + sdf.format(tomorrow) + "\", type: \"date\"}]}";
+                "{key: \"startDateGreat\", value: \"" + utils.sdf.format(yesterday) + "\", type: \"date\"}," +
+                "{key: \"startDateLess\", value: \"" + utils.sdf.format(tomorrow) + "\", type: \"date\"}]}";
         req.setContent(payload.getBytes());
         req.setContentType("application/json");
 
@@ -276,7 +276,7 @@ public class FlowsProcessInstanceResourceTest {
         String content = "{\"processParams\":" +
                 "[{\"key\":\"titoloIstanzaFlusso\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
                 "{\"key\":\"initiator\",\"value\":\"admin\",\"type\":\"textEqual\"}," +
-                "{\"key\":\"startDateGreat\",\"value\":\"" + sdf.format(new Date()) + "\",\"type\":\"date\"}]}";
+                "{\"key\":\"startDateGreat\",\"value\":\"" + utils.sdf.format(new Date()) + "\",\"type\":\"date\"}]}";
         request.setContent(content.getBytes());
         response = flowsProcessInstanceResource.getProcessInstances(request, true, ALL_PROCESS_INSTANCES, 0, 100, ASC);
         ArrayList<HistoricProcessInstanceResponse> entities = (ArrayList<HistoricProcessInstanceResponse>) response.getBody().getData();
@@ -286,7 +286,7 @@ public class FlowsProcessInstanceResourceTest {
         content = "{\"processParams\":" +
                 "[{\"key\":\"titoloIstanzaFlusso\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "AAAAAAAAA" + "\",\"type\":\"text\"}," +
                 "{\"key\":\"initiator\",\"value\":\"admin\",\"type\":\"textEqual\"}," +
-                "{\"key\":\"startDateGreat\",\"value\":\"" + sdf.format(new Date()) + "\",\"type\":\"date\"}]}";
+                "{\"key\":\"startDateGreat\",\"value\":\"" + utils.sdf.format(new Date()) + "\",\"type\":\"date\"}]}";
         request.setContent(content.getBytes());
         response = flowsProcessInstanceResource.getProcessInstances(request, true, ALL_PROCESS_INSTANCES, 0, 100, ASC);
         entities = (ArrayList<HistoricProcessInstanceResponse>) response.getBody().getData();
@@ -296,7 +296,7 @@ public class FlowsProcessInstanceResourceTest {
         content = "{\"processParams\":" +
                 "[{\"key\":\"titoloIstanzaFlusso\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
                 "{\"key\":\"initiator\",\"value\":\"admi\",\"type\":\"textEqual\"}," +
-                "{\"key\":\"startDateGreat\",\"value\":\"" + sdf.format(new Date()) + "\",\"type\":\"date\"}]}";
+                "{\"key\":\"startDateGreat\",\"value\":\"" + utils.sdf.format(new Date()) + "\",\"type\":\"date\"}]}";
         request.setContent(content.getBytes());
         response = flowsProcessInstanceResource.getProcessInstances(request, true, ALL_PROCESS_INSTANCES, 0, 100, ASC);
         entities = (ArrayList<HistoricProcessInstanceResponse>) response.getBody().getData();
