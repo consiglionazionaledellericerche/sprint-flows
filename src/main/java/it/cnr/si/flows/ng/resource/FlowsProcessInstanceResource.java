@@ -12,6 +12,7 @@ import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
+import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceActionRequest;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResource;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -57,9 +59,6 @@ public class FlowsProcessInstanceResource {
     @Inject
     private FlowsProcessInstanceService flowsProcessInstanceService;
     private Utils utils = new Utils();
-
-
-
 
 
     /**
@@ -207,5 +206,37 @@ public class FlowsProcessInstanceResource {
 
         Map<String, Object> result = flowsProcessInstanceService.search(req, processInstanceId, active, order, firstResult, maxResults);
         return ResponseEntity.ok(result);
+    }
+
+
+    /**
+     * Export csv: esporta il result-set di una search sulle Process Instances in un file Csv
+     *
+     * @param req               the req
+     * @param res               the res
+     * @param processInstanceId the process instance id della search-request
+     * @param active            the active Process Instances attive o terminate
+     * @param order             the order ordinamento del result-set
+     * @param firstResult       the first result (in caso di esportazione parziale del result-set)
+     * @param maxResults        the max results (in caso di esportazione parziale del result-set)
+     * @throws IOException the io exception
+     */
+    @RequestMapping(value = "/exportCsv/{processInstanceId}", headers = "Accept=application/vnd.ms-excel", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = "application/vnd.ms-excel")
+    @Timed
+    public void exportCsv(
+            HttpServletRequest req,
+            HttpServletResponse res,
+            @PathVariable("processInstanceId") String processInstanceId,
+            @RequestParam("active") boolean active,
+            @RequestParam("order") String order,
+            @RequestParam("firstResult") int firstResult,
+            @RequestParam("maxResults") int maxResults) throws IOException {
+
+        Map<String, Object> result = flowsProcessInstanceService.search(
+                req, processInstanceId, active, order, firstResult, maxResults);
+
+        flowsProcessInstanceService.buildCsv(
+                (List<HistoricProcessInstanceResponse>) result.get("processInstances"),
+                res.getWriter(), processInstanceId);
     }
 }
