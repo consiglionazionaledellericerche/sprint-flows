@@ -64,7 +64,7 @@
                     type: 'danger',
                     msg: msg,
                     params: params,
-                    timeout: timeout,
+                    timeout: 0,
                     toast: toast,
                     position: position
                 });
