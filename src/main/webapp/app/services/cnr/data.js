@@ -85,13 +85,13 @@
             return $http.get('api/attachments/history/'+ processInstaceId +'/'+ attachmentName);
         },
         search: function (processInstance, active, params, order, firstResult, maxResults) {
-            var processInstaceId;
+            var processInstanceId;
             if(processInstance !== undefined){
-                processInstaceId = processInstance.key;
+                processInstanceId = processInstance.key;
             } else {
-                processInstaceId = 'all';
+                processInstanceId = 'all';
             }
-            return $http.post('api/processInstances/search/' + processInstaceId +
+            return $http.post('api/processInstances/search/' + processInstanceId +
                 '?active=' + active +
                 '&order=' + order +
                 '&firstResult=' + firstResult +
@@ -99,6 +99,20 @@
         },
         exportSummary: function (processInstaceId) {
             return $http.get('api/summaryPdf?processInstanceId='+ processInstaceId);
+        },
+        exportCsv: function (processInstance, active, params, order, firstResult, maxResults) {
+            var processInstanceId;
+            if(processInstance !== undefined){
+                processInstanceId = processInstance.key;
+            } else {
+                processInstanceId = 'all';
+            }
+
+            return $http.post('api/processInstances/exportCsv/' + processInstanceId +
+                '?active=' + active +
+                '&order=' + order +
+                '&firstResult=' + firstResult +
+                '&maxResults=' + maxResults, params);
         }
       },
       definitions : {

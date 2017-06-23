@@ -36,11 +36,36 @@
 
 
         $scope.search = function() {
+            var maxResults = vm.itemsPerPage,
+                firstResult = vm.itemsPerPage * (vm.page - 1);
+            dataService.processInstances.search($scope.current, vm.active, exstractSearchParams(), vm.order, firstResult, maxResults)
+                .then(function(response) {
+                    vm.processInstances = utils.refactoringVariables(response.data.processInstances);
+                    // variabili per la gestione della paginazione
+                    vm.totalItems = response.data.totalItems;
+                    vm.queryCount = vm.totalItems;
+                }, function(response) {
+                    $log.error(response);
+                });
+        }
+
+
+        $scope.exportCsv = function() {
+            dataService.processInstances.exportCsv($scope.current, vm.active, exstractSearchParams(), vm.order, -1, -1)
+                .success(function(response) {
+                    var filename = new Date().toISOString().slice(0, 10) + ".xls",
+                        file = new Blob([response], {
+                            type: 'application/vnd.ms-excel'
+                        });
+                    $log.info(file, filename);
+                    saveAs(file, filename);
+                });
+        }
+
+
+        function exstractSearchParams() {
             var fields = Array.from($("input[id^='searchField-']")),
-                params = [],
-                firstResult,
-                maxResults = vm.itemsPerPage;
-            firstResult = vm.itemsPerPage * (vm.page - 1)
+                params = [];
 
             //popolo params con gli id, i valori sottomessi e il "type" dei campi di ricerca
             fields.forEach(function(field) {
@@ -56,18 +81,10 @@
             var paramsJson = {
                 "params": params
             };
-
-            dataService.processInstances.search($scope.current, vm.active, paramsJson, vm.order, firstResult, maxResults)
-                .then(function(response) {
-                    vm.processInstances = utils.refactoringVariables(response.data.processInstances);
-                    // variabili per la gestione della paginazione
-                    vm.totalItems = response.data.totalItems;
-                    vm.queryCount = vm.totalItems;
-                }, function(response) {
-                    $log.error(response);
-                });
+            return paramsJson;
         }
-            //funzione richiamata quando si chiede una nuova "pagina" dei risultati
+
+        //funzione richiamata quando si chiede una nuova "pagina" dei risultati
         function transition() {
             $scope.search();
         }
