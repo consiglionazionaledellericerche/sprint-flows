@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
   <process id="permessi-ferie" name="Permessi Ferie" isExecutable="true">
+    <extensionElements>
+      <activiti:executionListener event="start" delegateExpression="${startAcquistiSetGroupsPrototipoSenzaAce}"></activiti:executionListener>
+    </extensionElements>
     <startEvent id="startevent1" name="Start" activiti:async="true" activiti:initiator="initiator"></startEvent>
     <userTask id="approvazione" name="Direttore Approva o Rifiuta" activiti:candidateGroups="USER"></userTask>
     <endEvent id="endevent1" name="End"></endEvent>

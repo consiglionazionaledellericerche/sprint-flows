@@ -38,6 +38,9 @@ public class NotificationRule implements Serializable {
     @Column(name = "event_type", nullable = false)
     private String eventType;
 
+    @Column(name = "persona")
+    private Boolean persona;
+
     public Long getId() {
         return id;
     }
@@ -98,6 +101,19 @@ public class NotificationRule implements Serializable {
         this.eventType = eventType;
     }
 
+    public Boolean isPersona() {
+        return persona;
+    }
+
+    public NotificationRule persona(Boolean persona) {
+        this.persona = persona;
+        return this;
+    }
+
+    public void setPersona(Boolean persona) {
+        this.persona = persona;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -126,6 +142,7 @@ public class NotificationRule implements Serializable {
             ", taskName='" + taskName + "'" +
             ", groups='" + groups + "'" +
             ", eventType='" + eventType + "'" +
+            ", persona='" + persona + "'" +
             '}';
     }
 }

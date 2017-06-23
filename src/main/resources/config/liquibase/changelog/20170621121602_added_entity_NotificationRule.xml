@@ -37,6 +37,10 @@
                 <constraints nullable="false" />
             </column>
             
+            <column name="persona" type="bit">
+                <constraints nullable="true" />
+            </column>
+            
             <!-- jhipster-needle-liquibase-add-column - Jhipster will add columns here, do not remove-->
         </createTable>
         

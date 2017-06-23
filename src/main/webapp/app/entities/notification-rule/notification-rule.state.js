@@ -128,6 +128,7 @@
                                 taskName: null,
                                 groups: null,
                                 eventType: null,
+                                persona: null,
                                 id: null
                             };
                         }

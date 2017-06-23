@@ -14,13 +14,20 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import it.cnr.si.flows.ng.listeners.TaskMailNotificationListener;
+import it.cnr.si.flows.ng.listeners.MailNotificationListener;
 import it.cnr.si.service.MailService;
 
 @Service
 @Primary
 public class FlowsMailService extends MailService {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsMailService.class);
+
+    public static final String FLOW_NOTIFICATION = "notificaFlow.html";
+    public static final String PROCESS_NOTIFICATION = "notificaProcesso.html";
+    public static final String TASK_NOTIFICATION = "notificaTask.html";
+    public static final String TASK_ASSEGNATO_AL_GRUPPO_HTML = "taskAssegnatoAlGruppo.html";
+
 
     @Inject
     private TemplateEngine templateEngine;
@@ -36,14 +43,18 @@ public class FlowsMailService extends MailService {
         ctx.setVariable("username", username);
         ctx.setVariable("groupname", groupName);
 
-        String htmlContent = templateEngine.process("taskAssegnatoAlGruppo.html", ctx);
-        mailService.sendEmail("marcinireneusz.trycz@cnr.it", "Compito assegnato a uno dei tuoi gruppi", htmlContent, false, true);
+        String htmlContent = templateEngine.process(TASK_ASSEGNATO_AL_GRUPPO_HTML, ctx);
+        mailService.sendEmail("marcinireneusz.trycz@cnr.it", "Compito assegnato a uno dei tuoi gruppi (flusso "+ variables.get("titolo") +")", htmlContent, false, true);
     }
 
-    public void sendNotificationRuleNotification(Map<String, Object> variables, String name, String m,
-            String groupValueName) {
-        LOGGER.info("INVIANDO LA NOTIFICA A {} DEL GRUPPO {}", m, groupValueName);
+    public void sendNotificationRuleNotification(String notificationType, Map<String, Object> variables, String username, String groupName) {
+        Context ctx = new Context();
+        ctx.setVariables(variables);
+        ctx.setVariable("username", username);
+        ctx.setVariable("groupname", groupName);
 
+        String htmlContent = templateEngine.process(notificationType, ctx);
+        mailService.sendEmail("marcinireneusz.trycz@cnr.it", "Notifica relativa al flusso "+ variables.get("titolo"), htmlContent, false, true);
     }
 
 }

@@ -29,6 +29,10 @@
             "fieldValidateRules": [
                 "required"
             ]
+        },
+        {
+            "fieldName": "persona",
+            "fieldType": "Boolean"
         }
     ],
     "changelogDate": "20170621121602",

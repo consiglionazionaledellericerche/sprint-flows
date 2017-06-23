@@ -19,7 +19,8 @@
             "processId": "Process Id",
             "taskName": "Task Name",
             "groups": "Groups",
-            "eventType": "Event Type"
+            "eventType": "Event Type",
+            "persona": "Persona"
         }
     }
 }

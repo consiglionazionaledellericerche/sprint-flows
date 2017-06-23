@@ -80,7 +80,7 @@ class NotificationRuleGatlingTest extends Simulation {
             .exec(http("Create new notificationRule")
             .post("/api/notification-rules")
             .headers(headers_http_authenticated)
-            .body(StringBody("""{"id":null, "processId":"SAMPLE_TEXT", "taskName":"SAMPLE_TEXT", "groups":"SAMPLE_TEXT", "eventType":"SAMPLE_TEXT"}""")).asJSON
+            .body(StringBody("""{"id":null, "processId":"SAMPLE_TEXT", "taskName":"SAMPLE_TEXT", "groups":"SAMPLE_TEXT", "eventType":"SAMPLE_TEXT", "persona":null}""")).asJSON
             .check(status.is(201))
             .check(headerRegex("Location", "(.*)").saveAs("new_notificationRule_url"))).exitHereIfFailed
             .pause(10)

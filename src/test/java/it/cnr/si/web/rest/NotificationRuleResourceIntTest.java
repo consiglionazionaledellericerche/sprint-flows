@@ -45,6 +45,9 @@ public class NotificationRuleResourceIntTest {
     private static final String DEFAULT_EVENT_TYPE = "AAAAA";
     private static final String UPDATED_EVENT_TYPE = "BBBBB";
 
+    private static final Boolean DEFAULT_PERSONA = false;
+    private static final Boolean UPDATED_PERSONA = true;
+
     @Inject
     private NotificationRuleRepository notificationRuleRepository;
 
@@ -83,7 +86,8 @@ public class NotificationRuleResourceIntTest {
                 .processId(DEFAULT_PROCESS_ID)
                 .taskName(DEFAULT_TASK_NAME)
                 .groups(DEFAULT_GROUPS)
-                .eventType(DEFAULT_EVENT_TYPE);
+                .eventType(DEFAULT_EVENT_TYPE)
+                .persona(DEFAULT_PERSONA);
         return notificationRule;
     }
 
@@ -112,6 +116,7 @@ public class NotificationRuleResourceIntTest {
         assertThat(testNotificationRule.getTaskName()).isEqualTo(DEFAULT_TASK_NAME);
         assertThat(testNotificationRule.getGroups()).isEqualTo(DEFAULT_GROUPS);
         assertThat(testNotificationRule.getEventType()).isEqualTo(DEFAULT_EVENT_TYPE);
+        assertThat(testNotificationRule.isPersona()).isEqualTo(DEFAULT_PERSONA);
     }
 
     @Test
@@ -200,7 +205,8 @@ public class NotificationRuleResourceIntTest {
                 .andExpect(jsonPath("$.[*].processId").value(hasItem(DEFAULT_PROCESS_ID.toString())))
                 .andExpect(jsonPath("$.[*].taskName").value(hasItem(DEFAULT_TASK_NAME.toString())))
                 .andExpect(jsonPath("$.[*].groups").value(hasItem(DEFAULT_GROUPS.toString())))
-                .andExpect(jsonPath("$.[*].eventType").value(hasItem(DEFAULT_EVENT_TYPE.toString())));
+                .andExpect(jsonPath("$.[*].eventType").value(hasItem(DEFAULT_EVENT_TYPE.toString())))
+                .andExpect(jsonPath("$.[*].persona").value(hasItem(DEFAULT_PERSONA.booleanValue())));
     }
 
     @Test
@@ -217,7 +223,8 @@ public class NotificationRuleResourceIntTest {
             .andExpect(jsonPath("$.processId").value(DEFAULT_PROCESS_ID.toString()))
             .andExpect(jsonPath("$.taskName").value(DEFAULT_TASK_NAME.toString()))
             .andExpect(jsonPath("$.groups").value(DEFAULT_GROUPS.toString()))
-            .andExpect(jsonPath("$.eventType").value(DEFAULT_EVENT_TYPE.toString()));
+            .andExpect(jsonPath("$.eventType").value(DEFAULT_EVENT_TYPE.toString()))
+            .andExpect(jsonPath("$.persona").value(DEFAULT_PERSONA.booleanValue()));
     }
 
     @Test
@@ -241,7 +248,8 @@ public class NotificationRuleResourceIntTest {
                 .processId(UPDATED_PROCESS_ID)
                 .taskName(UPDATED_TASK_NAME)
                 .groups(UPDATED_GROUPS)
-                .eventType(UPDATED_EVENT_TYPE);
+                .eventType(UPDATED_EVENT_TYPE)
+                .persona(UPDATED_PERSONA);
 
         restNotificationRuleMockMvc.perform(put("/api/notification-rules")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -256,6 +264,7 @@ public class NotificationRuleResourceIntTest {
         assertThat(testNotificationRule.getTaskName()).isEqualTo(UPDATED_TASK_NAME);
         assertThat(testNotificationRule.getGroups()).isEqualTo(UPDATED_GROUPS);
         assertThat(testNotificationRule.getEventType()).isEqualTo(UPDATED_EVENT_TYPE);
+        assertThat(testNotificationRule.isPersona()).isEqualTo(UPDATED_PERSONA);
     }
 
     @Test
