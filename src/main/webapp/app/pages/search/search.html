@@ -33,7 +33,12 @@
         <workflow-types process-definitions="wfDefs" filters="true"></workflow-types>
         <br>
         <br>
-        <button ng-click="search()" class="btn btn-primary">Filtra</button>
+        <button ng-click="search()" class="btn btn-primary">
+            <span class="glyphicon glyphicon-filter"></span> Filtra
+        </button>
+        <button ng-click="exportCsv()" class="btn btn-info">
+            <span class="glyphicon glyphicon-export"></span> Esporta Csv
+        </button>
     </div>
 
 

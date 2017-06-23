@@ -1,6 +1,10 @@
 package it.cnr.si.flows.ng.service;
 
+import com.opencsv.CSVWriter;
+import it.cnr.si.domain.View;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.utils.Utils;
+import it.cnr.si.repository.ViewRepository;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.TaskService;
@@ -15,6 +19,7 @@ import org.activiti.engine.impl.util.json.JSONArray;
 import org.activiti.engine.impl.util.json.JSONObject;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.rest.service.api.RestResponseFactory;
+import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -24,8 +29,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static it.cnr.si.flows.ng.utils.Utils.*;
@@ -47,7 +53,10 @@ public class FlowsProcessInstanceService {
     private RepositoryService repositoryService;
     @Inject
     private TaskService taskService;
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    @Inject
+    private ViewRepository viewRepository;
+    private Utils utils = new Utils();
+
 
 
     public Map<String, Object> getProcessInstanceWithDetails(@RequestParam("processInstanceId") String processInstanceId) {
@@ -152,16 +161,63 @@ public class FlowsProcessInstanceService {
         long totalItems = processQuery.includeProcessVariables().count();
         result.put("totalItems", totalItems);
 
-        List<HistoricProcessInstance> taskRaw = processQuery.includeProcessVariables().listPage(firstResult, maxResults);
+        List<HistoricProcessInstance> taskRaw;
+        if (firstResult != -1 || maxResults != -1)
+            taskRaw = processQuery.includeProcessVariables().listPage(firstResult, maxResults);
+        else
+            taskRaw = processQuery.includeProcessVariables().list();
+
         List<HistoricProcessInstanceResponse> tasks = restResponseFactory.createHistoricProcessInstanceResponseList(taskRaw);
         result.put("processInstances", tasks);
         return result;
     }
 
 
+    public void buildCsv(List<HistoricProcessInstanceResponse> processInstances, PrintWriter printWriter, String processDefinitionKey) throws IOException {
+        // vista (campi e variabili) da inserire nel csv in base alla tipologia di flusso selezionato
+        View view = null;
+        if (!processDefinitionKey.equals(ALL_PROCESS_INSTANCES)) {
+            view = viewRepository.getViewByProcessidType(processDefinitionKey, "export-csv");
+        }
+        CSVWriter writer = new CSVWriter(printWriter, '\t');
+        ArrayList<String[]> entriesIterable = new ArrayList<>();
+        boolean hasHeaders = false;
+        ArrayList<String> headers = new ArrayList<>();
+        headers.add("Business Key");
+        headers.add("Start Date");
+        for (HistoricProcessInstanceResponse pi : processInstances) {
+            List<RestVariable> variables = pi.getVariables();
+            ArrayList<String> tupla = new ArrayList<>();
+            //field comuni a tutte le Process Instances (Business Key, Start date)
+            tupla.add(pi.getBusinessKey());
+            tupla.add(utils.formatoVisualizzazione.format(pi.getStartTime()));
+
+            //field specifici per ogni procesDefinition
+            if (view != null) {
+                JSONArray fields = new JSONArray(view.getView());
+                for (int i = 0; i < fields.length(); i++) {
+                    JSONObject field = fields.getJSONObject(i);
+                    tupla.add(Utils.filterProperties(variables, field.getString("varName")));
+                    //solo per il primo ciclo, prendo le label dei field specifici
+                    if (!hasHeaders)
+                        headers.add(field.getString("label"));
+                }
+            }
+            if (!hasHeaders) {
+                //inserisco gli headers come intestazione dei field del csv
+                entriesIterable.add(0, getArray(headers));
+                hasHeaders = true;
+            }
+            entriesIterable.add(getArray(tupla));
+        }
+        writer.writeAll(entriesIterable);
+        writer.close();
+    }
+
+
     private void processDate(HistoricProcessInstanceQuery taskQuery, String key, String value) {
         try {
-            Date date = sdf.parse(value);
+            Date date = utils.sdf.parse(value);
 
             if (key.contains("Less")) {
                 taskQuery.variableValueLessThanOrEqual(key.replace("Less", ""), date);
@@ -173,4 +229,9 @@ public class FlowsProcessInstanceService {
     }
 
 
+    private String[] getArray(ArrayList<String> tupla) {
+        String[] entries = new String[tupla.size()];
+        entries = tupla.toArray(entries);
+        return entries;
+    }
 }
