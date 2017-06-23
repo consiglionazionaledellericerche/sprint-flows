@@ -59,14 +59,14 @@
                 <version>0.8.1</version>
             </dependency>
             <dependency>
-                <groupId>com.opencsv</groupId>
-                <artifactId>opencsv</artifactId>
-                <version>3.9</version>
-            </dependency>
-            <dependency>
                 <groupId>org.apache.pdfbox</groupId>
                 <artifactId>pdfbox</artifactId>
                 <version>1.8.12</version>
+            </dependency>
+            <dependency>
+                <groupId>com.opencsv</groupId>
+                <artifactId>opencsv</artifactId>
+                <version>3.9</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.poi</groupId>
@@ -138,16 +138,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.ralfstuckert.pdfbox-layout</groupId>
-            <artifactId>pdfbox1-layout</artifactId>
-            <version>0.8.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.opencsv</groupId>
-            <artifactId>opencsv</artifactId>
-            <version>3.9</version>
-        </dependency>
-        <dependency>
             <groupId>it.cnr.commons</groupId>
             <artifactId>firmadigitale</artifactId>
             <version>${firmadigitale.version}</version>
@@ -179,11 +169,22 @@
             <artifactId>activiti-spring-boot-starter-rest-api</artifactId>
             <version>5.22.0</version>
         </dependency>
-        <!--BUONA versione vecchia di pdfbox-->
+        <!--BUONA versione vecchia di pdfbox (exportPdf)-->
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
             <version>1.8.12</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ralfstuckert.pdfbox-layout</groupId>
+            <artifactId>pdfbox1-layout</artifactId>
+            <version>0.8.1</version>
+        </dependency>
+        <!--dipendenze exportCsv-->
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>3.9</version>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
