@@ -21,29 +21,36 @@ public class ScorriElencoDitteCandidate implements ExecutionListener {
 	@Override
 	public void notify(DelegateExecution execution) throws Exception {
 
-		String ditteCandidateString = (String) execution.getVariable("ditteCandidate");
+		String ditteCandidateString = (String) execution.getVariable("ditteCandidate_json");
+		LOGGER.info("ditteCandidate_json: " + ditteCandidateString);
+
 		JSONArray ditteCandidate = new JSONArray(ditteCandidateString);
 		int nrTotaleDitte = ditteCandidate.length();
+		LOGGER.info("nrTotaleDitte: " + nrTotaleDitte);
 		execution.setVariable("ditteDisponibili", "presenti");
 
-		if (!execution.getVariable("nrElencoDitteInit").equals("true")) {
+		if (execution.getVariable("nrElencoDitteInit") == null) {
 			execution.setVariable("nrElencoDitteTot", ditteCandidate.length());
 			execution.setVariable("nrElencoDitteCorrente", 0);
 			execution.setVariable("nrElencoDitteInit", "true");
-		} else {
-			if (nrTotaleDitte > (int) execution.getVariable("nrElencoDitteCorrente")) 
-			{
-				execution.setVariable("nrElencoDitteCorrente", (int) execution.getVariable("nrElencoDitteCorrente") +1);
 
-			} else {
-				execution.setVariable("ditteDisponibili", 0);
-			}
-
+		} else
+		{			
+			execution.setVariable("nrElencoDitteCorrente", (int) execution.getVariable("nrElencoDitteCorrente") +1);
 		}
-		int nrElencoDitteCorrente = (int) execution.getVariable("nrElencoDitteCorrente");
-		JSONObject dittaCorrente = ditteCandidate.getJSONObject(nrElencoDitteCorrente);
-		execution.setVariable("pIvaCodiceFiscaleDittaAggiudicataria", dittaCorrente.get("pIvaCodiceFiscaleDittaCandidata"));
-		execution.setVariable("ragioneSocialeDittaAggiudicataria", dittaCorrente.get("ragioneSocialeDittaCandidata"));
+		if (nrTotaleDitte > (int) execution.getVariable("nrElencoDitteCorrente")) 
+		{
+			int nrElencoDitteCorrente = (int) execution.getVariable("nrElencoDitteCorrente");
+			JSONObject dittaCorrente = ditteCandidate.getJSONObject(nrElencoDitteCorrente);
+			execution.setVariable("pIvaCodiceFiscaleDittaAggiudicataria", dittaCorrente.get("pIvaCodiceFiscaleDittaCandidata"));
+			execution.setVariable("ragioneSocialeDittaAggiudicataria", dittaCorrente.get("ragioneSocialeDittaCandidata"));
+
+		} else {
+			execution.setVariable("ditteDisponibili", 0);
+			execution.setVariable("pIvaCodiceFiscaleDittaAggiudicataria", "NESSUNA");
+			execution.setVariable("ragioneSocialeDittaAggiudicataria", "NESSUNA");
+		}
+
 
 	}
 

@@ -132,7 +132,11 @@
       </sequenceFlow>
       <exclusiveGateway id="exclusivegateway27" name="Exclusive Gateway" default="flow143"></exclusiveGateway>
       <sequenceFlow id="flow140" sourceRef="exclusivegateway26" targetRef="verifica-requisiti"></sequenceFlow>
-      <sequenceFlow id="flow141" sourceRef="verifica-requisiti" targetRef="exclusivegateway27"></sequenceFlow>
+      <sequenceFlow id="flow141" sourceRef="verifica-requisiti" targetRef="exclusivegateway27">
+        <extensionElements>
+          <activiti:executionListener event="take" delegateExpression="${scorriElencoDitteCandidate}"></activiti:executionListener>
+        </extensionElements>
+      </sequenceFlow>
       <sequenceFlow id="flow143" sourceRef="exclusivegateway27" targetRef="predisposizione-provvedimento-aggiudicazione">
         <extensionElements>
           <activiti:executionListener event="take" delegateExpression="${sostituisciDocumentoListener}">
