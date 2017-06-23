@@ -5,12 +5,14 @@ import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import it.cnr.jada.firma.arss.ArubaSignServiceException;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.exception.TaskFailedException;
 import it.cnr.si.flows.ng.service.FlowsFirmaService;
 
+@Component
 public class ValidaDocumento implements ExecutionListener {
 
     private static final long serialVersionUID = -56001764662303256L;

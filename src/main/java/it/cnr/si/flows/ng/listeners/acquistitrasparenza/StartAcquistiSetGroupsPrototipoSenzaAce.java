@@ -53,6 +53,7 @@ public class StartAcquistiSetGroupsPrototipoSenzaAce implements ExecutionListene
 
             LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoRT, gruppoSFD, gruppoRA, gruppoDirettore);
 
+            execution.setVariable("organizzazioneStruttura", "Semplice");
             execution.setVariable("gruppoRT", gruppoRT);
             execution.setVariable("gruppoDirettore", gruppoDirettore);
             execution.setVariable("gruppoRA", gruppoRA);
