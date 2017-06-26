@@ -31,7 +31,7 @@ public class ScorriElencoDitteCandidate implements ExecutionListener {
 
 		if (execution.getVariable("nrElencoDitteInit") == null) {
 			execution.setVariable("nrElencoDitteTot", ditteCandidate.length());
-			execution.setVariable("nrElencoDitteCorrente", 0);
+			execution.setVariable("nrElencoDitteCorrente", 1);
 			execution.setVariable("nrElencoDitteInit", "true");
 
 		} else
@@ -50,9 +50,17 @@ public class ScorriElencoDitteCandidate implements ExecutionListener {
 			execution.setVariable("pIvaCodiceFiscaleDittaAggiudicataria", "NESSUNA");
 			execution.setVariable("ragioneSocialeDittaAggiudicataria", "NESSUNA");
 		}
+		String codiceVerificheRequisiti = execution.getVariable("verificheRequisitiid").toString();
 
-
+		if (codiceVerificheRequisiti.equals("1") || codiceVerificheRequisiti.equals("3"))
+		{
+			execution.setVariable("esitoVerificaRequisiti", "inviaRisultato");
+		} else if (execution.getVariable("ditteDisponibili").toString().equals("0"))
+		{
+			execution.setVariable("esitoVerificaRequisiti", "revocaConProvvedimento");
+		} else {
+			execution.setVariable("esitoVerificaRequisiti", "procediAltroCandidato");
+		}
 	}
-
 }
 

@@ -61,7 +61,7 @@
       </sequenceFlow>
       <endEvent id="endevent6" name="End">
         <extensionElements>
-          <activiti:executionListener event="start" expression="${execution.setVariable(&quot;sceltaPercorso&quot;, &quot;RevocaSemplice&quot;)}"></activiti:executionListener>
+          <activiti:executionListener event="start" expression="${execution.setVariable(&quot;sceltaUtente&quot;, &quot;RevocaSemplice&quot;)}"></activiti:executionListener>
         </extensionElements>
       </endEvent>
       <startEvent id="startevent11" name="Start Decisione a Contrattare"></startEvent>
@@ -102,7 +102,7 @@
       <sequenceFlow id="flow57" sourceRef="modifica-provvedimento-aggiudicazione" targetRef="exclusivegateway29"></sequenceFlow>
       <endEvent id="endevent7" name="End">
         <extensionElements>
-          <activiti:executionListener event="start" expression="${execution.setVariable(&quot;sceltaPercorso&quot;, &quot;RevocaConProvvedimento&quot;)}"></activiti:executionListener>
+          <activiti:executionListener event="start" expression="${execution.setVariable(&quot;sceltaUtente&quot;, &quot;RevocaConProvvedimento&quot;)}"></activiti:executionListener>
         </extensionElements>
       </endEvent>
       <userTask id="firma-provvedimento-aggiudicazione" name="Firma Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoDirettore}"></userTask>
@@ -147,7 +147,7 @@
         </extensionElements>
       </sequenceFlow>
       <sequenceFlow id="flow145" sourceRef="exclusivegateway27" targetRef="endevent7">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${ditteDisponibili == '0'}]]></conditionExpression>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${esitoVerificaRequisiti == 'revocaConProvvedimento'}]]></conditionExpression>
       </sequenceFlow>
       <exclusiveGateway id="exclusivegateway29" name="Exclusive Gateway" default="flow151"></exclusiveGateway>
       <sequenceFlow id="flow150" sourceRef="predisposizione-provvedimento-aggiudicazione" targetRef="exclusivegateway29"></sequenceFlow>
@@ -157,6 +157,9 @@
       </sequenceFlow>
       <sequenceFlow id="flow21" sourceRef="exclusivegateway3" targetRef="modifica-provvedimento-aggiudicazione">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Modifica'}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="flow153" sourceRef="exclusivegateway27" targetRef="endevent4">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${esitoVerificaRequisiti == 'inviaRisultato'}]]></conditionExpression>
       </sequenceFlow>
     </subProcess>
     <subProcess id="REVOCA" name="REVOCA">
@@ -687,6 +690,10 @@
         <omgdi:waypoint x="480.0" y="410.0"></omgdi:waypoint>
         <omgdi:waypoint x="480.0" y="491.0"></omgdi:waypoint>
         <omgdi:waypoint x="445.0" y="491.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow153" id="BPMNEdge_flow153">
+        <omgdi:waypoint x="910.0" y="525.0"></omgdi:waypoint>
+        <omgdi:waypoint x="861.0" y="508.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow39" id="BPMNEdge_flow39">
         <omgdi:waypoint x="314.0" y="1099.0"></omgdi:waypoint>
