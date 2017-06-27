@@ -9,8 +9,8 @@
         <hr>
         <p>
             Gentile <span th:text="${username}">nome.cognome</span><br>
-            Riceve questa notifica in quanto parte del gruppo <bold th:text="${groupname}">NOME GRUPPO</bold>
-        </p>
+            <span th:if="${groupname}">
+                Riceve questa notifica in quanto parte del gruppo <bold th:text="${groupname}">NOME GRUPPO</bold></span>
         <p>
             E' successo qualcosa per cui e' giusto che le arrivi la notifica.
         <p th:if="${commento}">

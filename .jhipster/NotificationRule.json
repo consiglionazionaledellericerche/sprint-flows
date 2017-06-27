@@ -17,7 +17,7 @@
             ]
         },
         {
-            "fieldName": "groups",
+            "fieldName": "recipients",
             "fieldType": "String",
             "fieldValidateRules": [
                 "required"

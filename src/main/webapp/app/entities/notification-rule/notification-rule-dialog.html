@@ -38,13 +38,13 @@
             </div>
         </div>
         <div class="form-group">
-            <label class="control-label" translate="sprintApp.notificationRule.groups" for="field_groups">Groups</label>
-            <input type="text" class="form-control" name="groups" id="field_groups"
-                    ng-model="vm.notificationRule.groups"
+            <label class="control-label" translate="sprintApp.notificationRule.recipients" for="field_recipients">Recipients</label>
+            <input type="text" class="form-control" name="recipients" id="field_recipients"
+                    ng-model="vm.notificationRule.recipients"
                     required />
-            <div ng-show="editForm.groups.$invalid">
+            <div ng-show="editForm.recipients.$invalid">
                 <p class="help-block"
-                    ng-show="editForm.groups.$error.required" translate="entity.validation.required">
+                    ng-show="editForm.recipients.$error.required" translate="entity.validation.required">
                     This field is required.
                 </p>
             </div>

@@ -126,7 +126,7 @@
                             return {
                                 processId: null,
                                 taskName: null,
-                                groups: null,
+                                recipients: null,
                                 eventType: null,
                                 persona: null,
                                 id: null

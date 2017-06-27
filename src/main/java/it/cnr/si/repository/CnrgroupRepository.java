@@ -13,9 +13,9 @@ import java.util.List;
 public interface CnrgroupRepository extends JpaRepository<Cnrgroup,Long> {
 
     @Query("select distinct cnrgroup from Cnrgroup cnrgroup left join fetch cnrgroup.parents")
-    List<Cnrgroup> findAllWithEagerRelationships();
+    public List<Cnrgroup> findAllWithEagerRelationships();
 
     @Query("select cnrgroup from Cnrgroup cnrgroup left join fetch cnrgroup.parents where cnrgroup.id =:id")
-    Cnrgroup findOneWithEagerRelationships(@Param("id") Long id);
+    public Cnrgroup findOneWithEagerRelationships(@Param("id") Long id);
 
 }

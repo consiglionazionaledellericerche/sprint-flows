@@ -29,7 +29,7 @@
                 <constraints nullable="false" />
             </column>
             
-            <column name="groups" type="varchar(255)">
+            <column name="recipients" type="varchar(255)">
                 <constraints nullable="false" />
             </column>
             

@@ -31,8 +31,8 @@ public class NotificationRule implements Serializable {
     private String taskName;
 
     @NotNull
-    @Column(name = "groups", nullable = false)
-    private String groups;
+    @Column(name = "recipients", nullable = false)
+    private String recipients;
 
     @NotNull
     @Column(name = "event_type", nullable = false)
@@ -75,17 +75,17 @@ public class NotificationRule implements Serializable {
         this.taskName = taskName;
     }
 
-    public String getGroups() {
-        return groups;
+    public String getRecipients() {
+        return recipients;
     }
 
-    public NotificationRule groups(String groups) {
-        this.groups = groups;
+    public NotificationRule recipients(String recipients) {
+        this.recipients = recipients;
         return this;
     }
 
-    public void setGroups(String groups) {
-        this.groups = groups;
+    public void setRecipients(String recipients) {
+        this.recipients = recipients;
     }
 
     public String getEventType() {
@@ -140,7 +140,7 @@ public class NotificationRule implements Serializable {
             "id=" + id +
             ", processId='" + processId + "'" +
             ", taskName='" + taskName + "'" +
-            ", groups='" + groups + "'" +
+            ", recipients='" + recipients + "'" +
             ", eventType='" + eventType + "'" +
             ", persona='" + persona + "'" +
             '}';
