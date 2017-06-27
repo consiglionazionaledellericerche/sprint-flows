@@ -133,6 +133,20 @@
       },
       users: function(filter) {
         return $http.get('api/users/'+ filter +"/search");
+      },
+      mail: {
+        isActive: function() {
+          return $http.get('api/mail/active');
+        },
+        setActive: function(active) {
+          return $http.post('api/mail/active?active='+ active)
+        },
+        getUsers: function() {
+          return $http.get('api/mail/users');
+        },
+        setUsers: function(users) {
+          return $http.post('api/mail/users?users='+ users)
+        }
       }
     };
   }

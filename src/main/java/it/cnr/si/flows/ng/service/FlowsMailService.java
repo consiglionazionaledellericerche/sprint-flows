@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import it.cnr.si.flows.ng.config.MailConfguration;
 import it.cnr.si.service.MailService;
 
 @Service
@@ -27,6 +28,8 @@ public class FlowsMailService extends MailService {
 
     @Inject
     private TemplateEngine templateEngine;
+    @Inject
+    private MailConfguration mailConfig;
 
     @Async
     public void sendFlowEventNotification(String notificationType, Map<String, Object> variables, String taskName, String username, String groupName) {
@@ -37,6 +40,10 @@ public class FlowsMailService extends MailService {
         ctx.setVariable("taskName", taskName);
 
         String htmlContent = templateEngine.process(notificationType, ctx);
-        sendEmail("marcinireneusz.trycz@cnr.it", "Notifica relativa al flusso "+ variables.get("title"), htmlContent, false, true);
+
+        if (mailConfig.isMailActivated()) {
+            mailConfig.getMailRecipients()
+            .forEach(r -> sendEmail(r, "Notifica relativa al flusso "+ variables.get("title"), htmlContent, false, true));
+        }
     }
 }
