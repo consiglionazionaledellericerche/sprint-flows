@@ -9,7 +9,6 @@ import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.image.ProcessDiagramGenerator;
@@ -61,23 +60,9 @@ public class FlowsProcessDiagramService {
                                            font, font, font,
                                            processEngineConfiguration.getClassLoader(), 1.2);
         } else {
-            HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
-            HistoricProcessInstance hpi = historicProcessInstanceQuery.processInstanceId(id).singleResult();
-
+            HistoricProcessInstance hpi = historyService.createHistoricProcessInstanceQuery().processInstanceId(id).singleResult();
             BpmnModel bpmnModel = repositoryService.getBpmnModel(hpi.getProcessDefinitionId());
-            // per cerchiare l'endEvent con cui un processo e' eventualmente terminato
-//            HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
-//            HistoricActivityInstance endActivity = query
-//                    .activityType(ELEMENT_EVENT_END)
-//                    .processInstanceId(((HistoricProcessInstanceEntity) hpi).getProcessInstanceId())
-//                    .singleResult();
 
-            for (FlowElement fe : bpmnModel.getProcesses().get(0).getFlowElements()) {
-                GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(fe.getId());
-                if (fe instanceof SubProcess) {
-                    graphicInfo.setExpanded(containsActiveTasks((SubProcess) fe, hpi.getId()));
-                }
-            }
             resource = pdg.generateDiagram(bpmnModel, "png",
                                            font, font, font,
                                            processEngineConfiguration.getClassLoader(), 1.2);

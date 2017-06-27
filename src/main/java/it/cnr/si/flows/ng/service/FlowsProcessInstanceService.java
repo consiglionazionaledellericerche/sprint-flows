@@ -162,7 +162,7 @@ public class FlowsProcessInstanceService {
         result.put("totalItems", totalItems);
 
         List<HistoricProcessInstance> taskRaw;
-        if (firstResult != -1 || maxResults != -1)
+        if (firstResult != -1 && maxResults != -1)
             taskRaw = processQuery.includeProcessVariables().listPage(firstResult, maxResults);
         else
             taskRaw = processQuery.includeProcessVariables().list();

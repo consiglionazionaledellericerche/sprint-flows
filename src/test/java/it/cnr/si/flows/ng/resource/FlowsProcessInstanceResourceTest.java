@@ -27,6 +27,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -224,6 +225,36 @@ public class FlowsProcessInstanceResourceTest {
         response = flowsProcessInstanceResource.search(req, util.getProcessDefinition().split(":")[0], true, ASC, 0, 10);
         verifySearchResponse(response, 0, searchField1, searchValue1, searchField2, searchValue2);
     }
+
+    @Test
+    public void testExportCsv() throws IOException {
+        //avvio un flusso acquisti-trasparenza
+        processInstance = util.mySetUp("acquisti-trasparenza");
+        //faccio l'exportCsv su tutti le Process Instance attive
+        MockHttpServletRequest req = new MockHttpServletRequest();
+        String payload = "{params: [{key: initiator, value: \"\", type: text}]}";
+        req.setContent(payload.getBytes());
+        req.setContentType("application/json");
+        MockHttpServletResponse responseAll = new MockHttpServletResponse();
+        flowsProcessInstanceResource.exportCsv(req, responseAll, ALL_PROCESS_INSTANCES, true, ASC, -1, -1);
+        assertEquals(OK.value(), responseAll.getStatus());
+
+        //faccio l'exportCsv su UNA SOLA Process Instance attiva
+        MockHttpServletResponse responseOne = new MockHttpServletResponse();
+        flowsProcessInstanceResource.exportCsv(req, responseOne, ALL_PROCESS_INSTANCES, true, ASC, 0, 1);
+        assertEquals(OK.value(), responseOne.getStatus());
+        assertEquals(responseAll.getContentAsString(), responseOne.getContentAsString());
+
+        //verifico che exportCsv dei flussi NON ATTIVI è vuoto
+        MockHttpServletResponse responseEmpty = new MockHttpServletResponse();
+        flowsProcessInstanceResource.exportCsv(req, responseEmpty, ALL_PROCESS_INSTANCES, false, ASC, 0, 1);
+        assertEquals(OK.value(), responseEmpty.getStatus());
+        assertTrue(responseEmpty.getContentAsString().isEmpty());
+    }
+
+
+
+
 
     private void verifySearchResponse(ResponseEntity<Object> response, int expectedTotalItems, String searchField1, String searchValue1, String searchField2, String searchValue2) {
         assertEquals(OK, response.getStatusCode());
