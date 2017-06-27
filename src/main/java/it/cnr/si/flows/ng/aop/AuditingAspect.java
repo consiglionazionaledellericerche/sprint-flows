@@ -30,14 +30,13 @@ public class AuditingAspect {
     @Inject
     private AuditEventRepository repo;
 
-    @Pointcut("execution(* it.cnr.si.flows.ng.service.FlowsMailService.sendNotification(..))")
+    @Pointcut("execution(* it.cnr.si.flows.ng.service.FlowsMailService.sendFlowEventNotification(..))")
     private void inFlowsMailService() {}
 
     @AfterReturning("inFlowsMailService() && args(notificationType, variables, taskName, username, groupName)")
     public void auditMailsendSuccess(JoinPoint joinPoint, String notificationType, Map<String, Object> variables, String taskName, String username, String groupName) {
 
         Object[] args = joinPoint.getArgs();
-        log.info("Arguments to sendNotification: "+ Arrays.toString(joinPoint.getArgs()));
 
         AuditEvent event = new AuditEvent(username, "EMAIL_SEND_SUCCESS", "groupName="+ groupName, "title="+ variables.get("title"), "notificationType="+ notificationType);
         repo.add(event);
@@ -48,7 +47,6 @@ public class AuditingAspect {
     public void auditMailsendFailure(JoinPoint joinPoint, String notificationType, Map<String, Object> variables, String taskName, String username, String groupName) {
 
         Object[] args = joinPoint.getArgs();
-        log.info("Arguments to sendNotification: "+ Arrays.toString(joinPoint.getArgs()));
 
         AuditEvent event = new AuditEvent(username, "EMAIL_SEND_FAILURE", "groupName="+ groupName, "title="+ variables.get("title"), "notificationType="+ notificationType);
         repo.add(event);
