@@ -13,7 +13,7 @@
       <userTask id="modifica-decisione" name="Modifica Decisione" activiti:candidateGroups="${gruppoRA}"></userTask>
       <sequenceFlow id="flow9" sourceRef="modifica-decisione" targetRef="exclusivegateway28">
         <extensionElements>
-          <activiti:executionListener event="take" class="it.cnr.si.flows.ng.listeners.acquistitrasparenza.CalcolaTotaleImpegniAcquisti"></activiti:executionListener>
+          <activiti:executionListener event="take" delegateExpression="${calcolaTotaleImpegniAcquisti}"></activiti:executionListener>
         </extensionElements>
       </sequenceFlow>
       <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway" default="flow10"></exclusiveGateway>
@@ -66,7 +66,11 @@
       </endEvent>
       <startEvent id="startevent11" name="Start Decisione a Contrattare"></startEvent>
       <exclusiveGateway id="exclusivegateway28" name="Exclusive Gateway" default="flow148"></exclusiveGateway>
-      <sequenceFlow id="flow147" sourceRef="startevent11" targetRef="exclusivegateway28"></sequenceFlow>
+      <sequenceFlow id="flow147" sourceRef="startevent11" targetRef="exclusivegateway28">
+        <extensionElements>
+          <activiti:executionListener event="take" delegateExpression="${calcolaTotaleImpegniAcquisti}"></activiti:executionListener>
+        </extensionElements>
+      </sequenceFlow>
       <sequenceFlow id="flow148" sourceRef="exclusivegateway28" targetRef="verifica-decisione"></sequenceFlow>
       <sequenceFlow id="flow149" sourceRef="exclusivegateway28" targetRef="firma-decisione">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${organizzazioneStruttura == 'Semplice'}]]></conditionExpression>
