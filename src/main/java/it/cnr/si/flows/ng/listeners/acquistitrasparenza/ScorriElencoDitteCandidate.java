@@ -38,28 +38,30 @@ public class ScorriElencoDitteCandidate implements ExecutionListener {
 		{			
 			execution.setVariable("nrElencoDitteCorrente", (int) execution.getVariable("nrElencoDitteCorrente") +1);
 		}
-		if (nrTotaleDitte > (int) execution.getVariable("nrElencoDitteCorrente")) 
+		int nrElencoDitteCorrente = (int) execution.getVariable("nrElencoDitteCorrente");
+		JSONObject dittaCorrente = ditteCandidate.getJSONObject(nrElencoDitteCorrente);
+		execution.setVariable("pIvaCodiceFiscaleDittaAggiudicataria", dittaCorrente.get("pIvaCodiceFiscaleDittaCandidata"));
+		execution.setVariable("ragioneSocialeDittaAggiudicataria", dittaCorrente.get("ragioneSocialeDittaCandidata"));
+		if (nrTotaleDitte <= (int) execution.getVariable("nrElencoDitteCorrente")) 
 		{
-			int nrElencoDitteCorrente = (int) execution.getVariable("nrElencoDitteCorrente");
-			JSONObject dittaCorrente = ditteCandidate.getJSONObject(nrElencoDitteCorrente);
-			execution.setVariable("pIvaCodiceFiscaleDittaAggiudicataria", dittaCorrente.get("pIvaCodiceFiscaleDittaCandidata"));
-			execution.setVariable("ragioneSocialeDittaAggiudicataria", dittaCorrente.get("ragioneSocialeDittaCandidata"));
-
-		} else {
 			execution.setVariable("ditteDisponibili", 0);
 			execution.setVariable("pIvaCodiceFiscaleDittaAggiudicataria", "NESSUNA");
 			execution.setVariable("ragioneSocialeDittaAggiudicataria", "NESSUNA");
 		}
 		String codiceVerificheRequisiti = execution.getVariable("verificheRequisitiid").toString();
-
 		if (codiceVerificheRequisiti.equals("1") || codiceVerificheRequisiti.equals("3"))
 		{
 			execution.setVariable("esitoVerificaRequisiti", "inviaRisultato");
+			dittaCorrente = ditteCandidate.getJSONObject(nrElencoDitteCorrente -1);
+			execution.setVariable("pIvaCodiceFiscaleDittaAggiudicataria", dittaCorrente.get("pIvaCodiceFiscaleDittaCandidata"));
+			execution.setVariable("ragioneSocialeDittaAggiudicataria", dittaCorrente.get("ragioneSocialeDittaCandidata"));
 		} else if (execution.getVariable("ditteDisponibili").toString().equals("0"))
 		{
 			execution.setVariable("esitoVerificaRequisiti", "revocaConProvvedimento");
 		} else {
 			execution.setVariable("esitoVerificaRequisiti", "procediAltroCandidato");
+			execution.setVariable("verificheRequisiti", "da verificare");
+
 		}
 	}
 }
