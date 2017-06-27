@@ -113,6 +113,12 @@
                 '&order=' + order +
                 '&firstResult=' + firstResult +
                 '&maxResults=' + maxResults, params);
+        },
+        setVariable(processInstanceId, variableName, value) {
+          return $http.post('api/processInstances/variable'+
+              '?processInstanceId='+ processInstanceId +
+              '&variableName='+ variableName +
+              '&value='+ value);
         }
       },
       definitions : {

@@ -47,5 +47,26 @@
         $scope.exportSummary = function(url, filename) {
             utils.downloadFile(url, filename, 'application/pdf');
         };
+
+        $scope.editVariable = function(variableName, currentValue) {
+          $uibModal.open({
+            templateUrl: 'app/pages/details/editvariable.modal.html',
+            controller: 'EditVariableModalController',
+            controllerAs: 'vm',
+            size: 'md',
+            resolve: {
+              processInstanceId: function() {
+                    return $scope.processInstanceId;
+                },
+                variableName: function() {
+                    return variableName;
+                },
+                currentValue: function() {
+                    return currentValue;
+                }
+
+            }
+          })
+        }
     }
 })();

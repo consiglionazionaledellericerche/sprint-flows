@@ -40,10 +40,15 @@
             <div has-authority="ROLE_ADMIN">
                 <h4>Tutte le variabili</h4>
                 <ul>
-                    <li ng-repeat="metadatum in vm.data.entity.variables">{{metadatum.name}}: {{metadatum.value}}</li>
+                    <li ng-repeat="metadatum in vm.data.entity.variables">
+                      {{metadatum.name}}: {{metadatum.value}}
+                      <a href ng-click="editVariable(metadatum.name, metadatum.value)"><span class="glyphicon glyphicon-pencil"></span></a>
+                    </li>
                 </ul>
             </div>
-            <div has-authority="ROLE_ADMIN">
+
+
+      <div has-authority="ROLE_ADMIN">
                 <h4>Identity Links</h4>
                 <span ng-repeat="(taskId, link) in vm.data.identityLinks">
                     TaskId - <strong>{{ taskId }}:</strong> <br>
