@@ -5,7 +5,8 @@
     left: 0;
     z-index: 1000;
     display: none;
-    background-color: #f9f9f9;
+    background-color: #fff;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
   }
 
   .custom-popup-wrapper > .message {
@@ -37,4 +38,15 @@
     typeahead-min-length=3
     typeahead-popup-template-url="app/inputs/userinput/userinput.popup.html"
     class="form-control">
-<span ng-if="hasMore">!!!</span>
+
+    <input type="text"
+    ng-model="ngModel"
+    ng-required="ngRequired"
+    placeholder="Digita il nome utente per avviare la ricerca"
+    uib-typeahead="user for user in loadUsers($viewValue)"
+    typeahead-loading="loadingLocations"
+    typeahead-no-results="noResults"
+    typeahead-editable=false
+    typeahead-min-length=3
+    class="form-control">
+<!--     typeahead-popup-template-url="app/inputs/userinput/userinput.popup.html" -->
