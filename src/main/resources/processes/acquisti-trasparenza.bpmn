@@ -7,7 +7,7 @@
     <startEvent id="startevent1" name="Predisposizione Decisione"></startEvent>
     <subProcess id="DECISIONE-CONTRATTARE" name="DECISIONE A CONTRATTARE">
       <endEvent id="endevent1" name="End"></endEvent>
-      <userTask id="verifica-decisione" name="Verifica Decisione" activiti:candidateGroups="${gruppoSFD}"></userTask>
+      <userTask id="verifica-decisione" name="PIPPO" activiti:candidateGroups="${gruppoSFD}"></userTask>
       <userTask id="firma-decisione" name="Firma Decisione" activiti:candidateGroups="${gruppoDirettore}"></userTask>
       <sequenceFlow id="flow8" sourceRef="verifica-decisione" targetRef="exclusivegateway1"></sequenceFlow>
       <userTask id="modifica-decisione" name="Modifica Decisione" activiti:candidateGroups="${gruppoRA}"></userTask>

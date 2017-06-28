@@ -3,6 +3,7 @@ package it.cnr.si.flows.ng.resource;
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.security.AuthoritiesConstants;
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.repository.DeploymentBuilder;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
@@ -15,9 +16,13 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
+
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -64,6 +69,19 @@ public class FlowsProcessDefinitionResource {
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @RequestMapping(value = "/send", method = RequestMethod.POST)
+    @Secured(AuthoritiesConstants.ADMIN)
+    @Timed
+    public ResponseEntity<Void> updateProcessDefinition(@RequestParam("procDef") MultipartFile procDef) throws IOException {
+
+        DeploymentBuilder builder = repositoryService.createDeployment();
+        builder.addInputStream(procDef.getOriginalFilename(), procDef.getInputStream());
+        builder.deploy();
+
+        return ResponseEntity.ok().build();
+
     }
 
 }
