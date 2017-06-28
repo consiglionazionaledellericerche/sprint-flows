@@ -85,13 +85,13 @@
             return $http.get('api/attachments/history/'+ processInstaceId +'/'+ attachmentName);
         },
         search: function (processInstance, active, params, order, firstResult, maxResults) {
-            var processInstaceId;
+            var processInstanceId;
             if(processInstance !== undefined){
-                processInstaceId = processInstance.key;
+                processInstanceId = processInstance.key;
             } else {
-                processInstaceId = 'all';
+                processInstanceId = 'all';
             }
-            return $http.post('api/processInstances/search/' + processInstaceId +
+            return $http.post('api/processInstances/search/' + processInstanceId +
                 '?active=' + active +
                 '&order=' + order +
                 '&firstResult=' + firstResult +
@@ -99,6 +99,26 @@
         },
         exportSummary: function (processInstaceId) {
             return $http.get('api/summaryPdf?processInstanceId='+ processInstaceId);
+        },
+        exportCsv: function (processInstance, active, params, order, firstResult, maxResults) {
+            var processInstanceId;
+            if(processInstance !== undefined){
+                processInstanceId = processInstance.key;
+            } else {
+                processInstanceId = 'all';
+            }
+
+            return $http.post('api/processInstances/exportCsv/' + processInstanceId +
+                '?active=' + active +
+                '&order=' + order +
+                '&firstResult=' + firstResult +
+                '&maxResults=' + maxResults, params);
+        },
+        setVariable(processInstanceId, variableName, value) {
+          return $http.post('api/processInstances/variable'+
+              '?processInstanceId='+ processInstanceId +
+              '&variableName='+ variableName +
+              '&value='+ value);
         }
       },
       definitions : {
@@ -119,6 +139,20 @@
       },
       users: function(filter) {
         return $http.get('api/users/'+ filter +"/search");
+      },
+      mail: {
+        isActive: function() {
+          return $http.get('api/mail/active');
+        },
+        setActive: function(active) {
+          return $http.post('api/mail/active?active='+ active)
+        },
+        getUsers: function() {
+          return $http.get('api/mail/users');
+        },
+        setUsers: function(users) {
+          return $http.post('api/mail/users?users='+ users)
+        }
       }
     };
   }

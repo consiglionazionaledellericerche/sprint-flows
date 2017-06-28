@@ -64,6 +64,9 @@
               vm.data.impegniVeri = JSON.stringify(vm.data.impegni);
               vm.data.impegni = undefined;
 
+              vm.data.ditteCandidate_json = JSON.stringify(vm.data.ditteCandidate);
+              vm.data.ditteCandidate = undefined;
+
                 Upload.upload({
                     url: 'api/tasks/complete',
                     data: vm.data,

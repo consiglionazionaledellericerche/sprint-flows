@@ -4,6 +4,7 @@ import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.service.FlowsProcessDiagramService;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
+import it.cnr.si.flows.ng.utils.Utils;
 import org.activiti.engine.RuntimeService;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricIdentityLinkResponse;
@@ -20,15 +21,12 @@ import rst.pdfbox.layout.elements.Paragraph;
 import rst.pdfbox.layout.text.BaseFont;
 import rst.pdfbox.layout.text.Position;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
@@ -45,8 +43,7 @@ public class SummaryPdfService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SummaryPdfService.class);
     private static final float FONT_SIZE = 10;
     private static final float TITLE_SIZE = 18;
-    private DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
-    private DateFormat formatVisualizzazione = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);
+
     @Inject
     private FlowsProcessInstanceService flowsProcessInstanceService;
     @Inject
@@ -55,13 +52,9 @@ public class SummaryPdfService {
     private FlowsAttachmentService flowsAttachmentService;
     @Inject
     private RuntimeService runtimeService;
+    private Utils utils = new Utils();
 
 
-    @PostConstruct
-    public void init() {
-        format.setTimeZone(TimeZone.getTimeZone("GMT"));
-        formatVisualizzazione.setTimeZone(TimeZone.getTimeZone("Europe/Rome"));
-    }
 
 
     public String createPdf(String processInstanceId, ByteArrayOutputStream outputStream) throws IOException, ParseException {
@@ -106,11 +99,11 @@ public class SummaryPdfService {
                     break;
                 case ("startDate"):
                     if (var.getValue() != null)
-                        paragraphField.addText("Avviato il: " + formatDate(format.parse((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
+                        paragraphField.addText("Avviato il: " + formatDate(utils.format.parse((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
                     break;
                 case ("endDate"):
                     if (var.getValue() != null)
-                        paragraphField.addText("Terminato il: " + formatDate(format.parse((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
+                        paragraphField.addText("Terminato il: " + formatDate(utils.format.parse((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
                     break;
                 case ("gruppoRA"):
                     paragraphField.addText("Gruppo Responsabile Acquisti: " + var.getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
@@ -163,7 +156,7 @@ public class SummaryPdfService {
 
 
     private String formatDate(Date date) {
-        return date != null ? formatVisualizzazione.format(date) : "";
+        return date != null ? utils.formatoVisualizzazione.format(date) : "";
     }
 
 

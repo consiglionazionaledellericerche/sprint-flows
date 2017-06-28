@@ -4,20 +4,20 @@
         <div class="col-md-8">
 
             <h4>{{vm.data.entity.title ? vm.data.entity.title : vm.data.entity.variabili.title}}
-                <span ng-class="{'label-warning': !vm.data.entity.completed , 'label-success': vm.data.entity.completed }"
+                <span ng-class="{'label-warning': vm.data.entity.endTime != null , 'label-success': vm.data.entity.endTime == null}"
                       class="label">
-                  {{!vm.data.entity.completed ? 'attivo' : 'completato'}}
+                  {{vm.data.entity.endTime == null ? 'attivo' : 'completato'}}
                 </span>
                 <br><br>
             </h4>
             <div>
                 <b>Avviato da: </b>{{vm.data.entity.variabili.initiator}} il {{vm.data.entity.variabili.startDate |
-                                   date}} <br><br>
+                                   data}} <br><br>
             </div>
             <div ng-hide="!vm.data.entity.variabili.completed">
-                <b>completato il:</b>{{vm.data.entity.variabili.endDate | date}}<br><br>
+                <b>completato il:</b>{{vm.data.entity.variabili.endDate | data}}<br><br>
             </div>
-            <div ng-show="!vm.data.entity.completed">
+            <div ng-show="vm.data.entity.endTime == null">
                 <b>Fase: </b>{{vm.data.fase}} <br><br>
             </div>
             <!--gruppo/utente assegnatario del task in esecuzione-->
@@ -40,10 +40,15 @@
             <div has-authority="ROLE_ADMIN">
                 <h4>Tutte le variabili</h4>
                 <ul>
-                    <li ng-repeat="metadatum in vm.data.entity.variables">{{metadatum.name}}: {{metadatum.value}}</li>
+                    <li ng-repeat="metadatum in vm.data.entity.variables">
+                      {{metadatum.name}}: {{metadatum.value}}
+                      <a href ng-click="editVariable(metadatum.name, metadatum.value)"><span class="glyphicon glyphicon-pencil"></span></a>
+                    </li>
                 </ul>
             </div>
-            <div has-authority="ROLE_ADMIN">
+
+
+      <div has-authority="ROLE_ADMIN">
                 <h4>Identity Links</h4>
                 <span ng-repeat="(taskId, link) in vm.data.identityLinks">
                     TaskId - <strong>{{ taskId }}:</strong> <br>
@@ -77,7 +82,7 @@
                         <history tasks="vm.data.history" start-task="vm.data.startEvent"></history>
                     </div>
                     <br>
-                    <button ng-click="exportSummary('/api/summaryPdf?processInstanceId=' + processInstanceId, 'Summary_' + vm.data.entity.variabili.title)"
+                    <button ng-click="exportSummary('/api/summaryPdf?processInstanceId=' + processInstanceId, 'Summary_' + vm.data.entity.variabili.title + '.pdf')"
                             class="btn btn-primary">Export Summary
                     </button>
                 </div>

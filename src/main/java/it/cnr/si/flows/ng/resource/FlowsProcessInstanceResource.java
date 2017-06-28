@@ -1,23 +1,28 @@
 package it.cnr.si.flows.ng.resource;
 
-import com.codahale.metrics.annotation.Timed;
-import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
-import it.cnr.si.flows.ng.utils.Utils;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.security.SecurityUtils;
+import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
+import static it.cnr.si.flows.ng.utils.Utils.ASC;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.activiti.engine.HistoryService;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.TaskService;
+import org.activiti.engine.RuntimeService;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
+import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceActionRequest;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResource;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,38 +33,30 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.List;
-import java.util.Map;
+import com.codahale.metrics.annotation.Timed;
 
-import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
-import static it.cnr.si.flows.ng.utils.Utils.ASC;
+import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
+import it.cnr.si.flows.ng.utils.Utils;
+import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.security.SecurityUtils;
 
 @Controller
 @RequestMapping("api/processInstances")
 public class FlowsProcessInstanceResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsProcessInstanceResource.class);
-    @Autowired
+
+    @Inject
     private RestResponseFactory restResponseFactory;
-    @Autowired
+    @Inject
     private HistoryService historyService;
-    @Autowired
+    @Inject
     private ProcessInstanceResource processInstanceResource;
-    @Autowired
-    private FlowsAttachmentResource attachmentResource;
-    @Autowired
-    private RepositoryService repositoryService;
-    @Autowired
-    private TaskService taskService;
+    @Inject
+    private RuntimeService runtimeService;
     @Inject
     private FlowsProcessInstanceService flowsProcessInstanceService;
     private Utils utils = new Utils();
-
-
-
 
 
     /**
@@ -207,5 +204,47 @@ public class FlowsProcessInstanceResource {
 
         Map<String, Object> result = flowsProcessInstanceService.search(req, processInstanceId, active, order, firstResult, maxResults);
         return ResponseEntity.ok(result);
+    }
+
+
+    /**
+     * Export csv: esporta il result-set di una search sulle Process Instances in un file Csv
+     *
+     * @param req               the req
+     * @param res               the res
+     * @param processInstanceId the process instance id della search-request
+     * @param active            the active Process Instances attive o terminate
+     * @param order             the order ordinamento del result-set
+     * @param firstResult       the first result (in caso di esportazione parziale del result-set)
+     * @param maxResults        the max results (in caso di esportazione parziale del result-set)
+     * @throws IOException the io exception
+     */
+    @RequestMapping(value = "/exportCsv/{processInstanceId}", headers = "Accept=application/vnd.ms-excel", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = "application/vnd.ms-excel")
+    @Timed
+    public void exportCsv(
+            HttpServletRequest req,
+            HttpServletResponse res,
+            @PathVariable("processInstanceId") String processInstanceId,
+            @RequestParam("active") boolean active,
+            @RequestParam("order") String order,
+            @RequestParam("firstResult") int firstResult,
+            @RequestParam("maxResults") int maxResults) throws IOException {
+
+        Map<String, Object> result = flowsProcessInstanceService.search(
+                req, processInstanceId, active, order, firstResult, maxResults);
+
+        flowsProcessInstanceService.buildCsv(
+                (List<HistoricProcessInstanceResponse>) result.get("processInstances"),
+                res.getWriter(), processInstanceId);
+    }
+
+    @RequestMapping(value = "/variable", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @Secured(AuthoritiesConstants.ADMIN)
+    public ResponseEntity<Void> setVariable(@RequestParam("processInstanceId") String processInstanceId,
+            @RequestParam("variableName") String variableName,
+            @RequestParam("value") String value) {
+        runtimeService.setVariable(processInstanceId, variableName, value);
+        return ResponseEntity.ok().build();
     }
 }

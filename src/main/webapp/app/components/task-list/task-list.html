@@ -4,7 +4,7 @@
         <strong>Flusso avviato da</strong>
         <em>{{task.variabili.initiator}}</em>
         <strong>il</strong>
-        <em>{{task.variabili.startDate | date}}</em>
+        <em>{{task.variabili.startDate | data}}</em>
         <span ng-bind-html="task.priority | priority"></span>
         <div ng-show="task.variabili.titoloIstanzaFlusso">
             <strong>Titolo:</strong> {{task.variabili.titoloIstanzaFlusso}} <br>
@@ -17,7 +17,7 @@
             <strong>Scelta utente:</strong> {{task.variabili.sceltaUtente}} <br>
         </div>
         <div ng-show="task.endTime">
-            <strong>Compito completato il </strong>{{task.endTime | date}}
+            <strong>Compito completato il </strong>{{task.endTime | data}}
         </div>
         <div ng-show="advanced">
             <ng-include src="task.searchView"/>

@@ -13,9 +13,9 @@ import java.util.List;
 public interface CnrauthorityRepository extends JpaRepository<Cnrauthority,Long> {
 
     @Query("select distinct cnrauthority from Cnrauthority cnrauthority left join fetch cnrauthority.cnrauthorityparents")
-    List<Cnrauthority> findAllWithEagerRelationships();
+    public List<Cnrauthority> findAllWithEagerRelationships();
 
     @Query("select cnrauthority from Cnrauthority cnrauthority left join fetch cnrauthority.cnrauthorityparents where cnrauthority.id =:id")
-    Cnrauthority findOneWithEagerRelationships(@Param("id") Long id);
+    public Cnrauthority findOneWithEagerRelationships(@Param("id") Long id);
 
 }

@@ -1,0 +1,34 @@
+<div ng-cloak>
+
+  <div class="row">
+
+    <div class="col-md-6 col-md-offset-3">
+
+      <h1>Gestisci Notifiche Email</h1>
+
+      <div class="btn-group">
+          <label class="btn btn-danger" ng-model="vm.active" uib-btn-radio="false">Disattivate</label>
+          <label class="btn btn-success" ng-model="vm.active" uib-btn-radio="true">Attivate</label>
+      </div>
+
+      <h1>Indirizzi da notificare</h1>
+      <h4>Da grandi poteri derivano grandi responsabilita'</h4>
+
+      <form novalidate class="flows-form" name="mailUsersForm" ng-submit="setUsers()">
+        <div class="form-group">
+
+          <label>Utenti (separati da virgola, senza spazi)</label>
+          <input class="form-control" type="text" name="users" label="Users" ng-model="vm.users" />
+
+          <button class="btn btn-primary" type="submit" ng-disabled="processDefinitionForm.$invalid"> invia <span class="glyphicon glyphicon-arrow-right"></span></button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+  <pre>{{vm | json}}</pre>
+</div>

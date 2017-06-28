@@ -110,6 +110,12 @@
                                 <span translate="global.menu.entities.view">View</span>
                             </a>
                         </li>
+                    <li ui-sref-active="active" >
+                            <a ui-sref="notification-rule" ng-click="vm.collapseNavbar()">
+                                <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
+                                <span translate="global.menu.entities.notificationRule">Notification Rule</span>
+                            </a>
+                        </li>
                     <!-- jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here -->
                 </ul>
             </li>
@@ -224,6 +230,12 @@
                         <a ui-sref="manageprocessdefinitions" ng-click="vm.collapseNavbar()">
                             <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
                             <span>Gestisci Process Definition</span>
+                        </a>
+                    </li>
+                    <li ui-sref-active="active">
+                        <a ui-sref="managemail" ng-click="vm.collapseNavbar()">
+                            <span class="glyphicon glyphicon-envelope"></span>&nbsp;
+                            <span>Gestisci Notifiche Email</span>
                         </a>
                     </li>
                     <!-- jhipster-needle-add-element-to-admin-menu - JHipster will add entities to the admin menu here -->

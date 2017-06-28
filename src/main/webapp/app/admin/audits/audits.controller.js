@@ -30,6 +30,9 @@
             var fromDate = $filter('date')(vm.fromDate, dateFormat);
             var toDate = $filter('date')(vm.toDate, dateFormat);
 
+            vm.fromDatea = fromDate;
+            vm.toDatea   = toDate;
+
             AuditsService.query({page: vm.page -1, size: 20, fromDate: fromDate, toDate: toDate}, function(result, headers){
                 vm.audits = result;
                 vm.links = ParseLinks.parse(headers('link'));

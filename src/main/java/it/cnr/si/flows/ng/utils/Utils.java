@@ -9,6 +9,7 @@ import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskInfoQuery;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
+import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.runtime.task.TaskResponse;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -17,12 +18,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public final class Utils {
 
@@ -36,14 +38,17 @@ public final class Utils {
     private static final String GREAT = "Great";
     private static final String ERRORE_NEL_PARSING_DELLA_DATA = "Errore nel parsing della data {} - ";
     private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
+    private static final String ENTRY_KEY = "entry";
+    private static final String VALUE_KEY = "value";
     @Autowired
-    static RestResponseFactory restResponseFactory;
-    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    private static RestResponseFactory restResponseFactory;
+    public final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    public DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
+    public DateFormat formatoVisualizzazione = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);
 
     public static boolean isEmpty(String in) {
         return in == null || in.equals("");
     }
-
     public static boolean isNotEmpty(String in) {
         return !isEmpty(in);
     }
@@ -59,6 +64,75 @@ public final class Utils {
         response.setData(list);
 
         return ResponseEntity.ok(response);
+    }
+
+    public static String removeLeadingRole(String in) {
+        return in.startsWith("ROLE_") ? in.substring(5) : in;
+    }
+
+    public static String addLeadingRole(String in) {
+        return in.startsWith("ROLE_") ? in : "ROLE_" + in;
+    }
+
+    public static Integer parseInt(String in) {
+        try {
+            return Integer.parseInt(in);
+        } catch (Exception e) {
+            return null;
+        }
+
+    }
+
+    public static HttpStatus getStatus(Integer errCode) {
+        try {
+            return HttpStatus.valueOf(errCode);
+        } catch (Exception e) {
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+    }
+
+    public static HttpStatus getStatus(String errCode) {
+        return getStatus(parseInt(errCode));
+    }
+
+    public static HashMap<String, Object> mapOf(String key, String value) {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put(key, value);
+        return result;
+    }
+
+    public static String filterProperties(List<RestVariable> properties, String property) {
+        List<RestVariable> list = properties.stream()
+                .filter(a -> a.getName().equals(property))
+                .collect(Collectors.toList());
+        String ret = "";
+        if (!list.isEmpty()) {
+            ret = ret + list.get(0).getValue();
+        }
+        return ret;
+
+
+//        RestVariable variable = properties.stream()
+//                .filter(a ->  a.getName().equals(property))
+//                .findFirst()
+//                .get();
+//        String ret = "";
+//        if(!((String)variable.getValue()).isEmpty()){
+//            ret = ret + variable.getValue();
+//        }
+//        return ret;
+
+//        return (String) properties.stream()
+//                .filter(a ->  a.getName().equals(property))
+//                .findFirst()
+//                .get()
+//                .getValue();
+    }
+
+    @PostConstruct
+    public void init() {
+        format.setTimeZone(TimeZone.getTimeZone("GMT"));
+        formatoVisualizzazione.setTimeZone(TimeZone.getTimeZone("Europe/Rome"));
     }
 
     public TaskInfoQuery orderTasks(String order, TaskInfoQuery query) {
@@ -214,7 +288,6 @@ public final class Utils {
         return taskQuery;
     }
 
-
     private TaskInfoQuery historicTaskDate(TaskInfoQuery taskQuery, String key, String value) {
         try {
             Date date = sdf.parse(value);
@@ -227,40 +300,5 @@ public final class Utils {
             LOGGER.error(ERRORE_NEL_PARSING_DELLA_DATA, value, e);
         }
         return taskQuery;
-    }
-
-    public static String removeLeadingRole(String in) {
-        return in.startsWith("ROLE_") ? in.substring(5) : in;
-    }
-
-    public static String addLeadingRole(String in) {
-        return in.startsWith("ROLE_") ? in : "ROLE_"+ in;
-    }
-
-    public static Integer parseInt(String in) {
-        try {
-            return Integer.parseInt(in);
-        } catch (Exception e) {
-            return null;
-        }
-
-    }
-
-    public static HttpStatus getStatus(Integer errCode) {
-        try {
-            return HttpStatus.valueOf(errCode);
-        } catch (Exception e) {
-            return HttpStatus.INTERNAL_SERVER_ERROR;
-        }
-    }
-
-    public static HttpStatus getStatus(String errCode) {
-        return getStatus(parseInt(errCode));
-    }
-
-    public static HashMap<String, Object> mapOf(String key, String value) {
-        HashMap<String, Object> result = new HashMap<>();
-        result.put(key, value);
-        return result;
     }
 }

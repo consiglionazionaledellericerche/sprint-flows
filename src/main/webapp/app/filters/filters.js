@@ -2,7 +2,7 @@
   'use strict';
 
   angular.module('sprintApp')
-  .filter('date', function () {
+  .filter('data', function () {
     return function(d) {
         return d ? moment(d).format('DD/MM/YYYY HH:mm') : null;
     };

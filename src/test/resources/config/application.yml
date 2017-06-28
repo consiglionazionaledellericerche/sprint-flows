@@ -43,6 +43,8 @@ spring:
             hibernate.hbm2ddl.auto: validate
     mail:
         host: localhost
+        recipients:
+        activated: false
     mvc:
         favicon:
             enabled: false
@@ -91,8 +93,13 @@ jhipster:
 cnr:
     activiti:
         diagram-font: DejaVu Sans
+    firma:
+         signcertid: AS0
+         typeotpauth: firma
+         url: http://arss.demo.si.cnr.it:8980/ArubaSignService/ArubaSignService?wsdl
+ajp:
+    port: 8009
+    timeout: 120000
 
 cache.hazelcast.port: 5504
-ajp.port: 8010
-ajp.timeout: 120000
 cache.hazelcast.packages:

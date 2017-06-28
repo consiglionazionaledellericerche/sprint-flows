@@ -71,7 +71,7 @@ public class FlowsListenersConfiguration {
         MailNotificationListener mailSender = (MailNotificationListener)
                 appContext.getAutowireCapableBeanFactory().createBean(MailNotificationListener.class,
                                                                       AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
-        runtimeService.addEventListener(mailSender, ActivitiEventType.TASK_CREATED);
+        runtimeService.addEventListener(mailSender);
 
 
     }

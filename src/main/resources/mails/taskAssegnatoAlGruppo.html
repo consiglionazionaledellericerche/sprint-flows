@@ -14,14 +14,17 @@
             Il compito
             <strong th:text="${taskName}"></strong>
             per il flusso <strong th:text="${title}">TITOLO FLUSSO</strong>
+        <span th:if="${titoloIstanzaFlusso}">
+              <br><i>dal titolo: "<bold th:text="${titoloIstanzaFlusso}">OGGETTO FLUSSO</bold>"</i></span>
+        <hr>
             è stato assegnato al gruppo <strong th:text="${groupname}">NOME GRUPPO</strong>
         <p th:if="${commento}">
             Il compito presenta la seguente nota di commento:
             <pre th:text="${commento}">Commento</pre>
         <hr>
 
-        <p> Data di Scadenza <strong th:text="${scadenza}">SCADENZA FLUSSO</strong></p>
-        <p> Priorita <strong th:text="${priorita}">CODICE VERDE</strong></p>
+        <p th:if="${scadenza}"> Data di Scadenza <strong th:text="${scadenza}">SCADENZA FLUSSO</strong></p>
+        <p th:if="${priorita}"> Priorita <strong th:text="${priorita}">CODICE VERDE</strong></p>
 
         <hr>
         <footer>
