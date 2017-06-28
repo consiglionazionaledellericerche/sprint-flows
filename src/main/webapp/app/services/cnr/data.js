@@ -114,7 +114,7 @@
                 '&firstResult=' + firstResult +
                 '&maxResults=' + maxResults, params);
         },
-        setVariable(processInstanceId, variableName, value) {
+        setVariable: function(processInstanceId, variableName, value) {
           return $http.post('api/processInstances/variable'+
               '?processInstanceId='+ processInstanceId +
               '&variableName='+ variableName +
