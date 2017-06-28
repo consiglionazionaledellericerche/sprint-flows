@@ -18,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.inject.Inject;
@@ -158,5 +159,19 @@ public class FlowsAttachmentResource {
 
         String processInstanceId = taskService.createTaskQuery().taskId(taskId).singleResult().getProcessInstanceId();
         getAttachment(response, processInstanceId, attachmentName);
+    }
+
+    @RequestMapping(value = "{processInstanceId}/{attachmentName}/pubblica", method = RequestMethod.POST)
+    @ResponseBody
+    @Secured(AuthoritiesConstants.USER)
+    @Timed
+    public void setPubblicabile(
+            HttpServletResponse response,
+            @PathVariable("processInstanceId") String processInstanceId,
+            @PathVariable("attachmentName") String attachmentName,
+            @RequestParam("pubblica") boolean pubblica ) {
+
+        flowsAttachmentService.setPubblicabile(processInstanceId, attachmentName, pubblica);
+
     }
 }

@@ -1,5 +1,7 @@
 package it.cnr.si.flows.ng.listeners;
 
+import javax.inject.Inject;
+
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
@@ -8,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 
 @Component
 public class PubblicaDocumento implements ExecutionListener {
@@ -15,7 +18,10 @@ public class PubblicaDocumento implements ExecutionListener {
     private static final long serialVersionUID = -56001764662303256L;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PubblicaDocumento.class);
-
+    
+    @Inject
+    private FlowsAttachmentService attachmentService;
+    
     private Expression nomeFileDaPubblicare;
     private Expression fileDaPubblicareFlag;
 
@@ -29,22 +35,7 @@ public class PubblicaDocumento implements ExecutionListener {
 
         String nomeVariabileFile = (String) nomeFileDaPubblicare.getValue(execution);
         Boolean flagPubblicazione =  Boolean.parseBoolean((String) fileDaPubblicareFlag.getValue(execution));
-        FlowsAttachment att = (FlowsAttachment) execution.getVariable(nomeVariabileFile);
-        if (flagPubblicazione) {
-            att.setAzione(FlowsAttachment.Azione.Pubblicazione);
-            att.addStato(FlowsAttachment.Stato.Pubblicato);
-            execution.setVariable(nomeVariabileFile, att);        	
-        } else {
-            att.removeAzione(FlowsAttachment.Azione.Pubblicazione);
-            att.removeStato(FlowsAttachment.Stato.Pubblicato);
-            execution.setVariable(nomeVariabileFile, att);      	
-        }
-
-        String isError = (String) execution.getVariable("error");
-        if ("true".equals(isError)) {
-            throw new IllegalStateException("L'utente ha selezionato l'opzione errore. Rollback.");
-        }
-
+        attachmentService.setPubblicabile(execution.getId(), nomeVariabileFile, flagPubblicazione);
     }
 
 }
