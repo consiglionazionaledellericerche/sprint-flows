@@ -6,6 +6,7 @@ import it.cnr.si.flows.ng.TestUtil;
 import it.cnr.si.repository.NotificationRuleRepository;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.hamcrest.Matchers.hasItem;
@@ -34,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *
  * @see NotificationRuleResource
  */
+@Ignore
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = SprintApp.class)
 public class NotificationRuleResourceIntTest {
