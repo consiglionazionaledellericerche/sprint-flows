@@ -7,19 +7,22 @@
     <body>
         <h1> Notifica relativa al flusso <span th:text="${title}">NOME FLUSSO</span></h1>
         <hr>
+        <span th:if="${titoloIstanzaFlusso}">
+              <br><i>dal titolo: "<bold th:text="${titoloIstanzaFlusso}">OGGETTO FLUSSO</bold>"</i></span>
+        <hr>
         <p>
             Gentile <span th:text="${username}">nome.cognome</span><br>
             <span th:if="${groupname}">
                 Riceve questa notifica in quanto parte del gruppo <bold th:text="${groupname}">NOME GRUPPO</bold></span>
         <p>
-            E' successo qualcosa per cui e' giusto che le arrivi la notifica.
+            Si notifica che il flusso in oggetto ha raggiunto la fase "<bold th:text="${fase}">FASE</bold>"
         <p th:if="${commento}">
             Il compito presenta la seguente nota di commento:
             <pre th:text="${commento}">Commento</pre>
         <hr>
 
-        <p> Data di Scadenza <bold th:text="${scadenza}">SCADENZA FLUSSO</bold></p>
-        <p> Priorita <bold th:text="${priorita}">CODICE VERDE</bold></p>
+        <p th:if="${scadenza}"> Data di Scadenza <strong th:text="${scadenza}">SCADENZA FLUSSO</strong></p>
+        <p th:if="${priorita}"> Priorita <strong th:text="${priorita}">CODICE VERDE</strong></p>
 
         <hr>
         <footer style="color: dark-gray; font-size: 0.8em;">

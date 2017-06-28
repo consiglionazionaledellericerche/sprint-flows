@@ -19,6 +19,7 @@ public class FlowsAttachment implements Serializable {
         Firmato,
         Controfirmato,
         Annullato,
+        Pubblicato,
         Sostituito
     }
 
@@ -144,6 +145,13 @@ private String name;
             this.getMetadati().put("stati", new ArrayList<Stato>());
         List<Stato> stato = (List<Stato>) this.getMetadati().get("stati");
         stato.remove(s);
+    }
+    @SuppressWarnings("unchecked")
+    public void removeAzione(Azione a) {
+        if (this.getMetadati().get("azioni") == null)
+            this.getMetadati().put("azioni", new ArrayList<Stato>());
+        List<Stato> azione = (List<Stato>) this.getMetadati().get("azioni");
+        azione.remove(a);
     }
 
     public void clearStato() {
