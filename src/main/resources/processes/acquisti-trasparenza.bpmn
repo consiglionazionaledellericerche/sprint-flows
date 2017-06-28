@@ -7,7 +7,7 @@
     <startEvent id="startevent1" name="Predisposizione Decisione"></startEvent>
     <subProcess id="DECISIONE-CONTRATTARE" name="DECISIONE A CONTRATTARE">
       <endEvent id="endevent1" name="End"></endEvent>
-      <userTask id="verifica-decisione" name="PIPPO" activiti:candidateGroups="${gruppoSFD}"></userTask>
+      <userTask id="verifica-decisione" name="Verifica Decisione" activiti:async="true" activiti:candidateGroups="${gruppoSFD}"></userTask>
       <userTask id="firma-decisione" name="Firma Decisione" activiti:candidateGroups="${gruppoDirettore}"></userTask>
       <sequenceFlow id="flow8" sourceRef="verifica-decisione" targetRef="exclusivegateway1"></sequenceFlow>
       <userTask id="modifica-decisione" name="Modifica Decisione" activiti:candidateGroups="${gruppoRA}"></userTask>
@@ -200,7 +200,18 @@
     </subProcess>
     <exclusiveGateway id="exclusivegateway13" name="Exclusive Gateway" default="flow61"></exclusiveGateway>
     <sequenceFlow id="flow60" sourceRef="DECISIONE-CONTRATTARE" targetRef="exclusivegateway13"></sequenceFlow>
-    <sequenceFlow id="flow61" sourceRef="exclusivegateway13" targetRef="espletamento-procedura"></sequenceFlow>
+    <sequenceFlow id="flow61" sourceRef="exclusivegateway13" targetRef="espletamento-procedura">
+      <extensionElements>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
+          <activiti:field name="nomeFileDaPubblicare">
+            <activiti:string><![CDATA[decisioneContrattare]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="fileDaPubblicareFlag">
+            <activiti:string><![CDATA[true]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </sequenceFlow>
     <userTask id="consuntivo" name="Consuntivo" activiti:assignee="${rup}"></userTask>
     <endEvent id="endevent8" name="End"></endEvent>
     <sequenceFlow id="flow71" sourceRef="consuntivo" targetRef="endevent8"></sequenceFlow>
@@ -250,6 +261,16 @@
     <exclusiveGateway id="exclusivegateway20" name="Exclusive Gateway" default="flow122"></exclusiveGateway>
     <sequenceFlow id="flow97" sourceRef="PROVVEDIMENTO-AGGIUDICAZIONE" targetRef="exclusivegateway20"></sequenceFlow>
     <sequenceFlow id="flow99" sourceRef="exclusivegateway20" targetRef="REVOCA">
+      <extensionElements>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
+          <activiti:field name="nomeFileDaPubblicare">
+            <activiti:string><![CDATA[decisioneContrattare]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="fileDaPubblicareFlag">
+            <activiti:string><![CDATA[false]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaConProvvedimento'}]]></conditionExpression>
     </sequenceFlow>
     <exclusiveGateway id="exclusivegateway22" name="Exclusive Gateway" default="flow102"></exclusiveGateway>
