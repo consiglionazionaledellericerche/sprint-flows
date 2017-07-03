@@ -4,6 +4,8 @@ import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
 import static it.cnr.si.flows.ng.utils.Utils.ASC;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -44,207 +46,248 @@ import it.cnr.si.security.SecurityUtils;
 @RequestMapping("api/processInstances")
 public class FlowsProcessInstanceResource {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FlowsProcessInstanceResource.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(FlowsProcessInstanceResource.class);
 
-    @Inject
-    private RestResponseFactory restResponseFactory;
-    @Inject
-    private HistoryService historyService;
-    @Inject
-    private ProcessInstanceResource processInstanceResource;
-    @Inject
-    private RuntimeService runtimeService;
-    @Inject
-    private FlowsProcessInstanceService flowsProcessInstanceService;
-    private Utils utils = new Utils();
-
-
-    /**
-     * Restituisce le Processs Instances avviate dall'utente loggato
-     *
-     * @param active booleano che indica se recuperare le MIE Process Instancess attive o quelle terminate
-     * @return the my processes
-     */
-    @RequestMapping(value = "/myProcessInstances", method = RequestMethod.GET)
-    @Secured(AuthoritiesConstants.USER)
-    @Timed
-    public ResponseEntity<DataResponse> getMyProcessInstances(
-            @RequestParam boolean active,
-            @RequestParam String processDefinition,
-            @RequestParam String order,
-            @RequestParam int firstResult,
-            @RequestParam int maxResults) {
-
-        String username = SecurityUtils.getCurrentUserLogin();
-        List<HistoricProcessInstance> list;
-        HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
-
-        if (active) {
-            historicProcessInstanceQuery.variableValueEquals("initiator", username)
-                    .unfinished()
-                    .includeProcessVariables();
-        } else {
-            historicProcessInstanceQuery.variableValueEquals("initiator", username)
-                    .finished()
-                    .includeProcessVariables();
-        }
-
-        if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
-            historicProcessInstanceQuery.processDefinitionKey(processDefinition);
-        if (order.equals(ASC))
-            historicProcessInstanceQuery.orderByProcessInstanceStartTime().asc();
-        else
-            historicProcessInstanceQuery.orderByProcessInstanceStartTime().desc();
-
-        list = historicProcessInstanceQuery.listPage(firstResult, maxResults);
-
-        DataResponse response = new DataResponse();
-        response.setStart(firstResult);
-        response.setSize(list.size()); //numero flussi restituito
-        response.setTotal(historicProcessInstanceQuery.count()); //totale Flussi
-        response.setData(restResponseFactory.createHistoricProcessInstanceResponseList(list));
-        response.setOrder(order);
-
-        return ResponseEntity.ok(response);
-    }
-
-    // TODO refactor in path param
-    @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured(AuthoritiesConstants.USER)
-    @Timed
-    public ResponseEntity<Map<String, Object>> getProcessInstanceById(@RequestParam("processInstanceId") String processInstanceId) {
-        Map<String, Object> result = flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId);
-
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }
+	@Inject
+	private RestResponseFactory restResponseFactory;
+	@Inject
+	private HistoryService historyService;
+	@Inject
+	private ProcessInstanceResource processInstanceResource;
+	@Inject
+	private RuntimeService runtimeService;
+	@Inject
+	private FlowsProcessInstanceService flowsProcessInstanceService;
+	private Utils utils = new Utils();
 
 
-    /**
-     * Restituisce le Process Instances attive o terminate.
-     *
-     * @param active boolean active
-     * @return le process Instance attive o terminate
-     */
-    @RequestMapping(value = "/getProcessInstances", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured({AuthoritiesConstants.ADMIN})
-    @Timed
-    public ResponseEntity getProcessInstances(
-            HttpServletRequest req,
-            @RequestParam("active") boolean active,
-            @RequestParam("processDefinition") String processDefinition,
-            @RequestParam("firstResult") int firstResult,
-            @RequestParam("maxResults") int maxResults,
-            @RequestParam("order") String order) {
-        HistoricProcessInstanceQuery historicProcessQuery = historyService.createHistoricProcessInstanceQuery().includeProcessVariables();
+	/**
+	 * Restituisce le Processs Instances avviate dall'utente loggato
+	 *
+	 * @param active booleano che indica se recuperare le MIE Process Instancess attive o quelle terminate
+	 * @return the my processes
+	 */
+	@RequestMapping(value = "/myProcessInstances", method = RequestMethod.GET)
+	@Secured(AuthoritiesConstants.USER)
+	@Timed
+	public ResponseEntity<DataResponse> getMyProcessInstances(
+			@RequestParam boolean active,
+			@RequestParam String processDefinition,
+			@RequestParam String order,
+			@RequestParam int firstResult,
+			@RequestParam int maxResults) {
 
-        historicProcessQuery = utils.orderProcess(order, historicProcessQuery);
+		String username = SecurityUtils.getCurrentUserLogin();
+		List<HistoricProcessInstance> list;
+		HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
 
-        historicProcessQuery = (HistoricProcessInstanceQuery) utils.searchParamsForProcess(req, historicProcessQuery);
-        if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
-            historicProcessQuery.processDefinitionKey(processDefinition);
+		if (active) {
+			historicProcessInstanceQuery.variableValueEquals("initiator", username)
+			.unfinished()
+			.includeProcessVariables();
+		} else {
+			historicProcessInstanceQuery.variableValueEquals("initiator", username)
+			.finished()
+			.includeProcessVariables();
+		}
 
-        if (active) {
-            historicProcessQuery.unfinished();
-        } else {
-            historicProcessQuery.finished().or().deleted();
-        }
+		if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
+			historicProcessInstanceQuery.processDefinitionKey(processDefinition);
+		if (order.equals(ASC))
+			historicProcessInstanceQuery.orderByProcessInstanceStartTime().asc();
+		else
+			historicProcessInstanceQuery.orderByProcessInstanceStartTime().desc();
 
-        List<HistoricProcessInstance> processInstances = historicProcessQuery.listPage(firstResult, maxResults);
+		list = historicProcessInstanceQuery.listPage(firstResult, maxResults);
 
-        DataResponse response = new DataResponse();
-        response.setStart(firstResult);
-        response.setSize(processInstances.size());// numero di task restituiti
-        response.setTotal(historicProcessQuery.count()); //numero totale di task avviati da me
-        response.setData(restResponseFactory.createHistoricProcessInstanceResponseList(processInstances));
+		DataResponse response = new DataResponse();
+		response.setStart(firstResult);
+		response.setSize(list.size()); //numero flussi restituito
+		response.setTotal(historicProcessInstanceQuery.count()); //totale Flussi
+		response.setData(restResponseFactory.createHistoricProcessInstanceResponseList(list));
+		response.setOrder(order);
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+		return ResponseEntity.ok(response);
+	}
 
-    @RequestMapping(value = "deleteProcessInstance", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured({AuthoritiesConstants.ADMIN})
-    @Timed
-    public HttpServletResponse delete(
-            HttpServletResponse response,
-            @RequestParam(value = "processInstanceId", required = true) String processInstanceId,
-            @RequestParam(value = "deleteReason", required = true) String deleteReason) {
-        processInstanceResource.deleteProcessInstance(processInstanceId, deleteReason, response);
-        return response;
-    }
+	// TODO refactor in path param
+	@RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Secured(AuthoritiesConstants.USER)
+	@Timed
+	public ResponseEntity<Map<String, Object>> getProcessInstanceById(@RequestParam("processInstanceId") String processInstanceId) {
+		Map<String, Object> result = flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId);
 
-    // TODO ???
-    @RequestMapping(value = "suspendProcessInstance", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured({AuthoritiesConstants.ADMIN})
-    @Timed
-    public ProcessInstanceResponse suspend(
-            HttpServletRequest request,
-            @RequestParam(value = "processInstanceId", required = true) String processInstanceId) {
-        ProcessInstanceActionRequest action = new ProcessInstanceActionRequest();
-        action.setAction(ProcessInstanceActionRequest.ACTION_SUSPEND);
-        return processInstanceResource.performProcessInstanceAction(processInstanceId, action, request);
-    }
-
-    /**
-     * Funzionalità di Ricerca delle Process Instances.
-     *
-     * @param req               the req
-     * @param processInstanceId Il processInstanceId della ricerca
-     * @param active            Boolean che indica se ricercare le Process Instances attive o terminate
-     * @param order             L'ordine in cui vogliamo i risltati ('ASC' o 'DESC')
-     * @return le response entity frutto della ricerca
-     */
-    @RequestMapping(value = "/search/{processInstanceId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
-    public ResponseEntity<Object> search(
-            HttpServletRequest req,
-            @PathVariable("processInstanceId") String processInstanceId,
-            @RequestParam("active") boolean active,
-            @RequestParam("order") String order,
-            @RequestParam("firstResult") int firstResult,
-            @RequestParam("maxResults") int maxResults) {
-
-        Map<String, Object> result = flowsProcessInstanceService.search(req, processInstanceId, active, order, firstResult, maxResults);
-        return ResponseEntity.ok(result);
-    }
+		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
 
 
-    /**
-     * Export csv: esporta il result-set di una search sulle Process Instances in un file Csv
-     *
-     * @param req               the req
-     * @param res               the res
-     * @param processInstanceId the process instance id della search-request
-     * @param active            the active Process Instances attive o terminate
-     * @param order             the order ordinamento del result-set
-     * @param firstResult       the first result (in caso di esportazione parziale del result-set)
-     * @param maxResults        the max results (in caso di esportazione parziale del result-set)
-     * @throws IOException the io exception
-     */
-    @RequestMapping(value = "/exportCsv/{processInstanceId}", headers = "Accept=application/vnd.ms-excel", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = "application/vnd.ms-excel")
-    @Timed
-    public void exportCsv(
-            HttpServletRequest req,
-            HttpServletResponse res,
-            @PathVariable("processInstanceId") String processInstanceId,
-            @RequestParam("active") boolean active,
-            @RequestParam("order") String order,
-            @RequestParam("firstResult") int firstResult,
-            @RequestParam("maxResults") int maxResults) throws IOException {
+	/**
+	 * Restituisce le Process Instances attive o terminate.
+	 *
+	 * @param active boolean active
+	 * @return le process Instance attive o terminate
+	 */
+	@RequestMapping(value = "/getProcessInstances", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Secured({AuthoritiesConstants.ADMIN})
+	@Timed
+	public ResponseEntity getProcessInstances(
+			HttpServletRequest req,
+			@RequestParam("active") boolean active,
+			@RequestParam("processDefinition") String processDefinition,
+			@RequestParam("firstResult") int firstResult,
+			@RequestParam("maxResults") int maxResults,
+			@RequestParam("order") String order) {
+		HistoricProcessInstanceQuery historicProcessQuery = historyService.createHistoricProcessInstanceQuery().includeProcessVariables();
 
-        Map<String, Object> result = flowsProcessInstanceService.search(
-                req, processInstanceId, active, order, firstResult, maxResults);
+		historicProcessQuery = utils.orderProcess(order, historicProcessQuery);
 
-        flowsProcessInstanceService.buildCsv(
-                (List<HistoricProcessInstanceResponse>) result.get("processInstances"),
-                res.getWriter(), processInstanceId);
-    }
+		historicProcessQuery = (HistoricProcessInstanceQuery) utils.searchParamsForProcess(req, historicProcessQuery);
+		if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
+			historicProcessQuery.processDefinitionKey(processDefinition);
 
-    @RequestMapping(value = "/variable", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
-    @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity<Void> setVariable(@RequestParam("processInstanceId") String processInstanceId,
-            @RequestParam("variableName") String variableName,
-            @RequestParam("value") String value) {
-        runtimeService.setVariable(processInstanceId, variableName, value);
-        return ResponseEntity.ok().build();
-    }
+		if (active) {
+			historicProcessQuery.unfinished();
+		} else {
+			historicProcessQuery.finished().or().deleted();
+		}
+
+		List<HistoricProcessInstance> processInstances = historicProcessQuery.listPage(firstResult, maxResults);
+
+		DataResponse response = new DataResponse();
+		response.setStart(firstResult);
+		response.setSize(processInstances.size());// numero di task restituiti
+		response.setTotal(historicProcessQuery.count()); //numero totale di task avviati da me
+		response.setData(restResponseFactory.createHistoricProcessInstanceResponseList(processInstances));
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "deleteProcessInstance", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Secured({AuthoritiesConstants.ADMIN})
+	@Timed
+	public HttpServletResponse delete(
+			HttpServletResponse response,
+			@RequestParam(value = "processInstanceId", required = true) String processInstanceId,
+			@RequestParam(value = "deleteReason", required = true) String deleteReason) {
+		processInstanceResource.deleteProcessInstance(processInstanceId, deleteReason, response);
+		return response;
+	}
+
+	/**
+	 * Restituisce le Process Instances attive o terminate.
+	 *
+	 * @param active boolean active
+	 * @return le process Instance attive o terminate
+	 */
+	@RequestMapping(value = "/getProcessInstancesForTrasparenza", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Secured({AuthoritiesConstants.ADMIN})
+	@Timed
+	public ResponseEntity getProcessInstancesForTrasparenza(
+			@RequestParam("processDefinition") String processDefinition,
+			@RequestParam("startYear") Integer startYear,
+			@RequestParam("endYear") Integer endYear) {
+		
+		Calendar startDate = Calendar.getInstance();
+		Calendar endDate = Calendar.getInstance();
+		startDate.clear();
+		endDate.clear();
+		startDate.set(startYear, 0, 0);
+		endDate.set(endYear + 1, 0, 0);
+
+		HistoricProcessInstanceQuery historicProcessQuery = historyService.createHistoricProcessInstanceQuery()
+				.processDefinitionKey(processDefinition)
+				.startedAfter(startDate.getTime())
+				.startedBefore(endDate.getTime())
+				//.finished().or().unfinished()
+				.orderByProcessInstanceStartTime().asc()
+				.includeProcessVariables();
+
+		List<HistoricProcessInstance> processInstances = historicProcessQuery.list();
+
+		DataResponse response = new DataResponse();
+		response.setStart(0);
+		response.setSize(processInstances.size());// numero di task restituiti
+		response.setTotal(historicProcessQuery.count()); //numero totale di task avviati da me
+		response.setData(restResponseFactory.createHistoricProcessInstanceResponseList(processInstances));
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+
+	// TODO ???
+	@RequestMapping(value = "suspendProcessInstance", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Secured({AuthoritiesConstants.ADMIN})
+	@Timed
+	public ProcessInstanceResponse suspend(
+			HttpServletRequest request,
+			@RequestParam(value = "processInstanceId", required = true) String processInstanceId) {
+		ProcessInstanceActionRequest action = new ProcessInstanceActionRequest();
+		action.setAction(ProcessInstanceActionRequest.ACTION_SUSPEND);
+		return processInstanceResource.performProcessInstanceAction(processInstanceId, action, request);
+	}
+
+	/**
+	 * Funzionalità di Ricerca delle Process Instances.
+	 *
+	 * @param req               the req
+	 * @param processInstanceId Il processInstanceId della ricerca
+	 * @param active            Boolean che indica se ricercare le Process Instances attive o terminate
+	 * @param order             L'ordine in cui vogliamo i risltati ('ASC' o 'DESC')
+	 * @return le response entity frutto della ricerca
+	 */
+	@RequestMapping(value = "/search/{processInstanceId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<Object> search(
+			HttpServletRequest req,
+			@PathVariable("processInstanceId") String processInstanceId,
+			@RequestParam("active") boolean active,
+			@RequestParam("order") String order,
+			@RequestParam("firstResult") int firstResult,
+			@RequestParam("maxResults") int maxResults) {
+
+		Map<String, Object> result = flowsProcessInstanceService.search(req, processInstanceId, active, order, firstResult, maxResults);
+		return ResponseEntity.ok(result);
+	}
+
+
+	/**
+	 * Export csv: esporta il result-set di una search sulle Process Instances in un file Csv
+	 *
+	 * @param req               the req
+	 * @param res               the res
+	 * @param processInstanceId the process instance id della search-request
+	 * @param active            the active Process Instances attive o terminate
+	 * @param order             the order ordinamento del result-set
+	 * @param firstResult       the first result (in caso di esportazione parziale del result-set)
+	 * @param maxResults        the max results (in caso di esportazione parziale del result-set)
+	 * @throws IOException the io exception
+	 */
+	@RequestMapping(value = "/exportCsv/{processInstanceId}", headers = "Accept=application/vnd.ms-excel", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = "application/vnd.ms-excel")
+	@Timed
+	public void exportCsv(
+			HttpServletRequest req,
+			HttpServletResponse res,
+			@PathVariable("processInstanceId") String processInstanceId,
+			@RequestParam("active") boolean active,
+			@RequestParam("order") String order,
+			@RequestParam("firstResult") int firstResult,
+			@RequestParam("maxResults") int maxResults) throws IOException {
+
+		Map<String, Object> result = flowsProcessInstanceService.search(
+				req, processInstanceId, active, order, firstResult, maxResults);
+
+		flowsProcessInstanceService.buildCsv(
+				(List<HistoricProcessInstanceResponse>) result.get("processInstances"),
+				res.getWriter(), processInstanceId);
+	}
+
+	@RequestMapping(value = "/variable", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	@Secured(AuthoritiesConstants.ADMIN)
+	public ResponseEntity<Void> setVariable(@RequestParam("processInstanceId") String processInstanceId,
+			@RequestParam("variableName") String variableName,
+			@RequestParam("value") String value) {
+		runtimeService.setVariable(processInstanceId, variableName, value);
+		return ResponseEntity.ok().build();
+	}
 }

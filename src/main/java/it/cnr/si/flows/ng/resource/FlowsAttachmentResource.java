@@ -59,6 +59,18 @@ public class FlowsAttachmentResource {
     }
 
 
+    @RequestMapping(value = "{processInstanceId}/getPublicDocuments", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @Secured(AuthoritiesConstants.USER)
+    @Timed
+    public ResponseEntity<Map<String, FlowsAttachment>> getPublicDocumentsForProcessInstance(
+            @PathVariable("processInstanceId") String processInstanceId) {
+
+        Map<String, FlowsAttachment> result = flowsAttachmentService.getPublicDocumentsForProcessInstance(processInstanceId);
+
+        return ResponseEntity.ok(result);
+    }
+
     @RequestMapping(value = "task/{taskId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured(AuthoritiesConstants.USER)
