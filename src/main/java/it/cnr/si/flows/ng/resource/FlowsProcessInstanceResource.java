@@ -304,19 +304,24 @@ public class FlowsProcessInstanceResource {
     }
 
     private static Map<String, Object> trasformaVariabiliPerTrasparenza(HistoricProcessInstance instance, List<String> viewExportTrasparenza) {
-        Map<String, Object> variables = instance.getProcessVariables();
         Map<String, Object> mappedVariables = new HashMap<>();
-        List<Map<String, Object>> documentiPubblicabili = new ArrayList<>();
 
-        for (Entry<String, Object> entry : variables.entrySet()) {
+        viewExportTrasparenza.stream().forEach(field -> mappedVariables.put(field, instance.getProcessVariables().get(field)));
+        mappedVariables.put("documentiPubblicabili", getDocumentiPubblicabili(instance));
+
+        return mappedVariables;
+    }
+
+    private static List<Map<String, Object>> getDocumentiPubblicabili(HistoricProcessInstance instance) {
+        List<Map<String, Object>> documentiPubblicabili = new ArrayList<>();
+        for (Entry<String, Object> entry : instance.getProcessVariables().entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
-            if (viewExportTrasparenza.contains(key))
-                mappedVariables.put(key, value);
 
             if (value instanceof FlowsAttachment) {
                 FlowsAttachment attachment = (FlowsAttachment) value;
                 if (attachment.getStati().contains(FlowsAttachment.Stato.Pubblicato)) {
+
                     Map<String, Object> metadatiDocumento = new HashMap<>();
                     metadatiDocumento.put("filename", attachment.getFilename());
                     metadatiDocumento.put("name", attachment.getName());
@@ -325,8 +330,6 @@ public class FlowsProcessInstanceResource {
                 }
             }
         }
-        mappedVariables.put("documentiPubblicabili", documentiPubblicabili);
-
-        return mappedVariables;
+        return documentiPubblicabili;
     }
 }
