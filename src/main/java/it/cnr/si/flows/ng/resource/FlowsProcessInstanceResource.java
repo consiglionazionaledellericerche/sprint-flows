@@ -4,8 +4,16 @@ import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
 import static it.cnr.si.flows.ng.utils.Utils.ASC;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.Map.Entry;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -21,11 +29,14 @@ import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceActionRequest;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResource;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.GsonFactoryBean;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,8 +46,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.codahale.metrics.annotation.Timed;
 
+import it.cnr.si.domain.View;
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.utils.Utils;
+import it.cnr.si.repository.ViewRepository;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.SecurityUtils;
 
@@ -56,8 +70,10 @@ public class FlowsProcessInstanceResource {
     private RuntimeService runtimeService;
     @Inject
     private FlowsProcessInstanceService flowsProcessInstanceService;
-    private Utils utils = new Utils();
+    @Inject
+    private ViewRepository viewRepository;
 
+    private Utils utils = new Utils();
 
     /**
      * Restituisce le Processs Instances avviate dall'utente loggato
@@ -81,12 +97,12 @@ public class FlowsProcessInstanceResource {
 
         if (active) {
             historicProcessInstanceQuery.variableValueEquals("initiator", username)
-                    .unfinished()
-                    .includeProcessVariables();
+            .unfinished()
+            .includeProcessVariables();
         } else {
             historicProcessInstanceQuery.variableValueEquals("initiator", username)
-                    .finished()
-                    .includeProcessVariables();
+            .finished()
+            .includeProcessVariables();
         }
 
         if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
@@ -126,7 +142,7 @@ public class FlowsProcessInstanceResource {
      * @return le process Instance attive o terminate
      */
     @RequestMapping(value = "/getProcessInstances", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured({AuthoritiesConstants.ADMIN})
+    @Secured(AuthoritiesConstants.ADMIN)
     @Timed
     public ResponseEntity getProcessInstances(
             HttpServletRequest req,
@@ -161,7 +177,7 @@ public class FlowsProcessInstanceResource {
     }
 
     @RequestMapping(value = "deleteProcessInstance", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured({AuthoritiesConstants.ADMIN})
+    @Secured(AuthoritiesConstants.ADMIN)
     @Timed
     public HttpServletResponse delete(
             HttpServletResponse response,
@@ -246,5 +262,74 @@ public class FlowsProcessInstanceResource {
             @RequestParam("value") String value) {
         runtimeService.setVariable(processInstanceId, variableName, value);
         return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping(value = "/getProcessInstancesForTrasparenza", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.ADMIN)
+    @Timed
+    public ResponseEntity<List<Map<String, Object>>> getProcessInstancesForTrasparenza(
+            @RequestParam("processDefinition") String processDefinition,
+            @RequestParam("startYear") Integer startYear,
+            @RequestParam("endYear") Integer endYear) throws JSONException {
+
+        Calendar startDate = Calendar.getInstance();
+        Calendar endDate = Calendar.getInstance();
+        startDate.clear();
+        endDate.clear();
+        startDate.set(startYear, 0, 0);
+        endDate.set(endYear + 1, 0, 0);
+
+        List<HistoricProcessInstance> processInstances  = historyService.createHistoricProcessInstanceQuery()
+                .processDefinitionKey(processDefinition)
+                .startedAfter(startDate.getTime())
+                .startedBefore(endDate.getTime())
+//                .finished().or().unfinished()
+                .orderByProcessInstanceStartTime().asc()
+                .includeProcessVariables()
+                .list();
+
+        List<String> exportTrasparenza = new ArrayList<>();
+        View trasparenza = viewRepository.getViewByProcessidType("acquisti-trasparenza", "export-trasparenza");
+        String view = trasparenza.getView();
+        JSONArray fields = new JSONArray(view);
+        for (int i = 0; i < fields.length(); i++) {
+            exportTrasparenza.add(fields.getString(i));
+        }
+
+        List<Map<String, Object>> mappedProcessInstances = processInstances.stream()
+                .map(instance -> trasformaVariabiliPerTrasparenza(instance, exportTrasparenza))
+                .collect(Collectors.toList());
+
+        return new ResponseEntity<>(mappedProcessInstances, HttpStatus.OK);
+    }
+
+    private static Map<String, Object> trasformaVariabiliPerTrasparenza(HistoricProcessInstance instance, List<String> viewExportTrasparenza) {
+        Map<String, Object> mappedVariables = new HashMap<>();
+
+        viewExportTrasparenza.stream().forEach(field -> mappedVariables.put(field, instance.getProcessVariables().get(field)));
+        mappedVariables.put("documentiPubblicabili", getDocumentiPubblicabili(instance));
+
+        return mappedVariables;
+    }
+
+    private static List<Map<String, Object>> getDocumentiPubblicabili(HistoricProcessInstance instance) {
+        List<Map<String, Object>> documentiPubblicabili = new ArrayList<>();
+        for (Entry<String, Object> entry : instance.getProcessVariables().entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+
+            if (value instanceof FlowsAttachment) {
+                FlowsAttachment attachment = (FlowsAttachment) value;
+                if (attachment.getStati().contains(FlowsAttachment.Stato.Pubblicato)) {
+
+                    Map<String, Object> metadatiDocumento = new HashMap<>();
+                    metadatiDocumento.put("filename", attachment.getFilename());
+                    metadatiDocumento.put("name", attachment.getName());
+                    metadatiDocumento.put("url", "api/attachments/"+ instance.getId() +"/"+ key +"/data");
+                    documentiPubblicabili.add(metadatiDocumento);
+                }
+            }
+        }
+        return documentiPubblicabili;
     }
 }

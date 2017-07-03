@@ -133,18 +133,20 @@ private String name;
 
     @SuppressWarnings("unchecked")
     public void addStato(Stato s) {
+        getStati().add(s);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Stato> getStati() {
         if (this.getMetadati().get("stati") == null)
             this.getMetadati().put("stati", new ArrayList<Stato>());
-
-        ((List<Stato>) this.getMetadati().get("stati")).add(s);
+        return (List<Stato>) this.getMetadati().get("stati");
     }
 
     @SuppressWarnings("unchecked")
     public void removeStato(Stato s) {
-        if (this.getMetadati().get("stati") == null)
-            this.getMetadati().put("stati", new ArrayList<Stato>());
-        List<Stato> stato = (List<Stato>) this.getMetadati().get("stati");
-        stato.remove(s);
+        List<Stato> stati = getStati();
+        stati.remove(s);
     }
     @SuppressWarnings("unchecked")
     public void removeAzione(Azione a) {
