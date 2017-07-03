@@ -204,6 +204,9 @@ public class FlowsProcessInstanceResource {
 
 		List<HistoricProcessInstance> processInstances = historicProcessQuery.list();
 
+		
+		processInstances.
+		
 		DataResponse response = new DataResponse();
 		response.setStart(0);
 		response.setSize(processInstances.size());// numero di task restituiti
