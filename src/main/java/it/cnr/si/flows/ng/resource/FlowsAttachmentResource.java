@@ -66,7 +66,7 @@ public class FlowsAttachmentResource {
     public ResponseEntity<Map<String, FlowsAttachment>> getPublicDocumentsForProcessInstance(
             @PathVariable("processInstanceId") String processInstanceId) {
 
-        Map<String, FlowsAttachment> result = flowsAttachmentService.getPublicDocumentsForProcessInstance(processInstanceId);
+        Map<String, FlowsAttachment> result = null;//flowsAttachmentService.getPublicDocumentsForProcessInstance(processInstanceId);
 
         return ResponseEntity.ok(result);
     }
