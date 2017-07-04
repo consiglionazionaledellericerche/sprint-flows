@@ -15,14 +15,8 @@
       <h1>Carica o aggiorna Process Definition</h1>
       <h4>Da grandi poteri derivano grandi responsabilita'</h4>
       <form novalidate class="flows-form" name="processDefinitionForm" ng-submit="submitProcessDefinition(picFile)">
-        <div class="form-group">
-
-          <fileinput name="procDef" label="Process Definition" multiple=false cnr-required=true />
-
-          <button class="btn btn-primary" type="submit" ng-disabled="processDefinitionForm.$invalid"> invia <span class="glyphicon glyphicon-arrow-right"></span></button>
-
-        </div>
-
+        <fileinput name="procDef" label="Process Definition" multiple=false cnr-required=true />
+        <button class="btn btn-primary" type="submit" ng-disabled="processDefinitionForm.$invalid"> invia <span class="glyphicon glyphicon-arrow-right"></span></button>
       </form>
 
     </div>

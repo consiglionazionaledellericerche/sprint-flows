@@ -5,10 +5,10 @@
       {{attachment.filename}}
     </a>
     <a href ng-if="showHistory === true" ng-click="showFileHistory(name)"><span class="glyphicon glyphicon-time" title="Cronologia"></span></a>
+    <a href ng-if="isPubblicatore === true" ng-click="showFileActions(attachment)"><span class="glyphicon glyphicon-cog" title="Azioni"></span></a>
     <span ng-repeat="stato in attachment.metadati.stati">
-      <span class="label label-primary">{{stato}}</span>
+      <span class="label label-primary label-{{stato}}">{{stato}}</span>
     </span>
-    <span ng-if="attachment.metadati.Pubblicazione" class="label label-success">Pubblicazione</span>
   </li>
 </ul>
 

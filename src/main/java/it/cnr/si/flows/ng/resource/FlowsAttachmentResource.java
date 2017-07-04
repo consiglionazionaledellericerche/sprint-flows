@@ -4,6 +4,8 @@ import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.security.SecurityUtils;
+
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import javax.servlet.ServletOutputStream;
@@ -27,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -137,6 +141,24 @@ public class FlowsAttachmentResource {
         response.setContentType(attachment.getMimetype());
         ByteArrayInputStream baos = new ByteArrayInputStream(attachment.getBytes());
         IOUtils.copy(baos, output);
+    }
+
+    @RequestMapping(value = "{processInstanceId}/{attachmentName}/data", method = RequestMethod.POST)
+    @ResponseBody
+    @Secured(AuthoritiesConstants.USER)
+    @Timed
+    public void setAttachment(@PathVariable("processInstanceId") String processInstanceId,
+            @PathVariable("attachmentName") String attachmentName,
+            @RequestParam("file") MultipartFile file) throws IOException {
+
+        FlowsAttachment attachment = runtimeService.getVariable(processInstanceId, attachmentName, FlowsAttachment.class);
+
+        attachment.setAzione(FlowsAttachment.Azione.Aggiornamento);
+        attachment.setBytes(file.getBytes());
+        attachment.setFilename(file.getOriginalFilename());
+        attachment.setMimetype(file.getContentType());
+
+        flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, attachmentName, attachment);
     }
 
     @RequestMapping(value = "{variableId}/data", method = RequestMethod.GET)

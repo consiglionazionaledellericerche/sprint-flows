@@ -121,6 +121,11 @@
               '&value='+ value);
         }
       },
+      attachments: {
+        pubblicaDocumento: function(processInstanceId, attachmentName, flag) {
+          return $http.post('/api/attachments/'+ processInstanceId +'/'+ attachmentName +'/pubblica?pubblica='+ flag);
+        }
+      },
       definitions : {
         all : function() {
           return $http.get('api/processDefinitions/all');
