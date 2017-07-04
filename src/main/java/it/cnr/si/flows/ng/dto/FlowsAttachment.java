@@ -4,8 +4,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -32,7 +34,8 @@ public class FlowsAttachment implements Serializable {
         Protocollo,
         Validazione,
         Annullo,
-        Sostituzione
+        Sostituzione,
+        RimozioneDaPubblicazione
     }
 
     private static final long serialVersionUID = -1794306306586001492L;
@@ -137,15 +140,15 @@ private String name;
     }
 
     @SuppressWarnings("unchecked")
-    public List<Stato> getStati() {
+    public Set<Stato> getStati() {
         if (this.getMetadati().get("stati") == null)
-            this.getMetadati().put("stati", new ArrayList<Stato>());
-        return (List<Stato>) this.getMetadati().get("stati");
+            this.getMetadati().put("stati", new HashSet<Stato>());
+        return (Set<Stato>) this.getMetadati().get("stati");
     }
 
     @SuppressWarnings("unchecked")
     public void removeStato(Stato s) {
-        List<Stato> stati = getStati();
+        Set<Stato> stati = getStati();
         stati.remove(s);
     }
     @SuppressWarnings("unchecked")
@@ -157,7 +160,7 @@ private String name;
     }
 
     public void clearStato() {
-        this.getMetadati().put("stati", new ArrayList<Stato>());
+        this.getMetadati().put("stati", new HashSet<Stato>());
     }
 
     public void setAzione(Azione a) {

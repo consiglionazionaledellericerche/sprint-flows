@@ -432,3 +432,7 @@ input.ng-touched.ng-invalid, button.ng-touched.ng-invalid, textarea.ng-touched.n
   max-height: 334px;
   box-shadow: 0px 0px 5px #ccc;
 }
+
+.label-Pubblicato {
+  background-color: #5cb85c;
+}

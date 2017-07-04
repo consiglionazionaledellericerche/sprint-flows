@@ -176,17 +176,25 @@ public class FlowsAttachmentService {
                 .filter(e -> e.getValue() instanceof FlowsAttachment)
                 .collect(Collectors.toMap(k -> k.getKey(), v -> ((FlowsAttachment) v.getValue())));
     }
-    
+
     public void setPubblicabile(String executionId, String nomeVariabileFile, Boolean flagPubblicazione) {
         FlowsAttachment att = (FlowsAttachment) runtimeService.getVariable(executionId, nomeVariabileFile);
         if (flagPubblicazione) {
             att.setAzione(FlowsAttachment.Azione.Pubblicazione);
             att.addStato(FlowsAttachment.Stato.Pubblicato);
         } else {
-            att.removeAzione(FlowsAttachment.Azione.Pubblicazione);
+            att.setAzione(FlowsAttachment.Azione.RimozioneDaPubblicazione);
             att.removeStato(FlowsAttachment.Stato.Pubblicato);
         }
-        runtimeService.setVariable(executionId, nomeVariabileFile, att);      	
+        saveAttachmentFuoriTask(executionId, nomeVariabileFile, att);
+    }
+
+    public void saveAttachmentFuoriTask(String executionId, String nomeVariabileFile, FlowsAttachment att) {
+        att.setUsername(SecurityUtils.getCurrentUserLogin());
+        att.setTime(new Date());
+        att.setTaskName("Fuori task");
+
+        runtimeService.setVariable(executionId, nomeVariabileFile, att);
     }
 
 }
