@@ -50,7 +50,7 @@
             collapseNavbar();
             Auth.logout();
             $state.go('home');
-            vm.wfDefs = []; // TODO la logica e' che gli oggetti non vanno svuotati qui
+            $rootScope.wfDefs = []; // TODO la logica e' che gli oggetti non vanno svuotati qui
         }
 
         function toggleNavbar() {
@@ -64,9 +64,10 @@
         function loadAvailableDefinitions() {
             dataService.definitions.all()
             .then(function(response) {
-                vm.wfDefs = response.data.data;
                 $rootScope.wfDefs = response.data.data;
-                $rootScope.wfDefs.push({key:"all", name: "ALL"});
+                $rootScope.wfDefsAll = [];
+                $rootScope.wfDefsAll.push.apply($rootScope.wfDefsAll, response.data.data);
+                $rootScope.wfDefsAll.push({key:"all", name: "ALL"});
             }, function (response) {
                 $log.error(response);
             });
