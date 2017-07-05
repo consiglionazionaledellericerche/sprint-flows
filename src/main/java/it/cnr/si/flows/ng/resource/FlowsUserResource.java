@@ -1,22 +1,24 @@
 package it.cnr.si.flows.ng.resource;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
+import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.LdapTemplate;
-import org.springframework.ldap.filter.AndFilter;
-import org.springframework.ldap.filter.EqualsFilter;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.ldap.search.LdapUserSearch;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -32,6 +34,19 @@ public class FlowsUserResource {
 
     @Autowired
     private LdapTemplate ldapTemplate;
+
+    @Resource(name = "aceDataSource")
+    private DataSource aceDataSource;
+
+    @RequestMapping(value= "/ace", method = RequestMethod.GET)
+    public String getAce() throws SQLException {
+
+        ResultSet executeQuery = aceDataSource.getConnection().prepareStatement("select * from view").executeQuery();
+        executeQuery.next();
+
+        return "" + executeQuery.getString(1);
+    }
+
 
     @RequestMapping(value = "/{username:.+}/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
