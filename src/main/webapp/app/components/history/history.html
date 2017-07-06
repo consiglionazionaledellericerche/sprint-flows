@@ -35,9 +35,9 @@
             </div>
         </div>
     </div>
-    <b>Data di assegnazione:</b> {{task.historyTask.startTime | fata}} <br>
+    <b>Data di assegnazione:</b> {{task.historyTask.startTime | data}} <br>
     <div ng-hide="task.historyTask.endTime === null">
-        <b>Con data di completamento:</b> {{task.historyTask.endTime | fata}}
+        <b>Con data di completamento:</b> {{task.historyTask.endTime | data}}
     </div>
     <!--scelta utente-->
     <div ng-repeat="variable in task.historyTask.variables">
