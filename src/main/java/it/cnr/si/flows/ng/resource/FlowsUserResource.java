@@ -1,10 +1,12 @@
 package it.cnr.si.flows.ng.resource;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 
@@ -13,10 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.LdapTemplate;
-import org.springframework.ldap.filter.AndFilter;
-import org.springframework.ldap.filter.EqualsFilter;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.ldap.search.LdapUserSearch;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 
+import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.security.AuthoritiesConstants;
 
 @RestController
@@ -32,6 +32,15 @@ public class FlowsUserResource {
 
     @Autowired
     private LdapTemplate ldapTemplate;
+
+    @Inject
+    private AceBridgeService aceService;
+
+    @RequestMapping(value= "/ace", method = RequestMethod.GET)
+    public List<String> getAce() throws SQLException {
+        return aceService.queryTest();
+    }
+
 
     @RequestMapping(value = "/{username:.+}/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
