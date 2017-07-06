@@ -61,11 +61,16 @@
                 AlertService.warning("Inserire tutti i valori obbligatori.");
             } else {
 
-              vm.data.impegniVeri = JSON.stringify(vm.data.impegni);
-              vm.data.impegni = undefined;
-
-              vm.data.ditteCandidate_json = JSON.stringify(vm.data.ditteCandidate);
-              vm.data.ditteCandidate = undefined;
+              // Serializzo gli oggetti complessi in stringhe
+              // E' necessario copiarli in un nuovo campo, senno' angular si incasina
+              // Non posso usare angular.copy() perche' ho degli oggetti File non gestiti bene
+              var jsons = {};
+              angular.forEach(vm.data, function(value, key, obj) {
+                if (value !== null && typeof value === 'object') {
+                  obj[key+"_json"] = JSON.stringify(value);
+                  obj[key] = undefined;
+                }
+              });
 
                 Upload.upload({
                     url: 'api/tasks/complete',

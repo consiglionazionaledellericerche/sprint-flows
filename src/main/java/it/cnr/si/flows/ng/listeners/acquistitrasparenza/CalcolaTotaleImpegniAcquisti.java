@@ -23,7 +23,7 @@ public class CalcolaTotaleImpegniAcquisti implements ExecutionListener {
 
         double importoTotale = 0.0;
 
-        String impegniString = (String) execution.getVariable("impegniVeri");
+        String impegniString = (String) execution.getVariable("impegni_json");
         JSONArray impegni = new JSONArray(impegniString);
 
         for ( int i = 0; i < impegni.length(); i++) {
