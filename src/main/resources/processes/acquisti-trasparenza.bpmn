@@ -325,7 +325,7 @@
       </sequenceFlow>
     </subProcess>
     <sequenceFlow id="flow119" sourceRef="exclusivegateway15" targetRef="ordine-fuori-mepa">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${strumentoAcquisizioneId == '12'  || strumentoAcquisizioneId == '13}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${strumentoAcquisizioneId == '12'  || strumentoAcquisizioneId == '13'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow120" sourceRef="ordine-fuori-mepa" targetRef="exclusivegateway22"></sequenceFlow>
     <sequenceFlow id="flow122" sourceRef="exclusivegateway20" targetRef="ordine-fuori-mepa"></sequenceFlow>
