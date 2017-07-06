@@ -29,13 +29,18 @@ import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceActionRequest;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResource;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.GsonBuilderUtils;
 import org.springframework.http.converter.json.GsonFactoryBean;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
@@ -306,10 +311,30 @@ public class FlowsProcessInstanceResource {
     private static Map<String, Object> trasformaVariabiliPerTrasparenza(HistoricProcessInstance instance, List<String> viewExportTrasparenza) {
         Map<String, Object> mappedVariables = new HashMap<>();
 
-        viewExportTrasparenza.stream().forEach(field -> mappedVariables.put(field, instance.getProcessVariables().get(field)));
+        viewExportTrasparenza.stream().forEach(field -> {
+            mappedVariables.put(field, mapVariable(instance, field));
+        });
         mappedVariables.put("documentiPubblicabili", getDocumentiPubblicabili(instance));
 
         return mappedVariables;
+    }
+
+    private static Object mapVariable(HistoricProcessInstance instance, String field) {
+        if (instance.getProcessVariables().get(field) == null)
+            return null;
+
+        if (field.endsWith("_json")) {
+            try {
+
+                return new ObjectMapper().readValue((String) instance.getProcessVariables().get(field), List.class);
+            } catch (IOException e) {}
+            try {
+                return new ObjectMapper().readValue((String) instance.getProcessVariables().get(field), Map.class);
+
+            } catch (IOException e) {}
+        }
+
+        return instance.getProcessVariables().get(field);
     }
 
     private static List<Map<String, Object>> getDocumentiPubblicabili(HistoricProcessInstance instance) {
