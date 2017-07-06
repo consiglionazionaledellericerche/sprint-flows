@@ -1,7 +1,7 @@
 <div ng-cloak>
     <div class="row form-group">
         <div class="col-md-12">
-            <uib-tabset active="1" justified="true" type="pills">
+            <uib-tabset active="0" justified="true" type="pills">
                 <uib-tab index="0" select="setActiveContent('active')">
                     <uib-tab-heading>
                         <h3>
@@ -10,7 +10,7 @@
                         </h3>
                     </uib-tab-heading>
                 </uib-tab>
-                <uib-tab index="1" select="setActiveContent('terminated')">
+                <uib-tab classes="available" index="1" select="setActiveContent('terminated')">
                     <uib-tab-heading>
                         <h3>
                             <i class="glyphicon glyphicon-check"></i>
@@ -52,7 +52,7 @@
                 </div>
             </div>
             <h4>Tipologie</h4>
-            <workflow-types process-definitions="wfDefs" filters="false"></workflow-types>
+            <workflow-types process-definitions="wfDefsAll" filters="false"></workflow-types>
         </div>
 
         <div class="col-md-9" ng-show="activeContent == 'active'">

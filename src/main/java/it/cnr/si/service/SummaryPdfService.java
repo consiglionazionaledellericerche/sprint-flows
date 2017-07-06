@@ -1,16 +1,22 @@
 package it.cnr.si.service;
 
+import it.cnr.si.domain.View;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.service.FlowsProcessDiagramService;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.utils.Utils;
+import it.cnr.si.repository.ViewRepository;
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.impl.util.json.JSONArray;
+import org.activiti.engine.impl.util.json.JSONObject;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricIdentityLinkResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.jsoup.Jsoup;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -52,39 +58,39 @@ public class SummaryPdfService {
     private FlowsAttachmentService flowsAttachmentService;
     @Inject
     private RuntimeService runtimeService;
+    @Inject
+    private ViewRepository viewRepository;
     private Utils utils = new Utils();
-
-
 
 
     public String createPdf(String processInstanceId, ByteArrayOutputStream outputStream) throws IOException, ParseException {
 
         Document pdf = new Document(40, 60, 40, 60);
         Paragraph paragraphField = new Paragraph();
-        PDPage pageDiagram = new PDPage();
         Paragraph paragraphDiagram = new Paragraph();
         Paragraph paragraphDocs = new Paragraph();
         Paragraph paragraphHistory = new Paragraph();
 
         Map<String, Object> map = flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId);
 
-        HistoricProcessInstanceResponse processInstances = (HistoricProcessInstanceResponse) map.get("entity");
-        String fileName = "Summary_" + processInstances.getBusinessKey() + ".pdf";
+        HistoricProcessInstanceResponse processInstance = (HistoricProcessInstanceResponse) map.get("entity");
+        String fileName = "Summary_" + processInstance.getBusinessKey() + ".pdf";
         LOGGER.debug("creating pdf {} ", fileName);
 
-        List<RestVariable> variables = processInstances.getVariables();
+        List<RestVariable> variables = processInstance.getVariables();
         ArrayList<Map> tasksSortedList = (ArrayList<Map>) map.get("history");
         Collections.reverse(tasksSortedList);  //ordino i task rispetto alla data di creazione (in senso crescente)
 
 //      genero il titolo del pdf (la bussineskey (es: "Acquisti Trasparenza-2017-1") + titoloIstanzaFlusso (es: "acquisto pc")
-        String titolo = processInstances.getBusinessKey() + "\n";
+        String titolo = processInstance.getBusinessKey() + "\n";
         Optional<RestVariable> variable = variables.stream()
                 .filter(a -> (a.getName()).equals("titoloIstanzaFlusso"))
                 .findFirst();
         if (variable.isPresent())
             titolo += variable.get().getValue() + "\n\n";
         else {
-            variables.stream()
+            // Titolo nel file pdf in caso di Workflow Definition che non ha il titolo nella variabile "titoloIstanzaFlusso"
+            variable = variables.stream()
                     .filter(a -> (a.getName()).equals("title"))
                     .findFirst();
 
@@ -92,6 +98,23 @@ public class SummaryPdfService {
         }
         paragraphField.addText(titolo, TITLE_SIZE, HELVETICA_BOLD);
 
+        View viewToDb = viewRepository.getViewByProcessidType(processInstance.getProcessDefinitionId().split(":")[0], "detail");
+        Elements metadatums = Jsoup.parse(viewToDb.getView()).getElementsByTag("metadatum");
+        for (org.jsoup.nodes.Element metadatum : metadatums) {
+            String[] appo = metadatum.val().replace("{", "").replace("}", "").replace("$", "").split("\\.");
+            String property = appo[appo.length - 1];
+
+            variable = variables.stream()
+                    .filter(a -> (a.getName()).equals(property))
+                    .findFirst();
+
+            if (variable.isPresent()) {
+                variables.remove(variable.get());
+                String label = metadatum.getElementsByAttribute("label").get(0).attr("label");
+                paragraphField.addText(label + ": " + variable.get().getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
+            }
+        }
+        //variabili
         for (RestVariable var : variables) {
             switch (var.getName()) {
                 case ("initiator"):
@@ -108,18 +131,30 @@ public class SummaryPdfService {
                 case ("gruppoRA"):
                     paragraphField.addText("Gruppo Responsabile Acquisti: " + var.getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
                     break;
-                default:
-                    if (var.getValue() != null && !var.getName().equals("titoloIstanzaFlusso"))
-                        paragraphField.addText(var.getName() + ": " + var.getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
+                case ("impegniVeri"):
+                    paragraphField.addText("Lista Impegni: \n", FONT_SIZE, HELVETICA_BOLD);
+                    JSONArray impegni = new JSONArray((String) var.getValue());
+                    for (int i = 0; i < impegni.length(); i++) {
+                        JSONObject impegno = impegni.getJSONObject(i);
+
+                        addLine(paragraphField, "Impegno numero " + (i + 1), "", true, false);
+                        JSONArray keys = impegno.names();
+                        for (int j = 0; j < keys.length(); j++) {
+                            String key = keys.getString(j);
+                            addLine(paragraphField, key, impegno.getString(key), true, true);
+                        }
+                    }
+                    //  Fine del markup indentato
+                    paragraphField.addMarkup("-!\n", FONT_SIZE, BaseFont.Helvetica);
+                    break;
             }
         }
-
         //caricamento diagramma workflow
-        ImageElement image = makeDiagram(processInstanceId, paragraphDiagram, pageDiagram);
+        ImageElement image = makeDiagram(processInstanceId, paragraphDiagram, new PDPage().getMediaBox().createDimension());
 
-//        //caricamento documenti allegati al flusso e cronologia
+        //caricamento documenti allegati al flusso e cronologia
         makeDocs(paragraphDocs, processInstanceId);
-//
+
         //caricamento history del workflow
         makeHistory(paragraphHistory, tasksSortedList);
 
@@ -136,6 +171,7 @@ public class SummaryPdfService {
 
         return fileName;
     }
+
 
     private void makeHistory(Paragraph paragraphHistory, ArrayList<Map> tasksSortedList) throws IOException {
         for (Map task : tasksSortedList) {
@@ -160,7 +196,7 @@ public class SummaryPdfService {
     }
 
 
-    private ImageElement makeDiagram(String processInstanceId, Paragraph paragraphDiagram, /*BindingSession adminBindingSession,*/ PDPage page) throws IOException {
+    private ImageElement makeDiagram(String processInstanceId, Paragraph paragraphDiagram, Dimension dimension) throws IOException {
         ImageElement image = null;
         intestazione(paragraphDiagram, "Diagramma del flusso:");
         int margineSx = 50;
@@ -169,7 +205,7 @@ public class SummaryPdfService {
 
         image = new ImageElement(diagram);
         Dimension scaledDim = getScaledDimension(new Dimension((int) image.getWidth(), (int) image.getHeight()),
-                                                 page.getMediaBox().createDimension(), margineSx);
+                                                 dimension, margineSx);
         image.setHeight((float) scaledDim.getHeight());
         image.setWidth((float) scaledDim.getWidth());
         image.setAbsolutePosition(new Position(20, 700));
@@ -177,7 +213,7 @@ public class SummaryPdfService {
     }
 
 
-    private void makeDocs(Paragraph paragraphDocs, String processInstancesId /*, String pakageNodeRef, Session adminSession*/) throws IOException {
+    private void makeDocs(Paragraph paragraphDocs, String processInstancesId) throws IOException {
 
         intestazione(paragraphDocs, "Documenti del flusso:");
         Map<String, FlowsAttachment> docs = flowsAttachmentService.getAttachementsForProcessInstance(processInstancesId);
@@ -198,15 +234,15 @@ public class SummaryPdfService {
     }
 
 
-    private void addLine(Paragraph contentStreamField, String fieldName, String fieldValue, boolean elenco, boolean subField) throws IOException {
+    private void addLine(Paragraph paragraphField, String fieldName, String fieldValue, boolean elenco, boolean subField) throws IOException {
         String text = "*" + fieldName + ":* " + fieldValue;
         if (elenco) {
             if (subField)
-                contentStreamField.addMarkup(" -+" + text + "\n", FONT_SIZE, BaseFont.Helvetica);
+                paragraphField.addMarkup(" -+" + text + "\n", FONT_SIZE, BaseFont.Helvetica);
             else
-                contentStreamField.addMarkup("-+" + text + "\n", FONT_SIZE, BaseFont.Helvetica);
+                paragraphField.addMarkup("-+" + text + "\n", FONT_SIZE, BaseFont.Helvetica);
         } else
-            contentStreamField.addText(text + "\n", FONT_SIZE, HELVETICA_BOLD);
+            paragraphField.addText(text + "\n", FONT_SIZE, HELVETICA_BOLD);
     }
 
 
