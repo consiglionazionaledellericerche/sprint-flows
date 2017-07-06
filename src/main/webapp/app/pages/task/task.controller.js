@@ -66,7 +66,7 @@
               // Non posso usare angular.copy() perche' ho degli oggetti File non gestiti bene
               var jsons = {};
               angular.forEach(vm.data, function(value, key, obj) {
-                if (value !== null && typeof value === 'object') {
+                if (value !== null && typeof value === 'object' && Object.prototype.toString.call(value) !== "[object File]") {
                   obj[key+"_json"] = JSON.stringify(value);
                   obj[key] = undefined;
                 }
