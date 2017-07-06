@@ -98,6 +98,42 @@ public class SummaryPdfService {
         }
         paragraphField.addText(titolo, TITLE_SIZE, HELVETICA_BOLD);
 
+        //variabili da visualizzare per forza (se presenti)
+        for (RestVariable var : variables) {
+            String variableName = var.getName();
+            if (variableName.equals("initiator")) {
+                paragraphField.addText("Avviato da: " + var.getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
+
+            } else if (variableName.equals("startDate")) {
+                if (var.getValue() != null)
+                    paragraphField.addText("Avviato il: " + formatDate(utils.format.parse((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
+
+            } else if (variableName.equals("endDate")) {
+                if (var.getValue() != null)
+                    paragraphField.addText("Terminato il: " + formatDate(utils.format.parse((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
+
+            } else if (variableName.equals("gruppoRA")) {
+                paragraphField.addText("Gruppo Responsabile Acquisti: " + var.getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
+
+            } else if (variableName.equals("impegniVeri")) {
+                paragraphField.addText("Lista Impegni: \n", FONT_SIZE, HELVETICA_BOLD);
+                JSONArray impegni = new JSONArray((String) var.getValue());
+                for (int i = 0; i < impegni.length(); i++) {
+                    JSONObject impegno = impegni.getJSONObject(i);
+
+                    addLine(paragraphField, "Impegno numero " + (i + 1), "", true, false);
+                    JSONArray keys = impegno.names();
+                    for (int j = 0; j < keys.length(); j++) {
+                        String key = keys.getString(j);
+                        addLine(paragraphField, key, impegno.getString(key), true, true);
+                    }
+                }
+                //  Fine del markup indentato
+                paragraphField.addMarkup("-!\n", FONT_SIZE, BaseFont.Helvetica);
+            }
+        }
+
+        //variabili "visibili" (cioè presenti nella view nel db
         View viewToDb = viewRepository.getViewByProcessidType(processInstance.getProcessDefinitionId().split(":")[0], "detail");
         Elements metadatums = Jsoup.parse(viewToDb.getView()).getElementsByTag("metadatum");
         for (org.jsoup.nodes.Element metadatum : metadatums) {
@@ -114,41 +150,7 @@ public class SummaryPdfService {
                 paragraphField.addText(label + ": " + variable.get().getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
             }
         }
-        //variabili
-        for (RestVariable var : variables) {
-            switch (var.getName()) {
-                case ("initiator"):
-                    paragraphField.addText("Avviato da: " + var.getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
-                    break;
-                case ("startDate"):
-                    if (var.getValue() != null)
-                        paragraphField.addText("Avviato il: " + formatDate(utils.format.parse((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
-                    break;
-                case ("endDate"):
-                    if (var.getValue() != null)
-                        paragraphField.addText("Terminato il: " + formatDate(utils.format.parse((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
-                    break;
-                case ("gruppoRA"):
-                    paragraphField.addText("Gruppo Responsabile Acquisti: " + var.getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
-                    break;
-                case ("impegniVeri"):
-                    paragraphField.addText("Lista Impegni: \n", FONT_SIZE, HELVETICA_BOLD);
-                    JSONArray impegni = new JSONArray((String) var.getValue());
-                    for (int i = 0; i < impegni.length(); i++) {
-                        JSONObject impegno = impegni.getJSONObject(i);
 
-                        addLine(paragraphField, "Impegno numero " + (i + 1), "", true, false);
-                        JSONArray keys = impegno.names();
-                        for (int j = 0; j < keys.length(); j++) {
-                            String key = keys.getString(j);
-                            addLine(paragraphField, key, impegno.getString(key), true, true);
-                        }
-                    }
-                    //  Fine del markup indentato
-                    paragraphField.addMarkup("-!\n", FONT_SIZE, BaseFont.Helvetica);
-                    break;
-            }
-        }
         //caricamento diagramma workflow
         ImageElement image = makeDiagram(processInstanceId, paragraphDiagram, new PDPage().getMediaBox().createDimension());
 
@@ -227,8 +229,11 @@ public class SummaryPdfService {
             addLine(paragraphDocs, "Dall'utente", doc.getUsername(), true, true);
             addLine(paragraphDocs, "Nel task", doc.getTaskName(), true, true);
             addLine(paragraphDocs, "Mime-Type", doc.getMimetype(), true, true);
-//            todo: far vedere i metadati?
-//            addLine(paragraphDocs, "Metadati associati", doc.getMetadati(), true, true);
+            //Tolgo le parentesi quadre (ad es.: [Firmato, Protocollato, Pubblicato]
+            String stati = doc.getStati().toString().replace("[", "").replace("]", "");
+            if (!stati.isEmpty())
+                addLine(paragraphDocs, "Stato Documento", stati, true, true);
+            //doppio a capo dopo ogni documento
             paragraphDocs.addText("\n\n", FONT_SIZE, HELVETICA_BOLD);
         }
     }
