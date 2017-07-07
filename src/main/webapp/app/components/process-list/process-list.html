@@ -1,33 +1,30 @@
 <div ng-show="processes" class="margin-bottom-helper tasks">
     <div class="row vertical-align-center" ng-repeat="process in processes">
-        <div class="col-md-10">
+        <div class="col-md-10 col-sm-10">
             <a ng-href="#/details?processInstanceId={{process.id}}"
                title="dettagli del flusso {{process.id}}">
                 <small class="label"
                        ng-class="{'label-info' : process.endTime, 'label-primary' : !process.endTime}">
-                    {{process.processDefinitionId}}
+                    {{process.variabili.title}}
                 </small>
                 <br>
             </a>
             <div>
-                <div ng-show="process.variabili.title">
-                    <strong>Identificativo flusso:</strong> {{process.variabili.title}} <br>
-                </div>
-                <div ng-show="process.variabili.titoloIstanzaFlusso">
-                    <strong>Titolo flusso:</strong> {{process.variabili.titoloIstanzaFlusso}} <br>
-                </div>
-                <div ng-show="process.variabili.startDate">
-                    <strong>Avviato da </strong>
-                    <em> {{process.variabili.initiator}} </em>
-                    <strong> il </strong>
-                    <em>{{process.variabili.startDate | data}}</em> <br>
-                </div>
-                <div ng-show="process.variabili.taskId">
-                    <strong>Id del compito in esecuzione:</strong> {{process.variabili.taskId}} <br>
-                </div>
+                <ul class="list-unstyled">
+                <li>
+                  <h4>{{process.variabili.titoloIstanzaFlusso}}</h4>
+                </li>
+                <li>
+                  Avviato il <strong>{{process.variabili.startDate | data}}</strong> da <strong> {{process.variabili.initiator}} </strong>
+                </li>
+<!--                 <div ng-show="process.variabili.taskId"> -->
+<!--                     <strong>Id del compito in esecuzione:</strong> {{process.variabili.taskId}} <br> -->
+<!--                 </div> -->
+                    <ng-include src="'api/views/' + process.processDefinitionId.split(':')[0] + '/search'" />
+                </ul>
             </div>
         </div>
-        <div class="col-md-2 text-right vertical-align-center">
+        <div class="col-md-2 col-sm-2 text-right vertical-align-center">
             <div class="btn-group" role="group" aria-label="Left Align">
                 <a class="btn btn-default btn-sm" ng-href="#/details?processInstanceId={{process.id}}">
                     <span class="glyphicon glyphicon-hand-right" aria-hidden="true"></span> dettagli

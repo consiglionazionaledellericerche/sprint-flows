@@ -10,7 +10,7 @@
                 </h5>
             </div>
             <div ng-switch-when="startDate">
-                <b>Avviato il </b> {{variable.value | data}} <br>
+                <b>Avviato il </b> {{variable.value | dataora}} <br>
             </div>
             <div ng-switch-when="initiator">
                 <b>Dall'utente </b> {{variable.value}} <br>
@@ -35,9 +35,9 @@
             </div>
         </div>
     </div>
-    <b>Data di assegnazione:</b> {{task.historyTask.startTime | data}} <br>
+    <b>Data di assegnazione:</b> {{task.historyTask.startTime | dataora}} <br>
     <div ng-hide="task.historyTask.endTime === null">
-        <b>Con data di completamento:</b> {{task.historyTask.endTime | data}}
+        <b>Con data di completamento:</b> {{task.historyTask.endTime | dataora}}
     </div>
     <!--scelta utente-->
     <div ng-repeat="variable in task.historyTask.variables">
