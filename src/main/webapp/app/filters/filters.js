@@ -4,6 +4,11 @@
   angular.module('sprintApp')
   .filter('data', function () {
     return function(d) {
+        return d ? moment(d).format('DD/MM/YYYY') : null;
+    };
+  })
+  .filter('dataora', function () {
+    return function(d) {
         return d ? moment(d).format('DD/MM/YYYY HH:mm') : null;
     };
   })

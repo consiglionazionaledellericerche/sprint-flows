@@ -1,6 +1,5 @@
 package it.cnr.si.flows.ng.config;
 
-import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -14,8 +13,27 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.zaxxer.hikari.HikariDataSource;
 
+/**
+ * Per poter creare un datasource secondario, non posso piu' affidarmi all'autoconfigurazione
+ * ma creare manualmente sia il datasource primario che il secondario.
+ *
+ * Il codice di creazione del datasource primario e' copia-incollato dall'autoconfigurazione di Spring Boot
+ *
+ *
+ *
+ * @author mtrycz
+ *
+ */
+
 @Configuration
-public class AceDatasourceConfiguration {
+public class DatasourcesConfiguration {
+
+    @Bean(name = {"dataSourceProperties"})
+    @ConfigurationProperties(prefix="spring.datasource")
+    @Primary
+    public DataSourceProperties dataSourceProperties() {
+        return new DataSourceProperties();
+    }
 
     @Bean(name = {"dataSource"})
     @Primary
@@ -27,15 +45,24 @@ public class AceDatasourceConfiguration {
                 .password(properties.determinePassword()).build();
     }
 
-    // TODO preferirei affidarmi all'autoconfigurazione di JHipster e non dover creare un dataSource @Primary per poter creare questo secondo... - Martin
-    @Bean(name = {"aceDataSource"})
-    @ConfigurationProperties(prefix="datasource.secondary")
-    public HikariDataSource aceDataSource(DataSourceProperties properties) {
 
-        return (HikariDataSource) DataSourceBuilder.create(properties.getClassLoader()).type(HikariDataSource.class)
-                .driverClassName(com.zaxxer.hikari.HikariDataSource.class.getName())
-                .url("jdbc:h2:file:./DB-H3/flows;DB_CLOSE_DELAY=-1")
-                .username("flows")
+    // TODO preferirei affidarmi all'autoconfigurazione di JHipster e non dover creare un dataSource @Primary per poter creare questo secondo... - Martin
+    @Bean(name = {"aceDataSourceProperties"})
+    @ConfigurationProperties(prefix="spring.datasource.ace")
+    public DataSourceProperties aceDataSourceProperties() {
+        return new DataSourceProperties();
+    }
+
+    @Bean(name = {"aceDataSource"})
+    public HikariDataSource aceDataSource(@Qualifier("aceDataSourceProperties") DataSourceProperties properties) {
+
+        return (HikariDataSource) DataSourceBuilder
+                .create(properties.getClassLoader())
+                .type(HikariDataSource.class)
+                .driverClassName(properties.determineDriverClassName())
+                .url(properties.determineUrl())
+                .username(properties.determineUsername())
+                .password(properties.determinePassword())
                 .build();
     }
 

@@ -54,9 +54,7 @@
       <h3>Flussi {{vm.active ? 'attivi' : 'terminati'}}</h3>
       <process-list processes="vm.processInstances" paging="paging"> </process-list>
 
-      <pre ng-show="development">
-      {{workflows.data | json}}
-    </pre>
+
     </div>
 
     <!--paginazione-->
@@ -66,3 +64,6 @@
     </div>
   </div>
 </div>
+<pre ng-show="development">
+  {{workflows.data | json}}
+</pre>

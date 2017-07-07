@@ -210,11 +210,27 @@
             <activiti:string><![CDATA[true]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaTuttiAllegatiPubblicabili}"></activiti:executionListener>
       </extensionElements>
     </sequenceFlow>
-    <userTask id="consuntivo" name="Consuntivo" activiti:assignee="${rup}"></userTask>
+    <userTask id="consuntivo" name="Consuntivo" activiti:assignee="${rup}">
+      <extensionElements>
+        <activiti:taskListener event="create" delegateExpression="${pubblicaDocumento}">
+          <activiti:field name="nomeFileDaPubblicare">
+            <activiti:string><![CDATA[ordine]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="fileDaPubblicareFlag">
+            <activiti:string><![CDATA[true]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
     <endEvent id="endevent8" name="End"></endEvent>
-    <sequenceFlow id="flow71" sourceRef="consuntivo" targetRef="endevent8"></sequenceFlow>
+    <sequenceFlow id="flow71" sourceRef="consuntivo" targetRef="endevent8">
+      <extensionElements>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaTuttiAllegatiPubblicabili}"></activiti:executionListener>
+      </extensionElements>
+    </sequenceFlow>
     <subProcess id="ordine-mepa" name="ORDINE MEPA">
       <startEvent id="startevent9" name="Start"></startEvent>
       <userTask id="carica-ordine-mepa" name="Carica Ordine Mepa" activiti:candidateGroups="${gruppoDirettore}"></userTask>
@@ -256,28 +272,31 @@
     <exclusiveGateway id="exclusivegateway16" name="Exclusive Gateway" default="flow84"></exclusiveGateway>
     <sequenceFlow id="flow84" sourceRef="exclusivegateway16" targetRef="consuntivo"></sequenceFlow>
     <sequenceFlow id="flow85" sourceRef="exclusivegateway16" targetRef="REVOCA">
+      <extensionElements>
+        <activiti:executionListener event="take" delegateExpression="${depubblicaTuttiDocumenti}"></activiti:executionListener>
+      </extensionElements>
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaConProvvedimento'}]]></conditionExpression>
     </sequenceFlow>
     <exclusiveGateway id="exclusivegateway20" name="Exclusive Gateway" default="flow122"></exclusiveGateway>
     <sequenceFlow id="flow97" sourceRef="PROVVEDIMENTO-AGGIUDICAZIONE" targetRef="exclusivegateway20"></sequenceFlow>
     <sequenceFlow id="flow99" sourceRef="exclusivegateway20" targetRef="REVOCA">
       <extensionElements>
-        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
-          <activiti:field name="nomeFileDaPubblicare">
-            <activiti:string><![CDATA[decisioneContrattare]]></activiti:string>
-          </activiti:field>
-          <activiti:field name="fileDaPubblicareFlag">
-            <activiti:string><![CDATA[false]]></activiti:string>
-          </activiti:field>
-        </activiti:executionListener>
+        <activiti:executionListener event="take" delegateExpression="${depubblicaTuttiDocumenti}"></activiti:executionListener>
       </extensionElements>
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaConProvvedimento'}]]></conditionExpression>
     </sequenceFlow>
     <exclusiveGateway id="exclusivegateway22" name="Exclusive Gateway" default="flow102"></exclusiveGateway>
     <sequenceFlow id="flow101" sourceRef="exclusivegateway22" targetRef="REVOCA">
+      <extensionElements>
+        <activiti:executionListener event="take" delegateExpression="${depubblicaTuttiDocumenti}"></activiti:executionListener>
+      </extensionElements>
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaConProvvedimento'}]]></conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="flow102" sourceRef="exclusivegateway22" targetRef="consuntivo"></sequenceFlow>
+    <sequenceFlow id="flow102" sourceRef="exclusivegateway22" targetRef="consuntivo">
+      <extensionElements>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaTuttiAllegatiPubblicabili}"></activiti:executionListener>
+      </extensionElements>
+    </sequenceFlow>
     <sequenceFlow id="flow103" sourceRef="ordine-mepa" targetRef="exclusivegateway16"></sequenceFlow>
     <subProcess id="ordine-fuori-mepa" name="ORDINE FUORI MEPA">
       <startEvent id="startevent10" name="Start"></startEvent>
@@ -328,13 +347,57 @@
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${strumentoAcquisizioneId == '12'  || strumentoAcquisizioneId == '13'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow120" sourceRef="ordine-fuori-mepa" targetRef="exclusivegateway22"></sequenceFlow>
-    <sequenceFlow id="flow122" sourceRef="exclusivegateway20" targetRef="ordine-fuori-mepa"></sequenceFlow>
+    <sequenceFlow id="flow122" sourceRef="exclusivegateway20" targetRef="ordine-fuori-mepa">
+      <extensionElements>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
+          <activiti:field name="nomeFileDaPubblicare">
+            <activiti:string><![CDATA[elencoVerbali]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="fileDaPubblicareFlag">
+            <activiti:string><![CDATA[true]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
+          <activiti:field name="nomeFileDaPubblicare">
+            <activiti:string><![CDATA[giustificazioniAnomalie]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="fileDaPubblicareFlag">
+            <activiti:string><![CDATA[true]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
+          <activiti:field name="nomeFileDaPubblicare">
+            <activiti:string><![CDATA[provvedimentoNominaCommissione]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="fileDaPubblicareFlag">
+            <activiti:string><![CDATA[true]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
+          <activiti:field name="nomeFileDaPubblicare">
+            <activiti:string><![CDATA[provvedimentoAggiudicazione]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="fileDaPubblicareFlag">
+            <activiti:string><![CDATA[true]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
+          <activiti:field name="nomeFileDaPubblicare">
+            <activiti:string><![CDATA[provvedimentoAmmessiEsclusi]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="fileDaPubblicareFlag">
+            <activiti:string><![CDATA[true]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaTuttiAllegatiPubblicabili}"></activiti:executionListener>
+      </extensionElements>
+    </sequenceFlow>
     <endEvent id="endevent17" name="End"></endEvent>
     <sequenceFlow id="flow125" sourceRef="REVOCA" targetRef="endevent17"></sequenceFlow>
     <sequenceFlow id="flow128" sourceRef="exclusivegateway13" targetRef="endevent17">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaSemplice'}]]></conditionExpression>
-    </sequenceFlow>
-    <sequenceFlow id="flow134" sourceRef="exclusivegateway22" targetRef="endevent17">
+      <extensionElements>
+        <activiti:executionListener event="take" delegateExpression="${depubblicaTuttiDocumenti}"></activiti:executionListener>
+      </extensionElements>
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaSemplice'}]]></conditionExpression>
     </sequenceFlow>
     <dataObject id="valore" name="valore" itemSubjectRef="xsd:int">
@@ -915,12 +978,6 @@
       <bpmndi:BPMNEdge bpmnElement="flow128" id="BPMNEdge_flow128">
         <omgdi:waypoint x="986.0" y="127.0"></omgdi:waypoint>
         <omgdi:waypoint x="1057.0" y="127.0"></omgdi:waypoint>
-        <omgdi:waypoint x="1057.0" y="1180.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow134" id="BPMNEdge_flow134">
-        <omgdi:waypoint x="944.0" y="683.0"></omgdi:waypoint>
-        <omgdi:waypoint x="944.0" y="649.0"></omgdi:waypoint>
-        <omgdi:waypoint x="1057.0" y="649.0"></omgdi:waypoint>
         <omgdi:waypoint x="1057.0" y="1180.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>

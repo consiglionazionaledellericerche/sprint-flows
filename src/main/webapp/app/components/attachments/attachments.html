@@ -20,7 +20,7 @@
 
   <ul>
   	<li ng-repeat="file in fileHistory">
-    	<strong>{{file.time | data}}:</strong> <br>
+    	<strong>{{file.time | dataora}}:</strong> <br>
 		L'utente <strong>{{file.username}}</strong> <br>
 		<span ng-if="file.metadati.azione">ha compiuto l'azione <strong>{{file.metadati.azione}}</strong><br></span>
 		sul file <a href ng-click="downloadFile(file.url, file.filename, file.mimetype)">{{file.filename}}</a>

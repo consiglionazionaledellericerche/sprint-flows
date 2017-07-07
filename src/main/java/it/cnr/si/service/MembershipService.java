@@ -1,6 +1,7 @@
 package it.cnr.si.service;
 
 import it.cnr.si.domain.Membership;
+import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.MembershipRepository;
 import org.slf4j.Logger;
@@ -31,6 +32,8 @@ public class MembershipService {
 
     @Inject
     private MembershipRepository membershipRepository;
+    @Inject
+    private AceBridgeService aceService;
 
     /**
      * Save a membership.
@@ -93,8 +96,8 @@ public class MembershipService {
     }
 
     private Set<String> getACEGroupsForUser(String username) {
-        // TODO Qui inseriremo i gruppi provenienti da ACE
-        return new HashSet<String>();
+
+        return new HashSet<String>(aceService.getAceGroupsForUser(username));
     }
 
     public List<String> findMembersInGroup(String groupName) {

@@ -24,8 +24,8 @@
                     vm.data.identityLinks = response.data.identityLinks;
                     vm.diagramUrl = '/rest/diagram/processInstance/' + vm.data.entity.id + "?" + new Date().getTime();
 
-                    var processDefinitionId = response.data.entity.processDefinitionId.split(":")[0];
-                    vm.detailsView = 'api/views/' + processDefinitionId + '/detail';
+                    var processDefinitionKey = response.data.entity.processDefinitionId.split(":")[0];
+                    vm.detailsView = 'api/views/' + processDefinitionKey + '/detail';
                     vm.data.history.forEach(function(el) {
                         //recupero l'ultimo task (quello ancora da eseguire)
                         if (el.historyTask.endTime === null){
