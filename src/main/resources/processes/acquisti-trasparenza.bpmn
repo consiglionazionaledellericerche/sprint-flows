@@ -210,6 +210,7 @@
             <activiti:string><![CDATA[true]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaTuttiAllegatiPubblicabili}"></activiti:executionListener>
       </extensionElements>
     </sequenceFlow>
     <userTask id="consuntivo" name="Consuntivo" activiti:assignee="${rup}">
@@ -225,7 +226,11 @@
       </extensionElements>
     </userTask>
     <endEvent id="endevent8" name="End"></endEvent>
-    <sequenceFlow id="flow71" sourceRef="consuntivo" targetRef="endevent8"></sequenceFlow>
+    <sequenceFlow id="flow71" sourceRef="consuntivo" targetRef="endevent8">
+      <extensionElements>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaTuttiAllegatiPubblicabili}"></activiti:executionListener>
+      </extensionElements>
+    </sequenceFlow>
     <subProcess id="ordine-mepa" name="ORDINE MEPA">
       <startEvent id="startevent9" name="Start"></startEvent>
       <userTask id="carica-ordine-mepa" name="Carica Ordine Mepa" activiti:candidateGroups="${gruppoDirettore}"></userTask>
@@ -287,7 +292,11 @@
       </extensionElements>
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaConProvvedimento'}]]></conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="flow102" sourceRef="exclusivegateway22" targetRef="consuntivo"></sequenceFlow>
+    <sequenceFlow id="flow102" sourceRef="exclusivegateway22" targetRef="consuntivo">
+      <extensionElements>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaTuttiAllegatiPubblicabili}"></activiti:executionListener>
+      </extensionElements>
+    </sequenceFlow>
     <sequenceFlow id="flow103" sourceRef="ordine-mepa" targetRef="exclusivegateway16"></sequenceFlow>
     <subProcess id="ordine-fuori-mepa" name="ORDINE FUORI MEPA">
       <startEvent id="startevent10" name="Start"></startEvent>
@@ -380,6 +389,7 @@
             <activiti:string><![CDATA[true]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaTuttiAllegatiPubblicabili}"></activiti:executionListener>
       </extensionElements>
     </sequenceFlow>
     <endEvent id="endevent17" name="End"></endEvent>

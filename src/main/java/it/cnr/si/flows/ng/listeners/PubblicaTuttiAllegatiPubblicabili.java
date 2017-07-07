@@ -16,11 +16,11 @@ import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 
 @Component
-public class DepubblicaTuttiDocumenti implements ExecutionListener {
+public class PubblicaTuttiAllegatiPubblicabili implements ExecutionListener {
 
 	private static final long serialVersionUID = -56001764662303256L;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(DepubblicaTuttiDocumenti.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(PubblicaTuttiAllegatiPubblicabili.class);
 
 	@Inject
 	private FlowsAttachmentService attachmentService;
@@ -36,8 +36,10 @@ public class DepubblicaTuttiDocumenti implements ExecutionListener {
 			if (entry.getValue() != null){
 				if (entry.getValue() instanceof FlowsAttachment) {
 					FlowsAttachment allegato = (FlowsAttachment) entry.getValue();
-					LOGGER.info("depubblico: " + allegato.getFilename() + "(" + entry.getKey() + ") per il flusso: " + execution.getId() );
-					attachmentService.setPubblicabile(execution.getId(), entry.getKey(), false);
+					if	(allegato != null && allegato.getName().startsWith("allegatiPubblicabili")){
+						LOGGER.info("pubblico: " + allegato.getFilename() + "(" + entry.getKey() + ") per il flusso: " + execution.getId() );
+						attachmentService.setPubblicabile(execution.getId(), entry.getKey(), true);
+					}
 				}				
 			}
 		}
