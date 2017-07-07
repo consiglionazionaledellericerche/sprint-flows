@@ -36,9 +36,9 @@ public class FlowsUserResource {
     @Inject
     private AceBridgeService aceService;
 
-    @RequestMapping(value= "/ace", method = RequestMethod.GET)
-    public List<String> getAce() throws SQLException {
-        return aceService.queryTest();
+    @RequestMapping(value= "/ace/{username:.+}", method = RequestMethod.GET)
+    public List<String> getAce(@PathVariable String username) throws SQLException {
+        return aceService.queryTest(username);
     }
 
 
