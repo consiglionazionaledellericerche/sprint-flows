@@ -37,8 +37,9 @@ public class FlowsUserResource {
     private AceBridgeService aceService;
 
     @RequestMapping(value= "/ace/{username:.+}", method = RequestMethod.GET)
+    @Secured(AuthoritiesConstants.ADMIN)
     public List<String> getAce(@PathVariable String username) throws SQLException {
-        return aceService.queryTest(username);
+        return aceService.getAceGroupsForUser(username);
     }
 
 

@@ -24,7 +24,7 @@ public class AceBridgeService {
             "where assegnazioneruolo.persona_id = (SELECT id FROM ace.persona WHERE persona.userid = ?)";
 
 
-    public List<String> queryTest(String username) {
+    public List<String> getAceGroupsForUser(String username) {
 
         List<String> authorities = aceJdbcTemplate.query(testQuery, new Object[] {username}, new RowMapper<String>() {
 
