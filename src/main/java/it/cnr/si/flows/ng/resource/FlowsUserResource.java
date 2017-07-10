@@ -36,10 +36,22 @@ public class FlowsUserResource {
     @Inject
     private AceBridgeService aceService;
 
-    @RequestMapping(value= "/ace/{username:.+}", method = RequestMethod.GET)
+    @RequestMapping(value= "/ace/user/{username:.+}", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.ADMIN)
     public List<String> getAce(@PathVariable String username) throws SQLException {
         return aceService.getAceGroupsForUser(username);
+    }
+
+    @RequestMapping(value= "/ace/group/{groupname:.+}", method = RequestMethod.GET)
+    @Secured(AuthoritiesConstants.ADMIN)
+    public List<String> getAceGroup(@PathVariable String groupname) throws SQLException {
+        return aceService.getUsersinAceGroup(groupname);
+    }
+
+    @RequestMapping(value= "/ace/groupdetail/{id}", method = RequestMethod.GET)
+    @Secured(AuthoritiesConstants.ADMIN)
+    public String getAceGroupDetail(@PathVariable Integer id) throws SQLException {
+        return aceService.getNomeStruturaById(id);
     }
 
 
