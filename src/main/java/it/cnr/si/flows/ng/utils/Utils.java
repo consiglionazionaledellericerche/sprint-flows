@@ -28,6 +28,9 @@ import java.util.stream.Collectors;
 
 public final class Utils {
 
+    public static final String TASK_EXECUTOR = "esecutore";
+    public static final String PROCESS_VISUALIZER = "visualizzatore";
+
     public static final String PROCESS_PARAMS = "processParams";
     public static final String ASC = "ASC";
     public static final String DESC = "DESC";

@@ -3,7 +3,13 @@
   <process id="acquisti-trasparenza" name="Acquisti Trasparenza" isExecutable="true">
     <extensionElements>
       <activiti:executionListener event="start" delegateExpression="${startAcquistiSetGroupsPrototipoSenzaAce}"></activiti:executionListener>
+
+
+      <activiti:executionListener event="start" delegateExpression="${addVisualizerListener}"></activiti:executionListener>
     </extensionElements>
+
+
+
     <startEvent id="startevent1" name="Predisposizione Decisione"></startEvent>
     <subProcess id="DECISIONE-CONTRATTARE" name="DECISIONE A CONTRATTARE">
       <endEvent id="endevent1" name="End"></endEvent>
