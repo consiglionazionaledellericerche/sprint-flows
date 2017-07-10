@@ -1,6 +1,7 @@
 package it.cnr.si.flows.ng.resource;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,12 @@ import javax.inject.Inject;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 
+import org.activiti.engine.ManagementService;
+import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.impl.interceptor.Command;
+import org.activiti.engine.impl.interceptor.CommandContext;
+import org.activiti.rest.service.api.RestResponseFactory;
+import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.codahale.metrics.annotation.Timed;
 
+import it.cnr.si.flows.ng.aop.FlowsHistoricProcessInstanceQuery;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.security.AuthoritiesConstants;
 
@@ -35,6 +43,12 @@ public class FlowsUserResource {
 
     @Inject
     private AceBridgeService aceService;
+
+    @Inject
+    private ManagementService managementService;
+
+    @Inject
+    private RestResponseFactory restResponseFactory;
 
     @RequestMapping(value= "/ace/user/{username:.+}", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.ADMIN)
@@ -74,6 +88,27 @@ public class FlowsUserResource {
         response.put("results", search.stream().limit(10).collect(Collectors.toList()));
 
         return ResponseEntity.ok(response);
+    }
+
+    @RequestMapping(value= "/customquery", method = RequestMethod.GET)
+    @Secured(AuthoritiesConstants.ADMIN)
+    public List<HistoricProcessInstanceResponse> customQuery() throws SQLException {
+
+        FlowsHistoricProcessInstanceQuery query = new FlowsHistoricProcessInstanceQuery(managementService);
+        List<String> groups = new ArrayList<>();
+        groups.add("sfd@2216");
+        query.setVisibleToGroups(groups);
+
+        List<HistoricProcessInstance> processes = managementService.executeCommand(new Command<List<HistoricProcessInstance>>() {
+
+            @SuppressWarnings("unchecked")
+            @Override
+            public List<HistoricProcessInstance> execute(CommandContext commandContext) {
+                return (List<HistoricProcessInstance>) commandContext.getDbSqlSession().selectList("selectFlowsHistoricProcessInstancesWithVariablesByQueryCriteria", query);
+            }
+        });
+
+        return restResponseFactory.createHistoricProcessInstanceResponseList(processes);
     }
 
 }

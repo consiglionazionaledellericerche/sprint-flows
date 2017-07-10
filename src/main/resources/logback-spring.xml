@@ -48,8 +48,9 @@
     <logger name="sun.rmi" level="WARN"/>
     <logger name="liquibase" level="WARN"/>
     <logger name="sun.rmi.transport" level="WARN"/>
-    <logger name="org.activiti.engine" level="INFO"/>
+    <!-- <logger name="org.activiti.engine" level="INFO"/>
     <logger name="org.activiti.spring" level="INFO"/>
+	<logger name="org.activiti.engine.impl.persistence.entity" level="DEBUG" /> -->
 
     <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
         <resetJUL>true</resetJUL>

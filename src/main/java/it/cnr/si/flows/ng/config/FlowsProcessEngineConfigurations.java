@@ -1,7 +1,18 @@
 package it.cnr.si.flows.ng.config;
 
-import com.zaxxer.hikari.HikariDataSource;
-import org.activiti.engine.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.activiti.engine.FormService;
+import org.activiti.engine.HistoryService;
+import org.activiti.engine.IdentityService;
+import org.activiti.engine.ManagementService;
+import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.ProcessEngineConfiguration;
+import org.activiti.engine.RepositoryService;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.image.ProcessDiagramGenerator;
 import org.activiti.rest.service.api.RestResponseFactory;
@@ -16,7 +27,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import java.util.Arrays;
+import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
 public class FlowsProcessEngineConfigurations {
@@ -67,6 +78,10 @@ public class FlowsProcessEngineConfigurations {
 
         // FULL serve per la storia dei documenti
         conf.setHistoryLevel(HistoryLevel.FULL);
+
+        Set<String> customXmlBatisMappers = new HashSet<>();
+        customXmlBatisMappers.add("mapper/FlowsHistoricProcessInstanceMapper.xml");
+        conf.setCustomMybatisXMLMappers(customXmlBatisMappers);
 
         return conf;
     }
