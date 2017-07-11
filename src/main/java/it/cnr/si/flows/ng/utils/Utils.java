@@ -45,9 +45,8 @@ public final class Utils {
     private static final String VALUE_KEY = "value";
     @Autowired
     private static RestResponseFactory restResponseFactory;
-    public final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    public DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
-    public DateFormat formatoVisualizzazione = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);
+    private static SimpleDateFormat formatoData = new SimpleDateFormat("yyyy-MM-dd");
+    private static DateFormat formatoDataOra = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);
 
     public static boolean isEmpty(String in) {
         return in == null || in.equals("");
@@ -132,10 +131,8 @@ public final class Utils {
 //                .getValue();
     }
 
-    @PostConstruct
     public void init() {
-        format.setTimeZone(TimeZone.getTimeZone("GMT"));
-        formatoVisualizzazione.setTimeZone(TimeZone.getTimeZone("Europe/Rome"));
+        formatoDataOra.setTimeZone(TimeZone.getTimeZone("Europe/Rome"));
     }
 
     public TaskInfoQuery orderTasks(String order, TaskInfoQuery query) {
@@ -186,7 +183,7 @@ public final class Utils {
                         processQuery.variableValueEquals(key, value);
                         break;
                     case "date":
-                        Date date = sdf.parse(value);
+                        Date date = formatoData.parse(value);
 
                         if (key.contains(LESS)) {
                             processQuery.variableValueLessThanOrEqual(key.replace(LESS, ""), date);
@@ -223,7 +220,7 @@ public final class Utils {
                     break;
                 case "date":
                     try {
-                        Date date = sdf.parse(value);
+                        Date date = formatoData.parse(value);
                         if (key.contains(LESS)) {
                             taskQuery.processVariableValueLessThanOrEqual(key.replace(LESS, ""), date);
                         } else if (key.contains(GREAT))
@@ -253,11 +250,11 @@ public final class Utils {
             if (taskQuery instanceof HistoricTaskInstanceQuery) {
                 try {
                     if (key.equals("taskCompletedGreat")) {
-                        ((HistoricTaskInstanceQuery) taskQuery).taskCompletedAfter(sdf.parse(value));
+                        ((HistoricTaskInstanceQuery) taskQuery).taskCompletedAfter(formatoData.parse(value));
                         break;
                     }
                     if (key.equals("taskCompletedLess")) {
-                        ((HistoricTaskInstanceQuery) taskQuery).taskCompletedBefore(sdf.parse(value));
+                        ((HistoricTaskInstanceQuery) taskQuery).taskCompletedBefore(formatoData.parse(value));
                         break;
                     }
                 } catch (ParseException e) {
@@ -291,9 +288,21 @@ public final class Utils {
         return taskQuery;
     }
 
+    public static String formattaDataOra(Date in) {
+        return formatoDataOra.format(in);
+    }
+
+    public static String formattaData(Date in) {
+        return formatoData.format(in);
+    }
+
+    public static Date parsaData(String in) throws ParseException {
+        return formatoData.parse(in);
+    }
+
     private TaskInfoQuery historicTaskDate(TaskInfoQuery taskQuery, String key, String value) {
         try {
-            Date date = sdf.parse(value);
+            Date date = formatoData.parse(value);
 
             if (key.contains(LESS)) {
                 taskQuery.taskVariableValueLessThanOrEqual(key.replace(LESS, ""), date);

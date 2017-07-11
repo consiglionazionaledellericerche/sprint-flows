@@ -1,10 +1,16 @@
 package it.cnr.si.flows.ng.aop;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.activiti.engine.ManagementService;
+import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.impl.HistoricProcessInstanceQueryImpl;
 import org.activiti.engine.impl.ManagementServiceImpl;
+import org.activiti.engine.impl.Page;
+import org.activiti.engine.impl.context.Context;
+import org.activiti.engine.impl.db.DbSqlSession;
+import org.activiti.engine.impl.interceptor.CommandContext;
 
 public class FlowsHistoricProcessInstanceQuery extends HistoricProcessInstanceQueryImpl {
 
@@ -24,4 +30,83 @@ public class FlowsHistoricProcessInstanceQuery extends HistoricProcessInstanceQu
         return this;
     }
 
+    public long executeCount(CommandContext commandContext) {
+        checkQueryOk();
+        ensureVariablesInitialized();
+        if (visibleToGroups != null) {
+            return executeCountWithVisibility(this);
+        } else
+            return commandContext
+              .getHistoricProcessInstanceEntityManager()
+              .findHistoricProcessInstanceCountByQueryCriteria(this);
+      }
+
+    public List<HistoricProcessInstance> executeList(CommandContext commandContext, Page page) {
+        checkQueryOk();
+        ensureVariablesInitialized();
+        List<HistoricProcessInstance> results = null;
+        if (visibleToGroups != null) {
+            results = executeListWithVisibility(this);
+        } else if (includeProcessVariables) {
+            results = commandContext.getHistoricProcessInstanceEntityManager().findHistoricProcessInstancesAndVariablesByQueryCriteria(this);
+        } else {
+            results = commandContext.getHistoricProcessInstanceEntityManager().findHistoricProcessInstancesByQueryCriteria(this);
+        }
+
+        for (HistoricProcessInstance processInstance : results) {
+            localize(processInstance, commandContext);
+        }
+
+        return results;
+    }
+
+
+
+    private long executeCountWithVisibility(FlowsHistoricProcessInstanceQuery flowsHistoricProcessInstanceQuery) {
+        return (Long) getDbSession().selectOne("selectFlowsHistoricProcessInstanceCountByQueryCriteria", flowsHistoricProcessInstanceQuery);
+
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<HistoricProcessInstance> executeListWithVisibility(FlowsHistoricProcessInstanceQuery flowsHistoricProcessInstanceQuery) {
+
+        // paging doesn't work for combining process instances and variables due to an outer join, so doing it in-memory
+        if (flowsHistoricProcessInstanceQuery.getFirstResult() < 0 || flowsHistoricProcessInstanceQuery.getMaxResults() <= 0) {
+            return Collections.EMPTY_LIST;
+        }
+
+        int firstResult = flowsHistoricProcessInstanceQuery.getFirstResult();
+        int maxResults = flowsHistoricProcessInstanceQuery.getMaxResults();
+
+        // setting max results, limit to 20000 results for performance reasons
+        if (flowsHistoricProcessInstanceQuery.getProcessInstanceVariablesLimit() != null) {
+            flowsHistoricProcessInstanceQuery.setMaxResults(flowsHistoricProcessInstanceQuery.getProcessInstanceVariablesLimit());
+        } else {
+            flowsHistoricProcessInstanceQuery.setMaxResults(Context.getProcessEngineConfiguration().getHistoricProcessInstancesQueryLimit());
+        }
+        flowsHistoricProcessInstanceQuery.setFirstResult(0);
+
+        List<HistoricProcessInstance> instanceList = getDbSession().selectListWithRawParameterWithoutFilter("selectFlowsHistoricProcessInstancesWithVariablesByQueryCriteria",
+                flowsHistoricProcessInstanceQuery, flowsHistoricProcessInstanceQuery.getFirstResult(), flowsHistoricProcessInstanceQuery.getMaxResults());
+
+        if (instanceList != null && !instanceList.isEmpty()) {
+            if (firstResult > 0) {
+                if (firstResult <= instanceList.size()) {
+                    int toIndex = firstResult + Math.min(maxResults, instanceList.size() - firstResult);
+                    return instanceList.subList(firstResult, toIndex);
+                } else {
+                    return Collections.EMPTY_LIST;
+                }
+            } else {
+                int toIndex = Math.min(maxResults, instanceList.size());
+                return instanceList.subList(0, toIndex);
+            }
+        }
+
+        return Collections.EMPTY_LIST;
+    }
+
+    private DbSqlSession getDbSession() {
+        return Context.getCommandContext().getSession(DbSqlSession.class);
+    }
 }
