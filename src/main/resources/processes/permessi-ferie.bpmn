@@ -14,15 +14,7 @@
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow3" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
-    <sequenceFlow id="flow4" sourceRef="usertask1" targetRef="approvazione">
-      <extensionElements>
-        <activiti:executionListener event="take" delegateExpression="${firmaDocumento}">
-          <activiti:field name="nomeFileDaFirmare">
-            <activiti:string><![CDATA[provvedimentoAggiudicazione]]></activiti:string>
-          </activiti:field>
-        </activiti:executionListener>
-      </extensionElements>
-    </sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="usertask1" targetRef="approvazione"></sequenceFlow>
     <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
     <sequenceFlow id="fine" sourceRef="exclusivegateway1" targetRef="endevent1">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approvato == true}]]></conditionExpression>

@@ -22,6 +22,7 @@ import org.activiti.engine.impl.util.json.JSONObject;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.IdentityLink;
+import org.activiti.engine.task.IdentityLinkType;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.activiti.rest.common.api.DataResponse;
@@ -62,9 +63,6 @@ public class FlowsTaskResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsTaskResource.class);
     @Autowired
     protected RestResponseFactory restResponseFactory;
-
-    private Utils utils = new Utils();
-
     @Autowired
     private MembershipService membershipService;
     @Autowired
@@ -84,20 +82,7 @@ public class FlowsTaskResource {
     @Inject
     private FlowsAttachmentResource attachmentResource;
 
-    // TODO magari un giorno avremo degli array, ma per adesso ce lo facciamo andare bene cosi'
-    private static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
-
-        Map<String, Object> data = new HashMap<>();
-
-        Enumeration<String> parameterNames = req.getParameterNames();
-        while (parameterNames.hasMoreElements()) {
-            String paramName = parameterNames.nextElement();
-            data.put(paramName, req.getParameter(paramName));
-        }
-
-        return data;
-
-    }
+    private Utils utils = new Utils();
 
     @RequestMapping(value = "/mytasks", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
@@ -308,9 +293,18 @@ public class FlowsTaskResource {
     public ResponseEntity<Map<String, Object>> unclaimTask(@PathVariable("id") String id) {
 
         String username = SecurityUtils.getCurrentUserLogin();
-        String assignee = taskService.createTaskQuery()
+        Task task = taskService.createTaskQuery()
                 .taskId(id)
-                .singleResult().getAssignee();
+                .singleResult();
+        String assignee = task.getAssignee();
+
+        // if has candidate groups or users -> can release
+        boolean releasable = taskService.getIdentityLinksForTask(task.getId())
+                .stream()
+                .anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE));
+
+        if (!releasable)
+            return new ResponseEntity<Map<String,Object>>(HttpStatus.FORBIDDEN);
 
         if (username.equals(assignee)) {
             taskService.unclaim(id);
@@ -526,5 +520,20 @@ public class FlowsTaskResource {
         response.setData(resultList);
 
         return ResponseEntity.ok(response);
+    }
+
+    // TODO magari un giorno avremo degli array, ma per adesso ce lo facciamo andare bene cosi'
+    private static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
+
+        Map<String, Object> data = new HashMap<>();
+
+        Enumeration<String> parameterNames = req.getParameterNames();
+        while (parameterNames.hasMoreElements()) {
+            String paramName = parameterNames.nextElement();
+            data.put(paramName, req.getParameter(paramName));
+        }
+
+        return data;
+
     }
 }

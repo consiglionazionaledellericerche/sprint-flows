@@ -90,7 +90,7 @@ public class FlowsProcessInstanceService {
         Map<String, FlowsAttachment> attachements = flowsAttachmentService.getAttachementsForProcessInstance(processInstanceId);
         result.put("attachments", attachements);
 
-        // IdentityLinks (candidate groups)
+        // IdentityLinks (candidate groups) (attenzione: funziona solo se usiamo un task per volta)
         final Map<String, Object> identityLinks = new HashMap<>();
         taskService.createTaskQuery().processInstanceId(processInstanceId).active().list().forEach(
                 task -> {
