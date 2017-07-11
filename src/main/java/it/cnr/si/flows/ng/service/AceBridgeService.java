@@ -49,6 +49,9 @@ public class AceBridgeService {
 
     public List<String> getUsersinAceGroup(String groupName) {
 
+        if (!groupName.contains("@"))
+            return null;
+
         String[] split = groupName.split("@");
         String sigla = split[0];
         Integer eo = Integer.parseInt(split[1]);
