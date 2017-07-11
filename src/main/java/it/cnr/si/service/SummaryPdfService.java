@@ -57,10 +57,7 @@ public class SummaryPdfService {
     @Inject
     private FlowsAttachmentService flowsAttachmentService;
     @Inject
-    private RuntimeService runtimeService;
-    @Inject
     private ViewRepository viewRepository;
-    private Utils utils = new Utils();
 
 
     public String createPdf(String processInstanceId, ByteArrayOutputStream outputStream) throws IOException, ParseException {
@@ -106,11 +103,11 @@ public class SummaryPdfService {
 
             } else if (variableName.equals("startDate")) {
                 if (var.getValue() != null)
-                    paragraphField.addText("Avviato il: " + formatDate(utils.format.parse((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
+                    paragraphField.addText("Avviato il: " + formatDate(Utils.parsaData((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
 
             } else if (variableName.equals("endDate")) {
                 if (var.getValue() != null)
-                    paragraphField.addText("Terminato il: " + formatDate(utils.format.parse((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
+                    paragraphField.addText("Terminato il: " + formatDate(Utils.parsaData((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
 
             } else if (variableName.equals("gruppoRA")) {
                 paragraphField.addText("Gruppo Responsabile Acquisti: " + var.getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
@@ -194,7 +191,7 @@ public class SummaryPdfService {
 
 
     private String formatDate(Date date) {
-        return date != null ? utils.formatoVisualizzazione.format(date) : "";
+        return date != null ? Utils.formattaDataOra(date) : "";
     }
 
 

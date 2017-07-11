@@ -1,16 +1,9 @@
 package it.cnr.si.flows.ng.resource;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-import javax.naming.NamingException;
-import javax.naming.directory.Attributes;
-
+import com.codahale.metrics.annotation.Timed;
+import it.cnr.si.flows.ng.aop.FlowsHistoricProcessInstanceQuery;
+import it.cnr.si.flows.ng.service.AceBridgeService;
+import it.cnr.si.security.AuthoritiesConstants;
 import org.activiti.engine.ManagementService;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.impl.interceptor.Command;
@@ -28,11 +21,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.codahale.metrics.annotation.Timed;
-
-import it.cnr.si.flows.ng.aop.FlowsHistoricProcessInstanceQuery;
-import it.cnr.si.flows.ng.service.AceBridgeService;
-import it.cnr.si.security.AuthoritiesConstants;
+import javax.inject.Inject;
+import javax.naming.NamingException;
+import javax.naming.directory.Attributes;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/users")
@@ -90,6 +87,7 @@ public class FlowsUserResource {
         return ResponseEntity.ok(response);
     }
 
+    //    todo: cancellare
     @RequestMapping(value= "/customquery", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.ADMIN)
     public List<HistoricProcessInstanceResponse> customQuery() throws SQLException {

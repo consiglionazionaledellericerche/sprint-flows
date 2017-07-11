@@ -1,12 +1,21 @@
 package it.cnr.si.flows.ng.service;
 
-import com.opencsv.CSVWriter;
-import it.cnr.si.domain.View;
-import it.cnr.si.flows.ng.aop.FlowsHistoricProcessInstanceQuery;
-import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.utils.Utils;
-import it.cnr.si.repository.ViewRepository;
-import it.cnr.si.security.SecurityUtils;
+import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
+import static it.cnr.si.flows.ng.utils.Utils.ASC;
+import static it.cnr.si.flows.ng.utils.Utils.DESC;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.ManagementService;
@@ -33,15 +42,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.util.*;
-import java.util.stream.Collectors;
+import com.opencsv.CSVWriter;
 
-import static it.cnr.si.flows.ng.utils.Utils.*;
+import it.cnr.si.domain.View;
+import it.cnr.si.flows.ng.aop.FlowsHistoricProcessInstanceQuery;
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.utils.Utils;
+import it.cnr.si.repository.ViewRepository;
 
 /**
  * Created by cirone on 15/06/17.
@@ -64,8 +71,6 @@ public class FlowsProcessInstanceService {
     private ViewRepository viewRepository;
     @Inject
     private ManagementService managementService;
-    private Utils utils = new Utils();
-
 
 
     public Map<String, Object> getProcessInstanceWithDetails(@RequestParam("processInstanceId") String processInstanceId) {
@@ -101,7 +106,7 @@ public class FlowsProcessInstanceService {
         result.put("identityLinks", identityLinks);
 
         //History
-        ArrayList<Map> history = new ArrayList<>();
+        ArrayList<Map<String, Object>> history = new ArrayList<>();
         historyService.createHistoricTaskInstanceQuery()
                 .includeTaskLocalVariables()
                 .processInstanceId(processInstanceId)
@@ -131,14 +136,15 @@ public class FlowsProcessInstanceService {
 
         FlowsHistoricProcessInstanceQuery processQuery = new FlowsHistoricProcessInstanceQuery(managementService);
 
-//        String username = SecurityUtils.getCurrentUserLogin();
-//        List<String> authorities =
-//                SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-//                        .map(GrantedAuthority::getAuthority)
-//                        .map(Utils::removeLeadingRole)
-//                        .collect(Collectors.toList());
-//
-//        processQuery.setVisibleToGroups(authorities);
+        List<String> authorities =
+                SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .map(Utils::removeLeadingRole)
+                        .collect(Collectors.toList());
+
+        if (!authorities.contains("ADMIN"))
+            processQuery.setVisibleToGroups(authorities);
+
 
         if (!processInstanceId.equals(ALL_PROCESS_INSTANCES))
             processQuery.processDefinitionKey(processInstanceId);
@@ -176,17 +182,19 @@ public class FlowsProcessInstanceService {
         else if (order.equals(DESC))
             processQuery.orderByProcessInstanceStartTime().desc();
 
-        long totalItems = processQuery.includeProcessVariables().count();
+        processQuery.includeProcessVariables();
+        long totalItems = processQuery.count();
         result.put("totalItems", totalItems);
 
-        List<HistoricProcessInstance> taskRaw;
-        if (firstResult != -1 && maxResults != -1)
-            taskRaw = processQuery.includeProcessVariables().listPage(firstResult, maxResults);
-        else
-            taskRaw = processQuery.includeProcessVariables().list();
+        List<HistoricProcessInstance> processesRaw;
 
-        List<HistoricProcessInstanceResponse> tasks = restResponseFactory.createHistoricProcessInstanceResponseList(taskRaw);
-        result.put("processInstances", tasks);
+        if (firstResult != -1 && maxResults != -1)
+            processesRaw = processQuery.listPage(firstResult, maxResults);
+        else
+            processesRaw = processQuery.list();
+
+        List<HistoricProcessInstanceResponse> processes = restResponseFactory.createHistoricProcessInstanceResponseList(processesRaw);
+        result.put("processInstances", processes);
         return result;
     }
 
@@ -208,7 +216,7 @@ public class FlowsProcessInstanceService {
             ArrayList<String> tupla = new ArrayList<>();
             //field comuni a tutte le Process Instances (Business Key, Start date)
             tupla.add(pi.getBusinessKey());
-            tupla.add(utils.formatoVisualizzazione.format(pi.getStartTime()));
+            tupla.add(Utils.formattaDataOra(pi.getStartTime()));
 
             //field specifici per ogni procesDefinition
             if (view != null) {
@@ -235,7 +243,7 @@ public class FlowsProcessInstanceService {
 
     private void processDate(HistoricProcessInstanceQuery taskQuery, String key, String value) {
         try {
-            Date date = utils.sdf.parse(value);
+            Date date = Utils.parsaData(value);
 
             if (key.contains("Less")) {
                 taskQuery.variableValueLessThanOrEqual(key.replace("Less", ""), date);

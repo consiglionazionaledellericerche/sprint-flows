@@ -1,4 +1,4 @@
-package it.cnr.si.flows.ng.listeners;
+package it.cnr.si.flows.ng.listeners.acquistitrasparenza;
 
 import it.cnr.si.service.MembershipService;
 import org.activiti.engine.RuntimeService;
