@@ -14,10 +14,6 @@
 <mapper
     namespace="org.activiti.engine.impl.persistence.entity.HistoricProcessInstanceEntity">
 
-    <select id="selectCustomTaskList" resultMap="historicProcessInstanceAndVariablesResultMap">
-        select * from ACT_HI_PROCINST RES
-    </select>
-
     <select id="selectFlowsHistoricProcessInstanceCountByQueryCriteria"
         parameterType="org.activiti.engine.impl.HistoricProcessInstanceQueryImpl"
         resultType="long">
