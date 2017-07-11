@@ -58,7 +58,7 @@ public class FlowsProcessInstanceService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsProcessInstanceService.class);
     @Inject
-    FlowsAttachmentService flowsAttachmentService;
+    private FlowsAttachmentService flowsAttachmentService;
     @Inject
     private HistoryService historyService;
     @Inject
@@ -73,10 +73,14 @@ public class FlowsProcessInstanceService {
     private ManagementService managementService;
 
 
-    public Map<String, Object> getProcessInstanceWithDetails(@RequestParam("processInstanceId") String processInstanceId) {
+    public Map<String, Object> getProcessInstanceWithDetails(String processInstanceId) {
         Map<String, Object> result = new HashMap<>();
+
         // PrecessInstance metadata
-        HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).includeProcessVariables().singleResult();
+        HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .includeProcessVariables()
+                .singleResult();
         result.put("entity", restResponseFactory.createHistoricProcessInstanceResponse(processInstance));
 
         // ProcessDefinition (static) metadata
