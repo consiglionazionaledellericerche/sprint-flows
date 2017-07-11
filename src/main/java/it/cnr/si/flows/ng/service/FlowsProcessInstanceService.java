@@ -2,10 +2,14 @@ package it.cnr.si.flows.ng.service;
 
 import com.opencsv.CSVWriter;
 import it.cnr.si.domain.View;
+import it.cnr.si.flows.ng.aop.FlowsHistoricProcessInstanceQuery;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
+import it.cnr.si.security.SecurityUtils;
+
 import org.activiti.engine.HistoryService;
+import org.activiti.engine.ManagementService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricIdentityLink;
@@ -24,6 +28,8 @@ import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -33,6 +39,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static it.cnr.si.flows.ng.utils.Utils.*;
 
@@ -55,6 +62,8 @@ public class FlowsProcessInstanceService {
     private TaskService taskService;
     @Inject
     private ViewRepository viewRepository;
+    @Inject
+    private ManagementService managementService;
     private Utils utils = new Utils();
 
 
@@ -120,7 +129,16 @@ public class FlowsProcessInstanceService {
         }
         JSONArray params = new JSONObject(jsonString).getJSONArray("params");
 
-        HistoricProcessInstanceQuery processQuery = historyService.createHistoricProcessInstanceQuery();
+        FlowsHistoricProcessInstanceQuery processQuery = new FlowsHistoricProcessInstanceQuery(managementService);
+
+//        String username = SecurityUtils.getCurrentUserLogin();
+//        List<String> authorities =
+//                SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+//                        .map(GrantedAuthority::getAuthority)
+//                        .map(Utils::removeLeadingRole)
+//                        .collect(Collectors.toList());
+//
+//        processQuery.setVisibleToGroups(authorities);
 
         if (!processInstanceId.equals(ALL_PROCESS_INSTANCES))
             processQuery.processDefinitionKey(processInstanceId);

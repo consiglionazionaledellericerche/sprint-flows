@@ -59,7 +59,6 @@ import static it.cnr.si.flows.ng.utils.Utils.*;
 @RequestMapping("api/tasks")
 public class FlowsTaskResource {
 
-    private static final String TASK_EXECUTOR = "esecutore";
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsTaskResource.class);
     @Autowired
     protected RestResponseFactory restResponseFactory;
