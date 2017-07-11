@@ -52,9 +52,15 @@ public class StartAcquistiSetGroupsPrototipoSenzaAce implements ExecutionListene
             String gruppoSFD = "sfd@"+ struttura;
 
             LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoRT, gruppoSFD, gruppoRA, gruppoDirettore);
+            
+            //Check se il gruppo SFD ha membri 
+            List<String> members = membershipService.findMembersInGroup(gruppoSFD);
+            if ( members.size() == 0 ) {
+                execution.setVariable("organizzazioneStruttura", "Semplice");
+            } else {
+                execution.setVariable("organizzazioneStruttura", "Complessa");
+            }
 
-            //execution.setVariable("organizzazioneStruttura", "Semplice");
-            execution.setVariable("organizzazioneStruttura", "Complessa");
             execution.setVariable("gruppoRT", gruppoRT);
             execution.setVariable("gruppoDirettore", gruppoDirettore);
             execution.setVariable("gruppoRA", gruppoRA);
