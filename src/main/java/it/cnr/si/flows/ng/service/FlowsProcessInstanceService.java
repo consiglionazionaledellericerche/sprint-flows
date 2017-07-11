@@ -6,8 +6,7 @@ import it.cnr.si.flows.ng.aop.FlowsHistoricProcessInstanceQuery;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
-import it.cnr.si.security.SecurityUtils;
-
+import it.cnr.si.service.MembershipService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.ManagementService;
 import org.activiti.engine.RepositoryService;
@@ -63,7 +62,9 @@ public class FlowsProcessInstanceService {
     @Inject
     private ViewRepository viewRepository;
     @Inject
-    private ManagementService managementService;
+    ManagementService managementService;
+    @Inject
+    private MembershipService membershipService;
     private Utils utils = new Utils();
 
 
@@ -131,14 +132,15 @@ public class FlowsProcessInstanceService {
 
         FlowsHistoricProcessInstanceQuery processQuery = new FlowsHistoricProcessInstanceQuery(managementService);
 
-//        String username = SecurityUtils.getCurrentUserLogin();
-//        List<String> authorities =
-//                SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-//                        .map(GrantedAuthority::getAuthority)
-//                        .map(Utils::removeLeadingRole)
-//                        .collect(Collectors.toList());
-//
-//        processQuery.setVisibleToGroups(authorities);
+        List<String> authorities =
+                SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                        .filter(h -> h.getAuthority().contains("@")) //aggiunta da me (TODO: fare in modo più elegante)
+                        .map(GrantedAuthority::getAuthority)
+                        .map(Utils::removeLeadingRole)
+                        .collect(Collectors.toList());
+
+        processQuery.setVisibleToGroups(authorities);
+
 
         if (!processInstanceId.equals(ALL_PROCESS_INSTANCES))
             processQuery.processDefinitionKey(processInstanceId);
