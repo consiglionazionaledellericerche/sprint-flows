@@ -2,7 +2,7 @@
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
   <process id="acquisti-trasparenza" name="Acquisti Trasparenza" isExecutable="true">
     <extensionElements>
-      <activiti:executionListener event="start" delegateExpression="${startAcquistiSetGroupsPrototipoSenzaAce}"></activiti:executionListener>
+      <activiti:executionListener event="start" delegateExpression="${startAcquistiSetGroupsAndVisibility}"></activiti:executionListener>
     </extensionElements>
     <startEvent id="startevent1" name="Predisposizione Decisione"></startEvent>
     <subProcess id="DECISIONE-CONTRATTARE" name="DECISIONE A CONTRATTARE">
@@ -470,13 +470,6 @@
       </extensionElements>
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaSemplice'}]]></conditionExpression>
     </sequenceFlow>
-    <dataObject id="valore" name="valore" itemSubjectRef="xsd:int">
-      <extensionElements>
-        <activiti:value>1</activiti:value>
-      </extensionElements>
-    </dataObject>
-    <dataObject id="sceltaUtente" name="sceltaUtente" itemSubjectRef="xsd:string"></dataObject>
-    <dataObject id="sceltaPercorso" name="sceltaPercorso" itemSubjectRef="xsd:string"></dataObject>
     <userTask id="conferma-revoca" name="Conferma Revoca" activiti:candidateGroups="${gruppoRA}"></userTask>
     <sequenceFlow id="flow160" sourceRef="exclusivegateway15" targetRef="conferma-revoca">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Revoca'}]]></conditionExpression>
@@ -487,6 +480,13 @@
     <sequenceFlow id="flow163" sourceRef="exclusivegateway30" targetRef="espletamento-procedura">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Annulla'}]]></conditionExpression>
     </sequenceFlow>
+    <dataObject id="valore" name="valore" itemSubjectRef="xsd:int">
+      <extensionElements>
+        <activiti:value>1</activiti:value>
+      </extensionElements>
+    </dataObject>
+    <dataObject id="sceltaUtente" name="sceltaUtente" itemSubjectRef="xsd:string"></dataObject>
+    <dataObject id="sceltaPercorso" name="sceltaPercorso" itemSubjectRef="xsd:string"></dataObject>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_acquisti-trasparenza">
     <bpmndi:BPMNPlane bpmnElement="acquisti-trasparenza" id="BPMNPlane_acquisti-trasparenza">

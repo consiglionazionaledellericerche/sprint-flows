@@ -10,6 +10,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -93,7 +94,7 @@ public class FlowsProcessInstanceService {
         Map<String, FlowsAttachment> attachements = flowsAttachmentService.getAttachementsForProcessInstance(processInstanceId);
         result.put("attachments", attachements);
 
-        final Map<String, Object> identityLinks = new HashMap<>();
+        final Map<String, Object> identityLinks = new LinkedHashMap<>();
         Map<String, Object> processLinks = new HashMap<>();
         processLinks.put("links", restResponseFactory.createRestIdentityLinks(runtimeService.getIdentityLinksForProcessInstance(processInstanceId)));
         identityLinks.put("process", processLinks);
