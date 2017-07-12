@@ -292,6 +292,8 @@ public class FlowsTaskResource {
     @Timed
     public ResponseEntity<Map<String, Object>> unclaimTask(@PathVariable("id") String id) {
 
+        // TODO implementare anche nell'UI
+
         String username = SecurityUtils.getCurrentUserLogin();
         Task task = taskService.createTaskQuery()
                 .taskId(id)
