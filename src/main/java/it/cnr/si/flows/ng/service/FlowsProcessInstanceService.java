@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.ManagementService;
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricProcessInstance;
@@ -71,6 +72,8 @@ public class FlowsProcessInstanceService {
     private ViewRepository viewRepository;
     @Inject
     private ManagementService managementService;
+    @Inject
+    private RuntimeService runtimeService;
 
 
     public Map<String, Object> getProcessInstanceWithDetails(String processInstanceId) {
@@ -90,8 +93,10 @@ public class FlowsProcessInstanceService {
         Map<String, FlowsAttachment> attachements = flowsAttachmentService.getAttachementsForProcessInstance(processInstanceId);
         result.put("attachments", attachements);
 
-        // IdentityLinks (candidate groups) (attenzione: funziona solo se usiamo un task per volta)
         final Map<String, Object> identityLinks = new HashMap<>();
+        Map<String, Object> processLinks = new HashMap<>();
+        processLinks.put("links", restResponseFactory.createRestIdentityLinks(runtimeService.getIdentityLinksForProcessInstance(processInstanceId)));
+        identityLinks.put("process", processLinks);
         taskService.createTaskQuery().processInstanceId(processInstanceId).active().list().forEach(
                 task -> {
                     Map<String, Object> identityLink = new HashMap<>();
