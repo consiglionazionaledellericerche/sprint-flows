@@ -3,6 +3,7 @@ package it.cnr.si.flows.ng.resource;
 import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.TestServices;
 import it.cnr.si.flows.ng.utils.Utils;
+import org.activiti.engine.HistoryService;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
@@ -14,7 +15,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
@@ -26,6 +26,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.ParseException;
@@ -44,15 +45,18 @@ import static org.springframework.http.HttpStatus.OK;
 public class FlowsProcessInstanceResourceTest {
 
     private static int processDeleted = 0;
-    @Autowired
+    @Inject
+    HistoryService historyService;
+    @Inject
     private FlowsTaskResource flowsTaskResource;
-    @Autowired
+    @Inject
     private FlowsProcessInstanceResource flowsProcessInstanceResource;
-    @Autowired
+    @Inject
     private TestServices util;
-    @Autowired
+    @Inject
     private FlowsProcessDefinitionResource flowsProcessDefinitionResource;
     private ProcessInstanceResponse processInstance;
+
 
     @Before
     public void setUp() {
@@ -75,7 +79,9 @@ public class FlowsProcessInstanceResourceTest {
         flowsProcessInstanceResource.suspend(new MockHttpServletRequest(), processInstanceID);
         processInstanceID = verifyMyProcesses(1, 0);
         //testo che eliminando una Process Instances NON la vedo tra i processi avviati da me
-        flowsProcessInstanceResource.delete(new MockHttpServletResponse(), processInstanceID, "TEST");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        flowsProcessInstanceResource.delete(response, processInstanceID, "TEST");
+        assertEquals(NO_CONTENT.value(), response.getStatus());
         verifyMyProcesses(0, 0);
     }
 
@@ -130,7 +136,7 @@ public class FlowsProcessInstanceResourceTest {
         req.setParameter("strumentoAcquisizioneId", "11");
         req.setParameter("priorita", "Alta");
         req.setParameter("rup", "spaclient");
-        req.setParameter("impegniVeri", "[{\"numero\":\"1\",\"importo\":100,\"descrizione\":\"descrizione impegno\",\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"gae\":\"spaclient\"}]");
+        req.setParameter("impegni_json", "[{\"numero\":\"1\",\"importo\":100,\"descrizione\":\"descrizione impegno\",\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"gae\":\"spaclient\"}]");
 
         ResponseEntity<Object> resp = flowsTaskResource.completeTask(req);
         assertEquals(OK, resp.getStatusCode());
@@ -239,15 +245,17 @@ public class FlowsProcessInstanceResourceTest {
 
         //faccio l'exportCsv su UNA SOLA Process Instance attiva
         MockHttpServletResponse responseOne = new MockHttpServletResponse();
-        flowsProcessInstanceResource.exportCsv(req, responseOne, ALL_PROCESS_INSTANCES, true, ASC, 0, 1);
+        flowsProcessInstanceResource.exportCsv(req, responseOne, ALL_PROCESS_INSTANCES, true, ASC, 0, 2);
         assertEquals(OK.value(), responseOne.getStatus());
         assertEquals(responseAll.getContentAsString(), responseOne.getContentAsString());
 
         //verifico che exportCsv dei flussi NON ATTIVI è vuoto
-        MockHttpServletResponse responseEmpty = new MockHttpServletResponse();
-        flowsProcessInstanceResource.exportCsv(req, responseEmpty, ALL_PROCESS_INSTANCES, false, ASC, 0, 1);
-        assertEquals(OK.value(), responseEmpty.getStatus());
-        assertTrue(responseEmpty.getContentAsString().isEmpty());
+        MockHttpServletResponse terminatedProcessInstances = new MockHttpServletResponse();
+        flowsProcessInstanceResource.exportCsv(req, terminatedProcessInstances, ALL_PROCESS_INSTANCES, false, ASC, -1, -1);
+        assertEquals(OK.value(), terminatedProcessInstances.getStatus());
+//        verifico che le righe dell csv siano quanti i flussi "terminati" + 1 (intestazione del file csv)
+        assertEquals(terminatedProcessInstances.getContentAsString().split("\n").length,
+                     historyService.createHistoricProcessInstanceQuery().finished().list().size() + 1);
     }
 
 

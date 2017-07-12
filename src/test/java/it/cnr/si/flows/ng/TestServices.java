@@ -1,6 +1,7 @@
 package it.cnr.si.flows.ng;
 
 import it.cnr.si.flows.ng.resource.FlowsTaskResource;
+import it.cnr.si.security.FlowsUserDetailsService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -13,11 +14,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Collection;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -46,6 +49,8 @@ public class TestServices {
     private FlowsTaskResource flowsTaskResource;
     @Inject
     private ProcessInstanceResource processInstanceResource;
+    @Inject
+    FlowsUserDetailsService flowsUserDetailsService;
     private String firstTaskId;
     private String processDefinition;
 
@@ -80,8 +85,10 @@ public class TestServices {
 
 
     private void login(String user, String psw) {
-        SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken(user, psw));
+//      prendo le Authorities dell'utente che si sta loggando per settarle nel "context"
+        Collection<? extends GrantedAuthority> authorities = flowsUserDetailsService.loadUserByUsername(user).getAuthorities();
+        SecurityContextHolder.getContext()
+                .setAuthentication(new UsernamePasswordAuthenticationToken(user, psw, authorities));
     }
 
     public void logout() {
@@ -101,9 +108,6 @@ public class TestServices {
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
         req.setParameter("processDefinitionId", processDefinition);
         if (processDefinitionKey.equals("acquisti-trasparenza")) {
-//            req.setParameter("decisioneContrattare", TITOLO_DELL_ISTANZA_DEL_FLUSSO);
-//            req.setParameter("relazioneTecnica", TITOLO_DELL_ISTANZA_DEL_FLUSSO);
-//            req.setParameter("__new__allegati[0]", TITOLO_DELL_ISTANZA_DEL_FLUSSO);
             req.setParameter("titoloIstanzaFlusso", TITOLO_DELL_ISTANZA_DEL_FLUSSO);
             req.setParameter("descrizioneAcquisizione", "descrizione");
             req.setParameter("tipologiaAcquisizioneI", "procedura aperta");
@@ -112,7 +116,7 @@ public class TestServices {
             req.setParameter("strumentoAcquisizioneId", "11");
             req.setParameter("priorita", "Alta");
             req.setParameter("rup", "spaclient");
-            req.setParameter("impegniVeri", "[{\"numero\":\"1\",\"importo\":100,\"descrizione\":\"descrizione impegno\",\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"gae\":\"spaclient\"}]");
+            req.setParameter("impegni_json", "[{\"numero\":\"1\",\"importo\":100,\"descrizione\":\"descrizione impegno\",\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"gae\":\"spaclient\"}]");
         }
         ResponseEntity<Object> response = flowsTaskResource.completeTask(req);
         assertEquals(OK, response.getStatusCode());
