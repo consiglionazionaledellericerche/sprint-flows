@@ -104,7 +104,9 @@ public class MembershipService {
 
         List<String> result = membershipRepository.findMembersInGroup(groupName);
 
-        // TODO Recuperare utenti di un gruppo ACE (quando ci sara')
+        List<String> usersinAceGroup = aceService.getUsersinAceGroup(groupName);
+        if (usersinAceGroup != null)
+            result.addAll(usersinAceGroup);
 
         return result;
     }

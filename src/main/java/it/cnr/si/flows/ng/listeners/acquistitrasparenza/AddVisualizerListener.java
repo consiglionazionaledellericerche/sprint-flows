@@ -1,6 +1,9 @@
 package it.cnr.si.flows.ng.listeners.acquistitrasparenza;
 
-import it.cnr.si.service.MembershipService;
+import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
+
+import javax.inject.Inject;
+
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
@@ -8,14 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
-
-import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
-
-//@Component
-//public class AddVisualizerListener implements ActivitiEventListener {
 @Component
 public class AddVisualizerListener implements ExecutionListener {
+
+    private static final long serialVersionUID = 5263454627295290775L;
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AddVisualizerListener.class);
@@ -23,9 +22,6 @@ public class AddVisualizerListener implements ExecutionListener {
 
     @Inject
     private RuntimeService runtimeService;
-    @Inject
-    private MembershipService membershipService;
-
 
     @Override
     public void notify(DelegateExecution execution) throws Exception {
