@@ -31,10 +31,10 @@
     ng-model="ngModel"
     ng-required="ngRequired"
     placeholder="Digita il nome utente per avviare la ricerca"
-    uib-typeahead="user for user in loadUsers($viewValue)"
+    uib-typeahead="record for record in loadRecords($viewValue)"
     typeahead-loading="loadingLocations"
     typeahead-no-results="noResults"
     typeahead-editable=false
     typeahead-min-length=3
-    typeahead-popup-template-url="app/inputs/userinput/userinput.popup.html"
+    typeahead-popup-template-url="app/inputs/typeaheadinput/typeaheadinput.popup.html"
     class="form-control">
