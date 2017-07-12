@@ -74,11 +74,11 @@ public class FlowsUserResource {
 
         Map<String, Object> response = new HashMap<>();
 
-        // TODO se cercare con due wildcard e' un overkill (ma non credo visto che sono un diecimila voci)
-        // TODO modificare la serach con un parametro piu' scaltro
-        List<Object> search = ldapTemplate.search("", "(uid=*"+ username +"*)", new AttributesMapper<Object>() {
-            public Object mapFromAttributes(Attributes attrs) throws NamingException {
-                return attrs.get("uid").get();
+        List<SearchResult> search = ldapTemplate.search("", "(uid=*"+ username +"*)", new AttributesMapper<SearchResult>() {
+            public SearchResult mapFromAttributes(Attributes attrs) throws NamingException {
+                return new SearchResult(attrs.get("uid").get().toString(),
+                        attrs.get("cnrnome").get() +" "+ attrs.get("cnrcognome").get() +" "+
+                                "("+ attrs.get("uid").get().toString() +")");
             }
         });
 
@@ -87,7 +87,7 @@ public class FlowsUserResource {
 
         return ResponseEntity.ok(response);
     }
-    
+
     @RequestMapping(value = "/struttura/{struttura:.+}/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
@@ -96,9 +96,10 @@ public class FlowsUserResource {
         Map<String, Object> response = new HashMap<>();
 
         List<Pair<Integer, String>> results = aceService.getUoLike(struttura);
+        List<SearchResult> collect = results.stream().map(p -> new SearchResult(p.getLeft().toString(), p.getRight())).collect(Collectors.toList());
 
-        response.put("more", results.size() > 10);
-        response.put("results", results.stream().limit(10).collect(Collectors.toList()));
+        response.put("more", collect.size() > 10);
+        response.put("results", collect.stream().limit(10).collect(Collectors.toList()));
 
         return ResponseEntity.ok(response);
     }
@@ -125,4 +126,14 @@ public class FlowsUserResource {
         return restResponseFactory.createHistoricProcessInstanceResponseList(processes);
     }
 
+
+    public class SearchResult {
+        public String value;
+        public String label;
+
+        public SearchResult(String v, String l) {
+            this.value = v;
+            this.label = l;
+        }
+    }
 }
