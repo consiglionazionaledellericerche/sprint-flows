@@ -10,6 +10,7 @@ import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -83,6 +84,21 @@ public class FlowsUserResource {
 
         response.put("more", search.size() > 10);
         response.put("results", search.stream().limit(10).collect(Collectors.toList()));
+
+        return ResponseEntity.ok(response);
+    }
+    
+    @RequestMapping(value = "/struttura/{struttura:.+}/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
+    @Timed
+    public ResponseEntity<Map<String, Object>> getUoLike(@PathVariable String struttura) {
+
+        Map<String, Object> response = new HashMap<>();
+
+        List<Pair<Integer, String>> results = aceService.getUoLike(struttura);
+
+        response.put("more", results.size() > 10);
+        response.put("results", results.stream().limit(10).collect(Collectors.toList()));
 
         return ResponseEntity.ok(response);
     }
