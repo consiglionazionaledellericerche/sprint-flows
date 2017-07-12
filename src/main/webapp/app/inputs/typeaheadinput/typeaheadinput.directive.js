@@ -23,20 +23,20 @@
 			link: function ($scope, element, attrs) {
 
 				$scope.loadRecords = function(filter) {
-					if (type === "users"){
+					if ($scope.type === "users"){
 						return dataService.search.users(filter)
 						.then(function(response) {
 							$scope.hasMore = response.data.more;
 							return response.data.results;
 						});
-					} else if (type === "uo"){
+					} else if ($scope.type === "uo"){
 						return dataService.search.uo(filter)
 						.then(function(response) {
 							$scope.hasMore = response.data.more;
 							return response.data.results;
 						});
 					} else {
-						$log.error("Type non riconosciuto " + type);
+						$log.error("Type non riconosciuto " + $scope.type);
 					}
 				}
 			}
