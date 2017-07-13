@@ -152,9 +152,11 @@ public class FlowsProcessInstanceService {
                         .map(Utils::removeLeadingRole)
                         .collect(Collectors.toList());
 
-        if (!authorities.contains("ADMIN"))
+        // solo l'admin ignora le regole di visibilita'
+        if (!authorities.contains("ADMIN")) {
             processQuery.setVisibleToGroups(authorities);
-
+            processQuery.setVisibleToUser(SecurityContextHolder.getContext().getAuthentication().getName());
+        }
 
         if (!processInstanceId.equals(ALL_PROCESS_INSTANCES))
             processQuery.processDefinitionKey(processInstanceId);

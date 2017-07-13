@@ -190,15 +190,17 @@
 
             <!-- Custom query per visibilita' -->
             <!-- aggiungere il tipo di link and I.TYPE_ = 'visualizzatore' -->
-            <if test="visibleToGroups != null">
-
+            <if test="visibleToGroups != null || visibleToUser != null">
                 and I.TYPE_ = 'visualizzatore'
-                and I.GROUP_ID_ IN (
-                <foreach item="group" index="index" collection="visibleToGroups"
-                    open="" separator="," close="">
-                    #{group}
-                </foreach>
-                )
+                and
+                  ( I.GROUP_ID_ IN (
+                  <foreach item="group" index="index" collection="visibleToGroups"
+                      open="" separator="," close="">
+                      #{group}
+                  </foreach>
+                     )
+                     OR I.USER_ID_ =  #{visibleToUser}
+                   )
             </if>
 
 

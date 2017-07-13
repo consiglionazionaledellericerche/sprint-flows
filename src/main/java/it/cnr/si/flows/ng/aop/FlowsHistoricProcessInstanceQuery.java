@@ -16,6 +16,15 @@ public class FlowsHistoricProcessInstanceQuery extends HistoricProcessInstanceQu
 
     private static final long serialVersionUID = -6296421487043345841L;
     protected List<String> visibleToGroups;
+    protected String visibleToUser;
+
+    public String getVisibleToUser() {
+        return visibleToUser;
+    }
+
+    public void setVisibleToUser(String visibleToUser) {
+        this.visibleToUser = visibleToUser;
+    }
 
     public FlowsHistoricProcessInstanceQuery(ManagementService managementService) {
         super(((ManagementServiceImpl) managementService).getCommandExecutor());
@@ -45,7 +54,7 @@ public class FlowsHistoricProcessInstanceQuery extends HistoricProcessInstanceQu
         checkQueryOk();
         ensureVariablesInitialized();
         List<HistoricProcessInstance> results = null;
-        if (visibleToGroups != null) {
+        if (visibleToGroups != null || visibleToUser != null) {
             results = executeListWithVisibility(this);
         } else if (includeProcessVariables) {
             results = commandContext.getHistoricProcessInstanceEntityManager().findHistoricProcessInstancesAndVariablesByQueryCriteria(this);

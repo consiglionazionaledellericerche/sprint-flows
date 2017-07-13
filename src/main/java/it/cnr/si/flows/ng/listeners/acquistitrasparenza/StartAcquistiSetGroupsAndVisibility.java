@@ -54,6 +54,7 @@ public class StartAcquistiSetGroupsAndVisibility implements ExecutionListener {
             String gruppoDirettore = "direttore@"+ struttura;
             String gruppoRA = "ra@"+ struttura;
             String gruppoSFD = "sfd@"+ struttura;
+            String rup = execution.getVariable("rup", String.class);
 
             LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoRT, gruppoSFD, gruppoRA, gruppoDirettore);
 
@@ -69,6 +70,7 @@ public class StartAcquistiSetGroupsAndVisibility implements ExecutionListener {
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoDirettore, PROCESS_VISUALIZER);
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoRA, PROCESS_VISUALIZER);
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoSFD, PROCESS_VISUALIZER);
+            runtimeService.addUserIdentityLink(execution.getProcessInstanceId(), rup, PROCESS_VISUALIZER);
 //            runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), "segreteria@" + struttura, PROCESS_VISUALIZER);
 
             execution.setVariable("gruppoRT", gruppoRT);
