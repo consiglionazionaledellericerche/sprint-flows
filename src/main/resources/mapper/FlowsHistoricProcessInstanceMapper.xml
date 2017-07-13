@@ -24,7 +24,7 @@
 
     <select
         id="selectFlowsHistoricProcessInstancesWithVariablesByQueryCriteria"
-        parameterType="it.cnr.si.flows.ng.aop.FlowsHistoricProcessInstanceQuery"
+        parameterType="it.cnr.si.flows.ng.dto.FlowsHistoricProcessInstanceQuery"
         resultMap="historicProcessInstanceAndVariablesResultMap">
         ${limitBefore}
         select distinct RES.*, DEF.KEY_ as PROC_DEF_KEY_, DEF.NAME_ as
