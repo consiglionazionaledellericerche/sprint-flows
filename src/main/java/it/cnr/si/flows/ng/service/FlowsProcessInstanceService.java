@@ -1,12 +1,27 @@
 package it.cnr.si.flows.ng.service;
 
-import com.opencsv.CSVWriter;
-import it.cnr.si.domain.View;
-import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.utils.Utils;
-import it.cnr.si.repository.ViewRepository;
+import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
+import static it.cnr.si.flows.ng.utils.Utils.ASC;
+import static it.cnr.si.flows.ng.utils.Utils.DESC;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+
 import org.activiti.engine.HistoryService;
+import org.activiti.engine.ManagementService;
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricProcessInstance;
@@ -24,17 +39,18 @@ import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.util.*;
+import com.opencsv.CSVWriter;
 
-import static it.cnr.si.flows.ng.utils.Utils.*;
+import it.cnr.si.domain.View;
+import it.cnr.si.flows.ng.aop.FlowsHistoricProcessInstanceQuery;
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.utils.Utils;
+import it.cnr.si.repository.ViewRepository;
 
 /**
  * Created by cirone on 15/06/17.
@@ -44,7 +60,7 @@ public class FlowsProcessInstanceService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsProcessInstanceService.class);
     @Inject
-    FlowsAttachmentService flowsAttachmentService;
+    private FlowsAttachmentService flowsAttachmentService;
     @Inject
     private HistoryService historyService;
     @Inject
@@ -55,14 +71,20 @@ public class FlowsProcessInstanceService {
     private TaskService taskService;
     @Inject
     private ViewRepository viewRepository;
-    private Utils utils = new Utils();
+    @Inject
+    private ManagementService managementService;
+    @Inject
+    private RuntimeService runtimeService;
 
 
-
-    public Map<String, Object> getProcessInstanceWithDetails(@RequestParam("processInstanceId") String processInstanceId) {
+    public Map<String, Object> getProcessInstanceWithDetails(String processInstanceId) {
         Map<String, Object> result = new HashMap<>();
+
         // PrecessInstance metadata
-        HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).includeProcessVariables().singleResult();
+        HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .includeProcessVariables()
+                .singleResult();
         result.put("entity", restResponseFactory.createHistoricProcessInstanceResponse(processInstance));
 
         // ProcessDefinition (static) metadata
@@ -72,8 +94,10 @@ public class FlowsProcessInstanceService {
         Map<String, FlowsAttachment> attachements = flowsAttachmentService.getAttachementsForProcessInstance(processInstanceId);
         result.put("attachments", attachements);
 
-        // IdentityLinks (candidate groups)
-        final Map<String, Object> identityLinks = new HashMap<>();
+        final Map<String, Object> identityLinks = new LinkedHashMap<>();
+        Map<String, Object> processLinks = new HashMap<>();
+        processLinks.put("links", restResponseFactory.createRestIdentityLinks(runtimeService.getIdentityLinksForProcessInstance(processInstanceId)));
+        identityLinks.put("process", processLinks);
         taskService.createTaskQuery().processInstanceId(processInstanceId).active().list().forEach(
                 task -> {
                     Map<String, Object> identityLink = new HashMap<>();
@@ -92,7 +116,7 @@ public class FlowsProcessInstanceService {
         result.put("identityLinks", identityLinks);
 
         //History
-        ArrayList<Map> history = new ArrayList<>();
+        ArrayList<Map<String, Object>> history = new ArrayList<>();
         historyService.createHistoricTaskInstanceQuery()
                 .includeTaskLocalVariables()
                 .processInstanceId(processInstanceId)
@@ -120,7 +144,19 @@ public class FlowsProcessInstanceService {
         }
         JSONArray params = new JSONObject(jsonString).getJSONArray("params");
 
-        HistoricProcessInstanceQuery processQuery = historyService.createHistoricProcessInstanceQuery();
+        FlowsHistoricProcessInstanceQuery processQuery = new FlowsHistoricProcessInstanceQuery(managementService);
+
+        List<String> authorities =
+                SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .map(Utils::removeLeadingRole)
+                        .collect(Collectors.toList());
+
+        // solo l'admin ignora le regole di visibilita'
+        if (!authorities.contains("ADMIN")) {
+            processQuery.setVisibleToGroups(authorities);
+            processQuery.setVisibleToUser(SecurityContextHolder.getContext().getAuthentication().getName());
+        }
 
         if (!processInstanceId.equals(ALL_PROCESS_INSTANCES))
             processQuery.processDefinitionKey(processInstanceId);
@@ -158,17 +194,19 @@ public class FlowsProcessInstanceService {
         else if (order.equals(DESC))
             processQuery.orderByProcessInstanceStartTime().desc();
 
-        long totalItems = processQuery.includeProcessVariables().count();
+        processQuery.includeProcessVariables();
+        long totalItems = processQuery.count();
         result.put("totalItems", totalItems);
 
-        List<HistoricProcessInstance> taskRaw;
-        if (firstResult != -1 && maxResults != -1)
-            taskRaw = processQuery.includeProcessVariables().listPage(firstResult, maxResults);
-        else
-            taskRaw = processQuery.includeProcessVariables().list();
+        List<HistoricProcessInstance> processesRaw;
 
-        List<HistoricProcessInstanceResponse> tasks = restResponseFactory.createHistoricProcessInstanceResponseList(taskRaw);
-        result.put("processInstances", tasks);
+        if (firstResult != -1 && maxResults != -1)
+            processesRaw = processQuery.listPage(firstResult, maxResults);
+        else
+            processesRaw = processQuery.list();
+
+        List<HistoricProcessInstanceResponse> processes = restResponseFactory.createHistoricProcessInstanceResponseList(processesRaw);
+        result.put("processInstances", processes);
         return result;
     }
 
@@ -190,7 +228,7 @@ public class FlowsProcessInstanceService {
             ArrayList<String> tupla = new ArrayList<>();
             //field comuni a tutte le Process Instances (Business Key, Start date)
             tupla.add(pi.getBusinessKey());
-            tupla.add(utils.formatoVisualizzazione.format(pi.getStartTime()));
+            tupla.add(Utils.formattaDataOra(pi.getStartTime()));
 
             //field specifici per ogni procesDefinition
             if (view != null) {
@@ -217,7 +255,7 @@ public class FlowsProcessInstanceService {
 
     private void processDate(HistoricProcessInstanceQuery taskQuery, String key, String value) {
         try {
-            Date date = utils.sdf.parse(value);
+            Date date = Utils.parsaData(value);
 
             if (key.contains("Less")) {
                 taskQuery.variableValueLessThanOrEqual(key.replace("Less", ""), date);

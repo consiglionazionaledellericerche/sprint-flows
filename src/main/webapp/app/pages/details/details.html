@@ -24,8 +24,8 @@
             <div ng-show="vm.data.groupCandidate">
                 <b>Gruppo Assegnatario: </b>{{vm.data.groupCandidate}} <br><br>
             </div>
-            <div ng-show="vm.data.userCandidate">
-                <b>Utente Assegnatario: </b>{{vm.data.userCandidate}} <br><br>
+            <div ng-show="vm.data.history[0].historyTask.assignee">
+                <b>Utente Assegnatario: </b>{{vm.data.history[0].historyTask.assignee}} <br><br>
             </div>
 
             <ul class="list-unstyled">

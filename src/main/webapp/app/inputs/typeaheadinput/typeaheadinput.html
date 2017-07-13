@@ -28,13 +28,14 @@
 </style>
 
 <input type="text"
-    ng-model="ngModel"
+    ng-model="localModel"
     ng-required="ngRequired"
-    placeholder="Digita il nome utente per avviare la ricerca"
-    uib-typeahead="user for user in loadUsers($viewValue)"
+    placeholder="Inizia a digitare per avviare la ricerca"
+    uib-typeahead="record as record.label for record in loadRecords($viewValue)"
+    typeahead-wait-ms=250
     typeahead-loading="loadingLocations"
     typeahead-no-results="noResults"
     typeahead-editable=false
     typeahead-min-length=3
-    typeahead-popup-template-url="app/inputs/userinput/userinput.popup.html"
+    typeahead-popup-template-url="app/inputs/typeaheadinput/typeaheadinput.popup.html"
     class="form-control">

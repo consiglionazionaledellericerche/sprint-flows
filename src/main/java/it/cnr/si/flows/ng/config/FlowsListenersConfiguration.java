@@ -2,6 +2,8 @@ package it.cnr.si.flows.ng.config;
 
 import it.cnr.si.flows.ng.listeners.MailNotificationListener;
 import it.cnr.si.flows.ng.listeners.SaveSummaryAtProcessCompletion;
+import it.cnr.si.flows.ng.listeners.VisibilitySetter;
+
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
@@ -72,6 +74,11 @@ public class FlowsListenersConfiguration {
                 appContext.getAutowireCapableBeanFactory().createBean(MailNotificationListener.class,
                                                                       AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
         runtimeService.addEventListener(mailSender);
+
+        VisibilitySetter visibilitySetter = (VisibilitySetter)
+                appContext.getAutowireCapableBeanFactory().createBean(VisibilitySetter.class,
+                                                                      AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
+        runtimeService.addEventListener(visibilitySetter);
 
 
     }
