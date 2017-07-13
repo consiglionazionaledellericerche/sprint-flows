@@ -46,6 +46,7 @@ public class AceBridgeService {
 			"OR tipoentitaorganizzativa.id = 41 " +
 			"OR tipoentitaorganizzativa.id = 42 " +
 			"OR tipoentitaorganizzativa.id = 43) " +
+			"AND (entitaorganizzativa.finevalidita IS NULL AND entitaorganizzativa.cdsuo <> 'SOPPRE') " +
 			"AND (entitaorganizzativa.sigla ilike ? OR entitaorganizzativa.denominazione ilike ?)";
 
 	private static final String denominazioneStruttura = "Select entitaorganizzativa.denominazione, entitaorganizzativa.sigla, entitaorganizzativa.denominazionebreve "
