@@ -34,6 +34,7 @@ public class MailConfguration {
 
     // --- //
 
+    // TODO thymeleaf si vuole gestire anche le pagine di errore (credo tutti gli endpoint con tipo di ritorno void)
     private ITemplateResolver htmlTemplateResolver() {
         final ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
         templateResolver.setOrder(Integer.valueOf(2));

@@ -16,7 +16,11 @@ import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 import it.cnr.si.flows.ng.ldap.FlowsAuthoritiesPopulator;
 
 /**
- * Created by francesco on 30/03/15.
+ * Modified my mtrycz
+ *
+ * Ho avuto bisogno di sovrascrivere questa configurazione da sprint-ldap, perche' uso un FlowsAuthoritiesPopulator customizzato
+ *
+ * TODO: Considerare l'opportunita' di spostare questa funzionalita' in sprint-flows
  */
 
 @Configuration

@@ -28,10 +28,10 @@ import java.util.List;
  * Created by cirone on 15/06/17.
  */
 @Configuration
-@AutoConfigureAfter(FlowsProcessEngineConfigurations.class)
-public class FlowsListenersConfiguration {
+@AutoConfigureAfter(ProcessEngineConfigurations.class)
+public class ListenersConfiguration {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FlowsListenersConfiguration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ListenersConfiguration.class);
     @Inject
     private ApplicationContext appContext;
     @Inject

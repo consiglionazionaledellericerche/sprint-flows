@@ -34,7 +34,13 @@ public class VisibilitySetter implements ActivitiEventListener {
 
     @Override
     public void onEvent(ActivitiEvent event) {
-        if (event.getType().equals(ActivitiEventType.TASK_CREATED)) {
+
+        if (event.getType().equals(ActivitiEventType.PROCESS_STARTED)) {
+
+            setDefaultVisibilityRulesForProcess(event);
+            setAdditionalVisibilityRulesForProcess(event);
+
+        } else if (event.getType().equals(ActivitiEventType.TASK_CREATED)) {
 
             ActivitiEntityEventImpl taskEvent = (ActivitiEntityEventImpl) event;
             TaskEntity task = (TaskEntity) taskEvent.getEntity();
@@ -45,21 +51,33 @@ public class VisibilitySetter implements ActivitiEventListener {
             String processDefinitionId = task.getProcessDefinitionId();
             String currentTaskKey = task.getTaskDefinitionKey();
 
-            setDefaultVisibilityRules(task.getId(), processInstanceId);
-            setAdditionalVisibilityRules(event, processInstanceId, processDefinitionId, currentTaskKey);
+            setDefaultVisibilityRulesForTask(task.getId(), processInstanceId);
+            setAdditionalVisibilityRulesForTask(event, processInstanceId, processDefinitionId, currentTaskKey);
 
         }
     }
 
 
-    private void setDefaultVisibilityRules(String taskId, String processInstanceId) {
+    private void setAdditionalVisibilityRulesForProcess(ActivitiEvent event) {
+        // TODO Auto-generated method stub
+
+    }
+
+
+    private void setDefaultVisibilityRulesForProcess(ActivitiEvent event) {
+        // TODO Auto-generated method stub
+        // supervisore, responsabile, supervisore per struttura, responsabile per struttura
+    }
+
+
+    private void setDefaultVisibilityRulesForTask(String taskId, String processInstanceId) {
         taskService.getIdentityLinksForTask(taskId).stream()
             .filter(l -> l.getType().equals(IdentityLinkType.CANDIDATE) && l.getGroupId() != null)
             .forEach(l -> runtimeService.addGroupIdentityLink(processInstanceId, l.getGroupId(), Utils.PROCESS_VISUALIZER));
     }
 
 
-    private void setAdditionalVisibilityRules(ActivitiEvent event, String processInstanceId, String processDefinitionId,
+    private void setAdditionalVisibilityRulesForTask(ActivitiEvent event, String processInstanceId, String processDefinitionId,
             String currentTaskKey) {
         List<String> groups = VisibilityMapping.GroupVisibilityMappingForProcessInstance.get(processDefinitionId +"-"+ currentTaskKey);
 

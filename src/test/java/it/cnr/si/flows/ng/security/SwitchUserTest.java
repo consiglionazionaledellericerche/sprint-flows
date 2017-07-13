@@ -28,7 +28,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import it.cnr.si.FlowsApp;
-import it.cnr.si.flows.ng.config.SwitchUserSecurityConfiguration;
+import it.cnr.si.security.SwitchUserSecurityConfiguration;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)

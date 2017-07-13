@@ -1,4 +1,4 @@
-package it.cnr.si.flows.ng.aop;
+package it.cnr.si.flows.ng.dto;
 
 import java.util.Collections;
 import java.util.List;
@@ -12,6 +12,15 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.interceptor.CommandContext;
 
+/**
+ * Questa classe permette di definire alcune query personalizzate sul db di activiti
+ *
+ * La query e' mappata in /src/main/resources/mapper/FlowsHistoricProcessInstanceMapper.xml
+ * e definisce i due nuovi parametri visibleToGroups e visibleToUser
+ *
+ * @author mtrycz
+ *
+ */
 public class FlowsHistoricProcessInstanceQuery extends HistoricProcessInstanceQueryImpl {
 
     private static final long serialVersionUID = -6296421487043345841L;

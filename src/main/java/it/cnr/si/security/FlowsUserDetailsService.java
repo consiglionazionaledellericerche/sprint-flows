@@ -1,6 +1,5 @@
 package it.cnr.si.security;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -15,7 +14,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.ldap.userdetails.LdapUserDetailsImpl;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +23,10 @@ import it.cnr.si.repository.UserRepository;
 import it.cnr.si.service.MembershipService;
 
 /**
- * Authenticate a user from the database.
+ * Authenticate a user from the database or LDAP
+ *
+ * @author mtrycz
+ * Estensione dell'UserDetailsService di sprint
  */
 @Component("flowsUserDetailsService")
 @Primary
