@@ -398,7 +398,7 @@
       <sequenceFlow id="flow106" sourceRef="predisposizione-ordine" targetRef="firma-ordine"></sequenceFlow>
       <sequenceFlow id="flow107" sourceRef="firma-ordine" targetRef="exclusivegateway23"></sequenceFlow>
       <userTask id="revoca-ordine" name="Revoca Ordine" activiti:candidateGroups="${gruppoRA}"></userTask>
-      <userTask id="modifica-ordine" name="Modifica Ordine" activiti:candidateGroups="{$gruppoRA}"></userTask>
+      <userTask id="modifica-ordine" name="Modifica Ordine" activiti:candidateGroups="${gruppoRA}"></userTask>
       <sequenceFlow id="flow108" sourceRef="exclusivegateway23" targetRef="modifica-ordine">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Modifica'}]]></conditionExpression>
       </sequenceFlow>
