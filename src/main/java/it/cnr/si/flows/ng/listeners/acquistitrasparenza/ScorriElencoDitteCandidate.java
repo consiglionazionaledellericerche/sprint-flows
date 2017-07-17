@@ -33,35 +33,29 @@ public class ScorriElencoDitteCandidate implements ExecutionListener {
 			execution.setVariable("nrElencoDitteTot", ditteCandidate.length());
 			execution.setVariable("nrElencoDitteCorrente", 1);
 			execution.setVariable("nrElencoDitteInit", "true");
-
 		} else
 		{			
 			execution.setVariable("nrElencoDitteCorrente", (int) execution.getVariable("nrElencoDitteCorrente") +1);
 		}
 		int nrElencoDitteCorrente = (int) execution.getVariable("nrElencoDitteCorrente");
-		JSONObject dittaCorrente = ditteCandidate.getJSONObject(nrElencoDitteCorrente);
-		execution.setVariable("pIvaCodiceFiscaleDittaAggiudicataria", dittaCorrente.get("pIvaCodiceFiscaleDittaCandidata"));
-		execution.setVariable("ragioneSocialeDittaAggiudicataria", dittaCorrente.get("ragioneSocialeDittaCandidata"));
-		if (nrTotaleDitte <= (int) execution.getVariable("nrElencoDitteCorrente")) 
-		{
-			execution.setVariable("ditteDisponibili", 0);
-			execution.setVariable("pIvaCodiceFiscaleDittaAggiudicataria", "NESSUNA");
-			execution.setVariable("ragioneSocialeDittaAggiudicataria", "NESSUNA");
-		}
+		JSONObject dittaCorrente = ditteCandidate.getJSONObject(nrElencoDitteCorrente -1);
 		String codiceVerificheRequisiti = execution.getVariable("verificheRequisitiid").toString();
 		if (codiceVerificheRequisiti.equals("1") || codiceVerificheRequisiti.equals("3"))
 		{
 			execution.setVariable("esitoVerificaRequisiti", "inviaRisultato");
-			dittaCorrente = ditteCandidate.getJSONObject(nrElencoDitteCorrente -1);
 			execution.setVariable("pIvaCodiceFiscaleDittaAggiudicataria", dittaCorrente.get("pIvaCodiceFiscaleDittaCandidata"));
 			execution.setVariable("ragioneSocialeDittaAggiudicataria", dittaCorrente.get("ragioneSocialeDittaCandidata"));
-		} else if (execution.getVariable("ditteDisponibili").toString().equals("0"))
+		} else if (nrTotaleDitte <= (int) execution.getVariable("nrElencoDitteCorrente")) 
 		{
+			execution.setVariable("pIvaCodiceFiscaleDittaAggiudicataria", "NESSUNA");
+			execution.setVariable("ragioneSocialeDittaAggiudicataria", "NESSUNA");
 			execution.setVariable("esitoVerificaRequisiti", "revocaConProvvedimento");
 		} else {
+			dittaCorrente = ditteCandidate.getJSONObject(nrElencoDitteCorrente);
+			execution.setVariable("pIvaCodiceFiscaleDittaAggiudicataria", dittaCorrente.get("pIvaCodiceFiscaleDittaCandidata"));
+			execution.setVariable("ragioneSocialeDittaAggiudicataria", dittaCorrente.get("ragioneSocialeDittaCandidata"));
 			execution.setVariable("esitoVerificaRequisiti", "procediAltroCandidato");
 			execution.setVariable("verificheRequisiti", "da verificare");
-
 		}
 	}
 }
