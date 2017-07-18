@@ -17,7 +17,8 @@ import com.zaxxer.hikari.HikariDataSource;
  * Per poter creare un datasource secondario, non posso piu' affidarmi all'autoconfigurazione
  * ma creare manualmente sia il datasource primario che il secondario.
  *
- * Il codice di creazione del datasource primario e' copia-incollato dall'autoconfigurazione di Spring Boot (inevitabile)
+ * Il codice di creazione del datasource primario e' copia-incollato dall'autoconfigurazione di Spring Boot
+ *
  *
  *
  * @author mtrycz

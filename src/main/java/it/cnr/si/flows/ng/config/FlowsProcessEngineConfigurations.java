@@ -30,9 +30,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
-public class ProcessEngineConfigurations {
+public class FlowsProcessEngineConfigurations {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessEngineConfigurations.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlowsProcessEngineConfigurations.class);
 
     @Value("${cnr.activiti.diagram-font}")
     private String diagramFont;

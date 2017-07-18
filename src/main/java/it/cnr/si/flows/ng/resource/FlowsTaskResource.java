@@ -27,7 +27,6 @@ import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
-import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.task.TaskResponse;
@@ -108,16 +107,13 @@ public class FlowsTaskResource {
 
         utils.orderTasks(order, taskQuery);
 
-        List<TaskResponse> tasksList = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
-        //aggiungo ad ogni singola TaskResponse la variabile che indica se il task è restituibile ad un gruppo (true)
-        // o se è stato assegnato ad un utente specifico "dal sistema" (false)
-        addIsReleasableVariables(tasksList);
+        List<TaskResponse> list = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
 
         DataResponse response = new DataResponse();
         response.setStart(firstResult);
-        response.setSize(tasksList.size());
+        response.setSize(list.size());
         response.setTotal(taskQuery.count());
-        response.setData(tasksList);
+        response.setData(list);
 
         return ResponseEntity.ok(response);
     }
@@ -151,13 +147,13 @@ public class FlowsTaskResource {
 
         utils.orderTasks(order, taskQuery);
 
-        List<TaskResponse> tasksList = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
+        List<TaskResponse> list = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
 
         DataResponse response = new DataResponse();
         response.setStart(firstResult);
-        response.setSize(tasksList.size());
+        response.setSize(list.size());
         response.setTotal(taskQuery.count());
-        response.setData(tasksList);
+        response.setData(list);
 
         return ResponseEntity.ok(response);
     }
@@ -211,20 +207,20 @@ public class FlowsTaskResource {
         //        List<TaskResponse> list = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
 
         List<TaskResponse> appo = restResponseFactory.createTaskResponseList(taskQuery.list());
-        List<TaskResponse> taskList = new ArrayList<>();
+        List<TaskResponse> list = new ArrayList<>();
 
         for (TaskResponse task : appo) {
             if (members.contains(task.getAssignee())) {
-                taskList.add(task);
+                list.add(task);
             }
         }
-        List<TaskResponse> responseList = taskList.subList(firstResult <= taskList.size() ? firstResult : taskList.size(),
-                                                           maxResults <= taskList.size() ? maxResults : taskList.size());
+        List<TaskResponse> responseList = list.subList(firstResult <= list.size() ? firstResult : list.size(),
+                                                       maxResults <= list.size() ? maxResults : list.size());
 
         DataResponse response = new DataResponse();
         response.setStart(firstResult);
         response.setSize(responseList.size());
-        response.setTotal(taskList.size());
+        response.setTotal(list.size());
         response.setData(responseList);
 
         return ResponseEntity.ok(response);
@@ -436,20 +432,6 @@ public class FlowsTaskResource {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Utils.mapOf("message", "Errore non gestito. Contattare gli amminstratori specificando il numero di riferimento: " + rif) );
         }
     }
-
-
-    private void addIsReleasableVariables(List<TaskResponse> tasks) {
-        for (TaskResponse task : tasks) {
-            RestVariable isUnclaimableVariable = new RestVariable();
-            isUnclaimableVariable.setName("isReleasable");
-            // if has candidate groups or users -> can release
-            isUnclaimableVariable.setValue(taskService.getIdentityLinksForTask(task.getId())
-                                                   .stream()
-                                                   .anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
-            task.getVariables().add(isUnclaimableVariable);
-        }
-    }
-
 
     /**
      * Funzionalità di Ricerca delle Process Instances.

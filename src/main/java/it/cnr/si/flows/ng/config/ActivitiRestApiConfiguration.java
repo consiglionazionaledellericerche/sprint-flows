@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 
 // TODO rimuovere prima di andare in produzione
 @Configuration
-@AutoConfigureAfter(ProcessEngineConfigurations.class)
+@AutoConfigureAfter(FlowsProcessEngineConfigurations.class)
 @ConditionalOnClass(name = {"org.activiti.rest.service.api.RestUrls", "org.springframework.web.servlet.DispatcherServlet"})
 public class ActivitiRestApiConfiguration {
 

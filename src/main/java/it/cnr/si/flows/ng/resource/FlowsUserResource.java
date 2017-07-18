@@ -1,8 +1,7 @@
 package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
-
-import it.cnr.si.flows.ng.dto.FlowsHistoricProcessInstanceQuery;
+import it.cnr.si.flows.ng.aop.FlowsHistoricProcessInstanceQuery;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.security.AuthoritiesConstants;
 import org.activiti.engine.ManagementService;
