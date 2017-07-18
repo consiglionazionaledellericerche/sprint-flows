@@ -1,28 +1,12 @@
 package it.cnr.si.flows.ng.service;
 
-import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
-import static it.cnr.si.flows.ng.utils.Utils.ASC;
-import static it.cnr.si.flows.ng.utils.Utils.DESC;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.ManagementService;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
+import com.opencsv.CSVWriter;
+import it.cnr.si.domain.View;
+import it.cnr.si.flows.ng.aop.FlowsHistoricProcessInstanceQuery;
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.utils.Utils;
+import it.cnr.si.repository.ViewRepository;
+import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
@@ -42,15 +26,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import com.opencsv.CSVWriter;
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.ParseException;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import it.cnr.si.domain.View;
-import it.cnr.si.flows.ng.aop.FlowsHistoricProcessInstanceQuery;
-import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.utils.Utils;
-import it.cnr.si.repository.ViewRepository;
+import static it.cnr.si.flows.ng.utils.Utils.*;
 
 /**
  * Created by cirone on 15/06/17.
@@ -96,7 +81,7 @@ public class FlowsProcessInstanceService {
 
         final Map<String, Object> identityLinks = new LinkedHashMap<>();
         Map<String, Object> processLinks = new HashMap<>();
-        processLinks.put("links", restResponseFactory.createRestIdentityLinks(runtimeService.getIdentityLinksForProcessInstance(processInstanceId)));
+        processLinks.put("links", restResponseFactory.createHistoricIdentityLinkResponseList(historyService.getHistoricIdentityLinksForProcessInstance(processInstanceId)));
         identityLinks.put("process", processLinks);
         taskService.createTaskQuery().processInstanceId(processInstanceId).active().list().forEach(
                 task -> {
