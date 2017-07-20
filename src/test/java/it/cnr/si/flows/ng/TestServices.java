@@ -105,17 +105,19 @@ public class TestServices {
                 break;
             }
         }
+
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
         req.setParameter("processDefinitionId", processDefinition);
         if (processDefinitionKey.equals("acquisti-trasparenza")) {
             req.setParameter("titoloIstanzaFlusso", TITOLO_DELL_ISTANZA_DEL_FLUSSO);
             req.setParameter("descrizioneAcquisizione", "descrizione");
-            req.setParameter("tipologiaAcquisizioneI", "procedura aperta");
+            req.setParameter("tipologiaAcquisizione", "procedura aperta");
             req.setParameter("tipologiaAcquisizioneId", "11");
             req.setParameter("strumentoAcquisizione", "AFFIDAMENTO DIRETTO - MEPA o CONSIP\n");
             req.setParameter("strumentoAcquisizioneId", "11");
             req.setParameter("priorita", "Alta");
-            req.setParameter("rup", "spaclient");
+            req.setParameter("rup", "marco.spasiano");
+            req.setParameter("rup_label", "MARCO SPASIANO (marco.spasiano)");
             req.setParameter("impegni_json", "[{\"numero\":\"1\",\"importo\":100,\"descrizione\":\"descrizione impegno\",\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"gae\":\"spaclient\"}]");
         }
         ResponseEntity<Object> response = flowsTaskResource.completeTask(req);
