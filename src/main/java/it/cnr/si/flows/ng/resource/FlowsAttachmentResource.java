@@ -7,6 +7,7 @@ import it.cnr.si.security.AuthoritiesConstants;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -126,12 +127,13 @@ public class FlowsAttachmentResource {
             @PathVariable("processInstanceId") String processInstanceId,
             @PathVariable("attachmentName") String attachmentName) throws IOException {
 
-        FlowsAttachment attachment = (FlowsAttachment) historyService.createHistoricVariableInstanceQuery()
+        List<HistoricVariableInstance> list = historyService.createHistoricVariableInstanceQuery()
                 .processInstanceId(processInstanceId)
-                .variableName(attachmentName).singleResult().getValue();
+                .variableName(attachmentName)
+                .list();
+        FlowsAttachment attachment = (FlowsAttachment) list.get(0).getValue();
 
         response.setContentLength(attachment.getBytes().length);
-
         ServletOutputStream output = response.getOutputStream();
         response.setContentType(attachment.getMimetype());
         ByteArrayInputStream baos = new ByteArrayInputStream(attachment.getBytes());

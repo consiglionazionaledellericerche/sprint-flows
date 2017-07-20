@@ -20,6 +20,7 @@
                     vm.data.history = response.data.history;
                     //in response.data.entity.variables ci sono anche le properties della Process Instance (initiator, startdate, ecc.)
                     vm.data.startEvent = response.data.entity.variables;
+                    //todo: rivedere perché il service per vedere gli attachments del flusso viene richiamato due volte nella pagina dei "dettagli" (prima viene chiamato da questo service per popolare il campo "attachments" e poi viene chiamato dalla direttiva "attachment" (loadAttachments)
                     vm.data.attachments = response.data.attachments;
                     vm.data.identityLinks = response.data.identityLinks;
                     vm.diagramUrl = '/rest/diagram/processInstance/' + vm.data.entity.id + "?" + new Date().getTime();
