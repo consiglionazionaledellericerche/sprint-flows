@@ -78,6 +78,16 @@
                 return {
                     "processParams": processParams
                 };
+            },
+            parseAttachments: function(attachments) {
+                if (attachments) {
+                    var appo = [];
+                    for (var attachment in attachments) {
+                        delete attachments[attachment].bytes;
+                        appo.push(attachments[attachment]);
+                    }
+                    return appo;
+                }
             }
         };
     }

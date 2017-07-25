@@ -96,6 +96,10 @@
             utils.downloadFile(url, filename, mimetype);
         }
 
+        $scope.parseAttachments = function(attachments) {
+            return utils.parseAttachments(attachments);
+        }
+
         function isObject(value) {
           if (value === null ||
               typeof value !== 'object' ||

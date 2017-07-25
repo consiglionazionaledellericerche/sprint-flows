@@ -32,10 +32,9 @@
                 <ng-include src="vm.detailsView"/>
             </ul>
 
-
-
             <h4>Documenti</h4>
-            <attachments process-instance-id="{{processInstanceId}}" attachments="{{parse(vm.data.attachments)}}"/>
+            <attachments process-instance-id="{{processInstanceId}}"
+                         attachments="{{parseAttachments(vm.data.attachments)}}"/>
 
             <div has-authority="ROLE_ADMIN">
                 <h4>Tutte le variabili</h4>

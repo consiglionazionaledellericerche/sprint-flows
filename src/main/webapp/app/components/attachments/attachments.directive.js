@@ -18,9 +18,6 @@
                 showHistory: '@?'
             },
             link: function($scope, element, attrs) {
-
-
-
                 $scope.showHistory = $scope.showHistory === undefined ? true : $scope.showHistory;
 
                 function setResponse(response) {
@@ -54,11 +51,11 @@
                     utils.downloadFile(url, filename, mimetype);
                 }
 
+
                 $scope.$watchGroup(['attachments'], function() {
                     if (typeof $scope.attachments === 'string' && $scope.attachments.length > 0)
                         $scope.attachments = JSON.parse($scope.attachments);
                 });
-
 
 
                 $scope.showFileHistory = function(attachmentName) {
