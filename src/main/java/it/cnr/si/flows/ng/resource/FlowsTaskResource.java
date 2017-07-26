@@ -503,7 +503,7 @@ public class FlowsTaskResource {
             query.processDefinitionKey(processDefinition);
 
         query = (HistoricTaskInstanceQuery) utils.orderTasks(order, query);
-
+        //seleziono solo i task in cui il TASK_EXECUTOR sia l'utente che sta facendo la richiesta
         List<HistoricTaskInstance> taskList = new ArrayList<>();
         for (HistoricTaskInstance task : query.list()) {
             List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForTask(task.getId());
