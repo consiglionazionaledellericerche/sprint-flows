@@ -27,6 +27,7 @@ import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
+import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.task.TaskResponse;
@@ -107,13 +108,17 @@ public class FlowsTaskResource {
 
         utils.orderTasks(order, taskQuery);
 
-        List<TaskResponse> list = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
+        List<TaskResponse> tasksList = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
+
+        //aggiungo ad ogni singola TaskResponse la variabile che indica se il task è restituibile ad un gruppo (true)
+        // o se è stato assegnato ad un utente specifico "dal sistema" (false)
+        addIsReleasableVariables(tasksList);
 
         DataResponse response = new DataResponse();
         response.setStart(firstResult);
-        response.setSize(list.size());
+        response.setSize(tasksList.size());
         response.setTotal(taskQuery.count());
-        response.setData(list);
+        response.setData(tasksList);
 
         return ResponseEntity.ok(response);
     }
@@ -432,6 +437,20 @@ public class FlowsTaskResource {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Utils.mapOf("message", "Errore non gestito. Contattare gli amminstratori specificando il numero di riferimento: " + rif) );
         }
     }
+
+
+    private void addIsReleasableVariables(List<TaskResponse> tasks) {
+        for (TaskResponse task : tasks) {
+            RestVariable isUnclaimableVariable = new RestVariable();
+            isUnclaimableVariable.setName("isReleasable");
+            // if has candidate groups or users -> can release
+            isUnclaimableVariable.setValue(taskService.getIdentityLinksForTask(task.getId())
+                                                   .stream()
+                                                   .anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
+            task.getVariables().add(isUnclaimableVariable);
+        }
+    }
+
 
     /**
      * Funzionalità di Ricerca delle Process Instances.
