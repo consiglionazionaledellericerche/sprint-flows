@@ -22,7 +22,7 @@
                     vm.data.history = response.data.history;
                     //in response.data.entity.variables ci sono anche le properties della Process Instance (initiator, startdate, ecc.)
                     vm.data.startEvent = response.data.entity.variables;
-                    vm.data.attachments = response.data.attachments;
+                    vm.data.attachments = utils.parseAttachments(response.data.attachments);
                     vm.data.identityLinks = response.data.identityLinks;
                     vm.diagramUrl = '/rest/diagram/processInstance/' + vm.data.entity.id + "?" + new Date().getTime();
 
@@ -50,11 +50,6 @@
         $scope.exportSummary = function(url, filename) {
             utils.downloadFile(url, filename, 'application/pdf');
         };
-
-
-        $scope.parseAttachments = function(attachments) {
-            return utils.parseAttachments(attachments);
-        }
 
 
         $scope.editVariable = function(variableName, currentValue) {
