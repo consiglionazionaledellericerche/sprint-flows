@@ -54,7 +54,7 @@ public class AccountResource {
             method = RequestMethod.POST,
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
     @Timed
-    public ResponseEntity<?> registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM, HttpServletRequest request) {
+    public ResponseEntity<Void> registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
@@ -68,7 +68,7 @@ public class AccountResource {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<?> activateAccount(@RequestParam(value = "key") String key) {
+    public ResponseEntity<Void> activateAccount(@RequestParam(value = "key") String key) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
@@ -137,7 +137,7 @@ public class AccountResource {
             method = RequestMethod.POST,
             produces = MediaType.TEXT_PLAIN_VALUE)
     @Timed
-    public ResponseEntity<?> changePassword(@RequestBody String password) {
+    public ResponseEntity<Void> changePassword(@RequestBody String password) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
@@ -152,7 +152,7 @@ public class AccountResource {
             method = RequestMethod.POST,
             produces = MediaType.TEXT_PLAIN_VALUE)
     @Timed
-    public ResponseEntity<?> requestPasswordReset(@RequestBody String mail, HttpServletRequest request) {
+    public ResponseEntity<Void> requestPasswordReset(@RequestBody String mail, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
@@ -167,7 +167,7 @@ public class AccountResource {
             method = RequestMethod.POST,
             produces = MediaType.TEXT_PLAIN_VALUE)
     @Timed
-    public ResponseEntity<?> finishPasswordReset(@RequestBody KeyAndPasswordVM keyAndPassword) {
+    public ResponseEntity<Void> finishPasswordReset(@RequestBody KeyAndPasswordVM keyAndPassword) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 }
