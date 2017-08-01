@@ -7,7 +7,6 @@ import it.cnr.si.flows.ng.service.FlowsProcessDiagramService;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
-import org.activiti.engine.RuntimeService;
 import org.activiti.engine.impl.util.json.JSONArray;
 import org.activiti.engine.impl.util.json.JSONObject;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
@@ -16,6 +15,7 @@ import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,53 +98,62 @@ public class SummaryPdfService {
         //variabili da visualizzare per forza (se presenti)
         for (RestVariable var : variables) {
             String variableName = var.getName();
-            if (variableName.equals("initiator")) {
-                paragraphField.addText("Avviato da: " + var.getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
+            switch (variableName) {
+                case "initiator":
+                    paragraphField.addText("Avviato da: " + var.getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
+                    break;
+                case "startDate":
+                    if (var.getValue() != null)
+                        paragraphField.addText("Avviato il: " + formatDate(Utils.parsaData((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
 
-            } else if (variableName.equals("startDate")) {
-                if (var.getValue() != null)
-                    paragraphField.addText("Avviato il: " + formatDate(Utils.parsaData((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
+                    break;
+                case "endDate":
+                    if (var.getValue() != null)
+                        paragraphField.addText("Terminato il: " + formatDate(Utils.parsaData((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
 
-            } else if (variableName.equals("endDate")) {
-                if (var.getValue() != null)
-                    paragraphField.addText("Terminato il: " + formatDate(Utils.parsaData((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
+                    break;
+                case "gruppoRA":
+                    paragraphField.addText("Gruppo Responsabile Acquisti: " + var.getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
 
-            } else if (variableName.equals("gruppoRA")) {
-                paragraphField.addText("Gruppo Responsabile Acquisti: " + var.getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
-
-            } else if (variableName.equals("impegniVeri")) {
-                paragraphField.addText("Lista Impegni: \n", FONT_SIZE, HELVETICA_BOLD);
-                JSONArray impegni = new JSONArray((String) var.getValue());
-                for (int i = 0; i < impegni.length(); i++) {
-                    JSONObject impegno = impegni.getJSONObject(i);
-
-                    addLine(paragraphField, "Impegno numero " + (i + 1), "", true, false);
-                    JSONArray keys = impegno.names();
-                    for (int j = 0; j < keys.length(); j++) {
-                        String key = keys.getString(j);
-                        addLine(paragraphField, key, impegno.getString(key), true, true);
-                    }
-                }
-                //  Fine del markup indentato
-                paragraphField.addMarkup("-!\n", FONT_SIZE, BaseFont.Helvetica);
+                    break;
             }
         }
 
-        //variabili "visibili" (cioè presenti nella view nel db
+        //variabili "visibili" (cioè presenti nella view nel db)
         View viewToDb = viewRepository.getViewByProcessidType(processInstance.getProcessDefinitionId().split(":")[0], "detail");
         Elements metadatums = Jsoup.parse(viewToDb.getView()).getElementsByTag("metadatum");
         for (org.jsoup.nodes.Element metadatum : metadatums) {
-            String[] appo = metadatum.val().replace("{", "").replace("}", "").replace("$", "").split("\\.");
-            String property = appo[appo.length - 1];
+            String label = metadatum.attr("label");
+            String type = metadatum.attr("type");
 
-            variable = variables.stream()
-                    .filter(a -> (a.getName()).equals(property))
-                    .findFirst();
+            if (type.equals("table")) {
+                variable = variables.stream()
+                        .filter(a -> (a.getName()).equals(getPropertyName(metadatum, "rows")))
+                        .findFirst();
+                if (variable.isPresent()) {
+                    paragraphField.addText(label + ":\n", FONT_SIZE, HELVETICA_BOLD);
+                    JSONArray impegni = new JSONArray((String) variable.get().getValue());
+                    for (int i = 0; i < impegni.length(); i++) {
+                        JSONObject impegno = impegni.getJSONObject(i);
 
-            if (variable.isPresent()) {
-                variables.remove(variable.get());
-                String label = metadatum.getElementsByAttribute("label").get(0).attr("label");
-                paragraphField.addText(label + ": " + variable.get().getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
+                        addLine(paragraphField, "Impegno numero " + (i + 1), "", true, false);
+                        JSONArray keys = impegno.names();
+                        for (int j = 0; j < keys.length(); j++) {
+                            String key = keys.getString(j);
+                            addLine(paragraphField, key, impegno.getString(key), true, true);
+                        }
+                    }
+                    //Fine del markup indentato
+                    paragraphField.addMarkup("-!\n", FONT_SIZE, BaseFont.Helvetica);
+                }
+            } else {
+                variable = variables.stream()
+                        .filter(a -> (a.getName()).equals(getPropertyName(metadatum, "value")))
+                        .findFirst();
+                if (variable.isPresent()) {
+                    variables.remove(variable.get());
+                    paragraphField.addText(label + ": " + variable.get().getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
+                }
             }
         }
 
@@ -171,8 +180,16 @@ public class SummaryPdfService {
         return fileName;
     }
 
+    private String getPropertyName(Element metadatum, String attr) {
+        String propertyName = "";
+        propertyName = metadatum.attr(attr);
+        propertyName = propertyName.substring(propertyName.lastIndexOf('.') + 1).replaceAll("}", "");
+        return propertyName;
+    }
+
 
     private void makeHistory(Paragraph paragraphHistory, ArrayList<Map> tasksSortedList) throws IOException {
+        intestazione(paragraphHistory, "Cronologia task del flusso:");
         for (Map task : tasksSortedList) {
             HistoricTaskInstanceResponse historyTask = (HistoricTaskInstanceResponse) task.get("historyTask");
             ArrayList<HistoricIdentityLinkResponse> historyIdentityLinks = (ArrayList<HistoricIdentityLinkResponse>) task.get("historyIdentityLink");

@@ -32,10 +32,9 @@
                 <ng-include src="vm.detailsView"/>
             </ul>
 
-
-
             <h4>Documenti</h4>
-            <attachments process-instance-id="{{processInstanceId}}"/>
+            <attachments process-instance-id="{{processInstanceId}}"
+                         attachments="{{vm.data.attachments}}"/>
 
             <div has-authority="ROLE_ADMIN">
                 <h4>Tutte le variabili</h4>
@@ -51,11 +50,13 @@
       <div has-authority="ROLE_ADMIN">
                 <h4>Identity Links</h4>
                 <span ng-repeat="(taskId, link) in vm.data.identityLinks">
-                    TaskId - <strong>{{ taskId }}:</strong> <br>
-                    (Assignee: {{link.assignee || null}}, Candidate Users: {{link.candidateUsers}}, Candidate Groups: {{link.candidateGroups}})<br>
+                    <div ng-show="link.assignee || link.candidateUsers || link.candidateGroup">
+                        TaskId - <strong>{{ taskId }}:</strong> <br>
+                        (Assignee: {{link.assignee || null}}, Candidate Users: {{link.candidateUsers}}, Candidate Groups: {{link.candidateGroups}})<br>
+                    </div>
                     <span ng-repeat="actualLink in link.links">
                       <strong>{{ actualLink.type }}:</strong>
-                      {{ actualLink.user || actualLink.group }}
+                      {{ actualLink.user || actualLink.group || actualLink.groupId || actualLink.userId}}
                       <br>
                     </span>
                 </span>

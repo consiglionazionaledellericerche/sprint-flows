@@ -17,6 +17,7 @@
       templateUrl: 'app/inputs/typeaheadinput/typeaheadinput.html',
       scope: {
         ngModel: '=',
+        labelModel: '=',
         type: '@',
         ngRequired: '@'
       },
@@ -24,10 +25,12 @@
 
         $scope.localModel = undefined;
 
-        $scope.$watch('localModel', function(newVal, otherVal) {
-          if (newVal)
+        $scope.$watch('localModel', function(newVal) {
+          if (newVal) {
             $scope.ngModel = newVal.value;
-        })
+            $scope.labelModel = newVal.label;
+          }
+        });
 
         $scope.loadRecords = function(filter) {
           if ($scope.type === "users"){
