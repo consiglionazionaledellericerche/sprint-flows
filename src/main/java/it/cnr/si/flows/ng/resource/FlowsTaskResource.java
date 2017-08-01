@@ -38,6 +38,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -363,9 +364,15 @@ public class FlowsTaskResource {
         }
     }
 
+    //TODO ??? probabilmente un refuso
+    public boolean canCompleteTask(MultipartHttpServletRequest req) {
+        return true;
+    }
+
     // TODO verificare almeno che l'utente abbia i gruppi necessari
     @RequestMapping(value = "complete", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured(AuthoritiesConstants.USER)
+//    @Secured(AuthoritiesConstants.USER)
+    @PreAuthorize("canCompleteTask(#req)")
     @Timed
     public ResponseEntity<Object> completeTask(MultipartHttpServletRequest req) {
 
