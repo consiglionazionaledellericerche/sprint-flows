@@ -21,8 +21,8 @@
     </prerequisites>
 
     <scm>
-        <connection>scm:git:ssh://git@git.si.cnr.it/dev/sprint-ace.git</connection>
-        <developerConnection>scm:git:ssh://git@git.si.cnr.it/dev/sprint-ace.git</developerConnection>
+        <connection>scm:git:ssh://git@git.si.cnr.it/dev/sprint-flows.git</connection>
+        <developerConnection>scm:git:ssh://git@git.si.cnr.it/dev/sprint-flows.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
