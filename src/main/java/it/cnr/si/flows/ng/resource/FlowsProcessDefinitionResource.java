@@ -63,8 +63,7 @@ public class FlowsProcessDefinitionResource {
         return response;
     }
 
-
-
+    // TODO sembra rudimentale, ma per ora non ho voglia di farlo piu' complicato di quanto serva - Martin
     private List<ProcessDefinition> filterAuthorizedDefinitionsForUser(List<ProcessDefinition> listraw) {
         Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
 
