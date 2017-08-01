@@ -40,7 +40,7 @@
                     vm.data.entity = utils.refactoringVariables([response.data.task])[0];
 
                     vm.taskVariables = utils.refactoringVariables(response.data.task).variabili;
-                    vm.attachments = response.data.attachments;
+                    vm.attachments = utils.parseAttachments(response.data.attachments);
                     vm.attachmentsList = response.data.attachmentsList;
                     vm.diagramUrl = '/rest/diagram/taskInstance/'+ vm.data.taskId +"?"+ new Date().getTime();
                     vm.formUrl = 'api/forms/task/'+ vm.data.taskId;
