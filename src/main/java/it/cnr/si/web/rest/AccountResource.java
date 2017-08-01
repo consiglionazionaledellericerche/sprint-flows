@@ -24,6 +24,9 @@ import java.util.Optional;
 
 /**
  * REST controller for managing the current user's account.  Url and service to create and modify user's account are Forbidden
+ *
+ * Abbiamo inibito la possibilità di creare e modificare gli utenti perchè gli utenti di sprint-flows sono utenti
+ * autenticati con LDAP quindi non possono modificare le credenziali o crearne di nuove dall'applicazione
  */
 @RestController
 @RequestMapping("/api")
