@@ -48,6 +48,7 @@
         <spring.security.version>4.1.1.RELEASE</spring.security.version>
         <spring.version>4.3.2.RELEASE</spring.version>
         <sprint.version>2.0.1</sprint.version>
+        <activiti.version>5.22.0</activiti.version>
         <start-class>it.cnr.si.FlowsApp</start-class>
     </properties>
 
@@ -166,19 +167,19 @@
         <dependency>
             <groupId>org.activiti</groupId>
             <artifactId>activiti-spring-boot-starter-actuator</artifactId>
-            <version>5.22.0</version>
+            <version>${activiti.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.activiti/activiti-spring-boot-starter-basic -->
         <dependency>
             <groupId>org.activiti</groupId>
             <artifactId>activiti-spring-boot-starter-basic</artifactId>
-            <version>5.22.0</version>
+            <version>${activiti.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.activiti/activiti-spring-boot-starter-rest-api -->
         <dependency>
             <groupId>org.activiti</groupId>
             <artifactId>activiti-spring-boot-starter-rest-api</artifactId>
-            <version>5.22.0</version>
+            <version>${activiti.version}</version>
         </dependency>
         <!--BUONA versione vecchia di pdfbox (exportPdf)-->
         <dependency>

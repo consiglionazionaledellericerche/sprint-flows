@@ -2,8 +2,8 @@ package it.cnr.si.flows.ng.service;
 
 import com.opencsv.CSVWriter;
 import it.cnr.si.domain.View;
-import it.cnr.si.flows.ng.aop.FlowsHistoricProcessInstanceQuery;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
 import org.activiti.engine.*;
