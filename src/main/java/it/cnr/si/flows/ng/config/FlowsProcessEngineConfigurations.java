@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.naming.ConfigurationException;
+
 import org.activiti.engine.FormService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
@@ -32,6 +34,8 @@ import com.zaxxer.hikari.HikariDataSource;
 @Configuration
 public class FlowsProcessEngineConfigurations {
 
+    private static final String ACTIVITI_VERSION = "5.22.0";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsProcessEngineConfigurations.class);
 
     @Value("${cnr.activiti.diagram-font}")
@@ -45,7 +49,7 @@ public class FlowsProcessEngineConfigurations {
     private ApplicationContext appContext;
 
     @Bean
-    public SpringProcessEngineConfiguration getProcessEngineConfiguration() {
+    public SpringProcessEngineConfiguration getProcessEngineConfiguration() throws ConfigurationException {
 
         SpringProcessEngineConfiguration conf = new SpringProcessEngineConfiguration();
 
@@ -78,6 +82,16 @@ public class FlowsProcessEngineConfigurations {
 
         // FULL serve per la storia dei documenti
         conf.setHistoryLevel(HistoryLevel.FULL);
+
+        // abbiamo implementato delle query custom
+        // @See it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery.java
+
+        // Check di sicurezza.
+        // se abbiamo aggiornato la versione di activiti,
+        // vanno aggiornati anche il mapper e la classe Query e bumpata la versione qui a mano
+        if (!conf.getClass().getPackage().getImplementationVersion().equals(ACTIVITI_VERSION))
+            throw new ConfigurationException("La versione di Activiti non e' supportata, aggiornare le classi che estendono Historic Query "
+                    + "e bumpare la versione");
 
         Set<String> customXmlBatisMappers = new HashSet<>();
         customXmlBatisMappers.add("mapper/FlowsHistoricProcessInstanceMapper.xml");

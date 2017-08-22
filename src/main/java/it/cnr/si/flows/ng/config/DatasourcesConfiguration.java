@@ -19,7 +19,7 @@ import com.zaxxer.hikari.HikariDataSource;
  *
  * Il codice di creazione del datasource primario e' copia-incollato dall'autoconfigurazione di Spring Boot
  *
- *
+ * Il datasource secondario attualmente serve per connettersi ad ACE e ricercare appartenenza a gruppi (in readonly)
  *
  * @author mtrycz
  *
