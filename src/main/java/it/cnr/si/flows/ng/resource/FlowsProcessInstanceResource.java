@@ -217,6 +217,7 @@ public class FlowsProcessInstanceResource {
 	 * @return le response entity frutto della ricerca
 	 */
 	@RequestMapping(value = "/search/{processInstanceId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@Secured(AuthoritiesConstants.USER)
 	@Timed
 	public ResponseEntity<Object> search(
 			HttpServletRequest req,
@@ -244,6 +245,7 @@ public class FlowsProcessInstanceResource {
 	 * @throws IOException the io exception
 	 */
 	@RequestMapping(value = "/exportCsv/{processInstanceId}", headers = "Accept=application/vnd.ms-excel", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = "application/vnd.ms-excel")
+    @Secured(AuthoritiesConstants.USER)
 	@Timed
 	public void exportCsv(
 			HttpServletRequest req,

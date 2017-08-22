@@ -22,14 +22,14 @@ public class AceBridgeService {
 
 	private static final String groupsForUser = "SELECT persona.nome, persona.cognome, persona.userid, persona.id, ruolo.sigla, ruolo.descr, ruolo.id,entitaorganizzativa.sigla, entitaorganizzativa.denominazione, entitaorganizzativa.id as eoid "+
 			"FROM ace.assegnazioneruolo "+
-			"INNER JOIN ace.persona ON persona.id = assegnazioneruolo.persona_id "+
+			"INNER JOIN ace.persona ON persona.id = assegnazioneruolo.ass_persona_id "+
 			"INNER JOIN ace.ruolo ON ruolo.id = assegnazioneruolo.ruolo_id "+
 			"INNER JOIN ace.entitaorganizzativa ON entitaorganizzativa.id = assegnazioneruolo.entitaorganizzativa_id "+
-			"where assegnazioneruolo.persona_id = (SELECT id FROM ace.persona WHERE persona.userid = ?)";
+			"where assegnazioneruolo.ass_persona_id = (SELECT id FROM ace.persona WHERE persona.userid = ?)";
 
 	private static final String usersInRole = "SELECT persona.nome, persona.cognome, persona.id, persona.userid, ruolo.sigla, ruolo.descr, ruolo.id,entitaorganizzativa.sigla, entitaorganizzativa.denominazione, entitaorganizzativa.id "+
 			"FROM ace.assegnazioneruolo "+
-			"INNER JOIN ace.persona ON persona.id = assegnazioneruolo.persona_id "+
+			"INNER JOIN ace.persona ON persona.id = assegnazioneruolo.ass_persona_id "+
 			"INNER JOIN ace.ruolo ON ruolo.id = assegnazioneruolo.ruolo_id "+
 			"INNER JOIN ace.entitaorganizzativa ON entitaorganizzativa.id = assegnazioneruolo.entitaorganizzativa_id "+
 			"where ruolo.sigla = ?  "+
@@ -84,12 +84,12 @@ public class AceBridgeService {
 	    public List<Pair<Integer, String>> getUoLike(String uoName) {
 	    	uoName = "%" + uoName + "%";
 			Object[] args = new Object[] {uoName, uoName};
-			
+
 			return aceJdbcTemplate.query(uoLike, args, new RowMapper<Pair<Integer, String>>() {
 	            @Override
 	            public Pair<Integer, String> mapRow(ResultSet rs, int rowNum) throws SQLException {
 	            	Integer idUo = rs.getInt("id");
-	            	
+
 	            	String sigla = rs.getString("sigla");
 	            	if(sigla == null){
 	            		sigla = " ";

@@ -72,7 +72,7 @@ public class FlowsProcessInstanceResourceTest {
     }
 
     @Test
-    public void testGetMyProcesses() {
+    public void testGetMyProcesses() throws IOException {
         processInstance = util.mySetUp("acquisti-trasparenza");
         String processInstanceID = verifyMyProcesses(1, 0);
         // testo che, anche se una Process Instance viene sospesa, la vedo ugualmente
@@ -115,7 +115,7 @@ public class FlowsProcessInstanceResourceTest {
     }
 
     @Test
-    public void testGetProcessInstances() {
+    public void testGetProcessInstances() throws IOException {
         processInstance = util.mySetUp("acquisti-trasparenza");
         //Recupero la Process Definition per acquisti-trasparenza
         util.loginUser();
@@ -188,7 +188,7 @@ public class FlowsProcessInstanceResourceTest {
     }
 
     @Test
-    public void testSearchProcessInstances() throws ParseException {
+    public void testSearchProcessInstances() throws ParseException, IOException {
         processInstance = util.mySetUp("acquisti-trasparenza");
         util.loginAdmin();
         MockHttpServletRequest req = new MockHttpServletRequest();

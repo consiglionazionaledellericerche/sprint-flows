@@ -3,6 +3,7 @@ package it.cnr.si.flows.ng.resource;
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.exception.FlowsPermissionException;
+import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
 import it.cnr.si.flows.ng.service.CounterService;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.utils.Utils;
@@ -141,9 +142,9 @@ public class FlowsTaskResource {
         String username = SecurityUtils.getCurrentUserLogin();
         List<String> authorities =
                 SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .map(Utils::removeLeadingRole)
-                        .collect(Collectors.toList());
+                .map(GrantedAuthority::getAuthority)
+                .map(Utils::removeLeadingRole)
+                .collect(Collectors.toList());
 
         TaskQuery taskQuery = taskService.createTaskQuery()
                 .taskCandidateUser(username)
@@ -225,7 +226,7 @@ public class FlowsTaskResource {
             }
         }
         List<TaskResponse> responseList = list.subList(firstResult <= list.size() ? firstResult : list.size(),
-                                                       maxResults <= list.size() ? maxResults : list.size());
+                maxResults <= list.size() ? maxResults : list.size());
 
         DataResponse response = new DataResponse();
         response.setStart(firstResult);
@@ -237,6 +238,7 @@ public class FlowsTaskResource {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    // TODO @PreAuthorize("@flowsTaskResource.blablabla")
     @Timed
     public ResponseEntity<Map<String, Object>> getTask(@PathVariable("id") String taskId) {
 
@@ -256,13 +258,9 @@ public class FlowsTaskResource {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * @param req
-     * @param taskId
-     * @param params
-     * @return
-     */
+
     @RequestMapping(value = "/claim/{taskId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<Map<String, Object>> claimTask(@PathVariable("taskId") String taskId) {
 
@@ -298,7 +296,9 @@ public class FlowsTaskResource {
         }
     }
 
+
     @RequestMapping(value = "/claim/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<Map<String, Object>> unclaimTask(@PathVariable("id") String id) {
 
@@ -327,6 +327,7 @@ public class FlowsTaskResource {
     }
 
     @RequestMapping(value = "/{id}/{user}", method = RequestMethod.PUT)
+    @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<Map<String, Object>> assignTask(
             HttpServletRequest req,
@@ -363,9 +364,9 @@ public class FlowsTaskResource {
             List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
             List<String> authorities =
                     flowsUserDetailsService.loadUserByUsername(username).getAuthorities().stream()
-                            .map(GrantedAuthority::getAuthority)
-                            .map(Utils::removeLeadingRole)
-                            .collect(Collectors.toList());
+                    .map(GrantedAuthority::getAuthority)
+                    .map(Utils::removeLeadingRole)
+                    .collect(Collectors.toList());
 
             return identityLinks.stream()
                     .filter(l -> l.getType().equals("candidate"))
@@ -385,66 +386,51 @@ public class FlowsTaskResource {
         }
     }
 
-    // TODO verificare almeno che l'utente abbia i gruppi necessari
+
     @RequestMapping(value = "complete", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("@flowsTaskResource.canCompleteTaskOrStartProcessInstance(#req)")
     @Timed
-    public ResponseEntity<Object> completeTask(MultipartHttpServletRequest req) {
+    public ResponseEntity<Object> completeTask(MultipartHttpServletRequest req) throws IOException {
 
         String username = SecurityUtils.getCurrentUserLogin();
 
         String taskId = (String) req.getParameter("taskId");
         String definitionId = (String) req.getParameter("processDefinitionId");
         if ( isEmpty(taskId) && isEmpty(definitionId) )
-            return ResponseEntity.badRequest().body("{'success': false, 'message': 'Fornire almeno un taskId o un definitionId'}");
+            throw new ProcessDefinitionAndTaskIdEmptyException();
 
-        try {
-            Map<String, Object> data = extractParameters(req);
-            data.putAll(attachmentService.extractAttachmentsVariables(req));
 
-            if ( isNotEmpty(taskId) ) {
+        Map<String, Object> data = extractParameters(req);
+        data.putAll(attachmentService.extractAttachmentsVariables(req));
 
-                // aggiungo l'identityLink che indica l'utente che esegue il task
-                taskService.addUserIdentityLink(taskId, username, TASK_EXECUTOR);
+        if ( isEmpty(taskId) ) {
 
-                taskService.setVariablesLocal(taskId, data);
-                taskService.complete(taskId, data);
+            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitionId).singleResult();
 
-                return new ResponseEntity<>(HttpStatus.OK);
+            String counterId = processDefinition.getName() +"-"+ Calendar.getInstance().get(Calendar.YEAR);
+            String key =  counterId +"-"+ counterService.getNext(counterId);
 
-            } else {
-                ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitionId).singleResult();
+            data.put("title", key);
+            data.put("initiator", username);
+            data.put("startDate", new Date());
 
-                String counterId = processDefinition.getName() +"-"+ Calendar.getInstance().get(Calendar.YEAR);
-                String key =  counterId +"-"+ counterService.getNext(counterId);
+            ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
 
-                data.put("title", key);
-                data.put("initiator", username);
-                data.put("startDate", new Date());
+            LOGGER.info("Avviata istanza di processo {}, id: {}", key, instance.getId());
 
-                ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
+            ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
+            return new ResponseEntity<>(response, HttpStatus.OK);
 
-                LOGGER.debug("Avviata istanza di processo {}, id: {}", key, instance.getId());
+        } else {
 
-                ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
-                return new ResponseEntity<>(response, HttpStatus.OK);
-            }
-        } catch (BpmnError e) {
-            //in caso di errore, se ho aggiunto l'identityLink con l'esecutore, lo tolgo (SE L'IDENTITYLINK NON È PRESENTE, IL METODO NON FA NIENTE)
-            taskService.deleteUserIdentityLink(taskId, username, TASK_EXECUTOR);
-            LOGGER.error("L'utente {} ha cercato di a completare il task {} / avviare il flusso {}, ma c'e' stato un errore: {}", username, taskId, definitionId, e.getMessage());
-            return ResponseEntity.status(Utils.getStatus(e.getErrorCode())).body(Utils.mapOf("message", e.getMessage()) );
-        } catch (IOException e) {
-            LOGGER.error("Errore nel processare i files:", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Utils.mapOf("message", "Errore nel processare i files") );
-        } catch (Exception e) {
-            //in caso di errore nel completamento del task tolgo l'identityLink con l'esecutore (SE L'IDENTITYLINK NON È PRESENTE, IL METODO NON FA NIENTE)
-            taskService.deleteUserIdentityLink(taskId, username, TASK_EXECUTOR);
+            // aggiungo l'identityLink che indica l'utente che esegue il task
+            // TODO ma questo e' necessario? - mtrycz
+            taskService.addUserIdentityLink(taskId, username, TASK_EXECUTOR);
 
-            // catch all con info per il debug
-            long rif = Instant.now().toEpochMilli();
-            LOGGER.error("(Riferimento " + rif + ") Errore non gestito con messaggio " + e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Utils.mapOf("message", "Errore non gestito. Contattare gli amminstratori specificando il numero di riferimento: " + rif) );
+            taskService.setVariablesLocal(taskId, data);
+            taskService.complete(taskId, data);
+
+            return new ResponseEntity<>(HttpStatus.OK);
         }
     }
 
@@ -455,8 +441,8 @@ public class FlowsTaskResource {
             isUnclaimableVariable.setName("isReleasable");
             // if has candidate groups or users -> can release
             isUnclaimableVariable.setValue(taskService.getIdentityLinksForTask(task.getId())
-                                                   .stream()
-                                                   .anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
+                    .stream()
+                    .anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
             task.getVariables().add(isUnclaimableVariable);
         }
     }
@@ -472,6 +458,7 @@ public class FlowsTaskResource {
      * @return le response entity frutto della ricerca
      */
     @RequestMapping(value = "/search/{processInstanceId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<Object> search(
             HttpServletRequest req,
@@ -513,6 +500,7 @@ public class FlowsTaskResource {
     }
 
     @RequestMapping(value = "/taskCompletedByMe", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<Object> getTasksCompletedByMe(
             HttpServletRequest req,

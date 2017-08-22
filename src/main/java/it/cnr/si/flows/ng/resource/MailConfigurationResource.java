@@ -20,13 +20,13 @@ import it.cnr.si.security.AuthoritiesConstants;
 
 @RestController
 @RequestMapping("api/mail")
+@Secured(AuthoritiesConstants.ADMIN)
 public class MailConfigurationResource {
 
     @Autowired
     private MailConfguration mailConfig;
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
-    @Secured(AuthoritiesConstants.ADMIN)
     @Timed
     public ResponseEntity<Void> setUsers(@RequestParam("users") String users) {
         List<String> userList = Arrays.asList(users.split(","));
@@ -35,14 +35,12 @@ public class MailConfigurationResource {
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
-    @Secured(AuthoritiesConstants.ADMIN)
     @Timed
     public ResponseEntity<String> getUsers() {
         return ResponseEntity.ok(mailConfig.getMailRecipients().stream().collect(Collectors.joining(",")));
     }
 
     @RequestMapping(value = "/active", method = RequestMethod.POST)
-    @Secured(AuthoritiesConstants.ADMIN)
     @Timed
     public ResponseEntity<Void> setActive(@RequestParam("active") Boolean active) {
         mailConfig.setMailActivated(active);
@@ -50,7 +48,6 @@ public class MailConfigurationResource {
     }
 
     @RequestMapping(value = "/active", method = RequestMethod.GET)
-    @Secured(AuthoritiesConstants.ADMIN)
     @Timed
     public ResponseEntity<Boolean> setActive() {
         return ResponseEntity.ok(mailConfig.isMailActivated());
