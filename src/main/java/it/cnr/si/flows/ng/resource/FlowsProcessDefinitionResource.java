@@ -48,13 +48,12 @@ public class FlowsProcessDefinitionResource {
     @Timed
     // TODO refactor
     public DataResponse getAllProcessDefinitions() {
+
         List<ProcessDefinition> listraw = repositoryService.createProcessDefinitionQuery().latestVersion().list();
-
-        listraw = filterAuthorizedDefinitionsForUser(listraw);
-
-        List<ProcessDefinitionResponse> list = restResponseFactory.createProcessDefinitionResponseList(listraw);
+        listraw = listraw.stream().filter(d -> canStartProcesByDefinitionKey(d.getKey())).collect(Collectors.toList());
 
         // Get result and set pagination parameters
+        List<ProcessDefinitionResponse> list = restResponseFactory.createProcessDefinitionResponseList(listraw);
         DataResponse response = new DataResponse();
         response.setStart(0);
         response.setSize(list.size());
@@ -63,25 +62,12 @@ public class FlowsProcessDefinitionResource {
         return response;
     }
 
-    // TODO sembra rudimentale, ma per ora non ho voglia di farlo piu' complicato di quanto serva - Martin
-    private List<ProcessDefinition> filterAuthorizedDefinitionsForUser(List<ProcessDefinition> listraw) {
+    public boolean canStartProcesByDefinitionKey(String definitionKey) {
+
         Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        return authorities.stream().anyMatch(a -> a.getAuthority().startsWith("ROLE_abilitati#"+ definitionKey));
 
-        return listraw.stream().filter(d -> {
-            switch (d.getKey()) {
-            case "acquisti-trasparenza":
-                if (authorities.stream().anyMatch(a -> a.getAuthority().startsWith("ROLE_ra@")))
-                    return true;
-            case "permessi-ferie":
-                if (authorities.stream().anyMatch(a -> a.getAuthority().startsWith("ROLE_ra@")))
-                    return true;
-            default:
-                // change default case to return true to show by default
-                return false;
-            }
-        }).collect(Collectors.toList());
     }
-
 
 
     @RequestMapping(value = "/{key}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

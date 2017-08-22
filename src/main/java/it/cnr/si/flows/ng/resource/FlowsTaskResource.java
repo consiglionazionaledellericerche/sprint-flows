@@ -63,26 +63,30 @@ import static it.cnr.si.flows.ng.utils.Utils.*;
 public class FlowsTaskResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsTaskResource.class);
-    @Autowired
+
+    @Inject
     protected RestResponseFactory restResponseFactory;
-    @Autowired
+    @Inject
     private MembershipService membershipService;
-    @Autowired
+    @Inject
     private FlowsUserDetailsService flowsUserDetailsService;
     @Inject
     private CounterService counterService;
     @Inject
     private RepositoryService repositoryService;
-    @Autowired
+    @Inject
     private RuntimeService runtimeService;
-    @Autowired
+    @Inject
     private TaskService taskService;
-    @Autowired
+    @Inject
     private FlowsAttachmentService attachmentService;
-    @Autowired
+    @Inject
     private HistoryService historyService;
     @Inject
     private FlowsAttachmentResource attachmentResource;
+    @Inject
+    private FlowsProcessDefinitionResource flowsProcessDefinitionResource;
+
 
     private Utils utils = new Utils();
 
@@ -369,15 +373,21 @@ public class FlowsTaskResource {
         }
     }
 
-    //TODO ??? probabilmente un refuso
-    public boolean canCompleteTask(MultipartHttpServletRequest req) {
-        return true;
+
+    public boolean canCompleteTaskOrStartProcessInstance(MultipartHttpServletRequest req) {
+        String taskId = (String) req.getParameter("taskId");
+        if (taskId != null) {
+            String username = SecurityUtils.getCurrentUserLogin();
+            return canCompleteTask(taskId, Optional.of(username));
+        } else {
+            String definitionKey = (String) req.getParameter("processDefinitionId").split(":")[0];
+            return flowsProcessDefinitionResource.canStartProcesByDefinitionKey(definitionKey);
+        }
     }
 
     // TODO verificare almeno che l'utente abbia i gruppi necessari
     @RequestMapping(value = "complete", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-//    @Secured(AuthoritiesConstants.USER)
-    @PreAuthorize("canCompleteTask(#req)")
+    @PreAuthorize("@flowsTaskResource.canCompleteTaskOrStartProcessInstance(#req)")
     @Timed
     public ResponseEntity<Object> completeTask(MultipartHttpServletRequest req) {
 
@@ -393,8 +403,6 @@ public class FlowsTaskResource {
             data.putAll(attachmentService.extractAttachmentsVariables(req));
 
             if ( isNotEmpty(taskId) ) {
-                if (!canCompleteTask(taskId, Optional.of(username)))
-                    throw new FlowsPermissionException();
 
                 // aggiungo l'identityLink che indica l'utente che esegue il task
                 taskService.addUserIdentityLink(taskId, username, TASK_EXECUTOR);
@@ -429,11 +437,6 @@ public class FlowsTaskResource {
         } catch (IOException e) {
             LOGGER.error("Errore nel processare i files:", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Utils.mapOf("message", "Errore nel processare i files") );
-        } catch (FlowsPermissionException e) {
-            //in caso in cui l'utente non sia abilitato ad eseguire il task, tolgo l'identityLink con l'esecutore (SE L'IDENTITYLINK NON È PRESENTE, IL METODO NON FA NIENTE)
-            taskService.deleteUserIdentityLink(taskId, username, TASK_EXECUTOR);
-            LOGGER.error("L'utente {} non e' abilitato a completare il task {} / avviare il flusso {}", username, taskId, definitionId);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Utils.mapOf("message", "L'utente non e' abilitato ad eseguire l'azione richiesta") );
         } catch (Exception e) {
             //in caso di errore nel completamento del task tolgo l'identityLink con l'esecutore (SE L'IDENTITYLINK NON È PRESENTE, IL METODO NON FA NIENTE)
             taskService.deleteUserIdentityLink(taskId, username, TASK_EXECUTOR);
