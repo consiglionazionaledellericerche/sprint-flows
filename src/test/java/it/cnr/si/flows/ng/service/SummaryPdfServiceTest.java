@@ -68,7 +68,7 @@ public class SummaryPdfServiceTest {
     }
 
     @Test
-    public void testSummaryPdfProcessCompleted() {
+    public void testSummaryPdfProcessCompleted() throws IOException {
         processInstance = util.mySetUp("acquisti-trasparenza");
 
         Map<String, FlowsAttachment> docs = flowsAttachmentResource.getAttachementsForProcessInstance(processInstance.getId()).getBody();
@@ -132,7 +132,7 @@ public class SummaryPdfServiceTest {
         assertFalse(content.isEmpty());
     }
 
-    private void completeTask() {
+    private void completeTask() throws IOException {
         //completo il primo task
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
 //        req.setParameter("taskId", util.getFirstTaskId());

@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -95,7 +97,7 @@ public class TestServices {
         SecurityContextHolder.clearContext();
     }
 
-    public ProcessInstanceResponse mySetUp(String processDefinitionKey) {
+    public ProcessInstanceResponse mySetUp(String processDefinitionKey) throws IOException {
         loginAdmin();
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().latestVersion().list();
 

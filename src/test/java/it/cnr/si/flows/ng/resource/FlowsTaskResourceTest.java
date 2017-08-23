@@ -24,6 +24,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -68,7 +70,7 @@ public class FlowsTaskResourceTest {
 
 
     @Test
-    public void testGetMyTasks() {
+    public void testGetMyTasks() throws IOException {
         processInstance = util.mySetUp("acquisti-trasparenza");
 //       all'inizio del test SFD non ha task assegnati'
         util.logout();
@@ -108,7 +110,7 @@ public class FlowsTaskResourceTest {
 
 
     @Test(expected = AccessDeniedException.class)
-    public void testGetAvailableTasks() {
+    public void testGetAvailableTasks() throws IOException {
         processInstance = util.mySetUp("acquisti-trasparenza");
         //SFD è sfd@sisinfo (quindi può vedere il task istanziato)
         util.logout();
@@ -134,7 +136,7 @@ public class FlowsTaskResourceTest {
 
 
     @Test
-    public void testGetTaskInstance() {
+    public void testGetTaskInstance() throws IOException {
         processInstance = util.mySetUp("acquisti-trasparenza");
         ResponseEntity<Map<String, Object>> response = flowsTaskResource.getTask(util.getFirstTaskId());
         assertEquals(OK, response.getStatusCode());
@@ -143,7 +145,7 @@ public class FlowsTaskResourceTest {
 
 
     @Test
-    public void testCompleteTask() {
+    public void testCompleteTask() throws IOException {
         processInstance = util.mySetUp("acquisti-trasparenza");
         //completo il primo task
         util.loginSfd();
@@ -162,7 +164,7 @@ public class FlowsTaskResourceTest {
 
 
     @Test
-    public void testSearch() {
+    public void testSearch() throws IOException {
         processInstance = util.mySetUp("acquisti-trasparenza");
 
         util.logout();
@@ -185,7 +187,7 @@ public class FlowsTaskResourceTest {
     }
 
     @Test
-    public void testTaskAssignedInMyGroups() {
+    public void testTaskAssignedInMyGroups() throws IOException {
         processInstance = util.mySetUp("acquisti-trasparenza");
 
         //verifico che all'inizio del test sfd2 NON veda nessun task
@@ -218,7 +220,7 @@ public class FlowsTaskResourceTest {
     }
 
     @Test
-    public void testClaimTask() {
+    public void testClaimTask() throws IOException {
         processInstance = util.mySetUp("acquisti-trasparenza");
 //      sfd è sfd@sisinfo quindi può prendere in carico iln flusso
         util.loginSfd();
@@ -234,7 +236,7 @@ public class FlowsTaskResourceTest {
 
 
     @Test
-    public void testGetTasksCompletedForMe() throws ArubaSignServiceException {
+    public void testGetTasksCompletedForMe() throws ArubaSignServiceException, IOException {
         processInstance = util.mySetUp("acquisti-trasparenza");
         //completo il primo task
         util.loginSfd();
