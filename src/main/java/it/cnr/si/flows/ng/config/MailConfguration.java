@@ -13,9 +13,9 @@ import org.thymeleaf.templateresolver.ITemplateResolver;
 @Configuration
 public class MailConfguration {
 
-    @Value("${spring.mail.recipients}")
+    @Value("${spring.mail.recipients:}")
     private List<String> mailRecipients;
-    @Value("${spring.mail.activated}")
+    @Value("${spring.mail.activated:false}")
     private boolean mailActivated;
 
     public List<String> getMailRecipients() {
