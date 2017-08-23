@@ -5,7 +5,7 @@ services:
         external_links:
             - sprint-flows-test-pg:postgresql
         environment:
-            - SPRING_PROFILES_ACTIVE=cnr,swagger,test
+            - SPRING_PROFILES_ACTIVE=swagger,test
             - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/activiti
             - SPRING_DATASOURCE_USERNAME=activiti
             - SPRING_DATASOURCE_PASSWORD=activitipw

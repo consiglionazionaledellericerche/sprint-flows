@@ -17,4 +17,4 @@ VOLUME /tmp
 EXPOSE 8080 5701/udp
 CMD echo "The application will start in ${JHIPSTER_SLEEP}s..." && \
     sleep ${JHIPSTER_SLEEP} && \
-    java -Djava.security.egd=file:/dev/./urandom -Dspring.profiles.active=cnr,swagger,test  -jar /app.war
+    java -Djava.security.egd=file:/dev/./urandom -Dspring.profiles.active=swagger,test  -jar /app.war

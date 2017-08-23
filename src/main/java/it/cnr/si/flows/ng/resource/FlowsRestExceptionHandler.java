@@ -10,7 +10,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -75,9 +74,9 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
         String definitionId = request.getParameter("definitionId");
 
         LOGGER.error("L'utente {} ha cercato di a completare il task {} / avviare il flusso {}, ma c'e' stato un errore: {}", username, taskId, definitionId, ex.getMessage());
-        return ResponseEntity.status(Utils.getStatus(ex.getErrorCode())).body(Utils.mapOf("message", ex.getMessage()) );
+        return handleExceptionInternal(ex, Utils.mapOf("message", ex.getMessage()),
+                new HttpHeaders(), Utils.getStatus(ex.getErrorCode()), request);
     }
-
 
     /* --- DEFAULT EXCEPTION HANDLERS --- */
 
