@@ -31,6 +31,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import com.zaxxer.hikari.HikariDataSource;
 
+import it.cnr.si.flows.ng.service.FlowsRuntimeService;
+
 @Configuration
 public class FlowsProcessEngineConfigurations {
 
@@ -97,6 +99,10 @@ public class FlowsProcessEngineConfigurations {
         customXmlBatisMappers.add("mapper/FlowsHistoricProcessInstanceMapper.xml");
         conf.setCustomMybatisXMLMappers(customXmlBatisMappers);
 
+        FlowsRuntimeService runtimeService = new FlowsRuntimeService();
+//        runtimeService.setCommandExecutor(conf.getCommandExecutor());
+        conf.setRuntimeService(runtimeService);
+        
         return conf;
     }
 
