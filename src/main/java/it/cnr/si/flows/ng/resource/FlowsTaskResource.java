@@ -399,7 +399,6 @@ public class FlowsTaskResource {
         if ( isEmpty(taskId) && isEmpty(definitionId) )
             throw new ProcessDefinitionAndTaskIdEmptyException();
 
-
         Map<String, Object> data = extractParameters(req);
         data.putAll(attachmentService.extractAttachmentsVariables(req));
 
@@ -546,11 +545,12 @@ public class FlowsTaskResource {
 
         Map<String, Object> data = new HashMap<>();
 
-        Enumeration<String> parameterNames = req.getParameterNames();
-        while (parameterNames.hasMoreElements()) {
-            String paramName = parameterNames.nextElement();
-            data.put(paramName, req.getParameter(paramName));
-        }
+        List<String> parameterNames = Collections.list(req.getParameterNames());
+        parameterNames.stream().forEach(paramName -> {
+            // se ho un json non aggiungo i suoi singoli campi
+            if (!parameterNames.contains(paramName.split("\\[")[0] +"_json"))
+                data.put(paramName, req.getParameter(paramName));
+        });
 
         return data;
 
