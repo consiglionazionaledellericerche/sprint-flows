@@ -77,6 +77,8 @@ public class FlowsProcessInstanceService {
 
         // Attachments
         Map<String, FlowsAttachment> attachements = flowsAttachmentService.getAttachementsForProcessInstance(processInstanceId);
+        // in visualizzazione dettagli non mi servono i dati binari degli allegati
+        attachements.values().stream().forEach(a -> a.setBytes(null));
         result.put("attachments", attachements);
 
         final Map<String, Object> identityLinks = new LinkedHashMap<>();
