@@ -52,11 +52,11 @@ public class AceBridgeService {
 	private static final String denominazioneStruttura = "Select entitaorganizzativa.denominazione, entitaorganizzativa.sigla, entitaorganizzativa.denominazionebreve "
 			+ "from ace.entitaorganizzativa "
 			+ "where entitaorganizzativa.id = ?";
-	
+
 	private static final String denominazioneRuolo = "Select ruolo.descr, ruolo.sigla, ruolo.id "
 			+ "from ace.ruolo "
 			+ "where ruolo.sigla = ?";
-	
+
 
 	public List<String> getAceGroupsForUser(String username) {
 
@@ -118,6 +118,9 @@ public class AceBridgeService {
 
 		@Cacheable("nomiEstesiGruppiRuoloStruttura")
 		public String getExtendedGroupNome(String groupRuoloStrutturaName) {
+		    if (groupRuoloStrutturaName == null)
+		        return null;
+
 			String[] splitGroupRuoloStrutturaName = groupRuoloStrutturaName.split("@");
 			String ruoloName = splitGroupRuoloStrutturaName[0];
 			Integer strutturaId = Integer.parseInt(splitGroupRuoloStrutturaName[1]) ;
