@@ -52,6 +52,11 @@ public class AceBridgeService {
 	private static final String denominazioneStruttura = "Select entitaorganizzativa.denominazione, entitaorganizzativa.sigla, entitaorganizzativa.denominazionebreve "
 			+ "from ace.entitaorganizzativa "
 			+ "where entitaorganizzativa.id = ?";
+	
+	private static final String denominazioneRuolo = "Select ruolo.descr, ruolo.sigla, ruolo.id "
+			+ "from ace.ruolo "
+			+ "where ruolo.sigla = ?";
+	
 
 	public List<String> getAceGroupsForUser(String username) {
 
@@ -101,14 +106,35 @@ public class AceBridgeService {
 	        });
 	    }
 
-	@Cacheable("nomiStrutture")
-	public String getNomeStruturaById(Integer id) {
-		return aceJdbcTemplate.query(denominazioneStruttura, new Object[] {id}, new ResultSetExtractor<String>() {
-			public String extractData(ResultSet rs) throws SQLException, DataAccessException {
-				rs.next();
-				return rs.getString("denominazione");
-			}
-		});
-	}
+		@Cacheable("nomiStrutture")
+		public String getNomeStruturaById(Integer id) {
+			return aceJdbcTemplate.query(denominazioneStruttura, new Object[] {id}, new ResultSetExtractor<String>() {
+				public String extractData(ResultSet rs) throws SQLException, DataAccessException {
+					rs.next();
+					return rs.getString("denominazione");
+				}
+			});
+		}
+
+		@Cacheable("nomiEstesiGruppiRuoloStruttura")
+		public String getExtendedGroupNome(String groupRuoloStrutturaName) {
+			String[] splitGroupRuoloStrutturaName = groupRuoloStrutturaName.split("@");
+			String ruoloName = splitGroupRuoloStrutturaName[0];
+			Integer strutturaId = Integer.parseInt(splitGroupRuoloStrutturaName[1]) ;
+
+			String descrizioneRuolo = aceJdbcTemplate.query(denominazioneRuolo, new Object[] {ruoloName}, new ResultSetExtractor<String>() {
+				public String extractData(ResultSet rs) throws SQLException, DataAccessException {
+					rs.next();
+					return rs.getString("descr");
+				}
+			});
+			String descrizioneStruttura = aceJdbcTemplate.query(denominazioneStruttura, new Object[] {strutturaId}, new ResultSetExtractor<String>() {
+				public String extractData(ResultSet rs) throws SQLException, DataAccessException {
+					rs.next();
+					return rs.getString("denominazione");
+				}
+			});
+			return (descrizioneRuolo + "@" + descrizioneStruttura);
+		}
 
 }
