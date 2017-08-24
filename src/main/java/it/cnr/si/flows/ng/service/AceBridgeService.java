@@ -131,7 +131,7 @@ public class AceBridgeService {
 			String descrizioneStruttura = aceJdbcTemplate.query(denominazioneStruttura, new Object[] {strutturaId}, new ResultSetExtractor<String>() {
 				public String extractData(ResultSet rs) throws SQLException, DataAccessException {
 					rs.next();
-					return rs.getString("denominazione");
+					return rs.getString("sigla");
 				}
 			});
 			return (descrizioneRuolo + "@" + descrizioneStruttura);
