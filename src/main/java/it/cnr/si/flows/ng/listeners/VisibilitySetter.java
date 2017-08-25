@@ -48,6 +48,29 @@ public class VisibilitySetter implements ActivitiEventListener {
             setDefaultVisibilityRules(task.getId(), processInstanceId);
             setAdditionalVisibilityRules(event, processInstanceId, processDefinitionId, currentTaskKey);
 
+        } else if (event.getType().equals(ActivitiEventType.PROCESS_STARTED)) {
+        	
+            ActivitiEntityEventImpl processEvent = (ActivitiEntityEventImpl) event;
+            
+            String executionId = event.getExecutionId();
+            Map<String, Object> variables = runtimeService.getVariables(executionId);
+            String processInstanceId = event.getProcessInstanceId();
+
+            String processDefinitionKeyVersionated = (String) variables.get("processDefinitionId"); 
+            String processDefinitionKey = processDefinitionKeyVersionated.split(":")[0];
+            if (processDefinitionKey != null) {
+                runtimeService.addGroupIdentityLink(processInstanceId, "supervisore#"+ processDefinitionKey, Utils.PROCESS_VISUALIZER);
+                runtimeService.addGroupIdentityLink(processInstanceId, "responsabile#"+ processDefinitionKey, Utils.PROCESS_VISUALIZER);            	
+            }
+     
+            String idStruttura = (String) variables.get("idStruttura");
+            if (idStruttura!= null) {
+                // TODO inserire if se è un flusso organizzato per strutture
+                runtimeService.addGroupIdentityLink(processInstanceId, "supervisore#"+ processDefinitionKey +"@"+ idStruttura, Utils.PROCESS_VISUALIZER);
+                runtimeService.addGroupIdentityLink(processInstanceId, "responsabile#"+ processDefinitionKey +"@"+ idStruttura, Utils.PROCESS_VISUALIZER);
+                runtimeService.addGroupIdentityLink(processInstanceId, "supervisore-struttura@"+ idStruttura , Utils.PROCESS_VISUALIZER);
+                runtimeService.addGroupIdentityLink(processInstanceId, "responsabile-struttura@"+ idStruttura, Utils.PROCESS_VISUALIZER);            	
+            }
         }
     }
 
