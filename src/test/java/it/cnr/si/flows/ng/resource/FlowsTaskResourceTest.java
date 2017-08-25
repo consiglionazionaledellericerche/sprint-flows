@@ -1,8 +1,21 @@
 package it.cnr.si.flows.ng.resource;
 
-import it.cnr.jada.firma.arss.ArubaSignServiceException;
-import it.cnr.si.FlowsApp;
-import it.cnr.si.flows.ng.TestServices;
+import static it.cnr.si.flows.ng.TestServices.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
+import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
+import static it.cnr.si.flows.ng.utils.Utils.ASC;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.springframework.http.HttpStatus.OK;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.activiti.engine.TaskService;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
@@ -23,20 +36,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import static it.cnr.si.flows.ng.TestServices.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
-import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
-import static it.cnr.si.flows.ng.utils.Utils.ASC;
-import static org.junit.Assert.assertEquals;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.HttpStatus.OK;
+import it.cnr.jada.firma.arss.ArubaSignServiceException;
+import it.cnr.si.FlowsApp;
+import it.cnr.si.flows.ng.TestServices;
 
 
 @RunWith(SpringRunner.class)
@@ -219,19 +221,25 @@ public class FlowsTaskResourceTest {
         assertEquals(1, (new ArrayList((Collection) response.getBody().getData())).size());
     }
 
+    // non uso expected perche' voglio controllare *esttamente* dove viene lanciata l'eccezione
     @Test
     public void testClaimTask() throws IOException {
         processInstance = util.mySetUp("acquisti-trasparenza");
-//      sfd è sfd@sisinfo quindi può prendere in carico iln flusso
+
+//      sfd è sfd@sisinfo quindi può prendere in carico il flusso
         util.loginSfd();
         ResponseEntity<Map<String, Object>> response = flowsTaskResource.claimTask(util.getFirstTaskId());
+        assertEquals(OK, response.getStatusCode());
+        response = flowsTaskResource.unclaimTask(util.getFirstTaskId());
         assertEquals(OK, response.getStatusCode());
         util.logout();
 
 //      spaclient NON è sfd@sisinfo quindi NON può richiamare il metodo
         util.loginSpaclient();
-        response = flowsTaskResource.claimTask(util.getFirstTaskId());
-        assertEquals(FORBIDDEN, response.getStatusCode());
+        try {
+            response = flowsTaskResource.claimTask(util.getFirstTaskId());
+            fail("Expected AccessDeniedException");
+        } catch (AccessDeniedException e) { /* expected */}
     }
 
 
@@ -253,8 +261,9 @@ public class FlowsTaskResourceTest {
         //Recupero solo il flusso completato da user e non quello assegnatogli né quello di cui è owner
         response = flowsTaskResource.getTasksCompletedByMe(new MockHttpServletRequest(), ALL_PROCESS_INSTANCES, 0, 1000, ASC);
         assertEquals(OK, response.getStatusCode());
-        assertEquals(util.getFirstTaskId(),
-                     ((ArrayList<HistoricTaskInstanceResponse>) ((DataResponse) response.getBody()).getData()).get(0).getId());
+        ArrayList<HistoricTaskInstanceResponse> tasks = (ArrayList<HistoricTaskInstanceResponse>) ((DataResponse) response.getBody()).getData();
+        assertTrue(tasks.stream().anyMatch(t -> t.getId().equals(util.getFirstTaskId())));
+
 
         //Verifico che il metodo funzioni anche con ADMIN
         util.logout();

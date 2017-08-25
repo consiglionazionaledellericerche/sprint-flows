@@ -46,7 +46,9 @@ public class FlowsProcessDefinitionResource {
     @RequestMapping(value = "/all", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
-    // TODO refactor
+    // TODO refactor, non usiamo DataResponse di Activity, ma e' meglio ResponseEntity di Spring (o direttamente un oggetto)
+    // Inoltre abbiamo bisogno sia di un getAllProcessDefinitions sia di un "GetAllProcessDefinitionsAvviaibiliDaMe"
+    // -> splittare il metedo
     public DataResponse getAllProcessDefinitions() {
 
         List<ProcessDefinition> listraw = repositoryService.createProcessDefinitionQuery().latestVersion().list();
