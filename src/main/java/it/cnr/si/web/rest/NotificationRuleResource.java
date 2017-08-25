@@ -6,6 +6,8 @@ import it.cnr.si.domain.NotificationRule;
 import it.cnr.si.repository.NotificationRuleRepository;
 import it.cnr.si.web.rest.util.HeaderUtil;
 import it.cnr.si.web.rest.util.PaginationUtil;
+
+import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -31,7 +33,7 @@ import java.util.Optional;
 public class NotificationRuleResource {
 
     private final Logger log = LoggerFactory.getLogger(NotificationRuleResource.class);
-        
+
     @Inject
     private NotificationRuleRepository notificationRuleRepository;
 
@@ -51,6 +53,10 @@ public class NotificationRuleResource {
         if (notificationRule.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("notificationRule", "idexists", "A new notificationRule cannot already have an ID")).body(null);
         }
+
+        // Boolean ha il terzo valore null, reminiscente di https://thedailywtf.com/articles/What_Is_Truth_0x3f_ - mtrycz
+        notificationRule.setPersona( BooleanUtils.isTrue(notificationRule.isPersona()) );
+
         NotificationRule result = notificationRuleRepository.save(notificationRule);
         return ResponseEntity.created(new URI("/api/notification-rules/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert("notificationRule", result.getId().toString()))

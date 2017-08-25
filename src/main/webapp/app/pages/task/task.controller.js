@@ -7,6 +7,26 @@
 
     HomeController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log', '$http', '$q', 'Upload', 'utils'];
 
+    /**
+     * Questo e' un po' il cuore di tutta l'applicazione, per questo e' un pochino piu' complicato di altri
+     * Innanzitutto c'e' una promise composta che aspetta che sia la form che le variabili siano caricate,
+     * e a quel punto valoriza i campi della form ove richiesto con 'autofill'.
+     *
+     * Al momento dell'invio della form succedono piu' cose un po' complicate per un motivo specifico:
+     * per permettere l'atomicita' delle azioni, i files sono trattati come metadati e vengono inviati
+     * insieme alla form degli altri metadati, e non in un momento separato come era nella vecchia Scrivania.
+     * Per fare questo usiamo form Multipart, e una libreria angular che gestisce l'invio dei file (wrappata nel nostro fileinput)
+     * Questo richiede alcuni accorgimenti, perche' possiamo inviare o JSON o Multipart con files
+     *
+     * Per questo, al momento dell'invio, campi complessi (subform, campi multipli) vengono serializzati in stringhe.
+     * Nel fare questo vanno copiati in una variabile nuova, senno l'UI sballa, e filtrati lato server (FlowsTaskResource.extractParameters())
+     *
+     * NB: non posso usare angular.copy() o altrimenti duplicare i dati per la submit
+     *     perche' non vengono gestiti bene gli oggetti del nuovo tipo File/Blob
+     *     Sono costretto a inviare il vm.data originale
+     *
+     * @author mtrycz
+     */
     function HomeController ($scope, Principal, LoginService, $state, dataService, AlertService, $log, $http, $q, Upload, utils) {
         var vm = this;
         vm.data = {};
@@ -19,7 +39,7 @@
         // Ho bisogno di caricare piu' risorse contemporaneamente (form e data);
         // quando sono finite entrambe, autofillo la form
         var formPromise = $q.defer(), dataPromise = $q.defer();
-        $scope.autofill = function() {formPromise.resolve(2);};
+        $scope.autofill = function() {formPromise.resolve(2);}; // usato nell'html
 
         $q.all([formPromise.promise, dataPromise.promise])
         .then(function(value) {
@@ -68,11 +88,9 @@
               // Serializzo gli oggetti complessi in stringhe
               // E' necessario copiarli in un nuovo campo, senno' angular si incasina
               // Non posso usare angular.copy() perche' ho degli oggetti File non gestiti bene
-              var jsons = {};
               angular.forEach(vm.data, function(value, key, obj) {
                 if (isObject(value)) {
                   obj[key+"_json"] = JSON.stringify(value);
-                  obj[key] = undefined;
                 }
               });
 

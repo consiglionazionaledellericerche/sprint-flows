@@ -19,6 +19,7 @@ import org.activiti.engine.impl.util.json.JSONObject;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
+import org.activiti.rest.service.api.history.HistoricIdentityLinkResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -60,6 +61,8 @@ public class FlowsProcessInstanceService {
     private ManagementService managementService;
     @Inject
     private RuntimeService runtimeService;
+    @Inject
+    private AceBridgeService aceBridgeService;
 
 
     public Map<String, Object> getProcessInstanceWithDetails(String processInstanceId) {
@@ -77,6 +80,8 @@ public class FlowsProcessInstanceService {
 
         // Attachments
         Map<String, FlowsAttachment> attachements = flowsAttachmentService.getAttachementsForProcessInstance(processInstanceId);
+        // in visualizzazione dettagli non mi servono i dati binari degli allegati
+        attachements.values().stream().forEach(a -> a.setBytes(null));
         result.put("attachments", attachements);
 
         final Map<String, Object> identityLinks = new LinkedHashMap<>();
@@ -111,7 +116,13 @@ public class FlowsProcessInstanceService {
                             List<HistoricIdentityLink> links = historyService.getHistoricIdentityLinksForTask(task.getId());
                             HashMap<String, Object> entity = new HashMap<>();
                             entity.put("historyTask", restResponseFactory.createHistoricTaskInstanceResponse(task));
-                            entity.put("historyIdentityLink", restResponseFactory.createHistoricIdentityLinkResponseList(links));
+
+                            // Sostituisco l'id interno del gruppo con la dicitura estesa
+                            List<HistoricIdentityLinkResponse> historicIdLinks = restResponseFactory.createHistoricIdentityLinkResponseList(links);
+                            historicIdLinks.stream().forEach(
+                                    l -> l.setGroupId(aceBridgeService.getExtendedGroupNome(l.getGroupId())) );
+
+                            entity.put("historyIdentityLink", historicIdLinks);
                             history.add(entity);
                         });
         result.put("history", history);

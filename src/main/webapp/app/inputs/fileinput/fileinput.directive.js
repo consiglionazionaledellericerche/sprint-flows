@@ -30,6 +30,7 @@
                     var tester = new RegExp(reg, 'g');
                     return tester.test(value.name);
                 }
+
             }
         }
     }

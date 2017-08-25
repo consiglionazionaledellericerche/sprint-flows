@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import it.cnr.si.FlowsApp;
 import it.cnr.si.SprintApp;
 
+@Ignore // Questo test non ha senso eseguirlo con H2, ma solo in locale con un postgres
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @EnableTransactionManagement
@@ -39,7 +40,6 @@ public class CounterServiceTest {
         show-sql: true
      */
     @Test
-    @Ignore // Questo test non ha senso eseguirlo con H2, ma solo in locale con un postgres
     public void testIncrement() throws InterruptedException {
 
         System.out.println(counter.getNext("pippo"));
