@@ -83,6 +83,7 @@ public class SwitchUserTest {
 
 
     @Test
+    // TODO refactor per concentrarsi sulla logica e esternalizzare il boilerpalte
     public void testAdminAbleToSwitchToLdapUser() throws URISyntaxException {
 
         SERVER = "http://localhost:"+ port + "/";
@@ -100,7 +101,7 @@ public class SwitchUserTest {
         assertThat(impersonatedAccount.get("authorities")).asList()
         .contains("ROLE_PREVIOUS_ADMINISTRATOR")
         .contains("DEPARTMENT_603240")
-        .contains("ROLE_sisinfo_segreteria"); // Questo ruolo cambiera' nel futuro, sistemare col nome nuovo
+        .contains("ROLE_segreteria@2216"); // Questo ruolo cambiera' nel futuro, sistemare col nome nuovo
 
         Map<String, Object> exitAccount = getAccount(token);
         assertThat(exitAccount).containsEntry("login", "admin");
