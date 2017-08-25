@@ -51,6 +51,8 @@ public class StartAcquistiSetGroupsAndVisibility implements ExecutionListener {
 
             String gruppoRT = groups.get(0);
             String struttura = gruppoRT.substring(gruppoRT.lastIndexOf('@') +1);
+            // idStruttura variabile che indica che il flusso è diviso per strutture (implica la visibilità distinta tra strutture)
+            execution.setVariable("idStruttura", struttura);
             String gruppoDirettore = "direttore@"+ struttura;
             String gruppoRA = "ra@"+ struttura;
             String gruppoSFD = "sfd@"+ struttura;
