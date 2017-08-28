@@ -15,7 +15,7 @@
             <span th:if="${groupname}">
                 Riceve questa notifica in quanto parte del gruppo <bold th:text="${groupname}">NOME GRUPPO</bold></span>
         <p>
-            Si notifica che il flusso in oggetto ha raggiunto la fase "<bold th:text="${fase}">FASE</bold>"
+            Si notifica che il flusso in oggetto ha raggiunto la fase "<bold th:text="${faseUltima}">FASE</bold>"
         <p th:if="${commento}">
             Il compito presenta la seguente nota di commento:
             <pre th:text="${commento}">Commento</pre>
