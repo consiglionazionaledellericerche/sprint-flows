@@ -227,7 +227,7 @@
       <sequenceFlow id="flow40" sourceRef="exclusivegateway9" targetRef="modifica-revoca">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Modifica'}]]></conditionExpression>
       </sequenceFlow>
-      <userTask id="protocollo-revoca" name="Protocollo Revoca" activiti:candidateGroups="{$gruppoRA}"></userTask>
+      <userTask id="protocollo-revoca" name="Protocollo Revoca" activiti:candidateGroups="${gruppoRA}"></userTask>
       <sequenceFlow id="flow42" sourceRef="exclusivegateway9" targetRef="protocollo-revoca">
         <extensionElements>
           <activiti:executionListener event="take" delegateExpression="${firmaDocumento}">
