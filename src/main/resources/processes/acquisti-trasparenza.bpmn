@@ -221,7 +221,7 @@
       <startEvent id="startevent7" name="Start"></startEvent>
       <endEvent id="endevent5" name="End"></endEvent>
       <userTask id="firma-revoca" name="Firma Revoca" activiti:candidateGroups="${gruppoDirettore}"></userTask>
-      <userTask id="modifica-revoca" name="Modifica Revoca" activiti:candidateGroups="{$gruppoRA}"></userTask>
+      <userTask id="modifica-revoca" name="Modifica Revoca" activiti:candidateGroups="${gruppoRA}"></userTask>
       <exclusiveGateway id="exclusivegateway9" name="Exclusive Gateway" default="flow42"></exclusiveGateway>
       <sequenceFlow id="flow39" sourceRef="firma-revoca" targetRef="exclusivegateway9"></sequenceFlow>
       <sequenceFlow id="flow40" sourceRef="exclusivegateway9" targetRef="modifica-revoca">
