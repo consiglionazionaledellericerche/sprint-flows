@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
+import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.event.ActivitiEntityEvent;
 import org.activiti.engine.delegate.event.ActivitiEvent;
@@ -60,9 +61,14 @@ public class MailNotificationListener  implements ActivitiEventListener {
 
         String executionId = event.getExecutionId();
         Map<String, Object> variables = runtimeService.getVariables(executionId);
+        
 
         ActivitiEntityEvent taskEvent = (ActivitiEntityEvent) event;
         TaskEntity task = (TaskEntity) taskEvent.getEntity();
+        String fase = ((TaskEntity)taskEvent.getEntity()).getTaskDefinitionKey();
+        variables.put("faseUltima", fase);
+        runtimeService.setVariable(executionId, "faseUltima", fase);
+        
         Set<IdentityLink> candidates = ((TaskEntity)taskEvent.getEntity()).getCandidates();
 
         candidates.forEach(c -> {
@@ -82,6 +88,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
         String executionId = event.getExecutionId();
 
         Map<String, Object> variables = runtimeService.getVariables(executionId);
+        
 
         // Notifiche personalizzate
         List<NotificationRule> notificationRules;
@@ -128,6 +135,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
      * @param tn
      */
     private void send(Map<String, Object> variables, List<NotificationRule> notificationRules, String nt, String tn) {
+    	
 
         notificationRules.stream()
         .forEach(rule -> {
