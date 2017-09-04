@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -89,7 +90,7 @@ public class FlowsProcessInstanceResourceTest {
     }
 
 
-    @Test
+    @Test(expected = AccessDeniedException.class)
     public void testGetProcessInstanceById() throws Exception {
         processInstance = util.mySetUp("acquisti-trasparenza");
 
@@ -115,6 +116,11 @@ public class FlowsProcessInstanceResourceTest {
 
         HashMap attachments = (HashMap) ((HashMap) response.getBody()).get("attachments");
         assertEquals(0, attachments.size());
+
+        //verifica risposta 403 Forbidden in caso di accesso di utenti non autorizzati
+        util.logout();
+        util.loginSpaclient();
+        response = flowsProcessInstanceResource.getProcessInstanceById(new MockHttpServletRequest(), processInstance.getId());
     }
 
     @Test
