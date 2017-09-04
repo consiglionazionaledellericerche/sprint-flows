@@ -9,7 +9,6 @@ import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
-import org.activiti.rest.service.api.repository.ProcessDefinitionResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.joda.time.DateTime;
 import org.junit.After;
@@ -94,7 +93,7 @@ public class FlowsProcessInstanceResourceTest {
     public void testGetProcessInstanceById() throws Exception {
         processInstance = util.mySetUp("acquisti-trasparenza");
 
-        ResponseEntity<Map<String, Object>> response = flowsProcessInstanceResource.getProcessInstanceById(processInstance.getId());
+        ResponseEntity<Map<String, Object>> response = flowsProcessInstanceResource.getProcessInstanceById(new MockHttpServletRequest(), processInstance.getId());
         assertEquals(OK, response.getStatusCode());
 
         HistoricProcessInstanceResponse entity = (HistoricProcessInstanceResponse) ((HashMap) response.getBody()).get("entity");
