@@ -323,17 +323,16 @@ public class FlowsTaskResource {
         }
     }
 
+
     @RequestMapping(value = "/{id}/{user}", method = RequestMethod.PUT)
     @Secured(AuthoritiesConstants.USER)
     @Timed
-    // TODO PreAuthorize(@flowsTaskResource.blablabla)
+//    @PreAuthorize("@flowsTaskResource.canAssignTask(#id, #user)") todo: implementare
     public ResponseEntity<Map<String, Object>> assignTask(
             HttpServletRequest req,
             @PathVariable("id") String id,
             @PathVariable("user") String user) {
-
-        //    todo: test
-        //    todo: chi può asegnare un task?
+        //    todo: non è ancora usata nell'interfaccia, fare i test
         //        String username = SecurityUtils.getCurrentUserLogin();
 
         taskService.setAssignee(id, user);
@@ -369,18 +368,6 @@ public class FlowsTaskResource {
             return identityLinks.stream()
                     .filter(l -> l.getType().equals("candidate"))
                     .anyMatch(l -> authorities.contains(l.getGroupId()) );
-        }
-    }
-
-
-    public boolean canCompleteTaskOrStartProcessInstance(MultipartHttpServletRequest req) {
-        String taskId = (String) req.getParameter("taskId");
-        if (taskId != null) {
-            String username = SecurityUtils.getCurrentUserLogin();
-            return canCompleteTask(taskId, Optional.of(username));
-        } else {
-            String definitionKey = (String) req.getParameter("processDefinitionId").split(":")[0];
-            return flowsProcessDefinitionResource.canStartProcesByDefinitionKey(definitionKey);
         }
     }
 
@@ -548,19 +535,32 @@ public class FlowsTaskResource {
         return ResponseEntity.ok(response);
     }
 
+
+    public boolean canCompleteTaskOrStartProcessInstance(MultipartHttpServletRequest req) {
+        String taskId = (String) req.getParameter("taskId");
+        if (taskId != null) {
+            String username = SecurityUtils.getCurrentUserLogin();
+            return canCompleteTask(taskId, Optional.of(username));
+        } else {
+            String definitionKey = (String) req.getParameter("processDefinitionId").split(":")[0];
+            return flowsProcessDefinitionResource.canStartProcesByDefinitionKey(definitionKey);
+        }
+    }
+
+//    todo: chi può assegnare un task?
+//    public boolean canAssignTask(String taskId, String user) {
+//    }
+
     // TODO magari un giorno avremo degli array, ma per adesso ce lo facciamo andare bene cosi'
     private static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
 
         Map<String, Object> data = new HashMap<>();
-
         List<String> parameterNames = Collections.list(req.getParameterNames());
         parameterNames.stream().forEach(paramName -> {
             // se ho un json non aggiungo i suoi singoli campi
             if (!parameterNames.contains(paramName.split("\\[")[0] +"_json"))
                 data.put(paramName, req.getParameter(paramName));
         });
-
         return data;
-
     }
 }
