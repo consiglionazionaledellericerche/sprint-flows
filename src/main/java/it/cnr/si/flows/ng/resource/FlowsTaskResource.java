@@ -2,7 +2,6 @@ package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.exception.FlowsPermissionException;
 import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
 import it.cnr.si.flows.ng.service.CounterService;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
@@ -15,7 +14,6 @@ import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
-import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
@@ -35,7 +33,6 @@ import org.activiti.rest.service.api.runtime.task.TaskResponse;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -49,7 +46,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -64,6 +60,7 @@ import static it.cnr.si.flows.ng.utils.Utils.*;
 public class FlowsTaskResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsTaskResource.class);
+    public static final String ERROR_MESSAGE = "message";
 
     @Inject
     protected RestResponseFactory restResponseFactory;
@@ -142,9 +139,9 @@ public class FlowsTaskResource {
         String username = SecurityUtils.getCurrentUserLogin();
         List<String> authorities =
                 SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .map(Utils::removeLeadingRole)
-                .collect(Collectors.toList());
+                        .map(GrantedAuthority::getAuthority)
+                        .map(Utils::removeLeadingRole)
+                        .collect(Collectors.toList());
 
         TaskQuery taskQuery = taskService.createTaskQuery()
                 .taskCandidateUser(username)
@@ -226,7 +223,7 @@ public class FlowsTaskResource {
             }
         }
         List<TaskResponse> responseList = list.subList(firstResult <= list.size() ? firstResult : list.size(),
-                maxResults <= list.size() ? maxResults : list.size());
+                                                       maxResults <= list.size() ? maxResults : list.size());
 
         DataResponse response = new DataResponse();
         response.setStart(firstResult);
@@ -273,7 +270,7 @@ public class FlowsTaskResource {
 
         if (assignee != null) {
             LOGGER.error("L'utente {} ha tentato di prendere in carico il  task {}, ma il task e' gia' in carico ad altri", username, taskId);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("message", "Il task e' gia' in carico ad altri"));
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf(ERROR_MESSAGE, "Il task e' gia' in carico ad altri"));
 
         } else {
             List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
@@ -291,7 +288,7 @@ public class FlowsTaskResource {
                 return new ResponseEntity<Map<String,Object>>(HttpStatus.OK);
             } else {
                 LOGGER.error("L'utente {} ha tentato di prendere in carico il  task {}", username, taskId);
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("message", "L'utente non e' abilitato ad eseguire l'azione richiesta"));
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("ERROR_MESSAGE", "L'utente non e' abilitato ad eseguire l'azione richiesta"));
             }
         }
     }
@@ -329,6 +326,7 @@ public class FlowsTaskResource {
     @RequestMapping(value = "/{id}/{user}", method = RequestMethod.PUT)
     @Secured(AuthoritiesConstants.USER)
     @Timed
+    // TODO PreAuthorize(@flowsTaskResource.blablabla)
     public ResponseEntity<Map<String, Object>> assignTask(
             HttpServletRequest req,
             @PathVariable("id") String id,
@@ -364,9 +362,9 @@ public class FlowsTaskResource {
             List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
             List<String> authorities =
                     flowsUserDetailsService.loadUserByUsername(username).getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .map(Utils::removeLeadingRole)
-                    .collect(Collectors.toList());
+                            .map(GrantedAuthority::getAuthority)
+                            .map(Utils::removeLeadingRole)
+                            .collect(Collectors.toList());
 
             return identityLinks.stream()
                     .filter(l -> l.getType().equals("candidate"))
@@ -402,34 +400,44 @@ public class FlowsTaskResource {
         Map<String, Object> data = extractParameters(req);
         data.putAll(attachmentService.extractAttachmentsVariables(req));
 
-        if ( isEmpty(taskId) ) {
-
+        if (isEmpty(taskId)) {
             ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitionId).singleResult();
+            try {
+                String counterId = processDefinition.getName() + "-" + Calendar.getInstance().get(Calendar.YEAR);
+                String key = counterId + "-" + counterService.getNext(counterId);
 
-            String counterId = processDefinition.getName() +"-"+ Calendar.getInstance().get(Calendar.YEAR);
-            String key =  counterId +"-"+ counterService.getNext(counterId);
+                data.put("title", key);
+                data.put("initiator", username);
+                data.put("startDate", new Date());
 
-            data.put("title", key);
-            data.put("initiator", username);
-            data.put("startDate", new Date());
+                ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
 
-            ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
+                LOGGER.info("Avviata istanza di processo {}, id: {}", key, instance.getId());
 
-            LOGGER.info("Avviata istanza di processo {}, id: {}", key, instance.getId());
+                ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
+                return new ResponseEntity<>(response, HttpStatus.OK);
 
-            ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-
+            } catch (Exception e) {
+                String errorMessage = String.format("Errore nell'avvio della Process Instances di tipo %s con eccezione:", processDefinition);
+                LOGGER.error(errorMessage, e);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mapOf(ERROR_MESSAGE, errorMessage));
+            }
         } else {
+            try {
+                // aggiungo l'identityLink che indica l'utente che esegue il task
+                taskService.addUserIdentityLink(taskId, username, TASK_EXECUTOR);
+                taskService.setVariablesLocal(taskId, data);
+                taskService.complete(taskId, data);
 
-            // aggiungo l'identityLink che indica l'utente che esegue il task
-            // TODO ma questo e' necessario? - mtrycz
-            taskService.addUserIdentityLink(taskId, username, TASK_EXECUTOR);
-
-            taskService.setVariablesLocal(taskId, data);
-            taskService.complete(taskId, data);
-
-            return new ResponseEntity<>(HttpStatus.OK);
+                return new ResponseEntity<>(HttpStatus.OK);
+            } catch (Exception e) {
+                //Se non riesco a completare il task rimuovo l'identityLink che indica "l'esecutore" del task e restituisco un INTERNAL_SERVER_ERROR
+                //l'alternativa sarebbe aggiungere l'identityLink dopo avwer completato il task ma posso creare identityLink SOLO di task attivi
+                String errorMessage = String.format("Errore durante il tentativo di completamento del task %s da parte dell'utente %s: %s", taskId, username, e.getMessage());
+                LOGGER.error(errorMessage);
+                taskService.deleteUserIdentityLink(taskId, username, TASK_EXECUTOR);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mapOf(ERROR_MESSAGE, errorMessage));
+            }
         }
     }
 
@@ -440,8 +448,8 @@ public class FlowsTaskResource {
             isUnclaimableVariable.setName("isReleasable");
             // if has candidate groups or users -> can release
             isUnclaimableVariable.setValue(taskService.getIdentityLinksForTask(task.getId())
-                    .stream()
-                    .anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
+                                                   .stream()
+                                                   .anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
             task.getVariables().add(isUnclaimableVariable);
         }
     }
