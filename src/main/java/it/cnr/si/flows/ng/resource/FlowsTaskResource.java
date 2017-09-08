@@ -194,41 +194,30 @@ public class FlowsTaskResource {
                 .collect(Collectors.toList());
         List<String> members = new ArrayList<>();
         for (String myGroup : myGroups) {
+        	if (!(myGroup.indexOf("afferenza") > -1) && !(myGroup.indexOf("USER") > -1) && !(myGroup.indexOf("DEPARTMENT") > -1) && !(myGroup.indexOf("PREVIUOS") > -1)&& (myGroup != null) ){
             List<String> userWithMyMembership = membershipService.findMembersInGroup(myGroup);
             userWithMyMembership.remove(username);
+            members.removeAll(userWithMyMembership);
             members.addAll(userWithMyMembership);
+        	}
         }
-        ////PROCEDIMENTO DI SELEZIONE NORMALE (NON FUNZIONA QUINDI VIENE FATTO A MANO)
-        //        // verifico che i task siano assegnati ALMENO ad uno dei "members"
-        //        taskQuery.or();
-        //        for(int i = 0; i < members.size() - 1; i++){
-        //            taskQuery = taskQuery
-        ////                    .or()
-        //                    .taskAssignee(members.get(i));
-        ////                    .endOr();
-        //        }
-        //        taskQuery = taskQuery
-        ////                .or()
-        //                .taskAssignee(members.get(members.size() - 1))
-        //                .endOr();
+        
+//		TODO: da analizzare se le prestazioni sono migliori rispetto a farsi dare la lista di task attivi e ciclare per quali il member è l'assignee (codice di Martin sottostante) 
 
-        //        List<TaskResponse> list = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
+        List<TaskResponse> list1 = new ArrayList<TaskResponse>();
 
-        List<TaskResponse> appo = restResponseFactory.createTaskResponseList(taskQuery.list());
-        List<TaskResponse> list = new ArrayList<>();
-
-        for (TaskResponse task : appo) {
-            if (members.contains(task.getAssignee())) {
-                list.add(task);
-            }
+        for(int i = 0; i < members.size(); i++){
+                List<TaskResponse> appo1 = restResponseFactory.createTaskResponseList(taskQuery.taskAssignee(members.get(i)).list());
+                list1.addAll(appo1);
         }
-        List<TaskResponse> responseList = list.subList(firstResult <= list.size() ? firstResult : list.size(),
-                                                       maxResults <= list.size() ? maxResults : list.size());
+                
+        List<TaskResponse> responseList = list1.subList(firstResult <= list1.size() ? firstResult : list1.size(),
+                maxResults <= list1.size() ? maxResults : list1.size());
 
         DataResponse response = new DataResponse();
         response.setStart(firstResult);
         response.setSize(responseList.size());
-        response.setTotal(list.size());
+        response.setTotal(list1.size());
         response.setData(responseList);
 
         return ResponseEntity.ok(response);
