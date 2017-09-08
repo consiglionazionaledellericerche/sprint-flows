@@ -139,14 +139,17 @@ public class FlowsProcessInstanceResource {
 
     public boolean canVisualizeProcessInstance(String processInstanceId) {
         Optional<String> username = Optional.of(SecurityUtils.getCurrentUserLogin());
-        List<IdentityLink> il = runtimeService.getIdentityLinksForProcessInstance(processInstanceId);
-
         List<String> authorities = flowsUserDetailsService.loadUserByUsername(username.orElse("")).getAuthorities().stream().map(GrantedAuthority::getAuthority)
                 .map(Utils::removeLeadingRole)
                 .collect(Collectors.toList());
-
-        return il.stream().anyMatch(link -> authorities.contains(link.getGroupId()));
-    }
+		//se ho un'utenza amministrativa posso vedere i "dettagli" della processInstances
+		if (authorities.contains("ADMIN")) {
+			return true;
+		} else {
+			List<IdentityLink> il = runtimeService.getIdentityLinksForProcessInstance(processInstanceId);
+			return il.stream().anyMatch(link -> authorities.contains(link.getGroupId()));
+		}
+	}
 
 	// TODO refactor in path param
 	@RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
