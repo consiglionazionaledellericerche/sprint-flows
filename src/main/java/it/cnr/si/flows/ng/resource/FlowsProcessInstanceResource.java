@@ -158,15 +158,6 @@ public class FlowsProcessInstanceResource {
         return ResponseEntity.ok(response);
     }
 
-    public boolean canVisualizeProcessInstance(String processInstanceId) {
-        Optional<String> username = Optional.of(SecurityUtils.getCurrentUserLogin());
-        List<String> authorities = flowsUserDetailsService.loadUserByUsername(username.orElse("")).getAuthorities().stream().map(GrantedAuthority::getAuthority)
-                .map(Utils::removeLeadingRole)
-                .collect(Collectors.toList());
-
-        List<IdentityLink> il = runtimeService.getIdentityLinksForProcessInstance(processInstanceId);
-        return il.stream().anyMatch(link -> authorities.contains(link.getGroupId()));
-    }
 
     @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
@@ -178,6 +169,7 @@ public class FlowsProcessInstanceResource {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+
     @RequestMapping(value = "deleteProcessInstance", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.ADMIN)
     @Timed
@@ -188,6 +180,7 @@ public class FlowsProcessInstanceResource {
         processInstanceResource.deleteProcessInstance(processInstanceId, deleteReason, response);
         return response;
     }
+
 
     // TODO ???
     @RequestMapping(value = "suspendProcessInstance", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -402,4 +395,16 @@ public class FlowsProcessInstanceResource {
 
         return new ResponseEntity<>(mappedProcessInstances, HttpStatus.OK);
     }
+
+
+    public boolean canVisualizeProcessInstance(String processInstanceId) {
+        Optional<String> username = Optional.of(SecurityUtils.getCurrentUserLogin());
+        List<String> authorities = flowsUserDetailsService.loadUserByUsername(username.orElse("")).getAuthorities().stream().map(GrantedAuthority::getAuthority)
+                .map(Utils::removeLeadingRole)
+                .collect(Collectors.toList());
+
+        List<IdentityLink> il = runtimeService.getIdentityLinksForProcessInstance(processInstanceId);
+        return il.stream().anyMatch(link -> authorities.contains(link.getGroupId()));
+    }
+
 }
