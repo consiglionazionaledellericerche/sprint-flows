@@ -1,21 +1,8 @@
 package it.cnr.si.flows.ng.resource;
 
-import static it.cnr.si.flows.ng.TestServices.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
-import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
-import static it.cnr.si.flows.ng.utils.Utils.ASC;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.springframework.http.HttpStatus.OK;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
+import it.cnr.jada.firma.arss.ArubaSignServiceException;
+import it.cnr.si.FlowsApp;
+import it.cnr.si.flows.ng.TestServices;
 import org.activiti.engine.TaskService;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
@@ -36,9 +23,19 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import it.cnr.jada.firma.arss.ArubaSignServiceException;
-import it.cnr.si.FlowsApp;
-import it.cnr.si.flows.ng.TestServices;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import static it.cnr.si.flows.ng.TestServices.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
+import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
+import static it.cnr.si.flows.ng.utils.Utils.ASC;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.springframework.http.HttpStatus.OK;
 
 
 @RunWith(SpringRunner.class)
@@ -111,7 +108,7 @@ public class FlowsTaskResourceTest {
     }
 
 
-    @Test(expected = AccessDeniedException.class)
+    @Test
     public void testGetAvailableTasks() throws IOException {
         processInstance = util.mySetUp("acquisti-trasparenza");
         //SFD è sfd@sisinfo (quindi può vedere il task istanziato)
@@ -123,26 +120,38 @@ public class FlowsTaskResourceTest {
         assertEquals(1, ((ArrayList) response.getBody().getData()).size());
         util.logout();
 
-        //USER NON è sfd@sisinfo (quindi può vedere il task istanziato)
+        //USER NON è sfd@sisinfo (quindi NON può vedere il task istanziato)
         util.loginUser();
         response = flowsTaskResource.getAvailableTasks(new MockHttpServletRequest(), ALL_PROCESS_INSTANCES, 0, 1000, ASC);
         assertEquals(OK, response.getStatusCode());
         assertEquals(0, response.getBody().getSize());
         assertEquals(0, ((ArrayList) response.getBody().getData()).size());
         util.logout();
-
-        //spaclient ha solo ROLE_ADMIN e non ha ROLE_USER(quindi non può accedere al servizio - AccessDeniedException)
-        util.loginSpaclient();
-        flowsTaskResource.getAvailableTasks(new MockHttpServletRequest(), ALL_PROCESS_INSTANCES, 0, 1000, ASC);
     }
 
 
-    @Test
+    @Test(expected = AccessDeniedException.class)
     public void testGetTaskInstance() throws IOException {
         processInstance = util.mySetUp("acquisti-trasparenza");
         ResponseEntity<Map<String, Object>> response = flowsTaskResource.getTask(util.getFirstTaskId());
         assertEquals(OK, response.getStatusCode());
         assertEquals(FIRST_TASK_NAME, ((TaskResponse) response.getBody().get("task")).getName());
+        //verifico che gli utenti SENZA ROLE_ADMIN non possano accedere al servizio
+        util.logout();
+        util.loginUser();
+        flowsTaskResource.getTask(util.getFirstTaskId());
+    }
+
+
+    @Test(expected = AccessDeniedException.class)
+    public void testVerifyGetTaskInstance() throws IOException {
+        processInstance = util.mySetUp("acquisti-trasparenza");
+
+        //verifico che gli utenti che NON SONO IN GRUPPI CANDIDATE DEL TASK NE' ROLE_ADMIN
+        // (ad esempio il direttore) non possano accedere al servizio
+        util.logout();
+        util.loginDirettore();
+        flowsTaskResource.getTask(util.getFirstTaskId());
     }
 
 
@@ -234,12 +243,13 @@ public class FlowsTaskResourceTest {
         assertEquals(OK, response.getStatusCode());
         util.logout();
 
-//      spaclient NON è sfd@sisinfo quindi NON può richiamare il metodo
-        util.loginSpaclient();
-        try {
-            response = flowsTaskResource.claimTask(util.getFirstTaskId());
-            fail("Expected AccessDeniedException");
-        } catch (AccessDeniedException e) { /* expected */}
+//        todo: testare il caso in cui un utente non opuò richiamare il metodo(non spaclient)
+////      spaclient NON è sfd@sisinfo quindi NON può richiamare il metodo
+//        util.loginSpaclient();
+//        try {
+//            response = flowsTaskResource.claimTask(util.getFirstTaskId());
+//            fail("Expected AccessDeniedException");
+//        } catch (AccessDeniedException e) { /* expected */}
     }
 
 
