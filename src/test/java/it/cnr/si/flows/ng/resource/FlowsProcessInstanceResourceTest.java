@@ -117,10 +117,15 @@ public class FlowsProcessInstanceResourceTest {
         HashMap attachments = (HashMap) ((HashMap) response.getBody()).get("attachments");
         assertEquals(0, attachments.size());
 
-        //verifica risposta 403 Forbidden in caso di accesso di utenti non autorizzati
+        //verifica che gli utenti con ROLE_ADMIN POSSANO accedere al servizio
         util.logout();
-        util.loginSpaclient();
-        response = flowsProcessInstanceResource.getProcessInstanceById(new MockHttpServletRequest(), processInstance.getId());
+        util.loginAdmin();
+        flowsProcessInstanceResource.getProcessInstanceById(new MockHttpServletRequest(), processInstance.getId());
+
+        //verifica AccessDeniedException (risposta 403 Forbidden) in caso di accesso di utenti non autorizzati
+        util.logout();
+        util.loginUser();
+        flowsProcessInstanceResource.getProcessInstanceById(new MockHttpServletRequest(), processInstance.getId());
     }
 
     @Test
