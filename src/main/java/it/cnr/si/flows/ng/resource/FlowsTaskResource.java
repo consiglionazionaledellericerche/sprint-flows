@@ -194,25 +194,25 @@ public class FlowsTaskResource {
                 .collect(Collectors.toList());
         List<String> members = new ArrayList<>();
         for (String myGroup : myGroups) {
-        	if (!(myGroup.indexOf("afferenza") > -1) && !(myGroup.indexOf("USER") > -1) && !(myGroup.indexOf("DEPARTMENT") > -1) && !(myGroup.indexOf("PREVIUOS") > -1)&& (myGroup != null) ){
-            List<String> userWithMyMembership = membershipService.findMembersInGroup(myGroup);
-            userWithMyMembership.remove(username);
-            members.removeAll(userWithMyMembership);
-            members.addAll(userWithMyMembership);
-        	}
+            if (!(myGroup.indexOf("afferenza") > -1) && !(myGroup.indexOf("USER") > -1) && !(myGroup.indexOf("DEPARTMENT") > -1) && !(myGroup.indexOf("PREVIUOS") > -1) && (myGroup != null)) {
+                List<String> userWithMyMembership = membershipService.findMembersInGroup(myGroup);
+                userWithMyMembership.remove(username);
+                members.removeAll(userWithMyMembership);
+                members.addAll(userWithMyMembership);
+            }
         }
-        
+
 //		TODO: da analizzare se le prestazioni sono migliori rispetto a farsi dare la lista di task attivi e ciclare per quali il member è l'assignee (codice di Martin sottostante) 
 
         List<TaskResponse> list1 = new ArrayList<TaskResponse>();
 
         for(int i = 0; i < members.size(); i++){
-                List<TaskResponse> appo1 = restResponseFactory.createTaskResponseList(taskQuery.taskAssignee(members.get(i)).list());
-                list1.addAll(appo1);
+            List<TaskResponse> appo1 = restResponseFactory.createTaskResponseList(taskQuery.taskAssignee(members.get(i)).list());
+            list1.addAll(appo1);
         }
-                
+
         List<TaskResponse> responseList = list1.subList(firstResult <= list1.size() ? firstResult : list1.size(),
-                maxResults <= list1.size() ? maxResults : list1.size());
+                                                        maxResults <= list1.size() ? maxResults : list1.size());
 
         DataResponse response = new DataResponse();
         response.setStart(firstResult);
@@ -224,7 +224,7 @@ public class FlowsTaskResource {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    // TODO @PreAuthorize("@flowsTaskResource.blablabla")
+    @PreAuthorize("hasRole('ROLE_ADMIN') || @flowsTaskResource.canVisualizeTask(#taskId)")
     @Timed
     public ResponseEntity<Map<String, Object>> getTask(@PathVariable("id") String taskId) {
 
@@ -246,7 +246,7 @@ public class FlowsTaskResource {
 
 
     @RequestMapping(value = "/claim/{taskId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured(AuthoritiesConstants.USER)
+//    @PreAuthorize("hasRole('ROLE_ADMIN') || @flowsTaskResource.canAssignTask(#taskId)")
     @Timed
     public ResponseEntity<Map<String, Object>> claimTask(@PathVariable("taskId") String taskId) {
 
@@ -536,9 +536,17 @@ public class FlowsTaskResource {
         }
     }
 
-//    todo: chi può assegnare un task?
-//    public boolean canAssignTask(String taskId, String user) {
-//    }
+
+    public boolean canVisualizeTask(String taskId) {
+        Optional<String> username = Optional.of(SecurityUtils.getCurrentUserLogin());
+
+        List<String> authorities = flowsUserDetailsService.loadUserByUsername(username.orElse("")).getAuthorities().stream().map(GrantedAuthority::getAuthority)
+                .map(Utils::removeLeadingRole)
+                .collect(Collectors.toList());
+
+        List<IdentityLink> il = taskService.getIdentityLinksForTask(taskId);
+        return il.stream().anyMatch(link -> authorities.contains(link.getGroupId()));
+    }
 
     // TODO magari un giorno avremo degli array, ma per adesso ce lo facciamo andare bene cosi'
     private static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
@@ -552,4 +560,9 @@ public class FlowsTaskResource {
         });
         return data;
     }
+
+
+    //todo: chi può assegnare un task?
+//    public boolean canAssignTask(String taskId, String user) {
+//    }
 }

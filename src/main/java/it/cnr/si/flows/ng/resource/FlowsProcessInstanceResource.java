@@ -406,5 +406,4 @@ public class FlowsProcessInstanceResource {
         List<IdentityLink> il = runtimeService.getIdentityLinksForProcessInstance(processInstanceId);
         return il.stream().anyMatch(link -> authorities.contains(link.getGroupId()));
     }
-
 }
