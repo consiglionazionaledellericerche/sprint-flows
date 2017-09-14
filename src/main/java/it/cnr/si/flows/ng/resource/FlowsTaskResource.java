@@ -37,6 +37,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -44,6 +45,9 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
@@ -55,6 +59,7 @@ import static it.cnr.si.flows.ng.utils.Utils.*;
  * @author mtrycz
  *
  */
+@Slf4j
 @RestController
 @RequestMapping("api/tasks")
 public class FlowsTaskResource {
@@ -242,19 +247,22 @@ public class FlowsTaskResource {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasPermission(#taskRaw, 'FlowsTaskResource.getTask')")
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Map<String, Object>> getTask(@PathVariable("id") String taskId) {
+    public ResponseEntity<Map<String, Object>> getTask(@PathVariable("id") Task taskRaw ) {
 
+        log.debug("Effettuata chiamata FlowsTaskResource.getTask, task = {}", taskRaw);
+        
         Map<String, Object> response = new HashMap<>();
-        Task taskRaw = taskService.createTaskQuery().taskId(taskId).includeProcessVariables().singleResult();
+        //Task taskRaw = taskService.createTaskQuery().taskId(taskId).includeProcessVariables().singleResult();
 
         // task + variables
         TaskResponse task = restResponseFactory.createTaskResponse(taskRaw);
         response.put("task", task);
 
         // attachments
-        ResponseEntity<Map<String, FlowsAttachment>> attachementsEntity = attachmentResource.getAttachementsForTask(taskId);
+        ResponseEntity<Map<String, FlowsAttachment>> attachementsEntity = attachmentResource.getAttachementsForTask(taskRaw.getId());
         Map<String, FlowsAttachment> attachments = attachementsEntity.getBody();
         attachments.values().stream().forEach(e -> e.setBytes(null)); // il contenuto dei file non mi serve, e rallenta l'UI
         response.put("attachments", attachments);

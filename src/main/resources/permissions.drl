@@ -1,0 +1,22 @@
+package it.cnr.si;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+
+import org.activiti.engine.task.Task;
+import it.cnr.si.security.PermissionCheck;
+
+/*
+ * Permesso di visualizzare solamente i propri task?
+ */
+rule ViewTask
+when
+  $a: Authentication()
+  $ga: GrantedAuthority(authority == 'ROLE_USER') from $a.authorities
+  /* TODO: implementare i controlli specifici tra task e utente corrente */
+  $t: Task()
+  $pc: PermissionCheck(permission == 'FlowsTaskResource.getTask', target == $t, granted == false)
+then
+  System.out.println("granted on task " + $t + ", permission to " + $a.getName());
+  $pc.grant();
+end

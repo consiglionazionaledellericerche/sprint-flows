@@ -1,0 +1,6 @@
+<kie:kmodule id="security" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://jboss.org/kie/6.0.0/kmodule">
+  <kie:kbase name="security-rules"></kie:kbase>
+</kie:kmodule>
+
+<bean id="kiePostProcessor" class="org.kie.spring.KModuleBeanFactoryPostProcessor" />
