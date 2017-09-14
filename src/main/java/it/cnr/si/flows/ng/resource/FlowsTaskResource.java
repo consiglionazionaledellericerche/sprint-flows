@@ -8,6 +8,7 @@ import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.FlowsUserDetailsService;
+import it.cnr.si.security.PermissionEvaluatorImpl;
 import it.cnr.si.security.SecurityUtils;
 import it.cnr.si.service.MembershipService;
 import org.activiti.engine.HistoryService;
@@ -20,7 +21,6 @@ import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.impl.util.json.JSONObject;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.IdentityLinkType;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
@@ -60,10 +60,9 @@ import static it.cnr.si.flows.ng.utils.Utils.*;
 public class FlowsTaskResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsTaskResource.class);
-    public static final String ERROR_MESSAGE = "message";
-
+    private static final String ERROR_MESSAGE = "message";
     @Inject
-    protected RestResponseFactory restResponseFactory;
+    private RestResponseFactory restResponseFactory;
     @Inject
     private MembershipService membershipService;
     @Inject
@@ -83,10 +82,9 @@ public class FlowsTaskResource {
     @Inject
     private FlowsAttachmentResource attachmentResource;
     @Inject
-    private FlowsProcessDefinitionResource flowsProcessDefinitionResource;
-
-
+    private PermissionEvaluatorImpl permissionEvaluator;
     private Utils utils = new Utils();
+
 
     @RequestMapping(value = "/mytasks", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
@@ -224,7 +222,7 @@ public class FlowsTaskResource {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ROLE_ADMIN') || @flowsTaskResource.canVisualizeTask(#taskId)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Map<String, Object>> getTask(@PathVariable("id") String taskId) {
 
@@ -246,123 +244,44 @@ public class FlowsTaskResource {
 
 
     @RequestMapping(value = "/claim/{taskId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-//    @PreAuthorize("hasRole('ROLE_ADMIN') || @flowsTaskResource.canAssignTask(#taskId)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.canAssignTask(#taskId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Map<String, Object>> claimTask(@PathVariable("taskId") String taskId) {
 
         String username = SecurityUtils.getCurrentUserLogin();
-        LOGGER.info("Do in carico il task {} a {}", taskId, username);
+        taskService.claim(taskId, username);
 
-        String assignee = taskService.createTaskQuery()
-                .taskId(taskId)
-                .singleResult().getAssignee();
-
-        if (assignee != null) {
-            LOGGER.error("L'utente {} ha tentato di prendere in carico il  task {}, ma il task e' gia' in carico ad altri", username, taskId);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf(ERROR_MESSAGE, "Il task e' gia' in carico ad altri"));
-
-        } else {
-            List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
-            List<String> authorities = flowsUserDetailsService.loadUserByUsername(username).getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .map(Utils::removeLeadingRole)
-                    .collect(Collectors.toList());
-
-            boolean isInCandidates = identityLinks.stream()
-                    .filter(l -> l.getType().equals("candidate"))
-                    .anyMatch(l -> authorities.contains(l.getGroupId()) );
-
-            if (isInCandidates) {
-                taskService.claim(taskId, username);
-                return new ResponseEntity<Map<String,Object>>(HttpStatus.OK);
-            } else {
-                LOGGER.error("L'utente {} ha tentato di prendere in carico il  task {}", username, taskId);
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("ERROR_MESSAGE", "L'utente non e' abilitato ad eseguire l'azione richiesta"));
-            }
-        }
+        return new ResponseEntity<Map<String, Object>>(HttpStatus.OK);
     }
 
 
-    @RequestMapping(value = "/claim/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured(AuthoritiesConstants.USER)
+    @RequestMapping(value = "/claim/{taskId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.canAssignTask(#taskId, @flowsUserDetailsService)")
     @Timed
-    public ResponseEntity<Map<String, Object>> unclaimTask(@PathVariable("id") String id) {
-
-        // TODO implementare anche nell'UI
-
-        String username = SecurityUtils.getCurrentUserLogin();
-        Task task = taskService.createTaskQuery()
-                .taskId(id)
-                .singleResult();
-        String assignee = task.getAssignee();
-
-        // if has candidate groups or users -> can release
-        boolean releasable = taskService.getIdentityLinksForTask(task.getId())
-                .stream()
-                .anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE));
-
-        if (!releasable)
-            return new ResponseEntity<Map<String,Object>>(HttpStatus.FORBIDDEN);
-
-        if (username.equals(assignee)) {
-            taskService.unclaim(id);
-            return new ResponseEntity<Map<String,Object>>(HttpStatus.OK);
-        } else {
-            return new ResponseEntity<Map<String,Object>>(HttpStatus.FORBIDDEN);
-        }
+    public ResponseEntity<Map<String, Object>> unclaimTask(@PathVariable("taskId") String taskId) {
+        taskService.unclaim(taskId);
+        return new ResponseEntity<Map<String, Object>>(HttpStatus.OK);
     }
 
 
     @RequestMapping(value = "/{id}/{user}", method = RequestMethod.PUT)
     @Secured(AuthoritiesConstants.USER)
     @Timed
-//    @PreAuthorize("@flowsTaskResource.canAssignTask(#id, #user)") todo: implementare
+    @PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.canAssignTask(#id, #user)")
     public ResponseEntity<Map<String, Object>> assignTask(
             HttpServletRequest req,
             @PathVariable("id") String id,
             @PathVariable("user") String user) {
-        //    todo: non è ancora usata nell'interfaccia, fare i test
-        //        String username = SecurityUtils.getCurrentUserLogin();
 
+        //    todo: non è ancora usata nell'interfaccia, fare i test
         taskService.setAssignee(id, user);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @RequestMapping(value = "canComplete/{taskId}/{user}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured(AuthoritiesConstants.USER)
-    @Timed
-    public boolean canCompleteTask(
-            @PathVariable("taskId") String taskId,
-            @PathVariable("username") Optional<String> user) {
-
-        String username = user.orElse(SecurityUtils.getCurrentUserLogin());
-        String assignee = taskService.createTaskQuery()
-                .taskId(taskId)
-                .singleResult().getAssignee();
-
-        if (assignee != null) {
-            // Se un assegnatario c'e', l'utente puo' completare il task se e' lui l'assegnatario
-            return assignee.equals(username);
-
-        } else {
-            // Se l'assegnatario non c'e', L'utente deve essere nei gruppi candidati
-            List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
-            List<String> authorities =
-                    flowsUserDetailsService.loadUserByUsername(username).getAuthorities().stream()
-                            .map(GrantedAuthority::getAuthority)
-                            .map(Utils::removeLeadingRole)
-                            .collect(Collectors.toList());
-
-            return identityLinks.stream()
-                    .filter(l -> l.getType().equals("candidate"))
-                    .anyMatch(l -> authorities.contains(l.getGroupId()) );
-        }
-    }
-
 
     @RequestMapping(value = "complete", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("@flowsTaskResource.canCompleteTaskOrStartProcessInstance(#req)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canCompleteTaskOrStartProcessInstance(#req, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Object> completeTask(MultipartHttpServletRequest req) throws IOException {
 
@@ -414,19 +333,6 @@ public class FlowsTaskResource {
                 taskService.deleteUserIdentityLink(taskId, username, TASK_EXECUTOR);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mapOf(ERROR_MESSAGE, errorMessage));
             }
-        }
-    }
-
-
-    private void addIsReleasableVariables(List<TaskResponse> tasks) {
-        for (TaskResponse task : tasks) {
-            RestVariable isUnclaimableVariable = new RestVariable();
-            isUnclaimableVariable.setName("isReleasable");
-            // if has candidate groups or users -> can release
-            isUnclaimableVariable.setValue(taskService.getIdentityLinksForTask(task.getId())
-                                                   .stream()
-                                                   .anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
-            task.getVariables().add(isUnclaimableVariable);
         }
     }
 
@@ -525,29 +431,6 @@ public class FlowsTaskResource {
     }
 
 
-    public boolean canCompleteTaskOrStartProcessInstance(MultipartHttpServletRequest req) {
-        String taskId = (String) req.getParameter("taskId");
-        if (taskId != null) {
-            String username = SecurityUtils.getCurrentUserLogin();
-            return canCompleteTask(taskId, Optional.of(username));
-        } else {
-            String definitionKey = (String) req.getParameter("processDefinitionId").split(":")[0];
-            return flowsProcessDefinitionResource.canStartProcesByDefinitionKey(definitionKey);
-        }
-    }
-
-
-    public boolean canVisualizeTask(String taskId) {
-        Optional<String> username = Optional.of(SecurityUtils.getCurrentUserLogin());
-
-        List<String> authorities = flowsUserDetailsService.loadUserByUsername(username.orElse("")).getAuthorities().stream().map(GrantedAuthority::getAuthority)
-                .map(Utils::removeLeadingRole)
-                .collect(Collectors.toList());
-
-        List<IdentityLink> il = taskService.getIdentityLinksForTask(taskId);
-        return il.stream().anyMatch(link -> authorities.contains(link.getGroupId()));
-    }
-
     // TODO magari un giorno avremo degli array, ma per adesso ce lo facciamo andare bene cosi'
     private static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
 
@@ -562,7 +445,15 @@ public class FlowsTaskResource {
     }
 
 
-    //todo: chi può assegnare un task?
-//    public boolean canAssignTask(String taskId, String user) {
-//    }
+    private void addIsReleasableVariables(List<TaskResponse> tasks) {
+        for (TaskResponse task : tasks) {
+            RestVariable isUnclaimableVariable = new RestVariable();
+            isUnclaimableVariable.setName("isReleasable");
+            // if has candidate groups or users -> can release
+            isUnclaimableVariable.setValue(taskService.getIdentityLinksForTask(task.getId())
+                                                   .stream()
+                                                   .anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
+            task.getVariables().add(isUnclaimableVariable);
+        }
+    }
 }
