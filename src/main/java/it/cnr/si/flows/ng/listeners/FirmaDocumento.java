@@ -38,7 +38,7 @@ public class FirmaDocumento implements ExecutionListener {
 			throw new IllegalStateException("Questo Listener ha bisogno del campo 'nomeFileDaFirmare' nella process definition (nel Task Listener - Fields).");
 
 		String nomeVariabileFile = (String) nomeFileDaFirmare.getValue(execution);
-
+		String stringaOscurante = "******";
 		// TODO: validare presenza di queste tre variabili
 		String username = (String) execution.getVariable("username");
 		String password = (String) execution.getVariable("password");
@@ -56,7 +56,8 @@ public class FirmaDocumento implements ExecutionListener {
 			att.addStato(FlowsAttachment.Stato.Firmato);
 
 			attachmentService.saveAttachment(execution, nomeVariabileFile, att);
-
+			execution.setVariable("otp", stringaOscurante);
+			execution.setVariable("password", stringaOscurante);
 		} catch (ArubaSignServiceException e) {
 			LOGGER.error("firma non riuscita", e);
 			if (e.getMessage().indexOf("error code 0001") != -1) {
