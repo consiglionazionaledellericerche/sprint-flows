@@ -9,7 +9,6 @@ import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
-import org.activiti.rest.service.api.repository.ProcessDefinitionResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.joda.time.DateTime;
 import org.junit.After;
@@ -23,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -90,11 +90,11 @@ public class FlowsProcessInstanceResourceTest {
     }
 
 
-    @Test
+    @Test(expected = AccessDeniedException.class)
     public void testGetProcessInstanceById() throws Exception {
         processInstance = util.mySetUp("acquisti-trasparenza");
 
-        ResponseEntity<Map<String, Object>> response = flowsProcessInstanceResource.getProcessInstanceById(processInstance.getId());
+        ResponseEntity<Map<String, Object>> response = flowsProcessInstanceResource.getProcessInstanceById(new MockHttpServletRequest(), processInstance.getId());
         assertEquals(OK, response.getStatusCode());
 
         HistoricProcessInstanceResponse entity = (HistoricProcessInstanceResponse) ((HashMap) response.getBody()).get("entity");
@@ -116,6 +116,16 @@ public class FlowsProcessInstanceResourceTest {
 
         HashMap attachments = (HashMap) ((HashMap) response.getBody()).get("attachments");
         assertEquals(0, attachments.size());
+
+        //verifica che gli utenti con ROLE_ADMIN POSSANO accedere al servizio
+        util.logout();
+        util.loginAdmin();
+        flowsProcessInstanceResource.getProcessInstanceById(new MockHttpServletRequest(), processInstance.getId());
+
+        //verifica AccessDeniedException (risposta 403 Forbidden) in caso di accesso di utenti non autorizzati
+        util.logout();
+        util.loginUser();
+        flowsProcessInstanceResource.getProcessInstanceById(new MockHttpServletRequest(), processInstance.getId());
     }
 
     @Test

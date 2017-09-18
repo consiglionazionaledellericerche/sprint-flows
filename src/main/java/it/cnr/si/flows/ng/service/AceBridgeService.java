@@ -20,7 +20,7 @@ public class AceBridgeService {
 	@Resource(name = "aceJdbcTemplate")
 	private JdbcTemplate aceJdbcTemplate;
 
-	private static final String groupsForUser = "SELECT persona.nome, persona.cognome, persona.userid, persona.id, ruolo.sigla, ruolo.descr, ruolo.id,entitaorganizzativa.sigla, entitaorganizzativa.denominazione, entitaorganizzativa.id as eoid "+
+	private static final String groupsForUser = "SELECT persona.nome, persona.cognome, persona.userid, persona.id, ruolo.sigla, ruolo.descr, ruolo.id,entitaorganizzativa.sigla as eosigla, entitaorganizzativa.denominazione, entitaorganizzativa.id as eoid "+
 			"FROM ace.assegnazioneruolo "+
 			"INNER JOIN ace.persona ON persona.id = assegnazioneruolo.ass_persona_id "+
 			"INNER JOIN ace.ruolo ON ruolo.id = assegnazioneruolo.ruolo_id "+
@@ -63,7 +63,11 @@ public class AceBridgeService {
 		return aceJdbcTemplate.query(groupsForUser, new Object[] {username}, new RowMapper<String>() {
 			@Override
 			public String mapRow(ResultSet rs, int rowNum) throws SQLException {
-				return rs.getString("sigla") +"@"+ rs.getString("eoid");
+				if (rs.getString("eosigla").equals("CNR")){
+					return rs.getString("sigla");
+				} else {
+					return rs.getString("sigla") +"@"+ rs.getString("eoid");
+				}
 			}
 		});
 	}
@@ -86,58 +90,58 @@ public class AceBridgeService {
 		});
 	}
 
-	    public List<Pair<Integer, String>> getUoLike(String uoName) {
-	    	uoName = "%" + uoName + "%";
-			Object[] args = new Object[] {uoName, uoName};
+	public List<Pair<Integer, String>> getUoLike(String uoName) {
+		uoName = "%" + uoName + "%";
+		Object[] args = new Object[] {uoName, uoName};
 
-			return aceJdbcTemplate.query(uoLike, args, new RowMapper<Pair<Integer, String>>() {
-	            @Override
-	            public Pair<Integer, String> mapRow(ResultSet rs, int rowNum) throws SQLException {
-	            	Integer idUo = rs.getInt("id");
+		return aceJdbcTemplate.query(uoLike, args, new RowMapper<Pair<Integer, String>>() {
+			@Override
+			public Pair<Integer, String> mapRow(ResultSet rs, int rowNum) throws SQLException {
+				Integer idUo = rs.getInt("id");
 
-	            	String sigla = rs.getString("sigla");
-	            	if(sigla == null){
-	            		sigla = " ";
-	            	}
-	            	String denominazione = rs.getString("denominazione");
-	            	String cdsuo = rs.getString("cdsuo");
-	            	return Pair.of(idUo, cdsuo + "-" + sigla + "-" + denominazione );
-	            }
-	        });
-	    }
-
-		@Cacheable("nomiStrutture")
-		public String getNomeStruturaById(Integer id) {
-			return aceJdbcTemplate.query(denominazioneStruttura, new Object[] {id}, new ResultSetExtractor<String>() {
-				public String extractData(ResultSet rs) throws SQLException, DataAccessException {
-					rs.next();
-					return rs.getString("denominazione");
+				String sigla = rs.getString("sigla");
+				if(sigla == null){
+					sigla = " ";
 				}
-			});
-		}
+				String denominazione = rs.getString("denominazione");
+				String cdsuo = rs.getString("cdsuo");
+				return Pair.of(idUo, cdsuo + "-" + sigla + "-" + denominazione );
+			}
+		});
+	}
 
-		@Cacheable("nomiEstesiGruppiRuoloStruttura")
-		public String getExtendedGroupNome(String groupRuoloStrutturaName) {
-		    if (groupRuoloStrutturaName == null)
-		        return null;
+	@Cacheable("nomiStrutture")
+	public String getNomeStruturaById(Integer id) {
+		return aceJdbcTemplate.query(denominazioneStruttura, new Object[] {id}, new ResultSetExtractor<String>() {
+			public String extractData(ResultSet rs) throws SQLException, DataAccessException {
+				rs.next();
+				return rs.getString("denominazione");
+			}
+		});
+	}
 
-			String[] splitGroupRuoloStrutturaName = groupRuoloStrutturaName.split("@");
-			String ruoloName = splitGroupRuoloStrutturaName[0];
-			Integer strutturaId = Integer.parseInt(splitGroupRuoloStrutturaName[1]) ;
+	@Cacheable("nomiEstesiGruppiRuoloStruttura")
+	public String getExtendedGroupNome(String groupRuoloStrutturaName) {
+		if (groupRuoloStrutturaName == null)
+			return null;
 
-			String descrizioneRuolo = aceJdbcTemplate.query(denominazioneRuolo, new Object[] {ruoloName}, new ResultSetExtractor<String>() {
-				public String extractData(ResultSet rs) throws SQLException, DataAccessException {
-					rs.next();
-					return rs.getString("descr");
-				}
-			});
-			String descrizioneStruttura = aceJdbcTemplate.query(denominazioneStruttura, new Object[] {strutturaId}, new ResultSetExtractor<String>() {
-				public String extractData(ResultSet rs) throws SQLException, DataAccessException {
-					rs.next();
-					return rs.getString("sigla");
-				}
-			});
-			return (descrizioneRuolo + "@" + descrizioneStruttura);
-		}
+		String[] splitGroupRuoloStrutturaName = groupRuoloStrutturaName.split("@");
+		String ruoloName = splitGroupRuoloStrutturaName[0];
+		Integer strutturaId = Integer.parseInt(splitGroupRuoloStrutturaName[1]) ;
+
+		String descrizioneRuolo = aceJdbcTemplate.query(denominazioneRuolo, new Object[] {ruoloName}, new ResultSetExtractor<String>() {
+			public String extractData(ResultSet rs) throws SQLException, DataAccessException {
+				rs.next();
+				return rs.getString("descr");
+			}
+		});
+		String descrizioneStruttura = aceJdbcTemplate.query(denominazioneStruttura, new Object[] {strutturaId}, new ResultSetExtractor<String>() {
+			public String extractData(ResultSet rs) throws SQLException, DataAccessException {
+				rs.next();
+				return rs.getString("sigla");
+			}
+		});
+		return (descrizioneRuolo + "@" + descrizioneStruttura);
+	}
 
 }
