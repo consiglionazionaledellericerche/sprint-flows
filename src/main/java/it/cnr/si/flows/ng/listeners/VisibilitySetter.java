@@ -60,7 +60,9 @@ public class VisibilitySetter implements ActivitiEventListener {
             String processDefinitionKey = processDefinitionKeyVersionated.split(":")[0];
             if (processDefinitionKey != null) {
                 runtimeService.addGroupIdentityLink(processInstanceId, "supervisore#"+ processDefinitionKey, Utils.PROCESS_VISUALIZER);
-                runtimeService.addGroupIdentityLink(processInstanceId, "responsabile#"+ processDefinitionKey, Utils.PROCESS_VISUALIZER);            	
+                runtimeService.addGroupIdentityLink(processInstanceId, "responsabile#"+ processDefinitionKey, Utils.PROCESS_VISUALIZER);
+                runtimeService.addGroupIdentityLink(processInstanceId, "supervisore#flussi", Utils.PROCESS_VISUALIZER);
+                runtimeService.addGroupIdentityLink(processInstanceId, "responsabile#flussi", Utils.PROCESS_VISUALIZER);            	
             }
      
             String idStruttura = (String) variables.get("idStruttura");
