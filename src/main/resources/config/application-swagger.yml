@@ -1,0 +1,60 @@
+spring:
+    ldap:
+        userSearchBase: o=cnr, c=it
+        userSearchFilter: uid={0}
+        url: ldap://virtest1.si.cnr.it:389
+        managerDn: cn=mastercnrapp2,ou=account,o=cnr,c=it
+        managerPassword: pippa
+#     datasource:
+#         type: com.zaxxer.hikari.HikariDataSource
+#         url: jdbc:h2:mem:flows;DB_CLOSE_DELAY=-1
+# #        url: jdbc:h2:file:./DB-H2/flows;DB_CLOSE_DELAY=-1
+#         username: flows
+#         password:
+#     jpa:
+#         database-platform: it.cnr.si.domain.util.FixedH2Dialect
+#         database: H2
+#         show-sql: false
+    datasource:
+        type: com.zaxxer.hikari.HikariDataSource
+#        url: jdbc:h2:mem:flows;DB_CLOSE_DELAY=-1
+        url: jdbc:h2:file:./DB-H2/flows;DB_CLOSE_DELAY=-1
+        username: flows
+        password:
+        ace:
+            type: com.zaxxer.hikari.HikariDataSource
+            url: jdbc:postgresql://dbtest1.si.cnr.it:5432/anagrafica
+            name: ace
+            username: acereader
+            password: anagraficapw
+    jpa:
+        database-platform: it.cnr.si.domain.util.FixedH2Dialect
+        database: H2
+        show-sql: false
+    mail:
+        host: smtp.cnr.it
+        protocol: smtp
+        port: 25
+        send.error.to: marcinireneusz.trycz@cnr.it
+        from: no-reply@scrivaniadigitale
+
+#     datasource:
+#         type: com.zaxxer.hikari.HikariDataSource
+#         url: jdbc:postgresql://localhost:5432/activiti
+#         name:
+#         username: activiti
+#         password: activitipw
+#     jpa:
+#         database-platform: it.cnr.si.domain.util.FixedPostgreSQL82Dialect
+#         database: POSTGRESQL
+#         show-sql: false
+#
+
+cnr:
+    activiti:
+        diagram-font: DejaVu Sans
+    firma:
+         signcertid: AS0
+         typeotpauth: firma
+         url: http://arss.demo.si.cnr.it:8980/ArubaSignService/ArubaSignService?wsdl
+

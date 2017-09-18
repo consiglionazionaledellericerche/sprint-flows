@@ -2,27 +2,25 @@ package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.exception.FlowsPermissionException;
 import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
 import it.cnr.si.flows.ng.service.CounterService;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.FlowsUserDetailsService;
+import it.cnr.si.security.PermissionEvaluatorImpl;
 import it.cnr.si.security.SecurityUtils;
 import it.cnr.si.service.MembershipService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
-import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.impl.util.json.JSONObject;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.IdentityLinkType;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
@@ -35,7 +33,6 @@ import org.activiti.rest.service.api.runtime.task.TaskResponse;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -49,7 +46,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -64,9 +60,9 @@ import static it.cnr.si.flows.ng.utils.Utils.*;
 public class FlowsTaskResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsTaskResource.class);
-
+    private static final String ERROR_MESSAGE = "message";
     @Inject
-    protected RestResponseFactory restResponseFactory;
+    private RestResponseFactory restResponseFactory;
     @Inject
     private MembershipService membershipService;
     @Inject
@@ -86,10 +82,9 @@ public class FlowsTaskResource {
     @Inject
     private FlowsAttachmentResource attachmentResource;
     @Inject
-    private FlowsProcessDefinitionResource flowsProcessDefinitionResource;
-
-
+    private PermissionEvaluatorImpl permissionEvaluator;
     private Utils utils = new Utils();
+
 
     @RequestMapping(value = "/mytasks", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
@@ -142,9 +137,9 @@ public class FlowsTaskResource {
         String username = SecurityUtils.getCurrentUserLogin();
         List<String> authorities =
                 SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .map(Utils::removeLeadingRole)
-                .collect(Collectors.toList());
+                        .map(GrantedAuthority::getAuthority)
+                        .map(Utils::removeLeadingRole)
+                        .collect(Collectors.toList());
 
         TaskQuery taskQuery = taskService.createTaskQuery()
                 .taskCandidateUser(username)
@@ -197,48 +192,37 @@ public class FlowsTaskResource {
                 .collect(Collectors.toList());
         List<String> members = new ArrayList<>();
         for (String myGroup : myGroups) {
-            List<String> userWithMyMembership = membershipService.findMembersInGroup(myGroup);
-            userWithMyMembership.remove(username);
-            members.addAll(userWithMyMembership);
-        }
-        ////PROCEDIMENTO DI SELEZIONE NORMALE (NON FUNZIONA QUINDI VIENE FATTO A MANO)
-        //        // verifico che i task siano assegnati ALMENO ad uno dei "members"
-        //        taskQuery.or();
-        //        for(int i = 0; i < members.size() - 1; i++){
-        //            taskQuery = taskQuery
-        ////                    .or()
-        //                    .taskAssignee(members.get(i));
-        ////                    .endOr();
-        //        }
-        //        taskQuery = taskQuery
-        ////                .or()
-        //                .taskAssignee(members.get(members.size() - 1))
-        //                .endOr();
-
-        //        List<TaskResponse> list = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
-
-        List<TaskResponse> appo = restResponseFactory.createTaskResponseList(taskQuery.list());
-        List<TaskResponse> list = new ArrayList<>();
-
-        for (TaskResponse task : appo) {
-            if (members.contains(task.getAssignee())) {
-                list.add(task);
+            if (!(myGroup.indexOf("afferenza") > -1) && !(myGroup.indexOf("USER") > -1) && !(myGroup.indexOf("DEPARTMENT") > -1) && !(myGroup.indexOf("PREVIUOS") > -1) && (myGroup != null)) {
+                List<String> userWithMyMembership = membershipService.findMembersInGroup(myGroup);
+                userWithMyMembership.remove(username);
+                members.removeAll(userWithMyMembership);
+                members.addAll(userWithMyMembership);
             }
         }
-        List<TaskResponse> responseList = list.subList(firstResult <= list.size() ? firstResult : list.size(),
-                maxResults <= list.size() ? maxResults : list.size());
+
+//		TODO: da analizzare se le prestazioni sono migliori rispetto a farsi dare la lista di task attivi e ciclare per quali il member è l'assignee (codice di Martin sottostante) 
+
+        List<TaskResponse> list1 = new ArrayList<TaskResponse>();
+
+        for(int i = 0; i < members.size(); i++){
+            List<TaskResponse> appo1 = restResponseFactory.createTaskResponseList(taskQuery.taskAssignee(members.get(i)).list());
+            list1.addAll(appo1);
+        }
+
+        List<TaskResponse> responseList = list1.subList(firstResult <= list1.size() ? firstResult : list1.size(),
+                                                        maxResults <= list1.size() ? maxResults : list1.size());
 
         DataResponse response = new DataResponse();
         response.setStart(firstResult);
         response.setSize(responseList.size());
-        response.setTotal(list.size());
+        response.setTotal(list1.size());
         response.setData(responseList);
 
         return ResponseEntity.ok(response);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    // TODO @PreAuthorize("@flowsTaskResource.blablabla")
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Map<String, Object>> getTask(@PathVariable("id") String taskId) {
 
@@ -260,135 +244,44 @@ public class FlowsTaskResource {
 
 
     @RequestMapping(value = "/claim/{taskId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured(AuthoritiesConstants.USER)
+    @PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.canAssignTask(#taskId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Map<String, Object>> claimTask(@PathVariable("taskId") String taskId) {
 
         String username = SecurityUtils.getCurrentUserLogin();
-        LOGGER.info("Do in carico il task {} a {}", taskId, username);
+        taskService.claim(taskId, username);
 
-        String assignee = taskService.createTaskQuery()
-                .taskId(taskId)
-                .singleResult().getAssignee();
-
-        if (assignee != null) {
-            LOGGER.error("L'utente {} ha tentato di prendere in carico il  task {}, ma il task e' gia' in carico ad altri", username, taskId);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("message", "Il task e' gia' in carico ad altri"));
-
-        } else {
-            List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
-            List<String> authorities = flowsUserDetailsService.loadUserByUsername(username).getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .map(Utils::removeLeadingRole)
-                    .collect(Collectors.toList());
-
-            boolean isInCandidates = identityLinks.stream()
-                    .filter(l -> l.getType().equals("candidate"))
-                    .anyMatch(l -> authorities.contains(l.getGroupId()) );
-
-            if (isInCandidates) {
-                taskService.claim(taskId, username);
-                return new ResponseEntity<Map<String,Object>>(HttpStatus.OK);
-            } else {
-                LOGGER.error("L'utente {} ha tentato di prendere in carico il  task {}", username, taskId);
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("message", "L'utente non e' abilitato ad eseguire l'azione richiesta"));
-            }
-        }
+        return new ResponseEntity<Map<String, Object>>(HttpStatus.OK);
     }
 
 
-    @RequestMapping(value = "/claim/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured(AuthoritiesConstants.USER)
+    @RequestMapping(value = "/claim/{taskId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.canAssignTask(#taskId, @flowsUserDetailsService)")
     @Timed
-    public ResponseEntity<Map<String, Object>> unclaimTask(@PathVariable("id") String id) {
-
-        // TODO implementare anche nell'UI
-
-        String username = SecurityUtils.getCurrentUserLogin();
-        Task task = taskService.createTaskQuery()
-                .taskId(id)
-                .singleResult();
-        String assignee = task.getAssignee();
-
-        // if has candidate groups or users -> can release
-        boolean releasable = taskService.getIdentityLinksForTask(task.getId())
-                .stream()
-                .anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE));
-
-        if (!releasable)
-            return new ResponseEntity<Map<String,Object>>(HttpStatus.FORBIDDEN);
-
-        if (username.equals(assignee)) {
-            taskService.unclaim(id);
-            return new ResponseEntity<Map<String,Object>>(HttpStatus.OK);
-        } else {
-            return new ResponseEntity<Map<String,Object>>(HttpStatus.FORBIDDEN);
-        }
+    public ResponseEntity<Map<String, Object>> unclaimTask(@PathVariable("taskId") String taskId) {
+        taskService.unclaim(taskId);
+        return new ResponseEntity<Map<String, Object>>(HttpStatus.OK);
     }
+
 
     @RequestMapping(value = "/{id}/{user}", method = RequestMethod.PUT)
     @Secured(AuthoritiesConstants.USER)
     @Timed
+    @PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.canAssignTask(#id, #user)")
     public ResponseEntity<Map<String, Object>> assignTask(
             HttpServletRequest req,
             @PathVariable("id") String id,
             @PathVariable("user") String user) {
 
-        //    todo: test
-        //    todo: chi può asegnare un task?
-        //        String username = SecurityUtils.getCurrentUserLogin();
-
+        //    todo: non è ancora usata nell'interfaccia, fare i test
         taskService.setAssignee(id, user);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @RequestMapping(value = "canComplete/{taskId}/{user}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured(AuthoritiesConstants.USER)
-    @Timed
-    public boolean canCompleteTask(
-            @PathVariable("taskId") String taskId,
-            @PathVariable("username") Optional<String> user) {
-
-        String username = user.orElse(SecurityUtils.getCurrentUserLogin());
-        String assignee = taskService.createTaskQuery()
-                .taskId(taskId)
-                .singleResult().getAssignee();
-
-        if (assignee != null) {
-            // Se un assegnatario c'e', l'utente puo' completare il task se e' lui l'assegnatario
-            return assignee.equals(username);
-
-        } else {
-            // Se l'assegnatario non c'e', L'utente deve essere nei gruppi candidati
-            List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
-            List<String> authorities =
-                    flowsUserDetailsService.loadUserByUsername(username).getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .map(Utils::removeLeadingRole)
-                    .collect(Collectors.toList());
-
-            return identityLinks.stream()
-                    .filter(l -> l.getType().equals("candidate"))
-                    .anyMatch(l -> authorities.contains(l.getGroupId()) );
-        }
-    }
-
-
-    public boolean canCompleteTaskOrStartProcessInstance(MultipartHttpServletRequest req) {
-        String taskId = (String) req.getParameter("taskId");
-        if (taskId != null) {
-            String username = SecurityUtils.getCurrentUserLogin();
-            return canCompleteTask(taskId, Optional.of(username));
-        } else {
-            String definitionKey = (String) req.getParameter("processDefinitionId").split(":")[0];
-            return flowsProcessDefinitionResource.canStartProcesByDefinitionKey(definitionKey);
-        }
-    }
-
 
     @RequestMapping(value = "complete", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("@flowsTaskResource.canCompleteTaskOrStartProcessInstance(#req)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canCompleteTaskOrStartProcessInstance(#req, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Object> completeTask(MultipartHttpServletRequest req) throws IOException {
 
@@ -399,51 +292,47 @@ public class FlowsTaskResource {
         if ( isEmpty(taskId) && isEmpty(definitionId) )
             throw new ProcessDefinitionAndTaskIdEmptyException();
 
-
         Map<String, Object> data = extractParameters(req);
         data.putAll(attachmentService.extractAttachmentsVariables(req));
 
-        if ( isEmpty(taskId) ) {
-
+        if (isEmpty(taskId)) {
             ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitionId).singleResult();
+            try {
+                String counterId = processDefinition.getName() + "-" + Calendar.getInstance().get(Calendar.YEAR);
+                String key = counterId + "-" + counterService.getNext(counterId);
 
-            String counterId = processDefinition.getName() +"-"+ Calendar.getInstance().get(Calendar.YEAR);
-            String key =  counterId +"-"+ counterService.getNext(counterId);
+                data.put("title", key);
+                data.put("initiator", username);
+                data.put("startDate", new Date());
 
-            data.put("title", key);
-            data.put("initiator", username);
-            data.put("startDate", new Date());
+                ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
 
-            ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
+                LOGGER.info("Avviata istanza di processo {}, id: {}", key, instance.getId());
 
-            LOGGER.info("Avviata istanza di processo {}, id: {}", key, instance.getId());
+                ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
+                return new ResponseEntity<>(response, HttpStatus.OK);
 
-            ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-
+            } catch (Exception e) {
+                String errorMessage = String.format("Errore nell'avvio della Process Instances di tipo %s con eccezione:", processDefinition);
+                LOGGER.error(errorMessage, e);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mapOf(ERROR_MESSAGE, errorMessage));
+            }
         } else {
+            try {
+                // aggiungo l'identityLink che indica l'utente che esegue il task
+                taskService.addUserIdentityLink(taskId, username, TASK_EXECUTOR);
+                taskService.setVariablesLocal(taskId, data);
+                taskService.complete(taskId, data);
 
-            // aggiungo l'identityLink che indica l'utente che esegue il task
-            // TODO ma questo e' necessario? - mtrycz
-            taskService.addUserIdentityLink(taskId, username, TASK_EXECUTOR);
-
-            taskService.setVariablesLocal(taskId, data);
-            taskService.complete(taskId, data);
-
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-    }
-
-
-    private void addIsReleasableVariables(List<TaskResponse> tasks) {
-        for (TaskResponse task : tasks) {
-            RestVariable isUnclaimableVariable = new RestVariable();
-            isUnclaimableVariable.setName("isReleasable");
-            // if has candidate groups or users -> can release
-            isUnclaimableVariable.setValue(taskService.getIdentityLinksForTask(task.getId())
-                    .stream()
-                    .anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
-            task.getVariables().add(isUnclaimableVariable);
+                return new ResponseEntity<>(HttpStatus.OK);
+            } catch (Exception e) {
+                //Se non riesco a completare il task rimuovo l'identityLink che indica "l'esecutore" del task e restituisco un INTERNAL_SERVER_ERROR
+                //l'alternativa sarebbe aggiungere l'identityLink dopo avwer completato il task ma posso creare identityLink SOLO di task attivi
+                String errorMessage = String.format("Errore durante il tentativo di completamento del task %s da parte dell'utente %s: %s", taskId, username, e.getMessage());
+                LOGGER.error(errorMessage);
+                taskService.deleteUserIdentityLink(taskId, username, TASK_EXECUTOR);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mapOf(ERROR_MESSAGE, errorMessage));
+            }
         }
     }
 
@@ -541,18 +430,30 @@ public class FlowsTaskResource {
         return ResponseEntity.ok(response);
     }
 
+
     // TODO magari un giorno avremo degli array, ma per adesso ce lo facciamo andare bene cosi'
     private static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
 
         Map<String, Object> data = new HashMap<>();
-
-        Enumeration<String> parameterNames = req.getParameterNames();
-        while (parameterNames.hasMoreElements()) {
-            String paramName = parameterNames.nextElement();
-            data.put(paramName, req.getParameter(paramName));
-        }
-
+        List<String> parameterNames = Collections.list(req.getParameterNames());
+        parameterNames.stream().forEach(paramName -> {
+            // se ho un json non aggiungo i suoi singoli campi
+            if (!parameterNames.contains(paramName.split("\\[")[0] +"_json"))
+                data.put(paramName, req.getParameter(paramName));
+        });
         return data;
+    }
 
+
+    private void addIsReleasableVariables(List<TaskResponse> tasks) {
+        for (TaskResponse task : tasks) {
+            RestVariable isUnclaimableVariable = new RestVariable();
+            isUnclaimableVariable.setName("isReleasable");
+            // if has candidate groups or users -> can release
+            isUnclaimableVariable.setValue(taskService.getIdentityLinksForTask(task.getId())
+                                                   .stream()
+                                                   .anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
+            task.getVariables().add(isUnclaimableVariable);
+        }
     }
 }
