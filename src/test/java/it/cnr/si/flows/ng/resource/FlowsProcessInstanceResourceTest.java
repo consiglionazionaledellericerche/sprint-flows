@@ -4,11 +4,11 @@ import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.TestServices;
 import it.cnr.si.flows.ng.utils.Utils;
 import org.activiti.engine.HistoryService;
+import org.activiti.engine.RepositoryService;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
-import org.activiti.rest.service.api.repository.ProcessDefinitionResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.joda.time.DateTime;
 import org.junit.After;
@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -55,6 +56,9 @@ public class FlowsProcessInstanceResourceTest {
     private TestServices util;
     @Inject
     private FlowsProcessDefinitionResource flowsProcessDefinitionResource;
+    @Inject
+    private RepositoryService repositoryService;
+
     private ProcessInstanceResponse processInstance;
 
 
@@ -86,11 +90,11 @@ public class FlowsProcessInstanceResourceTest {
     }
 
 
-    @Test
+    @Test(expected = AccessDeniedException.class)
     public void testGetProcessInstanceById() throws Exception {
         processInstance = util.mySetUp("acquisti-trasparenza");
 
-        ResponseEntity<Map<String, Object>> response = flowsProcessInstanceResource.getProcessInstanceById(processInstance.getId());
+        ResponseEntity<Map<String, Object>> response = flowsProcessInstanceResource.getProcessInstanceById(new MockHttpServletRequest(), processInstance.getId());
         assertEquals(OK, response.getStatusCode());
 
         HistoricProcessInstanceResponse entity = (HistoricProcessInstanceResponse) ((HashMap) response.getBody()).get("entity");
@@ -99,8 +103,8 @@ public class FlowsProcessInstanceResourceTest {
         assertEquals(processInstance.getProcessDefinitionId(), entity.getProcessDefinitionId());
 
         HashMap appo = (HashMap) ((HashMap) response.getBody()).get("identityLinks");
-        assertEquals(1, appo.size());
-        HashMap identityLinks = (HashMap) appo.get(appo.keySet().toArray()[0]);
+        assertEquals(2, appo.size());
+        HashMap identityLinks = (HashMap) appo.get(appo.keySet().toArray()[1]); // TODO
         assertEquals("[${gruppoSFD}]", identityLinks.get("candidateGroups").toString());
         assertEquals(((HashSet) identityLinks.get("candidateUsers")).size(), 0);
         assertEquals(((ArrayList) identityLinks.get("links")).size(), 1);
@@ -112,20 +116,25 @@ public class FlowsProcessInstanceResourceTest {
 
         HashMap attachments = (HashMap) ((HashMap) response.getBody()).get("attachments");
         assertEquals(0, attachments.size());
+
+        //verifica che gli utenti con ROLE_ADMIN POSSANO accedere al servizio
+        util.logout();
+        util.loginAdmin();
+        flowsProcessInstanceResource.getProcessInstanceById(new MockHttpServletRequest(), processInstance.getId());
+
+        //verifica AccessDeniedException (risposta 403 Forbidden) in caso di accesso di utenti non autorizzati
+        util.logout();
+        util.loginUser();
+        flowsProcessInstanceResource.getProcessInstanceById(new MockHttpServletRequest(), processInstance.getId());
     }
 
     @Test
     public void testGetProcessInstances() throws IOException {
         processInstance = util.mySetUp("acquisti-trasparenza");
-        //Recupero la Process Definition per acquisti-trasparenza
-        util.loginUser();
-        DataResponse appo = (DataResponse) flowsProcessDefinitionResource.getAllProcessDefinitions();
-        String acquistiTrasparenzaId = ((ArrayList<ProcessDefinitionResponse>) appo.getData()).stream()
-                .filter(h -> h.getKey().contains("acquisti-trasparenza"))
-                .collect(Collectors.toList()).get(0).getId();
+
         //responsabileacquisti crea una seconda Process Instance di acquisti-trasparenza con suffisso "2" nel titoloIstanzaFlusso
-        util.logout();
         util.loginResponsabileAcquisti();
+        String acquistiTrasparenzaId = repositoryService.createProcessDefinitionQuery().processDefinitionKey("acquisti-trasparenza").latestVersion().singleResult().getId();
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
         req.setParameter("processDefinitionId", acquistiTrasparenzaId);
         req.setParameter("titoloIstanzaFlusso", TITOLO_DELL_ISTANZA_DEL_FLUSSO + "2");
