@@ -32,6 +32,7 @@ import java.text.ParseException;
 import java.util.Map;
 
 import static it.cnr.si.flows.ng.TestServices.JUNIT_TEST;
+import static it.cnr.si.flows.ng.dto.FlowsAttachment.ProcessDefinitionEnum.acquistiTrasparenza;
 import static it.cnr.si.flows.ng.utils.Actions.revoca;
 import static it.cnr.si.flows.ng.utils.Actions.revocaSemplice;
 import static org.junit.Assert.*;
@@ -69,7 +70,7 @@ public class SummaryPdfServiceTest {
 
     @Test
     public void testSummaryPdfProcessCompleted() throws IOException {
-        processInstance = util.mySetUp("acquisti-trasparenza");
+        processInstance = util.mySetUp(acquistiTrasparenza.getValue());
 
         Map<String, FlowsAttachment> docs = flowsAttachmentResource.getAttachementsForProcessInstance(processInstance.getId()).getBody();
         assertTrue(docs.isEmpty());
@@ -112,7 +113,7 @@ public class SummaryPdfServiceTest {
     @Test
     public void testSummaryPdfService() throws IOException, ParseException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        processInstance = util.mySetUp("acquisti-trasparenza");
+        processInstance = util.mySetUp(acquistiTrasparenza.getValue());
 
         util.loginSfd();
         completeTask();
