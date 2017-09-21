@@ -1,15 +1,16 @@
 package it.cnr.si.flows.ng.listeners.acquistitrasparenza;
 
-import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
-
-import javax.inject.Inject;
-
+import it.cnr.si.flows.ng.dto.FlowsAttachment.ProcessDefinitionEnum;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+
+import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 
 @Component
 public class AddVisualizerListener implements ExecutionListener {
@@ -26,10 +27,10 @@ public class AddVisualizerListener implements ExecutionListener {
     @Override
     public void notify(DelegateExecution execution) throws Exception {
 
-        String processDefinition = execution.getProcessDefinitionId();
-        processDefinition = processDefinition.substring(0, processDefinition.indexOf(":"));
+        String processDefinitionString = execution.getProcessDefinitionId();
+        ProcessDefinitionEnum processDefinition = ProcessDefinitionEnum.valueOf(processDefinitionString.substring(0, processDefinitionString.indexOf(":")));
         switch (processDefinition) {
-            case "acquisti-trasparenza":
+            case acquistiTrasparenza:
                 String struttura = (String) execution.getVariable("gruppoRA");
                 struttura = struttura.substring(struttura.indexOf('@') + 1, struttura.length());
 
@@ -45,7 +46,7 @@ public class AddVisualizerListener implements ExecutionListener {
                 LOGGER.info("Aggiunta IdentityLink al flusso {} per il gruppo {}", execution.getId(), "sfd@" + struttura);
                 break;
 
-            case "permessi-ferie":
+            case permessiFerie:
 
                 break;
         }

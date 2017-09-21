@@ -1,17 +1,10 @@
 package it.cnr.si.flows.ng.dto;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
+import java.util.*;
 
 public class FlowsAttachment implements Serializable {
 
@@ -38,15 +31,19 @@ public class FlowsAttachment implements Serializable {
         RimozioneDaPubblicazione
     }
 
+    public static final String PUBBLICAZIONE_FLAG = null;
+
     private static final long serialVersionUID = -1794306306586001492L;
 
     @SuppressWarnings("unused")
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsAttachment.class);
+    private String name;
 
-	public static final String PUBBLICAZIONE_FLAG = null;
-
-
-private String name;
+    public Map<String, Object> getMetadati() {
+        if (this.metadati == null)
+            this.metadati = new HashMap<>();
+        return this.metadati;
+    }
     private String filename;
     private Date   time;
     private String taskId;
@@ -124,10 +121,8 @@ private String name;
         this.taskName = taskName;
     }
 
-    public Map<String, Object> getMetadati() {
-        if (this.metadati == null)
-                this.metadati = new HashMap<>();
-        return this.metadati;
+    public void setMetadato(String nome, Object valore) {
+        getMetadati().put(nome, valore);
     }
 
     public void setMetadati(Map<String, Object> metadati) {
@@ -167,8 +162,19 @@ private String name;
         this.getMetadati().put("azione", a);
     }
 
-    public void setMetadato(String nome, Object valore) {
-    	getMetadati().put(nome, valore);
+    public enum ProcessDefinitionEnum {
+        acquistiTrasparenza("acquisti-trasparenza"),
+        permessiFerie("permessi-ferie");
+
+        private String value;
+
+        ProcessDefinitionEnum(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
     }
 
 //    public FlowsAttachment clone() {
