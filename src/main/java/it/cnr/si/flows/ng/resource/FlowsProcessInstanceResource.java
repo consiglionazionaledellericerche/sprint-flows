@@ -162,7 +162,7 @@ public class FlowsProcessInstanceResource {
 
     @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
-    @PreAuthorize("hasRole('ROLE_ADMIN') || @flowsProcessInstanceResource.canVisualizeProcessInstance(#processInstanceId)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Map<String, Object>> getProcessInstanceById(HttpServletRequest req, @RequestParam("processInstanceId") String processInstanceId) {
         Map<String, Object> result = flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId);
@@ -297,8 +297,8 @@ public class FlowsProcessInstanceResource {
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Void> setVariable(
             @RequestParam("processInstanceId") String processInstanceId,
-                                            @RequestParam("variableName") String variableName,
-                                            @RequestParam("value") String value) {
+            @RequestParam("variableName") String variableName,
+            @RequestParam("value") String value) {
         runtimeService.setVariable(processInstanceId, variableName, value);
         return ResponseEntity.ok().build();
     }
