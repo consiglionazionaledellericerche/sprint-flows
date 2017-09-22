@@ -192,7 +192,7 @@ public class FlowsTaskResource {
                 .collect(Collectors.toList());
         List<String> members = new ArrayList<>();
         for (String myGroup : myGroups) {
-            if (!(myGroup.indexOf("afferenza") > -1) && !(myGroup.indexOf("USER") > -1) && !(myGroup.indexOf("DEPARTMENT") > -1) && !(myGroup.indexOf("PREVIUOS") > -1) && (myGroup != null)) {
+            if (myGroup.indexOf("afferenza") <= -1 && myGroup.indexOf("USER") <= -1 && myGroup.indexOf("DEPARTMENT") <= -1 && myGroup.indexOf("PREVIUOS") <= -1 && (myGroup != null)) {
                 List<String> userWithMyMembership = membershipService.findMembersInGroup(myGroup);
                 userWithMyMembership.remove(username);
                 members.removeAll(userWithMyMembership);
@@ -267,7 +267,7 @@ public class FlowsTaskResource {
     @RequestMapping(value = "/{id}/{user}", method = RequestMethod.PUT)
     @Secured(AuthoritiesConstants.USER)
     @Timed
-    @PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.canAssignTask(#id, #user)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canAssignTask(#id, #user)")
     public ResponseEntity<Map<String, Object>> assignTask(
             HttpServletRequest req,
             @PathVariable("id") String id,
