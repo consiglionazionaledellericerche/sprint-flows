@@ -5,6 +5,7 @@ import it.cnr.si.flows.ng.utils.Utils;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.IdentityLinkType;
 import org.activiti.engine.task.Task;
@@ -45,12 +46,8 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
     HistoryService historyService;
 
 
-    public PermissionEvaluatorImpl() {
-    }
-
-
     /**
-     * Determino se un utente ha i permessi per visualizzare un Task.
+     * Determina se un utente ha i permessi per visualizzare un Task.
      * *
      *
      * @param taskId                  l'id del taskd
@@ -114,26 +111,38 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
      */
     public boolean canVisualize(String processInstanceId, FlowsUserDetailsService flowsUserDetailsService) {
         boolean canVisualize = false;
-        List<String> authorities = getAuthorities(SecurityUtils.getCurrentUserLogin(), flowsUserDetailsService);
+        String userName = SecurityUtils.getCurrentUserLogin();
+        List<String> authorities = getAuthorities(userName, flowsUserDetailsService);
+        ProcessInstance pi = runtimeService.createProcessInstanceQuery()
+                .processInstanceId(processInstanceId).includeProcessVariables().singleResult();
+        String idStruttura = (String) pi.getProcessVariables().get("idStruttura");
 
-//        ProcessInstance pi = runtimeService.createProcessInstanceQuery()
-//                .processInstanceId(processInstanceId).includeProcessVariables().singleResult();
+        if (authorities.stream().anyMatch(a -> a.contains("supervisore@CNR") ||
+                a.contains("responsabile@CNR") ||
+                a.contains("supervisore-struttura@" + idStruttura) ||
+                a.contains("responsabile-struttura@" + idStruttura) ||
+                a.contains("supervisore#" + pi.getProcessDefinitionKey() + "@CNR") ||
+                a.contains("responsabile#" + pi.getProcessDefinitionKey() + "@CNR") ||
+                a.contains("supervisore#" + pi.getProcessDefinitionKey() + "@" + idStruttura) ||
+                a.contains("responsabile#" + pi.getProcessDefinitionKey() + "@" + idStruttura)))
+            canVisualize = true;
+        else {
+            List<IdentityLink> ilv = runtimeService.getIdentityLinksForProcessInstance(pi.getProcessInstanceId()).stream()
+                    .filter(il -> il.getType().equals("visualizzatore"))
+                    .collect(Collectors.toList());
 
-//        todo: integrare anche le authorities che derivano da:
-//        1) prendo solo i gruppi con "afferenza diretta" (NON EREDITATA PER DISCENDENZA)
-//        2) scarto i gruppi con RUOLO "afferenza", "sede", "responsabile" o "supervisori"
-//        3) restano solo alcuni gruppi a cui associo altri gruppi secondo regole specifiche dell'applicazione (definite in una tabella del DB?)
-
-        List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(processInstanceId);
-//        String idStruttura = (String) pi.getProcessVariables().get("idStruttura");
-//        String processDefinitionName = pi.getProcessDefinitionKey();
-
-//        todo: aggiungere altre figure che hanno visibilità sulla Process Instance
-
-        canVisualize = identityLinks.stream()
-                .filter(l -> l.getType().equals("visualizzatore"))
-                .anyMatch(l -> authorities.contains(l.getGroupId()));
-
+            if (ilv.stream()
+                    .filter(il -> il.getUserId() != null)
+                    .anyMatch(il -> il.getUserId().equals(userName)))
+                canVisualize = true;
+            else {
+                if (ilv.stream()
+                        .filter(il -> il.getGroupId() != null)
+                        .filter(il -> !(il.getGroupId().startsWith("responsabile") || il.getGroupId().startsWith("supervisore")))
+                        .anyMatch(il -> authorities.contains(il.getGroupId())))
+                    canVisualize = true;
+            }
+        }
         return canVisualize;
     }
 
