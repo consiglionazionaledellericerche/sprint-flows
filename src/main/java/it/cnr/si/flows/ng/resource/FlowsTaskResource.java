@@ -267,7 +267,8 @@ public class FlowsTaskResource {
     @RequestMapping(value = "/{id}/{user}", method = RequestMethod.PUT)
     @Secured(AuthoritiesConstants.USER)
     @Timed
-    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canAssignTask(#id, #user)")
+//    todo: scommentare quando sarà pronta anche l'interfaccia grafica
+//    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canAssignTask(#id, #user)")
     public ResponseEntity<Map<String, Object>> assignTask(
             HttpServletRequest req,
             @PathVariable("id") String id,

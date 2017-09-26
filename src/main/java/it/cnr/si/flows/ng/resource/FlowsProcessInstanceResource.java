@@ -13,7 +13,6 @@ import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
-import org.activiti.engine.task.IdentityLink;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
@@ -30,7 +29,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -395,16 +393,5 @@ public class FlowsProcessInstanceResource {
         }
 
         return new ResponseEntity<>(mappedProcessInstances, HttpStatus.OK);
-    }
-
-
-    public boolean canVisualizeProcessInstance(String processInstanceId) {
-        Optional<String> username = Optional.of(SecurityUtils.getCurrentUserLogin());
-        List<String> authorities = flowsUserDetailsService.loadUserByUsername(username.orElse("")).getAuthorities().stream().map(GrantedAuthority::getAuthority)
-                .map(Utils::removeLeadingRole)
-                .collect(Collectors.toList());
-
-        List<IdentityLink> il = runtimeService.getIdentityLinksForProcessInstance(processInstanceId);
-        return il.stream().anyMatch(link -> authorities.contains(link.getGroupId()));
     }
 }
