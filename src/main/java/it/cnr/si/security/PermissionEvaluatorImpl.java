@@ -105,8 +105,8 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
      * Verifica che l'utente abbia la visibilità sulla Process Instance.
      *
      * @param processInstanceId       Il process instance id
-     * @param flowsUserDetailsService flowsUserDetailService: non posso "iniettarlo" nella classe perchè altrimenti avrei
-     *                                una dipendenza ciclica visto che anche le classi che lo richiamano potrebbero averlo iniettato
+     * @param flowsUserDetailsService flowsUserDetailService: non posso "iniettarlo" nella classe perchè altrimenti avrei una dipendenza
+     *                               ciclica visto che anche le classi che richiamano questo metodo potrebbero averlo iniettato
      * @return risultato della verifica dei permessi (booleano)
      */
     public boolean canVisualize(String processInstanceId, FlowsUserDetailsService flowsUserDetailsService) {
@@ -117,6 +117,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
                 .processInstanceId(processInstanceId).includeProcessVariables().singleResult();
         String idStruttura = (String) pi.getProcessVariables().get("idStruttura");
 
+//      controllo che l'utente abbia un authorities di tipo "supervisore" o "responsabile" della struttura o del tipo di flusso
         if (authorities.stream().anyMatch(a -> a.contains("supervisore@CNR") ||
                 a.contains("responsabile@CNR") ||
                 a.contains("supervisore-struttura@" + idStruttura) ||
@@ -124,18 +125,21 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
                 a.contains("supervisore#" + pi.getProcessDefinitionKey() + "@CNR") ||
                 a.contains("responsabile#" + pi.getProcessDefinitionKey() + "@CNR") ||
                 a.contains("supervisore#" + pi.getProcessDefinitionKey() + "@" + idStruttura) ||
-                a.contains("responsabile#" + pi.getProcessDefinitionKey() + "@" + idStruttura)))
+                a.contains("responsabile#" + pi.getProcessDefinitionKey() + "@" + idStruttura))) {
             canVisualize = true;
-        else {
+        } else {
+//          controllo gli Identity Link "visualizzatore" per gli user senza authorities di "supervisore" o "responsabile"
             List<IdentityLink> ilv = runtimeService.getIdentityLinksForProcessInstance(pi.getProcessInstanceId()).stream()
                     .filter(il -> il.getType().equals("visualizzatore"))
                     .collect(Collectors.toList());
-
+//          controllo gli Identity Link con userId(ad es.: rup in acquisti trasparenza)
             if (ilv.stream()
                     .filter(il -> il.getUserId() != null)
-                    .anyMatch(il -> il.getUserId().equals(userName)))
+                    .anyMatch(il -> il.getUserId().equals(userName))) {
                 canVisualize = true;
+            }
             else {
+//          controllo gli Identity Link con groupId(tutti gli altri)
                 if (ilv.stream()
                         .filter(il -> il.getGroupId() != null)
                         .filter(il -> !(il.getGroupId().startsWith("responsabile") || il.getGroupId().startsWith("supervisore")))
