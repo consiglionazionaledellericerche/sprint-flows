@@ -1,5 +1,6 @@
 package it.cnr.si.flows.ng.listeners;
 
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
@@ -7,7 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import static it.cnr.si.flows.ng.utils.Enum.Azione.Annullo;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.Annullato;
 
 @Component
 public class AnnullaDocumento implements ExecutionListener {
@@ -31,8 +33,8 @@ public class AnnullaDocumento implements ExecutionListener {
 
 
         FlowsAttachment att = (FlowsAttachment) execution.getVariable(nomeVariabileFile);
-        att.setAzione(FlowsAttachment.Azione.Annullo);
-        att.addStato(FlowsAttachment.Stato.Annullato);
+        att.setAzione(Annullo);
+        att.addStato(Annullato);
         att.setFilename(nomeVariabileFile + "_annullato_");
         execution.setVariable(nomeVariabileFile, att);
 

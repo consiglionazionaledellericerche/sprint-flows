@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static it.cnr.si.flows.ng.utils.Enum.Role.*;
+
 
 /**
  * The type Permission evaluator.
@@ -33,6 +35,7 @@ import java.util.stream.Collectors;
 @Component("permissionEvaluator")
 @Primary
 public class PermissionEvaluatorImpl implements PermissionEvaluator {
+
 
     private final Logger LOGGER = LoggerFactory.getLogger(PermissionEvaluatorImpl.class);
 
@@ -118,14 +121,14 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
         String idStruttura = (String) pi.getProcessVariables().get("idStruttura");
 
 //      controllo che l'utente abbia un authorities di tipo "supervisore" o "responsabile" della struttura o del tipo di flusso
-        if (authorities.stream().anyMatch(a -> a.contains("supervisore@CNR") ||
-                a.contains("responsabile@CNR") ||
-                a.contains("supervisore-struttura@" + idStruttura) ||
-                a.contains("responsabile-struttura@" + idStruttura) ||
-                a.contains("supervisore#" + pi.getProcessDefinitionKey() + "@CNR") ||
-                a.contains("responsabile#" + pi.getProcessDefinitionKey() + "@CNR") ||
-                a.contains("supervisore#" + pi.getProcessDefinitionKey() + "@" + idStruttura) ||
-                a.contains("responsabile#" + pi.getProcessDefinitionKey() + "@" + idStruttura))) {
+        if (authorities.stream().anyMatch(a -> a.contains(supervisore + "@CNR") ||
+                a.contains(responsabile + "@CNR") ||
+                a.contains(supervisoreStruttura + "@" + idStruttura) ||
+                a.contains(responsabileStruttura + "@" + idStruttura) ||
+                a.contains(supervisore + "#" + pi.getProcessDefinitionKey() + "@CNR") ||
+                a.contains(responsabile + "#" + pi.getProcessDefinitionKey() + "@CNR") ||
+                a.contains(supervisore + "#" + pi.getProcessDefinitionKey() + "@" + idStruttura) ||
+                a.contains(responsabile + "#" + pi.getProcessDefinitionKey() + "@" + idStruttura))) {
             canVisualize = true;
         } else {
 //          controllo gli Identity Link "visualizzatore" per gli user senza authorities di "supervisore" o "responsabile"
@@ -142,7 +145,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 //          controllo gli Identity Link con groupId(tutti gli altri)
                 if (ilv.stream()
                         .filter(il -> il.getGroupId() != null)
-                        .filter(il -> !(il.getGroupId().startsWith("responsabile") || il.getGroupId().startsWith("supervisore")))
+                        .filter(il -> !(il.getGroupId().startsWith(String.valueOf(responsabile)) || il.getGroupId().startsWith(String.valueOf(supervisore))))
                         .anyMatch(il -> authorities.contains(il.getGroupId())))
                     canVisualize = true;
             }

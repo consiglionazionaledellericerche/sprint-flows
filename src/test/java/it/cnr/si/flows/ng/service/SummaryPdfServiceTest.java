@@ -33,8 +33,8 @@ import java.util.Map;
 
 import static it.cnr.si.flows.ng.TestServices.JUNIT_TEST;
 import static it.cnr.si.flows.ng.dto.FlowsAttachment.ProcessDefinitionEnum.acquistiTrasparenza;
-import static it.cnr.si.flows.ng.utils.Actions.revoca;
-import static it.cnr.si.flows.ng.utils.Actions.revocaSemplice;
+import static it.cnr.si.flows.ng.utils.Enum.Actions.revoca;
+import static it.cnr.si.flows.ng.utils.Enum.Actions.revocaSemplice;
 import static org.junit.Assert.*;
 import static org.springframework.http.HttpStatus.OK;
 

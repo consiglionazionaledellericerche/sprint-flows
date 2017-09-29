@@ -1,9 +1,7 @@
 package it.cnr.si.flows.ng.listeners;
 
-import java.util.Date;
-
-import javax.inject.Inject;
-
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
@@ -12,10 +10,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.dto.FlowsAttachment.Azione;
-import it.cnr.si.flows.ng.ldap.FlowsAuthoritiesPopulator;
-import it.cnr.si.flows.ng.service.FlowsAttachmentService;
+import javax.inject.Inject;
+
+import static it.cnr.si.flows.ng.utils.Enum.Azione.Sostituzione;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.Sostituito;
+
 
 @Component
 public class SostituisciDocumentoListener implements ExecutionListener {
@@ -43,16 +42,14 @@ public class SostituisciDocumentoListener implements ExecutionListener {
 
         LOGGER.debug("Ricarico il file {} originale, ma con gli stati puliti", nomeVariabileFile);
         originale.clearStato();
-        originale.setAzione(Azione.Sostituzione);
+        originale.setAzione(Sostituzione);
         attachmentService.saveAttachment(execution, nomeVariabileFile, originale);
 
         LOGGER.debug("Salvo una copia per futuro riferimento");
-        copia.setAzione(FlowsAttachment.Azione.Sostituzione);
-        copia.addStato(FlowsAttachment.Stato.Sostituito);
+        copia.setAzione(Sostituzione);
+        copia.addStato(Sostituito);
         copia.setName("Provvedimento di Aggiudicazione Sostiutito");
         // TODO il nome "provvedimentiRespinti" dovrebbe sempre essere un Expression
         attachmentService.saveAttachmentInArray(execution, "provvedimentiRespinti", copia);
-
     }
-
 }

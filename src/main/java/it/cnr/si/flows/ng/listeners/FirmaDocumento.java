@@ -1,5 +1,9 @@
 package it.cnr.si.flows.ng.listeners;
 
+import it.cnr.jada.firma.arss.ArubaSignServiceException;
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.service.FlowsAttachmentService;
+import it.cnr.si.flows.ng.service.FlowsFirmaService;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
@@ -9,11 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import it.cnr.jada.firma.arss.ArubaSignServiceException;
-import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.exception.TaskFailedException;
-import it.cnr.si.flows.ng.service.FlowsFirmaService;
-import it.cnr.si.flows.ng.service.FlowsAttachmentService;
+import static it.cnr.si.flows.ng.utils.Enum.Azione.Firma;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.Firmato;
 
 @Component
 public class FirmaDocumento implements ExecutionListener {
@@ -52,8 +53,8 @@ public class FirmaDocumento implements ExecutionListener {
 			byte[] bytesfirmati = firmaService.firma(username, password, otp, bytes);
 			att.setBytes(bytesfirmati);
 			att.setFilename(getSignedFilename(att.getFilename()));
-			att.setAzione(FlowsAttachment.Azione.Firma);
-			att.addStato(FlowsAttachment.Stato.Firmato);
+            att.setAzione(Firma);
+            att.addStato(Firmato);
 
 			attachmentService.saveAttachment(execution, nomeVariabileFile, att);
 			execution.setVariable("otp", stringaOscurante);
