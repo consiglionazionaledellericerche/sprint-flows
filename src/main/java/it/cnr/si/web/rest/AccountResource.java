@@ -137,8 +137,14 @@ public class AccountResource {
             method = RequestMethod.POST,
             produces = MediaType.TEXT_PLAIN_VALUE)
     @Timed
-    public ResponseEntity<Void> changePassword(@RequestBody String password) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    public ResponseEntity<Object> changePassword(@RequestBody String password) {
+        return userRepository
+                .findOneByLogin(SecurityUtils.getCurrentUserLogin())
+                .map(u -> {
+                    userService.changePassword(password);
+                    return new ResponseEntity<>(HttpStatus.OK);
+                })
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
     }
 
     /**
