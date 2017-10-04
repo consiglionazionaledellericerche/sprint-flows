@@ -35,6 +35,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static it.cnr.si.flows.ng.TestServices.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
+import static it.cnr.si.flows.ng.dto.FlowsAttachment.ProcessDefinitionEnum.acquistiTrasparenza;
 import static it.cnr.si.flows.ng.utils.Utils.*;
 import static org.junit.Assert.*;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -77,7 +78,7 @@ public class FlowsProcessInstanceResourceTest {
 
     @Test
     public void testGetMyProcesses() throws IOException {
-        processInstance = util.mySetUp("acquisti-trasparenza");
+        processInstance = util.mySetUp(acquistiTrasparenza.getValue());
         String processInstanceID = verifyMyProcesses(1, 0);
         // testo che, anche se una Process Instance viene sospesa, la vedo ugualmente
         flowsProcessInstanceResource.suspend(new MockHttpServletRequest(), processInstanceID);
@@ -92,7 +93,7 @@ public class FlowsProcessInstanceResourceTest {
 
     @Test(expected = AccessDeniedException.class)
     public void testGetProcessInstanceById() throws Exception {
-        processInstance = util.mySetUp("acquisti-trasparenza");
+        processInstance = util.mySetUp(acquistiTrasparenza.getValue());
 
         ResponseEntity<Map<String, Object>> response = flowsProcessInstanceResource.getProcessInstanceById(new MockHttpServletRequest(), processInstance.getId());
         assertEquals(OK, response.getStatusCode());
@@ -130,11 +131,11 @@ public class FlowsProcessInstanceResourceTest {
 
     @Test
     public void testGetProcessInstances() throws IOException {
-        processInstance = util.mySetUp("acquisti-trasparenza");
+        processInstance = util.mySetUp(acquistiTrasparenza.getValue());
 
         //responsabileacquisti crea una seconda Process Instance di acquisti-trasparenza con suffisso "2" nel titoloIstanzaFlusso
         util.loginResponsabileAcquisti();
-        String acquistiTrasparenzaId = repositoryService.createProcessDefinitionQuery().processDefinitionKey("acquisti-trasparenza").latestVersion().singleResult().getId();
+        String acquistiTrasparenzaId = repositoryService.createProcessDefinitionQuery().processDefinitionKey(acquistiTrasparenza.getValue()).latestVersion().singleResult().getId();
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
         req.setParameter("processDefinitionId", acquistiTrasparenzaId);
         req.setParameter("titoloIstanzaFlusso", TITOLO_DELL_ISTANZA_DEL_FLUSSO + "2");
@@ -190,7 +191,7 @@ public class FlowsProcessInstanceResourceTest {
 
     @Test
     public void testSuspend() throws Exception {
-        processInstance = util.mySetUp("acquisti-trasparenza");
+        processInstance = util.mySetUp(acquistiTrasparenza.getValue());
         assertEquals(false, processInstance.isSuspended());
         ProcessInstanceResponse response = flowsProcessInstanceResource.suspend(new MockHttpServletRequest(), processInstance.getId());
         assertEquals(true, response.isSuspended());
@@ -198,7 +199,7 @@ public class FlowsProcessInstanceResourceTest {
 
     @Test
     public void testSearchProcessInstances() throws ParseException, IOException {
-        processInstance = util.mySetUp("acquisti-trasparenza");
+        processInstance = util.mySetUp(acquistiTrasparenza.getValue());
         util.loginAdmin();
         MockHttpServletRequest req = new MockHttpServletRequest();
 
@@ -242,7 +243,7 @@ public class FlowsProcessInstanceResourceTest {
     @Test
     public void testExportCsv() throws IOException {
         //avvio un flusso acquisti-trasparenza
-        processInstance = util.mySetUp("acquisti-trasparenza");
+        processInstance = util.mySetUp(acquistiTrasparenza.getValue());
         //faccio l'exportCsv su tutti le Process Instance attive
         MockHttpServletRequest req = new MockHttpServletRequest();
         String payload = "{params: [{key: initiator, value: \"\", type: text}]}";
