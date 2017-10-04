@@ -64,7 +64,7 @@ public class AceBridgeService {
 			@Override
 			public String mapRow(ResultSet rs, int rowNum) throws SQLException {
 				if (rs.getString("eosigla").equals("CNR")){
-					return rs.getString("sigla");
+					return rs.getString("sigla") +"@CNR";
 				} else {
 					return rs.getString("sigla") +"@"+ rs.getString("eoid");
 				}

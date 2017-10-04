@@ -4,6 +4,8 @@ import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.security.FlowsUserDetailsService;
+import it.cnr.si.security.PermissionEvaluatorImpl;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -29,12 +31,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static it.cnr.si.flows.ng.utils.Enum.Azione.Aggiornamento;
+
 @Controller
 @RequestMapping("api/attachments")
 public class FlowsAttachmentResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsAttachmentResource.class);
-
     @Inject
     private HistoryService historyService;
     @Inject
@@ -43,6 +46,12 @@ public class FlowsAttachmentResource {
     private TaskService taskService;
     @Inject
     private FlowsAttachmentService flowsAttachmentService;
+    @Inject
+    FlowsUserDetailsService flowsUserDetailsService;
+    @Inject
+    PermissionEvaluatorImpl permissionEvaluator;
+
+
 
     @RequestMapping(value = "{processInstanceId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -120,6 +129,8 @@ public class FlowsAttachmentResource {
 
     @RequestMapping(value = "{processInstanceId}/{attachmentName}/data", method = RequestMethod.GET)
     @ResponseBody
+    //todo: controllare che tutti quelli che possono visualizzare la Process Instances possono anche scaricarne i documenti
+//    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public void getAttachment(
@@ -145,12 +156,12 @@ public class FlowsAttachmentResource {
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public void setAttachment(@PathVariable("processInstanceId") String processInstanceId,
-            @PathVariable("attachmentName") String attachmentName,
-            @RequestParam("file") MultipartFile file) throws IOException {
+                              @PathVariable("attachmentName") String attachmentName,
+                              @RequestParam("file") MultipartFile file) throws IOException {
 
         FlowsAttachment attachment = runtimeService.getVariable(processInstanceId, attachmentName, FlowsAttachment.class);
 
-        attachment.setAzione(FlowsAttachment.Azione.Aggiornamento);
+        attachment.setAzione(Aggiornamento);
         attachment.setBytes(file.getBytes());
         attachment.setFilename(file.getOriginalFilename());
         attachment.setMimetype(file.getContentType());

@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
 
+import static it.cnr.si.flows.ng.utils.Enum.Azione.Caricamento;
+
 @Component
 public class SaveSummaryAtProcessCompletion implements ActivitiEventListener {
 
@@ -43,7 +45,7 @@ public class SaveSummaryAtProcessCompletion implements ActivitiEventListener {
 
             FlowsAttachment pdfToDB = new FlowsAttachment();
             pdfToDB.setBytes(outputStream.toByteArray());
-            pdfToDB.setAzione(FlowsAttachment.Azione.Caricamento);
+            pdfToDB.setAzione(Caricamento);
             pdfToDB.setTaskId(null);
             pdfToDB.setTaskName(null);
             pdfToDB.setTime(new Date());

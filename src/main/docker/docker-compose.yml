@@ -1,8 +1,10 @@
 version: '2'
 services:
     sprint-flows-test:
+        #scommentare per avviare docker-compose per le docker image dei branch "demo" pushate sul docker registry
+#        image: docker.si.cnr.it/sprint-flows-demo
         image: docker.si.cnr.it/sprint-flows-test
-        external_links:
+        links:
             - sprint-flows-test-pg:postgresql
         environment:
             - SPRING_PROFILES_ACTIVE=swagger,test
@@ -11,10 +13,14 @@ services:
             - SPRING_DATASOURCE_PASSWORD=activitipw
             - JHIPSTER_SLEEP=10 # gives time for the database to boot before the application
         ports:
-            - 8484:8080
-    sprint-flows-test-pg:
-        container_name: sprint-flows-test-pg
+            - 9200:8080
+        #scommentare per avviare docker-compose per le docker image dei branch "demo" pushate sul docker registry
+#    sprint-flows-test-pg:
+#        container_name: sprint-flows-test-pg
+    sprint-flows-demo-pg:
+        container_name: sprint-flows-demo-pg
         image: postgres:9.6.1
+        # scommentare per "aggiungere" un volume al db: le modifiche al db sono persistenti al riavvio dell'applicazione
         # volumes:
         #     - ~/volumes/jhipster/sprint/postgresql/:/var/lib/postgresql/
         environment:

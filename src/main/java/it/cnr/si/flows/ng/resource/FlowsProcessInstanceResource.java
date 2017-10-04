@@ -13,7 +13,6 @@ import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
-import org.activiti.engine.task.IdentityLink;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
@@ -29,8 +28,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,6 +42,8 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import static it.cnr.si.flows.ng.dto.FlowsAttachment.ProcessDefinitionEnum.acquistiTrasparenza;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.Pubblicato;
 import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
 import static it.cnr.si.flows.ng.utils.Utils.ASC;
 
@@ -96,7 +95,7 @@ public class FlowsProcessInstanceResource {
 
             if (value instanceof FlowsAttachment) {
                 FlowsAttachment attachment = (FlowsAttachment) value;
-                if (attachment.getStati().contains(FlowsAttachment.Stato.Pubblicato)) {
+                if (attachment.getStati().contains(Pubblicato)) {
 
                     Map<String, Object> metadatiDocumento = new HashMap<>();
                     metadatiDocumento.put("filename", attachment.getFilename());
@@ -161,7 +160,7 @@ public class FlowsProcessInstanceResource {
 
     @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
-    @PreAuthorize("hasRole('ROLE_ADMIN') || @flowsProcessInstanceResource.canVisualizeProcessInstance(#processInstanceId)")
+//    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Map<String, Object>> getProcessInstanceById(HttpServletRequest req, @RequestParam("processInstanceId") String processInstanceId) {
         Map<String, Object> result = flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId);
@@ -296,8 +295,8 @@ public class FlowsProcessInstanceResource {
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Void> setVariable(
             @RequestParam("processInstanceId") String processInstanceId,
-                                            @RequestParam("variableName") String variableName,
-                                            @RequestParam("value") String value) {
+            @RequestParam("variableName") String variableName,
+            @RequestParam("value") String value) {
         runtimeService.setVariable(processInstanceId, variableName, value);
         return ResponseEntity.ok().build();
     }
@@ -338,7 +337,7 @@ public class FlowsProcessInstanceResource {
                 .list();
 
         List<String> exportTrasparenza = new ArrayList<>();
-        View trasparenza = viewRepository.getViewByProcessidType("acquisti-trasparenza", "export-trasparenza");
+        View trasparenza = viewRepository.getViewByProcessidType(acquistiTrasparenza.getValue(), "export-trasparenza");
         String view = trasparenza.getView();
         JSONArray fields = new JSONArray(view);
         for (int i = 0; i < fields.length(); i++) {
@@ -374,7 +373,7 @@ public class FlowsProcessInstanceResource {
                     .list();
 
 
-            View trasparenza = viewRepository.getViewByProcessidType("acquisti-trasparenza", "export-trasparenza");
+            View trasparenza = viewRepository.getViewByProcessidType(acquistiTrasparenza.getValue(), "export-trasparenza");
             String view = trasparenza.getView();
             JSONArray fields = new JSONArray(view);
             for (int j = 0; j < fields.length(); j++) {
@@ -394,16 +393,5 @@ public class FlowsProcessInstanceResource {
         }
 
         return new ResponseEntity<>(mappedProcessInstances, HttpStatus.OK);
-    }
-
-
-    public boolean canVisualizeProcessInstance(String processInstanceId) {
-        Optional<String> username = Optional.of(SecurityUtils.getCurrentUserLogin());
-        List<String> authorities = flowsUserDetailsService.loadUserByUsername(username.orElse("")).getAuthorities().stream().map(GrantedAuthority::getAuthority)
-                .map(Utils::removeLeadingRole)
-                .collect(Collectors.toList());
-
-        List<IdentityLink> il = runtimeService.getIdentityLinksForProcessInstance(processInstanceId);
-        return il.stream().anyMatch(link -> authorities.contains(link.getGroupId()));
     }
 }
