@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static it.cnr.si.flows.ng.TestServices.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
+import static it.cnr.si.flows.ng.dto.FlowsAttachment.ProcessDefinitionEnum.acquistiTrasparenza;
 import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
 import static it.cnr.si.flows.ng.utils.Utils.ASC;
 import static org.junit.Assert.assertEquals;
@@ -70,7 +71,7 @@ public class FlowsTaskResourceTest {
 
     @Test
     public void testGetMyTasks() throws IOException {
-        processInstance = util.mySetUp("acquisti-trasparenza");
+        processInstance = util.mySetUp(acquistiTrasparenza.getValue());
 //       all'inizio del test SFD non ha task assegnati'
         util.logout();
         util.loginSfd();
@@ -110,7 +111,7 @@ public class FlowsTaskResourceTest {
 
     @Test
     public void testGetAvailableTasks() throws IOException {
-        processInstance = util.mySetUp("acquisti-trasparenza");
+        processInstance = util.mySetUp(acquistiTrasparenza.getValue());
         //SFD è sfd@sisinfo (quindi può vedere il task istanziato)
         util.logout();
         util.loginSfd();
@@ -132,7 +133,7 @@ public class FlowsTaskResourceTest {
 
     @Test(expected = AccessDeniedException.class)
     public void testGetTaskInstance() throws IOException {
-        processInstance = util.mySetUp("acquisti-trasparenza");
+        processInstance = util.mySetUp(acquistiTrasparenza.getValue());
         ResponseEntity<Map<String, Object>> response = flowsTaskResource.getTask(util.getFirstTaskId());
         assertEquals(OK, response.getStatusCode());
         assertEquals(FIRST_TASK_NAME, ((TaskResponse) response.getBody().get("task")).getName());
@@ -145,7 +146,7 @@ public class FlowsTaskResourceTest {
 
     @Test(expected = AccessDeniedException.class)
     public void testVerifyGetTaskInstance() throws IOException {
-        processInstance = util.mySetUp("acquisti-trasparenza");
+        processInstance = util.mySetUp(acquistiTrasparenza.getValue());
 
         //verifico che gli utenti che NON SONO IN GRUPPI CANDIDATE DEL TASK NE' ROLE_ADMIN
         // (ad esempio il direttore) non possano accedere al servizio
@@ -157,7 +158,7 @@ public class FlowsTaskResourceTest {
 
     @Test
     public void testCompleteTask() throws IOException {
-        processInstance = util.mySetUp("acquisti-trasparenza");
+        processInstance = util.mySetUp(acquistiTrasparenza.getValue());
         //completo il primo task
         util.loginSfd();
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
@@ -176,7 +177,7 @@ public class FlowsTaskResourceTest {
 
     @Test
     public void testSearch() throws IOException {
-        processInstance = util.mySetUp("acquisti-trasparenza");
+        processInstance = util.mySetUp(acquistiTrasparenza.getValue());
 
         util.logout();
         util.loginSfd();
@@ -199,7 +200,7 @@ public class FlowsTaskResourceTest {
 
     @Test
     public void testTaskAssignedInMyGroups() throws IOException {
-        processInstance = util.mySetUp("acquisti-trasparenza");
+        processInstance = util.mySetUp(acquistiTrasparenza.getValue());
 
         //verifico che all'inizio del test sfd2 NON veda nessun task
         util.logout();
@@ -233,7 +234,7 @@ public class FlowsTaskResourceTest {
     // non uso expected perche' voglio controllare *esttamente* dove viene lanciata l'eccezione
     @Test
     public void testClaimTask() throws IOException {
-        processInstance = util.mySetUp("acquisti-trasparenza");
+        processInstance = util.mySetUp(acquistiTrasparenza.getValue());
 
 //      sfd è sfd@sisinfo quindi può prendere in carico il flusso
         util.loginSfd();
@@ -255,7 +256,7 @@ public class FlowsTaskResourceTest {
 
     @Test
     public void testGetTasksCompletedForMe() throws ArubaSignServiceException, IOException {
-        processInstance = util.mySetUp("acquisti-trasparenza");
+        processInstance = util.mySetUp(acquistiTrasparenza.getValue());
         //completo il primo task
         util.loginSfd();
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();

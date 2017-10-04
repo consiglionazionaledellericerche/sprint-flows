@@ -1,52 +1,26 @@
 package it.cnr.si.flows.ng.dto;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import it.cnr.si.flows.ng.utils.Enum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
+import java.util.*;
+
 public class FlowsAttachment implements Serializable {
-
-    public enum Stato {
-        Validato,
-        Protocollato,
-        Firmato,
-        Controfirmato,
-        Annullato,
-        Pubblicato,
-        Sostituito
-    }
-
-    public enum Azione {
-        Caricamento,
-        Aggiornamento,
-        Firma,
-        Controfirma,
-        Pubblicazione,
-        Protocollo,
-        Validazione,
-        Annullo,
-        Sostituzione,
-        RimozioneDaPubblicazione
-    }
+    public static final String PUBBLICAZIONE_FLAG = null;
 
     private static final long serialVersionUID = -1794306306586001492L;
 
     @SuppressWarnings("unused")
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsAttachment.class);
+    private String name;
 
-	public static final String PUBBLICAZIONE_FLAG = null;
-
-
-private String name;
+    public Map<String, Object> getMetadati() {
+        if (this.metadati == null)
+            this.metadati = new HashMap<>();
+        return this.metadati;
+    }
     private String filename;
     private Date   time;
     private String taskId;
@@ -124,10 +98,8 @@ private String name;
         this.taskName = taskName;
     }
 
-    public Map<String, Object> getMetadati() {
-        if (this.metadati == null)
-                this.metadati = new HashMap<>();
-        return this.metadati;
+    public void setMetadato(String nome, Object valore) {
+        getMetadati().put(nome, valore);
     }
 
     public void setMetadati(Map<String, Object> metadati) {
@@ -135,40 +107,51 @@ private String name;
     }
 
     @SuppressWarnings("unchecked")
-    public void addStato(Stato s) {
+    public void addStato(Enum.Stato s) {
         getStati().add(s);
     }
 
     @SuppressWarnings("unchecked")
-    public Set<Stato> getStati() {
+    public Set<Enum.Stato> getStati() {
         if (this.getMetadati().get("stati") == null)
-            this.getMetadati().put("stati", new HashSet<Stato>());
-        return (Set<Stato>) this.getMetadati().get("stati");
+            this.getMetadati().put("stati", new HashSet<Enum.Stato>());
+        return (Set<Enum.Stato>) this.getMetadati().get("stati");
     }
 
     @SuppressWarnings("unchecked")
-    public void removeStato(Stato s) {
-        Set<Stato> stati = getStati();
+    public void removeStato(Enum.Stato s) {
+        Set<Enum.Stato> stati = getStati();
         stati.remove(s);
     }
     @SuppressWarnings("unchecked")
-    public void removeAzione(Azione a) {
+    public void removeAzione(Enum.Azione a) {
         if (this.getMetadati().get("azioni") == null)
-            this.getMetadati().put("azioni", new ArrayList<Stato>());
-        List<Stato> azione = (List<Stato>) this.getMetadati().get("azioni");
+            this.getMetadati().put("azioni", new ArrayList<Enum.Stato>());
+        List<Enum.Stato> azione = (List<Enum.Stato>) this.getMetadati().get("azioni");
         azione.remove(a);
     }
 
     public void clearStato() {
-        this.getMetadati().put("stati", new HashSet<Stato>());
+        this.getMetadati().put("stati", new HashSet<Enum.Stato>());
     }
 
-    public void setAzione(Azione a) {
+    public void setAzione(Enum.Azione a) {
         this.getMetadati().put("azione", a);
     }
 
-    public void setMetadato(String nome, Object valore) {
-    	getMetadati().put(nome, valore);
+    public enum ProcessDefinitionEnum {
+        acquistiTrasparenza("acquisti-trasparenza"),
+        permessiFerie("permessi-ferie");
+
+        private String value;
+
+        ProcessDefinitionEnum(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
     }
 
 //    public FlowsAttachment clone() {

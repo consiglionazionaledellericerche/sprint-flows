@@ -1,5 +1,6 @@
 package it.cnr.si.flows.ng.listeners;
 
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
@@ -7,10 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import it.cnr.jada.firma.arss.ArubaSignServiceException;
-import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.exception.TaskFailedException;
-import it.cnr.si.flows.ng.service.FlowsFirmaService;
+import static it.cnr.si.flows.ng.utils.Enum.Azione.Validazione;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.Validato;
 
 @Component
 public class ValidaDocumento implements ExecutionListener {
@@ -31,8 +30,8 @@ public class ValidaDocumento implements ExecutionListener {
         String nomeVariabileFile = (String) nomeFileDaValidare.getValue(execution);
 
         FlowsAttachment att = (FlowsAttachment) execution.getVariable(nomeVariabileFile);
-        att.setAzione(FlowsAttachment.Azione.Validazione);
-        att.addStato(FlowsAttachment.Stato.Validato);
+        att.setAzione(Validazione);
+        att.addStato(Validato);
         execution.setVariable(nomeVariabileFile, att);
 
         String isError = (String) execution.getVariable("error");

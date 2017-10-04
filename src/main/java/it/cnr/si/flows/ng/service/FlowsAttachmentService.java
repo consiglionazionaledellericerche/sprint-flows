@@ -1,7 +1,6 @@
 package it.cnr.si.flows.ng.service;
 
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.dto.FlowsAttachment.Azione;
 import it.cnr.si.security.SecurityUtils;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
@@ -23,6 +22,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static it.cnr.si.flows.ng.utils.Enum.Azione.*;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.Pubblicato;
 import static it.cnr.si.flows.ng.utils.MimetypeUtils.getMimetype;
 
 @Service
@@ -93,9 +94,9 @@ public class FlowsAttachmentService {
 			att.setBytes(file.getBytes());
 
 			if (nuovo) {
-				att.setAzione(Azione.Caricamento);
+                att.setAzione(Caricamento);
 			} else {
-				att.setAzione(Azione.Aggiornamento);
+                att.setAzione(Aggiornamento);
 			}
 
 			attachments.put(fileName, att);
@@ -181,11 +182,11 @@ public class FlowsAttachmentService {
 		FlowsAttachment att = (FlowsAttachment) runtimeService.getVariable(executionId, nomeVariabileFile);
 		if (att != null) {
 			if (flagPubblicazione) {
-				att.setAzione(FlowsAttachment.Azione.Pubblicazione);
-				att.addStato(FlowsAttachment.Stato.Pubblicato);
+                att.setAzione(Pubblicazione);
+                att.addStato(Pubblicato);
 			} else {
-				att.setAzione(FlowsAttachment.Azione.RimozioneDaPubblicazione);
-				att.removeStato(FlowsAttachment.Stato.Pubblicato);
+                att.setAzione(RimozioneDaPubblicazione);
+                att.removeStato(Pubblicato);
 			}
 			saveAttachmentFuoriTask(executionId, nomeVariabileFile, att);
 		}

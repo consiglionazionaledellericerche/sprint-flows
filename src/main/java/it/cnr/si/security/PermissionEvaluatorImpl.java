@@ -2,7 +2,10 @@ package it.cnr.si.security;
 
 import it.cnr.si.flows.ng.resource.FlowsProcessDefinitionResource;
 import it.cnr.si.flows.ng.utils.Utils;
+import org.activiti.engine.HistoryService;
+import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.IdentityLinkType;
 import org.activiti.engine.task.Task;
@@ -21,6 +24,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static it.cnr.si.flows.ng.utils.Enum.Role.*;
+
 
 /**
  * The type Permission evaluator.
@@ -31,33 +36,35 @@ import java.util.stream.Collectors;
 @Primary
 public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
+
     private final Logger LOGGER = LoggerFactory.getLogger(PermissionEvaluatorImpl.class);
 
     @Inject
     TaskService taskService;
     @Inject
     private FlowsProcessDefinitionResource flowsProcessDefinitionResource;
-
-
-    public PermissionEvaluatorImpl() {
-    }
+    @Inject
+    RuntimeService runtimeService;
+    @Inject
+    HistoryService historyService;
 
 
     /**
-     * Determino se un utente ha i permessi per visualizzare un Task.
+     * Determina se un utente ha i permessi per visualizzare un Task.
      * *
      *
      * @param taskId                  l'id del taskd
-     * @param flowsUserDetailsService flowsUserDetailService: non posso "iniettarlo" nella classe perchè altrimenti avrei                                una dipendenza ciclica visto che anche le classi che lo richiamano potrebbero averlo iniettato
+     * @param flowsUserDetailsService flowsUserDetailService: non posso "iniettarlo" nella classe perchè altrimenti avrei
+     *                               una dipendenza ciclica visto che anche le classi che lo richiamano potrebbero averlo iniettato
      * @return risultato della verifica dei permessi (booleano)
      */
     public boolean canVisualizeTask(String taskId, FlowsUserDetailsService flowsUserDetailsService) {
         Optional<String> username = Optional.of(SecurityUtils.getCurrentUserLogin());
-        List<String> authorities = flowsUserDetailsService.loadUserByUsername(username.orElse("")).getAuthorities().stream().map(GrantedAuthority::getAuthority)
-                .map(Utils::removeLeadingRole)
-                .collect(Collectors.toList());
-        List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
-        return identityLinks.stream().anyMatch(link -> authorities.contains(link.getGroupId()));
+        List<String> authorities = getAuthorities(username.orElse(""), flowsUserDetailsService);
+
+        return taskService.getIdentityLinksForTask(taskId).stream()
+                .filter(link -> link.getType().equals("candidate") || link.getType().equals("assignee"))
+                .anyMatch(link -> authorities.contains(link.getGroupId()) || username.get().equals(link.getUserId()));
     }
 
 
@@ -67,6 +74,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
      *
      * @param req                     La req da cui prendo i vari parametri (per comodità i parametri non sono specificati nella signature del metodo che richiama la verifica)
      * @param flowsUserDetailsService flowsUserDetailService: non posso "iniettarlo" nella classe perchè altrimenti avrei
+     *                               una dipendenza ciclica visto che anche le classi che lo richiamano potrebbero averlo iniettato
      * @return risultato della verifica dei permessi (booleano)
      */
     public boolean canCompleteTaskOrStartProcessInstance(MultipartHttpServletRequest req, FlowsUserDetailsService flowsUserDetailsService) {
@@ -84,10 +92,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
                 // Se l'assegnatario non c'e', L'utente deve essere nei gruppi candidati
                 List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
                 List<String> authorities =
-                        flowsUserDetailsService.loadUserByUsername(username).getAuthorities().stream()
-                                .map(GrantedAuthority::getAuthority)
-                                .map(Utils::removeLeadingRole)
-                                .collect(Collectors.toList());
+                        getAuthorities(username, flowsUserDetailsService);
 
                 return identityLinks.stream()
                         .filter(l -> l.getType().equals("candidate"))
@@ -102,11 +107,62 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
 
     /**
-     * Verifico che l'utente possa assegnare un task a se stesso (prenderlo in  carico)
+     * Verifica che l'utente abbia la visibilità sulla Process Instance.
+     *
+     * @param processInstanceId       Il process instance id
+     * @param flowsUserDetailsService flowsUserDetailService: non posso "iniettarlo" nella classe perchè altrimenti avrei una dipendenza
+     *                               ciclica visto che anche le classi che richiamano questo metodo potrebbero averlo iniettato
+     * @return risultato della verifica dei permessi (booleano)
+     */
+    public boolean canVisualize(String processInstanceId, FlowsUserDetailsService flowsUserDetailsService) {
+        boolean canVisualize = false;
+        String userName = SecurityUtils.getCurrentUserLogin();
+        List<String> authorities = getAuthorities(userName, flowsUserDetailsService);
+        ProcessInstance pi = runtimeService.createProcessInstanceQuery()
+                .processInstanceId(processInstanceId).includeProcessVariables().singleResult();
+        String idStruttura = (String) pi.getProcessVariables().get("idStruttura");
+
+//      controllo che l'utente abbia un authorities di tipo "supervisore" o "responsabile" della struttura o del tipo di flusso
+        if (authorities.stream().anyMatch(a -> a.contains(supervisore + "@CNR") ||
+                a.contains(responsabile + "@CNR") ||
+                a.contains(supervisoreStruttura + "@" + idStruttura) ||
+                a.contains(responsabileStruttura + "@" + idStruttura) ||
+                a.contains(supervisore + "#" + pi.getProcessDefinitionKey() + "@CNR") ||
+                a.contains(responsabile + "#" + pi.getProcessDefinitionKey() + "@CNR") ||
+                a.contains(supervisore + "#" + pi.getProcessDefinitionKey() + "@" + idStruttura) ||
+                a.contains(responsabile + "#" + pi.getProcessDefinitionKey() + "@" + idStruttura))) {
+            canVisualize = true;
+        } else {
+//          controllo gli Identity Link "visualizzatore" per gli user senza authorities di "supervisore" o "responsabile"
+            List<IdentityLink> ilv = runtimeService.getIdentityLinksForProcessInstance(pi.getProcessInstanceId()).stream()
+                    .filter(il -> il.getType().equals("visualizzatore"))
+                    .collect(Collectors.toList());
+//          controllo gli Identity Link con userId(ad es.: rup in acquisti trasparenza)
+            if (ilv.stream()
+                    .filter(il -> il.getUserId() != null)
+                    .anyMatch(il -> il.getUserId().equals(userName))) {
+                canVisualize = true;
+            }
+            else {
+//          controllo gli Identity Link con groupId(tutti gli altri)
+                if (ilv.stream()
+                        .filter(il -> il.getGroupId() != null)
+                        .filter(il -> !(il.getGroupId().startsWith(String.valueOf(responsabile)) || il.getGroupId().startsWith(String.valueOf(supervisore))))
+                        .anyMatch(il -> authorities.contains(il.getGroupId())))
+                    canVisualize = true;
+            }
+        }
+        return canVisualize;
+    }
+
+
+    /**
+     * Verifica che l'utente possa assegnare un task a se stesso (prenderlo in carico)
      * o che possa rilasciarlo (restituirlo al gruppo assegnatario del task).
      *
      * @param taskId                  Il task id
      * @param flowsUserDetailsService flowsUserDetailService: non posso "iniettarlo" nella classe perchè altrimenti avrei
+     *                               una dipendenza ciclica visto che anche le classi che lo richiamano potrebbero averlo iniettato
      * @return risultato della verifica dei permessi (booleano)
      */
     public boolean canAssignTask(String taskId, FlowsUserDetailsService flowsUserDetailsService) {
@@ -133,10 +189,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
             /*        claim         */
             LOGGER.info("Do in carico il task {} a {}", taskId, username);
             List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
-            List<String> authorities = flowsUserDetailsService.loadUserByUsername(username).getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .map(Utils::removeLeadingRole)
-                    .collect(Collectors.toList());
+            List<String> authorities = getAuthorities(username, flowsUserDetailsService);
 
             boolean isInCandidates = identityLinks.stream()
                     .filter(l -> l.getType().equals("candidate"))
@@ -150,6 +203,8 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
         }
         return result;
     }
+
+
 
     /**
      * Verifico che l'utente che è anche "responsabile" del flusso possa assegnare
@@ -174,13 +229,23 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
         return resut;
     }
 
+
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
         return true;
     }
 
+
     @Override
     public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) {
         return false;
+    }
+
+
+    private List<String> getAuthorities(String username, FlowsUserDetailsService flowsUserDetailsService) {
+        return flowsUserDetailsService.loadUserByUsername(username).getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .map(Utils::removeLeadingRole)
+                .collect(Collectors.toList());
     }
 }
