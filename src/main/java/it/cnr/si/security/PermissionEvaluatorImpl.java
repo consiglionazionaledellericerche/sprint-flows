@@ -61,8 +61,10 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
     public boolean canVisualizeTask(String taskId, FlowsUserDetailsService flowsUserDetailsService) {
         Optional<String> username = Optional.of(SecurityUtils.getCurrentUserLogin());
         List<String> authorities = getAuthorities(username.orElse(""), flowsUserDetailsService);
-        List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
-        return identityLinks.stream().anyMatch(link -> authorities.contains(link.getGroupId()));
+
+        return taskService.getIdentityLinksForTask(taskId).stream()
+                .filter(link -> link.getType().equals("candidate") || link.getType().equals("assignee"))
+                .anyMatch(link -> authorities.contains(link.getGroupId()) || username.get().equals(link.getUserId()));
     }
 
 

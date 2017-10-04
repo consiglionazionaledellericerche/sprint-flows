@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -131,7 +130,7 @@ public class FlowsAttachmentResource {
     @RequestMapping(value = "{processInstanceId}/{attachmentName}/data", method = RequestMethod.GET)
     @ResponseBody
     //todo: controllare che tutti quelli che possono visualizzare la Process Instances possono anche scaricarne i documenti
-    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
+//    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public void getAttachment(
