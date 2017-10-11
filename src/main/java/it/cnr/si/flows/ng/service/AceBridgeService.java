@@ -27,7 +27,7 @@ public class AceBridgeService {
 			"INNER JOIN ace.entitaorganizzativa ON entitaorganizzativa.id = assegnazioneruolo.entitaorganizzativa_id "+
 			"where assegnazioneruolo.ass_persona_id = (SELECT id FROM ace.persona WHERE persona.userid = ?)";
 
-	private static final String usersInRole = "SELECT persona.nome, persona.cognome, persona.id, persona.userid, ruolo.sigla, ruolo.descr, ruolo.id,entitaorganizzativa.sigla, entitaorganizzativa.denominazione, entitaorganizzativa.id "+
+	private static final String usersInRole = "SELECT persona.nome, persona.cognome, persona.id, persona.userid, ruolo.sigla, ruolo.descr, ruolo.id,entitaorganizzativa.sigla as eosigla, entitaorganizzativa.denominazione, entitaorganizzativa.id as eoid "+
 			"FROM ace.assegnazioneruolo "+
 			"INNER JOIN ace.persona ON persona.id = assegnazioneruolo.ass_persona_id "+
 			"INNER JOIN ace.ruolo ON ruolo.id = assegnazioneruolo.ruolo_id "+
@@ -85,7 +85,11 @@ public class AceBridgeService {
 		return aceJdbcTemplate.query(usersInRole, args, new RowMapper<String>() {
 			@Override
 			public String mapRow(ResultSet rs, int rowNum) throws SQLException {
-				return rs.getString("userid");
+				if (rs.getString("eosigla").equals("CNR")){
+					return rs.getString("sigla") +"@CNR";
+				} else {
+					return rs.getString("sigla") +"@"+ rs.getString("eoid");
+				}
 			}
 		});
 	}

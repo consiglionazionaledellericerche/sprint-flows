@@ -8,7 +8,14 @@
     <subProcess id="DECISIONE-CONTRATTARE" name="DECISIONE A CONTRATTARE">
       <endEvent id="endevent1" name="End"></endEvent>
       <userTask id="verifica-decisione" name="Verifica Decisione" activiti:candidateGroups="${gruppoSFD}"></userTask>
-      <userTask id="firma-decisione" name="Firma Decisione" activiti:candidateGroups="${gruppoDirettore}"></userTask>
+      <userTask id="firma-decisione" name="Firma Decisione" activiti:candidateGroups="${gruppoDirettore}">
+        <extensionElements>
+          <activiti:taskListener event="complete" expression="${execution.setVariable(&quot;firma_password&quot;, task.getVariable(&quot;password&quot;))}"></activiti:taskListener>
+          <activiti:taskListener event="complete" expression="${execution.setVariable(&quot;firma_otp&quot;, task.getVariable(&quot;otp&quot;))}"></activiti:taskListener>
+          <activiti:taskListener event="complete" expression="${task.setVariable(&quot;password&quot;, &quot;******&quot;)}"></activiti:taskListener>
+          <activiti:taskListener event="complete" expression="${task.setVariable(&quot;otp&quot;, &quot;******&quot;)}"></activiti:taskListener>
+        </extensionElements>
+      </userTask>
       <sequenceFlow id="flow8" sourceRef="verifica-decisione" targetRef="exclusivegateway1"></sequenceFlow>
       <userTask id="modifica-decisione" name="Modifica Decisione" activiti:candidateGroups="${gruppoRA}"></userTask>
       <sequenceFlow id="flow9" sourceRef="modifica-decisione" targetRef="exclusivegateway28">
@@ -79,7 +86,11 @@
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="DECISIONE-CONTRATTARE"></sequenceFlow>
     <userTask id="espletamento-procedura" name="Espletamento Procedura" activiti:assignee="${rup}"></userTask>
     <subProcess id="PROVVEDIMENTO-AGGIUDICAZIONE" name="PROVVEDIMENTO DI AGGIUDICAZIONE">
-      <userTask id="predisposizione-provvedimento-aggiudicazione" name="Predisposizione Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoRA}"></userTask>
+      <userTask id="predisposizione-provvedimento-aggiudicazione" name="Predisposizione Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoRA}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${evidenziaDittaCandidata}"></activiti:executionListener>
+        </extensionElements>
+      </userTask>
       <startEvent id="startevent6" name="Start"></startEvent>
       <sequenceFlow id="flow17" sourceRef="startevent6" targetRef="predisposizione-provvedimento-aggiudicazione">
         <extensionElements>
@@ -264,7 +275,7 @@
         <activiti:executionListener event="take" delegateExpression="${pubblicaTuttiAllegatiPubblicabili}"></activiti:executionListener>
       </extensionElements>
     </sequenceFlow>
-    <userTask id="consuntivo" name="Consuntivo" activiti:assignee="${rup}"></userTask>
+    <userTask id="consuntivo" name="Consuntivo" activiti:candidateGroups="${gruppoRA}"></userTask>
     <endEvent id="endevent8" name="End"></endEvent>
     <sequenceFlow id="flow71" sourceRef="consuntivo" targetRef="endevent8">
       <extensionElements>

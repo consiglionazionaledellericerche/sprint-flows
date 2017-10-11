@@ -40,6 +40,8 @@ public class ScorriElencoDitteCandidate implements ExecutionListener {
 		int nrElencoDitteCorrente = (int) execution.getVariable("nrElencoDitteCorrente");
 		JSONObject dittaCorrente = ditteCandidate.getJSONObject(nrElencoDitteCorrente -1);
 		String codiceVerificheRequisiti = execution.getVariable("verificheRequisitiid").toString();
+		execution.setVariable("pIvaCodiceFiscaleDittaCandidata", null);
+		execution.setVariable("ragioneSocialeDittaCandidata", null);
 		if (codiceVerificheRequisiti.equals("1") || codiceVerificheRequisiti.equals("3"))
 		{
 			execution.setVariable("esitoVerificaRequisiti", "inviaRisultato");
@@ -59,4 +61,3 @@ public class ScorriElencoDitteCandidate implements ExecutionListener {
 		}
 	}
 }
-
