@@ -30,10 +30,10 @@ public void notify(DelegateExecution execution) throws Exception {
 	execution.setVariable("ditteDisponibili", "presenti");
 
 	if (execution.getVariable("nrElencoDitteCorrente") == null) {
-		execution.setVariable("nrElencoDitteCorrente", 1);
+		execution.setVariable("nrElencoDitteCorrente", 0);
 	} 
 	int nrElencoDitteCorrente = (int) execution.getVariable("nrElencoDitteCorrente");
-	JSONObject dittaCorrente = ditteCandidate.getJSONObject(nrElencoDitteCorrente -1);
+	JSONObject dittaCorrente = ditteCandidate.getJSONObject(nrElencoDitteCorrente);
 	execution.setVariable("pIvaCodiceFiscaleDittaCandidata", dittaCorrente.get("pIvaCodiceFiscaleDittaCandidata"));
 	execution.setVariable("ragioneSocialeDittaCandidata", dittaCorrente.get("ragioneSocialeDittaCandidata"));
 }

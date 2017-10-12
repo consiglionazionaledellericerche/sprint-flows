@@ -51,9 +51,11 @@ public class ScorriElencoDitteCandidate implements ExecutionListener {
 		{
 			execution.setVariable("pIvaCodiceFiscaleDittaAggiudicataria", "NESSUNA");
 			execution.setVariable("ragioneSocialeDittaAggiudicataria", "NESSUNA");
+			execution.setVariable("ditteRTI_json", null);
 			execution.setVariable("esitoVerificaRequisiti", "revocaConProvvedimento");
 		} else {
 			dittaCorrente = ditteCandidate.getJSONObject(nrElencoDitteCorrente);
+			execution.setVariable("ditteRTI_json", null);
 			execution.setVariable("pIvaCodiceFiscaleDittaAggiudicataria", dittaCorrente.get("pIvaCodiceFiscaleDittaCandidata"));
 			execution.setVariable("ragioneSocialeDittaAggiudicataria", dittaCorrente.get("ragioneSocialeDittaCandidata"));
 			execution.setVariable("esitoVerificaRequisiti", "procediAltroCandidato");
