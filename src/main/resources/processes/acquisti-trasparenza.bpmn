@@ -10,8 +10,6 @@
       <userTask id="verifica-decisione" name="Verifica Decisione" activiti:candidateGroups="${gruppoSFD}"></userTask>
       <userTask id="firma-decisione" name="Firma Decisione" activiti:candidateGroups="${gruppoDirettore}">
         <extensionElements>
-          <activiti:taskListener event="complete" expression="${execution.setVariable(&quot;firma_password&quot;, task.getVariable(&quot;password&quot;))}"></activiti:taskListener>
-          <activiti:taskListener event="complete" expression="${execution.setVariable(&quot;firma_otp&quot;, task.getVariable(&quot;otp&quot;))}"></activiti:taskListener>
           <activiti:taskListener event="complete" expression="${task.setVariable(&quot;password&quot;, &quot;******&quot;)}"></activiti:taskListener>
           <activiti:taskListener event="complete" expression="${task.setVariable(&quot;otp&quot;, &quot;******&quot;)}"></activiti:taskListener>
         </extensionElements>
@@ -24,11 +22,7 @@
         </extensionElements>
       </sequenceFlow>
       <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway" default="flow10"></exclusiveGateway>
-      <sequenceFlow id="flow10" sourceRef="exclusivegateway1" targetRef="firma-decisione">
-        <extensionElements>
-          <activiti:executionListener event="take" delegateExpression="${firmaDecisione}"></activiti:executionListener>
-        </extensionElements>
-      </sequenceFlow>
+      <sequenceFlow id="flow10" sourceRef="exclusivegateway1" targetRef="firma-decisione"></sequenceFlow>
       <sequenceFlow id="flow11" sourceRef="exclusivegateway1" targetRef="modifica-decisione">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Modifica'}]]></conditionExpression>
       </sequenceFlow>
@@ -171,7 +165,12 @@
           <activiti:executionListener event="start" expression="${execution.setVariable(&quot;sceltaUtente&quot;, &quot;RevocaConProvvedimento&quot;)}"></activiti:executionListener>
         </extensionElements>
       </endEvent>
-      <userTask id="firma-provvedimento-aggiudicazione" name="Firma Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoDirettore}"></userTask>
+      <userTask id="firma-provvedimento-aggiudicazione" name="Firma Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoDirettore}">
+        <extensionElements>
+          <activiti:taskListener event="complete" expression="${task.setVariable(&quot;password&quot;, &quot;******&quot;)}"></activiti:taskListener>
+          <activiti:taskListener event="complete" expression="${task.setVariable(&quot;otp&quot;, &quot;******&quot;)}"></activiti:taskListener>
+        </extensionElements>
+      </userTask>
       <sequenceFlow id="flow51" sourceRef="firma-provvedimento-aggiudicazione" targetRef="exclusivegateway11"></sequenceFlow>
       <exclusiveGateway id="exclusivegateway26" name="Exclusive Gateway" default="flow140"></exclusiveGateway>
       <sequenceFlow id="flow137" sourceRef="protocollo-provvedimento-aggiudicazione" targetRef="exclusivegateway26">
@@ -231,7 +230,12 @@
     <subProcess id="REVOCA" name="REVOCA">
       <startEvent id="startevent7" name="Start"></startEvent>
       <endEvent id="endevent5" name="End"></endEvent>
-      <userTask id="firma-revoca" name="Firma Revoca" activiti:candidateGroups="${gruppoDirettore}"></userTask>
+      <userTask id="firma-revoca" name="Firma Revoca" activiti:candidateGroups="${gruppoDirettore}">
+        <extensionElements>
+          <activiti:taskListener event="complete" expression="${task.setVariable(&quot;password&quot;, &quot;******&quot;)}"></activiti:taskListener>
+          <activiti:taskListener event="complete" expression="${task.setVariable(&quot;otp&quot;, &quot;******&quot;)}"></activiti:taskListener>
+        </extensionElements>
+      </userTask>
       <userTask id="modifica-revoca" name="Modifica Revoca" activiti:candidateGroups="${gruppoRA}"></userTask>
       <exclusiveGateway id="exclusivegateway9" name="Exclusive Gateway" default="flow42"></exclusiveGateway>
       <sequenceFlow id="flow39" sourceRef="firma-revoca" targetRef="exclusivegateway9"></sequenceFlow>
@@ -384,7 +388,12 @@
     <subProcess id="ordine-fuori-mepa" name="ORDINE FUORI MEPA">
       <startEvent id="startevent10" name="Start"></startEvent>
       <userTask id="predisposizione-ordine" name="Predisposizione Ordine" activiti:candidateGroups="${gruppoRA}"></userTask>
-      <userTask id="firma-ordine" name="Firma Ordine" activiti:candidateGroups="${gruppoDirettore}"></userTask>
+      <userTask id="firma-ordine" name="Firma Ordine" activiti:candidateGroups="${gruppoDirettore}">
+        <extensionElements>
+          <activiti:taskListener event="complete" expression="${task.setVariable(&quot;otp&quot;, &quot;******&quot;)}"></activiti:taskListener>
+          <activiti:taskListener event="complete" expression="${task.setVariable(&quot;password&quot;, &quot;******&quot;)}"></activiti:taskListener>
+        </extensionElements>
+      </userTask>
       <exclusiveGateway id="exclusivegateway23" name="Exclusive Gateway" default="flow111"></exclusiveGateway>
       <sequenceFlow id="flow105" sourceRef="startevent10" targetRef="predisposizione-ordine">
         <extensionElements>
