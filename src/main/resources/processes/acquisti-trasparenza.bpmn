@@ -341,6 +341,31 @@
     <sequenceFlow id="flow78" sourceRef="espletamento-procedura" targetRef="exclusivegateway15">
       <extensionElements>
         <activiti:executionListener event="take" delegateExpression="${pubblicaTuttiAllegatiPubblicabili}"></activiti:executionListener>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumentoSePresente}">
+          <activiti:field name="nomeFileDaPubblicare">
+            <activiti:string><![CDATA[bandoAvvisi]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumentoSePresente}">
+          <activiti:field name="nomeFileDaPubblicare">
+            <activiti:string><![CDATA[letteraInvito]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumentoSePresente}">
+          <activiti:field name="nomeFileDaPubblicare">
+            <activiti:string><![CDATA[provvedimentoAmmessiEsclusi]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumentoSePresente}">
+          <activiti:field name="nomeFileDaPubblicare">
+            <activiti:string><![CDATA[provvedimentoNominaCommissione]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumentoSePresente}">
+          <activiti:field name="nomeFileDaPubblicare">
+            <activiti:string><![CDATA[elencoVerbali]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
       </extensionElements>
     </sequenceFlow>
     <sequenceFlow id="flow79" sourceRef="exclusivegateway15" targetRef="PROVVEDIMENTO-AGGIUDICAZIONE">
