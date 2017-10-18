@@ -284,6 +284,16 @@
     <sequenceFlow id="flow71" sourceRef="consuntivo" targetRef="endevent8">
       <extensionElements>
         <activiti:executionListener event="take" delegateExpression="${pubblicaTuttiAllegatiPubblicabili}"></activiti:executionListener>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumentoSePresente}">
+          <activiti:field name="nomeFileDaPubblicare">
+            <activiti:string><![CDATA[avvisoPostInformazione]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumentoSePresente}">
+          <activiti:field name="nomeFileDaPubblicare">
+            <activiti:string><![CDATA[modificheVariantiArt106]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
       </extensionElements>
     </sequenceFlow>
     <subProcess id="ordine-mepa" name="ORDINE MEPA">
