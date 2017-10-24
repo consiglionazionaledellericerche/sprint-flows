@@ -1,5 +1,6 @@
 package it.cnr.si.flows.ng.utils;
 
+import it.cnr.si.domain.Relationship;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.impl.util.json.JSONArray;
@@ -18,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -41,11 +41,10 @@ public final class Utils {
     private static final String GREAT = "Great";
     private static final String ERRORE_NEL_PARSING_DELLA_DATA = "Errore nel parsing della data {} - ";
     private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
-    private static final String ENTRY_KEY = "entry";
-    private static final String VALUE_KEY = "value";
+    private static final String ROLE = "ROLE_";
     @Autowired
     private static RestResponseFactory restResponseFactory;
-    private static SimpleDateFormat formatoData = new SimpleDateFormat("yyyy-MM-dd");
+    private static DateFormat formatoData = new SimpleDateFormat("yyyy-MM-dd");
     private static DateFormat formatoDataOra = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);
 
     public static boolean isEmpty(String in) {
@@ -68,12 +67,16 @@ public final class Utils {
         return ResponseEntity.ok(response);
     }
 
+    public static String replaceStruttura(Relationship relationship, String struttura) {
+        return relationship.getGroupRelationship().replace("@STRUTTURA", struttura);
+    }
+
     public static String removeLeadingRole(String in) {
-        return in.startsWith("ROLE_") ? in.substring(5) : in;
+        return in.startsWith(ROLE) ? in.substring(5) : in;
     }
 
     public static String addLeadingRole(String in) {
-        return in.startsWith("ROLE_") ? in : "ROLE_" + in;
+        return in.startsWith(ROLE) ? in : ROLE + in;
     }
 
     public static Integer parseInt(String in) {

@@ -27,6 +27,7 @@
     </scm>
 
     <properties>
+        <activiti.version>5.22.0</activiti.version>
         <assertj-core.version>3.5.2</assertj-core.version>
         <firmadigitale.version>1.6</firmadigitale.version>
         <gatling-maven-plugin.version>2.1.7</gatling-maven-plugin.version>
@@ -48,7 +49,6 @@
         <spring.security.version>4.1.1.RELEASE</spring.security.version>
         <spring.version>4.3.2.RELEASE</spring.version>
         <sprint.version>2.0.1</sprint.version>
-        <activiti.version>5.22.0</activiti.version>
         <start-class>it.cnr.si.FlowsApp</start-class>
     </properties>
 

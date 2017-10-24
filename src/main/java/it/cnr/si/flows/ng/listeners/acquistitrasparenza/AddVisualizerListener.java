@@ -19,6 +19,7 @@ public class AddVisualizerListener implements ExecutionListener {
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AddVisualizerListener.class);
+    private static final String LOG_STRING = "Aggiunta IdentityLink al flusso {} per il gruppo {}";
 
 
     @Inject
@@ -30,20 +31,20 @@ public class AddVisualizerListener implements ExecutionListener {
         String processDefinitionString = execution.getProcessDefinitionId();
         ProcessDefinitionEnum processDefinition = ProcessDefinitionEnum.valueOf(processDefinitionString.substring(0, processDefinitionString.indexOf(":")));
         switch (processDefinition) {
-            case acquistiTrasparenza:
+            case acquisti:
                 String struttura = (String) execution.getVariable("gruppoRA");
                 struttura = struttura.substring(struttura.indexOf('@') + 1, struttura.length());
 
                 runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), "ra@" + struttura, PROCESS_VISUALIZER);
-                LOGGER.info("Aggiunta IdentityLink al flusso {} per il gruppo {}", execution.getId(), "ra@" + struttura);
+                LOGGER.info(LOG_STRING, execution.getId(), String.format("ra@%s", struttura));
                 runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), "direttore@" + struttura, PROCESS_VISUALIZER);
-                LOGGER.info("Aggiunta IdentityLink al flusso {} per il gruppo {}", execution.getId(), "direttore@" + struttura);
+                LOGGER.info(LOG_STRING, execution.getId(), String.format("direttore@%s", struttura));
                 runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), "segreteria@" + struttura, PROCESS_VISUALIZER);
-                LOGGER.info("Aggiunta IdentityLink al flusso {} per il gruppo {}", execution.getId(), "segreteria@" + struttura);
+                LOGGER.info(LOG_STRING, execution.getId(), String.format("segreteria@%s", struttura));
                 runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), "rt@" + struttura, PROCESS_VISUALIZER);
-                LOGGER.info("Aggiunta IdentityLink al flusso {} per il gruppo {}", execution.getId(), "rt@" + struttura);
+                LOGGER.info(LOG_STRING, execution.getId(), String.format("rt@%s", struttura));
                 runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), "sfd@" + struttura, PROCESS_VISUALIZER);
-                LOGGER.info("Aggiunta IdentityLink al flusso {} per il gruppo {}", execution.getId(), "sfd@" + struttura);
+                LOGGER.info(LOG_STRING, execution.getId(), String.format("sfd@%s", struttura));
                 break;
 
             case permessiFerie:
