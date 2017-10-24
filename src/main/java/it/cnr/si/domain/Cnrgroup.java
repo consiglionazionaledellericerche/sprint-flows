@@ -4,11 +4,12 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * A Cnrgroup.
@@ -25,7 +26,7 @@ public class Cnrgroup implements Serializable {
     private Long id;
 
     @NotNull
-    @Pattern(regexp = "^[a-zA-Z0-9_@-#]*$")
+    @Pattern(regexp = "^[a-zA-Z0-9\\#]*[a-zA-Z0-9\\-\\@]*[a-zA-Z0-9]*$")
     @Column(name = "name", nullable = false)
     private String name;
 
@@ -36,8 +37,8 @@ public class Cnrgroup implements Serializable {
     @ManyToMany
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @JoinTable(name = "cnrgroup_parents",
-               joinColumns = @JoinColumn(name="cnrgroups_id", referencedColumnName="ID"),
-               inverseJoinColumns = @JoinColumn(name="parents_id", referencedColumnName="ID"))
+            joinColumns = @JoinColumn(name = "cnrgroups_id", referencedColumnName = "ID"),
+            inverseJoinColumns = @JoinColumn(name = "parents_id", referencedColumnName = "ID"))
     private Set<Cnrgroup> parents = new HashSet<>();
 
     public Long getId() {
@@ -83,18 +84,6 @@ public class Cnrgroup implements Serializable {
         return this;
     }
 
-//    public Cnrgroup addCnrgroup(Cnrgroup cnrgroup) {
-//        parents.add(cnrgroup);
-//        cnrgroup.getMemberGroups().add(this);
-//        return this;
-//    }
-//
-//    public Cnrgroup removeCnrgroup(Cnrgroup cnrgroup) {
-//        parents.remove(cnrgroup);
-//        cnrgroup.getMemberGroups().remove(this);
-//        return this;
-//    }
-
     public void setParents(Set<Cnrgroup> cnrgroups) {
         this.parents = cnrgroups;
     }
@@ -122,9 +111,9 @@ public class Cnrgroup implements Serializable {
     @Override
     public String toString() {
         return "Cnrgroup{" +
-            "id=" + id +
-            ", name='" + name + "'" +
-            ", displayName='" + displayName + "'" +
-            '}';
+                "id=" + id +
+                ", name='" + name + "'" +
+                ", displayName='" + displayName + "'" +
+                '}';
     }
 }
