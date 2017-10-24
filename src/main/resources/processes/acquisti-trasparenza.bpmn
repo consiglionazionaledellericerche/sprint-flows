@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
-  <process id="acquisti-trasparenza" name="Acquisti Trasparenza" isExecutable="true">
+  <process id="acquisti" name="Acquisti" isExecutable="true">
     <extensionElements>
       <activiti:executionListener event="start" delegateExpression="${startAcquistiSetGroupsAndVisibility}"></activiti:executionListener>
     </extensionElements>
@@ -543,8 +543,8 @@
     <dataObject id="sceltaUtente" name="sceltaUtente" itemSubjectRef="xsd:string"></dataObject>
     <dataObject id="sceltaPercorso" name="sceltaPercorso" itemSubjectRef="xsd:string"></dataObject>
   </process>
-  <bpmndi:BPMNDiagram id="BPMNDiagram_acquisti-trasparenza">
-    <bpmndi:BPMNPlane bpmnElement="acquisti-trasparenza" id="BPMNPlane_acquisti-trasparenza">
+  <bpmndi:BPMNDiagram id="BPMNDiagram_acquisti">
+    <bpmndi:BPMNPlane bpmnElement="acquisti" id="BPMNPlane_acquisti">
       <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
         <omgdc:Bounds height="35.0" width="35.0" x="38.0" y="111.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
