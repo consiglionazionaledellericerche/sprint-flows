@@ -11,6 +11,7 @@
                 "form": "Form",
                 "cnrgroup": "Cnrgroup",
                 "membership": "Membership",
+              "relationship": "Relationship",
                 "dynamiclist": "Dynamiclist",
                 "view": "View",
                 "notificationRule": "Notification Rule",

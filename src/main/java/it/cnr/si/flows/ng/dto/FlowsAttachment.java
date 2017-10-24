@@ -140,7 +140,7 @@ public class FlowsAttachment implements Serializable {
     }
 
     public enum ProcessDefinitionEnum {
-        acquistiTrasparenza("acquisti-trasparenza"),
+        //        acquistiTrasparenza("acquisti-trasparenza"),
         acquisti("acquisti"),
         permessiFerie("permessi-ferie");
 

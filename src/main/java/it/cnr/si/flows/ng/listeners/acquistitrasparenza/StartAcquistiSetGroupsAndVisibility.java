@@ -1,10 +1,8 @@
 package it.cnr.si.flows.ng.listeners.acquistitrasparenza;
 
-import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
+import it.cnr.si.flows.ng.utils.Utils;
+import it.cnr.si.service.MembershipService;
+import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
@@ -15,15 +13,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import it.cnr.si.flows.ng.resource.FlowsTaskResource;
-import it.cnr.si.flows.ng.utils.Utils;
-import it.cnr.si.service.MembershipService;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 
 @Component
 public class StartAcquistiSetGroupsAndVisibility implements ExecutionListener {
     private static final long serialVersionUID = 686169707042367215L;
     private static final Logger LOGGER = LoggerFactory.getLogger(StartAcquistiSetGroupsAndVisibility.class);
 
+    @Autowired
+    private RelationshipService relationshipService;
     @Autowired
     private MembershipService membershipService;
     @Autowired
@@ -35,7 +36,7 @@ public class StartAcquistiSetGroupsAndVisibility implements ExecutionListener {
         String initiator = (String) execution.getVariable("initiator");
         LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
 
-        List<GrantedAuthority> authorities = membershipService.getAllAdditionalAuthoritiesForUser(initiator);
+        List<GrantedAuthority> authorities = relationshipService.getAllAdditionalGroupsForUser(initiator);
 
         List<String> groups = authorities.stream()
                 .map(a -> a.getAuthority())

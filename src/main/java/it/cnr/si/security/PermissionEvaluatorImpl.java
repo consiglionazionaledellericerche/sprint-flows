@@ -63,7 +63,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
         List<String> authorities = getAuthorities(username.orElse(""), flowsUserDetailsService);
 
         return taskService.getIdentityLinksForTask(taskId).stream()
-                .filter(link -> link.getType().equals("candidate") || link.getType().equals("assignee"))
+                .filter(link -> link.getType().equals(IdentityLinkType.CANDIDATE) || link.getType().equals("assignee"))
                 .anyMatch(link -> authorities.contains(link.getGroupId()) || username.get().equals(link.getUserId()));
     }
 
@@ -78,7 +78,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
      * @return risultato della verifica dei permessi (booleano)
      */
     public boolean canCompleteTaskOrStartProcessInstance(MultipartHttpServletRequest req, FlowsUserDetailsService flowsUserDetailsService) {
-        String taskId = (String) req.getParameter("taskId");
+        String taskId = req.getParameter("taskId");
         if (taskId != null) {
             String username = SecurityUtils.getCurrentUserLogin();
             String assignee = taskService.createTaskQuery()
@@ -95,12 +95,12 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
                         getAuthorities(username, flowsUserDetailsService);
 
                 return identityLinks.stream()
-                        .filter(l -> l.getType().equals("candidate"))
+                        .filter(l -> l.getType().equals(IdentityLinkType.CANDIDATE))
                         .anyMatch(l -> authorities.contains(l.getGroupId()));
             }
         } else {
             //Se non è valorizzato il taskId allora sto "avviando" un nuovo workflow e verifico di averne i permessi
-            String definitionKey = (String) req.getParameter("processDefinitionId").split(":")[0];
+            String definitionKey = req.getParameter("processDefinitionId").split(":")[0];
             return flowsProcessDefinitionResource.canStartProcesByDefinitionKey(definitionKey);
         }
     }
@@ -192,7 +192,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
             List<String> authorities = getAuthorities(username, flowsUserDetailsService);
 
             boolean isInCandidates = identityLinks.stream()
-                    .filter(l -> l.getType().equals("candidate"))
+                    .filter(l -> l.getType().equals(IdentityLinkType.CANDIDATE))
                     .anyMatch(l -> authorities.contains(l.getGroupId()));
 
             if (isInCandidates) {

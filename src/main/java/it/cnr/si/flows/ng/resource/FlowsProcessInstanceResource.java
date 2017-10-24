@@ -42,7 +42,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import static it.cnr.si.flows.ng.dto.FlowsAttachment.ProcessDefinitionEnum.acquistiTrasparenza;
+import static it.cnr.si.flows.ng.dto.FlowsAttachment.ProcessDefinitionEnum.acquisti;
 import static it.cnr.si.flows.ng.utils.Enum.Stato.Pubblicato;
 import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
 import static it.cnr.si.flows.ng.utils.Utils.ASC;
@@ -337,7 +337,7 @@ public class FlowsProcessInstanceResource {
                 .list();
 
         List<String> exportTrasparenza = new ArrayList<>();
-        View trasparenza = viewRepository.getViewByProcessidType(acquistiTrasparenza.getValue(), "export-trasparenza");
+        View trasparenza = viewRepository.getViewByProcessidType(acquisti.getValue(), "export-trasparenza");
         String view = trasparenza.getView();
         JSONArray fields = new JSONArray(view);
         for (int i = 0; i < fields.length(); i++) {
@@ -373,7 +373,7 @@ public class FlowsProcessInstanceResource {
                     .list();
 
 
-            View trasparenza = viewRepository.getViewByProcessidType(acquistiTrasparenza.getValue(), "export-trasparenza");
+            View trasparenza = viewRepository.getViewByProcessidType(acquisti.getValue(), "export-trasparenza");
             String view = trasparenza.getView();
             JSONArray fields = new JSONArray(view);
             for (int j = 0; j < fields.length(); j++) {
