@@ -67,7 +67,6 @@ public class StartAcquistiSetGroupsAndVisibility implements ExecutionListener {
             } else {
                 execution.setVariable("organizzazioneStruttura", "Complessa");
             }
-
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoRT, PROCESS_VISUALIZER);
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoDirettore, PROCESS_VISUALIZER);
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoRA, PROCESS_VISUALIZER);
@@ -79,6 +78,7 @@ public class StartAcquistiSetGroupsAndVisibility implements ExecutionListener {
             execution.setVariable("gruppoDirettore", gruppoDirettore);
             execution.setVariable("gruppoRA", gruppoRA);
             execution.setVariable("gruppoSFD", gruppoSFD);
+
         }
 
     }
