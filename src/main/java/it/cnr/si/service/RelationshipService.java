@@ -122,18 +122,20 @@ public class RelationshipService {
             result.addAll(relationshipRepository.findRelationshipGroup(group));
 
             //match "@STRUTTURA" (ad es. relationship: ra@STRUTTURA -> supervisore#acquistitrasparenza@STRUTTURA)
-            String role = group.substring(0, group.indexOf('@'));
-            Set<Relationship> relationshipGroupForStruttura = relationshipRepository.findRelationshipGroupForStruttura(
-                    group.contains("@") ? role : group);
+            if (group.contains("@")) {
+                String role = group.substring(0, group.indexOf('@'));
+                Set<Relationship> relationshipGroupForStruttura = relationshipRepository.findRelationshipGroupForStruttura(
+                        group.contains("@") ? role : group);
 
-            // rimpiazzo "@STRUTTURA" nella relationship con il codice della struttura (ad es:
-            result.addAll(relationshipGroupForStruttura.stream()
-                                  .map(a -> {
-                                      String struttura = group.substring(group.indexOf('@'), group.length());
-                                      a.setGroupRelationship(Utils.replaceStruttura(a, struttura));
-                                      return a;
-                                  })
-                                  .collect(Collectors.toSet()));
+                // rimpiazzo "@STRUTTURA" nella relationship con il codice della struttura (ad es:
+                result.addAll(relationshipGroupForStruttura.stream()
+                                      .map(a -> {
+                                          String struttura = group.substring(group.indexOf('@'), group.length());
+                                          a.setGroupRelationship(Utils.replaceStruttura(a, struttura));
+                                          return a;
+                                      })
+                                      .collect(Collectors.toSet()));
+            }
         }
         //mapping in modo da recuperare il set di gruppi in relationships (stringhe)
         return result.stream()
