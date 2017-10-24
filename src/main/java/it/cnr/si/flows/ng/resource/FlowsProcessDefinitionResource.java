@@ -67,7 +67,7 @@ public class FlowsProcessDefinitionResource {
     public boolean canStartProcesByDefinitionKey(String definitionKey) {
 
         Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-        return authorities.stream().anyMatch(a -> a.getAuthority().startsWith("ROLE_abilitati#"+ definitionKey));
+        return authorities.stream().anyMatch(a -> a.getAuthority().startsWith("ROLE_abilitati#"+ definitionKey + "@"));
 
     }
 
