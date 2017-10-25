@@ -63,11 +63,7 @@ public class AceBridgeService {
 		return aceJdbcTemplate.query(groupsForUser, new Object[] {username}, new RowMapper<String>() {
 			@Override
 			public String mapRow(ResultSet rs, int rowNum) throws SQLException {
-				if (rs.getString("eosigla").equals("CNR")){
-					return rs.getString("sigla") +"@CNR";
-				} else {
 					return rs.getString("sigla") +"@"+ rs.getString("eoid");
-				}
 			}
 		});
 	}
@@ -85,11 +81,7 @@ public class AceBridgeService {
 		return aceJdbcTemplate.query(usersInRole, args, new RowMapper<String>() {
 			@Override
 			public String mapRow(ResultSet rs, int rowNum) throws SQLException {
-				if (rs.getString("eosigla").equals("CNR")){
-					return rs.getString("sigla") +"@CNR";
-				} else {
 					return rs.getString("sigla") +"@"+ rs.getString("eoid");
-				}
 			}
 		});
 	}
