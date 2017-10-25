@@ -33,46 +33,47 @@ public class FirmaDocumento implements ExecutionListener {
 
 	@Override
 	public void notify(DelegateExecution execution) throws Exception {
-		if (!execution.getEventName().equals(ExecutionListener.EVENTNAME_TAKE))
-			throw new IllegalStateException("Questo Listener accetta solo eventi 'take'.");
+		if (!execution.getEventName().equals(ExecutionListener.EVENTNAME_END))
+			throw new IllegalStateException("Questo Listener accetta solo eventi 'end'.");
 		if (nomeFileDaFirmare.getValue(execution) == null)
 			throw new IllegalStateException("Questo Listener ha bisogno del campo 'nomeFileDaFirmare' nella process definition (nel Task Listener - Fields).");
+		if (execution.getVariable("sceltaUtente").toString().equals("Firma")) {
+			String nomeVariabileFile = (String) nomeFileDaFirmare.getValue(execution);
+			String stringaOscurante = "******";
+			// TODO: validare presenza di queste tre variabili
+			String username = (String) execution.getVariable("username");
+			String password = (String) execution.getVariable("password");
+			String otp = (String) execution.getVariable("otp");
+			String textMessage = "";
 
-		String nomeVariabileFile = (String) nomeFileDaFirmare.getValue(execution);
-		String stringaOscurante = "******";
-		// TODO: validare presenza di queste tre variabili
-		String username = (String) execution.getVariable("username");
-		String password = (String) execution.getVariable("password");
-		String otp = (String) execution.getVariable("otp");
-		String textMessage = "";
+			FlowsAttachment att = (FlowsAttachment) execution.getVariable(nomeVariabileFile);
+			byte[] bytes = att.getBytes();
 
-		FlowsAttachment att = (FlowsAttachment) execution.getVariable(nomeVariabileFile);
-		byte[] bytes = att.getBytes();
+			try {
+				byte[] bytesfirmati = firmaService.firma(username, password, otp, bytes);
+				att.setBytes(bytesfirmati);
+				att.setFilename(getSignedFilename(att.getFilename()));
+				att.setAzione(Firma);
+				att.addStato(Firmato);
 
-		try {
-			byte[] bytesfirmati = firmaService.firma(username, password, otp, bytes);
-			att.setBytes(bytesfirmati);
-			att.setFilename(getSignedFilename(att.getFilename()));
-            att.setAzione(Firma);
-            att.addStato(Firmato);
-
-			attachmentService.saveAttachment(execution, nomeVariabileFile, att);
-			execution.setVariable("otp", stringaOscurante);
-			execution.setVariable("password", stringaOscurante);
-		} catch (ArubaSignServiceException e) {
-			LOGGER.error("firma non riuscita", e);
-			if (e.getMessage().indexOf("error code 0001") != -1) {
-				textMessage = "controlla il formato del file sottopsto alla firma";
-			} else if(e.getMessage().indexOf("error code 0003") != -1) {
-				textMessage = "Errore in fase di verifica delle credenziali";
-			} else if(e.getMessage().indexOf("error code 0004") != -1) {
-				textMessage = "Errore nel PIN";
-			} else {
-				textMessage = "errore generico";
+				attachmentService.saveAttachment(execution, nomeVariabileFile, att);
+				execution.setVariable("otp", stringaOscurante);
+				execution.setVariable("password", stringaOscurante);
+			} catch (ArubaSignServiceException e) {
+				LOGGER.error("firma non riuscita", e);
+				if (e.getMessage().indexOf("error code 0001") != -1) {
+					textMessage = "controlla il formato del file sottopsto alla firma";
+				} else if(e.getMessage().indexOf("error code 0003") != -1) {
+					textMessage = "Errore in fase di verifica delle credenziali";
+				} else if(e.getMessage().indexOf("error code 0004") != -1) {
+					textMessage = "Errore nel PIN";
+				} else {
+					textMessage = "errore generico";
+				}
+				throw new BpmnError("500", "firma non riuscita - " + textMessage);
 			}
-			throw new BpmnError("500", "firma non riuscita - " + textMessage);
-		}
 
+		}
 	}
 
 
