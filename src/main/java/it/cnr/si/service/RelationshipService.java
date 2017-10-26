@@ -8,6 +8,7 @@ import it.cnr.si.repository.CnrgroupRepository;
 import it.cnr.si.repository.RelationshipRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,6 +46,7 @@ public class RelationshipService {
      * @param relationship the entity to save
      * @return the persisted entity
      */
+    @CacheEvict(value = "allGroups", allEntries = true)
     public Relationship save(Relationship relationship) {
         log.debug("Request to save Relationship : {}", relationship);
         return relationshipRepository.save(relationship);
@@ -84,9 +86,8 @@ public class RelationshipService {
         relationshipRepository.delete(id);
     }
 
-    //todo: vedere se va cachato
-    @Cacheable("additionalAuthorities")
-    public List<GrantedAuthority> getAllAdditionalGroupsForUser(String username) {
+    @Cacheable(value = "allGroups")
+    public List<GrantedAuthority> getAllGroupsForUser(String username) {
         Set<String> aceGroup = getACEGroupsForUser(username);
         Set<String> aceGropupWithParents = getAllACEParents(aceGroup);
 
@@ -146,7 +147,7 @@ public class RelationshipService {
         return new HashSet<>(aceService.getAceGroupsForUser(username));
     }
 
-
+    //todo: rivedere perchè forse è un concetto superato
     private Set<String> getACEParents(Set<String> groups) {
         Set<String> parents = new HashSet<>();
 

@@ -2,7 +2,6 @@ package it.cnr.si.flows.ng;
 
 import it.cnr.si.flows.ng.resource.FlowsTaskResource;
 import it.cnr.si.security.FlowsUserDetailsService;
-import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -63,13 +62,14 @@ public class TestServices {
     FlowsUserDetailsService flowsUserDetailsService;
     private String processDefinition;
     private String firstTaskId;
-    //    Prova
-    @Inject
-    private RelationshipService relationshipService;
-//    OAuthCookieSwithUserFilter oAuthCookieSwithUserFilter;
+
 
     public static String getRA() {
         return RA;
+    }
+
+    public static String getRA2() {
+        return RA2;
     }
 
     public void loginAdmin() {
