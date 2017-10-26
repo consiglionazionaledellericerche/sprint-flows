@@ -81,7 +81,8 @@ public class AceBridgeService {
 		return aceJdbcTemplate.query(usersInRole, args, new RowMapper<String>() {
 			@Override
 			public String mapRow(ResultSet rs, int rowNum) throws SQLException {
-					return rs.getString("sigla") +"@"+ rs.getString("eoid");
+				//return rs.getString("sigla") +"@"+ rs.getString("eoid");
+				return rs.getString("userid");
 			}
 		});
 	}
