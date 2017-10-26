@@ -42,7 +42,7 @@ public class FlowsAuthoritiesPopulator implements LdapAuthoritiesPopulator {
             log.debug("no attribute {} defined for user {}", DEPARTMENT_NUMBER, username);
         }
 
-        List<GrantedAuthority> fullGrantedAuthorities = relationshipService.getAllAdditionalGroupsForUser(username);
+        List<GrantedAuthority> fullGrantedAuthorities = relationshipService.getAllGroupsForUser(username);
         list.addAll(fullGrantedAuthorities);
         log.info("Full Groups, including from local membership {}", fullGrantedAuthorities);
 

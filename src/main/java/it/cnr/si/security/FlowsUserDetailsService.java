@@ -53,7 +53,7 @@ public class FlowsUserDetailsService implements org.springframework.security.cor
                 List<GrantedAuthority> grantedAuthorities = user.getAuthorities().stream()
                         .map(authority -> new SimpleGrantedAuthority(authority.getName()))
                         .collect(Collectors.toList());
-                grantedAuthorities.addAll(relationshipService.getAllAdditionalGroupsForUser(lowercaseLogin));
+                grantedAuthorities.addAll(relationshipService.getAllGroupsForUser(lowercaseLogin));
 
                 return new org.springframework.security.core.userdetails.User(lowercaseLogin,
                                                                               user.getPassword(),
