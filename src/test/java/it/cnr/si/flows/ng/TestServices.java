@@ -2,6 +2,7 @@ package it.cnr.si.flows.ng;
 
 import it.cnr.si.flows.ng.resource.FlowsTaskResource;
 import it.cnr.si.security.FlowsUserDetailsService;
+import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -21,10 +22,11 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static it.cnr.si.flows.ng.dto.FlowsAttachment.ProcessDefinitionEnum.acquistiTrasparenza;
+import static it.cnr.si.flows.ng.dto.FlowsAttachment.ProcessDefinitionEnum.acquisti;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -38,6 +40,12 @@ public class TestServices {
 
     public static final String TITOLO_DELL_ISTANZA_DEL_FLUSSO = "titolo dell'istanza del flusso JUnit";
     public static final String JUNIT_TEST = " JUnit test";
+    //    private static final String SFD = "supportofunzionidirigenziali";
+    private static final String SFD = "roberto.puccinelli";
+    //    private static final String RA = "responsabileacquisti";
+    private static final String DIRETTORE = "direttore";
+    private static final String RA = "anna.penna";
+    private static final String RA2 = "silvia.rossi";
 
 
     @Inject
@@ -53,81 +61,62 @@ public class TestServices {
     private ProcessInstanceResource processInstanceResource;
     @Inject
     FlowsUserDetailsService flowsUserDetailsService;
-    private String firstTaskId;
     private String processDefinition;
+    private String firstTaskId;
+    //    Prova
+    @Inject
+    private RelationshipService relationshipService;
+//    OAuthCookieSwithUserFilter oAuthCookieSwithUserFilter;
 
+    public static String getRA() {
+        return RA;
+    }
 
     public void loginAdmin() {
+        logout();
         login("admin", "admin");
     }
 
     public void loginSpaclient() {
-        login("spaclient", "sp@si@n0");
+        logout();
+//        login("spaclient", "sp@si@n0");
+        login("spaclient", "");
     }
 
     public void loginUser() {
+        logout();
         login("user", "user");
     }
 
     public void loginSfd() {
-        login("supportofunzionidirigenziali", "supportofunzionidirigenziali");
-    }
-
-    public void loginSfd2() {
-        login("supportofunzionidirigenziali2", "supportofunzionidirigenziali2");
+        logout();
+        login(SFD, SFD);
     }
 
     public void loginResponsabileAcquisti() {
-        login("responsabileacquisti", "responsabileacquisti");
+        logout();
+        login(TestServices.RA, "");
+    }
+
+    public void loginResponsabileAcquisti2() {
+        logout();
+        login(TestServices.RA2, "");
     }
 
     public void loginDirettore() {
-        login("direttore", "direttore");
-    }
-
-
-    private void login(String user, String psw) {
-//      prendo le Authorities dell'utente che si sta loggando per settarle nel "context"
-        Collection<? extends GrantedAuthority> authorities = flowsUserDetailsService.loadUserByUsername(user).getAuthorities();
-        SecurityContextHolder.getContext()
-                .setAuthentication(new UsernamePasswordAuthenticationToken(user, psw, authorities));
+        login(DIRETTORE, DIRETTORE);
     }
 
     public void logout() {
         SecurityContextHolder.clearContext();
     }
 
-    public ProcessInstanceResponse mySetUp(String processDefinitionKey) throws IOException {
-        loginAdmin();
-        List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().latestVersion().list();
+    private void login(String user, String psw) {
+//      prendo le Authorities dell'utente che si sta loggando per settarle nel "context"
+        Collection<GrantedAuthority> authorities = new ArrayList<>(flowsUserDetailsService.loadUserByUsername(user).getAuthorities());
 
-        for (ProcessDefinition pd : processDefinitions) {
-            if (pd.getId().contains(processDefinitionKey)) {
-                processDefinition = pd.getId();
-                break;
-            }
-        }
-
-        MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
-        req.setParameter("processDefinitionId", processDefinition);
-        if (processDefinitionKey.equals(acquistiTrasparenza.getValue())) {
-            req.setParameter("titoloIstanzaFlusso", TITOLO_DELL_ISTANZA_DEL_FLUSSO);
-            req.setParameter("descrizioneAcquisizione", "descrizione");
-            req.setParameter("tipologiaAcquisizione", "procedura aperta");
-            req.setParameter("tipologiaAcquisizioneId", "11");
-            req.setParameter("strumentoAcquisizione", "AFFIDAMENTO DIRETTO - MEPA o CONSIP\n");
-            req.setParameter("strumentoAcquisizioneId", "11");
-            req.setParameter("priorita", "Alta");
-            req.setParameter("rup", "marco.spasiano");
-            req.setParameter("rup_label", "MARCO SPASIANO (marco.spasiano)");
-            req.setParameter("impegni_json", "[{\"numero\":\"1\",\"importo\":100,\"descrizione\":\"descrizione impegno\",\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"gae\":\"spaclient\"}]");
-        }
-        ResponseEntity<Object> response = flowsTaskResource.completeTask(req);
-        assertEquals(OK, response.getStatusCode());
-        // Recupero il TaskId del primo task del flusso
-        firstTaskId = taskService.createTaskQuery().singleResult().getId();
-        //Recupero la ProcessInstance
-        return (ProcessInstanceResponse) response.getBody();
+        SecurityContextHolder.getContext()
+                .setAuthentication(new UsernamePasswordAuthenticationToken(user, psw, authorities));
     }
 
 
@@ -148,5 +137,38 @@ public class TestServices {
 
     public String getFirstTaskId() {
         return firstTaskId;
+    }
+
+    public ProcessInstanceResponse mySetUp(String processDefinitionKey) throws IOException {
+        loginResponsabileAcquisti();
+        List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().latestVersion().list();
+
+        for (ProcessDefinition pd : processDefinitions) {
+            if (pd.getId().contains(processDefinitionKey)) {
+                processDefinition = pd.getId();
+                break;
+            }
+        }
+
+        MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
+        req.setParameter("processDefinitionId", processDefinition);
+        if (processDefinitionKey.equals(acquisti.getValue())) {
+            req.setParameter("titoloIstanzaFlusso", TITOLO_DELL_ISTANZA_DEL_FLUSSO);
+            req.setParameter("descrizioneAcquisizione", "descrizione");
+            req.setParameter("tipologiaAcquisizione", "procedura aperta");
+            req.setParameter("tipologiaAcquisizioneId", "11");
+            req.setParameter("strumentoAcquisizione", "AFFIDAMENTO DIRETTO - MEPA o CONSIP\n");
+            req.setParameter("strumentoAcquisizioneId", "11");
+            req.setParameter("priorita", "Alta");
+            req.setParameter("rup", "marco.spasiano");
+            req.setParameter("rup_label", "MARCO SPASIANO (marco.spasiano)");
+            req.setParameter("impegni_json", "[{\"numero\":\"1\",\"importoNetto\":100,\"importoLordo\":120,\"descrizione\":\"descrizione impegno\",\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"gae\":\"spaclient\"}]");
+        }
+        ResponseEntity<Object> response = flowsTaskResource.completeTask(req);
+        assertEquals(OK, response.getStatusCode());
+        // Recupero il TaskId del primo task del flusso
+        firstTaskId = taskService.createTaskQuery().singleResult().getId();
+        //Recupero la ProcessInstance
+        return (ProcessInstanceResponse) response.getBody();
     }
 }

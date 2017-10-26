@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static it.cnr.si.flows.ng.TestServices.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
-import static it.cnr.si.flows.ng.dto.FlowsAttachment.ProcessDefinitionEnum.acquistiTrasparenza;
+import static it.cnr.si.flows.ng.dto.FlowsAttachment.ProcessDefinitionEnum.acquisti;
 import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
 import static it.cnr.si.flows.ng.utils.Utils.ASC;
 import static org.junit.Assert.assertEquals;
@@ -71,9 +71,8 @@ public class FlowsTaskResourceTest {
 
     @Test
     public void testGetMyTasks() throws IOException {
-        processInstance = util.mySetUp(acquistiTrasparenza.getValue());
+        processInstance = util.mySetUp(acquisti.getValue());
 //       all'inizio del test SFD non ha task assegnati'
-        util.logout();
         util.loginSfd();
         ResponseEntity<DataResponse> response = flowsTaskResource.getMyTasks(new MockHttpServletRequest(), ALL_PROCESS_INSTANCES, 0, 100, ASC);
         assertEquals(OK, response.getStatusCode());
@@ -86,7 +85,7 @@ public class FlowsTaskResourceTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         String content = "{\"processParams\":" +
                 "[{\"key\":\"titoloIstanzaFlusso\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
-                "{\"key\":\"initiator\",\"value\":\"admin\",\"type\":\"textEqual\"}]," +
+                "{\"key\":\"initiator\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
                 "\"taskParams\":" +
                 "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
         request.setContent(content.getBytes());
@@ -111,7 +110,7 @@ public class FlowsTaskResourceTest {
 
     @Test
     public void testGetAvailableTasks() throws IOException {
-        processInstance = util.mySetUp(acquistiTrasparenza.getValue());
+        processInstance = util.mySetUp(acquisti.getValue());
         //SFD è sfd@sisinfo (quindi può vedere il task istanziato)
         util.logout();
         util.loginSfd();
@@ -133,7 +132,7 @@ public class FlowsTaskResourceTest {
 
     @Test(expected = AccessDeniedException.class)
     public void testGetTaskInstance() throws IOException {
-        processInstance = util.mySetUp(acquistiTrasparenza.getValue());
+        processInstance = util.mySetUp(acquisti.getValue());
         ResponseEntity<Map<String, Object>> response = flowsTaskResource.getTask(util.getFirstTaskId());
         assertEquals(OK, response.getStatusCode());
         assertEquals(FIRST_TASK_NAME, ((TaskResponse) response.getBody().get("task")).getName());
@@ -146,11 +145,10 @@ public class FlowsTaskResourceTest {
 
     @Test(expected = AccessDeniedException.class)
     public void testVerifyGetTaskInstance() throws IOException {
-        processInstance = util.mySetUp(acquistiTrasparenza.getValue());
+        processInstance = util.mySetUp(acquisti.getValue());
 
         //verifico che gli utenti che NON SONO IN GRUPPI CANDIDATE DEL TASK NE' ROLE_ADMIN
         // (ad esempio il direttore) non possano accedere al servizio
-        util.logout();
         util.loginDirettore();
         flowsTaskResource.getTask(util.getFirstTaskId());
     }
@@ -158,7 +156,7 @@ public class FlowsTaskResourceTest {
 
     @Test
     public void testCompleteTask() throws IOException {
-        processInstance = util.mySetUp(acquistiTrasparenza.getValue());
+        processInstance = util.mySetUp(acquisti.getValue());
         //completo il primo task
         util.loginSfd();
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
@@ -177,7 +175,7 @@ public class FlowsTaskResourceTest {
 
     @Test
     public void testSearch() throws IOException {
-        processInstance = util.mySetUp(acquistiTrasparenza.getValue());
+        processInstance = util.mySetUp(acquisti.getValue());
 
         util.logout();
         util.loginSfd();
@@ -185,7 +183,7 @@ public class FlowsTaskResourceTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         String content = "{\"processParams\":" +
                 "[{\"key\":\"titoloIstanzaFlusso\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
-                "{\"key\":\"initiator\",\"value\":\"admin\",\"type\":\"textEqual\"}]," +
+                "{\"key\":\"initiator\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
                 "\"taskParams\":" +
                 "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
         request.setContent(content.getBytes());
@@ -200,41 +198,40 @@ public class FlowsTaskResourceTest {
 
     @Test
     public void testTaskAssignedInMyGroups() throws IOException {
-        processInstance = util.mySetUp(acquistiTrasparenza.getValue());
-
-        //verifico che all'inizio del test sfd2 NON veda nessun task
-        util.logout();
-        util.loginSfd2();
+        processInstance = util.mySetUp(acquisti.getValue());
         MockHttpServletRequest request = new MockHttpServletRequest();
+
+        //sfd NON deve vedere NESSUN Task prima dell'assegnazione del task a responsabileAcquisti2
+        util.loginSfd();
         ResponseEntity<DataResponse> response = flowsTaskResource.taskAssignedInMyGroups(request, ALL_PROCESS_INSTANCES, 0, 100, ASC);
         assertEquals(OK, response.getStatusCode());
         assertEquals(0, (new ArrayList((Collection) response.getBody().getData())).size());
 
-        //sfd non deve vedere NESSUN Task né prima né dopo l'assegnazione del task
-        util.logout();
-        util.loginSfd();
-        response = flowsTaskResource.taskAssignedInMyGroups(request, ALL_PROCESS_INSTANCES, 0, 100, ASC);
-        assertEquals(OK, response.getStatusCode());
-        assertEquals(0, (new ArrayList((Collection) response.getBody().getData())).size());
-        //assegno il task a sfd
+        //assegno il task a responsabileAcquisti2
+        util.loginResponsabileAcquisti2();
         ResponseEntity<Map<String, Object>> resp = flowsTaskResource.claimTask(util.getFirstTaskId());
         assertEquals(OK, resp.getStatusCode());
         response = flowsTaskResource.taskAssignedInMyGroups(request, ALL_PROCESS_INSTANCES, 0, 100, ASC);
         assertEquals(OK, response.getStatusCode());
         assertEquals(0, (new ArrayList((Collection) response.getBody().getData())).size());
 
-        //verifico che sfd2 veda il task assegnato ad sfd PERCHÈ HANNO LA STESSA MEMBERSHIP (sfd@sisinfo)
-        util.logout();
-        util.loginSfd2();
+        //verifico che responsabileAcquisti veda il task assegnato ad responsabileaquisti2 PERCHÈ FANNO PARTE DELLO STESSO GRUPPO (RA)
+        util.loginResponsabileAcquisti();
         response = flowsTaskResource.taskAssignedInMyGroups(request, ALL_PROCESS_INSTANCES, 0, 100, ASC);
         assertEquals(OK, response.getStatusCode());
         assertEquals(1, (new ArrayList((Collection) response.getBody().getData())).size());
+
+        //sfd NON deve vedere il Task assegnato a responsabileAcquisti2 perchè NON hanno NESSUN gruppo in comune
+        util.loginSfd();
+        response = flowsTaskResource.taskAssignedInMyGroups(request, ALL_PROCESS_INSTANCES, 0, 100, ASC);
+        assertEquals(OK, response.getStatusCode());
+        assertEquals(0, (new ArrayList((Collection) response.getBody().getData())).size());
     }
 
     // non uso expected perche' voglio controllare *esttamente* dove viene lanciata l'eccezione
     @Test
     public void testClaimTask() throws IOException {
-        processInstance = util.mySetUp(acquistiTrasparenza.getValue());
+        processInstance = util.mySetUp(acquisti.getValue());
 
 //      sfd è sfd@sisinfo quindi può prendere in carico il flusso
         util.loginSfd();
@@ -256,7 +253,7 @@ public class FlowsTaskResourceTest {
 
     @Test
     public void testGetTasksCompletedForMe() throws ArubaSignServiceException, IOException {
-        processInstance = util.mySetUp(acquistiTrasparenza.getValue());
+        processInstance = util.mySetUp(acquisti.getValue());
         //completo il primo task
         util.loginSfd();
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
@@ -292,7 +289,7 @@ public class FlowsTaskResourceTest {
         //titolo flusso sbagliato
         content = "{\"processParams\":" +
                 "[{\"key\":\"titoloIstanzaFlusso\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "AAA\",\"type\":\"text\"}," +
-                "{\"key\":\"initiator\",\"value\":\"admin\",\"type\":\"textEqual\"}]," +
+                "{\"key\":\"initiator\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
                 "\"taskParams\":" +
                 "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
         request.setContent(content.getBytes());
@@ -312,7 +309,7 @@ public class FlowsTaskResourceTest {
         //Fase sbaliata
         content = "{\"processParams\":" +
                 "[{\"key\":\"titoloIstanzaFlusso\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
-                "{\"key\":\"initiator\",\"value\":\"admin\",\"type\":\"textEqual\"}]," +
+                "{\"key\":\"initiator\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
                 "\"taskParams\":" +
                 "[{\"key\":\"Fase\",\"value\":\"Verifica DecisioneEEEEE\",\"type\":null}]}";
         request.setContent(content.getBytes());

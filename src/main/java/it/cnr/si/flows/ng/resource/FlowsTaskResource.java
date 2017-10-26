@@ -3,6 +3,7 @@ package it.cnr.si.flows.ng.resource;
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
+import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.CounterService;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.utils.Utils;
@@ -37,6 +38,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -82,6 +84,8 @@ public class FlowsTaskResource {
     private FlowsAttachmentResource attachmentResource;
     @Inject
     private PermissionEvaluatorImpl permissionEvaluator;
+    @Inject
+    private AceBridgeService aceBridgeService;
     private Utils utils = new Utils();
 
 
@@ -181,47 +185,48 @@ public class FlowsTaskResource {
         if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
             taskQuery.processDefinitionKey(processDefinition);
 
-
         utils.orderTasks(order, taskQuery);
 
-        //filtro (in "members") gli utenti che appartengono agli stessi gruppi dell'utente loggato
+        //filtro in ACE gli utenti che appartengono agli stessi gruppi dell'utente loggato
         List<String> myGroups = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .map(Utils::removeLeadingRole)
+                .filter(group -> group.indexOf("afferenza") <= -1)
+                .filter(group -> group.indexOf("USER") <= -1)
+                .filter(group -> group.indexOf("DEPARTMENT") <= -1)
+                .filter(group -> group.indexOf("PREVIUOS") <= -1)
                 .collect(Collectors.toList());
-        List<String> members = new ArrayList<>();
+
+////		TODO: da analizzare se le prestazioni sono migliori rispetto a farsi dare la lista di task attivi e ciclare per quali il member è l'assignee (codice di Martin sottostante)
+        List<TaskResponse> result = new ArrayList<TaskResponse>();
+
+        List<String> usersInMyGroups = new ArrayList<>();
         for (String myGroup : myGroups) {
-            if (myGroup.indexOf("afferenza") <= -1 && myGroup.indexOf("USER") <= -1 && myGroup.indexOf("DEPARTMENT") <= -1 && myGroup.indexOf("PREVIUOS") <= -1 && (myGroup != null)) {
-                List<String> userWithMyMembership = membershipService.findMembersInGroup(myGroup);
-                userWithMyMembership.remove(username);
-                members.removeAll(userWithMyMembership);
-                members.addAll(userWithMyMembership);
-            }
+            usersInMyGroups.addAll(aceBridgeService.getUsersinAceGroup(myGroup) != null ? aceBridgeService.getUsersinAceGroup(myGroup) : new ArrayList<>());
         }
 
-//		TODO: da analizzare se le prestazioni sono migliori rispetto a farsi dare la lista di task attivi e ciclare per quali il member è l'assignee (codice di Martin sottostante) 
+        usersInMyGroups = usersInMyGroups.stream()
+                .distinct()
+                .filter(user -> !user.equals(username))
+                .collect(Collectors.toList());
+//      prendo i task assegnati agli utenti trovati
+        for (String user : usersInMyGroups)
+            result.addAll(restResponseFactory.createTaskResponseList(taskQuery.taskAssignee(user).list()));
 
-        List<TaskResponse> list1 = new ArrayList<TaskResponse>();
-
-        for(int i = 0; i < members.size(); i++){
-            List<TaskResponse> appo1 = restResponseFactory.createTaskResponseList(taskQuery.taskAssignee(members.get(i)).list());
-            list1.addAll(appo1);
-        }
-
-        List<TaskResponse> responseList = list1.subList(firstResult <= list1.size() ? firstResult : list1.size(),
-                                                        maxResults <= list1.size() ? maxResults : list1.size());
-
+        List<TaskResponse> responseList = result.subList(firstResult <= result.size() ? firstResult : result.size(),
+                                                         maxResults <= result.size() ? maxResults : result.size());
         DataResponse response = new DataResponse();
         response.setStart(firstResult);
         response.setSize(responseList.size());
-        response.setTotal(list1.size());
+        response.setTotal(result.size());
         response.setData(responseList);
 
         return ResponseEntity.ok(response);
     }
 
+
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-//    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId, @flowsUserDetailsService)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Map<String, Object>> getTask(@PathVariable("id") String taskId) {
 
@@ -250,7 +255,7 @@ public class FlowsTaskResource {
         String username = SecurityUtils.getCurrentUserLogin();
         taskService.claim(taskId, username);
 
-        return new ResponseEntity<Map<String, Object>>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 
@@ -259,7 +264,7 @@ public class FlowsTaskResource {
     @Timed
     public ResponseEntity<Map<String, Object>> unclaimTask(@PathVariable("taskId") String taskId) {
         taskService.unclaim(taskId);
-        return new ResponseEntity<Map<String, Object>>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 

@@ -47,8 +47,7 @@ public class RelationshipService {
      */
     public Relationship save(Relationship relationship) {
         log.debug("Request to save Relationship : {}", relationship);
-        Relationship result = relationshipRepository.save(relationship);
-        return result;
+        return relationshipRepository.save(relationship);
     }
 
     /**
@@ -60,8 +59,7 @@ public class RelationshipService {
     @Transactional(readOnly = true)
     public Page<Relationship> findAll(Pageable pageable) {
         log.debug("Request to get all Relationships");
-        Page<Relationship> result = relationshipRepository.findAll(pageable);
-        return result;
+        return relationshipRepository.findAll(pageable);
     }
 
     /**
@@ -73,8 +71,7 @@ public class RelationshipService {
     @Transactional(readOnly = true)
     public Relationship findOne(Long id) {
         log.debug("Request to get Relationship : {}", id);
-        Relationship relationship = relationshipRepository.findOne(id);
-        return relationship;
+        return relationshipRepository.findOne(id);
     }
 
     /**
@@ -87,7 +84,7 @@ public class RelationshipService {
         relationshipRepository.delete(id);
     }
 
-
+    //todo: vedere se va cachato
     @Cacheable("additionalAuthorities")
     public List<GrantedAuthority> getAllAdditionalGroupsForUser(String username) {
         Set<String> aceGroup = getACEGroupsForUser(username);
@@ -103,7 +100,7 @@ public class RelationshipService {
 
     public Set<String> getAllACEParents(Set<String> groups) {
         Set<String> parents = getACEParents(groups);
-        Set<String> groupAndParents = new HashSet<>();
+        Set<String> groupAndParents = new HashSet<>(groups);
         //calcolo anche i padri "ricorsivamente", risalendio l'albero delle strutture
         while (!parents.isEmpty()) {
             groupAndParents = Stream.concat(groups.stream(), parents.stream()
@@ -115,7 +112,7 @@ public class RelationshipService {
     }
 
 
-    private Set<String> getAllRelationship(Set<String> aceGropupWithParents) {
+    public Set<String> getAllRelationship(Set<String> aceGropupWithParents) {
         Set<Relationship> result = new HashSet<>();
         for (String group : aceGropupWithParents) {
             //match esatto (ad es.: ra@2216 -> supervisore#acquistitrasparenza@STRUTTURA)
