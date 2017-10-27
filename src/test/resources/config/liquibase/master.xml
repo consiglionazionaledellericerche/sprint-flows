@@ -14,8 +14,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20170220121351_added_entity_Cnrgroup.xml"
              relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog/20170418091241_added_entity_Membership.xml"
-             relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20170503122545_added_entity_Dynamiclist.xml"
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20170504083856_added_entity_View.xml"
