@@ -11,7 +11,6 @@ import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.FlowsUserDetailsService;
 import it.cnr.si.security.PermissionEvaluatorImpl;
 import it.cnr.si.security.SecurityUtils;
-import it.cnr.si.service.MembershipService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
@@ -64,8 +63,6 @@ public class FlowsTaskResource {
     private static final String ERROR_MESSAGE = "message";
     @Inject
     private RestResponseFactory restResponseFactory;
-    @Inject
-    private MembershipService membershipService;
     @Inject
     private FlowsUserDetailsService flowsUserDetailsService;
     @Inject

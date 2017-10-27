@@ -1,7 +1,7 @@
 package it.cnr.si.flows.ng.listeners.acquistitrasparenza;
 
+import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.utils.Utils;
-import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.BpmnError;
@@ -9,10 +9,10 @@ import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,11 +23,11 @@ public class StartAcquistiSetGroupsAndVisibility implements ExecutionListener {
     private static final long serialVersionUID = 686169707042367215L;
     private static final Logger LOGGER = LoggerFactory.getLogger(StartAcquistiSetGroupsAndVisibility.class);
 
-    @Autowired
+    @Inject
     private RelationshipService relationshipService;
-    @Autowired
-    private MembershipService membershipService;
-    @Autowired
+    @Inject
+    private AceBridgeService aceBridgeService;
+    @Inject
     private RuntimeService runtimeService;
 
     @Override
@@ -36,7 +36,7 @@ public class StartAcquistiSetGroupsAndVisibility implements ExecutionListener {
         String initiator = (String) execution.getVariable("initiator");
         LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
 
-        List<GrantedAuthority> authorities = relationshipService.getAllAdditionalGroupsForUser(initiator);
+        List<GrantedAuthority> authorities = relationshipService.getAllGroupsForUser(initiator);
 
         List<String> groups = authorities.stream()
                 .map(a -> a.getAuthority())
@@ -62,7 +62,7 @@ public class StartAcquistiSetGroupsAndVisibility implements ExecutionListener {
             LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoRT, gruppoSFD, gruppoRA, gruppoDirettore);
 
             //Check se il gruppo SFD ha membri
-            List<String> members = membershipService.findMembersInGroup(gruppoSFD);
+            List<String> members = aceBridgeService.getUsersinAceGroup(gruppoSFD);
             if ( members.size() == 0 ) {
                 execution.setVariable("organizzazioneStruttura", "Semplice");
             } else {
