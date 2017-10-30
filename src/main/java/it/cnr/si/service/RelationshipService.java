@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -96,6 +97,38 @@ public class RelationshipService {
                 .map(Utils::addLeadingRole)
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
+
+
+////        NUOVA
+//
+////      A) recupero la lista dei gruppi a cui appartiene direttamente l'utente
+//        List<String> usersGroups = getUserGroups();
+//
+////      B) per ogni gruppo "supervisore" o "responsabile" getGroupHierarchicalChildren
+//        List<String> groupsToHierarchy = usersGroups.stream()
+//                .filter(group -> group.contains("supervisore") || group.contains("responsabile"))
+//                .collect(Collectors.toList());
+//
+//        List<String> parents = new ArrayList<>();
+//        for (String group : groupsToHierarchy){
+//
+//        }
+//
+//        Set<String> groupAndParents = Stream.concat(usersGroups.stream(), parents.stream()
+//                .distinct())
+//                .collect(Collectors.toSet());
+//
+////      C) recupero i gruppi "associati" nel nostro db
+//        return Stream.concat(groupAndParents.stream(), getAllRelationship(groupAndParents).stream())
+//                .distinct()
+//                .map(Utils::addLeadingRole)
+//                .map(SimpleGrantedAuthority::new)
+//                .collect(Collectors.toList());
+    }
+
+    //    todo: da implementare
+    public List getUserGroups() {
+        return new ArrayList();
     }
 
 
