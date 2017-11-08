@@ -79,7 +79,6 @@ public class TestServices {
 
     public void loginSpaclient() {
         logout();
-//        login("spaclient", "sp@si@n0");
         login("spaclient", "");
     }
 
