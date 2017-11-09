@@ -139,6 +139,11 @@
 					return $http.get('api/dynamiclists/byname/'+ name);
 				}
 			},
+			sigladynamiclist : {
+				byName: function(name) {
+					return $http.get('api/sigladynamiclist/byname/'+ name);
+				}
+			},
 			view: function(processid, type) {
 				return $http.get('api/views/'+ processid +'/'+ type);
 			},

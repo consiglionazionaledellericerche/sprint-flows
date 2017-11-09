@@ -2,8 +2,8 @@ package it.cnr.si.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.domain.Dynamiclist;
-
 import it.cnr.si.repository.DynamiclistRepository;
+import it.cnr.si.service.DynamicListService;
 import it.cnr.si.web.rest.util.HeaderUtil;
 import it.cnr.si.web.rest.util.PaginationUtil;
 import org.slf4j.Logger;
@@ -34,6 +34,11 @@ public class DynamiclistResource {
 
     @Inject
     private DynamiclistRepository dynamiclistRepository;
+    @Inject
+    DynamicListService dynamicListService;
+
+
+
 
     /**
      * POST  /dynamiclists : Create a new dynamiclist.
@@ -43,8 +48,8 @@ public class DynamiclistResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @RequestMapping(value = "/dynamiclists",
-        method = RequestMethod.POST,
-        produces = MediaType.APPLICATION_JSON_VALUE)
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<Dynamiclist> createDynamiclist(@Valid @RequestBody Dynamiclist dynamiclist) throws URISyntaxException {
         log.debug("REST request to save Dynamiclist : {}", dynamiclist);
@@ -53,8 +58,8 @@ public class DynamiclistResource {
         }
         Dynamiclist result = dynamiclistRepository.save(dynamiclist);
         return ResponseEntity.created(new URI("/api/dynamiclists/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert("dynamiclist", result.getId().toString()))
-            .body(result);
+                .headers(HeaderUtil.createEntityCreationAlert("dynamiclist", result.getId().toString()))
+                .body(result);
     }
 
     /**
@@ -67,8 +72,8 @@ public class DynamiclistResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @RequestMapping(value = "/dynamiclists",
-        method = RequestMethod.PUT,
-        produces = MediaType.APPLICATION_JSON_VALUE)
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<Dynamiclist> updateDynamiclist(@Valid @RequestBody Dynamiclist dynamiclist) throws URISyntaxException {
         log.debug("REST request to update Dynamiclist : {}", dynamiclist);
@@ -77,8 +82,8 @@ public class DynamiclistResource {
         }
         Dynamiclist result = dynamiclistRepository.save(dynamiclist);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert("dynamiclist", dynamiclist.getId().toString()))
-            .body(result);
+                .headers(HeaderUtil.createEntityUpdateAlert("dynamiclist", dynamiclist.getId().toString()))
+                .body(result);
     }
 
     /**
@@ -89,11 +94,11 @@ public class DynamiclistResource {
      * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
      */
     @RequestMapping(value = "/dynamiclists",
-        method = RequestMethod.GET,
-        produces = MediaType.APPLICATION_JSON_VALUE)
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<List<Dynamiclist>> getAllDynamiclists(Pageable pageable)
-        throws URISyntaxException {
+            throws URISyntaxException {
         log.debug("REST request to get a page of Dynamiclists");
         Page<Dynamiclist> page = dynamiclistRepository.findAll(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/dynamiclists");
@@ -107,38 +112,55 @@ public class DynamiclistResource {
      * @return the ResponseEntity with status 200 (OK) and with body the dynamiclist, or with status 404 (Not Found)
      */
     @RequestMapping(value = "/dynamiclists/{id}",
-        method = RequestMethod.GET,
-        produces = MediaType.APPLICATION_JSON_VALUE)
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<Dynamiclist> getDynamiclist(@PathVariable Long id) {
         log.debug("REST request to get Dynamiclist : {}", id);
         Dynamiclist dynamiclist = dynamiclistRepository.findOne(id);
         return Optional.ofNullable(dynamiclist)
-            .map(result -> new ResponseEntity<>(
-                result,
-                HttpStatus.OK))
-            .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                .map(result -> new ResponseEntity<>(
+                        result,
+                        HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+
     /**
-     * GET  /dynamiclists/:id : get the "id" dynamiclist.
+     * Gets sigla dynamic list.
      *
-     * @param id the id of the dynamiclist to retrieve
-     * @return the ResponseEntity with status 200 (OK) and with body the dynamiclist, or with status 404 (Not Found)
+     * @param name the name
+     * @return the sigla dynamic list
      */
-    @RequestMapping(value = "/dynamiclists/byname/{id}",
-        method = RequestMethod.GET,
-        produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/sigladynamiclist/byname/{name}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Dynamiclist> getDynamiclistByName(@PathVariable String id) {
-        log.debug("REST request to get Dynamiclist byName : {}", id);
-        Dynamiclist dynamiclist = dynamiclistRepository.findOneByName(id);
+    public ResponseEntity<Dynamiclist> getSiglaDynamicList(@PathVariable String name) {
+        Dynamiclist dynamiclist = dynamicListService.getSiglaDynamicList(name);
+
         return Optional.ofNullable(dynamiclist)
-            .map(result -> new ResponseEntity<>(
-                result,
-                HttpStatus.OK))
-            .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                .map(result -> new ResponseEntity<>(
+                        result,
+                        HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+
+
+    @RequestMapping(value = "/dynamiclists/byname/{name}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<Dynamiclist> getDynamiclistByName(@PathVariable String name) {
+        log.debug("REST request to get Dynamiclist byName : {}", name);
+        Dynamiclist dynamiclist = dynamiclistRepository.findOneByName(name);
+        return Optional.ofNullable(dynamiclist)
+                .map(result -> new ResponseEntity<>(
+                        result,
+                        HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
 
     /**
      * DELETE  /dynamiclists/:id : delete the "id" dynamiclist.
@@ -147,13 +169,14 @@ public class DynamiclistResource {
      * @return the ResponseEntity with status 200 (OK)
      */
     @RequestMapping(value = "/dynamiclists/{id}",
-        method = RequestMethod.DELETE,
-        produces = MediaType.APPLICATION_JSON_VALUE)
+            method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Void> deleteDynamiclist(@PathVariable Long id) {
-        log.debug("REST request to delete Dynamiclist : {}", id);
-        dynamiclistRepository.delete(id);
-        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("dynamiclist", id.toString())).build();
+    public ResponseEntity<Void> deleteDynamiclist(@PathVariable Long name) {
+        log.debug("REST request to delete Dynamiclist : {}", name);
+        dynamiclistRepository.delete(name);
+        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("dynamiclist", name.toString())).build();
     }
+
 
 }
