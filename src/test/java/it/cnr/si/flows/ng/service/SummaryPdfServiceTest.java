@@ -32,9 +32,9 @@ import java.text.ParseException;
 import java.util.Map;
 
 import static it.cnr.si.flows.ng.TestServices.JUNIT_TEST;
-import static it.cnr.si.flows.ng.dto.FlowsAttachment.ProcessDefinitionEnum.acquisti;
 import static it.cnr.si.flows.ng.utils.Enum.Actions.revoca;
 import static it.cnr.si.flows.ng.utils.Enum.Actions.revocaSemplice;
+import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
 import static org.junit.Assert.*;
 import static org.springframework.http.HttpStatus.OK;
 

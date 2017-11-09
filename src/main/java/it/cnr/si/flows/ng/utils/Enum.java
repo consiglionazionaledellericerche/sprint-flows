@@ -69,4 +69,19 @@ public class Enum {
         Sostituzione,
         RimozioneDaPubblicazione
     }
+
+    public enum ProcessDefinitionEnum {
+        acquisti("acquisti"),
+        permessiFerie("permessi-ferie");
+
+        private String value;
+
+        ProcessDefinitionEnum(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
 }

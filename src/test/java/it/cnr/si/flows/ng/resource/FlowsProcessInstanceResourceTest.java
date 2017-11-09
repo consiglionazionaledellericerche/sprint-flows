@@ -35,7 +35,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static it.cnr.si.flows.ng.TestServices.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
-import static it.cnr.si.flows.ng.dto.FlowsAttachment.ProcessDefinitionEnum.acquisti;
+import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
 import static it.cnr.si.flows.ng.utils.Utils.*;
 import static org.junit.Assert.*;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
