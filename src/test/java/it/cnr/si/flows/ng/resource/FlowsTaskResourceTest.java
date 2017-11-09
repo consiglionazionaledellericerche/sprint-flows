@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static it.cnr.si.flows.ng.TestServices.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
-import static it.cnr.si.flows.ng.dto.FlowsAttachment.ProcessDefinitionEnum.acquisti;
+import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
 import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
 import static it.cnr.si.flows.ng.utils.Utils.ASC;
 import static org.junit.Assert.assertEquals;

@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static it.cnr.si.flows.ng.dto.FlowsAttachment.ProcessDefinitionEnum.acquisti;
+import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
 import static it.cnr.si.flows.ng.utils.Enum.SiglaList.TIPOLOGIA_ACQUISIZIONE;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpStatus.NO_CONTENT;

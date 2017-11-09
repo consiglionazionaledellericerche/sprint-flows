@@ -138,45 +138,4 @@ public class FlowsAttachment implements Serializable {
     public void setAzione(Enum.Azione a) {
         this.getMetadati().put("azione", a);
     }
-
-    public enum ProcessDefinitionEnum {
-        //        acquistiTrasparenza("acquisti-trasparenza"),
-        acquisti("acquisti"),
-        permessiFerie("permessi-ferie");
-
-        private String value;
-
-        ProcessDefinitionEnum(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-    }
-
-//    public FlowsAttachment clone() {
-//        FlowsAttachment clone = new FlowsAttachment();
-//
-//        HashMap<String, Object> metadati = (HashMap<String, Object>) getMetadati();
-//
-//        clone.setFilename(getFilename());
-//        clone.setUsername(getUsername());
-//        clone.setUrl(getUrl());
-//        clone.setMimetype(getMimetype());
-//        clone.setTime(getTime());
-//        clone.setName(getName());
-//        clone.setBytes(getBytes());
-//        clone.setTaskName(getTaskName());
-//        clone.setMetadati(
-//                getMetadati().entrySet().stream().collect(Collectors.toMap(
-//                        k -> k.clone(),
-//                        v -> v.clone())
-//                        )
-//                );
-//
-//
-//        return clone;
-//    }
-
 }

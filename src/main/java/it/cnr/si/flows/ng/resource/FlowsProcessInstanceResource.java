@@ -43,7 +43,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import static it.cnr.si.flows.ng.dto.FlowsAttachment.ProcessDefinitionEnum.acquisti;
+import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
 import static it.cnr.si.flows.ng.utils.Enum.Stato.Pubblicato;
 import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
 import static it.cnr.si.flows.ng.utils.Utils.ASC;

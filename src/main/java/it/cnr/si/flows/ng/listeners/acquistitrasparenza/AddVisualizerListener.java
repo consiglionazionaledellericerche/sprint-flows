@@ -1,6 +1,7 @@
 package it.cnr.si.flows.ng.listeners.acquistitrasparenza;
 
-import it.cnr.si.flows.ng.dto.FlowsAttachment.ProcessDefinitionEnum;
+import it.cnr.si.flows.ng.utils.Enum;
+import it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
@@ -29,7 +30,7 @@ public class AddVisualizerListener implements ExecutionListener {
     public void notify(DelegateExecution execution) throws Exception {
 
         String processDefinitionString = execution.getProcessDefinitionId();
-        ProcessDefinitionEnum processDefinition = ProcessDefinitionEnum.valueOf(processDefinitionString.substring(0, processDefinitionString.indexOf(":")));
+        ProcessDefinitionEnum processDefinition = Enum.ProcessDefinitionEnum.valueOf(processDefinitionString.substring(0, processDefinitionString.indexOf(":")));
         switch (processDefinition) {
             case acquisti:
                 String struttura = (String) execution.getVariable("gruppoRA");
