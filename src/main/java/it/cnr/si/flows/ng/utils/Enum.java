@@ -41,6 +41,11 @@ public class Enum {
     }
 
 
+    public enum SiglaList {
+        TIPOLOGIA_ACQUISIZIONE;
+    }
+
+
     public enum Stato {
         Validato,
         Protocollato,
