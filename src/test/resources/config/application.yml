@@ -103,9 +103,13 @@ cnr:
          signcertid: AS0
          typeotpauth: firma
          url: http://arss.demo.si.cnr.it:8980/ArubaSignService/ArubaSignService?wsdl
+    sigla:
+        usr: app.scrivaniadigitale
+        psw: bubbazza
 ajp:
     port: 8009
     timeout: 120000
 
 cache.hazelcast.port: 5504
 cache.hazelcast.packages:
+
