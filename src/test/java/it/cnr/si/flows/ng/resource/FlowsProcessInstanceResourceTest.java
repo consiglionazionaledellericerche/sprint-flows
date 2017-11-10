@@ -136,7 +136,7 @@ public class FlowsProcessInstanceResourceTest {
     public void testGetProcessInstances() throws IOException {
         processInstance = util.mySetUp(acquisti.getValue());
 
-        //responsabileacquisti crea una seconda Process Instance di acquisti-trasparenza con suffisso "2" nel titoloIstanzaFlusso
+        //responsabileacquisti crea una seconda Process Instance di acquisti con suffisso "2" nel titoloIstanzaFlusso
         util.loginResponsabileAcquisti();
         String acquistiTrasparenzaId = repositoryService.createProcessDefinitionQuery().processDefinitionKey(acquisti.getValue()).latestVersion().singleResult().getId();
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
@@ -250,7 +250,7 @@ public class FlowsProcessInstanceResourceTest {
 
     @Test
     public void testExportCsv() throws IOException {
-        //avvio un flusso acquisti-trasparenza
+        //avvio un flusso acquisti
         processInstance = util.mySetUp(acquisti.getValue());
         //faccio l'exportCsv su tutti le Process Instance attive
         MockHttpServletRequest req = new MockHttpServletRequest();
