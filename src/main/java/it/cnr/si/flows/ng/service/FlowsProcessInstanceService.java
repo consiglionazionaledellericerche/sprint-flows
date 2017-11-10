@@ -6,6 +6,8 @@ import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
+import it.cnr.si.security.FlowsUserDetailsService;
+import it.cnr.si.security.PermissionEvaluatorImpl;
 import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricProcessInstance;
@@ -63,6 +65,10 @@ public class FlowsProcessInstanceService {
     private RuntimeService runtimeService;
     @Inject
     private AceBridgeService aceBridgeService;
+    @Inject
+    PermissionEvaluatorImpl permissionEvaluator;
+    @Inject
+    private FlowsUserDetailsService flowsUserDetailsService;
 
 
     public Map<String, Object> getProcessInstanceWithDetails(String processInstanceId) {
@@ -129,80 +135,80 @@ public class FlowsProcessInstanceService {
         return result;
     }
 
-    public Map<String, Object> search(HttpServletRequest req, String processInstanceId, boolean active, String order, int firstResult, int maxResults) {
-        String jsonString = "";
-        Map<String, Object> result = new HashMap<>();
 
+    public Map<String, Object> search(HttpServletRequest req, String processInstanceId, boolean active, String order, int firstResult, int maxResults) {
+        Map<String, Object> result = new HashMap<>();
         try {
-            jsonString = IOUtils.toString(req.getReader());
-        } catch (Exception e) {
+            JSONArray params = new JSONObject(IOUtils.toString(req.getReader())).getJSONArray("params");
+
+            FlowsHistoricProcessInstanceQuery processQuery = new FlowsHistoricProcessInstanceQuery(managementService);
+
+            List<String> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .map(Utils::removeLeadingRole)
+                    .collect(Collectors.toList());
+
+            if (!processInstanceId.equals(ALL_PROCESS_INSTANCES))
+                processQuery.processDefinitionKey(processInstanceId);
+
+            if (active)
+                processQuery.unfinished();
+            else
+                processQuery.finished();
+
+            for (int i = 0; i < params.length(); i++) {
+                JSONObject appo = params.optJSONObject(i);
+                String key = appo.getString("key");
+                String value = appo.getString("value");
+                String type = appo.getString("type");
+                //wildcard ("%") di default ma non a TUTTI i campi
+                switch (type) {
+                    case "textEqual":
+                        processQuery.variableValueEquals(key, value);
+                        break;
+                    case "boolean":
+                        // gestione variabili booleane
+                        processQuery.variableValueEquals(key, Boolean.valueOf(value));
+                        break;
+                    case "date":
+                        processDate(processQuery, key, value);
+                        break;
+                    default:
+                        //variabili con la wildcard  (%value%)
+                        processQuery.variableValueLikeIgnoreCase(key, "%" + value + "%");
+                        break;
+                }
+            }
+            if (order.equals(ASC))
+                processQuery.orderByProcessInstanceStartTime().asc();
+            else if (order.equals(DESC))
+                processQuery.orderByProcessInstanceStartTime().desc();
+
+            processQuery.includeProcessVariables();
+            long totalItems = processQuery.count();
+            result.put("totalItems", totalItems);
+
+            List<HistoricProcessInstance> processesRaw = processQuery.list();
+
+            //filtro le process instances che l'utente può vedere (solo l'authorities admin ignora le regole di visibilita')
+            if (!authorities.contains("ADMIN")) {
+                processesRaw = processesRaw.stream()
+                        .filter(pi -> permissionEvaluator.canVisualize((String) pi.getProcessVariables().get("idStruttura"),
+                                                                       pi.getProcessDefinitionKey(),
+                                                                       pi.getId(),
+                                                                       flowsUserDetailsService))
+                        .collect(Collectors.toList());
+            }
+
+            if (firstResult != -1 && maxResults != -1)
+                processesRaw = processesRaw.stream().skip(firstResult).limit(maxResults).collect(Collectors.toList());
+
+            result.put("processInstances", restResponseFactory.createHistoricProcessInstanceResponseList(processesRaw));
+
+        } catch (IOException e) {
             LOGGER.error("Errore nella letture dello stream della request", e);
         }
-        JSONArray params = new JSONObject(jsonString).getJSONArray("params");
 
-        FlowsHistoricProcessInstanceQuery processQuery = new FlowsHistoricProcessInstanceQuery(managementService);
-
-        List<String> authorities =
-                SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .map(Utils::removeLeadingRole)
-                        .collect(Collectors.toList());
-
-        // solo l'admin ignora le regole di visibilita'
-        if (!authorities.contains("ADMIN")) {
-            processQuery.setVisibleToGroups(authorities);
-            processQuery.setVisibleToUser(SecurityContextHolder.getContext().getAuthentication().getName());
-        }
-
-        if (!processInstanceId.equals(ALL_PROCESS_INSTANCES))
-            processQuery.processDefinitionKey(processInstanceId);
-
-        if (active)
-            processQuery.unfinished();
-        else
-            processQuery.finished();
-
-        for (int i = 0; i < params.length(); i++) {
-            JSONObject appo = params.optJSONObject(i);
-            String key = appo.getString("key");
-            String value = appo.getString("value");
-            String type = appo.getString("type");
-            //wildcard ("%") di default ma non a TUTTI i campi
-            switch (type) {
-                case "textEqual":
-                    processQuery.variableValueEquals(key, value);
-                    break;
-                case "boolean":
-                    // gestione variabili booleane
-                    processQuery.variableValueEquals(key, Boolean.valueOf(value));
-                    break;
-                case "date":
-                    processDate(processQuery, key, value);
-                    break;
-                default:
-                    //variabili con la wildcard  (%value%)
-                    processQuery.variableValueLikeIgnoreCase(key, "%" + value + "%");
-                    break;
-            }
-        }
-        if (order.equals(ASC))
-            processQuery.orderByProcessInstanceStartTime().asc();
-        else if (order.equals(DESC))
-            processQuery.orderByProcessInstanceStartTime().desc();
-
-        processQuery.includeProcessVariables();
-        long totalItems = processQuery.count();
-        result.put("totalItems", totalItems);
-
-        List<HistoricProcessInstance> processesRaw;
-
-        if (firstResult != -1 && maxResults != -1)
-            processesRaw = processQuery.listPage(firstResult, maxResults);
-        else
-            processesRaw = processQuery.list();
-
-        List<HistoricProcessInstanceResponse> processes = restResponseFactory.createHistoricProcessInstanceResponseList(processesRaw);
-        result.put("processInstances", processes);
         return result;
     }
 
