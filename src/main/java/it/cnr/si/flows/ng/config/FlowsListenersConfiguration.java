@@ -3,10 +3,8 @@ package it.cnr.si.flows.ng.config;
 import it.cnr.si.flows.ng.listeners.MailNotificationListener;
 import it.cnr.si.flows.ng.listeners.SaveSummaryAtProcessCompletion;
 import it.cnr.si.flows.ng.listeners.VisibilitySetter;
-
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
-import org.activiti.engine.delegate.event.ActivitiEventListener;
 import org.activiti.engine.delegate.event.ActivitiEventType;
 import org.activiti.engine.repository.DeploymentBuilder;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -20,8 +18,6 @@ import org.springframework.core.io.Resource;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -50,7 +46,7 @@ public class FlowsListenersConfiguration {
         for (Resource resource : appContext.getResources("classpath:processes/*.bpmn*")) {
             LOGGER.info("\n ------- definition " + resource.getFilename());
             List<ProcessDefinition> processes = repositoryService.createProcessDefinitionQuery()
-                    .processDefinitionKeyLike("%" + resource.getFilename().split("[.]")[0] + "%")
+                    .processDefinitionKey(resource.getFilename().split("[.]")[0])
                     .list();
 
             if (processes.size() == 0) {
