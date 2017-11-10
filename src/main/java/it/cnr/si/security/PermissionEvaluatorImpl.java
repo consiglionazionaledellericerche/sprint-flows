@@ -5,6 +5,7 @@ import it.cnr.si.flows.ng.utils.Utils;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.IdentityLinkType;
@@ -23,6 +24,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static it.cnr.si.flows.ng.utils.Enum.Role.*;
 
@@ -37,7 +39,8 @@ import static it.cnr.si.flows.ng.utils.Enum.Role.*;
 public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
 
-    private final Logger LOGGER = LoggerFactory.getLogger(PermissionEvaluatorImpl.class);
+    private static final String CNR_CODE = "4000";
+    private final Logger log = LoggerFactory.getLogger(PermissionEvaluatorImpl.class);
 
     @Inject
     TaskService taskService;
@@ -115,36 +118,51 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
      * @return risultato della verifica dei permessi (booleano)
      */
     public boolean canVisualize(String processInstanceId, FlowsUserDetailsService flowsUserDetailsService) {
+        ProcessInstance pi = runtimeService.createProcessInstanceQuery()
+                .processInstanceId(processInstanceId).includeProcessVariables().singleResult();
+
+        return canVisualize((String) pi.getProcessVariables().get("idStruttura"), pi.getProcessDefinitionKey(), processInstanceId, flowsUserDetailsService);
+    }
+
+
+    /**
+     * Verifica che l'utente abbia la visibilità sulla Process Instance.
+     *
+     * @param idStruttura             the id struttura
+     * @param processDefinitionKey    the process definition key
+     * @param processInstanceId       the process instance id
+     * @param flowsUserDetailsService the flows user details service
+     * @return the boolean
+     */
+    public boolean canVisualize(String idStruttura, String processDefinitionKey, String processInstanceId, FlowsUserDetailsService flowsUserDetailsService) {
         boolean canVisualize = false;
         String userName = SecurityUtils.getCurrentUserLogin();
         List<String> authorities = getAuthorities(userName, flowsUserDetailsService);
-        ProcessInstance pi = runtimeService.createProcessInstanceQuery()
-                .processInstanceId(processInstanceId).includeProcessVariables().singleResult();
-        String idStruttura = (String) pi.getProcessVariables().get("idStruttura");
 
-//      controllo che l'utente abbia un authorities di tipo "supervisore" o "responsabile" della struttura o del tipo di flusso
-        if (authorities.stream().anyMatch(a -> a.contains(supervisore + "@CNR") ||
-                a.contains(responsabile + "@CNR") ||
+        //controllo che l'utente abbia un authorities di tipo "supervisore" o "responsabile" della struttura o del tipo di flusso
+        if (authorities.stream().anyMatch(a -> a.contains(supervisore + "@" + CNR_CODE) ||
+                a.contains(responsabile + "@" + CNR_CODE) ||
                 a.contains(supervisoreStruttura + "@" + idStruttura) ||
                 a.contains(responsabileStruttura + "@" + idStruttura) ||
-                a.contains(supervisore + "#" + pi.getProcessDefinitionKey() + "@CNR") ||
-                a.contains(responsabile + "#" + pi.getProcessDefinitionKey() + "@CNR") ||
-                a.contains(supervisore + "#" + pi.getProcessDefinitionKey() + "@" + idStruttura) ||
-                a.contains(responsabile + "#" + pi.getProcessDefinitionKey() + "@" + idStruttura))) {
+                a.contains(supervisore + "#" + processDefinitionKey + "@" + CNR_CODE) ||
+                a.contains(responsabile + "#" + processDefinitionKey + "@" + CNR_CODE) ||
+                a.contains(supervisore + "#" + processDefinitionKey + "@" + idStruttura) ||
+                a.contains(responsabile + "#" + processDefinitionKey + "@" + idStruttura))) {
             canVisualize = true;
         } else {
-//          controllo gli Identity Link "visualizzatore" per gli user senza authorities di "supervisore" o "responsabile"
-            List<IdentityLink> ilv = runtimeService.getIdentityLinksForProcessInstance(pi.getProcessInstanceId()).stream()
+            //controllo gli Identity Link "visualizzatore" per gli user senza authorities di "supervisore" o "responsabile"
+            Stream<HistoricIdentityLink> identityLinkStream = historyService.getHistoricIdentityLinksForProcessInstance(processInstanceId).stream();
+
+            List<HistoricIdentityLink> ilv = identityLinkStream
                     .filter(il -> il.getType().equals("visualizzatore"))
                     .collect(Collectors.toList());
-//          controllo gli Identity Link con userId(ad es.: rup in acquisti trasparenza)
+            //controllo gli Identity Link con userId(ad es.: rup in acquisti trasparenza)
             if (ilv.stream()
                     .filter(il -> il.getUserId() != null)
                     .anyMatch(il -> il.getUserId().equals(userName))) {
                 canVisualize = true;
-            }
-            else {
-//          controllo gli Identity Link con groupId(tutti gli altri)
+            } else {
+                //controllo gli Identity Link con groupId(tutti gli altri)
                 if (ilv.stream()
                         .filter(il -> il.getGroupId() != null)
                         .filter(il -> !(il.getGroupId().startsWith(String.valueOf(responsabile)) || il.getGroupId().startsWith(String.valueOf(supervisore))))
@@ -181,13 +199,13 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
                     .anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE));
 
             if (!releasable) {
-                LOGGER.error("L'utente {} ha tentato di prendere in carico il  task {} CHE NON E' RILASCIABILE (non ha un gruppo candidate)", username, taskId);
+                log.error("L'utente {} ha tentato di prendere in carico il  task {} CHE NON E' RILASCIABILE (non ha un gruppo candidate)", username, taskId);
             } else if (username.equals(assignee)) {
                 result = true;
             }
         } else {
             /*        claim         */
-            LOGGER.info("Do in carico il task {} a {}", taskId, username);
+            log.info("Do in carico il task {} a {}", taskId, username);
             List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
             List<String> authorities = getAuthorities(username, flowsUserDetailsService);
 
@@ -198,7 +216,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
             if (isInCandidates) {
                 result = true;
             } else {
-                LOGGER.error("L'utente {} ha tentato di prendere in carico il  task {} SENZA averne i permassi", username, taskId);
+                log.error("L'utente {} ha tentato di prendere in carico il  task {} SENZA averne i permassi", username, taskId);
             }
         }
         return result;
