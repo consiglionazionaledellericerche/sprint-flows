@@ -120,15 +120,18 @@ public class TestServices {
     }
 
 
-    public void myTearDown() {
+    public int myTearDown() {
+        int processDeleted = 0;
         //cancello le Process Instance creata all'inizio del test'
         List<ProcessInstance> list = runtimeService.createProcessInstanceQuery().list();
         HttpServletResponse res = new MockHttpServletResponse();
         for (ProcessInstance pi : list) {
             processInstanceResource.deleteProcessInstance(pi.getProcessInstanceId(), "TEST", res);
             assertEquals(NO_CONTENT.value(), res.getStatus());
+            processDeleted++;
         }
         logout();
+        return processDeleted;
     }
 
     public String getProcessDefinition() {

@@ -30,7 +30,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -72,8 +71,7 @@ public class FlowsProcessInstanceResourceTest {
 
     @After
     public void tearDown() {
-        util.myTearDown();
-        processDeleted++;
+        processDeleted = processDeleted + util.myTearDown();
     }
 
     @Test
@@ -182,13 +180,13 @@ public class FlowsProcessInstanceResourceTest {
         util.loginResponsabileAcquisti();
         ret = flowsProcessInstanceResource.getProcessInstances(new MockHttpServletRequest(), false, ALL_PROCESS_INSTANCES, 0, 1000, ASC);
         entities = (ArrayList<HistoricProcessInstanceResponse>) ret.getBody().getData();
-        assertEquals(entities.size(), processDeleted + 1);
+        assertEquals(processDeleted + 2, entities.size());
 
         // .. e 1 processo ancora attivo VERIFICANDO CHE GLI ID COINCIDANO
         ret = flowsProcessInstanceResource.getProcessInstances(new MockHttpServletRequest(), true, ALL_PROCESS_INSTANCES, 0, 1000, ASC);
         entities = (ArrayList<HistoricProcessInstanceResponse>) ret.getBody().getData();
-        assertEquals(entities.size(), 1);
-        assertEquals(entities.get(0).getId(), activeId);
+        assertEquals(1, entities.size());
+        assertEquals(activeId, entities.get(0).getId());
 
         //VERIFICO FUNZIONI LA RICERCA
         verifyBadSearchParams(request);
@@ -206,7 +204,7 @@ public class FlowsProcessInstanceResourceTest {
     }
 
     @Test
-    public void testSearchProcessInstances() throws ParseException, IOException {
+    public void testSearchProcessInstances() throws IOException {
         processInstance = util.mySetUp(acquisti.getValue());
         util.loginAdmin();
         MockHttpServletRequest req = new MockHttpServletRequest();
@@ -235,9 +233,9 @@ public class FlowsProcessInstanceResourceTest {
         response = flowsProcessInstanceResource.search(req, "all", true, ASC, 0, 10);
         verifySearchResponse(response, 1, searchField1, searchValue1, searchField2, TestServices.getRA());
 
-        //cerco che le Process Instance completate (active = false) siano quelle cancellate nel tearDown (processDeleted) + 1 (quella rimossa in testGetProcessInstances)
+        //cerco che le Process Instance completate (active = false) siano quelle cancellate nel tearDown (processDeleted) + 2 (quelle rimosse in testGetProcessInstances ed in testGetMyProcesses)
         response = flowsProcessInstanceResource.search(req, util.getProcessDefinition().split(":")[0], false, DESC, 0, 10);
-        verifySearchResponse(response, processDeleted + 1, searchField1, searchValue1, searchField2, TestServices.getRA());
+        verifySearchResponse(response, processDeleted + 2, searchField1, searchValue1, searchField2, TestServices.getRA());
 
         //parametri sbagliati (strumentoAcquisizioneId 12 invece di 11, initiator = admin invece dell'RA) ==> 0 risultati
         payload = "{params: [{key: " + searchField1 + ", value: \"12\", type: textEqual} , {key: initiator, value: \"admin\", type: text}]}";
