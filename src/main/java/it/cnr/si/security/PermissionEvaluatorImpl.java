@@ -147,7 +147,11 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
                 a.contains(supervisore + "#" + processDefinitionKey + "@" + CNR_CODE) ||
                 a.contains(responsabile + "#" + processDefinitionKey + "@" + CNR_CODE) ||
                 a.contains(supervisore + "#" + processDefinitionKey + "@" + idStruttura) ||
-                a.contains(responsabile + "#" + processDefinitionKey + "@" + idStruttura))) {
+                a.contains(responsabile + "#" + processDefinitionKey + "@" + idStruttura) ||
+                a.contains(supervisore + "#flussi@" + CNR_CODE) ||
+                a.contains(responsabile + "#flussi@" + CNR_CODE) ||
+                a.contains(supervisore + "#flussi@" + idStruttura) ||
+                a.contains(responsabile + "#flussi@" + idStruttura))) {
             canVisualize = true;
         } else {
             //controllo gli Identity Link "visualizzatore" per gli user senza authorities di "supervisore" o "responsabile"
