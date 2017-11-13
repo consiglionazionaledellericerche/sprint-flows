@@ -87,43 +87,19 @@ public class RelationshipService {
         relationshipRepository.delete(id);
     }
 
-    @Cacheable(value = "allGroups")
+    @Cacheable(value = "allGroups", key = "#username")
     public List<GrantedAuthority> getAllGroupsForUser(String username) {
+        //A) recupero la lista dei gruppi a cui appartiene direttamente l'utente
         Set<String> aceGroup = getACEGroupsForUser(username);
+        //B) recupero i parent dei gruppi ACE
         Set<String> aceGropupWithParents = getAllACEParents(aceGroup);
 
+        //C) recupero i gruppi "associati" nel nostro db (getAllRelationship) e mergio
         return Stream.concat(aceGropupWithParents.stream(), getAllRelationship(aceGropupWithParents).stream())
                 .distinct()
                 .map(Utils::addLeadingRole)
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
-
-
-////        NUOVA
-//
-////      A) recupero la lista dei gruppi a cui appartiene direttamente l'utente
-//        List<String> usersGroups = getUserGroups();
-//
-////      B) per ogni gruppo "supervisore" o "responsabile" getGroupHierarchicalChildren
-//        List<String> groupsToHierarchy = usersGroups.stream()
-//                .filter(group -> group.contains("supervisore") || group.contains("responsabile"))
-//                .collect(Collectors.toList());
-//
-//        List<String> parents = new ArrayList<>();
-//        for (String group : groupsToHierarchy){
-//
-//        }
-//
-//        Set<String> groupAndParents = Stream.concat(usersGroups.stream(), parents.stream()
-//                .distinct())
-//                .collect(Collectors.toSet());
-//
-////      C) recupero i gruppi "associati" nel nostro db
-//        return Stream.concat(groupAndParents.stream(), getAllRelationship(groupAndParents).stream())
-//                .distinct()
-//                .map(Utils::addLeadingRole)
-//                .map(SimpleGrantedAuthority::new)
-//                .collect(Collectors.toList());
     }
 
     //    todo: da implementare

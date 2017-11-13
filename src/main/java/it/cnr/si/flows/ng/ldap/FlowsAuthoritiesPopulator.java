@@ -3,6 +3,7 @@ package it.cnr.si.flows.ng.ldap;
 import it.cnr.si.service.RelationshipService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -26,6 +27,7 @@ public class FlowsAuthoritiesPopulator implements LdapAuthoritiesPopulator {
     @Inject
     private RelationshipService relationshipService;
 
+    @CacheEvict(value = "allGroups", key = "#username")
     @Override
     public Collection<GrantedAuthority> getGrantedAuthorities(DirContextOperations userData, String username) {
 
