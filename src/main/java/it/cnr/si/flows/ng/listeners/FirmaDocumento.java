@@ -37,7 +37,7 @@ public class FirmaDocumento implements ExecutionListener {
 			throw new IllegalStateException("Questo Listener accetta solo eventi 'end'.");
 		if (nomeFileDaFirmare.getValue(execution) == null)
 			throw new IllegalStateException("Questo Listener ha bisogno del campo 'nomeFileDaFirmare' nella process definition (nel Task Listener - Fields).");
-		if (execution.getVariable("sceltaUtente").toString().equals("Firma")) {
+		if (execution.getVariable("sceltaUtente") != null && execution.getVariable("sceltaUtente").toString().equals("Firma")) {
 			String nomeVariabileFile = (String) nomeFileDaFirmare.getValue(execution);
 			String stringaOscurante = "******";
 			// TODO: validare presenza di queste tre variabili
