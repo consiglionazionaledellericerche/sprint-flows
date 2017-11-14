@@ -123,31 +123,34 @@ public class RelationshipService {
 
 
     public Set<String> getAllRelationship(Set<String> aceGropupWithParents) {
-        Set<Relationship> result = new HashSet<>();
+        Set<String> result = new HashSet<>();
         for (String group : aceGropupWithParents) {
             //match esatto (ad es.: ra@2216 -> supervisore#acquistitrasparenza@STRUTTURA)
-            result.addAll(relationshipRepository.findRelationshipGroup(group));
-
+            result.addAll(relationshipRepository.findRelationshipGroup(group).stream()
+                                  .map(Relationship::getGroupRelationship)
+                                  .collect(Collectors.toSet())
+            );
             //match "@STRUTTURA" (ad es. relationship: ra@STRUTTURA -> supervisore#acquistitrasparenza@STRUTTURA)
             if (group.contains("@")) {
                 String role = group.substring(0, group.indexOf('@'));
-                Set<Relationship> relationshipGroupForStruttura = relationshipRepository.findRelationshipGroupForStruttura(
+                Set<Relationship> relationshipGroupForStructure = relationshipRepository.findRelationshipForStructure(
                         group.contains("@") ? role : group);
 
-                // rimpiazzo "@STRUTTURA" nella relationship con il codice della struttura (ad es:
-                result.addAll(relationshipGroupForStruttura.stream()
-                                      .map(a -> {
-                                          String struttura = group.substring(group.indexOf('@'), group.length());
-                                          a.setGroupRelationship(Utils.replaceStruttura(a, struttura));
-                                          return a;
+                // rimpiazzo "@STRUTTURA" nella relationship trovata con il CODICE SPECIFICO della struttura
+                result.addAll(relationshipGroupForStructure.stream()
+                                      .map(relationship -> {
+                                          if (relationship.getGroupRelationship().contains("@")) {
+                                              String struttura = group.substring(group.indexOf('@'), group.length());
+                                              return Utils.replaceStruttura(relationship.getGroupRelationship(), struttura);
+                                          } else
+                                              return relationship.getGroupRelationship();
                                       })
                                       .collect(Collectors.toSet()));
             }
         }
-        //mapping in modo da recuperare il set di gruppi in relationships (stringhe)
+        //mapping in modo da recuperare il distinct
         return result.stream()
                 .distinct()
-                .map(Relationship::getGroupRelationship)
                 .collect(Collectors.toSet());
     }
 
