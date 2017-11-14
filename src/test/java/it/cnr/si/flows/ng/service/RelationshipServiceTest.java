@@ -13,7 +13,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.inject.Inject;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
@@ -31,10 +30,6 @@ public class RelationshipServiceTest {
         List<GrantedAuthority> groupsForRa = relationshipService.getAllGroupsForUser(TestServices.getRA());
         List<GrantedAuthority> groupsForRa2 = relationshipService.getAllGroupsForUser(TestServices.getRA2());
 
-//        todo: rimuovere
-        groupsForRa = relationshipService.getAllGroupsForUser(TestServices.getRA());
-        groupsForRa2 = relationshipService.getAllGroupsForUser(TestServices.getRA2());
-
         assertEquals("Due utenti che appartengono allo stesso gruppo hanno RELAZIONI DIVERSE", groupsForRa, groupsForRa2);
 
         //aggiungo una nuova relationship
@@ -50,16 +45,5 @@ public class RelationshipServiceTest {
 
         assertEquals("Aggiungendo una relationship NON viene rilevata da getAllGroupsForUser", groupsForRa.size() + 1, newGroupsForRa.size());
         assertEquals("Aggiungendo una relationship NON viene rilevata da getAllGroupsForUser", groupsForRa2.size() + 1, newGroupsForRa2.size());
-    }
-
-    @Test
-    public void testGetAllACEParents() throws Exception {
-        Set<String> groupsRa = relationshipService.getACEGroupsForUser(TestServices.getRA());
-        Set<String> groupsRa2 = relationshipService.getACEGroupsForUser(TestServices.getRA2());
-        assertEquals("I gruppi ACE per due utenti che appartengono allo stesso gruppo sono DIVERSI", groupsRa, groupsRa2);
-
-        Set<String> parentsForRa = relationshipService.getAllACEParents(groupsRa);
-        Set<String> parentsForRa2 = relationshipService.getAllACEParents(groupsRa2);
-        assertEquals("I PARENT ACE per due utenti che appartengono allo stesso gruppo sono DIVERSI", parentsForRa, parentsForRa2);
     }
 }
