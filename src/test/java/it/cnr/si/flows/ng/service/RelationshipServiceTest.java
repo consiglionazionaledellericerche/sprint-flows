@@ -21,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class RelationshipServiceTest {
 
+    private static final String GROUP_RELATIONSHIP = "aaaaaa";
     @Inject
     private RelationshipService relationshipService;
 
@@ -35,8 +36,8 @@ public class RelationshipServiceTest {
         //aggiungo una nuova relationship
         Relationship relationship = new Relationship();
         relationship.setGroupName(Utils.removeLeadingRole(String.valueOf(groupsForRa.get(0))));
-        relationship.setGroupRelationship("aaaaaa");
-        relationshipService.save(relationship);
+        relationship.setGroupRelationship(GROUP_RELATIONSHIP);
+        relationship = relationshipService.save(relationship);
 
         //verifico che getAllGroupsForUser prenda la modifica per entrambi gli utenti
         List<GrantedAuthority> newGroupsForRa = relationshipService.getAllGroupsForUser(TestServices.getRA());
@@ -45,5 +46,16 @@ public class RelationshipServiceTest {
 
         assertEquals("Aggiungendo una relationship NON viene rilevata da getAllGroupsForUser", groupsForRa.size() + 1, newGroupsForRa.size());
         assertEquals("Aggiungendo una relationship NON viene rilevata da getAllGroupsForUser", groupsForRa2.size() + 1, newGroupsForRa2.size());
+
+        newGroupsForRa.removeAll(groupsForRa);
+        newGroupsForRa2.removeAll(groupsForRa2);
+        assertEquals("il gruppo aggiunto con la relationship NON è quello atteso", newGroupsForRa.get(0).equals(GROUP_RELATIONSHIP), newGroupsForRa2.get(0).equals(GROUP_RELATIONSHIP));
+
+        //elimino la relazione e verifico che tutto funzioni come prima
+        relationshipService.delete(relationship.getId());
+        groupsForRa = relationshipService.getAllGroupsForUser(TestServices.getRA());
+        groupsForRa2 = relationshipService.getAllGroupsForUser(TestServices.getRA2());
+
+        assertEquals("Due utenti che appartengono allo stesso gruppo hanno RELAZIONI DIVERSE dopo la cancellazione della relationship", groupsForRa, groupsForRa2);
     }
 }
