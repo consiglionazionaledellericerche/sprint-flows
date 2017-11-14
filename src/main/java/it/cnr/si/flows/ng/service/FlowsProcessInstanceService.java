@@ -185,9 +185,6 @@ public class FlowsProcessInstanceService {
                 processQuery.orderByProcessInstanceStartTime().desc();
 
             processQuery.includeProcessVariables();
-            long totalItems = processQuery.count();
-            result.put("totalItems", totalItems);
-
             List<HistoricProcessInstance> processesRaw = processQuery.list();
 
             //filtro le process instances che l'utente può vedere (solo l'authorities admin ignora le regole di visibilita')
@@ -200,6 +197,7 @@ public class FlowsProcessInstanceService {
                         .collect(Collectors.toList());
             }
 
+            result.put("totalItems", processesRaw.size());
             if (firstResult != -1 && maxResults != -1)
                 processesRaw = processesRaw.stream().skip(firstResult).limit(maxResults).collect(Collectors.toList());
 
@@ -208,7 +206,6 @@ public class FlowsProcessInstanceService {
         } catch (IOException e) {
             LOGGER.error("Errore nella letture dello stream della request", e);
         }
-
         return result;
     }
 

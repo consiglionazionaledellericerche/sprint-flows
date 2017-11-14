@@ -24,6 +24,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.StopWatch;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -45,6 +46,7 @@ import static org.springframework.http.HttpStatus.OK;
 @RunWith(SpringRunner.class)
 public class FlowsProcessInstanceResourceTest {
 
+    private static final int LOAD_TEST_PROCESS_INSTANCES = 700;
     private static int processDeleted = 0;
     @Inject
     HistoryService historyService;
@@ -59,6 +61,7 @@ public class FlowsProcessInstanceResourceTest {
     @Inject
     private RepositoryService repositoryService;
 
+    private StopWatch stopWatch = new StopWatch();
     private ProcessInstanceResponse processInstance;
 
 
@@ -71,6 +74,7 @@ public class FlowsProcessInstanceResourceTest {
 
     @After
     public void tearDown() {
+        System.out.println(stopWatch.prettyPrint());
         processDeleted = processDeleted + util.myTearDown();
     }
 
@@ -226,24 +230,111 @@ public class FlowsProcessInstanceResourceTest {
         req.setContentType("application/json");
 
         //verifico la richiesta normale
-        ResponseEntity<Object> response = flowsProcessInstanceResource.search(req, util.getProcessDefinition().split(":")[0], true, ASC, 0, 10);
-        verifySearchResponse(response, 1, searchField1, searchValue1, searchField2, TestServices.getRA());
+        ResponseEntity<Object> response = flowsProcessInstanceResource.search(req, util.getProcessDefinition().split(":")[0], true, ASC, 0, 1000);
+        verifySearchResponse(response, 1, 1, searchField1, searchValue1, searchField2, TestServices.getRA());
 
         //verifico la richiesta su tutte le Process Definition
-        response = flowsProcessInstanceResource.search(req, "all", true, ASC, 0, 10);
-        verifySearchResponse(response, 1, searchField1, searchValue1, searchField2, TestServices.getRA());
+        response = flowsProcessInstanceResource.search(req, "all", true, ASC, 0, 1000);
+        verifySearchResponse(response, 1, 1, searchField1, searchValue1, searchField2, TestServices.getRA());
 
         //cerco che le Process Instance completate (active = false) siano quelle cancellate nel tearDown (processDeleted) + 2 (quelle rimosse in testGetProcessInstances ed in testGetMyProcesses)
-        response = flowsProcessInstanceResource.search(req, util.getProcessDefinition().split(":")[0], false, DESC, 0, 10);
-        verifySearchResponse(response, processDeleted + 2, searchField1, searchValue1, searchField2, TestServices.getRA());
+        response = flowsProcessInstanceResource.search(req, util.getProcessDefinition().split(":")[0], false, DESC, 0, 1000);
+        verifySearchResponse(response, processDeleted + 2, processDeleted + 2, searchField1, searchValue1, searchField2, TestServices.getRA());
+
+        /*
+         * VERIFICA GESTIONE DELLE AUTHORITIES
+         */
+        verifyAuthorities(1, req, searchField1, searchValue1, searchField2, 1);
+
 
         //parametri sbagliati (strumentoAcquisizioneId 12 invece di 11, initiator = admin invece dell'RA) ==> 0 risultati
         payload = "{params: [{key: " + searchField1 + ", value: \"12\", type: textEqual} , {key: initiator, value: \"admin\", type: text}]}";
         req.setContent(payload.getBytes());
         req.setContentType("application/json");
 
-        response = flowsProcessInstanceResource.search(req, util.getProcessDefinition().split(":")[0], true, ASC, 0, 10);
-        verifySearchResponse(response, 0, searchField1, searchValue1, searchField2, TestServices.getRA());
+        response = flowsProcessInstanceResource.search(req, util.getProcessDefinition().split(":")[0], true, ASC, 0, 1000);
+        verifySearchResponse(response, 0, 0, searchField1, searchValue1, searchField2, TestServices.getRA());
+    }
+
+
+    @Test
+    public void loadTestSearchProcessInstances() throws IOException {
+        int maxResults = 25;
+        // creo un certo numero di Process Instances
+        for (int i = 0; i < LOAD_TEST_PROCESS_INSTANCES; i++) {
+            try {
+                util.mySetUp(acquisti.getValue());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        processInstance = util.mySetUp(acquisti.getValue());
+        util.loginAdmin();
+        MockHttpServletRequest req = new MockHttpServletRequest();
+
+        String searchField1 = "strumentoAcquisizioneId";
+        String searchValue1 = "11";
+        String searchField2 = "initiator";
+
+        final Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, +1);
+        Date tomorrow = cal.getTime();
+        cal.add(Calendar.DATE, -2);
+        Date yesterday = cal.getTime();
+        String payload = "{params: [{key: " + searchField1 + ", value: \"" + searchValue1 + "\", type: textEqual}, " +
+                "{key: " + searchField2 + ", value: \"" + TestServices.getRA() + "\", type: text}, " +
+                "{key: \"startDateGreat\", value: \"" + Utils.formattaData(yesterday) + "\", type: \"date\"}," +
+                "{key: \"startDateLess\", value: \"" + Utils.formattaData(tomorrow) + "\", type: \"date\"}]}";
+        req.setContent(payload.getBytes());
+        req.setContentType("application/json");
+
+        //verifico la richiesta normale
+        stopWatch.start(String.format("verifico una richiesta normale ( %s istanze recuperate!)", LOAD_TEST_PROCESS_INSTANCES + 1));
+        ResponseEntity<Object> response = flowsProcessInstanceResource.search(req, util.getProcessDefinition().split(":")[0], true, ASC, 0, maxResults);
+        stopWatch.stop();
+        verifySearchResponse(response, LOAD_TEST_PROCESS_INSTANCES + 1, maxResults, searchField1, searchValue1, searchField2, TestServices.getRA());
+
+        //verifico la richiesta su tutte le Process Definition
+        stopWatch.start(String.format("verifico la richiesta su tutte le Process Definition ( %s istanze recuperate!)", LOAD_TEST_PROCESS_INSTANCES + 1));
+        response = flowsProcessInstanceResource.search(req, "all", true, ASC, 0, maxResults);
+        stopWatch.stop();
+        verifySearchResponse(response, LOAD_TEST_PROCESS_INSTANCES + 1, maxResults, searchField1, searchValue1, searchField2, TestServices.getRA());
+
+        /*
+         * VERIFICA GESTIONE DELLE AUTHORITIES
+         */
+        verifyAuthorities(maxResults, req, searchField1, searchValue1, searchField2, LOAD_TEST_PROCESS_INSTANCES + 1);
+
+        //parametri sbagliati (strumentoAcquisizioneId 12 invece di 11, initiator = admin invece dell'RA) ==> 0 risultati
+        payload = "{params: [{key: " + searchField1 + ", value: \"12\", type: textEqual} , {key: initiator, value: \"admin\", type: text}]}";
+        req.setContent(payload.getBytes());
+        req.setContentType("application/json");
+        response = flowsProcessInstanceResource.search(req, "all", true, ASC, 0, maxResults);
+        verifySearchResponse(response, 0, 0, searchField1, searchValue1, searchField2, TestServices.getRA());
+    }
+
+    private void verifyAuthorities(int maxResults, MockHttpServletRequest req, String searchField1, String searchValue1, String searchField2, int expectedTotalItems) {
+        ResponseEntity<Object> response;
+
+        //Uno User normale ed il direttore, a questo punto dei flussi non devono poterli vedere
+        util.loginUser();
+        response = flowsProcessInstanceResource.search(req, "all", true, ASC, 0, maxResults);
+        verifySearchResponse(response, 0, 0, searchField1, searchValue1, searchField2, TestServices.getRA());
+        util.loginDirettore();
+        response = flowsProcessInstanceResource.search(req, "all", true, ASC, 0, maxResults);
+        verifySearchResponse(response, 0, 0, searchField1, searchValue1, searchField2, TestServices.getRA());
+
+        //l'sfd ed ENTRAMBI i responsabili acquisti devono vedere TUTTI i flussiavviati
+        util.loginSfd();
+        response = flowsProcessInstanceResource.search(req, "all", true, ASC, 0, maxResults);
+        verifySearchResponse(response, expectedTotalItems, maxResults, searchField1, searchValue1, searchField2, TestServices.getRA());
+        util.loginResponsabileAcquisti();
+        response = flowsProcessInstanceResource.search(req, "all", true, ASC, 0, maxResults);
+        verifySearchResponse(response, expectedTotalItems, maxResults, searchField1, searchValue1, searchField2, TestServices.getRA());
+        util.loginResponsabileAcquisti2();
+        response = flowsProcessInstanceResource.search(req, "all", true, ASC, 0, maxResults);
+        verifySearchResponse(response, expectedTotalItems, maxResults, searchField1, searchValue1, searchField2, TestServices.getRA());
     }
 
     @Test
@@ -275,15 +366,12 @@ public class FlowsProcessInstanceResourceTest {
     }
 
 
-
-
-
-    private void verifySearchResponse(ResponseEntity<Object> response, int expectedTotalItems, String searchField1, String searchValue1, String searchField2, String searchValue2) {
+    private void verifySearchResponse(ResponseEntity<Object> response, int expectedTotalItems, int expectedResonseItems, String searchField1, String searchValue1, String searchField2, String searchValue2) {
         assertEquals(OK, response.getStatusCode());
         HashMap body = (HashMap) response.getBody();
         ArrayList responseList = (ArrayList) body.get("processInstances");
-        assertEquals(responseList.size(), ((Long) body.get("totalItems")).intValue());
-        assertEquals(expectedTotalItems, ((Long) body.get("totalItems")).intValue());
+        assertEquals(expectedResonseItems, responseList.size());
+        assertEquals(expectedTotalItems, ((Integer) body.get("totalItems")).intValue());
 
         if (responseList.size() > 0) {
             HistoricProcessInstanceResponse taskresponse = ((HistoricProcessInstanceResponse) responseList.get(0));
