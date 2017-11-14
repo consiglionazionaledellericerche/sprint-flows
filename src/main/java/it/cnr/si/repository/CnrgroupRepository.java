@@ -17,8 +17,4 @@ public interface CnrgroupRepository extends JpaRepository<Cnrgroup,Long> {
 
     @Query("select cnrgroup from Cnrgroup cnrgroup left join fetch cnrgroup.parents where cnrgroup.id =:id")
     public Cnrgroup findOneWithEagerRelationships(@Param("id") Long id);
-
-    @Query("select cnrgroup from Cnrgroup cnrgroup left join fetch cnrgroup.parents where cnrgroup.name =:name")
-    public Cnrgroup findOneWithEagerRelationshipsByName(@Param("name") String name);
-
 }
