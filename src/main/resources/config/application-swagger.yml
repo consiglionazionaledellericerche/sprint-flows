@@ -24,7 +24,7 @@ spring:
         ace:
             type: com.zaxxer.hikari.HikariDataSource
             url: jdbc:postgresql://dbtest1.si.cnr.it:5432/anagrafica
-            name: ace
+            name: ace_old
             username: acereader
             password: anagraficapw
     jpa:
