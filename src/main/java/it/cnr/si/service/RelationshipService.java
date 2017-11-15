@@ -1,6 +1,5 @@
 package it.cnr.si.service;
 
-import it.cnr.si.domain.Cnrgroup;
 import it.cnr.si.domain.Relationship;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.utils.Utils;
@@ -18,12 +17,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static it.cnr.si.flows.ng.utils.Enum.Role.*;
 
 /**
  * Service Implementation for managing Relationship.
@@ -87,111 +87,75 @@ public class RelationshipService {
         relationshipRepository.delete(id);
     }
 
-    @Cacheable(value = "allGroups")
+    @Cacheable(value = "allGroups", key = "#username")
     public List<GrantedAuthority> getAllGroupsForUser(String username) {
+        //A) recupero la lista dei gruppi a cui appartiene direttamente l'utente
         Set<String> aceGroup = getACEGroupsForUser(username);
-        Set<String> aceGropupWithParents = getAllACEParents(aceGroup);
+        //B) recupero i children dei gruppi "supervisori" e "responsabili"
+        Set<String> aceGroupWithChildren = getACEChildren(aceGroup);
 
-        return Stream.concat(aceGropupWithParents.stream(), getAllRelationship(aceGropupWithParents).stream())
+        //C) recupero i gruppi "associati" nel nostro db (getAllRelationship) e mergio
+        return Stream.concat(aceGroupWithChildren.stream(), getAllRelationship(aceGroupWithChildren).stream())
                 .distinct()
                 .map(Utils::addLeadingRole)
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
-
-
-////        NUOVA
-//
-////      A) recupero la lista dei gruppi a cui appartiene direttamente l'utente
-//        List<String> usersGroups = getUserGroups();
-//
-////      B) per ogni gruppo "supervisore" o "responsabile" getGroupHierarchicalChildren
-//        List<String> groupsToHierarchy = usersGroups.stream()
-//                .filter(group -> group.contains("supervisore") || group.contains("responsabile"))
-//                .collect(Collectors.toList());
-//
-//        List<String> parents = new ArrayList<>();
-//        for (String group : groupsToHierarchy){
-//
-//        }
-//
-//        Set<String> groupAndParents = Stream.concat(usersGroups.stream(), parents.stream()
-//                .distinct())
-//                .collect(Collectors.toSet());
-//
-////      C) recupero i gruppi "associati" nel nostro db
-//        return Stream.concat(groupAndParents.stream(), getAllRelationship(groupAndParents).stream())
-//                .distinct()
-//                .map(Utils::addLeadingRole)
-//                .map(SimpleGrantedAuthority::new)
-//                .collect(Collectors.toList());
     }
 
-    //    todo: da implementare
-    public List getUserGroups() {
-        return new ArrayList();
-    }
-
-
-    public Set<String> getAllACEParents(Set<String> groups) {
-        Set<String> parents = getACEParents(groups);
-        Set<String> groupAndParents = new HashSet<>(groups);
-        //calcolo anche i padri "ricorsivamente", risalendio l'albero delle strutture
-        while (!parents.isEmpty()) {
-            groupAndParents = Stream.concat(groups.stream(), parents.stream()
-                    .distinct())
-                    .collect(Collectors.toSet());
-            parents = getACEParents(parents);
+    private Set<String> getACEChildren(Set<String> aceGroup) {
+        //Filtro solo i gruppi di tipo "responsabili" o "supervisori"
+        Set<String> groupToSearchChildren = aceGroup.stream()
+                .filter(group -> group.contains(supervisore.getValue()) ||
+                        group.contains(supervisoreStruttura.getValue()) ||
+                        group.contains(responsabile.getValue()) ||
+                        group.contains(responsabileStruttura.getValue()))
+                .collect(Collectors.toSet());
+        //cerco i children dei gruppi che ho filtrato
+        Set<String> children = new HashSet<>();
+        for (String group : groupToSearchChildren) {
+            //todo: ancora da implementare in ACE
+//            children.addAll();
         }
-        return groupAndParents;
+        return Stream.concat(aceGroup.stream(), children.stream())
+                .distinct()
+                .collect(Collectors.toSet());
     }
 
 
     public Set<String> getAllRelationship(Set<String> aceGropupWithParents) {
-        Set<Relationship> result = new HashSet<>();
+        Set<String> result = new HashSet<>();
         for (String group : aceGropupWithParents) {
             //match esatto (ad es.: ra@2216 -> supervisore#acquistitrasparenza@STRUTTURA)
-            result.addAll(relationshipRepository.findRelationshipGroup(group));
-
+            result.addAll(relationshipRepository.findRelationshipGroup(group).stream()
+                                  .map(Relationship::getGroupRelationship)
+                                  .collect(Collectors.toSet())
+            );
             //match "@STRUTTURA" (ad es. relationship: ra@STRUTTURA -> supervisore#acquistitrasparenza@STRUTTURA)
             if (group.contains("@")) {
                 String role = group.substring(0, group.indexOf('@'));
-                Set<Relationship> relationshipGroupForStruttura = relationshipRepository.findRelationshipGroupForStruttura(
+                Set<Relationship> relationshipGroupForStructure = relationshipRepository.findRelationshipForStructure(
                         group.contains("@") ? role : group);
 
-                // rimpiazzo "@STRUTTURA" nella relationship con il codice della struttura (ad es:
-                result.addAll(relationshipGroupForStruttura.stream()
-                                      .map(a -> {
-                                          String struttura = group.substring(group.indexOf('@'), group.length());
-                                          a.setGroupRelationship(Utils.replaceStruttura(a, struttura));
-                                          return a;
+                // rimpiazzo "@STRUTTURA" nella relationship trovata con il CODICE SPECIFICO della struttura
+                result.addAll(relationshipGroupForStructure.stream()
+                                      .map(relationship -> {
+                                          if (relationship.getGroupRelationship().contains("@")) {
+                                              String struttura = group.substring(group.indexOf('@'), group.length());
+                                              return Utils.replaceStruttura(relationship.getGroupRelationship(), struttura);
+                                          } else
+                                              return relationship.getGroupRelationship();
                                       })
                                       .collect(Collectors.toSet()));
             }
         }
-        //mapping in modo da recuperare il set di gruppi in relationships (stringhe)
+        //mapping in modo da recuperare il distinct
         return result.stream()
                 .distinct()
-                .map(Relationship::getGroupRelationship)
                 .collect(Collectors.toSet());
     }
 
 
     public Set<String> getACEGroupsForUser(String username) {
         return new HashSet<>(aceService.getAceGroupsForUser(username));
-    }
-
-    //todo: rivedere perchè forse è un concetto superato
-    private Set<String> getACEParents(Set<String> groups) {
-        Set<String> parents = new HashSet<>();
-
-        for (String groupString : groups) {
-            Cnrgroup group = cnrgroupRepository.findOneWithEagerRelationshipsByName(groupString);
-            if (group != null) {
-                parents.addAll(group.getParents().stream()
-                                       .map(Cnrgroup::getName)
-                                       .collect(Collectors.toSet()));
-            }
-        }
-        return parents.stream().distinct().collect(Collectors.toSet());
     }
 }

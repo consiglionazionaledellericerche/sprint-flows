@@ -1,6 +1,5 @@
 package it.cnr.si.flows.ng.utils;
 
-import it.cnr.si.domain.Relationship;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.impl.util.json.JSONArray;
@@ -42,6 +41,8 @@ public final class Utils {
     private static final String ERRORE_NEL_PARSING_DELLA_DATA = "Errore nel parsing della data {} - ";
     private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
     private static final String ROLE = "ROLE_";
+    private static final String TEXT_EQUAL = "textEqual";
+    private static final String BOOLEAN = "boolean";
     @Autowired
     private static RestResponseFactory restResponseFactory;
     private static DateFormat formatoData = new SimpleDateFormat("yyyy-MM-dd");
@@ -67,8 +68,8 @@ public final class Utils {
         return ResponseEntity.ok(response);
     }
 
-    public static String replaceStruttura(Relationship relationship, String struttura) {
-        return relationship.getGroupRelationship().replace("@STRUTTURA", struttura);
+    public static String replaceStruttura(String groupRelationship, String struttura) {
+        return groupRelationship.replace("@STRUTTURA", struttura);
     }
 
     public static String removeLeadingRole(String in) {
@@ -100,7 +101,7 @@ public final class Utils {
         return getStatus(parseInt(errCode));
     }
 
-    public static HashMap<String, Object> mapOf(String key, String value) {
+    public static Map<String, Object> mapOf(String key, String value) {
         HashMap<String, Object> result = new HashMap<>();
         result.put(key, value);
         return result;
@@ -115,23 +116,6 @@ public final class Utils {
             ret = ret + list.get(0).getValue();
         }
         return ret;
-
-
-//        RestVariable variable = properties.stream()
-//                .filter(a ->  a.getName().equals(property))
-//                .findFirst()
-//                .get();
-//        String ret = "";
-//        if(!((String)variable.getValue()).isEmpty()){
-//            ret = ret + variable.getValue();
-//        }
-//        return ret;
-
-//        return (String) properties.stream()
-//                .filter(a ->  a.getName().equals(property))
-//                .findFirst()
-//                .get()
-//                .getValue();
     }
 
     public void init() {
@@ -180,8 +164,8 @@ public final class Utils {
                 String type = appo.getString("type");
                 //wildcard ("%") di default ma non a TUTTI i campi
                 switch (type) {
-                    case "textEqual":
-                    case "boolean":
+                    case TEXT_EQUAL:
+                    case BOOLEAN:
                         // gestione variabili booleane e dei valori testuali "perfettamente uguali"
                         processQuery.variableValueEquals(key, value);
                         break;
@@ -214,10 +198,10 @@ public final class Utils {
             String type = appo.getString("type");
             //wildcard ("%") di default ma non a TUTTI i campi
             switch (type) {
-                case "textEqual":
+                case TEXT_EQUAL:
                     taskQuery.processVariableValueEquals(key, value);
                     break;
-                case "boolean":
+                case BOOLEAN:
                     // gestione variabili booleane
                     taskQuery.processVariableValueEquals(key, Boolean.valueOf(value));
                     break;
@@ -271,10 +255,10 @@ public final class Utils {
             } else {
                 //wildcard ("%") di default ma non a TUTTI i campi
                 switch (type) {
-                    case "textEqual":
+                    case TEXT_EQUAL:
                         taskQuery.taskVariableValueEquals(key, value);
                         break;
-                    case "boolean":
+                    case BOOLEAN:
                         // gestione variabili booleane
                         taskQuery.taskVariableValueEquals(key, Boolean.valueOf(value));
                         break;
