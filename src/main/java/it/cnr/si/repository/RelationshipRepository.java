@@ -17,5 +17,5 @@ public interface RelationshipRepository extends JpaRepository<Relationship, Long
     public Set<Relationship> findRelationshipGroup(@Param("groupName") String groupName);
 
     @Query("select relationship from Relationship relationship where relationship.groupName = CONCAT(:groupName, '@STRUTTURA')")
-    public Set<Relationship> findRelationshipGroupForStruttura(@Param("groupName") String groupName);
+    public Set<Relationship> findRelationshipForStructure(@Param("groupName") String groupName);
 }

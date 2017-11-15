@@ -170,7 +170,8 @@ public class TestServices {
         ResponseEntity<Object> response = flowsTaskResource.completeTask(req);
         assertEquals(OK, response.getStatusCode());
         // Recupero il TaskId del primo task del flusso
-        firstTaskId = taskService.createTaskQuery().singleResult().getId();
+//        firstTaskId = taskService.createTaskQuery().singleResult().getId();
+        firstTaskId = taskService.createTaskQuery().list().get(0).getId();
         //Recupero la ProcessInstance
         return (ProcessInstanceResponse) response.getBody();
     }
