@@ -20,23 +20,23 @@ public class AceBridgeService {
 	private JdbcTemplate aceJdbcTemplate;
 
     private static final String GROUPS_FOR_USER = "SELECT persona.nome, persona.cognome, persona.userid, persona.id, ruolo.sigla, ruolo.descr, ruolo.id,entitaorganizzativa.sigla as eosigla, entitaorganizzativa.denominazione, entitaorganizzativa.id as eoid " +
-			"FROM ace.assegnazioneruolo "+
-			"INNER JOIN ace.persona ON persona.id = assegnazioneruolo.ass_persona_id "+
-			"INNER JOIN ace.ruolo ON ruolo.id = assegnazioneruolo.ruolo_id "+
-			"INNER JOIN ace.entitaorganizzativa ON entitaorganizzativa.id = assegnazioneruolo.entitaorganizzativa_id "+
-			"where assegnazioneruolo.ass_persona_id = (SELECT id FROM ace.persona WHERE persona.userid = ?)";
+			"FROM ace_old.assegnazioneruolo "+
+			"INNER JOIN ace_old.persona ON persona.id = assegnazioneruolo.ass_persona_id "+
+			"INNER JOIN ace_old.ruolo ON ruolo.id = assegnazioneruolo.ruolo_id "+
+			"INNER JOIN ace_old.entitaorganizzativa ON entitaorganizzativa.id = assegnazioneruolo.entitaorganizzativa_id "+
+			"where assegnazioneruolo.ass_persona_id = (SELECT id FROM ace_old.persona WHERE persona.userid = ?)";
 
     private static final String USERS_IN_ROLE = "SELECT persona.nome, persona.cognome, persona.id, persona.userid, ruolo.sigla, ruolo.descr, ruolo.id,entitaorganizzativa.sigla as eosigla, entitaorganizzativa.denominazione, entitaorganizzativa.id as eoid " +
-			"FROM ace.assegnazioneruolo "+
-			"INNER JOIN ace.persona ON persona.id = assegnazioneruolo.ass_persona_id "+
-			"INNER JOIN ace.ruolo ON ruolo.id = assegnazioneruolo.ruolo_id "+
-			"INNER JOIN ace.entitaorganizzativa ON entitaorganizzativa.id = assegnazioneruolo.entitaorganizzativa_id "+
+			"FROM ace_old.assegnazioneruolo "+
+			"INNER JOIN ace_old.persona ON persona.id = assegnazioneruolo.ass_persona_id "+
+			"INNER JOIN ace_old.ruolo ON ruolo.id = assegnazioneruolo.ruolo_id "+
+			"INNER JOIN ace_old.entitaorganizzativa ON entitaorganizzativa.id = assegnazioneruolo.entitaorganizzativa_id "+
 			"where ruolo.sigla = ?  "+
 			"and entitaorganizzativa.id = ?";
 
     private static final String UO_LIKE = "select distinct entitaorganizzativa.id, entitaorganizzativa.sigla, entitaorganizzativa.denominazione, entitaorganizzativa.cdsuo " +
-			"from ace.entitaorganizzativa " +
-			"INNER JOIN ace.tipoentitaorganizzativa ON tipoentitaorganizzativa.id = entitaorganizzativa.tipo_id " +
+			"from ace_old.entitaorganizzativa " +
+			"INNER JOIN ace_old.tipoentitaorganizzativa ON tipoentitaorganizzativa.id = entitaorganizzativa.tipo_id " +
 			"where  " +
 			"(tipoentitaorganizzativa.id = 1 " +
 			"OR tipoentitaorganizzativa.id = 6 " +
@@ -49,11 +49,11 @@ public class AceBridgeService {
 			"AND (entitaorganizzativa.sigla ilike ? OR entitaorganizzativa.denominazione ilike ?)";
 
     private static final String DENOMINAZIONE_STRUTTURA = "Select entitaorganizzativa.denominazione, entitaorganizzativa.sigla, entitaorganizzativa.denominazionebreve "
-			+ "from ace.entitaorganizzativa "
+			+ "from ace_old.entitaorganizzativa "
 			+ "where entitaorganizzativa.id = ?";
 
     private static final String DENOMINAZIONE_RUOLO = "Select ruolo.descr, ruolo.sigla, ruolo.id "
-			+ "from ace.ruolo "
+			+ "from ace_old.ruolo "
 			+ "where ruolo.sigla = ?";
 
 
