@@ -74,6 +74,9 @@ public class FlowsProcessEngineConfigurations {
         // FULL serve per la storia dei documenti
         conf.setHistoryLevel(HistoryLevel.FULL);
 
+        //Serve per prendere tutte le istanze nelle search dell'app (il default (20000) si dovrebbe riferire al numero di variabili recuperabili nella query)
+        conf.setHistoricProcessInstancesQueryLimit(1000000);
+
         // abbiamo implementato delle query custom
         // @See it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery.java
 
