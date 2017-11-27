@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="test-timer" name="Test Timer" isExecutable="true">
+    <startEvent id="startevent1" name="Start" activiti:async="true" activiti:initiator="initiator"></startEvent>
+    <sequenceFlow id="flow18" sourceRef="startevent1" targetRef="subprocess1"></sequenceFlow>
+    <endEvent id="endevent2" name="End">
+      <extensionElements>
+        <activiti:executionListener event="start" expression="LOGGER.info(&quot;ucita 3&quot;);"></activiti:executionListener>
+      </extensionElements>
+    </endEvent>
+    <subProcess id="subprocess1" name="Sub Process">
+      <startEvent id="startevent2" name="Start"></startEvent>
+      <userTask id="applica" name="APPLICA" activiti:candidateUsers="massimo.fraticelli,admin">
+        <extensionElements>
+          <activiti:executionListener event="end" class="it.cnr.si.flows.ng.listeners.oiv.StopTimer"></activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <sequenceFlow id="flow28" sourceRef="startevent2" targetRef="applica"></sequenceFlow>
+      <boundaryEvent id="boundarytimer4" name="Timer" attachedToRef="applica" cancelActivity="true">
+        <timerEventDefinition>
+          <timeDuration>PT15M25S</timeDuration>
+        </timerEventDefinition>
+      </boundaryEvent>
+      <endEvent id="endevent3" name="End">
+        <extensionElements>
+          <activiti:executionListener event="start" expression="LOGGER.info(&quot;uscita 1&quot;);"></activiti:executionListener>
+        </extensionElements>
+      </endEvent>
+      <endEvent id="endevent4" name="End">
+        <extensionElements>
+          <activiti:executionListener event="start" expression="LOGGER.info(&quot;uscita 2&quot;);"></activiti:executionListener>
+        </extensionElements>
+      </endEvent>
+      <sequenceFlow id="flow29" sourceRef="boundarytimer4" targetRef="endevent4"></sequenceFlow>
+      <sequenceFlow id="flow30" sourceRef="applica" targetRef="endevent3"></sequenceFlow>
+    </subProcess>
+    <boundaryEvent id="boundarytimer3" name="Timer" attachedToRef="subprocess1" cancelActivity="true">
+      <timerEventDefinition>
+        <timeDuration>PT50M10S</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <userTask id="provvedimento" name="Provvedimento" activiti:assignee="massimo.fraticelli"></userTask>
+    <sequenceFlow id="flow25" sourceRef="boundarytimer3" targetRef="provvedimento"></sequenceFlow>
+    <sequenceFlow id="flow26" sourceRef="provvedimento" targetRef="endevent2"></sequenceFlow>
+    <sequenceFlow id="flow27" sourceRef="subprocess1" targetRef="endevent2"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_test-timer">
+    <bpmndi:BPMNPlane bpmnElement="test-timer" id="BPMNPlane_test-timer">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="31.0" y="118.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent2" id="BPMNShape_endevent2">
+        <omgdc:Bounds height="35.0" width="35.0" x="644.0" y="118.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="subprocess1" id="BPMNShape_subprocess1">
+        <omgdc:Bounds height="191.0" width="471.0" x="124.0" y="40.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="startevent2" id="BPMNShape_startevent2">
+        <omgdc:Bounds height="35.0" width="35.0" x="150.0" y="120.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="applica" id="BPMNShape_applica">
+        <omgdc:Bounds height="55.0" width="105.0" x="230.0" y="110.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="boundarytimer4" id="BPMNShape_boundarytimer4">
+        <omgdc:Bounds height="30.0" width="30.0" x="310.0" y="140.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent3" id="BPMNShape_endevent3">
+        <omgdc:Bounds height="35.0" width="35.0" x="410.0" y="120.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent4" id="BPMNShape_endevent4">
+        <omgdc:Bounds height="35.0" width="35.0" x="410.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="boundarytimer3" id="BPMNShape_boundarytimer3">
+        <omgdc:Bounds height="30.0" width="30.0" x="524.0" y="220.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="provvedimento" id="BPMNShape_provvedimento">
+        <omgdc:Bounds height="55.0" width="105.0" x="486.0" y="280.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow18" id="BPMNEdge_flow18">
+        <omgdi:waypoint x="66.0" y="135.0"></omgdi:waypoint>
+        <omgdi:waypoint x="124.0" y="135.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow28" id="BPMNEdge_flow28">
+        <omgdi:waypoint x="185.0" y="137.0"></omgdi:waypoint>
+        <omgdi:waypoint x="230.0" y="137.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow29" id="BPMNEdge_flow29">
+        <omgdi:waypoint x="325.0" y="170.0"></omgdi:waypoint>
+        <omgdi:waypoint x="324.0" y="197.0"></omgdi:waypoint>
+        <omgdi:waypoint x="410.0" y="197.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow30" id="BPMNEdge_flow30">
+        <omgdi:waypoint x="335.0" y="137.0"></omgdi:waypoint>
+        <omgdi:waypoint x="410.0" y="137.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow25" id="BPMNEdge_flow25">
+        <omgdi:waypoint x="539.0" y="250.0"></omgdi:waypoint>
+        <omgdi:waypoint x="538.0" y="280.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow26" id="BPMNEdge_flow26">
+        <omgdi:waypoint x="591.0" y="307.0"></omgdi:waypoint>
+        <omgdi:waypoint x="661.0" y="307.0"></omgdi:waypoint>
+        <omgdi:waypoint x="661.0" y="153.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow27" id="BPMNEdge_flow27">
+        <omgdi:waypoint x="595.0" y="135.0"></omgdi:waypoint>
+        <omgdi:waypoint x="644.0" y="135.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
