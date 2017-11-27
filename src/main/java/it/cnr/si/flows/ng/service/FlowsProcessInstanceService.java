@@ -3,11 +3,11 @@ package it.cnr.si.flows.ng.service;
 import com.opencsv.CSVWriter;
 import it.cnr.si.domain.View;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
 import it.cnr.si.security.FlowsUserDetailsService;
 import it.cnr.si.security.PermissionEvaluatorImpl;
+import it.cnr.si.security.SecurityUtils;
 import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricProcessInstance;
@@ -46,6 +46,7 @@ import static it.cnr.si.flows.ng.utils.Utils.*;
 @Service
 public class FlowsProcessInstanceService {
 
+    private static final String CNR_CODE = "4000";
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsProcessInstanceService.class);
     @Inject
     private FlowsAttachmentService flowsAttachmentService;
@@ -140,8 +141,9 @@ public class FlowsProcessInstanceService {
         Map<String, Object> result = new HashMap<>();
         try {
             JSONArray params = new JSONObject(IOUtils.toString(req.getReader())).getJSONArray("params");
-
-            FlowsHistoricProcessInstanceQuery processQuery = new FlowsHistoricProcessInstanceQuery(managementService);
+            //verificato sperimentalmente che è più veloca fare una query normale e poi filtrare con lo stream parallelo
+            // che fare la nostra query customizzata sugli identityLink e poi verificare solo i permessi speciali
+            HistoricProcessInstanceQuery processQuery = historyService.createHistoricProcessInstanceQuery();
 
             List<String> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
@@ -185,24 +187,25 @@ public class FlowsProcessInstanceService {
                 processQuery.orderByProcessInstanceStartTime().desc();
 
             processQuery.includeProcessVariables();
-            List<HistoricProcessInstance> processesRaw = processQuery.list();
+            List<HistoricProcessInstance> processList = processQuery.list();
 
             //filtro le process instances che l'utente può vedere (solo l'authorities admin ignora le regole di visibilita')
             if (!authorities.contains("ADMIN")) {
-                processesRaw = processesRaw.stream()
+                //cambiare la memorizzazione di idStruttura NON migliora significativamente le prestazioni
+                processList = processList.parallelStream()
                         .filter(pi -> permissionEvaluator.canVisualize((String) pi.getProcessVariables().get("idStruttura"),
                                                                        pi.getProcessDefinitionKey(),
                                                                        pi.getId(),
-                                                                       flowsUserDetailsService))
+                                                                       authorities,
+                                                                       SecurityUtils.getCurrentUserLogin()))
                         .collect(Collectors.toList());
             }
 
-            result.put("totalItems", processesRaw.size());
+            result.put("totalItems", processList.size());
             if (firstResult != -1 && maxResults != -1)
-                processesRaw = processesRaw.stream().skip(firstResult).limit(maxResults).collect(Collectors.toList());
+                processList = processList.stream().skip(firstResult).limit(maxResults).collect(Collectors.toList());
 
-            result.put("processInstances", restResponseFactory.createHistoricProcessInstanceResponseList(processesRaw));
-
+            result.put("processInstances", restResponseFactory.createHistoricProcessInstanceResponseList(processList));
         } catch (IOException e) {
             LOGGER.error("Errore nella letture dello stream della request", e);
         }
