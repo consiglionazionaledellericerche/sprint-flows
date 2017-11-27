@@ -118,28 +118,18 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
      * @return risultato della verifica dei permessi (booleano)
      */
     public boolean canVisualize(String processInstanceId, FlowsUserDetailsService flowsUserDetailsService) {
+        String userName = SecurityUtils.getCurrentUserLogin();
+        List<String> authorities = getAuthorities(userName, flowsUserDetailsService);
         ProcessInstance pi = runtimeService.createProcessInstanceQuery()
                 .processInstanceId(processInstanceId).includeProcessVariables().singleResult();
 
-        return canVisualize((String) pi.getProcessVariables().get("idStruttura"), pi.getProcessDefinitionKey(), processInstanceId, flowsUserDetailsService);
+        return canVisualize((String) pi.getProcessVariables().get("idStruttura"), pi.getProcessDefinitionKey(), processInstanceId, authorities, userName);
     }
 
 
-    /**
-     * Verifica che l'utente abbia la visibilità sulla Process Instance.
-     *
-     * @param idStruttura             the id struttura
-     * @param processDefinitionKey    the process definition key
-     * @param processInstanceId       the process instance id
-     * @param flowsUserDetailsService the flows user details service
-     * @return the boolean
-     */
-    public boolean canVisualize(String idStruttura, String processDefinitionKey, String processInstanceId, FlowsUserDetailsService flowsUserDetailsService) {
-        boolean canVisualize = false;
-        String userName = SecurityUtils.getCurrentUserLogin();
-        List<String> authorities = getAuthorities(userName, flowsUserDetailsService);
-
-        //controllo che l'utente abbia un authorities di tipo "supervisore" o "responsabile" della struttura o del tipo di flusso
+    //controllo che l'utente abbia un authorities di tipo "supervisore" o "responsabile" della struttura o del tipo di flusso
+    private boolean verifyAuthorities(String idStruttura, String processDefinitionKey, List<String> authorities) {
+        Boolean canVisualize = false;
         if (authorities.stream().anyMatch(a -> a.contains(supervisore + "@" + CNR_CODE) ||
                 a.contains(responsabile + "@" + CNR_CODE) ||
                 a.contains(supervisoreStruttura + "@" + idStruttura) ||
@@ -153,12 +143,31 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
                 a.contains(supervisore + "#flussi@" + idStruttura) ||
                 a.contains(responsabile + "#flussi@" + idStruttura))) {
             canVisualize = true;
+        }
+        return canVisualize;
+    }
+
+
+    /**
+     * Verifica che l'utente abbia la visibilità sulla Process Instance.
+     *
+     * @param idStruttura          the id struttura
+     * @param processDefinitionKey the process definition key
+     * @param processInstanceId    the process instance id
+     * @param authorities          le authorities dell'utente loggato
+     * @param userName             userName loggato
+     * @return the boolean
+     */
+    public boolean canVisualize(String idStruttura, String processDefinitionKey, String processInstanceId, List<String> authorities, String userName) {
+        boolean canVisualize = false;
+        if (verifyAuthorities(idStruttura, processDefinitionKey, authorities)) {
+            canVisualize = true;
         } else {
-            //controllo gli Identity Link "visualizzatore" per gli user senza authorities di "supervisore" o "responsabile"
+            //controllo gli Identity Link "visualizzatore" (o "assignee" o "candidate") per gli user senza authorities di "supervisore" o "responsabile"
             Stream<HistoricIdentityLink> identityLinkStream = historyService.getHistoricIdentityLinksForProcessInstance(processInstanceId).stream();
 
             List<HistoricIdentityLink> ilv = identityLinkStream
-                    .filter(il -> il.getType().equals("visualizzatore"))
+                    .filter(il -> il.getType().equals("visualizzatore") || il.getType().equals("candidate") || il.getType().equals("assignee"))
                     .collect(Collectors.toList());
             //controllo gli Identity Link con userId(ad es.: rup in acquisti trasparenza)
             if (ilv.stream()
