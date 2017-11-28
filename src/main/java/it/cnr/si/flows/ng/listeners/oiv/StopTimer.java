@@ -10,6 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 
@@ -38,9 +41,12 @@ public class StopTimer implements ExecutionListener {
                     .replace("\"", "")
                     .replace("}", "");
             LOGGER.debug("getDuedate {}, getId {}, TimerDeclarationImpl {}", job.getDuedate(), job.getId(), timerName);
-            if (timerName.equals("boundarytimer4")) {
-                LOGGER.debug("--- trovatogetDuedate {}, getId {}, timerName{}", job.getDuedate(), job.getId(), timerName);
-            	job.wait();
+            if (timerName.equals("boundarytimer3")) {
+                LOGGER.debug("--- CAMBIO DATA Duedate: {}, getId: {}, timerName: {}", job.getDuedate(), job.getId(), timerName);
+            	//job.wait().
+                Date date3000 = new GregorianCalendar(3000, Calendar.FEBRUARY, 11).getTime();
+            	((TimerEntity) job).setDuedate(date3000);
+                LOGGER.debug("--- NUOVO Duedate: {}, getId: {}, timerName: {}", job.getDuedate(), job.getId(), timerName);
             }
         }
         JobQuery jobQuery =  execution.getEngineServices().getManagementService().createJobQuery().processInstanceId(processInstanceId);

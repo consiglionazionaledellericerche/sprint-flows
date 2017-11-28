@@ -12,7 +12,17 @@
       <startEvent id="startevent2" name="Start"></startEvent>
       <userTask id="applica" name="APPLICA" activiti:candidateUsers="massimo.fraticelli,admin">
         <extensionElements>
-          <activiti:executionListener event="end" class="it.cnr.si.flows.ng.listeners.oiv.StopTimer"></activiti:executionListener>
+          <activiti:executionListener event="end" class="it.cnr.si.flows.ng.listeners.oiv.SetTimer">
+            <activiti:field name="boundarytimerName">
+              <activiti:string><![CDATA[boundarytimer3]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="yearAddValue">
+              <activiti:string><![CDATA[100]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="monthAddValue">
+              <activiti:string><![CDATA[2]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
         </extensionElements>
       </userTask>
       <sequenceFlow id="flow28" sourceRef="startevent2" targetRef="applica"></sequenceFlow>
@@ -32,14 +42,29 @@
         </extensionElements>
       </endEvent>
       <sequenceFlow id="flow29" sourceRef="boundarytimer4" targetRef="endevent4"></sequenceFlow>
-      <sequenceFlow id="flow30" sourceRef="applica" targetRef="endevent3"></sequenceFlow>
+      <sequenceFlow id="flow30" sourceRef="applica" targetRef="riprendi"></sequenceFlow>
+      <userTask id="riprendi" name="RIPRENDI" activiti:candidateUsers="massimo.fraticelli,admin">
+        <extensionElements>
+          <activiti:executionListener event="end" class="it.cnr.si.flows.ng.listeners.oiv.SetTimer">
+            <activiti:field name="boundarytimerName">
+              <activiti:string><![CDATA[boundarytimer3]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="minuteAddValue">
+              <activiti:string><![CDATA[5]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <sequenceFlow id="flow31" sourceRef="pausa" targetRef="endevent3"></sequenceFlow>
+      <userTask id="pausa" name="PAUSA" activiti:candidateUsers="massimo.fraticelli,admin"></userTask>
+      <sequenceFlow id="flow32" sourceRef="riprendi" targetRef="pausa"></sequenceFlow>
     </subProcess>
     <boundaryEvent id="boundarytimer3" name="Timer" attachedToRef="subprocess1" cancelActivity="true">
       <timerEventDefinition>
         <timeDuration>PT50M10S</timeDuration>
       </timerEventDefinition>
     </boundaryEvent>
-    <userTask id="provvedimento" name="Provvedimento" activiti:assignee="massimo.fraticelli"></userTask>
+    <userTask id="provvedimento" name="PROVVEDIMENTO" activiti:candidateUsers="massimo.fraticelli,admin"></userTask>
     <sequenceFlow id="flow25" sourceRef="boundarytimer3" targetRef="provvedimento"></sequenceFlow>
     <sequenceFlow id="flow26" sourceRef="provvedimento" targetRef="endevent2"></sequenceFlow>
     <sequenceFlow id="flow27" sourceRef="subprocess1" targetRef="endevent2"></sequenceFlow>
@@ -59,16 +84,22 @@
         <omgdc:Bounds height="35.0" width="35.0" x="150.0" y="120.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="applica" id="BPMNShape_applica">
-        <omgdc:Bounds height="55.0" width="105.0" x="230.0" y="110.0"></omgdc:Bounds>
+        <omgdc:Bounds height="55.0" width="105.0" x="210.0" y="110.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="boundarytimer4" id="BPMNShape_boundarytimer4">
-        <omgdc:Bounds height="30.0" width="30.0" x="310.0" y="140.0"></omgdc:Bounds>
+        <omgdc:Bounds height="30.0" width="30.0" x="290.0" y="140.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="endevent3" id="BPMNShape_endevent3">
-        <omgdc:Bounds height="35.0" width="35.0" x="410.0" y="120.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="505.0" y="60.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="endevent4" id="BPMNShape_endevent4">
         <omgdc:Bounds height="35.0" width="35.0" x="410.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="riprendi" id="BPMNShape_riprendi">
+        <omgdc:Bounds height="55.0" width="105.0" x="340.0" y="110.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="pausa" id="BPMNShape_pausa">
+        <omgdc:Bounds height="55.0" width="105.0" x="470.0" y="110.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="boundarytimer3" id="BPMNShape_boundarytimer3">
         <omgdc:Bounds height="30.0" width="30.0" x="524.0" y="220.0"></omgdc:Bounds>
@@ -82,16 +113,24 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow28" id="BPMNEdge_flow28">
         <omgdi:waypoint x="185.0" y="137.0"></omgdi:waypoint>
-        <omgdi:waypoint x="230.0" y="137.0"></omgdi:waypoint>
+        <omgdi:waypoint x="210.0" y="137.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow29" id="BPMNEdge_flow29">
-        <omgdi:waypoint x="325.0" y="170.0"></omgdi:waypoint>
-        <omgdi:waypoint x="324.0" y="197.0"></omgdi:waypoint>
+        <omgdi:waypoint x="305.0" y="170.0"></omgdi:waypoint>
+        <omgdi:waypoint x="304.0" y="197.0"></omgdi:waypoint>
         <omgdi:waypoint x="410.0" y="197.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow30" id="BPMNEdge_flow30">
-        <omgdi:waypoint x="335.0" y="137.0"></omgdi:waypoint>
-        <omgdi:waypoint x="410.0" y="137.0"></omgdi:waypoint>
+        <omgdi:waypoint x="315.0" y="137.0"></omgdi:waypoint>
+        <omgdi:waypoint x="340.0" y="137.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow31" id="BPMNEdge_flow31">
+        <omgdi:waypoint x="522.0" y="110.0"></omgdi:waypoint>
+        <omgdi:waypoint x="522.0" y="95.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow32" id="BPMNEdge_flow32">
+        <omgdi:waypoint x="445.0" y="137.0"></omgdi:waypoint>
+        <omgdi:waypoint x="470.0" y="137.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow25" id="BPMNEdge_flow25">
         <omgdi:waypoint x="539.0" y="250.0"></omgdi:waypoint>
