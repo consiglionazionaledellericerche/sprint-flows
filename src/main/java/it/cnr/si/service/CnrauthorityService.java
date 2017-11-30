@@ -1,16 +1,16 @@
 package it.cnr.si.service;
 
-import javax.inject.Inject;
-
+import it.cnr.si.domain.Cnrauthority;
+import it.cnr.si.repository.CnrauthorityRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import it.cnr.si.domain.Cnrauthority;
-import it.cnr.si.repository.CnrauthorityRepository;
+import javax.inject.Inject;
 
 /**
  * Service Implementation for managing Cnrauthority.
@@ -30,10 +30,10 @@ public class CnrauthorityService {
      * @param cnrauthority the entity to save
      * @return the persisted entity
      */
+    @CacheEvict(value = {"allGroups", "user"}, allEntries = true)
     public Cnrauthority save(Cnrauthority cnrauthority) {
         log.debug("Request to save Cnrauthority : {}", cnrauthority);
-        Cnrauthority result = cnrauthorityRepository.save(cnrauthority);
-        return result;
+        return cnrauthorityRepository.save(cnrauthority);
     }
 
     /**
@@ -45,8 +45,7 @@ public class CnrauthorityService {
     @Transactional(readOnly = true)
     public Page<Cnrauthority> findAll(Pageable pageable) {
         log.debug("Request to get all Cnrauthorities");
-        Page<Cnrauthority> result = cnrauthorityRepository.findAll(pageable);
-        return result;
+        return cnrauthorityRepository.findAll(pageable);
     }
 
     /**
@@ -58,8 +57,7 @@ public class CnrauthorityService {
     @Transactional(readOnly = true)
     public Cnrauthority findOne(Long id) {
         log.debug("Request to get Cnrauthority : {}", id);
-        Cnrauthority cnrauthority = cnrauthorityRepository.findOneWithEagerRelationships(id);
-        return cnrauthority;
+        return cnrauthorityRepository.findOneWithEagerRelationships(id);
     }
 
     /**
