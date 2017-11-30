@@ -47,7 +47,7 @@ public class RelationshipService {
      * @param relationship the entity to save
      * @return the persisted entity
      */
-    @CacheEvict(value = "allGroups", allEntries = true)
+    @CacheEvict(value = {"allGroups", "user"}, allEntries = true)
     public Relationship save(Relationship relationship) {
         log.debug("Request to save Relationship : {}", relationship);
         return relationshipRepository.save(relationship);
