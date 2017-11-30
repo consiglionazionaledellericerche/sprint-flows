@@ -1,14 +1,8 @@
 package it.cnr.si.flows.ng.security;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
-
+import it.cnr.si.FlowsApp;
+import it.cnr.si.flows.ng.config.SwitchUserSecurityConfiguration;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,19 +10,17 @@ import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import it.cnr.si.FlowsApp;
-import it.cnr.si.flows.ng.config.SwitchUserSecurityConfiguration;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -101,7 +93,7 @@ public class SwitchUserTest {
         assertThat(impersonatedAccount.get("authorities")).asList()
         .contains("ROLE_PREVIOUS_ADMINISTRATOR")
         .contains("DEPARTMENT_603240")
-        .contains("ROLE_segreteria@2216"); // Questo ruolo cambiera' nel futuro, sistemare col nome nuovo
+                .contains("ROLE_responsabile#acquisti@2216");
 
         Map<String, Object> exitAccount = getAccount(token);
         assertThat(exitAccount).containsEntry("login", "admin");
