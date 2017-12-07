@@ -84,4 +84,16 @@ public class Enum {
             return value;
         }
     }
+
+    //    todo: fare il refactoring dei campui in giro per l'appliazione'
+    public enum VariableEnum {
+        initiator,
+        title,
+        descrizione,
+        oggetto,
+        idStruttura,
+        startDate,
+        endDate,
+        gruppoRA;
+    }
 }

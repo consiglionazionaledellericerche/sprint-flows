@@ -5,6 +5,7 @@ import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.service.FlowsProcessDiagramService;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
+import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
 import org.activiti.engine.impl.util.json.JSONArray;
@@ -97,22 +98,21 @@ public class SummaryPdfService {
 
         //variabili da visualizzare per forza (se presenti)
         for (RestVariable var : variables) {
-            String variableName = var.getName();
-            switch (variableName) {
-                case "initiator":
+            switch (Enum.VariableEnum.valueOf(var.getName())) {
+                case initiator:
                     paragraphField.addText("Avviato da: " + var.getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
                     break;
-                case "startDate":
+                case startDate:
                     if (var.getValue() != null)
                         paragraphField.addText("Avviato il: " + formatDate(Utils.parsaData((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
 
                     break;
-                case "endDate":
+                case endDate:
                     if (var.getValue() != null)
                         paragraphField.addText("Terminato il: " + formatDate(Utils.parsaData((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
 
                     break;
-                case "gruppoRA":
+                case gruppoRA:
                     paragraphField.addText("Gruppo Responsabile Acquisti: " + var.getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
 
                     break;

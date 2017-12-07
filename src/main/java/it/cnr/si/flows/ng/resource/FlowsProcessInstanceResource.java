@@ -4,6 +4,7 @@ import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.domain.View;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
+import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
 import it.cnr.si.security.AuthoritiesConstants;
@@ -130,11 +131,11 @@ public class FlowsProcessInstanceResource {
         HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
 
         if (active) {
-            historicProcessInstanceQuery.variableValueEquals("initiator", username)
+            historicProcessInstanceQuery.variableValueEquals(Enum.VariableEnum.initiator.name(), username)
                     .unfinished()
                     .includeProcessVariables();
         } else {
-            historicProcessInstanceQuery.variableValueEquals("initiator", username)
+            historicProcessInstanceQuery.variableValueEquals(Enum.VariableEnum.initiator.name(), username)
                     .finished()
                     .includeProcessVariables();
         }

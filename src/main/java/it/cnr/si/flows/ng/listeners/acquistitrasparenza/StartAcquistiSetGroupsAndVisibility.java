@@ -1,6 +1,7 @@
 package it.cnr.si.flows.ng.listeners.acquistitrasparenza;
 
 import it.cnr.si.flows.ng.service.AceBridgeService;
+import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.RuntimeService;
@@ -33,8 +34,8 @@ public class StartAcquistiSetGroupsAndVisibility implements ExecutionListener {
     @Override
     public void notify(DelegateExecution execution) throws Exception {
 
-        String initiator = (String) execution.getVariable("initiator");
-        LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
+        String initiator = (String) execution.getVariable(Enum.VariableEnum.initiator.name());
+        LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable(Enum.VariableEnum.title.name()));
 
         List<GrantedAuthority> authorities = relationshipService.getAllGroupsForUser(initiator);
 
