@@ -27,8 +27,10 @@
         parameterType="it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery"
         resultMap="historicProcessInstanceAndVariablesResultMap">
         ${limitBefore}
-        select distinct RES.*, DEF.KEY_ as PROC_DEF_KEY_, DEF.NAME_ as
-        PROC_DEF_NAME_, DEF.VERSION_ as PROC_DEF_VERSION_,
+        select distinct RES.*,
+        DEF.KEY_ as PROC_DEF_KEY_,
+        DEF.NAME_ as PROC_DEF_NAME_,
+        DEF.VERSION_ as PROC_DEF_VERSION_,
         DEF.DEPLOYMENT_ID_ as DEPLOYMENT_ID_,
         VAR.ID_ as VAR_ID_,
         VAR.NAME_ as VAR_NAME_,
@@ -63,15 +65,17 @@
     <sql id="commonFlowsSelectHistoricProcessInstancesByQueryCriteriaSql">
 
 
-        <!-- Custom per visibilita' -->
-        left outer join ${prefix}ACT_HI_IDENTITYLINK I on
-        I.PROC_INST_ID_ = RES.ID_
-        <!-- fine custom -->
+        <!--&lt;!&ndash; Custom per visibilita' &ndash;&gt;-->
+        <!--left outer join ${prefix}ACT_HI_IDENTITYLINK I on-->
+        <!--I.PROC_INST_ID_ = RES.ID_-->
+        <!--&lt;!&ndash; fine custom &ndash;&gt;-->
 
         <foreach collection="queryVariableValues" index="index"
             item="queryVariableValue">
-            inner join ${prefix}ACT_HI_VARINST A${index} on RES.PROC_INST_ID_ =
-            A${index}.PROC_INST_ID_
+            <if test="queryVariableValue.name.equals('titoloIstanzaFlusso')">
+                inner join ${prefix}ACT_HI_VARINST A${index} on RES.PROC_INST_ID_ =
+                A${index}.PROC_INST_ID_
+            </if>
         </foreach>
         <foreach collection="orQueryObjects" index="orIndex"
             item="orQueryObject">
@@ -190,18 +194,18 @@
 
             <!-- Custom query per visibilita' -->
             <!-- aggiungere il tipo di link and I.TYPE_ = 'visualizzatore' -->
-            <if test="visibleToGroups != null || visibleToUser != null">
-                and I.TYPE_ = 'visualizzatore'
-                and
-                  ( I.GROUP_ID_ IN (
-                  <foreach item="group" index="index" collection="visibleToGroups"
-                      open="" separator="," close="">
-                      #{group}
-                  </foreach>
-                     )
-                     OR I.USER_ID_ =  #{visibleToUser}
-                   )
-            </if>
+            <!--<if test="visibleToGroups != null || visibleToUser != null">-->
+            <!--and I.TYPE_ = 'visualizzatore'-->
+            <!--and-->
+            <!--( I.GROUP_ID_ IN (-->
+            <!--<foreach item="group" index="index" collection="visibleToGroups"-->
+            <!--open="" separator="," close="">-->
+            <!--#{group}-->
+            <!--</foreach>-->
+            <!--)-->
+            <!--OR I.USER_ID_ =  #{visibleToUser}-->
+            <!--)-->
+            <!--</if>-->
 
 
             <if test="startedBy != null">
@@ -233,86 +237,94 @@
             </if>
             <foreach collection="queryVariableValues" index="index"
                 item="queryVariableValue">
-                <if test="queryVariableValue.name != null">
-                    <!-- Match-all variable-names when name is null -->
-                    and A${index}.NAME_= #{queryVariableValue.name}
-                </if>
-                <if test="!queryVariableValue.type.equals('null')">
-                    <!-- When operator is not-equals or type of value is
-                        null, type doesn't matter! -->
-                    and A${index}.VAR_TYPE_ = #{queryVariableValue.type}
-                </if>
-                <if
-                    test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
-                    <choose>
-                        <when
-                            test="queryVariableValue.operator.equals('EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">
-                            and lower(A${index}.TEXT_)
-                        </when>
-                        <otherwise>
-                            and A${index}.TEXT_
-                        </otherwise>
-                    </choose>
-                    <choose>
-                        <when
-                            test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">LIKE</when>
-                        <otherwise>
-                            <include
-                                refid="flowsExecutionVariableOperatorcommonFlowsSelectHistoricProcessInstancesByQueryCriteriaSql" />
-                        </otherwise>
-                    </choose>
-                    #{queryVariableValue.textValue}
-                    <choose>
-                        <when
-                            test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
-                    </choose>
-                </if>
-                <if test="queryVariableValue.textValue2 != null">
-                    and A${index}.TEXT2_
-                    <choose>
-                        <when
-                            test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
-                        <otherwise>
-                            <include
-                                refid="flowsExecutionVariableOperatorcommonFlowsSelectHistoricProcessInstancesByQueryCriteriaSql" />
-                        </otherwise>
-                    </choose>
-                    #{queryVariableValue.textValue2}
-                    <choose>
-                        <when
-                            test="queryVariableValue.operator.equals('LIKE')">${wildcardEscapeClause}</when>
-                    </choose>
-                </if>
-                <if test="queryVariableValue.longValue != null">
-                    and A${index}.LONG_
-                    <include
-                        refid="flowsExecutionVariableOperatorcommonFlowsSelectHistoricProcessInstancesByQueryCriteriaSql" />
-                    #{queryVariableValue.longValue}
-                </if>
-                <if test="queryVariableValue.doubleValue != null">
-                    and A${index}.DOUBLE_
-                    <include
-                        refid="flowsExecutionVariableOperatorcommonFlowsSelectHistoricProcessInstancesByQueryCriteriaSql" />
-                    #{queryVariableValue.doubleValue}
-                </if>
-                <!-- Null variable type -->
-                <if
-                    test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
-                    <choose>
-                        <when
-                            test="queryVariableValue.operator.equals('NOT_EQUALS')">
-                            and (A${index}.TEXT_ is not null or A${index}.TEXT2_ is not null or
-                            A${index}.LONG_ is not null or
-                            A${index}.DOUBLE_ is not null or
-                            A${index}.BYTEARRAY_ID_ is not null)
-                        </when>
-                        <otherwise>
-                            and A${index}.TEXT_ is null and A${index}.TEXT2_ is null and
-                            A${index}.LONG_ is null and
-                            A${index}.DOUBLE_ is null and
-                            A${index}.BYTEARRAY_ID_ is null
-                        </otherwise>
-                    </choose>
+                <if test="queryVariableValue.name.equals('titoloIstanzaFlusso')">
+                    <if test="queryVariableValue.name != null">
+                        <!-- Match-all variable-names when name is null todo:MODIFICARE QUI?-->
+                        and A${index}.NAME_= #{queryVariableValue.name}
+                    </if>
+                    <if test="!queryVariableValue.type.equals('null')">
+                        <!-- When operator is not-equals or type of value is
+                            null, type doesn't matter! -->
+                        and A${index}.VAR_TYPE_ = #{queryVariableValue.type}
+                    </if>
+                    <if
+                            test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+                        <choose>
+                            <when
+                                    test="queryVariableValue.operator.equals('EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">
+                                and lower(A${index}.TEXT_)
+                            </when>
+                            <otherwise>
+                                and A${index}.TEXT_
+                            </otherwise>
+                        </choose>
+                        <choose>
+                            <when
+                                    test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">
+                                LIKE
+                            </when>
+                            <otherwise>
+                                <include
+                                        refid="flowsExecutionVariableOperatorcommonFlowsSelectHistoricProcessInstancesByQueryCriteriaSql"/>
+                            </otherwise>
+                        </choose>
+                        #{queryVariableValue.textValue}
+                        <choose>
+                            <when
+                                    test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">
+                                ${wildcardEscapeClause}
+                            </when>
+                        </choose>
+                    </if>
+                    <if test="queryVariableValue.textValue2 != null">
+                        and A${index}.TEXT2_
+                        <choose>
+                            <when
+                                    test="queryVariableValue.operator.equals('LIKE')">LIKE
+                            </when>
+                            <otherwise>
+                                <include
+                                        refid="flowsExecutionVariableOperatorcommonFlowsSelectHistoricProcessInstancesByQueryCriteriaSql"/>
+                            </otherwise>
+                        </choose>
+                        #{queryVariableValue.textValue2}
+                        <choose>
+                            <when
+                                    test="queryVariableValue.operator.equals('LIKE')">${wildcardEscapeClause}
+                            </when>
+                        </choose>
+                    </if>
+                    <if test="queryVariableValue.longValue != null">
+                        and A${index}.LONG_
+                        <include
+                                refid="flowsExecutionVariableOperatorcommonFlowsSelectHistoricProcessInstancesByQueryCriteriaSql"/>
+                        #{queryVariableValue.longValue}
+                    </if>
+                    <if test="queryVariableValue.doubleValue != null">
+                        and A${index}.DOUBLE_
+                        <include
+                                refid="flowsExecutionVariableOperatorcommonFlowsSelectHistoricProcessInstancesByQueryCriteriaSql"/>
+                        #{queryVariableValue.doubleValue}
+                    </if>
+                    <!-- Null variable type -->
+                    <if
+                            test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+                        <choose>
+                            <when
+                                    test="queryVariableValue.operator.equals('NOT_EQUALS')">
+                                and (A${index}.TEXT_ is not null or A${index}.TEXT2_ is not null or
+                                A${index}.LONG_ is not null or
+                                A${index}.DOUBLE_ is not null or
+                                A${index}.BYTEARRAY_ID_ is not null)
+                            </when>
+                            <otherwise>
+                                and A${index}.TEXT_ is null and A${index}.TEXT2_ is null and
+                                A${index}.LONG_ is null and
+                                A${index}.DOUBLE_ is null and
+                                A${index}.BYTEARRAY_ID_ is null
+                            </otherwise>
+                        </choose>
+                    </if>
                 </if>
             </foreach>
             <foreach item="orQueryObject" index="orIndex"

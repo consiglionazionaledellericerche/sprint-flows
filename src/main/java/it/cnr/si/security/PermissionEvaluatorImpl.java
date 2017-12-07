@@ -10,6 +10,7 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.IdentityLinkType;
 import org.activiti.engine.task.Task;
+import org.activiti.rest.service.api.RestResponseFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Primary;
@@ -50,6 +51,9 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
     RuntimeService runtimeService;
     @Inject
     HistoryService historyService;
+    @Inject
+    RestResponseFactory restResponseFactory;
+
 
 
     /**
@@ -130,18 +134,20 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
     //controllo che l'utente abbia un authorities di tipo "supervisore" o "responsabile" della struttura o del tipo di flusso
     private boolean verifyAuthorities(String idStruttura, String processDefinitionKey, List<String> authorities) {
         Boolean canVisualize = false;
-        if (authorities.stream().anyMatch(a -> a.contains(supervisore + "@" + CNR_CODE) ||
-                a.contains(responsabile + "@" + CNR_CODE) ||
-                a.contains(supervisoreStruttura + "@" + idStruttura) ||
-                a.contains(responsabileStruttura + "@" + idStruttura) ||
-                a.contains(supervisore + "#" + processDefinitionKey + "@" + CNR_CODE) ||
-                a.contains(responsabile + "#" + processDefinitionKey + "@" + CNR_CODE) ||
-                a.contains(supervisore + "#" + processDefinitionKey + "@" + idStruttura) ||
-                a.contains(responsabile + "#" + processDefinitionKey + "@" + idStruttura) ||
-                a.contains(supervisore + "#flussi@" + CNR_CODE) ||
-                a.contains(responsabile + "#flussi@" + CNR_CODE) ||
-                a.contains(supervisore + "#flussi@" + idStruttura) ||
-                a.contains(responsabile + "#flussi@" + idStruttura))) {
+        if (authorities.stream()
+                .anyMatch(
+                        a -> a.contains(supervisore + "@" + CNR_CODE) ||
+                                a.contains(responsabile + "@" + CNR_CODE) ||
+                                a.contains(supervisoreStruttura + "@" + idStruttura) ||
+                                a.contains(responsabileStruttura + "@" + idStruttura) ||
+                                a.contains(supervisore + "#" + processDefinitionKey + "@" + CNR_CODE) ||
+                                a.contains(responsabile + "#" + processDefinitionKey + "@" + CNR_CODE) ||
+                                a.contains(supervisore + "#" + processDefinitionKey + "@" + idStruttura) ||
+                                a.contains(responsabile + "#" + processDefinitionKey + "@" + idStruttura) ||
+                                a.contains(supervisore + "#flussi@" + CNR_CODE) ||
+                                a.contains(responsabile + "#flussi@" + CNR_CODE) ||
+                                a.contains(supervisore + "#flussi@" + idStruttura) ||
+                                a.contains(responsabile + "#flussi@" + idStruttura))) {
             canVisualize = true;
         }
         return canVisualize;
@@ -152,15 +158,15 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
      * Verifica che l'utente abbia la visibilità sulla Process Instance.
      *
      * @param idStruttura          the id struttura
-     * @param processDefinitionKey the process definition key
-     * @param processInstanceId    the process instance id
      * @param authorities          le authorities dell'utente loggato
-     * @param userName             userName loggato
+     * @param currentUserLogin             userName loggato
      * @return the boolean
      */
-    public boolean canVisualize(String idStruttura, String processDefinitionKey, String processInstanceId, List<String> authorities, String userName) {
+
+    public boolean canVisualize(String idStruttura, String processDefinitionKey, String processInstanceId, List<String> authorities, String currentUserLogin) {
         boolean canVisualize = false;
-        if (verifyAuthorities(idStruttura, processDefinitionKey, authorities)) {
+
+        if (authorities.contains("ADMIN") || verifyAuthorities(idStruttura, processDefinitionKey, authorities)) {
             canVisualize = true;
         } else {
             //controllo gli Identity Link "visualizzatore" (o "assignee" o "candidate") per gli user senza authorities di "supervisore" o "responsabile"
@@ -172,7 +178,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
             //controllo gli Identity Link con userId(ad es.: rup in acquisti trasparenza)
             if (ilv.stream()
                     .filter(il -> il.getUserId() != null)
-                    .anyMatch(il -> il.getUserId().equals(userName))) {
+                    .anyMatch(il -> il.getUserId().equals(currentUserLogin))) {
                 canVisualize = true;
             } else {
                 //controllo gli Identity Link con groupId(tutti gli altri)
