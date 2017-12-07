@@ -5,6 +5,7 @@ import it.cnr.si.repository.UserRepository;
 import it.cnr.si.service.RelationshipService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -39,6 +40,7 @@ public class FlowsUserDetailsService implements org.springframework.security.cor
 
     @Override
     @Transactional
+    @Cacheable("user")
     public UserDetails loadUserByUsername(final String login) {
         UserDetails userDetails;
 

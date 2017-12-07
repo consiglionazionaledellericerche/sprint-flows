@@ -88,7 +88,7 @@ public class FlowsProcessInstanceResourceTest {
 
         util.loginResponsabileAcquisti();
         processInstanceID = verifyMyProcesses(1, 0);
-        //testo che eliminando una Process Instances NON la vedo tra i processi avviati da me
+        //testo che sospendendo una Process Instances NON la vedo tra i processi avviati da me
         util.loginAdmin();
         MockHttpServletResponse response = new MockHttpServletResponse();
         flowsProcessInstanceResource.delete(response, processInstanceID, "TEST");
@@ -114,8 +114,8 @@ public class FlowsProcessInstanceResourceTest {
         assertEquals(2, appo.size());
         HashMap identityLinks = (HashMap) appo.get(appo.keySet().toArray()[1]); // TODO
         assertEquals("[${gruppoSFD}]", identityLinks.get("candidateGroups").toString());
-        assertEquals(((HashSet) identityLinks.get("candidateUsers")).size(), 0);
-        assertEquals(((ArrayList) identityLinks.get("links")).size(), 1);
+        assertEquals(0, ((HashSet) identityLinks.get("candidateUsers")).size());
+        assertEquals(1, ((ArrayList) identityLinks.get("links")).size());
         assertNull(identityLinks.get("assignee"));
 
         HashMap history = (HashMap) ((ArrayList) ((HashMap) response.getBody()).get("history")).get(0);
@@ -270,7 +270,7 @@ public class FlowsProcessInstanceResourceTest {
         }
 
         processInstance = util.mySetUp(acquisti.getValue());
-        util.loginAdmin();
+        util.loginResponsabileAcquisti();
         MockHttpServletRequest req = new MockHttpServletRequest();
 
         String searchField1 = "strumentoAcquisizioneId";
@@ -297,9 +297,16 @@ public class FlowsProcessInstanceResourceTest {
 
         //verifico la richiesta su tutte le Process Definition
         stopWatch.start(String.format("verifico la richiesta su tutte le Process Definition ( %s istanze recuperate!)", LOAD_TEST_PROCESS_INSTANCES + 1));
-        response = flowsProcessInstanceResource.search(req, "all", true, ASC, 0, maxResults);
+        response = flowsProcessInstanceResource.search(req, ALL_PROCESS_INSTANCES, true, ASC, 0, maxResults);
         stopWatch.stop();
         verifySearchResponse(response, LOAD_TEST_PROCESS_INSTANCES + 1, maxResults, searchField1, searchValue1, searchField2, TestServices.getRA());
+
+        //verifico la richiesta su tutte le Process Definition TERMINATE (0 risultati)
+        stopWatch.start(String.format("verifico la richiesta su tutte le Process Definition per le process Instances TERMINATE( %s istanze recuperate!)", 0));
+        response = flowsProcessInstanceResource.search(req, ALL_PROCESS_INSTANCES, false, ASC, 0, maxResults);
+        stopWatch.stop();
+        //recupero le pross instajnces cancellate nei tearDown + quella rimossa in testGetMyProcesses (eseguito prima)
+        verifySearchResponse(response, processDeleted + 1, processDeleted + 1, searchField1, searchValue1, searchField2, TestServices.getRA());
 
         /*
          * VERIFICA GESTIONE DELLE AUTHORITIES
@@ -310,30 +317,43 @@ public class FlowsProcessInstanceResourceTest {
         payload = "{params: [{key: " + searchField1 + ", value: \"12\", type: textEqual} , {key: initiator, value: \"admin\", type: text}]}";
         req.setContent(payload.getBytes());
         req.setContentType("application/json");
+        stopWatch.start(String.format("verifico una richiesta SBAGLIATA ( %s istanze recuperate!)", 0));
         response = flowsProcessInstanceResource.search(req, "all", true, ASC, 0, maxResults);
+        stopWatch.stop();
         verifySearchResponse(response, 0, 0, searchField1, searchValue1, searchField2, TestServices.getRA());
     }
+
 
     private void verifyAuthorities(int maxResults, MockHttpServletRequest req, String searchField1, String searchValue1, String searchField2, int expectedTotalItems) {
         ResponseEntity<Object> response;
 
         //Uno User normale ed il direttore, a questo punto dei flussi non devono poterli vedere
         util.loginUser();
-        response = flowsProcessInstanceResource.search(req, "all", true, ASC, 0, maxResults);
+        stopWatch.start(String.format("verifico una richiesta di USER ( %s istanze recuperate!)", 0));
+        response = flowsProcessInstanceResource.search(req, util.getProcessDefinition().split(":")[0], true, ASC, 0, maxResults);
+        stopWatch.stop();
         verifySearchResponse(response, 0, 0, searchField1, searchValue1, searchField2, TestServices.getRA());
         util.loginDirettore();
-        response = flowsProcessInstanceResource.search(req, "all", true, ASC, 0, maxResults);
+        stopWatch.start(String.format("verifico una richiesta di DIRETTORE ( %s istanze recuperate!)", 0));
+        response = flowsProcessInstanceResource.search(req, util.getProcessDefinition().split(":")[0], true, ASC, 0, maxResults);
+        stopWatch.stop();
         verifySearchResponse(response, 0, 0, searchField1, searchValue1, searchField2, TestServices.getRA());
 
-        //l'sfd ed ENTRAMBI i responsabili acquisti devono vedere TUTTI i flussiavviati
+        //l'sfd ed ENTRAMBI i responsabili acquisti devono vedere TUTTI i flussi avviati
         util.loginSfd();
-        response = flowsProcessInstanceResource.search(req, "all", true, ASC, 0, maxResults);
+        stopWatch.start(String.format("verifico una richiesta di SFD ( %s istanze recuperate!)", maxResults));
+        response = flowsProcessInstanceResource.search(req, util.getProcessDefinition().split(":")[0], true, ASC, 0, maxResults);
+        stopWatch.stop();
         verifySearchResponse(response, expectedTotalItems, maxResults, searchField1, searchValue1, searchField2, TestServices.getRA());
         util.loginResponsabileAcquisti();
-        response = flowsProcessInstanceResource.search(req, "all", true, ASC, 0, maxResults);
+        stopWatch.start(String.format("verifico una richiesta di RA ( %s istanze recuperate!)", maxResults));
+        response = flowsProcessInstanceResource.search(req, util.getProcessDefinition().split(":")[0], true, ASC, 0, maxResults);
+        stopWatch.stop();
         verifySearchResponse(response, expectedTotalItems, maxResults, searchField1, searchValue1, searchField2, TestServices.getRA());
         util.loginResponsabileAcquisti2();
-        response = flowsProcessInstanceResource.search(req, "all", true, ASC, 0, maxResults);
+        stopWatch.start(String.format("verifico una richiesta di RA2 ( %s istanze recuperate!)", maxResults));
+        response = flowsProcessInstanceResource.search(req, util.getProcessDefinition().split(":")[0], true, ASC, 0, maxResults);
+        stopWatch.stop();
         verifySearchResponse(response, expectedTotalItems, maxResults, searchField1, searchValue1, searchField2, TestServices.getRA());
     }
 
@@ -347,7 +367,7 @@ public class FlowsProcessInstanceResourceTest {
         req.setContent(payload.getBytes());
         req.setContentType("application/json");
         MockHttpServletResponse responseAll = new MockHttpServletResponse();
-        flowsProcessInstanceResource.exportCsv(req, responseAll, ALL_PROCESS_INSTANCES, true, ASC, -1, -1);
+        flowsProcessInstanceResource.exportCsv(req, responseAll, ALL_PROCESS_INSTANCES, true, ASC, 0, 1000);
         assertEquals(OK.value(), responseAll.getStatus());
 
         //faccio l'exportCsv su UNA SOLA Process Instance attiva
@@ -358,9 +378,9 @@ public class FlowsProcessInstanceResourceTest {
 
         //verifico che exportCsv dei flussi NON ATTIVI è vuoto
         MockHttpServletResponse terminatedProcessInstances = new MockHttpServletResponse();
-        flowsProcessInstanceResource.exportCsv(req, terminatedProcessInstances, ALL_PROCESS_INSTANCES, false, ASC, -1, -1);
+        flowsProcessInstanceResource.exportCsv(req, terminatedProcessInstances, ALL_PROCESS_INSTANCES, false, ASC, 0, 1000);
         assertEquals(OK.value(), terminatedProcessInstances.getStatus());
-//        verifico che le righe dell csv siano quanti i flussi "terminati" + 1 (intestazione del file csv)
+//        verifico che le righe del csv siano quanti i flussi "terminati" + 1 (intestazione del file csv)
         assertEquals(terminatedProcessInstances.getContentAsString().split("\n").length,
                      historyService.createHistoricProcessInstanceQuery().finished().list().size() + 1);
     }
@@ -370,8 +390,8 @@ public class FlowsProcessInstanceResourceTest {
         assertEquals(OK, response.getStatusCode());
         HashMap body = (HashMap) response.getBody();
         ArrayList responseList = (ArrayList) body.get("processInstances");
-        assertEquals(expectedResonseItems, responseList.size());
-        assertEquals(expectedTotalItems, ((Integer) body.get("totalItems")).intValue());
+        assertEquals("Lunghezza della lista NON corrispondente alle attese", expectedResonseItems, responseList.size());
+        assertEquals("TotalItems NON corrispondente alle attese", expectedTotalItems, ((Integer) body.get("totalItems")).intValue());
 
         if (responseList.size() > 0) {
             HistoricProcessInstanceResponse taskresponse = ((HistoricProcessInstanceResponse) responseList.get(0));

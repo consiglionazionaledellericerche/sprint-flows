@@ -4,13 +4,13 @@ import it.cnr.si.domain.Cnrgroup;
 import it.cnr.si.repository.CnrgroupRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.List;
 
 /**
  * Service Implementation for managing Cnrgroup.
@@ -30,10 +30,10 @@ public class CnrgroupService {
      * @param cnrgroup the entity to save
      * @return the persisted entity
      */
+    @CacheEvict(value = {"allGroups", "user"}, allEntries = true)
     public Cnrgroup save(Cnrgroup cnrgroup) {
         log.debug("Request to save Cnrgroup : {}", cnrgroup);
-        Cnrgroup result = cnrgroupRepository.save(cnrgroup);
-        return result;
+        return cnrgroupRepository.save(cnrgroup);
     }
 
     /**
@@ -45,8 +45,7 @@ public class CnrgroupService {
     @Transactional(readOnly = true) 
     public Page<Cnrgroup> findAll(Pageable pageable) {
         log.debug("Request to get all Cnrgroups");
-        Page<Cnrgroup> result = cnrgroupRepository.findAll(pageable);
-        return result;
+        return cnrgroupRepository.findAll(pageable);
     }
 
     /**
@@ -58,8 +57,7 @@ public class CnrgroupService {
     @Transactional(readOnly = true) 
     public Cnrgroup findOne(Long id) {
         log.debug("Request to get Cnrgroup : {}", id);
-        Cnrgroup cnrgroup = cnrgroupRepository.findOneWithEagerRelationships(id);
-        return cnrgroup;
+        return cnrgroupRepository.findOneWithEagerRelationships(id);
     }
 
     /**
