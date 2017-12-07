@@ -185,26 +185,26 @@ public class FlowsProcessInstanceService {
             else if (order.equals(DESC))
                 processQuery.orderByProcessInstanceStartTime().desc();
 
-            processQuery.includeProcessVariables();
-            List<HistoricProcessInstance> processList = processQuery.list();
+            List<HistoricProcessInstanceResponse> historicProcessInstanceResponseList = restResponseFactory.createHistoricProcessInstanceResponseList(processQuery.list());
 
             //filtro le process instances che l'utente può vedere (solo l'authorities admin ignora le regole di visibilita')
-            if (!authorities.contains("ADMIN")) {
-                //cambiare la memorizzazione di idStruttura NON migliora significativamente le prestazioni
-                processList = processList.parallelStream()
-                        .filter(pi -> permissionEvaluator.canVisualize((String) pi.getProcessVariables().get("idStruttura"),
-                                                                       pi.getProcessDefinitionKey(),
-                                                                       pi.getId(),
-                                                                       authorities,
-                                                                       SecurityUtils.getCurrentUserLogin()))
-                        .collect(Collectors.toList());
-            }
+            historicProcessInstanceResponseList = historicProcessInstanceResponseList.parallelStream()
+                    .filter(pi -> permissionEvaluator.canVisualize(new JSONObject(pi.getName()).getString("idStruttura"),
+                                                                   pi.getProcessDefinitionId().split(":")[0],
+                                                                   pi.getId(),
+                                                                   authorities,
+                                                                   SecurityUtils.getCurrentUserLogin()))
+                    .distinct()
+                    .collect(Collectors.toList());
 
-            result.put("totalItems", processList.size());
+            result.put("totalItems", historicProcessInstanceResponseList.size());
             if (firstResult != -1 && maxResults != -1)
-                processList = processList.stream().skip(firstResult).limit(maxResults).collect(Collectors.toList());
+                historicProcessInstanceResponseList = historicProcessInstanceResponseList.parallelStream()
+                        .skip(firstResult)
+                        .limit(maxResults)
+                        .collect(Collectors.toList());
 
-            result.put("processInstances", restResponseFactory.createHistoricProcessInstanceResponseList(processList));
+            result.put("processInstances", historicProcessInstanceResponseList);
         } catch (IOException e) {
             LOGGER.error("Errore nella letture dello stream della request", e);
         }

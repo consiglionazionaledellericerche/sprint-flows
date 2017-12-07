@@ -5,21 +5,22 @@
                title="dettagli del flusso {{process.id}}">
                 <small class="label"
                        ng-class="{'label-info' : process.endTime, 'label-primary' : !process.endTime}">
-                    {{process.variabili.title}}
+                    {{process.businessKey}}
                 </small>
                 <br>
             </a>
             <div>
                 <ul class="list-unstyled">
-                <li>
-                  <h4>{{process.variabili.titoloIstanzaFlusso}}</h4>
-                </li>
-                <li>
-                  Avviato il <strong>{{process.variabili.startDate | data}}</strong> da <strong> {{process.variabili.initiator}} </strong>
-                </li>
-<!--                 <div ng-show="process.variabili.taskId"> -->
-<!--                     <strong>Id del compito in esecuzione:</strong> {{process.variabili.taskId}} <br> -->
-<!--                 </div> -->
+                    <li>
+                        <h4>Oggetto: {{process.name | get: 'oggetto'}}</h4>
+                    </li>
+                    <li>
+                        <h4>Descrizione: {{process.name | get: 'descrizione'}}</h4>
+                    </li>
+                    <li>
+                        Avviato il <strong>{{process.startTime | dataora}}</strong> da <strong> {{process.name | get:
+                                                                                                'initiator'}} </strong>
+                    </li>
                     <ng-include src="'api/views/' + process.processDefinitionId.split(':')[0] + '/search'" />
                 </ul>
             </div>

@@ -11,10 +11,9 @@ import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.FlowsUserDetailsService;
 import it.cnr.si.security.PermissionEvaluatorImpl;
 import it.cnr.si.security.SecurityUtils;
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
+import it.cnr.si.service.RelationshipService;
+import org.activiti.engine.*;
+import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
@@ -33,6 +32,8 @@ import org.activiti.rest.service.api.runtime.task.TaskResponse;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +50,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
 import static it.cnr.si.flows.ng.utils.Utils.*;
 
 /**
@@ -61,6 +63,7 @@ public class FlowsTaskResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsTaskResource.class);
     private static final String ERROR_MESSAGE = "message";
+
     @Inject
     private RestResponseFactory restResponseFactory;
     @Inject
@@ -83,6 +86,11 @@ public class FlowsTaskResource {
     private PermissionEvaluatorImpl permissionEvaluator;
     @Inject
     private AceBridgeService aceBridgeService;
+    @Autowired
+    @Qualifier("processEngine")
+    protected ProcessEngine engine;
+    @Inject
+    private RelationshipService relationshipService;
     private Utils utils = new Utils();
 
 
@@ -164,7 +172,6 @@ public class FlowsTaskResource {
         return ResponseEntity.ok(response);
     }
 
-
     @RequestMapping(value = "/taskAssignedInMyGroups", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
@@ -195,7 +202,7 @@ public class FlowsTaskResource {
                 .collect(Collectors.toList());
 
 ////		TODO: da analizzare se le prestazioni sono migliori rispetto a farsi dare la lista di task attivi e ciclare per quali il member è l'assignee (codice di Martin sottostante)
-        List<TaskResponse> result = new ArrayList<TaskResponse>();
+        List<TaskResponse> result = new ArrayList<>();
 
         List<String> usersInMyGroups = new ArrayList<>();
         for (String myGroup : myGroups) {
@@ -303,17 +310,41 @@ public class FlowsTaskResource {
                 String counterId = processDefinition.getName() + "-" + Calendar.getInstance().get(Calendar.YEAR);
                 String key = counterId + "-" + counterService.getNext(counterId);
 
-                data.put("title", key);
-                data.put("initiator", username);
-                data.put("startDate", new Date());
+                //recupero l'idStruttura dell'RA che sta avviando il flusso
+                List<GrantedAuthority> authorities = relationshipService.getAllGroupsForUser(username);
+                List<String> groups = authorities.stream()
+                        .map(GrantedAuthority::<String>getAuthority)
+                        .map(Utils::removeLeadingRole)
+                        .filter(g -> g.startsWith("ra@"))
+                        .collect(Collectors.toList());
 
-                ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
+                if (groups.isEmpty())
+                    throw new BpmnError("403", "L'utente non e' abilitato ad avviare questo flusso (NON è Responsabile Acquisti)");
+                else if (groups.size() > 1)
+                    throw new BpmnError("500", "L'utente appartiene a piu' di un gruppo Responsabile Acquisti");
+                else {
+                    String gruppoRT = groups.get(0);
+                    String idStrutturaString = gruppoRT.substring(gruppoRT.lastIndexOf('@') + 1);
 
-                LOGGER.info("Avviata istanza di processo {}, id: {}", key, instance.getId());
+                    data.put(title.name(), key);
+                    data.put(initiator.name(), username);
+                    data.put("startDate", new Date());
 
-                ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
-                return new ResponseEntity<>(response, HttpStatus.OK);
+                    ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
 
+                    org.json.JSONObject name = new org.json.JSONObject();
+                    name.put(idStruttura.name(), idStrutturaString);
+                    name.put(title.name(), data.get(title.name()));
+                    name.put(oggetto.name(), data.get(oggetto.name()));
+                    name.put(descrizione.name(), data.get(descrizione.name()));
+                    name.put(initiator.name(), data.get(initiator.name()));
+                    runtimeService.setProcessInstanceName(instance.getId(), name.toString());
+
+                    LOGGER.info("Avviata istanza di processo {}, id: {}", key, instance.getId());
+
+                    ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
+                    return new ResponseEntity<>(response, HttpStatus.OK);
+                }
             } catch (Exception e) {
                 String errorMessage = String.format("Errore nell'avvio della Process Instances di tipo %s con eccezione:", processDefinition);
                 LOGGER.error(errorMessage, e);
