@@ -46,7 +46,6 @@ import static it.cnr.si.flows.ng.utils.Utils.*;
 @Service
 public class FlowsProcessInstanceService {
 
-    private static final String CNR_CODE = "4000";
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsProcessInstanceService.class);
     @Inject
     private FlowsAttachmentService flowsAttachmentService;
@@ -141,8 +140,8 @@ public class FlowsProcessInstanceService {
         Map<String, Object> result = new HashMap<>();
         try {
             JSONArray params = new JSONObject(IOUtils.toString(req.getReader())).getJSONArray("params");
-            //verificato sperimentalmente che è più veloca fare una query normale e poi filtrare con lo stream parallelo
-            // che fare la nostra query customizzata sugli identityLink e poi verificare solo i permessi speciali
+            //verificato sperimentalmente che è più veloce fare una query normale e poi filtrare con lo stream parallelo che fare la
+            // nostra query customizzata sugli identityLink e poi verificare solo i permessi speciali ("responsabile" e "supervisore")
             HistoricProcessInstanceQuery processQuery = historyService.createHistoricProcessInstanceQuery();
 
             List<String> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()

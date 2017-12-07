@@ -70,12 +70,15 @@ public class FlowsProcessEngineConfigurations {
 
         // async migliora le prestazioni, in particolare con tanti utenti
         conf.setAsyncExecutorActivate(true);
+        // migliorano un poco le prestazioni della search  (0,5 secondi)
+        conf.setAsyncExecutorEnabled(true);
+//        il default è 10
+        conf.setAsyncExecutorMaxPoolSize(30);
 
         // FULL serve per la storia dei documenti
         conf.setHistoryLevel(HistoryLevel.FULL);
-
-        //Serve per prendere tutte le istanze nelle search dell'app (il default (20000) si dovrebbe riferire al numero di variabili recuperabili nella query)
-        conf.setHistoricProcessInstancesQueryLimit(1000000);
+        //Serve per recuperare molte process istances nelle search dell'app (si riferisce al numero di variabili recuperabili nelle query (default 20000))
+        conf.setHistoricProcessInstancesQueryLimit(200000);
 
         // abbiamo implementato delle query custom
         // @See it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery.java
@@ -92,7 +95,6 @@ public class FlowsProcessEngineConfigurations {
         conf.setCustomMybatisXMLMappers(customXmlBatisMappers);
 
         FlowsRuntimeService runtimeService = new FlowsRuntimeService();
-//        runtimeService.setCommandExecutor(conf.getCommandExecutor());
         conf.setRuntimeService(runtimeService);
         
         return conf;
