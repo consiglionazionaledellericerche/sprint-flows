@@ -2,6 +2,7 @@ package it.cnr.si.flows.ng.resource;
 
 import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.TestServices;
+import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
@@ -36,6 +37,7 @@ import java.util.stream.Collectors;
 
 import static it.cnr.si.flows.ng.TestServices.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
 import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.initiator;
 import static it.cnr.si.flows.ng.utils.Utils.*;
 import static org.junit.Assert.*;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -215,7 +217,6 @@ public class FlowsProcessInstanceResourceTest {
 
         String searchField1 = "strumentoAcquisizioneId";
         String searchValue1 = "11";
-        String searchField2 = "initiator";
 
         final Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, +1);
@@ -223,7 +224,7 @@ public class FlowsProcessInstanceResourceTest {
         cal.add(Calendar.DATE, -2);
         Date yesterday = cal.getTime();
         String payload = "{params: [{key: " + searchField1 + ", value: \"" + searchValue1 + "\", type: textEqual}, " +
-                "{key: " + searchField2 + ", value: \"" + TestServices.getRA() + "\", type: text}, " +
+                "{key: " + initiator.name() + ", value: \"" + TestServices.getRA() + "\", type: text}, " +
                 "{key: \"startDateGreat\", value: \"" + Utils.formattaData(yesterday) + "\", type: \"date\"}," +
                 "{key: \"startDateLess\", value: \"" + Utils.formattaData(tomorrow) + "\", type: \"date\"}]}";
         req.setContent(payload.getBytes());
@@ -231,20 +232,20 @@ public class FlowsProcessInstanceResourceTest {
 
         //verifico la richiesta normale
         ResponseEntity<Object> response = flowsProcessInstanceResource.search(req, util.getProcessDefinition().split(":")[0], true, ASC, 0, 1000);
-        verifySearchResponse(response, 1, 1, searchField1, searchValue1, searchField2, TestServices.getRA());
+        verifySearchResponse(response, 1, 1, searchField1, searchValue1, initiator.name(), TestServices.getRA());
 
         //verifico la richiesta su tutte le Process Definition
         response = flowsProcessInstanceResource.search(req, "all", true, ASC, 0, 1000);
-        verifySearchResponse(response, 1, 1, searchField1, searchValue1, searchField2, TestServices.getRA());
+        verifySearchResponse(response, 1, 1, searchField1, searchValue1, initiator.name(), TestServices.getRA());
 
         //cerco che le Process Instance completate (active = false) siano quelle cancellate nel tearDown (processDeleted) + 2 (quelle rimosse in testGetProcessInstances ed in testGetMyProcesses)
         response = flowsProcessInstanceResource.search(req, util.getProcessDefinition().split(":")[0], false, DESC, 0, 1000);
-        verifySearchResponse(response, processDeleted + 2, processDeleted + 2, searchField1, searchValue1, searchField2, TestServices.getRA());
+        verifySearchResponse(response, processDeleted + 2, processDeleted + 2, searchField1, searchValue1, initiator.name(), TestServices.getRA());
 
         /*
          * VERIFICA GESTIONE DELLE AUTHORITIES
          */
-        verifyAuthorities(1, req, searchField1, searchValue1, searchField2, 1);
+        verifyAuthorities(1, req, searchField1, searchValue1, initiator.name(), 1);
 
 
         //parametri sbagliati (strumentoAcquisizioneId 12 invece di 11, initiator = admin invece dell'RA) ==> 0 risultati
@@ -253,7 +254,7 @@ public class FlowsProcessInstanceResourceTest {
         req.setContentType("application/json");
 
         response = flowsProcessInstanceResource.search(req, util.getProcessDefinition().split(":")[0], true, ASC, 0, 1000);
-        verifySearchResponse(response, 0, 0, searchField1, searchValue1, searchField2, TestServices.getRA());
+        verifySearchResponse(response, 0, 0, searchField1, searchValue1, initiator.name(), TestServices.getRA());
     }
 
 
@@ -275,7 +276,6 @@ public class FlowsProcessInstanceResourceTest {
 
         String searchField1 = "strumentoAcquisizioneId";
         String searchValue1 = "11";
-        String searchField2 = "initiator";
 
         final Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, +1);
@@ -283,7 +283,7 @@ public class FlowsProcessInstanceResourceTest {
         cal.add(Calendar.DATE, -2);
         Date yesterday = cal.getTime();
         String payload = "{params: [{key: " + searchField1 + ", value: \"" + searchValue1 + "\", type: textEqual}, " +
-                "{key: " + searchField2 + ", value: \"" + TestServices.getRA() + "\", type: text}, " +
+                "{key: " + Enum.VariableEnum.initiator.name() + ", value: \"" + TestServices.getRA() + "\", type: text}, " +
                 "{key: \"startDateGreat\", value: \"" + Utils.formattaData(yesterday) + "\", type: \"date\"}," +
                 "{key: \"startDateLess\", value: \"" + Utils.formattaData(tomorrow) + "\", type: \"date\"}]}";
         req.setContent(payload.getBytes());
@@ -293,25 +293,25 @@ public class FlowsProcessInstanceResourceTest {
         stopWatch.start(String.format("verifico una richiesta normale ( %s istanze recuperate!)", LOAD_TEST_PROCESS_INSTANCES + 1));
         ResponseEntity<Object> response = flowsProcessInstanceResource.search(req, util.getProcessDefinition().split(":")[0], true, ASC, 0, maxResults);
         stopWatch.stop();
-        verifySearchResponse(response, LOAD_TEST_PROCESS_INSTANCES + 1, maxResults, searchField1, searchValue1, searchField2, TestServices.getRA());
+        verifySearchResponse(response, LOAD_TEST_PROCESS_INSTANCES + 1, maxResults, searchField1, searchValue1, initiator.name(), TestServices.getRA());
 
         //verifico la richiesta su tutte le Process Definition
         stopWatch.start(String.format("verifico la richiesta su tutte le Process Definition ( %s istanze recuperate!)", LOAD_TEST_PROCESS_INSTANCES + 1));
         response = flowsProcessInstanceResource.search(req, ALL_PROCESS_INSTANCES, true, ASC, 0, maxResults);
         stopWatch.stop();
-        verifySearchResponse(response, LOAD_TEST_PROCESS_INSTANCES + 1, maxResults, searchField1, searchValue1, searchField2, TestServices.getRA());
+        verifySearchResponse(response, LOAD_TEST_PROCESS_INSTANCES + 1, maxResults, searchField1, searchValue1, initiator.name(), TestServices.getRA());
 
         //verifico la richiesta su tutte le Process Definition TERMINATE (0 risultati)
         stopWatch.start(String.format("verifico la richiesta su tutte le Process Definition per le process Instances TERMINATE( %s istanze recuperate!)", 0));
         response = flowsProcessInstanceResource.search(req, ALL_PROCESS_INSTANCES, false, ASC, 0, maxResults);
         stopWatch.stop();
         //recupero le pross instajnces cancellate nei tearDown + quella rimossa in testGetMyProcesses (eseguito prima)
-        verifySearchResponse(response, processDeleted + 1, processDeleted + 1, searchField1, searchValue1, searchField2, TestServices.getRA());
+        verifySearchResponse(response, processDeleted + 1, processDeleted + 1, searchField1, searchValue1, initiator.name(), TestServices.getRA());
 
         /*
          * VERIFICA GESTIONE DELLE AUTHORITIES
          */
-        verifyAuthorities(maxResults, req, searchField1, searchValue1, searchField2, LOAD_TEST_PROCESS_INSTANCES + 1);
+        verifyAuthorities(maxResults, req, searchField1, searchValue1, initiator.name(), LOAD_TEST_PROCESS_INSTANCES + 1);
 
         //parametri sbagliati (strumentoAcquisizioneId 12 invece di 11, initiator = admin invece dell'RA) ==> 0 risultati
         payload = "{params: [{key: " + searchField1 + ", value: \"12\", type: textEqual} , {key: initiator, value: \"admin\", type: text}]}";
@@ -320,7 +320,7 @@ public class FlowsProcessInstanceResourceTest {
         stopWatch.start(String.format("verifico una richiesta SBAGLIATA ( %s istanze recuperate!)", 0));
         response = flowsProcessInstanceResource.search(req, "all", true, ASC, 0, maxResults);
         stopWatch.stop();
-        verifySearchResponse(response, 0, 0, searchField1, searchValue1, searchField2, TestServices.getRA());
+        verifySearchResponse(response, 0, 0, searchField1, searchValue1, initiator.name(), TestServices.getRA());
     }
 
 
@@ -446,7 +446,7 @@ public class FlowsProcessInstanceResourceTest {
         //titolo flusso sbagliato
         content = "{\"processParams\":" +
                 "[{\"key\":\"titoloIstanzaFlusso\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "AAAAAAAAA" + "\",\"type\":\"text\"}," +
-                "{\"key\":\"initiator\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}," +
+                "{\"key\":\"" + Enum.VariableEnum.initiator.name() + "\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}," +
                 "{\"key\":\"startDateGreat\",\"value\":\"" + Utils.formattaData(new Date()) + "\",\"type\":\"date\"}]}";
         request.setContent(content.getBytes());
         response = flowsProcessInstanceResource.getProcessInstances(request, true, ALL_PROCESS_INSTANCES, 0, 100, ASC);
@@ -457,7 +457,7 @@ public class FlowsProcessInstanceResourceTest {
         //initiator sbaliato
         content = "{\"processParams\":" +
                 "[{\"key\":\"titoloIstanzaFlusso\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
-                "{\"key\":\"initiator\",\"value\":\"" + TestServices.getRA() + "AAA" + "\",\"type\":\"textEqual\"}," +
+                "{\"key\":\"" + Enum.VariableEnum.initiator.name() + "\",\"value\":\"" + TestServices.getRA() + "AAA" + "\",\"type\":\"textEqual\"}," +
                 "{\"key\":\"startDateGreat\",\"value\":\"" + Utils.formattaData(new Date()) + "\",\"type\":\"date\"}]}";
         request.setContent(content.getBytes());
         response = flowsProcessInstanceResource.getProcessInstances(request, true, ALL_PROCESS_INSTANCES, 0, 100, ASC);
@@ -468,7 +468,7 @@ public class FlowsProcessInstanceResourceTest {
         //STARTDATE sbaliata
         content = "{\"processParams\":" +
                 "[{\"key\":\"titoloIstanzaFlusso\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
-                "{\"key\":\"initiator\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}," +
+                "{\"key\":\"" + Enum.VariableEnum.initiator.name() + "\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}," +
                 "{\"key\":\"startDateGreat\",\"value\":\"" + new DateTime().plusDays(1).toString("yyyy-MM-dd") + "\",\"type\":\"date\"}]}";
         request.setContent(content.getBytes());
         response = flowsProcessInstanceResource.getProcessInstances(request, true, ALL_PROCESS_INSTANCES, 0, 100, ASC);

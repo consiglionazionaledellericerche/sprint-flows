@@ -3,6 +3,7 @@ package it.cnr.si.flows.ng.resource;
 import it.cnr.jada.firma.arss.ArubaSignServiceException;
 import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.TestServices;
+import it.cnr.si.flows.ng.utils.Enum;
 import org.activiti.engine.TaskService;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
@@ -88,7 +89,7 @@ public class FlowsTaskResourceTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         String content = "{\"processParams\":" +
                 "[{\"key\":\"titoloIstanzaFlusso\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
-                "{\"key\":\"initiator\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
+                "{\"key\":\"" + Enum.VariableEnum.initiator.name() + "\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
                 "\"taskParams\":" +
                 "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
         request.setContent(content.getBytes());
@@ -186,7 +187,7 @@ public class FlowsTaskResourceTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         String content = "{\"processParams\":" +
                 "[{\"key\":\"titoloIstanzaFlusso\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
-                "{\"key\":\"initiator\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
+                "{\"key\":\"" + Enum.VariableEnum.initiator.name() + "\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
                 "\"taskParams\":" +
                 "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
         request.setContent(content.getBytes());
@@ -291,7 +292,7 @@ public class FlowsTaskResourceTest {
         //titolo flusso sbagliato
         content = "{\"processParams\":" +
                 "[{\"key\":\"titoloIstanzaFlusso\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "AAA\",\"type\":\"text\"}," +
-                "{\"key\":\"initiator\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
+                "{\"key\":\"" + Enum.VariableEnum.initiator.name() + "\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
                 "\"taskParams\":" +
                 "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
         request.setContent(content.getBytes());
@@ -301,7 +302,7 @@ public class FlowsTaskResourceTest {
         //initiator sbaliato
         content = "{\"processParams\":" +
                 "[{\"key\":\"titoloIstanzaFlusso\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
-                "{\"key\":\"initiator\",\"value\":\"admi\",\"type\":\"textEqual\"}]," +
+                "{\"key\":\"" + Enum.VariableEnum.initiator.name() + "\",\"value\":\"admi\",\"type\":\"textEqual\"}]," +
                 "\"taskParams\":" +
                 "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
         request.setContent(content.getBytes());
@@ -311,7 +312,7 @@ public class FlowsTaskResourceTest {
         //Fase sbaliata
         content = "{\"processParams\":" +
                 "[{\"key\":\"titoloIstanzaFlusso\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
-                "{\"key\":\"initiator\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
+                "{\"key\":\"" + Enum.VariableEnum.initiator.name() + "\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
                 "\"taskParams\":" +
                 "[{\"key\":\"Fase\",\"value\":\"Verifica DecisioneEEEEE\",\"type\":null}]}";
         request.setContent(content.getBytes());
