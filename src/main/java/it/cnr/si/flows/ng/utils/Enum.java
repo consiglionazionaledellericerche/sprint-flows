@@ -70,6 +70,7 @@ public class Enum {
         RimozioneDaPubblicazione
     }
 
+
     public enum ProcessDefinitionEnum {
         acquisti("acquisti"),
         permessiFerie("permessi-ferie");
@@ -85,12 +86,12 @@ public class Enum {
         }
     }
 
-    //    todo: fare il refactoring dei campui in giro per l'appliazione'
+
     public enum VariableEnum {
         initiator,
         title,
-        descrizione,
         oggetto,
+        descrizione,
         idStruttura,
         startDate,
         endDate,

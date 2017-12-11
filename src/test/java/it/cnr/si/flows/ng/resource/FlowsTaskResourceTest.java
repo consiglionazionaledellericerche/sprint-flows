@@ -3,7 +3,6 @@ package it.cnr.si.flows.ng.resource;
 import it.cnr.jada.firma.arss.ArubaSignServiceException;
 import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.TestServices;
-import it.cnr.si.flows.ng.utils.Enum;
 import org.activiti.engine.TaskService;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
@@ -33,6 +32,8 @@ import java.util.Map;
 
 import static it.cnr.si.flows.ng.TestServices.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
 import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.initiator;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.oggetto;
 import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
 import static it.cnr.si.flows.ng.utils.Utils.ASC;
 import static org.junit.Assert.assertEquals;
@@ -88,8 +89,8 @@ public class FlowsTaskResourceTest {
 
         MockHttpServletRequest request = new MockHttpServletRequest();
         String content = "{\"processParams\":" +
-                "[{\"key\":\"titoloIstanzaFlusso\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
-                "{\"key\":\"" + Enum.VariableEnum.initiator.name() + "\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
+                "[{\"key\":\"" + oggetto + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
+                "{\"key\":\"" + initiator + "\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
                 "\"taskParams\":" +
                 "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
         request.setContent(content.getBytes());
@@ -186,8 +187,8 @@ public class FlowsTaskResourceTest {
         //verifico che la ricerca recuperi il primo task della process instance appena avviata
         MockHttpServletRequest request = new MockHttpServletRequest();
         String content = "{\"processParams\":" +
-                "[{\"key\":\"titoloIstanzaFlusso\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
-                "{\"key\":\"" + Enum.VariableEnum.initiator.name() + "\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
+                "[{\"key\":\"" + oggetto + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
+                "{\"key\":\"" + initiator + "\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
                 "\"taskParams\":" +
                 "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
         request.setContent(content.getBytes());
@@ -291,8 +292,8 @@ public class FlowsTaskResourceTest {
         ResponseEntity<DataResponse> response;//verifico che non prenda nessun elemento (SEARCH PARAMS SBAGLIATI)
         //titolo flusso sbagliato
         content = "{\"processParams\":" +
-                "[{\"key\":\"titoloIstanzaFlusso\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "AAA\",\"type\":\"text\"}," +
-                "{\"key\":\"" + Enum.VariableEnum.initiator.name() + "\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
+                "[{\"key\":\"" + oggetto + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "AAA\",\"type\":\"text\"}," +
+                "{\"key\":\"" + initiator + "\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
                 "\"taskParams\":" +
                 "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
         request.setContent(content.getBytes());
@@ -301,8 +302,8 @@ public class FlowsTaskResourceTest {
         assertEquals(0, ((ArrayList) response.getBody().getData()).size());
         //initiator sbaliato
         content = "{\"processParams\":" +
-                "[{\"key\":\"titoloIstanzaFlusso\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
-                "{\"key\":\"" + Enum.VariableEnum.initiator.name() + "\",\"value\":\"admi\",\"type\":\"textEqual\"}]," +
+                "[{\"key\":\"" + oggetto + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
+                "{\"key\":\"" + initiator + "\",\"value\":\"admi\",\"type\":\"textEqual\"}]," +
                 "\"taskParams\":" +
                 "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
         request.setContent(content.getBytes());
@@ -311,8 +312,8 @@ public class FlowsTaskResourceTest {
         assertEquals(0, ((ArrayList) response.getBody().getData()).size());
         //Fase sbaliata
         content = "{\"processParams\":" +
-                "[{\"key\":\"titoloIstanzaFlusso\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
-                "{\"key\":\"" + Enum.VariableEnum.initiator.name() + "\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
+                "[{\"key\":\"" + oggetto + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
+                "{\"key\":\"" + initiator + "\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
                 "\"taskParams\":" +
                 "[{\"key\":\"Fase\",\"value\":\"Verifica DecisioneEEEEE\",\"type\":null}]}";
         request.setContent(content.getBytes());

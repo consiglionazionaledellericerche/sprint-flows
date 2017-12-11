@@ -38,6 +38,7 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.idStruttura;
 import static it.cnr.si.flows.ng.utils.Utils.*;
 
 /**
@@ -189,7 +190,7 @@ public class FlowsProcessInstanceService {
 
             //filtro le process instances che l'utente può vedere (solo l'authorities admin ignora le regole di visibilita')
             historicProcessInstanceResponseList = historicProcessInstanceResponseList.parallelStream()
-                    .filter(pi -> permissionEvaluator.canVisualize(new JSONObject(pi.getName()).getString("idStruttura"),
+                    .filter(pi -> permissionEvaluator.canVisualize(new JSONObject(pi.getName()).getString(idStruttura.name()),
                                                                    pi.getProcessDefinitionId().split(":")[0],
                                                                    pi.getId(),
                                                                    authorities,
