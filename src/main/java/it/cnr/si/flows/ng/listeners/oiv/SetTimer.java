@@ -25,6 +25,7 @@ public class SetTimer implements ExecutionListener {
 
 	private Expression boundarytimerName;
 	private Expression yearAddValue;
+	private Expression dayAddValue;
 	private Expression monthAddValue;
 	private Expression hourAddValue;
 	private Expression minuteAddValue;
@@ -54,6 +55,7 @@ public class SetTimer implements ExecutionListener {
 				int yearAddValueInt = 0;   
 				int monthAddValueInt = 0;   
 				int hourAddValueInt = 0;   
+				int dayAddValueInt = 0;   
 				int minuteAddValueInt = 0;   
 				if (yearAddValue != null) {
 					try {
@@ -72,6 +74,15 @@ public class SetTimer implements ExecutionListener {
 						//do something! anything to handle the exception.
 					}
 				}
+				if (dayAddValue != null) {
+					try {
+						dayAddValueInt = Integer.parseInt(dayAddValue.getValue(execution).toString());
+					} catch (NumberFormatException e) {
+						//Will Throw exception!
+						//do something! anything to handle the exception.
+					}
+				}
+
 				if (hourAddValue != null) {
 					try {
 						hourAddValueInt = Integer.parseInt(hourAddValue.getValue(execution).toString());
@@ -92,11 +103,14 @@ public class SetTimer implements ExecutionListener {
 				Calendar newDate = Calendar.getInstance();
 				newDate.add(Calendar.YEAR, yearAddValueInt);
 				newDate.add(Calendar.MONTH, monthAddValueInt);
+				newDate.add(Calendar.DAY_OF_YEAR, dayAddValueInt);
 				newDate.add(Calendar.HOUR, hourAddValueInt);
 				newDate.add(Calendar.MINUTE, minuteAddValueInt);
 				Date newTimerDate = newDate.getTime();
 				((TimerEntity) job).setDuedate(newTimerDate);
 				LOGGER.debug("--- NUOVO Duedate: {}, getId: {}, timerName: {}", job.getDuedate(), job.getId(), timerName);
+				int giorni = ((job.getDuedate().getDate()) - newDate.getTime().getDate()) ;
+				LOGGER.debug("--- La differenza di giorni sarà: {}", job.getDuedate(), job.getId(), timerName);
 			}
 		}
 		//JobQuery jobQuery =  execution.getEngineServices().getManagementService().createJobQuery().processInstanceId(processInstanceId);
