@@ -30,23 +30,23 @@ public final class Utils {
     public static final String TASK_EXECUTOR = "esecutore";
     public static final String PROCESS_VISUALIZER = "visualizzatore";
 
+    public static final String TASK_PARAMS = "taskParams";
     public static final String PROCESS_PARAMS = "processParams";
+    public static final String ERRORE_NELLA_LETTURE_DELLO_STREAM_DELLA_REQUEST = "Errore nella letture dello stream della request";
     public static final String ASC = "ASC";
     public static final String DESC = "DESC";
     public static final String ALL_PROCESS_INSTANCES = "all";
     public static final String LESS = "Less";
-    public static final String ERRORE_NELLA_LETTURE_DELLO_STREAM_DELLA_REQUEST = "Errore nella letture dello stream della request";
-    private static final String TASK_PARAMS = "taskParams";
     private static final String GREAT = "Great";
-    private static final String ERRORE_NEL_PARSING_DELLA_DATA = "Errore nel parsing della data {} - ";
     private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
-    private static final String ROLE = "ROLE_";
+    private static final String ERRORE_NEL_PARSING_DELLA_DATA = "Errore nel parsing della data {} - ";
     private static final String TEXT_EQUAL = "textEqual";
     private static final String BOOLEAN = "boolean";
+    private static final String ROLE = "ROLE_";
     @Autowired
     private static RestResponseFactory restResponseFactory;
-    private static DateFormat formatoData = new SimpleDateFormat("yyyy-MM-dd");
-    private static DateFormat formatoDataOra = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);
+    private DateFormat formatoData = new SimpleDateFormat("yyyy-MM-dd");
+    private DateFormat formatoDataOra = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);
 
     public static boolean isEmpty(String in) {
         return in == null || in.equals("");
@@ -155,7 +155,7 @@ public final class Utils {
 
     public Query searchParamsForProcess(HttpServletRequest req, HistoricProcessInstanceQuery processQuery) {
         try {
-            JSONArray processParams = new JSONObject(IOUtils.toString(req.getReader())).getJSONArray("processParams");
+            JSONArray processParams = new JSONObject(IOUtils.toString(req.getReader())).getJSONArray(PROCESS_PARAMS);
 
             for (int i = 0; i < processParams.length(); i++) {
                 JSONObject appo = processParams.optJSONObject(i);
@@ -225,7 +225,7 @@ public final class Utils {
         return taskQuery;
     }
 
-    public TaskInfoQuery extractTaskSearchParams(TaskInfoQuery taskQuery, JSONArray taskParams) {
+    private TaskInfoQuery extractTaskSearchParams(TaskInfoQuery taskQuery, JSONArray taskParams) {
 
         for (int i = 0; i < taskParams.length(); i++) {
             JSONObject appo = taskParams.optJSONObject(i);
@@ -275,16 +275,23 @@ public final class Utils {
         return taskQuery;
     }
 
-    public static String formattaDataOra(Date in) {
+    public String formattaDataOra(Date in) {
         return formatoDataOra.format(in);
     }
 
-    public static String formattaData(Date in) {
+    public String formattaData(Date in) {
         return formatoData.format(in);
     }
 
-    public static Date parsaData(String in) throws ParseException {
+    public Date parsaData(String in) throws ParseException {
         return formatoData.parse(in);
+    }
+
+
+    public String[] getArray(List<String> tupla) {
+        String[] entries = new String[tupla.size()];
+        entries = tupla.toArray(entries);
+        return entries;
     }
 
     private TaskInfoQuery historicTaskDate(TaskInfoQuery taskQuery, String key, String value) {
