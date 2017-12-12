@@ -1,8 +1,6 @@
 package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
-import com.hazelcast.security.SecurityContext;
-
 import it.cnr.si.security.AuthoritiesConstants;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.repository.DeploymentBuilder;
@@ -17,16 +15,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
-import javax.persistence.criteria.CriteriaBuilder.Case;
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -67,8 +59,8 @@ public class FlowsProcessDefinitionResource {
     public boolean canStartProcesByDefinitionKey(String definitionKey) {
 
         Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-        return authorities.stream().anyMatch(a -> a.getAuthority().startsWith("ROLE_abilitati#"+ definitionKey + "@"));
-
+        return authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") ||
+                a.getAuthority().startsWith("ROLE_abilitati#" + definitionKey + "@"));
     }
 
 
