@@ -36,6 +36,7 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.List;
 
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
 import static org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA_BOLD;
 
 
@@ -78,17 +79,17 @@ public class SummaryPdfService {
         ArrayList<Map> tasksSortedList = (ArrayList<Map>) map.get("history");
         Collections.reverse(tasksSortedList);  //ordino i task rispetto alla data di creazione (in senso crescente)
 
-//      genero il titolo del pdf (la bussineskey (es: "Acquisti Trasparenza-2017-1") + titoloIstanzaFlusso (es: "acquisto pc")
+//      genero il titolo del pdf (la bussineskey (es: "Acquisti Trasparenza-2017-1") + oggetto (es: "acquisto pc")
         String titolo = processInstance.getBusinessKey() + "\n";
         Optional<RestVariable> variable = variables.stream()
-                .filter(a -> (a.getName()).equals("titoloIstanzaFlusso"))
+                .filter(a -> (a.getName().equals(oggetto.name())))
                 .findFirst();
         if (variable.isPresent())
             titolo += variable.get().getValue() + "\n\n";
         else {
-            // Titolo nel file pdf in caso di Workflow Definition che non ha il titolo nella variabile "titoloIstanzaFlusso"
+            // Titolo nel file pdf in caso di Workflow Definition che non ha il titolo nella variabile "oggetto"
             variable = variables.stream()
-                    .filter(a -> (a.getName()).equals("title"))
+                    .filter(a -> (a.getName()).equals(title.name()))
                     .findFirst();
 
             titolo += variable.get().getValue() + "\n\n";
@@ -98,24 +99,16 @@ public class SummaryPdfService {
         //variabili da visualizzare per forza (se presenti)
         for (RestVariable var : variables) {
             String variableName = var.getName();
-            switch (variableName) {
-                case "initiator":
-                    paragraphField.addText("Avviato da: " + var.getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
-                    break;
-                case "startDate":
-                    if (var.getValue() != null)
-                        paragraphField.addText("Avviato il: " + formatDate(Utils.parsaData((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
-
-                    break;
-                case "endDate":
-                    if (var.getValue() != null)
-                        paragraphField.addText("Terminato il: " + formatDate(Utils.parsaData((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
-
-                    break;
-                case "gruppoRA":
-                    paragraphField.addText("Gruppo Responsabile Acquisti: " + var.getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
-
-                    break;
+            if (variableName.equals(initiator.name())) {
+                paragraphField.addText("Avviato da: " + var.getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
+            } else if (variableName.equals(startDate.name())) {
+                if (var.getValue() != null)
+                    paragraphField.addText("Avviato il: " + formatDate(Utils.parsaData((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
+            } else if (variableName.equals(endDate.name())) {
+                if (var.getValue() != null)
+                    paragraphField.addText("Terminato il: " + formatDate(Utils.parsaData((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
+            } else if (variableName.equals(gruppoRA.name())) {
+                paragraphField.addText("Gruppo Responsabile Acquisti: " + var.getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
             }
         }
 
