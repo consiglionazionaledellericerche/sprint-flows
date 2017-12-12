@@ -1,16 +1,8 @@
 package it.cnr.si.flows.ng.aop;
 
-import java.util.Arrays;
-import java.util.Map;
-
-import javax.inject.Inject;
-
+import it.cnr.si.security.SecurityUtils;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.AfterThrowing;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.actuate.audit.AuditEvent;
@@ -19,7 +11,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
 import org.springframework.stereotype.Component;
 
-import it.cnr.si.security.SecurityUtils;
+import javax.inject.Inject;
+import java.util.Map;
+
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.title;
 
 @Aspect
 @Component
@@ -48,7 +43,7 @@ public class AuditingAspect {
 
         Object[] args = joinPoint.getArgs();
 
-        AuditEvent event = new AuditEvent(username, "EMAIL_SEND_FAILURE", "groupName="+ groupName, "title="+ variables.get("title"), "notificationType="+ notificationType);
+        AuditEvent event = new AuditEvent(username, "EMAIL_SEND_FAILURE", "groupName=" + groupName, title.name() + "=" + variables.get(title.name()), "notificationType=" + notificationType);
         repo.add(event);
     }
 

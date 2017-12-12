@@ -70,6 +70,7 @@ public class Enum {
         RimozioneDaPubblicazione
     }
 
+
     public enum ProcessDefinitionEnum {
         acquisti("acquisti"),
         permessiFerie("permessi-ferie");
@@ -83,5 +84,17 @@ public class Enum {
         public String getValue() {
             return value;
         }
+    }
+
+
+    public enum VariableEnum {
+        initiator,
+        title,
+        oggetto,
+        descrizione,
+        idStruttura,
+        startDate,
+        endDate,
+        gruppoRA;
     }
 }

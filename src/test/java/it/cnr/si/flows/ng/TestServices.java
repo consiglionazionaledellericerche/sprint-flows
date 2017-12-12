@@ -27,6 +27,8 @@ import java.util.List;
 
 import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
 import static it.cnr.si.flows.ng.utils.Enum.SiglaList.TIPOLOGIA_ACQUISIZIONE;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.descrizione;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.oggetto;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -156,8 +158,8 @@ public class TestServices {
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
         req.setParameter("processDefinitionId", processDefinition);
         if (processDefinitionKey.equals(acquisti.getValue())) {
-            req.setParameter("titoloIstanzaFlusso", TITOLO_DELL_ISTANZA_DEL_FLUSSO);
-            req.setParameter("descrizioneAcquisizione", "descrizione");
+            req.setParameter(oggetto.name(), TITOLO_DELL_ISTANZA_DEL_FLUSSO);
+            req.setParameter(descrizione.name(), "descrizione");
             req.setParameter(TIPOLOGIA_ACQUISIZIONE.name(), "procedura aperta");
             req.setParameter("tipologiaAcquisizioneId", "11");
             req.setParameter("strumentoAcquisizione", "AFFIDAMENTO DIRETTO - MEPA o CONSIP\n");
