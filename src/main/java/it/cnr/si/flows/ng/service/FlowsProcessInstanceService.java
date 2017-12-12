@@ -70,6 +70,8 @@ public class FlowsProcessInstanceService {
     PermissionEvaluatorImpl permissionEvaluator;
     @Inject
     private FlowsUserDetailsService flowsUserDetailsService;
+    private Utils utils = new Utils();
+
 
 
     public Map<String, Object> getProcessInstanceWithDetails(String processInstanceId) {
@@ -230,7 +232,7 @@ public class FlowsProcessInstanceService {
             ArrayList<String> tupla = new ArrayList<>();
             //field comuni a tutte le Process Instances (Business Key, Start date)
             tupla.add(pi.getBusinessKey());
-            tupla.add(Utils.formattaDataOra(pi.getStartTime()));
+            tupla.add(utils.formattaDataOra(pi.getStartTime()));
 
             //field specifici per ogni procesDefinition
             if (view != null) {
@@ -245,10 +247,10 @@ public class FlowsProcessInstanceService {
             }
             if (!hasHeaders) {
                 //inserisco gli headers come intestazione dei field del csv
-                entriesIterable.add(0, getArray(headers));
+                entriesIterable.add(0, utils.getArray(headers));
                 hasHeaders = true;
             }
-            entriesIterable.add(getArray(tupla));
+            entriesIterable.add(utils.getArray(tupla));
         }
         writer.writeAll(entriesIterable);
         writer.close();
@@ -257,7 +259,7 @@ public class FlowsProcessInstanceService {
 
     private void processDate(HistoricProcessInstanceQuery taskQuery, String key, String value) {
         try {
-            Date date = Utils.parsaData(value);
+            Date date = utils.parsaData(value);
 
             if (key.contains("Less")) {
                 taskQuery.variableValueLessThanOrEqual(key.replace("Less", ""), date);
@@ -266,12 +268,5 @@ public class FlowsProcessInstanceService {
         } catch (ParseException e) {
             LOGGER.error("Errore nel parsing della data {} - ", value, e);
         }
-    }
-
-
-    private String[] getArray(ArrayList<String> tupla) {
-        String[] entries = new String[tupla.size()];
-        entries = tupla.toArray(entries);
-        return entries;
     }
 }
