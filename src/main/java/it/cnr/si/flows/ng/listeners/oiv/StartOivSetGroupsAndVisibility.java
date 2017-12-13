@@ -13,6 +13,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,18 +40,26 @@ public class StartOivSetGroupsAndVisibility implements ExecutionListener {
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
 
 		String struttura = "99999";
-		String gruppoIstruttori = "gruppoIstruttori@"+ struttura;
+		String gruppoIstruttori = "istruttore@"+ struttura;
 		String gruppoDirettore = "direttore@"+ struttura;
 		String gruppoCoordinatoreResponsabile = "coordinatoreresponsabile@"+ struttura;
+
 		execution.setVariable("gruppoIstruttori", gruppoIstruttori);
 		execution.setVariable("gruppoDirettore", gruppoDirettore);
 		execution.setVariable("gruppoCoordinatoreResponsabile", gruppoCoordinatoreResponsabile);
-
+		
 		LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoIstruttori, gruppoDirettore, gruppoCoordinatoreResponsabile);
 
+		//conversione semplice di date
+		if (execution.getVariable("valutazioneEsperienze_json") !=  null) {
+			String valutazioneEsperienze_json = execution.getVariable("valutazioneEsperienze_json").toString(); 
+			valutazioneEsperienze_json = valutazioneEsperienze_json.replaceAll("T23:00:00.000Z", "");
+			execution.setVariable("valutazioneEsperienze_json", valutazioneEsperienze_json);
+		}
 
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoIstruttori, PROCESS_VISUALIZER);
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoDirettore, PROCESS_VISUALIZER);
+		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoCoordinatoreResponsabile, PROCESS_VISUALIZER);
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoCoordinatoreResponsabile, PROCESS_VISUALIZER);
 
 	}
