@@ -59,6 +59,33 @@
 				getAttachments: function(taskId) {
 					return $http.get('api/attachments/task/'+ taskId);
 				},
+                search: function (processInstance, active, params, order, firstResult, maxResults) {
+                    var processInstanceId;
+                    if (processInstance !== undefined) {
+                        processInstanceId = processInstance.key;
+                    } else {
+                        processInstanceId = 'all';
+                    }
+                    return $http.post('api/tasks/search/' + processInstanceId +
+                        '?active=' + active +
+                        '&order=' + order +
+                        '&firstResult=' + firstResult +
+                        '&maxResults=' + maxResults, params);
+                },
+                exportCsv: function (processInstance, active, params, order, firstResult, maxResults) {
+                    var processInstanceId;
+                    if (processInstance !== undefined) {
+                        processInstanceId = processInstance.key;
+                    } else {
+                        processInstanceId = 'all';
+                    }
+
+                    return $http.post('api/tasks/exportCsv/' + processInstanceId +
+                        '?active=' + active +
+                        '&order=' + order +
+                        '&firstResult=' + firstResult +
+                        '&maxResults=' + maxResults, params);
+                }
 			},
 			processInstances: {
 				byProcessInstanceId : function(processInstanceId) {
