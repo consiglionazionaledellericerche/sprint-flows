@@ -38,41 +38,28 @@
         $scope.search = function() {
             var maxResults = vm.itemsPerPage,
                 firstResult = vm.itemsPerPage * (vm.page - 1);
-            if (vm.taskQuery) {
-                dataService.tasks.search($scope.current, vm.active, exstractSearchParams(), vm.order, firstResult, maxResults)
-                    .then(function (response) {
-                        vm.processInstances = utils.refactoringVariables(response.data.processInstances);
-                        // variabili per la gestione della paginazione
-                        vm.totalItems = response.data.totalItems;
-                        vm.queryCount = vm.totalItems;
-                    }, function (response) {
-                        $log.error(response);
-                    });
-            } else {
-                dataService.processInstances.search($scope.current, vm.active, exstractSearchParams(), vm.order, firstResult, maxResults)
-                    .then(function (response) {
-                        vm.processInstances = utils.refactoringVariables(response.data.processInstances);
-                        // variabili per la gestione della paginazione
-                        vm.totalItems = response.data.totalItems;
-                        vm.queryCount = vm.totalItems;
-                    }, function (response) {
-                        $log.error(response);
-                    });
-            }
+            dataService.processInstances.search($scope.current, vm.active, exstractSearchParams(), vm.order, firstResult, maxResults)
+                .then(function (response) {
+                    vm.processInstances = utils.refactoringVariables(response.data.processInstances);
+                    // variabili per la gestione della paginazione
+                    vm.totalItems = response.data.totalItems;
+                    vm.queryCount = vm.totalItems;
+                }, function (response) {
+                    $log.error(response);
+                });
         };
 
 
         $scope.exportCsv = function() {
-            if ()
-                dataService.processInstances.exportCsv($scope.current, vm.active, exstractSearchParams(), vm.order, -1, -1)
-                    .success(function(response) {
-                        var filename = new Date().toISOString().slice(0, 10) + ".xls",
-                            file = new Blob([response], {
-                                type: 'application/vnd.ms-excel'
-                            });
-                        $log.info(file, filename);
-                        saveAs(file, filename);
-                    });
+            dataService.processInstances.exportCsv($scope.current, vm.active, exstractSearchParams(), vm.order, -1, -1)
+                .success(function (response) {
+                    var filename = new Date().toISOString().slice(0, 10) + ".xls",
+                        file = new Blob([response], {
+                            type: 'application/vnd.ms-excel'
+                        });
+                    $log.info(file, filename);
+                    saveAs(file, filename);
+                });
         };
 
 
