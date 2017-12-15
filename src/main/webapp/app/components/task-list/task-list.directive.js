@@ -16,7 +16,7 @@
       templateUrl: 'app/components/task-list/task-list.html',
       link: function (scope, element, attrs) {
 
-        scope.actionButtons = attrs.actionButtons
+          scope.actionButtons = attrs.actionButtons;
 
         scope.completed = attrs.completed;
 
