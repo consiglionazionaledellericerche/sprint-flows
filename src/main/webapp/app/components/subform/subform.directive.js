@@ -13,6 +13,7 @@
             templateUrl: 'app/components/subform/subform.html',
             scope: {
                 ngModel: '=',
+                json: '=',
                 label: '@',
                 multiple: '@',
                 subformName: '@'
@@ -20,6 +21,9 @@
             link: function ($scope, element, attrs) {
                 var subform = this;
                 $scope.subform = subform;
+
+                if ($scope.json !== undefined)
+                  $scope.ngModel = JSON.parse($scope.json);
 
                 subform.formUrl = 'api/forms/'+ $scope.$parent.vm.processDefinitionKey +"/"+$scope.$parent.vm.processVersion +"/"+ $scope.subformName;
 
