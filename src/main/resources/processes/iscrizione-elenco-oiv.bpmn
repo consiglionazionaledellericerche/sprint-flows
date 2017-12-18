@@ -5,13 +5,13 @@
       <activiti:executionListener event="start" delegateExpression="${startOivSetGroupsAndVisibility}"></activiti:executionListener>
     </extensionElements>
     <sequenceFlow id="flow47" sourceRef="boundarytimer2" targetRef="usertask6"></sequenceFlow>
-    <subProcess id="istruttoria" name="ISTRUTTORIA">
+    <subProcess id="valutazione-domande" name="VALUTAZIONE DOMANDE">
       <startEvent id="startevent1" name="Start"></startEvent>
-      <sequenceFlow id="flow10" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
-      <userTask id="usertask1" name="ISTRUTTORIA" activiti:candidateGroups="${gruppoIstruttori}"></userTask>
-      <sequenceFlow id="flow4" sourceRef="usertask1" targetRef="exclusivegateway1"></sequenceFlow>
+      <sequenceFlow id="flow10" sourceRef="startevent1" targetRef="istruttoria"></sequenceFlow>
+      <userTask id="istruttoria" name="ISTRUTTORIA" activiti:candidateGroups="${gruppoIstruttori}"></userTask>
+      <sequenceFlow id="flow4" sourceRef="istruttoria" targetRef="exclusivegateway1"></sequenceFlow>
       <userTask id="usertask2" name="SOCCORSO ISTRUTTORIO" activiti:candidateUsers="${initiator}"></userTask>
-      <sequenceFlow id="flow32" sourceRef="usertask2" targetRef="usertask1"></sequenceFlow>
+      <sequenceFlow id="flow32" sourceRef="usertask2" targetRef="istruttoria"></sequenceFlow>
       <boundaryEvent id="boundarytimer2" name="Timer" attachedToRef="usertask2" cancelActivity="true">
         <timerEventDefinition>
           <timeDuration>P30D</timeDuration>
@@ -22,7 +22,7 @@
       <sequenceFlow id="flow6" sourceRef="exclusivegateway1" targetRef="usertask6"></sequenceFlow>
       <sequenceFlow id="flow35" sourceRef="exclusivegateway1" targetRef="usertask10"></sequenceFlow>
       <userTask id="usertask10" name="CAMBIO ISTRUTTORE" activiti:candidateGroups="${gruppoCoordinatoreResponsabile}"></userTask>
-      <sequenceFlow id="flow36" sourceRef="usertask10" targetRef="usertask1"></sequenceFlow>
+      <sequenceFlow id="flow36" sourceRef="usertask10" targetRef="istruttoria"></sequenceFlow>
       <userTask id="usertask6" name="VALUTAZIONE" activiti:candidateGroups="${gruppoCoordinatoreResponsabile}"></userTask>
       <endEvent id="endevent2" name="End"></endEvent>
       <userTask id="usertask14" name="FIRMA DG PREAVVISO RIGETTO" activiti:candidateGroups="${gruppoDirettore}"></userTask>
@@ -56,7 +56,7 @@
       <sequenceFlow id="flow79" sourceRef="exclusivegateway12" targetRef="usertask17"></sequenceFlow>
       <endEvent id="endevent10" name="End"></endEvent>
       <sequenceFlow id="flow80" name="respinta" sourceRef="exclusivegateway12" targetRef="endevent10"></sequenceFlow>
-      <sequenceFlow id="flow81" sourceRef="usertask19" targetRef="usertask1"></sequenceFlow>
+      <sequenceFlow id="flow81" sourceRef="usertask19" targetRef="istruttoria"></sequenceFlow>
       <sequenceFlow id="flow83" sourceRef="usertask16" targetRef="usertask17"></sequenceFlow>
       <sequenceFlow id="flow84" sourceRef="exclusivegateway1" targetRef="endevent8"></sequenceFlow>
       <exclusiveGateway id="exclusivegateway13" name="Exclusive Gateway" default="flow86"></exclusiveGateway>
@@ -66,8 +66,8 @@
       <sequenceFlow id="flow89" sourceRef="exclusivegateway13" targetRef="usertask2"></sequenceFlow>
     </subProcess>
     <startEvent id="startevent2" name="Start"></startEvent>
-    <sequenceFlow id="flow48" sourceRef="startevent2" targetRef="istruttoria"></sequenceFlow>
-    <boundaryEvent id="boundarytimer3" name="Timer" attachedToRef="istruttoria" cancelActivity="false">
+    <sequenceFlow id="flow48" sourceRef="startevent2" targetRef="valutazione-domande"></sequenceFlow>
+    <boundaryEvent id="boundarytimer3" name="Timer" attachedToRef="valutazione-domande" cancelActivity="false">
       <timerEventDefinition>
         <timeDuration>P30D</timeDuration>
       </timerEventDefinition>
@@ -78,17 +78,17 @@
 </script>
     </scriptTask>
     <endEvent id="endevent11" name="End"></endEvent>
-    <sequenceFlow id="flow82" sourceRef="istruttoria" targetRef="endevent11"></sequenceFlow>
+    <sequenceFlow id="flow82" sourceRef="valutazione-domande" targetRef="endevent11"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_iscrizione-elenco-oiv">
     <bpmndi:BPMNPlane bpmnElement="iscrizione-elenco-oiv" id="BPMNPlane_iscrizione-elenco-oiv">
-      <bpmndi:BPMNShape bpmnElement="istruttoria" id="BPMNShape_istruttoria">
+      <bpmndi:BPMNShape bpmnElement="valutazione-domande" id="BPMNShape_valutazione-domande">
         <omgdc:Bounds height="561.0" width="585.0" x="76.0" y="10.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
         <omgdc:Bounds height="35.0" width="35.0" x="87.0" y="169.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+      <bpmndi:BPMNShape bpmnElement="istruttoria" id="BPMNShape_istruttoria">
         <omgdc:Bounds height="55.0" width="105.0" x="160.0" y="159.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
@@ -206,7 +206,7 @@
         <omgdi:waypoint x="410.0" y="53.0"></omgdi:waypoint>
         <omgdi:waypoint x="576.0" y="52.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="62.0" x="576.0" y="23.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="62.0" x="591.0" y="8.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow72" id="BPMNEdge_flow72">
@@ -266,7 +266,7 @@
         <omgdi:waypoint x="501.0" y="274.0"></omgdi:waypoint>
         <omgdi:waypoint x="581.0" y="274.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="571.0" y="240.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="49.0" x="571.0" y="240.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow87" id="BPMNEdge_flow87">

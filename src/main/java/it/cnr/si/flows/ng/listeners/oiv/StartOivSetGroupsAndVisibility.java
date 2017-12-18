@@ -51,11 +51,11 @@ public class StartOivSetGroupsAndVisibility implements ExecutionListener {
 		LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoIstruttori, gruppoDirettore, gruppoCoordinatoreResponsabile);
 
 		//conversione semplice di date
-		if (execution.getVariable("valutazioneEsperienze_json") !=  null) {
-			String valutazioneEsperienze_json = execution.getVariable("valutazioneEsperienze_json").toString(); 
-			valutazioneEsperienze_json = valutazioneEsperienze_json.replaceAll("T23:00:00.000Z", "");
-			execution.setVariable("valutazioneEsperienze_json", valutazioneEsperienze_json);
-		}
+//		if (execution.getVariable("valutazioneEsperienze_json") !=  null) {
+//			String valutazioneEsperienze_json = execution.getVariable("valutazioneEsperienze_json").toString(); 
+//			valutazioneEsperienze_json = valutazioneEsperienze_json.replaceAll("T23:00:00.000Z", "");
+//			execution.setVariable("valutazioneEsperienze_json", valutazioneEsperienze_json);
+//		}
 
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoIstruttori, PROCESS_VISUALIZER);
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoDirettore, PROCESS_VISUALIZER);
