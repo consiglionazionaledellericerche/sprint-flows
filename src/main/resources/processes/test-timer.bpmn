@@ -23,6 +23,16 @@
               <activiti:string><![CDATA[2]]></activiti:string>
             </activiti:field>
           </activiti:executionListener>
+          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.oiv.SetTimerToNow">
+            <activiti:field name="timeVariable">
+              <activiti:string><![CDATA[T10]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" class="it.cnr.si.flows.ng.listeners.oiv.SetTimerToNow">
+            <activiti:field name="timeVariable">
+              <activiti:string><![CDATA[T11]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
         </extensionElements>
       </userTask>
       <sequenceFlow id="flow28" sourceRef="startevent2" targetRef="applica"></sequenceFlow>
@@ -51,6 +61,17 @@
             </activiti:field>
             <activiti:field name="minuteAddValue">
               <activiti:string><![CDATA[5]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.oiv.CalcolaTempi">
+            <activiti:field name="timeVariableStart">
+              <activiti:string><![CDATA[T10]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="timeVariableStop">
+              <activiti:string><![CDATA[T11]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="timeVariableRecord">
+              <activiti:string><![CDATA[T12]]></activiti:string>
             </activiti:field>
           </activiti:executionListener>
         </extensionElements>
