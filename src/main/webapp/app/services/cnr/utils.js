@@ -50,7 +50,7 @@
                         appo["key"] = fieldName;
                         appo["value"] = field.value;
                         appo["type"] = field.getAttribute("type");
-                        if (field.id.includes("initiator") || field.id.includes("titoloIstanzaFlusso")) {
+                        if (field.id.includes("initiator") || field.id.includes("oggetto")) {
                             processParams.push(appo);
                         } else {
                             taskParams.push(appo);
