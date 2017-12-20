@@ -28,6 +28,7 @@ public class FlowsProcessEngineConfigurations {
     private static final String ACTIVITI_VERSION = "5.22.0";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsProcessEngineConfigurations.class);
+    public static final int VARIABLE_LIMIT = 200000;
 
     @Value("${cnr.activiti.diagram-font}")
     private String diagramFont;
@@ -77,8 +78,9 @@ public class FlowsProcessEngineConfigurations {
 
         // FULL serve per la storia dei documenti
         conf.setHistoryLevel(HistoryLevel.FULL);
-        //Serve per recuperare molte process istances nelle search dell'app (si riferisce al numero di variabili recuperabili nelle query (default 20000))
-        conf.setHistoricProcessInstancesQueryLimit(200000);
+        //Serve per recuperare molte process istances/task nelle search dell'app (si riferisce al numero di variabili recuperabili nelle query (default 20000))
+        conf.setHistoricProcessInstancesQueryLimit(VARIABLE_LIMIT);
+        conf.setHistoricTaskQueryLimit(VARIABLE_LIMIT);
 
         // abbiamo implementato delle query custom
         // @See it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery.java
