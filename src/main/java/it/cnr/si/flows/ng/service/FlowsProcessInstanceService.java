@@ -142,7 +142,7 @@ public class FlowsProcessInstanceService {
     public Map<String, Object> search(HttpServletRequest req, String processInstanceId, boolean active, String order, int firstResult, int maxResults) {
         Map<String, Object> result = new HashMap<>();
         try {
-            JSONArray params = new JSONObject(IOUtils.toString(req.getReader())).getJSONArray("params");
+            JSONArray params = new JSONObject(IOUtils.toString(req.getReader())).getJSONArray("processParams");
             //verificato sperimentalmente che è più veloce fare una query normale e poi filtrare con lo stream parallelo che fare la
             // nostra query customizzata sugli identityLink e poi verificare solo i permessi speciali ("responsabile" e "supervisore")
             HistoricProcessInstanceQuery processQuery = historyService.createHistoricProcessInstanceQuery();
