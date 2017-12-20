@@ -72,7 +72,7 @@
 
         <foreach collection="queryVariableValues" index="index"
             item="queryVariableValue">
-            <if test="queryVariableValue.name.equals('titoloIstanzaFlusso')">
+            <if test="queryVariableValue.name.equals('oggetto')">
                 inner join ${prefix}ACT_HI_VARINST A${index} on RES.PROC_INST_ID_ =
                 A${index}.PROC_INST_ID_
             </if>
@@ -237,7 +237,7 @@
             </if>
             <foreach collection="queryVariableValues" index="index"
                 item="queryVariableValue">
-                <if test="queryVariableValue.name.equals('titoloIstanzaFlusso')">
+                <if test="queryVariableValue.name.equals('oggetto')">
                     <if test="queryVariableValue.name != null">
                         <!-- Match-all variable-names when name is null todo:MODIFICARE QUI?-->
                         and A${index}.NAME_= #{queryVariableValue.name}
