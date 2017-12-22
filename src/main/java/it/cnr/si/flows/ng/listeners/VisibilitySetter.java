@@ -12,8 +12,6 @@ import org.activiti.engine.delegate.event.ActivitiEventListener;
 import org.activiti.engine.delegate.event.ActivitiEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEntityEventImpl;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
-import org.activiti.engine.impl.persistence.entity.VariableInstance;
-import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.IdentityLinkType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +38,6 @@ public class VisibilitySetter implements ActivitiEventListener {
             TaskEntity task = (TaskEntity) taskEvent.getEntity();
 
             String processInstanceId = event.getProcessInstanceId();
-            Map<String, Object> variables = runtimeService.getVariables(event.getExecutionId());
 
             String processDefinitionId = task.getProcessDefinitionId();
             String currentTaskKey = task.getTaskDefinitionKey();
@@ -49,30 +46,27 @@ public class VisibilitySetter implements ActivitiEventListener {
             setAdditionalVisibilityRules(event, processInstanceId, processDefinitionId, currentTaskKey);
 
         } else if (event.getType().equals(ActivitiEventType.PROCESS_STARTED)) {
-        	
-            ActivitiEntityEventImpl processEvent = (ActivitiEntityEventImpl) event;
-            
-            String executionId = event.getExecutionId();
-            Map<String, Object> variables = runtimeService.getVariables(executionId);
+
+            Map<String, Object> variables = runtimeService.getVariables(event.getExecutionId());
             String processInstanceId = event.getProcessInstanceId();
 
-            String processDefinitionKeyVersionated = (String) variables.get("processDefinitionId"); 
+            String processDefinitionKeyVersionated = (String) variables.get("processDefinitionId");
             String processDefinitionKey = processDefinitionKeyVersionated.split(":")[0];
-//            if (processDefinitionKey != null) {
-//                runtimeService.addGroupIdentityLink(processInstanceId, "supervisore#"+ processDefinitionKey, Utils.PROCESS_VISUALIZER);
-//                runtimeService.addGroupIdentityLink(processInstanceId, "responsabile#"+ processDefinitionKey, Utils.PROCESS_VISUALIZER);
-//                runtimeService.addGroupIdentityLink(processInstanceId, "supervisore#flussi", Utils.PROCESS_VISUALIZER);
-//                runtimeService.addGroupIdentityLink(processInstanceId, "responsabile#flussi", Utils.PROCESS_VISUALIZER);            	
-//            }
-//     
-//            String idStruttura = (String) variables.get("idStruttura");
-//            if (idStruttura!= null) {
-//                // TODO inserire if se è un flusso organizzato per strutture
-//                runtimeService.addGroupIdentityLink(processInstanceId, "supervisore#"+ processDefinitionKey +"@"+ idStruttura, Utils.PROCESS_VISUALIZER);
-//                runtimeService.addGroupIdentityLink(processInstanceId, "responsabile#"+ processDefinitionKey +"@"+ idStruttura, Utils.PROCESS_VISUALIZER);
-//                runtimeService.addGroupIdentityLink(processInstanceId, "supervisore-struttura@"+ idStruttura , Utils.PROCESS_VISUALIZER);
-//                runtimeService.addGroupIdentityLink(processInstanceId, "responsabile-struttura@"+ idStruttura, Utils.PROCESS_VISUALIZER);            	
-//            }
+            if (processDefinitionKey != null) {
+                runtimeService.addGroupIdentityLink(processInstanceId, "supervisore#"+ processDefinitionKey, Utils.PROCESS_VISUALIZER);
+                runtimeService.addGroupIdentityLink(processInstanceId, "responsabile#"+ processDefinitionKey, Utils.PROCESS_VISUALIZER);
+                runtimeService.addGroupIdentityLink(processInstanceId, "supervisore#flussi", Utils.PROCESS_VISUALIZER);
+                runtimeService.addGroupIdentityLink(processInstanceId, "responsabile#flussi", Utils.PROCESS_VISUALIZER);
+            }
+
+            String idStruttura = (String) variables.get("idStruttura");
+            if (idStruttura!= null) {
+                // TODO inserire if se è un flusso organizzato per strutture
+                runtimeService.addGroupIdentityLink(processInstanceId, "supervisore#"+ processDefinitionKey +"@"+ idStruttura, Utils.PROCESS_VISUALIZER);
+                runtimeService.addGroupIdentityLink(processInstanceId, "responsabile#"+ processDefinitionKey +"@"+ idStruttura, Utils.PROCESS_VISUALIZER);
+                runtimeService.addGroupIdentityLink(processInstanceId, "supervisore-struttura@"+ idStruttura , Utils.PROCESS_VISUALIZER);
+                runtimeService.addGroupIdentityLink(processInstanceId, "responsabile-struttura@"+ idStruttura, Utils.PROCESS_VISUALIZER);
+            }
         }
     }
 
