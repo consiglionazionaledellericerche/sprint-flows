@@ -19,7 +19,10 @@
             'angular-loading-bar',
             'ui.ace',
             'ngJsTree',
-            'bootstrapLightbox'
+            'bootstrapLightbox',
+            'toggle-switch',
+            'ui.select',
+            'ngSanitize'
         ])
         .run(run);
 

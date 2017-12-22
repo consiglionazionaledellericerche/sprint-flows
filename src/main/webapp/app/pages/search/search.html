@@ -6,7 +6,7 @@
           <a class="pointer" ng-click="showProcessInstances(true)" data-toggle="tab">
             <h3>
               <i class="glyphicon glyphicon-edit"></i>
-              Flussi attivi
+                {{$rootScope.isTaskQuery ? 'Task' : 'Flussi'}} attivi
             </h3>
           </a>
         </li>
@@ -14,7 +14,7 @@
           <a class="pointer" ng-click="showProcessInstances(false)" data-toggle="tab">
             <h3>
               <i class="glyphicon glyphicon-check"></i>
-              Flussi terminati
+                {{$rootScope.isTaskQuery ? 'Task' : 'Flussi'}} terminati
             </h3>
           </a>
         </li>
@@ -23,11 +23,25 @@
   </div>
   <div class="row">
     <div class="col-md-3 padding-top">
-      <br>
+        <div>
+            <h4>Search type</h4>
+            <div>
+                <toggle-switch
+                        ng-model="$rootScope.isTaskQuery"
+                        ng-click="switch(!isTaskQuery)"
+                        on-label="Task"
+                        off-label="Flussi"
+                        class="switch-large">
+                </toggle-switch>
+            </div>
+        </div>
+
+        <br>
       <div>
         <h4>Ordinamento temporale</h4>
         <div>
-          <button class="btn btn-default btn-block margin-top-20" ng-click="vm.order ===  'ASC' ?  vm.order='DESC' : vm.order = 'ASC'">
+            <button class="btn btn-default btn-block margin-top-20"
+                    ng-click="vm.order ===  'ASC' ?  vm.order = 'DESC' : vm.order = 'ASC'">
             <span class="glyphicon glyphicon-sort"></span>
             {{vm.order === 'ASC' ? 'Crescente' : 'Descrescente'}}
           </button>
@@ -36,7 +50,9 @@
 
       <br>
       <h4>Tipologie</h4>
-      <workflow-types process-definitions="wfDefsAll" filters="true"></workflow-types>
+        <div id="tipologieDiv">
+            <workflow-types process-definitions="wfDefsAll" filters="true"></workflow-types>
+        </div>
       <br>
       <br>
       <button ng-click="search()" class="btn btn-primary">
@@ -50,17 +66,28 @@
     </div>
 
 
-    <div class="col-md-9">
-      <h3>Flussi {{vm.active ? 'attivi' : 'terminati'}}</h3>
-      <process-list processes="vm.processInstances" paging="paging"> </process-list>
-
-
-    </div>
-
-    <!--paginazione-->
-    <div class="text-center">
-      <jhi-item-count page="vm.page" total="vm.queryCount" items-per-page="vm.itemsPerPage"></jhi-item-count>
-      <uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.page" ng-change="vm.transition()"></uib-pagination>
+      <div id="resultDiv" class="col-md-9">
+          <h3>{{$rootScope.isTaskQuery ? 'Task' : 'Flussi'}} {{vm.active ? 'attivi' : 'terminati'}}</h3>
+          <div ng-show="!$rootScope.isTaskQuery">
+              <process-list processes="vm.processInstances" paging="paging"></process-list>
+              <!--paginazione Process Instances-->
+              <div class="text-center">
+                  <jhi-item-count page="vm.page" total="vm.queryCount"
+                                  items-per-page="vm.itemsPerPage"></jhi-item-count>
+                  <uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.page"
+                                  ng-change="vm.transition()"></uib-pagination>
+              </div>
+          </div>
+          <div ng-show="$rootScope.isTaskQuery">
+              <task-list tasks="vm.taskInstances" action-buttons="false"></task-list>
+              <!--paginazione Task-->
+              <div class="text-center">
+                  <jhi-item-count page="vm.page" total="vm.queryCount"
+                                  items-per-page="vm.itemsPerPage"></jhi-item-count>
+                  <uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.page"
+                                  ng-change="vm.transition()"></uib-pagination>
+              </div>
+          </div>
     </div>
   </div>
 </div>
