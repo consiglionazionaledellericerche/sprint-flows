@@ -50,6 +50,8 @@ public class VisibilitySetter implements ActivitiEventListener {
             Map<String, Object> variables = runtimeService.getVariables(event.getExecutionId());
             String processInstanceId = event.getProcessInstanceId();
 
+            runtimeService.addUserIdentityLink(processInstanceId, variables.get("initiator").toString(), Utils.PROCESS_VISUALIZER);
+
             String processDefinitionKeyVersionated = (String) variables.get("processDefinitionId");
             String processDefinitionKey = processDefinitionKeyVersionated.split(":")[0];
             if (processDefinitionKey != null) {

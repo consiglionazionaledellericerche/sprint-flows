@@ -145,8 +145,78 @@ public class FlowsProcessInstanceService {
         Map<String, Object> result = new HashMap<>();
 
         try {
+<<<<<<< HEAD
             jsonString = IOUtils.toString(req.getReader());
         } catch (Exception e) {
+=======
+            JSONArray params = new JSONObject(IOUtils.toString(req.getReader())).getJSONArray("processParams");
+            //verificato sperimentalmente che è più veloce fare una query normale e poi filtrare con lo stream parallelo che fare la
+            // nostra query customizzata sugli identityLink e poi verificare solo i permessi speciali ("responsabile" e "supervisore")
+            HistoricProcessInstanceQuery processQuery = historyService.createHistoricProcessInstanceQuery();
+
+            List<String> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .map(Utils::removeLeadingRole)
+                    .collect(Collectors.toList());
+
+            if (!processInstanceId.equals(ALL_PROCESS_INSTANCES))
+                processQuery.processDefinitionKey(processInstanceId);
+
+            if (active)
+                processQuery.unfinished();
+            else
+                processQuery.finished();
+
+            for (int i = 0; i < params.length(); i++) {
+                JSONObject appo = params.optJSONObject(i);
+                String key = appo.getString("key");
+                String value = appo.getString("value");
+                String type = appo.getString("type");
+                //wildcard ("%") di default ma non a TUTTI i campi
+                switch (type) {
+                    case "textEqual":
+                        processQuery.variableValueEquals(key, value);
+                        break;
+                    case "boolean":
+                        // gestione variabili booleane
+                        processQuery.variableValueEquals(key, Boolean.valueOf(value));
+                        break;
+                    case "date":
+                        processDate(processQuery, key, value);
+                        break;
+                    default:
+                        //variabili con la wildcard  (%value%)
+                        processQuery.variableValueLikeIgnoreCase(key, "%" + value + "%");
+                        break;
+                }
+            }
+            if (order.equals(ASC))
+                processQuery.orderByProcessInstanceStartTime().asc();
+            else if (order.equals(DESC))
+                processQuery.orderByProcessInstanceStartTime().desc();
+
+            List<HistoricProcessInstanceResponse> historicProcessInstanceResponseList = restResponseFactory.createHistoricProcessInstanceResponseList(processQuery.list());
+
+            //filtro le process instances che l'utente può vedere (solo l'authorities admin ignora le regole di visibilita')
+            historicProcessInstanceResponseList = historicProcessInstanceResponseList.parallelStream()
+                    .filter(pi -> permissionEvaluator.canVisualize(new JSONObject(pi.getName()).getString(idStruttura.name()),
+                                                                   pi.getProcessDefinitionId().split(":")[0],
+                                                                   pi.getId(),
+                                                                   authorities,
+                                                                   SecurityUtils.getCurrentUserLogin()))
+                    .distinct()
+                    .collect(Collectors.toList());
+
+            result.put("totalItems", historicProcessInstanceResponseList.size());
+            if (firstResult != -1 && maxResults != -1)
+                historicProcessInstanceResponseList = historicProcessInstanceResponseList.parallelStream()
+                        .skip(firstResult)
+                        .limit(maxResults)
+                        .collect(Collectors.toList());
+
+            result.put("processInstances", historicProcessInstanceResponseList);
+        } catch (IOException e) {
+>>>>>>> refs/heads/dev
             LOGGER.error("Errore nella letture dello stream della request", e);
         }
         JSONArray params = new JSONObject(jsonString).getJSONArray("params");

@@ -223,7 +223,7 @@ public class FlowsProcessInstanceResourceTest {
         Date tomorrow = cal.getTime();
         cal.add(Calendar.DATE, -2);
         Date yesterday = cal.getTime();
-        String payload = "{params: [{key: " + oggetto + ", value: \"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\", type: textEqual}, " +
+        String payload = "{processParams: [{key: " + oggetto + ", value: \"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\", type: textEqual}, " +
                 "{key: " + initiator.name() + ", value: \"" + TestServices.getRA() + "\", type: text}, " +
                 "{key: " + startDate + "Great, value: \"" + utils.formattaData(yesterday) + "\", type: \"date\"}," +
                 "{key: " + startDate + "Less, value: \"" + utils.formattaData(tomorrow) + "\", type: \"date\"}]}";
@@ -249,7 +249,7 @@ public class FlowsProcessInstanceResourceTest {
 
 
         //parametri sbagliati (strumentoAcquisizioneId 12 invece di 11, initiator = admin invece dell'RA) ==> 0 risultati
-        payload = "{params: [{key: " + oggetto + ", value: \"12\", type: textEqual} , {key: initiator, value: \"admin\", type: text}]}";
+        payload = "{processParams: [{key: " + oggetto + ", value: \"12\", type: textEqual} , {key: initiator, value: \"admin\", type: text}]}";
         req.setContent(payload.getBytes());
         req.setContentType("application/json");
 
@@ -282,7 +282,7 @@ public class FlowsProcessInstanceResourceTest {
         Date tomorrow = cal.getTime();
         cal.add(Calendar.DATE, -2);
         Date yesterday = cal.getTime();
-        String payload = "{params: [{key: " + searchField1 + ", value: \"" + searchValue1 + "\", type: textEqual}, " +
+        String payload = "{processParams: [{key: " + searchField1 + ", value: \"" + searchValue1 + "\", type: textEqual}, " +
                 "{key: " + Enum.VariableEnum.initiator.name() + ", value: \"" + TestServices.getRA() + "\", type: text}, " +
                 "{key: " + startDate + "Great, value: \"" + utils.formattaData(yesterday) + "\", type: \"date\"}," +
                 "{key: " + startDate + "Less, value: \"" + utils.formattaData(tomorrow) + "\", type: \"date\"}]}";
@@ -314,7 +314,7 @@ public class FlowsProcessInstanceResourceTest {
         verifyAuthorities(maxResults, req, searchField1, searchValue1, initiator.name(), LOAD_TEST_PROCESS_INSTANCES + 1);
 
         //parametri sbagliati (strumentoAcquisizioneId 12 invece di 11, initiator = admin invece dell'RA) ==> 0 risultati
-        payload = "{params: [{key: " + searchField1 + ", value: \"12\", type: textEqual} , {key: initiator, value: \"admin\", type: text}]}";
+        payload = "{processParams: [{key: " + searchField1 + ", value: \"12\", type: textEqual} , {key: initiator, value: \"admin\", type: text}]}";
         req.setContent(payload.getBytes());
         req.setContentType("application/json");
         stopWatch.start(String.format("verifico una richiesta SBAGLIATA ( %s istanze recuperate!)", 0));
@@ -363,7 +363,7 @@ public class FlowsProcessInstanceResourceTest {
         processInstance = util.mySetUp(acquisti.getValue());
         //faccio l'exportCsv su tutti le Process Instance attive
         MockHttpServletRequest req = new MockHttpServletRequest();
-        String payload = "{params: [{key: initiator, value: \"\", type: text}]}";
+        String payload = "{processParams: [{key: initiator, value: \"\", type: text}]}";
         req.setContent(payload.getBytes());
         req.setContentType("application/json");
         MockHttpServletResponse responseAll = new MockHttpServletResponse();
