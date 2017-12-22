@@ -149,7 +149,7 @@ public class FlowsProcessInstanceService {
         } catch (Exception e) {
             LOGGER.error("Errore nella letture dello stream della request", e);
         }
-        JSONArray params = new JSONObject(jsonString).getJSONArray("params");
+        JSONArray params = new JSONObject(jsonString).getJSONArray("processParams");
 
         FlowsHistoricProcessInstanceQuery processQuery = new FlowsHistoricProcessInstanceQuery(managementService);
 
