@@ -4,9 +4,9 @@
   angular.module('sprintApp')
   .directive('workflowTypes', workflowTypesDirective);
 
-  workflowTypesDirective.$inject = ['$rootScope'];
+  workflowTypesDirective.$inject = [];
 
-  function workflowTypesDirective(rootScope) {
+  function workflowTypesDirective() {
 
     return {
             restrict: 'E',

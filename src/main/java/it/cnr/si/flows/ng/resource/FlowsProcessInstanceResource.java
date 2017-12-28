@@ -32,6 +32,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -245,21 +246,26 @@ public class FlowsProcessInstanceResource {
      * @param order             L'ordine in cui vogliamo i risltati ('ASC' o 'DESC')
      * @return le response entity frutto della ricerca
      */
-    @RequestMapping(value = "/search/{processInstanceId}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/search/", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
-    public ResponseEntity<Object> search(
-            HttpServletRequest req,
-            @PathVariable("processInstanceId") String processInstanceId,
-            @RequestParam("active") boolean active,
-            @RequestParam("order") String order,
-            @RequestParam("firstResult") int firstResult,
-            @RequestParam("maxResults") int maxResults) {
+    public ResponseEntity<Object> search(@RequestBody Map<String, String> params) {
 
-        Map<String, Object> result = flowsProcessInstanceService.search(req, processInstanceId, active, order, firstResult, maxResults);
+        String processDefinitionKey = getString(params, "processDefinitionKey", "all");
+        String order = getString(params, "order", "ASC");
+        boolean active = Boolean.parseBoolean(getString(params, "active", "true"));
+        Integer firstResult = Integer.parseInt(getString(params, "firstResult", "0"));
+        Integer maxResults = Integer.parseInt(getString(params, "maxResults", "20"));
+        
+        Map<String, Object> result = flowsProcessInstanceService.search(params, processDefinitionKey, active, order, firstResult, maxResults);
         return ResponseEntity.ok(result);
     }
 
+    private static String getString(Map<String, String> req, String paramName, String defaultValue) {
+        String value = req.get(paramName);
+        return value != null ? value : defaultValue;
+    }
+    
     /**
      * Export csv: esporta il result-set di una search sulle Process Instances in un file Csv
      *
@@ -276,20 +282,21 @@ public class FlowsProcessInstanceResource {
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public void exportCsv(
-            HttpServletRequest req,
             HttpServletResponse res,
-            @PathVariable("processInstanceId") String processInstanceId,
-            @RequestParam("active") boolean active,
-            @RequestParam("order") String order,
-            @RequestParam("firstResult") int firstResult,
-            @RequestParam("maxResults") int maxResults) throws IOException {
+            @RequestBody Map<String, String> params) throws IOException {
+
+        String processDefinitionKey = getString(params, "processDefinitionKey", "all");
+        String order = getString(params, "order", "ASC");
+        boolean active = Boolean.parseBoolean(getString(params, "active", "true"));
+        Integer firstResult = Integer.parseInt(getString(params, "firstResult", "0"));
+        Integer maxResults = Integer.parseInt(getString(params, "maxResults", "20"));
 
         Map<String, Object> result = flowsProcessInstanceService.search(
-                req, processInstanceId, active, order, firstResult, maxResults);
+                params, processDefinitionKey, active, order, firstResult, maxResults);
 
         flowsProcessInstanceService.buildCsv(
                 (List<HistoricProcessInstanceResponse>) result.get("processInstances"),
-                res.getWriter(), processInstanceId);
+                res.getWriter(), processDefinitionKey);
     }
 
     @RequestMapping(value = "/variable", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

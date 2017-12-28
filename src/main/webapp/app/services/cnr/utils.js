@@ -63,21 +63,14 @@
                 };
             },
             populateProcessParams: function(fields) {
-                var processParams = [];
+                var processParams = {};
 
                 fields.forEach(function(field) {
-                    var fieldName = field.getAttribute('id').replace('searchField-', ''),
-                        appo = {};
-                    if (field.value !== "") {
-                        appo["key"] = fieldName;
-                        appo["value"] = field.value;
-                        appo["type"] = field.getAttribute("type");
-                        processParams.push(appo);
-                    }
+                    var fieldName = field.getAttribute('id').replace('searchField-', '');
+                    if (field.value !== "") 
+                    	processParams[fieldName] = field.getAttribute("type") +"="+ field.value;
                 });
-                return {
-                    "processParams": processParams
-                };
+                return processParams;
             },
             parseAttachments: function(attachments) {
                 var appo = [];

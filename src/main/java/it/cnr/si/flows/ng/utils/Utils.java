@@ -17,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.DateFormat;
@@ -72,6 +74,13 @@ public final class Utils {
         return groupRelationship.replace("@STRUTTURA", struttura);
     }
 
+    public static List<String> getCurrentUserAuthorities() {
+        return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .map(Utils::removeLeadingRole)
+                .collect(Collectors.toList());
+    }
+    
     public static String removeLeadingRole(String in) {
         return in.startsWith(ROLE) ? in.substring(5) : in;
     }
