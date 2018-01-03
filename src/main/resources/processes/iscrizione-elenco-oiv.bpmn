@@ -18,9 +18,16 @@
         </timerEventDefinition>
       </boundaryEvent>
       <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway" default="flow6"></exclusiveGateway>
-      <sequenceFlow id="flow5" sourceRef="exclusivegateway1" targetRef="soccorso-istruttorio"></sequenceFlow>
+      <sequenceFlow id="flow5" sourceRef="exclusivegateway1" targetRef="soccorso-istruttorio">
+        <extensionElements>
+          <activiti:executionListener event="take" expression="${execution.setVariable(&quot;soccorsoIstruttoriaFlag&quot;, &quot;1&quot;)}"></activiti:executionListener>
+        </extensionElements>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'richiesta_soccorso_istruttorio' && soccorsoIstruttoriaFlag != '1'}]]></conditionExpression>
+      </sequenceFlow>
       <sequenceFlow id="flow6" sourceRef="exclusivegateway1" targetRef="valutazione"></sequenceFlow>
-      <sequenceFlow id="flow35" sourceRef="exclusivegateway1" targetRef="cambio-istruttore"></sequenceFlow>
+      <sequenceFlow id="flow35" sourceRef="exclusivegateway1" targetRef="cambio-istruttore">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'richiesto_cambio_istruttore'}]]></conditionExpression>
+      </sequenceFlow>
       <userTask id="cambio-istruttore" name="CAMBIO ISTRUTTORE" activiti:candidateGroups="${gruppoCoordinatoreResponsabile}"></userTask>
       <sequenceFlow id="flow36" sourceRef="cambio-istruttore" targetRef="istruttoria"></sequenceFlow>
       <userTask id="valutazione" name="VALUTAZIONE" activiti:candidateGroups="${gruppoCoordinatoreResponsabile}"></userTask>
@@ -31,7 +38,12 @@
       <userTask id="valutazione-preavviso" name="VALUTAZIONE SU PREAVVISO" activiti:candidateGroups="${gruppoCoordinatoreResponsabile}"></userTask>
       <userTask id="firma-dg-rigetto" name="FIRMA DG RIGETTO" activiti:candidateGroups="${gruppoDirettore}"></userTask>
       <userTask id="improcedibilita" name="IMPROCEDIBILITA'" activiti:candidateUsers="${initiator}"></userTask>
-      <sequenceFlow id="flow68" sourceRef="exclusivegateway1" targetRef="improcedibilita"></sequenceFlow>
+      <sequenceFlow id="flow68" sourceRef="exclusivegateway1" targetRef="improcedibilita">
+        <extensionElements>
+          <activiti:executionListener event="take" expression="${execution.setVariable(&quot;domandaImprocedibileFlag&quot;, &quot;1&quot;)}"></activiti:executionListener>
+        </extensionElements>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'domanda_improcedibile' && domandaImprocedibileFlag  != '1'}]]></conditionExpression>
+      </sequenceFlow>
       <endEvent id="endevent8" name="End"></endEvent>
       <boundaryEvent id="boundarytimer4" name="Timer" attachedToRef="improcedibilita" cancelActivity="true">
         <timerEventDefinition>
@@ -56,19 +68,33 @@
       <sequenceFlow id="flow80" name="respinta" sourceRef="exclusivegateway12" targetRef="endevent10"></sequenceFlow>
       <sequenceFlow id="flow81" sourceRef="improcedibilita" targetRef="istruttoria"></sequenceFlow>
       <sequenceFlow id="flow83" sourceRef="istruttoria-su-preavviso" targetRef="valutazione-preavviso"></sequenceFlow>
-      <sequenceFlow id="flow84" sourceRef="exclusivegateway1" targetRef="endevent8"></sequenceFlow>
+      <sequenceFlow id="flow84" sourceRef="exclusivegateway1" targetRef="endevent8">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'domanda_improcedibile' && domandaImprocedibileFlag  == '1'}]]></conditionExpression>
+      </sequenceFlow>
       <exclusiveGateway id="exclusivegateway13" name="Exclusive Gateway" default="flow86"></exclusiveGateway>
       <sequenceFlow id="flow86" name="approvata" sourceRef="exclusivegateway13" targetRef="endevent2"></sequenceFlow>
-      <sequenceFlow id="flow87" sourceRef="exclusivegateway13" targetRef="firma-dg-preavviso-rigetto"></sequenceFlow>
+      <sequenceFlow id="flow87" sourceRef="exclusivegateway13" targetRef="firma-dg-preavviso-rigetto">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'proponi_PDF_preavviso_di_rigetto'}]]></conditionExpression>
+      </sequenceFlow>
       <sequenceFlow id="flow88" sourceRef="valutazione" targetRef="exclusivegateway13"></sequenceFlow>
-      <sequenceFlow id="flow89" sourceRef="exclusivegateway13" targetRef="soccorso-istruttorio"></sequenceFlow>
+      <sequenceFlow id="flow89" sourceRef="exclusivegateway13" targetRef="soccorso-istruttorio">
+        <extensionElements>
+          <activiti:executionListener event="take" expression="${execution.setVariable(&quot;soccorsoIstruttoriaFlag&quot;, &quot;1&quot;)}"></activiti:executionListener>
+        </extensionElements>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'richiesta_soccorso_istruttorio' && soccorsoIstruttoriaFlag != '1'}]]></conditionExpression>
+      </sequenceFlow>
       <exclusiveGateway id="exclusivegateway14" name="Exclusive Gateway"></exclusiveGateway>
       <sequenceFlow id="flow90" sourceRef="firma-dg-preavviso-rigetto" targetRef="exclusivegateway14"></sequenceFlow>
       <sequenceFlow id="flow92" sourceRef="exclusivegateway14" targetRef="valutazione"></sequenceFlow>
       <endEvent id="endevent12" name="End"></endEvent>
       <sequenceFlow id="flow93" name="approvata" sourceRef="exclusivegateway11" targetRef="endevent12"></sequenceFlow>
       <sequenceFlow id="flow94" sourceRef="exclusivegateway14" targetRef="preavviso-rigetto"></sequenceFlow>
-      <sequenceFlow id="flow95" sourceRef="exclusivegateway13" targetRef="valutazione"></sequenceFlow>
+      <sequenceFlow id="flow95" sourceRef="exclusivegateway13" targetRef="valutazione">
+        <extensionElements>
+          <activiti:executionListener event="take" expression="${execution.setVariable(&quot;pdfPreavvisoRigettoFlag&quot;, &quot;1&quot;)}"></activiti:executionListener>
+        </extensionElements>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'genera_PDF_preavviso_di_rigetto'}]]></conditionExpression>
+      </sequenceFlow>
       <sequenceFlow id="flow96" sourceRef="exclusivegateway11" targetRef="valutazione-preavviso"></sequenceFlow>
     </subProcess>
     <startEvent id="startevent2" name="Start"></startEvent>
@@ -213,7 +239,7 @@
         <omgdi:waypoint x="410.0" y="53.0"></omgdi:waypoint>
         <omgdi:waypoint x="576.0" y="52.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="62.0" x="572.0" y="23.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="62.0" x="587.0" y="8.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow72" id="BPMNEdge_flow72">
@@ -320,7 +346,7 @@
         <omgdi:waypoint x="46.0" y="290.0"></omgdi:waypoint>
         <omgdi:waypoint x="76.0" y="290.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="10.0" y="258.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="34.0" x="10.0" y="258.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow65" id="BPMNEdge_flow65">
@@ -331,7 +357,7 @@
         <omgdi:waypoint x="661.0" y="290.0"></omgdi:waypoint>
         <omgdi:waypoint x="720.0" y="290.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="729.0" y="258.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="20.0" x="729.0" y="258.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
