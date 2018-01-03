@@ -438,7 +438,7 @@ input.ng-touched.ng-invalid, button.ng-touched.ng-invalid, textarea.ng-touched.n
 }
 
 /* START SPINNER */
-@-moz-keyframes spinner-loader {
+@-moz-keyframes sprint-loader {
   0% {
     -moz-transform: rotate(0deg);
     transform: rotate(0deg);
@@ -448,7 +448,7 @@ input.ng-touched.ng-invalid, button.ng-touched.ng-invalid, textarea.ng-touched.n
     transform: rotate(360deg);
   }
 }
-@-webkit-keyframes spinner-loader {
+@-webkit-keyframes sprint-loader {
   0% {
     -webkit-transform: rotate(0deg);
     transform: rotate(0deg);
@@ -458,7 +458,7 @@ input.ng-touched.ng-invalid, button.ng-touched.ng-invalid, textarea.ng-touched.n
     transform: rotate(360deg);
   }
 }
-@keyframes spinner-loader {
+@keyframes sprint-loader {
   0% {
     -moz-transform: rotate(0deg);
     -ms-transform: rotate(0deg);
@@ -473,10 +473,10 @@ input.ng-touched.ng-invalid, button.ng-touched.ng-invalid, textarea.ng-touched.n
   }
 }
 /* :not(:required) hides this rule from IE9 and below */
-.spinner-loader:not(:required) {
-  -moz-animation: spinner-loader 1500ms infinite linear;
-  -webkit-animation: spinner-loader 1500ms infinite linear;
-  animation: spinner-loader 1500ms infinite linear;
+.sprint-loader:not(:required) {
+  -moz-animation: sprint-loader 1500ms infinite linear;
+  -webkit-animation: sprint-loader 1500ms infinite linear;
+  animation: sprint-loader 1500ms infinite linear;
   -moz-border-radius: 0.5em;
   -webkit-border-radius: 0.5em;
   border-radius: 0.5em;
@@ -491,7 +491,7 @@ input.ng-touched.ng-invalid, button.ng-touched.ng-invalid, textarea.ng-touched.n
   overflow: hidden;
   text-indent: 100%;
 }
-.spinner-loader-mini {
+.sprint-loader-mini {
   font-size: 5px!important;
 }
 /* END SPINNER */
