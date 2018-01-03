@@ -17,10 +17,16 @@
 		if ($location.search().isTaskQuery === undefined)
 			vm.searchParams.isTaskQuery = false;
 		else
-			vm.searchParams.isTaskQuery = ($location.search().isTaskQuery || $location.search().isTaskQuery == 'true');
+			vm.searchParams.isTaskQuery = ($location.search().isTaskQuery === true || $location.search().isTaskQuery == 'true');
 
+		$scope.hasPendingRequests = function () {
+		   return httpRequestTracker.hasPendingRequests();
+		};
                  
 		$scope.search = function() {
+			
+			vm.results = [];
+			vm.loading = true;
 			
 			if (vm.searchParams.processDefinitionKey === null)
 				vm.searchParams.processDefinitionKey = undefined;
@@ -35,9 +41,13 @@
 						vm.results = utils.refactoringVariables(response.data.tasks);
 					else
 						vm.results = utils.refactoringVariables(response.data.processInstances);
+					
 					vm.totalItems = response.data.totalItems;
+					vm.loading = false;
+
 				}, function(response) {
 					$log.error(response);
+					vm.loading = false;
 				});
 		};
 

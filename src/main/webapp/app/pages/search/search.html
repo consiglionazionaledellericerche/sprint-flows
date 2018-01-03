@@ -81,21 +81,21 @@
     </div>
 
 
-      <div id="resultDiv" class="col-md-9">
+      <div id="resultDiv" class="col-md-9" ng-cloak>
           <h3>{{vm.searchParams.isTaskQuery ? 'Task' : 'Flussi'}} {{vm.searchParams.active ? 'attivi' : 'terminati'}}</h3>
           <div>
-              <div class="text-center">
-                  <jhi-item-count page="vm.searchParams.page" total="vm.totalItems"
-                                  items-per-page="20"></jhi-item-count>
-                  <uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.searchParams.page"
-                                  ng-change="search()"></uib-pagination>
+              <div ng-show="vm.loading" class="text-center">
+              	<div class="spinner-loader"></div>Loading...
               </div>
-              <div ng-show="vm.searchParams.isTaskQuery">
-	            <task-list tasks="vm.results" action-buttons="false"></task-list>
-              </div>
-              <div ng-show="!vm.searchParams.isTaskQuery">
-				<process-list processes="vm.results" paging="paging"></process-list>
-              </div>
+              <div ng-hide="vm.loading">
+	              <div ng-show="vm.searchParams.isTaskQuery">
+		            <task-list tasks="vm.results" action-buttons="false"></task-list>
+	              </div>
+	              <div ng-show="!vm.searchParams.isTaskQuery">
+					<process-list processes="vm.results" paging="paging"></process-list>
+	              </div>
+	          </div>
+	              
               <div class="text-center">
                   <jhi-item-count page="vm.searchParams.page" total="vm.totalItems"
                                   items-per-page="20"></jhi-item-count>
