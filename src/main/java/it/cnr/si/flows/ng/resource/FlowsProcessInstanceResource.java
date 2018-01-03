@@ -237,68 +237,6 @@ public class FlowsProcessInstanceResource {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    /**
-     * Funzionalità di Ricerca delle Process Instances.
-     *
-     * @param req               the req
-     * @param processInstanceId Il processInstanceId della ricerca
-     * @param active            Boolean che indica se ricercare le Process Instances attive o terminate
-     * @param order             L'ordine in cui vogliamo i risltati ('ASC' o 'DESC')
-     * @return le response entity frutto della ricerca
-     */
-    @RequestMapping(value = "/search/", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured(AuthoritiesConstants.USER)
-    @Timed
-    public ResponseEntity<Object> search(@RequestBody Map<String, String> params) {
-
-        String processDefinitionKey = getString(params, "processDefinitionKey", "all");
-        String order = getString(params, "order", "ASC");
-        boolean active = Boolean.parseBoolean(getString(params, "active", "true"));
-        Integer firstResult = Integer.parseInt(getString(params, "firstResult", "0"));
-        Integer maxResults = Integer.parseInt(getString(params, "maxResults", "20"));
-        
-        Map<String, Object> result = flowsProcessInstanceService.search(params, processDefinitionKey, active, order, firstResult, maxResults);
-        return ResponseEntity.ok(result);
-    }
-
-    private static String getString(Map<String, String> req, String paramName, String defaultValue) {
-        String value = req.get(paramName);
-        return value != null ? value : defaultValue;
-    }
-    
-    /**
-     * Export csv: esporta il result-set di una search sulle Process Instances in un file Csv
-     *
-     * @param req               the req
-     * @param res               the res
-     * @param processInstanceId the process instance id della search-request
-     * @param active            the active Process Instances attive o terminate
-     * @param order             the order ordinamento del result-set
-     * @param firstResult       the first result (in caso di esportazione parziale del result-set)
-     * @param maxResults        the max results (in caso di esportazione parziale del result-set)
-     * @throws IOException the io exception
-     */
-    @RequestMapping(value = "/exportCsv/{processInstanceId}", headers = "Accept=application/vnd.ms-excel", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = "application/vnd.ms-excel")
-    @Secured(AuthoritiesConstants.USER)
-    @Timed
-    public void exportCsv(
-            HttpServletResponse res,
-            @RequestBody Map<String, String> params) throws IOException {
-
-        String processDefinitionKey = getString(params, "processDefinitionKey", "all");
-        String order = getString(params, "order", "ASC");
-        boolean active = Boolean.parseBoolean(getString(params, "active", "true"));
-        Integer firstResult = Integer.parseInt(getString(params, "firstResult", "0"));
-        Integer maxResults = Integer.parseInt(getString(params, "maxResults", "20"));
-
-        Map<String, Object> result = flowsProcessInstanceService.search(
-                params, processDefinitionKey, active, order, firstResult, maxResults);
-
-        flowsProcessInstanceService.buildCsv(
-                (List<HistoricProcessInstanceResponse>) result.get("processInstances"),
-                res.getWriter(), processDefinitionKey);
-    }
-
     @RequestMapping(value = "/variable", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     @Secured(AuthoritiesConstants.ADMIN)

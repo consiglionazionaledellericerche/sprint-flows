@@ -22,7 +22,8 @@
             'bootstrapLightbox',
             'toggle-switch',
             'ui.select',
-            'ngSanitize'
+            'ngSanitize',
+            'dc.inputAddOn'
         ])
         .run(run);
 

@@ -29,6 +29,8 @@ import java.util.stream.Collectors;
 
 public final class Utils {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
+
     public static final String TASK_EXECUTOR = "esecutore";
     public static final String PROCESS_VISUALIZER = "visualizzatore";
 
@@ -39,16 +41,15 @@ public final class Utils {
     public static final String DESC = "DESC";
     public static final String ALL_PROCESS_INSTANCES = "all";
     public static final String LESS = "Less";
-    private static final String GREAT = "Great";
-    private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
-    private static final String ERRORE_NEL_PARSING_DELLA_DATA = "Errore nel parsing della data {} - ";
+    public static final String ERRORE_NEL_PARSING_DELLA_DATA = "Errore nel parsing della data {} - ";
+    public static final String GREAT = "Great";
     private static final String TEXT_EQUAL = "textEqual";
     private static final String BOOLEAN = "boolean";
     private static final String ROLE = "ROLE_";
     @Autowired
     private static RestResponseFactory restResponseFactory;
-    private DateFormat formatoData = new SimpleDateFormat("yyyy-MM-dd");
-    private DateFormat formatoDataOra = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);
+    public static DateFormat formatoData = new SimpleDateFormat("yyyy-MM-dd");
+    public static DateFormat formatoDataOra = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);
 
     public static boolean isEmpty(String in) {
         return in == null || in.equals("");
@@ -284,15 +285,15 @@ public final class Utils {
         return taskQuery;
     }
 
-    public String formattaDataOra(Date in) {
+    public static String formattaDataOra(Date in) {
         return formatoDataOra.format(in);
     }
 
-    public String formattaData(Date in) {
+    public static String formattaData(Date in) {
         return formatoData.format(in);
     }
 
-    public Date parsaData(String in) throws ParseException {
+    public static Date parsaData(String in) throws ParseException {
         return formatoData.parse(in);
     }
 
@@ -305,7 +306,7 @@ public final class Utils {
 
     private TaskInfoQuery historicTaskDate(TaskInfoQuery taskQuery, String key, String value) {
         try {
-            Date date = formatoData.parse(value);
+            Date date = parsaData(value);
 
             if (key.contains(LESS)) {
                 taskQuery.taskVariableValueLessThanOrEqual(key.replace(LESS, ""), date);
