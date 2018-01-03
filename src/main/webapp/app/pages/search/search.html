@@ -2,19 +2,19 @@
   <div class="row form-group">
     <div class="col-md-12">
       <ul class="nav nav-pills nav-justified">
-        <li role="presentation" ng-class="{'active': vm.searchTerms.active}">
-          <a class="pointer" ng-click="vm.searchTerms.active = true; search()" data-toggle="tab">
+        <li role="presentation" ng-class="{'active': vm.searchParams.active}">
+          <a class="pointer" ng-click="vm.searchParams.active = true; search()" data-toggle="tab">
             <h3>
               <i class="glyphicon glyphicon-edit"></i>
-                {{$rootScope.isTaskQuery ? 'Task' : 'Flussi'}} attivi
+                {{vm.searchParams.isTaskQuery ? 'Task' : 'Flussi'}} attivi
             </h3>
           </a>
         </li>
-        <li role="presentation" ng-class="{'active-info': !vm.searchTerms.active}">
-          <a class="pointer" ng-click="vm.searchTerms.active = false; search()" data-toggle="tab">
+        <li role="presentation" ng-class="{'active-info': !vm.searchParams.active}">
+          <a class="pointer" ng-click="vm.searchParams.active = false; search()" data-toggle="tab">
             <h3>
               <i class="glyphicon glyphicon-check"></i>
-                {{$rootScope.isTaskQuery ? 'Task' : 'Flussi'}} terminati
+                {{vm.searchParams.isTaskQuery ? 'Task' : 'Flussi'}} terminati
             </h3>
           </a>
         </li>
@@ -27,8 +27,8 @@
             <h4>Search type</h4>
             <div>
                 <toggle-switch
-                        ng-model="$rootScope.isTaskQuery"
-                        ng-click="switch(!isTaskQuery)"
+                        ng-model="vm.searchParams.isTaskQuery"
+                        ng-click="vm.searchParams.processDefinitionKey = undefined; stripParams(); search()"
                         on-label="Task"
                         off-label="Flussi"
                         class="switch-large">
@@ -41,9 +41,9 @@
         <h4>Ordinamento temporale</h4>
         <div>
             <button class="btn btn-default btn-block margin-top-20"
-                    ng-click="vm.searchTerms.order ===  'ASC' ?  vm.searchTerms.order  = 'DESC' : vm.searchTerms.order  = 'ASC'; search()">
+                    ng-click="vm.searchParams.order ===  'ASC' ?  vm.searchParams.order  = 'DESC' : vm.searchParams.order  = 'ASC'; search()">
             <span class="glyphicon glyphicon-sort"></span>
-            {{vm.searchTerms.order === 'ASC' ? 'Crescente' : 'Descrescente'}}
+            {{vm.searchParams.order === 'ASC' ? 'Crescente' : 'Descrescente'}}
           </button>
         </div>
       </div>
@@ -51,11 +51,26 @@
       <br>
       <h4>Tipologie</h4>
         <div id="tipologieDiv">
-            <workflow-types process-definitions="wfDefsAll" filters="true"></workflow-types>
+			<div>
+			    <div class="dropdown md-menu-origin">
+			        <ui-select ng-model="vm.searchParams.processDefinitionKey" title="Tipologie" on-select="search()">
+			            <ui-select-match placeholder="Seleziona la tipologia di flusso" allow-clear="true">
+			                {{$select.selected.name}}
+			            </ui-select-match>
+			            <ui-select-choices repeat="processDefinition.key as processDefinition in wfDefsAll">
+			                <span ng-bind-html="processDefinition.name"></span>
+			            </ui-select-choices>
+			        </ui-select>
+			    </div>
+			    <br>
+			    <div>
+			        <ng-include id="searchFields" src="formUrl"></ng-include>
+			    </div>
+			</div>
         </div>
       <br>
       <br>
-      <button ng-click="search()" class="btn btn-primary">
+      <button ng-click="vm.searchParams.page = 1; search()" class="btn btn-primary">
         <span class="glyphicon glyphicon-filter"></span>
         Filtra
       </button>
@@ -67,30 +82,28 @@
 
 
       <div id="resultDiv" class="col-md-9">
-          <h3>{{$rootScope.isTaskQuery ? 'Task' : 'Flussi'}} {{vm.active ? 'attivi' : 'terminati'}}</h3>
-          <div ng-show="!$rootScope.isTaskQuery">
-              <process-list processes="vm.processInstances" paging="paging"></process-list>
-              <!--paginazione Process Instances-->
+          <h3>{{vm.searchParams.isTaskQuery ? 'Task' : 'Flussi'}} {{vm.searchParams.active ? 'attivi' : 'terminati'}}</h3>
+          <div>
               <div class="text-center">
-                  <jhi-item-count page="vm.page" total="vm.queryCount"
-                                  items-per-page="vm.itemsPerPage"></jhi-item-count>
-                  <uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.page"
-                                  ng-change="vm.transition()"></uib-pagination>
+                  <jhi-item-count page="vm.searchParams.page" total="vm.totalItems"
+                                  items-per-page="20"></jhi-item-count>
+                  <uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.searchParams.page"
+                                  ng-change="search()"></uib-pagination>
               </div>
-          </div>
-          <div ng-show="$rootScope.isTaskQuery">
-              <task-list tasks="vm.taskInstances" action-buttons="false"></task-list>
-              <!--paginazione Task-->
+              <div ng-show="$rootScope.isTaskQuery">
+	            <task-list tasks="vm.taskInstances" action-buttons="false"></task-list>
+              </div>
+              <div ng-show="!$rootScope.isTaskQuery">
+				<process-list processes="vm.processInstances" paging="paging"></process-list>
+              </div>
               <div class="text-center">
-                  <jhi-item-count page="vm.page" total="vm.queryCount"
-                                  items-per-page="vm.itemsPerPage"></jhi-item-count>
-                  <uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.page"
-                                  ng-change="vm.transition()"></uib-pagination>
+                  <jhi-item-count page="vm.searchParams.page" total="vm.totalItems"
+                                  items-per-page="20"></jhi-item-count>
+                  <uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.searchParams.page"
+                                  ng-change="search()"></uib-pagination>
               </div>
           </div>
     </div>
   </div>
 </div>
-<pre ng-show="development">
-  {{vm.searchTerms | json}}
-</pre>
+<pre>{{vm | json}}</pre>

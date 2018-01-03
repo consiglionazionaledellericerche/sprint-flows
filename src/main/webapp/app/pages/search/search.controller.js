@@ -5,52 +5,49 @@
 		.module('sprintApp')
 		.controller('SearchController', SearchController);
 
-	SearchController.$inject = ['$scope', '$state', 'dataService', 'AlertService', 'paginationConstants', 'utils', 'workflowTypesDirective', '$log', '$location'];
+	SearchController.$inject = ['$scope', '$rootScope', '$state', 'dataService', 'AlertService', 'paginationConstants', 'utils', 'workflowTypesDirective', '$log', '$location'];
 
-	function SearchController($scope, $state, dataService, AlertService, paginationConstants, utils, workflowTypesDirective, $log, $location) {
+	function SearchController($scope, $rootScope, $state, dataService, AlertService, paginationConstants, utils, workflowTypesDirective, $log, $location) {
 		var vm = this;
-		vm.searchTerms = {};
 
-// 		//variabili usate nella paginazione
-// 		vm.transition = transition;
+		vm.searchParams = $location.search();
+		vm.searchParams.active = $location.search().active || true;
+		vm.searchParams.order = $location.search().order || "ASC";
+		vm.searchParams.page = $location.search().page || 1;
+		if ($location.search().isTaskQuery === undefined)
+			vm.searchParams.isTaskQuery = false;
+		else
+			vm.searchParams.isTaskQuery = ($location.search().isTaskQuery == 'true');
 
-		vm.searchTerms = $location.search();
- 		vm.itemsPerPage = vm.itemsPerPage || paginationConstants.itemsPerPage;
-		vm.page = vm.page || 1;
-		vm.totalItems = vm.itemsPerPage * vm.page;
-		vm.searchTerms.active = vm.active || true;
-		vm.searchTerms.order = vm.searchTerms.order || "ASC";
-	
-
+                 
 		$scope.search = function() {
 			
-			vm.maxResults = vm.itemsPerPage;
-			vm.firstResult = vm.itemsPerPage * (vm.page - 1);
-
-			angular.extend(vm.searchTerms, utils.populateProcessParams(Array.from($("input[id^='searchField-']"))) );
-			vm.searchTerms.processDefinitionKey = $scope.current;
+			if (vm.searchParams.processDefinitionKey === null)
+				vm.searchParams.processDefinitionKey = undefined;
 			
-			$log.info(vm.searchTerms);
-			$location.search(vm.searchTerms);
+			$log.info(vm.searchParams)
 			
-			dataService.processInstances.search(vm.searchTerms)
+			$location.search(vm.searchParams);
+			
+			dataService.processInstances.search(vm.searchParams)
 				.then(function(response) {
 					vm.processInstances = utils.refactoringVariables(response.data.processInstances);
-					// variabili per la gestione della paginazione
 					vm.totalItems = response.data.totalItems;
-					vm.queryCount = vm.totalItems;
 				}, function(response) {
 					$log.error(response);
 				});
 		};
 
-
-
-		$scope.switch = function(isTaskQuery) {
-			$scope.isTaskQuery = isTaskQuery;
-			$scope.current = undefined;
-		};
-
+		$scope.stripParams = function() {
+			var cleanParams = {};
+			cleanParams.active = vm.searchParams.active;
+			cleanParams.order  = vm.searchParams.order;
+			cleanParams.page   = 1;
+			cleanParams.isTaskQuery = vm.searchParams.isTaskQuery;
+			cleanParams.processDefinitionKey = vm.searchParams.processDefinitionKey;
+			
+			vm.searchParams = cleanParams;
+		}
 
 		$scope.exportCsv = function() {
 			if ($scope.isTaskQuery) {
@@ -76,12 +73,19 @@
 			}
 		};
 
-
-
-		//funzione richiamata quando si chiede una nuova "pagina" dei risultati
-		function transition() {
-			$scope.search();
-		}
+        $scope.$watchGroup(['vm.searchParams.processDefinitionKey'], function(newVal) {
+        	
+            if (vm.searchParams.processDefinitionKey) {
+                if(vm.searchParams.isTaskQuery) {
+                    $scope.formUrl = 'api/forms/'+ vm.searchParams.processDefinitionKey + '/1/search-ti';
+                } else {
+                    $scope.formUrl = 'api/forms/'+ vm.searchParams.processDefinitionKey + '/1/search-pi';
+                }
+            } else
+                $scope.formUrl = undefined;
+            
+            $scope.search();
+         });
 		
 		$scope.search();
 	}

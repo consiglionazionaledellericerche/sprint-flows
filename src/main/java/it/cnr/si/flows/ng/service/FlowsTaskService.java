@@ -4,6 +4,7 @@ import com.opencsv.CSVWriter;
 import it.cnr.si.domain.View;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
+import it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery;
 import it.cnr.si.flows.ng.resource.FlowsAttachmentResource;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
@@ -22,6 +23,7 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.IdentityLinkType;
 import org.activiti.engine.task.Task;
+import org.activiti.engine.task.TaskInfoQuery;
 import org.activiti.engine.task.TaskQuery;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
@@ -46,6 +48,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -130,14 +133,14 @@ public class FlowsTaskService {
         return response;
     }
 
-    public Map<String, Object> search(HttpServletRequest req, String processInstanceId, boolean active, String order, int firstResult, int maxResults) {
+    public Map<String, Object> search(Map<String, String> params, String processInstanceId, boolean active, String order, int firstResult, int maxResults) {
         Map<String, Object> result = new HashMap<>();
         HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery();
 
         if (!processInstanceId.equals(ALL_PROCESS_INSTANCES))
             taskQuery.processDefinitionKey(processInstanceId);
 
-        taskQuery = (HistoricTaskInstanceQuery) utils.searchParamsForTasks(req, taskQuery);
+        setSearchTerms(params, taskQuery);
 
         if (active)
             taskQuery.unfinished();
@@ -153,6 +156,64 @@ public class FlowsTaskService {
         List<HistoricTaskInstanceResponse> tasks = restResponseFactory.createHistoricTaskInstanceResponseList(taskRaw);
         result.put("tasks", tasks);
         return result;
+    }
+    
+    private void setSearchTerms(Map<String, String> params, HistoricTaskInstanceQuery taskQuery) {
+        
+        params.forEach((key, typevalue) -> {
+            
+            try {
+                if (key.equals("taskCompletedGreat")) {
+                    taskQuery.taskCompletedAfter(formatoData.parse(typevalue));
+                }
+                if (key.equals("taskCompletedLess")) {
+                    taskQuery.taskCompletedBefore(formatoData.parse(typevalue));
+                }
+            } catch (ParseException e) {
+                LOGGER.error(ERRORE_NEL_PARSING_DELLA_DATA, typevalue, e);
+            }
+            
+            if (key.contains("Fase")) {
+                taskQuery.taskNameLikeIgnoreCase("%" + typevalue + "%");
+                
+            } else if (typevalue.contains("=")) {
+
+                String type = typevalue.substring(0, typevalue.indexOf('='));
+                String value = typevalue.substring(typevalue.indexOf('=')+1);
+                
+                //wildcard ("%") di default ma non a TUTTI i campi
+                switch (type) {
+                case "textEqual":
+                    taskQuery.taskVariableValueEquals(key, value);
+                    break;
+                case "boolean":
+                    // gestione variabili booleane
+                    taskQuery.taskVariableValueEquals(key, Boolean.valueOf(value));
+                    break;
+                case "date":
+                    processDate(taskQuery, key, value);
+                    break;
+                default:
+                    //variabili con la wildcard  (%value%)
+                    taskQuery.taskVariableValueLikeIgnoreCase(key, "%" + value + "%");
+                    break;
+                }
+            }
+        });
+    }
+    
+    private HistoricTaskInstanceQuery processDate(HistoricTaskInstanceQuery taskQuery, String key, String value) {
+        try {
+            Date date = parsaData(value);
+
+            if (key.contains(LESS)) {
+                taskQuery.taskVariableValueLessThanOrEqual(key.replace(LESS, ""), date);
+            } else if (key.contains(GREAT))
+                taskQuery.taskVariableValueGreaterThanOrEqual(key.replace(GREAT, ""), date);
+        } catch (ParseException e) {
+            LOGGER.error(ERRORE_NEL_PARSING_DELLA_DATA, value, e);
+        }
+        return taskQuery;
     }
 
     public DataResponse getAvailableTask(HttpServletRequest req, String processDefinition, int firstResult, int maxResults, String order) {
