@@ -158,6 +158,7 @@ public class FlowsTaskService {
         return result;
     }
     
+    // TODO questo metodo e' duplicato di uno in utils
     private void setSearchTerms(Map<String, String> params, HistoricTaskInstanceQuery taskQuery) {
         
         params.forEach((key, typevalue) -> {
@@ -173,30 +174,36 @@ public class FlowsTaskService {
                 LOGGER.error(ERRORE_NEL_PARSING_DELLA_DATA, typevalue, e);
             }
             
-            if (key.contains("Fase")) {
-                taskQuery.taskNameLikeIgnoreCase("%" + typevalue + "%");
-                
-            } else if (typevalue.contains("=")) {
+            if (typevalue.contains("=")) {
 
                 String type = typevalue.substring(0, typevalue.indexOf('='));
                 String value = typevalue.substring(typevalue.indexOf('=')+1);
                 
+                if (key.contains("initiator") || key.contains("oggetto")) {
+                    taskQuery.processVariableValueLikeIgnoreCase(key, "%" + value + "%");
+
+                } else if (key.contains("Fase")) {
+                    taskQuery.taskNameLikeIgnoreCase("%" + value + "%");
+                    
+                } else {
+                    
                 //wildcard ("%") di default ma non a TUTTI i campi
-                switch (type) {
-                case "textEqual":
-                    taskQuery.taskVariableValueEquals(key, value);
-                    break;
-                case "boolean":
-                    // gestione variabili booleane
-                    taskQuery.taskVariableValueEquals(key, Boolean.valueOf(value));
-                    break;
-                case "date":
-                    processDate(taskQuery, key, value);
-                    break;
-                default:
-                    //variabili con la wildcard  (%value%)
-                    taskQuery.taskVariableValueLikeIgnoreCase(key, "%" + value + "%");
-                    break;
+                    switch (type) {
+                    case "textEqual":
+                        taskQuery.taskVariableValueEquals(key, value);
+                        break;
+                    case "boolean":
+                        // gestione variabili booleane
+                        taskQuery.taskVariableValueEquals(key, Boolean.valueOf(value));
+                        break;
+                    case "date":
+                        processDate(taskQuery, key, value);
+                        break;
+                    default:
+                        //variabili con la wildcard  (%value%)
+                        taskQuery.taskVariableValueLikeIgnoreCase(key, "%" + value + "%");
+                        break;
+                    }
                 }
             }
         });

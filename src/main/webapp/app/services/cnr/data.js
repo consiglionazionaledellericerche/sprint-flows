@@ -102,7 +102,7 @@
 					return $http.get('api/attachments/history/'+ processInstaceId +'/'+ attachmentName);
 				},
 				search: function (params) {
-					return $http.post('api/processInstances/search/', params);
+					return $http.post('api/search/', params);
 				},
 				exportSummary: function (processInstaceId) {
 					return $http.get('api/summaryPdf?processInstanceId='+ processInstaceId);

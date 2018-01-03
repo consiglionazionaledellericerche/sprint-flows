@@ -90,11 +90,11 @@
                   <uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.searchParams.page"
                                   ng-change="search()"></uib-pagination>
               </div>
-              <div ng-show="$rootScope.isTaskQuery">
-	            <task-list tasks="vm.taskInstances" action-buttons="false"></task-list>
+              <div ng-show="vm.searchParams.isTaskQuery">
+	            <task-list tasks="vm.results" action-buttons="false"></task-list>
               </div>
-              <div ng-show="!$rootScope.isTaskQuery">
-				<process-list processes="vm.processInstances" paging="paging"></process-list>
+              <div ng-show="!vm.searchParams.isTaskQuery">
+				<process-list processes="vm.results" paging="paging"></process-list>
               </div>
               <div class="text-center">
                   <jhi-item-count page="vm.searchParams.page" total="vm.totalItems"

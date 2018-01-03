@@ -17,7 +17,7 @@
 		if ($location.search().isTaskQuery === undefined)
 			vm.searchParams.isTaskQuery = false;
 		else
-			vm.searchParams.isTaskQuery = ($location.search().isTaskQuery == 'true');
+			vm.searchParams.isTaskQuery = ($location.search().isTaskQuery || $location.search().isTaskQuery == 'true');
 
                  
 		$scope.search = function() {
@@ -31,7 +31,10 @@
 			
 			dataService.processInstances.search(vm.searchParams)
 				.then(function(response) {
-					vm.processInstances = utils.refactoringVariables(response.data.processInstances);
+					if(vm.searchParams.isTaskQuery) 
+						vm.results = utils.refactoringVariables(response.data.tasks);
+					else
+						vm.results = utils.refactoringVariables(response.data.processInstances);
 					vm.totalItems = response.data.totalItems;
 				}, function(response) {
 					$log.error(response);
@@ -50,6 +53,9 @@
 		}
 
 		$scope.exportCsv = function() {
+			
+			// TODO uniformare con dataService.processInstances.search
+			
 			if ($scope.isTaskQuery) {
 				dataService.tasks.exportCsv($scope.current, vm.active, utils.populateTaskParams(Array.from($("input[id^='searchField-']"))), vm.order, -1, -1)
 					.success(function(response) {
