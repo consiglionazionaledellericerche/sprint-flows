@@ -17,6 +17,8 @@ public class FlowsFirmaService {
     private String RemoteSignServiceTypeOtpAuth;
     @Value("${cnr.firma.url}")
     private String RemoteSignServiceUrl;
+    @Value("${cnr.firma.pdfprofile}")
+    private String RemotePdfprofile;
 
     public byte[] firma(String username, String password, String otp, byte[] bytes) throws ArubaSignServiceException {
         Properties props = new Properties();
@@ -24,6 +26,8 @@ public class FlowsFirmaService {
         props.setProperty("arubaRemoteSignService.url", RemoteSignServiceUrl);
         props.setProperty("arubaRemoteSignService.typeOtpAuth", RemoteSignServiceTypeOtpAuth);
         props.setProperty("arubaRemoteSignService.certId", RemoteSignServiceCertId);
+        props.setProperty("arubaRemoteSignService.pdfprofile", RemotePdfprofile);
+        
         client.setProps(props);
 
         // TODO Convenire su un formato adeguato per la firma grafica, se la si vuole

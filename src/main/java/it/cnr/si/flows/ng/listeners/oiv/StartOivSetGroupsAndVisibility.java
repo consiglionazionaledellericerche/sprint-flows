@@ -47,6 +47,8 @@ public class StartOivSetGroupsAndVisibility implements ExecutionListener {
 		execution.setVariable("gruppoIstruttori", gruppoIstruttori);
 		execution.setVariable("gruppoDirettore", gruppoDirettore);
 		execution.setVariable("gruppoCoordinatoreResponsabile", gruppoCoordinatoreResponsabile);
+		execution.setVariable("domandaImprocedibileFlag", "0");
+		execution.setVariable("soccorsoIstruttoriaFlag", "0");
 		
 		LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoIstruttori, gruppoDirettore, gruppoCoordinatoreResponsabile);
 
