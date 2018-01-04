@@ -14,10 +14,14 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -34,7 +38,9 @@ public class FlowsListenersConfiguration {
     private RepositoryService repositoryService;
     @Inject
     private RuntimeService runtimeService;
-
+    @Inject
+    private Environment env;
+    
     @PostConstruct
     public void init() throws Exception {
         createDeployments();
@@ -42,7 +48,15 @@ public class FlowsListenersConfiguration {
     }
 
     private void createDeployments() throws Exception {
-
+        Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
+        String dir;
+        if (activeProfiles.contains("cnr"))
+            dir = "cnr";
+        else if (activeProfiles.contains("oiv"))
+            dir = "oiv";
+        else
+            System.exit(1);
+        
         for (Resource resource : appContext.getResources("classpath:processes/*.bpmn*")) {
             LOGGER.info("\n ------- definition " + resource.getFilename());
             List<ProcessDefinition> processes = repositoryService.createProcessDefinitionQuery()
