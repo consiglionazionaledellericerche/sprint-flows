@@ -83,12 +83,14 @@
         </extensionElements>
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'richiesta_soccorso_istruttorio' && soccorsoIstruttoriaFlag != '1'}]]></conditionExpression>
       </sequenceFlow>
-      <exclusiveGateway id="exclusivegateway14" name="Exclusive Gateway"></exclusiveGateway>
+      <exclusiveGateway id="exclusivegateway14" name="Exclusive Gateway" default="flow92"></exclusiveGateway>
       <sequenceFlow id="flow90" sourceRef="firma-dg-preavviso-rigetto" targetRef="exclusivegateway14"></sequenceFlow>
       <sequenceFlow id="flow92" sourceRef="exclusivegateway14" targetRef="valutazione"></sequenceFlow>
       <endEvent id="endevent12" name="End"></endEvent>
       <sequenceFlow id="flow93" name="approvata" sourceRef="exclusivegateway11" targetRef="endevent12"></sequenceFlow>
-      <sequenceFlow id="flow94" sourceRef="exclusivegateway14" targetRef="preavviso-rigetto"></sequenceFlow>
+      <sequenceFlow id="flow94" sourceRef="exclusivegateway14" targetRef="preavviso-rigetto">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'invia_preavviso_di_rigetto'}]]></conditionExpression>
+      </sequenceFlow>
       <sequenceFlow id="flow95" sourceRef="exclusivegateway13" targetRef="valutazione">
         <extensionElements>
           <activiti:executionListener event="take" expression="${execution.setVariable(&quot;pdfPreavvisoRigettoFlag&quot;, &quot;1&quot;)}"></activiti:executionListener>
@@ -239,7 +241,7 @@
         <omgdi:waypoint x="410.0" y="53.0"></omgdi:waypoint>
         <omgdi:waypoint x="576.0" y="52.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="62.0" x="587.0" y="8.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="62.0" x="602.0" y="-7.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow72" id="BPMNEdge_flow72">
