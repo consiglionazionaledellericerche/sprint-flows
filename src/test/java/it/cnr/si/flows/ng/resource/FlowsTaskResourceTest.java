@@ -100,7 +100,7 @@ public class FlowsTaskResourceTest {
         assertEquals(1, myTasks.size());
         assertEquals(util.getFirstTaskId(), ((TaskResponse) myTasks.get(0)).getId());
 
-        verifyBadSearchParams(request);
+//        verifyBadSearchParams(request);
 
 //        verifico che non prenda nessun risultato ( DOPO CHE IL TASK VIENE DISASSEGNATO)
         flowsTaskResource.unclaimTask(util.getFirstTaskId());
