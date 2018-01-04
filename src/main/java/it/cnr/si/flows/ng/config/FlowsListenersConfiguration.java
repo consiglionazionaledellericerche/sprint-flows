@@ -49,7 +49,7 @@ public class FlowsListenersConfiguration {
 
     private void createDeployments() throws Exception {
         Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
-        String dir;
+        String dir = null;
         if (activeProfiles.contains("cnr"))
             dir = "cnr";
         else if (activeProfiles.contains("oiv"))
@@ -57,7 +57,7 @@ public class FlowsListenersConfiguration {
         else
             System.exit(1);
         
-        for (Resource resource : appContext.getResources("classpath:processes/*.bpmn*")) {
+        for (Resource resource : appContext.getResources("classpath:processes/"+ dir +"/*.bpmn*")) {
             LOGGER.info("\n ------- definition " + resource.getFilename());
             List<ProcessDefinition> processes = repositoryService.createProcessDefinitionQuery()
                     .processDefinitionKey(resource.getFilename().split("[.]")[0])
