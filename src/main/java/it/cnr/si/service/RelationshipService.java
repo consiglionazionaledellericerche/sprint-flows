@@ -7,8 +7,10 @@ import it.cnr.si.repository.CnrgroupRepository;
 import it.cnr.si.repository.RelationshipRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties.Env;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,7 +44,12 @@ public class RelationshipService {
     private AceBridgeService aceService;
     @Inject
     private CnrgroupRepository cnrgroupRepository;
-
+    @Inject
+    private MembershipService membershipService;
+    @Inject
+    private Environment env;
+    
+    
     /**
      * Save a relationship.
      *
@@ -95,11 +104,25 @@ public class RelationshipService {
         Set<String> aceGroupWithChildren = getACEChildren(aceGroup);
 
         //C) recupero i gruppi "associati" nel nostro db (getAllRelationship) e mergio
-        return Stream.concat(aceGroupWithChildren.stream(), getAllRelationship(aceGroupWithChildren).stream())
+        List<String> merged = Stream.concat(aceGroupWithChildren.stream(), getAllRelationship(aceGroupWithChildren).stream())
                 .distinct()
                 .map(Utils::addLeadingRole)
+                .collect(Collectors.toList());
+        
+        // D) Se sono su OIV, carico anche le Membership
+        if (Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
+            
+            merged = Stream.concat(merged.stream(), membershipService.getGroupsForUser(username).stream())
+                    .distinct()
+                    .map(Utils::addLeadingRole)
+                    .collect(Collectors.toList());
+        }
+        
+        List<GrantedAuthority> auths = merged.stream()
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
+        
+        return auths;
     }
 
     private Set<String> getACEChildren(Set<String> aceGroup) {
