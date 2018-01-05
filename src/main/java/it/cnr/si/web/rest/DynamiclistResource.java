@@ -3,6 +3,7 @@ package it.cnr.si.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.domain.Dynamiclist;
 import it.cnr.si.repository.DynamiclistRepository;
+import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.DynamicListService;
 import it.cnr.si.web.rest.util.HeaderUtil;
 import it.cnr.si.web.rest.util.PaginationUtil;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -51,6 +53,7 @@ public class DynamiclistResource {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
+    @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Dynamiclist> createDynamiclist(@Valid @RequestBody Dynamiclist dynamiclist) throws URISyntaxException {
         log.debug("REST request to save Dynamiclist : {}", dynamiclist);
         if (dynamiclist.getId() != null) {
@@ -75,6 +78,7 @@ public class DynamiclistResource {
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
+    @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Dynamiclist> updateDynamiclist(@Valid @RequestBody Dynamiclist dynamiclist) throws URISyntaxException {
         log.debug("REST request to update Dynamiclist : {}", dynamiclist);
         if (dynamiclist.getId() == null) {
@@ -172,6 +176,7 @@ public class DynamiclistResource {
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
+    @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Void> deleteDynamiclist(@PathVariable Long name) {
         log.debug("REST request to delete Dynamiclist : {}", name);
         dynamiclistRepository.delete(name);
