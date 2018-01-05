@@ -49,7 +49,7 @@ public class StartAcquistiSetGroupsAndVisibility implements ExecutionListener {
         if (groups.isEmpty())
             throw new BpmnError("403", "L'utente non e' abilitato ad avviare questo flusso");
         else if ( groups.size() > 1 )
-            throw new BpmnError("500", "L'utente appartiene a piu' di un gruppo Responsabile Tecnico");
+            throw new BpmnError("500", "L'utente appartiene a piu' di un gruppo Responsabile Acquisti");
         else {
 
             String gruppoRT = groups.get(0);

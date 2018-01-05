@@ -76,4 +76,8 @@ public class MembershipService {
     public Set<String> getGroupsForUser(String username) {
         return membershipRepository.findGroupsForUsername(username);
     }
+    
+    public List<String> findMembersInGroup(String groupname) {
+        return membershipRepository.findMembersInGroup(groupname);
+    }
 }
