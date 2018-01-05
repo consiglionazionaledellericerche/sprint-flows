@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -36,13 +39,14 @@ public class FlowsUserDetailsService implements org.springframework.security.cor
     private LdapUserDetailsService ldapUserDetailsService;
     @Inject
     private RelationshipService relationshipService;
-
+    @Inject
+    private Environment env;
 
     @Override
     @Transactional
     @Cacheable("user")
     public UserDetails loadUserByUsername(final String login) {
-        UserDetails userDetails;
+        UserDetails userDetails = null;
 
         log.debug("Loading User {}", login);
         String lowercaseLogin = login.toLowerCase(Locale.ENGLISH);
@@ -62,7 +66,8 @@ public class FlowsUserDetailsService implements org.springframework.security.cor
                                                                               grantedAuthorities);
             }).orElseGet(null);
         } else {
-            userDetails = ldapUserDetailsService.loadUserByUsername(login);
+            if (!Arrays.asList(env.getActiveProfiles()).contains("oiv")) 
+                userDetails = ldapUserDetailsService.loadUserByUsername(login);
         }
 
         if (userDetails == null)

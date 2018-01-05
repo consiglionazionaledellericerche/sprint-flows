@@ -263,28 +263,11 @@ public class FlowsTaskService {
 
         utils.orderTasks(order, taskQuery);
 
-        //filtro in ACE gli utenti che appartengono agli stessi gruppi dell'utente loggato
-        List<String> myGroups = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .map(Utils::removeLeadingRole)
-                .filter(group -> group.indexOf("afferenza") <= -1)
-                .filter(group -> group.indexOf("USER") <= -1)
-                .filter(group -> group.indexOf("DEPARTMENT") <= -1)
-                .filter(group -> group.indexOf("PREVIUOS") <= -1)
-                .collect(Collectors.toList());
-
 ////		TODO: da analizzare se le prestazioni sono migliori rispetto a farsi dare la lista di task attivi e ciclare per quali il member è l'assignee (codice di Martin sottostante)
         List<TaskResponse> result = new ArrayList<>();
 
-        List<String> usersInMyGroups = new ArrayList<>();
-        for (String myGroup : myGroups) {
-            usersInMyGroups.addAll(aceBridgeService.getUsersinAceGroup(myGroup) != null ? aceBridgeService.getUsersinAceGroup(myGroup) : new ArrayList<>());
-        }
-
-        usersInMyGroups = usersInMyGroups.stream()
-                .distinct()
-                .filter(user -> !user.equals(username))
-                .collect(Collectors.toList());
+        List<String> usersInMyGroups = relationshipService.getUsersInMyGroups(username);
+        
 //      prendo i task assegnati agli utenti trovati
         for (String user : usersInMyGroups)
             result.addAll(restResponseFactory.createTaskResponseList(taskQuery.taskAssignee(user).list()));
@@ -337,16 +320,15 @@ public class FlowsTaskService {
                 List<String> groups = authorities.stream()
                         .map(GrantedAuthority::<String>getAuthority)
                         .map(Utils::removeLeadingRole)
-                        .filter(g -> g.startsWith("ra@"))
+                        .filter(g -> g.startsWith("abilitati#"+ processDefinition.getKey() +"@"))
                         .collect(Collectors.toList());
 
-                if (groups.isEmpty())
-                    throw new BpmnError("403", "L'utente non e' abilitato ad avviare questo flusso (NON è Responsabile Acquisti)");
-                else if (groups.size() > 1)
-                    throw new BpmnError("500", "L'utente appartiene a piu' di un gruppo Responsabile Acquisti");
-                else {
-                    String gruppoRT = groups.get(0);
-                    String idStrutturaString = gruppoRT.substring(gruppoRT.lastIndexOf('@') + 1);
+                if (groups.isEmpty()) {
+                    throw new BpmnError("403", "L'utente non e' abilitato ad avviare questo flusso");
+                } else {
+                    // TODO la struttura va inserita nei listener specifico del flusso e non allo start
+//                    String gruppoAbilitati = groups.get(0);
+//                    String idStrutturaString = gruppoAbilitati.substring(gruppoAbilitati.lastIndexOf('@') + 1);
 
                     data.put(title.name(), key);
                     data.put(initiator.name(), username);
@@ -355,7 +337,7 @@ public class FlowsTaskService {
                     ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
 
                     org.json.JSONObject name = new org.json.JSONObject();
-                    name.put(idStruttura.name(), idStrutturaString);
+//                    name.put(idStruttura.name(), idStrutturaString);
                     name.put(title.name(), data.get(title.name()));
                     name.put(oggetto.name(), data.get(oggetto.name()));
                     name.put(descrizione.name(), data.get(descrizione.name()));

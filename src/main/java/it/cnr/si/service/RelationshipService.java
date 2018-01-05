@@ -1,25 +1,11 @@
 package it.cnr.si.service;
 
-import it.cnr.si.domain.Relationship;
-import it.cnr.si.flows.ng.service.AceBridgeService;
-import it.cnr.si.flows.ng.utils.Utils;
-import it.cnr.si.repository.CnrgroupRepository;
-import it.cnr.si.repository.RelationshipRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties.Env;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.core.env.Environment;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import static it.cnr.si.flows.ng.utils.Enum.Role.responsabile;
+import static it.cnr.si.flows.ng.utils.Enum.Role.responsabileStruttura;
+import static it.cnr.si.flows.ng.utils.Enum.Role.supervisore;
+import static it.cnr.si.flows.ng.utils.Enum.Role.supervisoreStruttura;
 
-import javax.inject.Inject;
-
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -27,7 +13,28 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static it.cnr.si.flows.ng.utils.Enum.Role.*;
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.env.Environment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.codahale.metrics.annotation.Timed;
+
+import it.cnr.si.domain.Relationship;
+import it.cnr.si.flows.ng.service.AceBridgeService;
+import it.cnr.si.flows.ng.utils.Utils;
+import it.cnr.si.repository.CnrgroupRepository;
+import it.cnr.si.repository.RelationshipRepository;
 
 /**
  * Service Implementation for managing Relationship.
@@ -97,22 +104,25 @@ public class RelationshipService {
     }
 
     @Cacheable(value = "allGroups", key = "#username")
+    @Timed
     public List<GrantedAuthority> getAllGroupsForUser(String username) {
-        //A) recupero la lista dei gruppi a cui appartiene direttamente l'utente
-        Set<String> aceGroup = getACEGroupsForUser(username);
-        //B) recupero i children dei gruppi "supervisori" e "responsabili"
-        Set<String> aceGroupWithChildren = getACEChildren(aceGroup);
-
-        //C) recupero i gruppi "associati" nel nostro db (getAllRelationship) e mergio
-        List<String> merged = Stream.concat(aceGroupWithChildren.stream(), getAllRelationship(aceGroupWithChildren).stream())
-                .distinct()
-                .map(Utils::addLeadingRole)
-                .collect(Collectors.toList());
         
-        // D) Se sono su OIV, carico anche le Membership
-        if (Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
-            
-            merged = Stream.concat(merged.stream(), membershipService.getGroupsForUser(username).stream())
+        List<String> merged;
+        if (!Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
+
+            //A) recupero la lista dei gruppi a cui appartiene direttamente l'utente
+            Set<String> aceGroup = getACEGroupsForUser(username);
+            //B) recupero i children dei gruppi "supervisori" e "responsabili"
+            Set<String> aceGroupWithChildren = getACEChildren(aceGroup);
+    
+            //C) recupero i gruppi "associati" nel nostro db (getAllRelationship) e mergio
+            merged = Stream.concat(aceGroupWithChildren.stream(), getAllRelationship(aceGroupWithChildren).stream())
+                    .distinct()
+                    .map(Utils::addLeadingRole)
+                    .collect(Collectors.toList());
+        } else {
+        // A) Se sono su OIV, carico le Membership            
+            merged = membershipService.getGroupsForUser(username).stream()
                     .distinct()
                     .map(Utils::addLeadingRole)
                     .collect(Collectors.toList());
@@ -180,5 +190,37 @@ public class RelationshipService {
 
     public Set<String> getACEGroupsForUser(String username) {
         return new HashSet<>(aceService.getAceGroupsForUser(username));
+    }
+
+    public List<String> getUsersInMyGroups(String username) {
+        
+        List<String> usersInMyGroups = new ArrayList<>();
+        List<String> myGroups = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .map(Utils::removeLeadingRole)
+                .filter(group -> group.indexOf("afferenza") <= -1)
+                .filter(group -> group.indexOf("USER") <= -1)
+                .filter(group -> group.indexOf("DEPARTMENT") <= -1)
+                .filter(group -> group.indexOf("PREVIOUS") <= -1)
+                .collect(Collectors.toList());
+        
+        if (!Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
+            //filtro in ACE gli utenti che appartengono agli stessi gruppi dell'utente loggato
+            for (String myGroup : myGroups) {
+                usersInMyGroups.addAll(aceService.getUsersinAceGroup(myGroup) != null ? aceService.getUsersinAceGroup(myGroup) : new ArrayList<>());
+            }
+        } else {
+            //filtro in Membership gli utenti che appartengono agli stessi gruppi dell'utente loggato            
+            for (String myGroup : myGroups) {
+                usersInMyGroups.addAll(membershipService.findMembersInGroup(myGroup) != null ? membershipService.findMembersInGroup(myGroup) : new ArrayList<>());
+            }
+        }
+            
+        usersInMyGroups = usersInMyGroups.stream()
+                .distinct()
+                .filter(user -> !user.equals(username))
+                .collect(Collectors.toList());
+        
+        return usersInMyGroups;
     }
 }
