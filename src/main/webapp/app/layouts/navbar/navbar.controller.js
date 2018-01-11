@@ -2,12 +2,12 @@
     'use strict';
 
     angular
-    .module('sprintApp')
-    .controller('NavbarController', NavbarController);
+        .module('sprintApp')
+        .controller('NavbarController', NavbarController);
 
     NavbarController.$inject = ['$rootScope', '$scope', '$state', 'Auth', 'Principal', 'ProfileService', 'LoginService', 'SwitchUserService', 'dataService', '$log'];
 
-    function NavbarController ($rootScope, $scope, $state, Auth, Principal, ProfileService, LoginService, SwitchUserService, dataService, $log) {
+    function NavbarController($rootScope, $scope, $state, Auth, Principal, ProfileService, LoginService, SwitchUserService, dataService, $log) {
         var vm = this;
 
         vm.isNavbarCollapsed = true;
@@ -16,6 +16,11 @@
         ProfileService.getProfileInfo().then(function(response) {
             vm.inProduction = response.inProduction;
             vm.swaggerEnabled = response.swaggerEnabled;
+            //recupero l'informazione circa il fatto che il profilo spring sia "cnr" o "oiv"
+            $rootScope.app = response.activeProfiles.filter(
+                function(profile) {
+                    return (profile !== 'dev' && profile !== 'prod');
+                })[0];
         });
 
         vm.login = login;
@@ -63,14 +68,17 @@
 
         function loadAvailableDefinitions() {
             dataService.definitions.all()
-            .then(function(response) {
-                $rootScope.wfDefs = response.data.data;
-                $rootScope.wfDefsAll = [];
-                $rootScope.wfDefsAll.push.apply($rootScope.wfDefsAll, response.data.data);
-                $rootScope.wfDefsAll.push({key:"all", name: "ALL"});
-            }, function (response) {
-                $log.error(response);
-            });
+                .then(function(response) {
+                    $rootScope.wfDefs = response.data.data;
+                    $rootScope.wfDefsAll = [];
+                    $rootScope.wfDefsAll.push.apply($rootScope.wfDefsAll, response.data.data);
+                    $rootScope.wfDefsAll.push({
+                        key: "all",
+                        name: "ALL"
+                    });
+                }, function(response) {
+                    $log.error(response);
+                });
         }
 
         loadAvailableDefinitions();
