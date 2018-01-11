@@ -3,10 +3,8 @@ package it.cnr.si.flows.ng.config;
 import it.cnr.si.flows.ng.listeners.MailNotificationListener;
 import it.cnr.si.flows.ng.listeners.SaveSummaryAtProcessCompletion;
 import it.cnr.si.flows.ng.listeners.VisibilitySetter;
-
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
-import org.activiti.engine.delegate.event.ActivitiEventListener;
 import org.activiti.engine.delegate.event.ActivitiEventType;
 import org.activiti.engine.repository.DeploymentBuilder;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -16,12 +14,14 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -38,7 +38,9 @@ public class FlowsListenersConfiguration {
     private RepositoryService repositoryService;
     @Inject
     private RuntimeService runtimeService;
-
+    @Inject
+    private Environment env;
+    
     @PostConstruct
     public void init() throws Exception {
         createDeployments();
@@ -46,11 +48,19 @@ public class FlowsListenersConfiguration {
     }
 
     private void createDeployments() throws Exception {
-
-        for (Resource resource : appContext.getResources("classpath:processes/*.bpmn*")) {
+        Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
+        String dir = null;
+        if (activeProfiles.contains("cnr"))
+            dir = "cnr";
+        else if (activeProfiles.contains("oiv"))
+            dir = "oiv";
+        else
+            System.exit(1);
+        
+        for (Resource resource : appContext.getResources("classpath:processes/"+ dir +"/*.bpmn*")) {
             LOGGER.info("\n ------- definition " + resource.getFilename());
             List<ProcessDefinition> processes = repositoryService.createProcessDefinitionQuery()
-                    .processDefinitionKeyLike("%" + resource.getFilename().split("[.]")[0] + "%")
+                    .processDefinitionKey(resource.getFilename().split("[.]")[0])
                     .list();
 
             if (processes.size() == 0) {

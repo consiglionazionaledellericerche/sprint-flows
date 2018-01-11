@@ -1,11 +1,14 @@
 package it.cnr.si.config;
 
+import java.util.Arrays;
+
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -20,6 +23,7 @@ import it.cnr.si.flows.ng.ldap.FlowsAuthoritiesPopulator;
  */
 
 @Configuration
+@Profile(value = {"cnr", "!oiv"})
 @EnableWebSecurity
 @Order(200)
 public class SecurityConfigurationLDAP extends WebSecurityConfigurerAdapter {
@@ -38,24 +42,28 @@ public class SecurityConfigurationLDAP extends WebSecurityConfigurerAdapter {
 
     @Inject
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        log.info("security LDAP configure global");
-        this.propertyResolver = new RelaxedPropertyResolver(env, "spring.ldap.");
-        String url = propertyResolver.getProperty("url");
-        if (propertyResolver != null && url != null) {
-            log.info("ldap server: " + url);
-
-            auth.ldapAuthentication()
-                    .userDetailsContextMapper(userDetailsContextMapper)
-                    .ldapAuthoritiesPopulator(authPopulator)
-                    .userSearchBase(propertyResolver.getProperty("userSearchBase"))
-                    .userSearchFilter(propertyResolver.getProperty("userSearchFilter"))
-                    .groupSearchBase(null)
-                    .contextSource()
-                    .url(url)
-                    .managerDn(propertyResolver.getProperty("managerDn"))
-                    .managerPassword(propertyResolver.getProperty("managerPassword"));
+        if (Arrays.asList(env.getActiveProfiles()).contains("cnr")) {
+            log.info("security LDAP configure global");
+            this.propertyResolver = new RelaxedPropertyResolver(env, "spring.ldap.");
+            String url = propertyResolver.getProperty("url");
+            if (propertyResolver != null && url != null) {
+                log.info("ldap server: " + url);
+    
+                auth.ldapAuthentication()
+                        .userDetailsContextMapper(userDetailsContextMapper)
+                        .ldapAuthoritiesPopulator(authPopulator)
+                        .userSearchBase(propertyResolver.getProperty("userSearchBase"))
+                        .userSearchFilter(propertyResolver.getProperty("userSearchFilter"))
+                        .groupSearchBase(null)
+                        .contextSource()
+                        .url(url)
+                        .managerDn(propertyResolver.getProperty("managerDn"))
+                        .managerPassword(propertyResolver.getProperty("managerPassword"));
+            } else {
+                log.warn("no ldap configuration found");
+            }
         } else {
-            log.warn("no ldap configuration found");
+            log.info("Profilo oiv, non carico LDAP");
         }
     }
 

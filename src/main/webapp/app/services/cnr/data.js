@@ -59,6 +59,23 @@
 				getAttachments: function(taskId) {
 					return $http.get('api/attachments/task/'+ taskId);
 				},
+                search: function (params) {					
+                    return $http.post('api/tasks/search/', params);
+                },
+                exportCsv: function (processInstance, active, params, order, firstResult, maxResults) {
+                    var processInstanceId;
+                    if (processInstance !== undefined) {
+                        processInstanceId = processInstance.key;
+                    } else {
+                        processInstanceId = 'all';
+                    }
+
+                    return $http.post('api/tasks/exportCsv/' + processInstanceId +
+                        '?active=' + active +
+                        '&order=' + order +
+                        '&firstResult=' + firstResult +
+                        '&maxResults=' + maxResults, params);
+                }
 			},
 			processInstances: {
 				byProcessInstanceId : function(processInstanceId) {
@@ -84,18 +101,8 @@
 				attachmentHistory: function(processInstaceId, attachmentName) {
 					return $http.get('api/attachments/history/'+ processInstaceId +'/'+ attachmentName);
 				},
-				search: function (processInstance, active, params, order, firstResult, maxResults) {
-					var processInstanceId;
-					if(processInstance !== undefined){
-						processInstanceId = processInstance.key;
-					} else {
-						processInstanceId = 'all';
-					}
-					return $http.post('api/processInstances/search/' + processInstanceId +
-							'?active=' + active +
-							'&order=' + order +
-							'&firstResult=' + firstResult +
-							'&maxResults=' + maxResults, params);
+				search: function (params) {
+					return $http.post('api/search/', params);
 				},
 				exportSummary: function (processInstaceId) {
 					return $http.get('api/summaryPdf?processInstanceId='+ processInstaceId);
@@ -137,6 +144,11 @@
 			dynamiclist : {
 				byName: function(name) {
 					return $http.get('api/dynamiclists/byname/'+ name);
+				}
+			},
+			sigladynamiclist : {
+				byName: function(name) {
+					return $http.get('api/sigladynamiclist/byname/'+ name);
 				}
 			},
 			view: function(processid, type) {

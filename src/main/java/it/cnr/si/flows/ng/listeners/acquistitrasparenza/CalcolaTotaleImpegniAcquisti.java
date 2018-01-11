@@ -21,7 +21,8 @@ public class CalcolaTotaleImpegniAcquisti implements ExecutionListener {
     @Override
     public void notify(DelegateExecution execution) throws Exception {
 
-        double importoTotale = 0.0;
+        double importoTotaleNetto = 0.0;
+        double importoTotaleLordo = 0.0;
 
         String impegniString = (String) execution.getVariable("impegni_json");
         JSONArray impegni = new JSONArray(impegniString);
@@ -30,13 +31,20 @@ public class CalcolaTotaleImpegniAcquisti implements ExecutionListener {
 
             JSONObject impegno = impegni.getJSONObject(i);
             try {
-                importoTotale += impegno.getDouble("importo");
+            	importoTotaleNetto += impegno.getDouble("importoNetto");
             } catch (JSONException e) {
-                LOGGER.error("Formato Impegno Non Valido {} nel flusso {} - {}", impegno.getString("importo"), execution.getId(), execution.getVariable("title"));
-                throw new BpmnError("400", "Formato Impegno Non Valido: " + impegno.getString("importo"));
+                LOGGER.error("Formato Impegno Non Valido {} nel flusso {} - {}", impegno.getString("importoNetto"), execution.getId(), execution.getVariable("title"));
+                throw new BpmnError("400", "Formato Impegno Non Valido: " + impegno.getString("importoNetto"));
+            }
+            try {
+            	importoTotaleLordo += impegno.getDouble("importoLordo");
+            } catch (JSONException e) {
+                LOGGER.error("Formato Impegno Non Valido {} nel flusso {} - {}", impegno.getString("importoLordo"), execution.getId(), execution.getVariable("title"));
+                throw new BpmnError("400", "Formato Impegno Non Valido: " + impegno.getString("importoLordo"));
             }
         }
 
-        execution.setVariable("importoTotale", importoTotale);
+        execution.setVariable("importoTotaleNetto", importoTotaleNetto);
+        execution.setVariable("importoTotaleLordo", importoTotaleLordo);
     }
 }

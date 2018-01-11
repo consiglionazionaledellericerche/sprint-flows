@@ -29,11 +29,10 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping("/api")
-@Secured(AuthoritiesConstants.ADMIN)
 public class MembershipResource {
 
     private final Logger log = LoggerFactory.getLogger(MembershipResource.class);
-
+        
     @Inject
     private MembershipService membershipService;
 
@@ -48,6 +47,7 @@ public class MembershipResource {
         method = RequestMethod.POST,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
+    @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Membership> createMembership(@Valid @RequestBody Membership membership) throws URISyntaxException {
         log.debug("REST request to save Membership : {}", membership);
         if (membership.getId() != null) {
@@ -72,6 +72,7 @@ public class MembershipResource {
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
+    @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Membership> updateMembership(@Valid @RequestBody Membership membership) throws URISyntaxException {
         log.debug("REST request to update Membership : {}", membership);
         if (membership.getId() == null) {
@@ -132,27 +133,11 @@ public class MembershipResource {
         method = RequestMethod.DELETE,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
+    @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Void> deleteMembership(@PathVariable Long id) {
         log.debug("REST request to delete Membership : {}", id);
         membershipService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("membership", id.toString())).build();
     }
 
-
-    /**
-     * GET  /memberships : get all the memberships.
-     *
-     * @param pageable the pagination information
-     * @return the ResponseEntity with status 200 (OK) and the list of memberships in body
-     * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
-     */
-    @RequestMapping(value = "/members/{groupName}",
-        method = RequestMethod.GET,
-        produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
-    public ResponseEntity<List<String>> getMembersInGroup(@PathVariable String groupName) {
-        log.debug("REST request to get Members in Group");
-        List<String> result = membershipService.findMembersInGroup(groupName);
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }
 }

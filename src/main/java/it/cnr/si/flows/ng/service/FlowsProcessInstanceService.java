@@ -6,6 +6,9 @@ import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
+import it.cnr.si.security.FlowsUserDetailsService;
+import it.cnr.si.security.PermissionEvaluatorImpl;
+import it.cnr.si.security.SecurityUtils;
 import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricProcessInstance;
@@ -14,14 +17,15 @@ import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.pvm.PvmActivity;
 import org.activiti.engine.impl.pvm.ReadOnlyProcessDefinition;
 import org.activiti.engine.impl.task.TaskDefinition;
-import org.activiti.engine.impl.util.json.JSONArray;
-import org.activiti.engine.impl.util.json.JSONObject;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricIdentityLinkResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
@@ -36,6 +40,7 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.idStruttura;
 import static it.cnr.si.flows.ng.utils.Utils.*;
 
 /**
@@ -63,6 +68,11 @@ public class FlowsProcessInstanceService {
     private RuntimeService runtimeService;
     @Inject
     private AceBridgeService aceBridgeService;
+    @Inject
+    PermissionEvaluatorImpl permissionEvaluator;
+    @Inject
+    private FlowsUserDetailsService flowsUserDetailsService;
+    private Utils utils = new Utils();
 
 
     public Map<String, Object> getProcessInstanceWithDetails(String processInstanceId) {
@@ -108,45 +118,35 @@ public class FlowsProcessInstanceService {
         //History
         ArrayList<Map<String, Object>> history = new ArrayList<>();
         historyService.createHistoricTaskInstanceQuery()
-                .includeTaskLocalVariables()
-                .processInstanceId(processInstanceId)
-                .list()
-                .forEach(
-                        task -> {
-                            List<HistoricIdentityLink> links = historyService.getHistoricIdentityLinksForTask(task.getId());
-                            HashMap<String, Object> entity = new HashMap<>();
-                            entity.put("historyTask", restResponseFactory.createHistoricTaskInstanceResponse(task));
+        .includeTaskLocalVariables()
+        .processInstanceId(processInstanceId)
+        .list()
+        .forEach(
+                task -> {
+                    List<HistoricIdentityLink> links = historyService.getHistoricIdentityLinksForTask(task.getId());
+                    HashMap<String, Object> entity = new HashMap<>();
+                    entity.put("historyTask", restResponseFactory.createHistoricTaskInstanceResponse(task));
 
-                            // Sostituisco l'id interno del gruppo con la dicitura estesa
-                            List<HistoricIdentityLinkResponse> historicIdLinks = restResponseFactory.createHistoricIdentityLinkResponseList(links);
-                            historicIdLinks.stream().forEach(
-                                    l -> l.setGroupId(aceBridgeService.getExtendedGroupNome(l.getGroupId())) );
+                    // Sostituisco l'id interno del gruppo con la dicitura estesa
+                    List<HistoricIdentityLinkResponse> historicIdLinks = restResponseFactory.createHistoricIdentityLinkResponseList(links);
+                    historicIdLinks.stream().forEach(
+                            l -> l.setGroupId(aceBridgeService.getExtendedGroupNome(l.getGroupId())) );
 
-                            entity.put("historyIdentityLink", historicIdLinks);
-                            history.add(entity);
-                        });
+                    entity.put("historyIdentityLink", historicIdLinks);
+                    history.add(entity);
+                });
         result.put("history", history);
         return result;
     }
 
-    public Map<String, Object> search(HttpServletRequest req, String processInstanceId, boolean active, String order, int firstResult, int maxResults) {
-        String jsonString = "";
-        Map<String, Object> result = new HashMap<>();
 
-        try {
-            jsonString = IOUtils.toString(req.getReader());
-        } catch (Exception e) {
-            LOGGER.error("Errore nella letture dello stream della request", e);
-        }
-        JSONArray params = new JSONObject(jsonString).getJSONArray("params");
+    public Map<String, Object> search(Map<String, String> req, String processDefinitionKey, boolean active, String order, int firstResult, int maxResults) {
 
         FlowsHistoricProcessInstanceQuery processQuery = new FlowsHistoricProcessInstanceQuery(managementService);
 
-        List<String> authorities =
-                SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .map(Utils::removeLeadingRole)
-                        .collect(Collectors.toList());
+        setSearchTerms(req, processQuery);
+
+        List<String> authorities = Utils.getCurrentUserAuthorities();
 
         // solo l'admin ignora le regole di visibilita'
         if (!authorities.contains("ADMIN")) {
@@ -154,21 +154,50 @@ public class FlowsProcessInstanceService {
             processQuery.setVisibleToUser(SecurityContextHolder.getContext().getAuthentication().getName());
         }
 
-        if (!processInstanceId.equals(ALL_PROCESS_INSTANCES))
-            processQuery.processDefinitionKey(processInstanceId);
+        if (!processDefinitionKey.equals(ALL_PROCESS_INSTANCES))
+            processQuery.processDefinitionKey(processDefinitionKey);
 
         if (active)
             processQuery.unfinished();
         else
             processQuery.finished();
 
-        for (int i = 0; i < params.length(); i++) {
-            JSONObject appo = params.optJSONObject(i);
-            String key = appo.getString("key");
-            String value = appo.getString("value");
-            String type = appo.getString("type");
-            //wildcard ("%") di default ma non a TUTTI i campi
-            switch (type) {
+        if (order.equals(ASC))
+            processQuery.orderByProcessInstanceStartTime().asc();
+        else if (order.equals(DESC))
+            processQuery.orderByProcessInstanceStartTime().desc();
+
+
+        Map<String, Object> result = new HashMap<>();
+
+        // processQuery.includeProcessVariables();
+        long totalItems = processQuery.count();
+        result.put("totalItems", totalItems);
+
+        List<HistoricProcessInstance> processesRaw;
+
+        if (firstResult != -1 && maxResults != -1)
+            processesRaw = processQuery.listPage(firstResult, maxResults);
+        else
+            processesRaw = processQuery.list();
+
+        List<HistoricProcessInstanceResponse> processes = restResponseFactory.createHistoricProcessInstanceResponseList(processesRaw);
+        result.put("processInstances", processes);
+
+        return result;
+    }
+
+
+    private void setSearchTerms(Map<String, String> params, FlowsHistoricProcessInstanceQuery processQuery) {
+
+        params.forEach((key, typevalue) -> {
+            if (typevalue.contains("=")) {
+
+                String type = typevalue.substring(0, typevalue.indexOf('='));
+                String value = typevalue.substring(typevalue.indexOf('=')+1);
+                
+                //wildcard ("%") di default ma non a TUTTI i campi
+                switch (type) {
                 case "textEqual":
                     processQuery.variableValueEquals(key, value);
                     break;
@@ -183,27 +212,10 @@ public class FlowsProcessInstanceService {
                     //variabili con la wildcard  (%value%)
                     processQuery.variableValueLikeIgnoreCase(key, "%" + value + "%");
                     break;
+                }
             }
-        }
-        if (order.equals(ASC))
-            processQuery.orderByProcessInstanceStartTime().asc();
-        else if (order.equals(DESC))
-            processQuery.orderByProcessInstanceStartTime().desc();
+        });
 
-        processQuery.includeProcessVariables();
-        long totalItems = processQuery.count();
-        result.put("totalItems", totalItems);
-
-        List<HistoricProcessInstance> processesRaw;
-
-        if (firstResult != -1 && maxResults != -1)
-            processesRaw = processQuery.listPage(firstResult, maxResults);
-        else
-            processesRaw = processQuery.list();
-
-        List<HistoricProcessInstanceResponse> processes = restResponseFactory.createHistoricProcessInstanceResponseList(processesRaw);
-        result.put("processInstances", processes);
-        return result;
     }
 
 
@@ -224,48 +236,46 @@ public class FlowsProcessInstanceService {
             ArrayList<String> tupla = new ArrayList<>();
             //field comuni a tutte le Process Instances (Business Key, Start date)
             tupla.add(pi.getBusinessKey());
-            tupla.add(Utils.formattaDataOra(pi.getStartTime()));
+            tupla.add(utils.formattaDataOra(pi.getStartTime()));
 
             //field specifici per ogni procesDefinition
             if (view != null) {
-                JSONArray fields = new JSONArray(view.getView());
-                for (int i = 0; i < fields.length(); i++) {
-                    JSONObject field = fields.getJSONObject(i);
-                    tupla.add(Utils.filterProperties(variables, field.getString("varName")));
-                    //solo per il primo ciclo, prendo le label dei field specifici
-                    if (!hasHeaders)
-                        headers.add(field.getString("label"));
+                try {
+                    JSONArray fields = new JSONArray(view.getView());
+                    for (int i = 0; i < fields.length(); i++) {
+                        JSONObject field = fields.getJSONObject(i);
+                        tupla.add(Utils.filterProperties(variables, field.getString("varName")));
+                        //solo per il primo ciclo, prendo le label dei field specifici
+                        if (!hasHeaders)
+                            headers.add(field.getString("label"));
+                    }
+                } catch (JSONException e) {
+                    LOGGER.error("Errore nel processamento del JSON", e);
+                    throw new IOException(e);
                 }
             }
             if (!hasHeaders) {
                 //inserisco gli headers come intestazione dei field del csv
-                entriesIterable.add(0, getArray(headers));
+                entriesIterable.add(0, utils.getArray(headers));
                 hasHeaders = true;
             }
-            entriesIterable.add(getArray(tupla));
+            entriesIterable.add(utils.getArray(tupla));
         }
         writer.writeAll(entriesIterable);
         writer.close();
     }
 
 
-    private void processDate(HistoricProcessInstanceQuery taskQuery, String key, String value) {
+    private void processDate(HistoricProcessInstanceQuery processQuery, String key, String value) {
         try {
-            Date date = Utils.parsaData(value);
+            Date date = utils.parsaData(value);
 
             if (key.contains("Less")) {
-                taskQuery.variableValueLessThanOrEqual(key.replace("Less", ""), date);
+                processQuery.variableValueLessThanOrEqual(key.replace("Less", ""), date);
             } else if (key.contains("Great"))
-                taskQuery.variableValueGreaterThanOrEqual(key.replace("Great", ""), date);
+                processQuery.variableValueGreaterThanOrEqual(key.replace("Great", ""), date);
         } catch (ParseException e) {
             LOGGER.error("Errore nel parsing della data {} - ", value, e);
         }
-    }
-
-
-    private String[] getArray(ArrayList<String> tupla) {
-        String[] entries = new String[tupla.size()];
-        entries = tupla.toArray(entries);
-        return entries;
     }
 }
