@@ -7,6 +7,11 @@
         return d ? moment(d).format('DD/MM/YYYY') : null;
     };
   })
+      .filter('get', function () {
+          return function (json, field) {
+              return json ? JSON.parse(json)[field] : null;
+          };
+      })
   .filter('dataora', function () {
     return function(d) {
         return d ? moment(d).format('DD/MM/YYYY HH:mm') : null;

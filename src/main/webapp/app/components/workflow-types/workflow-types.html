@@ -1,25 +1,15 @@
 <div>
     <div class="dropdown md-menu-origin">
-        <ul>
-            <li ui-sref-active="active" uib-dropdown class="dropdown pointer">
-                <a class="dropdown-toggle" uib-dropdown-toggle href="" id="definitions-menu">
-                            <span>
-                                <span class="hidden-sm">
-                                    {{$root.current.key || 'Process Definition'}}
-                                </span>
-                                <b class="caret"></b>
-                            </span>
-                </a>
-                <ul class="dropdown-menu" uib-dropdown-menu>
-                    <li ng-repeat="processDefinition in processDefinitions">
-                        <a ng-click="selectForm(processDefinition)">
-                            {{processDefinition.name}}
-                        </a>
-                    </li>
-                </ul>
-            </li>
-        </ul>
+        <ui-select ng-model="$root.current" title="Tipologie">
+            <ui-select-match placeholder="Seleziona la tipologia di flusso" allow-clear="true">
+                {{$select.selected.name}}
+            </ui-select-match>
+            <ui-select-choices repeat="processDefinition in processDefinitions">
+                <span ng-bind-html="processDefinition.name"></span>
+            </ui-select-choices>
+        </ui-select>
     </div>
+    <br>
     <div>
         <ng-include id="searchFields" src="formUrl"></ng-include>
     </div>
