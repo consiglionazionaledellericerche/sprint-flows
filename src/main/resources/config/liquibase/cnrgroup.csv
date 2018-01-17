@@ -26,3 +26,6 @@ id;name;display_name
 26;supervisore#acquisti-trasparenza@1865;GEDOC - Supervisore Flusso Acquisti Trasparenza
 27;rt@generic;Responsabile Tecnico di ogni Struttura
 28;abilitati_avvio_acquisti-trasparenza@4000;Abilitati avvio Flusso Acquisti trasparenza di ogni Struttura
+29;abilitati#iscrizione-elenco-oiv@99999;Abilitati avvio Flusso Elenco OIV
+30;istruttore@99999;Istruttore Elenco OIV
+31;coordinatoreresponsabile@99999;Coordinatore Responsabile  Elenco OIV
