@@ -14,8 +14,8 @@
             Il compito
             <strong th:text="${taskName}"></strong>
             per il flusso <strong th:text="${title}">TITOLO FLUSSO</strong>
-        <span th:if="${titoloIstanzaFlusso}">
-              <br><i>dal titolo: "<bold th:text="${titoloIstanzaFlusso}">OGGETTO FLUSSO</bold>"</i></span>
+            <span th:if="${oggetto}">
+              <br><i>dal titolo: "<bold th:text="${oggetto}">OGGETTO FLUSSO</bold>"</i></span>
         <hr>
             è stato assegnato al gruppo <strong th:text="${groupname}">NOME GRUPPO</strong>
         <p th:if="${commento}">

@@ -1,0 +1,14 @@
+# JMeter generated Header file
+        Authorization    Bearer b3189858-ecf6-4082-993d-0153d1876538
+        Accept    application/json, text/plain, */*
+        Accept-Encoding    gzip, deflate, br
+        Accept-Language    it-IT,it;q=0.8,en-US;q=0.6,en;q=0.4
+        Cache-Control    no-cache
+        Connection    keep-alive
+        Content-Type    multipart/form-data; boundary=----WebKitFormBoundaryDBe6pf0d0TjKh4jl
+        Cookie    __ngDebug=false; JSESSIONID=B9B023763632B73354A9F898661E47F2; Idea-a2e939e=3bdaa5cc-4cc3-42b7-8aab-3b20ac8af2aa; Idea-720fc07d=84b3d711-5926-46ce-8916-cc6808548881; cnr_impersonate=anna.penna; NG_TRANSLATE_LANG_KEY=%22it%22
+        Host    localhost:8080
+        Origin    http://localhost:8080
+        Pragma    no-cache
+        Referer    http://localhost:8080/
+        User-Agent    Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36

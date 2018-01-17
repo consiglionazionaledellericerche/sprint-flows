@@ -77,6 +77,15 @@ public class FlowsApp {
             log.error("You have misconfigured your application! It should not" +
                     "run with both the 'dev' and 'cloud' profiles at the same time.");
         }
+        
+        if (activeProfiles.contains("cnr") && activeProfiles.contains("oiv")) {
+            log.error("Non e' possibile eseguire l'applicazione con entrambi i profili 'cnr' e 'oiv'");
+            System.exit(1);
+        }
+        if (!activeProfiles.contains("cnr") && !activeProfiles.contains("oiv")) {
+            log.error("Selezionare esattamente un profilo tra 'cnr' e 'oiv'");
+            System.exit(1);
+        }
 
     }
 

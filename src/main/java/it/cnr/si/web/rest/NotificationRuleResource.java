@@ -4,6 +4,7 @@ import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.domain.NotificationRule;
 
 import it.cnr.si.repository.NotificationRuleRepository;
+import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.web.rest.util.HeaderUtil;
 import it.cnr.si.web.rest.util.PaginationUtil;
 
@@ -16,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -48,6 +50,7 @@ public class NotificationRuleResource {
         method = RequestMethod.POST,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
+    @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<NotificationRule> createNotificationRule(@Valid @RequestBody NotificationRule notificationRule) throws URISyntaxException {
         log.debug("REST request to save NotificationRule : {}", notificationRule);
         if (notificationRule.getId() != null) {
@@ -76,6 +79,7 @@ public class NotificationRuleResource {
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
+    @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<NotificationRule> updateNotificationRule(@Valid @RequestBody NotificationRule notificationRule) throws URISyntaxException {
         log.debug("REST request to update NotificationRule : {}", notificationRule);
         if (notificationRule.getId() == null) {
@@ -98,6 +102,7 @@ public class NotificationRuleResource {
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
+    @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<List<NotificationRule>> getAllNotificationRules(Pageable pageable)
         throws URISyntaxException {
         log.debug("REST request to get a page of NotificationRules");
@@ -116,6 +121,7 @@ public class NotificationRuleResource {
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
+    @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<NotificationRule> getNotificationRule(@PathVariable Long id) {
         log.debug("REST request to get NotificationRule : {}", id);
         NotificationRule notificationRule = notificationRuleRepository.findOne(id);
@@ -136,6 +142,7 @@ public class NotificationRuleResource {
         method = RequestMethod.DELETE,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
+    @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Void> deleteNotificationRule(@PathVariable Long id) {
         log.debug("REST request to delete NotificationRule : {}", id);
         notificationRuleRepository.delete(id);

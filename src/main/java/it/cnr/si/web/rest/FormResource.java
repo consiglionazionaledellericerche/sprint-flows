@@ -4,6 +4,7 @@ import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.domain.Form;
 
 import it.cnr.si.repository.FormRepository;
+import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.web.rest.util.HeaderUtil;
 import it.cnr.si.web.rest.util.PaginationUtil;
 
@@ -19,6 +20,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -55,6 +57,7 @@ public class FormResource {
         method = RequestMethod.POST,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
+    @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Form> createForm(@Valid @RequestBody Form form) throws URISyntaxException {
         log.debug("REST request to save Form : {}", form);
         if (form.getId() != null) {
@@ -79,6 +82,7 @@ public class FormResource {
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
+    @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Form> updateForm(@Valid @RequestBody Form form) throws URISyntaxException {
         log.debug("REST request to update Form : {}", form);
         if (form.getId() == null) {
@@ -139,6 +143,7 @@ public class FormResource {
         method = RequestMethod.DELETE,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
+    @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Void> deleteForm(@PathVariable Long id) {
         log.debug("REST request to delete Form : {}", id);
         formRepository.delete(id);

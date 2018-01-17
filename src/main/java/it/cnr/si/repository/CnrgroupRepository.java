@@ -1,8 +1,8 @@
 package it.cnr.si.repository;
 
 import it.cnr.si.domain.Cnrgroup;
-
-import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
@@ -17,5 +17,4 @@ public interface CnrgroupRepository extends JpaRepository<Cnrgroup,Long> {
 
     @Query("select cnrgroup from Cnrgroup cnrgroup left join fetch cnrgroup.parents where cnrgroup.id =:id")
     public Cnrgroup findOneWithEagerRelationships(@Param("id") Long id);
-
 }
