@@ -4,9 +4,9 @@
   angular.module('sprintApp')
   .directive('workflowTypes', workflowTypesDirective);
 
-  workflowTypesDirective.$inject = ['$rootScope'];
+  workflowTypesDirective.$inject = [];
 
-  function workflowTypesDirective(rootScope) {
+  function workflowTypesDirective() {
 
     return {
             restrict: 'E',
@@ -16,13 +16,16 @@
             },
             templateUrl: 'app/components/workflow-types/workflow-types.html',
             link: function (scope) {
-                scope.selectForm = function(processDefinition) {
-                    rootScope.current = processDefinition;
-
-                    if (processDefinition && scope.filters) {
-                         scope.formUrl = 'api/forms/'+ processDefinition.key + '/1/search';
-                    }
-                };
+                scope.$watchGroup(['$root.current'], function() {
+                    if (scope.filters && scope.$root.current) {
+                        if(scope.$root.isTaskQuery){
+                            scope.formUrl = 'api/forms/'+ scope.$root.current.key + '/1/search-ti';
+                        } else {
+                            scope.formUrl = 'api/forms/'+ scope.$root.current.key + '/1/search-pi';
+                        }
+                    } else
+                        scope.formUrl = null;
+                 });
             }
         };
     }

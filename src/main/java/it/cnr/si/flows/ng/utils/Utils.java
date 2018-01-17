@@ -17,8 +17,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -28,25 +29,27 @@ import java.util.stream.Collectors;
 
 public final class Utils {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
+
     public static final String TASK_EXECUTOR = "esecutore";
     public static final String PROCESS_VISUALIZER = "visualizzatore";
 
+    public static final String TASK_PARAMS = "taskParams";
     public static final String PROCESS_PARAMS = "processParams";
+    public static final String ERRORE_NELLA_LETTURE_DELLO_STREAM_DELLA_REQUEST = "Errore nella letture dello stream della request";
     public static final String ASC = "ASC";
     public static final String DESC = "DESC";
     public static final String ALL_PROCESS_INSTANCES = "all";
     public static final String LESS = "Less";
-    public static final String ERRORE_NELLA_LETTURE_DELLO_STREAM_DELLA_REQUEST = "Errore nella letture dello stream della request";
-    private static final String TASK_PARAMS = "taskParams";
-    private static final String GREAT = "Great";
-    private static final String ERRORE_NEL_PARSING_DELLA_DATA = "Errore nel parsing della data {} - ";
-    private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
-    private static final String ENTRY_KEY = "entry";
-    private static final String VALUE_KEY = "value";
+    public static final String ERRORE_NEL_PARSING_DELLA_DATA = "Errore nel parsing della data {} - ";
+    public static final String GREAT = "Great";
+    private static final String TEXT_EQUAL = "textEqual";
+    private static final String BOOLEAN = "boolean";
+    private static final String ROLE = "ROLE_";
     @Autowired
     private static RestResponseFactory restResponseFactory;
-    private static SimpleDateFormat formatoData = new SimpleDateFormat("yyyy-MM-dd");
-    private static DateFormat formatoDataOra = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);
+    public static DateFormat formatoData = new SimpleDateFormat("yyyy-MM-dd");
+    public static DateFormat formatoDataOra = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);
 
     public static boolean isEmpty(String in) {
         return in == null || in.equals("");
@@ -68,12 +71,23 @@ public final class Utils {
         return ResponseEntity.ok(response);
     }
 
+    public static String replaceStruttura(String groupRelationship, String struttura) {
+        return groupRelationship.replace("@STRUTTURA", struttura);
+    }
+
+    public static List<String> getCurrentUserAuthorities() {
+        return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .map(Utils::removeLeadingRole)
+                .collect(Collectors.toList());
+    }
+    
     public static String removeLeadingRole(String in) {
-        return in.startsWith("ROLE_") ? in.substring(5) : in;
+        return in.startsWith(ROLE) ? in.substring(5) : in;
     }
 
     public static String addLeadingRole(String in) {
-        return in.startsWith("ROLE_") ? in : "ROLE_" + in;
+        return in.startsWith(ROLE) ? in : ROLE + in;
     }
 
     public static Integer parseInt(String in) {
@@ -97,7 +111,7 @@ public final class Utils {
         return getStatus(parseInt(errCode));
     }
 
-    public static HashMap<String, Object> mapOf(String key, String value) {
+    public static Map<String, Object> mapOf(String key, String value) {
         HashMap<String, Object> result = new HashMap<>();
         result.put(key, value);
         return result;
@@ -112,23 +126,6 @@ public final class Utils {
             ret = ret + list.get(0).getValue();
         }
         return ret;
-
-
-//        RestVariable variable = properties.stream()
-//                .filter(a ->  a.getName().equals(property))
-//                .findFirst()
-//                .get();
-//        String ret = "";
-//        if(!((String)variable.getValue()).isEmpty()){
-//            ret = ret + variable.getValue();
-//        }
-//        return ret;
-
-//        return (String) properties.stream()
-//                .filter(a ->  a.getName().equals(property))
-//                .findFirst()
-//                .get()
-//                .getValue();
     }
 
     public void init() {
@@ -168,7 +165,7 @@ public final class Utils {
 
     public Query searchParamsForProcess(HttpServletRequest req, HistoricProcessInstanceQuery processQuery) {
         try {
-            JSONArray processParams = new JSONObject(IOUtils.toString(req.getReader())).getJSONArray("processParams");
+            JSONArray processParams = new JSONObject(IOUtils.toString(req.getReader())).getJSONArray(PROCESS_PARAMS);
 
             for (int i = 0; i < processParams.length(); i++) {
                 JSONObject appo = processParams.optJSONObject(i);
@@ -177,8 +174,8 @@ public final class Utils {
                 String type = appo.getString("type");
                 //wildcard ("%") di default ma non a TUTTI i campi
                 switch (type) {
-                    case "textEqual":
-                    case "boolean":
+                    case TEXT_EQUAL:
+                    case BOOLEAN:
                         // gestione variabili booleane e dei valori testuali "perfettamente uguali"
                         processQuery.variableValueEquals(key, value);
                         break;
@@ -211,10 +208,10 @@ public final class Utils {
             String type = appo.getString("type");
             //wildcard ("%") di default ma non a TUTTI i campi
             switch (type) {
-                case "textEqual":
+                case TEXT_EQUAL:
                     taskQuery.processVariableValueEquals(key, value);
                     break;
-                case "boolean":
+                case BOOLEAN:
                     // gestione variabili booleane
                     taskQuery.processVariableValueEquals(key, Boolean.valueOf(value));
                     break;
@@ -238,7 +235,7 @@ public final class Utils {
         return taskQuery;
     }
 
-    public TaskInfoQuery extractTaskSearchParams(TaskInfoQuery taskQuery, JSONArray taskParams) {
+    private TaskInfoQuery extractTaskSearchParams(TaskInfoQuery taskQuery, JSONArray taskParams) {
 
         for (int i = 0; i < taskParams.length(); i++) {
             JSONObject appo = taskParams.optJSONObject(i);
@@ -268,10 +265,10 @@ public final class Utils {
             } else {
                 //wildcard ("%") di default ma non a TUTTI i campi
                 switch (type) {
-                    case "textEqual":
+                    case TEXT_EQUAL:
                         taskQuery.taskVariableValueEquals(key, value);
                         break;
-                    case "boolean":
+                    case BOOLEAN:
                         // gestione variabili booleane
                         taskQuery.taskVariableValueEquals(key, Boolean.valueOf(value));
                         break;
@@ -300,9 +297,16 @@ public final class Utils {
         return formatoData.parse(in);
     }
 
+
+    public String[] getArray(List<String> tupla) {
+        String[] entries = new String[tupla.size()];
+        entries = tupla.toArray(entries);
+        return entries;
+    }
+
     private TaskInfoQuery historicTaskDate(TaskInfoQuery taskQuery, String key, String value) {
         try {
-            Date date = formatoData.parse(value);
+            Date date = parsaData(value);
 
             if (key.contains(LESS)) {
                 taskQuery.taskVariableValueLessThanOrEqual(key.replace(LESS, ""), date);

@@ -41,6 +41,11 @@ public class Enum {
     }
 
 
+    public enum SiglaList {
+        TIPOLOGIA_ACQUISIZIONE;
+    }
+
+
     public enum Stato {
         Validato,
         Protocollato,
@@ -63,5 +68,33 @@ public class Enum {
         Annullo,
         Sostituzione,
         RimozioneDaPubblicazione
+    }
+
+
+    public enum ProcessDefinitionEnum {
+        acquisti("acquisti"),
+        permessiFerie("permessi-ferie");
+
+        private String value;
+
+        ProcessDefinitionEnum(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
+
+    public enum VariableEnum {
+        initiator,
+        title,
+        oggetto,
+        descrizione,
+        idStruttura,
+        startDate,
+        endDate,
+        gruppoRA;
     }
 }
