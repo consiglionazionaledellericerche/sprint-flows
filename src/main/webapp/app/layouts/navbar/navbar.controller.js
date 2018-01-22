@@ -17,10 +17,7 @@
             vm.inProduction = response.inProduction;
             vm.swaggerEnabled = response.swaggerEnabled;
             //recupero l'informazione circa il fatto che il profilo spring sia "cnr" o "oiv"
-            $rootScope.app = response.activeProfiles.filter(
-                function(profile) {
-                    return (profile !== 'dev' && profile !== 'prod');
-                })[0];
+            $rootScope.app = response.activeProfiles.includes('oiv') ? 'oiv' : 'cnr'
         });
 
         vm.login = login;
