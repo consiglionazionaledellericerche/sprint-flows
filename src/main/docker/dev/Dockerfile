@@ -19,5 +19,6 @@ CMD echo "The application will start in ${JHIPSTER_SLEEP}s..." && \
     sleep ${JHIPSTER_SLEEP} && \
 # tolto -Dspring.profiles.active=swagger,test perché va nello yml di docker
 #    java -Djava.security.egd=file:/dev/./urandom -Dspring.profiles.active=swagger,test  -jar /app.war
-    java -Djava.security.egd=file:/dev/./urandom  -jar /app.war
+
+    java -Djava.security.egd=file:/dev/./urandom  -Dspring.profiles.active=demo,cnr -jar /app.war
     
