@@ -6,7 +6,7 @@ cd src/main/docker/demo
 
 
 echo "################################## Copio il war nella folder di docker #################################################!"
-cp target/sprint-flows*.war src/main/docker/dev/app.war
+cp target/sprint-flows*.war app.war
 
 
 
