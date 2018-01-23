@@ -5,7 +5,7 @@ mvn clean install -DskipTests
 cd src/main/docker/demo
 
 echo -e "\n################################## Copio il war nella folder di docker #################################################\n"
-cp ../../../target/sprint-flows*.war src/main/docker/demo/app.war
+cp ../../../../target/sprint-flows*.war app.war
 
 
 if [[ $(docker ps -a -q -f name=sprint-flows*) != "" ]]; then
