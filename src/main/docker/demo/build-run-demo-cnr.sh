@@ -25,10 +25,7 @@ docker build --no-cache -t sprint-flows-demo -f Dockerfile .
 #docker run -p 8080:8080 --name sprint-flows-dev sprint-flows-dev
 
 #todo: customizzarsi il path di sprint-flows-demo
-#applicazione con il profilo CNR
-#cd /home/cirone/Scrivania/git/docker-compose-demo/sprint-flows-demo-cnr
-#applicazione con il profilo OIV
-cd /home/cirone/Scrivania/git/docker-compose-demo/sprint-flows-demo-oiv
+cd /home/cirone/Scrivania/git/docker-compose-demo/sprint-flows-demo-cnr
 
 docker-compose up
 
