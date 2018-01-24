@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <databaseChangeLog
-    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
     <property name="now" value="now()" dbms="mysql,h2"/>
     <property name="now" value="current_timestamp" dbms="postgresql"/>
@@ -14,23 +14,27 @@
     <property name="floatType" value="float" dbms="mysql, oracle"/>
 
     <!--
-        Added the entity Counter.
+        Added the entity Dynamiclist.
     -->
-    <changeSet id="20160922122807-1" author="jhipster">
-        <createTable tableName="counter">
+    <changeSet id="20170503122545-1" author="jhipster">
+        <createTable tableName="dynamiclist">
             <column name="id" type="bigint" autoIncrement="${autoIncrement}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="name" type="varchar(255)">
-                <constraints nullable="true" />
+                <constraints nullable="false" unique="true"/>
             </column>
 
-            <column name="value" type="bigint">
-                <constraints nullable="true" />
+            <column name="listjson" type="varchar">
+                <constraints nullable="false"/>
             </column>
 
             <!-- jhipster-needle-liquibase-add-column - Jhipster will add columns here, do not remove-->
         </createTable>
 
+        <loadData encoding="UTF-8"
+                  file="config/liquibase/oiv/dynamiclist.csv"
+                  separator=";"
+                  tableName="dynamiclist"/>
     </changeSet>
 </databaseChangeLog>

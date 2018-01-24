@@ -1,0 +1,33 @@
+id;name;display_name
+1;root;Root
+2;gestori_flussi@4000;Gestori Flussi
+3;gestori#permessi-ferie@4000;Gestori Flusso Permessi e Ferie
+4;responsabile#permessi-ferie@4000;Responsabile Flusso Ferie
+5;supervisore#permessi-ferie@4000;Supervisore Flusso Permessi e Ferie
+6;gestiori#acquisti-trasparenza@4000;Gestori Flusso Acquisti
+7;responsabile#acquisti-trasparenza@4000;Responsabile Flusso Acquisti Trasparenza
+8;supervisore#acquisti-trasparenza@4000;Supervisore Flusso Acquisti Trasparenza
+10;gestori_strutture@4000;Gestori Strutture
+11;2216;SISIFNO
+12;1865;GEDOC
+13;direttore@2216;SISINFO - Direttore
+14;segreteria@2216;SISINFO - Segreteria
+15;rt@2216;SISINFO - RT
+16;sfd@2216;SISIDFO - SFD
+17;ra@2216;SISINFO - RA
+18;responsabile#acquisti-trasparenza@2216;SISINFO - Responsabile Flusso Acquisti Trasparenza
+19;supervisore#acquisti-trasparenza@2216;SISINFO - Supervisore Flusso Acquisti Trasparenza
+20;direttore@1865;GEDOC - Direttore
+21;segreteria@1865;GEDOC - Segreteria
+22;rt@1865;GEDOC - RT
+23;sfd@1865;SISIDFO - SFD
+24;ra@1865;GEDOC - RA
+25;responsabile#acquisti-trasparenza@1865;GEDOC - Responsabile Flusso Acquisti Trasparenza
+26;supervisore#acquisti-trasparenza@1865;GEDOC - Supervisore Flusso Acquisti Trasparenza
+27;rt@generic;Responsabile Tecnico di ogni Struttura
+28;abilitati_avvio_acquisti-trasparenza@4000;Abilitati avvio Flusso Acquisti trasparenza di ogni Struttura
+29;abilitati#iscrizione-elenco-oiv@99999;Abilitati avvio Flusso Elenco OIV
+30;istruttore@99999;Istruttore Elenco OIV
+31;coordinatoreresponsabile@99999;Coordinatore Responsabile  Elenco OIV
+32;coordinatoreresponsabile@99999;Coordinatore Responsabile  Elenco CNR
+33;coordinatoreresponsabile@99999;Coordinatore Responsabile  Elenco CNR 2
