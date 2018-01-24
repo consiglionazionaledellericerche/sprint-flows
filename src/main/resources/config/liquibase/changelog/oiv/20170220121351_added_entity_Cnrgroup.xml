@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <databaseChangeLog
-    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
     <property name="now" value="now()" dbms="mysql,h2"/>
     <property name="now" value="current_timestamp" dbms="postgresql"/>
@@ -14,34 +14,40 @@
     <property name="floatType" value="float" dbms="mysql, oracle"/>
 
     <!--
-        Added the entity Cnrauthority.
+        Added the entity Cnrgroup.
     -->
-    <changeSet id="20170206085209-1" author="jhipster">
-        <createTable tableName="cnrauthority">
+    <changeSet id="20170220121351-1" author="jhipster">
+        <createTable tableName="cnrgroup">
             <column name="id" type="bigint" autoIncrement="${autoIncrement}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="display_name" type="varchar(255)">
-                <constraints nullable="true" />
-            </column>
-            
             <column name="name" type="varchar(255)">
-                <constraints nullable="true" />
-            </column>
-            
-            <!-- jhipster-needle-liquibase-add-column - Jhipster will add columns here, do not remove-->
-        </createTable>
-        
-        <createTable tableName="cnrauthority_cnrauthorityparent">
-            <column name="cnrauthorityparents_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="cnrauthorities_id" type="bigint">
+
+            <column name="display_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <!-- jhipster-needle-liquibase-add-column - Jhipster will add columns here, do not remove-->
+        </createTable>
+
+        <createTable tableName="cnrgroup_parents">
+            <column name="parents_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cnrgroups_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
         </createTable>
 
-        <addPrimaryKey columnNames="cnrauthorities_id, cnrauthorityparents_id" tableName="cnrauthority_cnrauthorityparent"/>
-        
+        <addPrimaryKey columnNames="cnrgroups_id, parents_id" tableName="cnrgroup_parents"/>
+
+        <loadData encoding="UTF-8"
+                  file="config/liquibase/oiv/cnrgroup.csv"
+                  separator=";"
+                  tableName="cnrgroup"/>
+
+
     </changeSet>
 </databaseChangeLog>
