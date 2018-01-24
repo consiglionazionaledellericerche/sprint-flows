@@ -21,11 +21,15 @@ echo -e "\n################################## BUILDING sprint-flows-demo #######
 docker build --no-cache -t sprint-flows-demo -f Dockerfile .
 
 
-#echo "################################## RUNNING sprint-flows #################################################!"
+#echo -e "\n################################## RUNNING sprint-flows #################################################\n"
 #docker run -p 8080:8080 --name sprint-flows-dev sprint-flows-dev
 
 #todo: customizzarsi il path di sprint-flows-demo
-cd /home/cirone/Scrivania/git/docker-compose-demo/sprint-flows-demo
+#applicazione con il profilo CNR
+#cd /home/cirone/Scrivania/git/docker-compose-demo/sprint-flows-demo-cnr
+#applicazione con il profilo OIV
+cd /home/cirone/Scrivania/git/docker-compose-demo/sprint-flows-demo-oiv
+
 docker-compose up
 
 
