@@ -49,7 +49,7 @@ public class StartOivSetGroupsAndVisibility implements ExecutionListener {
 		execution.setVariable("gruppoCoordinatoreResponsabile", gruppoCoordinatoreResponsabile);
 		execution.setVariable("domandaImprocedibileFlag", "0");
 		execution.setVariable("soccorsoIstruttoriaFlag", "0");
-		
+		execution.setVariable("soccorsoIstruttoriaFlag", "0");
 		LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoIstruttori, gruppoDirettore, gruppoCoordinatoreResponsabile);
 
 		//conversione semplice di date
