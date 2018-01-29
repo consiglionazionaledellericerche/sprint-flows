@@ -14,18 +14,22 @@
     <property name="floatType" value="float" dbms="mysql, oracle"/>
 
     <!--
-        Added the entity Dynamiclist.
+        Added the entity View.
     -->
-    <changeSet id="20170503122545-1" author="jhipster">
-        <createTable tableName="dynamiclist">
+    <changeSet id="20170504083856-1" author="jhipster">
+        <createTable tableName="view">
             <column name="id" type="bigint" autoIncrement="${autoIncrement}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="name" type="varchar(255)">
-                <constraints nullable="false" unique="true"/>
+            <column name="process_id" type="varchar(255)">
+                <constraints nullable="false"/>
             </column>
 
-            <column name="listjson" type="varchar">
+            <column name="type" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="view" type="varchar">
                 <constraints nullable="false"/>
             </column>
 
@@ -33,8 +37,8 @@
         </createTable>
 
         <loadData encoding="UTF-8"
-                  file="config/liquibase/oiv/dynamiclist.csv"
+                  file="config/liquibase/view.csv"
                   separator=";"
-                  tableName="dynamiclist"/>
+                  tableName="view"/>
     </changeSet>
 </databaseChangeLog>

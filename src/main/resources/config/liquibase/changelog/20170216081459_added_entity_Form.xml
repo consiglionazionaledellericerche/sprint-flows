@@ -41,7 +41,7 @@
         </createTable>
 
         <loadData encoding="UTF-8"
-                  file="config/liquibase/cnr/form.csv"
+                  file="config/liquibase/form.csv"
                   separator=";"
                   tableName="form"/>
     </changeSet>
