@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -66,8 +65,10 @@ public class FlowsUserDetailsService implements org.springframework.security.cor
                                                                               grantedAuthorities);
             }).orElseGet(null);
         } else {
-            if (!Arrays.asList(env.getActiveProfiles()).contains("oiv")) 
+            List<String> profiles = Arrays.asList(env.getActiveProfiles());
+            if (profiles.contains("cnr"))
                 userDetails = ldapUserDetailsService.loadUserByUsername(login);
+//            else if(profiles.contains("oiv")){} implementare l'impersonate per gli utenti oiv'   todo: implementare l'impersonate per gli utenti oiv
         }
 
         if (userDetails == null)
