@@ -6,11 +6,15 @@ spring:
         managerDn: cn=mastercnrapp2,ou=account,o=cnr,c=it
         managerPassword: pippa
     datasource:
+#        type: com.zaxxer.hikari.HikariDataSource
+#        url: jdbc:postgresql://localhost:5432/activiti
+#        name:
+#        username: activiti
+#        password: activitipw
         type: com.zaxxer.hikari.HikariDataSource
-        url: jdbc:postgresql://localhost:5432/activiti
-        name:
-        username: activiti
-        password: activitipw
+        url: jdbc:h2:file:./DB-H2/flows;DB_CLOSE_DELAY=-1
+        username: flows
+        password:
         ace:
            type: com.zaxxer.hikari.HikariDataSource
            url: jdbc:postgresql://dbtest1.si.cnr.it:5432/anagrafica
