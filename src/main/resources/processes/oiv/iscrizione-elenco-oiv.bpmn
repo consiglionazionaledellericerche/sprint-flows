@@ -10,8 +10,8 @@
       <sequenceFlow id="flow10" sourceRef="startevent1" targetRef="istruttoria"></sequenceFlow>
       <userTask id="istruttoria" name="ISTRUTTORIA" activiti:candidateGroups="${gruppoIstruttori}">
         <extensionElements>
+          <activiti:executionListener event="end" delegateExpression="${determinaTimer}"></activiti:executionListener>
           <activiti:executionListener event="end" delegateExpression="${calcolaPunteggioFascia}"></activiti:executionListener>
-          <activiti:executionListener event="start" expression="LOGGER.info(&quot;------ DATA FINE PROCEDURA: &quot; + execution.getVariable(boundarytimer3));"></activiti:executionListener>
         </extensionElements>
       </userTask>
       <sequenceFlow id="flow4" sourceRef="istruttoria" targetRef="exclusivegateway1"></sequenceFlow>
@@ -105,6 +105,7 @@
       <sequenceFlow id="flow95" sourceRef="exclusivegateway13" targetRef="valutazione">
         <extensionElements>
           <activiti:executionListener event="take" expression="${execution.setVariable(&quot;pdfPreavvisoRigettoFlag&quot;, &quot;1&quot;)}"></activiti:executionListener>
+          <activiti:executionListener event="take" delegateExpression="${createOivPdf}"></activiti:executionListener>
         </extensionElements>
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'genera_PDF_preavviso_di_rigetto' || sceltaUtente == 'calcola_punteggio' }]]></conditionExpression>
       </sequenceFlow>
