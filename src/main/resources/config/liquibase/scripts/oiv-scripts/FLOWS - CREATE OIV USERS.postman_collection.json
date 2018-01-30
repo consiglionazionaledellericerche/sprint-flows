@@ -1,0 +1,380 @@
+{
+	"info": {
+		"name": "FLOWS - CREATE OIV USERS",
+		"_postman_id": "c172a71d-e508-ed7c-3d62-1dc6e80c9b1f",
+		"description": "crwa utenti oiv",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Richiesta token Flows",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3c91000b-a35e-49be-b5f1-d3153b8f3f67",
+						"type": "text/javascript",
+						"exec": [
+							"postman.setGlobalVariable(\"ACCESS_TOKEN\", \"d8de3f89-0069-4caf-95ae-058d29239783\");",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "f467fcee-9ef5-4633-b821-cd2392450e33",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/api/account",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"account"
+					]
+				},
+				"description": "Ottiene il token (impostare una passoword)."
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE USER1",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":null,\"login\":\"utente1\",\"firstName\":\"utente1\",\"lastName\":\"utente1\",\"email\":\"utente1@cnr.it\",\"activated\":true,\"langKey\":\"en\",\"createdBy\":null,\"createdDate\":null,\"lastModifiedBy\":null,\"lastModifiedDate\":null,\"resetDate\":null,\"resetKey\":null,\"authorities\":[\"ROLE_USER\"]}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/users?",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"users"
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE USER2",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":null,\"login\":\"utente2\",\"firstName\":\"utente2\",\"lastName\":\"utente2\",\"email\":\"utente2@cnr.it\",\"activated\":true,\"langKey\":\"en\",\"createdBy\":null,\"createdDate\":null,\"lastModifiedBy\":null,\"lastModifiedDate\":null,\"resetDate\":null,\"resetKey\":null,\"authorities\":[\"ROLE_USER\"]}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/users?",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"users"
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE USER3",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":null,\"login\":\"utente3\",\"firstName\":\"utente3\",\"lastName\":\"utente3\",\"email\":\"utente3@cnr.it\",\"activated\":true,\"langKey\":\"en\",\"createdBy\":null,\"createdDate\":null,\"lastModifiedBy\":null,\"lastModifiedDate\":null,\"resetDate\":null,\"resetKey\":null,\"authorities\":[\"ROLE_USER\"]}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/users?",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"users"
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE USER4",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":null,\"login\":\"utente4\",\"firstName\":\"utente4\",\"lastName\":\"utente4\",\"email\":\"utente4@cnr.it\",\"activated\":true,\"langKey\":\"en\",\"createdBy\":null,\"createdDate\":null,\"lastModifiedBy\":null,\"lastModifiedDate\":null,\"resetDate\":null,\"resetKey\":null,\"authorities\":[\"ROLE_USER\"]}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/users?",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"users"
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE MEMBERSHIP USER1",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 21,\r\n    \"username\": \"utente1\",\r\n    \"groupname\": \"abilitati#iscrizione-elenco-oiv@99999\"\r\n  }"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/memberships",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"memberships"
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE MEMBERSHIP USER2",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 22,\r\n    \"username\": \"utente2\",\r\n    \"groupname\": \"istruttore@99999\"\r\n  }"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/memberships",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"memberships"
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE MEMBERSHIP USER3",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 23,\r\n    \"username\": \"utente3\",\r\n    \"groupname\": \"coordinatoreresponsabile@99999\"\r\n  }"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/memberships",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"memberships"
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE MEMBERSHIP USER4",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 24,\r\n    \"username\": \"utente4\",\r\n    \"groupname\": \"direttore@99999\"\r\n  }"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/memberships",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"memberships"
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		}
+	]
+}
