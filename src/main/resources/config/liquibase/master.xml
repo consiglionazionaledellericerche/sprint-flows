@@ -5,26 +5,26 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
     <include file="classpath:config/liquibase/changelog/00000000000000_initial_schema.xml" relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog/cnr/20160922122807_added_entity_Counter.xml"
+    <include file="classpath:config/liquibase/changelog/20160922122807_added_entity_Counter.xml"
              relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog/cnr/20170206085209_added_entity_Cnrauthority.xml"
+    <include file="classpath:config/liquibase/changelog/20170206085209_added_entity_Cnrauthority.xml"
              relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog/cnr/20170216081459_added_entity_Form.xml"
+    <include file="classpath:config/liquibase/changelog/20170216081459_added_entity_Form.xml"
              relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog/cnr/20170220121351_added_entity_Cnrgroup.xml"
+    <include file="classpath:config/liquibase/changelog/20170220121351_added_entity_Cnrgroup.xml"
              relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog/cnr/20170503122545_added_entity_Dynamiclist.xml"
+    <include file="classpath:config/liquibase/changelog/20170503122545_added_entity_Dynamiclist.xml"
              relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog/cnr/20170504083856_added_entity_View.xml"
+    <include file="classpath:config/liquibase/changelog/20170504083856_added_entity_View.xml"
              relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog/cnr/20170621121602_added_entity_NotificationRule.xml"
+    <include file="classpath:config/liquibase/changelog/20170621121602_added_entity_NotificationRule.xml"
              relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog/cnr/20171023125007_added_entity_Relationship.xml"
+    <include file="classpath:config/liquibase/changelog/20171023125007_added_entity_Relationship.xml"
              relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog/cnr/20170418091241_added_entity_Membership.xml"
+    <include file="classpath:config/liquibase/changelog/20170418091241_added_entity_Membership.xml"
              relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
-    <include file="classpath:config/liquibase/changelog/cnr/20170206085209_added_entity_constraints_Cnrauthority.xml"
+    <include file="classpath:config/liquibase/changelog/20170206085209_added_entity_constraints_Cnrauthority.xml"
              relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
 </databaseChangeLog>
