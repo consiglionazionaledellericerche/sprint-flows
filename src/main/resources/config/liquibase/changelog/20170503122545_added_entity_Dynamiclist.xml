@@ -33,7 +33,7 @@
         </createTable>
 
         <loadData encoding="UTF-8"
-                  file="config/liquibase/oiv/dynamiclist.csv"
+                  file="config/liquibase/dynamiclist.csv"
                   separator=";"
                   tableName="dynamiclist"/>
     </changeSet>

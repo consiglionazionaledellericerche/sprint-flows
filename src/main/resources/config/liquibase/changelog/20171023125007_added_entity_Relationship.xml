@@ -14,26 +14,18 @@
     <property name="floatType" value="float" dbms="mysql, oracle"/>
 
     <!--
-        Added the entity Form.
+        Added the entity Relationship.
     -->
-    <changeSet id="20170216081459-1" author="jhipster">
-        <createTable tableName="form">
+    <changeSet id="20171023125007-1" author="jhipster">
+        <createTable tableName="relationship">
             <column name="id" type="bigint" autoIncrement="${autoIncrement}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="process_definition_key" type="varchar(255)">
+            <column name="group_name" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
 
-            <column name="version" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="task_id" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="form" type="varchar">
+            <column name="group_relationship" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
 
@@ -41,8 +33,8 @@
         </createTable>
 
         <loadData encoding="UTF-8"
-                  file="config/liquibase/cnr/form.csv"
+                  file="config/liquibase/relationship.csv"
                   separator=";"
-                  tableName="form"/>
+                  tableName="relationship"/>
     </changeSet>
 </databaseChangeLog>

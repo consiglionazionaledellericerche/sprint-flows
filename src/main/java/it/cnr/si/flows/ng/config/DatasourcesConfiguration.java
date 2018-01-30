@@ -1,7 +1,6 @@
 package it.cnr.si.flows.ng.config;
 
-import javax.sql.DataSource;
-
+import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
@@ -9,9 +8,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.zaxxer.hikari.HikariDataSource;
+import javax.inject.Inject;
+import javax.sql.DataSource;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * Per poter creare un datasource secondario, non posso piu' affidarmi all'autoconfigurazione
@@ -28,6 +31,10 @@ import com.zaxxer.hikari.HikariDataSource;
 @Configuration
 public class DatasourcesConfiguration {
 
+    @Inject
+    private Environment env;
+
+
     @Bean(name = {"dataSourceProperties"})
     @ConfigurationProperties(prefix="spring.datasource")
     @Primary
@@ -35,13 +42,16 @@ public class DatasourcesConfiguration {
         return new DataSourceProperties();
     }
 
+
     @Bean(name = {"dataSource"})
     @Primary
     @ConfigurationProperties(prefix="spring.datasource")
     public HikariDataSource cataSource(DataSourceProperties properties) {
-        return (HikariDataSource) DataSourceBuilder.create(properties.getClassLoader()).type(HikariDataSource.class)
+        return (HikariDataSource) DataSourceBuilder.create(properties.getClassLoader())
+                .type(HikariDataSource.class)
                 .driverClassName(properties.determineDriverClassName())
-                .url(properties.determineUrl()).username(properties.determineUsername())
+                .url(getDbUrl(properties.determineUrl(), Arrays.asList(env.getActiveProfiles())))
+                .username(properties.determineUsername())
                 .password(properties.determinePassword()).build();
     }
 
@@ -52,6 +62,7 @@ public class DatasourcesConfiguration {
     public DataSourceProperties aceDataSourceProperties() {
         return new DataSourceProperties();
     }
+
 
     @Bean(name = {"aceDataSource"})
     public HikariDataSource aceDataSource(@Qualifier("aceDataSourceProperties") DataSourceProperties properties) {
@@ -66,9 +77,22 @@ public class DatasourcesConfiguration {
                 .build();
     }
 
+
     @Bean(name= {"aceJdbcTemplate"})
     public JdbcTemplate aceJdbcTemplate(@Qualifier("aceDataSource") DataSource aceDataSource) {
         return new JdbcTemplate(aceDataSource);
     }
 
+
+    //serve per far puntare db diversi se uso il profilo "oiv" o il profilo "cnr"
+    private String getDbUrl(String dbUrl, Collection<String> springActiveProfiles) {
+
+        //serve per far puntare db diversi se uso il profilo oiv o il profilo cnr
+        if (springActiveProfiles.contains("cnr")) {
+            dbUrl = dbUrl.replace("flows", "flows-cnr");
+        } else if (springActiveProfiles.contains("oiv")) {
+            dbUrl = dbUrl.replace("flows", "flows-oiv");
+        }
+        return dbUrl;
+    }
 }
