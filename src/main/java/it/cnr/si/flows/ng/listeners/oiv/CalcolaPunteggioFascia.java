@@ -26,17 +26,19 @@ public class CalcolaPunteggioFascia implements ExecutionListener {
 		String jsonStr = valutazioneEsperienzeJson;
 		LOGGER.debug("--- jsonStr: {}", jsonStr);
 
-	    JSONArray valutazioni =  new JSONArray(jsonStr);
-	    int numeroValutazioniPositive = 0;
- 	    for (int i = 0 ; i < valutazioni.length(); i++) {
-	        JSONObject obj = valutazioni.getJSONObject(i);
-	        if (obj.getString("giudizioFinale").equals("OK")) {
-	        	numeroValutazioniPositive = numeroValutazioniPositive +1;
-	        }
-	        System.out.println("Si sono evidenziate nr. " + numeroValutazioniPositive + " valutazioni positive su un totale di: " + valutazioni.length());
-	    }
-	    int numeroValutazioniNegative = valutazioni.length() - numeroValutazioniPositive;
-		
+		JSONArray valutazioni =  new JSONArray(jsonStr);
+		int numeroValutazioniPositive = 0;
+		for (int i = 0 ; i < valutazioni.length(); i++) {
+			JSONObject obj = valutazioni.getJSONObject(i);
+			if (obj.getString("giudizioFinale") !=null && obj.getString("giudizioFinale") != "") {
+				if (obj.getString("giudizioFinale").equals("OK")) {
+					numeroValutazioniPositive = numeroValutazioniPositive +1;
+				}
+			}
+			System.out.println("Si sono evidenziate nr. " + numeroValutazioniPositive + " valutazioni positive su un totale di: " + valutazioni.length());
+		}
+		int numeroValutazioniNegative = valutazioni.length() - numeroValutazioniPositive;
+
 		execution.setVariable("numeroValutazioniNegative", numeroValutazioniNegative);
 		execution.setVariable("numeroValutazioniPositive", numeroValutazioniPositive);
 
