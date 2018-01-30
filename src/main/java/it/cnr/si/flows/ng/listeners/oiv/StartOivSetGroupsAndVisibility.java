@@ -7,6 +7,10 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
+import org.activiti.engine.impl.persistence.entity.TimerEntity;
+import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
+import org.activiti.engine.runtime.Execution;
+import org.activiti.engine.runtime.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,7 +19,9 @@ import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,10 +32,7 @@ public class StartOivSetGroupsAndVisibility implements ExecutionListener {
     private static final long serialVersionUID = 686169707042367215L;
     private static final Logger LOGGER = LoggerFactory.getLogger(StartOivSetGroupsAndVisibility.class);
 
-    @Inject
-    private RelationshipService relationshipService;
-    @Inject
-    private AceBridgeService aceBridgeService;
+
     @Inject
     private RuntimeService runtimeService;
 
@@ -59,6 +62,7 @@ public class StartOivSetGroupsAndVisibility implements ExecutionListener {
 //			execution.setVariable("valutazioneEsperienze_json", valutazioneEsperienze_json);
 //		}
 
+        LOGGER.info("------ DATA FINE PROCEDURA: " + execution.getVariable("dataScadenzaTerminiDomanda"));
         runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoIstruttori, PROCESS_VISUALIZER);
         runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoDirettore, PROCESS_VISUALIZER);
         runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoCoordinatoreResponsabile, PROCESS_VISUALIZER);
