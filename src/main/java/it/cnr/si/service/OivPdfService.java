@@ -1,6 +1,8 @@
 package it.cnr.si.service;
 
 import it.cnr.si.domain.View;
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
@@ -48,15 +50,20 @@ public class OivPdfService {
 
     @Inject
     private FlowsProcessInstanceService flowsProcessInstanceService;
-	@Inject
+    @Inject
+    private FlowsAttachmentService flowsAttachmentService;
+    @Inject
 	private ViewRepository viewRepository;
 	private Utils utils = new Utils();
 
 
 	public String createPdf(String processInstanceId, ByteArrayOutputStream outputStream) throws IOException, ParseException {
 
-		Document pdf = new Document(40, 60, 40, 60);
-		Paragraph paragraphField = new Paragraph();
+        Document pdf = new Document(40, 60, 40, 60);
+        Paragraph paragraphField = new Paragraph();
+        Paragraph paragraphDiagram = new Paragraph();
+        Paragraph paragraphDocs = new Paragraph();
+        Paragraph paragraphHistory = new Paragraph();
 
 		LOGGER.info("createPdf - ProcessInstanceId: " + processInstanceId);
 		//FlowsProcessInstanceService flowsProcessInstanceService = new FlowsProcessInstanceService();
@@ -148,10 +155,19 @@ public class OivPdfService {
 		}
 
 
-		pdf.add(paragraphField);
-		pdf.save(outputStream);
+	       //caricamento documenti allegati al flusso e cronologia
+        makeDocs(paragraphDocs, processInstanceId);
 
-		return fileName;
+
+        pdf.add(paragraphField);
+        pdf.add(ControlElement.NEWPAGE);
+        pdf.add(paragraphDiagram);
+        pdf.add(ControlElement.NEWPAGE);
+        pdf.add(paragraphDocs);
+
+        pdf.save(outputStream);
+
+        return fileName;
 	}
 
 	private String getPropertyName(Element metadatum, String attr) {
@@ -165,16 +181,44 @@ public class OivPdfService {
 	private String formatDate(Date date) {
 		return date != null ? utils.formattaDataOra(date) : "";
 	}
+	
+    private void makeDocs(Paragraph paragraphDocs, String processInstancesId) throws IOException {
 
-	private void addLine(Paragraph paragraphField, String fieldName, String fieldValue, boolean elenco, boolean subField) throws IOException {
-		String text = "*" + fieldName + ":* " + fieldValue;
-		if (elenco) {
-			if (subField)
-				paragraphField.addMarkup(" -+" + text + "\n", FONT_SIZE, BaseFont.Helvetica);
-			else
-				paragraphField.addMarkup("-+" + text + "\n", FONT_SIZE, BaseFont.Helvetica);
-		} else
-			paragraphField.addText(text + "\n", FONT_SIZE, HELVETICA_BOLD);
-	}
+        intestazione(paragraphDocs, "Documenti del flusso:");
+        Map<String, FlowsAttachment> docs = flowsAttachmentService.getAttachementsForProcessInstance(processInstancesId);
+
+        for (Map.Entry<String, FlowsAttachment> entry : docs.entrySet()) {
+            FlowsAttachment doc = entry.getValue();
+            addLine(paragraphDocs, entry.getKey(), doc.getName(), true, false);
+
+            addLine(paragraphDocs, "Nome del file", doc.getFilename(), true, true);
+            addLine(paragraphDocs, "Caricato il", formatDate(doc.getTime()), true, true);
+            addLine(paragraphDocs, "Dall'utente", doc.getUsername(), true, true);
+            addLine(paragraphDocs, "Nel task", doc.getTaskName(), true, true);
+            addLine(paragraphDocs, "Mime-Type", doc.getMimetype(), true, true);
+            //Tolgo le parentesi quadre (ad es.: [Firmato, Protocollato, Pubblicato]
+            String stati = doc.getStati().toString().replace("[", "").replace("]", "");
+            if (!stati.isEmpty())
+                addLine(paragraphDocs, "Stato Documento", stati, true, true);
+            //doppio a capo dopo ogni documento
+            paragraphDocs.addText("\n\n", FONT_SIZE, HELVETICA_BOLD);
+        }
+    }
+
+    private void addLine(Paragraph paragraphField, String fieldName, String fieldValue, boolean elenco, boolean subField) throws IOException {
+        String text = "*" + fieldName + ":* " + fieldValue;
+        if (elenco) {
+            if (subField)
+                paragraphField.addMarkup(" -+" + text + "\n", FONT_SIZE, BaseFont.Helvetica);
+            else
+                paragraphField.addMarkup("-+" + text + "\n", FONT_SIZE, BaseFont.Helvetica);
+        } else
+            paragraphField.addText(text + "\n", FONT_SIZE, HELVETICA_BOLD);
+    }
+
+
+    private void intestazione(Paragraph contentStream, String titolo) throws IOException {
+        contentStream.addText(titolo + "\n\n", TITLE_SIZE, HELVETICA_BOLD);
+    }
 
 }
