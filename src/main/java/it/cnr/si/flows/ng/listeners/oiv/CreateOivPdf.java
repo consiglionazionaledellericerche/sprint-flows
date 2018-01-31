@@ -2,6 +2,8 @@ package it.cnr.si.flows.ng.listeners.oiv;
 
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.utils.Utils;
+import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
+
 import it.cnr.si.service.OivPdfService;
 import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.RuntimeService;
@@ -28,18 +30,22 @@ import java.util.stream.Collectors;
 
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 
+
+
 @Component
 public class CreateOivPdf implements ExecutionListener {
 	private static final long serialVersionUID = 686169707042367215L;
 	private static final Logger LOGGER = LoggerFactory.getLogger(CreateOivPdf.class);
 
-
+	@Inject
+	private OivPdfService oivPdfService;
+	
 	@Override
 	public void notify(DelegateExecution execution) throws Exception {
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		String processInstanceId =  execution.getProcessInstanceId();
 		LOGGER.info("ProcessInstanceId: " + processInstanceId);
-		OivPdfService oivPdfService = new OivPdfService();
+		//(OivPdfService oivPdfService = new OivPdfService();
 		String Titolo = oivPdfService.createPdf(processInstanceId, outputStream);
 		LOGGER.info("avvio la generazione del pdf: " + Titolo);
 		

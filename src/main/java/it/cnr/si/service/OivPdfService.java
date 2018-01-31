@@ -21,7 +21,6 @@ import rst.pdfbox.layout.elements.Paragraph;
 import rst.pdfbox.layout.text.BaseFont;
 import rst.pdfbox.layout.text.Position;
 
-import javax.inject.Inject;
 import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -29,6 +28,8 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.util.*;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
 import static org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA_BOLD;
@@ -45,12 +46,11 @@ public class OivPdfService {
 	private static final float FONT_SIZE = 10;
 	private static final float TITLE_SIZE = 18;
 
-	@Inject
-	private FlowsProcessInstanceService flowsProcessInstanceService;
+    @Inject
+    private FlowsProcessInstanceService flowsProcessInstanceService;
 	@Inject
 	private ViewRepository viewRepository;
 	private Utils utils = new Utils();
-
 
 
 	public String createPdf(String processInstanceId, ByteArrayOutputStream outputStream) throws IOException, ParseException {
@@ -59,8 +59,10 @@ public class OivPdfService {
 		Paragraph paragraphField = new Paragraph();
 
 		LOGGER.info("createPdf - ProcessInstanceId: " + processInstanceId);
+		//FlowsProcessInstanceService flowsProcessInstanceService = new FlowsProcessInstanceService();
 
 		Map<String, Object> map = flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId);
+		//Map<String, Object> map = flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId);
 
 		HistoricProcessInstanceResponse processInstance = (HistoricProcessInstanceResponse) map.get("entity");
 		String fileName = "Preavviso di Rigetto.pdf";
