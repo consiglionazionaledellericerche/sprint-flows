@@ -30,7 +30,7 @@ public class CalcolaPunteggioFascia implements ExecutionListener {
 		int numeroValutazioniPositive = 0;
 		for (int i = 0 ; i < valutazioni.length(); i++) {
 			JSONObject obj = valutazioni.getJSONObject(i);
-			if (obj.getString("giudizioFinale") !=null && obj.getString("giudizioFinale") != "") {
+			if (obj.has("giudizioFinale")) {
 				if (obj.getString("giudizioFinale").equals("OK")) {
 					numeroValutazioniPositive = numeroValutazioniPositive +1;
 				}
