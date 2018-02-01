@@ -46,11 +46,7 @@
       <userTask id="firma-dg-rigetto" name="FIRMA DG RIGETTO" activiti:candidateGroups="${gruppoDirettore}"></userTask>
       <endEvent id="endevent8" name="End">
         <extensionElements>
-          <activiti:executionListener event="start" expression="LOGGER.info(&quot;------ DOMANDA IMPROCEDIBILE&quot;)">
-            <activiti:field name="statoFinaleDomanda">
-              <activiti:string><![CDATA[IMPROCEDIBILE]]></activiti:string>
-            </activiti:field>
-          </activiti:executionListener>
+          <activiti:executionListener event="start" expression="${execution.setVariable(&quot;statoFinaleDomanda&quot;, &quot;IMPROCEDIBILE&quot;)}"></activiti:executionListener>
         </extensionElements>
       </endEvent>
       <boundaryEvent id="boundarytimer5" name="Timer" attachedToRef="preavviso-rigetto" cancelActivity="true">
@@ -68,11 +64,7 @@
       <sequenceFlow id="flow79" sourceRef="exclusivegateway12" targetRef="valutazione-preavviso"></sequenceFlow>
       <endEvent id="endevent10" name="End">
         <extensionElements>
-          <activiti:executionListener event="start" expression="LOGGER.info(&quot;------ DOMANDA RESPINTA&quot;);">
-            <activiti:field name="statoFinaleDomanda">
-              <activiti:string><![CDATA[RESPINTA]]></activiti:string>
-            </activiti:field>
-          </activiti:executionListener>
+          <activiti:executionListener event="start" expression="${execution.setVariable(&quot;statoFinaleDomanda&quot;, &quot;DOMANDA RESPINTA&quot;)}"></activiti:executionListener>
         </extensionElements>
       </endEvent>
       <sequenceFlow id="flow80" name="respinta" sourceRef="exclusivegateway12" targetRef="endevent10"></sequenceFlow>
@@ -91,11 +83,7 @@
       </sequenceFlow>
       <endEvent id="endevent12" name="End">
         <extensionElements>
-          <activiti:executionListener event="start" expression="LOGGER.info(&quot;------ DOMANDA APPROVATA&quot;);">
-            <activiti:field name="statoFinaleDomanda">
-              <activiti:string><![CDATA[APPROVATA]]></activiti:string>
-            </activiti:field>
-          </activiti:executionListener>
+          <activiti:executionListener event="start" expression="${execution.setVariable(&quot;statoFinaleDomanda&quot;, &quot;DOMANDA APPROVATA&quot;)}"></activiti:executionListener>
         </extensionElements>
       </endEvent>
       <sequenceFlow id="flow93" sourceRef="exclusivegateway11" targetRef="endevent12"></sequenceFlow>
