@@ -8,17 +8,10 @@
     NavbarController.$inject = ['$rootScope', '$scope', '$state', 'Auth', 'Principal', 'ProfileService', 'LoginService', 'SwitchUserService', 'dataService', '$log'];
 
     function NavbarController($rootScope, $scope, $state, Auth, Principal, ProfileService, LoginService, SwitchUserService, dataService, $log) {
-        var vm = this;
+        var vm = this, appo = true;
 
         vm.isNavbarCollapsed = true;
         vm.isAuthenticated = Principal.isAuthenticated;
-
-        ProfileService.getProfileInfo().then(function(response) {
-            vm.inProduction = response.inProduction;
-            vm.swaggerEnabled = response.swaggerEnabled;
-            //recupero l'informazione circa il fatto che il profilo spring sia "cnr" o "oiv"
-            $rootScope.app = response.activeProfiles.includes('oiv') ? 'oiv' : 'cnr'
-        });
 
         vm.login = login;
         vm.logout = logout;
@@ -64,6 +57,13 @@
         }
 
         function loadAvailableDefinitions() {
+            ProfileService.getProfileInfo().then(function(response) {
+                vm.inProduction = response.inProduction;
+                vm.swaggerEnabled = response.swaggerEnabled;
+                //verifico qual è il profilo spring con cui è stata avviata l'app per caricare il corrispondente banner
+                $rootScope.app = response.activeProfiles.includes('oiv') ? 'oiv' : 'cnr'
+            });
+
             dataService.definitions.all()
                 .then(function(response) {
                     $rootScope.wfDefs = response.data.data;
