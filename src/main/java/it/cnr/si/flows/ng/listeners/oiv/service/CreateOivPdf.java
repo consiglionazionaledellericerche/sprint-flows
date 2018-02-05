@@ -1,16 +1,13 @@
-package it.cnr.si.flows.ng.listeners.oiv;
+package it.cnr.si.flows.ng.listeners.oiv.service;
 
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
-
-
-import it.cnr.si.service.OivPdfService;
 
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.google.common.net.MediaType;
 
@@ -27,25 +24,24 @@ import static it.cnr.si.flows.ng.utils.Enum.Azione.Caricamento;
 
 
 
-@Component
-public class CreateOivPdf implements ExecutionListener {
-	private static final long serialVersionUID = 686169707042367215L;
+@Service
+public class CreateOivPdf  {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CreateOivPdf.class);
 
 	@Inject
 	private OivPdfService oivPdfService;
 	
-	@Override
-	public void notify(DelegateExecution execution) throws Exception {
+	public void CreaPdfOiv(DelegateExecution execution, String tipologiaDoc) throws IOException, ParseException {
 		//(OivPdfService oivPdfService = new OivPdfService();
 		
 		
 		String processInstanceId =  execution.getProcessInstanceId();		
 		LOGGER.info("ProcessInstanceId: " + processInstanceId);
+		LOGGER.info("STAMPA la seguente tipologia di documento: " + processInstanceId);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         String fileName = null;
         try {
-            fileName = oivPdfService.createPdf(processInstanceId, outputStream);
+            fileName = oivPdfService.createPdf(processInstanceId, outputStream, tipologiaDoc);
         } catch (IOException | ParseException e) {
             LOGGER.error("Errore nella creazione del file pdf  per la Process Instance {}. \n" +
                                  "Errore: {}", processInstanceId, e.getMessage());
