@@ -3,7 +3,6 @@ package it.cnr.si.flows.ng.listeners.oiv;
 import it.cnr.si.flows.ng.listeners.oiv.service.CalcolaPunteggioFascia;
 import it.cnr.si.flows.ng.listeners.oiv.service.DeterminaTimer;
 import it.cnr.si.flows.ng.listeners.oiv.service.ManageSceltaUtente;
-import it.cnr.si.flows.ng.listeners.oiv.service.OivPdfService;
 import it.cnr.si.flows.ng.listeners.oiv.service.StartOivSetGroupsAndVisibility;
 
 import org.activiti.engine.delegate.DelegateExecution;
@@ -11,11 +10,12 @@ import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 
-@Service
+
+@Component
 public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 	private static final long serialVersionUID = 686169707042367215L;
 	private static final Logger LOGGER = LoggerFactory.getLogger(ManageProcessIscrizioneElencoOiv.class);
@@ -29,7 +29,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 	@Inject
 	private ManageSceltaUtente manageSceltaUtente;
 
-	
+
 	private Expression faseEsecuzione;
 
 	@Override
@@ -57,7 +57,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 			determinaTimer.getTimer(execution, "boundarytimer3");
 			calcolaPunteggioFascia.calcola(execution);
 		};break;  
-		case "isoccorso-istruttorio-start":  {
+		case "soccorso-istruttorio-start":  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
 		};break;    
 		case "soccorso-istruttorio-end":  {
@@ -119,5 +119,6 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 		// Codice per gestire le Scelte
 		manageSceltaUtente.azioneScelta(execution, faseEsecuzioneValue, sceltaUtente);
 		LOGGER.info("sceltaUtente: " + sceltaUtente);
+
 	}
 }
