@@ -1,27 +1,27 @@
-package it.cnr.si.flows.ng.listeners.oiv;
+package it.cnr.si.flows.ng.listeners.oiv.service;
+
+import java.io.IOException;
+import java.text.ParseException;
 
 import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.ExecutionListener;
 
 import org.activiti.engine.impl.util.json.JSONArray;
 import org.activiti.engine.impl.util.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 
 
 
 
-@Component
-public class CalcolaPunteggioFascia implements ExecutionListener {
-	private static final long serialVersionUID = 686169707042367215L;
+@Service
+public class CalcolaPunteggioFascia {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CalcolaPunteggioFascia.class);
 
 
 
-	@Override
-	public void notify(DelegateExecution execution) throws Exception {
+	public void calcola(DelegateExecution execution) throws IOException, ParseException {
 		String valutazioneEsperienzeJson = execution.getVariable("valutazioneEsperienze_json").toString();
 		String jsonStr = valutazioneEsperienzeJson;
 		LOGGER.debug("--- jsonStr: {}", jsonStr);
