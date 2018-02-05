@@ -180,9 +180,6 @@
       <sequenceFlow id="flow86" name="approvata" sourceRef="exclusivegateway13" targetRef="endevent12"></sequenceFlow>
       <sequenceFlow id="flow88" sourceRef="valutazione" targetRef="exclusivegateway13"></sequenceFlow>
       <sequenceFlow id="flow89" sourceRef="exclusivegateway13" targetRef="soccorso-istruttorio">
-        <extensionElements>
-          <activiti:executionListener event="take" expression="${execution.setVariable(&quot;soccorsoIstruttoriaFlag&quot;, &quot;1&quot;)}"></activiti:executionListener>
-        </extensionElements>
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'richiesta_soccorso_istruttorio' && soccorsoIstruttoriaFlag != '1'}]]></conditionExpression>
       </sequenceFlow>
       <endEvent id="endevent12" name="End">
@@ -213,13 +210,13 @@
     <sequenceFlow id="flow65" sourceRef="boundarytimer3" targetRef="scadenza-tempi-procedurali"></sequenceFlow>
     <scriptTask id="scadenza-tempi-procedurali" name="SCADENZA TEMPI PROCEDURALI" scriptFormat="javascript" activiti:autoStoreVariables="false">
       <script>execution.setVariable('istruttoriaInevasa', true);
-</script>
+			</script>
     </scriptTask>
     <endEvent id="endevent11" name="End"></endEvent>
     <sequenceFlow id="flow82" name="END" sourceRef="valutazione-domande" targetRef="endevent11"></sequenceFlow>
     <scriptTask id="avviso-scadenza-tempi-procedurali" name="AVVISO SCADENZA TEMPI PROCEDURALI" scriptFormat="javascript" activiti:autoStoreVariables="false">
       <script>execution.setVariable('avvisoIstruttoriaInevasa', true);
-</script>
+			</script>
     </scriptTask>
     <boundaryEvent id="boundarytimer6" name="Timer" attachedToRef="valutazione-domande" cancelActivity="false">
       <timerEventDefinition>
@@ -380,7 +377,7 @@
         <omgdi:waypoint x="393.0" y="156.0"></omgdi:waypoint>
         <omgdi:waypoint x="583.0" y="156.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="522.0" y="129.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="62.0" x="522.0" y="129.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow86" id="BPMNEdge_flow86">
