@@ -148,13 +148,15 @@
         </timerEventDefinition>
       </boundaryEvent>
       <sequenceFlow id="flow72" sourceRef="boundarytimer5" targetRef="valutazione-preavviso"></sequenceFlow>
-      <exclusiveGateway id="exclusivegateway11" name="Exclusive Gateway" default="flow93"></exclusiveGateway>
+      <exclusiveGateway id="exclusivegateway11" name="Exclusive Gateway" default="flow76"></exclusiveGateway>
       <sequenceFlow id="flow74" sourceRef="valutazione-preavviso" targetRef="exclusivegateway11"></sequenceFlow>
       <sequenceFlow id="flow76" sourceRef="exclusivegateway11" targetRef="firma-dg-rigetto"></sequenceFlow>
       <exclusiveGateway id="exclusivegateway12" name="Exclusive Gateway" default="flow80"></exclusiveGateway>
       <sequenceFlow id="flow77" sourceRef="firma-dg-rigetto" targetRef="exclusivegateway12"></sequenceFlow>
       <sequenceFlow id="flow78" sourceRef="preavviso-rigetto" targetRef="istruttoria-su-preavviso"></sequenceFlow>
-      <sequenceFlow id="flow79" sourceRef="exclusivegateway12" targetRef="valutazione-preavviso"></sequenceFlow>
+      <sequenceFlow id="flow79" sourceRef="exclusivegateway12" targetRef="valutazione-preavviso">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'riproponi_in_valutazione'}]]></conditionExpression>
+      </sequenceFlow>
       <endEvent id="endevent10" name="End">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
@@ -184,14 +186,18 @@
           </activiti:executionListener>
         </extensionElements>
       </endEvent>
-      <sequenceFlow id="flow93" sourceRef="exclusivegateway11" targetRef="endevent12"></sequenceFlow>
+      <sequenceFlow id="flow93" sourceRef="exclusivegateway11" targetRef="endevent12">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'approva'}]]></conditionExpression>
+      </sequenceFlow>
       <sequenceFlow id="flow94" sourceRef="exclusivegateway13" targetRef="preavviso-rigetto">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'invia_preavviso_di_rigetto'}]]></conditionExpression>
       </sequenceFlow>
       <sequenceFlow id="flow95" sourceRef="exclusivegateway13" targetRef="valutazione">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'genera_PDF_preavviso_di_rigetto' || sceltaUtente == 'calcola_punteggio' }]]></conditionExpression>
       </sequenceFlow>
-      <sequenceFlow id="flow96" sourceRef="exclusivegateway11" targetRef="valutazione-preavviso"></sequenceFlow>
+      <sequenceFlow id="flow96" sourceRef="exclusivegateway11" targetRef="valutazione-preavviso">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'genera_PDF_rigetto' || sceltaUtente == 'calcola_punteggio' }]]></conditionExpression>
+      </sequenceFlow>
       <sequenceFlow id="flow98" sourceRef="exclusivegateway1" targetRef="soccorso-istruttorio">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'richiesta_soccorso_istruttorio' && soccorsoIstruttoriaFlag != '1'}]]></conditionExpression>
       </sequenceFlow>
@@ -353,7 +359,7 @@
         <omgdi:waypoint x="563.0" y="491.0"></omgdi:waypoint>
         <omgdi:waypoint x="583.0" y="491.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="39.0" x="550.0" y="459.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="100.0" x="550.0" y="459.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow83" id="BPMNEdge_flow83">
@@ -373,7 +379,7 @@
         <omgdi:waypoint x="600.0" y="248.0"></omgdi:waypoint>
         <omgdi:waypoint x="600.0" y="300.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="49.0" x="540.0" y="286.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="100.0" x="540.0" y="286.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow88" id="BPMNEdge_flow88">
