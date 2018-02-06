@@ -71,6 +71,9 @@ public class OivPdfService {
 		String fileName = "Documento Generico.pdf";
 		if (tipologiaDoc.equals("preavvisoRigetto")) {
 			fileName = "Preavviso di Rigetto.pdf";
+		}
+		if (tipologiaDoc.equals("rigetto")) {
+			fileName = "Rigetto.pdf";
 		} 
 
 
@@ -109,7 +112,7 @@ public class OivPdfService {
 			} else if (variableName.equals(gruppoRA.name())) {
 				paragraphField.addText("Gruppo Responsabile Acquisti: " + var.getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
 			} else if (variableName.equals("nomeRichiedente")) {
-				fileName = "Preavviso di Rigetto " + var.getValue() + ".pdf";
+				fileName = fileName.replace(".pdf", " ") + var.getValue() + ".pdf";
 				LOGGER.debug("creating pdf {} ", fileName);
 			}            
 
