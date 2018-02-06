@@ -46,8 +46,9 @@ public class CreateOivPdf  {
             LOGGER.error("Errore nella creazione del file pdf  per la Process Instance {}. \n" +
                                  "Errore: {}", processInstanceId, e.getMessage());
         }
-        String variableFileName = fileName.replaceAll(" ", "_");
-        variableFileName = variableFileName.replace(".pdf", "");
+        //String variableFileName = fileName.replaceAll(" ", "_");
+        //variableFileName = variableFileName.replace(".pdf", "");
+        String variableFileName = tipologiaDoc;
 		LOGGER.info("avvio la generazione del pdf: " + fileName + " con variabile: " + variableFileName);
         FlowsAttachment pdfToDB = new FlowsAttachment();
         pdfToDB.setBytes(outputStream.toByteArray());

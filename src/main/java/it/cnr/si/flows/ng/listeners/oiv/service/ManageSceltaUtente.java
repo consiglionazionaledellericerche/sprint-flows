@@ -21,7 +21,7 @@ public class ManageSceltaUtente {
 	private CreateOivPdf createOivPdf;
 
 	public void azioneScelta(DelegateExecution execution, String faseEsecuzioneValue, String sceltaUtente) throws IOException, ParseException {
-
+		LOGGER.info("-- azioneScelta: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 		switch(faseEsecuzioneValue){  
 		case "istruttoria-end": {
 			if(sceltaUtente.equals("richiesta_soccorso_istruttorio")) {
@@ -43,8 +43,6 @@ public class ManageSceltaUtente {
 		default:  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
 		};break;    
-
 		}
 	}
-
 }
