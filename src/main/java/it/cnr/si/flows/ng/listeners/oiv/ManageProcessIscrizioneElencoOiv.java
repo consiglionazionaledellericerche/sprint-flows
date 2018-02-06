@@ -87,12 +87,14 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 		};break;    
 		case "istruttoria-su-preavviso-end":  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
+			calcolaPunteggioFascia.calcola(execution);
 		};break;        
 		case "valutazione-preavviso-start":  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
 		};break;    
 		case "valutazione-preavviso-end":  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
+			calcolaPunteggioFascia.calcola(execution);
 		};break;        
 		case "firma-dg-rigetto-start":  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
