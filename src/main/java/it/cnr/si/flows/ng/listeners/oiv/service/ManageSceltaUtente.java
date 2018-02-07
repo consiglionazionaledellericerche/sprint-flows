@@ -23,21 +23,22 @@ public class ManageSceltaUtente {
 	public void azioneScelta(DelegateExecution execution, String faseEsecuzioneValue, String sceltaUtente) throws IOException, ParseException {
 		LOGGER.info("-- azioneScelta: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 		switch(faseEsecuzioneValue){  
-		case "istruttoria-end": {
-			if(sceltaUtente.equals("richiesta_soccorso_istruttorio")) {
-				LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
-				execution.setVariable("soccorsoIstruttoriaFlag", "1");
-			}
-		};break;
 		case "valutazione-end": {
 			if(sceltaUtente.equals("genera_PDF_preavviso_di_rigetto")) {
 				LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 				execution.setVariable("pdfPreavvisoRigettoFlag", "1");
 				createOivPdf.CreaPdfOiv(execution, "preavvisoRigetto");
 			}
-			if(sceltaUtente.equals("richiesta_soccorso_istruttorio")) {
+		};break;
+		case "soccorso-istruttorio-start": {
+			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
+			execution.setVariable("soccorsoIstruttoriaFlag", "1");
+		};break;
+		case "valutazione-preavviso-end": {
+			if(sceltaUtente.equals("genera_PDF_rigetto")) {
 				LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
-				execution.setVariable("soccorsoIstruttoriaFlag", "1");
+				execution.setVariable("pdfRigettoFlag", "1");
+				createOivPdf.CreaPdfOiv(execution, "rigetto");
 			}
 		};break;
 		default:  {
