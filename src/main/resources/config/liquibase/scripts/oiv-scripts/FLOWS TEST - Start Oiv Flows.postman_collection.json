@@ -1,0 +1,300 @@
+{
+	"info": {
+		"name": "FLOWS TEST - Start Oiv Flows",
+		"_postman_id": "2c375092-3d9f-3752-32df-5df169cc6a3a",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Richiesta token FLOWS",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"postman.setGlobalVariable(\"ACCESS_TOKEN\", data.access_token);",
+							"postman.setGlobalVariable(\"REFRESH_TOKEN\", data.refresh_token);"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic c3ByaW50YXBwOm15LXNlY3JldC10b2tlbi10by1jaGFuZ2UtaW4tcHJvZHVjdGlvbg=="
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "admin",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "read write",
+							"description": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/oauth/token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"oauth",
+						"token"
+					]
+				},
+				"description": "Ottiene il token (impostare una passoword)."
+			},
+			"response": []
+		},
+		{
+			"name": "IMPERSONATE USER",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/impersonate/start?impersonate_username=utente1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"impersonate",
+						"start"
+					],
+					"query": [
+						{
+							"key": "impersonate_username",
+							"value": "utente1",
+							"equals": true
+						}
+					]
+				},
+				"description": "IMPERSONATE USER"
+			},
+			"response": []
+		},
+		{
+			"name": "SPRINT_FLOWS Start OIV Workflow",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "cacheBuster",
+						"value": "150399103591"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "processDefinitionId",
+							"value": "iscrizione-elenco-oiv:1:4",
+							"type": "text",
+							"description": ""
+						},
+						{
+							"key": "oggetto",
+							"value": "TEST 12",
+							"type": "text",
+							"description": ""
+						},
+						{
+							"key": "descrizione",
+							"value": "Decrizione 12",
+							"type": "text",
+							"description": ""
+						},
+						{
+							"key": "nomeRichiedente",
+							"value": "Paolo Verdi",
+							"type": "text",
+							"description": ""
+						},
+						{
+							"key": "dataNascitaRichiedente",
+							"value": "1962-11-10T23:00:00.000Z",
+							"type": "text",
+							"description": ""
+						},
+						{
+							"key": "sessoRichiedente",
+							"value": "m",
+							"type": "text",
+							"description": ""
+						},
+						{
+							"key": "codiceFiscaleRichiedente",
+							"value": "PPBAIUISH62J298",
+							"type": "text",
+							"description": ""
+						},
+						{
+							"key": "emailRichiedente",
+							"value": "paolo.verdi@cnr.it",
+							"type": "text",
+							"description": ""
+						},
+						{
+							"key": "tipologiaRichiesta",
+							"value": "Iscrizione",
+							"type": "text",
+							"description": ""
+						},
+						{
+							"key": "dataIscrizioneElenco",
+							"value": "2010-11-10T23:00:00.000Z",
+							"type": "text",
+							"description": ""
+						},
+						{
+							"key": "codiceIscrizioneElenco",
+							"value": "USY-34",
+							"type": "text",
+							"description": ""
+						},
+						{
+							"key": "dataInvioDomanda",
+							"value": "2015-11-11T23:00:00.000Z",
+							"type": "text",
+							"description": ""
+						},
+						{
+							"key": "valutazioneEsperienze_json",
+							"value": "[{ \"numeroEsperienza\": 1, \"dataInizio\": \"1998-11-22T23:00:00.000Z\", \"dataFine\": \"2012-01-31T23:00:00.000Z\", \"tipologiaEsperienza\": \"esperienza 1\", \"ambitoEsperienza\": \"agraria\", \"attivitaSvolta\": \"dirigente\" }, { \"numeroEsperienza\": 2, \"dataInizio\": \"1998-11-22T23:00:00.000Z\", \"dataFine\": \"2012-01-31T23:00:00.000Z\", \"tipologiaEsperienza\": \"esperienza 2\", \"ambitoEsperienza\": \"pubblico\", \"attivitaSvolta\": \"impiegato\" }, { \"numeroEsperienza\": 3, \"dataInizio\": \"1998-11-22T23:00:00.000Z\", \"dataFine\": \"2012-01-31T23:00:00.000Z\", \"tipologiaEsperienza\": \"esperienza 3\", \"ambitoEsperienza\": \"settore privato\", \"attivitaSvolta\": \"direttore\" } ]",
+							"type": "text",
+							"description": ""
+						},
+						{
+							"key": "dataNascitaRichiedente_json",
+							"value": "\\\"1962-11-10T23:00:00.000Z\\\"",
+							"type": "text",
+							"description": ""
+						},
+						{
+							"key": "dataIscrizioneElenco_json",
+							"value": "\\\"2010-11-10T23:00:00.000Z\\\"",
+							"type": "text",
+							"description": ""
+						},
+						{
+							"key": "dataInvioDomanda_json",
+							"value": "\\\"2015-11-11T23:00:00.000Z\\\"",
+							"type": "text",
+							"description": ""
+						},
+						{
+							"key": "punteggioEsperienzeProposto",
+							"value": "123",
+							"type": "text",
+							"description": ""
+						},
+						{
+							"key": "fasciaAppartenenzaProposta",
+							"value": "2",
+							"type": "text",
+							"description": ""
+						},
+						{
+							"key": "domanda",
+							"value": "",
+							"type": "file",
+							"description": ""
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/tasks/complete?",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"tasks",
+						"complete"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "4de5989d-b2bb-4757-b48d-0831b35ecaae",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "4c55e236-8604-4491-acf4-4d737ae9461a",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
