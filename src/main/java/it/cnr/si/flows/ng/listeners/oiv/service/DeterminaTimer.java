@@ -1,33 +1,26 @@
-package it.cnr.si.flows.ng.listeners.oiv;
+package it.cnr.si.flows.ng.listeners.oiv.service;
 
 
 import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.impl.persistence.entity.TimerEntity;
 import org.activiti.engine.runtime.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.text.ParseException;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 
-@Component
-public class DeterminaTimer implements ExecutionListener {
-    private static final long serialVersionUID = 686169707042367215L;
+@Service
+public class DeterminaTimer {
     private static final Logger LOGGER = LoggerFactory.getLogger(DeterminaTimer.class);
 
 
 
-    @Override
-    public void notify(DelegateExecution execution) throws Exception {
+    public void getTimer(DelegateExecution execution, String timerId) throws IOException, ParseException {
 
 
 //      TIMER
@@ -44,7 +37,7 @@ public class DeterminaTimer implements ExecutionListener {
                     .replace("\"", "")
                     .replace("}", "");
             LOGGER.info("getDuedate {}, getId {}, TimerDeclarationImpl {}", job.getDuedate(), job.getId(), timerName);
-            if (timerName.equals("boundarytimer3")) {
+            if (timerName.equals(timerId)) {
                 LOGGER.info("--- DATA FINE PROCEDURA: {}, getId: {}, timerName: {}", job.getDuedate(), job.getId(), timerName);
                 execution.setVariable("dataScadenzaTerminiDomanda", job.getDuedate());
             }
