@@ -1,10 +1,8 @@
 package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
-
 import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.service.OivPdfService;
-
+import it.cnr.si.service.SummaryPdfService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,7 +26,7 @@ import java.io.ByteArrayOutputStream;
 public class FlowsPdfSummaryResource {
 
     @Inject
-    private OivPdfService summaryPdfService;
+    private SummaryPdfService summaryPdfService;
 
 
     /**

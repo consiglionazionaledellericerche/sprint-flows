@@ -1,43 +1,30 @@
-package it.cnr.si.flows.ng.listeners.oiv;
+package it.cnr.si.flows.ng.listeners.oiv.service;
 
-import it.cnr.si.flows.ng.service.AceBridgeService;
-import it.cnr.si.flows.ng.utils.Utils;
-import it.cnr.si.service.RelationshipService;
+
 import org.activiti.engine.RuntimeService;
-import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.ExecutionListener;
-import org.activiti.engine.impl.persistence.entity.TimerEntity;
-import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
-import org.activiti.engine.runtime.Execution;
-import org.activiti.engine.runtime.Job;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.io.IOException;
+import java.text.ParseException;
+
 
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 
-@Component
-public class StartOivSetGroupsAndVisibility implements ExecutionListener {
-    private static final long serialVersionUID = 686169707042367215L;
+@Service
+public class StartOivSetGroupsAndVisibility {
     private static final Logger LOGGER = LoggerFactory.getLogger(StartOivSetGroupsAndVisibility.class);
 
 
     @Inject
     private RuntimeService runtimeService;
 
-    @Override
-    public void notify(DelegateExecution execution) throws Exception {
+    public void configuraVariabiliStart(DelegateExecution execution)  throws IOException, ParseException  {
 
         String initiator = (String) execution.getVariable("initiator");
         LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
@@ -51,7 +38,6 @@ public class StartOivSetGroupsAndVisibility implements ExecutionListener {
         execution.setVariable("gruppoDirettore", gruppoDirettore);
         execution.setVariable("gruppoCoordinatoreResponsabile", gruppoCoordinatoreResponsabile);
         execution.setVariable("domandaImprocedibileFlag", "0");
-        execution.setVariable("soccorsoIstruttoriaFlag", "0");
         execution.setVariable("soccorsoIstruttoriaFlag", "0");
         LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoIstruttori, gruppoDirettore, gruppoCoordinatoreResponsabile);
 
