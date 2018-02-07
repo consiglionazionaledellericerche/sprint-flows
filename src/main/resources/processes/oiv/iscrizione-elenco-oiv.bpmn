@@ -2,7 +2,11 @@
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
   <process id="iscrizione-elenco-oiv" name="Iscrizione Elenco Oiv" isExecutable="true">
     <extensionElements>
-      <activiti:executionListener event="start" delegateExpression="${startOivSetGroupsAndVisibility}"></activiti:executionListener>
+      <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+        <activiti:field name="faseEsecuzione">
+          <activiti:string><![CDATA[process-start]]></activiti:string>
+        </activiti:field>
+      </activiti:executionListener>
     </extensionElements>
     <sequenceFlow id="flow47" sourceRef="boundarytimer2" targetRef="valutazione"></sequenceFlow>
     <subProcess id="valutazione-domande" name="VALUTAZIONE DOMANDE">
@@ -10,43 +14,132 @@
       <sequenceFlow id="flow10" sourceRef="startevent1" targetRef="istruttoria"></sequenceFlow>
       <userTask id="istruttoria" name="ISTRUTTORIA" activiti:candidateGroups="${gruppoIstruttori}">
         <extensionElements>
-          <activiti:executionListener event="end" delegateExpression="${determinaTimer}"></activiti:executionListener>
-          <activiti:executionListener event="end" delegateExpression="${calcolaPunteggioFascia}"></activiti:executionListener>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[istruttoria-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[istruttoria-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
         </extensionElements>
       </userTask>
       <sequenceFlow id="flow4" sourceRef="istruttoria" targetRef="exclusivegateway1"></sequenceFlow>
-      <userTask id="soccorso-istruttorio" name="SOCCORSO ISTRUTTORIO" activiti:candidateUsers="${initiator}"></userTask>
+      <userTask id="soccorso-istruttorio" name="SOCCORSO ISTRUTTORIO" activiti:candidateUsers="${initiator}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[soccorso-istruttorio-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[soccorso-istruttorio-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
       <sequenceFlow id="flow32" sourceRef="soccorso-istruttorio" targetRef="istruttoria"></sequenceFlow>
       <boundaryEvent id="boundarytimer2" name="Timer" attachedToRef="soccorso-istruttorio" cancelActivity="true">
         <timerEventDefinition>
           <timeDuration>P30D</timeDuration>
         </timerEventDefinition>
       </boundaryEvent>
-      <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway" default="flow6"></exclusiveGateway>
-      <sequenceFlow id="flow5" sourceRef="exclusivegateway1" targetRef="soccorso-istruttorio">
+      <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway" default="flow99"></exclusiveGateway>
+      <userTask id="cambio-istruttore" name="CAMBIO ISTRUTTORE" activiti:candidateGroups="${gruppoCoordinatoreResponsabile}">
         <extensionElements>
-          <activiti:executionListener event="take" expression="${execution.setVariable(&quot;soccorsoIstruttoriaFlag&quot;, &quot;1&quot;)}"></activiti:executionListener>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[cambio-istruttore-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[cambio-istruttore-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
         </extensionElements>
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'richiesta_soccorso_istruttorio' && soccorsoIstruttoriaFlag != '1'}]]></conditionExpression>
-      </sequenceFlow>
-      <sequenceFlow id="flow6" sourceRef="exclusivegateway1" targetRef="valutazione"></sequenceFlow>
-      <sequenceFlow id="flow35" sourceRef="exclusivegateway1" targetRef="cambio-istruttore">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'richiesto_cambio_istruttore'}]]></conditionExpression>
-      </sequenceFlow>
-      <userTask id="cambio-istruttore" name="CAMBIO ISTRUTTORE" activiti:candidateGroups="${gruppoCoordinatoreResponsabile}"></userTask>
+      </userTask>
       <sequenceFlow id="flow36" sourceRef="cambio-istruttore" targetRef="istruttoria"></sequenceFlow>
       <userTask id="valutazione" name="VALUTAZIONE" activiti:candidateGroups="${gruppoCoordinatoreResponsabile}">
         <extensionElements>
-          <activiti:executionListener event="end" delegateExpression="${calcolaPunteggioFascia}"></activiti:executionListener>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[valutazione-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[valutazione-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
         </extensionElements>
       </userTask>
-      <userTask id="preavviso-rigetto" name="PREAVVISO RIGETTO" activiti:candidateUsers="${initiator}"></userTask>
-      <userTask id="istruttoria-su-preavviso" name="ISTRUTTORIA SU PREAVVISO" activiti:candidateGroups="${gruppoIstruttori}"></userTask>
-      <userTask id="valutazione-preavviso" name="VALUTAZIONE SU PREAVVISO" activiti:candidateGroups="${gruppoCoordinatoreResponsabile}"></userTask>
-      <userTask id="firma-dg-rigetto" name="FIRMA DG RIGETTO" activiti:candidateGroups="${gruppoDirettore}"></userTask>
+      <userTask id="preavviso-rigetto" name="PREAVVISO RIGETTO" activiti:candidateUsers="${initiator}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[preavviso-rigetto-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[preavviso-rigetto-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <userTask id="istruttoria-su-preavviso" name="ISTRUTTORIA SU PREAVVISO" activiti:candidateGroups="${gruppoIstruttori}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[istruttoria-su-preavviso-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[istruttoria-su-preavviso-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <userTask id="valutazione-preavviso" name="VALUTAZIONE SU PREAVVISO" activiti:candidateGroups="${gruppoCoordinatoreResponsabile}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[valutazione-preavviso-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[valutazione-preavviso-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <userTask id="firma-dg-rigetto" name="FIRMA DG RIGETTO" activiti:candidateGroups="${gruppoDirettore}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[firma-dg-rigetto-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[firma-dg-rigetto-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
       <endEvent id="endevent8" name="End">
         <extensionElements>
-          <activiti:executionListener event="start" expression="${execution.setVariable(&quot;statoFinaleDomanda&quot;, &quot;IMPROCEDIBILE&quot;)}"></activiti:executionListener>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[end-improcedibile]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
         </extensionElements>
       </endEvent>
       <boundaryEvent id="boundarytimer5" name="Timer" attachedToRef="preavviso-rigetto" cancelActivity="true">
@@ -55,16 +148,22 @@
         </timerEventDefinition>
       </boundaryEvent>
       <sequenceFlow id="flow72" sourceRef="boundarytimer5" targetRef="valutazione-preavviso"></sequenceFlow>
-      <exclusiveGateway id="exclusivegateway11" name="Exclusive Gateway" default="flow93"></exclusiveGateway>
+      <exclusiveGateway id="exclusivegateway11" name="Exclusive Gateway" default="flow76"></exclusiveGateway>
       <sequenceFlow id="flow74" sourceRef="valutazione-preavviso" targetRef="exclusivegateway11"></sequenceFlow>
       <sequenceFlow id="flow76" sourceRef="exclusivegateway11" targetRef="firma-dg-rigetto"></sequenceFlow>
       <exclusiveGateway id="exclusivegateway12" name="Exclusive Gateway" default="flow80"></exclusiveGateway>
       <sequenceFlow id="flow77" sourceRef="firma-dg-rigetto" targetRef="exclusivegateway12"></sequenceFlow>
       <sequenceFlow id="flow78" sourceRef="preavviso-rigetto" targetRef="istruttoria-su-preavviso"></sequenceFlow>
-      <sequenceFlow id="flow79" sourceRef="exclusivegateway12" targetRef="valutazione-preavviso"></sequenceFlow>
+      <sequenceFlow id="flow79" sourceRef="exclusivegateway12" targetRef="valutazione-preavviso">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'riproponi_in_valutazione'}]]></conditionExpression>
+      </sequenceFlow>
       <endEvent id="endevent10" name="End">
         <extensionElements>
-          <activiti:executionListener event="start" expression="${execution.setVariable(&quot;statoFinaleDomanda&quot;, &quot;DOMANDA RESPINTA&quot;)}"></activiti:executionListener>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[end-respinta]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
         </extensionElements>
       </endEvent>
       <sequenceFlow id="flow80" name="respinta" sourceRef="exclusivegateway12" targetRef="endevent10"></sequenceFlow>
@@ -76,28 +175,36 @@
       <sequenceFlow id="flow86" name="approvata" sourceRef="exclusivegateway13" targetRef="endevent12"></sequenceFlow>
       <sequenceFlow id="flow88" sourceRef="valutazione" targetRef="exclusivegateway13"></sequenceFlow>
       <sequenceFlow id="flow89" sourceRef="exclusivegateway13" targetRef="soccorso-istruttorio">
-        <extensionElements>
-          <activiti:executionListener event="take" expression="${execution.setVariable(&quot;soccorsoIstruttoriaFlag&quot;, &quot;1&quot;)}"></activiti:executionListener>
-        </extensionElements>
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'richiesta_soccorso_istruttorio' && soccorsoIstruttoriaFlag != '1'}]]></conditionExpression>
       </sequenceFlow>
       <endEvent id="endevent12" name="End">
         <extensionElements>
-          <activiti:executionListener event="start" expression="${execution.setVariable(&quot;statoFinaleDomanda&quot;, &quot;DOMANDA APPROVATA&quot;)}"></activiti:executionListener>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[end-approvata]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
         </extensionElements>
       </endEvent>
-      <sequenceFlow id="flow93" sourceRef="exclusivegateway11" targetRef="endevent12"></sequenceFlow>
+      <sequenceFlow id="flow93" sourceRef="exclusivegateway11" targetRef="endevent12">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'approva'}]]></conditionExpression>
+      </sequenceFlow>
       <sequenceFlow id="flow94" sourceRef="exclusivegateway13" targetRef="preavviso-rigetto">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'invia_preavviso_di_rigetto'}]]></conditionExpression>
       </sequenceFlow>
       <sequenceFlow id="flow95" sourceRef="exclusivegateway13" targetRef="valutazione">
-        <extensionElements>
-          <activiti:executionListener event="take" expression="${execution.setVariable(&quot;pdfPreavvisoRigettoFlag&quot;, &quot;1&quot;)}"></activiti:executionListener>
-          <activiti:executionListener event="take" delegateExpression="${createOivPdf}"></activiti:executionListener>
-        </extensionElements>
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'genera_PDF_preavviso_di_rigetto' || sceltaUtente == 'calcola_punteggio' }]]></conditionExpression>
       </sequenceFlow>
-      <sequenceFlow id="flow96" sourceRef="exclusivegateway11" targetRef="valutazione-preavviso"></sequenceFlow>
+      <sequenceFlow id="flow96" sourceRef="exclusivegateway11" targetRef="valutazione-preavviso">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'genera_PDF_rigetto' || sceltaUtente == 'calcola_punteggio' }]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="flow98" sourceRef="exclusivegateway1" targetRef="soccorso-istruttorio">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'richiesta_soccorso_istruttorio' && soccorsoIstruttoriaFlag != '1'}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="flow99" sourceRef="exclusivegateway1" targetRef="valutazione"></sequenceFlow>
+      <sequenceFlow id="flow100" sourceRef="exclusivegateway1" targetRef="cambio-istruttore">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'richiesto_cambio_istruttore'}]]></conditionExpression>
+      </sequenceFlow>
     </subProcess>
     <startEvent id="startevent2" name="Start"></startEvent>
     <sequenceFlow id="flow48" name="START" sourceRef="startevent2" targetRef="valutazione-domande"></sequenceFlow>
@@ -109,13 +216,13 @@
     <sequenceFlow id="flow65" sourceRef="boundarytimer3" targetRef="scadenza-tempi-procedurali"></sequenceFlow>
     <scriptTask id="scadenza-tempi-procedurali" name="SCADENZA TEMPI PROCEDURALI" scriptFormat="javascript" activiti:autoStoreVariables="false">
       <script>execution.setVariable('istruttoriaInevasa', true);
-</script>
+			</script>
     </scriptTask>
     <endEvent id="endevent11" name="End"></endEvent>
     <sequenceFlow id="flow82" name="END" sourceRef="valutazione-domande" targetRef="endevent11"></sequenceFlow>
     <scriptTask id="avviso-scadenza-tempi-procedurali" name="AVVISO SCADENZA TEMPI PROCEDURALI" scriptFormat="javascript" activiti:autoStoreVariables="false">
       <script>execution.setVariable('avvisoIstruttoriaInevasa', true);
-</script>
+			</script>
     </scriptTask>
     <boundaryEvent id="boundarytimer6" name="Timer" attachedToRef="valutazione-domande" cancelActivity="false">
       <timerEventDefinition>
@@ -217,18 +324,6 @@
         <omgdi:waypoint x="210.0" y="215.0"></omgdi:waypoint>
         <omgdi:waypoint x="210.0" y="184.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
-        <omgdi:waypoint x="373.0" y="176.0"></omgdi:waypoint>
-        <omgdi:waypoint x="210.0" y="215.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
-        <omgdi:waypoint x="373.0" y="176.0"></omgdi:waypoint>
-        <omgdi:waypoint x="373.0" y="215.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow35" id="BPMNEdge_flow35">
-        <omgdi:waypoint x="373.0" y="136.0"></omgdi:waypoint>
-        <omgdi:waypoint x="374.0" y="106.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow36" id="BPMNEdge_flow36">
         <omgdi:waypoint x="310.0" y="73.0"></omgdi:waypoint>
         <omgdi:waypoint x="210.0" y="73.0"></omgdi:waypoint>
@@ -264,7 +359,7 @@
         <omgdi:waypoint x="563.0" y="491.0"></omgdi:waypoint>
         <omgdi:waypoint x="583.0" y="491.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="39.0" x="550.0" y="459.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="100.0" x="550.0" y="459.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow83" id="BPMNEdge_flow83">
@@ -276,7 +371,7 @@
         <omgdi:waypoint x="393.0" y="156.0"></omgdi:waypoint>
         <omgdi:waypoint x="583.0" y="156.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="62.0" x="522.0" y="129.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="100.0" x="522.0" y="129.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow86" id="BPMNEdge_flow86">
@@ -284,7 +379,7 @@
         <omgdi:waypoint x="600.0" y="248.0"></omgdi:waypoint>
         <omgdi:waypoint x="600.0" y="300.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="49.0" x="540.0" y="286.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="100.0" x="540.0" y="286.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow88" id="BPMNEdge_flow88">
@@ -320,6 +415,18 @@
         <omgdi:waypoint x="445.0" y="350.0"></omgdi:waypoint>
         <omgdi:waypoint x="335.0" y="350.0"></omgdi:waypoint>
         <omgdi:waypoint x="335.0" y="370.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow98" id="BPMNEdge_flow98">
+        <omgdi:waypoint x="373.0" y="176.0"></omgdi:waypoint>
+        <omgdi:waypoint x="210.0" y="215.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow99" id="BPMNEdge_flow99">
+        <omgdi:waypoint x="373.0" y="176.0"></omgdi:waypoint>
+        <omgdi:waypoint x="373.0" y="215.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow100" id="BPMNEdge_flow100">
+        <omgdi:waypoint x="373.0" y="136.0"></omgdi:waypoint>
+        <omgdi:waypoint x="374.0" y="106.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow48" id="BPMNEdge_flow48">
         <omgdi:waypoint x="44.0" y="280.0"></omgdi:waypoint>
