@@ -1,45 +1,37 @@
 package it.cnr.si.flows.ng.resource;
 
-import static it.cnr.si.flows.ng.TestServices.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
-import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.initiator;
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.oggetto;
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.startDate;
-import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
-import static it.cnr.si.flows.ng.utils.Utils.ASC;
-import static it.cnr.si.flows.ng.utils.Utils.DESC;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.springframework.http.HttpStatus.OK;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.inject.Inject;
-
+import it.cnr.si.FlowsApp;
+import it.cnr.si.flows.ng.TestServices;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
-import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.joda.time.DateTime;
 import org.json.JSONException;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import it.cnr.si.FlowsApp;
-import it.cnr.si.flows.ng.TestServices;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.*;
+
+import static it.cnr.si.flows.ng.TestServices.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
+import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
 import static it.cnr.si.flows.ng.utils.Utils.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.springframework.http.HttpStatus.OK;
+
 
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
+@ActiveProfiles(profiles = "cnr")
 @RunWith(SpringRunner.class)
 public class FlowsSearchResourceTest {
 
@@ -47,14 +39,23 @@ public class FlowsSearchResourceTest {
     private TestServices util;
     @Inject
     private FlowsProcessInstanceResource flowsProcessInstanceResource;
-    @Inject 
+    @Inject
     private FlowsTaskResource flowsTaskResource;
     @Inject
     private FlowsSearchResource flowsSearchResource;
-    
+
     private ProcessInstanceResponse processInstance;
     private static int processDeleted = 0;
-    
+
+
+    @After
+    public void tearDown() {
+        processDeleted = processDeleted + util.myTearDown();
+    }
+
+
+
+
     @Test
     public void testProcessInstanceSearch() throws IOException, JSONException {
         processInstance = util.mySetUp(acquisti.getValue());
@@ -65,9 +66,9 @@ public class FlowsSearchResourceTest {
         Date tomorrow = cal.getTime();
         cal.add(Calendar.DATE, -2);
         Date yesterday = cal.getTime();
-        
+
         Map<String, String> requestParams = new HashMap<>();
-        
+
         requestParams.put("oggetto", "textEqual="+ TITOLO_DELL_ISTANZA_DEL_FLUSSO);
         requestParams.put(initiator.name(), "text="+ TestServices.getRA());
         requestParams.put(startDate + "Great", "date="+ formattaData(yesterday));
@@ -83,14 +84,16 @@ public class FlowsSearchResourceTest {
         verifySearchResponse(response, 1, 1);
 
         //verifico la richiesta su tutte le Process Definition
+        requestParams.put("processDefinitionKey", ALL_PROCESS_INSTANCES);
         response = flowsSearchResource.search(requestParams);
         verifySearchResponse(response, 1, 1);
 
-        //cerco che le Process Instance completate (active = false) siano quelle cancellate nel tearDown (processDeleted) + 2 (quella cancellata in testGetMyProcesses (NON quella creata con oggetto diverso in testGetProcessInstances) )
+        //verifico che le Process Instance completate (active = false) siano quelle cancellate nel tearDown di questa classe (processDeleted)
+        // + 3 (quelle cancellate nei test precedenti) + 1 (quella cancellata in testGetMyProcesses (NON quella creata con oggetto diverso in testGetProcessInstances) )
         requestParams.put("active", "false");
         requestParams.put("order", DESC);
         response = flowsSearchResource.search(requestParams);
-        verifySearchResponse(response, processDeleted + 1, processDeleted + 1);
+        verifySearchResponse(response, processDeleted + 3 + 1, processDeleted + 3 + 1);
 
         /*
          * VERIFICA GESTIONE DELLE AUTHORITIES TODO
@@ -105,7 +108,7 @@ public class FlowsSearchResourceTest {
         requestParams.put("active", "true");
         requestParams.put("firstResult", "0");
         requestParams.put("maxResults", "20");
-        
+
         response = flowsSearchResource.search(requestParams);
         verifySearchResponse(response, 0, 0);
     }
@@ -244,7 +247,7 @@ public class FlowsSearchResourceTest {
         HashMap body = (HashMap) response.getBody();
         ArrayList responseList = (ArrayList) body.get("processInstances");
         assertEquals("Lunghezza della lista NON corrispondente alle attese", expectedResponseItems, responseList.size());
-        assertEquals("TotalItems NON corrispondente alle attese", expectedTotalItems, ((Integer) body.get("totalItems")).intValue());
+        assertEquals("TotalItems NON corrispondente alle attese", expectedTotalItems, (int) ((Long) body.get("totalItems")).longValue());
 
         if (responseList.size() > 0) {
             for (int i = 0; i < (expectedTotalItems > expectedResponseItems ? expectedResponseItems : expectedTotalItems); i++) {
@@ -306,10 +309,8 @@ public class FlowsSearchResourceTest {
         assertEquals(0, entities.size());
         assertEquals(0, ((ArrayList) response.getBody().getData()).size());
     }
-    
-    
-    
-    
+
+
     /* ----- TASKS ----- */
     @Test
     public void testTaskSearch() throws IOException {
@@ -325,9 +326,9 @@ public class FlowsSearchResourceTest {
                 "\"taskParams\":" +
                 "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
         request.setContent(content.getBytes());
-        
+
         Map<String, String> requestParams = new HashMap<>();
-        
+
         requestParams.put("oggetto", "textEqual="+ TITOLO_DELL_ISTANZA_DEL_FLUSSO);
         requestParams.put(initiator.name(), "textEqual="+ TestServices.getRA());
         requestParams.put("processDefinitionKey", ALL_PROCESS_INSTANCES);
@@ -335,7 +336,7 @@ public class FlowsSearchResourceTest {
         requestParams.put("active", "true");
         requestParams.put("firstResult", "0");
         requestParams.put("maxResults", "100");
-        
+
 
         // TODO fixare e decommentare
 //        ResponseEntity response = flowsSearchResource.search(request, ALL_PROCESS_INSTANCES, true, ASC, 0, 100);
@@ -343,11 +344,11 @@ public class FlowsSearchResourceTest {
 //        assertEquals(Long.valueOf("1"), ((HashMap) response.getBody()).get("totalItems"));
 //        assertEquals(1, tasks.size());
 //        assertEquals(util.getFirstTaskId(), ((HistoricTaskInstanceResponse) tasks.get(0)).getId());
-        
+
         //verifico che con parametri di ricerca sbagliati non abbia task nel searchResult
         verifyBadTaskSearchParams(request);
     }
-    
+
     private void verifyBadTaskSearchParams(MockHttpServletRequest request) {
         String content;
         ResponseEntity<DataResponse> response;//verifico che non prenda nessun elemento (SEARCH PARAMS SBAGLIATI)
@@ -381,5 +382,5 @@ public class FlowsSearchResourceTest {
         response = flowsTaskResource.getMyTasks(request, ALL_PROCESS_INSTANCES, 0, 100, ASC);
         assertEquals(0, response.getBody().getSize());
         assertEquals(0, ((ArrayList) response.getBody().getData()).size());
-    }    
+    }
 }
