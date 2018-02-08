@@ -1,6 +1,7 @@
 package it.cnr.si.security;
 
 import it.cnr.si.domain.User;
+import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.UserRepository;
 import it.cnr.si.service.RelationshipService;
 import org.slf4j.Logger;
@@ -40,10 +41,14 @@ public class FlowsUserDetailsService implements org.springframework.security.cor
     private RelationshipService relationshipService;
     @Inject
     private Environment env;
+    @Inject
+    private Utils utils;
+
 
     @Override
     @Transactional
-    @Cacheable("user")
+    //la cache "user" attivata solo per il profilo cnr perchè in oiv abbiamo pochi utenti e la cache fa casini con la creazione dei nuovi utenti
+    @Cacheable(value = "user", key = "#login", condition = "@utils.isProfileActive(\"cnr\")")
     public UserDetails loadUserByUsername(final String login) {
         UserDetails userDetails = null;
 
