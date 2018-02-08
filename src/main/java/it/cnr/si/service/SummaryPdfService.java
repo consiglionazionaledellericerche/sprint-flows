@@ -59,8 +59,8 @@ public class SummaryPdfService {
     private FlowsAttachmentService flowsAttachmentService;
     @Inject
     private ViewRepository viewRepository;
-    private Utils utils = new Utils();
-
+    @Inject
+    private Utils utils;
 
 
     public String createPdf(String processInstanceId, ByteArrayOutputStream outputStream) throws IOException, ParseException {
