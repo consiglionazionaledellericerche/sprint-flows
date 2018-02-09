@@ -73,7 +73,6 @@ public class FlowsUserDetailsService implements org.springframework.security.cor
             List<String> profiles = Arrays.asList(env.getActiveProfiles());
             if (profiles.contains("cnr"))
                 userDetails = ldapUserDetailsService.loadUserByUsername(login);
-//            else if(profiles.contains("oiv")){} implementare l'impersonate per gli utenti oiv'   todo: implementare l'impersonate per gli utenti oiv
         }
 
         if (userDetails == null)
