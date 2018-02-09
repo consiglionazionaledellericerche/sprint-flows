@@ -110,10 +110,6 @@
 				</textElement>
 				<textFieldExpression><![CDATA["E-mail :"]]></textFieldExpression>
 			</textField>
-			<image>
-				<reportElement x="1" y="2" width="329" height="130" uuid="6beae08d-439c-499c-9fc8-d7d0aa6d351e"/>
-				<imageExpression><![CDATA["C:\\CNR\\1_PROGETTI\\OIV\\PDF - JASPER REPORT\\print\\logo_OIV.JPG"]]></imageExpression>
-			</image>
 			<textField isStretchWithOverflow="true">
 				<reportElement style="Detail" x="392" y="143" width="160" height="17" uuid="73aefea6-9311-45d7-9f1f-84cad715b43c"/>
 				<textElement>
