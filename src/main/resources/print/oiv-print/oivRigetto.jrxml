@@ -13,7 +13,7 @@
 			<style backcolor="#E6DAC3"/>
 		</conditionalStyle>
 	</style>
-	<parameter name="ANN_IMAGE" class="java.lang.String"/>
+	<parameter name="ANN_IMAGE" class="java.io.InputStream"/>
 	<queryString language="json">
 		<![CDATA[]]>
 	</queryString>
