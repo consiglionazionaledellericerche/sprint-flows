@@ -1,8 +1,5 @@
 <div ng-cloak>
     <div class="row">
-<!--         <div class="col-md-4"> -->
-<!--             <span class="hipster img-responsive img-rounded"></span> -->
-<!--         </div> -->
         <div class="col-md-8 col-md-offset-2">
             <h1>Benvenuti</h1>
             <p class="lead" >Benvenuti nella Scrivania Digitale CNR</p>
@@ -11,8 +8,12 @@
                 <div class="alert alert-success" ng-switch-when="true" translate="home.logged.message" translate-values="{username: '{{vm.account.login}}'}">
                     You are logged in as user "{{vm.account.login}}".
                 </div>
-                <div class="alert alert-info" ng-switch-when="false">
+
+                <div ng-If="app == 'cnr'">
                     Per autenticarsi usare il menu' "Utente" usando le credenziali Siper.
+                </div>
+                <div ng-If="app == 'oiv'">
+                    Per autenticarsi usare il menu' "Utente" usando le credenziali dell'applicazione.
                 </div>
             </div>
 
