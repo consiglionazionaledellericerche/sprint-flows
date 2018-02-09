@@ -13,6 +13,7 @@
 			<style backcolor="#E6DAC3"/>
 		</conditionalStyle>
 	</style>
+	<parameter name="ANN_IMAGE" class="java.lang.String"/>
 	<queryString language="json">
 		<![CDATA[]]>
 	</queryString>
@@ -112,7 +113,7 @@
 			</textField>
 			<image>
 				<reportElement x="1" y="2" width="329" height="130" uuid="6beae08d-439c-499c-9fc8-d7d0aa6d351e"/>
-                <imageExpression><![CDATA[$P{ANN_IMAGE}]]></imageExpression>
+				<imageExpression><![CDATA[$P{ANN_IMAGE}]]></imageExpression>
 			</image>
 			<textField isStretchWithOverflow="true">
 				<reportElement style="Detail" x="392" y="143" width="160" height="17" uuid="73aefea6-9311-45d7-9f1f-84cad715b43c"/>
