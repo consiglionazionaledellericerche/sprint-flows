@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="OIV RIGETTO 2" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c0187353-db16-46fc-a7a4-9ece39bc4976">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="39"/>
+	<style name="Title" fontName="Times New Roman" fontSize="50" isBold="true" pdfFontName="Times-Bold"/>
+	<style name="SubTitle" forecolor="#736343" fontName="Arial" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="Arial" fontSize="12"/>
+	<style name="Row" mode="Transparent">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+			<style backcolor="#E6DAC3"/>
+		</conditionalStyle>
+	</style>
+	<field name="dataInvioDomanda" class="java.lang.String">
+		<fieldDescription><![CDATA[dataInvioDomanda]]></fieldDescription>
+	</field>
+	<field name="nomeRichiedente" class="java.lang.String">
+		<fieldDescription><![CDATA[nomeRichiedente]]></fieldDescription>
+	</field>
+	<field name="emailRichiedente" class="java.lang.String">
+		<fieldDescription><![CDATA[emailRichiedente]]></fieldDescription>
+	</field>
+	<field name="motivazioneStandard" class="java.lang.String">
+		<fieldDescription><![CDATA[motivazioneStandard]]></fieldDescription>
+	</field>
+	<field name="protocolloPreavviso" class="java.lang.String">
+		<fieldDescription><![CDATA[protocolloPreavviso]]></fieldDescription>
+	</field>
+	<field name="testoMotivazioneStandard" class="java.lang.String">
+		<fieldDescription><![CDATA[testoMotivazioneStandard]]></fieldDescription>
+	</field>
+	<field name="dataPreavviso" class="java.lang.String">
+		<fieldDescription><![CDATA[dataPreavviso]]></fieldDescription>
+	</field>
+	<group name="Group1">
+		<groupExpression><![CDATA[(int)($V{REPORT_COUNT}/15)]]></groupExpression>
+		<groupHeader>
+			<band/>
+		</groupHeader>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<group name="Group2">
+		<groupExpression><![CDATA[(int)($V{REPORT_COUNT}/5)]]></groupExpression>
+		<groupHeader>
+			<band height="385">
+				<textField isStretchWithOverflow="true">
+					<reportElement style="Detail" x="250" y="314" width="292" height="51" uuid="2d49c6fc-7ded-4f0d-94fb-e4cc1e708646"/>
+					<textElement textAlignment="Center">
+						<font fontName="SansSerif" size="11" isBold="false"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["per il Direttore dell’Ufficio\r\ndott.ssa Alessandra Barberi\r\n(Dirigente del Servizio per la valutazione indipendente)"]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement style="Detail" x="37" y="88" width="505" height="144" uuid="7ac903fa-55d2-4e21-a610-fa7dda8d3df3"/>
+					<textElement>
+						<font fontName="SansSerif" size="11" isBold="false"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["\t Con riferimento alla sua comunicazione del "+$F{dataInvioDomanda}+", con la quale ha inoltrato documentazione relativa all’esperienza professionale, si comunica che le informazioni fornite non consentono di ritenere sussistenti i requisiti richiesti in quanto non è stato possibile acquisire elementi relativi a esperienze concrete, maturate nel periodo indicato, utili per l’iscrizione nell’Elenco nazionale degli OIV. Al riguardo, si precisa che "+$F{testoMotivazioneStandard}+"Pertanto, il Dipartimento procede al rigetto dell’istanza confermando quanto già esplicitato nel preavviso con nota del  "+$F{dataPreavviso}+" (Prot.  "+$F{protocolloPreavviso}+")."]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="37" y="13" width="505" height="40" uuid="e9825bfd-c98f-4489-83b3-1ceb9783f873"/>
+					<textElement>
+						<font size="11" isBold="true"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Oggetto:\t rigetto della domanda di iscrizione nell’Elenco nazionale dei componenti\r\n\t\tdegli Organismi indipendenti di valutazione ai sensi del D.M 2 dicembre 2016."]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement style="Detail" x="37" y="247" width="505" height="51" uuid="69d503f3-ad7b-4365-ba59-a924c5baa7e8"/>
+					<textElement>
+						<font fontName="SansSerif" size="11" isBold="false"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["\t Al riguardo, si precisa che "+$F{testoMotivazioneStandard}+"\r\n\t Pertanto, il Dipartimento procede al rigetto dell’istanza confermando quanto già esplicitato nel preavviso con nota del  "+$F{dataPreavviso}+" (Prot.  "+$F{protocolloPreavviso}+")."]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="185" splitType="Stretch">
+			<textField isStretchWithOverflow="true">
+				<reportElement style="Detail" x="330" y="143" width="49" height="17" uuid="0b92db97-6423-4fe6-aa21-2c7b75c4dc9b"/>
+				<textElement>
+					<font fontName="SansSerif" size="11" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Al dott.: "]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="Detail" x="330" y="162" width="49" height="17" uuid="e2a46fcd-e936-4956-a327-61d08f44f5bd"/>
+				<textElement>
+					<font fontName="SansSerif" size="11" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["E-mail :"]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="1" y="2" width="329" height="130" uuid="6beae08d-439c-499c-9fc8-d7d0aa6d351e"/>
+				<imageExpression><![CDATA["C:\\CNR\\1_PROGETTI\\OIV\\PDF - JASPER REPORT\\print\\logo_OIV.JPG"]]></imageExpression>
+			</image>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="Detail" x="392" y="143" width="160" height="17" uuid="73aefea6-9311-45d7-9f1f-84cad715b43c"/>
+				<textElement>
+					<font fontName="SansSerif" size="11" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nomeRichiedente}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="Detail" x="392" y="162" width="160" height="17" uuid="461b7621-7cc4-4b3f-918d-756b70d532d8"/>
+				<textElement>
+					<font fontName="SansSerif" size="11" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{emailRichiedente}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="19" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="5" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="25" splitType="Stretch">
+			<textField isStretchWithOverflow="true">
+				<reportElement style="Detail" x="17" y="6" width="505" height="19" uuid="33f2da54-0668-4db7-ac94-d1a49ef00fb5"/>
+				<textElement>
+					<font fontName="SansSerif" size="11" isBold="false" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Il presente rigetto è firmato digitalmente ai sensi dell’art. 24 del D.lgs 7 marzo 2005, n. 82"]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>
