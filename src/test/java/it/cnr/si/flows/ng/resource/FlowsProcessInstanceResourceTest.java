@@ -85,7 +85,7 @@ public class FlowsProcessInstanceResourceTest {
 
     @Test
     public void testGetMyProcesses() throws IOException {
-        processInstance = util.mySetUp(acquisti.getValue());
+        processInstance = util.mySetUp(acquisti);
         String processInstanceID = verifyMyProcesses(1, 0);
         // testo che, anche se una Process Instance viene sospesa, la vedo ugualmente
         util.loginAdmin();
@@ -105,7 +105,7 @@ public class FlowsProcessInstanceResourceTest {
 
     @Test(expected = AccessDeniedException.class)
     public void testGetProcessInstanceById() throws Exception {
-        processInstance = util.mySetUp(acquisti.getValue());
+        processInstance = util.mySetUp(acquisti);
 
         ResponseEntity<Map<String, Object>> response = flowsProcessInstanceResource.getProcessInstanceById(new MockHttpServletRequest(), processInstance.getId());
         assertEquals(OK, response.getStatusCode());
@@ -141,7 +141,7 @@ public class FlowsProcessInstanceResourceTest {
 
     @Test
     public void testGetProcessInstances() throws IOException {
-        processInstance = util.mySetUp(acquisti.getValue());
+        processInstance = util.mySetUp(acquisti);
 
         //responsabileacquisti crea una seconda Process Instance di acquisti con suffisso "2" nell'oggetto della PI
         util.loginResponsabileAcquisti();
@@ -207,7 +207,7 @@ public class FlowsProcessInstanceResourceTest {
 
     @Test
     public void testSuspend() throws Exception {
-        processInstance = util.mySetUp(acquisti.getValue());
+        processInstance = util.mySetUp(acquisti);
         assertEquals(false, processInstance.isSuspended());
         //solo admin può sospendere il flow
         util.loginAdmin();

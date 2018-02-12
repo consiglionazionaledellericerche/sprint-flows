@@ -1,6 +1,7 @@
 package it.cnr.si.flows.ng;
 
 import it.cnr.si.flows.ng.resource.FlowsTaskResource;
+import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.security.FlowsUserDetailsService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
@@ -28,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
 import static it.cnr.si.flows.ng.utils.Enum.SiglaList.TIPOLOGIA_ACQUISIZIONE;
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.descrizione;
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.oggetto;
@@ -52,6 +52,7 @@ public class TestServices {
     private static final String DIRETTORE = "direttore";
     private static final String RA = "anna.penna";
     private static final String RA2 = "silvia.rossi";
+    private static final String APP = "utente1";
 
 
     @Inject
@@ -92,6 +93,11 @@ public class TestServices {
     public void loginUser() {
         logout();
         login("user", "user");
+    }
+
+    public void loginApp() {
+        logout();
+        login(TestServices.APP, "");
     }
 
     public void loginSfd() {
@@ -148,37 +154,75 @@ public class TestServices {
         return firstTaskId;
     }
 
-    public ProcessInstanceResponse mySetUp(String processDefinitionKey) throws IOException {
-        loginResponsabileAcquisti();
-        List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().latestVersion().list();
+    public ProcessInstanceResponse mySetUp(Enum.ProcessDefinitionEnum processDefinitionKey) throws IOException {
+        ProcessInstanceResponse processInstanceResponse = null;
+        MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
 
+        List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().latestVersion().list();
         for (ProcessDefinition pd : processDefinitions) {
-            if (pd.getId().contains(processDefinitionKey)) {
+            if (pd.getId().contains(processDefinitionKey.getValue())) {
                 processDefinition = pd.getId();
                 break;
             }
         }
-
-        MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
         req.setParameter("processDefinitionId", processDefinition);
-        if (processDefinitionKey.equals(acquisti.getValue())) {
-            req.setParameter(oggetto.name(), TITOLO_DELL_ISTANZA_DEL_FLUSSO);
-            req.setParameter(descrizione.name(), "descrizione");
-            req.setParameter(TIPOLOGIA_ACQUISIZIONE.name(), "procedura aperta");
-            req.setParameter("tipologiaAcquisizioneId", "11");
-            req.setParameter("strumentoAcquisizione", "AFFIDAMENTO DIRETTO - MEPA o CONSIP\n");
-            req.setParameter("strumentoAcquisizioneId", "11");
-            req.setParameter("priorita", "Alta");
-            req.setParameter("rup", "marco.spasiano");
-            req.setParameter("rup_label", "MARCO SPASIANO (marco.spasiano)");
-            req.setParameter("impegni_json", "[{\"numero\":\"1\",\"importoNetto\":100,\"importoLordo\":120,\"descrizione\":\"descrizione impegno\",\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"gae\":\"spaclient\"}]");
+
+        switch (processDefinitionKey) {
+            case acquisti:
+                loginResponsabileAcquisti();
+
+                req.setParameter(oggetto.name(), TITOLO_DELL_ISTANZA_DEL_FLUSSO);
+                req.setParameter(descrizione.name(), "descrizione");
+                req.setParameter(TIPOLOGIA_ACQUISIZIONE.name(), "procedura aperta");
+                req.setParameter("tipologiaAcquisizioneId", "11");
+                req.setParameter("strumentoAcquisizione", "AFFIDAMENTO DIRETTO - MEPA o CONSIP\n");
+                req.setParameter("strumentoAcquisizioneId", "11");
+                req.setParameter("priorita", "Alta");
+                req.setParameter("rup", "marco.spasiano");
+                req.setParameter("rup_label", "MARCO SPASIANO (marco.spasiano)");
+                req.setParameter("impegni_json", "[{\"numero\":\"1\",\"importoNetto\":100,\"importoLordo\":120,\"descrizione\":\"descrizione impegno\",\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"gae\":\"spaclient\"}]");
+
+                break;
+
+            case iscrizioneElencoOiv:
+                loginApp();
+                req.setParameter("valutazioneEsperienze[0][numeroEsperienza]", "1");
+                req.setParameter("valutazioneEsperienze[0][dataInizio]", "2018-01-31T23:00:00.000Z");
+                req.setParameter("valutazioneEsperienze[0][dataFine]", "2018-02-01T23:00:00.000Z");
+                req.setParameter("valutazioneEsperienze[0][tipologiaEsperienza]", "Tipologia");
+                req.setParameter("valutazioneEsperienze[0][ambitoEsperienza]", "Ambito");
+                req.setParameter("valutazioneEsperienze[0][attivitaSvolta]", "Attività Svolta");
+//                req.setParameter("domanda"; filename="30ed6cde-2fb7-4392-86d0-cfae95832f15 (2).pdf"
+//                req.setParameter("cartaIdentita"; filename="30ed6cde-2fb7-4392-86d0-cfae95832f15 (2).pdf"
+//                req.setParameter(="cv"; filename="30ed6cde-2fb7-4392-86d0-cfae95832f15 (2).pdf");
+//                req.setParameter("__new__allegati[0]",filename="30ed6cde-2fb7-4392-86d0-cfae95832f15 (2).pdf");
+                req.setParameter("oggetto", "titolo");
+                req.setParameter("descrizione", "descrizione");
+                req.setParameter("nomeRichiedente", "Nome e Cognome Richiedente");
+                req.setParameter("dataNascitaRichiedente", "2018-01-31T23:00:00.000Z");
+                req.setParameter("sessoRichiedente", "m");
+                req.setParameter("codiceFiscaleRichiedente", "Codice Fiscale");
+                req.setParameter("emailRichiedente", "e-mail@e-mail");
+                req.setParameter("tipologiaRichiesta", "iscrizione");
+                req.setParameter("punteggioEsperienzeProposto", "Punteggio Esperienze Proposto");
+                req.setParameter("fasciaAppartenenzaProposta", "1");
+                req.setParameter("dataIscrizioneElenco", "2018-02-07T23:00:00.000Z");
+                req.setParameter("codiceIscrizioneElenco", "Codice Iscrizione Elenco");
+                req.setParameter("dataInvioDomanda", "2018-02-17T23:00:00.000Z");
+                req.setParameter("valutazioneEsperienze_json", "[{\"numeroEsperienza\":1,\"dataInizio\":\"2018-01-31T23:00:00.000Z\",\"dataFine\":\"2018-02-01T23:00:00.000Z\",\"tipologiaEsperienza\":\"Tipologia\",\"ambitoEsperienza\":\"Ambito\",\"attivitaSvolta\":\"Attività Svolta\"}]");
+                req.setParameter("dataNascitaRichiedente_json", "2018-01-31T23:00:00.000Z");
+                req.setParameter("dataIscrizioneElenco_json", "2018-02-07T23:00:00.000Z");
+                req.setParameter("dataInvioDomanda_json", "2018-02-17T23:00:00.000Z");
+                break;
         }
+        //Recupero la ProcessInstance
         ResponseEntity<Object> response = flowsTaskResource.completeTask(req);
         assertEquals(OK, response.getStatusCode());
+
         // Recupero il TaskId del primo task del flusso
 //        firstTaskId = taskService.createTaskQuery().singleResult().getId();
         firstTaskId = taskService.createTaskQuery().list().get(0).getId();
-        //Recupero la ProcessInstance
+
         return (ProcessInstanceResponse) response.getBody();
     }
 

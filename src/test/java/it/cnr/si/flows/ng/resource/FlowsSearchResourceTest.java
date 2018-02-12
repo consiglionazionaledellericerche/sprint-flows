@@ -58,7 +58,7 @@ public class FlowsSearchResourceTest {
 
     @Test
     public void testProcessInstanceSearch() throws IOException, JSONException {
-        processInstance = util.mySetUp(acquisti.getValue());
+        processInstance = util.mySetUp(acquisti);
         util.loginAdmin();
 
         final Calendar cal = Calendar.getInstance();
@@ -314,7 +314,7 @@ public class FlowsSearchResourceTest {
     /* ----- TASKS ----- */
     @Test
     public void testTaskSearch() throws IOException {
-        processInstance = util.mySetUp(acquisti.getValue());
+        processInstance = util.mySetUp(acquisti);
 
         util.logout();
         util.loginSfd();
