@@ -69,7 +69,7 @@ public class SummaryPdfServiceTest {
 
     @Test
     public void testSummaryPdfProcessCompleted() throws IOException {
-        processInstance = util.mySetUp(acquisti.getValue());
+        processInstance = util.mySetUp(acquisti);
 
         Map<String, FlowsAttachment> docs = flowsAttachmentResource.getAttachementsForProcessInstance(processInstance.getId()).getBody();
         assertTrue(docs.isEmpty());
@@ -112,7 +112,7 @@ public class SummaryPdfServiceTest {
     @Test
     public void testSummaryPdfService() throws IOException, ParseException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        processInstance = util.mySetUp(acquisti.getValue());
+        processInstance = util.mySetUp(acquisti);
 
         util.loginSfd();
         completeTask();

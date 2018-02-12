@@ -77,7 +77,7 @@ public class FlowsTaskResourceTest {
 
     @Test
     public void testGetMyTasks() throws IOException {
-        processInstance = util.mySetUp(acquisti.getValue());
+        processInstance = util.mySetUp(acquisti);
 //       all'inizio del test SFD non ha task assegnati'
         util.loginSfd();
         ResponseEntity<DataResponse> response = flowsTaskResource.getMyTasks(mockHttpServletRequest, ALL_PROCESS_INSTANCES, 0, 100, ASC);
@@ -116,7 +116,7 @@ public class FlowsTaskResourceTest {
 
     @Test
     public void testGetAvailableTasks() throws IOException {
-        processInstance = util.mySetUp(acquisti.getValue());
+        processInstance = util.mySetUp(acquisti);
         //SFD è sfd@sisinfo (quindi può vedere il task istanziato)
         util.logout();
         util.loginSfd();
@@ -138,7 +138,7 @@ public class FlowsTaskResourceTest {
 
     @Test(expected = AccessDeniedException.class)
     public void testGetTaskInstance() throws IOException {
-        processInstance = util.mySetUp(acquisti.getValue());
+        processInstance = util.mySetUp(acquisti);
         ResponseEntity<Map<String, Object>> response = flowsTaskResource.getTask(util.getFirstTaskId());
         assertEquals(OK, response.getStatusCode());
         assertEquals(FIRST_TASK_NAME, ((TaskResponse) response.getBody().get("task")).getName());
@@ -151,7 +151,7 @@ public class FlowsTaskResourceTest {
 
     @Test(expected = AccessDeniedException.class)
     public void testVerifyGetTaskInstance() throws IOException {
-        processInstance = util.mySetUp(acquisti.getValue());
+        processInstance = util.mySetUp(acquisti);
 
         //verifico che gli utenti che NON SONO IN GRUPPI CANDIDATE DEL TASK NE' ROLE_ADMIN
         // (ad esempio il direttore) non possano accedere al servizio
@@ -162,7 +162,7 @@ public class FlowsTaskResourceTest {
 
     @Test
     public void testCompleteTask() throws IOException {
-        processInstance = util.mySetUp(acquisti.getValue());
+        processInstance = util.mySetUp(acquisti);
         //completo il primo task
         util.loginSfd();
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
@@ -183,7 +183,7 @@ public class FlowsTaskResourceTest {
 
     @Test
     public void testTaskAssignedInMyGroups() throws IOException {
-        processInstance = util.mySetUp(acquisti.getValue());
+        processInstance = util.mySetUp(acquisti);
 
         //sfd NON deve vedere NESSUN Task prima dell'assegnazione del task a responsabileAcquisti2
         util.loginSfd();
@@ -215,7 +215,7 @@ public class FlowsTaskResourceTest {
     // non uso expected perche' voglio controllare *esttamente* dove viene lanciata l'eccezione
     @Test
     public void testClaimTask() throws IOException {
-        processInstance = util.mySetUp(acquisti.getValue());
+        processInstance = util.mySetUp(acquisti);
 
 //      sfd è sfd@sisinfo quindi può prendere in carico il flusso
         util.loginSfd();
@@ -237,7 +237,7 @@ public class FlowsTaskResourceTest {
 
     @Test
     public void testGetTasksCompletedForMe() throws ArubaSignServiceException, IOException {
-        processInstance = util.mySetUp(acquisti.getValue());
+        processInstance = util.mySetUp(acquisti);
         //completo il primo task
         util.loginSfd();
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
