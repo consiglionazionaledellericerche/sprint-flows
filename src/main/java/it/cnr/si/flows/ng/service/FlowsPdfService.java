@@ -1,24 +1,29 @@
-package it.cnr.si.service;
+package it.cnr.si.flows.ng.service;
 
 import it.cnr.si.domain.View;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.service.FlowsAttachmentService;
-import it.cnr.si.flows.ng.service.FlowsProcessDiagramService;
-import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
+import it.cnr.si.flows.ng.exception.ReportException;
+import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.data.JsonDataSource;
+import net.sf.jasperreports.engine.util.LocalJasperReportsContext;
 import org.activiti.engine.impl.util.json.JSONArray;
 import org.activiti.engine.impl.util.json.JSONObject;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricIdentityLinkResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
+import org.apache.commons.io.IOUtils;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.bind.RelaxedPropertyResolver;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import rst.pdfbox.layout.elements.ControlElement;
 import rst.pdfbox.layout.elements.Document;
@@ -29,9 +34,11 @@ import rst.pdfbox.layout.text.Position;
 
 import javax.inject.Inject;
 import java.awt.*;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.util.*;
 import java.util.List;
@@ -39,15 +46,11 @@ import java.util.List;
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
 import static org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA_BOLD;
 
-
-/**
- * Created by Paolo on 13/06/17.
- */
 @Service
-public class SummaryPdfService {
+public class FlowsPdfService {
 
     public static final String TITLE = "title";
-    private static final Logger LOGGER = LoggerFactory.getLogger(SummaryPdfService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlowsPdfService.class);
     private static final float FONT_SIZE = 10;
     private static final float TITLE_SIZE = 18;
 
@@ -61,9 +64,11 @@ public class SummaryPdfService {
     private ViewRepository viewRepository;
     @Inject
     private Utils utils;
+    @Inject
+    private Environment env;
 
 
-    public String createPdf(String processInstanceId, ByteArrayOutputStream outputStream) throws IOException, ParseException {
+    public String makeSummaryPdf(String processInstanceId, ByteArrayOutputStream outputStream) throws IOException, ParseException {
 
         Document pdf = new Document(40, 60, 40, 60);
         Paragraph paragraphField = new Paragraph();
@@ -105,10 +110,10 @@ public class SummaryPdfService {
                 paragraphField.addText("Avviato da: " + var.getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
             } else if (variableName.equals(startDate.name())) {
                 if (var.getValue() != null)
-                    paragraphField.addText("Avviato il: " + formatDate(utils.parsaData((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
+                    paragraphField.addText("Avviato il: " + formatDate(Utils.parsaData((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
             } else if (variableName.equals(endDate.name())) {
                 if (var.getValue() != null)
-                    paragraphField.addText("Terminato il: " + formatDate(utils.parsaData((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
+                    paragraphField.addText("Terminato il: " + formatDate(Utils.parsaData((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
             } else if (variableName.equals(gruppoRA.name())) {
                 paragraphField.addText("Gruppo Responsabile Acquisti: " + var.getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
             }
@@ -175,6 +180,52 @@ public class SummaryPdfService {
         return fileName;
     }
 
+
+    public String makePdf(ByteArrayOutputStream outputStream, Enum.PdfType pdfType) {
+        String dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir");
+
+        String printNameJasper = "";
+        switch (pdfType) {
+            case rigetto:
+                try {
+                    //nome del file jasper da caricare(dipende dal tipo di pdf da creare)
+                    printNameJasper = "oivRigetto.jasper";
+
+                    //json con i dati da "inserire" nel pdf (a regime prenderò i dati da varie fonti: db, activiti, ecc)
+                    String myJson = IOUtils.toString(
+                            this.getClass().getResourceAsStream("/print/oiv-print/oivRigetto.json"),
+                            "UTF-8"
+                    );
+
+                    HashMap<String, Object> parameters = new HashMap();
+                    JRDataSource datasource = new JsonDataSource(new ByteArrayInputStream(myJson.getBytes(Charset.forName("UTF-8"))));
+                    final ResourceBundle resourceBundle = ResourceBundle.getBundle(
+                            "net.sf.jasperreports.view.viewer", Locale.ITALIAN);
+                    parameters.put(JRParameter.REPORT_LOCALE, Locale.ITALIAN);
+                    parameters.put(JRParameter.REPORT_RESOURCE_BUNDLE, resourceBundle);
+                    parameters.put(JRParameter.REPORT_DATA_SOURCE, datasource);
+
+                    //carico un'immagine nel pdf "dinamicamente" (sostituisco una variabile ne file jsper con lo stream dell'immagine)
+                    parameters.put("ANN_IMAGE", this.getClass().getResourceAsStream(dir.substring(dir.indexOf("/print")) + "logo_OIV.JPG"));
+
+                    LocalJasperReportsContext ctx = new LocalJasperReportsContext(DefaultJasperReportsContext.getInstance());
+                    ctx.setClassLoader(ClassLoader.getSystemClassLoader());
+
+                    JasperFillManager fillmgr = JasperFillManager.getInstance(ctx);
+
+                    LOGGER.debug("Json con i dati da inserire nel pdf: {}", myJson);
+                    JasperPrint jasperPrint = fillmgr.fill(this.getClass().getResourceAsStream(dir.substring(dir.indexOf("/print")) + printNameJasper),
+                                                           parameters);
+                    byte[] pdfByteArray = JasperExportManager.exportReportToPdf(jasperPrint);
+                    outputStream.write(pdfByteArray);
+                } catch (Exception e) {
+                    throw new ReportException("Error in JASPER (" + e + ").", e);
+                }
+        }
+        return printNameJasper + ".pdf";
+    }
+
+
     private String getPropertyName(Element metadatum, String attr) {
         String propertyName = "";
         propertyName = metadatum.attr(attr);
@@ -203,7 +254,7 @@ public class SummaryPdfService {
 
 
     private String formatDate(Date date) {
-        return date != null ? utils.formattaDataOra(date) : "";
+        return date != null ? Utils.formattaDataOra(date) : "";
     }
 
 

@@ -39,7 +39,7 @@
         <maven-enforcer-plugin.version>1.4.1</maven-enforcer-plugin.version>
         <maven-resources-plugin.version>3.0.1</maven-resources-plugin.version>
         <maven-war-plugin.version>3.0.0</maven-war-plugin.version>
-
+        <jasperreports.version>5.5.0</jasperreports.version>
         <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
         <profile.no-liquibase />
         <profile.swagger />
@@ -214,6 +214,54 @@
             <artifactId>thymeleaf-spring4</artifactId>
             <version>3.0.6.RELEASE</version>
         </dependency>
+        <!--prova jasperreport-->
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports</artifactId>
+            <version></version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>xml-apis</artifactId>
+                    <groupId>xml-apis</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jackson-databind</artifactId>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jackson-core</artifactId>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jackson-annotations</artifactId>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jfreechart</artifactId>
+                    <groupId>jfree</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>castor</artifactId>
+                    <groupId>org.codehaus.castor</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jdtcore</artifactId>
+                    <groupId>eclipse</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jcommon</artifactId>
+                    <groupId>jfree</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy</artifactId>
+            <version>2.4.3</version>
+            <scope>compile</scope>
+        </dependency>
+
+
     </dependencies>
 
     <build>
@@ -511,16 +559,19 @@
                     <dependency>
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-starter-data-jpa</artifactId>
-                        <version>${project.parent.version}</version>
+                        <version>${spring-boot.version}</version>
                     </dependency>
                 </dependencies>
                 <configuration>
                     <changeLogFile>src/main/resources/config/liquibase/master.xml</changeLogFile>
                     <diffChangeLogFile>src/main/resources/config/liquibase/changelog/${maven.build.timestamp}_changelog.xml</diffChangeLogFile>
                     <driver />
-                    <url />
-                    <defaultSchemaName />
-                    <username>sprint</username>
+                    <defaultSchemaName>public</defaultSchemaName>
+                    <username>activiti</username>
+                    <password>activitipw</password>
+                    <url>jdbc:h2:file:./DB-H2/flows-cnr;DB_CLOSE_DELAY=-1</url>
+                    <!--<url>jdbc:h2:file:./DB-H2/flows-oiv;DB_CLOSE_DELAY=-1</url>-->
+                    <username>flows</username>
                     <password />
                     <referenceUrl>hibernate:spring:it.cnr.si.domain?dialect=&amp;hibernate.ejb.naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringNamingStrategy</referenceUrl>
                     <verbose>true</verbose>
@@ -531,6 +582,26 @@
                         oauth_client_token, oauth_code,
                         oauth_refresh_token</diffExcludeObjects>
                 </configuration>
+                <!--<configuration>-->
+                <!--&lt;!&ndash;todo:&ndash;&gt;-->
+                <!--&lt;!&ndash;<changeLogFile>src/main/resources/config/liquibase/master.xml</changeLogFile>&ndash;&gt;-->
+                <!--<diffChangeLogFile>src/main/resources/config/liquibase/changelog/${maven.build.timestamp}_changelog.xml</diffChangeLogFile>-->
+                <!--<driver />-->
+                <!--<defaultSchemaName>public</defaultSchemaName>-->
+                <!--<username>activiti</username>-->
+                <!--<password>activitipw</password>-->
+                <!--<url>jdbc:h2:file:./DB-H2/flows;DB_CLOSE_DELAY=-1</url>-->
+                <!--<username>flows</username>-->
+                <!--<password />-->
+                <!--<referenceUrl>hibernate:spring:it.cnr.si.domain?dialect=&amp;hibernate.ejb.naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringNamingStrategy</referenceUrl>-->
+                <!--<verbose>true</verbose>-->
+                <!--<logging>debug</logging>-->
+                <!--<diffExcludeObjects>oauth_access_token,-->
+                <!--oauth_approvals,-->
+                <!--oauth_client_details,-->
+                <!--oauth_client_token, oauth_code,-->
+                <!--oauth_refresh_token</diffExcludeObjects>-->
+                <!--</configuration>-->
             </plugin>
             <plugin>
                 <groupId>org.sonarsource.scanner.maven</groupId>
