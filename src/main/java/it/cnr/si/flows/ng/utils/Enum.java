@@ -97,4 +97,19 @@ public class Enum {
         endDate,
         gruppoRA;
     }
+
+
+    public enum PdfType {
+        rigetto("rigetto");
+
+        private String value;
+
+        PdfType(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
 }
