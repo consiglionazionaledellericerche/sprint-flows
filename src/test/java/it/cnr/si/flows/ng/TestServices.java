@@ -20,6 +20,9 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,6 +33,7 @@ import static it.cnr.si.flows.ng.utils.Enum.SiglaList.TIPOLOGIA_ACQUISIZIONE;
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.descrizione;
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.oggetto;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -176,5 +180,20 @@ public class TestServices {
         firstTaskId = taskService.createTaskQuery().list().get(0).getId();
         //Recupero la ProcessInstance
         return (ProcessInstanceResponse) response.getBody();
+    }
+
+    public File makeFile(ByteArrayOutputStream outputStream, String title) throws IOException {
+        //metto il contenuto dell'outputStream in un summary fisico'
+        File pdf = new File("./src/test/resources/summary-test/" + title);
+
+        FileOutputStream fop = new FileOutputStream(pdf);
+        byte[] byteArray = outputStream.toByteArray();
+        fop.write(byteArray);
+        fop.flush();
+        fop.close();
+        String content = new String(byteArray);
+        assertFalse(content.isEmpty());
+
+        return pdf;
     }
 }
