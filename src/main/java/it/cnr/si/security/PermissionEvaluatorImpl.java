@@ -125,13 +125,13 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
         String userName = SecurityUtils.getCurrentUserLogin();
         List<String> authorities = getAuthorities(userName, flowsUserDetailsService);
 
-        HistoricProcessInstance historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
+        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
                 .includeProcessVariables()
                 .processInstanceId(processInstanceId)
                 .singleResult();
 
-        return canVisualize((String) historicProcessInstances.getProcessVariables().get("idStruttura"),
-                            historicProcessInstances.getProcessDefinitionKey(),
+        return canVisualize((String) historicProcessInstance.getProcessVariables().get("idStruttura"),
+                            historicProcessInstance.getProcessDefinitionKey(),
                             processInstanceId, authorities, userName);
     }
 
