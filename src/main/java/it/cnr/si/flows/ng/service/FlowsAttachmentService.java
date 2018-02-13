@@ -6,6 +6,7 @@ import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.DelegateExecution;
+import org.activiti.engine.task.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +82,7 @@ public class FlowsAttachmentService {
 			}
 
 			boolean nuovo = taskId.equals("start") || taskService.getVariable(taskId, fileName) == null;
-			LOGGER.info("inserisco come variabile il file "+ fileName);
+            LOGGER.info("inserisco come variabile il file {}", fileName);
 
 			FlowsAttachment att = new FlowsAttachment();
 			att.setName(fileName);
@@ -105,14 +106,33 @@ public class FlowsAttachmentService {
 		return attachments;
 	}
 
-	public void saveAttachment(DelegateExecution execution, String variableName, FlowsAttachment att) {
+    public void saveAttachment(DelegateExecution execution, String variableName, FlowsAttachment att) {
 
-		att.setTime(new Date());
-		att.setTaskName(execution.getCurrentActivityName());
-		att.setTaskId( (String) execution.getVariable("taskId"));
+        att.setTime(new Date());
+        att.setTaskName(execution.getCurrentActivityName());
+        att.setTaskId((String) execution.getVariable("taskId"));
 
-		execution.setVariable(variableName, att);
-	}
+        execution.setVariable(variableName, att);
+    }
+
+
+    /**
+     * Salva gli attachment di un Process Instance NON dai listners ma dai service
+     * (NON ha bisogno del DelegateExecution).
+     * *
+     *
+     * @param variableName Nome della "tipologia" dell'allegato ("rigetto", "carta d'identità", cv", ecc.)
+     * @param att          l'attachment vero e proprio
+     * @param taskId       l'id del task in cui viene "allegato" il documento
+     */
+    public void saveAttachment(String variableName, FlowsAttachment att, String taskId) {
+        att.setTime(new Date());
+        att.setTaskId(taskId);
+        Task task = taskService.createTaskQuery().active().taskId(taskId).singleResult();
+        att.setTaskName(task.getName());
+
+        runtimeService.setVariable(task.getExecutionId(), variableName, att);
+    }
 
 	public void saveAttachmentInArray(DelegateExecution execution, String arrayName, FlowsAttachment att) {
 

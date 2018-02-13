@@ -2,9 +2,15 @@ package it.cnr.si.flows.ng.resource;
 
 
 import com.codahale.metrics.annotation.Timed;
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.service.FlowsPdfService;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.security.AuthoritiesConstants;
+import org.activiti.engine.HistoryService;
+import org.activiti.engine.TaskService;
+import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.impl.util.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -21,6 +27,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;
+import java.util.Date;
+import java.util.Map;
+
+import static it.cnr.si.flows.ng.utils.Enum.Azione.Aggiornamento;
+import static it.cnr.si.flows.ng.utils.Enum.Azione.Caricamento;
 
 @Controller
 @RequestMapping("api")
@@ -29,7 +40,12 @@ public class FlowsPdfResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsPdfResource.class);
     @Inject
     private FlowsPdfService pdfService;
-
+    @Inject
+    FlowsAttachmentService flowsAttachmentService;
+    @Inject
+    TaskService taskService;
+    @Inject
+    private HistoryService historyService;
 
     /**
      * Crea e restituisce il summary pdf del flusso.
@@ -69,8 +85,10 @@ public class FlowsPdfResource {
     /**
      * Crea e restituisce il un pdf del tipo specificato.
      *
-     * @param pdfType la "tipologia" di pdf da create (ad es.: "rigetto")
-     * @param req     the req
+     * @param processInstanceId processInstanceId del flusso
+     * @param tipologiaDoc      la "tipologia" di pdf da create (ad es.: "rigetto")
+
+     * @return the response entity
      * @throws Exception the exception
      * @return: restituisce il pdf generato
      */
@@ -79,23 +97,59 @@ public class FlowsPdfResource {
     @Timed
     @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<byte[]> makePdf(
-            @RequestParam("pdfType") String pdfType,
-            HttpServletRequest req) {
+            @RequestParam("processInstanceId") String processInstanceId,
+            @RequestParam("tipologiaDoc") String tipologiaDoc) {
 
+
+        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                .includeProcessVariables()
+                .processInstanceId(processInstanceId)
+                .singleResult();
+        JSONObject processvariables = new JSONObject(historicProcessInstance.getProcessVariables());
+
+        String utenteRichiedente = processvariables.getString("nomeRichiedente");
+        String fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
         try {
-            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            String fileName = pdfService.makePdf(outputStream, Enum.PdfType.valueOf(pdfType));
+            byte[] pdfByteArray = pdfService.makePdf(Enum.PdfType.valueOf(tipologiaDoc), processvariables);
 
             HttpHeaders headers = new HttpHeaders();
             ResponseEntity<byte[]> resp;
             headers.set("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
             headers.setContentType(MediaType.parseMediaType("application/pdf"));
-            headers.setContentLength(outputStream.toByteArray().length);
-            resp = new ResponseEntity<>(outputStream.toByteArray(), headers, HttpStatus.OK);
+            headers.setContentLength(pdfByteArray.length);
+            resp = new ResponseEntity<>(pdfByteArray, headers, HttpStatus.OK);
+
+            //"Allego" il file nel flusso
+            Map<String, FlowsAttachment> attachments = flowsAttachmentService.getAttachementsForProcessInstance(processInstanceId);
+
+            FlowsAttachment attachment = attachments.get(tipologiaDoc);
+            if (attachment != null) {
+                //aggiorno il pdf
+                attachment.setFilename(fileName);
+                attachment.setName(fileName);
+                attachment.setName(fileName);
+                attachment.setAzione(Aggiornamento);
+                attachment.setBytes(pdfByteArray);
+                attachment.setUsername(utenteRichiedente);
+            } else {
+                //salvo il pdf nel flusso
+                attachment = new FlowsAttachment();
+                attachment.setBytes(pdfByteArray);
+                attachment.setAzione(Caricamento);
+                attachment.setTaskId(null);
+                attachment.setTaskName(null);
+                attachment.setTime(new Date());
+                attachment.setName(fileName);
+                attachment.setFilename(fileName);
+                attachment.setMimetype(com.google.common.net.MediaType.PDF.toString());
+                attachment.setUsername(utenteRichiedente);
+            }
+            String taskId = taskService.createTaskQuery().processInstanceId(processInstanceId).active().singleResult().getId();
+            flowsAttachmentService.saveAttachment(tipologiaDoc, attachment, taskId);
 
             return resp;
         } catch (Exception e) {
-            LOGGER.error("Errore nella creazione del del file pdf di tipo {}: ", pdfType, e);
+            LOGGER.error("Errore nella creazione del del file pdf di tipo {}: ", fileName, e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
