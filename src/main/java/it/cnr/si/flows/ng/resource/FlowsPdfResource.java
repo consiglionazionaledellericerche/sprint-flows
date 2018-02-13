@@ -41,9 +41,9 @@ public class FlowsPdfResource {
     @Inject
     private FlowsPdfService pdfService;
     @Inject
-    FlowsAttachmentService flowsAttachmentService;
+    private FlowsAttachmentService flowsAttachmentService;
     @Inject
-    TaskService taskService;
+    private TaskService taskService;
     @Inject
     private HistoryService historyService;
 
