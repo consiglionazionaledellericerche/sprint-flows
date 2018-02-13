@@ -9,6 +9,7 @@ import it.cnr.si.repository.ViewRepository;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JsonDataSource;
 import net.sf.jasperreports.engine.util.LocalJasperReportsContext;
+import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.util.json.JSONArray;
 import org.activiti.engine.impl.util.json.JSONObject;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
@@ -42,6 +43,8 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.List;
 
+import static it.cnr.si.flows.ng.utils.Enum.Azione.Aggiornamento;
+import static it.cnr.si.flows.ng.utils.Enum.Azione.Caricamento;
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
 import static org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA_BOLD;
 
@@ -65,6 +68,8 @@ public class FlowsPdfService {
     private Utils utils;
     @Inject
     private Environment env;
+    @Inject
+    private TaskService taskService;
 
 
 
@@ -181,7 +186,7 @@ public class FlowsPdfService {
     }
 
 
-    public byte[] makePdf(Enum.PdfType pdfType, JSONObject processvariables) {
+    public byte[] makePdf(Enum.PdfType pdfType, JSONObject processvariables, String fileName, String utenteRichiedente, String processInstanceId) {
         String dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir");
         byte[] pdfByteArray = null;
 
@@ -211,6 +216,36 @@ public class FlowsPdfService {
                     JasperPrint jasperPrint = fillmgr.fill(jasperFile, parameters);
 
                     pdfByteArray = JasperExportManager.exportReportToPdf(jasperPrint);
+
+
+                    //"Allego" il file nel flusso
+                    Map<String, FlowsAttachment> attachments = flowsAttachmentService.getAttachementsForProcessInstance(processInstanceId);
+
+                    FlowsAttachment attachment = attachments.get(pdfType.getValue());
+                    if (attachment != null) {
+                        //aggiorno il pdf
+                        attachment.setFilename(fileName);
+                        attachment.setName(fileName);
+                        attachment.setName(fileName);
+                        attachment.setAzione(Aggiornamento);
+                        attachment.setBytes(pdfByteArray);
+                        attachment.setUsername(utenteRichiedente);
+                    } else {
+                        //salvo il pdf nel flusso
+                        attachment = new FlowsAttachment();
+                        attachment.setBytes(pdfByteArray);
+                        attachment.setAzione(Caricamento);
+                        attachment.setTaskId(null);
+                        attachment.setTaskName(null);
+                        attachment.setTime(new Date());
+                        attachment.setName(fileName);
+                        attachment.setFilename(fileName);
+                        attachment.setMimetype(com.google.common.net.MediaType.PDF.toString());
+                        attachment.setUsername(utenteRichiedente);
+                    }
+                    String taskId = taskService.createTaskQuery().processInstanceId(processInstanceId).active().singleResult().getId();
+                    flowsAttachmentService.saveAttachment(pdfType.getValue(), attachment, taskId);
+
                 } catch (JRException e) {
                     throw new ReportException("Errore JASPER nella creazione del pdf: {}", e);
                 }
