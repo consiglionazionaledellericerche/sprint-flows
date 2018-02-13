@@ -181,24 +181,19 @@ public class TestServices {
                 req.setParameter("rup", "marco.spasiano");
                 req.setParameter("rup_label", "MARCO SPASIANO (marco.spasiano)");
                 req.setParameter("impegni_json", "[{\"numero\":\"1\",\"importoNetto\":100,\"importoLordo\":120,\"descrizione\":\"descrizione impegno\",\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"gae\":\"spaclient\"}]");
-
                 break;
-
             case iscrizioneElencoOiv:
                 loginApp();
+
                 req.setParameter("valutazioneEsperienze[0][numeroEsperienza]", "1");
                 req.setParameter("valutazioneEsperienze[0][dataInizio]", "2018-01-31T23:00:00.000Z");
                 req.setParameter("valutazioneEsperienze[0][dataFine]", "2018-02-01T23:00:00.000Z");
                 req.setParameter("valutazioneEsperienze[0][tipologiaEsperienza]", "Tipologia");
                 req.setParameter("valutazioneEsperienze[0][ambitoEsperienza]", "Ambito");
                 req.setParameter("valutazioneEsperienze[0][attivitaSvolta]", "Attività Svolta");
-//                req.setParameter("domanda"; filename="30ed6cde-2fb7-4392-86d0-cfae95832f15 (2).pdf"
-//                req.setParameter("cartaIdentita"; filename="30ed6cde-2fb7-4392-86d0-cfae95832f15 (2).pdf"
-//                req.setParameter(="cv"; filename="30ed6cde-2fb7-4392-86d0-cfae95832f15 (2).pdf");
-//                req.setParameter("__new__allegati[0]",filename="30ed6cde-2fb7-4392-86d0-cfae95832f15 (2).pdf");
                 req.setParameter("oggetto", "titolo");
                 req.setParameter("descrizione", "descrizione");
-                req.setParameter("nomeRichiedente", "Nome e Cognome Richiedente");
+                req.setParameter("nomeRichiedente", "utenteRichiedente");
                 req.setParameter("dataNascitaRichiedente", "2018-01-31T23:00:00.000Z");
                 req.setParameter("sessoRichiedente", "m");
                 req.setParameter("codiceFiscaleRichiedente", "Codice Fiscale");

@@ -11,7 +11,7 @@ public class Enum {
 
         private String value;
 
-        private Actions(String value) {
+        Actions(String value) {
             this.value = value;
         }
 
@@ -73,7 +73,8 @@ public class Enum {
 
     public enum ProcessDefinitionEnum {
         acquisti("acquisti"),
-        permessiFerie("permessi-ferie");
+        permessiFerie("permessi-ferie"),
+        iscrizioneElencoOiv("iscrizione-elenco-oiv");
 
         private String value;
 

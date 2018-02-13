@@ -15,7 +15,6 @@ import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricIdentityLinkResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
-import org.apache.commons.io.IOUtils;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
@@ -66,6 +65,7 @@ public class FlowsPdfService {
     private Utils utils;
     @Inject
     private Environment env;
+
 
 
     public String makeSummaryPdf(String processInstanceId, ByteArrayOutputStream outputStream) throws IOException, ParseException {
@@ -181,24 +181,17 @@ public class FlowsPdfService {
     }
 
 
-    public String makePdf(ByteArrayOutputStream outputStream, Enum.PdfType pdfType) {
+    public byte[] makePdf(Enum.PdfType pdfType, JSONObject processvariables) {
         String dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir");
+        byte[] pdfByteArray = null;
 
-        String printNameJasper = "";
         switch (pdfType) {
             case rigetto:
                 try {
-                    //nome del file jasper da caricare(dipende dal tipo di pdf da creare)
-                    printNameJasper = "oivRigetto.jasper";
-
-                    //json con i dati da "inserire" nel pdf (a regime prenderò i dati da varie fonti: db, activiti, ecc)
-                    String myJson = IOUtils.toString(
-                            this.getClass().getResourceAsStream("/print/oiv-print/oivRigetto.json"),
-                            "UTF-8"
-                    );
-
                     HashMap<String, Object> parameters = new HashMap();
-                    JRDataSource datasource = new JsonDataSource(new ByteArrayInputStream(myJson.getBytes(Charset.forName("UTF-8"))));
+                    //carico le variabili della process instance
+                    JRDataSource datasource = new JsonDataSource(new ByteArrayInputStream(processvariables.toString().getBytes(Charset.forName("UTF-8"))));
+
                     final ResourceBundle resourceBundle = ResourceBundle.getBundle(
                             "net.sf.jasperreports.view.viewer", Locale.ITALIAN);
                     parameters.put(JRParameter.REPORT_LOCALE, Locale.ITALIAN);
@@ -210,19 +203,19 @@ public class FlowsPdfService {
 
                     LocalJasperReportsContext ctx = new LocalJasperReportsContext(DefaultJasperReportsContext.getInstance());
                     ctx.setClassLoader(ClassLoader.getSystemClassLoader());
-
                     JasperFillManager fillmgr = JasperFillManager.getInstance(ctx);
+                    LOGGER.debug("Json con i dati da inserire nel pdf: {}", processvariables.toString());
 
-                    LOGGER.debug("Json con i dati da inserire nel pdf: {}", myJson);
-                    JasperPrint jasperPrint = fillmgr.fill(this.getClass().getResourceAsStream(dir.substring(dir.indexOf("/print")) + printNameJasper),
-                                                           parameters);
-                    byte[] pdfByteArray = JasperExportManager.exportReportToPdf(jasperPrint);
-                    outputStream.write(pdfByteArray);
-                } catch (Exception e) {
-                    throw new ReportException("Error in JASPER (" + e + ").", e);
+                    //il nome del file jasper da caricare(dipende dal tipo di pdf da creare)
+                    InputStream jasperFile = this.getClass().getResourceAsStream(dir.substring(dir.indexOf("/print")) + pdfType.getValue() + ".jasper");
+                    JasperPrint jasperPrint = fillmgr.fill(jasperFile, parameters);
+
+                    pdfByteArray = JasperExportManager.exportReportToPdf(jasperPrint);
+                } catch (JRException e) {
+                    throw new ReportException("Errore JASPER nella creazione del pdf: {}", e);
                 }
         }
-        return printNameJasper + ".pdf";
+        return pdfByteArray;
     }
 
 
