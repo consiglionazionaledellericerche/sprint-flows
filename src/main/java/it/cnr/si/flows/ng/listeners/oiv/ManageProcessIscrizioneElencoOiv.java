@@ -1,6 +1,7 @@
 package it.cnr.si.flows.ng.listeners.oiv;
 
 import it.cnr.si.flows.ng.listeners.oiv.service.CalcolaPunteggioFascia;
+import it.cnr.si.flows.ng.listeners.oiv.service.DeterminaAttore;
 import it.cnr.si.flows.ng.listeners.oiv.service.DeterminaTimer;
 import it.cnr.si.flows.ng.listeners.oiv.service.ManageSceltaUtente;
 import it.cnr.si.flows.ng.listeners.oiv.service.StartOivSetGroupsAndVisibility;
@@ -28,7 +29,8 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 	private StartOivSetGroupsAndVisibility startOivSetGroupsAndVisibility;
 	@Inject
 	private ManageSceltaUtente manageSceltaUtente;
-
+	@Inject
+	private DeterminaAttore determinaAttore;
 
 	private Expression faseEsecuzione;
 
@@ -42,7 +44,6 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 		LOGGER.info("ProcessInstanceId: " + processInstanceId);
 		String faseEsecuzioneValue = "noValue";
 		faseEsecuzioneValue = faseEsecuzione.getValue(execution).toString();
-
 		switch(faseEsecuzioneValue){  
 		case "process-start": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
@@ -56,6 +57,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
 			determinaTimer.getTimer(execution, "boundarytimer3");
 			calcolaPunteggioFascia.calcola(execution);
+			determinaAttore.determinaIstruttore(execution);
 		};break;  
 		case "soccorso-istruttorio-start":  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
