@@ -28,21 +28,29 @@ public class CalcolaPunteggioFascia {
 
 		JSONArray valutazioni =  new JSONArray(jsonStr);
 		int numeroValutazioniPositive = 0;
+		int numeroValutazioniNegative = 0;
+		String elencoValutazioniNegative = "";
 		for (int i = 0 ; i < valutazioni.length(); i++) {
 			JSONObject obj = valutazioni.getJSONObject(i);
 			if (obj.has("giudizioFinale")) {
 				if (obj.getString("giudizioFinale").equals("OK")) {
 					numeroValutazioniPositive = numeroValutazioniPositive +1;
+				} else {
+					if(numeroValutazioniNegative >= 1) {
+						elencoValutazioniNegative = elencoValutazioniNegative.concat("; ");
+					}
+					elencoValutazioniNegative = elencoValutazioniNegative.concat(obj.getString("numeroEsperienza"));
+					numeroValutazioniNegative = numeroValutazioniNegative +1;
 				}
 			}
-			System.out.println("Si sono evidenziate nr. " + numeroValutazioniPositive + " valutazioni positive su un totale di: " + valutazioni.length());
 		}
-		int numeroValutazioniNegative = valutazioni.length() - numeroValutazioniPositive;
 
 		execution.setVariable("numeroValutazioniNegative", numeroValutazioniNegative);
 		execution.setVariable("numeroValutazioniPositive", numeroValutazioniPositive);
+		execution.setVariable("elencoValutazioniNegative", elencoValutazioniNegative);
 
 		LOGGER.debug("--- numeroValutazioniNegative: {} numeroValutazioniPositive: {}", numeroValutazioniNegative, numeroValutazioniPositive);
+		LOGGER.debug("--- elencoValutazioniNegative: {} ", elencoValutazioniNegative);
 		// Chiamta REST applicazione Elenco OIV per il calcolo punteggio
 		// invio campi json e recupero fascia e punteggio
 		execution.setVariable("punteggioEsperienzeAttribuito", "23");
