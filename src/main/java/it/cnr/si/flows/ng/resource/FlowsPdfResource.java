@@ -8,7 +8,8 @@ import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.security.AuthoritiesConstants;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.impl.util.json.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -25,12 +26,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;
+import java.util.Map;
+
 
 @Controller
 @RequestMapping("api")
 public class FlowsPdfResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsPdfResource.class);
+    private static final String VALUTAZIONE_ESPERIENZE_JSON = "valutazioneEsperienze_json";
     @Inject
     private FlowsPdfService pdfService;
     @Inject
@@ -90,30 +94,34 @@ public class FlowsPdfResource {
     public ResponseEntity<byte[]> makePdf(
             @RequestParam("processInstanceId") String processInstanceId,
             @RequestParam("tipologiaDoc") String tipologiaDoc) {
-
-
+        //carico le processVariablwes e rimappo in formato json il campo stringa "valutazioneEsperienze_json"
         HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
                 .includeProcessVariables()
                 .processInstanceId(processInstanceId)
                 .singleResult();
-        JSONObject processvariables = new JSONObject(historicProcessInstance.getProcessVariables());
-
+        JSONObject processvariables = mappingValutazioniEsperienze(historicProcessInstance.getProcessVariables());
+        //creo il pdf corrispondente
         String utenteRichiedente = processvariables.getString("nomeRichiedente");
         String fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
-        try {
-            byte[] pdfByteArray = pdfService.makePdf(Enum.PdfType.valueOf(tipologiaDoc), processvariables, fileName, utenteRichiedente, processInstanceId);
+        byte[] pdfByteArray = pdfService.makePdf(Enum.PdfType.valueOf(tipologiaDoc), processvariables, fileName, utenteRichiedente, processInstanceId);
+        //popolo gli headers della response
+        HttpHeaders headers = new HttpHeaders();
+        ResponseEntity<byte[]> resp;
+        headers.set("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+        headers.setContentType(MediaType.parseMediaType("application/pdf"));
+        headers.setContentLength(pdfByteArray.length);
+        resp = new ResponseEntity<>(pdfByteArray, headers, HttpStatus.OK);
 
-            HttpHeaders headers = new HttpHeaders();
-            ResponseEntity<byte[]> resp;
-            headers.set("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
-            headers.setContentType(MediaType.parseMediaType("application/pdf"));
-            headers.setContentLength(pdfByteArray.length);
-            resp = new ResponseEntity<>(pdfByteArray, headers, HttpStatus.OK);
+        return resp;
+    }
 
-            return resp;
-        } catch (Exception e) {
-            LOGGER.error("Errore nella creazione del del file pdf di tipo {}: ", fileName, e);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    private JSONObject mappingValutazioniEsperienze(Map<String, Object> processVariables) {
+        JSONObject variables = new JSONObject(processVariables);
+
+        if (variables.has(VALUTAZIONE_ESPERIENZE_JSON)) {
+            JSONArray esperienze = new JSONArray(variables.getString(VALUTAZIONE_ESPERIENZE_JSON));
+            variables.put(VALUTAZIONE_ESPERIENZE_JSON, esperienze);
         }
+        return variables;
     }
 }
