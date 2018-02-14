@@ -74,6 +74,11 @@
                 <version>3.6</version>
             </dependency>
             <dependency>
+                <groupId>org.json</groupId>
+                <artifactId>json</artifactId>
+                <version>20160810</version>
+            </dependency>
+            <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>1.7.21</version>
@@ -157,6 +162,12 @@
             <groupId>it.cnr.si.sprint</groupId>
             <artifactId>sprint-core</artifactId>
             <version>${sprint.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>json</artifactId>
+                    <groupId>org.apache.geronimo.bundles</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>it.cnr.si.sprint</groupId>
@@ -242,6 +253,11 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20160810</version>
+        </dependency>
+        <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
             <version>1.8.2</version>
@@ -258,7 +274,6 @@
             <artifactId>thymeleaf-spring4</artifactId>
             <version>3.0.6.RELEASE</version>
         </dependency>
-
     </dependencies>
 
     <build>
