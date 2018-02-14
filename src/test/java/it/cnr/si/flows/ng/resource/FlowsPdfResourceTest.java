@@ -1,6 +1,5 @@
 package it.cnr.si.flows.ng.resource;
 
-import it.cnr.jada.comp.ComponentException;
 import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.TestServices;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
@@ -24,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import static it.cnr.si.flows.ng.utils.Enum.PdfType.preavvisoRigetto;
 import static it.cnr.si.flows.ng.utils.Enum.PdfType.rigetto;
 import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.iscrizioneElencoOiv;
 import static org.junit.Assert.assertEquals;
@@ -59,19 +59,39 @@ public class FlowsPdfResourceTest {
 
 
     @Test
-    public void testMakePdf() throws IOException, ComponentException {
+    public void testMakePdfRigetto() throws IOException {
+        //creo il pdf "rigetto"
         util.loginApp();
-        ResponseEntity<byte[]> response = flowsPdfResource.makePdf(processInstance.getId(),
-                                                                   rigetto.getValue());
+        ResponseEntity<byte[]> response = flowsPdfResource.makePdf(processInstance.getId(), rigetto.name());
+
         //verifico che il file creato sia un pdf non vuoto e che abbia il nome giusto
         HttpHeaders headers = response.getHeaders();
-        String titolo = headers.get("Content-Disposition").get(0).split("\"")[1];
-        assertEquals("rigetto-utenteRichiedente.pdf", titolo);
+        String titoloPdf = headers.get("Content-Disposition").get(0).split("\"")[1];
+        assertEquals("rigetto-utenteRichiedente.pdf", titoloPdf);
         assertEquals(MediaType.APPLICATION_PDF, headers.getContentType());
         assertTrue(response.getBody().length > 0);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(response.getBody().length);
         outputStream.write(response.getBody());
-        util.makeFile(outputStream, titolo);
+        util.makeFile(outputStream, titoloPdf);
+    }
+
+
+    @Test
+    public void testMakePdfPreavvisoRigetto() throws IOException {
+        //creo il pdf "preavviso di rigetto"
+        util.loginApp();
+        ResponseEntity<byte[]> response = flowsPdfResource.makePdf(processInstance.getId(), preavvisoRigetto.name());
+
+        //verifico che il file creato sia un pdf non vuoto e che abbia il nome giusto
+        HttpHeaders headers = response.getHeaders();
+        String titoloPdf = headers.get("Content-Disposition").get(0).split("\"")[1];
+        assertEquals("preavvisoRigetto-utenteRichiedente.pdf", titoloPdf);
+        assertEquals(MediaType.APPLICATION_PDF, headers.getContentType());
+        assertTrue(response.getBody().length > 0);
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(response.getBody().length);
+        outputStream.write(response.getBody());
+        util.makeFile(outputStream, titoloPdf);
     }
 }
