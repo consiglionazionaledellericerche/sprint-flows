@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.5.1.final utlizzo versione della libreria JasperReports6.5.1  -->
 <jasperReport xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xmlns="http://jasperreports.sourceforge.net/jasperreports"
               xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
-              name="OivRigetto" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="NoPages"
-              columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20"
-              uuid="c0187353-db16-46fc-a7a4-9ece39bc4976">
+              name="OivRigetto" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20"
+              rightMargin="20" topMargin="20" bottomMargin="20" uuid="c0187353-db16-46fc-a7a4-9ece39bc4976">
     <property name="ireport.zoom" value="1.0"/>
     <property name="ireport.x" value="0"/>
     <property name="ireport.y" value="0"/>
@@ -23,8 +21,8 @@
     <queryString language="json">
         <![CDATA[]]>
     </queryString>
-    <field name="dataInvioDomanda" class="java.lang.String">
-        <fieldDescription><![CDATA[dataInvioDomanda]]></fieldDescription>
+    <field name="dataInvioDomanda_json" class="java.lang.String">
+        <fieldDescription><![CDATA[dataInvioDomanda_json]]></fieldDescription>
     </field>
     <field name="nomeRichiedente" class="java.lang.String">
         <fieldDescription><![CDATA[nomeRichiedente]]></fieldDescription>
