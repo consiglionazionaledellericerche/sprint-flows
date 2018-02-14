@@ -17,8 +17,8 @@
 	<queryString language="json">
 		<![CDATA[]]>
 	</queryString>
-	<field name="dataInvioDomanda_json" class="java.lang.String">
-		<fieldDescription><![CDATA[dataInvioDomanda_json]]></fieldDescription>
+	<field name="dataInvioDomanda" class="java.lang.String">
+		<fieldDescription><![CDATA[dataInvioDomanda]]></fieldDescription>
 	</field>
 	<field name="nomeRichiedente" class="java.lang.String">
 		<fieldDescription><![CDATA[nomeRichiedente]]></fieldDescription>
@@ -80,14 +80,6 @@
 						<paragraph lineSpacing="Single"/>
 					</textElement>
 					<textFieldExpression><![CDATA["Oggetto:\t rigetto della domanda di iscrizione nell’Elenco nazionale dei componenti\r\n\t\tdegli Organismi indipendenti di valutazione ai sensi del D.M 2 dicembre 2016."]]></textFieldExpression>
-				</textField>
-				<textField isStretchWithOverflow="true">
-					<reportElement style="Detail" x="37" y="271" width="505" height="51" uuid="69d503f3-ad7b-4365-ba59-a924c5baa7e8"/>
-					<textElement>
-						<font fontName="SansSerif" size="11" isBold="false"/>
-						<paragraph lineSpacing="1_1_2"/>
-					</textElement>
-					<textFieldExpression><![CDATA["\t Al riguardo, si precisa che "+$F{testoMotivazioneStandard}+"\r\n\t Pertanto, il Dipartimento procede al rigetto dell’istanza confermando quanto già esplicitato nel preavviso con nota del  "+$F{dataPreavviso}+" (Prot.  "+$F{protocolloPreavviso}+")."]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupHeader>

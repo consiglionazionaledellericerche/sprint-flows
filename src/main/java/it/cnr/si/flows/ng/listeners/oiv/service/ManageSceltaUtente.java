@@ -10,7 +10,7 @@ import org.activiti.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
+import static it.cnr.si.flows.ng.utils.Enum.PdfType.*;
 
 @Service
 public class ManageSceltaUtente {
@@ -27,7 +27,7 @@ public class ManageSceltaUtente {
 			if(sceltaUtente.equals("genera_PDF_preavviso_di_rigetto")) {
 				LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 				execution.setVariable("pdfPreavvisoRigettoFlag", "1");
-				createOivPdf.CreaPdfOiv(execution, "preavvisoRigetto");
+				createOivPdf.CreaPdfOiv(execution, preavvisoRigetto.name());
 			}
 		};break;
 		case "soccorso-istruttorio-start": {
@@ -38,7 +38,7 @@ public class ManageSceltaUtente {
 			if(sceltaUtente.equals("genera_PDF_rigetto")) {
 				LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 				execution.setVariable("pdfRigettoFlag", "1");
-				createOivPdf.CreaPdfOiv(execution, "rigetto");
+				createOivPdf.CreaPdfOiv(execution, rigetto.name());
 			}
 		};break;
 		default:  {
