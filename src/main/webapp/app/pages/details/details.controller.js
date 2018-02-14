@@ -72,5 +72,23 @@
                 }
             })
         }
+
+
+        $scope.history = function(tasks, startTask) {
+            $uibModal.open({
+                templateUrl: 'app/pages/details/history.modal.html',
+                controller: 'HistoryModalController',
+                controllerAs: 'vm',
+                size: 'md',
+                resolve: {
+                    tasks: function() {
+                        return tasks;
+                    },
+                    startTask: function() {
+                        return startTask;
+                    }
+                }
+            })
+        }
     }
 })();

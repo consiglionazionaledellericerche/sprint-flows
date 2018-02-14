@@ -15,11 +15,14 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -27,6 +30,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
+@Component("utils")
 public final class Utils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
@@ -51,9 +56,13 @@ public final class Utils {
     public static DateFormat formatoData = new SimpleDateFormat("yyyy-MM-dd");
     public static DateFormat formatoDataOra = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);
 
+    @Inject
+    private Environment env;
+
     public static boolean isEmpty(String in) {
         return in == null || in.equals("");
     }
+
     public static boolean isNotEmpty(String in) {
         return !isEmpty(in);
     }
@@ -81,7 +90,7 @@ public final class Utils {
                 .map(Utils::removeLeadingRole)
                 .collect(Collectors.toList());
     }
-    
+
     public static String removeLeadingRole(String in) {
         return in.startsWith(ROLE) ? in.substring(5) : in;
     }
@@ -126,6 +135,18 @@ public final class Utils {
             ret = ret + list.get(0).getValue();
         }
         return ret;
+    }
+
+    public static String formattaDataOra(Date in) {
+        return formatoDataOra.format(in);
+    }
+
+    public static String formattaData(Date in) {
+        return formatoData.format(in);
+    }
+
+    public static Date parsaData(String in) throws ParseException {
+        return formatoData.parse(in);
     }
 
     public void init() {
@@ -235,6 +256,16 @@ public final class Utils {
         return taskQuery;
     }
 
+    public String[] getArray(List<String> tupla) {
+        String[] entries = new String[tupla.size()];
+        entries = tupla.toArray(entries);
+        return entries;
+    }
+
+    public boolean isProfileActive(String profile) {
+        return Arrays.asList(env.getActiveProfiles()).contains(profile);
+    }
+
     private TaskInfoQuery extractTaskSearchParams(TaskInfoQuery taskQuery, JSONArray taskParams) {
 
         for (int i = 0; i < taskParams.length(); i++) {
@@ -285,24 +316,6 @@ public final class Utils {
         return taskQuery;
     }
 
-    public static String formattaDataOra(Date in) {
-        return formatoDataOra.format(in);
-    }
-
-    public static String formattaData(Date in) {
-        return formatoData.format(in);
-    }
-
-    public static Date parsaData(String in) throws ParseException {
-        return formatoData.parse(in);
-    }
-
-
-    public String[] getArray(List<String> tupla) {
-        String[] entries = new String[tupla.size()];
-        entries = tupla.toArray(entries);
-        return entries;
-    }
 
     private TaskInfoQuery historicTaskDate(TaskInfoQuery taskQuery, String key, String value) {
         try {

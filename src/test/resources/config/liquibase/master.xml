@@ -27,5 +27,7 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20170220121351_added_entity_constraints_Cnrgroup.xml"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/changelog/20170418091241_added_entity_Membership.xml"
+             relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
 </databaseChangeLog>

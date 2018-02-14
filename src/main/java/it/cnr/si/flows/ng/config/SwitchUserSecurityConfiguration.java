@@ -1,7 +1,7 @@
 package it.cnr.si.flows.ng.config;
 
+import it.cnr.si.flows.ng.ldap.FlowsAuthoritiesPopulator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.oauth2.authserver.AuthorizationServerProperties;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -14,17 +14,12 @@ import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
-import org.springframework.security.ldap.authentication.LdapAuthenticator;
 import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
 import org.springframework.security.ldap.search.LdapUserSearch;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsManager;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsService;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
-
-import it.cnr.si.config.ldap.CustomAuthoritiesPopulator;
-import it.cnr.si.flows.ng.ldap.FlowsAuthoritiesPopulator;
 
 
 @Configuration
@@ -40,13 +35,19 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-        .antMatcher("/impersonate/**")
-        .authorizeRequests()
-        .antMatchers(IMPERSONATE_START_URL).hasRole("ADMIN")
-        .antMatchers(IMPERSONATE_EXIT_URL).hasRole("PREVIOUS_ADMINISTRATOR")
-        .and()
-        .addFilterAfter(switchUserFilter(), FilterSecurityInterceptor.class);
-    };
+                //url per vedere con che profilo è avviata l'applicazione(serve per caricare la giusta immagine della home)
+                .antMatcher("/flows/api/profile-info**")
+                .authorizeRequests()
+                .anyRequest()
+                .permitAll()
+                .and()
+                .antMatcher("/impersonate/**")
+                .authorizeRequests()
+                .antMatchers(IMPERSONATE_START_URL).hasRole("ADMIN")
+                .antMatchers(IMPERSONATE_EXIT_URL).hasRole("PREVIOUS_ADMINISTRATOR")
+                .and()
+                .addFilterAfter(switchUserFilter(), FilterSecurityInterceptor.class);
+    }
 
     @Bean public LdapUserDetailsManager getLdapUserDetailsManager(LdapContextSource ctx) {
         return new LdapUserDetailsManager(ctx);
@@ -89,8 +90,7 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
     }
 
     @Bean
-    public SwitchUserFilter switchUserFilter(
-            ) {
+    public SwitchUserFilter switchUserFilter() {
         OAuthCookieSwithUserFilter filter = new OAuthCookieSwithUserFilter();
         filter.setUserDetailsService(userDetailsService);
         filter.setSwitchUserUrl(IMPERSONATE_START_URL);

@@ -113,4 +113,6 @@ ajp:
 
 cache.hazelcast.port: 5504
 cache.hazelcast.packages:
+jasper-report:
+    dir: /src/test/resources/print/oiv-print/
 
