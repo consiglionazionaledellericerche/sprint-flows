@@ -21,13 +21,11 @@ import rst.pdfbox.layout.elements.Document;
 import rst.pdfbox.layout.elements.Paragraph;
 import rst.pdfbox.layout.text.BaseFont;
 
+import javax.inject.Inject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
-import java.util.List;
-
-import javax.inject.Inject;
 
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
 import static org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA_BOLD;
@@ -50,7 +48,8 @@ public class OivPdfService {
 	private FlowsAttachmentService flowsAttachmentService;
 	@Inject
 	private ViewRepository viewRepository;
-	private Utils utils = new Utils();
+	@Inject
+	private Utils utils;
 
 
 	public String createPdf(String processInstanceId, ByteArrayOutputStream outputStream, String tipologiaDoc) throws IOException, ParseException {
@@ -74,7 +73,7 @@ public class OivPdfService {
 		}
 		if (tipologiaDoc.equals("rigetto")) {
 			fileName = "Rigetto.pdf";
-		} 
+		}
 
 
 		List<RestVariable> variables = processInstance.getVariables();
@@ -114,7 +113,7 @@ public class OivPdfService {
 			} else if (variableName.equals("nomeRichiedente")) {
 				fileName = fileName.replace(".pdf", " ") + var.getValue() + ".pdf";
 				LOGGER.debug("creating pdf {} ", fileName);
-			}            
+			}
 
 		}
 

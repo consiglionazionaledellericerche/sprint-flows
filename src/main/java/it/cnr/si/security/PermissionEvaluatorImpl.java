@@ -6,7 +6,7 @@ import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricIdentityLink;
-import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.IdentityLinkType;
 import org.activiti.engine.task.Task;
@@ -124,10 +124,15 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
     public boolean canVisualize(String processInstanceId, FlowsUserDetailsService flowsUserDetailsService) {
         String userName = SecurityUtils.getCurrentUserLogin();
         List<String> authorities = getAuthorities(userName, flowsUserDetailsService);
-        ProcessInstance pi = runtimeService.createProcessInstanceQuery()
-                .processInstanceId(processInstanceId).includeProcessVariables().singleResult();
 
-        return canVisualize((String) pi.getProcessVariables().get("idStruttura"), pi.getProcessDefinitionKey(), processInstanceId, authorities, userName);
+        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                .includeProcessVariables()
+                .processInstanceId(processInstanceId)
+                .singleResult();
+
+        return canVisualize((String) historicProcessInstance.getProcessVariables().get("idStruttura"),
+                            historicProcessInstance.getProcessDefinitionKey(),
+                            processInstanceId, authorities, userName);
     }
 
 
