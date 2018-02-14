@@ -8,7 +8,6 @@ import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
 import it.cnr.si.security.FlowsUserDetailsService;
 import it.cnr.si.security.PermissionEvaluatorImpl;
-import it.cnr.si.security.SecurityUtils;
 import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricProcessInstance;
@@ -22,26 +21,22 @@ import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricIdentityLinkResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
-import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.idStruttura;
 import static it.cnr.si.flows.ng.utils.Utils.*;
+
 
 /**
  * Created by cirone on 15/06/17.
@@ -72,8 +67,8 @@ public class FlowsProcessInstanceService {
     PermissionEvaluatorImpl permissionEvaluator;
     @Inject
     private FlowsUserDetailsService flowsUserDetailsService;
-    private Utils utils = new Utils();
-
+    @Inject
+    private Utils utils;
 
     public Map<String, Object> getProcessInstanceWithDetails(String processInstanceId) {
         Map<String, Object> result = new HashMap<>();
@@ -118,23 +113,23 @@ public class FlowsProcessInstanceService {
         //History
         ArrayList<Map<String, Object>> history = new ArrayList<>();
         historyService.createHistoricTaskInstanceQuery()
-        .includeTaskLocalVariables()
-        .processInstanceId(processInstanceId)
-        .list()
-        .forEach(
-                task -> {
-                    List<HistoricIdentityLink> links = historyService.getHistoricIdentityLinksForTask(task.getId());
-                    HashMap<String, Object> entity = new HashMap<>();
-                    entity.put("historyTask", restResponseFactory.createHistoricTaskInstanceResponse(task));
+                .includeTaskLocalVariables()
+                .processInstanceId(processInstanceId)
+                .list()
+                .forEach(
+                        task -> {
+                            List<HistoricIdentityLink> links = historyService.getHistoricIdentityLinksForTask(task.getId());
+                            HashMap<String, Object> entity = new HashMap<>();
+                            entity.put("historyTask", restResponseFactory.createHistoricTaskInstanceResponse(task));
 
-                    // Sostituisco l'id interno del gruppo con la dicitura estesa
-                    List<HistoricIdentityLinkResponse> historicIdLinks = restResponseFactory.createHistoricIdentityLinkResponseList(links);
-                    historicIdLinks.stream().forEach(
-                            l -> l.setGroupId(aceBridgeService.getExtendedGroupNome(l.getGroupId())) );
+                            // Sostituisco l'id interno del gruppo con la dicitura estesa
+                            List<HistoricIdentityLinkResponse> historicIdLinks = restResponseFactory.createHistoricIdentityLinkResponseList(links);
+                            historicIdLinks.stream().forEach(
+                                    l -> l.setGroupId(aceBridgeService.getExtendedGroupNome(l.getGroupId())));
 
-                    entity.put("historyIdentityLink", historicIdLinks);
-                    history.add(entity);
-                });
+                            entity.put("historyIdentityLink", historicIdLinks);
+                            history.add(entity);
+                        });
         result.put("history", history);
         return result;
     }
@@ -195,23 +190,23 @@ public class FlowsProcessInstanceService {
 
                 String type = typevalue.substring(0, typevalue.indexOf('='));
                 String value = typevalue.substring(typevalue.indexOf('=')+1);
-                
+
                 //wildcard ("%") di default ma non a TUTTI i campi
                 switch (type) {
-                case "textEqual":
-                    processQuery.variableValueEquals(key, value);
-                    break;
-                case "boolean":
-                    // gestione variabili booleane
-                    processQuery.variableValueEquals(key, Boolean.valueOf(value));
-                    break;
-                case "date":
-                    processDate(processQuery, key, value);
-                    break;
-                default:
-                    //variabili con la wildcard  (%value%)
-                    processQuery.variableValueLikeIgnoreCase(key, "%" + value + "%");
-                    break;
+                    case "textEqual":
+                        processQuery.variableValueEquals(key, value);
+                        break;
+                    case "boolean":
+                        // gestione variabili booleane
+                        processQuery.variableValueEquals(key, Boolean.valueOf(value));
+                        break;
+                    case "date":
+                        processDate(processQuery, key, value);
+                        break;
+                    default:
+                        //variabili con la wildcard  (%value%)
+                        processQuery.variableValueLikeIgnoreCase(key, "%" + value + "%");
+                        break;
                 }
             }
         });

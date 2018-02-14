@@ -1,20 +1,19 @@
 package it.cnr.si.web.rest;
 
 import it.cnr.si.config.JHipsterProperties;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import javax.inject.Inject;
-
 import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/flows/api")
 public class ProfileInfoResource {
 
     @Inject
@@ -42,20 +41,27 @@ public class ProfileInfoResource {
         List<String> springBootProfiles = Arrays.asList(activeProfiles);
         ribbonProfiles.retainAll(springBootProfiles);
 
-        if (ribbonProfiles.size() > 0) {
+        if (!ribbonProfiles.isEmpty()) {
             return ribbonProfiles.get(0);
         }
         return null;
     }
 
     class ProfileInfoResponse {
-
-        public String[] activeProfiles;
-        public String ribbonEnv;
+        private String[] activeProfiles;
+        private String ribbonEnv;
 
         ProfileInfoResponse(String[] activeProfiles,String ribbonEnv) {
             this.activeProfiles=activeProfiles;
             this.ribbonEnv=ribbonEnv;
+        }
+
+        public String[] getActiveProfiles() {
+            return activeProfiles;
+        }
+
+        public String getRibbonEnv() {
+            return ribbonEnv;
         }
     }
 }

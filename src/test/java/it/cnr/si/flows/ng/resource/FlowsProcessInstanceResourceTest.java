@@ -2,7 +2,6 @@ package it.cnr.si.flows.ng.resource;
 
 import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.TestServices;
-import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
@@ -10,8 +9,6 @@ import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
-import org.joda.time.DateTime;
-import org.json.JSONException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,6 +21,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.StopWatch;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -37,14 +35,17 @@ import java.util.*;
 import static it.cnr.si.flows.ng.TestServices.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
 import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
-import static it.cnr.si.flows.ng.utils.Utils.*;
-import static org.junit.Assert.*;
+import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
+import static it.cnr.si.flows.ng.utils.Utils.ASC;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @RunWith(SpringRunner.class)
+@ActiveProfiles(profiles = "cnr")
 public class FlowsProcessInstanceResourceTest {
 
     private static final int LOAD_TEST_PROCESS_INSTANCES = 700;
@@ -64,7 +65,8 @@ public class FlowsProcessInstanceResourceTest {
 
     private StopWatch stopWatch = new StopWatch();
     private ProcessInstanceResponse processInstance;
-    private Utils utils = new Utils();
+    @Inject
+    private Utils utils;
 
 
 
@@ -83,7 +85,7 @@ public class FlowsProcessInstanceResourceTest {
 
     @Test
     public void testGetMyProcesses() throws IOException {
-        processInstance = util.mySetUp(acquisti.getValue());
+        processInstance = util.mySetUp(acquisti);
         String processInstanceID = verifyMyProcesses(1, 0);
         // testo che, anche se una Process Instance viene sospesa, la vedo ugualmente
         util.loginAdmin();
@@ -103,7 +105,7 @@ public class FlowsProcessInstanceResourceTest {
 
     @Test(expected = AccessDeniedException.class)
     public void testGetProcessInstanceById() throws Exception {
-        processInstance = util.mySetUp(acquisti.getValue());
+        processInstance = util.mySetUp(acquisti);
 
         ResponseEntity<Map<String, Object>> response = flowsProcessInstanceResource.getProcessInstanceById(new MockHttpServletRequest(), processInstance.getId());
         assertEquals(OK, response.getStatusCode());
@@ -139,7 +141,7 @@ public class FlowsProcessInstanceResourceTest {
 
     @Test
     public void testGetProcessInstances() throws IOException {
-        processInstance = util.mySetUp(acquisti.getValue());
+        processInstance = util.mySetUp(acquisti);
 
         //responsabileacquisti crea una seconda Process Instance di acquisti con suffisso "2" nell'oggetto della PI
         util.loginResponsabileAcquisti();
@@ -205,7 +207,7 @@ public class FlowsProcessInstanceResourceTest {
 
     @Test
     public void testSuspend() throws Exception {
-        processInstance = util.mySetUp(acquisti.getValue());
+        processInstance = util.mySetUp(acquisti);
         assertEquals(false, processInstance.isSuspended());
         //solo admin può sospendere il flow
         util.loginAdmin();

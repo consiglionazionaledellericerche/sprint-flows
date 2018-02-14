@@ -4,7 +4,6 @@ import com.opencsv.CSVWriter;
 import it.cnr.si.domain.View;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
-import it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery;
 import it.cnr.si.flows.ng.resource.FlowsAttachmentResource;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
@@ -23,7 +22,6 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.IdentityLinkType;
 import org.activiti.engine.task.Task;
-import org.activiti.engine.task.TaskInfoQuery;
 import org.activiti.engine.task.TaskQuery;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
@@ -90,7 +88,9 @@ public class FlowsTaskService {
     private RelationshipService relationshipService;
     @Inject
     private ViewRepository viewRepository;
-    private Utils utils = new Utils();
+    @Inject
+    private Utils utils;
+
 
     // TODO magari un giorno avremo degli array, ma per adesso ce lo facciamo andare bene cosi'
     private static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
@@ -157,12 +157,12 @@ public class FlowsTaskService {
         result.put("tasks", tasks);
         return result;
     }
-    
+
     // TODO questo metodo e' duplicato di uno in utils
     private void setSearchTerms(Map<String, String> params, HistoricTaskInstanceQuery taskQuery) {
-        
+
         params.forEach((key, typevalue) -> {
-            
+
             try {
                 if (key.equals("taskCompletedGreat")) {
                     taskQuery.taskCompletedAfter(formatoData.parse(typevalue));
@@ -173,42 +173,42 @@ public class FlowsTaskService {
             } catch (ParseException e) {
                 LOGGER.error(ERRORE_NEL_PARSING_DELLA_DATA, typevalue, e);
             }
-            
+
             if (typevalue.contains("=")) {
 
                 String type = typevalue.substring(0, typevalue.indexOf('='));
                 String value = typevalue.substring(typevalue.indexOf('=')+1);
-                
+
                 if (key.contains("initiator") || key.contains("oggetto")) {
                     taskQuery.processVariableValueLikeIgnoreCase(key, "%" + value + "%");
 
                 } else if (key.contains("Fase")) {
                     taskQuery.taskNameLikeIgnoreCase("%" + value + "%");
-                    
+
                 } else {
-                    
-                //wildcard ("%") di default ma non a TUTTI i campi
+
+                    //wildcard ("%") di default ma non a TUTTI i campi
                     switch (type) {
-                    case "textEqual":
-                        taskQuery.taskVariableValueEquals(key, value);
-                        break;
-                    case "boolean":
-                        // gestione variabili booleane
-                        taskQuery.taskVariableValueEquals(key, Boolean.valueOf(value));
-                        break;
-                    case "date":
-                        processDate(taskQuery, key, value);
-                        break;
-                    default:
-                        //variabili con la wildcard  (%value%)
-                        taskQuery.taskVariableValueLikeIgnoreCase(key, "%" + value + "%");
-                        break;
+                        case "textEqual":
+                            taskQuery.taskVariableValueEquals(key, value);
+                            break;
+                        case "boolean":
+                            // gestione variabili booleane
+                            taskQuery.taskVariableValueEquals(key, Boolean.valueOf(value));
+                            break;
+                        case "date":
+                            processDate(taskQuery, key, value);
+                            break;
+                        default:
+                            //variabili con la wildcard  (%value%)
+                            taskQuery.taskVariableValueLikeIgnoreCase(key, "%" + value + "%");
+                            break;
                     }
                 }
             }
         });
     }
-    
+
     private HistoricTaskInstanceQuery processDate(HistoricTaskInstanceQuery taskQuery, String key, String value) {
         try {
             Date date = parsaData(value);
@@ -267,7 +267,7 @@ public class FlowsTaskService {
         List<TaskResponse> result = new ArrayList<>();
 
         List<String> usersInMyGroups = relationshipService.getUsersInMyGroups(username);
-        
+
 //      prendo i task assegnati agli utenti trovati
         for (String user : usersInMyGroups)
             result.addAll(restResponseFactory.createTaskResponseList(taskQuery.taskAssignee(user).list()));
