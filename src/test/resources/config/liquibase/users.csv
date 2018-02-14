@@ -9,3 +9,4 @@ id;login;password_hash;first_name;last_name;email;activated;lang_key;created_by;
 8;responsabiletecnico;$2a$10$2WCYR8cjcNHqig62Q6udO.gr/3ZTHX7tw2g.TaWsdvb6NI8Vt7JJi;null;null;rt@rt;TRUE;it;system;admin;
 9;responsabileacquisti;$2a$10$X7L7tejv9a2V8T655wqn2ut8C38cN7RUv2lWHfIMWUKhZsvtPeInC;null;null;ra@ra;TRUE;it;system;admin;
 10;direttore;$2a$10$o0HS8vZbst4xWwWoGVfhb.sTqJ8TBOppYS3tRn9Z/8SVz80tVbUoS;null;null;direttore@direttore;TRUE;it;system;admin;
+11;utente1;$2a$10$Fuirca6g/id0dZ8Vz2p01OTgmKJQToKSvOB0cRVNY2USh6vEwGXGG;null;null;utente1@utente1;TRUE;it;system;admin;

@@ -2,7 +2,7 @@ package it.cnr.si.flows.ng.listeners;
 
 import com.google.common.net.MediaType;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.service.SummaryPdfService;
+import it.cnr.si.flows.ng.service.FlowsPdfService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
@@ -25,7 +25,7 @@ public class SaveSummaryAtProcessCompletion implements ActivitiEventListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveSummaryAtProcessCompletion.class);
 
     @Inject
-    private SummaryPdfService summaryPdfService;
+    private FlowsPdfService flowsPdfService;
 
     @Override
     public void onEvent(ActivitiEvent event) {
@@ -37,7 +37,7 @@ public class SaveSummaryAtProcessCompletion implements ActivitiEventListener {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             String fileName = null;
             try {
-                fileName = summaryPdfService.createPdf(event.getProcessInstanceId(), outputStream);
+                fileName = flowsPdfService.makeSummaryPdf(event.getProcessInstanceId(), outputStream);
             } catch (IOException | ParseException e) {
                 LOGGER.error("Errore nella creazione del summary pdf FINALE per la Process Instance {}. \n" +
                                      "Errore: {}", event.getProcessInstanceId(), e.getMessage());

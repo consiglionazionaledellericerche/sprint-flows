@@ -6,7 +6,6 @@ import it.cnr.si.flows.ng.TestServices;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.resource.FlowsAttachmentResource;
 import it.cnr.si.flows.ng.resource.FlowsTaskResource;
-import it.cnr.si.service.SummaryPdfService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
@@ -18,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -25,8 +25,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Map;
@@ -40,10 +38,11 @@ import static org.springframework.http.HttpStatus.OK;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
+@ActiveProfiles(profiles = "cnr")
 public class SummaryPdfServiceTest {
 
     @Inject
-    private SummaryPdfService summaryPdfService;
+    private FlowsPdfService flowsPdfService;
     @Inject
     private TestServices util;
     @Inject
@@ -70,7 +69,7 @@ public class SummaryPdfServiceTest {
 
     @Test
     public void testSummaryPdfProcessCompleted() throws IOException {
-        processInstance = util.mySetUp(acquisti.getValue());
+        processInstance = util.mySetUp(acquisti);
 
         Map<String, FlowsAttachment> docs = flowsAttachmentResource.getAttachementsForProcessInstance(processInstance.getId()).getBody();
         assertTrue(docs.isEmpty());
@@ -113,24 +112,16 @@ public class SummaryPdfServiceTest {
     @Test
     public void testSummaryPdfService() throws IOException, ParseException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        processInstance = util.mySetUp(acquisti.getValue());
+        processInstance = util.mySetUp(acquisti);
 
         util.loginSfd();
         completeTask();
 
-        summaryPdfService.createPdf(processInstance.getId(), outputStream);
+        flowsPdfService.makeSummaryPdf(processInstance.getId(), outputStream);
         assertTrue(outputStream.size() > 0);
+        util.makeFile(outputStream, "summaryCreato.pdf");
 
-        //metto il contenuto dell'outputStream in un summary fisico'
-        File summary = new File("./src/test/resources/summary-test/summaryCreato.pdf");
 
-        FileOutputStream fop = new FileOutputStream(summary);
-        byte[] byteArray = outputStream.toByteArray();
-        fop.write(byteArray);
-        fop.flush();
-        fop.close();
-        String content = new String(byteArray);
-        assertFalse(content.isEmpty());
     }
 
     private void completeTask() throws IOException {
