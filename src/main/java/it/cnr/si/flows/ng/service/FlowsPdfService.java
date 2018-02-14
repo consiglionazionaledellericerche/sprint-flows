@@ -10,13 +10,13 @@ import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JsonDataSource;
 import net.sf.jasperreports.engine.util.LocalJasperReportsContext;
 import org.activiti.engine.TaskService;
-import org.activiti.engine.impl.util.json.JSONArray;
-import org.activiti.engine.impl.util.json.JSONObject;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricIdentityLinkResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -189,67 +189,63 @@ public class FlowsPdfService {
     public byte[] makePdf(Enum.PdfType pdfType, JSONObject processvariables, String fileName, String utenteRichiedente, String processInstanceId) {
         String dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir");
         byte[] pdfByteArray = null;
+        HashMap<String, Object> parameters = new HashMap();
+        InputStream jasperFile = null;
+        try {
+            //carico le variabili della process instance
+            LOGGER.debug("Json con i dati da inserire nel pdf: {}", processvariables.toString());
+            JRDataSource datasource = new JsonDataSource(new ByteArrayInputStream(processvariables.toString().getBytes(Charset.forName("UTF-8"))));
 
-        switch (pdfType) {
-            case rigetto:
-                try {
-                    HashMap<String, Object> parameters = new HashMap();
-                    //carico le variabili della process instance
-                    JRDataSource datasource = new JsonDataSource(new ByteArrayInputStream(processvariables.toString().getBytes(Charset.forName("UTF-8"))));
+            final ResourceBundle resourceBundle = ResourceBundle.getBundle(
+                    "net.sf.jasperreports.view.viewer", Locale.ITALIAN);
 
-                    final ResourceBundle resourceBundle = ResourceBundle.getBundle(
-                            "net.sf.jasperreports.view.viewer", Locale.ITALIAN);
-                    parameters.put(JRParameter.REPORT_LOCALE, Locale.ITALIAN);
-                    parameters.put(JRParameter.REPORT_RESOURCE_BUNDLE, resourceBundle);
-                    parameters.put(JRParameter.REPORT_DATA_SOURCE, datasource);
+            //carico un'immagine nel pdf "dinamicamente" (sostituisco una variabile nel file jsper con lo stream dell'immagine)
+            parameters.put("ANN_IMAGE", this.getClass().getResourceAsStream(dir.substring(dir.indexOf("/print")) + "logo_OIV.JPG"));
+            parameters.put(JRParameter.REPORT_LOCALE, Locale.ITALIAN);
+            parameters.put(JRParameter.REPORT_RESOURCE_BUNDLE, resourceBundle);
+            parameters.put(JRParameter.REPORT_DATA_SOURCE, datasource);
 
-                    //carico un'immagine nel pdf "dinamicamente" (sostituisco una variabile ne file jsper con lo stream dell'immagine)
-                    parameters.put("ANN_IMAGE", this.getClass().getResourceAsStream(dir.substring(dir.indexOf("/print")) + "logo_OIV.JPG"));
+            LocalJasperReportsContext ctx = new LocalJasperReportsContext(DefaultJasperReportsContext.getInstance());
+            ctx.setClassLoader(ClassLoader.getSystemClassLoader());
+            JasperFillManager fillmgr = JasperFillManager.getInstance(ctx);
 
-                    LocalJasperReportsContext ctx = new LocalJasperReportsContext(DefaultJasperReportsContext.getInstance());
-                    ctx.setClassLoader(ClassLoader.getSystemClassLoader());
-                    JasperFillManager fillmgr = JasperFillManager.getInstance(ctx);
-                    LOGGER.debug("Json con i dati da inserire nel pdf: {}", processvariables.toString());
+            //il nome del file jasper da caricare(dipende dal tipo di pdf da creare)
+            jasperFile = this.getClass().getResourceAsStream(dir.substring(dir.indexOf("/print")) + pdfType.name() + ".jasper");
+            JasperPrint jasperPrint = fillmgr.fill(jasperFile, parameters);
 
-                    //il nome del file jasper da caricare(dipende dal tipo di pdf da creare)
-                    InputStream jasperFile = this.getClass().getResourceAsStream(dir.substring(dir.indexOf("/print")) + pdfType.getValue() + ".jasper");
-                    JasperPrint jasperPrint = fillmgr.fill(jasperFile, parameters);
-
-                    pdfByteArray = JasperExportManager.exportReportToPdf(jasperPrint);
-
-
-                    //"Allego" il file nel flusso
-                    Map<String, FlowsAttachment> attachments = flowsAttachmentService.getAttachementsForProcessInstance(processInstanceId);
-
-                    FlowsAttachment attachment = attachments.get(pdfType.getValue());
-                    if (attachment != null) {
-                        //aggiorno il pdf
-                        attachment.setFilename(fileName);
-                        attachment.setName(fileName);
-                        attachment.setName(fileName);
-                        attachment.setAzione(Aggiornamento);
-                        attachment.setBytes(pdfByteArray);
-                        attachment.setUsername(utenteRichiedente);
-                    } else {
-                        //salvo il pdf nel flusso
-                        attachment = new FlowsAttachment();
-                        attachment.setBytes(pdfByteArray);
-                        attachment.setAzione(Caricamento);
-                        attachment.setTaskId(null);
-                        attachment.setTaskName(null);
-                        attachment.setTime(new Date());
-                        attachment.setName(fileName);
-                        attachment.setFilename(fileName);
-                        attachment.setMimetype(com.google.common.net.MediaType.PDF.toString());
-                        attachment.setUsername(utenteRichiedente);
-                    }
-                    String taskId = taskService.createTaskQuery().processInstanceId(processInstanceId).active().singleResult().getId();
-                    flowsAttachmentService.saveAttachment(pdfType.getValue(), attachment, taskId);
-
-                } catch (JRException e) {
-                    throw new ReportException("Errore JASPER nella creazione del pdf: {}", e);
-                }
+            pdfByteArray = JasperExportManager.exportReportToPdf(jasperPrint);
+        } catch (JRException e) {
+            throw new ReportException("Errore JASPER nella creazione del pdf: {}", e);
         }
+
+        //"Allego" il file nel flusso
+        Map<String, FlowsAttachment> attachments = flowsAttachmentService.getAttachementsForProcessInstance(processInstanceId);
+
+        FlowsAttachment attachment = attachments.get(pdfType.name());
+        if (attachment != null) {
+            //aggiorno il pdf
+            attachment.setFilename(fileName);
+            attachment.setName(fileName);
+            attachment.setName(fileName);
+            attachment.setAzione(Aggiornamento);
+            attachment.setBytes(pdfByteArray);
+            attachment.setUsername(utenteRichiedente);
+        } else {
+            //salvo il pdf nel flusso
+            attachment = new FlowsAttachment();
+            attachment.setBytes(pdfByteArray);
+            attachment.setAzione(Caricamento);
+            attachment.setTaskId(null);
+            attachment.setTaskName(null);
+            attachment.setTime(new Date());
+            attachment.setName(fileName);
+            attachment.setFilename(fileName);
+            attachment.setMimetype(com.google.common.net.MediaType.PDF.toString());
+            attachment.setUsername(utenteRichiedente);
+        }
+        String taskId = taskService.createTaskQuery().processInstanceId(processInstanceId).active().singleResult().getId();
+        flowsAttachmentService.saveAttachment(pdfType.name(), attachment, taskId);
+
         return pdfByteArray;
     }
 
