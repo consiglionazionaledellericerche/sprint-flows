@@ -225,8 +225,7 @@ public class FlowsPdfService {
         if (attachment != null) {
             //aggiorno il pdf
             attachment.setFilename(fileName);
-            attachment.setName(fileName);
-            attachment.setName(fileName);
+            attachment.setName(pdfType.name());
             attachment.setAzione(Aggiornamento);
             attachment.setBytes(pdfByteArray);
             attachment.setUsername(utenteRichiedente);
@@ -238,7 +237,7 @@ public class FlowsPdfService {
             attachment.setTaskId(null);
             attachment.setTaskName(null);
             attachment.setTime(new Date());
-            attachment.setName(fileName);
+            attachment.setName(pdfType.name());
             attachment.setFilename(fileName);
             attachment.setMimetype(com.google.common.net.MediaType.PDF.toString());
             attachment.setUsername(utenteRichiedente);
