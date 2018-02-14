@@ -184,13 +184,21 @@ public class TestServices {
                 break;
             case iscrizioneElencoOiv:
                 loginApp();
-
+                //valutazione esperienza
                 req.setParameter("valutazioneEsperienze[0][numeroEsperienza]", "1");
                 req.setParameter("valutazioneEsperienze[0][dataInizio]", "2018-01-31T23:00:00.000Z");
                 req.setParameter("valutazioneEsperienze[0][dataFine]", "2018-02-01T23:00:00.000Z");
                 req.setParameter("valutazioneEsperienze[0][tipologiaEsperienza]", "Tipologia");
                 req.setParameter("valutazioneEsperienze[0][ambitoEsperienza]", "Ambito");
                 req.setParameter("valutazioneEsperienze[0][attivitaSvolta]", "Attività Svolta");
+                //valutazione esperienza
+                req.setParameter("valutazioneEsperienze[0][numeroEsperienza]", "2");
+                req.setParameter("valutazioneEsperienze[0][dataInizio]", "2018-01-31T23:00:00.000Z");
+                req.setParameter("valutazioneEsperienze[0][dataFine]", "2018-02-01T23:00:00.000Z");
+                req.setParameter("valutazioneEsperienze[0][tipologiaEsperienza]", "Tipologia 2");
+                req.setParameter("valutazioneEsperienze[0][ambitoEsperienza]", "Ambito 2");
+                req.setParameter("valutazioneEsperienze[0][attivitaSvolta]", "Attività Svolta 2");
+
                 req.setParameter("oggetto", "titolo");
                 req.setParameter("descrizione", "descrizione");
                 req.setParameter("nomeRichiedente", "utenteRichiedente");
@@ -204,10 +212,11 @@ public class TestServices {
                 req.setParameter("dataIscrizioneElenco", "2018-02-07T23:00:00.000Z");
                 req.setParameter("codiceIscrizioneElenco", "Codice Iscrizione Elenco");
                 req.setParameter("dataInvioDomanda", "2018-02-17T23:00:00.000Z");
-                req.setParameter("valutazioneEsperienze_json", "[{\"numeroEsperienza\":1,\"dataInizio\":\"2018-01-31T23:00:00.000Z\",\"dataFine\":\"2018-02-01T23:00:00.000Z\",\"tipologiaEsperienza\":\"Tipologia\",\"ambitoEsperienza\":\"Ambito\",\"attivitaSvolta\":\"Attività Svolta\"}]");
+                req.setParameter("valutazioneEsperienze_json", "[{\"numeroEsperienza\":1,\"dataInizio\":\"2018-02-13T23:00:00.000Z\",\"dataFine\":\"2018-02-13T23:00:00.000Z\",\"tipologiaEsperienza\":\"1\",\"ambitoEsperienza\":\"1\",\"attivitaSvolta\":\"1\"},{\"numeroEsperienza\":2,\"dataInizio\":\"2018-02-14T23:00:00.000Z\",\"dataFine\":\"2018-02-14T23:00:00.000Z\",\"tipologiaEsperienza\":\"2\",\"ambitoEsperienza\":\"2\",\"attivitaSvolta\":\"2\"}]");
                 req.setParameter("dataNascitaRichiedente_json", "2018-01-31T23:00:00.000Z");
                 req.setParameter("dataIscrizioneElenco_json", "2018-02-07T23:00:00.000Z");
                 req.setParameter("dataInvioDomanda_json", "2018-02-17T23:00:00.000Z");
+
                 break;
         }
         //Recupero la ProcessInstance
