@@ -2,29 +2,16 @@ package it.cnr.si.flows.ng.listeners.oiv.service;
 
 
 import org.activiti.engine.RuntimeService;
-import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import it.cnr.si.flows.ng.TestServices;
-
 import javax.inject.Inject;
-
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
-import static it.cnr.si.flows.ng.TestServices.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.initiator;
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.oggetto;
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
-import static org.junit.Assert.assertEquals;
 
 @Service
 public class StartOivSetGroupsAndVisibility {
