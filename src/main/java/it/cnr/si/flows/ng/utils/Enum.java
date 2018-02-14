@@ -101,16 +101,10 @@ public class Enum {
 
 
     public enum PdfType {
-        rigetto("rigetto");
+        rigetto,
+        preavvisoRigetto;
 
-        private String value;
-
-        PdfType(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
+        PdfType() {
         }
     }
 }
