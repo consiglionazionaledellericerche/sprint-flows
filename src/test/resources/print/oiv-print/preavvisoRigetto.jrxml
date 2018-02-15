@@ -1,413 +1,383 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-              xmlns="http://jasperreports.sourceforge.net/jasperreports"
-              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
-              name="OivRigetto" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20"
-              rightMargin="20" topMargin="20" bottomMargin="20" uuid="c0187353-db16-46fc-a7a4-9ece39bc4976">
-    <property name="ireport.zoom" value="1.0"/>
-    <property name="ireport.x" value="0"/>
-    <property name="ireport.y" value="0"/>
-    <style name="Title" fontName="Times New Roman" fontSize="50" isBold="true" pdfFontName="Times-Bold"/>
-    <style name="SubTitle" forecolor="#736343" fontName="Arial" fontSize="18"/>
-    <style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
-    <style name="Detail" fontName="Arial" fontSize="12"/>
-    <style name="Row" mode="Transparent">
-        <conditionalStyle>
-            <conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
-            <style backcolor="#E6DAC3"/>
-        </conditionalStyle>
-    </style>
-    <style name="table">
-        <box>
-            <pen lineWidth="1.0" lineColor="#000000"/>
-        </box>
-    </style>
-    <style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
-        <box>
-            <pen lineWidth="0.5" lineColor="#000000"/>
-        </box>
-    </style>
-    <style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
-        <box>
-            <pen lineWidth="0.5" lineColor="#000000"/>
-        </box>
-    </style>
-    <style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
-        <box>
-            <pen lineWidth="0.5" lineColor="#000000"/>
-        </box>
-    </style>
-    <style name="table 1">
-        <box>
-            <pen lineWidth="1.0" lineColor="#000000"/>
-        </box>
-    </style>
-    <style name="table 1_TH" mode="Opaque" backcolor="#F0F8FF">
-        <box>
-            <pen lineWidth="0.5" lineColor="#000000"/>
-        </box>
-    </style>
-    <style name="table 1_CH" mode="Opaque" backcolor="#BFE1FF">
-        <box>
-            <pen lineWidth="0.5" lineColor="#000000"/>
-        </box>
-    </style>
-    <style name="table 1_TD" mode="Opaque" backcolor="#FFFFFF">
-        <box>
-            <pen lineWidth="0.5" lineColor="#000000"/>
-        </box>
-    </style>
-    <style name="table 2">
-        <box>
-            <pen lineWidth="1.0" lineColor="#000000"/>
-        </box>
-    </style>
-    <style name="table 2_TH" mode="Opaque" backcolor="#F0F8FF">
-        <box>
-            <pen lineWidth="0.5" lineColor="#000000"/>
-        </box>
-    </style>
-    <style name="table 2_CH" mode="Opaque" backcolor="#BFE1FF">
-        <box>
-            <pen lineWidth="0.5" lineColor="#000000"/>
-        </box>
-    </style>
-    <style name="table 2_TD" mode="Opaque" backcolor="#FFFFFF">
-        <box>
-            <pen lineWidth="0.5" lineColor="#000000"/>
-        </box>
-    </style>
-    <style name="table 3">
-        <box>
-            <pen lineWidth="1.0" lineColor="#000000"/>
-        </box>
-    </style>
-    <style name="table 3_TH" mode="Opaque" backcolor="#F0F8FF">
-        <box>
-            <pen lineWidth="0.5" lineColor="#000000"/>
-        </box>
-    </style>
-    <style name="table 3_CH" mode="Opaque" backcolor="#BFE1FF">
-        <box>
-            <pen lineWidth="0.5" lineColor="#000000"/>
-        </box>
-    </style>
-    <style name="table 3_TD" mode="Opaque" backcolor="#FFFFFF">
-        <box>
-            <pen lineWidth="0.5" lineColor="#000000"/>
-        </box>
-    </style>
-    <style name="table 4">
-        <box>
-            <pen lineWidth="1.0" lineColor="#000000"/>
-        </box>
-    </style>
-    <style name="table 4_TH" mode="Opaque" backcolor="#F0F8FF">
-        <box>
-            <pen lineWidth="0.5" lineColor="#000000"/>
-        </box>
-    </style>
-    <style name="table 4_CH" mode="Opaque" backcolor="#BFE1FF">
-        <box>
-            <pen lineWidth="0.5" lineColor="#000000"/>
-        </box>
-    </style>
-    <style name="table 4_TD" mode="Opaque" backcolor="#FFFFFF">
-        <box>
-            <pen lineWidth="0.5" lineColor="#000000"/>
-        </box>
-    </style>
-    <style name="table 5">
-        <box>
-            <pen lineWidth="1.0" lineColor="#000000"/>
-        </box>
-    </style>
-    <style name="table 5_TH" mode="Opaque" backcolor="#F0F8FF">
-        <box>
-            <pen lineWidth="0.5" lineColor="#000000"/>
-        </box>
-    </style>
-    <style name="table 5_CH" mode="Opaque" backcolor="#BFE1FF">
-        <box>
-            <pen lineWidth="0.5" lineColor="#000000"/>
-        </box>
-    </style>
-    <style name="table 5_TD" mode="Opaque" backcolor="#FFFFFF">
-        <box>
-            <pen lineWidth="0.5" lineColor="#000000"/>
-        </box>
-    </style>
-    <style name="table 6">
-        <box>
-            <pen lineWidth="1.0" lineColor="#000000"/>
-        </box>
-    </style>
-    <style name="table 6_TH" mode="Opaque" backcolor="#F0F8FF">
-        <box>
-            <pen lineWidth="0.5" lineColor="#000000"/>
-        </box>
-    </style>
-    <style name="table 6_CH" mode="Opaque" backcolor="#BFE1FF">
-        <box>
-            <pen lineWidth="0.5" lineColor="#000000"/>
-        </box>
-    </style>
-    <style name="table 6_TD" mode="Opaque" backcolor="#FFFFFF">
-        <box>
-            <pen lineWidth="0.5" lineColor="#000000"/>
-        </box>
-    </style>
-    <subDataset name="Esperienze" uuid="43718d59-fac1-44c4-8e31-33ea348b2df2">
-        <queryString language="json">
-            <![CDATA[]]>
-        </queryString>
-        <field name="numeroEsperienza" class="java.lang.String">
-            <fieldDescription><![CDATA[numeroEsperienza]]></fieldDescription>
-        </field>
-        <field name="tipologiaEsperienza" class="java.lang.String">
-            <fieldDescription><![CDATA[tipologiaEsperienza]]></fieldDescription>
-        </field>
-        <field name="attivitaSvolta" class="java.lang.String">
-            <fieldDescription><![CDATA[attivitaSvolta]]></fieldDescription>
-        </field>
-        <field name="ambitoEsperienza" class="java.lang.String">
-            <fieldDescription><![CDATA[ambitoEsperienza]]></fieldDescription>
-        </field>
-    </subDataset>
-    <parameter name="ANN_IMAGE" class="java.io.InputStream"/>
-    <parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
-        <defaultValueExpression>
-            <![CDATA["C:\\CNR\\1_PROGETTI\\OIV\\PDF - JASPER REPORT\\print\\"]]></defaultValueExpression>
-    </parameter>
-    <queryString language="json">
-        <![CDATA[]]>
-    </queryString>
-    <field name="dataInvioDomanda_json" class="java.lang.String">
-        <fieldDescription><![CDATA[dataInvioDomanda_json]]></fieldDescription>
-    </field>
-    <field name="nomeRichiedente" class="java.lang.String">
-        <fieldDescription><![CDATA[nomeRichiedente]]></fieldDescription>
-    </field>
-    <field name="emailRichiedente" class="java.lang.String">
-        <fieldDescription><![CDATA[emailRichiedente]]></fieldDescription>
-    </field>
-    <field name="motivazioneStandard" class="java.lang.String">
-        <fieldDescription><![CDATA[motivazioneStandard]]></fieldDescription>
-    </field>
-    <field name="protocolloPreavviso" class="java.lang.String">
-        <fieldDescription><![CDATA[protocolloPreavviso]]></fieldDescription>
-    </field>
-    <field name="testoMotivazioneStandard" class="java.lang.String">
-        <fieldDescription><![CDATA[testoMotivazioneStandard]]></fieldDescription>
-    </field>
-    <field name="dataPreavviso" class="java.lang.String">
-        <fieldDescription><![CDATA[dataPreavviso]]></fieldDescription>
-    </field>
-    <field name="sessoRichiedente" class="java.lang.String">
-        <fieldDescription><![CDATA[sessoRichiedente]]></fieldDescription>
-    </field>
-    <field name="testoMotivazioneSpecifica" class="java.lang.String">
-        <fieldDescription><![CDATA[testoMotivazioneSpecifica]]></fieldDescription>
-    </field>
-    <field name="numeroValutazioniNegative" class="java.lang.String">
-        <fieldDescription><![CDATA[numeroValutazioniNegative]]></fieldDescription>
-    </field>
-    <field name="numeroValutazioniPositive" class="java.lang.String">
-        <fieldDescription><![CDATA[numeroValutazioniPositive]]></fieldDescription>
-    </field>
-    <field name="elencoValutazioniNegative" class="java.lang.String">
-        <fieldDescription><![CDATA[elencoValutazioniNegative]]></fieldDescription>
-    </field>
-    <group name="Group2">
-        <groupExpression><![CDATA[(int)($V{REPORT_COUNT}/5)]]></groupExpression>
-        <groupHeader>
-            <band height="467">
-                <textField>
-                    <reportElement x="37" y="13" width="505" height="40" uuid="e9825bfd-c98f-4489-83b3-1ceb9783f873"/>
-                    <textElement>
-                        <font size="11" isBold="true"/>
-                        <paragraph lineSpacing="Single"/>
-                    </textElement>
-                    <textFieldExpression>
-                        <![CDATA["Oggetto:\t preavviso di rigetto della domanda di iscrizione nell’Elenco nazionale \r\n\t\tdei componenti degli Organismi indipendenti di valutazione ai sensi del D.M 2 dicembre 2016."]]></textFieldExpression>
-                </textField>
-                <textField isStretchWithOverflow="true">
-                    <reportElement style="Detail" x="37" y="67" width="505" height="335"
-                                   uuid="7ac903fa-55d2-4e21-a610-fa7dda8d3df3"/>
-                    <textElement>
-                        <font fontName="SansSerif" size="11" isBold="false"/>
-                        <paragraph lineSpacing="1_1_2"/>
-                    </textElement>
-                    <textFieldExpression>
-                        <![CDATA["\t Con riferimento alla domanda di iscrizione nell’Elenco nazionale dei componenti degli Organismi indipendenti di valutazione inviata in data "+$F{dataInvioDomanda_json}+", si rappresenta quanto segue.\r\n\tL’art. 2 del D.M 2 dicembre 2016, nell’individuare i requisiti necessari per poter richiedere l’iscrizione al suddetto Elenco, al comma 1, lett. b), punto 2, espressamente prevede che i soggetti interessati devono \"essere in possesso di comprovata esperienza professionale di almeno cinque anni, maturata presso pubbliche amministrazioni o aziende private, nella misurazione e valutazione della performance organizzativa e individuale, nella pianificazione, nel controllo di gestione, nella programmazione finanziaria e di bilancio e nel risk management.\"\r\n\tL’art. 3, comma 2, del medesimo decreto stabilisce che l’effettiva iscrizione nell’Elenco decorre dalla comunicazione da parte di questo Dipartimento della completezza delle informazioni fornite circa la sussistenza dei requisiti di cui al citato art. 2. \r\n\tsulla base delle dichiarazioni fornite nella richiesta, "+( $F{numeroValutazioniNegative}.equals( "1" )  ? ("l’esperienza riportata nel punto: ") : ("le esperienze riportate nei punti: ") ) +" "+$F{elencoValutazioniNegative} +" della domanda, non "+( $F{numeroValutazioniNegative}.equals( "1" )  ? ("è riconducibile ") : ("sono riconducibili ") ) +"all’ambito indicato.La ratio della nuova disciplina, infatti, è quella di valorizzare l’elemento, sostanziale, della qualificazione professionale derivante da specifiche esperienze maturate, con carattere di continuità e prevalenza, nello svolgimento di attività in almeno uno degli ambiti individuati dal decreto."]]></textFieldExpression>
-                </textField>
-            </band>
-            <band height="187">
-                <textField>
-                    <reportElement x="37" y="10" width="505" height="165" uuid="217a73b7-12c4-46db-9f98-dcc4ab6fa73a"/>
-                    <textElement>
-                        <font size="11"/>
-                        <paragraph lineSpacing="1_1_2"/>
-                    </textElement>
-                    <textFieldExpression>
-                        <![CDATA["La ratio della nuova disciplina, infatti, è quella di valorizzare l’elemento, sostanziale, della qualificazione professionale derivante da specifiche esperienze maturate, con carattere di continuità e prevalenza, nello svolgimento di attività in almeno uno degli ambiti individuati dal decreto. Tali ambiti vanno intesi in maniera coerente con le finalità e l’area di applicazione del decreto stesso. Ne consegue che, nel caso specifico "+( $F{numeroValutazioniNegative}.equals( "1" )  ? ("del ") : ("della ") ) + $F{numeroValutazioniNegative} +"</del/della/> </ Ambito 1, [Ambito 2], [Ambito 3], [Ambito 4] [e del/della] [Ambito 5]/> cui la S.V. riconduce prevalentemente le esperienze professionali maturate, le attività positivamente valutabili devono essere riferibili, rispettivamente: "]]></textFieldExpression>
-                </textField>
-            </band>
-        </groupHeader>
-    </group>
-    <group name="Group1">
-        <groupExpression><![CDATA[(int)($V{REPORT_COUNT}/15)]]></groupExpression>
-        <groupFooter>
-            <band/>
-            <band height="170">
-                <textField>
-                    <reportElement x="34" y="11" width="505" height="141" uuid="d7b7e47d-30b0-40ae-8f62-33489ba02aef"/>
-                    <textElement>
-                        <font size="11"/>
-                        <paragraph lineSpacing="1_1_2"/>
-                    </textElement>
-                    <textFieldExpression>
-                        <![CDATA["\t In merito alla questione sopra evidenziata, si informa la S.V. che laddove intenda fornire ulteriori elementi in ordine ai requisiti posseduti, potrà comunicarli, con la apposita funzionalità disponibile nel profilo nell’area riservata, entro 10 giorni dal ricevimento della presente.\r\n\t Tale comunicazione dovrà essere corredata da idonea documentazione comprovante il possesso dei requisiti richiesti dal citato decreto.\r\n\t In assenza di riscontro, l’Ufficio procederà al rigetto dell’istanza di iscrizione nell’Elenco.\r\n\t Per altri eventuali chiarimenti è possibile contattare </ il dott./la dott.ssa/> </ istruttore /> dalle 11.00 alle 13.00, telefono 06 6899 </interno/>."]]></textFieldExpression>
-                </textField>
-            </band>
-            <band height="62">
-                <textField isStretchWithOverflow="true">
-                    <reportElement style="Detail" x="256" y="0" width="292" height="51"
-                                   uuid="2d49c6fc-7ded-4f0d-94fb-e4cc1e708646"/>
-                    <textElement textAlignment="Center">
-                        <font fontName="SansSerif" size="11" isBold="false"/>
-                        <paragraph lineSpacing="1_1_2"/>
-                    </textElement>
-                    <textFieldExpression>
-                        <![CDATA["per il Direttore dell’Ufficio\r\ndott.ssa Alessandra Barberi\r\n(Dirigente del Servizio per la valutazione indipendente)"]]></textFieldExpression>
-                </textField>
-            </band>
-        </groupFooter>
-    </group>
-    <background>
-        <band splitType="Stretch"/>
-    </background>
-    <title>
-        <band height="185" splitType="Stretch">
-            <textField isStretchWithOverflow="true">
-                <reportElement style="Detail" x="310" y="143" width="69" height="17"
-                               uuid="0b92db97-6423-4fe6-aa21-2c7b75c4dc9b"/>
-                <textElement>
-                    <font fontName="SansSerif" size="11" isBold="false"/>
-                </textElement>
-                <textFieldExpression>
-                    <![CDATA[( $F{sessoRichiedente}.equalsIgnoreCase( "m" )  ? ("Al dott.: ") : ("Alla dott.ssa: ") )]]></textFieldExpression>
-            </textField>
-            <textField isStretchWithOverflow="true">
-                <reportElement style="Detail" x="310" y="162" width="69" height="17"
-                               uuid="e2a46fcd-e936-4956-a327-61d08f44f5bd"/>
-                <textElement>
-                    <font fontName="SansSerif" size="11" isBold="false"/>
-                </textElement>
-                <textFieldExpression><![CDATA["E-mail :"]]></textFieldExpression>
-            </textField>
-            <image>
-                <reportElement x="1" y="2" width="329" height="130" uuid="6beae08d-439c-499c-9fc8-d7d0aa6d351e"/>
-                <imageExpression><![CDATA[$P{ANN_IMAGE}]]></imageExpression>
-            </image>
-            <textField isStretchWithOverflow="true">
-                <reportElement style="Detail" x="392" y="143" width="160" height="17"
-                               uuid="73aefea6-9311-45d7-9f1f-84cad715b43c"/>
-                <textElement>
-                    <font fontName="SansSerif" size="11" isBold="false"/>
-                </textElement>
-                <textFieldExpression><![CDATA[$F{nomeRichiedente}]]></textFieldExpression>
-            </textField>
-            <textField isStretchWithOverflow="true">
-                <reportElement style="Detail" x="392" y="162" width="160" height="17"
-                               uuid="461b7621-7cc4-4b3f-918d-756b70d532d8"/>
-                <textElement>
-                    <font fontName="SansSerif" size="11" isBold="false"/>
-                </textElement>
-                <textFieldExpression><![CDATA[$F{emailRichiedente}]]></textFieldExpression>
-            </textField>
-        </band>
-    </title>
-    <pageHeader>
-        <band splitType="Stretch"/>
-    </pageHeader>
-    <columnHeader>
-        <band height="19" splitType="Stretch"/>
-    </columnHeader>
-    <detail>
-        <band height="131" splitType="Stretch">
-            <componentElement>
-                <reportElement x="83" y="0" width="459" height="105" uuid="04333226-daf1-4ae5-b491-7b4f6a8d6855"/>
-                <jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components"
-                         xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd"
-                         printOrder="Vertical">
-                    <datasetRun subDataset="Esperienze" uuid="5c4bcf38-5213-4c81-bae1-c6b0b767ae80">
-                        <dataSourceExpression>
-                            <![CDATA[((net.sf.jasperreports.engine.data.JsonDataSource)$P{REPORT_DATA_SOURCE}).subDataSource("valutazioneEsperienze_json")]]></dataSourceExpression>
-                    </datasetRun>
-                    <jr:listContents height="105" width="459">
-                        <staticText>
-                            <reportElement x="0" y="3" width="100" height="20"
-                                           uuid="e7d3b57f-51c4-4d34-aff5-6f5a58bb9e11"/>
-                            <text><![CDATA[numeroEsperienza]]></text>
-                        </staticText>
-                        <textField>
-                            <reportElement x="110" y="3" width="346" height="20"
-                                           uuid="c76d5669-e350-4482-9b22-f97c2fbc1c7d"/>
-                            <textFieldExpression><![CDATA[$F{numeroEsperienza}]]></textFieldExpression>
-                        </textField>
-                        <staticText>
-                            <reportElement x="0" y="23" width="100" height="20"
-                                           uuid="66cfa98c-c893-4e00-b9de-26ba9bc55f6b"/>
-                            <text><![CDATA[tipologiaEsperienza]]></text>
-                        </staticText>
-                        <textField>
-                            <reportElement x="110" y="23" width="346" height="20"
-                                           uuid="cd5aef3c-d049-4fbd-8220-a740baffbe28"/>
-                            <textFieldExpression><![CDATA[$F{tipologiaEsperienza}]]></textFieldExpression>
-                        </textField>
-                        <staticText>
-                            <reportElement x="0" y="43" width="100" height="20"
-                                           uuid="12ae40f4-d9a5-40fd-a0bd-1eafc4fa45b8"/>
-                            <text><![CDATA[ambitoEsperienza]]></text>
-                        </staticText>
-                        <textField>
-                            <reportElement x="110" y="43" width="346" height="20"
-                                           uuid="98f0555a-b968-4f13-b59d-f796ed66a4d1"/>
-                            <textFieldExpression><![CDATA[$F{ambitoEsperienza}]]></textFieldExpression>
-                        </textField>
-                        <staticText>
-                            <reportElement x="0" y="60" width="100" height="20"
-                                           uuid="5bd292a1-beaf-4142-8a24-cf75c254ae73"/>
-                            <text><![CDATA[attivitaSvolta]]></text>
-                        </staticText>
-                        <textField>
-                            <reportElement x="113" y="60" width="343" height="20"
-                                           uuid="6fd034a1-2fe4-4ed6-b8fb-392561e12fae"/>
-                            <textFieldExpression><![CDATA[$F{attivitaSvolta}]]></textFieldExpression>
-                        </textField>
-                    </jr:listContents>
-                </jr:list>
-            </componentElement>
-        </band>
-    </detail>
-    <columnFooter>
-        <band splitType="Stretch"/>
-    </columnFooter>
-    <pageFooter>
-        <band height="43" splitType="Stretch">
-            <textField isStretchWithOverflow="true">
-                <reportElement style="Detail" x="1" y="16" width="505" height="19"
-                               uuid="33f2da54-0668-4db7-ac94-d1a49ef00fb5"/>
-                <textElement>
-                    <font fontName="SansSerif" size="11" isBold="false" isItalic="true"/>
-                </textElement>
-                <textFieldExpression>
-                    <![CDATA["Il presente rigetto è firmato digitalmente ai sensi dell’art. 24 del D.lgs 7 marzo 2005, n. 82"]]></textFieldExpression>
-            </textField>
-        </band>
-    </pageFooter>
-    <summary>
-        <band splitType="Stretch"/>
-    </summary>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="OivRigetto" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c0187353-db16-46fc-a7a4-9ece39bc4976">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Title" fontName="Times New Roman" fontSize="50" isBold="true" pdfFontName="Times-Bold"/>
+	<style name="SubTitle" forecolor="#736343" fontName="Arial" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="Arial" fontSize="12"/>
+	<style name="Row" mode="Transparent">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+			<style backcolor="#E6DAC3"/>
+		</conditionalStyle>
+	</style>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 3">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 3_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 3_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 3_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 4">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 4_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 4_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 4_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 5">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 5_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 5_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 5_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 6">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 6_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 6_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 6_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Esperienze" uuid="43718d59-fac1-44c4-8e31-33ea348b2df2">
+		<queryString language="json">
+			<![CDATA[]]>
+		</queryString>
+		<field name="numeroEsperienza" class="java.lang.String">
+			<fieldDescription><![CDATA[numeroEsperienza]]></fieldDescription>
+		</field>
+		<field name="tipologiaEsperienza" class="java.lang.String">
+			<fieldDescription><![CDATA[tipologiaEsperienza]]></fieldDescription>
+		</field>
+		<field name="attivitaSvolta" class="java.lang.String">
+			<fieldDescription><![CDATA[attivitaSvolta]]></fieldDescription>
+		</field>
+		<field name="ambitoEsperienza" class="java.lang.String">
+			<fieldDescription><![CDATA[ambitoEsperienza]]></fieldDescription>
+		</field>
+	</subDataset>
+	<parameter name="ANN_IMAGE" class="java.io.InputStream"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["C:\\CNR\\1_PROGETTI\\OIV\\PDF - JASPER REPORT\\print\\"]]></defaultValueExpression>
+	</parameter>
+	<queryString language="json">
+		<![CDATA[]]>
+	</queryString>
+	<field name="dataInvioDomanda" class="java.lang.String">
+		<fieldDescription><![CDATA[dataInvioDomanda]]></fieldDescription>
+	</field>
+	<field name="nomeRichiedente" class="java.lang.String">
+		<fieldDescription><![CDATA[nomeRichiedente]]></fieldDescription>
+	</field>
+	<field name="emailRichiedente" class="java.lang.String">
+		<fieldDescription><![CDATA[emailRichiedente]]></fieldDescription>
+	</field>
+	<field name="motivazioneStandard" class="java.lang.String">
+		<fieldDescription><![CDATA[motivazioneStandard]]></fieldDescription>
+	</field>
+	<field name="protocolloPreavviso" class="java.lang.String">
+		<fieldDescription><![CDATA[protocolloPreavviso]]></fieldDescription>
+	</field>
+	<field name="testoMotivazioneStandard" class="java.lang.String">
+		<fieldDescription><![CDATA[testoMotivazioneStandard]]></fieldDescription>
+	</field>
+	<field name="dataPreavviso" class="java.lang.String">
+		<fieldDescription><![CDATA[dataPreavviso]]></fieldDescription>
+	</field>
+	<field name="sessoRichiedente" class="java.lang.String">
+		<fieldDescription><![CDATA[sessoRichiedente]]></fieldDescription>
+	</field>
+	<field name="testoMotivazioneSpecifica" class="java.lang.String">
+		<fieldDescription><![CDATA[testoMotivazioneSpecifica]]></fieldDescription>
+	</field>
+	<field name="numeroValutazioniNegative" class="java.lang.String">
+		<fieldDescription><![CDATA[numeroValutazioniNegative]]></fieldDescription>
+	</field>
+	<field name="numeroValutazioniPositive" class="java.lang.String">
+		<fieldDescription><![CDATA[numeroValutazioniPositive]]></fieldDescription>
+	</field>
+	<field name="elencoValutazioniNegative" class="java.lang.String">
+		<fieldDescription><![CDATA[elencoValutazioniNegative]]></fieldDescription>
+	</field>
+	<group name="Group2">
+		<groupExpression><![CDATA[(int)($V{REPORT_COUNT}/5)]]></groupExpression>
+		<groupHeader>
+			<band height="467">
+				<textField>
+					<reportElement x="37" y="13" width="505" height="40" uuid="e9825bfd-c98f-4489-83b3-1ceb9783f873"/>
+					<textElement>
+						<font size="11" isBold="true"/>
+						<paragraph lineSpacing="Single"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Oggetto:\t preavviso di rigetto della domanda di iscrizione nell’Elenco nazionale \r\n\t\tdei componenti degli Organismi indipendenti di valutazione ai sensi del D.M 2 dicembre 2016."]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement style="Detail" x="37" y="67" width="505" height="335" uuid="7ac903fa-55d2-4e21-a610-fa7dda8d3df3"/>
+					<textElement>
+						<font fontName="SansSerif" size="11" isBold="false"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["\t Con riferimento alla domanda di iscrizione nell’Elenco nazionale dei componenti degli Organismi indipendenti di valutazione inviata in data "+$F{dataInvioDomanda}+", si rappresenta quanto segue.\r\n\tL’art. 2 del D.M 2 dicembre 2016, nell’individuare i requisiti necessari per poter richiedere l’iscrizione al suddetto Elenco, al comma 1, lett. b), punto 2, espressamente prevede che i soggetti interessati devono \"essere in possesso di comprovata esperienza professionale di almeno cinque anni, maturata presso pubbliche amministrazioni o aziende private, nella misurazione e valutazione della performance organizzativa e individuale, nella pianificazione, nel controllo di gestione, nella programmazione finanziaria e di bilancio e nel risk management.\"\r\n\tL’art. 3, comma 2, del medesimo decreto stabilisce che l’effettiva iscrizione nell’Elenco decorre dalla comunicazione da parte di questo Dipartimento della completezza delle informazioni fornite circa la sussistenza dei requisiti di cui al citato art. 2.\r\n\tsulla base delle dichiarazioni fornite nella richiesta, "+( $F{numeroValutazioniNegative}.equals( "1" )  ? ("l’esperienza riportata nel punto: ") : ("le esperienze riportate nei punti: ") ) +" "+$F{elencoValutazioniNegative} +" della domanda, non "+( $F{numeroValutazioniNegative}.equals( "1" )  ? ("è riconducibile ") : ("sono riconducibili ") ) +"all’ambito indicato.La ratio della nuova disciplina, infatti, è quella di valorizzare l’elemento, sostanziale, della qualificazione professionale derivante da specifiche esperienze maturate, con carattere di continuità e prevalenza, nello svolgimento di attività in almeno uno degli ambiti individuati dal decreto."]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="187">
+				<textField>
+					<reportElement x="37" y="10" width="505" height="165" uuid="217a73b7-12c4-46db-9f98-dcc4ab6fa73a"/>
+					<textElement>
+						<font size="11"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["La ratio della nuova disciplina, infatti, è quella di valorizzare l’elemento, sostanziale, della qualificazione professionale derivante da specifiche esperienze maturate, con carattere di continuità e prevalenza, nello svolgimento di attività in almeno uno degli ambiti individuati dal decreto. Tali ambiti vanno intesi in maniera coerente con le finalità e l’area di applicazione del decreto stesso. Ne consegue che, nel caso specifico "+( $F{numeroValutazioniNegative}.equals( "1" )  ? ("del ") : ("della ") ) + $F{numeroValutazioniNegative} +"</del/della/> </ Ambito 1, [Ambito 2], [Ambito 3], [Ambito 4] [e del/della] [Ambito 5]/> cui la S.V. riconduce prevalentemente le esperienze professionali maturate, le attività positivamente valutabili devono essere riferibili, rispettivamente: "]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="Group1">
+		<groupExpression><![CDATA[(int)($V{REPORT_COUNT}/15)]]></groupExpression>
+		<groupFooter>
+			<band/>
+			<band height="170">
+				<textField>
+					<reportElement x="34" y="11" width="505" height="141" uuid="d7b7e47d-30b0-40ae-8f62-33489ba02aef"/>
+					<textElement>
+						<font size="11"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["\t In merito alla questione sopra evidenziata, si informa la S.V. che laddove intenda fornire ulteriori elementi in ordine ai requisiti posseduti, potrà comunicarli, con la apposita funzionalità disponibile nel profilo nell’area riservata, entro 10 giorni dal ricevimento della presente.\r\n\t Tale comunicazione dovrà essere corredata da idonea documentazione comprovante il possesso dei requisiti richiesti dal citato decreto.\r\n\t In assenza di riscontro, l’Ufficio procederà al rigetto dell’istanza di iscrizione nell’Elenco.\r\n\t Per altri eventuali chiarimenti è possibile contattare </ il dott./la dott.ssa/> </ istruttore /> dalle 11.00 alle 13.00, telefono 06 6899 </interno/>."]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="62">
+				<textField isStretchWithOverflow="true">
+					<reportElement style="Detail" x="256" y="0" width="292" height="51" uuid="2d49c6fc-7ded-4f0d-94fb-e4cc1e708646"/>
+					<textElement textAlignment="Center">
+						<font fontName="SansSerif" size="11" isBold="false"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["per il Direttore dell’Ufficio\r\ndott.ssa Alessandra Barberi\r\n(Dirigente del Servizio per la valutazione indipendente)"]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="185" splitType="Stretch">
+			<textField isStretchWithOverflow="true">
+				<reportElement style="Detail" x="310" y="143" width="69" height="17" uuid="0b92db97-6423-4fe6-aa21-2c7b75c4dc9b"/>
+				<textElement>
+					<font fontName="SansSerif" size="11" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[( $F{sessoRichiedente}.equalsIgnoreCase( "m" )  ? ("Al dott.: ") : ("Alla dott.ssa: ") )]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="Detail" x="310" y="162" width="69" height="17" uuid="e2a46fcd-e936-4956-a327-61d08f44f5bd"/>
+				<textElement>
+					<font fontName="SansSerif" size="11" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["E-mail :"]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="1" y="2" width="329" height="130" uuid="6beae08d-439c-499c-9fc8-d7d0aa6d351e"/>
+				<imageExpression><![CDATA[$P{ANN_IMAGE}]]></imageExpression>
+			</image>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="Detail" x="392" y="143" width="160" height="17" uuid="73aefea6-9311-45d7-9f1f-84cad715b43c"/>
+				<textElement>
+					<font fontName="SansSerif" size="11" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nomeRichiedente}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="Detail" x="392" y="162" width="160" height="17" uuid="461b7621-7cc4-4b3f-918d-756b70d532d8"/>
+				<textElement>
+					<font fontName="SansSerif" size="11" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{emailRichiedente}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="19" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="131" splitType="Stretch">
+			<componentElement>
+				<reportElement x="83" y="0" width="459" height="105" uuid="04333226-daf1-4ae5-b491-7b4f6a8d6855"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="Esperienze" uuid="5c4bcf38-5213-4c81-bae1-c6b0b767ae80">
+						<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JsonDataSource)$P{REPORT_DATA_SOURCE}).subDataSource("valutazioneEsperienze_json")]]></dataSourceExpression>
+					</datasetRun>
+					<jr:listContents height="105" width="459">
+						<staticText>
+							<reportElement x="0" y="3" width="100" height="20" uuid="e7d3b57f-51c4-4d34-aff5-6f5a58bb9e11"/>
+							<text><![CDATA[numeroEsperienza]]></text>
+						</staticText>
+						<textField>
+							<reportElement x="110" y="3" width="346" height="20" uuid="c76d5669-e350-4482-9b22-f97c2fbc1c7d"/>
+							<textFieldExpression><![CDATA[$F{numeroEsperienza}]]></textFieldExpression>
+						</textField>
+						<staticText>
+							<reportElement x="0" y="23" width="100" height="20" uuid="66cfa98c-c893-4e00-b9de-26ba9bc55f6b"/>
+							<text><![CDATA[tipologiaEsperienza]]></text>
+						</staticText>
+						<textField>
+							<reportElement x="110" y="23" width="346" height="20" uuid="cd5aef3c-d049-4fbd-8220-a740baffbe28"/>
+							<textFieldExpression><![CDATA[$F{tipologiaEsperienza}]]></textFieldExpression>
+						</textField>
+						<staticText>
+							<reportElement x="0" y="43" width="100" height="20" uuid="12ae40f4-d9a5-40fd-a0bd-1eafc4fa45b8"/>
+							<text><![CDATA[ambitoEsperienza]]></text>
+						</staticText>
+						<textField>
+							<reportElement x="110" y="43" width="346" height="20" uuid="98f0555a-b968-4f13-b59d-f796ed66a4d1"/>
+							<textFieldExpression><![CDATA[$F{ambitoEsperienza}]]></textFieldExpression>
+						</textField>
+						<staticText>
+							<reportElement x="0" y="60" width="100" height="20" uuid="5bd292a1-beaf-4142-8a24-cf75c254ae73"/>
+							<text><![CDATA[attivitaSvolta]]></text>
+						</staticText>
+						<textField>
+							<reportElement x="113" y="60" width="343" height="20" uuid="6fd034a1-2fe4-4ed6-b8fb-392561e12fae"/>
+							<textFieldExpression><![CDATA[$F{attivitaSvolta}]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="43" splitType="Stretch">
+			<textField isStretchWithOverflow="true">
+				<reportElement style="Detail" x="1" y="16" width="505" height="19" uuid="33f2da54-0668-4db7-ac94-d1a49ef00fb5"/>
+				<textElement>
+					<font fontName="SansSerif" size="11" isBold="false" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Il presente rigetto è firmato digitalmente ai sensi dell’art. 24 del D.lgs 7 marzo 2005, n. 82"]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
 </jasperReport>
