@@ -96,7 +96,10 @@
                 Lista dei compiti assegnati a me
               </span>
             </h3>
-            <task-list tasks="vm.myTasks.data" action-buttons="true"></task-list>
+              <task-list tasks="vm.myTasks.data"
+                         action-buttons="true"
+                         completed="false">
+              </task-list>
 
             <!--paginazione myTasks-->
             <div class="text-center">
@@ -114,7 +117,10 @@
                 Lista dei compiti di gruppo da prendere in carico
               </span>
             </h3>
-            <task-list tasks="vm.availableTasks.data" action-buttons="true"></task-list>
+              <task-list tasks="vm.availableTasks.data"
+                         action-buttons="true"
+                         completed="false">
+              </task-list>
 
             <!--paginazione availabletasks-->
             <div class="text-center">
@@ -132,7 +138,9 @@
                 Lista dei compiti di gruppo presi in carico da altri
               </span>
             </h3>
-            <task-list tasks="vm.taskAssignedInMyGroups.data"></task-list>
+              <task-list tasks="vm.taskAssignedInMyGroups.data"
+                         completed="false">
+              </task-list>
 
             <!--paginazione availabletasks-->
             <div class="text-center">

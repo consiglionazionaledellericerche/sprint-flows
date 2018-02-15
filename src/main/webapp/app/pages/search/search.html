@@ -89,7 +89,10 @@
               </div>
               <div ng-hide="vm.loading" class="col-md-12">
 	              <div ng-show="vm.searchParams.isTaskQuery">
-		            <task-list tasks="vm.results" action-buttons="false"></task-list>
+                      <task-list tasks="vm.results"
+                                 action-buttons="false"
+                                 completed="true">
+                      </task-list>
 	              </div>
 	              <div ng-show="!vm.searchParams.isTaskQuery">
 					<process-list processes="vm.results" paging="paging"></process-list>
