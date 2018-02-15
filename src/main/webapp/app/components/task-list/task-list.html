@@ -24,9 +24,14 @@
         </div>
     </div>
 
-    <div class="col-md-3 pull-right" ng-show="!completed">
+    <div class="col-md-3 pull-right">
         <div class="btn-group-vertical btn-block" role="group">
-            <a class="btn btn-primary" ng-class="{'btn-xs': !advanced}"
+            <!--uso il campo completati impropriamente per non far apparire il bottone con le azioni della pagina dei dettagli-->
+            <a ng-show="{{completed}}" class="btn btn-primary" ng-class="{'btn-xs': !advanced}"
+               ui-sref="details({processInstanceId: task.processInstanceId})">
+                <span class="glyphicon glyphicon-th-list"></span> Dettagli Flusso
+            </a>
+            <a ng-show="{{!completed}}" class="btn btn-primary" ng-class="{'btn-xs': !advanced}"
                ui-sref="details({processInstanceId: task.processInstanceId, taskId: task.id})">
                 <span class="glyphicon glyphicon-th-list"></span> Dettagli Flusso
             </a>
