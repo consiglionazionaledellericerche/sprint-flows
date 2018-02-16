@@ -18,6 +18,8 @@
         $scope.loadTaskCompleted = function() {
             var maxResults = vm.itemsPerPage,
                 firstResult = vm.itemsPerPage * (vm.page - 1);
+            //carico le form di ricerca specifiche per ogni tipologia di Process Definitions
+            $scope.formUrl = utils.loadSearchFields(vm.searchParams.processDefinitionKey, true);
 
             dataService.tasks.getTaskCompletedByMe($rootScope.current, firstResult, maxResults, vm.order, utils.populateTaskParams(Array.from($("input[id^='searchField-']"))))
                 .then(function(response) {

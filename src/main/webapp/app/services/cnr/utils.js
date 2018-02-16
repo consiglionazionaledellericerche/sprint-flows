@@ -79,6 +79,17 @@
                     appo.push(attachments[attachment]);
                 }
                 return appo;
+            },
+            loadSearchFields: function(processDefinitionKey, isTaskQuery){
+                var formUrl = undefined;
+                if (processDefinitionKey) {
+                   if(isTaskQuery) {
+                       formUrl = 'api/forms/'+ processDefinitionKey + '/1/search-ti';
+                   } else {
+                       formUrl = 'api/forms/'+ processDefinitionKey + '/1/search-pi';
+                   }
+                }
+                return formUrl;
             }
         };
     }
