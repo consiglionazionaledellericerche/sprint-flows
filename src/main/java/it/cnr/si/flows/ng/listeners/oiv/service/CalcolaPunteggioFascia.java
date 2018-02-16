@@ -29,7 +29,15 @@ public class CalcolaPunteggioFascia {
 		JSONArray valutazioni =  new JSONArray(jsonStr);
 		int numeroValutazioniPositive = 0;
 		int numeroValutazioniNegative = 0;
+		int numeroAmbitoPianificazioneKo = 0;
+		int numeroAmbitoControlloGestioneKo = 0;
+		int numeroAmbitoMisurazionePerformanceKo = 0;
+		int numeroAmbitoProgrammazioneFinanziariaKo = 0;
+		int numeroAmbitoRiskManagmentKo = 0;
+		int numeroAmbitiKo = 0;
 		String elencoValutazioniNegative = "";
+		String elencoAmbitiKo = "";
+		
 		for (int i = 0 ; i < valutazioni.length(); i++) {
 			JSONObject obj = valutazioni.getJSONObject(i);
 			if (obj.has("giudizioFinale")) {
@@ -41,6 +49,48 @@ public class CalcolaPunteggioFascia {
 					}
 					elencoValutazioniNegative = elencoValutazioniNegative.concat(obj.getString("numeroEsperienza"));
 					numeroValutazioniNegative = numeroValutazioniNegative +1;
+					switch(obj.getString("ambitoEsperienza")){  
+					case "CONTROLLO DI GESTIONE": {
+						numeroAmbitoControlloGestioneKo = numeroAmbitoControlloGestioneKo +1;
+						LOGGER.info("-- ambitoEsperienza: " + obj.getString("ambitoEsperienza") + " nr KO: " + numeroAmbitoControlloGestioneKo);
+						if(numeroAmbitoControlloGestioneKo == 1) {
+							elencoAmbitiKo = elencoAmbitiKo.concat(" - " + obj.getString("ambitoEsperienza"));
+							numeroAmbitiKo = numeroAmbitiKo + 1;
+						}
+					};break;    
+					case "PIANIFICAZIONE": {
+						numeroAmbitoPianificazioneKo = numeroAmbitoPianificazioneKo +1;
+						LOGGER.info("-- ambitoEsperienza: " + obj.getString("ambitoEsperienza") + " nr KO: " + numeroAmbitoPianificazioneKo);
+						if(numeroAmbitoPianificazioneKo == 1) {
+							elencoAmbitiKo = elencoAmbitiKo.concat(" - " + obj.getString("ambitoEsperienza"));
+							numeroAmbitiKo = numeroAmbitiKo + 1;
+						}
+					};break;    
+					case "MISURAZIONE E VALUTAZIONE DELLA PERFORMANCE ORGANIZZATIVA E INDIVIDUALE": {
+						numeroAmbitoMisurazionePerformanceKo = numeroAmbitoMisurazionePerformanceKo +1;
+						LOGGER.info("-- ambitoEsperienza: " + obj.getString("ambitoEsperienza") + " nr KO: " + numeroAmbitoMisurazionePerformanceKo);
+						if(numeroAmbitoMisurazionePerformanceKo == 1) {
+							elencoAmbitiKo = elencoAmbitiKo.concat(" - " + obj.getString("ambitoEsperienza"));
+							numeroAmbitiKo = numeroAmbitiKo + 1;
+						}
+					};break;    
+					case "PROGRAMMAZIONE FINANZIARIA E DI BILANCIO": {
+						numeroAmbitoProgrammazioneFinanziariaKo = numeroAmbitoProgrammazioneFinanziariaKo +1;
+						LOGGER.info("-- ambitoEsperienza: " + obj.getString("ambitoEsperienza") + " nr KO: " + numeroAmbitoProgrammazioneFinanziariaKo);
+						if(numeroAmbitoProgrammazioneFinanziariaKo == 1) {
+							elencoAmbitiKo = elencoAmbitiKo.concat(" - " + obj.getString("ambitoEsperienza"));
+							numeroAmbitiKo = numeroAmbitiKo + 1;
+						}
+					};break;    
+					case "RISK MANAGEMENT": {
+						numeroAmbitoRiskManagmentKo = numeroAmbitoRiskManagmentKo +1;
+						LOGGER.info("-- ambitoEsperienza: " + obj.getString("ambitoEsperienza") + " nr KO: " + numeroAmbitoRiskManagmentKo);
+						if(numeroAmbitoRiskManagmentKo == 1) {
+							elencoAmbitiKo = elencoAmbitiKo.concat(" - " + obj.getString("ambitoEsperienza"));
+							numeroAmbitiKo = numeroAmbitiKo + 1;
+						}
+					};break;
+					}
 				}
 			}
 		}
@@ -48,6 +98,13 @@ public class CalcolaPunteggioFascia {
 		execution.setVariable("numeroValutazioniNegative", numeroValutazioniNegative);
 		execution.setVariable("numeroValutazioniPositive", numeroValutazioniPositive);
 		execution.setVariable("elencoValutazioniNegative", elencoValutazioniNegative);
+		execution.setVariable("numeroAmbitoPianificazioneKo", String.valueOf(numeroAmbitoPianificazioneKo));
+		execution.setVariable("numeroAmbitoControlloGestioneKo", String.valueOf(numeroAmbitoControlloGestioneKo));
+		execution.setVariable("numeroAmbitoMisurazionePerformanceKo", String.valueOf(numeroAmbitoMisurazionePerformanceKo));
+		execution.setVariable("numeroAmbitoProgrammazioneFinanziariaKo", String.valueOf(numeroAmbitoProgrammazioneFinanziariaKo));
+		execution.setVariable("numeroAmbitoRiskManagmentKo", String.valueOf(numeroAmbitoRiskManagmentKo));
+		execution.setVariable("numeroAmbitiKo", String.valueOf(numeroAmbitiKo));
+		execution.setVariable("elencoAmbitiKo", elencoAmbitiKo);
 
 		LOGGER.debug("--- numeroValutazioniNegative: {} numeroValutazioniPositive: {}", numeroValutazioniNegative, numeroValutazioniPositive);
 		LOGGER.debug("--- elencoValutazioniNegative: {} ", elencoValutazioniNegative);
