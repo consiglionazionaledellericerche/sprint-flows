@@ -19,10 +19,18 @@ public class ManageSceltaUtente {
 
 	@Inject
 	private CreateOivPdf createOivPdf;
+	@Inject
+	private ManageControlli manageControlli;
 
 	public void azioneScelta(DelegateExecution execution, String faseEsecuzioneValue, String sceltaUtente) throws IOException, ParseException {
 		LOGGER.info("-- azioneScelta: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 		switch(faseEsecuzioneValue){  
+		case "istruttoria-end": {
+			if(sceltaUtente.equals("invio_valutazione")) {
+				LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
+				manageControlli.valutazioneEsperienze(execution);
+			}
+		};break;
 		case "valutazione-end": {
 			if(sceltaUtente.equals("genera_PDF_preavviso_di_rigetto")) {
 				LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
