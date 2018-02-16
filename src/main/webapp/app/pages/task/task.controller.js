@@ -111,8 +111,12 @@
 
  				}, function(err) {
  					$log.error(err);
- 					AlertService.error("Richiesta non riuscita<br>" + err.data.message);
- 				});
+					if (err.status == 412){
+						AlertService.warning("AVVISO<br>" + err.data.message);
+					}else{
+						AlertService.error("Richiesta non riuscita<br>" + err.data.message);
+					}
+				});
  			}
  		}
 
