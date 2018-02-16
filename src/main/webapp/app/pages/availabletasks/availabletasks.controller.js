@@ -28,6 +28,10 @@
         $scope.loadMyTasks = function() {
             //variabili usate nella paginazione
             var myFirstResult, myMaxResults;
+
+            //carico le form di ricerca specifiche per ogni tipologia di Process Definitions
+    		$scope.formUrl = utils.loadSearchFields(vm.searchParams.processDefinitionKey, vm.searchParams.isTaskQuery);
+
             vm.itemsPerPage = paginationConstants.itemsPerPage;
             vm.myTotalItems = vm.itemsPerPage * vm.myPage;
             myFirstResult = vm.itemsPerPage * (vm.myPage - 1);

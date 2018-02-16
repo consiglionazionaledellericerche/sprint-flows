@@ -13,8 +13,21 @@
                 </div>
             </div>
             <h4>Tipologie</h4>
-            <workflow-types process-definitions="wfDefsAll" filters="false"></workflow-types>
-
+            <div id="tipologieDiv">
+                <div>
+                    <div class="dropdown md-menu-origin">
+                        <ui-select ng-model="vm.searchParams.processDefinitionKey" title="Tipologie"
+                                   on-select="loadTaskCompleted()">
+                            <ui-select-match placeholder="Seleziona la tipologia di flusso" allow-clear="true">
+                                {{$select.selected.name}}
+                            </ui-select-match>
+                            <ui-select-choices repeat="processDefinition.key as processDefinition in wfDefsAll">
+                                <span ng-bind-html="processDefinition.name"></span>
+                            </ui-select-choices>
+                        </ui-select>
+                    </div>
+                </div>
+            </div>
 
             <div class="ng-scope" style="">
                 <strong class="ng-binding">Parole Chiavi nel Titolo</strong>
@@ -46,6 +59,9 @@
                        class="form-control ng-pristine ng-valid ng-empty ng-touched" aria-invalid="false">
             </div>
             <br>
+            <div>
+                <ng-include id="searchFields" src="formUrl"></ng-include>
+            </div>
             <br>
             <div>
                 <button ng-click="loadTaskCompleted()" class="btn btn-primary">Filtra</button>
