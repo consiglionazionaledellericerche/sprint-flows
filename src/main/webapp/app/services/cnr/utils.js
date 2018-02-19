@@ -82,12 +82,14 @@
             },
             loadSearchFields: function(processDefinitionKey, isTaskQuery){
                 var formUrl = undefined;
-                if (processDefinitionKey) {
-                   if(isTaskQuery) {
-                       formUrl = 'api/forms/'+ processDefinitionKey + '/1/search-ti';
-                   } else {
-                       formUrl = 'api/forms/'+ processDefinitionKey + '/1/search-pi';
-                   }
+                //se processDefinitionKey non è definita carico la form per tutte le Process Definitions
+                if (processDefinitionKey === undefined) {
+                    processDefinitionKey = 'all';
+                }
+                if(isTaskQuery) {
+                    formUrl = 'api/forms/'+ processDefinitionKey + '/1/search-ti';
+                } else {
+                    formUrl = 'api/forms/'+ processDefinitionKey + '/1/search-pi';
                 }
                 return formUrl;
             }

@@ -29,10 +29,6 @@
             //variabili usate nella paginazione
             var myFirstResult, myMaxResults;
 
-
-            if (vm.processDefinitionKey === null)
-                vm.processDefinitionKey = undefined;
-
             //carico le form di ricerca specifiche per ogni tipologia di Process Definitions
     		$scope.formUrl = utils.loadSearchFields(vm.processDefinitionKey, true);
 
