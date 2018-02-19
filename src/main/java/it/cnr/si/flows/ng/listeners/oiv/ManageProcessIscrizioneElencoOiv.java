@@ -43,6 +43,8 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 		String sceltaUtente =  (String) execution.getVariable("sceltaUtente");		
 		LOGGER.info("ProcessInstanceId: " + processInstanceId);
 		String faseEsecuzioneValue = "noValue";
+		boolean aggiornaGiudizioFinale = true;
+		boolean nonAggiornaGiudizioFinale = false;
 		faseEsecuzioneValue = faseEsecuzione.getValue(execution).toString();
 		switch(faseEsecuzioneValue){  
 		case "process-start": {
@@ -51,12 +53,12 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 		};break;    
 		case "istruttoria-start": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
-			calcolaPunteggioFascia.calcola(execution);
+			calcolaPunteggioFascia.calcolaAggiornaGiudizioFinale(execution, nonAggiornaGiudizioFinale);
 		};break;     
 		case "istruttoria-end": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
 			determinaTimer.getTimer(execution, "boundarytimer3");
-			calcolaPunteggioFascia.calcola(execution);
+			calcolaPunteggioFascia.calcolaAggiornaGiudizioFinale(execution, aggiornaGiudizioFinale);
 			determinaAttore.determinaIstruttore(execution);
 		};break;  
 		case "soccorso-istruttorio-start":  {
@@ -76,7 +78,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 		};break;    
 		case "valutazione-end":  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
-			calcolaPunteggioFascia.calcola(execution);
+			calcolaPunteggioFascia.calcolaAggiornaGiudizioFinale(execution, nonAggiornaGiudizioFinale);
 		};break;        
 		case "preavviso-rigetto-start":  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
@@ -89,14 +91,14 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 		};break;    
 		case "istruttoria-su-preavviso-end":  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
-			calcolaPunteggioFascia.calcola(execution);
+			calcolaPunteggioFascia.calcolaAggiornaGiudizioFinale(execution, aggiornaGiudizioFinale);
 		};break;        
 		case "valutazione-preavviso-start":  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
 		};break;    
 		case "valutazione-preavviso-end":  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
-			calcolaPunteggioFascia.calcola(execution);
+			calcolaPunteggioFascia.calcolaAggiornaGiudizioFinale(execution, nonAggiornaGiudizioFinale);
 		};break;        
 		case "firma-dg-rigetto-start":  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);

@@ -21,7 +21,7 @@ public class CalcolaPunteggioFascia {
 
 
 
-	public void calcola(DelegateExecution execution) throws IOException, ParseException {
+	public void calcolaAggiornaGiudizioFinale(DelegateExecution execution, boolean aggiornaGiudizioFinale) throws IOException, ParseException {
 		String valutazioneEsperienzeJson = execution.getVariable("valutazioneEsperienze_json").toString();
 		String jsonStr = valutazioneEsperienzeJson;
 		LOGGER.debug("--- jsonStr: {}", jsonStr);
@@ -37,10 +37,14 @@ public class CalcolaPunteggioFascia {
 		int numeroAmbitiKo = 0;
 		String elencoValutazioniNegative = "";
 		String elencoAmbitiKo = "";
-		
+
 		for (int i = 0 ; i < valutazioni.length(); i++) {
 			JSONObject obj = valutazioni.getJSONObject(i);
-			if (obj.has("giudizioFinale")) {
+			if (obj.has("giudizioFinaleIstruttore")){
+				if(aggiornaGiudizioFinale){
+					obj.put("giudizioFinale", obj.getString("giudizioFinaleIstruttore"));
+					LOGGER.info("-- aggiorno giudizioFinale: " + obj.getString("giudizioFinale") + " con giudizioFinaleIstruttore: " + obj.getString("giudizioFinaleIstruttore"));
+				}
 				if (obj.getString("giudizioFinale").equals("OK")) {
 					numeroValutazioniPositive = numeroValutazioniPositive +1;
 				} else {
@@ -94,7 +98,6 @@ public class CalcolaPunteggioFascia {
 				}
 			}
 		}
-
 		execution.setVariable("numeroValutazioniNegative", numeroValutazioniNegative);
 		execution.setVariable("numeroValutazioniPositive", numeroValutazioniPositive);
 		execution.setVariable("elencoValutazioniNegative", elencoValutazioniNegative);
@@ -110,8 +113,7 @@ public class CalcolaPunteggioFascia {
 		LOGGER.debug("--- elencoValutazioniNegative: {} ", elencoValutazioniNegative);
 		// Chiamta REST applicazione Elenco OIV per il calcolo punteggio
 		// invio campi json e recupero fascia e punteggio
-		execution.setVariable("punteggioEsperienzeAttribuito", "23");
-		execution.setVariable("fasciaAppartenenzaAttribuita", "3");
+		execution.setVariable("punteggioEsperienzeAttribuito", "42");
+		execution.setVariable("fasciaAppartenenzaAttribuita", "1");
 	}
-
 }
