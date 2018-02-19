@@ -30,9 +30,6 @@
 			vm.results = [];
 			vm.loading = true;
 			
-			if (vm.searchParams.processDefinitionKey === null)
-				vm.searchParams.processDefinitionKey = undefined;
-			
 			$log.info(vm.searchParams)
 			
 			$location.search(vm.searchParams);
