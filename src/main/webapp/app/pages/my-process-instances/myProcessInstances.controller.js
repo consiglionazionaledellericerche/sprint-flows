@@ -29,9 +29,6 @@
                 maxResultsActive = vm.itemsPerPage,
                 maxResultsTerminated = vm.itemsPerPage;
 
-            if (vm.processDefinitionKey === null)
-                vm.processDefinitionKey = undefined;
-
             //carico le form di ricerca specifiche per ogni tipologia di Process Definitions
             $scope.formUrl = utils.loadSearchFields(vm.processDefinitionKey, false);
 
