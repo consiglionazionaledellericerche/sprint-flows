@@ -34,10 +34,23 @@ public class ManageSceltaUtente {
 		case "valutazione-end": {
 			if(sceltaUtente.equals("genera_PDF_preavviso_di_rigetto")) {
 				LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
-				execution.setVariable("pdfPreavvisoRigettoFlag", "1");
-				createOivPdf.CreaPdfOiv(execution, preavvisoRigetto.name());
+				execution.setVariable("pdfPreavvisoRigettoFlag", "1");					
+				switch(execution.getVariable("tipologiaRichiesta").toString()){  
+				case "iscrizione": {
+					createOivPdf.CreaPdfOiv(execution, preavvisoRigetto.name());
+				};break;
+				case "rinnovo": {
+					createOivPdf.CreaPdfOiv(execution, preavvisoRigetto.name());
+				};break;
+				case "modifica_fascia": {
+					createOivPdf.CreaPdfOiv(execution, preavvisoRigettoCambioFascia.name());
+				};break;
+				default:  {
+					LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
+				};break;    
+				}
 			}
-		};break;
+		};break;    
 		case "soccorso-istruttorio-start": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 			execution.setVariable("soccorsoIstruttoriaFlag", "1");
