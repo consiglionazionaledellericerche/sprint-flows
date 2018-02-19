@@ -41,8 +41,8 @@
             <div id="tipologieDiv">
                 <div>
                     <div class="dropdown md-menu-origin">
-                        <ui-select ng-model="vm.searchParams.processDefinitionKey" title="Tipologie"
-                                   on-select="loadMyTasks()">
+                        <ui-select ng-model="vm.processDefinitionKey" title="Tipologie"
+                                   on-select="loadActiveProcess()">
                             <ui-select-match placeholder="Seleziona la tipologia di flusso" allow-clear="true">
                                 {{$select.selected.name}}
                             </ui-select-match>
@@ -52,25 +52,6 @@
                         </ui-select>
                     </div>
                 </div>
-            </div>
-            <br>
-            <br>
-            <div class="ng-scope" style="">
-                <strong class="ng-binding">Parole Chiavi nel Titolo</strong>
-                <div>
-                    <input id="searchField-oggetto" type="text">
-                </div>
-            </div>
-            <div class="ng-scope" style="">
-                <strong class="ng-binding">Utente che ha avviato il flusso</strong>
-                <div>
-                    <input id="searchField-initiator" type="textEqual">
-                </div>
-            </div>
-            <div>
-                <label for="datada">Flusso avviato dopo</label>
-                <input id="searchField-startDateGreat" type="date" ng-model="datada" id="datada"
-                       class="form-control ng-pristine ng-valid ng-empty ng-touched" aria-invalid="false">
             </div>
             <br>
             <div>
