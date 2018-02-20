@@ -2,7 +2,7 @@ package it.cnr.si.flows.ng.listeners.oiv;
 
 import it.cnr.si.flows.ng.listeners.oiv.service.CalcolaPunteggioFascia;
 import it.cnr.si.flows.ng.listeners.oiv.service.DeterminaAttore;
-import it.cnr.si.flows.ng.listeners.oiv.service.DeterminaTimer;
+import it.cnr.si.flows.ng.listeners.oiv.service.GestioneTimer;
 import it.cnr.si.flows.ng.listeners.oiv.service.ManageSceltaUtente;
 import it.cnr.si.flows.ng.listeners.oiv.service.StartOivSetGroupsAndVisibility;
 
@@ -22,7 +22,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ManageProcessIscrizioneElencoOiv.class);
 
 	@Inject
-	private DeterminaTimer determinaTimer;
+	private GestioneTimer determinaTimer;
 	@Inject
 	private CalcolaPunteggioFascia calcolaPunteggioFascia;
 	@Inject
@@ -39,8 +39,12 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 		//(OivPdfService oivPdfService = new OivPdfService();
 
 
-		String processInstanceId =  execution.getProcessInstanceId();		
-		String sceltaUtente =  (String) execution.getVariable("sceltaUtente");		
+		String processInstanceId =  execution.getProcessInstanceId();
+		String sceltaUtente = "start";
+		if(execution.getVariable("sceltaUtente") != null) {
+			sceltaUtente =  (String) execution.getVariable("sceltaUtente");	
+		}
+		
 		LOGGER.info("ProcessInstanceId: " + processInstanceId);
 		String faseEsecuzioneValue = "noValue";
 		boolean aggiornaGiudizioFinale = true;
