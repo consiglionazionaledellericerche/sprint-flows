@@ -145,7 +145,13 @@ public class FlowsPdfService {
                         JSONArray keys = impegno.names();
                         for (int j = 0; j < keys.length(); j++) {
                             String key = keys.getString(j);
-                            addLine(paragraphField, key, impegno.getString(key), true, true);
+                            Object value = impegno.get(key);
+                            String stringValue;
+                            if (value instanceof Integer)
+                                stringValue = ((Integer) value).toString();
+                            else
+                                stringValue = (String) value;
+                            addLine(paragraphField, key, stringValue, true, true);
                         }
                     }
                     //Fine del markup indentato
