@@ -115,10 +115,10 @@ public class FlowsPdfService {
                 paragraphField.addText("Avviato da: " + var.getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
             } else if (variableName.equals(startDate.name())) {
                 if (var.getValue() != null)
-                    paragraphField.addText("Avviato il: " + formatDate(Utils.parsaData((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
+                    paragraphField.addText("Avviato il: " + formatDate(utils.parsaData((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
             } else if (variableName.equals(endDate.name())) {
                 if (var.getValue() != null)
-                    paragraphField.addText("Terminato il: " + formatDate(Utils.parsaData((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
+                    paragraphField.addText("Terminato il: " + formatDate(utils.parsaData((String) var.getValue())) + "\n", FONT_SIZE, HELVETICA_BOLD);
             } else if (variableName.equals(gruppoRA.name())) {
                 paragraphField.addText("Gruppo Responsabile Acquisti: " + var.getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
             }
@@ -277,7 +277,7 @@ public class FlowsPdfService {
 
 
     private String formatDate(Date date) {
-        return date != null ? Utils.formattaDataOra(date) : "";
+        return date != null ? utils.formattaDataOra(date) : "";
     }
 
 
