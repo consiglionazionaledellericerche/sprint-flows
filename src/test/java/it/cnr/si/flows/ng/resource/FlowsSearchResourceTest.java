@@ -9,6 +9,7 @@ import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,8 +18,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.*;
 
@@ -48,15 +52,20 @@ public class FlowsSearchResourceTest {
     private FlowsSearchResource flowsSearchResource;
 
     private ProcessInstanceResponse processInstance;
-    private static int processDeleted = 0;
+
+
+    @Before
+    public void setUp() {
+        HttpServletRequest mockRequest = new MockHttpServletRequest();
+        ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(mockRequest);
+        RequestContextHolder.setRequestAttributes(servletRequestAttributes);
+    }
 
 
     @After
     public void tearDown() {
-        processDeleted = processDeleted + util.myTearDown();
+        util.myTearDown();
     }
-
-
 
 
     @Test
@@ -96,7 +105,7 @@ public class FlowsSearchResourceTest {
         requestParams.put("active", "false");
         requestParams.put("order", DESC);
         response = flowsSearchResource.search(requestParams);
-        verifySearchResponse(response, processDeleted + 3 + 1, processDeleted + 3 + 1);
+        verifySearchResponse(response, 1, 1);
 
         /*
          * VERIFICA GESTIONE DELLE AUTHORITIES TODO
