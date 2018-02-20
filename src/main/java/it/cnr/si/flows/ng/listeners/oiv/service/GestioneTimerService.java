@@ -65,10 +65,7 @@ public class GestioneTimerService {
     @Inject
     private RepositoryService repositoryService;
     
-    public List getTimer(String processInstanceId, String timerId) throws IOException, ParseException {
-
-    	//ManagementService managementService = new ManagementService();
-    	
+    public List getTimers(String processInstanceId) throws IOException, ParseException {
     	
 //      TIMER
         List<Job> timerJobs = managementService.createJobQuery()
@@ -83,13 +80,34 @@ public class GestioneTimerService {
                     .replace("\"", "")
                     .replace("}", "");
             LOGGER.info("getDuedate {}, getId {}, TimerDeclarationImpl {}", job.getDuedate(), job.getId(), timerName);
+        }
+        return timerJobs;
+    }
+    
+    public List getTimer(String processInstanceId, String timerId) throws IOException, ParseException {
+    	
+//      TIMER
+    	List<Job> selectedTimerJob = new ArrayList<>();
+        List<Job> timerJobs = managementService.createJobQuery()
+             	.processInstanceId(processInstanceId)
+             	.timers()
+             	.list();
+        LOGGER.info("TIMERS" + timerJobs);
+        for(Job job : timerJobs)
+        {
+            String timerName = ((TimerEntity) job).getJobHandlerConfiguration()
+                    .split(":")[1]
+                    .replace("\"", "")
+                    .replace("}", "");
+            LOGGER.info("getDuedate {}, getId {}, TimerDeclarationImpl {}", job.getDuedate(), job.getId(), timerName);
             if (timerName.equals(timerId)) {
                 LOGGER.info("--- DATA FINE PROCEDURA: {}, getId: {}, timerName: {}", job.getDuedate(), job.getId(), timerName);
+                selectedTimerJob.add(0, job);
+                LOGGER.info("--- selectedTimerJob.size(): {} ", selectedTimerJob.size());
+
             }
         }
-
-
-        return timerJobs;
+        return selectedTimerJob;
     }
     
     
