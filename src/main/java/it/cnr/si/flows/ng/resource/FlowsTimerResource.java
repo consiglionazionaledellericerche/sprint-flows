@@ -55,11 +55,23 @@ public class FlowsTimerResource {
     @Inject
     private RestResponseFactory restResponseFactory;
     
-    @RequestMapping(value = "/{processId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/timer/{processId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId, @flowsUserDetailsService)")
     @Timed
-    public ResponseEntity<DataResponse> getTimer(@PathVariable("processId") String processInstanceId) throws IOException, ParseException {
-    	String timerId = "x";
+    public ResponseEntity<DataResponse> getProcessTimers(@PathVariable("processId") String processInstanceId) throws IOException, ParseException {
+        List<Job> timerList = gestioneTimerService.getTimers(processInstanceId);
+        LOGGER.info("timerList.size(): " + timerList.size());
+        DataResponse response = new DataResponse();
+        response.setSize(timerList.size());// numero di timer restituiti
+        response.setData(restResponseFactory.createJobResponseList(timerList));
+        return ResponseEntity.ok(response);
+    }
+    
+    @RequestMapping(value = "/timer/{processId}/{timerId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId, @flowsUserDetailsService)")
+    @Timed
+    public ResponseEntity<DataResponse> getProcessSingleTimer(@PathVariable("processId") String processInstanceId,
+            @PathVariable("timerId") String timerId) throws IOException, ParseException {
 
         List<Job> timerList = gestioneTimerService.getTimer(processInstanceId, timerId);
         LOGGER.info("timerList.size(): " + timerList.size());
