@@ -81,4 +81,33 @@ public class FlowsTimerResource {
         return ResponseEntity.ok(response);
     }
     
+    @RequestMapping(value = "/timer/setTimerValuesFromNow", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId, @flowsUserDetailsService)")
+    @Timed
+    public ResponseEntity<DataResponse> setTimerValuesFromNow(
+            HttpServletRequest req,
+            @RequestParam("processInstanceId") String processInstanceId,
+            @RequestParam("timerId") String timerId,
+            @RequestParam("yearAddValue") int yearAddValue,
+            @RequestParam("monthAddValue") int monthAddValue,
+            @RequestParam("dayAddValue") int dayAddValue,
+            @RequestParam("hourAddValue") int hourAddValue,
+            @RequestParam("minuteAddValue") int minuteAddValue) {
+    	
+        DataResponse response = new DataResponse();
+        
+        try {
+			gestioneTimerService.setTimerValuesFromNow(processInstanceId, timerId, yearAddValue, monthAddValue, dayAddValue, hourAddValue, minuteAddValue);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+        return ResponseEntity.ok(response);
+    }
+
+    
 }
