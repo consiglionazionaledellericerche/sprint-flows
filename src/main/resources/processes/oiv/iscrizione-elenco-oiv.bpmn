@@ -215,12 +215,26 @@
     </boundaryEvent>
     <sequenceFlow id="flow65" sourceRef="boundarytimer3" targetRef="scadenza-tempi-procedurali"></sequenceFlow>
     <scriptTask id="scadenza-tempi-procedurali" name="SCADENZA TEMPI PROCEDURALI" scriptFormat="javascript" activiti:autoStoreVariables="false">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[scadenza-tempi-procedurali-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
       <script>execution.setVariable('istruttoriaInevasa', true);
 			</script>
     </scriptTask>
     <endEvent id="endevent11" name="End"></endEvent>
     <sequenceFlow id="flow82" name="END" sourceRef="valutazione-domande" targetRef="endevent11"></sequenceFlow>
     <scriptTask id="avviso-scadenza-tempi-procedurali" name="AVVISO SCADENZA TEMPI PROCEDURALI" scriptFormat="javascript" activiti:autoStoreVariables="false">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[avviso-scadenza-tempi-procedurali-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
       <script>execution.setVariable('avvisoIstruttoriaInevasa', true);
 			</script>
     </scriptTask>
@@ -359,7 +373,7 @@
         <omgdi:waypoint x="563.0" y="491.0"></omgdi:waypoint>
         <omgdi:waypoint x="583.0" y="491.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="550.0" y="459.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="39.0" x="550.0" y="459.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow83" id="BPMNEdge_flow83">
@@ -379,7 +393,7 @@
         <omgdi:waypoint x="600.0" y="248.0"></omgdi:waypoint>
         <omgdi:waypoint x="600.0" y="300.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="540.0" y="286.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="49.0" x="540.0" y="286.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow88" id="BPMNEdge_flow88">
