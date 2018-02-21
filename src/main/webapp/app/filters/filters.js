@@ -54,5 +54,12 @@
       return p ? '<span class="label ' + p.cssClass + '">' + p.label + '</b>' : '';
     };
   })
+  .filter('inTable', function() {
+    return function(columns){
+        return columns.filter(function (el) {
+                return el.inTable
+            });
+    };
+  })
 
 })();
