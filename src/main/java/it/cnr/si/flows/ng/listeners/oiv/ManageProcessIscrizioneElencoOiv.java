@@ -2,7 +2,7 @@ package it.cnr.si.flows.ng.listeners.oiv;
 
 import it.cnr.si.flows.ng.listeners.oiv.service.CalcolaPunteggioFascia;
 import it.cnr.si.flows.ng.listeners.oiv.service.DeterminaAttore;
-import it.cnr.si.flows.ng.listeners.oiv.service.GestioneTimer;
+import it.cnr.si.flows.ng.listeners.oiv.service.DeterminaTimer;
 import it.cnr.si.flows.ng.listeners.oiv.service.ManageSceltaUtente;
 import it.cnr.si.flows.ng.listeners.oiv.service.StartOivSetGroupsAndVisibility;
 
@@ -22,7 +22,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ManageProcessIscrizioneElencoOiv.class);
 
 	@Inject
-	private GestioneTimer determinaTimer;
+	private DeterminaTimer determinaTimer;
 	@Inject
 	private CalcolaPunteggioFascia calcolaPunteggioFascia;
 	@Inject
@@ -122,9 +122,21 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
 			execution.setVariable("statoFinaleDomanda", "RESPINTA");
 		};break;
+		case "avviso-scadenza-tempi-procedurali-start":  {
+			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
+			execution.setVariable("tempiProcedimentaliDomanda", "IN SCADENZA");
+		};break;           
+		case "scadenza-tempi-procedurali-start":  {
+			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
+			execution.setVariable("tempiProcedimentaliDomanda", "SCADUTI");
+		};break;
 		default:  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
 		};break;    
+		
+		
+		
+		
 		} 
 		// Codice per gestire le Scelte
 		manageSceltaUtente.azioneScelta(execution, faseEsecuzioneValue, sceltaUtente);
