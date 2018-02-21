@@ -1,0 +1,10 @@
+<div class="modal-header">
+    <h4>Esperienze</h4>
+    <div class="task-history">
+        <div ng-repeat="column in vm.columns">
+            <h5>
+                <b>{{column.label}}:</b> {{vm.experience[column.field]}}
+            </h5>
+        </div>
+    </div>
+</div>
