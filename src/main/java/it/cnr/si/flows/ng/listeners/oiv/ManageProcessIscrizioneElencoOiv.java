@@ -122,9 +122,21 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
 			execution.setVariable("statoFinaleDomanda", "RESPINTA");
 		};break;
+		case "avviso-scadenza-tempi-procedurali-start":  {
+			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
+			execution.setVariable("tempiProcedimentaliDomanda", "IN SCADENZA");
+		};break;           
+		case "scadenza-tempi-procedurali-start":  {
+			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
+			execution.setVariable("tempiProcedimentaliDomanda", "SCADUTI");
+		};break;
 		default:  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
 		};break;    
+		
+		
+		
+		
 		} 
 		// Codice per gestire le Scelte
 		manageSceltaUtente.azioneScelta(execution, faseEsecuzioneValue, sceltaUtente);

@@ -4,7 +4,7 @@ package it.cnr.si.flows.ng.resource;
 import com.codahale.metrics.annotation.Timed;
 
 import it.cnr.si.domain.Membership;
-import it.cnr.si.flows.ng.dto.Timer;
+import it.cnr.si.flows.ng.dto.TimerSettings;
 import it.cnr.si.flows.ng.listeners.oiv.service.GestioneTimerService;
 import it.cnr.si.flows.ng.resource.FlowsUserResource.SearchResult;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
@@ -88,9 +88,9 @@ public class FlowsTimerResource {
     @RequestMapping(value = "/timer/setTimerValuesFromNow", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId, @flowsUserDetailsService)")
     @Timed
-    public  ResponseEntity<Timer> setTimerValuesFromNow(
+    public  ResponseEntity<TimerSettings> setTimerValuesFromNow(
             //HttpServletRequest req,
-            @RequestBody Timer timer) {
+            @RequestBody TimerSettings timer) {
 
 
         DataResponse response = new DataResponse();

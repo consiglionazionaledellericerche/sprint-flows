@@ -14,7 +14,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "timer")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-public class Timer implements Serializable {
+public class TimerSettings implements Serializable {
 
     private static final long serialVersionUID = 1L;
     
@@ -62,7 +62,7 @@ public class Timer implements Serializable {
         return processInstanceId;
     }
 
-    public Timer processInstanceId(String processInstanceId) {
+    public TimerSettings processInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
         return this;
     }
@@ -75,7 +75,7 @@ public class Timer implements Serializable {
         return timerId;
     }
 
-    public Timer timerId(String timerId) {
+    public TimerSettings timerId(String timerId) {
         this.timerId = timerId;
         return this;
     }
@@ -88,7 +88,7 @@ public class Timer implements Serializable {
         return yearAddValue;
     }
 
-    public Timer yearAddValue(int yearAddValue) {
+    public TimerSettings yearAddValue(int yearAddValue) {
         this.yearAddValue = yearAddValue;
         return this;
     }
@@ -102,7 +102,7 @@ public class Timer implements Serializable {
         return yearAddValue;
     }
 
-    public Timer monthAddValue(int monthAddValue) {
+    public TimerSettings monthAddValue(int monthAddValue) {
         this.monthAddValue = monthAddValue;
         return this;
     }
@@ -115,7 +115,7 @@ public class Timer implements Serializable {
         return dayAddValue;
     }
 
-    public Timer dayAddValue(int dayAddValue) {
+    public TimerSettings dayAddValue(int dayAddValue) {
         this.dayAddValue = dayAddValue;
         return this;
     }
@@ -128,7 +128,7 @@ public class Timer implements Serializable {
         return hourAddValue;
     }
 
-    public Timer hourAddValue(int hourAddValue) {
+    public TimerSettings hourAddValue(int hourAddValue) {
         this.hourAddValue = hourAddValue;
         return this;
     }
@@ -141,7 +141,7 @@ public class Timer implements Serializable {
         return minuteAddValue;
     }
 
-    public Timer minuteAddValue(int minuteAddValue) {
+    public TimerSettings minuteAddValue(int minuteAddValue) {
         this.minuteAddValue = minuteAddValue;
         return this;
     }
