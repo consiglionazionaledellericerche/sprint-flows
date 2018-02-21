@@ -2,7 +2,7 @@ package it.cnr.si.flows.ng.listeners.oiv;
 
 import it.cnr.si.flows.ng.listeners.oiv.service.CalcolaPunteggioFascia;
 import it.cnr.si.flows.ng.listeners.oiv.service.DeterminaAttore;
-import it.cnr.si.flows.ng.listeners.oiv.service.GestioneTimer;
+import it.cnr.si.flows.ng.listeners.oiv.service.DeterminaTimer;
 import it.cnr.si.flows.ng.listeners.oiv.service.ManageSceltaUtente;
 import it.cnr.si.flows.ng.listeners.oiv.service.StartOivSetGroupsAndVisibility;
 
@@ -22,7 +22,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ManageProcessIscrizioneElencoOiv.class);
 
 	@Inject
-	private GestioneTimer determinaTimer;
+	private DeterminaTimer determinaTimer;
 	@Inject
 	private CalcolaPunteggioFascia calcolaPunteggioFascia;
 	@Inject
