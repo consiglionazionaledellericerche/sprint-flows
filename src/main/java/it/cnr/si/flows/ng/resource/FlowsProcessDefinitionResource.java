@@ -5,7 +5,6 @@ import it.cnr.si.security.AuthoritiesConstants;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.repository.DeploymentBuilder;
 import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.repository.ProcessDefinitionResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,9 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -38,29 +39,20 @@ public class FlowsProcessDefinitionResource {
     @RequestMapping(value = "/all", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
-    // TODO refactor, non usiamo DataResponse di Activity, ma e' meglio ResponseEntity di Spring (o direttamente un oggetto)
-    // Inoltre abbiamo bisogno sia di un getAllProcessDefinitions sia di un "GetAllProcessDefinitionsAvviaibiliDaMe"
-    // -> splittare il metedo
-    public DataResponse getAllProcessDefinitions() {
+    public ResponseEntity<Map<String, List<ProcessDefinitionResponse>>> getAllProcessDefinitions() {
 
-        List<ProcessDefinition> listraw = repositoryService.createProcessDefinitionQuery().latestVersion().list();
-        listraw = listraw.stream().filter(d -> canStartProcesByDefinitionKey(d.getKey())).collect(Collectors.toList());
+        Map<String, List<ProcessDefinitionResponse>> result = new HashMap<>();
+        //lista di TUTTE le Process Definition
+        List<ProcessDefinition> list = repositoryService.createProcessDefinitionQuery().latestVersion().list();
+        List<ProcessDefinitionResponse> responseList = restResponseFactory.createProcessDefinitionResponseList(list);
+        result.put("all", responseList);
 
-        // Get result and set pagination parameters
-        List<ProcessDefinitionResponse> list = restResponseFactory.createProcessDefinitionResponseList(listraw);
-        DataResponse response = new DataResponse();
-        response.setStart(0);
-        response.setSize(list.size());
-        response.setTotal(list.size());
-        response.setData(list);
-        return response;
-    }
+        //lista delle Process Definition che l'utente loggato può avviare
+        List<ProcessDefinition> listBootable = list.stream().filter(d -> canStartProcesByDefinitionKey(d.getKey())).collect(Collectors.toList());
+        List<ProcessDefinitionResponse> responseListBootable = restResponseFactory.createProcessDefinitionResponseList(listBootable);
+        result.put("bootable", responseListBootable);
 
-    public boolean canStartProcesByDefinitionKey(String definitionKey) {
-
-        Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-        return authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") ||
-                a.getAuthority().startsWith("ROLE_abilitati#" + definitionKey + "@"));
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
 
@@ -73,11 +65,12 @@ public class FlowsProcessDefinitionResource {
 
         if (definitionraw != null) {
             ProcessDefinitionResponse definition = restResponseFactory.createProcessDefinitionResponse(definitionraw);
-            return new ResponseEntity<ProcessDefinitionResponse>(definition, HttpStatus.OK);
+            return new ResponseEntity<>(definition, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
 
     @RequestMapping(value = "/send", method = RequestMethod.POST)
     @Secured(AuthoritiesConstants.ADMIN)
@@ -92,4 +85,11 @@ public class FlowsProcessDefinitionResource {
 
     }
 
+
+    public boolean canStartProcesByDefinitionKey(String definitionKey) {
+
+        Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        return authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") ||
+                a.getAuthority().startsWith("ROLE_abilitati#" + definitionKey + "@"));
+    }
 }
