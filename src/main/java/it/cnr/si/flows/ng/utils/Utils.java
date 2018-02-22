@@ -5,19 +5,13 @@ import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.impl.util.json.JSONArray;
 import org.activiti.engine.impl.util.json.JSONObject;
 import org.activiti.engine.query.Query;
-import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskInfoQuery;
-import org.activiti.rest.common.api.DataResponse;
-import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
-import org.activiti.rest.service.api.runtime.task.TaskResponse;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -39,9 +33,9 @@ public final class Utils {
     public static final String TASK_EXECUTOR = "esecutore";
     public static final String PROCESS_VISUALIZER = "visualizzatore";
 
-    public static final String TASK_PARAMS = "taskParams";
-    public static final String PROCESS_PARAMS = "processParams";
-    public static final String ERRORE_NELLA_LETTURE_DELLO_STREAM_DELLA_REQUEST = "Errore nella letture dello stream della request";
+    private static final String TASK_PARAMS = "taskParams";
+    private static final String PROCESS_PARAMS = "processParams";
+    private static final String ERRORE_NELLA_LETTURE_DELLO_STREAM_DELLA_REQUEST = "Errore nella letture dello stream della request";
     public static final String ASC = "ASC";
     public static final String DESC = "DESC";
     public static final String ALL_PROCESS_INSTANCES = "all";
@@ -51,10 +45,8 @@ public final class Utils {
     private static final String TEXT_EQUAL = "textEqual";
     private static final String BOOLEAN = "boolean";
     private static final String ROLE = "ROLE_";
-    @Autowired
-    private static RestResponseFactory restResponseFactory;
-    public static DateFormat formatoData = new SimpleDateFormat("yyyy-MM-dd");
-    public static DateFormat formatoDataOra = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);
+    private DateFormat formatoData = new SimpleDateFormat("yyyy-MM-dd");
+    private DateFormat formatoDataOra = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);
 
     @Inject
     private Environment env;
@@ -67,18 +59,6 @@ public final class Utils {
         return !isEmpty(in);
     }
 
-    //    todo: rifattorizzare metodi in FlowsProcessDefinitionsResource, FlowsProcessInstanceResource, FlowsTaskResource
-    public static ResponseEntity<DataResponse> getDataResponseResponseEntity(List<Task> listraw) {
-        List<TaskResponse> list = restResponseFactory.createTaskResponseList(listraw);
-
-        DataResponse response = new DataResponse();
-        response.setStart(0);
-        response.setSize(list.size());
-        response.setTotal(list.size());
-        response.setData(list);
-
-        return ResponseEntity.ok(response);
-    }
 
     public static String replaceStruttura(String groupRelationship, String struttura) {
         return groupRelationship.replace("@STRUTTURA", struttura);
@@ -137,15 +117,15 @@ public final class Utils {
         return ret;
     }
 
-    public static String formattaDataOra(Date in) {
+    public String formattaDataOra(Date in) {
         return formatoDataOra.format(in);
     }
 
-    public static String formattaData(Date in) {
+    public String formattaData(Date in) {
         return formatoData.format(in);
     }
 
-    public static Date parsaData(String in) throws ParseException {
+    public Date parsaData(String in) throws ParseException {
         return formatoData.parse(in);
     }
 

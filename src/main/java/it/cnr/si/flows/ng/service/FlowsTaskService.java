@@ -165,10 +165,10 @@ public class FlowsTaskService {
 
 			try {
 				if (key.equals("taskCompletedGreat")) {
-					taskQuery.taskCompletedAfter(formatoData.parse(typevalue));
+					taskQuery.taskCompletedAfter(utils.parsaData(typevalue));
 				}
 				if (key.equals("taskCompletedLess")) {
-					taskQuery.taskCompletedBefore(formatoData.parse(typevalue));
+					taskQuery.taskCompletedBefore(utils.parsaData(typevalue));
 				}
 			} catch (ParseException e) {
 				LOGGER.error(ERRORE_NEL_PARSING_DELLA_DATA, typevalue, e);
@@ -189,20 +189,20 @@ public class FlowsTaskService {
 
 					//wildcard ("%") di default ma non a TUTTI i campi
 					switch (type) {
-					case "textEqual":
-						taskQuery.taskVariableValueEquals(key, value);
-						break;
-					case "boolean":
-						// gestione variabili booleane
-						taskQuery.taskVariableValueEquals(key, Boolean.valueOf(value));
-						break;
-					case "date":
-						processDate(taskQuery, key, value);
-						break;
-					default:
-						//variabili con la wildcard  (%value%)
-						taskQuery.taskVariableValueLikeIgnoreCase(key, "%" + value + "%");
-						break;
+						case "textEqual":
+							taskQuery.taskVariableValueEquals(key, value);
+							break;
+						case "boolean":
+							// gestione variabili booleane
+							taskQuery.taskVariableValueEquals(key, Boolean.valueOf(value));
+							break;
+						case "date":
+							processDate(taskQuery, key, value);
+							break;
+						default:
+							//variabili con la wildcard  (%value%)
+							taskQuery.taskVariableValueLikeIgnoreCase(key, "%" + value + "%");
+							break;
 					}
 				}
 			}
@@ -211,7 +211,7 @@ public class FlowsTaskService {
 
 	private HistoricTaskInstanceQuery processDate(HistoricTaskInstanceQuery taskQuery, String key, String value) {
 		try {
-			Date date = parsaData(value);
+			Date date = utils.parsaData(value);
 
 			if (key.contains(LESS)) {
 				taskQuery.taskVariableValueLessThanOrEqual(key.replace(LESS, ""), date);
@@ -227,9 +227,9 @@ public class FlowsTaskService {
 		String username = SecurityUtils.getCurrentUserLogin();
 		List<String> authorities =
 				SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-				.map(GrantedAuthority::getAuthority)
-				.map(Utils::removeLeadingRole)
-				.collect(Collectors.toList());
+						.map(GrantedAuthority::getAuthority)
+						.map(Utils::removeLeadingRole)
+						.collect(Collectors.toList());
 
 		TaskQuery taskQuery = taskService.createTaskQuery()
 				.taskCandidateUser(username)
@@ -273,7 +273,7 @@ public class FlowsTaskService {
 			result.addAll(restResponseFactory.createTaskResponseList(taskQuery.taskAssignee(user).list()));
 
 		List<TaskResponse> responseList = result.subList(firstResult <= result.size() ? firstResult : result.size(),
-				maxResults <= result.size() ? maxResults : result.size());
+														 maxResults <= result.size() ? maxResults : result.size());
 		DataResponse response = new DataResponse();
 		response.setStart(firstResult);
 		response.setSize(responseList.size());
@@ -417,8 +417,8 @@ public class FlowsTaskService {
 			isUnclaimableVariable.setName("isReleasable");
 			// if has candidate groups or users -> can release
 			isUnclaimableVariable.setValue(taskService.getIdentityLinksForTask(task.getId())
-					.stream()
-					.anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
+												   .stream()
+												   .anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
 			task.getVariables().add(isUnclaimableVariable);
 		}
 	}
