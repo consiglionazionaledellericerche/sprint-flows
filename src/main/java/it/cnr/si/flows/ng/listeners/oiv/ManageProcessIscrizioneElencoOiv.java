@@ -2,7 +2,7 @@ package it.cnr.si.flows.ng.listeners.oiv;
 
 import it.cnr.si.flows.ng.listeners.oiv.service.CalcolaPunteggioFascia;
 import it.cnr.si.flows.ng.listeners.oiv.service.DeterminaAttore;
-import it.cnr.si.flows.ng.listeners.oiv.service.DeterminaTimer;
+import it.cnr.si.flows.ng.listeners.oiv.service.OperazioniTimer;
 import it.cnr.si.flows.ng.listeners.oiv.service.ManageSceltaUtente;
 import it.cnr.si.flows.ng.listeners.oiv.service.StartOivSetGroupsAndVisibility;
 
@@ -22,7 +22,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ManageProcessIscrizioneElencoOiv.class);
 
 	@Inject
-	private DeterminaTimer determinaTimer;
+	private OperazioniTimer operazioniTimer;
 	@Inject
 	private CalcolaPunteggioFascia calcolaPunteggioFascia;
 	@Inject
@@ -32,6 +32,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 	@Inject
 	private DeterminaAttore determinaAttore;
 
+	
 	private Expression faseEsecuzione;
 
 	@Override
@@ -61,15 +62,19 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 		};break;     
 		case "istruttoria-end": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
-			determinaTimer.getTimer(execution, "boundarytimer3");
+			operazioniTimer.determinaTimerScadenzaTermini(execution, "boundarytimer3");
 			calcolaPunteggioFascia.calcolaAggiornaGiudizioFinale(execution, aggiornaGiudizioFinale);
 			determinaAttore.determinaIstruttore(execution);
 		};break;  
 		case "soccorso-istruttorio-start":  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
+			//Sospendo i timer di scadenza tempi proderumantali (boundarytimer3) e avviso di scadenza tempi proderumantali (boundarytimer6)
+			operazioniTimer.sospendiTimerTempiProceduramentali(execution, "boundarytimer3", "boundarytimer6");
 		};break;    
 		case "soccorso-istruttorio-end":  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
+			//Riprendo i timer di scadenza tempi proderumantali (boundarytimer3) e avviso di scadenza tempi proderumantali (boundarytimer6)
+			operazioniTimer.riprendiTimerTempiProceduramentali(execution, "boundarytimer3", "boundarytimer6");
 		};break;    
 		case "cambio-istruttore-start":  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
@@ -86,9 +91,17 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 		};break;        
 		case "preavviso-rigetto-start":  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
+			// Estende  il timer di scadenza tempi proderumantali (boundarytimer3) a 1 anno
+			operazioniTimer.setTimerScadenzaTermini(execution, "boundarytimer3", 1, 0, 0, 0, 0);
+			// Estende  il timer di avviso scadenza tempi proderumantali (boundarytimer6) a 25 giorni
+			operazioniTimer.setTimerScadenzaTermini(execution, "boundarytimer6", 1, 0, 0, 0, 0);
 		};break;    
 		case "preavviso-rigetto-end":  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
+			// Estende  il timer di scadenza tempi proderumantali (boundarytimer3) a 30 giorni
+			operazioniTimer.setTimerScadenzaTermini(execution, "boundarytimer3", 0, 30, 0, 0, 0);
+			// Estende  il timer di avviso scadenza tempi proderumantali (boundarytimer6) a 25 giorni
+			operazioniTimer.setTimerScadenzaTermini(execution, "boundarytimer6", 0, 25, 0, 0, 0);
 		};break;        
 		case "istruttoria-su-preavviso-start":  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);

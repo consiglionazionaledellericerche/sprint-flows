@@ -41,7 +41,7 @@ public class CalcolaPunteggioFascia {
 		for (int i = 0 ; i < valutazioni.length(); i++) {
 			JSONObject obj = valutazioni.getJSONObject(i);
 			if (obj.has("giudizioFinaleIstruttore")){
-				if(aggiornaGiudizioFinale){
+				if((aggiornaGiudizioFinale) && obj.has("giudizioFinale")){
 					obj.put("giudizioFinale", obj.getString("giudizioFinaleIstruttore"));
 					LOGGER.info("-- aggiorno giudizioFinale: " + obj.getString("giudizioFinale") + " con giudizioFinaleIstruttore: " + obj.getString("giudizioFinaleIstruttore"));
 				}
