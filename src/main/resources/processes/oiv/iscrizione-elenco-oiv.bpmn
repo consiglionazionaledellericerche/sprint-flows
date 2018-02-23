@@ -8,7 +8,6 @@
         </activiti:field>
       </activiti:executionListener>
     </extensionElements>
-    <sequenceFlow id="flow47" sourceRef="boundarytimer2" targetRef="valutazione"></sequenceFlow>
     <subProcess id="valutazione-domande" name="VALUTAZIONE DOMANDE">
       <startEvent id="startevent1" name="Start"></startEvent>
       <sequenceFlow id="flow10" sourceRef="startevent1" targetRef="istruttoria"></sequenceFlow>
@@ -43,6 +42,13 @@
       </userTask>
       <sequenceFlow id="flow32" sourceRef="soccorso-istruttorio" targetRef="istruttoria"></sequenceFlow>
       <boundaryEvent id="boundarytimer2" name="Timer" attachedToRef="soccorso-istruttorio" cancelActivity="true">
+        <extensionElements>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[scadenza-tempi-soccorso-istruttorio]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
         <timerEventDefinition>
           <timeDuration>P30D</timeDuration>
         </timerEventDefinition>
@@ -143,6 +149,13 @@
         </extensionElements>
       </endEvent>
       <boundaryEvent id="boundarytimer5" name="Timer" attachedToRef="preavviso-rigetto" cancelActivity="true">
+        <extensionElements>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[scadenza-tempi-preavviso-rigetto]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
         <timerEventDefinition>
           <timeDuration>P10D</timeDuration>
         </timerEventDefinition>
@@ -205,6 +218,7 @@
       <sequenceFlow id="flow100" sourceRef="exclusivegateway1" targetRef="cambio-istruttore">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'richiesto_cambio_istruttore'}]]></conditionExpression>
       </sequenceFlow>
+      <sequenceFlow id="flow101" sourceRef="boundarytimer2" targetRef="valutazione"></sequenceFlow>
     </subProcess>
     <startEvent id="startevent2" name="Start"></startEvent>
     <sequenceFlow id="flow48" name="START" sourceRef="startevent2" targetRef="valutazione-domande"></sequenceFlow>
@@ -260,7 +274,7 @@
         <omgdc:Bounds height="67.0" width="121.0" x="150.0" y="215.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="boundarytimer2" id="BPMNShape_boundarytimer2">
-        <omgdc:Bounds height="30.0" width="30.0" x="257.0" y="235.0"></omgdc:Bounds>
+        <omgdc:Bounds height="30.0" width="30.0" x="250.0" y="235.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
         <omgdc:Bounds height="40.0" width="40.0" x="353.0" y="136.0"></omgdc:Bounds>
@@ -322,10 +336,6 @@
       <bpmndi:BPMNShape bpmnElement="avviso-scadenza-tempi-procedurali" id="BPMNShape_avviso-scadenza-tempi-procedurali">
         <omgdc:Bounds height="85.0" width="105.0" x="700.0" y="115.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge bpmnElement="flow47" id="BPMNEdge_flow47">
-        <omgdi:waypoint x="287.0" y="250.0"></omgdi:waypoint>
-        <omgdi:waypoint x="308.0" y="248.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
         <omgdi:waypoint x="120.0" y="156.0"></omgdi:waypoint>
         <omgdi:waypoint x="158.0" y="156.0"></omgdi:waypoint>
@@ -441,6 +451,10 @@
       <bpmndi:BPMNEdge bpmnElement="flow100" id="BPMNEdge_flow100">
         <omgdi:waypoint x="373.0" y="136.0"></omgdi:waypoint>
         <omgdi:waypoint x="374.0" y="106.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow101" id="BPMNEdge_flow101">
+        <omgdi:waypoint x="280.0" y="250.0"></omgdi:waypoint>
+        <omgdi:waypoint x="308.0" y="248.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow48" id="BPMNEdge_flow48">
         <omgdi:waypoint x="44.0" y="280.0"></omgdi:waypoint>
