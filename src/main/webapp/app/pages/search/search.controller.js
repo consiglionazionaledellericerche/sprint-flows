@@ -5,9 +5,9 @@
 		.module('sprintApp')
 		.controller('SearchController', SearchController);
 
-	SearchController.$inject = ['$scope', '$rootScope', '$state', 'dataService', 'AlertService', 'paginationConstants', 'utils', 'workflowTypesDirective', '$log', '$location'];
+	SearchController.$inject = ['$scope', '$rootScope', '$state', 'dataService', 'AlertService', 'paginationConstants', 'utils', '$log', '$location'];
 
-	function SearchController($scope, $rootScope, $state, dataService, AlertService, paginationConstants, utils, workflowTypesDirective, $log, $location) {
+	function SearchController($scope, $rootScope, $state, dataService, AlertService, paginationConstants, utils, $log, $location) {
 		var vm = this;
 
 		vm.searchParams = $location.search();
@@ -24,12 +24,11 @@
 		};
                  
 		$scope.search = function() {
-			
+		    //carico le form di ricerca specifiche per ogni tipologia di Process Definitions
+		    $scope.formUrl = utils.loadSearchFields(vm.searchParams.processDefinitionKey, vm.searchParams.isTaskQuery);
+
 			vm.results = [];
 			vm.loading = true;
-			
-			if (vm.searchParams.processDefinitionKey === null)
-				vm.searchParams.processDefinitionKey = undefined;
 			
 			$log.info(vm.searchParams)
 			
@@ -60,6 +59,8 @@
 			cleanParams.processDefinitionKey = vm.searchParams.processDefinitionKey;
 			
 			vm.searchParams = cleanParams;
+            //lancia la ricerca se cambio il tipo di ricerca (Process Instances /Tasks)
+			$scope.search();
 		}
 
 		$scope.exportCsv = function() {
@@ -88,20 +89,6 @@
 					});
 			}
 		};
-
-        $scope.$watchGroup(['vm.searchParams.processDefinitionKey'], function(newVal) {
-        	
-            if (vm.searchParams.processDefinitionKey) {
-                if(vm.searchParams.isTaskQuery) {
-                    $scope.formUrl = 'api/forms/'+ vm.searchParams.processDefinitionKey + '/1/search-ti';
-                } else {
-                    $scope.formUrl = 'api/forms/'+ vm.searchParams.processDefinitionKey + '/1/search-pi';
-                }
-            } else
-                $scope.formUrl = undefined;
-            
-            $scope.search();
-         });
 		
 		$scope.search();
 	}

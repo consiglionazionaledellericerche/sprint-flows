@@ -35,6 +35,7 @@ public class FlowsPdfResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsPdfResource.class);
     private static final String VALUTAZIONE_ESPERIENZE_JSON = "valutazioneEsperienze_json";
+    public static final String BYTES = "bytes";
     @Inject
     private FlowsPdfService pdfService;
     @Inject
@@ -99,7 +100,7 @@ public class FlowsPdfResource {
                 .includeProcessVariables()
                 .processInstanceId(processInstanceId)
                 .singleResult();
-        JSONObject processvariables = mappingValutazioniEsperienze(historicProcessInstance.getProcessVariables());
+        JSONObject processvariables = mappingVariables(historicProcessInstance.getProcessVariables());
         //creo il pdf corrispondente
         String utenteRichiedente = processvariables.getString("nomeRichiedente");
         String fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
@@ -115,13 +116,28 @@ public class FlowsPdfResource {
         return resp;
     }
 
-    private JSONObject mappingValutazioniEsperienze(Map<String, Object> processVariables) {
+    private JSONObject mappingVariables(Map<String, Object> processVariables) {
         JSONObject variables = new JSONObject(processVariables);
 
+        //refactoring della stringona contenete le esperienze in un jsonArray
         if (variables.has(VALUTAZIONE_ESPERIENZE_JSON)) {
             JSONArray esperienze = new JSONArray(variables.getString(VALUTAZIONE_ESPERIENZE_JSON));
             variables.put(VALUTAZIONE_ESPERIENZE_JSON, esperienze);
         }
+
+        //tolgo, nel json, i campi "byte" dei documenti
+        if (variables.has("domanda"))
+            variables.getJSONObject("domanda").remove(BYTES);
+
+        if (variables.has("cv"))
+            variables.getJSONObject("cv").remove(BYTES);
+
+        if (variables.has("cartaIdentita"))
+            variables.getJSONObject("cartaIdentita").remove(BYTES);
+        //i bytes degli altri allegati continuano ad apparire nel json ma non posso verificarli tutti
+        if (variables.has("allegati[0]"))
+            variables.getJSONObject("allegati[0]").remove(BYTES);
+
         return variables;
     }
 }
