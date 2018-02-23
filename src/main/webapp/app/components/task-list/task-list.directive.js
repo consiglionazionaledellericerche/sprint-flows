@@ -15,10 +15,9 @@
             },
             templateUrl: 'app/components/task-list/task-list.html',
             link: function (scope, element, attrs) {
-
                 scope.actionButtons = attrs.actionButtons;
 
-                scope.completed = attrs.completed;
+                scope.completed = (attrs.completed == 'true');
 
                 scope.pooled = [];
 

@@ -2,12 +2,14 @@ package it.cnr.si.flows.ng.resource;
 
 import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.TestServices;
+import it.cnr.si.flows.ng.utils.Utils;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,8 +18,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.*;
 
@@ -38,6 +43,8 @@ public class FlowsSearchResourceTest {
     @Inject
     private TestServices util;
     @Inject
+    private Utils utils;
+    @Inject
     private FlowsProcessInstanceResource flowsProcessInstanceResource;
     @Inject
     private FlowsTaskResource flowsTaskResource;
@@ -45,15 +52,20 @@ public class FlowsSearchResourceTest {
     private FlowsSearchResource flowsSearchResource;
 
     private ProcessInstanceResponse processInstance;
-    private static int processDeleted = 0;
+
+
+    @Before
+    public void setUp() {
+        HttpServletRequest mockRequest = new MockHttpServletRequest();
+        ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(mockRequest);
+        RequestContextHolder.setRequestAttributes(servletRequestAttributes);
+    }
 
 
     @After
     public void tearDown() {
-        processDeleted = processDeleted + util.myTearDown();
+        util.myTearDown();
     }
-
-
 
 
     @Test
@@ -71,8 +83,8 @@ public class FlowsSearchResourceTest {
 
         requestParams.put("oggetto", "textEqual="+ TITOLO_DELL_ISTANZA_DEL_FLUSSO);
         requestParams.put(initiator.name(), "text="+ TestServices.getRA());
-        requestParams.put(startDate + "Great", "date="+ formattaData(yesterday));
-        requestParams.put(startDate + "Less", "date="+ formattaData(tomorrow));
+        requestParams.put(startDate + "Great", "date=" + utils.formattaData(yesterday));
+        requestParams.put(startDate + "Less", "date=" + utils.formattaData(tomorrow));
         requestParams.put("processDefinitionKey", util.getProcessDefinition().split(":")[0]);
         requestParams.put("order", ASC);
         requestParams.put("active", "true");
@@ -93,7 +105,7 @@ public class FlowsSearchResourceTest {
         requestParams.put("active", "false");
         requestParams.put("order", DESC);
         response = flowsSearchResource.search(requestParams);
-        verifySearchResponse(response, processDeleted + 3 + 1, processDeleted + 3 + 1);
+        verifySearchResponse(response, 1, 1);
 
         /*
          * VERIFICA GESTIONE DELLE AUTHORITIES TODO
@@ -269,7 +281,7 @@ public class FlowsSearchResourceTest {
         String content = "{\"processParams\":" +
                 "[{\"key\":\"" + oggetto + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
                 "{\"key\":\"initiator\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}," +
-                "{\"key\":\"" + startDate + "Great\",\"value\":\"" + formattaData(new Date()) + "\",\"type\":\"date\"}]}";
+                "{\"key\":\"" + startDate + "Great\",\"value\":\"" + utils.formattaData(new Date()) + "\",\"type\":\"date\"}]}";
         request.setContent(content.getBytes());
         response = flowsProcessInstanceResource.getProcessInstances(request, true, ALL_PROCESS_INSTANCES, 0, 100, ASC);
         ArrayList<HistoricProcessInstanceResponse> entities = (ArrayList<HistoricProcessInstanceResponse>) response.getBody().getData();
@@ -280,7 +292,7 @@ public class FlowsSearchResourceTest {
         content = "{\"processParams\":" +
                 "[{\"key\":" + oggetto + ",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "AAAAAAAAA" + "\",\"type\":\"text\"}," +
                 "{\"key\":" + initiator + ",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}," +
-                "{\"key\":" + startDate + "Great,\"value\":\"" + formattaData(new Date()) + "\",\"type\":\"date\"}]}";
+                "{\"key\":" + startDate + "Great,\"value\":\"" + utils.formattaData(new Date()) + "\",\"type\":\"date\"}]}";
         request.setContent(content.getBytes());
         response = flowsProcessInstanceResource.getProcessInstances(request, true, ALL_PROCESS_INSTANCES, 0, 100, ASC);
         entities = (ArrayList<HistoricProcessInstanceResponse>) response.getBody().getData();
@@ -291,7 +303,7 @@ public class FlowsSearchResourceTest {
         content = "{\"processParams\":" +
                 "[{\"key\":" + oggetto + ",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
                 "{\"key\":" + initiator + ",\"value\":\"" + TestServices.getRA() + "AAA" + "\",\"type\":\"textEqual\"}," +
-                "{\"key\":" + startDate + "Great,\"value\":\"" + formattaData(new Date()) + "\",\"type\":\"date\"}]}";
+                "{\"key\":" + startDate + "Great,\"value\":\"" + utils.formattaData(new Date()) + "\",\"type\":\"date\"}]}";
         request.setContent(content.getBytes());
         response = flowsProcessInstanceResource.getProcessInstances(request, true, ALL_PROCESS_INSTANCES, 0, 100, ASC);
         entities = (ArrayList<HistoricProcessInstanceResponse>) response.getBody().getData();

@@ -102,7 +102,13 @@ public class Enum {
 
     public enum PdfType {
         rigetto,
-        preavvisoRigetto;
+        rigettoRuolo,
+        rigettoDopoPreavviso,
+        rigettoDopo10Giorni,
+        preavvisoRigetto,
+        preavvisoRigettoDocenza,
+        preavvisoRigettoDef10Giorni,
+        preavvisoRigettoCambioFascia;
 
         PdfType() {
         }
