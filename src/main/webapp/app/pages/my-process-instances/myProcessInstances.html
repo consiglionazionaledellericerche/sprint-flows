@@ -60,7 +60,7 @@
                             <ui-select-match placeholder="Seleziona la tipologia di flusso" allow-clear="true">
                                 {{$select.selected.name}}
                             </ui-select-match>
-                            <ui-select-choices repeat="processDefinition.key as processDefinition in wfDefsAll">
+                            <ui-select-choices repeat="processDefinition.key as processDefinition in wfDefsBootable">
                                 <span ng-bind-html="processDefinition.name"></span>
                             </ui-select-choices>
                         </ui-select>
