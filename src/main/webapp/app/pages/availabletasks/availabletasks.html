@@ -61,26 +61,24 @@
             <br>
             <br>
             <h4>Tipologie</h4>
-            <workflow-types process-definitions="wfDefsAll" filters="false"></workflow-types>
-            <br>
-            <br>
-            <div class="ng-scope" style="">
-                <strong class="ng-binding">Parole Chiavi nel Titolo</strong>
+            <div id="tipologieDiv">
                 <div>
-                    <input type="text" id="searchField-oggetto" class="form-control">
+                    <div class="dropdown md-menu-origin">
+                        <ui-select ng-model="vm.processDefinitionKey" title="Tipologie"
+                                   on-select="loadMyTasks()">
+                            <ui-select-match placeholder="Seleziona la tipologia di flusso" allow-clear="true">
+                                {{$select.selected.name}}
+                            </ui-select-match>
+                            <ui-select-choices repeat="processDefinition.key as processDefinition in wfDefsAll">
+                                <span ng-bind-html="processDefinition.name"></span>
+                            </ui-select-choices>
+                        </ui-select>
+                    </div>
                 </div>
             </div>
-            <div class="ng-scope" style="">
-                <strong class="ng-binding">Parole Chiavi nella Fase</strong>
-                <div>
-                    <input id="searchField-Fase" class="form-control">
-                </div>
-            </div>
-            <div class="ng-scope" style="">
-                <strong class="ng-binding">Utente che ha avviato il flusso</strong>
-                <div>
-                    <input id="searchField-initiator" type="textEqual" class="form-control">
-                </div>
+            <br>
+            <div>
+                <ng-include id="searchFields" src="formUrl"></ng-include>
             </div>
             <br>
             <div>
@@ -89,59 +87,68 @@
         </div>
 
         <div class="col-sm-9">
-          <div ng-show="vm.activeContent == 'myTasks'">
-            <h3>
+            <div ng-show="vm.activeContent == 'myTasks'">
+                <h3>
               <span class="label label-primary" class="assegnatiAMe">
                 <i class="glyphicon glyphicon-inbox"></i>
                 Lista dei compiti assegnati a me
               </span>
-            </h3>
-            <task-list tasks="vm.myTasks.data" action-buttons="true"></task-list>
+                </h3>
+                <task-list tasks="vm.myTasks.data"
+                           action-buttons="true"
+                           completed="false">
+                </task-list>
 
-            <!--paginazione myTasks-->
-            <div class="text-center">
-              <jhi-item-count page="vm.myPage" total="vm.myQueryCount"
-                              items-per-page="vm.itemsPerPage"></jhi-item-count>
-              <uib-pagination class="pagination-sm" total-items="vm.myTotalItems" ng-model="vm.myPage"
-                              ng-change="vm.transition()"></uib-pagination>
+                <!--paginazione myTasks-->
+                <div class="text-center">
+                    <jhi-item-count page="vm.myPage" total="vm.myQueryCount"
+                                    items-per-page="vm.itemsPerPage"></jhi-item-count>
+                    <uib-pagination class="pagination-sm" total-items="vm.myTotalItems" ng-model="vm.myPage"
+                                    ng-change="vm.transition()"></uib-pagination>
+                </div>
             </div>
-          </div>
 
-          <div ng-show="vm.activeContent == 'availables'">
-            <h3>
+            <div ng-show="vm.activeContent == 'availables'">
+                <h3>
               <span class="label label-info" ng-class="label-info">
                 <i class="glyphicon glyphicon-user"></i>
                 Lista dei compiti di gruppo da prendere in carico
               </span>
-            </h3>
-            <task-list tasks="vm.availableTasks.data" action-buttons="true"></task-list>
+                </h3>
+                <task-list tasks="vm.availableTasks.data"
+                           action-buttons="true"
+                           completed="false">
+                </task-list>
 
-            <!--paginazione availabletasks-->
-            <div class="text-center">
-              <jhi-item-count page="vm.availablePage" total="vm.availableQueryCount"
-                              items-per-page="vm.itemsPerPage"></jhi-item-count>
-              <uib-pagination class="pagination-sm" total-items="vm.availableTotalItems" ng-model="vm.availablePage"
-                                ng-change="vm.transition()"></uib-pagination>
+                <!--paginazione availabletasks-->
+                <div class="text-center">
+                    <jhi-item-count page="vm.availablePage" total="vm.availableQueryCount"
+                                    items-per-page="vm.itemsPerPage"></jhi-item-count>
+                    <uib-pagination class="pagination-sm" total-items="vm.availableTotalItems"
+                                    ng-model="vm.availablePage"
+                                    ng-change="vm.transition()"></uib-pagination>
+                </div>
             </div>
-          </div>
 
-          <div ng-show="vm.activeContent == 'taskAssignedInMyGroups'">
-            <h3>
+            <div ng-show="vm.activeContent == 'taskAssignedInMyGroups'">
+                <h3>
               <span class="label label-info" ng-class="label-info">
                 <i class="glyphicon glyphicon-user"></i>
                 Lista dei compiti di gruppo presi in carico da altri
               </span>
-            </h3>
-            <task-list tasks="vm.taskAssignedInMyGroups.data"></task-list>
+                </h3>
+                <task-list tasks="vm.taskAssignedInMyGroups.data"
+                           completed="false">
+                </task-list>
 
-            <!--paginazione availabletasks-->
-            <div class="text-center">
-              <jhi-item-count page="vm.TAIMGPage" total="vm.TAIMGQueryCount"
-                              items-per-page="vm.itemsPerPage"></jhi-item-count>
-              <uib-pagination class="pagination-sm" total-items="vm.TAIMGTotalItems" ng-model="vm.TAIMGPage"
-                                ng-change="vm.transition()"></uib-pagination>
+                <!--paginazione availabletasks-->
+                <div class="text-center">
+                    <jhi-item-count page="vm.TAIMGPage" total="vm.TAIMGQueryCount"
+                                    items-per-page="vm.itemsPerPage"></jhi-item-count>
+                    <uib-pagination class="pagination-sm" total-items="vm.TAIMGTotalItems" ng-model="vm.TAIMGPage"
+                                    ng-change="vm.transition()"></uib-pagination>
+                </div>
             </div>
-          </div>
 
         </div>
 

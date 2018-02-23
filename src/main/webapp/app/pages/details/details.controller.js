@@ -13,8 +13,6 @@
         vm.taskId = $state.params.taskId;
         $scope.processInstanceId = $state.params.processInstanceId; // mi torna comodo per gli attachments -martin
 
-
-
         if ($state.params.processInstanceId) {
             dataService.processInstances.byProcessInstanceId($state.params.processInstanceId).then(
                 function(response) {
@@ -28,6 +26,7 @@
 
                     var processDefinitionKey = response.data.entity.processDefinitionId.split(":")[0];
                     vm.detailsView = 'api/views/' + processDefinitionKey + '/detail';
+                    vm.experiences = jQuery.parseJSON(vm.data.entity.variabili.valutazioneEsperienze_json);
                     vm.data.history.forEach(function(el) {
                         //recupero l'ultimo task (quello ancora da eseguire)
                         if (el.historyTask.endTime === null) {
@@ -71,7 +70,7 @@
 
                 }
             })
-        }
+        };
 
 
         $scope.history = function(tasks, startTask) {
@@ -89,6 +88,6 @@
                     }
                 }
             })
-        }
+        };
     }
 })();

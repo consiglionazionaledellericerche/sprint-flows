@@ -1,13 +1,7 @@
 package it.cnr.si.flows.ng.service;
 
-import static org.junit.Assert.*;
-
-import java.io.FileReader;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
-import org.activiti.engine.delegate.BpmnError;
+import it.cnr.jada.firma.arss.ArubaSignServiceException;
+import it.cnr.si.FlowsApp;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,9 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import it.cnr.jada.firma.arss.ArubaSignServiceException;
-import it.cnr.si.FlowsApp;
-import it.cnr.si.flows.ng.listeners.FirmaDocumento;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+import static org.junit.Assert.fail;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -32,19 +28,19 @@ public class FirmaServiceTest {
     
     @Ignore // TODO non e' chiaro se lasciare le credenziali di test su git
     @Test
-    public void testFirma() throws ArubaSignServiceException, IOException {
+    public void testFirma() throws IOException {
         
 
         String username = "";
         String password = "";
         String otp = "";
         String textMessage = "";
-        
-        byte[] bytes = Files.readAllBytes(Paths.get("./src/test/resources/summary-test/summaryCreato.pdf"));
+
+        byte[] bytes = Files.readAllBytes(Paths.get("./src/test/resources/pdf-test/summaryCreato.pdf"));
         
         try {
             byte[] bytesfirmati = firmaService.firma(username, password, otp, bytes);
-            Files.write(Paths.get("./src/test/resources/summary-test/summaryFirmato.pdf"), bytesfirmati);
+            Files.write(Paths.get("./src/test/resources/pdf-test/summaryFirmato.pdf"), bytesfirmati);
             
         } catch (ArubaSignServiceException e) {
             LOGGER.error("firma non riuscita", e);

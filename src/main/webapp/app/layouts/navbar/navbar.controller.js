@@ -8,7 +8,7 @@
     NavbarController.$inject = ['$rootScope', '$scope', '$state', 'Auth', 'Principal', 'ProfileService', 'LoginService', 'SwitchUserService', 'dataService', '$log'];
 
     function NavbarController($rootScope, $scope, $state, Auth, Principal, ProfileService, LoginService, SwitchUserService, dataService, $log) {
-        var vm = this, appo = true;
+        var vm = this;
 
         vm.isNavbarCollapsed = true;
         vm.isAuthenticated = Principal.isAuthenticated;
@@ -45,7 +45,8 @@
             collapseNavbar();
             Auth.logout();
             $state.go('home');
-            $rootScope.wfDefs = []; // TODO la logica e' che gli oggetti non vanno svuotati qui
+            $rootScope.wfDefsBootable = []; // TODO la logica e' che gli oggetti non vanno svuotati qui
+            $rootScope.wfDefsAll = []; // TODO la logica e' che gli oggetti non vanno svuotati qui
         }
 
         function toggleNavbar() {
@@ -66,9 +67,14 @@
 
             dataService.definitions.all()
                 .then(function(response) {
-                    $rootScope.wfDefs = response.data.data;
-                    $rootScope.wfDefsAll = [];
-                    $rootScope.wfDefsAll.push.apply($rootScope.wfDefsAll, response.data.data);
+                    //lista delle Process Definition che l'utente può avviare
+                    $rootScope.wfDefsBootable = response.data.bootable;
+                    $rootScope.wfDefsBootable.push({
+                        key: "all",
+                        name: "ALL"
+                    });
+                    //lista di TUTTE le Process Definition
+                    $rootScope.wfDefsAll = response.data.all;
                     $rootScope.wfDefsAll.push({
                         key: "all",
                         name: "ALL"

@@ -136,9 +136,6 @@
 			definitions : {
 				all : function() {
 					return $http.get('api/processDefinitions/all');
-				},
-				get: function(id) {
-					return $http.get('api/processDefinitions/', id);
 				}
 			},
 			dynamiclist : {

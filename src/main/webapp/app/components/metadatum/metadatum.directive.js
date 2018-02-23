@@ -4,9 +4,9 @@
   angular.module('sprintApp')
   .directive('metadatum', metadatum);
 
-  metadatum.$inject = ['dataService', '$log'];
+  metadatum.$inject = ['dataService', '$uibModal', '$log'];
 
-  function metadatum(dataService, $log) {
+  function metadatum(dataService, $uibModal, $log) {
 
     return {
       restrict: 'E',
@@ -16,16 +16,19 @@
         value: '@',
         type: '@?',
         columns: '=?',
-        rows: '=?'
+        rows: '=?',
+        details: '@'
       },
       link: function ($scope, element, attrs) {
 
         $scope.type = $scope.type || "text";
         $scope.attrs = attrs;
 
+
         if ($scope.type === 'table') {
-          if ($scope.columns === undefined)
-            throw "Per metadati 'table' e' necessario fornire l'attributo 'columns'";
+            $scope.details = attrs.details;
+            if ($scope.columns === undefined)
+                throw "Per metadati 'table' e' necessario fornire l'attributo 'columns'";
 
 
           $scope.$watch('rows', function(newValue) {
@@ -33,6 +36,23 @@
               $scope.righe = JSON.parse(newValue);
           });
 
+
+          $scope.experience = function(experience, columns) {
+              $uibModal.open({
+                  templateUrl: 'app/components/metadatum/detailsMetadatum.modal.html',
+                  controller: 'DetailsMetadatumModalController',
+                  controllerAs: 'vm',
+                  size: 'md',
+                  resolve: {
+                      experience: function() {
+                          return experience;
+                      },
+                      columns: function() {
+                          return columns;
+                      }
+                  }
+              })
+          };
         }
       }
     }
