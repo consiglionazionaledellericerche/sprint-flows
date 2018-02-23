@@ -11,8 +11,10 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResource;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -198,7 +200,15 @@ public class TestServices {
                 req.setParameter("valutazioneEsperienze[0][tipologiaEsperienza]", "Tipologia 2");
                 req.setParameter("valutazioneEsperienze[0][ambitoEsperienza]", "Ambito 2");
                 req.setParameter("valutazioneEsperienze[0][attivitaSvolta]", "Attività Svolta 2");
-
+                //aggiungo i file alla request
+                req.addFile(new MockMultipartFile("domanda", "domanda.pdf", MediaType.APPLICATION_PDF.getType(),
+                                                  this.getClass().getResourceAsStream("/pdf-test/domanda.pdf")));
+                req.addFile(new MockMultipartFile("cartaIdentita", "cartaIdentita.pdf", MediaType.APPLICATION_PDF.getType(),
+                                                  this.getClass().getResourceAsStream("/pdf-test/cartaIdentita.pdf")));
+                req.addFile(new MockMultipartFile("cv", "cv.pdf", MediaType.APPLICATION_PDF.getType(),
+                                                  this.getClass().getResourceAsStream("/pdf-test/cv.pdf")));
+                req.addFile(new MockMultipartFile("__new__allegati[0]", "allegato.pdf", MediaType.APPLICATION_PDF.getType(),
+                                                  this.getClass().getResourceAsStream("/pdf-test/allegato.pdf")));
                 req.setParameter("oggetto", "titolo");
                 req.setParameter("descrizione", "descrizione");
                 req.setParameter("nomeRichiedente", "utenteRichiedente");
@@ -232,7 +242,7 @@ public class TestServices {
 
     public File makeFile(ByteArrayOutputStream outputStream, String title) throws IOException {
         //metto il contenuto dell'outputStream in un summary fisico'
-        File pdf = new File("./src/test/resources/summary-test/" + title);
+        File pdf = new File("./src/test/resources/pdf-test/" + title);
 
         FileOutputStream fop = new FileOutputStream(pdf);
         byte[] byteArray = outputStream.toByteArray();
