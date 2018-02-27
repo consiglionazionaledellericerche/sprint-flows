@@ -60,7 +60,11 @@ public class ManageSceltaUtente {
 				if(sceltaUtente.equals("genera_PDF_rigetto")) {
 					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 					execution.setVariable("pdfRigettoFlag", "1");
-					createOivPdf.CreaPdfOiv(execution, rigetto.name());
+					if(((execution.getVariable("tempiPreavvisoRigetto")  != null) && (execution.getVariable("tempiPreavvisoRigetto").toString().equals("SCADUTI")))){
+						createOivPdf.CreaPdfOiv(execution, RigettoDef10Giorni.name());
+					} else {
+						createOivPdf.CreaPdfOiv(execution, rigetto.name());
+					}
 				}
 			};break;
 			default:  {

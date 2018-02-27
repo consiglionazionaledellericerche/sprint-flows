@@ -1,7 +1,7 @@
 {
 	"info": {
-		"name": "FLOWS TEST - OIV - Soccorso Istruttorio",
-		"_postman_id": "1c09aa97-9dd6-3aed-0650-bc73a1577bcd",
+		"name": "FLOWS TEST - OIV - Preavviso di rigetto",
+		"_postman_id": "17c41b34-035c-62ae-482b-30bf021d0db8",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -115,15 +115,15 @@
 			"response": []
 		},
 		{
-			"name": "SPRINT_FLOWS - OIV - Soccorso Istruttorio",
+			"name": "SPRINT_FLOWS - OIV - Preavviso di Rigetto",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "b0d6f234-0233-4839-b2ed-02ee34744f7b",
+						"id": "d29a1d90-306f-435f-90af-8b2d9e737570",
 						"type": "text/javascript",
 						"exec": [
-							"postman.setGlobalVariable(\"TASK_ID\", \"5335\");",
+							"postman.setGlobalVariable(\"TASK_ID\", \"5498\");",
 							""
 						]
 					}
@@ -173,43 +173,19 @@
 							"type": "text"
 						},
 						{
-							"key": "dataComunicazioneSoccorsoIstruttorio",
-							"value": "2018-02-05T23:00:00.000Z",
-							"description": "",
-							"type": "text"
-						},
-						{
-							"key": "dataInvioSoccorsoIstruttorio",
-							"value": "2018-02-07T23:00:00.000Z",
-							"description": "",
-							"type": "text"
-						},
-						{
-							"key": "punteggioEsperienzeProposto",
-							"value": "1212",
-							"description": "",
-							"type": "text"
-						},
-						{
-							"key": "fasciaAppartenenzaProposta",
-							"value": "2",
+							"key": "osservazioniRichiedente",
+							"value": "Le mie osservazioni sono in merito al punto 1 e 4",
 							"description": "",
 							"type": "text"
 						},
 						{
 							"key": "commento",
-							"value": "bah",
+							"value": "2018-02-07T23:00:00.000Z",
 							"description": "",
 							"type": "text"
 						},
 						{
-							"key": "valutazioneEsperienze_json",
-							"value": "[{\"numeroEsperienza\":1,\"dataInizio\":\"2017-12-31T23:00:00.000Z\",\"dataFine\":\"2018-02-10T23:00:00.000Z\",\"tipologiaEsperienza\":\"esperienza 1\",\"ambitoEsperienza\":\"agraria\",\"attivitaSvolta\":\"dirigente\",\"annotazioniValutatore\":\"8556\",\"oggettoDiSoccorso\":\"SI\",\"motivazioneSoccorso\":\"5745\",\"giudizioFinale\":\"OK\"},{\"numeroEsperienza\":2,\"dataInizio\":\"2018-01-28T23:00:00.000Z\",\"dataFine\":\"2018-02-15T23:00:00.000Z\",\"tipologiaEsperienza\":\"esperienza 2 versione2\",\"ambitoEsperienza\":\"pubblico  versione2\",\"attivitaSvolta\":\"impiegato versione2\",\"annotazioniValutatore\":\"566i\",\"giudizioFinale\":\"OK\",\"oggettoDiSoccorso\":\"SI\",\"motivazioneSoccorso\":\"67\"},{\"numeroEsperienza\":3,\"dataInizio\":\"2018-02-04T23:00:00.000Z\",\"dataFine\":\"2018-02-08T23:00:00.000Z\",\"tipologiaEsperienza\":\"esperienza 3 versione2\",\"ambitoEsperienza\":\"settore privato versione2\",\"attivitaSvolta\":\"direttore versione2\",\"annotazioniValutatore\":\"758\",\"oggettoDiSoccorso\":\"SI\",\"motivazioneSoccorso\":\"ytr\",\"giudizioFinale\":\"KO\"},{\"numeroEsperienza\":4,\"dataInizio\":\"2011-02-15T23:00:00.000Z\",\"dataFine\":\"2016-02-22T23:00:00.000Z\",\"tipologiaEsperienza\":\"nuova esperienza post soccorso\",\"ambitoEsperienza\":\"professionale\",\"attivitaSvolta\":\"dirigente\"}]",
-							"description": "",
-							"type": "text"
-						},
-						{
-							"key": "allegati[0]",
+							"key": "allegati[1]",
 							"value": "",
 							"description": "",
 							"type": "file"
