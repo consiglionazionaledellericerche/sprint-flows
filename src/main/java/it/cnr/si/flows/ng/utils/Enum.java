@@ -105,6 +105,7 @@ public class Enum {
         rigettoRuolo,
         rigettoDopoPreavviso,
         rigettoDopo10Giorni,
+        RigettoDef10Giorni,
         preavvisoRigetto,
         preavvisoRigettoDocenza,
         preavvisoRigettoDef10Giorni,
