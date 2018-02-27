@@ -339,7 +339,7 @@ public class FlowsTaskService {
 					org.json.JSONObject name = new org.json.JSONObject();
 					//                    name.put(idStruttura.name(), idStrutturaString);
 					name.put(title.name(), data.get(title.name()));
-					name.put(oggetto.name(), data.get(oggetto.name()));
+					name.put(titolo.name(), data.get(titolo.name()));
 					name.put(descrizione.name(), data.get(descrizione.name()));
 					name.put(initiator.name(), data.get(initiator.name()));
 					runtimeService.setProcessInstanceName(instance.getId(), name.toString());
