@@ -32,7 +32,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 	@Inject
 	private DeterminaAttore determinaAttore;
 
-	
+
 	private Expression faseEsecuzione;
 
 	@Override
@@ -45,7 +45,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 		if(execution.getVariable("sceltaUtente") != null) {
 			sceltaUtente =  (String) execution.getVariable("sceltaUtente");	
 		}
-		
+
 		LOGGER.info("ProcessInstanceId: " + processInstanceId);
 		String faseEsecuzioneValue = "noValue";
 		boolean aggiornaGiudizioFinale = true;
@@ -58,7 +58,11 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 		};break;    
 		case "istruttoria-start": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
-			calcolaPunteggioFascia.calcolaAggiornaGiudizioFinale(execution, nonAggiornaGiudizioFinale);
+			if((execution.getVariable("soccorsoIstruttoriaFlag") != null) && (execution.getVariable("soccorsoIstruttoriaFlag").toString().equals("1"))) {
+				calcolaPunteggioFascia.calcolaAggiornaGiudizioFinale(execution, aggiornaGiudizioFinale);
+			} else {
+				calcolaPunteggioFascia.calcolaAggiornaGiudizioFinale(execution, nonAggiornaGiudizioFinale);
+			}
 		};break;     
 		case "istruttoria-end": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
@@ -154,10 +158,10 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 		default:  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
 		};break;    
-		
-		
-		
-		
+
+
+
+
 		} 
 		// Codice per gestire le Scelte
 		manageSceltaUtente.azioneScelta(execution, faseEsecuzioneValue, sceltaUtente);
