@@ -31,6 +31,10 @@ public class ManageSceltaUtente {
 					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 					manageControlli.valutazioneEsperienze(execution);
 				}
+				if(sceltaUtente.equals("richiesta_soccorso_istruttorio")) {
+					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
+					manageControlli.verificaPuntiSoccorso(execution);
+				}
 			};break;
 			case "valutazione-end": {
 				if(sceltaUtente.equals("genera_PDF_preavviso_di_rigetto")) {
@@ -51,6 +55,10 @@ public class ManageSceltaUtente {
 					};break;    
 					}
 				}
+				if(sceltaUtente.equals("richiesta_soccorso_istruttorio")) {
+					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
+					manageControlli.verificaPuntiSoccorso(execution);
+				}
 			};break;    
 			case "soccorso-istruttorio-start": {
 				LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
@@ -63,7 +71,7 @@ public class ManageSceltaUtente {
 					if(((execution.getVariable("tempiPreavvisoRigetto")  != null) && (execution.getVariable("tempiPreavvisoRigetto").toString().equals("SCADUTI")))){
 						createOivPdf.CreaPdfOiv(execution, RigettoDef10Giorni.name());
 					} else {
-						createOivPdf.CreaPdfOiv(execution, rigetto.name());
+						createOivPdf.CreaPdfOiv(execution, rigettoMotivato.name());
 					}
 				}
 			};break;

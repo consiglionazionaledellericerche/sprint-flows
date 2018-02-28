@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="OivRigetto" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c0187353-db16-46fc-a7a4-9ece39bc4976">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.y" value="139"/>
 	<style name="Title" fontName="Times New Roman" fontSize="50" isBold="true" pdfFontName="Times-Bold"/>
 	<style name="SubTitle" forecolor="#736343" fontName="Arial" fontSize="18"/>
 	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
@@ -234,13 +234,13 @@
 	<field name="elencoAmbitiKo" class="java.lang.String">
 		<fieldDescription><![CDATA[elencoAmbitiKo]]></fieldDescription>
 	</field>
-	<group name="Group2">
+	<group name="Group2" isStartNewColumn="true" footerPosition="StackAtBottom">
 		<groupExpression><![CDATA[(int)($V{REPORT_COUNT}/5)]]></groupExpression>
 		<groupHeader>
-			<band height="283" splitType="Stretch">
+			<band height="236" splitType="Stretch">
 				<textField isStretchWithOverflow="true">
-					<reportElement style="Detail" x="35" y="6" width="505" height="272" uuid="7ac903fa-55d2-4e21-a610-fa7dda8d3df3"/>
-					<textElement>
+					<reportElement style="Detail" x="35" y="6" width="505" height="228" uuid="7ac903fa-55d2-4e21-a610-fa7dda8d3df3"/>
+					<textElement textAlignment="Justified">
 						<font fontName="SansSerif" size="11" isBold="false"/>
 						<paragraph lineSpacing="1_1_2"/>
 					</textElement>
@@ -250,7 +250,7 @@
 			<band height="140" splitType="Stretch">
 				<textField isStretchWithOverflow="true">
 					<reportElement x="37" y="5" width="505" height="132" uuid="637f807b-c116-4153-ae82-a5a70ac9adf0"/>
-					<textElement>
+					<textElement textAlignment="Justified">
 						<font size="11"/>
 						<paragraph lineSpacing="1_1_2"/>
 					</textElement>
@@ -260,7 +260,7 @@
 			<band height="60" splitType="Stretch">
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 					<reportElement positionType="Float" x="34" y="4" width="505" height="56" isRemoveLineWhenBlank="true" uuid="217a73b7-12c4-46db-9f98-dcc4ab6fa73a"/>
-					<textElement>
+					<textElement textAlignment="Justified">
 						<font size="11"/>
 						<paragraph lineSpacing="1_1_2"/>
 					</textElement>
@@ -270,7 +270,7 @@
 			<band height="60" splitType="Stretch">
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 					<reportElement positionType="Float" x="34" y="4" width="505" height="56" isRemoveLineWhenBlank="true" uuid="d1bb2e86-50a3-4984-b2a7-f7f02c43dea7"/>
-					<textElement>
+					<textElement textAlignment="Justified">
 						<font size="11"/>
 						<paragraph lineSpacing="1_1_2"/>
 					</textElement>
@@ -280,7 +280,7 @@
 			<band height="60" splitType="Stretch">
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 					<reportElement positionType="Float" x="34" y="4" width="505" height="56" isRemoveLineWhenBlank="true" uuid="b32f0ce4-628c-465f-92b5-1190a0b4dbf4"/>
-					<textElement>
+					<textElement textAlignment="Justified">
 						<font size="11"/>
 						<paragraph lineSpacing="1_1_2"/>
 					</textElement>
@@ -290,7 +290,7 @@
 			<band height="60" splitType="Stretch">
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 					<reportElement positionType="Float" x="34" y="4" width="505" height="56" isRemoveLineWhenBlank="true" uuid="32602fa2-fb10-488e-aaa7-ac335be9ebd5"/>
-					<textElement>
+					<textElement textAlignment="Justified">
 						<font size="11"/>
 						<paragraph lineSpacing="1_1_2"/>
 					</textElement>
@@ -300,7 +300,7 @@
 			<band height="60" splitType="Stretch">
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 					<reportElement positionType="Float" x="34" y="4" width="505" height="56" isRemoveLineWhenBlank="true" uuid="e546ac5c-2012-4ad8-9928-664d6bfc4ecf"/>
-					<textElement>
+					<textElement textAlignment="Justified">
 						<font size="11"/>
 						<paragraph lineSpacing="1_1_2"/>
 					</textElement>
@@ -309,25 +309,13 @@
 			</band>
 		</groupHeader>
 		<groupFooter>
-			<band/>
-			<band height="154" splitType="Stretch">
+			<band height="24">
 				<textField isStretchWithOverflow="true">
-					<reportElement x="34" y="6" width="505" height="136" uuid="d7b7e47d-30b0-40ae-8f62-33489ba02aef"/>
+					<reportElement style="Detail" positionType="FixRelativeToBottom" x="5" y="5" width="505" height="19" uuid="33f2da54-0668-4db7-ac94-d1a49ef00fb5"/>
 					<textElement>
-						<font size="11"/>
-						<paragraph lineSpacing="1_1_2"/>
+						<font fontName="SansSerif" size="11" isBold="false" isItalic="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA["\r\n\t Pertanto, alla luce di quanto dichiarato non emergono esperienze con carattere di continuità e prevalenza " +( $F{numeroAmbitiKo}.equals( "1" )  ? ("riconducibile all’ambito indicato.") : ("riconducibili agli ambiti indicati.") ) + "\r\n\t In merito alla questione sopra evidenziata, si informa la S.V. che laddove intenda fornire ulteriori elementi in ordine ai requisiti posseduti, potrà comunicarli, con la apposita funzionalità disponibile nel profilo nell’area riservata, entro 10 giorni dal ricevimento della presente.\r\n\t Tale comunicazione dovrà essere corredata da idonea documentazione comprovante il possesso dei requisiti richiesti dal citato decreto.\r\n\t In assenza di riscontro, l’Ufficio procederà al rigetto dell’istanza di iscrizione nell’Elenco.\r\n\t Per altri eventuali chiarimenti è possibile contattare </ il dott./la dott.ssa/> </ istruttore /> dalle 11.00 alle 13.00, telefono 06 6899 </interno/>."]]></textFieldExpression>
-				</textField>
-			</band>
-			<band height="62" splitType="Stretch">
-				<textField isStretchWithOverflow="true">
-					<reportElement style="Detail" x="243" y="0" width="305" height="51" uuid="2d49c6fc-7ded-4f0d-94fb-e4cc1e708646"/>
-					<textElement textAlignment="Center">
-						<font fontName="SansSerif" size="11" isBold="false"/>
-						<paragraph lineSpacing="1_1_2"/>
-					</textElement>
-					<textFieldExpression><![CDATA["per il Direttore dell’Ufficio\r\ndott.ssa Alessandra Barberi\r\n(Dirigente del Servizio per la valutazione indipendente)"]]></textFieldExpression>
+					<textFieldExpression><![CDATA["Il presente rigetto è firmato digitalmente ai sensi dell’art. 24 del D.lgs 7 marzo 2005, n. 82"]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupFooter>
@@ -370,12 +358,19 @@
 				<textFieldExpression><![CDATA[$F{emailRichiedente}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement x="35" y="193" width="505" height="40" uuid="e9825bfd-c98f-4489-83b3-1ceb9783f873"/>
-				<textElement>
+				<reportElement x="89" y="193" width="453" height="40" uuid="e9825bfd-c98f-4489-83b3-1ceb9783f873"/>
+				<textElement textAlignment="Justified">
 					<font size="11" isBold="true"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Oggetto:\tPreavviso di rigetto della domanda di iscrizione nell’Elenco nazionale \r\n\t\tdei componenti degli Organismi indipendenti di valutazione \r\n\t\tai sensi del D.M 2 dicembre 2016."]]></textFieldExpression>
+				<textFieldExpression><![CDATA["preavviso di rigetto della domanda di iscrizione nell’Elenco nazionale dei componenti degli Organismi indipendenti di valutazione ai sensi del D.M 2 dicembre 2016."]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="Detail" x="34" y="193" width="53" height="17" uuid="2b247120-dc96-41bb-8eb9-084eecc0fda8"/>
+				<textElement>
+					<font fontName="SansSerif" size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Oggetto: "]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -386,21 +381,32 @@
 		<band height="4" splitType="Stretch"/>
 	</columnHeader>
 	<detail>
-		<band splitType="Stretch"/>
+		<band height="143">
+			<textField isStretchWithOverflow="true">
+				<reportElement x="34" y="6" width="505" height="136" uuid="d7b7e47d-30b0-40ae-8f62-33489ba02aef"/>
+				<textElement textAlignment="Justified">
+					<font size="11"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["\r\n\t Pertanto, alla luce di quanto dichiarato non emergono esperienze con carattere di continuità e prevalenza " +( $F{numeroAmbitiKo}.equals( "1" )  ? ("riconducibile all’ambito indicato.") : ("riconducibili agli ambiti indicati.") ) + "\r\n\t In merito alla questione sopra evidenziata, si informa la S.V. che laddove intenda fornire ulteriori elementi in ordine ai requisiti posseduti, potrà comunicarli, con la apposita funzionalità disponibile nel profilo nell’area riservata, entro 10 giorni dal ricevimento della presente.\r\n\t Tale comunicazione dovrà essere corredata da idonea documentazione comprovante il possesso dei requisiti richiesti dal citato decreto.\r\n\t In assenza di riscontro, l’Ufficio procederà al rigetto dell’istanza di iscrizione nell’Elenco.\r\n\t Per altri eventuali chiarimenti è possibile contattare </ il dott./la dott.ssa/> </ istruttore /> dalle 11.00 alle 13.00, telefono 06 6899 </interno/>."]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="93">
+			<textField isStretchWithOverflow="true">
+				<reportElement style="Detail" x="247" y="41" width="305" height="51" uuid="2d49c6fc-7ded-4f0d-94fb-e4cc1e708646"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="11" isBold="false"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["per il Direttore dell’Ufficio\r\ndott.ssa Alessandra Barberi\r\n(Dirigente del Servizio per la valutazione indipendente)"]]></textFieldExpression>
+			</textField>
+		</band>
 	</detail>
 	<columnFooter>
 		<band splitType="Stretch"/>
 	</columnFooter>
 	<pageFooter>
-		<band height="43" splitType="Stretch">
-			<textField isStretchWithOverflow="true">
-				<reportElement style="Detail" x="1" y="16" width="505" height="19" uuid="33f2da54-0668-4db7-ac94-d1a49ef00fb5"/>
-				<textElement>
-					<font fontName="SansSerif" size="11" isBold="false" isItalic="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Il presente rigetto è firmato digitalmente ai sensi dell’art. 24 del D.lgs 7 marzo 2005, n. 82"]]></textFieldExpression>
-			</textField>
-		</band>
+		<band height="11" splitType="Stretch"/>
 	</pageFooter>
 	<summary>
 		<band splitType="Stretch"/>
