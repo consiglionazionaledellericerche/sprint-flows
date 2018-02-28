@@ -58,7 +58,7 @@
 		<groupFooter>
 			<band height="50">
 				<textField isStretchWithOverflow="true">
-					<reportElement style="Detail" x="6" y="29" width="505" height="19" uuid="33f2da54-0668-4db7-ac94-d1a49ef00fb5"/>
+					<reportElement style="Detail" x="5" y="29" width="505" height="19" uuid="33f2da54-0668-4db7-ac94-d1a49ef00fb5"/>
 					<textElement>
 						<font fontName="SansSerif" size="11" isBold="false" isItalic="true"/>
 					</textElement>

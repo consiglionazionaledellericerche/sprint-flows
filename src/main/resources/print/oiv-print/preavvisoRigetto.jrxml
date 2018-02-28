@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="OivRigetto" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c0187353-db16-46fc-a7a4-9ece39bc4976">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="139"/>
+	<property name="ireport.y" value="572"/>
 	<style name="Title" fontName="Times New Roman" fontSize="50" isBold="true" pdfFontName="Times-Bold"/>
 	<style name="SubTitle" forecolor="#736343" fontName="Arial" fontSize="18"/>
 	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
@@ -311,7 +311,7 @@
 		<groupFooter>
 			<band height="24">
 				<textField isStretchWithOverflow="true">
-					<reportElement style="Detail" positionType="FixRelativeToBottom" x="5" y="5" width="505" height="19" uuid="33f2da54-0668-4db7-ac94-d1a49ef00fb5"/>
+					<reportElement style="Detail" positionType="FixRelativeToBottom" x="4" y="5" width="505" height="19" uuid="33f2da54-0668-4db7-ac94-d1a49ef00fb5"/>
 					<textElement>
 						<font fontName="SansSerif" size="11" isBold="false" isItalic="true"/>
 					</textElement>
