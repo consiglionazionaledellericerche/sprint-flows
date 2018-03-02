@@ -28,7 +28,7 @@
                 <div>
                     <toggle-switch
                             ng-model="vm.searchParams.isTaskQuery"
-                            ng-click="vm.searchParams.processDefinitionKey = undefined; stripParams(); search()"
+                            ng-click="vm.searchParams.processDefinitionKey = undefined; stripParams()"
                             on-label="Task"
                             off-label="Flussi"
                             class="switch-large">
@@ -65,7 +65,7 @@
                     </div>
                     <br>
                     <div>
-                        <ng-include id="searchFields" src="formUrl"></ng-include>
+                        <ng-include id="searchFields" src="formUrl" onload="reload"></ng-include>
                     </div>
                 </div>
             </div>

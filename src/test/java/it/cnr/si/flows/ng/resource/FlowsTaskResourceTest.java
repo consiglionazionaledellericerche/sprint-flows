@@ -33,7 +33,7 @@ import java.util.Map;
 import static it.cnr.si.flows.ng.TestServices.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
 import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.initiator;
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.oggetto;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.titolo;
 import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
 import static it.cnr.si.flows.ng.utils.Utils.ASC;
 import static org.junit.Assert.assertEquals;
@@ -90,7 +90,7 @@ public class FlowsTaskResourceTest {
 
         MockHttpServletRequest request = new MockHttpServletRequest();
         String content = "{\"processParams\":" +
-                "[{\"key\":\"" + oggetto + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
+                "[{\"key\":\"" + titolo + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
                 "{\"key\":\"" + initiator + "\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
                 "\"taskParams\":" +
                 "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
