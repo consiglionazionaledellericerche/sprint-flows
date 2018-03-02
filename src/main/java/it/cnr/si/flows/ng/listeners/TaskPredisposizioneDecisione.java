@@ -16,7 +16,7 @@ public class TaskPredisposizioneDecisione implements ExecutionListener {
 		LOGGER.info(" - processId: " + execution.getId());
 		LOGGER.info("TaskPredisposizioneDecisione - sceltaUtente: " + execution.getVariable(nomeVariabileScelta));
 		LOGGER.info("TaskPredisposizioneDecisione - valore: " + execution.getVariable("valore"));
-        LOGGER.info("TaskPredisposizioneDecisione - oggetto: " + execution.getVariable("oggetto"));
+        LOGGER.info("TaskPredisposizioneDecisione - titolo: " + execution.getVariable("titolo"));
         LOGGER.info("TaskPredisposizioneDecisione - descrizione: " + execution.getVariable("descrizione"));
 		LOGGER.info("TaskPredisposizioneDecisione - titolo: " + execution.getVariable("titolo"));
 		LOGGER.info("TaskPredisposizioneDecisione - priorita: " + execution.getVariable("priorita"));

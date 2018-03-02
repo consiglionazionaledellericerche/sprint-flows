@@ -33,7 +33,7 @@ import java.util.List;
 
 import static it.cnr.si.flows.ng.utils.Enum.SiglaList.TIPOLOGIA_ACQUISIZIONE;
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.descrizione;
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.oggetto;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.titolo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -173,7 +173,7 @@ public class TestServices {
             case acquisti:
                 loginResponsabileAcquisti();
 
-                req.setParameter(oggetto.name(), TITOLO_DELL_ISTANZA_DEL_FLUSSO);
+                req.setParameter(titolo.name(), TITOLO_DELL_ISTANZA_DEL_FLUSSO);
                 req.setParameter(descrizione.name(), "descrizione");
                 req.setParameter(TIPOLOGIA_ACQUISIZIONE.name(), "procedura aperta");
                 req.setParameter("tipologiaAcquisizioneId", "11");
@@ -209,7 +209,7 @@ public class TestServices {
                                                   this.getClass().getResourceAsStream("/pdf-test/cv.pdf")));
                 req.addFile(new MockMultipartFile("__new__allegati[0]", "allegato.pdf", MediaType.APPLICATION_PDF.getType(),
                                                   this.getClass().getResourceAsStream("/pdf-test/allegato.pdf")));
-                req.setParameter("oggetto", "titolo");
+                req.setParameter("titolo", "titolo");
                 req.setParameter("descrizione", "descrizione");
                 req.setParameter("nomeRichiedente", "utenteRichiedente");
                 req.setParameter("dataNascitaRichiedente", "2018-01-31T23:00:00.000Z");
