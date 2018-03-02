@@ -21,11 +21,22 @@ public class ManageSceltaUtente {
 	private CreateOivPdf createOivPdf;
 	@Inject
 	private ManageControlli manageControlli;
-
+	@Inject
+	private DeterminaAttore determinaAttore;
 	public void azioneScelta(DelegateExecution execution, String faseEsecuzioneValue, String sceltaUtente) throws IOException, ParseException {
 		LOGGER.info("-- azioneScelta: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 		if (sceltaUtente != null){
 			switch(faseEsecuzioneValue){  
+			case "smistamento-end": {
+				if(sceltaUtente.equals("prendo_in_carico_la_domanda")) {
+					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
+					determinaAttore.determinaIstruttore(execution);
+				}
+				if(sceltaUtente.equals("richiesta_soccorso_istruttorio")) {
+					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
+					manageControlli.verificaPuntiSoccorso(execution);
+				}
+			};break;
 			case "istruttoria-end": {
 				if(sceltaUtente.equals("invio_valutazione")) {
 					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
