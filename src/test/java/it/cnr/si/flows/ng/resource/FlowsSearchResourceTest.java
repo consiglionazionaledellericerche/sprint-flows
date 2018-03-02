@@ -81,7 +81,7 @@ public class FlowsSearchResourceTest {
 
         Map<String, String> requestParams = new HashMap<>();
 
-        requestParams.put("oggetto", "textEqual="+ TITOLO_DELL_ISTANZA_DEL_FLUSSO);
+        requestParams.put(titolo.name(), "textEqual=" + TITOLO_DELL_ISTANZA_DEL_FLUSSO);
         requestParams.put(initiator.name(), "text="+ TestServices.getRA());
         requestParams.put(startDate + "Great", "date=" + utils.formattaData(yesterday));
         requestParams.put(startDate + "Less", "date=" + utils.formattaData(tomorrow));
@@ -101,7 +101,7 @@ public class FlowsSearchResourceTest {
         verifySearchResponse(response, 1, 1);
 
         //verifico che le Process Instance completate (active = false) siano quelle cancellate nel tearDown di questa classe (processDeleted)
-        // + 3 (quelle cancellate nei test precedenti) + 1 (quella cancellata in testGetMyProcesses (NON quella creata con oggetto diverso in testGetProcessInstances) )
+        // + 3 (quelle cancellate nei test precedenti) + 1 (quella cancellata in testGetMyProcesses (NON quella creata con titolo diverso in testGetProcessInstances) )
         requestParams.put("active", "false");
         requestParams.put("order", DESC);
         response = flowsSearchResource.search(requestParams);
@@ -110,11 +110,11 @@ public class FlowsSearchResourceTest {
         /*
          * VERIFICA GESTIONE DELLE AUTHORITIES TODO
          */
-//        verifyAuthorities(1, req, oggetto.name(), TITOLO_DELL_ISTANZA_DEL_FLUSSO, initiator.name(), 1);
+//        verifyAuthorities(1, req, titolo.name(), TITOLO_DELL_ISTANZA_DEL_FLUSSO, initiator.name(), 1);
 
 
         //parametri sbagliati (strumentoAcquisizioneId 12 invece di 11, initiator = admin invece dell'RA) ==> 0 risultati
-        requestParams.put("oggetto", "textEqual=12");
+        requestParams.put("titolo", "textEqual=12");
         requestParams.put("initiator", "text=admin");
         requestParams.put("order", ASC);
         requestParams.put("active", "true");
@@ -267,7 +267,7 @@ public class FlowsSearchResourceTest {
                 assertTrue(taskresponse.getProcessDefinitionId().contains(util.getProcessDefinition()));
                 //verifico che le Process Instance restituite dalla search rispettino i parametri della ricerca
                 org.json.JSONObject json = new org.json.JSONObject(taskresponse.getName());
-                assertEquals(TITOLO_DELL_ISTANZA_DEL_FLUSSO, json.getString(oggetto.name()));
+                assertEquals(TITOLO_DELL_ISTANZA_DEL_FLUSSO, json.getString(titolo.name()));
                 assertEquals(TestServices.getRA(), json.getString(initiator.name()));
             }
         }
@@ -279,7 +279,7 @@ public class FlowsSearchResourceTest {
 
         //prendo solo quello avviato da RA
         String content = "{\"processParams\":" +
-                "[{\"key\":\"" + oggetto + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
+                "[{\"key\":\"" + titolo + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
                 "{\"key\":\"initiator\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}," +
                 "{\"key\":\"" + startDate + "Great\",\"value\":\"" + utils.formattaData(new Date()) + "\",\"type\":\"date\"}]}";
         request.setContent(content.getBytes());
@@ -290,7 +290,7 @@ public class FlowsSearchResourceTest {
 
         //titolo flusso sbagliato
         content = "{\"processParams\":" +
-                "[{\"key\":" + oggetto + ",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "AAAAAAAAA" + "\",\"type\":\"text\"}," +
+                "[{\"key\":" + titolo + ",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "AAAAAAAAA" + "\",\"type\":\"text\"}," +
                 "{\"key\":" + initiator + ",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}," +
                 "{\"key\":" + startDate + "Great,\"value\":\"" + utils.formattaData(new Date()) + "\",\"type\":\"date\"}]}";
         request.setContent(content.getBytes());
@@ -301,7 +301,7 @@ public class FlowsSearchResourceTest {
 
         //initiator sbaliato
         content = "{\"processParams\":" +
-                "[{\"key\":" + oggetto + ",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
+                "[{\"key\":" + titolo + ",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
                 "{\"key\":" + initiator + ",\"value\":\"" + TestServices.getRA() + "AAA" + "\",\"type\":\"textEqual\"}," +
                 "{\"key\":" + startDate + "Great,\"value\":\"" + utils.formattaData(new Date()) + "\",\"type\":\"date\"}]}";
         request.setContent(content.getBytes());
@@ -312,7 +312,7 @@ public class FlowsSearchResourceTest {
 
         //STARTDATE sbaliata
         content = "{\"processParams\":" +
-                "[{\"key\":\"" + oggetto + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
+                "[{\"key\":\"" + titolo + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
                 "{\"key\":" + initiator + ",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}," +
                 "{\"key\":" + startDate + "Great,\"value\":\"" + new DateTime().plusDays(1).toString("yyyy-MM-dd") + "\",\"type\":\"date\"}]}";
         request.setContent(content.getBytes());
@@ -333,7 +333,7 @@ public class FlowsSearchResourceTest {
         //verifico che la ricerca recuperi il primo task della process instance appena avviata
         MockHttpServletRequest request = new MockHttpServletRequest();
         String content = "{\"processParams\":" +
-                "[{\"key\":\"" + oggetto + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
+                "[{\"key\":\"" + titolo + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
                 "{\"key\":\"" + initiator + "\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
                 "\"taskParams\":" +
                 "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
@@ -341,7 +341,7 @@ public class FlowsSearchResourceTest {
 
         Map<String, String> requestParams = new HashMap<>();
 
-        requestParams.put("oggetto", "textEqual="+ TITOLO_DELL_ISTANZA_DEL_FLUSSO);
+        requestParams.put("titolo", "textEqual=" + TITOLO_DELL_ISTANZA_DEL_FLUSSO);
         requestParams.put(initiator.name(), "textEqual="+ TestServices.getRA());
         requestParams.put("processDefinitionKey", ALL_PROCESS_INSTANCES);
         requestParams.put("order", ASC);
@@ -366,7 +366,7 @@ public class FlowsSearchResourceTest {
         ResponseEntity<DataResponse> response;//verifico che non prenda nessun elemento (SEARCH PARAMS SBAGLIATI)
         //titolo flusso sbagliato
         content = "{\"processParams\":" +
-                "[{\"key\":\"" + oggetto + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "AAA\",\"type\":\"text\"}," +
+                "[{\"key\":\"" + titolo + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "AAA\",\"type\":\"text\"}," +
                 "{\"key\":\"" + initiator + "\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
                 "\"taskParams\":" +
                 "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
@@ -376,7 +376,7 @@ public class FlowsSearchResourceTest {
         assertEquals(0, ((ArrayList) response.getBody().getData()).size());
         //initiator sbaliato
         content = "{\"processParams\":" +
-                "[{\"key\":\"" + oggetto + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
+                "[{\"key\":\"" + titolo + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
                 "{\"key\":\"" + initiator + "\",\"value\":\"admi\",\"type\":\"textEqual\"}]," +
                 "\"taskParams\":" +
                 "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
@@ -386,7 +386,7 @@ public class FlowsSearchResourceTest {
         assertEquals(0, ((ArrayList) response.getBody().getData()).size());
         //Fase sbaliata
         content = "{\"processParams\":" +
-                "[{\"key\":\"" + oggetto + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
+                "[{\"key\":\"" + titolo + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
                 "{\"key\":\"" + initiator + "\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
                 "\"taskParams\":" +
                 "[{\"key\":\"Fase\",\"value\":\"Verifica DecisioneEEEEE\",\"type\":null}]}";

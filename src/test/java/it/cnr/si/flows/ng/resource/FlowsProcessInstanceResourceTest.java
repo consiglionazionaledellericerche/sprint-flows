@@ -143,12 +143,12 @@ public class FlowsProcessInstanceResourceTest {
     public void testGetProcessInstances() throws IOException {
         processInstance = util.mySetUp(acquisti);
 
-        //responsabileacquisti crea una seconda Process Instance di acquisti con suffisso "2" nell'oggetto della PI
+        //responsabileacquisti crea una seconda Process Instance di acquisti con suffisso "2" nel titolo della PI
         util.loginResponsabileAcquisti();
         String acquistiTrasparenzaId = repositoryService.createProcessDefinitionQuery().processDefinitionKey(acquisti.getValue()).latestVersion().singleResult().getId();
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
         req.setParameter("processDefinitionId", acquistiTrasparenzaId);
-        req.setParameter(oggetto.name(), TITOLO_DELL_ISTANZA_DEL_FLUSSO + "2");
+        req.setParameter(titolo.name(), TITOLO_DELL_ISTANZA_DEL_FLUSSO + "2");
         req.setParameter(descrizione.name(), "descrizione" + "2");
         req.setParameter("tipologiaAcquisizione", "procedura aperta");
         req.setParameter("tipologiaAcquisizioneId", "11");
@@ -165,7 +165,7 @@ public class FlowsProcessInstanceResourceTest {
         util.loginAdmin();
         MockHttpServletRequest request = new MockHttpServletRequest();
         String content = "{\"processParams\":" +
-                "[{\"key\":" + oggetto.name() + ",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
+                "[{\"key\":" + titolo.name() + ",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
                 "{\"key\":" + startDate + "Great,\"value\":\"" + utils.formattaData(new Date()) + "\",\"type\":\"date\"}]}";
         request.setContent(content.getBytes());
 
