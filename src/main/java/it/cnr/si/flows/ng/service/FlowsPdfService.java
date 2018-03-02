@@ -91,15 +91,15 @@ public class FlowsPdfService {
         ArrayList<Map> tasksSortedList = (ArrayList<Map>) map.get("history");
         Collections.reverse(tasksSortedList);  //ordino i task rispetto alla data di creazione (in senso crescente)
 
-//      genero il titolo del pdf (la bussineskey (es: "Acquisti Trasparenza-2017-1") + oggetto (es: "acquisto pc")
+//      genero il titolo del pdf (la bussineskey (es: "Acquisti Trasparenza-2017-1") + titolo (es: "acquisto pc")
         String titolo = processInstance.getBusinessKey() + "\n";
         Optional<RestVariable> variable = variables.stream()
-                .filter(a -> (a.getName().equals(oggetto.name())))
+                .filter(a -> (a.getName().equals(Enum.VariableEnum.titolo.name())))
                 .findFirst();
         if (variable.isPresent())
             titolo += variable.get().getValue() + "\n\n";
         else {
-            // Titolo nel file pdf in caso di Workflow Definition che non ha il titolo nella variabile "oggetto"
+            // Titolo nel file pdf in caso di Workflow Definition che non ha il titolo nella variabile "titolo"
             variable = variables.stream()
                     .filter(a -> (a.getName()).equals(title.name()))
                     .findFirst();
