@@ -29,8 +29,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 	private StartOivSetGroupsAndVisibility startOivSetGroupsAndVisibility;
 	@Inject
 	private ManageSceltaUtente manageSceltaUtente;
-	@Inject
-	private DeterminaAttore determinaAttore;
+
 
 
 	private Expression faseEsecuzione;
@@ -56,6 +55,12 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
 			startOivSetGroupsAndVisibility.configuraVariabiliStart(execution);
 		};break;    
+		case "smistamento-start": {
+			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
+		};break;     
+		case "smistamento-end": {
+			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
+		};break;     
 		case "istruttoria-start": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
 			if((execution.getVariable("soccorsoIstruttoriaFlag") != null) && (execution.getVariable("soccorsoIstruttoriaFlag").toString().equals("1"))) {
@@ -68,7 +73,6 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
 			operazioniTimer.determinaTimerScadenzaTermini(execution, "boundarytimer3");
 			calcolaPunteggioFascia.calcolaAggiornaGiudizioFinale(execution, aggiornaGiudizioFinale);
-			determinaAttore.determinaIstruttore(execution);
 		};break;  
 		case "soccorso-istruttorio-start":  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
