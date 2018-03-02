@@ -5,7 +5,7 @@ import com.codahale.metrics.annotation.Timed;
 
 import it.cnr.si.domain.Membership;
 import it.cnr.si.flows.ng.dto.TimerSettings;
-import it.cnr.si.flows.ng.listeners.oiv.service.GestioneTimerService;
+import it.cnr.si.flows.ng.service.FlowsTimerService;
 import it.cnr.si.flows.ng.resource.FlowsUserResource.SearchResult;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.service.FlowsPdfService;
@@ -55,7 +55,7 @@ public class FlowsTimerResource {
 
     public static final String BYTES = "bytes";
     @Inject
-    private GestioneTimerService gestioneTimerService;
+    private FlowsTimerService flowsTimerService;
     @Inject
     private RestResponseFactory restResponseFactory;
     
@@ -63,7 +63,7 @@ public class FlowsTimerResource {
     @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Object>  getProcessTimers(@PathVariable("processId") String processInstanceId) throws IOException, ParseException {
-        List<Job> timerList = gestioneTimerService.getTimers(processInstanceId);
+        List<Job> timerList = flowsTimerService.getTimers(processInstanceId);
         LOGGER.info("timerList.size(): " + timerList.size());
         DataResponse response = new DataResponse();
         response.setSize(timerList.size());// numero di timer restituiti
@@ -77,7 +77,7 @@ public class FlowsTimerResource {
     public ResponseEntity<DataResponse> getProcessSingleTimer(@PathVariable("processId") String processInstanceId,
             @PathVariable("timerId") String timerId) throws IOException, ParseException {
 
-        List<Job> timerList = gestioneTimerService.getTimer(processInstanceId, timerId);
+        List<Job> timerList = flowsTimerService.getTimer(processInstanceId, timerId);
         LOGGER.info("timerList.size(): " + timerList.size());
         DataResponse response = new DataResponse();
         response.setSize(timerList.size());// numero di timer restituiti
@@ -96,7 +96,7 @@ public class FlowsTimerResource {
         DataResponse response = new DataResponse();
         
         try {
-			gestioneTimerService.setTimerValuesFromNow(timer.getProcessInstanceId(), timer.getTimerId(), timer.getYearAddValue(), timer.getMonthAddValue(), timer.getDayAddValue(), timer.getHourAddValue(), timer.getMinuteAddValue());
+			flowsTimerService.setTimerValuesFromNow(timer.getProcessInstanceId(), timer.getTimerId(), timer.getYearAddValue(), timer.getMonthAddValue(), timer.getDayAddValue(), timer.getHourAddValue(), timer.getMinuteAddValue());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
