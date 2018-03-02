@@ -32,7 +32,6 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.ParseException;
 import java.util.*;
 
 import static it.cnr.si.flows.ng.utils.Utils.*;
@@ -165,7 +164,6 @@ public class FlowsProcessInstanceService {
 
         Map<String, Object> result = new HashMap<>();
 
-        // processQuery.includeProcessVariables();
         long totalItems = processQuery.count();
         result.put("totalItems", totalItems);
 
@@ -185,13 +183,33 @@ public class FlowsProcessInstanceService {
 
     private void setSearchTerms(Map<String, String> params, FlowsHistoricProcessInstanceQuery processQuery) {
 
+        String title = params.remove("title");
+        String titolo = params.remove("titolo");
+        String initiator = params.remove("initiator");
+        String descrizione = params.remove("descrizione");
+
+        //i campi "titolo, "title", "initiator", "descrizione" sono salvati in un json in name e non come variabili di Process Instance
+        if (title != null || titolo != null || initiator != null || descrizione != null) {
+            String appo = "";
+            //l'ordine delle field di ricerca è importante nella query sul campo singolo "name"
+            //todo: è una porcata ma avere i campi in "name" migliora di moltissimo le prestazioni della ricerca
+            if (descrizione != null)
+                appo += "%\"descrizione\":\"%" + descrizione.substring(descrizione.indexOf('=') + 1) + "%\"%";
+            if (titolo != null)
+                appo += "%\"titolo\":\"%" + titolo.substring(titolo.indexOf('=') + 1) + "%\"%";
+            if (initiator != null)
+                appo += "%\"initiator\":\"%" + initiator.substring(initiator.indexOf('=') + 1) + "%\"%";
+            if (title != null)
+                appo += "%\"title\":\"%" + title.substring(title.indexOf('=') + 1) + "%\"%";
+
+            processQuery.processInstanceNameLikeIgnoreCase(appo);
+        }
+
         params.forEach((key, typevalue) -> {
             if (typevalue.contains("=")) {
-
                 String type = typevalue.substring(0, typevalue.indexOf('='));
                 String value = typevalue.substring(typevalue.indexOf('=')+1);
 
-                //wildcard ("%") di default ma non a TUTTI i campi
                 switch (type) {
                     case "textEqual":
                         processQuery.variableValueEquals(key, value);
@@ -200,17 +218,18 @@ public class FlowsProcessInstanceService {
                         // gestione variabili booleane
                         processQuery.variableValueEquals(key, Boolean.valueOf(value));
                         break;
-                    case "date":
-                        processDate(processQuery, key, value);
-                        break;
                     default:
                         //variabili con la wildcard  (%value%)
                         processQuery.variableValueLikeIgnoreCase(key, "%" + value + "%");
                         break;
                 }
+            } else {
+                //per <input type="date"' non funziona "input-prepend" quindi rimetto la vecchia implementazione
+                if ("startDateGreat".equals(key) || "startDateLess".equals(key)) {
+                    processDate(processQuery, key, typevalue);
+                }
             }
         });
-
     }
 
 
@@ -262,15 +281,11 @@ public class FlowsProcessInstanceService {
 
 
     private void processDate(HistoricProcessInstanceQuery processQuery, String key, String value) {
-        try {
-            Date date = utils.parsaData(value);
+        Calendar calendar = javax.xml.bind.DatatypeConverter.parseDateTime(value);
 
-            if (key.contains("Less")) {
-                processQuery.variableValueLessThanOrEqual(key.replace("Less", ""), date);
-            } else if (key.contains("Great"))
-                processQuery.variableValueGreaterThanOrEqual(key.replace("Great", ""), date);
-        } catch (ParseException e) {
-            LOGGER.error("Errore nel parsing della data {} - ", value, e);
-        }
+        if (key.contains("Less"))
+            processQuery.startedBefore(calendar.getTime());
+        else if (key.contains("Great"))
+            processQuery.startedAfter(calendar.getTime());
     }
 }
