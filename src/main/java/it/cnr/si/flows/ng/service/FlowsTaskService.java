@@ -158,35 +158,24 @@ public class FlowsTaskService {
 		return result;
 	}
 
-	// TODO questo metodo e' duplicato di uno in utils
+	// TODO questo metodo e' duplicato di uno in utils (controllare)
 	private void setSearchTerms(Map<String, String> params, HistoricTaskInstanceQuery taskQuery) {
 
 		params.forEach((key, typevalue) -> {
 
-			try {
-				if (key.equals("taskCompletedGreat")) {
-					taskQuery.taskCompletedAfter(utils.parsaData(typevalue));
-				}
-				if (key.equals("taskCompletedLess")) {
-					taskQuery.taskCompletedBefore(utils.parsaData(typevalue));
-				}
-			} catch (ParseException e) {
-				LOGGER.error(ERRORE_NEL_PARSING_DELLA_DATA, typevalue, e);
-			}
-
-			if (typevalue.contains("=")) {
-
+			if (key.equals("taskCompletedGreat"))
+				taskQuery.taskCompletedAfter(javax.xml.bind.DatatypeConverter.parseDateTime(typevalue).getTime());
+			else if (key.equals("taskCompletedLess"))
+				taskQuery.taskCompletedBefore(javax.xml.bind.DatatypeConverter.parseDateTime(typevalue).getTime());
+			else if (typevalue.contains("=")) {
 				String type = typevalue.substring(0, typevalue.indexOf('='));
 				String value = typevalue.substring(typevalue.indexOf('=')+1);
 
-				if (key.contains("initiator") || key.contains("oggetto")) {
+				if (key.contains("initiator") || key.contains("oggetto"))
 					taskQuery.processVariableValueLikeIgnoreCase(key, "%" + value + "%");
-
-				} else if (key.contains("Fase")) {
+				else if (key.contains("Fase"))
 					taskQuery.taskNameLikeIgnoreCase("%" + value + "%");
-
-				} else {
-
+				else {
 					//wildcard ("%") di default ma non a TUTTI i campi
 					switch (type) {
 						case "textEqual":
@@ -201,7 +190,8 @@ public class FlowsTaskService {
 							break;
 						default:
 							//variabili con la wildcard  (%value%)
-							taskQuery.taskVariableValueLikeIgnoreCase(key, "%" + value + "%");
+							if (!value.isEmpty())
+								taskQuery.taskVariableValueLikeIgnoreCase(key, "%" + value + "%");
 							break;
 					}
 				}
@@ -339,7 +329,7 @@ public class FlowsTaskService {
 					org.json.JSONObject name = new org.json.JSONObject();
 					//                    name.put(idStruttura.name(), idStrutturaString);
 					name.put(title.name(), data.get(title.name()));
-					name.put(oggetto.name(), data.get(oggetto.name()));
+					name.put(titolo.name(), data.get(titolo.name()));
 					name.put(descrizione.name(), data.get(descrizione.name()));
 					name.put(initiator.name(), data.get(initiator.name()));
 					runtimeService.setProcessInstanceName(instance.getId(), name.toString());
