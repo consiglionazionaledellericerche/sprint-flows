@@ -22,9 +22,11 @@ public class DeterminaAttore {
 	public void determinaIstruttore(DelegateExecution execution) throws IOException, ParseException {
 		
 		String currentName = userService.getUserWithAuthorities().getFirstName() + " " + userService.getUserWithAuthorities().getLastName();
+		String currentUsername = userService.getUserWithAuthorities().getLogin();
 
 		execution.setVariable("nomeIstruttore", currentName);
-		LOGGER.debug("--- currentName: {} ", currentName);
+		execution.setVariable("istruttoreIncaricato", currentUsername);
+		LOGGER.debug("--- nomeIstruttore: {} - istruttoreIncaricato: {}", currentName, currentUsername);
 
 	}
 

@@ -21,15 +21,30 @@ public class ManageSceltaUtente {
 	private CreateOivPdf createOivPdf;
 	@Inject
 	private ManageControlli manageControlli;
-
+	@Inject
+	private DeterminaAttore determinaAttore;
 	public void azioneScelta(DelegateExecution execution, String faseEsecuzioneValue, String sceltaUtente) throws IOException, ParseException {
 		LOGGER.info("-- azioneScelta: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 		if (sceltaUtente != null){
 			switch(faseEsecuzioneValue){  
+			case "smistamento-end": {
+				if(sceltaUtente.equals("prendo_in_carico_la_domanda")) {
+					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
+					determinaAttore.determinaIstruttore(execution);
+				}
+				if(sceltaUtente.equals("richiesta_soccorso_istruttorio")) {
+					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
+					manageControlli.verificaPuntiSoccorso(execution);
+				}
+			};break;
 			case "istruttoria-end": {
 				if(sceltaUtente.equals("invio_valutazione")) {
 					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 					manageControlli.valutazioneEsperienze(execution);
+				}
+				if(sceltaUtente.equals("richiesta_soccorso_istruttorio")) {
+					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
+					manageControlli.verificaPuntiSoccorso(execution);
 				}
 			};break;
 			case "valutazione-end": {
@@ -51,6 +66,10 @@ public class ManageSceltaUtente {
 					};break;    
 					}
 				}
+				if(sceltaUtente.equals("richiesta_soccorso_istruttorio")) {
+					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
+					manageControlli.verificaPuntiSoccorso(execution);
+				}
 			};break;    
 			case "soccorso-istruttorio-start": {
 				LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
@@ -60,7 +79,11 @@ public class ManageSceltaUtente {
 				if(sceltaUtente.equals("genera_PDF_rigetto")) {
 					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 					execution.setVariable("pdfRigettoFlag", "1");
-					createOivPdf.CreaPdfOiv(execution, rigetto.name());
+					if(((execution.getVariable("tempiPreavvisoRigetto")  != null) && (execution.getVariable("tempiPreavvisoRigetto").toString().equals("SCADUTI")))){
+						createOivPdf.CreaPdfOiv(execution, RigettoDef10Giorni.name());
+					} else {
+						createOivPdf.CreaPdfOiv(execution, rigettoMotivato.name());
+					}
 				}
 			};break;
 			default:  {

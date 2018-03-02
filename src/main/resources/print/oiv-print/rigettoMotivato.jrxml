@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="OivRigetto" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c0187353-db16-46fc-a7a4-9ece39bc4976">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="572"/>
+	<property name="ireport.y" value="384"/>
 	<style name="Title" fontName="Times New Roman" fontSize="50" isBold="true" pdfFontName="Times-Bold"/>
 	<style name="SubTitle" forecolor="#736343" fontName="Arial" fontSize="18"/>
 	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
@@ -234,22 +234,25 @@
 	<field name="elencoAmbitiKo" class="java.lang.String">
 		<fieldDescription><![CDATA[elencoAmbitiKo]]></fieldDescription>
 	</field>
+	<field name="dataInvioNuovaDomanda" class="java.lang.String">
+		<fieldDescription><![CDATA[dataInvioNuovaDomanda]]></fieldDescription>
+	</field>
 	<group name="Group2" isStartNewColumn="true" footerPosition="StackAtBottom">
 		<groupExpression><![CDATA[(int)($V{REPORT_COUNT}/5)]]></groupExpression>
 		<groupHeader>
-			<band height="236" splitType="Stretch">
+			<band height="87" splitType="Stretch">
 				<textField isStretchWithOverflow="true">
-					<reportElement style="Detail" x="35" y="6" width="505" height="228" uuid="7ac903fa-55d2-4e21-a610-fa7dda8d3df3"/>
+					<reportElement style="Detail" x="35" y="6" width="505" height="77" uuid="7ac903fa-55d2-4e21-a610-fa7dda8d3df3"/>
 					<textElement textAlignment="Justified">
 						<font fontName="SansSerif" size="11" isBold="false"/>
 						<paragraph lineSpacing="1_1_2"/>
 					</textElement>
-					<textFieldExpression><![CDATA["\t Con riferimento alla domanda di iscrizione nell’Elenco nazionale dei componenti degli Organismi indipendenti di valutazione inviata in data "+$F{dataInvioDomanda}+", si rappresenta quanto segue.\r\n\tL’art. 2 del D.M 2 dicembre 2016, nell’individuare i requisiti necessari per poter richiedere l’iscrizione al suddetto Elenco, al comma 1, lett. b), punto 2, espressamente prevede che i soggetti interessati devono \"essere in possesso di comprovata esperienza professionale di almeno cinque anni, maturata presso pubbliche amministrazioni o aziende private, nella misurazione e valutazione della performance organizzativa e individuale, nella pianificazione, nel controllo di gestione, nella programmazione finanziaria e di bilancio e nel risk management.\"\r\n\tL’art. 3, comma 2, del medesimo decreto stabilisce che l’effettiva iscrizione nell’Elenco decorre dalla comunicazione da parte di questo Dipartimento della completezza delle informazioni fornite circa la sussistenza dei requisiti di cui al citato art. 2.\r\n\tsulla base delle dichiarazioni fornite nella richiesta, "+( $F{numeroValutazioniNegative}.equals( "1" )  ? ("l’esperienza riportata nel punto: ") : ("le esperienze riportate nei punti: ") ) +" "+$F{elencoValutazioniNegative} +" della domanda, non "+( $F{numeroValutazioniNegative}.equals( "1" )  ? ("è riconducibile ") : ("sono riconducibili ") ) +"all’ambito indicato."]]></textFieldExpression>
+					<textFieldExpression><![CDATA["\tCon riferimento alla nuova versione della sua domanda di iscrizione nell’Elenco nazionale dei componenti degli Organismi indipendenti di valutazione inviata in data "+$F{dataInvioNuovaDomanda}+" a seguito del preavviso di rigetto identificato al numero "+$F{protocolloPreavviso}+" trasmesso il "+$F{dataPreavviso}+", si rappresenta quanto segue.\r\n\tAl riguardo, si precisa che, sulla base delle dichiarazioni fornite nella richiesta di iscrizione, "+( $F{numeroValutazioniNegative}.equals( "1" )  ? ("l’esperienza riportata nel punto: ") : ("le esperienze riportate nei punti: ") ) +" "+$F{elencoValutazioniNegative} +" della domanda, non "+( $F{numeroValutazioniNegative}.equals( "1" )  ? ("è riconducibile ") : ("sono riconducibili ") ) +"all’ambito indicato."]]></textFieldExpression>
 				</textField>
 			</band>
-			<band height="140" splitType="Stretch">
+			<band height="101" splitType="Stretch">
 				<textField isStretchWithOverflow="true">
-					<reportElement x="37" y="5" width="505" height="132" uuid="637f807b-c116-4153-ae82-a5a70ac9adf0"/>
+					<reportElement x="37" y="5" width="505" height="93" uuid="637f807b-c116-4153-ae82-a5a70ac9adf0"/>
 					<textElement textAlignment="Justified">
 						<font size="11"/>
 						<paragraph lineSpacing="1_1_2"/>
@@ -358,15 +361,15 @@
 				<textFieldExpression><![CDATA[$F{emailRichiedente}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement x="89" y="193" width="453" height="40" uuid="e9825bfd-c98f-4489-83b3-1ceb9783f873"/>
+				<reportElement x="107" y="193" width="433" height="40" uuid="e9825bfd-c98f-4489-83b3-1ceb9783f873"/>
 				<textElement textAlignment="Justified">
 					<font size="11" isBold="true"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<textFieldExpression><![CDATA["preavviso di rigetto della domanda di iscrizione nell’Elenco nazionale dei componenti degli Organismi indipendenti di valutazione ai sensi del D.M 2 dicembre 2016."]]></textFieldExpression>
+				<textFieldExpression><![CDATA["rigetto della domanda di iscrizione nell’Elenco nazionale dei componenti degli Organismi indipendenti di valutazione ai sensi del D.M 2 dicembre 2016."]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="Detail" x="34" y="193" width="53" height="17" uuid="2b247120-dc96-41bb-8eb9-084eecc0fda8"/>
+				<reportElement style="Detail" x="37" y="193" width="53" height="17" uuid="dd416054-cc8d-42ad-b73f-7b2d1262a798"/>
 				<textElement>
 					<font fontName="SansSerif" size="11" isBold="true"/>
 				</textElement>
@@ -388,7 +391,7 @@
 					<font size="11"/>
 					<paragraph lineSpacing="1_1_2"/>
 				</textElement>
-				<textFieldExpression><![CDATA["\r\n\t Pertanto, alla luce di quanto dichiarato non emergono esperienze con carattere di continuità e prevalenza " +( $F{numeroAmbitiKo}.equals( "1" )  ? ("riconducibile all’ambito indicato.") : ("riconducibili agli ambiti indicati.") ) + "\r\n\t In merito alla questione sopra evidenziata, si informa la S.V. che laddove intenda fornire ulteriori elementi in ordine ai requisiti posseduti, potrà comunicarli, con la apposita funzionalità disponibile nel profilo nell’area riservata, entro 10 giorni dal ricevimento della presente.\r\n\t Tale comunicazione dovrà essere corredata da idonea documentazione comprovante il possesso dei requisiti richiesti dal citato decreto.\r\n\t In assenza di riscontro, l’Ufficio procederà al rigetto dell’istanza di iscrizione nell’Elenco.\r\n\t Per altri eventuali chiarimenti è possibile contattare </ il dott./la dott.ssa/> </ istruttore /> dalle 11.00 alle 13.00, telefono 06 6899 </interno/>."]]></textFieldExpression>
+				<textFieldExpression><![CDATA["\tPertanto, alla luce di quanto dichiarato non emergono esperienze con carattere di continuità e prevalenza " +( $F{numeroAmbitiKo}.equals( "1" )  ? ("riconducibile all’ambito indicato.") : ("riconducibili agli ambiti indicati.") ) + "\r\n\t In merito alla questione sopra evidenziata, si informa la S.V. che laddove intenda fornire ulteriori elementi in ordine ai requisiti posseduti, potrà comunicarli, con la apposita funzionalità disponibile nel profilo nell’area riservata, entro 10 giorni dal ricevimento della presente.\r\n\t Tale comunicazione dovrà essere corredata da idonea documentazione comprovante il possesso dei requisiti richiesti dal citato decreto.\r\n\t In assenza di riscontro, l’Ufficio procederà al rigetto dell’istanza di iscrizione nell’Elenco.\r\n\t Per altri eventuali chiarimenti è possibile contattare </ il dott./la dott.ssa/> </ istruttore /> dalle 11.00 alle 13.00, telefono 06 6899 </interno/>."]]></textFieldExpression>
 			</textField>
 		</band>
 		<band height="93">

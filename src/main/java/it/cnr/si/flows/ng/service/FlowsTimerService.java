@@ -1,4 +1,4 @@
-package it.cnr.si.flows.ng.listeners.oiv.service;
+package it.cnr.si.flows.ng.service;
 
 
 import org.activiti.engine.ManagementService;
@@ -37,8 +37,8 @@ import 	it.cnr.si.flows.ng.repository.SetTimerDuedateCmd;
 
 
 @Service
-public class GestioneTimerService {
-	private static final Logger LOGGER = LoggerFactory.getLogger(GestioneTimerService.class);
+public class FlowsTimerService {
+	private static final Logger LOGGER = LoggerFactory.getLogger(FlowsTimerService.class);
 
 	@Autowired
 	protected ManagementService managementService;
