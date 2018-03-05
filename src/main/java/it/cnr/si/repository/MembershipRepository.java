@@ -1,8 +1,8 @@
 package it.cnr.si.repository;
 
 import it.cnr.si.domain.Membership;
-
-import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
