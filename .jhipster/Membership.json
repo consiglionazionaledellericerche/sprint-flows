@@ -15,6 +15,10 @@
             "fieldValidateRules": [
                 "required"
             ]
+        },
+        {
+            "fieldName": "grouprole",
+            "fieldType": "String"
         }
     ],
     "changelogDate": "20170418091241",
