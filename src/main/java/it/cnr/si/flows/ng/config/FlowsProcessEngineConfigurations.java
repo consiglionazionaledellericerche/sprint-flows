@@ -4,6 +4,10 @@ import com.zaxxer.hikari.HikariDataSource;
 import it.cnr.si.flows.ng.service.FlowsRuntimeService;
 import org.activiti.engine.*;
 import org.activiti.engine.impl.history.HistoryLevel;
+import org.activiti.engine.impl.variable.ByteArrayType;
+import org.activiti.engine.impl.variable.DefaultVariableTypes;
+import org.activiti.engine.impl.variable.SerializableType;
+import org.activiti.engine.impl.variable.VariableTypes;
 import org.activiti.image.ProcessDiagramGenerator;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.spring.ProcessEngineFactoryBean;
@@ -28,7 +32,8 @@ public class FlowsProcessEngineConfigurations {
     private static final String ACTIVITI_VERSION = "5.22.0";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsProcessEngineConfigurations.class);
-    public static final int VARIABLE_LIMIT = 200000;
+    private static final int VARIABLE_LIMIT = 200000;
+
 
     @Value("${cnr.activiti.diagram-font}")
     private String diagramFont;
@@ -90,7 +95,7 @@ public class FlowsProcessEngineConfigurations {
         // vanno aggiornati anche il mapper e la classe Query e bumpata la versione qui a mano
         if (!conf.getClass().getPackage().getImplementationVersion().equals(ACTIVITI_VERSION))
             throw new ConfigurationException("La versione di Activiti non e' supportata, aggiornare le classi che estendono Historic Query "
-                    + "e bumpare la versione");
+                                                     + "e bumpare la versione");
 
         Set<String> customXmlBatisMappers = new HashSet<>();
         customXmlBatisMappers.add("mapper/FlowsHistoricProcessInstanceMapper.xml");
@@ -98,7 +103,7 @@ public class FlowsProcessEngineConfigurations {
 
         FlowsRuntimeService runtimeService = new FlowsRuntimeService();
         conf.setRuntimeService(runtimeService);
-        
+
         return conf;
     }
 
@@ -107,6 +112,17 @@ public class FlowsProcessEngineConfigurations {
             SpringProcessEngineConfiguration conf) throws Exception {
         //modifica per il flusso test-timer
         conf.setJobExecutorActivate(true);
+        conf.setMaxLengthStringVariableType(1000000);
+
+        //IMPORTANTE: aggiungo un nuovo tipo di dato specifico SOLO SE è NON VERR° MODIFICATO (per non creare problemi al DB)
+        // https://blog.progs.be/628/activiti-variables-json
+        VariableTypes variableTypes = new DefaultVariableTypes();
+
+        // Risolvono il problema delle variabili "troppo" lunghe (ad es.: "valutazioneEsperienze_json")
+        variableTypes.addType(new ByteArrayType());
+        variableTypes.addType(new SerializableType());
+
+        conf.setVariableTypes(variableTypes);
 
         ProcessEngineFactoryBean factory = new ProcessEngineFactoryBean();
         factory.setApplicationContext(appContext);
@@ -116,32 +132,37 @@ public class FlowsProcessEngineConfigurations {
     }
 
     @Bean
-    public RepositoryService getRepositoryService(ProcessEngine processEngine) throws Exception {
+    public RepositoryService getRepositoryService(ProcessEngine processEngine) {
         return processEngine.getRepositoryService();
     }
 
     @Bean
-    public RuntimeService getRuntimeService(ProcessEngine processEngine) throws Exception {
+    public RuntimeService getRuntimeService(ProcessEngine processEngine) {
         return processEngine.getRuntimeService();
     }
 
-    @Bean public FormService getFormService(ProcessEngine processEngine) throws Exception {
+    @Bean
+    public FormService getFormService(ProcessEngine processEngine) {
         return processEngine.getFormService();
     }
 
-    @Bean public HistoryService getHistoryService(ProcessEngine processEngine) throws Exception {
+    @Bean
+    public HistoryService getHistoryService(ProcessEngine processEngine) {
         return processEngine.getHistoryService();
     }
 
-    @Bean public TaskService getTaskService(ProcessEngine processEngine) throws Exception {
+    @Bean
+    public TaskService getTaskService(ProcessEngine processEngine) {
         return processEngine.getTaskService();
     }
 
-    @Bean public IdentityService getIdentityService(ProcessEngine processEngine) throws Exception {
+    @Bean
+    public IdentityService getIdentityService(ProcessEngine processEngine) {
         return processEngine.getIdentityService();
     }
 
-    @Bean public ManagementService getManagementService(ProcessEngine processEngine) throws Exception {
+    @Bean
+    public ManagementService getManagementService(ProcessEngine processEngine) {
         return processEngine.getManagementService();
     }
 
@@ -154,6 +175,4 @@ public class FlowsProcessEngineConfigurations {
     public ProcessDiagramGenerator getProcessDiagramGenerator(ProcessEngine processEingine) {
         return processEingine.getProcessEngineConfiguration().getProcessDiagramGenerator();
     }
-
-
 }
