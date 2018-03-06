@@ -4,7 +4,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -29,6 +29,9 @@ public class Membership implements Serializable {
     @NotNull
     @Column(name = "groupname", nullable = false)
     private String groupname;
+
+    @Column(name = "grouprole")
+    private String grouprole;
 
     public Long getId() {
         return id;
@@ -64,6 +67,19 @@ public class Membership implements Serializable {
         this.groupname = groupname;
     }
 
+    public String getGrouprole() {
+        return grouprole;
+    }
+
+    public void setGrouprole(String grouprole) {
+        this.grouprole = grouprole;
+    }
+
+    public Membership grouprole(String grouprole) {
+        this.grouprole = grouprole;
+        return this;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -90,6 +106,7 @@ public class Membership implements Serializable {
             "id=" + id +
             ", username='" + username + "'" +
             ", groupname='" + groupname + "'" +
+                ", grouprole='" + grouprole + "'" +
             '}';
     }
 }
