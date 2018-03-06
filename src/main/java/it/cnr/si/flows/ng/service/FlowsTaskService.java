@@ -105,7 +105,6 @@ public class FlowsTaskService {
 		return data;
 	}
 
-
 	public DataResponse getMyTask(HttpServletRequest req, String processDefinition, int firstResult, int maxResults, String order) {
 		String username = SecurityUtils.getCurrentUserLogin();
 
@@ -134,7 +133,6 @@ public class FlowsTaskService {
 		return response;
 	}
 
-
 	public Map<String, Object> search(Map<String, String> params, String processInstanceId, boolean active, String order, int firstResult, int maxResults) {
 		Map<String, Object> result = new HashMap<>();
 		HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery();
@@ -159,7 +157,6 @@ public class FlowsTaskService {
 		result.put("tasks", tasks);
 		return result;
 	}
-
 
 	// TODO questo metodo e' duplicato di uno in utils (controllare)
 	private void setSearchTerms(Map<String, String> params, HistoricTaskInstanceQuery taskQuery) {
@@ -202,7 +199,6 @@ public class FlowsTaskService {
 		});
 	}
 
-
 	private HistoricTaskInstanceQuery processDate(HistoricTaskInstanceQuery taskQuery, String key, String value) {
 		try {
 			Date date = utils.parsaData(value);
@@ -216,7 +212,6 @@ public class FlowsTaskService {
 		}
 		return taskQuery;
 	}
-
 
 	public DataResponse getAvailableTask(HttpServletRequest req, String processDefinition, int firstResult, int maxResults, String order) {
 		String username = SecurityUtils.getCurrentUserLogin();
@@ -248,7 +243,6 @@ public class FlowsTaskService {
 		return response;
 	}
 
-
 	public DataResponse taskAssignedInMyGroups(HttpServletRequest req, String processDefinition, int firstResult, int maxResults, String order) {
 		String username = SecurityUtils.getCurrentUserLogin();
 
@@ -278,7 +272,6 @@ public class FlowsTaskService {
 		return response;
 	}
 
-
 	public Map<String, Object> getTask(@PathVariable("id") String taskId) {
 		Map<String, Object> response = new HashMap<>();
 		Task taskRaw = taskService.createTaskQuery().taskId(taskId).includeProcessVariables().singleResult();
@@ -294,7 +287,6 @@ public class FlowsTaskService {
 		response.put("attachments", attachments);
 		return response;
 	}
-
 
 	public ResponseEntity<Object> completeTask(MultipartHttpServletRequest req) throws IOException {
 		String username = SecurityUtils.getCurrentUserLogin();
@@ -377,7 +369,6 @@ public class FlowsTaskService {
 		}
 	}
 
-
 	public DataResponse getTasksCompletedByMe(HttpServletRequest req, @RequestParam("processDefinition") String processDefinition, @RequestParam("firstResult") int firstResult, @RequestParam("maxResults") int maxResults, @RequestParam("order") String order) {
 		String username = SecurityUtils.getCurrentUserLogin();
 
@@ -409,7 +400,6 @@ public class FlowsTaskService {
 		response.setData(resultList);
 		return response;
 	}
-
 
 	private void addIsReleasableVariables(List<TaskResponse> tasks) {
 		for (TaskResponse task : tasks) {
