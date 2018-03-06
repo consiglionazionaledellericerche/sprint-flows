@@ -21,6 +21,8 @@
                     <th jh-sort-by="id"><span translate="global.field.id">ID</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="username"><span translate="sprintApp.membership.username">Username</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="groupname"><span translate="sprintApp.membership.groupname">Groupname</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="grouprole"><span translate="sprintApp.membership.grouprole">Grouprole</span> <span
+                            class="glyphicon glyphicon-sort"></span></th>
                     <th></th>
                 </tr>
             </thead>
@@ -29,6 +31,7 @@
                     <td><a ui-sref="membership-detail({id:membership.id})">{{membership.id}}</a></td>
                     <td>{{membership.username}}</td>
                     <td>{{membership.groupname}}</td>
+                    <td>{{membership.grouprole}}</td>
                     <td class="text-right">
                         <div class="btn-group flex-btn-group-container">
                             <button type="submit"
