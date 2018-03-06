@@ -50,7 +50,7 @@
           </activiti:executionListener>
         </extensionElements>
         <timerEventDefinition>
-          <timeDuration>P30D</timeDuration>
+          <timeDuration>P5D</timeDuration>
         </timerEventDefinition>
       </boundaryEvent>
       <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway" default="flow99"></exclusiveGateway>
@@ -125,7 +125,7 @@
           </activiti:executionListener>
         </extensionElements>
       </userTask>
-      <userTask id="firma-dg-rigetto" name="FIRMA DG RIGETTO" activiti:candidateGroups="${gruppoDirettore}">
+      <userTask id="firma-dg-rigetto" name="FIRMA DG RIGETTO" activiti:candidateGroups="${gruppoFirmaRigetto}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
             <activiti:field name="faseEsecuzione">
@@ -157,7 +157,7 @@
           </activiti:executionListener>
         </extensionElements>
         <timerEventDefinition>
-          <timeDuration>P10D</timeDuration>
+          <timeDuration>P2D</timeDuration>
         </timerEventDefinition>
       </boundaryEvent>
       <sequenceFlow id="flow72" sourceRef="boundarytimer5" targetRef="valutazione-preavviso"></sequenceFlow>
@@ -244,7 +244,7 @@
     <sequenceFlow id="flow48" name="START" sourceRef="startevent2" targetRef="valutazione-domande"></sequenceFlow>
     <boundaryEvent id="boundarytimer3" name="Timer" attachedToRef="valutazione-domande" cancelActivity="false">
       <timerEventDefinition>
-        <timeDuration>P30D</timeDuration>
+        <timeDuration>P5D</timeDuration>
       </timerEventDefinition>
     </boundaryEvent>
     <sequenceFlow id="flow65" sourceRef="boundarytimer3" targetRef="scadenza-tempi-procedurali"></sequenceFlow>
@@ -274,7 +274,7 @@
     </scriptTask>
     <boundaryEvent id="boundarytimer6" name="Timer" attachedToRef="valutazione-domande" cancelActivity="false">
       <timerEventDefinition>
-        <timeDuration>P25D</timeDuration>
+        <timeDuration>P4D</timeDuration>
       </timerEventDefinition>
     </boundaryEvent>
     <sequenceFlow id="flow97" sourceRef="boundarytimer6" targetRef="avviso-scadenza-tempi-procedurali"></sequenceFlow>

@@ -54,6 +54,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 		case "process-start": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
 			startOivSetGroupsAndVisibility.configuraVariabiliStart(execution);
+			calcolaPunteggioFascia.settaNoAllOggettoSoccrso(execution);
 		};break;    
 		case "smistamento-start": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
