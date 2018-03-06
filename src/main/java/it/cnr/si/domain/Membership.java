@@ -71,13 +71,13 @@ public class Membership implements Serializable {
         return grouprole;
     }
 
-    public void setGrouprole(String grouprole) {
-        this.grouprole = grouprole;
-    }
-
     public Membership grouprole(String grouprole) {
         this.grouprole = grouprole;
         return this;
+    }
+
+    public void setGrouprole(String grouprole) {
+        this.grouprole = grouprole;
     }
 
     @Override
@@ -103,10 +103,10 @@ public class Membership implements Serializable {
     @Override
     public String toString() {
         return "Membership{" +
-            "id=" + id +
-            ", username='" + username + "'" +
-            ", groupname='" + groupname + "'" +
+                "id=" + id +
+                ", username='" + username + "'" +
+                ", groupname='" + groupname + "'" +
                 ", grouprole='" + grouprole + "'" +
-            '}';
+                '}';
     }
 }

@@ -69,8 +69,8 @@ public class MembershipResourceIntTest {
         MembershipResource membershipResource = new MembershipResource();
         ReflectionTestUtils.setField(membershipResource, "membershipService", membershipService);
         this.restMembershipMockMvc = MockMvcBuilders.standaloneSetup(membershipResource)
-            .setCustomArgumentResolvers(pageableArgumentResolver)
-            .setMessageConverters(jacksonMessageConverter).build();
+                .setCustomArgumentResolvers(pageableArgumentResolver)
+                .setMessageConverters(jacksonMessageConverter).build();
     }
 
     /**
@@ -101,8 +101,8 @@ public class MembershipResourceIntTest {
         // Create the Membership
 
         restMembershipMockMvc.perform(post("/api/memberships")
-                .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(TestUtil.convertObjectToJsonBytes(membership)))
+                                              .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                                              .content(TestUtil.convertObjectToJsonBytes(membership)))
                 .andExpect(status().isCreated());
 
         // Validate the Membership in the database
@@ -124,8 +124,8 @@ public class MembershipResourceIntTest {
         // Create the Membership, which fails.
 
         restMembershipMockMvc.perform(post("/api/memberships")
-                .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(TestUtil.convertObjectToJsonBytes(membership)))
+                                              .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                                              .content(TestUtil.convertObjectToJsonBytes(membership)))
                 .andExpect(status().isBadRequest());
 
         List<Membership> memberships = membershipRepository.findAll();
@@ -142,8 +142,8 @@ public class MembershipResourceIntTest {
         // Create the Membership, which fails.
 
         restMembershipMockMvc.perform(post("/api/memberships")
-                .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(TestUtil.convertObjectToJsonBytes(membership)))
+                                              .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                                              .content(TestUtil.convertObjectToJsonBytes(membership)))
                 .andExpect(status().isBadRequest());
 
         List<Membership> memberships = membershipRepository.findAll();
@@ -174,10 +174,10 @@ public class MembershipResourceIntTest {
 
         // Get the membership
         restMembershipMockMvc.perform(get("/api/memberships/{id}", membership.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.id").value(membership.getId().intValue()))
-            .andExpect(jsonPath("$.username").value(DEFAULT_USERNAME.toString()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(jsonPath("$.id").value(membership.getId().intValue()))
+                .andExpect(jsonPath("$.username").value(DEFAULT_USERNAME.toString()))
                 .andExpect(jsonPath("$.groupname").value(DEFAULT_GROUPNAME.toString()))
                 .andExpect(jsonPath("$.grouprole").value(DEFAULT_GROUPROLE.toString()));
     }
@@ -206,8 +206,8 @@ public class MembershipResourceIntTest {
                 .grouprole(UPDATED_GROUPROLE);
 
         restMembershipMockMvc.perform(put("/api/memberships")
-                .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                .content(TestUtil.convertObjectToJsonBytes(updatedMembership)))
+                                              .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                                              .content(TestUtil.convertObjectToJsonBytes(updatedMembership)))
                 .andExpect(status().isOk());
 
         // Validate the Membership in the database
@@ -229,7 +229,7 @@ public class MembershipResourceIntTest {
 
         // Get the membership
         restMembershipMockMvc.perform(delete("/api/memberships/{id}", membership.getId())
-                .accept(TestUtil.APPLICATION_JSON_UTF8))
+                                              .accept(TestUtil.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk());
 
         // Validate the database is empty
