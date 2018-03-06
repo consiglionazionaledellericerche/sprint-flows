@@ -2,18 +2,17 @@ package it.cnr.si.web.rest;
 
 import it.cnr.si.SprintApp;
 import it.cnr.si.domain.Membership;
+import it.cnr.si.flows.ng.TestUtil;
 import it.cnr.si.repository.MembershipRepository;
 import it.cnr.si.service.MembershipService;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import static org.hamcrest.Matchers.hasItem;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
@@ -24,9 +23,9 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import java.util.List;
-import it.cnr.si.flows.ng.TestUtil;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -42,6 +41,8 @@ public class MembershipResourceIntTest {
     private static final String UPDATED_USERNAME = "BBBBB";
     private static final String DEFAULT_GROUPNAME = "AAAAA";
     private static final String UPDATED_GROUPNAME = "BBBBB";
+    private static final String DEFAULT_GROUPROLE = "AAAAA";
+    private static final String UPDATED_GROUPROLE = "BBBBB";
 
     @Inject
     private MembershipRepository membershipRepository;
@@ -82,7 +83,8 @@ public class MembershipResourceIntTest {
         Membership membership = new Membership();
         membership = new Membership()
                 .username(DEFAULT_USERNAME)
-                .groupname(DEFAULT_GROUPNAME);
+                .groupname(DEFAULT_GROUPNAME)
+                .grouprole(DEFAULT_GROUPROLE);
         return membership;
     }
 
@@ -109,6 +111,7 @@ public class MembershipResourceIntTest {
         Membership testMembership = memberships.get(memberships.size() - 1);
         assertThat(testMembership.getUsername()).isEqualTo(DEFAULT_USERNAME);
         assertThat(testMembership.getGroupname()).isEqualTo(DEFAULT_GROUPNAME);
+        assertThat(testMembership.getGrouprole()).isEqualTo(DEFAULT_GROUPROLE);
     }
 
     @Test
@@ -159,7 +162,8 @@ public class MembershipResourceIntTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(membership.getId().intValue())))
                 .andExpect(jsonPath("$.[*].username").value(hasItem(DEFAULT_USERNAME.toString())))
-                .andExpect(jsonPath("$.[*].groupname").value(hasItem(DEFAULT_GROUPNAME.toString())));
+                .andExpect(jsonPath("$.[*].groupname").value(hasItem(DEFAULT_GROUPNAME.toString())))
+                .andExpect(jsonPath("$.[*].grouprole").value(hasItem(DEFAULT_GROUPROLE.toString())));
     }
 
     @Test
@@ -174,7 +178,8 @@ public class MembershipResourceIntTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(membership.getId().intValue()))
             .andExpect(jsonPath("$.username").value(DEFAULT_USERNAME.toString()))
-            .andExpect(jsonPath("$.groupname").value(DEFAULT_GROUPNAME.toString()));
+                .andExpect(jsonPath("$.groupname").value(DEFAULT_GROUPNAME.toString()))
+                .andExpect(jsonPath("$.grouprole").value(DEFAULT_GROUPROLE.toString()));
     }
 
     @Test
@@ -197,7 +202,8 @@ public class MembershipResourceIntTest {
         Membership updatedMembership = membershipRepository.findOne(membership.getId());
         updatedMembership
                 .username(UPDATED_USERNAME)
-                .groupname(UPDATED_GROUPNAME);
+                .groupname(UPDATED_GROUPNAME)
+                .grouprole(UPDATED_GROUPROLE);
 
         restMembershipMockMvc.perform(put("/api/memberships")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -210,6 +216,7 @@ public class MembershipResourceIntTest {
         Membership testMembership = memberships.get(memberships.size() - 1);
         assertThat(testMembership.getUsername()).isEqualTo(UPDATED_USERNAME);
         assertThat(testMembership.getGroupname()).isEqualTo(UPDATED_GROUPNAME);
+        assertThat(testMembership.getGrouprole()).isEqualTo(UPDATED_GROUPROLE);
     }
 
     @Test
