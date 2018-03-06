@@ -18,10 +18,7 @@
         },
         {
             "fieldName": "grouprole",
-            "fieldType": "String",
-            "fieldValidateRules": [
-                "required"
-            ]
+            "fieldType": "String"
         }
     ],
     "changelogDate": "20170418091241",
