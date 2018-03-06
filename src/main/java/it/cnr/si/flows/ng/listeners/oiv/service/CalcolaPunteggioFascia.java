@@ -45,7 +45,7 @@ public class CalcolaPunteggioFascia {
 					obj.put("giudizioFinale", obj.getString("giudizioFinaleIstruttore"));
 					LOGGER.info("-- aggiorno giudizioFinale: " + obj.getString("giudizioFinale") + " con giudizioFinaleIstruttore: " + obj.getString("giudizioFinaleIstruttore"));
 				}
-					if (obj.getString("giudizioFinale").equals("OK")) {
+				if (obj.getString("giudizioFinale").equals("OK")) {
 					numeroValutazioniPositive = numeroValutazioniPositive +1;
 				} else {
 					if(numeroValutazioniNegative >= 1) {
@@ -98,6 +98,9 @@ public class CalcolaPunteggioFascia {
 				}
 			}
 		}
+		if((aggiornaGiudizioFinale)){
+			execution.setVariable("valutazioneEsperienze_json", valutazioni.toString());
+		}
 		execution.setVariable("numeroValutazioniNegative", numeroValutazioniNegative);
 		execution.setVariable("numeroValutazioniPositive", numeroValutazioniPositive);
 		execution.setVariable("elencoValutazioniNegative", elencoValutazioniNegative);
@@ -115,5 +118,21 @@ public class CalcolaPunteggioFascia {
 		// invio campi json e recupero fascia e punteggio
 		execution.setVariable("punteggioEsperienzeAttribuito", "42");
 		execution.setVariable("fasciaAppartenenzaAttribuita", "1");
+	}
+
+
+	public void settaNoAllOggettoSoccrso(DelegateExecution execution) throws IOException, ParseException {
+		String valutazioneEsperienzeJson = execution.getVariable("valutazioneEsperienze_json").toString();
+		String jsonStr = valutazioneEsperienzeJson;
+		LOGGER.debug("--- jsonStr: {}", jsonStr);
+
+		JSONArray valutazioni =  new JSONArray(jsonStr);
+
+		for (int i = 0 ; i < valutazioni.length(); i++) {
+			JSONObject obj = valutazioni.getJSONObject(i);
+			obj.put("oggettoDiSoccorso", "NO");
+			LOGGER.info("-- setto tutti NO ad oggettoDiSoccorso: " + obj.getString("oggettoDiSoccorso"));
+		}
+		execution.setVariable("valutazioneEsperienze_json", valutazioni.toString());
 	}
 }

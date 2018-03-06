@@ -3,25 +3,15 @@ package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
 
-import it.cnr.si.domain.Membership;
 import it.cnr.si.flows.ng.dto.TimerSettings;
 import it.cnr.si.flows.ng.service.FlowsTimerService;
-import it.cnr.si.flows.ng.resource.FlowsUserResource.SearchResult;
-import it.cnr.si.flows.ng.service.FlowsAttachmentService;
-import it.cnr.si.flows.ng.service.FlowsPdfService;
-import it.cnr.si.flows.ng.utils.Enum;
-import it.cnr.si.security.AuthoritiesConstants;
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.history.HistoricProcessInstance;
+
 import org.activiti.engine.runtime.Job;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
-import org.apache.commons.lang3.tuple.Pair;
-import org.json.JSONArray;
-import org.json.JSONObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,17 +24,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.text.ParseException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+
 
 
 @Controller
