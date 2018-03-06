@@ -126,7 +126,6 @@
                             return {
                                 username: null,
                                 groupname: null,
-                                grouprole: null,
                                 id: null
                             };
                         }

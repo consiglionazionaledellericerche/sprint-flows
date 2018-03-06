@@ -17,8 +17,7 @@
                 "title": "Membership"
             },
             "username": "Username",
-          "groupname": "Groupname",
-          "grouprole": "Grouprole"
+          "groupname": "Groupname"
         }
     }
 }

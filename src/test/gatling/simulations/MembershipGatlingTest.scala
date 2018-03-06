@@ -80,7 +80,7 @@ class MembershipGatlingTest extends Simulation {
             .exec(http("Create new membership")
             .post("/api/memberships")
             .headers(headers_http_authenticated)
-            .body(StringBody("""{"id":null, "username":"SAMPLE_TEXT", "groupname":"SAMPLE_TEXT", "grouprole":"SAMPLE_TEXT"}""")).asJSON
+            .body(StringBody("""{"id":null, "username":"SAMPLE_TEXT", "groupname":"SAMPLE_TEXT"}""")).asJSON
             .check(status.is(201))
             .check(headerRegex("Location", "(.*)").saveAs("new_membership_url"))).exitHereIfFailed
             .pause(10)
