@@ -41,8 +41,6 @@ public class MembershipResourceIntTest {
     private static final String UPDATED_USERNAME = "BBBBB";
     private static final String DEFAULT_GROUPNAME = "AAAAA";
     private static final String UPDATED_GROUPNAME = "BBBBB";
-    private static final String DEFAULT_GROUPROLE = "AAAAA";
-    private static final String UPDATED_GROUPROLE = "BBBBB";
 
     @Inject
     private MembershipRepository membershipRepository;
@@ -83,8 +81,7 @@ public class MembershipResourceIntTest {
         Membership membership = new Membership();
         membership = new Membership()
                 .username(DEFAULT_USERNAME)
-                .groupname(DEFAULT_GROUPNAME)
-                .grouprole(DEFAULT_GROUPROLE);
+                .groupname(DEFAULT_GROUPNAME);
         return membership;
     }
 
@@ -111,7 +108,6 @@ public class MembershipResourceIntTest {
         Membership testMembership = memberships.get(memberships.size() - 1);
         assertThat(testMembership.getUsername()).isEqualTo(DEFAULT_USERNAME);
         assertThat(testMembership.getGroupname()).isEqualTo(DEFAULT_GROUPNAME);
-        assertThat(testMembership.getGrouprole()).isEqualTo(DEFAULT_GROUPROLE);
     }
 
     @Test
@@ -162,8 +158,7 @@ public class MembershipResourceIntTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(membership.getId().intValue())))
                 .andExpect(jsonPath("$.[*].username").value(hasItem(DEFAULT_USERNAME.toString())))
-                .andExpect(jsonPath("$.[*].groupname").value(hasItem(DEFAULT_GROUPNAME.toString())))
-                .andExpect(jsonPath("$.[*].grouprole").value(hasItem(DEFAULT_GROUPROLE.toString())));
+                .andExpect(jsonPath("$.[*].groupname").value(hasItem(DEFAULT_GROUPNAME.toString())));
     }
 
     @Test
@@ -178,8 +173,7 @@ public class MembershipResourceIntTest {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(membership.getId().intValue()))
             .andExpect(jsonPath("$.username").value(DEFAULT_USERNAME.toString()))
-                .andExpect(jsonPath("$.groupname").value(DEFAULT_GROUPNAME.toString()))
-                .andExpect(jsonPath("$.grouprole").value(DEFAULT_GROUPROLE.toString()));
+                .andExpect(jsonPath("$.groupname").value(DEFAULT_GROUPNAME.toString()));
     }
 
     @Test
@@ -202,8 +196,7 @@ public class MembershipResourceIntTest {
         Membership updatedMembership = membershipRepository.findOne(membership.getId());
         updatedMembership
                 .username(UPDATED_USERNAME)
-                .groupname(UPDATED_GROUPNAME)
-                .grouprole(UPDATED_GROUPROLE);
+                .groupname(UPDATED_GROUPNAME);
 
         restMembershipMockMvc.perform(put("/api/memberships")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -216,7 +209,6 @@ public class MembershipResourceIntTest {
         Membership testMembership = memberships.get(memberships.size() - 1);
         assertThat(testMembership.getUsername()).isEqualTo(UPDATED_USERNAME);
         assertThat(testMembership.getGroupname()).isEqualTo(UPDATED_GROUPNAME);
-        assertThat(testMembership.getGrouprole()).isEqualTo(UPDATED_GROUPROLE);
     }
 
     @Test

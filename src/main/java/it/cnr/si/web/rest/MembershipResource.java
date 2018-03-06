@@ -2,6 +2,7 @@ package it.cnr.si.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.domain.Membership;
+import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.MembershipService;
 import it.cnr.si.web.rest.util.HeaderUtil;
 import it.cnr.si.web.rest.util.PaginationUtil;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -45,6 +47,7 @@ public class MembershipResource {
         method = RequestMethod.POST,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
+    @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Membership> createMembership(@Valid @RequestBody Membership membership) throws URISyntaxException {
         log.debug("REST request to save Membership : {}", membership);
         if (membership.getId() != null) {
@@ -69,6 +72,7 @@ public class MembershipResource {
         method = RequestMethod.PUT,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
+    @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Membership> updateMembership(@Valid @RequestBody Membership membership) throws URISyntaxException {
         log.debug("REST request to update Membership : {}", membership);
         if (membership.getId() == null) {
@@ -129,6 +133,7 @@ public class MembershipResource {
         method = RequestMethod.DELETE,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
+    @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Void> deleteMembership(@PathVariable Long id) {
         log.debug("REST request to delete Membership : {}", id);
         membershipService.delete(id);
