@@ -28,15 +28,16 @@ public class StartOivSetGroupsAndVisibility {
 
 		String struttura = "99999";
 		String gruppoIstruttori = "istruttore@"+ struttura;
+		String gruppoFirmaRigetto = "firmaRigetto@"+ struttura;
 		String gruppoDirettore = "direttore@"+ struttura;
 		String gruppoCoordinatoreResponsabile = "coordinatoreresponsabile@"+ struttura;
 
 		execution.setVariable("gruppoIstruttori", gruppoIstruttori);
-		execution.setVariable("gruppoDirettore", gruppoDirettore);
+		execution.setVariable("gruppoFirmaRigetto", gruppoDirettore);
 		execution.setVariable("gruppoCoordinatoreResponsabile", gruppoCoordinatoreResponsabile);
 		execution.setVariable("domandaImprocedibileFlag", "0");
 		execution.setVariable("soccorsoIstruttoriaFlag", "0");
-		LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoIstruttori, gruppoDirettore, gruppoCoordinatoreResponsabile);
+		LOGGER.debug("Imposto i gruppi del flusso gruppoIstruttori: {}, gruppoFirmaRigetto: {}, gruppoCoordinatoreResponsabile: {}", gruppoIstruttori, gruppoDirettore, gruppoCoordinatoreResponsabile);
 
 		//conversione semplice di date
 		//if (execution.getVariable("valutazioneEsperienze_json") !=  null) {
@@ -76,9 +77,7 @@ public class StartOivSetGroupsAndVisibility {
 
 		LOGGER.info("------ DATA FINE PROCEDURA: " + execution.getVariable("dataScadenzaTerminiDomanda"));
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoIstruttori, PROCESS_VISUALIZER);
-		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoDirettore, PROCESS_VISUALIZER);
+		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoFirmaRigetto, PROCESS_VISUALIZER);
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoCoordinatoreResponsabile, PROCESS_VISUALIZER);
-		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoCoordinatoreResponsabile, PROCESS_VISUALIZER);
-
 	}
 }
