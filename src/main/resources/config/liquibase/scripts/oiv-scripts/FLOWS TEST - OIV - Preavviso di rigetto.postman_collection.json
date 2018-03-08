@@ -2,7 +2,7 @@
 	"info": {
 		"name": "FLOWS TEST - OIV - Preavviso di rigetto",
 		"_postman_id": "17c41b34-035c-62ae-482b-30bf021d0db8",
-		"description": "",
+		"description": "FLOWS TEST - OIV - Preavviso di rigetto",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -173,28 +173,34 @@
 							"type": "text"
 						},
 						{
-							"key": "osservazioniRichiedente",
-							"value": "Le mie osservazioni sono in merito al punto 1 e 4",
-							"description": "",
-							"type": "text"
-						},
-						{
 							"key": "dataInvioNuovaDomanda",
 							"value": "2018-02-07T23:00:00.000Z",
 							"description": "",
 							"type": "text"
 						},
 						{
-							"key": "allegati[1]",
-							"value": "",
+							"key": "osservazioniRichiedente",
+							"value": "Le mie osservazioni sono in merito al punto 1 e 4",
 							"description": "",
-							"type": "file"
+							"type": "text"
 						},
 						{
 							"key": "commento",
 							"value": "bah",
 							"description": "",
 							"type": "text"
+						},
+						{
+							"key": "allegati-riscontro-preavviso[0]",
+							"value": "",
+							"description": "",
+							"type": "file"
+						},
+						{
+							"key": "allegati-riscontro-preavviso[1]",
+							"value": "",
+							"description": "",
+							"type": "file"
 						}
 					]
 				},
