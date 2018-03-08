@@ -209,16 +209,22 @@
 							"type": "text"
 						},
 						{
-							"key": "allegati[0]",
+							"key": "osservazioniSoccorsoRichiedente",
+							"value": "Le osservazioni riguardano i punri 4b e 2a",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "allegati-soccorso-istruttorio[0]",
 							"value": "",
 							"description": "",
 							"type": "file"
 						},
 						{
-							"key": "osservazioniSoccorsoRichiedente",
-							"value": "Le osservazioni riguardano i punri 4b e 2a",
+							"key": "allegati-soccorso-istruttorio[1]",
+							"value": "",
 							"description": "",
-							"type": "text"
+							"type": "file"
 						}
 					]
 				},
