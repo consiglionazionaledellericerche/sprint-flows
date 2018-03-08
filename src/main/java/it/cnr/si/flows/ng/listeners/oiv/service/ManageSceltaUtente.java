@@ -9,21 +9,32 @@ import org.activiti.engine.delegate.DelegateExecution;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.service.FlowsAttachmentService;
+import it.cnr.si.flows.ng.service.FlowsControlService;
+
 import static it.cnr.si.flows.ng.utils.Enum.PdfType.*;
 
 @Service
 public class ManageSceltaUtente {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ManageSceltaUtente.class);
 
-
+	@Autowired
+	private FlowsAttachmentService attachmentService;
 	@Inject
 	private CreateOivPdf createOivPdf;
 	@Inject
 	private ManageControlli manageControlli;
 	@Inject
 	private DeterminaAttore determinaAttore;
+	@Inject
+	private FlowsControlService flowsControlService;
+
 	public void azioneScelta(DelegateExecution execution, String faseEsecuzioneValue, String sceltaUtente) throws IOException, ParseException {
+		String processInstanceId =  execution.getProcessInstanceId();
 		LOGGER.info("-- azioneScelta: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 		if (sceltaUtente != null){
 			switch(faseEsecuzioneValue){  
@@ -64,11 +75,26 @@ public class ManageSceltaUtente {
 					default:  {
 						LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
 					};break;    
-					}
+					}			
 				}
 				if(sceltaUtente.equals("richiesta_soccorso_istruttorio")) {
 					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 					manageControlli.verificaPuntiSoccorso(execution);
+				}
+				if(sceltaUtente.equals("invia_preavviso_di_rigetto")) {
+					String nomeFilePreavviso = "preavvisoRigetto";
+					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
+					FlowsAttachment fileRecuperato = attachmentService.getAttachementsForProcessInstance(processInstanceId).get("preavvisoRigetto");
+					if (fileRecuperato != null){
+						nomeFilePreavviso = fileRecuperato.getName();
+					} else {
+						fileRecuperato = attachmentService.getAttachementsForProcessInstance(processInstanceId).get("preavvisoRigettoCambioFascia");
+						if (fileRecuperato != null){
+							nomeFilePreavviso = fileRecuperato.getName();
+						}		
+					}
+					LOGGER.info("-- verificaFileFirmatoP7m: nomeFilePreavviso:" + nomeFilePreavviso);
+					flowsControlService.verificaFileFirmato_Cades_Pades(execution, nomeFilePreavviso);
 				}
 			};break;    
 			case "soccorso-istruttorio-start": {
@@ -86,6 +112,23 @@ public class ManageSceltaUtente {
 					}
 				}
 			};break;
+			case "firma-dg-rigetto-end": {
+				if(sceltaUtente.equals("invia_rigetto_firmato")) {
+					String nomeFileRigetto = "rigettoMotivato";
+					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
+					FlowsAttachment fileRecuperato = attachmentService.getAttachementsForProcessInstance(processInstanceId).get("rigettoMotivato");
+					if (fileRecuperato != null){
+						nomeFileRigetto = fileRecuperato.getName();
+					} else {
+						fileRecuperato = attachmentService.getAttachementsForProcessInstance(processInstanceId).get("RigettoDef10Giorni");
+						if (fileRecuperato != null){
+							nomeFileRigetto = fileRecuperato.getName();
+						}		
+					}
+					LOGGER.info("-- verificaFileFirmatoP7m: nomeFileRigetto:" + nomeFileRigetto);
+					flowsControlService.verificaFileFirmato_Cades_Pades(execution, nomeFileRigetto);
+				}
+			};break;			
 			default:  {
 				LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
 			};break;    
