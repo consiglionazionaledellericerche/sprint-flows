@@ -8,9 +8,14 @@ import it.cnr.si.flows.ng.listeners.oiv.service.StartOivSetGroupsAndVisibility;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
+import org.activiti.engine.impl.persistence.entity.VariableInstance;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.inject.Inject;
 
