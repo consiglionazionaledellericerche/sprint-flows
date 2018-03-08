@@ -3,7 +3,6 @@ package it.cnr.si.flows.ng.listeners.oiv.service;
 import java.io.IOException;
 import java.text.ParseException;
 
-
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.impl.util.json.JSONArray;
@@ -12,10 +11,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+
 @Service
 public class ManageControlli {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ManageControlli.class);
 
+	
 	public void valutazioneEsperienze(DelegateExecution execution) throws IOException, ParseException {
 		String numeroValutazioniPositive = execution.getVariable("numeroValutazioniPositive").toString();
 		String numeroValutazioniNegative = execution.getVariable("numeroValutazioniNegative").toString();
@@ -56,5 +57,6 @@ public class ManageControlli {
 			LOGGER.debug("--- numeroPuntiOggettoDiSoccorso: {} > 0 ---> OK", numeroPuntiOggettoDiSoccorso);
 		}
 	}
+	
 }
 
