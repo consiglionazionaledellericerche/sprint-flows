@@ -236,7 +236,47 @@
 			"response": []
 		},
 		{
-			"name": "CREATE MEMBERSHIP USER1",
+			"name": "CREATE USER5",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":null,\"login\":\"utente5\",\"firstName\":\"utente5\",\"lastName\":\"utente5\",\"email\":\"utente5@cnr.it\",\"activated\":true,\"langKey\":\"en\",\"createdBy\":null,\"createdDate\":null,\"lastModifiedBy\":null,\"lastModifiedDate\":null,\"resetDate\":null,\"resetKey\":null,\"authorities\":[\"ROLE_USER\"]}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/users?",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"users"
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE MEMBERSHIP USER1 abilitati#iscrizione-elenco-oiv@",
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -257,7 +297,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"id\": 21,\r\n    \"username\": \"utente1\",\r\n    \"groupname\": \"abilitati#iscrizione-elenco-oiv@99999\"\r\n  }"
+					"raw": "{\r\n    \"id\": 21,\r\n    \"username\": \"utente1\",\r\n    \"groupname\": \"abilitati#iscrizione-elenco-oiv@99999\",\r\n    \"grouprole\": \"member\"\r\n  }"
 				},
 				"url": {
 					"raw": "http://localhost:8080/api/memberships",
@@ -276,7 +316,7 @@
 			"response": []
 		},
 		{
-			"name": "CREATE MEMBERSHIP USER2",
+			"name": "CREATE MEMBERSHIP USER2 istruttore@",
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -297,7 +337,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"id\": 22,\r\n    \"username\": \"utente2\",\r\n    \"groupname\": \"istruttore@99999\"\r\n  }"
+					"raw": "{\r\n    \"id\": 22,\r\n    \"username\": \"utente2\",\r\n    \"groupname\": \"istruttore@99999\",\r\n    \"grouprole\": \"member\"\r\n  }"
 				},
 				"url": {
 					"raw": "http://localhost:8080/api/memberships",
@@ -316,7 +356,7 @@
 			"response": []
 		},
 		{
-			"name": "CREATE MEMBERSHIP USER3",
+			"name": "CREATE MEMBERSHIP USER3 coordinatoreresponsabile@",
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -337,7 +377,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"id\": 23,\r\n    \"username\": \"utente3\",\r\n    \"groupname\": \"coordinatoreresponsabile@99999\"\r\n  }"
+					"raw": "{\r\n    \"id\": 23,\r\n    \"username\": \"utente3\",\r\n    \"groupname\": \"coordinatoreresponsabile@99999\",\r\n    \"grouprole\": \"member\"\r\n  }"
 				},
 				"url": {
 					"raw": "http://localhost:8080/api/memberships",
@@ -356,7 +396,7 @@
 			"response": []
 		},
 		{
-			"name": "CREATE MEMBERSHIP USER4",
+			"name": "CREATE MEMBERSHIP USER4 direttore@",
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -377,7 +417,87 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"id\": 24,\r\n    \"username\": \"utente4\",\r\n    \"groupname\": \"direttore@99999\"\r\n  }"
+					"raw": "{\r\n    \"id\": 24,\r\n    \"username\": \"utente4\",\r\n    \"groupname\": \"direttore@99999\",\r\n    \"grouprole\": \"member\"\r\n  }"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/memberships",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"memberships"
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE MEMBERSHIP USER4 firmaRigetto@",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 24,\r\n    \"username\": \"utente4\",\r\n    \"groupname\": \"firmaRigetto@99999\",\r\n    \"grouprole\": \"member\"\r\n  }"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/memberships",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"memberships"
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE MEMBERSHIP USER5 istruttore@",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 24,\r\n    \"username\": \"utente5\",\r\n    \"groupname\": \"istruttore@99999\",\r\n    \"grouprole\": \"member\"\r\n  }"
 				},
 				"url": {
 					"raw": "http://localhost:8080/api/memberships",
@@ -677,6 +797,81 @@
 				"body": {
 					"mode": "raw",
 					"raw": "utente4"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/account/change_password",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"account",
+						"change_password"
+					]
+				},
+				"description": "IMPERSONATE USER"
+			},
+			"response": []
+		},
+		{
+			"name": "IMPERSONATE USER5",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/impersonate/start?impersonate_username=utente5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"impersonate",
+						"start"
+					],
+					"query": [
+						{
+							"key": "impersonate_username",
+							"value": "utente5",
+							"equals": true
+						}
+					]
+				},
+				"description": "IMPERSONATE USER"
+			},
+			"response": []
+		},
+		{
+			"name": "CHANGE PW USER5",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "utente5"
 				},
 				"url": {
 					"raw": "http://localhost:8080/api/account/change_password",

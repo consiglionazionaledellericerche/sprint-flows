@@ -148,26 +148,26 @@
 							"description": ""
 						},
 						{
-                          "key": "titolo",
-							"value": "TEST 12",
+							"key": "titolo",
+							"value": "Domanda 34",
 							"type": "text",
 							"description": ""
 						},
 						{
 							"key": "descrizione",
-							"value": "Descrizione 12",
+							"value": "Domanda 34",
 							"type": "text",
 							"description": ""
 						},
 						{
 							"key": "nomeRichiedente",
-							"value": "Paolo Verdi",
+							"value": "paperino",
 							"type": "text",
 							"description": ""
 						},
 						{
 							"key": "dataNascitaRichiedente",
-							"value": "20/02/1968",
+							"value": "1968-01-19T00:00:00.000Z",
 							"type": "text",
 							"description": ""
 						},
@@ -185,7 +185,7 @@
 						},
 						{
 							"key": "emailRichiedente",
-							"value": "paolo.verdi@cnr.it",
+							"value": "mario.rossi@cnr.it",
 							"type": "text",
 							"description": ""
 						},
@@ -197,7 +197,7 @@
 						},
 						{
 							"key": "dataIscrizioneElenco",
-							"value": "21/09/2010",
+							"value": "2012-01-09T23:00:00.000Z",
 							"type": "text",
 							"description": ""
 						},
@@ -209,7 +209,7 @@
 						},
 						{
 							"key": "dataInvioDomanda",
-							"value": "02/02/2018",
+							"value": "2108-02-19T00:00:00.000Z",
 							"type": "text",
 							"description": ""
 						},
@@ -233,9 +233,13 @@
 						},
 						{
 							"key": "domanda",
-							"value": "",
 							"type": "file",
 							"description": ""
+						},
+						{
+							"key": "cv",
+							"description": "",
+							"type": "file"
 						}
 					]
 				},

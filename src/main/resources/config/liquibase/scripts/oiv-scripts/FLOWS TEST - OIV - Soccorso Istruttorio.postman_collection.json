@@ -213,6 +213,12 @@
 							"value": "",
 							"description": "",
 							"type": "file"
+						},
+						{
+							"key": "osservazioniSoccorsoRichiedente",
+							"value": "Le osservazioni riguardano i punri 4b e 2a",
+							"description": "",
+							"type": "text"
 						}
 					]
 				},
