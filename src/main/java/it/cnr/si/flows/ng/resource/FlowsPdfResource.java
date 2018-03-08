@@ -7,7 +7,9 @@ import it.cnr.si.flows.ng.service.FlowsPdfService;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.security.AuthoritiesConstants;
 import org.activiti.engine.HistoryService;
+import org.activiti.engine.RuntimeService;
 import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.impl.persistence.entity.VariableInstance;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -27,6 +29,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;
 import java.util.Map;
+import java.util.Map.Entry;
 
 
 @Controller
@@ -42,6 +45,8 @@ public class FlowsPdfResource {
     private FlowsAttachmentService flowsAttachmentService;
     @Inject
     private HistoryService historyService;
+    @Inject
+    private RuntimeService runtimeService;
 
     /**
      * Crea e restituisce il summary pdf del flusso.
@@ -96,11 +101,26 @@ public class FlowsPdfResource {
             @RequestParam("processInstanceId") String processInstanceId,
             @RequestParam("tipologiaDoc") String tipologiaDoc) {
         //carico le processVariablwes e rimappo in formato json il campo stringa "valutazioneEsperienze_json"
-        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
-                .includeProcessVariables()
-                .processInstanceId(processInstanceId)
-                .singleResult();
-        JSONObject processvariables = mappingVariables(historicProcessInstance.getProcessVariables());
+//        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+//                .includeProcessVariables()
+//                .processInstanceId(processInstanceId)
+//                .singleResult();
+        //Sotituisco la lista di variabili da quelle storiche (historicProcessInstance.getProcessVariables() )a quelle attuali (variableInstanceJson)
+        //JSONObject processvariables = mappingVariables(historicProcessInstance.getProcessVariables());
+
+        Map<String, VariableInstance> tutteVariabiliMap = runtimeService.getVariableInstances(processInstanceId);
+		JSONObject variableInstanceJson = new JSONObject();
+		for (Entry<String, VariableInstance> entry : tutteVariabiliMap.entrySet()) {
+		    String key = entry.getKey();
+		    VariableInstance value = entry.getValue();
+		    Object variableValuealue = value.getValue();
+		    variableInstanceJson.put(key, variableValuealue);
+		}
+		LOGGER.info("variableInstanceJson: " + variableInstanceJson);
+		
+        //Sotituisco la lista di variabili da quelle storiche (historicProcessInstance.getProcessVariables() )a quelle attuali (variableInstanceJson)
+        JSONObject processvariables = mappingVariables(variableInstanceJson);
+     
         //creo il pdf corrispondente
         String utenteRichiedente = processvariables.getString("nomeRichiedente");
         String fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
@@ -116,8 +136,10 @@ public class FlowsPdfResource {
         return resp;
     }
 
-    private JSONObject mappingVariables(Map<String, Object> processVariables) {
-        JSONObject variables = new JSONObject(processVariables);
+    //Sotituisco il mapping direttamente con il json delle variabili sttuali 
+    //private JSONObject mappingVariables(Map<String, Object> processVariables) {
+    //	JSONObject variables = new JSONObject(processVariables);
+    private JSONObject mappingVariables(JSONObject variables) {
 
         //refactoring della stringona contenete le esperienze in un jsonArray
         if (variables.has(VALUTAZIONE_ESPERIENZE_JSON)) {
