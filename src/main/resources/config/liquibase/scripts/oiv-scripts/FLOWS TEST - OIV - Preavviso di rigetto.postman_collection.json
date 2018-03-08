@@ -168,7 +168,7 @@
 						},
 						{
 							"key": "sceltaUtente",
-							"value": "invia_a_istruttoria",
+							"value": "invia_istruttoria",
 							"description": "",
 							"type": "text"
 						},
@@ -179,7 +179,7 @@
 							"type": "text"
 						},
 						{
-							"key": "commento",
+							"key": "dataInvioNuovaDomanda",
 							"value": "2018-02-07T23:00:00.000Z",
 							"description": "",
 							"type": "text"
@@ -189,6 +189,12 @@
 							"value": "",
 							"description": "",
 							"type": "file"
+						},
+						{
+							"key": "commento",
+							"value": "bah",
+							"description": "",
+							"type": "text"
 						}
 					]
 				},
