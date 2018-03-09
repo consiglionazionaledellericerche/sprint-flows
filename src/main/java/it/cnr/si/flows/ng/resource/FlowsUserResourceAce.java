@@ -33,10 +33,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 
-/**
- * REST controller per la gestione FlowsUser: usiamo un "nostro" REST controller
- * (e non quello di sprint-core) perchè abbiamo dei campi customizzati (phone).
- */
 @RestController
 @RequestMapping("api/users")
 public class FlowsUserResourceAce {
