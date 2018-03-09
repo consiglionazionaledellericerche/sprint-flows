@@ -1,4 +1,4 @@
-package it.cnr.si.web.rest;
+package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.config.Constants;
@@ -9,6 +9,7 @@ import it.cnr.si.flows.ng.service.FlowsMailService;
 import it.cnr.si.repository.FlowsUserRepository;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.FlowsUserService;
+import it.cnr.si.web.rest.UserResource;
 import it.cnr.si.web.rest.util.HeaderUtil;
 import it.cnr.si.web.rest.util.PaginationUtil;
 import org.slf4j.Logger;
