@@ -26,7 +26,7 @@
         </extensionElements>
       </userTask>
       <sequenceFlow id="flow4" sourceRef="istruttoria" targetRef="exclusivegateway1"></sequenceFlow>
-      <userTask id="soccorso-istruttorio" name="SOCCORSO ISTRUTTORIO" activiti:candidateUsers="${initiator}">
+      <userTask id="soccorso-istruttorio" name="SOCCORSO ISTRUTTORIO" activiti:assignee="${initiator}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
             <activiti:field name="faseEsecuzione">
@@ -83,7 +83,7 @@
           </activiti:executionListener>
         </extensionElements>
       </userTask>
-      <userTask id="preavviso-rigetto" name="PREAVVISO RIGETTO" activiti:candidateUsers="${initiator}">
+      <userTask id="preavviso-rigetto" name="PREAVVISO RIGETTO" activiti:assignee="${initiator}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
             <activiti:field name="faseEsecuzione">
