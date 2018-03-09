@@ -100,23 +100,40 @@ public class FlowsPdfResource {
     public ResponseEntity<byte[]> makePdf(
             @RequestParam("processInstanceId") String processInstanceId,
             @RequestParam("tipologiaDoc") String tipologiaDoc) {
-        //carico le processVariablwes e rimappo in formato json il campo stringa "valutazioneEsperienze_json"
-//        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
-//                .includeProcessVariables()
-//                .processInstanceId(processInstanceId)
-//                .singleResult();
+    	
+    	
+   	
+
         //Sotituisco la lista di variabili da quelle storiche (historicProcessInstance.getProcessVariables() )a quelle attuali (variableInstanceJson)
         //JSONObject processvariables = mappingVariables(historicProcessInstance.getProcessVariables());
-
-        Map<String, VariableInstance> tutteVariabiliMap = runtimeService.getVariableInstances(processInstanceId);
+		boolean porcessoterminato = false;
 		JSONObject variableInstanceJson = new JSONObject();
-		for (Entry<String, VariableInstance> entry : tutteVariabiliMap.entrySet()) {
-		    String key = entry.getKey();
-		    VariableInstance value = entry.getValue();
-		    Object variableValuealue = value.getValue();
-		    variableInstanceJson.put(key, variableValuealue);
-		}
-		LOGGER.info("variableInstanceJson: " + variableInstanceJson);
+		
+        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                .includeProcessVariables()
+                .processInstanceId(processInstanceId)
+                .singleResult();
+        
+        if(historicProcessInstance.getEndTime() != null){
+    		porcessoterminato = true;
+
+    	// Verifico se il workflow è terminato
+        }
+    	if(porcessoterminato){
+            //carico le processVariablwes e rimappo in formato json il campo stringa "valutazioneEsperienze_json"
+          variableInstanceJson = new JSONObject(historicProcessInstance.getProcessVariables());
+    	} else {
+            Map<String, VariableInstance> tutteVariabiliMap = runtimeService.getVariableInstances(processInstanceId);
+    		for (Entry<String, VariableInstance> entry : tutteVariabiliMap.entrySet()) {
+    		    String key = entry.getKey();
+    		    VariableInstance value = entry.getValue();
+    		    Object variableValuealue = value.getValue();
+    		    variableInstanceJson.put(key, variableValuealue);
+    		}
+    		LOGGER.info("variableInstanceJson: " + variableInstanceJson);
+    		
+    	}
+
 		
         //Sotituisco la lista di variabili da quelle storiche (historicProcessInstance.getProcessVariables() )a quelle attuali (variableInstanceJson)
         JSONObject processvariables = mappingVariables(variableInstanceJson);
@@ -138,7 +155,6 @@ public class FlowsPdfResource {
 
     //Sotituisco il mapping direttamente con il json delle variabili sttuali 
     //private JSONObject mappingVariables(Map<String, Object> processVariables) {
-    //	JSONObject variables = new JSONObject(processVariables);
     private JSONObject mappingVariables(JSONObject variables) {
 
         //refactoring della stringona contenete le esperienze in un jsonArray
