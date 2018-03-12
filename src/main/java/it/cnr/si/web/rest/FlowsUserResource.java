@@ -83,7 +83,8 @@ public class FlowsUserResource {
         } else {
             FlowsUserDto flowsUserDto = new FlowsUserDto(flowsUser.getId(), flowsUser.getLogin(), flowsUser.getPassword(), flowsUser.getFirstName(),
                                                          flowsUser.getLastName(), flowsUser.getEmail(), flowsUser.isActivated(), flowsUser.getLangKey(),
-                                                         flowsUser.getAuthorities(), flowsUser.getCreatedDate(), flowsUser.getLastModifiedBy(), flowsUser.getLastModifiedDate(), flowsUser.getPhone());
+                                                         flowsUser.getAuthorities(), flowsUser.getCreatedDate(), flowsUser.getLastModifiedBy(),
+                                                         flowsUser.getLastModifiedDate(), flowsUser.getPhone(), flowsUser.getGender());
 
             FlowsUser newFlowsUser = flowsUserService.createUser(flowsUserDto);
 
@@ -118,13 +119,13 @@ public class FlowsUserResource {
         }
         flowsUserService.updateUser(flowsUserDto.getId(), flowsUserDto.getLogin(), flowsUserDto.getFirstName(),
                                     flowsUserDto.getLastName(), flowsUserDto.getEmail(), flowsUserDto.isActivated(),
-                                    flowsUserDto.getLangKey(), flowsUserDto.getAuthorities(), flowsUserDto.getPhone());
+                                    flowsUserDto.getLangKey(), flowsUserDto.getAuthorities(), flowsUserDto.getPhone(), flowsUserDto.getGender());
 
         FlowsUserDto newFlowsUserDto = new FlowsUserDto(flowsUserDto.getId(), flowsUserDto.getLogin(), flowsUserDto.getPassword(),
                                                         flowsUserDto.getFirstName(), flowsUserDto.getLastName(), flowsUserDto.getEmail(),
                                                         flowsUserDto.isActivated(), flowsUserDto.getLangKey(), flowsUserDto.getAuthorities(),
                                                         flowsUserDto.getCreatedDate(), flowsUserDto.getLastModifiedBy(),
-                                                        flowsUserDto.getLastModifiedDate(), flowsUserDto.getPhone());
+                                                        flowsUserDto.getLastModifiedDate(), flowsUserDto.getPhone(), flowsUserDto.getGender());
         return ResponseEntity.ok()
                 .headers(HeaderUtil.createAlert("userManagement.updated", flowsUserDto.getLogin()))
                 .body(newFlowsUserDto);
@@ -176,7 +177,7 @@ public class FlowsUserResource {
         return new FlowsUserDto(flowsUserDto.getId(), flowsUserDto.getLogin(), flowsUserDto.getPassword(), flowsUserDto.getFirstName(),
                                 flowsUserDto.getLastName(), flowsUserDto.getEmail(), flowsUserDto.getActivated(), flowsUserDto.getLangKey(),
                                 authorities, flowsUserDto.getCreatedDate(), flowsUserDto.getLastModifiedBy(),
-                                flowsUserDto.getLastModifiedDate(), flowsUserDto.getPhone());
+                                flowsUserDto.getLastModifiedDate(), flowsUserDto.getPhone(), flowsUserDto.getGender());
     }
 
     /**

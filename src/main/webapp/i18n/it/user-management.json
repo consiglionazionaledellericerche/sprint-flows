@@ -26,6 +26,7 @@
         "createdDate": "Creato il",
         "lastModifiedBy": "Modificato da",
         "lastModifiedDate": "Modificato il",
-        "phone": "Telefono"
+      "phone": "Telefono",
+      "gender": "Sesso"
     }
 }

@@ -73,11 +73,13 @@ public class FlowsUser extends AbstractAuditingEntity implements Serializable {
     private String resetKey;
 
     @Column(name = "reset_date", nullable = true)
-    private ZonedDateTime resetDate = null;
+    private transient ZonedDateTime resetDate;
 
+    @Column(name = "phone")
+    private String phone;
 
-    @Column(name = "phone", nullable = true)
-    private String phone = null;
+    @Column(name = "gender")
+    private String gender;
 
     @JsonIgnore
     @ManyToMany
@@ -185,13 +187,20 @@ public class FlowsUser extends AbstractAuditingEntity implements Serializable {
         this.authorities = authorities;
     }
 
-
     public String getPhone() {
         return phone;
     }
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     @Override

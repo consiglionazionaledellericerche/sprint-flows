@@ -26,6 +26,7 @@
         "createdDate": "Created date",
         "lastModifiedBy": "Modified by",
         "lastModifiedDate": "Modified date",
-        "phone": "Telephone"
+      "phone": "Telephone",
+      "gender": "Gender"
     }
 }
