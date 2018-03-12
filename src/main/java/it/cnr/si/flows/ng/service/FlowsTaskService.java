@@ -98,8 +98,8 @@ public class FlowsTaskService {
 		Map<String, Object> data = new HashMap<>();
 		List<String> parameterNames = Collections.list(req.getParameterNames());
 		parameterNames.stream().forEach(paramName -> {
-			// se ho un json non aggiungo i suoi singoli campi
-			if (!parameterNames.contains(paramName.split("\\[")[0] + "_json"))
+            // se ho un json non aggiungo i suoi singoli campi (Ed escludo il parametro "cacheBuster")
+            if ((!parameterNames.contains(paramName.split("\\[")[0] + "_json")) && (!paramName.equals("cacheBuster")))
 				data.put(paramName, req.getParameter(paramName));
 		});
 		return data;
