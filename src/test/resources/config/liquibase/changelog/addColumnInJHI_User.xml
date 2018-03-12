@@ -13,7 +13,7 @@
         <addColumn catalogName=""
                    schemaName="public"
                    tableName="jhi_user">
-            <column name="gender" type="char(1)"/>
+            <column name="gender" type="varchar(10)"/>
         </addColumn>
     </changeSet>
 

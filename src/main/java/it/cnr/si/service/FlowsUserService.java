@@ -139,27 +139,16 @@ public class FlowsUserService {
         user.setResetDate(ZonedDateTime.now());
         user.setActivated(true);
         user.setPhone(flowsUseDto.getPhone());
+        user.setGender(flowsUseDto.getGender());
         flowsUserRepository.save(user);
         log.debug("Created Information for User: {}", user);
         return user;
     }
 
 
-    public void updateUser(String firstName, String lastName, String email, String langKey) {
-        flowsUserRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).ifPresent(u -> {
-            u.setFirstName(firstName);
-            u.setLastName(lastName);
-            u.setEmail(email);
-            u.setLangKey(langKey);
-            flowsUserRepository.save(u);
-            log.debug("Changed Information for User: {}", u);
-        });
-    }
-
-
     public void updateUser(
             Long id, String login, String firstName, String lastName, String email,
-            boolean activated, String langKey, Set<String> authorities, String phone) {
+            boolean activated, String langKey, Set<String> authorities, String phone, String gender) {
         flowsUserRepository
                 .findOneById(id)
                 .ifPresent(u -> {
@@ -175,6 +164,7 @@ public class FlowsUserService {
                             authority -> managedAuthorities.add(authorityRepository.findOne(authority))
                     );
                     u.setPhone(phone);
+                    u.setGender(gender);
                     log.debug("Changed Information for User: {}", u);
                 });
     }

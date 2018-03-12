@@ -1,6 +1,5 @@
 package it.cnr.si.flows.ng.dto;
 
-import it.cnr.si.domain.User;
 import it.cnr.si.service.dto.UserDTO;
 
 import javax.validation.constraints.NotNull;
@@ -26,6 +25,8 @@ public class FlowsUserDto extends UserDTO {
 
     private String phone;
 
+    private String gender;
+
     @NotNull
     @Size(min = PASSWORD_MIN_LENGTH, max = PASSWORD_MAX_LENGTH)
     private String password;
@@ -33,19 +34,9 @@ public class FlowsUserDto extends UserDTO {
     public FlowsUserDto() {
     }
 
-    public FlowsUserDto(User user, String phone) {
-        super(user);
-        this.id = user.getId();
-        this.createdDate = user.getCreatedDate();
-        this.lastModifiedBy = user.getLastModifiedBy();
-        this.lastModifiedDate = user.getLastModifiedDate();
-        this.password = null;
-        this.phone = phone;
-    }
-
     public FlowsUserDto(
             Long id, String login, String password, String firstName, String lastName, String email, boolean activated, String langKey,
-            Set<String> authorities, ZonedDateTime createdDate, String lastModifiedBy, ZonedDateTime lastModifiedDate, String phone) {
+            Set<String> authorities, ZonedDateTime createdDate, String lastModifiedBy, ZonedDateTime lastModifiedDate, String phone, String gender) {
         super(login, firstName, lastName, email, activated, langKey, authorities);
         this.id = id;
         this.createdDate = createdDate;
@@ -53,6 +44,7 @@ public class FlowsUserDto extends UserDTO {
         this.lastModifiedDate = lastModifiedDate;
         this.password = password;
         this.phone = phone;
+        this.gender = gender;
     }
 
     public Long getId() {
@@ -93,6 +85,14 @@ public class FlowsUserDto extends UserDTO {
 
     public String getPhone() {
         return phone;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     @Override
