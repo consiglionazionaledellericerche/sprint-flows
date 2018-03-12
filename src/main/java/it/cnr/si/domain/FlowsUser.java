@@ -233,6 +233,7 @@ public class FlowsUser extends AbstractAuditingEntity implements Serializable {
                 ", langKey='" + langKey + '\'' +
                 ", activationKey='" + activationKey + '\'' +
                 ", phone='" + phone + '\'' +
+                ", gender='" + gender + '\'' +
                 "}";
     }
 }

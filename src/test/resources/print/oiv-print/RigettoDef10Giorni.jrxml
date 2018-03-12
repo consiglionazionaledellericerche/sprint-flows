@@ -107,7 +107,7 @@
 				<textElement>
 					<font fontName="SansSerif" size="11" isBold="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA[( $F{sessoRichiedente}.equalsIgnoreCase( "m" )  ? ("Al dott.: ") : ("Alla dott.ssa: ") )]]></textFieldExpression>
+				<textFieldExpression><![CDATA[( $F{sessoRichiedente}.equalsIgnoreCase( "M" )  ? ("Al dott.: ") : ("Alla dott.ssa: ") )]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
 				<reportElement style="Detail" x="310" y="162" width="69" height="17" uuid="e2a46fcd-e936-4956-a327-61d08f44f5bd"/>

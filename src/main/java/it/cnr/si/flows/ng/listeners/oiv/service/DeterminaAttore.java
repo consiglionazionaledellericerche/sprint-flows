@@ -9,7 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import it.cnr.si.service.FlowsUserService;
-import it.cnr.si.service.UserService;
+
+
+
 
 
 
@@ -26,13 +28,13 @@ public class DeterminaAttore {
 		String currentName = flowsUserService.getUserWithAuthorities().getFirstName() + " " + flowsUserService.getUserWithAuthorities().getLastName();
 		String currentUsername = flowsUserService.getUserWithAuthorities().getLogin();
 		String userPhone = "1";
-		String sessoIstruttore = "m";
+		String sessoIstruttore = "M";
 		if(flowsUserService.getUserWithAuthorities().getPhone() != null){
 		    userPhone = flowsUserService.getUserWithAuthorities().getPhone();
 		}
-//		if(flowsUserService.getUserWithAuthorities().getGender() != null){
-//			sessoIstruttore = flowsUserService.getUserWithAuthorities().getGender();
-//		}
+		if(flowsUserService.getUserWithAuthorities().getGender() != null){
+			sessoIstruttore = flowsUserService.getUserWithAuthorities().getGender();
+		}
 
 		execution.setVariable("nomeIstruttore", currentName);
 		execution.setVariable("istruttoreIncaricato", currentUsername);
