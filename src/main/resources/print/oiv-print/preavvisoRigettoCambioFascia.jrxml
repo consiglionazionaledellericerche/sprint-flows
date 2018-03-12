@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="OivRigetto" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c0187353-db16-46fc-a7a4-9ece39bc4976">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="755"/>
+	<property name="ireport.y" value="754"/>
 	<style name="Title" fontName="Times New Roman" fontSize="50" isBold="true" pdfFontName="Times-Bold"/>
 	<style name="SubTitle" forecolor="#736343" fontName="Arial" fontSize="18"/>
 	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
@@ -237,6 +237,15 @@
 	<field name="fasciaAppartenenzaProposta" class="java.lang.String">
 		<fieldDescription><![CDATA[fasciaAppartenenzaProposta]]></fieldDescription>
 	</field>
+	<field name="nomeIstruttore" class="java.lang.String">
+		<fieldDescription><![CDATA[nomeIstruttore]]></fieldDescription>
+	</field>
+	<field name="telefonoIstruttore" class="java.lang.String">
+		<fieldDescription><![CDATA[telefonoIstruttore]]></fieldDescription>
+	</field>
+	<field name="sessoIstruttore" class="java.lang.String">
+		<fieldDescription><![CDATA[sessoIstruttore]]></fieldDescription>
+	</field>
 	<group name="Group2" footerPosition="ForceAtBottom">
 		<groupExpression><![CDATA[(int)($V{REPORT_COUNT}/5)]]></groupExpression>
 		<groupHeader>
@@ -392,7 +401,7 @@
 					<font size="11"/>
 					<paragraph lineSpacing="1_1_2"/>
 				</textElement>
-				<textFieldExpression><![CDATA["\r\n\t Pertanto, alla luce di quanto dichiarato non emergono esperienze con carattere di continuità e prevalenza " +( $F{numeroAmbitiKo}.equals( "1" )  ? ("riconducibile all’ambito indicato.") : ("riconducibili agli ambiti indicati.") ) + "\r\n\t In merito alla questione sopra evidenziata, si informa la S.V. che laddove intenda fornire ulteriori elementi in ordine ai requisiti posseduti, potrà comunicarli, con la apposita funzionalità disponibile nel profilo nell’area riservata, entro 10 giorni dal ricevimento della presente.\r\n\t Tale comunicazione dovrà essere corredata da idonea documentazione comprovante il possesso dei requisiti richiesti dal citato decreto.\r\n\t In assenza di riscontro, l’Ufficio procederà al rigetto dell’istanza di iscrizione nell’Elenco.\r\n\t Per altri eventuali chiarimenti è possibile contattare </ il dott./la dott.ssa/> </ istruttore /> dalle 11.00 alle 13.00, telefono 06 6899 </interno/>."]]></textFieldExpression>
+				<textFieldExpression><![CDATA["\r\n\t Pertanto, alla luce di quanto dichiarato non emergono esperienze con carattere di continuità e prevalenza " +( $F{numeroAmbitiKo}.equals( "1" )  ? ("riconducibile all’ambito indicato.") : ("riconducibili agli ambiti indicati.") ) + "\r\n\t In merito alla questione sopra evidenziata, si informa la S.V. che laddove intenda fornire ulteriori elementi in ordine ai requisiti posseduti, potrà comunicarli, con la apposita funzionalità disponibile nel profilo nell’area riservata, entro 10 giorni dal ricevimento della presente.\r\n\t Tale comunicazione dovrà essere corredata da idonea documentazione comprovante il possesso dei requisiti richiesti dal citato decreto.\r\n\t In assenza di riscontro, l’Ufficio procederà al rigetto dell’istanza di iscrizione nell’Elenco.\r\n\t Per altri eventuali chiarimenti è possibile contattare " + ( $F{sessoIstruttore}.equals( "m" )  ?  ("il dott. ") : ("la dott.ssa ") )+ $F{nomeIstruttore} + " dalle 11.00 alle 13.00, telefono 06 6899 "+ $F{telefonoIstruttore} +"."]]></textFieldExpression>
 			</textField>
 		</band>
 		<band height="109">
