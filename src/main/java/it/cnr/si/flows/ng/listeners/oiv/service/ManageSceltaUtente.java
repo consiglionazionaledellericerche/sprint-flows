@@ -51,7 +51,12 @@ public class ManageSceltaUtente {
 			case "istruttoria-end": {
 				if(sceltaUtente.equals("invio_valutazione")) {
 					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
-					manageControlli.valutazioneEsperienze(execution);
+					String valutazioneIstruttore = execution.getVariable("valutazioneIstruttore").toString();
+					String esitoValutazione = "negativa";
+					if(valutazioneIstruttore.equals("domanda_da_approvare")){
+						esitoValutazione = "positiva";
+					}
+					manageControlli.valutazioneEsperienze(execution, esitoValutazione);
 				}
 				if(sceltaUtente.equals("richiesta_soccorso_istruttorio")) {
 					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
@@ -61,6 +66,7 @@ public class ManageSceltaUtente {
 			case "valutazione-end": {
 				if(sceltaUtente.equals("genera_PDF_preavviso_di_rigetto")) {
 					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
+					manageControlli.valutazioneEsperienzeGenerazionePdf(execution);
 					execution.setVariable("pdfPreavvisoRigettoFlag", "1");					
 					switch(execution.getVariable("tipologiaRichiesta").toString()){  
 					case "iscrizione": {
@@ -82,8 +88,8 @@ public class ManageSceltaUtente {
 					manageControlli.verificaPuntiSoccorso(execution);
 				}
 				if(sceltaUtente.equals("invia_preavviso_di_rigetto")) {
-					String nomeFilePreavviso = "preavvisoRigetto";
 					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
+					String nomeFilePreavviso = "preavvisoRigetto";
 					FlowsAttachment fileRecuperato = attachmentService.getAttachementsForProcessInstance(processInstanceId).get("preavvisoRigetto");
 					if (fileRecuperato != null){
 						nomeFilePreavviso = fileRecuperato.getName();
@@ -96,20 +102,42 @@ public class ManageSceltaUtente {
 					LOGGER.info("-- verificaFileFirmatoP7m: nomeFilePreavviso:" + nomeFilePreavviso);
 					flowsControlService.verificaFileFirmato_Cades_Pades(execution, nomeFilePreavviso);
 				}
+				if(sceltaUtente.equals("approva")) {
+					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
+					String esitoValutazione = "positiva";
+					manageControlli.valutazioneEsperienze(execution, esitoValutazione);
+				}
 			};break;    
 			case "soccorso-istruttorio-start": {
 				LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 				execution.setVariable("soccorsoIstruttoriaFlag", "1");
 			};break;
+			case "istruttoria-su-preavviso-end": {
+				if(sceltaUtente.equals("invia_alla_valutazione")) {
+					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
+					String valutazioneIstruttore = execution.getVariable("valutazioneIstruttore").toString();
+					String esitoValutazione = "negativa";
+					if(valutazioneIstruttore.equals("domanda_da_approvare")){
+						esitoValutazione = "positiva";
+					}
+					manageControlli.valutazioneEsperienze(execution, esitoValutazione);
+				}
+			};break;	
 			case "valutazione-preavviso-end": {
 				if(sceltaUtente.equals("genera_PDF_rigetto")) {
 					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
+					manageControlli.valutazioneEsperienzeGenerazionePdf(execution);
 					execution.setVariable("pdfRigettoFlag", "1");
 					if(((execution.getVariable("tempiPreavvisoRigetto")  != null) && (execution.getVariable("tempiPreavvisoRigetto").toString().equals("SCADUTI")))){
 						createOivPdf.CreaPdfOiv(execution, RigettoDef10Giorni.name());
 					} else {
 						createOivPdf.CreaPdfOiv(execution, rigettoMotivato.name());
 					}
+				}
+				if(sceltaUtente.equals("approva")) {
+					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
+					String esitoValutazione = "positiva";
+					manageControlli.valutazioneEsperienze(execution, esitoValutazione);
 				}
 			};break;
 			case "firma-dg-rigetto-end": {
@@ -128,7 +156,7 @@ public class ManageSceltaUtente {
 					LOGGER.info("-- verificaFileFirmatoP7m: nomeFileRigetto:" + nomeFileRigetto);
 					flowsControlService.verificaFileFirmato_Cades_Pades(execution, nomeFileRigetto);
 				}
-			};break;			
+			};break;		
 			default:  {
 				LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
 			};break;    
