@@ -17,17 +17,28 @@ public class ManageControlli {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ManageControlli.class);
 
 	
-	public void valutazioneEsperienze(DelegateExecution execution) throws IOException, ParseException {
+	public void valutazioneEsperienze(DelegateExecution execution, String esitoValutazione) throws IOException, ParseException {
 		String numeroValutazioniPositive = execution.getVariable("numeroValutazioniPositive").toString();
 		String numeroValutazioniNegative = execution.getVariable("numeroValutazioniNegative").toString();
-		String valutazioneIstruttore = execution.getVariable("valutazioneIstruttore").toString();
-		if((numeroValutazioniPositive.equals("0")) && valutazioneIstruttore.equals("domanda_da_approvare")){
+		LOGGER.info("-- numeroValutazioniPositive: " + numeroValutazioniPositive + "-- numeroValutazioniNegative: " + numeroValutazioniNegative );
+		if((numeroValutazioniPositive.equals("0")) && esitoValutazione.equals("positiva")){
 			LOGGER.info("-- numeroValutazioniPositive: " + numeroValutazioniPositive );
-			throw new BpmnError("412", "La scelta 'domanda_da_approvare' non risulta congruente<br>con la valutazione negativa di tutte le esperienze<br>");
+			throw new BpmnError("412", "La scelta '"+ execution.getVariable("sceltaUtente").toString() + "' non risulta congruente<br>con la valutazione negativa di tutte le esperienze<br>");
 		}
-		if((numeroValutazioniNegative.equals("0")) && valutazioneIstruttore.equals("domanda_da_respingere")){
+		if((numeroValutazioniNegative.equals("0")) && esitoValutazione.equals("negativa")){
 			LOGGER.info("-- numeroValutazioniNegative: " + numeroValutazioniNegative );
-			throw new BpmnError("412", "La scelta 'domanda_da_respingere' non risulta congruente<br>con la valutazione positiva di tutte le esperienze<br>");
+			throw new BpmnError("412", "La scelta '"+ execution.getVariable("sceltaUtente").toString() + "' non risulta congruente<br>con la valutazione positiva di tutte le esperienze<br>");
+		}
+	}
+
+	
+	public void valutazioneEsperienzeGenerazionePdf(DelegateExecution execution) throws IOException, ParseException {
+		String numeroValutazioniPositive = execution.getVariable("numeroValutazioniPositive").toString();
+		String numeroValutazioniNegative = execution.getVariable("numeroValutazioniNegative").toString();
+		LOGGER.info("-- numeroValutazioniPositive: " + numeroValutazioniPositive + "-- numeroValutazioniNegative: " + numeroValutazioniNegative );
+		if(numeroValutazioniNegative.equals("0")){
+			LOGGER.info("-- numeroValutazioniNegative: " + numeroValutazioniNegative );
+			throw new BpmnError("412", "La scelta '"+ execution.getVariable("sceltaUtente").toString() + "' non risulta congruente<br>con la valutazione positiva di tutte le esperienze<br>");
 		}
 	}
 
