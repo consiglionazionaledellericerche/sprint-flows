@@ -164,17 +164,17 @@ public class FlowsPdfResource {
         }
 
         //tolgo, nel json, i campi "byte" dei documenti
-        if (variables.has("domanda"))
-            variables.getJSONObject("domanda").remove(BYTES);
-
-        if (variables.has("cv"))
-            variables.getJSONObject("cv").remove(BYTES);
-
-        if (variables.has("cartaIdentita"))
-            variables.getJSONObject("cartaIdentita").remove(BYTES);
-        //i bytes degli altri allegati continuano ad apparire nel json ma non posso verificarli tutti
-        if (variables.has("allegati[0]"))
-            variables.getJSONObject("allegati[0]").remove(BYTES);
+//        if (variables.has("domanda"))
+//            variables.getJSONObject("domanda").remove(BYTES);
+//
+//        if (variables.has("cv"))
+//            variables.getJSONObject("cv").remove(BYTES);
+//
+//        if (variables.has("cartaIdentita"))
+//            variables.getJSONObject("cartaIdentita").remove(BYTES);
+//        //i bytes degli altri allegati continuano ad apparire nel json ma non posso verificarli tutti
+//        if (variables.has("allegati[0]"))
+//            variables.getJSONObject("allegati[0]").remove(BYTES);
 
         return variables;
     }
