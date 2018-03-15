@@ -112,7 +112,7 @@ public class FlowsProcessInstanceService {
         //History
         ArrayList<Map<String, Object>> history = new ArrayList<>();
         historyService.createHistoricTaskInstanceQuery()
-                .includeProcessVariables()
+                .includeTaskLocalVariables()
                 .processInstanceId(processInstanceId)
                 .list()
                 .forEach(
