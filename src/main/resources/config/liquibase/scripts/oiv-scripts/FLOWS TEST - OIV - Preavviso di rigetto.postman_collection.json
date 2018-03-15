@@ -115,15 +115,94 @@
 			"response": []
 		},
 		{
+			"name": "SPRINT_FLOWS - OIV - Get Task (PREAVVISO RIGETTO)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "247f7b3a-a833-48f9-bc38-2bfb6bf988d4",
+						"type": "text/javascript",
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"    console.log(data.history.length);",
+							"    for (var i = 0; i < data.history.length;i++ ) {",
+							"    console.log(i + \") ID: \" + data.history[i].historyTask.id + \" NAME: \" + data.history[i].historyTask.name);",
+							"    if(data.history[i].historyTask.name === \"PREAVVISO RIGETTO\"){",
+							"        postman.setGlobalVariable(\"TASK_ID\", data.history[i].historyTask.id);",
+							"    }",
+							"}",
+							"    console.log(\"-- ID recuperato è: \" + postman.getGlobalVariable(\"TASK_ID\"));",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "cacheBuster",
+						"value": "150399103591"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "processInstanceId",
+							"value": "5",
+							"type": "text",
+							"description": ""
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/processInstances?processInstanceId=2501",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"processInstances"
+					],
+					"query": [
+						{
+							"key": "processInstanceId",
+							"value": "2501",
+							"equals": true
+						}
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
 			"name": "SPRINT_FLOWS - OIV - Preavviso di Rigetto",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "d29a1d90-306f-435f-90af-8b2d9e737570",
+						"id": "61524458-6586-43f2-87fd-80a2273e709c",
 						"type": "text/javascript",
 						"exec": [
-							"postman.setGlobalVariable(\"TASK_ID\", \"5498\");",
+							"//postman.setGlobalVariable(\"TASK_ID\", \"51068\");",
 							""
 						]
 					}
@@ -156,7 +235,7 @@
 					"formdata": [
 						{
 							"key": "processDefinitionId",
-							"value": "iscrizione-elenco-oiv:1:2504",
+							"value": "iscrizione-elenco-oiv:1:4",
 							"type": "text",
 							"description": ""
 						},
@@ -174,13 +253,13 @@
 						},
 						{
 							"key": "dataInvioNuovaDomanda",
-							"value": "2018-02-07T23:00:00.000Z",
+							"value": "2018-03-07T23:00:00.000Z",
 							"description": "",
 							"type": "text"
 						},
 						{
 							"key": "osservazioniRichiedente",
-							"value": "Le mie osservazioni sono in merito al punto 1 e 4",
+							"value": "Le mie osservazioni sono in merito al punto 1 e 4 E BASTAAAAA.",
 							"description": "",
 							"type": "text"
 						},
@@ -192,13 +271,11 @@
 						},
 						{
 							"key": "allegati-riscontro-preavviso[0]",
-							"value": "",
 							"description": "",
 							"type": "file"
 						},
 						{
 							"key": "allegati-riscontro-preavviso[1]",
-							"value": "",
 							"description": "",
 							"type": "file"
 						}

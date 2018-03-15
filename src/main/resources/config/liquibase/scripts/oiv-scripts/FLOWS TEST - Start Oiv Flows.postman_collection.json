@@ -149,13 +149,13 @@
 						},
 						{
 							"key": "titolo",
-							"value": "Domanda 38",
+							"value": "Domanda 50",
 							"type": "text",
 							"description": ""
 						},
 						{
 							"key": "descrizione",
-							"value": "Domanda 38",
+							"value": "Domanda 50",
 							"type": "text",
 							"description": ""
 						},
@@ -215,7 +215,7 @@
 						},
 						{
 							"key": "valutazioneEsperienze_json",
-							"value": "[{ \"numeroEsperienza\": 1, \"dataInizio\": \"22/10/2010\", \"dataFine\": \"22/11/2012\", \"tipologiaEsperienza\": \"esperienza 1\", \"ambitoEsperienza\": \"CONTROLLO DI GESTIONE\", \"descrizioneIpa\": \"Consiglio Nazionale delle Ricerche\", \"attivitaSvolta\": \"dirigente\" }, { \"numeroEsperienza\": 2, \"dataInizio\": \"13/05/2012\", \"dataFine\": \"21/02/2013\", \"tipologiaEsperienza\": \"esperienza 2\", \"ambitoEsperienza\": \"PIANIFICAZIONE\", \"descrizioneIpa\": \"INPS\", \"attivitaSvolta\": \"impiegato\" }, { \"numeroEsperienza\": 3, \"dataInizio\": \"21/04/2014\", \"dataFine\": \"21/06/2014\", \"tipologiaEsperienza\": \"esperienza 3\", \"ambitoEsperienza\": \"RISK MANAGEMENT\", \"descrizioneIpa\": \"INAIL\", \"attivitaSvolta\": \"direttore\" } ]",
+							"value": "[{ \"numeroEsperienza\": 1, \"dataInizio\": \"22/12/2001\", \"dataFine\": \"22/12/2003\", \"tipologiaEsperienza\": \"esperienza 1\", \"ambitoEsperienza\": \"agraria\", \"attivitaSvolta\": \"dirigente\", \"annotazioniValutatore\": \"8556\", \"oggettoDiSoccorso\": \"SI\", \"motivazioneSoccorso\": \"5745\", \"giudizioFinale\": \"OK\" }, { \"numeroEsperienza\": 2, \"dataInizio\": \"02/04/2003\", \"dataFine\": \"13/12/2007\", \"tipologiaEsperienza\": \"esperienza 2 versione2\", \"ambitoEsperienza\": \"pubblico  versione2\", \"attivitaSvolta\": \"impiegato versione2\", \"annotazioniValutatore\": \"566i\", \"giudizioFinale\": \"OK\", \"oggettoDiSoccorso\": \"SI\", \"motivazioneSoccorso\": \"67\" }, { \"numeroEsperienza\": 3, \"dataInizio\": \"09/11/2007\", \"dataFine\": \"14/03/2011\", \"tipologiaEsperienza\": \"esperienza 3 versione2\", \"ambitoEsperienza\": \"settore privato versione2\", \"attivitaSvolta\": \"direttore versione2\", \"annotazioniValutatore\": \"758\", \"oggettoDiSoccorso\": \"SI\", \"motivazioneSoccorso\": \"ytr\", \"giudizioFinale\": \"KO\" }, { \"numeroEsperienza\": 4, \"dataInizio\": \"14/04/2011\", \"dataFine\": \"23/02/2017\", \"tipologiaEsperienza\": \"nuova esperienza post soccorso\", \"ambitoEsperienza\": \"professionale\", \"attivitaSvolta\": \"dirigente\" } ]",
 							"type": "text",
 							"description": ""
 						},

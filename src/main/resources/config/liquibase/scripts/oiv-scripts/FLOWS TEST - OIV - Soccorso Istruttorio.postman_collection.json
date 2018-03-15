@@ -115,15 +115,94 @@
 			"response": []
 		},
 		{
+			"name": "SPRINT_FLOWS - OIV - Get Task (SOCCORSO ISTRUTTORIO)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9697b43a-4164-433f-a57b-a2c0a09f2703",
+						"type": "text/javascript",
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"    console.log(data.history.length);",
+							"    for (var i = 0; i < data.history.length;i++ ) {",
+							"    console.log(i + \") ID: \" + data.history[i].historyTask.id + \" NAME: \" + data.history[i].historyTask.name);",
+							"    if(data.history[i].historyTask.name === \"SOCCORSO ISTRUTTORIO\"){",
+							"        postman.setGlobalVariable(\"TASK_ID\", data.history[i].historyTask.id);",
+							"    }",
+							"}",
+							"    console.log(\"-- ID recuperato è: \" + postman.getGlobalVariable(\"TASK_ID\"));",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "cacheBuster",
+						"value": "150399103591"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "processInstanceId",
+							"value": "5",
+							"type": "text",
+							"description": ""
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/processInstances?processInstanceId=2501",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"processInstances"
+					],
+					"query": [
+						{
+							"key": "processInstanceId",
+							"value": "2501",
+							"equals": true
+						}
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
 			"name": "SPRINT_FLOWS - OIV - Soccorso Istruttorio",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
-						"id": "b0d6f234-0233-4839-b2ed-02ee34744f7b",
+						"id": "8f7743ad-0fd0-4030-acc3-1f3309b68014",
 						"type": "text/javascript",
 						"exec": [
-							"postman.setGlobalVariable(\"TASK_ID\", \"5335\");",
+							"//postman.setGlobalVariable(\"TASK_ID\", \"5335\");",
 							""
 						]
 					}
@@ -156,7 +235,7 @@
 					"formdata": [
 						{
 							"key": "processDefinitionId",
-							"value": "iscrizione-elenco-oiv:1:2504",
+							"value": "iscrizione-elenco-oiv:1:4",
 							"type": "text",
 							"description": ""
 						},
