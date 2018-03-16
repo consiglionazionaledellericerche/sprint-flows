@@ -50,7 +50,11 @@
             "confirmpassword": "Conferma nuova password",
             "confirmpassword.placeholder": "Conferma nuova password",
             "email": "Email",
-            "email.placeholder": "Il tuo indirizzo email"
+            "email.placeholder": "Il tuo indirizzo email",
+            "phone": "Telefono",
+            "phone.placeholder": "Il tuo telefono",
+            "gender": "Sesso",
+            "gender.placeholder": "M/F"
         },
         "messages": {
             "info": {

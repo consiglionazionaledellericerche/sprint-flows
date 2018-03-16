@@ -94,8 +94,9 @@
  				if (_.has(vm.data, 'entity')) {
  					delete vm.data.entity;
  				}
+ 				// aggiunto (&& obj[key].constructor.name !== 'Date') per non rendere json le date
  				angular.forEach(vm.data, function(value, key, obj) {
- 					if (isObject(value) && key !== 'entity') {
+ 					if (isObject(value) && key !== 'entity' && obj[key].constructor.name !== 'Date') {
  						obj[key + "_json"] = JSON.stringify(value);
  					}
  				});
