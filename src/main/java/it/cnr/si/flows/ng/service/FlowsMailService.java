@@ -45,13 +45,11 @@ public class FlowsMailService extends MailService {
 
         String htmlContent = templateEngine.process(notificationType, ctx);
 
-        LOGGER.info("Invio mail a {} con titolo {} del tipo {} nella fase {} e con contenuto {}", username + "@cnr.it", "Notifica relativa al flusso " + variables.get("title"), notificationType, variables.get("faseUltima"), htmlContent);
+        LOGGER.info("Invio mail a {} con titolo {} del tipo {} nella fase {} e con contenuto {}", username + "@cnr.it", "Notifica relativa al flusso "+ variables.get("title"), notificationType, variables.get("faseUltima"), htmlContent);
 
         if (!mailConfig.isMailActivated()) {
             mailConfig.getMailRecipients()
-                    .forEach(r -> {
-                        sendEmail(r, "Notifica relativa al flusso " + variables.get("title"), htmlContent, false, true);
-                    });
+                    .forEach(r -> sendEmail(r, "Notifica relativa al flusso "+ variables.get("title"), htmlContent, false, true));
         } else {
             // TODO recuperare la mail da LDAP (vedi issue #66)
             // TODO scommentare per la produzione
