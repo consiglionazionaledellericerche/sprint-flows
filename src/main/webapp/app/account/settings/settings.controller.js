@@ -22,6 +22,8 @@
             return {
                 activated: account.activated,
                 email: account.email,
+                phone: account.phone,
+                gender: account.gender,
                 firstName: account.firstName,
                 langKey: account.langKey,
                 lastName: account.lastName,
