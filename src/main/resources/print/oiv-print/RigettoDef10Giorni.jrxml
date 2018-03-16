@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="OivRigetto" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c0187353-db16-46fc-a7a4-9ece39bc4976">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.y" value="135"/>
 	<style name="Title" fontName="Times New Roman" fontSize="50" isBold="true" pdfFontName="Times-Bold"/>
 	<style name="SubTitle" forecolor="#736343" fontName="Arial" fontSize="18"/>
 	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
@@ -77,7 +77,7 @@
 						<font fontName="SansSerif" size="11" isBold="false"/>
 						<paragraph lineSpacing="1_1_2"/>
 					</textElement>
-					<textFieldExpression><![CDATA["\tFacendo seguito al preavviso di rigetto, inviato il "+$F{dataPreavviso}+" (Prot.  "+$F{protocolloPreavviso}+"), a cui la S.V. non ha dato riscontro, entro il termine indicato dei dieci giorni, per ulteriori elementi ai fini dell’iscrizione nell’Elenco nazionale degli OIV, il Dipartimento procede al rigetto dell’istanza per le ragioni già riportate nella citata nota di preavviso, che si intendono qui integralmente richiamate."]]></textFieldExpression>
+					<textFieldExpression><![CDATA["\tFacendo seguito al preavviso di rigetto, inviato il "+$F{dataPreavviso}.substring( 8, 10 )+"/"+$F{dataPreavviso}.substring( 5, 7 )+"/"+$F{dataPreavviso}.substring( 0, 4 )+" (Prot.  "+$F{protocolloPreavviso}+"), a cui la S.V. non ha dato riscontro, entro il termine indicato dei dieci giorni, per ulteriori elementi ai fini dell’iscrizione nell’Elenco nazionale degli OIV, il Dipartimento procede al rigetto dell’istanza per le ragioni già riportate nella citata nota di preavviso, che si intendono qui integralmente richiamate."]]></textFieldExpression>
 				</textField>
 				<textField>
 					<reportElement x="98" y="13" width="444" height="40" uuid="e9825bfd-c98f-4489-83b3-1ceb9783f873"/>
@@ -107,7 +107,7 @@
 				<textElement>
 					<font fontName="SansSerif" size="11" isBold="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA[( $F{sessoRichiedente}.equalsIgnoreCase( "m" )  ? ("Al dott.: ") : ("Alla dott.ssa: ") )]]></textFieldExpression>
+				<textFieldExpression><![CDATA[( $F{sessoRichiedente}.equalsIgnoreCase( "M" )  ? ("Al dott.: ") : ("Alla dott.ssa: ") )]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
 				<reportElement style="Detail" x="310" y="162" width="69" height="17" uuid="e2a46fcd-e936-4956-a327-61d08f44f5bd"/>

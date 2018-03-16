@@ -97,10 +97,10 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"id\":null,\"login\":\"utente1\",\"firstName\":\"utente1\",\"lastName\":\"utente1\",\"email\":\"utente1@cnr.it\",\"activated\":true,\"langKey\":\"en\",\"createdBy\":null,\"createdDate\":null,\"lastModifiedBy\":null,\"lastModifiedDate\":null,\"resetDate\":null,\"resetKey\":null,\"authorities\":[\"ROLE_USER\"]}"
+					"raw": "{\"id\":null,\"login\":\"utente1\",\"firstName\":\"utente1\",\"lastName\":\"utente1\",\"email\":\"utente1@cnr.it\",\"phone\":\"1111\",\"gender\":\"M\",\"activated\":true,\"langKey\":\"en\",\"createdBy\":null,\"createdDate\":null,\"lastModifiedBy\":null,\"lastModifiedDate\":null,\"resetDate\":null,\"resetKey\":null,\"authorities\":[\"ROLE_USER\"]}"
 				},
 				"url": {
-					"raw": "http://localhost:8080/api/users?",
+					"raw": "http://localhost:8080/api/flows/users?",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -108,6 +108,7 @@
 					"port": "8080",
 					"path": [
 						"api",
+						"flows",
 						"users"
 					]
 				},
@@ -137,10 +138,10 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"id\":null,\"login\":\"utente2\",\"firstName\":\"utente2\",\"lastName\":\"utente2\",\"email\":\"utente2@cnr.it\",\"activated\":true,\"langKey\":\"en\",\"createdBy\":null,\"createdDate\":null,\"lastModifiedBy\":null,\"lastModifiedDate\":null,\"resetDate\":null,\"resetKey\":null,\"authorities\":[\"ROLE_USER\"]}"
+					"raw": "{\"id\":null,\"login\":\"utente2\",\"firstName\":\"utente2\",\"lastName\":\"utente2\",\"email\":\"utente2@cnr.it\",\"phone\":\"2222\",\"gender\":\"M\",\"activated\":true,\"langKey\":\"en\",\"createdBy\":null,\"createdDate\":null,\"lastModifiedBy\":null,\"lastModifiedDate\":null,\"resetDate\":null,\"resetKey\":null,\"authorities\":[\"ROLE_USER\"]}"
 				},
 				"url": {
-					"raw": "http://localhost:8080/api/users?",
+					"raw": "http://localhost:8080/api/flows/users?",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -148,10 +149,52 @@
 					"port": "8080",
 					"path": [
 						"api",
+						"flows",
 						"users"
 					]
 				},
 				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "UPDATE USER2",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{    \"login\": \"utente2\",\r\n    \"firstName\": \"utente2\",\r\n    \"lastName\": \"utente2\",\r\n    \"email\": \"utente2@cnr.it\",\r\n    \"activated\": true,\r\n    \"langKey\": \"en\",\r\n    \"authorities\": [\"ROLE_USER\"],\r\n    \"id\": 6,\r\n    \"createdDate\": \"2018-03-12T15:23:52.147Z\",\r\n    \"lastModifiedBy\": \"utente2\",\r\n    \"lastModifiedDate\": \"2018-03-12T15:23:53.709Z\",\r\n    \"phone\": \"22222\",\r\n    \"gender\": \"M\",\r\n    \"password\": \"$2a$10$UoWwTdDG2XjmJUPFl1DxdukWDWAMf87nINWBzXEe7diOcnMrzvs9S\"\r\n\t\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/flows/users?",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"flows",
+						"users"
+					]
+				},
+				"description": "update user"
 			},
 			"response": []
 		},
@@ -177,10 +220,10 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"id\":null,\"login\":\"utente3\",\"firstName\":\"utente3\",\"lastName\":\"utente3\",\"email\":\"utente3@cnr.it\",\"activated\":true,\"langKey\":\"en\",\"createdBy\":null,\"createdDate\":null,\"lastModifiedBy\":null,\"lastModifiedDate\":null,\"resetDate\":null,\"resetKey\":null,\"authorities\":[\"ROLE_USER\"]}"
+					"raw": "{\"id\":null,\"login\":\"utente3\",\"firstName\":\"utente3\",\"lastName\":\"utente3\",\"email\":\"utente3@cnr.it\",\"phone\":\"3333\",\"gender\":\"F\",\"activated\":true,\"langKey\":\"en\",\"createdBy\":null,\"createdDate\":null,\"lastModifiedBy\":null,\"lastModifiedDate\":null,\"resetDate\":null,\"resetKey\":null,\"authorities\":[\"ROLE_USER\"]}"
 				},
 				"url": {
-					"raw": "http://localhost:8080/api/users?",
+					"raw": "http://localhost:8080/api/flows/users?",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -188,6 +231,7 @@
 					"port": "8080",
 					"path": [
 						"api",
+						"flows",
 						"users"
 					]
 				},
@@ -217,10 +261,10 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"id\":null,\"login\":\"utente4\",\"firstName\":\"utente4\",\"lastName\":\"utente4\",\"email\":\"utente4@cnr.it\",\"activated\":true,\"langKey\":\"en\",\"createdBy\":null,\"createdDate\":null,\"lastModifiedBy\":null,\"lastModifiedDate\":null,\"resetDate\":null,\"resetKey\":null,\"authorities\":[\"ROLE_USER\"]}"
+					"raw": "{\"id\":null,\"login\":\"utente4\",\"firstName\":\"utente4\",\"lastName\":\"utente4\",\"email\":\"utente4@cnr.it\",\"phone\":\"4444\",\"gender\":\"F\",\"activated\":true,\"langKey\":\"en\",\"createdBy\":null,\"createdDate\":null,\"lastModifiedBy\":null,\"lastModifiedDate\":null,\"resetDate\":null,\"resetKey\":null,\"authorities\":[\"ROLE_USER\"]}"
 				},
 				"url": {
-					"raw": "http://localhost:8080/api/users?",
+					"raw": "http://localhost:8080/api/flows/users?",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -228,6 +272,7 @@
 					"port": "8080",
 					"path": [
 						"api",
+						"flows",
 						"users"
 					]
 				},
@@ -236,7 +281,48 @@
 			"response": []
 		},
 		{
-			"name": "CREATE MEMBERSHIP USER1",
+			"name": "CREATE USER5",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":null,\"login\":\"utente5\",\"firstName\":\"utente5\",\"lastName\":\"utente5\",\"email\":\"utente5@cnr.it\",\"phone\":\"5555\",\"gender\":\"F\",\"activated\":true,\"langKey\":\"en\",\"createdBy\":null,\"createdDate\":null,\"lastModifiedBy\":null,\"lastModifiedDate\":null,\"resetDate\":null,\"resetKey\":null,\"authorities\":[\"ROLE_USER\"]}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/flows/users?",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"flows",
+						"users"
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE MEMBERSHIP USER1 abilitati#iscrizione-elenco-oiv@",
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -257,7 +343,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"id\": 21,\r\n    \"username\": \"utente1\",\r\n    \"groupname\": \"abilitati#iscrizione-elenco-oiv@99999\"\r\n  }"
+					"raw": "{\r\n    \"id\": 21,\r\n    \"username\": \"utente1\",\r\n    \"groupname\": \"abilitati#iscrizione-elenco-oiv@99999\",\r\n    \"grouprole\": \"member\"\r\n  }"
 				},
 				"url": {
 					"raw": "http://localhost:8080/api/memberships",
@@ -276,7 +362,7 @@
 			"response": []
 		},
 		{
-			"name": "CREATE MEMBERSHIP USER2",
+			"name": "CREATE MEMBERSHIP USER2 istruttore@",
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -297,7 +383,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"id\": 22,\r\n    \"username\": \"utente2\",\r\n    \"groupname\": \"istruttore@99999\"\r\n  }"
+					"raw": "{\r\n    \"id\": 22,\r\n    \"username\": \"utente2\",\r\n    \"groupname\": \"istruttore@99999\",\r\n    \"grouprole\": \"member\"\r\n  }"
 				},
 				"url": {
 					"raw": "http://localhost:8080/api/memberships",
@@ -316,7 +402,7 @@
 			"response": []
 		},
 		{
-			"name": "CREATE MEMBERSHIP USER3",
+			"name": "CREATE MEMBERSHIP USER3 coordinatoreresponsabile@",
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -337,7 +423,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"id\": 23,\r\n    \"username\": \"utente3\",\r\n    \"groupname\": \"coordinatoreresponsabile@99999\"\r\n  }"
+					"raw": "{\r\n    \"id\": 23,\r\n    \"username\": \"utente3\",\r\n    \"groupname\": \"coordinatoreresponsabile@99999\",\r\n    \"grouprole\": \"member\"\r\n  }"
 				},
 				"url": {
 					"raw": "http://localhost:8080/api/memberships",
@@ -356,7 +442,7 @@
 			"response": []
 		},
 		{
-			"name": "CREATE MEMBERSHIP USER4",
+			"name": "CREATE MEMBERSHIP USER4 direttore@",
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -377,7 +463,87 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"id\": 24,\r\n    \"username\": \"utente4\",\r\n    \"groupname\": \"direttore@99999\"\r\n  }"
+					"raw": "{\r\n    \"id\": 24,\r\n    \"username\": \"utente4\",\r\n    \"groupname\": \"direttore@99999\",\r\n    \"grouprole\": \"member\"\r\n  }"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/memberships",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"memberships"
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE MEMBERSHIP USER4 firmaRigetto@",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 24,\r\n    \"username\": \"utente4\",\r\n    \"groupname\": \"firmaRigetto@99999\",\r\n    \"grouprole\": \"member\"\r\n  }"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/memberships",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"memberships"
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE MEMBERSHIP USER5 istruttore@",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 24,\r\n    \"username\": \"utente5\",\r\n    \"groupname\": \"istruttore@99999\",\r\n    \"grouprole\": \"member\"\r\n  }"
 				},
 				"url": {
 					"raw": "http://localhost:8080/api/memberships",
@@ -677,6 +843,81 @@
 				"body": {
 					"mode": "raw",
 					"raw": "utente4"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/account/change_password",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"account",
+						"change_password"
+					]
+				},
+				"description": "IMPERSONATE USER"
+			},
+			"response": []
+		},
+		{
+			"name": "IMPERSONATE USER5",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/impersonate/start?impersonate_username=utente5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"impersonate",
+						"start"
+					],
+					"query": [
+						{
+							"key": "impersonate_username",
+							"value": "utente5",
+							"equals": true
+						}
+					]
+				},
+				"description": "IMPERSONATE USER"
+			},
+			"response": []
+		},
+		{
+			"name": "CHANGE PW USER5",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "utente5"
 				},
 				"url": {
 					"raw": "http://localhost:8080/api/account/change_password",
