@@ -27,4 +27,8 @@
     <include file="classpath:config/liquibase/changelog/20170206085209_added_entity_constraints_Cnrauthority.xml"
              relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
+
+    <include file="classpath:config/liquibase/changelog/addColumnInJHI_User.xml"
+             relativeToChangelogFile="false"/>
+
 </databaseChangeLog>
