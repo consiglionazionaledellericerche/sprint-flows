@@ -46,6 +46,19 @@
             </div>
         </div>
         <div class="form-group">
+            <label class="control-label" translate="userManagement.phone">Phone</label>
+            <input type="text" class="form-control" name="phone"
+                   ng-model="vm.user.phone" ng-maxlength="20">
+
+            <div ng-show="editForm.phone.$invalid">
+                <p class="help-block"
+                   ng-show="editForm.phone.$error.maxlength" translate="entity.validation.maxlength"
+                   translate-value-max="20">
+                    This field cannot be longer than 20 characters.
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
             <label translate="userManagement.lastName">Last Name</label>
             <input type="text" class="form-control" name="lastName"
                    ng-model="vm.user.lastName" ng-maxlength="50">
@@ -74,10 +87,10 @@
                    translate-value-max="100">
                     This field cannot be longer than 100 characters.
                 </p>
-				<p class="help-block"
+                <p class="help-block"
                    ng-show="editForm.email.$error.email" translate="global.messages.validate.email.invalid">
                     Your e-mail is invalid.
-                 </p>
+                </p>
             </div>
         </div>
         <div class="form-group">
@@ -87,6 +100,12 @@
             </label>
         </div>
 
+        <div class="form-group">
+            <label translate="userManagement.gender">Gender</label>
+            <select class="form-control" name="langKey" ng-model="vm.user.gender"
+                    ng-options="gender as gender for gender in vm.gender track by gender">
+            </select>
+        </div>
         <div class="form-group">
             <label translate="userManagement.langKey">Lang Key</label>
             <select class="form-control" name="langKey" ng-model="vm.user.langKey"
@@ -104,7 +123,7 @@
     <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="vm.clear()">
             <span class="glyphicon glyphicon-ban-circle"></span>&nbsp;<span
-            translate="entity.action.cancel">Cancel</span>
+                translate="entity.action.cancel">Cancel</span>
         </button>
         <button type="submit" ng-disabled="editForm.$invalid || isSaving" class="btn btn-primary">
             <span class="glyphicon glyphicon-save"></span>&nbsp;<span translate="entity.action.save">Save</span>

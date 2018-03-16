@@ -1,7 +1,6 @@
 package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
-
 import it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.security.AuthoritiesConstants;
@@ -33,9 +32,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+
 @RestController
 @RequestMapping("api/users")
-public class FlowsUserResource {
+public class FlowsUserResourceAce {
 
     @Autowired
     private LdapTemplate ldapTemplate;
@@ -49,19 +49,19 @@ public class FlowsUserResource {
     @Inject
     private RestResponseFactory restResponseFactory;
 
-    @RequestMapping(value= "/ace/user/{username:.+}", method = RequestMethod.GET)
+    @RequestMapping(value = "/ace/user/{username:.+}", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.ADMIN)
     public List<String> getAce(@PathVariable String username) throws SQLException {
         return aceService.getAceGroupsForUser(username);
     }
 
-    @RequestMapping(value= "/ace/group/{groupname:.+}", method = RequestMethod.GET)
+    @RequestMapping(value = "/ace/group/{groupname:.+}", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.ADMIN)
     public List<String> getAceGroup(@PathVariable String groupname) throws SQLException {
         return aceService.getUsersinAceGroup(groupname);
     }
 
-    @RequestMapping(value= "/ace/groupdetail/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/ace/groupdetail/{id}", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.ADMIN)
     public String getAceGroupDetail(@PathVariable Integer id) throws SQLException {
         return aceService.getNomeStruturaById(id);
@@ -75,11 +75,11 @@ public class FlowsUserResource {
 
         Map<String, Object> response = new HashMap<>();
 
-        List<SearchResult> search = ldapTemplate.search("", "(uid=*"+ username +"*)", new AttributesMapper<SearchResult>() {
+        List<SearchResult> search = ldapTemplate.search("", "(uid=*" + username + "*)", new AttributesMapper<SearchResult>() {
             public SearchResult mapFromAttributes(Attributes attrs) throws NamingException {
                 return new SearchResult(attrs.get("uid").get().toString(),
-                        attrs.get("cnrnome").get() +" "+ attrs.get("cnrcognome").get() +" "+
-                                "("+ attrs.get("uid").get().toString() +")");
+                                        attrs.get("cnrnome").get() + " " + attrs.get("cnrcognome").get() + " " +
+                                                "(" + attrs.get("uid").get().toString() + ")");
             }
         });
 
@@ -105,8 +105,8 @@ public class FlowsUserResource {
         return ResponseEntity.ok(response);
     }
 
-    //    todo: cancellare
-    @RequestMapping(value= "/customquery", method = RequestMethod.GET)
+    //    todo: non vieme mai usato => cancellare?
+    @RequestMapping(value = "/customquery", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.ADMIN)
     public List<HistoricProcessInstanceResponse> customQuery() throws SQLException {
 

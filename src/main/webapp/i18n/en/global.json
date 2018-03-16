@@ -49,7 +49,11 @@
             "confirmpassword": "New password confirmation",
             "confirmpassword.placeholder": "Confirm the new password",
             "email": "E-mail",
-            "email.placeholder": "Your e-mail"
+            "email.placeholder": "Your e-mail",
+            "phone": "Phone",
+            "phone.placeholder": "Your phone",
+            "gender": "Gender",
+            "gender.placeholder": "Your gender"
         },
         "messages": {
             "info": {

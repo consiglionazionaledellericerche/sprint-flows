@@ -1,17 +1,20 @@
 package it.cnr.si.flows.ng.listeners.oiv;
 
-import it.cnr.si.flows.ng.listeners.oiv.service.CalcolaPunteggioFascia;
-import it.cnr.si.flows.ng.listeners.oiv.service.DeterminaAttore;
-import it.cnr.si.flows.ng.listeners.oiv.service.OperazioniTimer;
-import it.cnr.si.flows.ng.listeners.oiv.service.ManageSceltaUtente;
-import it.cnr.si.flows.ng.listeners.oiv.service.StartOivSetGroupsAndVisibility;
+
 
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import it.cnr.si.flows.ng.listeners.oiv.service.CalcolaPunteggioFascia;
+import it.cnr.si.flows.ng.listeners.oiv.service.ManageSceltaUtente;
+import it.cnr.si.flows.ng.listeners.oiv.service.OperazioniTimer;
+import it.cnr.si.flows.ng.listeners.oiv.service.StartOivSetGroupsAndVisibility;
+
 
 import javax.inject.Inject;
 
@@ -30,7 +33,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 	@Inject
 	private ManageSceltaUtente manageSceltaUtente;
 
-
+	
 
 	private Expression faseEsecuzione;
 
@@ -61,6 +64,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 		};break;     
 		case "smistamento-end": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
+			operazioniTimer.determinaTimerScadenzaTermini(execution, "boundarytimer3");
 		};break;     
 		case "istruttoria-start": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
@@ -72,7 +76,6 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 		};break;     
 		case "istruttoria-end": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
-			operazioniTimer.determinaTimerScadenzaTermini(execution, "boundarytimer3");
 			calcolaPunteggioFascia.calcolaAggiornaGiudizioFinale(execution, aggiornaGiudizioFinale);
 		};break;  
 		case "soccorso-istruttorio-start":  {
