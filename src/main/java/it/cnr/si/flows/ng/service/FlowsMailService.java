@@ -1,7 +1,10 @@
 package it.cnr.si.flows.ng.service;
 
-import it.cnr.si.flows.ng.config.MailConfguration;
-import it.cnr.si.service.MailService;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Primary;
@@ -10,8 +13,8 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import javax.inject.Inject;
-import java.util.Map;
+import it.cnr.si.flows.ng.config.MailConfguration;
+import it.cnr.si.service.MailService;
 
 @Service
 @Primary
@@ -30,7 +33,7 @@ public class FlowsMailService extends MailService {
     private MailConfguration mailConfig;
     @Inject
     private AceBridgeService aceService;
-
+    
     @Async
     public void sendFlowEventNotification(String notificationType, Map<String, Object> variables, String taskName, String username, String groupName) {
         Context ctx = new Context();
@@ -45,11 +48,13 @@ public class FlowsMailService extends MailService {
 
         String htmlContent = templateEngine.process(notificationType, ctx);
 
-        LOGGER.info("Invio mail a {} con titolo {} del tipo {} nella fase {} e con contenuto {}", username + "@cnr.it", "Notifica relativa al flusso "+ variables.get("title"), notificationType, variables.get("faseUltima"), htmlContent);
+        LOGGER.info("Invio mail a {} con titolo {} del tipo {} nella fase {} e con contenuto {}", username+"@cnr.it", "Notifica relativa al flusso "+ variables.get("title"), notificationType, variables.get("faseUltima"), htmlContent);
 
         if (!mailConfig.isMailActivated()) {
             mailConfig.getMailRecipients()
-                    .forEach(r -> sendEmail(r, "Notifica relativa al flusso "+ variables.get("title"), htmlContent, false, true));
+            .forEach(r -> {
+                sendEmail(r, "Notifica relativa al flusso "+ variables.get("title"), htmlContent, false, true);
+            });
         } else {
             // TODO recuperare la mail da LDAP (vedi issue #66)
             // TODO scommentare per la produzione
