@@ -104,7 +104,7 @@ public class FlowsUserResource {
      * @param flowsUserDto il FlowsUser da aggiornare
      * @return la ResponseEntity con status 200 (OK) ed il FlowsUser aggiornato nel body,
      * o con status 400 (Bad Request) se il login o la email è già in uso,
-     * o con status 500 (Internal Server Error) se lo FlowsUser non può essere aggiornato
+     * o con status 500 (Internal Server Error) se lo FlowsUser non può essere aggiornato (ad es.: si è avviata l'app con il profilo "cnr"),
      */
     @RequestMapping(value = "/users",
             method = RequestMethod.PUT,
@@ -156,7 +156,7 @@ public class FlowsUserResource {
 
                 Long id = existingUser.orElse(new FlowsUser()).getId();
                 Set<String> authorities = new HashSet<>();
-                authorities.add("ROLE_USER");
+                authorities.add(AuthoritiesConstants.USER);
 
                 flowsUserService.updateUser(id, flowsUserDto.getLogin(), flowsUserDto.getFirstName(), flowsUserDto.getLastName(), flowsUserDto.getEmail(),
                                             true, flowsUserDto.getLangKey(), authorities, flowsUserDto.getPhone(), flowsUserDto.getGender());
