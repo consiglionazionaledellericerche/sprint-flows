@@ -8,11 +8,13 @@ import it.cnr.si.flows.ng.dto.FlowsUserDto;
 import it.cnr.si.flows.ng.service.FlowsMailService;
 import it.cnr.si.repository.FlowsUserRepository;
 import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.security.SecurityUtils;
 import it.cnr.si.service.FlowsUserService;
 import it.cnr.si.web.rest.util.HeaderUtil;
 import it.cnr.si.web.rest.util.PaginationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -26,6 +28,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -94,6 +97,7 @@ public class FlowsUserResource {
         }
     }
 
+
     /**
      * PUT  /users : Aggiorna un FlowsUser che esiste.
      *
@@ -106,30 +110,71 @@ public class FlowsUserResource {
             method = RequestMethod.PUT,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    @Secured(AuthoritiesConstants.ADMIN)
+    @Profile(value = {"!cnr", "oiv"})
     public ResponseEntity<FlowsUserDto> updateUser(@RequestBody FlowsUserDto flowsUserDto) {
-        log.debug("REST request to update User : {}", flowsUserDto);
-        Optional<FlowsUser> existingUser = flowsUserRepository.findOneByEmail(flowsUserDto.getEmail());
-        if (existingUser.isPresent() && (!existingUser.get().getId().equals(flowsUserDto.getId()))) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("userManagement", "emailexists", "E-mail already in use")).body(null);
-        }
-        existingUser = flowsUserRepository.findOneByLogin(flowsUserDto.getLogin().toLowerCase());
-        if (existingUser.isPresent() && (!existingUser.get().getId().equals(flowsUserDto.getId()))) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("userManagement", "userexists", "Login already in use")).body(null);
-        }
-        flowsUserService.updateUser(flowsUserDto.getId(), flowsUserDto.getLogin(), flowsUserDto.getFirstName(),
-                                    flowsUserDto.getLastName(), flowsUserDto.getEmail(), flowsUserDto.isActivated(),
-                                    flowsUserDto.getLangKey(), flowsUserDto.getAuthorities(), flowsUserDto.getPhone(), flowsUserDto.getGender());
+        //se l'utente ha ROLE_ADMIN può fare tutto
+        if (SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN)) {
+            log.debug("L'utente {} sta modificando i campi dell'utente {}", SecurityUtils.getCurrentUserLogin(), flowsUserDto.getLogin());
 
-        FlowsUserDto newFlowsUserDto = new FlowsUserDto(flowsUserDto.getId(), flowsUserDto.getLogin(), flowsUserDto.getPassword(),
-                                                        flowsUserDto.getFirstName(), flowsUserDto.getLastName(), flowsUserDto.getEmail(),
-                                                        flowsUserDto.isActivated(), flowsUserDto.getLangKey(), flowsUserDto.getAuthorities(),
-                                                        flowsUserDto.getCreatedDate(), flowsUserDto.getLastModifiedBy(),
-                                                        flowsUserDto.getLastModifiedDate(), flowsUserDto.getPhone(), flowsUserDto.getGender());
-        return ResponseEntity.ok()
-                .headers(HeaderUtil.createAlert("userManagement.updated", flowsUserDto.getLogin()))
-                .body(newFlowsUserDto);
+            Optional<FlowsUser> existingUser = flowsUserRepository.findOneByEmail(flowsUserDto.getEmail());
+            if (existingUser.isPresent() && (!existingUser.get().getId().equals(flowsUserDto.getId()))) {
+                return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("userManagement", "emailexists", "E-mail already in use")).body(null);
+            }
+
+            existingUser = flowsUserRepository.findOneByLogin(flowsUserDto.getLogin().toLowerCase());
+            if (existingUser.isPresent() && (!existingUser.get().getId().equals(flowsUserDto.getId()))) {
+                return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("userManagement", "userexists", "Login already in use")).body(null);
+            }
+
+            flowsUserService.updateUser(flowsUserDto.getId(), flowsUserDto.getLogin(), flowsUserDto.getFirstName(),
+                                        flowsUserDto.getLastName(), flowsUserDto.getEmail(), flowsUserDto.isActivated(),
+                                        flowsUserDto.getLangKey(), flowsUserDto.getAuthorities(), flowsUserDto.getPhone(), flowsUserDto.getGender());
+
+            FlowsUserDto newFlowsUserDto = new FlowsUserDto(flowsUserDto.getId(), flowsUserDto.getLogin(), flowsUserDto.getPassword(),
+                                                            flowsUserDto.getFirstName(), flowsUserDto.getLastName(), flowsUserDto.getEmail(),
+                                                            flowsUserDto.isActivated(), flowsUserDto.getLangKey(), flowsUserDto.getAuthorities(),
+                                                            flowsUserDto.getCreatedDate(), flowsUserDto.getLastModifiedBy(),
+                                                            flowsUserDto.getLastModifiedDate(), flowsUserDto.getPhone(), flowsUserDto.getGender());
+            return ResponseEntity.ok()
+                    .headers(HeaderUtil.createAlert("userManagement.updated", flowsUserDto.getLogin()))
+                    .body(newFlowsUserDto);
+        } else {
+            //ALTRIMENTI può modificare solo se stesso e solo alcuni campi (CAMPI IMMUTABILI: "id", "activate" e "authorities"
+            // (sarà sempre "ROLE_USER" perchè solo gli utenti con questo ruolo eseguono questo ramo del codice))
+            String username = SecurityUtils.getCurrentUserLogin();
+            if (username.equals(flowsUserDto.getLogin())) {
+                log.debug("L'utente {} sta modificando i propri campi", flowsUserDto.getLogin());
+                Optional<FlowsUser> existingUser = flowsUserRepository.findOneByEmail(flowsUserDto.getEmail());
+                if (existingUser.isPresent() && (!existingUser.get().getId().equals(flowsUserDto.getId()))) {
+                    return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("userManagement", "emailexists", "E-mail already in use")).body(null);
+                }
+
+                existingUser = flowsUserRepository.findOneByLogin(flowsUserDto.getLogin().toLowerCase());
+                if (existingUser.isPresent() && (!existingUser.get().getId().equals(flowsUserDto.getId()))) {
+                    return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("userManagement", "userexists", "Login already in use")).body(null);
+                }
+
+                Long id = existingUser.orElse(new FlowsUser()).getId();
+                Set<String> authorities = new HashSet<>();
+                authorities.add("ROLE_USER");
+
+                flowsUserService.updateUser(id, flowsUserDto.getLogin(), flowsUserDto.getFirstName(), flowsUserDto.getLastName(), flowsUserDto.getEmail(),
+                                            true, flowsUserDto.getLangKey(), authorities, flowsUserDto.getPhone(), flowsUserDto.getGender());
+
+                FlowsUserDto newFlowsUserDto = new FlowsUserDto(id, username, flowsUserDto.getPassword(), flowsUserDto.getFirstName(),
+                                                                flowsUserDto.getLastName(), flowsUserDto.getEmail(), true,
+                                                                flowsUserDto.getLangKey(), authorities, flowsUserDto.getCreatedDate(),
+                                                                flowsUserDto.getLastModifiedBy(), flowsUserDto.getLastModifiedDate(),
+                                                                flowsUserDto.getPhone(), flowsUserDto.getGender());
+
+                return ResponseEntity.ok()
+                        .headers(HeaderUtil.createAlert("userManagement.updated", flowsUserDto.getLogin()))
+                        .body(newFlowsUserDto);
+            } else
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new FlowsUserDto());
+        }
     }
+
 
     /**
      * GET  /users : get all FlowsUser.

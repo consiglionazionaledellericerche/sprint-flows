@@ -46,19 +46,6 @@
             </div>
         </div>
         <div class="form-group">
-            <label class="control-label" translate="userManagement.phone">Phone</label>
-            <input type="text" class="form-control" name="phone"
-                   ng-model="vm.user.phone" ng-maxlength="20">
-
-            <div ng-show="editForm.phone.$invalid">
-                <p class="help-block"
-                   ng-show="editForm.phone.$error.maxlength" translate="entity.validation.maxlength"
-                   translate-value-max="20">
-                    This field cannot be longer than 20 characters.
-                </p>
-            </div>
-        </div>
-        <div class="form-group">
             <label translate="userManagement.lastName">Last Name</label>
             <input type="text" class="form-control" name="lastName"
                    ng-model="vm.user.lastName" ng-maxlength="50">
@@ -68,6 +55,25 @@
                    ng-show="editForm.lastName.$error.maxlength" translate="entity.validation.maxlength"
                    translate-value-max="50">
                     This field cannot be longer than 50 characters.
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label translate="userManagement.gender">Gender</label>
+            <select class="form-control" name="langKey" ng-model="vm.user.gender"
+                    ng-options="gender as gender for gender in vm.gender track by gender">
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="userManagement.phone">Phone</label>
+            <input type="text" class="form-control" name="phone"
+                   ng-model="vm.user.phone" ng-maxlength="20">
+
+            <div ng-show="editForm.phone.$invalid">
+                <p class="help-block"
+                   ng-show="editForm.phone.$error.maxlength" translate="entity.validation.maxlength"
+                   translate-value-max="20">
+                    This field cannot be longer than 20 characters.
                 </p>
             </div>
         </div>
@@ -98,13 +104,6 @@
                 <input ng-disabled="vm.user.id === null" type="checkbox" id="activated" ng-model="vm.user.activated">
                 <span translate="userManagement.activated">Activated</span>
             </label>
-        </div>
-
-        <div class="form-group">
-            <label translate="userManagement.gender">Gender</label>
-            <select class="form-control" name="langKey" ng-model="vm.user.gender"
-                    ng-options="gender as gender for gender in vm.gender track by gender">
-            </select>
         </div>
         <div class="form-group">
             <label translate="userManagement.langKey">Lang Key</label>
