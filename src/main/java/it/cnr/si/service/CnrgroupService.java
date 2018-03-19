@@ -55,6 +55,18 @@ public class CnrgroupService {
      *  @return the entity
      */
     @Transactional(readOnly = true) 
+    public String findDisplayName(String name) {
+        log.debug("Request to get Cnrgroup : {}", name);
+        return cnrgroupRepository.findDisplayName(name);
+    }
+
+    /**
+     *  Get one cnrgroup by id.
+     *
+     *  @param id the id of the entity
+     *  @return the entity
+     */
+    @Transactional(readOnly = true) 
     public Cnrgroup findOne(Long id) {
         log.debug("Request to get Cnrgroup : {}", id);
         return cnrgroupRepository.findOneWithEagerRelationships(id);
