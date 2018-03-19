@@ -101,29 +101,29 @@
                         </a>
                     </li>
                     <li ui-sref-active="active" >
-                            <a ui-sref="dynamiclist" ng-click="vm.collapseNavbar()">
-                                <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
-                                <span translate="global.menu.entities.dynamiclist">Dynamiclist</span>
-                            </a>
-                        </li>
+                        <a ui-sref="dynamiclist" ng-click="vm.collapseNavbar()">
+                            <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
+                            <span translate="global.menu.entities.dynamiclist">Dynamiclist</span>
+                        </a>
+                    </li>
                     <li ui-sref-active="active" >
-                            <a ui-sref="view" ng-click="vm.collapseNavbar()">
-                                <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
-                                <span translate="global.menu.entities.view">View</span>
-                            </a>
-                        </li>
+                        <a ui-sref="view" ng-click="vm.collapseNavbar()">
+                            <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
+                            <span translate="global.menu.entities.view">View</span>
+                        </a>
+                    </li>
                     <li ui-sref-active="active" >
-                            <a ui-sref="notification-rule" ng-click="vm.collapseNavbar()">
-                                <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
-                                <span translate="global.menu.entities.notificationRule">Notification Rule</span>
-                            </a>
-                        </li>
+                        <a ui-sref="notification-rule" ng-click="vm.collapseNavbar()">
+                            <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
+                            <span translate="global.menu.entities.notificationRule">Notification Rule</span>
+                        </a>
+                    </li>
                     <li ui-sref-active="active" >
-                            <a ui-sref="membership" ng-click="vm.collapseNavbar()">
-                                <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
-                                <span translate="global.menu.entities.membership">Membership</span>
-                            </a>
-                        </li>
+                        <a ui-sref="membership" ng-click="vm.collapseNavbar()">
+                            <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
+                            <span translate="global.menu.entities.membership">Membership</span>
+                        </a>
+                    </li>
                     <!-- jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here -->
                 </ul>
             </li>
@@ -138,13 +138,13 @@
                     </span>
                 </a>
                 <ul class="dropdown-menu" uib-dropdown-menu>
-                    <li ui-sref-active="active" ng-switch-when="true">
+                    <li ui-sref-active="active" ng-if="app == 'oiv'">
                         <a ui-sref="settings" ng-click="vm.collapseNavbar()">
                             <span class="glyphicon glyphicon-wrench"></span>&nbsp;
                             <span translate="global.menu.account.settings">Settings</span>
                         </a>
                     </li>
-                    <li ui-sref-active="active" ng-switch-when="true">
+                    <li ui-sref-active="active" ng-if="(app == 'oiv')||(app == 'cnr')">
                         <a ui-sref="password" ng-click="vm.collapseNavbar()">
                             <span class="glyphicon glyphicon-lock"></span>&nbsp;
                             <span translate="global.menu.account.password">Password</span>
