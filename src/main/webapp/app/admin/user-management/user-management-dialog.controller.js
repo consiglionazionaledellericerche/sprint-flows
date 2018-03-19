@@ -15,7 +15,7 @@
         vm.languages = null;
         vm.save = save;
         vm.user = entity;
-        vm.gender = ["F", "M"]
+        vm.gender = ["F", "M"];
 
 
         JhiLanguageService.getAll().then(function (languages) {
