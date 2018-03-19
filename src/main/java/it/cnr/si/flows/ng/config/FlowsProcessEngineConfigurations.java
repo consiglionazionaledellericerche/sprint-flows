@@ -3,6 +3,8 @@ package it.cnr.si.flows.ng.config;
 import com.zaxxer.hikari.HikariDataSource;
 import it.cnr.si.flows.ng.service.FlowsRuntimeService;
 import org.activiti.engine.*;
+import org.activiti.engine.impl.bpmn.data.ItemInstance;
+import org.activiti.engine.impl.bpmn.webservice.MessageInstance;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.impl.variable.*;
 import org.activiti.image.ProcessDiagramGenerator;
@@ -111,18 +113,31 @@ public class FlowsProcessEngineConfigurations {
             SpringProcessEngineConfiguration conf) throws Exception {
         //modifica per il flusso test-timer
         conf.setJobExecutorActivate(true);
-        conf.setMaxLengthStringVariableType(1000000);
+        conf.setMaxLengthStringVariableType(10000000);
 
-        //IMPORTANTE: aggiungo un nuovo tipo di dato specifico SOLO SE è NON VERR° MODIFICATO (per non creare problemi al DB)
+        //IMPORTANTE: aggiungo un nuovo tipo di dato specifico SOLO SE è NON VERRA' MODIFICATO (per non creare problemi al DB)
         // https://blog.progs.be/628/activiti-variables-json
         VariableTypes variableTypes = new DefaultVariableTypes();
 
-        // Risolvono il problema delle variabili "troppo" lunghe (ad es.: "valutazioneEsperienze_json")
-        variableTypes.addType(new ByteArrayType());
-        variableTypes.addType(new SerializableType());
         //Aggiungo il tipo json nel db (per le variabili di tipo json, se si riesce ad usare dovrebbe gestirle meglio delle stringhe e degli stream)
         variableTypes.addType(new JsonType(DEFAULT_GENERIC_MAX_LENGTH_STRING, conf.getObjectMapper()));
         variableTypes.addType(new LongJsonType(DEFAULT_GENERIC_MAX_LENGTH_STRING + 1, conf.getObjectMapper()));
+        variableTypes.addType(new LongStringType(DEFAULT_GENERIC_MAX_LENGTH_STRING));
+
+        variableTypes.addType(new NullType());
+        variableTypes.addType(new StringType(DEFAULT_GENERIC_MAX_LENGTH_STRING));
+        variableTypes.addType(new BooleanType());
+        variableTypes.addType(new ShortType());
+        variableTypes.addType(new IntegerType());
+        variableTypes.addType(new LongType());
+        variableTypes.addType(new DateType());
+        variableTypes.addType(new DoubleType());
+        variableTypes.addType(new UUIDType());
+        // Risolvono il problema delle variabili "troppo" lunghe (ad es.: "valutazioneEsperienze_json")
+        variableTypes.addType(new ByteArrayType());
+        variableTypes.addType(new SerializableType());
+        variableTypes.addType(new CustomObjectType("item", ItemInstance.class));
+        variableTypes.addType(new CustomObjectType("message", MessageInstance.class));
 
         conf.setVariableTypes(variableTypes);
 
