@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import it.cnr.si.flows.ng.listeners.oiv.service.CalcolaPunteggioFascia;
+import it.cnr.si.flows.ng.listeners.oiv.service.ManageControlli;
 import it.cnr.si.flows.ng.listeners.oiv.service.ManageSceltaUtente;
 import it.cnr.si.flows.ng.listeners.oiv.service.OperazioniTimer;
 import it.cnr.si.flows.ng.listeners.oiv.service.StartOivSetGroupsAndVisibility;
@@ -32,6 +33,8 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 	private StartOivSetGroupsAndVisibility startOivSetGroupsAndVisibility;
 	@Inject
 	private ManageSceltaUtente manageSceltaUtente;
+	@Inject
+	private ManageControlli manageControlli;
 
 	
 
@@ -57,6 +60,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 		case "process-start": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
 			startOivSetGroupsAndVisibility.configuraVariabiliStart(execution);
+			manageControlli.verificaUnicaDomandaAttivaUtente(execution);
 			calcolaPunteggioFascia.settaNoAllOggettoSoccrso(execution);
 		};break;    
 		case "smistamento-start": {

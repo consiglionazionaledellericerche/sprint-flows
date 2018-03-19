@@ -33,7 +33,7 @@ public class StartOivSetGroupsAndVisibility {
 		String gruppoCoordinatoreResponsabile = "coordinatoreresponsabile@"+ struttura;
 
 		execution.setVariable("gruppoIstruttori", gruppoIstruttori);
-		execution.setVariable("gruppoFirmaRigetto", gruppoDirettore);
+		execution.setVariable("gruppoFirmaRigetto", gruppoFirmaRigetto);
 		execution.setVariable("gruppoCoordinatoreResponsabile", gruppoCoordinatoreResponsabile);
 		execution.setVariable("domandaImprocedibileFlag", "0");
 		execution.setVariable("soccorsoIstruttoriaFlag", "0");
