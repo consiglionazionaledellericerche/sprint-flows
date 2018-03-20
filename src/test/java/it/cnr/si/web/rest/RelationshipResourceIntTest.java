@@ -2,10 +2,8 @@ package it.cnr.si.web.rest;
 
 import it.cnr.si.SprintApp;
 import it.cnr.si.domain.Relationship;
-import it.cnr.si.flows.ng.TestUtil;
 import it.cnr.si.repository.RelationshipRepository;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
@@ -13,7 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
@@ -37,13 +34,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = SprintApp.class)
-@ActiveProfiles(profiles = "cnr")
-@Ignore
 public class RelationshipResourceIntTest {
     private static final String DEFAULT_GROUP_NAME = "AAAAA";
     private static final String UPDATED_GROUP_NAME = "BBBBB";
     private static final String DEFAULT_GROUP_RELATIONSHIP = "AAAAA";
     private static final String UPDATED_GROUP_RELATIONSHIP = "BBBBB";
+    private static final String DEFAULT_GROUP_ROLE = "AAAAA";
+    private static final String UPDATED_GROUP_ROLE = "BBBBB";
 
     @Inject
     private RelationshipRepository relationshipRepository;
@@ -63,7 +60,7 @@ public class RelationshipResourceIntTest {
 
     /**
      * Create an entity for this test.
-     * <p>
+     *
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
@@ -71,7 +68,8 @@ public class RelationshipResourceIntTest {
         Relationship relationship = new Relationship();
         relationship = new Relationship()
                 .groupName(DEFAULT_GROUP_NAME)
-                .groupRelationship(DEFAULT_GROUP_RELATIONSHIP);
+                .groupRelationship(DEFAULT_GROUP_RELATIONSHIP)
+                .groupRole(DEFAULT_GROUP_ROLE);
         return relationship;
     }
 
@@ -108,6 +106,7 @@ public class RelationshipResourceIntTest {
         Relationship testRelationship = relationships.get(relationships.size() - 1);
         assertThat(testRelationship.getGroupName()).isEqualTo(DEFAULT_GROUP_NAME);
         assertThat(testRelationship.getGroupRelationship()).isEqualTo(DEFAULT_GROUP_RELATIONSHIP);
+        assertThat(testRelationship.getGroupRole()).isEqualTo(DEFAULT_GROUP_ROLE);
     }
 
     @Test
@@ -158,7 +157,8 @@ public class RelationshipResourceIntTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(relationship.getId().intValue())))
                 .andExpect(jsonPath("$.[*].groupName").value(hasItem(DEFAULT_GROUP_NAME.toString())))
-                .andExpect(jsonPath("$.[*].groupRelationship").value(hasItem(DEFAULT_GROUP_RELATIONSHIP.toString())));
+                .andExpect(jsonPath("$.[*].groupRelationship").value(hasItem(DEFAULT_GROUP_RELATIONSHIP.toString())))
+                .andExpect(jsonPath("$.[*].groupRole").value(hasItem(DEFAULT_GROUP_ROLE.toString())));
     }
 
     @Test
@@ -173,7 +173,8 @@ public class RelationshipResourceIntTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.id").value(relationship.getId().intValue()))
                 .andExpect(jsonPath("$.groupName").value(DEFAULT_GROUP_NAME.toString()))
-                .andExpect(jsonPath("$.groupRelationship").value(DEFAULT_GROUP_RELATIONSHIP.toString()));
+                .andExpect(jsonPath("$.groupRelationship").value(DEFAULT_GROUP_RELATIONSHIP.toString()))
+                .andExpect(jsonPath("$.groupRole").value(DEFAULT_GROUP_ROLE.toString()));
     }
 
     @Test
@@ -195,7 +196,8 @@ public class RelationshipResourceIntTest {
         Relationship updatedRelationship = relationshipRepository.findOne(relationship.getId());
         updatedRelationship
                 .groupName(UPDATED_GROUP_NAME)
-                .groupRelationship(UPDATED_GROUP_RELATIONSHIP);
+                .groupRelationship(UPDATED_GROUP_RELATIONSHIP)
+                .groupRole(UPDATED_GROUP_ROLE);
 
         restRelationshipMockMvc.perform(put("/api/relationships")
                                                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -208,6 +210,7 @@ public class RelationshipResourceIntTest {
         Relationship testRelationship = relationships.get(relationships.size() - 1);
         assertThat(testRelationship.getGroupName()).isEqualTo(UPDATED_GROUP_NAME);
         assertThat(testRelationship.getGroupRelationship()).isEqualTo(UPDATED_GROUP_RELATIONSHIP);
+        assertThat(testRelationship.getGroupRole()).isEqualTo(UPDATED_GROUP_ROLE);
     }
 
     @Test
