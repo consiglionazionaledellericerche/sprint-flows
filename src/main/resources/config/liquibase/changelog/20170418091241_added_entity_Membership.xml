@@ -36,5 +36,9 @@
             <!-- jhipster-needle-liquibase-add-column - Jhipster will add columns here, do not remove-->
         </createTable>
 
+        <loadData encoding="UTF-8"
+                  file="config/liquibase/membership.csv"
+                  separator=";"
+                  tableName="membership"/>
     </changeSet>
 </databaseChangeLog>
