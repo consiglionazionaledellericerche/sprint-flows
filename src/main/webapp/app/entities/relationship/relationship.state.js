@@ -126,6 +126,7 @@
                             return {
                                 groupName: null,
                                 groupRelationship: null,
+                                groupRole: null,
                                 id: null
                             };
                         }

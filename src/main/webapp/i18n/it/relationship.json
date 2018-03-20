@@ -17,7 +17,8 @@
         "title": "Relationship"
       },
       "groupName": "Group Name",
-      "groupRelationship": "Group Relationship"
+      "groupRelationship": "Group Relationship",
+      "groupRole": "Group Role"
     }
   }
 }
