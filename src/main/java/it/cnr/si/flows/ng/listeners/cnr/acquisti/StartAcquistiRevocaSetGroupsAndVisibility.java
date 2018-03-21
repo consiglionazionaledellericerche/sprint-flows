@@ -1,7 +1,6 @@
-package it.cnr.si.flows.ng.listeners.acquistitrasparenza;
+package it.cnr.si.flows.ng.listeners.cnr.acquisti;
 
 import it.cnr.si.flows.ng.service.AceBridgeService;
-import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.RuntimeService;
@@ -17,13 +16,12 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.idStruttura;
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 
 @Component
-public class StartAcquistiSetGroupsAndVisibility implements ExecutionListener {
+public class StartAcquistiRevocaSetGroupsAndVisibility implements ExecutionListener {
     private static final long serialVersionUID = 686169707042367215L;
-    private static final Logger LOGGER = LoggerFactory.getLogger(StartAcquistiSetGroupsAndVisibility.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StartAcquistiRevocaSetGroupsAndVisibility.class);
 
     @Inject
     private RelationshipService relationshipService;
@@ -35,27 +33,25 @@ public class StartAcquistiSetGroupsAndVisibility implements ExecutionListener {
     @Override
     public void notify(DelegateExecution execution) throws Exception {
 
-        String initiator = (String) execution.getVariable(Enum.VariableEnum.initiator.name());
-        LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable(Enum.VariableEnum.title.name()));
+        String initiator = (String) execution.getVariable("initiator");
+        LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
 
         List<GrantedAuthority> authorities = relationshipService.getAllGroupsForUser(initiator);
 
         List<String> groups = authorities.stream()
-                .map(GrantedAuthority::getAuthority)
+                .map(a -> a.getAuthority())
                 .map(Utils::removeLeadingRole)
-                .filter(g -> g.startsWith("ra@"))
+                .filter(g -> g.startsWith("responsabile#"))
                 .collect(Collectors.toList());
 
-        if (groups.isEmpty())
+        if ( groups.size() == 0 )
             throw new BpmnError("403", "L'utente non e' abilitato ad avviare questo flusso");
-        else if ( groups.size() > 1 )
-            throw new BpmnError("500", "L'utente appartiene a piu' di un gruppo Responsabile Acquisti");
         else {
 
             String gruppoRT = groups.get(0);
             String struttura = gruppoRT.substring(gruppoRT.lastIndexOf('@') +1);
             // idStruttura variabile che indica che il flusso è diviso per strutture (implica la visibilità distinta tra strutture)
-            execution.setVariable(idStruttura.name(), struttura);
+            execution.setVariable("idStruttura", struttura);
             String gruppoDirettore = "direttore@"+ struttura;
             String gruppoRA = "ra@"+ struttura;
             String gruppoSFD = "sfd@"+ struttura;
@@ -65,7 +61,7 @@ public class StartAcquistiSetGroupsAndVisibility implements ExecutionListener {
 
             //Check se il gruppo SFD ha membri
             List<String> members = aceBridgeService.getUsersinAceGroup(gruppoSFD);
-            if (members.isEmpty()) {
+            if ( members.size() == 0 ) {
                 execution.setVariable("organizzazioneStruttura", "Semplice");
             } else {
                 execution.setVariable("organizzazioneStruttura", "Complessa");
@@ -79,7 +75,7 @@ public class StartAcquistiSetGroupsAndVisibility implements ExecutionListener {
 
             execution.setVariable("gruppoRT", gruppoRT);
             execution.setVariable("gruppoDirettore", gruppoDirettore);
-            execution.setVariable(Enum.VariableEnum.gruppoRA.name(), gruppoRA);
+            execution.setVariable("gruppoRA", gruppoRA);
             execution.setVariable("gruppoSFD", gruppoSFD);
 
         }
