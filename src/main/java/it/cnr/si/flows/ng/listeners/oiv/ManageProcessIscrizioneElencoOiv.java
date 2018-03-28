@@ -115,9 +115,9 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 		case "preavviso-rigetto-end":  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
 			// Estende  il timer di scadenza tempi proderumantali (boundarytimer3) a 30 giorni
-			operazioniTimer.setTimerScadenzaTermini(execution, "boundarytimer3", 0, 30, 0, 0, 0);
+			operazioniTimer.setTimerScadenzaTermini(execution, "boundarytimer3", 0, 0, 30, 0, 0);
 			// Estende  il timer di avviso scadenza tempi proderumantali (boundarytimer6) a 25 giorni
-			operazioniTimer.setTimerScadenzaTermini(execution, "boundarytimer6", 0, 25, 0, 0, 0);
+			operazioniTimer.setTimerScadenzaTermini(execution, "boundarytimer6", 0, 0, 25, 0, 0);
 		};break;        
 		case "istruttoria-su-preavviso-start":  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
