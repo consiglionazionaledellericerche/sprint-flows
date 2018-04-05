@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.text.ParseException;
 import java.util.*;
+import java.util.Calendar;
 import static it.cnr.si.flows.ng.utils.Utils.*;
 
 
@@ -56,11 +57,21 @@ public class StatisticOivService {
 	int nrDomandeTempiProcedimentaliScaduti = 0;
 	int nrDomandeTempiSoccorsoIstruttorioScaduti = 0;
 	int nrDomandeTempiPreavvisoRigettoScaduti = 0;
+	
+	Calendar newDate = Calendar.getInstance();	
+    Date dataOdierna = newDate.getTime();
+    Date dataScadenzaTerminiDomanda = newDate.getTime();
+    Date dataInvioDomanda = newDate.getTime();
+    Date dataPreavviso = newDate.getTime();
+    
+    int nrGiorniInvioDomanda = 0;
+    int nrGiorniScadenzaTerminiDomanda = 0;
+    int nrGiorniDataPreavviso = 0;
+    int nrGiorniCompletamentoDomanda = 0;
 
 	String sessoRichiedente = "";
 	String fasciaAppartenenzaAttribuita = "";
 	String tipologiaRichiesta = "";
-	String dataInvioDomanda = "";
 	String faseUltima = "";
 	String statoFinaleDomanda = "";
 	String tempiProcedimentaliDomanda = "";
@@ -102,17 +113,12 @@ public class StatisticOivService {
 			HistoricProcessInstanceResponse processInstance = (HistoricProcessInstanceResponse) processInstanceDetails.get("entity");
 			List<RestVariable> variables = processInstance.getVariables();
 
-			sessoRichiedente = "";
-			fasciaAppartenenzaAttribuita = "";
-			tipologiaRichiesta = "";
-			dataInvioDomanda = "";
-			faseUltima = "";
-
 			mappaturaVariabili(variables);
 			statoFlussiAttivi();
 			determinaSessoFascia();
 			statoScadenzeTemporali();
 			calcolaNrSoccorsoIstruttorio();
+			calcolaVariabiliDateFlussiAttivi();
 		}
 
 		// GESTIONE VARIABILI SINGOLE ISTANZE FLUSSI TERMINATI
@@ -126,17 +132,12 @@ public class StatisticOivService {
 			HistoricProcessInstanceResponse processInstance = (HistoricProcessInstanceResponse) processInstanceDetails.get("entity");
 			List<RestVariable> variables = processInstance.getVariables();
 
-			sessoRichiedente = "";
-			fasciaAppartenenzaAttribuita = "";
-			tipologiaRichiesta = "";
-			dataInvioDomanda = "";
-			faseUltima = "";
-
 			mappaturaVariabili(variables);
 			statoFlussiCompletati();
 			determinaSessoFascia();
 			statoScadenzeTemporali();
 			calcolaNrSoccorsoIstruttorio();
+			calcolaVariabiliDateFlussiCompletati(pi);
 		}
 
 		LOGGER.info("-- nrUominiFascia1: {} - nrUominiFascia2: {} - nrUominiFascia3: {} - nrUominiTotale: {} ",  nrUominiFascia1, nrUominiFascia2, nrUominiFascia3, nrUominiFascia1 + nrUominiFascia2 + nrUominiFascia3);
@@ -173,9 +174,17 @@ public class StatisticOivService {
 				faseUltima = var.getValue().toString();
 			};break;
 			case "dataInvioDomanda": {
-				LOGGER.info("-- " + var.getName() + ": " + formatDate(utils.parsaData((String) var.getValue())));
-				dataInvioDomanda = formatDate(utils.parsaData((String) var.getValue()));
+				LOGGER.info("-- " + var.getName() + ": " + var.getValue());
+				dataInvioDomanda = utils.parsaData(var.getValue().toString());
 			};break;
+			case "dataScadenzaTerminiDomanda": {
+				LOGGER.info("-- " + var.getName() + ": " + var.getValue());
+				dataScadenzaTerminiDomanda = utils.parsaData(var.getValue().toString());
+			};break;
+			case "dataPreavviso": {
+				LOGGER.info("-- " + var.getName() + ": " + var.getValue());
+				dataPreavviso = utils.parsaData(var.getValue().toString());
+			};break;		    
 			case "tempiProcedimentaliDomanda": {
 				LOGGER.info("-- " + var.getName() + ": " + var.getValue());
 				tempiProcedimentaliDomanda = var.getValue().toString();
@@ -302,8 +311,33 @@ public class StatisticOivService {
 		}	
 	}
 
+	private void calcolaVariabiliDateFlussiAttivi() {
+		nrGiorniInvioDomanda = calcolaGiorniTraDate(dataInvioDomanda, dataOdierna);
+		nrGiorniScadenzaTerminiDomanda = calcolaGiorniTraDate(dataOdierna, dataScadenzaTerminiDomanda);
+		nrGiorniDataPreavviso = calcolaGiorniTraDate(dataPreavviso, dataOdierna);
+		LOGGER.debug("--- nrGiorniInvioDomanda: {} nrGiorniScadenzaTerminiDomanda: {} nrGiorniDataPreavviso: {}", nrGiorniInvioDomanda, nrGiorniScadenzaTerminiDomanda, nrGiorniDataPreavviso);
+	}
+	
+	private void calcolaVariabiliDateFlussiCompletati(HistoricProcessInstanceResponse processInstance) {
+		nrGiorniCompletamentoDomanda = (int) (processInstance.getDurationInMillis()/ (1000 * 60 * 60 * 24));
+		LOGGER.debug("--- nrGiorniCompletamentoDomanda: {}", nrGiorniCompletamentoDomanda);
+	}
+
+    
+
+	private int calcolaGiorniTraDate(Date dateInf, Date dateSup) {
+
+		int timeVariableRecordDateValue =(int) (dateSup.getTime() - dateInf.getTime());
+		int timeVariableRecordDateDays = timeVariableRecordDateValue/ (1000 * 60 * 60 * 24);
+		int timeVariableRecordDateHours = timeVariableRecordDateValue/ (1000 * 60 * 60);
+		int timeVariableRecordDateMinutes = timeVariableRecordDateValue/ (1000 * 60);
+
+		LOGGER.debug("--- {} gg diff tra : {} e: {}", timeVariableRecordDateDays, dateInf, dateSup);
+		return timeVariableRecordDateDays;
+	}
+
 	private String formatDate(Date date) {
 		return date != null ? utils.formattaDataOra(date) : "";
 	}
-
+	
 }
