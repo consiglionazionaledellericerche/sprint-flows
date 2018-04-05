@@ -88,6 +88,10 @@ public class Enum {
     }
 
 
+    public enum RoleOiv {
+        coordinator,
+        member;
+    }
     public enum VariableEnum {
         initiator,
         title,

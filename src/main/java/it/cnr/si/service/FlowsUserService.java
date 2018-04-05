@@ -232,4 +232,8 @@ public class FlowsUserService {
             flowsUserRepository.delete(user);
         }
     }
+
+    public List<FlowsUser> searchByLogin(String username) {
+        return flowsUserRepository.searchByLogin(username);
+    }
 }
