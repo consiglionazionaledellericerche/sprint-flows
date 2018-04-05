@@ -1,20 +1,11 @@
 package it.cnr.si.service;
 
-import static it.cnr.si.flows.ng.utils.Enum.Role.responsabile;
-import static it.cnr.si.flows.ng.utils.Enum.Role.responsabileStruttura;
-import static it.cnr.si.flows.ng.utils.Enum.Role.supervisore;
-import static it.cnr.si.flows.ng.utils.Enum.Role.supervisoreStruttura;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.inject.Inject;
-
+import com.codahale.metrics.annotation.Timed;
+import it.cnr.si.domain.Relationship;
+import it.cnr.si.flows.ng.service.AceBridgeService;
+import it.cnr.si.flows.ng.utils.Utils;
+import it.cnr.si.repository.CnrgroupRepository;
+import it.cnr.si.repository.RelationshipRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
@@ -28,13 +19,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.codahale.metrics.annotation.Timed;
+import javax.inject.Inject;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import it.cnr.si.domain.Relationship;
-import it.cnr.si.flows.ng.service.AceBridgeService;
-import it.cnr.si.flows.ng.utils.Utils;
-import it.cnr.si.repository.CnrgroupRepository;
-import it.cnr.si.repository.RelationshipRepository;
+import static it.cnr.si.flows.ng.utils.Enum.Role.*;
 
 /**
  * Service Implementation for managing Relationship.
@@ -55,8 +45,8 @@ public class RelationshipService {
     private MembershipService membershipService;
     @Inject
     private Environment env;
-    
-    
+
+
     /**
      * Save a relationship.
      *
@@ -106,7 +96,7 @@ public class RelationshipService {
     @Cacheable(value = "allGroups", key = "#username")
     @Timed
     public List<GrantedAuthority> getAllGroupsForUser(String username) {
-        
+
         List<String> merged;
         if (!Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
 
@@ -114,25 +104,23 @@ public class RelationshipService {
             Set<String> aceGroup = getACEGroupsForUser(username);
             //B) recupero i children dei gruppi "supervisori" e "responsabili"
             Set<String> aceGroupWithChildren = getACEChildren(aceGroup);
-    
+
             //C) recupero i gruppi "associati" nel nostro db (getAllRelationship) e mergio
             merged = Stream.concat(aceGroupWithChildren.stream(), getAllRelationship(aceGroupWithChildren).stream())
                     .distinct()
                     .map(Utils::addLeadingRole)
                     .collect(Collectors.toList());
         } else {
-        // A) Se sono su OIV, carico le Membership            
+            // A) Se sono su OIV, carico le Membership
             merged = membershipService.getGroupsForUser(username).stream()
                     .distinct()
                     .map(Utils::addLeadingRole)
                     .collect(Collectors.toList());
         }
-        
-        List<GrantedAuthority> auths = merged.stream()
+
+        return merged.stream()
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
-        
-        return auths;
     }
 
     private Set<String> getACEChildren(Set<String> aceGroup) {
@@ -145,10 +133,10 @@ public class RelationshipService {
                 .collect(Collectors.toSet());
         //cerco i children dei gruppi che ho filtrato
         Set<String> children = new HashSet<>();
-        for (String group : groupToSearchChildren) {
+//        for (String group : groupToSearchChildren) {
             //todo: ancora da implementare in ACE
 //            children.addAll();
-        }
+//        }
         return Stream.concat(aceGroup.stream(), children.stream())
                 .distinct()
                 .collect(Collectors.toSet());
@@ -187,13 +175,16 @@ public class RelationshipService {
                 .collect(Collectors.toSet());
     }
 
+    public Set<Relationship> getAllRelationshipForGroup(String group) {
+        return relationshipRepository.findRelationshipGroup(group);
+    }
 
     public Set<String> getACEGroupsForUser(String username) {
         return new HashSet<>(aceService.getAceGroupsForUser(username));
     }
 
     public List<String> getUsersInMyGroups(String username) {
-        
+
         List<String> usersInMyGroups = new ArrayList<>();
         List<String> myGroups = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -203,7 +194,7 @@ public class RelationshipService {
                 .filter(group -> group.indexOf("DEPARTMENT") <= -1)
                 .filter(group -> group.indexOf("PREVIOUS") <= -1)
                 .collect(Collectors.toList());
-        
+
         if (!Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
             //filtro in ACE gli utenti che appartengono agli stessi gruppi dell'utente loggato
             for (String myGroup : myGroups) {
@@ -215,12 +206,16 @@ public class RelationshipService {
                 usersInMyGroups.addAll(membershipService.findMembersInGroup(myGroup) != null ? membershipService.findMembersInGroup(myGroup) : new ArrayList<>());
             }
         }
-            
+
         usersInMyGroups = usersInMyGroups.stream()
                 .distinct()
                 .filter(user -> !user.equals(username))
                 .collect(Collectors.toList());
-        
+
         return usersInMyGroups;
+    }
+
+    public List<Relationship> getRelationshipsForGroupRelationship(String groupRelationship) {
+        return relationshipRepository.getRelationshipsForGroupRelationship(groupRelationship);
     }
 }

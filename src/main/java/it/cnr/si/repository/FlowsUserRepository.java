@@ -16,6 +16,9 @@ public interface FlowsUserRepository extends JpaRepository<FlowsUser, Long> {
     @Query("SELECT u from FlowsUser u where u.login = :login")
     Optional<FlowsUser> findOneByLogin(@Param("login") String login);
 
+    @Query("SELECT u from FlowsUser u where u.login LIKE CONCAT('%',:login,'%')")
+    List<FlowsUser> searchByLogin(@Param("login") String login);
+
     Optional<FlowsUser> findOneByActivationKey(String var1);
 
     List<FlowsUser> findAllByActivatedIsFalseAndCreatedDateBefore(ZonedDateTime var1);
