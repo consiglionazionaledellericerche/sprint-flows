@@ -42,8 +42,7 @@ public class MembershipService {
      */
     public Membership save(Membership membership) {
         log.debug("Request to save Membership : {}", membership);
-        Membership result = membershipRepository.save(membership);
-        return result;
+        return membershipRepository.save(membership);
     }
 
     /**
@@ -55,8 +54,7 @@ public class MembershipService {
     @Transactional(readOnly = true)
     public Page<Membership> findAll(Pageable pageable) {
         log.debug("Request to get all Memberships");
-        Page<Membership> result = membershipRepository.findAll(pageable);
-        return result;
+        return membershipRepository.findAll(pageable);
     }
 
     /**
@@ -68,8 +66,20 @@ public class MembershipService {
     @Transactional(readOnly = true)
     public Membership findOne(Long id) {
         log.debug("Request to get Membership : {}", id);
-        Membership membership = membershipRepository.findOne(id);
-        return membership;
+        return membershipRepository.findOne(id);
+    }
+
+    /**
+     * Get one membership by username and groupname.
+     *
+     * @param username  the username of the entity
+     * @param groupname the groupname of the entity
+     * @return the entity
+     */
+    @Transactional(readOnly = true)
+    public Membership findOneByUsernameAndGroupname(String username, String groupname) {
+        log.debug("Request to get Membership with username {} and groupname {}", username, groupname);
+        return membershipRepository.findOneByUsernameAndGroupname(username, groupname);
     }
 
     /**
@@ -90,7 +100,7 @@ public class MembershipService {
         return Stream.concat(getGroupsForUser(username).stream(), getACEGroupsForUser(username).stream())
                 .distinct()
                 .map(Utils::addLeadingRole)
-                .map(g -> new SimpleGrantedAuthority(g))
+                .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
     }
 
@@ -108,5 +118,14 @@ public class MembershipService {
             result.addAll(usersinAceGroup);
 
         return result;
+    }
+
+    public Page<Membership> getGroupsWithRole(Pageable pageable, String user, String role) {
+        return membershipRepository.getGroupsWithRole(role, user, pageable);
+    }
+
+
+    public List<Membership> getMembershipByGroupName(String groupName) {
+        return membershipRepository.getMembershipByGroupName(groupName);
     }
 }

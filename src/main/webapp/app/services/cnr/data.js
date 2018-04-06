@@ -157,6 +157,14 @@
 				setUsers: function(users) {
 					return $http.post('api/mail/users?users=' + users)
 				}
+			},
+			userMemberships: {
+			    groupsWithRoleCoordinator: function() {
+			        return $http.get('api/memberships/groupsWithRoleCoordinator');
+			    },
+			    groupMembersByGroupName: function(groupName) {
+			        return $http.get('api/memberships/groupMembersByGroupName?groupName=' + groupName)
+			    }
 			}
 		};
 	}
