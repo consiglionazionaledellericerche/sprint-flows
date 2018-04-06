@@ -185,10 +185,11 @@ public class MembershipResource {
             }
         }
         userGroup.addAll(pageCoordinator.getContent());
+        userGroup = userGroup.stream().distinct().collect(Collectors.toList());
+
         PageImpl<Membership> resultPage = new PageImpl<>(userGroup, pageable, userGroup.size());
 
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(pageCoordinator, "/api/memberships");
-
         return Optional.ofNullable(resultPage.getContent())
                 .map(result -> new ResponseEntity<>(
                         result,
