@@ -57,17 +57,25 @@ public class StatisticOivService {
 	int nrDomandeTempiProcedimentaliScaduti = 0;
 	int nrDomandeTempiSoccorsoIstruttorioScaduti = 0;
 	int nrDomandeTempiPreavvisoRigettoScaduti = 0;
-	
+
 	Calendar newDate = Calendar.getInstance();	
-    Date dataOdierna = newDate.getTime();
-    Date dataScadenzaTerminiDomanda = newDate.getTime();
-    Date dataInvioDomanda = newDate.getTime();
-    Date dataPreavviso = newDate.getTime();
-    
-    int nrGiorniInvioDomanda = 0;
-    int nrGiorniScadenzaTerminiDomanda = 0;
-    int nrGiorniDataPreavviso = 0;
-    int nrGiorniCompletamentoDomanda = 0;
+	Date dataOdierna = newDate.getTime();
+	Date dataScadenzaTerminiDomanda = newDate.getTime();
+	Date dataInvioDomanda = newDate.getTime();
+	Date dataPreavviso = newDate.getTime();
+
+	int nrGiorniInvioDomanda = 0;
+	int nrGiorniScadenzaTerminiDomanda = 0;
+	int nrGiorniDataPreavviso = 0;
+	int nrGiorniCompletamentoDomanda = 0;
+	int nrGiorniExtraTerminiDomanda = 0;
+
+	int nrDomandeScadenza_0_5 = 0;
+	int nrDomandeScadenza_5_10 = 0;
+	int nrDomandeScadenza_10_more = 0;
+	int nrDomandeExtraTermini_0_5 = 0;
+	int nrDomandeExtraTermini_5_10 = 0;
+	int nrDomandeExtraTermini_10_more = 0;	
 
 	String sessoRichiedente = "";
 	String fasciaAppartenenzaAttribuita = "";
@@ -90,6 +98,7 @@ public class StatisticOivService {
 		Boolean active = true;
 		Boolean finished = false;
 
+		resetStatisticvariables();
 
 		Map<String, Object>  flussiAttivi = flowsProcessInstanceService.search(req, processDefinitionKey, active, order, firstResult, maxResults);
 		Map<String, Object>  flussiTerminati = flowsProcessInstanceService.search(req, processDefinitionKey, finished, order, firstResult, maxResults);
@@ -145,7 +154,8 @@ public class StatisticOivService {
 		LOGGER.info("-- STATO DOMANDE ATTIVE nrFaseSmistamento: {} - nrFaseIstruttoria: {} - nrFaseSoccorsoIstruttorio: {} - nrFaseCambioIstruttore: {} - nrFaseValutazione: {} - nrFasePreavvisoRigetto: {} - nrFaseIstruttoriaSuPreavviso: {} - nrFaseValutazionePreavviso: {} - nrFaseFirmaDgRigetto: {} ", nrFaseSmistamento, nrFaseIstruttoria, nrFaseSoccorsoIstruttorio, nrFaseCambioIstruttore, nrFaseValutazione, nrFasePreavvisoRigetto, nrFaseIstruttoriaSuPreavviso, nrFaseValutazionePreavviso, nrFaseFirmaDgRigetto);
 		LOGGER.info("-- STATO DOMANDE TERMINATE nrDomandeImprocedibili: {} - nrDomandeApprovate: {} - nrDomandeRespinte: {} - nrDomandeTerminateTotale: {} ",  nrDomandeImprocedibili, nrDomandeApprovate, nrDomandeRespinte, nrDomandeImprocedibili + nrDomandeApprovate + nrDomandeRespinte);
 		LOGGER.info("-- STATO TEMPI DOMANDE nrDomandeTempiProcedimentaliInScadenza: {} - nrDomandeTempiProcedimentaliScaduti: {} - nrDomandeTempiSoccorsoIstruttorioScaduti: {} - nrDomandeTempiPreavvisoRigettoScaduti: {} ",  nrDomandeTempiProcedimentaliInScadenza, nrDomandeTempiProcedimentaliScaduti, nrDomandeTempiSoccorsoIstruttorioScaduti, nrDomandeTempiPreavvisoRigettoScaduti);
-
+		LOGGER.info("-- STATO TEMPI DOMANDE nrDomandeScadenza_0_5: {} - nrDomandeScadenza_5_10: {} - nrDomandeScadenza_10_more: {}",  nrDomandeScadenza_0_5, nrDomandeScadenza_5_10, nrDomandeScadenza_10_more);
+		LOGGER.info("-- STATO TEMPI DOMANDE nrDomandeExtraTermini_0_5: {} - nrDomandeExtraTermini_5_10: {} - nrDomandeExtraTermini_10_more: {}",  nrDomandeExtraTermini_0_5, nrDomandeExtraTermini_5_10, nrDomandeExtraTermini_10_more);	
 	}
 
 	private void mappaturaVariabili(List<RestVariable> variables) throws ParseException {
@@ -316,14 +326,33 @@ public class StatisticOivService {
 		nrGiorniScadenzaTerminiDomanda = calcolaGiorniTraDate(dataOdierna, dataScadenzaTerminiDomanda);
 		nrGiorniDataPreavviso = calcolaGiorniTraDate(dataPreavviso, dataOdierna);
 		LOGGER.debug("--- nrGiorniInvioDomanda: {} nrGiorniScadenzaTerminiDomanda: {} nrGiorniDataPreavviso: {}", nrGiorniInvioDomanda, nrGiorniScadenzaTerminiDomanda, nrGiorniDataPreavviso);
-	}
-	
-	private void calcolaVariabiliDateFlussiCompletati(HistoricProcessInstanceResponse processInstance) {
-		nrGiorniCompletamentoDomanda = (int) (processInstance.getDurationInMillis()/ (1000 * 60 * 60 * 24));
-		LOGGER.debug("--- nrGiorniCompletamentoDomanda: {}", nrGiorniCompletamentoDomanda);
+		if ( 0 < nrGiorniScadenzaTerminiDomanda && nrGiorniScadenzaTerminiDomanda <= 5) {
+			nrDomandeScadenza_0_5 = nrDomandeScadenza_0_5 +1;
+		}
+		if ( 5 < nrGiorniScadenzaTerminiDomanda && nrGiorniScadenzaTerminiDomanda <= 10) {
+			nrDomandeScadenza_5_10 = nrDomandeScadenza_5_10 +1;
+		}
+		if ( 10 < nrGiorniScadenzaTerminiDomanda) {
+			nrDomandeScadenza_10_more = nrDomandeScadenza_10_more +1;
+		}
 	}
 
-    
+	private void calcolaVariabiliDateFlussiCompletati(HistoricProcessInstanceResponse processInstance) {
+		nrGiorniCompletamentoDomanda = (int) (processInstance.getDurationInMillis()/ (1000 * 60 * 60 * 24));
+		nrGiorniExtraTerminiDomanda = calcolaGiorniTraDate(processInstance.getEndTime(), dataScadenzaTerminiDomanda);
+		LOGGER.debug("--- nrGiorniCompletamentoDomanda: {} -  nrGiorniExtraTerminiDomanda: {}", nrGiorniCompletamentoDomanda, nrGiorniExtraTerminiDomanda);
+		if ( 0 < nrGiorniExtraTerminiDomanda && nrGiorniExtraTerminiDomanda <= 5) {
+			nrDomandeExtraTermini_0_5 = nrDomandeExtraTermini_0_5 +1;
+		}
+		if ( 5 < nrGiorniExtraTerminiDomanda && nrGiorniExtraTerminiDomanda <= 10) {
+			nrDomandeExtraTermini_5_10 = nrDomandeExtraTermini_5_10 +1;
+		}
+		if ( 10 < nrGiorniExtraTerminiDomanda) {
+			nrDomandeExtraTermini_10_more = nrDomandeExtraTermini_10_more +1;
+		}
+	}
+
+
 
 	private int calcolaGiorniTraDate(Date dateInf, Date dateSup) {
 
@@ -339,5 +368,65 @@ public class StatisticOivService {
 	private String formatDate(Date date) {
 		return date != null ? utils.formattaDataOra(date) : "";
 	}
-	
+
+	private void resetStatisticvariables() {
+
+		domandeTotali = 0;
+		domandeInEsame = 0;
+		domandeEsaminate = 0;
+		nrUominiFascia1 = 0;
+		nrUominiFascia2 = 0;
+		nrUominiFascia3 = 0;
+		nrDonneFascia1 = 0;
+		nrDonneFascia2 = 0;
+		nrDonneFascia3 = 0;
+
+		nrFaseSmistamento = 0;
+		nrFaseIstruttoria = 0;
+		nrFaseSoccorsoIstruttorio = 0;
+		nrFaseCambioIstruttore = 0;
+		nrFaseValutazione = 0;
+		nrFasePreavvisoRigetto = 0;
+		nrFaseIstruttoriaSuPreavviso = 0;
+		nrFaseValutazionePreavviso = 0;
+		nrFaseFirmaDgRigetto = 0;
+
+		nrDomandeImprocedibili = 0;
+		nrDomandeApprovate = 0;
+		nrDomandeRespinte = 0;
+		nrDomandeSoccorsoIstruttorio = 0;
+
+		nrDomandeTempiProcedimentaliInScadenza = 0;
+		nrDomandeTempiProcedimentaliScaduti = 0;
+		nrDomandeTempiSoccorsoIstruttorioScaduti = 0;
+		nrDomandeTempiPreavvisoRigettoScaduti = 0;
+		dataOdierna = newDate.getTime();
+		dataScadenzaTerminiDomanda = newDate.getTime();
+		dataInvioDomanda = newDate.getTime();
+		dataPreavviso = newDate.getTime();
+
+		nrGiorniInvioDomanda = 0;
+		nrGiorniScadenzaTerminiDomanda = 0;
+		nrGiorniDataPreavviso = 0;
+		nrGiorniCompletamentoDomanda = 0;
+		nrGiorniExtraTerminiDomanda = 0;
+
+		nrDomandeScadenza_0_5 = 0;
+		nrDomandeScadenza_5_10 = 0;
+		nrDomandeScadenza_10_more = 0;
+		nrDomandeExtraTermini_0_5 = 0;
+		nrDomandeExtraTermini_5_10 = 0;
+		nrDomandeExtraTermini_10_more = 0;	
+		sessoRichiedente = "";
+		fasciaAppartenenzaAttribuita = "";
+		tipologiaRichiesta = "";
+		faseUltima = "";
+		statoFinaleDomanda = "";
+		tempiProcedimentaliDomanda = "";
+		tempiSoccorsoIstruttorio = "";
+		tempiPreavvisoRigetto = "";	
+		soccorsoIstruttoriaFlag = "";
+
+	}
+
 }
