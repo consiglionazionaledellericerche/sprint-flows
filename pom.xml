@@ -31,7 +31,7 @@
         <firmadigitale.version>1.11</firmadigitale.version>
         <gatling-maven-plugin.version>2.1.7</gatling-maven-plugin.version>
         <jacoco-maven-plugin.version>0.7.7.201606060606</jacoco-maven-plugin.version>
-        <jasperreports.version>5.5.0</jasperreports.version>
+        <jasperreports.version>5.5.1</jasperreports.version>
         <json-path.version>2.2.0</json-path.version>
         <liquibase-hibernate4.version>3.5</liquibase-hibernate4.version>
         <liquibase.version>3.4.2</liquibase.version>
@@ -196,20 +196,12 @@
                     <groupId>com.fasterxml.jackson.core</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>jfreechart</artifactId>
-                    <groupId>jfree</groupId>
-                </exclusion>
-                <exclusion>
                     <artifactId>castor</artifactId>
                     <groupId>org.codehaus.castor</groupId>
                 </exclusion>
                 <exclusion>
                     <artifactId>jdtcore</artifactId>
                     <groupId>eclipse</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jcommon</artifactId>
-                    <groupId>jfree</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
