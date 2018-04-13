@@ -112,7 +112,7 @@ public class RelationshipService {
                     .collect(Collectors.toList());
         } else {
             // A) Se sono su OIV, carico le Membership
-            merged = membershipService.getGroupsForUser(username).stream()
+            merged = membershipService.getGroupNamesForUser(username).stream()
                     .distinct()
                     .map(Utils::addLeadingRole)
                     .collect(Collectors.toList());
