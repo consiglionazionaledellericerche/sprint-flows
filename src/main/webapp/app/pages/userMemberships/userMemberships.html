@@ -19,7 +19,7 @@
             <thead>
             <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.transition()">
                 <th jh-sort-by="gFroupname">
-                    <span translate="sprintApp.membership.username">Username</span>
+                    <span translate="sprintApp.membership.groupname">Username</span>
                     <span class="glyphicon glyphicon-sort"></span></th>
                 <th jh-sort-by="grouprole">
                     <span translate="sprintApp.membership.grouprole">Grouprole</span>
@@ -29,7 +29,7 @@
             </thead>
             <tbody>
             <tr ng-repeat="membership in vm.memberships">
-                <td>{{membership.groupname}}</td>
+                <td>{{membership.cnrgroup.displayName}}</td>
                 <td>{{membership.grouprole}}</td>
                 <td class="text-right">
 
@@ -37,14 +37,14 @@
                     <div class="btn-group flex-btn-group-container">
                         <!--IMPORTANTE: Se ho l'id allora la membership è nella tabella del Db e posso fare le CRUD (altrimenti è "derivata" dalle relationship-->
                         <button type="submit"
-                                ui-sref="group-memberships({groupname:membership.groupname})"
+                                ui-sref="group-memberships({groupname:membership.cnrgroup.name})"
                                 class="btn btn-info btn-sm">
                             <span class="glyphicon glyphicon-eye-open"></span>
                             <span class="hidden-xs hidden-sm" translate="entity.action.view"></span>
                         </button>
                         <div ng-if="membership.grouprole == 'coordinator'">
                             <button type="submit"
-                                    ui-sref="group-memberships-edit({groupname:membership.groupname})"
+                                    ui-sref="group-memberships-edit({groupname:membership.cnrgroup.name})"
                                     class="btn btn-primary btn-sm">
                                 <span class="glyphicon glyphicon-pencil"></span>
                                 <span class="hidden-xs hidden-sm" translate="entity.action.edit"></span>

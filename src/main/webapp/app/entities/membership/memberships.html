@@ -1,13 +1,13 @@
 <div>
     <h2 translate="sprintApp.membership.home.title">Memberships</h2>
-    <jhi-alert></jhi-alert>
+    <jh-alert></jh-alert>
     <div class="container-fluid">
         <div class="row">
             <div class="col-xs-4 no-padding-left">
                 <button class="btn btn-primary" ui-sref="membership.new" >
                     <span class="glyphicon glyphicon-plus"></span>
-                    <span  translate="sprintApp.membership.home.createLabel">
-                        Create new Membership
+                    <span 
+                        translate="sprintApp.membership.home.createLabel">Create new Membership
                     </span>
                 </button>
             </div>
@@ -17,26 +17,29 @@
     <div class="table-responsive">
         <table class="jh-table table table-striped">
             <thead>
-                <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.transition()">
+                <tr jh-sort="predicate" ascending="reverse" callback="loadAll()">
                     <th jh-sort-by="id"><span translate="global.field.id">ID</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th jh-sort-by="username"><span translate="sprintApp.membership.username">Username</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th jh-sort-by="groupname"><span translate="sprintApp.membership.groupname">Groupname</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th jh-sort-by="grouprole"><span translate="sprintApp.membership.grouprole">Grouprole</span> <span
-                            class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="grouprole"><span translate="sprintApp.membership.grouprole">Grouprole</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="cnrgroup.display_name"><span translate="sprintApp.membership.cnrgroup">cnrgroup</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="user.login"><span translate="sprintApp.membership.user">user</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="membership in vm.memberships track by membership.id">
-                    <td><a ui-sref="membership-detail({id:membership.id})">{{membership.id}}</a></td>
-                    <td>{{membership.username}}</td>
-                    <td>{{membership.groupname}}</td>
+                <tr ng-repeat="membership in memberships track by membership.id">
+                    <td><a ui-sref="membership.detail({id:membership.id})">{{membership.id}}</a></td>
                     <td>{{membership.grouprole}}</td>
+                    <td>
+                        <a ui-sref="cnrgroup.detail({id:membership.cnrgroup.id})">{{membership.cnrgroup.display_name}}</a>
+                    </td>
+                    <td>
+                        <a ui-sref="jhi_user.detail({id:membership.user.id})">{{membership.user.login}}</a>
+                    </td>
                     <td class="text-right">
                         <div class="btn-group flex-btn-group-container">
                             <button type="submit"
-                                    ui-sref="membership-detail({id:membership.id})"
-                                    class="btn btn-info btn-sm">
+                                    ui-sref="membership.detail({id:membership.id})"
+                                    class="btn btn-info btn-sm"> 
                                 <span class="glyphicon glyphicon-eye-open"></span>
                                 <span class="hidden-xs hidden-sm" translate="entity.action.view"></span>
                             </button>
@@ -48,7 +51,7 @@
                             </button>
                             <button type="submit"
                                     ui-sref="membership.delete({id:membership.id})"
-                                    class="btn btn-danger btn-sm">
+                                    class="btn btn-danger btn-sm">                                    
                                 <span class="glyphicon glyphicon-remove-circle"></span>
                                 <span class="hidden-xs hidden-sm" translate="entity.action.delete"></span>
                             </button>
@@ -58,8 +61,5 @@
             </tbody>
         </table>
     </div>
-    <div class="text-center">
-        <jhi-item-count page="vm.page" total="vm.queryCount" items-per-page="vm.itemsPerPage"></jhi-item-count>
-        <uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.page" ng-change="vm.transition()"></uib-pagination>
-    </div>
+    <uib-pager total-items="totalItems" ng-model="page" ng-change="loadAll()"></uib-pager>
 </div>
