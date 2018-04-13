@@ -1,33 +1,46 @@
 
 <div>
-    <h2><span translate="sprintApp.membership.detail.title">Membership</span> {{vm.membership.id}}</h2>
-    <hr>
-    <jhi-alert-error></jhi-alert-error>
-    <dl class="dl-horizontal jh-entity-details">
-        <dt><span translate="sprintApp.membership.username">Username</span></dt>
-        <dd>
-            <span>{{vm.membership.username}}</span>
-        </dd>
-        <dt><span translate="sprintApp.membership.groupname">Groupname</span></dt>
-        <dd>
-            <span>{{vm.membership.groupname}}</span>
-        </dd>
-        <dt><span translate="sprintApp.membership.grouprole">Grouprole</span></dt>
-        <dd>
-            <span>{{vm.membership.grouprole}}</span>
-        </dd>
-    </dl>
+    <h2><span translate="sprintApp.membership.detail.title">Membership</span> {{membership.id}}</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th translate="entity.detail.field">Field</th>
+                <th translate="entity.detail.value">Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>
+                    <span translate="sprintApp.membership.grouprole">Grouprole</span>
+                </td>
+                <td>
+                    <span class="form-control-static">{{membership.grouprole}}</span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span translate="sprintApp.membership.cnrgroup">cnrgroup</span>
+                </td>
+                <td>
+                    <a class="form-control-static" ui-sref="cnrgroup.detail({id:membership.cnrgroup.id})">{{membership.cnrgroup.display_name}}</a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span translate="sprintApp.membership.user">user</span>
+                </td>
+                <td>
+                    <a class="form-control-static" ui-sref="jhi_user.detail({id:membership.user.id})">{{membership.user.login}}</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
     <button type="submit"
-            ui-sref="{{ vm.previousState }}"
+            onclick="window.history.back()"
             class="btn btn-info">
         <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span translate="entity.action.back"> Back</span>
     </button>
-
-    <div has-authority="ROLE_ADMIN">
-        <button type="button" ui-sref="membership-detail.edit({id:vm.membership.id})" class="btn btn-primary">
-            <span class="glyphicon glyphicon-pencil"></span>
-            <span class="hidden-xs hidden-sm" translate="entity.action.edit"> Edit</span>
-        </button>
-    </div>
 </div>

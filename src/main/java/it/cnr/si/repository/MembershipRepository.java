@@ -13,23 +13,25 @@ import java.util.Set;
 /**
  * Spring Data JPA repository for the Membership entity.
  */
-@SuppressWarnings("unused")
 public interface MembershipRepository extends JpaRepository<Membership,Long> {
 
-    @Query("select groupname from Membership membership where membership.username =:username")
-    public Set<String> findGroupsForUsername(@Param("username") String username);
+    @Query("select cnrgroup.name from Membership membership where membership.user.login =:username")
+    public Set<String> findGroupNamesForUser(@Param("username") String username);
 
-    @Query("select username from Membership membership where membership.groupname =:groupname")
+    @Query("select membership.user.login from Membership membership where membership.cnrgroup.name =:groupname")
     public List<String> findMembersInGroup(@Param("groupname") String groupname);
 
-    @Query("select membership from Membership membership where membership.groupname =:groupname")
+    @Query("select membership from Membership membership where membership.cnrgroup.name =:groupname")
     public List<Membership> getMembershipByGroupName(@Param("groupname") String groupname);
 
     @Query(
-            value = "SELECT membership FROM Membership membership WHERE membership.grouprole = :grouprole AND membership.username = :username"
+            value = "SELECT membership FROM Membership membership WHERE membership.grouprole = :grouprole AND membership.user.login = :username"
     )
     public Page<Membership> getGroupsWithRole(@Param("grouprole") String grouprole, @Param("username") String username, Pageable pageable);
 
-    @Query("select membership from Membership membership where membership.username =:username AND membership.groupname =:groupname")
+    @Query("select membership from Membership membership where membership.user.login =:username AND membership.cnrgroup.name =:groupname")
     public Membership findOneByUsernameAndGroupname(@Param("username") String username, @Param("groupname") String groupname);
+
+    @Query("select membership from Membership membership where membership.user.login =:username")
+    List<Membership> getGroupForUser(@Param("username") String username);
 }

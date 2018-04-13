@@ -16,13 +16,14 @@
 		vm.reverse = pagingParams.ascending;
 		vm.transition = transition;
 		vm.itemsPerPage = paginationConstants.itemsPerPage;
+		//serve per visualizzarlo nell'html
 		vm.groupname = $stateParams.groupname;
 
 		loadAll();
 
 
 		function loadAll() {
-			dataService.userMemberships.groupMembersByGroupName(vm.groupname).then(onSuccess, onError);
+			dataService.userMemberships.membersByGroupName(vm.groupname).then(onSuccess, onError);
 
 			function onSuccess(data) {
 				vm.links = ParseLinks.parse(data.headers('link'));
