@@ -1,59 +1,46 @@
 (function() {
-    'use strict';
+	'use strict';
 
-    angular
-        .module('sprintApp')
-        .controller('MembershipController', MembershipController);
+	angular
+		.module('sprintApp')
+		.controller('MembershipController', MembershipController);
 
-    MembershipController.$inject = ['$scope', '$state', 'Membership', 'ParseLinks', 'AlertService', 'pagingParams', 'paginationConstants'];
+	MembershipController.$inject = ['$scope', '$state', 'Membership', 'ParseLinks', 'AlertService'];
 
-    function MembershipController ($scope, $state, Membership, ParseLinks, AlertService, pagingParams, paginationConstants) {
-        var vm = this;
-        
-        vm.loadPage = loadPage;
-        vm.predicate = pagingParams.predicate;
-        vm.reverse = pagingParams.ascending;
-        vm.transition = transition;
-        vm.itemsPerPage = paginationConstants.itemsPerPage;
+	function MembershipController($scope, $state, Membership, ParseLinks, AlertService) {
 
-        loadAll();
+		$scope.memberships = [];
+		$scope.predicate = 'id';
+		$scope.reverse = true;
+		$scope.page = 1;
+		$scope.loadAll = function() {
+			Membership.query({
+				page: $scope.page - 1,
+				size: 20,
+				sort: [$scope.predicate + ',' + ($scope.reverse ? 'asc' : 'desc'), 'id']
+			}, function(result, headers) {
+				$scope.links = ParseLinks.parse(headers('link'));
+				$scope.totalItems = headers('X-Total-Count');
+				$scope.memberships = result;
+			});
+		};
+		$scope.loadPage = function(page) {
+			$scope.page = page;
+			$scope.loadAll();
+		};
+		$scope.loadAll();
 
-        function loadAll () {
-            Membership.query({
-                page: pagingParams.page - 1,
-                size: vm.itemsPerPage,
-                sort: sort()
-            }, onSuccess, onError);
-            function sort() {
-                var result = [vm.predicate + ',' + (vm.reverse ? 'asc' : 'desc')];
-                if (vm.predicate !== 'id') {
-                    result.push('id');
-                }
-                return result;
-            }
-            function onSuccess(data, headers) {
-                vm.links = ParseLinks.parse(headers('link'));
-                vm.totalItems = headers('X-Total-Count');
-                vm.queryCount = vm.totalItems;
-                vm.memberships = data;
-                vm.page = pagingParams.page;
-            }
-            function onError(error) {
-                AlertService.error(error.data.message);
-            }
-        }
 
-        function loadPage (page) {
-            vm.page = page;
-            vm.transition();
-        }
+		$scope.refresh = function() {
+			$scope.loadAll();
+			$scope.clear();
+		};
 
-        function transition () {
-            $state.transitionTo($state.$current, {
-                page: vm.page,
-                sort: vm.predicate + ',' + (vm.reverse ? 'asc' : 'desc'),
-                search: vm.currentSearch
-            });
-        }
-    }
+		$scope.clear = function() {
+			$scope.membership = {
+				grouprole: null,
+				id: null
+			};
+		};
+	}
 })();

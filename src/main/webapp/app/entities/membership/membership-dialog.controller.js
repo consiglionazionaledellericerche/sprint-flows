@@ -1,46 +1,45 @@
 (function() {
-    'use strict';
+	'use strict';
 
-    angular
-        .module('sprintApp')
-        .controller('MembershipDialogController', MembershipDialogController);
+	angular
+		.module('sprintApp')
+		.controller('MembershipDialogController', MembershipDialogController);
 
-    MembershipDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'entity', 'Membership'];
+	MembershipDialogController.$inject = ['$scope', '$stateParams', '$uibModalInstance', 'entity', 'Membership', 'Cnrgroup', 'Jhi_user'];
 
-    function MembershipDialogController ($timeout, $scope, $stateParams, $uibModalInstance, entity, Membership) {
-        var vm = this;
+	function MembershipDialogController($scope, $stateParams, $uibModalInstance, entity, Membership, Cnrgroup, Jhi_user) {
+		$scope.membership = entity;
+		$scope.cnrgroups = Cnrgroup.query();
+		$scope.jhi_users = Jhi_user.query();
+		$scope.load = function(id) {
+			Membership.get({
+				id: id
+			}, function(result) {
+				$scope.membership = result;
+			});
+		};
 
-        vm.membership = entity;
-        vm.clear = clear;
-        vm.save = save;
+		var onSaveSuccess = function(result) {
+			$scope.$emit('sprintApp:membershipUpdate', result);
+			$uibModalInstance.close(result);
+			$scope.isSaving = false;
+		};
 
-        $timeout(function (){
-            angular.element('.form-group:eq(1)>input').focus();
-        });
+		var onSaveError = function(result) {
+			$scope.isSaving = false;
+		};
 
-        function clear () {
-            $uibModalInstance.dismiss('cancel');
-        }
+		$scope.save = function() {
+			$scope.isSaving = true;
+			if ($scope.membership.id != null) {
+				Membership.update($scope.membership, onSaveSuccess, onSaveError);
+			} else {
+				Membership.save($scope.membership, onSaveSuccess, onSaveError);
+			}
+		};
 
-        function save () {
-            vm.isSaving = true;
-            if (vm.membership.id !== null) {
-                Membership.update(vm.membership, onSaveSuccess, onSaveError);
-            } else {
-                Membership.save(vm.membership, onSaveSuccess, onSaveError);
-            }
-        }
-
-        function onSaveSuccess (result) {
-            $scope.$emit('sprintApp:membershipUpdate', result);
-            $uibModalInstance.close(result);
-            vm.isSaving = false;
-        }
-
-        function onSaveError () {
-            vm.isSaving = false;
-        }
-
-
-    }
+		$scope.clear = function() {
+			$uibModalInstance.dismiss('cancel');
+		};
+	}
 })();

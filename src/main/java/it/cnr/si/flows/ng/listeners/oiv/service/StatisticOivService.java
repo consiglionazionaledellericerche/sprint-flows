@@ -4,6 +4,7 @@ import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.utils.Utils;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -29,8 +30,8 @@ public class StatisticOivService {
 
 	// ELENCO PARAMETRI STATISTICHE
 	int domandeTotali = 0;
-	int domandeInEsame = 0;
-	int domandeEsaminate = 0;
+	int domandeAttive = 0;
+	int domandeTerminate = 0;
 	int nrUominiFascia1 = 0;
 	int nrUominiFascia2 = 0;
 	int nrUominiFascia3 = 0;
@@ -66,16 +67,20 @@ public class StatisticOivService {
 
 	int nrGiorniInvioDomanda = 0;
 	int nrGiorniScadenzaTerminiDomanda = 0;
+	int nrGiorniScadutiTerminiDomanda = 0;
 	int nrGiorniDataPreavviso = 0;
 	int nrGiorniCompletamentoDomanda = 0;
 	int nrGiorniExtraTerminiDomanda = 0;
 
-	int nrDomandeScadenza_0_5 = 0;
-	int nrDomandeScadenza_5_10 = 0;
-	int nrDomandeScadenza_10_more = 0;
-	int nrDomandeExtraTermini_0_5 = 0;
-	int nrDomandeExtraTermini_5_10 = 0;
-	int nrDomandeExtraTermini_10_more = 0;	
+	int nrDomandeAttiveScadenza_0_5 = 0;
+	int nrDomandeAttiveScadenza_5_10 = 0;
+	int nrDomandeAttiveScadenza_10_more = 0;
+	int nrDomandeAttiveScadute_0_5 = 0;
+	int nrDomandeAttiveScadute_5_10 = 0;
+	int nrDomandeAttiveScadute_10_more = 0;
+	int nrDomandeTerminateScadute_0_5 = 0;
+	int nrDomandeTerminateScadute_5_10 = 0;
+	int nrDomandeTerminateScadute_10_more = 0;	
 
 	String sessoRichiedente = "";
 	String fasciaAppartenenzaAttribuita = "";
@@ -87,7 +92,7 @@ public class StatisticOivService {
 	String tempiPreavvisoRigetto = "";	
 	String soccorsoIstruttoriaFlag = "";	
 
-	public void getOivStatistics (String processDefinitionKey, String startDateGreat, String startDateLess) throws ParseException {
+	public JSONObject getOivStatistics (String processDefinitionKey, String startDateGreat, String startDateLess) throws ParseException {
 		Map<String, String> req = new HashMap<>();
 		req.put("startDateGreat", startDateGreat);
 		req.put("startDateLess", startDateLess);
@@ -104,12 +109,12 @@ public class StatisticOivService {
 		Map<String, Object>  flussiTerminati = flowsProcessInstanceService.search(req, processDefinitionKey, finished, order, firstResult, maxResults);
 
 		//VALORIZZAZIONE PARAMETRI STATISTICHE
-		domandeInEsame = parseInt(flussiAttivi.get("totalItems").toString());
-		domandeEsaminate = parseInt(flussiTerminati.get("totalItems").toString());
-		domandeTotali = domandeInEsame + domandeEsaminate;
+		domandeAttive = parseInt(flussiAttivi.get("totalItems").toString());
+		domandeTerminate = parseInt(flussiTerminati.get("totalItems").toString());
+		domandeTotali = domandeAttive + domandeTerminate;
 
 
-		LOGGER.debug("nr. domandeInEsame: {} - nr. domandeEsaminate: {} - nr. domandeTotali: {}", domandeInEsame, domandeEsaminate, domandeTotali);
+		LOGGER.debug("nr. domandeAttive: {} - nr. domandeTerminate: {} - nr. domandeTotali: {}", domandeAttive, domandeTerminate, domandeTotali);
 
 		// GESTIONE VARIABILI SINGOLE ISTANZE FLUSSI ATTIVI
 		List<HistoricProcessInstanceResponse> activeProcessInstances = (List<HistoricProcessInstanceResponse>) flussiAttivi.get("processInstances");
@@ -154,9 +159,59 @@ public class StatisticOivService {
 		LOGGER.info("-- STATO DOMANDE ATTIVE nrFaseSmistamento: {} - nrFaseIstruttoria: {} - nrFaseSoccorsoIstruttorio: {} - nrFaseCambioIstruttore: {} - nrFaseValutazione: {} - nrFasePreavvisoRigetto: {} - nrFaseIstruttoriaSuPreavviso: {} - nrFaseValutazionePreavviso: {} - nrFaseFirmaDgRigetto: {} ", nrFaseSmistamento, nrFaseIstruttoria, nrFaseSoccorsoIstruttorio, nrFaseCambioIstruttore, nrFaseValutazione, nrFasePreavvisoRigetto, nrFaseIstruttoriaSuPreavviso, nrFaseValutazionePreavviso, nrFaseFirmaDgRigetto);
 		LOGGER.info("-- STATO DOMANDE TERMINATE nrDomandeImprocedibili: {} - nrDomandeApprovate: {} - nrDomandeRespinte: {} - nrDomandeTerminateTotale: {} ",  nrDomandeImprocedibili, nrDomandeApprovate, nrDomandeRespinte, nrDomandeImprocedibili + nrDomandeApprovate + nrDomandeRespinte);
 		LOGGER.info("-- STATO TEMPI DOMANDE nrDomandeTempiProcedimentaliInScadenza: {} - nrDomandeTempiProcedimentaliScaduti: {} - nrDomandeTempiSoccorsoIstruttorioScaduti: {} - nrDomandeTempiPreavvisoRigettoScaduti: {} ",  nrDomandeTempiProcedimentaliInScadenza, nrDomandeTempiProcedimentaliScaduti, nrDomandeTempiSoccorsoIstruttorioScaduti, nrDomandeTempiPreavvisoRigettoScaduti);
-		LOGGER.info("-- STATO TEMPI DOMANDE nrDomandeScadenza_0_5: {} - nrDomandeScadenza_5_10: {} - nrDomandeScadenza_10_more: {}",  nrDomandeScadenza_0_5, nrDomandeScadenza_5_10, nrDomandeScadenza_10_more);
-		LOGGER.info("-- STATO TEMPI DOMANDE nrDomandeExtraTermini_0_5: {} - nrDomandeExtraTermini_5_10: {} - nrDomandeExtraTermini_10_more: {}",  nrDomandeExtraTermini_0_5, nrDomandeExtraTermini_5_10, nrDomandeExtraTermini_10_more);	
+		LOGGER.info("-- STATO TEMPI DOMANDE nrDomandeAttiveScadenza_0_5: {} - nrDomandeAttiveScadenza_5_10: {} - nrDomandeAttiveScadenza_10_more: {}",  nrDomandeAttiveScadenza_0_5, nrDomandeAttiveScadenza_5_10, nrDomandeAttiveScadenza_10_more);
+		LOGGER.info("-- STATO TEMPI DOMANDE nrDomandeTerminateScadute_0_5: {} - nrDomandeTerminateScadute_5_10: {} - nrDomandeTerminateScadute_10_more: {}",  nrDomandeTerminateScadute_0_5, nrDomandeTerminateScadute_5_10, nrDomandeTerminateScadute_10_more);	
+
+		JSONObject variableStatisticsJson = new JSONObject();
+		variableStatisticsJson.put("dataIn", startDateGreat);
+		variableStatisticsJson.put("dataOut", startDateLess);
+		variableStatisticsJson.put("domandeAttive", domandeAttive);
+		variableStatisticsJson.put("domandeTerminate", domandeTerminate);
+		variableStatisticsJson.put("domandeTotali", domandeTotali);
+		variableStatisticsJson.put("nrUominiFascia1", nrUominiFascia1);
+		variableStatisticsJson.put("nrUominiFascia2", nrUominiFascia2);
+		variableStatisticsJson.put("nrUominiFascia3", nrUominiFascia3);
+		variableStatisticsJson.put("nrUominiTotale", nrUominiFascia1 + nrUominiFascia2 + nrUominiFascia3);
+		variableStatisticsJson.put("nrDonneFascia1", nrDonneFascia1);
+		variableStatisticsJson.put("nrDonneFascia2", nrDonneFascia2);
+		variableStatisticsJson.put("nrDonneFascia3", nrDonneFascia3);
+		variableStatisticsJson.put("nrDonneTotale", nrDonneFascia1 + nrDonneFascia2 + nrDonneFascia3);
+		variableStatisticsJson.put("nrFaseSmistamento", nrFaseSmistamento);
+		variableStatisticsJson.put("nrFaseIstruttoria", nrFaseIstruttoria);
+		variableStatisticsJson.put("nrFaseSoccorsoIstruttorio", nrFaseSoccorsoIstruttorio);
+		variableStatisticsJson.put("nrFaseCambioIstruttore", nrFaseCambioIstruttore);
+		variableStatisticsJson.put("nrFaseValutazione", nrFaseValutazione);
+		variableStatisticsJson.put("nrFasePreavvisoRigetto", nrFasePreavvisoRigetto);
+		variableStatisticsJson.put("nrFaseIstruttoriaSuPreavviso", nrFaseIstruttoriaSuPreavviso);
+		variableStatisticsJson.put("nrFaseValutazionePreavviso", nrFaseValutazionePreavviso);
+		variableStatisticsJson.put("nrFaseFirmaDgRigetto", nrFaseFirmaDgRigetto);
+		variableStatisticsJson.put("nrDomandeImprocedibili", nrDomandeImprocedibili);
+		variableStatisticsJson.put("nrDomandeApprovate", nrDomandeApprovate);
+		variableStatisticsJson.put("nrDomandeRespinte", nrDomandeRespinte);
+		variableStatisticsJson.put("nrDomandeTerminateTotale", nrDomandeImprocedibili + nrDomandeApprovate + nrDomandeRespinte);
+		variableStatisticsJson.put("nrDomandeTempiProcedimentaliInScadenza", nrDomandeTempiProcedimentaliInScadenza);
+		variableStatisticsJson.put("nrDomandeTempiProcedimentaliScaduti", nrDomandeTempiProcedimentaliScaduti);
+		variableStatisticsJson.put("nrDomandeTempiSoccorsoIstruttorioScaduti", nrDomandeTempiSoccorsoIstruttorioScaduti);
+		variableStatisticsJson.put("nrDomandeTempiPreavvisoRigettoScaduti", nrDomandeTempiPreavvisoRigettoScaduti);
+		variableStatisticsJson.put("nrDomandeAttiveScadenza_0_5", nrDomandeAttiveScadenza_0_5);
+		variableStatisticsJson.put("nrDomandeAttiveScadenza_5_10", nrDomandeAttiveScadenza_5_10);
+		variableStatisticsJson.put("nrDomandeAttiveScadenza_10_more", nrDomandeAttiveScadenza_10_more);
+		variableStatisticsJson.put("nrDomandeAttiveScadute_0_5", nrDomandeAttiveScadute_0_5);
+		variableStatisticsJson.put("nrDomandeAttiveScadute_5_10", nrDomandeAttiveScadute_5_10);
+		variableStatisticsJson.put("nrDomandeAttiveScadute_10_more", nrDomandeAttiveScadute_10_more);
+		variableStatisticsJson.put("nrDomandeTerminateScadute_0_5", nrDomandeTerminateScadute_0_5);
+		variableStatisticsJson.put("nrDomandeTerminateScadute_5_10", nrDomandeTerminateScadute_5_10);
+		variableStatisticsJson.put("nrDomandeTerminateScadute_10_more", nrDomandeTerminateScadute_10_more);
+		
+		//flowsPdfResource.makeStatisticPdf(processDefinitionKey, variableStatisticsJson);
+
+		return variableStatisticsJson;
 	}
+
+
+
+
+
 
 	private void mappaturaVariabili(List<RestVariable> variables) throws ParseException {
 		//GESTIONE DEI PARAMETRI DA VISUALIZZARE
@@ -324,31 +379,44 @@ public class StatisticOivService {
 	private void calcolaVariabiliDateFlussiAttivi() {
 		nrGiorniInvioDomanda = calcolaGiorniTraDate(dataInvioDomanda, dataOdierna);
 		nrGiorniScadenzaTerminiDomanda = calcolaGiorniTraDate(dataOdierna, dataScadenzaTerminiDomanda);
+		nrGiorniScadutiTerminiDomanda = calcolaGiorniTraDate(dataScadenzaTerminiDomanda, dataOdierna);
 		nrGiorniDataPreavviso = calcolaGiorniTraDate(dataPreavviso, dataOdierna);
-		LOGGER.debug("--- nrGiorniInvioDomanda: {} nrGiorniScadenzaTerminiDomanda: {} nrGiorniDataPreavviso: {}", nrGiorniInvioDomanda, nrGiorniScadenzaTerminiDomanda, nrGiorniDataPreavviso);
+		LOGGER.debug("--- nrGiorniInvioDomanda: {} nrGiorniScadenzaTerminiDomanda: {} nrGiorniScadutiTerminiDomanda: {} nrGiorniDataPreavviso: {}", nrGiorniInvioDomanda, nrGiorniScadenzaTerminiDomanda, nrGiorniScadutiTerminiDomanda, nrGiorniDataPreavviso);
+		//TERMINI IN SCADENZA
 		if ( 0 < nrGiorniScadenzaTerminiDomanda && nrGiorniScadenzaTerminiDomanda <= 5) {
-			nrDomandeScadenza_0_5 = nrDomandeScadenza_0_5 +1;
+			nrDomandeAttiveScadenza_0_5 = nrDomandeAttiveScadenza_0_5 +1;
 		}
 		if ( 5 < nrGiorniScadenzaTerminiDomanda && nrGiorniScadenzaTerminiDomanda <= 10) {
-			nrDomandeScadenza_5_10 = nrDomandeScadenza_5_10 +1;
+			nrDomandeAttiveScadenza_5_10 = nrDomandeAttiveScadenza_5_10 +1;
 		}
 		if ( 10 < nrGiorniScadenzaTerminiDomanda) {
-			nrDomandeScadenza_10_more = nrDomandeScadenza_10_more +1;
+			nrDomandeAttiveScadenza_10_more = nrDomandeAttiveScadenza_10_more +1;
 		}
+		//TERMINI SCADUTI
+		if ( 0 < nrGiorniScadutiTerminiDomanda && nrGiorniScadutiTerminiDomanda <= 5) {
+			nrDomandeAttiveScadute_0_5 = nrDomandeAttiveScadute_0_5 +1;
+		}
+		if ( 5 < nrGiorniScadutiTerminiDomanda && nrGiorniScadutiTerminiDomanda <= 10) {
+			nrDomandeAttiveScadute_5_10 = nrDomandeAttiveScadute_5_10 +1;
+		}
+		if ( 10 < nrGiorniScadutiTerminiDomanda) {
+			nrDomandeAttiveScadute_10_more = nrDomandeAttiveScadute_10_more +1;
+		}	
 	}
 
 	private void calcolaVariabiliDateFlussiCompletati(HistoricProcessInstanceResponse processInstance) {
 		nrGiorniCompletamentoDomanda = (int) (processInstance.getDurationInMillis()/ (1000 * 60 * 60 * 24));
 		nrGiorniExtraTerminiDomanda = calcolaGiorniTraDate(processInstance.getEndTime(), dataScadenzaTerminiDomanda);
 		LOGGER.debug("--- nrGiorniCompletamentoDomanda: {} -  nrGiorniExtraTerminiDomanda: {}", nrGiorniCompletamentoDomanda, nrGiorniExtraTerminiDomanda);
+		//TERMINI SCADUTI
 		if ( 0 < nrGiorniExtraTerminiDomanda && nrGiorniExtraTerminiDomanda <= 5) {
-			nrDomandeExtraTermini_0_5 = nrDomandeExtraTermini_0_5 +1;
+			nrDomandeTerminateScadute_0_5 = nrDomandeTerminateScadute_0_5 +1;
 		}
 		if ( 5 < nrGiorniExtraTerminiDomanda && nrGiorniExtraTerminiDomanda <= 10) {
-			nrDomandeExtraTermini_5_10 = nrDomandeExtraTermini_5_10 +1;
+			nrDomandeTerminateScadute_5_10 = nrDomandeTerminateScadute_5_10 +1;
 		}
 		if ( 10 < nrGiorniExtraTerminiDomanda) {
-			nrDomandeExtraTermini_10_more = nrDomandeExtraTermini_10_more +1;
+			nrDomandeTerminateScadute_10_more = nrDomandeTerminateScadute_10_more +1;
 		}
 	}
 
@@ -372,8 +440,8 @@ public class StatisticOivService {
 	private void resetStatisticvariables() {
 
 		domandeTotali = 0;
-		domandeInEsame = 0;
-		domandeEsaminate = 0;
+		domandeAttive = 0;
+		domandeTerminate = 0;
 		nrUominiFascia1 = 0;
 		nrUominiFascia2 = 0;
 		nrUominiFascia3 = 0;
@@ -407,16 +475,22 @@ public class StatisticOivService {
 
 		nrGiorniInvioDomanda = 0;
 		nrGiorniScadenzaTerminiDomanda = 0;
+		nrGiorniScadutiTerminiDomanda = 0;
 		nrGiorniDataPreavviso = 0;
 		nrGiorniCompletamentoDomanda = 0;
 		nrGiorniExtraTerminiDomanda = 0;
 
-		nrDomandeScadenza_0_5 = 0;
-		nrDomandeScadenza_5_10 = 0;
-		nrDomandeScadenza_10_more = 0;
-		nrDomandeExtraTermini_0_5 = 0;
-		nrDomandeExtraTermini_5_10 = 0;
-		nrDomandeExtraTermini_10_more = 0;	
+		nrDomandeAttiveScadenza_0_5 = 0;
+		nrDomandeAttiveScadenza_5_10 = 0;
+		nrDomandeAttiveScadenza_10_more = 0;
+		nrDomandeAttiveScadute_0_5 = 0;
+		nrDomandeAttiveScadute_5_10 = 0;
+		nrDomandeAttiveScadute_10_more = 0;
+
+
+		nrDomandeTerminateScadute_0_5 = 0;
+		nrDomandeTerminateScadute_5_10 = 0;
+		nrDomandeTerminateScadute_10_more = 0;	
 		sessoRichiedente = "";
 		fasciaAppartenenzaAttribuita = "";
 		tipologiaRichiesta = "";

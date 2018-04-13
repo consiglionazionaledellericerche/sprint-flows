@@ -2,6 +2,8 @@ package it.cnr.si.flows.ng.resource;
 
 
 import com.codahale.metrics.annotation.Timed;
+
+import it.cnr.si.flows.ng.listeners.oiv.service.StatisticOivService;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.service.FlowsPdfService;
 import it.cnr.si.flows.ng.utils.Enum;
@@ -28,8 +30,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;
+import java.text.ParseException;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Calendar;
+import java.util.Date;
+import it.cnr.si.flows.ng.utils.Utils;
 
 
 @Controller
@@ -47,7 +53,10 @@ public class FlowsPdfResource {
     private HistoryService historyService;
     @Inject
     private RuntimeService runtimeService;
-
+    @Inject
+    private StatisticOivService statisticOivService;
+	@Inject
+	private Utils utils;
     /**
      * Crea e restituisce il summary pdf del flusso.
      *
@@ -152,6 +161,34 @@ public class FlowsPdfResource {
 
         return resp;
     }
+    
+    
+    @RequestMapping(value = "/makeStatisticPdf", headers = "Accept=application/pdf", method = RequestMethod.GET, produces = "application/pdf")
+    @ResponseBody
+    @Timed
+    @Secured(AuthoritiesConstants.USER)
+    public ResponseEntity<byte[]> makeStatisticPdf(
+            @RequestParam("processDefinitionKey") String processDefinitionKey,
+            @RequestParam("startDateGreat") String startDateGreat,
+    		@RequestParam("startDateLess") String startDateLess) throws ParseException {
+    	
+       	
+        //Sotituisco la lista di variabili da quelle storiche (historicProcessInstance.getProcessVariables() )a quelle attuali (variableInstanceJson)
+        JSONObject processvariables = statisticOivService.getOivStatistics(processDefinitionKey, startDateGreat, startDateLess);
+     
+        //creo il pdf corrispondente
+        String fileName = processDefinitionKey + "-Statistics";
+        byte[] pdfByteArray = pdfService.makeStatisticPdf(processvariables, fileName, processDefinitionKey);
+        //popolo gli headers della response
+        HttpHeaders headers = new HttpHeaders();
+        ResponseEntity<byte[]> resp;
+        headers.set("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+        headers.setContentType(MediaType.parseMediaType("application/pdf"));
+        headers.setContentLength(pdfByteArray.length);
+        resp = new ResponseEntity<>(pdfByteArray, headers, HttpStatus.OK);
+
+        return resp;
+    }
 
     //Sotituisco il mapping direttamente con il json delle variabili sttuali 
     //private JSONObject mappingVariables(Map<String, Object> processVariables) {
@@ -178,4 +215,8 @@ public class FlowsPdfResource {
 
         return variables;
     }
+    
+	private String formatDate(Date date) {
+		return date != null ? utils.formattaDataOra(date) : "";
+	}
 }
