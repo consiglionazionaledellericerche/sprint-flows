@@ -2,43 +2,44 @@
 
 describe('Controller Tests', function() {
 
-    describe('Membership Management Detail Controller', function() {
-        var $scope, $rootScope;
-        var MockEntity, MockPreviousState, MockMembership;
-        var createController;
+	describe('Membership Detail Controller', function() {
+		var $scope, $rootScope;
+		var MockEntity, MockMembership, MockCnrgroup, MockJhi_user;
+		var createController;
 
-        beforeEach(inject(function($injector) {
-            $rootScope = $injector.get('$rootScope');
-            $scope = $rootScope.$new();
-            MockEntity = jasmine.createSpy('MockEntity');
-            MockPreviousState = jasmine.createSpy('MockPreviousState');
-            MockMembership = jasmine.createSpy('MockMembership');
-            
-
-            var locals = {
-                '$scope': $scope,
-                '$rootScope': $rootScope,
-                'entity': MockEntity,
-                'previousState': MockPreviousState,
-                'Membership': MockMembership
-            };
-            createController = function() {
-                $injector.get('$controller')("MembershipDetailController", locals);
-            };
-        }));
+		beforeEach(inject(function($injector) {
+			$rootScope = $injector.get('$rootScope');
+			$scope = $rootScope.$new();
+			MockEntity = jasmine.createSpy('MockEntity');
+			MockMembership = jasmine.createSpy('MockMembership');
+			MockCnrgroup = jasmine.createSpy('MockCnrgroup');
+			MockJhi_user = jasmine.createSpy('MockJhi_user');
 
 
-        describe('Root Scope Listening', function() {
-            it('Unregisters root scope listener upon scope destruction', function() {
-                var eventType = 'sprintApp:membershipUpdate';
+			var locals = {
+				'$scope': $scope,
+				'$rootScope': $rootScope,
+				'entity': MockEntity,
+				'Membership': MockMembership,
+				'Cnrgroup': MockCnrgroup,
+				'Jhi_user': MockJhi_user
+			};
+			createController = function() {
+				$injector.get('$controller')("MembershipDetailController", locals);
+			};
+		}));
 
-                createController();
-                expect($rootScope.$$listenerCount[eventType]).toEqual(1);
 
-                $scope.$destroy();
-                expect($rootScope.$$listenerCount[eventType]).toBeUndefined();
-            });
-        });
-    });
+		describe('Root Scope Listening', function() {
+			it('Unregisters root scope listener upon scope destruction', function() {
+				var eventType = 'sprintApp:membershipUpdate';
 
+				createController();
+				expect($rootScope.$$listenerCount[eventType]).toEqual(1);
+
+				$scope.$destroy();
+				expect($rootScope.$$listenerCount[eventType]).toBeUndefined();
+			});
+		});
+	});
 });

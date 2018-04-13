@@ -16,22 +16,21 @@ import java.util.Objects;
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class Membership implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @NotNull
-    @Column(name = "username", nullable = false)
-    private String username;
-
-    @NotNull
-    @Column(name = "groupname", nullable = false)
-    private String groupname;
-
-    @Column(name = "grouprole")
+    @Column(name = "grouprole", nullable = false)
     private String grouprole;
+
+    @ManyToOne
+    @JoinColumn(name = "cnrgroup_id")
+    private Cnrgroup cnrgroup;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private FlowsUser user;
 
     public Long getId() {
         return id;
@@ -41,43 +40,28 @@ public class Membership implements Serializable {
         this.id = id;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public Membership username(String username) {
-        this.username = username;
-        return this;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getGroupname() {
-        return groupname;
-    }
-
-    public Membership groupname(String groupname) {
-        this.groupname = groupname;
-        return this;
-    }
-
-    public void setGroupname(String groupname) {
-        this.groupname = groupname;
-    }
-
     public String getGrouprole() {
         return grouprole;
     }
 
-    public Membership grouprole(String grouprole) {
-        this.grouprole = grouprole;
-        return this;
-    }
-
     public void setGrouprole(String grouprole) {
         this.grouprole = grouprole;
+    }
+
+    public Cnrgroup getCnrgroup() {
+        return cnrgroup;
+    }
+
+    public void setCnrgroup(Cnrgroup cnrgroup) {
+        this.cnrgroup = cnrgroup;
+    }
+
+    public FlowsUser getUser() {
+        return user;
+    }
+
+    public void setUser(FlowsUser user) {
+        this.user = user;
     }
 
     @Override
@@ -104,8 +88,6 @@ public class Membership implements Serializable {
     public String toString() {
         return "Membership{" +
                 "id=" + id +
-                ", username='" + username + "'" +
-                ", groupname='" + groupname + "'" +
                 ", grouprole='" + grouprole + "'" +
                 '}';
     }

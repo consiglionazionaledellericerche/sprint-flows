@@ -19,7 +19,7 @@
 		loadAll();
 
 		function loadAll() {
-			dataService.userMemberships.groupsWithRoleCoordinator({
+			dataService.userMemberships.groupsForUser({
 				page: pagingParams.page - 1,
 				size: vm.itemsPerPage,
 				sort: sort()

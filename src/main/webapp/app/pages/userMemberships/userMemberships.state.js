@@ -54,7 +54,7 @@
 			})
 			.state('group-memberships', {
 				parent: 'app',
-				url: '/group-membership?page&sort&search/{groupname}',
+				url: '/group-membership?page&sort&search',
 				data: {
 					authorities: ['ROLE_USER'],
 					pageTitle: 'sprintApp.userMemberships.home.title'
@@ -78,7 +78,7 @@
 					search: null
 				},
 				resolve: {
-					modify: ['$stateParams', function($stateParams) {
+					modify: [function() {
 						return false;
 					}],
 					pagingParams: ['$stateParams', 'PaginationUtil', function($stateParams, PaginationUtil) {
@@ -133,7 +133,7 @@
 					groupname: null
 				},
 				resolve: {
-					modify: ['$stateParams', function($stateParams) {
+					modify: [function() {
 						return true;
 					}],
 					pagingParams: ['$stateParams', 'PaginationUtil', function($stateParams, PaginationUtil) {
@@ -174,7 +174,7 @@
 						controllerAs: 'vm',
 						size: 'md',
 						resolve: {
-							entity: ['Membership', function(Membership) {
+							entity: ['$state', 'Membership', function($state, Membership) {
 								return Membership.get({
 									id: $stateParams.id
 								}).$promise;
@@ -189,7 +189,10 @@
 					}, function() {
 						$state.go('^');
 					});
-				}]
+				}],
+				params: {
+					groupname: null
+				}
 			})
 			.state('user-membership-new', {
 				parent: 'group-memberships',
