@@ -159,11 +159,14 @@
 				}
 			},
 			userMemberships: {
-			    groupsWithRoleCoordinator: function() {
-			        return $http.get('api/memberships/groupsWithRoleCoordinator');
+			    groupsForUser: function() {
+			        return $http.get('api/memberships/groupsForUser');
 			    },
-			    groupMembersByGroupName: function(groupName) {
-			        return $http.get('api/memberships/groupMembersByGroupName?groupName=' + groupName)
+			    membersByGroupName: function(groupName) {
+			        return $http.get('api/memberships/membersByGroupName?groupName=' + groupName)
+			    },
+			    createMembership: function(groupName, userName, groupRole){
+			        return $http.post('api/createMemberships?groupName=' + groupName + '&userName=' + userName + '&groupRole=' + groupRole);
 			    }
 			}
 		};

@@ -4,6 +4,8 @@ import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.domain.Membership;
 import it.cnr.si.domain.Relationship;
 import it.cnr.si.security.SecurityUtils;
+import it.cnr.si.service.CnrgroupService;
+import it.cnr.si.service.FlowsUserService;
 import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.RelationshipService;
 import it.cnr.si.web.rest.util.HeaderUtil;
@@ -44,14 +46,12 @@ public class MembershipResource {
     private MembershipService membershipService;
     @Inject
     private RelationshipService relationshipService;
+    @Inject
+    private CnrgroupService cnrgroupService;
+    @Inject
+    private FlowsUserService flowsUserService;
 
-    /**
-     * POST  /memberships : Create a new membership.
-     *
-     * @param membership the membership to create
-     * @return the ResponseEntity with status 201 (Created) and with body the new membership, or with status 400 (Bad Request) if the membership has already an ID
-     * @throws URISyntaxException if the Location URI syntax is incorrect
-     */
+
     @RequestMapping(value = "/memberships",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -61,9 +61,45 @@ public class MembershipResource {
         if (membership.getId() != null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("membership", "idexists", "A new membership cannot already have an ID")).body(null);
         }
-        //se cerco di creare una relationshi con username e groupname uguale ad una che già esiste restituisco errore
-        if (membershipService.findOneByUsernameAndGroupname(membership.getUsername(), membership.getGroupname()) != null)
+        //se cerco di creare una relationship con username e groupname uguale ad una che già esiste restituisco errore
+        if (membershipService.findOneByUsernameAndGroupname(membership.getUser().getLogin(), membership.getCnrgroup().getName()) != null)
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("membership", "A membership with this Username AND groupname already exist", "A membership with this Username AND groupname already exist")).body(null);
+
+        Membership result = membershipService.save(membership);
+        return ResponseEntity.created(new URI("/api/memberships/" + result.getId()))
+                .headers(HeaderUtil.createEntityCreationAlert("membership", result.getId().toString()))
+                .body(result);
+    }
+
+
+    /**
+     * Metodo di creazione delle membership customizzato
+     * (prende come parametri 3 stringhe e non l'oggetto "membership", in questo modo è più facile da richiamare da js)
+     *
+     * @param groupName the group name
+     * @param userName  the user name
+     * @param groupRole the group role
+     * @return the response entity
+     * @throws URISyntaxException the uri syntax exception
+     */
+    @RequestMapping(value = "/createMemberships",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<Membership> myCreateMembership(@RequestParam("groupName") String groupName,
+                                                         @RequestParam("userName") String userName,
+                                                         @RequestParam("groupRole") String groupRole) throws URISyntaxException {
+
+        log.debug("REST request to save Membership : groupName->{} , userName->{}, groupRole->{}", groupName, userName, groupRole);
+
+        //se cerco di creare una relationship con username e groupname uguale ad una che già esiste restituisco errore
+        if (membershipService.findOneByUsernameAndGroupname(userName, groupName) != null)
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("membership", "A membership with this Username AND groupname already exist", "A membership with this Username AND groupname already exist")).body(null);
+
+        Membership membership = new Membership();
+        membership.setCnrgroup(cnrgroupService.findCnrgroupByName(groupName));
+        membership.setGrouprole(groupRole);
+        membership.setUser(flowsUserService.getUserWithAuthoritiesByLogin(userName).orElse(null));
 
         Membership result = membershipService.save(membership);
         return ResponseEntity.created(new URI("/api/memberships/" + result.getId()))
@@ -151,40 +187,46 @@ public class MembershipResource {
     }
 
 
-    @RequestMapping(value = "/memberships/groupsWithRoleCoordinator",
+    /**
+     * Gets groups for user.
+     *
+     * @param pageable the pageable
+     * @return the groups for user
+     * @throws URISyntaxException the uri syntax exception
+     */
+    @RequestMapping(value = "/memberships/groupsForUser",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<List<Membership>> getGroupsWithRoleCoordinator(Pageable pageable) throws URISyntaxException {
+    public ResponseEntity<List<Membership>> getGroupsForUser(Pageable pageable) throws URISyntaxException {
 
         String user = SecurityUtils.getCurrentUserLogin();
-        log.debug("REST request dei grutti di cui è coordinator l'utente {}", user);
+        log.debug("REST request dei gruppi di cui è coordinator l'utente {}", user);
 
+        //recupero le mebership in cui l'utente ha "role" coordinator
         Page<Membership> pageCoordinator = membershipService.getGroupsWithRole(pageable, user, coordinator.name());
+        //recupero le mebership in cui l'utente ha "role" member
         Page<Membership> pageMember = membershipService.getGroupsWithRole(pageable, user, member.name());
 
-        List<Membership> userGroup = membershipService.findAll(pageable).getContent().stream()
-                .filter(membership -> membership.getUsername().equals(user))
-                .collect(Collectors.toList());
+        //recupero i gruppi di cui l'utente fa parte sia come "coordinator" che come "member"
+        List<Membership> userGroup = membershipService.getGroupForUser(user);
 
+        //di quelli di cui è "member" recupero anche le relationship
         for (Membership membership : pageMember.getContent()) {
-            String groupname = membership.getGroupname();
-
+            String groupname = membership.getCnrgroup().getName();
+            //le membership che recupero dalle relatrionship  devono avere lo stesso grouprole indicato nella relationship
             Set<Relationship> relationships = relationshipService.getAllRelationshipForGroup(groupname);
             for (Relationship relationship : relationships) {
-                if (relationship.getGroupRole().equals(coordinator.name())) {
-
                     Membership membershipFromRelationship = new Membership();
 
-                    membershipFromRelationship.setUsername(membership.getUsername());
-                    membershipFromRelationship.setGrouprole(coordinator.name());
-                    membershipFromRelationship.setGroupname(relationship.getGroupRelationship());
+                    membershipFromRelationship.setGrouprole(relationship.getGroupRole());
+                    membershipFromRelationship.setUser(membership.getUser());
+                    membershipFromRelationship.setCnrgroup(cnrgroupService.findCnrgroupByName(relationship.getGroupRelationship()));
 
                     userGroup.add(membershipFromRelationship);
-                }
             }
         }
-        userGroup.addAll(pageCoordinator.getContent());
+        //tolgo i gruppi "duplicati"
         userGroup = userGroup.stream().distinct().collect(Collectors.toList());
 
         PageImpl<Membership> resultPage = new PageImpl<>(userGroup, pageable, userGroup.size());
@@ -199,11 +241,19 @@ public class MembershipResource {
     }
 
 
-    @RequestMapping(value = "/memberships/groupMembersByGroupName",
+    /**
+     * Gets members by group name.
+     *
+     * @param pageable  the pageable
+     * @param groupName the group name
+     * @return the members by group name
+     * @throws URISyntaxException the uri syntax exception
+     */
+    @RequestMapping(value = "/memberships/membersByGroupName",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<List<Membership>> getGroupMembersByGroupName(Pageable pageable, @RequestParam("groupName") String groupName) throws URISyntaxException {
+    public ResponseEntity<List<Membership>> getMembersByGroupName(Pageable pageable, @RequestParam("groupName") String groupName) throws URISyntaxException {
 
         List<Membership> members = membershipService.getMembershipByGroupName(groupName);
 
@@ -214,7 +264,7 @@ public class MembershipResource {
 //            setto il grouprole e il groupName come indicato dalla relationship
             for (Membership membership : membershipForRelationship) {
                 membership.setGrouprole(relationship.getGroupRole());
-                membership.setGroupname(relationship.getGroupName());
+                membership.setCnrgroup(cnrgroupService.findCnrgroupByName(relationship.getGroupName()));
                 membership.setId(null);
             }
             members.addAll(membershipForRelationship);
@@ -232,5 +282,4 @@ public class MembershipResource {
                         HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
-
 }
