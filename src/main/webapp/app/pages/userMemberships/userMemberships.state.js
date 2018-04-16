@@ -75,7 +75,8 @@
 						value: 'id,asc',
 						squash: true
 					},
-					search: null
+					search: null,
+					groupname: null
 				},
 				resolve: {
 					modify: [function() {
