@@ -43,7 +43,7 @@ public class StartAcquistiSetGroupsAndVisibility {
 	public void configuraVariabiliStart(DelegateExecution execution)  throws IOException, ParseException  {
 
 		String initiator = (String) execution.getVariable(Enum.VariableEnum.initiator.name());
-		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable(Enum.VariableEnum.title.name()));
+		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable(Enum.VariableEnum.titolo.name()));
 
 		List<GrantedAuthority> authorities = relationshipService.getAllGroupsForUser(initiator);
 
