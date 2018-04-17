@@ -1,5 +1,6 @@
 package it.cnr.si.flows.ng.service;
 
+import com.opencsv.CSVWriter;
 import it.cnr.si.domain.View;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
@@ -11,14 +12,14 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import com.opencsv.CSVWriter;
-import javax.inject.Inject;
 
-import java.io.FileWriter;
+import javax.inject.Inject;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
 import static it.cnr.si.flows.ng.utils.Utils.parseInt;
@@ -26,7 +27,6 @@ import static it.cnr.si.flows.ng.utils.Utils.parseInt;
 @Service
 public class FlowsCsvService {
 
-    public static final String TITLE = "title";
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsCsvService.class);
 
     @Inject
@@ -39,7 +39,7 @@ public class FlowsCsvService {
     private Utils utils;
     
 
-	public List<HistoricProcessInstanceResponse> getProcessesStatistics (String processDefinitionKey, String startDateGreat, String startDateLess, boolean activeFlag) throws ParseException {
+	public List<HistoricProcessInstanceResponse> getProcessesStatistics(String processDefinitionKey, String startDateGreat, String startDateLess, boolean activeFlag) {
 		Map<String, String> req = new HashMap<>();
 		req.put("startDateGreat", startDateGreat);
 		req.put("startDateLess", startDateLess);
@@ -55,8 +55,7 @@ public class FlowsCsvService {
 
 		LOGGER.debug("nr. domande: {} con activeFlag: {}", domandeAttive, activeFlag);
 		// GESTIONE VARIABILI SINGOLE ISTANZE FLUSSI ATTIVI
-		List<HistoricProcessInstanceResponse> processInstances = (List<HistoricProcessInstanceResponse>) flussi.get("processInstances");
-		return processInstances;
+		return (List<HistoricProcessInstanceResponse>) flussi.get("processInstances");
 	}
 
 
@@ -124,7 +123,4 @@ public class FlowsCsvService {
 		writer.writeAll(entriesIterable);
 		writer.close();
 	}
-
-
-
 }
