@@ -32,10 +32,12 @@ public class FlowsCsvService {
     @Inject
     private FlowsProcessInstanceService flowsProcessInstanceService;
     @Inject
+    private FlowsCsvDispatcherService flowsCsvDispatcherService;
+    @Inject
     private ViewRepository viewRepository;
     @Inject
     private Utils utils;
-
+    
 
 	public List<HistoricProcessInstanceResponse> getProcessesStatistics (String processDefinitionKey, String startDateGreat, String startDateLess, boolean activeFlag) throws ParseException {
 		Map<String, String> req = new HashMap<>();
@@ -77,8 +79,14 @@ public class FlowsCsvService {
 			String processInstanceId = pi.getId();
 			Map<String, Object> processInstanceDetails = flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId);
 			HistoricProcessInstanceResponse processInstance = (HistoricProcessInstanceResponse) processInstanceDetails.get("entity");
+			// LISTA DEI PARAMETRI BASATI SULLE VARIABILI DELL'ISTANZA DI PROCESSO
 			List<RestVariable> variables = processInstance.getVariables();
-			
+			// LISTA DEI PARAMETRI CALCOLATI PER STATISTICHE AVANZATE
+			List<RestVariable> processInstanceMetadata = flowsCsvDispatcherService.getProcessInstanceMetadatas(processDefinitionKey, processInstance);
+			List<RestVariable> totalStatisticmetadata = new ArrayList<>();
+			totalStatisticmetadata.addAll(variables);
+			totalStatisticmetadata.addAll(processInstanceMetadata);
+
 			ArrayList<String> tupla = new ArrayList<>();
 			//field comuni a tutte le Process Instances (Business Key, Start date)
 			if (pi.getEndTime() == null){
@@ -96,7 +104,7 @@ public class FlowsCsvService {
 					JSONArray fields = new JSONArray(view.getView());
 					for (int i = 0; i < fields.length(); i++) {
 						JSONObject field = fields.getJSONObject(i);
-						tupla.add(Utils.filterProperties(variables, field.getString("varName")));
+						tupla.add(Utils.filterProperties(totalStatisticmetadata, field.getString("varName")));
 						//solo per il primo ciclo, prendo le label dei field specifici
 						if (!hasHeaders)
 							headers.add(field.getString("label"));
