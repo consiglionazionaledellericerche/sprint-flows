@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 import java.util.Map;
 
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.title;
+import static it.cnr.si.flows.ng.service.FlowsPdfService.TITLE;
 
 @Aspect
 @Component
@@ -43,7 +43,7 @@ public class AuditingAspect {
 
         Object[] args = joinPoint.getArgs();
 
-        AuditEvent event = new AuditEvent(username, "EMAIL_SEND_FAILURE", "groupName=" + groupName, title.name() + "=" + variables.get(title.name()), "notificationType=" + notificationType);
+        AuditEvent event = new AuditEvent(username, "EMAIL_SEND_FAILURE", "groupName=" + groupName, TITLE + "=" + variables.get(TITLE), "notificationType=" + notificationType);
         repo.add(event);
     }
 

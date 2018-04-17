@@ -99,9 +99,10 @@ public class FlowsPdfService {
         if (variable.isPresent())
             titolo += variable.get().getValue() + "\n\n";
         else {
-            // Titolo nel file pdf in caso di Workflow Definition che non ha il titolo nella variabile "titolo"
+            // Titolo nel file pdf in caso di Workflow Definition che non ha il titolo
+            // nella variabile "titolo" ma nella vecchia variabile "title" Flussi CNR
             variable = variables.stream()
-                    .filter(a -> (a.getName()).equals(title.name()))
+                    .filter(a -> (a.getName()).equals(TITLE))
                     .findFirst();
 
             titolo += variable.get().getValue() + "\n\n";
@@ -199,7 +200,7 @@ public class FlowsPdfService {
         InputStream jasperFile = null;
         try {
             //carico le variabili della process instance
-            LOGGER.debug("Json con i dati da inserire nel pdf: {}", processvariables.toString());
+            LOGGER.debug("Json con i dati da inserire nel pdf: {0}", processvariables.toString());
             JRDataSource datasource = new JsonDataSource(new ByteArrayInputStream(processvariables.toString().getBytes(Charset.forName("UTF-8"))));
 
             final ResourceBundle resourceBundle = ResourceBundle.getBundle(
@@ -262,7 +263,7 @@ public class FlowsPdfService {
         InputStream jasperFile = null;
         try {
             //carico le variabili della process instance
-            LOGGER.debug("Json con i dati da inserire nel pdf: {}", processvariables.toString());
+            LOGGER.debug("Json con i dati da inserire nel pdf: {0}", processvariables.toString());
             JRDataSource datasource = new JsonDataSource(new ByteArrayInputStream(processvariables.toString().getBytes(Charset.forName("UTF-8"))));
 
             final ResourceBundle resourceBundle = ResourceBundle.getBundle(

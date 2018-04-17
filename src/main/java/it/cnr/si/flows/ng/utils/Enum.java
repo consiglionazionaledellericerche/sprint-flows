@@ -94,8 +94,8 @@ public class Enum {
     }
     public enum VariableEnum {
         initiator,
-        title,
         titolo,
+        fase,
         descrizione,
         idStruttura,
         startDate,
