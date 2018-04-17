@@ -1,6 +1,5 @@
 package it.cnr.si.flows.ng.listeners.cnr.acquisti;
 
-import it.cnr.si.flows.ng.listeners.oiv.service.StartOivSetGroupsAndVisibility;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
@@ -31,7 +30,7 @@ import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 
 @Service
 public class StartAcquistiSetGroupsAndVisibility {
-	private static final Logger LOGGER = LoggerFactory.getLogger(StartOivSetGroupsAndVisibility.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(StartAcquistiSetGroupsAndVisibility.class);
 
 
 	@Inject

@@ -51,10 +51,10 @@ public class FlowsCsvService {
 		//VALORIZZAZIONE PARAMETRI STATISTICHE
 		Integer domandeAttive = parseInt(flussi.get("totalItems").toString());
 
-		LOGGER.debug("nr. domandeAttive: {}", domandeAttive);
+		LOGGER.debug("nr. domande: {} con activeFlag: {}", domandeAttive, activeFlag);
 		// GESTIONE VARIABILI SINGOLE ISTANZE FLUSSI ATTIVI
-		List<HistoricProcessInstanceResponse> activeProcessInstances = (List<HistoricProcessInstanceResponse>) flussi.get("processInstances");
-		return activeProcessInstances;
+		List<HistoricProcessInstanceResponse> processInstances = (List<HistoricProcessInstanceResponse>) flussi.get("processInstances");
+		return processInstances;
 	}
 
 
@@ -70,6 +70,7 @@ public class FlowsCsvService {
 		ArrayList<String[]> entriesIterable = new ArrayList<>();
 		boolean hasHeaders = false;
 		ArrayList<String> headers = new ArrayList<>();
+		headers.add("Stato Istanza");
 		headers.add("Business Key");
 		headers.add("Start Date");
 		for (HistoricProcessInstanceResponse pi : processInstances) {
@@ -80,6 +81,12 @@ public class FlowsCsvService {
 			
 			ArrayList<String> tupla = new ArrayList<>();
 			//field comuni a tutte le Process Instances (Business Key, Start date)
+			if (pi.getEndTime() == null){
+				tupla.add("ATTIVO");
+
+			} else {
+				tupla.add("TERMINATO");
+			}
 			tupla.add(pi.getBusinessKey());
 			tupla.add(utils.formattaDataOra(pi.getStartTime()));
 

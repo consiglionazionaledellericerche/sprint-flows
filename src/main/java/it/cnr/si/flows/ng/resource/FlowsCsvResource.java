@@ -55,13 +55,19 @@ public class FlowsCsvResource {
 			@RequestParam("processDefinitionKey") String processDefinitionKey,
 			@RequestParam("startDateGreat") String startDateGreat,
 			@RequestParam("startDateLess") String startDateLess) throws ParseException, IOException {
-
-		boolean activeFlag = true;
+		
 		// Lista processi attivi
-		List<HistoricProcessInstanceResponse> processvariables = flowsCsvService.getProcessesStatistics(processDefinitionKey, startDateGreat, startDateLess, activeFlag);
+		boolean activeFlag = true;
+		List<HistoricProcessInstanceResponse> activeProcessInstances = flowsCsvService.getProcessesStatistics(processDefinitionKey, startDateGreat, startDateLess, activeFlag);
+		// Lista processi terminati
+		activeFlag = false;
+		List<HistoricProcessInstanceResponse> terminatedProcessInstances = flowsCsvService.getProcessesStatistics(processDefinitionKey, startDateGreat, startDateLess, activeFlag);
+		// Lista processi totali
+		activeProcessInstances.addAll(terminatedProcessInstances);
+		List<HistoricProcessInstanceResponse> processInstances= activeProcessInstances;
 		//creo il pdf corrispondente
-		String fileName = processDefinitionKey + "-Statistics";
-		flowsCsvService.makeCsv(processvariables, res.getWriter(), processDefinitionKey);
+		//String fileName = processDefinitionKey + "-Statistics";
+		flowsCsvService.makeCsv(processInstances, res.getWriter(), processDefinitionKey);
 	}
 
 }
