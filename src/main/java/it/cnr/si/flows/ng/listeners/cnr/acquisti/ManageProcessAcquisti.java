@@ -218,10 +218,10 @@ public class ManageProcessAcquisti implements ExecutionListener {
 		case "consuntivo-end": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
 		};break; 
-		case "endevent-consuntivo-start": {
+		case "end-stipulato-start": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
 		};break;     
-		case "endevent-consuntivo-end": {
+		case "end-stipulato-end": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
 		};break;
 		// END CONSUNTIVO  
@@ -295,10 +295,10 @@ public class ManageProcessAcquisti implements ExecutionListener {
 
 		// FINE ACQUISTI  
 
-		case "endevent-acquisti-start": {
+		case "end-revocato-start": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
 		};break;     
-		case "endevent-acquisti-end": {
+		case "end-revocato-end": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
 		};break;  
 

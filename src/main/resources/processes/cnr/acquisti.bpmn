@@ -506,21 +506,21 @@
         </activiti:executionListener>
       </extensionElements>
     </userTask>
-    <endEvent id="endevent-consuntivo" name="endevent-consuntivo">
+    <endEvent id="end-stipulato" name="STIPULATO">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
           <activiti:field name="faseEsecuzione">
-            <activiti:string><![CDATA[endevent-consuntivo-start]]></activiti:string>
+            <activiti:string><![CDATA[end-stipulato-start]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
         <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
           <activiti:field name="faseEsecuzione">
-            <activiti:string><![CDATA[endevent-consuntivo-end]]></activiti:string>
+            <activiti:string><![CDATA[end-stipulato-end]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
       </extensionElements>
     </endEvent>
-    <sequenceFlow id="flow71" sourceRef="consuntivo" targetRef="endevent-consuntivo">
+    <sequenceFlow id="flow71" sourceRef="consuntivo" targetRef="end-stipulato">
       <extensionElements>
         <activiti:executionListener event="take" delegateExpression="${pubblicaTuttiAllegatiPubblicabili}"></activiti:executionListener>
         <activiti:executionListener event="take" delegateExpression="${pubblicaDocumentoSePresente}">
@@ -877,22 +877,22 @@
         <activiti:executionListener event="take" delegateExpression="${pubblicaTuttiAllegatiPubblicabili}"></activiti:executionListener>
       </extensionElements>
     </sequenceFlow>
-    <endEvent id="endevent17" name="End">
+    <endEvent id="end-revocato" name="REVOCATO">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
           <activiti:field name="faseEsecuzione">
-            <activiti:string><![CDATA[endevent-acquisti-start]]></activiti:string>
+            <activiti:string><![CDATA[end-revocato-start]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
         <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
           <activiti:field name="faseEsecuzione">
-            <activiti:string><![CDATA[endevent-acquisti-end]]></activiti:string>
+            <activiti:string><![CDATA[end-revocato-end]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
       </extensionElements>
     </endEvent>
-    <sequenceFlow id="flow125" sourceRef="revoca" targetRef="endevent17"></sequenceFlow>
-    <sequenceFlow id="flow128" sourceRef="exclusivegateway13" targetRef="endevent17">
+    <sequenceFlow id="flow125" sourceRef="revoca" targetRef="end-revocato"></sequenceFlow>
+    <sequenceFlow id="flow128" sourceRef="exclusivegateway13" targetRef="end-revocato">
       <extensionElements>
         <activiti:executionListener event="take" delegateExpression="${depubblicaTuttiDocumenti}"></activiti:executionListener>
       </extensionElements>
@@ -1054,7 +1054,7 @@
       <bpmndi:BPMNShape bpmnElement="consuntivo" id="BPMNShape_consuntivo">
         <omgdc:Bounds height="71.0" width="105.0" x="893.0" y="749.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="endevent-consuntivo" id="BPMNShape_endevent-consuntivo">
+      <bpmndi:BPMNShape bpmnElement="end-stipulato" id="BPMNShape_end-stipulato">
         <omgdc:Bounds height="35.0" width="35.0" x="928.0" y="850.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="stipulamepa" id="BPMNShape_stipulamepa">
@@ -1129,7 +1129,7 @@
       <bpmndi:BPMNShape bpmnElement="endevent-contratto-fuori-mepa-protocollo" id="BPMNShape_endevent-contratto-fuori-mepa-protocollo">
         <omgdc:Bounds height="35.0" width="35.0" x="690.0" y="758.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="endevent17" id="BPMNShape_endevent17">
+      <bpmndi:BPMNShape bpmnElement="end-revocato" id="BPMNShape_end-revocato">
         <omgdc:Bounds height="35.0" width="35.0" x="1040.0" y="1180.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="conferma-revoca" id="BPMNShape_conferma-revoca">
