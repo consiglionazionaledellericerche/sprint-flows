@@ -2,9 +2,7 @@ package it.cnr.si.flows.ng.service;
 
 
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.listeners.oiv.service.StartOivSetGroupsAndVisibility;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
-import it.cnr.si.flows.ng.service.FlowsFirmaService;
 
 import org.activiti.engine.delegate.DelegateExecution;
 
@@ -21,9 +19,8 @@ import java.text.ParseException;
 
 @Service
 public class ProtocolloDocumentoService {
-	private static final Logger LOGGER = LoggerFactory.getLogger(StartOivSetGroupsAndVisibility.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ProtocolloDocumentoService.class);
 
-	private FlowsAttachmentService flowsAttachmentService;
 
 	public void protocolla(DelegateExecution execution, String nomeVariabileFile)  throws IOException, ParseException  {
 

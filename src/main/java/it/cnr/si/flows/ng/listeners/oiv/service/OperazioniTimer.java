@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 import it.cnr.si.flows.ng.service.FlowsTimerService;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -105,5 +107,30 @@ public class OperazioniTimer {
 		flowsTimerService.setTimerValuesFromNow(processInstanceId, timerAvvisoScadenzaId, 0, 0, diffDaysAvviso, 0, 0);
 		determinaTimerScadenzaTermini(execution, "boundarytimer3");
 		LOGGER.info("------ DATA FINE PROCEDURA: " + execution.getVariable("dataScadenzaTerminiDomanda"));
+	}
+	
+	public int calcolaGiorniTraDateString(String stringDateInf, String stringDateSup) throws ParseException {
+				
+		DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+		Date dateInf =  df.parse(stringDateInf);
+		Date dateSup =  df.parse(stringDateSup);
+		int timeVariableRecordDateValue =(int) (dateSup.getTime() - dateInf.getTime());
+		int timeVariableRecordDateDays = timeVariableRecordDateValue/ (1000 * 60 * 60 * 24);
+		int timeVariableRecordDateHours = timeVariableRecordDateValue/ (1000 * 60 * 60);
+		int timeVariableRecordDateMinutes = timeVariableRecordDateValue/ (1000 * 60);
+
+		LOGGER.debug("--- {} gg diff tra : {} e: {}", timeVariableRecordDateDays, dateInf, dateSup);
+		return timeVariableRecordDateDays;
+	}
+	
+	public int calcolaGiorniTraDate(Date dateInf, Date dateSup) throws ParseException {
+		
+		int timeVariableRecordDateValue =(int) (dateSup.getTime() - dateInf.getTime());
+		int timeVariableRecordDateDays = timeVariableRecordDateValue/ (1000 * 60 * 60 * 24);
+		int timeVariableRecordDateHours = timeVariableRecordDateValue/ (1000 * 60 * 60);
+		int timeVariableRecordDateMinutes = timeVariableRecordDateValue/ (1000 * 60);
+
+		LOGGER.debug("--- {} gg diff tra : {} e: {}", timeVariableRecordDateDays, dateInf, dateSup);
+		return timeVariableRecordDateDays;
 	}
 }
