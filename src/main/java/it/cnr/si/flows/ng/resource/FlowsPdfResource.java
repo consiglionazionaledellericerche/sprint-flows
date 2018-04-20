@@ -6,6 +6,7 @@ import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.flows.ng.listeners.oiv.service.StatisticOivService;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.service.FlowsPdfService;
+import it.cnr.si.flows.ng.service.FlowsPdfStatisticService;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.security.AuthoritiesConstants;
 import org.activiti.engine.HistoryService;
@@ -55,6 +56,8 @@ public class FlowsPdfResource {
     private RuntimeService runtimeService;
     @Inject
     private StatisticOivService statisticOivService;
+    @Inject
+    private FlowsPdfStatisticService flowsPdfStatisticService;
 	@Inject
 	private Utils utils;
     /**
@@ -174,7 +177,8 @@ public class FlowsPdfResource {
     	
        	
         //Sotituisco la lista di variabili da quelle storiche (historicProcessInstance.getProcessVariables() )a quelle attuali (variableInstanceJson)
-        JSONObject processvariables = statisticOivService.getOivStatistics(processDefinitionKey, startDateGreat, startDateLess);
+        //JSONObject processvariables = statisticOivService.getOivStatistics(processDefinitionKey, startDateGreat, startDateLess);
+        JSONObject processvariables = flowsPdfStatisticService.getPdfStatistics(processDefinitionKey, startDateGreat, startDateLess);
      
         //creo il pdf corrispondente
         String fileName = processDefinitionKey + "-Statistics";
