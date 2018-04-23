@@ -36,7 +36,7 @@ public class FlowsPdfStatisticService {
 	ProcessEngine processEngine;
 	@Inject
 	TaskService taskService;
-	
+
 
 	// ELENCO PARAMETRI STATISTICHE
 	int nrFlussiTotali = 0;
@@ -46,7 +46,7 @@ public class FlowsPdfStatisticService {
 
 	Calendar newDate = Calendar.getInstance();	
 	Date dataOdierna = newDate.getTime();
-	
+
 	String sessoRichiedente = "";
 	String fasciaAppartenenzaAttribuita = "";
 	String tipologiaRichiesta = "";
@@ -70,6 +70,7 @@ public class FlowsPdfStatisticService {
 		Map<String, Object>  flussiAttivi = flowsProcessInstanceService.search(req, processDefinitionKey, active, order, firstResult, maxResults);
 		Map<String, Object>  flussiTerminati = flowsProcessInstanceService.search(req, processDefinitionKey, finished, order, firstResult, maxResults);
 		Map<String, Integer> mapStatiFlussiAttivi = new HashMap<String, Integer>();
+		Map<String, Integer> mapStatiFlussiTerminati = new HashMap<String, Integer>();
 
 		//VALORIZZAZIONE PARAMETRI STATISTICHE
 		nrFlussiAttivi = parseInt(flussiAttivi.get("totalItems").toString());
@@ -92,17 +93,17 @@ public class FlowsPdfStatisticService {
 			HistoricProcessInstanceResponse processInstance = (HistoricProcessInstanceResponse) processInstanceDetails.get("entity");
 			List<RestVariable> variables = processInstance.getVariables();
 
-			
+
 			// Calcolo gli stati nei flussi attivi)
 			String currentTaskName = taskService.createTaskQuery().processInstanceId(processInstanceId).active().singleResult().getName();
 			LOGGER.debug("--##  currentTaskName : {} ", currentTaskName);
-			//TODO calcolo nr istanze
+			//calcolo nr istanze per Stato
 			if(mapStatiFlussiAttivi.containsKey(currentTaskName)) {
 				mapStatiFlussiAttivi.put(currentTaskName, mapStatiFlussiAttivi.get(currentTaskName) + 1);
 			} else {
 				mapStatiFlussiAttivi.put(currentTaskName, 1);
 			}
-		
+
 
 		}
 
@@ -117,34 +118,64 @@ public class FlowsPdfStatisticService {
 			HistoricProcessInstanceResponse processInstance = (HistoricProcessInstanceResponse) processInstanceDetails.get("entity");
 			List<RestVariable> variables = processInstance.getVariables();
 			allTerminatedProcessInstancesDurationInMillis = (int) (allTerminatedProcessInstancesDurationInMillis + pi.getDurationInMillis());
+			String taskEndName;
+			for (RestVariable var : variables) {
+				String variableName = var.getName().toString();
+				switch(variableName){  
+				case "faseEsecuzione": {
+					LOGGER.info("-- " + var.getName() + ": " + var.getValue());
+					taskEndName = var.getValue().toString();
+					if (taskEndName.startsWith("end-")) {
+						//calcolo nr istanze per Stato
+						if(mapStatiFlussiTerminati.containsKey(taskEndName)) {
+							mapStatiFlussiTerminati.put(taskEndName, mapStatiFlussiTerminati.get(taskEndName) + 1);
+						} else {
+							mapStatiFlussiTerminati.put(taskEndName, 1);
+						}
+					}
+				};break; 
+				default:  {
+					//LOGGER.info("-- " + var.getName() + ": " + var.getValue());
+				};break;  
 
+				}
+			}
 		}
-		
+
+
+
+
 		JSONObject variableStatisticsJson = new JSONObject();
-		
+
 		//LISTA VARIABILI COMUNI
 		variableStatisticsJson.put("dataIn", startDateGreat);
 		variableStatisticsJson.put("dataOut", startDateLess);
+		variableStatisticsJson.put("processDefinitionKey", processDefinitionKey);
 		variableStatisticsJson.put("nrFlussiAttivi", nrFlussiAttivi);
 		variableStatisticsJson.put("nrFlussiTerminati", nrFlussiTerminati);
 		variableStatisticsJson.put("nrFlussiTotali", nrFlussiTotali);
-		
+
 		//LISTA VARIABILI FLUSSI ATTIVI
-		Map<String, String> listaStatiFlussiAttivi = new HashMap<String, String>();
+		Map<String, Object> listaStatiFlussiAttivi = new HashMap<String, Object>();
 		JSONArray arrayStatiFlussiAttivi = new JSONArray();
 		for (Entry<String, Integer> pair : mapStatiFlussiAttivi.entrySet()) {
 			listaStatiFlussiAttivi.put("Stato", pair.getKey());
-			listaStatiFlussiAttivi.put("NrIstanze", pair.getValue().toString());
+			listaStatiFlussiAttivi.put("NrIstanze", pair.getValue());
 			arrayStatiFlussiAttivi.put(listaStatiFlussiAttivi);
 		}
 		variableStatisticsJson.put("StatiFlussiAttivi", arrayStatiFlussiAttivi);
-		
+
 		//LISTA VARIABILI FLUSSI TERMINATI
 		Map<String, String> listaStatiFlussiTerminati = new HashMap<String, String>();
 		JSONArray arrayStatiFlussiTerminati = new JSONArray();
 		int mediaGiorniFlusso = allTerminatedProcessInstancesDurationInMillis/ (1000 * 60 * 60 * 24 * nrFlussiTerminati);
-		listaStatiFlussiTerminati.put("mediaGiorniFlusso", String.valueOf(mediaGiorniFlusso));
-		arrayStatiFlussiTerminati.put(listaStatiFlussiTerminati);
+		variableStatisticsJson.put("mediaGiorniFlusso", mediaGiorniFlusso);
+
+		for (Entry<String, Integer> pair : mapStatiFlussiTerminati.entrySet()) {
+			listaStatiFlussiTerminati.put("Stato", pair.getKey());
+			listaStatiFlussiTerminati.put("NrIstanze", pair.getValue().toString());
+			arrayStatiFlussiTerminati.put(listaStatiFlussiTerminati);
+		}
 		variableStatisticsJson.put("StatiFlussiTerminati", arrayStatiFlussiTerminati);
 
 
@@ -168,8 +199,11 @@ public class FlowsPdfStatisticService {
 		return date != null ? utils.formattaDataOra(date) : "";
 	}
 
-	private void resetStatisticvariables() {
 
+	//GESTIONE DEI PARAMETRI DA VISUALIZZARE
+
+
+	private void resetStatisticvariables() {
 		nrFlussiTotali = 0;
 		nrFlussiAttivi = 0;
 		nrFlussiTerminati = 0;

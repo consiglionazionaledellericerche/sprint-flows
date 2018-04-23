@@ -181,7 +181,8 @@ public class FlowsPdfResource {
         JSONObject processvariables = flowsPdfStatisticService.getPdfStatistics(processDefinitionKey, startDateGreat, startDateLess);
      
         //creo il pdf corrispondente
-        String fileName = processDefinitionKey + "-Statistics";
+        //String fileName = processDefinitionKey + "-Statistics";
+        String fileName = "statisticheGeneraliFlows";
         byte[] pdfByteArray = pdfService.makeStatisticPdf(processvariables, fileName, processDefinitionKey);
         //popolo gli headers della response
         HttpHeaders headers = new HttpHeaders();
