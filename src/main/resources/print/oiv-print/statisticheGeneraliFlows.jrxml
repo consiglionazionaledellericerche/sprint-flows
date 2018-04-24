@@ -139,7 +139,7 @@
 			</textField>
 			<textField>
 				<reportElement style="table_TH" x="11" y="32" width="119" height="20" uuid="9644e116-5619-42e9-9ae4-1cf1439eef50"/>
-				<textElement>
+				<textElement textAlignment="Center">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["nr flussi totali:"]]></textFieldExpression>
@@ -153,7 +153,7 @@
 			</textField>
 			<textField>
 				<reportElement style="table_TH" x="11" y="52" width="119" height="20" uuid="58e648ea-8610-4b16-aa6d-295c53a6eb09"/>
-				<textElement>
+				<textElement textAlignment="Center">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["nr flussi attivi:"]]></textFieldExpression>
@@ -167,7 +167,7 @@
 			</textField>
 			<textField>
 				<reportElement style="table_TH" x="11" y="72" width="119" height="20" uuid="881014ca-5c86-48b0-85d6-50e0c2a46bc0"/>
-				<textElement>
+				<textElement textAlignment="Center">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["nr flussi terminati:"]]></textFieldExpression>
@@ -202,7 +202,7 @@
 		<band height="213" splitType="Stretch">
 			<barChart>
 				<chart>
-					<reportElement x="169" y="43" width="386" height="113" uuid="da021a49-e5e3-4274-b15a-f2418c2626c4"/>
+					<reportElement x="180" y="43" width="375" height="113" uuid="da021a49-e5e3-4274-b15a-f2418c2626c4"/>
 					<chartTitle/>
 					<chartSubtitle/>
 					<chartLegend/>
@@ -232,7 +232,7 @@
 				</barPlot>
 			</barChart>
 			<componentElement>
-				<reportElement key="table 1" style="table 1" x="11" y="43" width="157" height="113" uuid="9fb2da14-4515-485a-a1c8-bb30a8135f26"/>
+				<reportElement key="table 1" style="table 1" x="5" y="43" width="164" height="60" uuid="9fb2da14-4515-485a-a1c8-bb30a8135f26"/>
 				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
 					<datasetRun subDataset="Flussi Attivi" uuid="8e7c0085-e144-46ff-8d36-bc5eba6a03ad">
 						<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JsonDataSource)$P{REPORT_DATA_SOURCE}).subDataSource("StatiFlussiAttivi")]]></dataSourceExpression>
@@ -315,7 +315,7 @@
 			</line>
 			<textField>
 				<reportElement style="table_TH" x="4" y="55" width="146" height="20" uuid="81c07864-9627-44a9-bbac-1533d68ceb05"/>
-				<textElement>
+				<textElement textAlignment="Center">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["durata media (nr. gg):"]]></textFieldExpression>
