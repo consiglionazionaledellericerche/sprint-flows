@@ -39,7 +39,7 @@ public class OivSetGroupsAndVisibility {
 
 		String struttura = "99999";
 		String gruppoIstruttori = "istruttore@"+ struttura;
-		String gruppoFirmaRigetto = "firmaRigetto@"+ struttura;
+		String gruppoFirmaRigetto = "delegatofirma@"+ struttura;
 		String gruppoDirettore = "direttore@"+ struttura;
 		String gruppoCoordinatoreResponsabile = "coordinatoreresponsabile@"+ struttura;
 
