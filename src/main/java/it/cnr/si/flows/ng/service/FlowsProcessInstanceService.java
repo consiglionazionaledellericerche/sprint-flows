@@ -12,6 +12,7 @@ import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
+import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.pvm.PvmActivity;
 import org.activiti.engine.impl.pvm.ReadOnlyProcessDefinition;
@@ -68,6 +69,22 @@ public class FlowsProcessInstanceService {
     private FlowsUserDetailsService flowsUserDetailsService;
     @Inject
     private Utils utils;
+
+    public HistoricTaskInstance getCurrentTaskOfProcessInstance(String processInstanceId) {
+        return historyService.createHistoricTaskInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .list()
+                .stream()
+                .filter(historicTaskInstance -> !Optional.ofNullable(historicTaskInstance.getEndTime()).isPresent())
+                .findAny()
+                .orElseThrow(() -> new RuntimeException("Nessun Task attivo"));
+    }
+
+    public HistoricProcessInstance getProcessInstance(String processInstanceId) {
+        return historyService.createHistoricProcessInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .singleResult();
+    }
 
     public Map<String, Object> getProcessInstanceWithDetails(String processInstanceId) {
         Map<String, Object> result = new HashMap<>();
