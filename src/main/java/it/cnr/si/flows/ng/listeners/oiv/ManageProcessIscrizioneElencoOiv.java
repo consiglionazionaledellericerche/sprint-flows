@@ -8,15 +8,24 @@ import org.activiti.engine.delegate.Expression;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.bind.RelaxedPropertyResolver;
+import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import it.cnr.si.flows.ng.listeners.oiv.service.CalcolaPunteggioFascia;
 import it.cnr.si.flows.ng.listeners.oiv.service.ManageSceltaUtente;
 import it.cnr.si.flows.ng.listeners.oiv.service.OperazioniTimer;
 import it.cnr.si.flows.ng.listeners.oiv.service.StartOivSetGroupsAndVisibility;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 
 import javax.inject.Inject;
+import java.util.Map;
+import java.util.Optional;
 
 
 @Component
@@ -32,7 +41,10 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 	private StartOivSetGroupsAndVisibility startOivSetGroupsAndVisibility;
 	@Inject
 	private ManageSceltaUtente manageSceltaUtente;
-
+	@Autowired(required = false)
+	private RestTemplate oivRestTemplate;
+	@Inject
+	private Environment env;
 	
 
 	private Expression faseEsecuzione;
@@ -141,6 +153,11 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 		};break;           
 		case "end-approvata":  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
+			execution.setVariable("numeroIscrizioneInElenco",
+				iscriviInElenco(Optional.ofNullable(execution.getVariable("idDomanda"))
+						.filter(String.class::isInstance)
+						.map(String.class::cast)
+						.orElse(null)));
 			execution.setVariable("statoFinaleDomanda", "DOMANDA APPROVATA");
 		};break;           
 		case "end-respinta":  {
@@ -176,4 +193,18 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 		LOGGER.info("sceltaUtente: " + sceltaUtente);
 
 	}
+
+	private String iscriviInElenco(String id) {
+		final RelaxedPropertyResolver relaxedPropertyResolver = new RelaxedPropertyResolver(env, "oiv.");
+		UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(relaxedPropertyResolver.getProperty("iscrivi-inelenco"))
+				.queryParam("idDomanda", id);
+		return Optional.ofNullable(oivRestTemplate.getForEntity(builder.buildAndExpand().toUri(), Map.class))
+				.filter(mapResponseEntity -> mapResponseEntity.getStatusCode() == HttpStatus.OK)
+				.map(ResponseEntity::getBody)
+				.map(map -> map.get("progressivo"))
+				.map(Integer.class::cast)
+				.map(String::valueOf)
+				.orElse(null);
+	}
+
 }
