@@ -6,13 +6,13 @@ import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
+import it.cnr.si.security.FlowsUserDetailsService;
 import it.cnr.si.security.PermissionEvaluatorImpl;
-import it.cnr.si.service.CnrgroupService;
-
 import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
+import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.pvm.PvmActivity;
 import org.activiti.engine.impl.pvm.ReadOnlyProcessDefinition;
@@ -27,7 +27,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +35,8 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static it.cnr.si.flows.ng.utils.Utils.*;
 
@@ -60,17 +62,32 @@ public class FlowsProcessInstanceService {
 	private ViewRepository viewRepository;
 	@Inject
 	private ManagementService managementService;
-
 	@Inject
+	private RuntimeService runtimeService;
+	@Autowired(required = false)
 	private AceBridgeService aceBridgeService;
 	@Inject
 	PermissionEvaluatorImpl permissionEvaluator;
 	@Inject
+	private FlowsUserDetailsService flowsUserDetailsService;
+	@Inject
 	private Utils utils;
-	@Inject
-	private CnrgroupService cnrgroupService;
-	@Inject
-	private Environment env;
+
+	public HistoricTaskInstance getCurrentTaskOfProcessInstance(String processInstanceId) {
+		return historyService.createHistoricTaskInstanceQuery()
+				.processInstanceId(processInstanceId)
+				.list()
+				.stream()
+				.filter(historicTaskInstance -> !Optional.ofNullable(historicTaskInstance.getEndTime()).isPresent())
+				.findAny()
+				.orElseThrow(() -> new RuntimeException("Nessun Task attivo"));
+	}
+
+	public HistoricProcessInstance getProcessInstance(String processInstanceId) {
+		return historyService.createHistoricProcessInstanceQuery()
+				.processInstanceId(processInstanceId)
+				.singleResult();
+	}
 
 	public Map<String, Object> getProcessInstanceWithDetails(String processInstanceId) {
 		Map<String, Object> result = new HashMap<>();
@@ -115,28 +132,29 @@ public class FlowsProcessInstanceService {
 		//History
 		ArrayList<Map<String, Object>> history = new ArrayList<>();
 		historyService.createHistoricTaskInstanceQuery()
-		.includeTaskLocalVariables()
-		.processInstanceId(processInstanceId)
-		.list()
-		.forEach(
-				task -> {
-					List<HistoricIdentityLink> links = historyService.getHistoricIdentityLinksForTask(task.getId());
-					HashMap<String, Object> entity = new HashMap<>();
-					entity.put("historyTask", restResponseFactory.createHistoricTaskInstanceResponse(task));
+				.includeTaskLocalVariables()
+				.processInstanceId(processInstanceId)
+				.list()
+				.forEach(
+						task -> {
+							List<HistoricIdentityLink> links = historyService.getHistoricIdentityLinksForTask(task.getId());
+							HashMap<String, Object> entity = new HashMap<>();
+							entity.put("historyTask", restResponseFactory.createHistoricTaskInstanceResponse(task));
 
-					// Sostituisco l'id interno del gruppo con la dicitura estesa
-					List<HistoricIdentityLinkResponse> historicIdLinks = restResponseFactory.createHistoricIdentityLinkResponseList(links);
-					List<String> profiles = Arrays.asList(env.getActiveProfiles());
-					if (profiles.contains("cnr")){
-						historicIdLinks.stream().forEach(
-								l -> l.setGroupId(aceBridgeService.getExtendedGroupNome(l.getGroupId())));
-					} else {
-						historicIdLinks.stream().forEach(
-								l -> l.setGroupId(cnrgroupService.findDisplayName(l.getGroupId())));
-					}
-					entity.put("historyIdentityLink", historicIdLinks);
-					history.add(entity);
-				});
+							// Sostituisco l'id interno del gruppo con la dicitura estesa
+							entity.put("historyIdentityLink", Optional.ofNullable(links)
+									.map(historicIdentityLinks -> restResponseFactory.createHistoricIdentityLinkResponseList(historicIdentityLinks))
+									.filter(historicIdentityLinkResponses -> !historicIdentityLinkResponses.isEmpty())
+									.map(historicIdentityLinkResponses -> historicIdentityLinkResponses.stream())
+									.orElse(Stream.empty())
+									.map(h -> {
+										if (Optional.ofNullable(aceBridgeService).isPresent()) {
+											h.setGroupId(aceBridgeService.getExtendedGroupNome(h.getGroupId()));
+										}
+										return h;
+									}).collect(Collectors.toList()));
+							history.add(entity);
+						});
 		result.put("history", history);
 		return result;
 	}
@@ -219,17 +237,17 @@ public class FlowsProcessInstanceService {
 				String value = typevalue.substring(typevalue.indexOf('=')+1);
 
 				switch (type) {
-				case "textEqual":
-					processQuery.variableValueEquals(key, value);
-					break;
-				case "boolean":
-					// gestione variabili booleane
-					processQuery.variableValueEquals(key, Boolean.valueOf(value));
-					break;
-				default:
-					//variabili con la wildcard  (%value%)
-					processQuery.variableValueLikeIgnoreCase(key, "%" + value + "%");
-					break;
+					case "textEqual":
+						processQuery.variableValueEquals(key, value);
+						break;
+					case "boolean":
+						// gestione variabili booleane
+						processQuery.variableValueEquals(key, Boolean.valueOf(value));
+						break;
+					default:
+						//variabili con la wildcard  (%value%)
+						processQuery.variableValueLikeIgnoreCase(key, "%" + value + "%");
+						break;
 				}
 			} else {
 				//per <input type="date"' non funziona "input-prepend" quindi rimetto la vecchia implementazione

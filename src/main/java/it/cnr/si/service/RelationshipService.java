@@ -8,6 +8,7 @@ import it.cnr.si.repository.CnrgroupRepository;
 import it.cnr.si.repository.RelationshipRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
@@ -37,7 +38,7 @@ public class RelationshipService {
 
     @Inject
     private RelationshipRepository relationshipRepository;
-    @Inject
+    @Autowired(required = false)
     private AceBridgeService aceService;
     @Inject
     private CnrgroupRepository cnrgroupRepository;
@@ -134,7 +135,7 @@ public class RelationshipService {
         //cerco i children dei gruppi che ho filtrato
         Set<String> children = new HashSet<>();
 //        for (String group : groupToSearchChildren) {
-            //todo: ancora da implementare in ACE
+        //todo: ancora da implementare in ACE
 //            children.addAll();
 //        }
         return Stream.concat(aceGroup.stream(), children.stream())
@@ -148,8 +149,8 @@ public class RelationshipService {
         for (String group : aceGropupWithParents) {
             //match esatto (ad es.: ra@2216 -> supervisore#acquistitrasparenza@STRUTTURA)
             result.addAll(relationshipRepository.findRelationshipGroup(group).stream()
-                                  .map(Relationship::getGroupRelationship)
-                                  .collect(Collectors.toSet())
+                    .map(Relationship::getGroupRelationship)
+                    .collect(Collectors.toSet())
             );
             //match "@STRUTTURA" (ad es. relationship: ra@STRUTTURA -> supervisore#acquistitrasparenza@STRUTTURA)
             if (group.contains("@")) {
@@ -159,14 +160,14 @@ public class RelationshipService {
 
                 // rimpiazzo "@STRUTTURA" nella relationship trovata con il CODICE SPECIFICO della struttura
                 result.addAll(relationshipGroupForStructure.stream()
-                                      .map(relationship -> {
-                                          if (relationship.getGroupRelationship().contains("@")) {
-                                              String struttura = group.substring(group.indexOf('@'), group.length());
-                                              return Utils.replaceStruttura(relationship.getGroupRelationship(), struttura);
-                                          } else
-                                              return relationship.getGroupRelationship();
-                                      })
-                                      .collect(Collectors.toSet()));
+                        .map(relationship -> {
+                            if (relationship.getGroupRelationship().contains("@")) {
+                                String struttura = group.substring(group.indexOf('@'), group.length());
+                                return Utils.replaceStruttura(relationship.getGroupRelationship(), struttura);
+                            } else
+                                return relationship.getGroupRelationship();
+                        })
+                        .collect(Collectors.toSet()));
             }
         }
         //mapping in modo da recuperare il distinct
@@ -180,7 +181,11 @@ public class RelationshipService {
     }
 
     public Set<String> getACEGroupsForUser(String username) {
-        return new HashSet<>(aceService.getAceGroupsForUser(username));
+        return Optional.ofNullable(aceService)
+                .map(aceBridgeService -> aceBridgeService.getAceGroupsForUser(username))
+                .map(strings -> strings.stream())
+                .orElse(Stream.empty())
+                .collect(Collectors.toSet());
     }
 
     public List<String> getUsersInMyGroups(String username) {

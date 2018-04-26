@@ -68,7 +68,7 @@ public class FlowsTaskService {
 	private RestResponseFactory restResponseFactory;
 	@Inject
 	private TaskService taskService;
-	@Inject
+	@Autowired(required = false)
 	private AceBridgeService aceBridgeService;
 	@Inject
 	private FlowsAttachmentResource attachmentResource;
