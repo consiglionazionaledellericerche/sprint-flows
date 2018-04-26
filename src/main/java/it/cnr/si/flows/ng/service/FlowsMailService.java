@@ -4,6 +4,7 @@ import it.cnr.si.flows.ng.config.MailConfguration;
 import it.cnr.si.service.MailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import org.thymeleaf.context.Context;
 
 import javax.inject.Inject;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Primary
@@ -28,19 +30,18 @@ public class FlowsMailService extends MailService {
     private TemplateEngine templateEngine;
     @Inject
     private MailConfguration mailConfig;
-    @Inject
+    @Autowired(required = false)
     private AceBridgeService aceService;
 
     @Async
-    public void sendFlowEventNotification(String notificationType, Map<String, Object> variables, String taskName, String username, String groupName) {
+    public void sendFlowEventNotification(String notificationType, Map<String, Object> variables, String taskName, String username, final String groupName) {
         Context ctx = new Context();
         ctx.setVariables(variables);
         ctx.setVariable("username", username);
-        if(groupName != null){
-            String groupDenominazione = aceService.getExtendedGroupNome(groupName);
-            groupName = groupDenominazione;
-        }
-        ctx.setVariable("groupname", groupName);
+        ctx.setVariable("groupname",  Optional.ofNullable(aceService)
+                .flatMap(aceBridgeService -> Optional.ofNullable(groupName))
+                .map(s ->   aceService.getExtendedGroupNome(s))
+                .orElse(groupName));
         ctx.setVariable("taskName", taskName);
 
         String htmlContent = templateEngine.process(notificationType, ctx);

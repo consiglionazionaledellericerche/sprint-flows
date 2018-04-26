@@ -6,6 +6,7 @@ import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.MembershipRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,9 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,7 +30,8 @@ public class MembershipService {
     
     @Inject
     private MembershipRepository membershipRepository;
-    @Inject
+
+    @Autowired(required = false)
     private AceBridgeService aceService;
 
     /**
@@ -99,19 +99,20 @@ public class MembershipService {
                 .collect(Collectors.toList());
     }
 
-
     private Set<String> getACEGroupsForUser(String username) {
-        return new HashSet<String>(aceService.getAceGroupsForUser(username));
+        return Optional.ofNullable(aceService)
+                .map(aceBridgeService -> aceBridgeService.getAceGroupsForUser(username))
+                .map(strings -> strings.stream())
+                .orElse(Stream.empty())
+                .collect(Collectors.toSet());
     }
-
 
     public List<String> findMembersInGroup(String groupName) {
         List<String> result = membershipRepository.findMembersInGroup(groupName);
-
-        List<String> usersinAceGroup = aceService.getUsersinAceGroup(groupName);
-        if (usersinAceGroup != null)
-            result.addAll(usersinAceGroup);
-
+        Optional.ofNullable(aceService)
+                .map(aceBridgeService -> aceService.getUsersinAceGroup(groupName))
+                .filter(strings -> !strings.isEmpty())
+                .ifPresent(strings -> result.addAll(strings));
         return result;
     }
 

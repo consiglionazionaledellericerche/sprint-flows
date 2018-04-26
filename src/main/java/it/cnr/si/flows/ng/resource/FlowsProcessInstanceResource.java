@@ -14,6 +14,7 @@ import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
+import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceActionRequest;
@@ -163,12 +164,23 @@ public class FlowsProcessInstanceResource {
     @Secured(AuthoritiesConstants.USER)
     @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
     @Timed
-    public ResponseEntity<Map<String, Object>> getProcessInstanceById(HttpServletRequest req, @RequestParam("processInstanceId") String processInstanceId) {
-        Map<String, Object> result = flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId);
-
-        return new ResponseEntity<>(result, HttpStatus.OK);
+    public ResponseEntity<?> getProcessInstanceById(HttpServletRequest req, @RequestParam("processInstanceId") String processInstanceId, @RequestParam(value = "detail", required = false, defaultValue = "true") Boolean detail) {
+        if (!detail) {
+            return new ResponseEntity<>(flowsProcessInstanceService.getProcessInstance(processInstanceId), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId), HttpStatus.OK);
+        }
     }
 
+    @RequestMapping(value = "/currentTask", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
+    @Timed
+    public ResponseEntity<HistoricTaskInstance> getCurrentTaskProcessInstanceById(HttpServletRequest req, @RequestParam("processInstanceId") String processInstanceId) {
+        HistoricTaskInstance result = flowsProcessInstanceService.getCurrentTaskOfProcessInstance(processInstanceId);
+
+        return new ResponseEntity(result, HttpStatus.OK);
+    }
 
     @RequestMapping(value = "deleteProcessInstance", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.ADMIN)
