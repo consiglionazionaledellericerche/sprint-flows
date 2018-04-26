@@ -2,6 +2,7 @@ package it.cnr.si.flows.ng.service;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Profile("!oiv")
 public class AceBridgeService {
 
 	@Resource(name = "aceJdbcTemplate")

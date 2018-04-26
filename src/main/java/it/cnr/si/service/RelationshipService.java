@@ -5,11 +5,7 @@ import static it.cnr.si.flows.ng.utils.Enum.Role.responsabileStruttura;
 import static it.cnr.si.flows.ng.utils.Enum.Role.supervisore;
 import static it.cnr.si.flows.ng.utils.Enum.Role.supervisoreStruttura;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -17,6 +13,7 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
@@ -47,7 +44,7 @@ public class RelationshipService {
 
     @Inject
     private RelationshipRepository relationshipRepository;
-    @Inject
+    @Autowired(required = false)
     private AceBridgeService aceService;
     @Inject
     private CnrgroupRepository cnrgroupRepository;
@@ -189,7 +186,11 @@ public class RelationshipService {
 
 
     public Set<String> getACEGroupsForUser(String username) {
-        return new HashSet<>(aceService.getAceGroupsForUser(username));
+        return Optional.ofNullable(aceService)
+                .map(aceBridgeService -> aceBridgeService.getAceGroupsForUser(username))
+                .map(strings -> strings.stream())
+                .orElse(Stream.empty())
+                .collect(Collectors.toSet());
     }
 
     public List<String> getUsersInMyGroups(String username) {
