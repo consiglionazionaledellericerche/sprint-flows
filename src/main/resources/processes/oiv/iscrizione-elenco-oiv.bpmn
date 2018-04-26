@@ -211,10 +211,10 @@
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'invia_preavviso_di_rigetto'}]]></conditionExpression>
       </sequenceFlow>
       <sequenceFlow id="flow95" sourceRef="exclusivegateway13" targetRef="valutazione">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'genera_PDF_preavviso_di_rigetto' || sceltaUtente == 'calcola_punteggio' }]]></conditionExpression>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'genera_PDF_preavviso_di_rigetto' || sceltaUtente == 'calcola_punteggio' || sceltaUtente == 'aggiorna_PDF_preavviso_di_rigetto'}]]></conditionExpression>
       </sequenceFlow>
       <sequenceFlow id="flow96" sourceRef="exclusivegateway11" targetRef="valutazione-preavviso">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'genera_PDF_rigetto' || sceltaUtente == 'calcola_punteggio' }]]></conditionExpression>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'genera_PDF_rigetto' || sceltaUtente == 'calcola_punteggio'  ||  sceltaUtente == 'aggiorna_PDF_rigetto'}]]></conditionExpression>
       </sequenceFlow>
       <sequenceFlow id="flow98" sourceRef="exclusivegateway1" targetRef="soccorso-istruttorio">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'richiesta_soccorso_istruttorio' && soccorsoIstruttoriaFlag != '1'}]]></conditionExpression>
