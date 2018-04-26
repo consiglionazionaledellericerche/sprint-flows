@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.5.1.final utlizzo versione della libreria JasperReports6.5.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="statisticheGeneraliFlows" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7b71396d-3d8c-4330-ab55-2e08d62477c5">
+	<property name="ireport.zoom" value="1.2100000000000002"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="statisticheFlows"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Flussi Attivi" uuid="f6acc2f2-5183-4d28-87b2-0a46d02f61a1">
+		<queryString language="json">
+			<![CDATA[]]>
+		</queryString>
+		<field name="NrIstanze" class="java.lang.Integer">
+			<fieldDescription><![CDATA[NrIstanze]]></fieldDescription>
+		</field>
+		<field name="Stato" class="java.lang.String">
+			<fieldDescription><![CDATA[Stato]]></fieldDescription>
+		</field>
+	</subDataset>
+	<queryString language="json">
+		<![CDATA[]]>
+	</queryString>
+	<field name="nrFlussiTotali" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrFlussiTotali]]></fieldDescription>
+	</field>
+	<field name="nrFlussiAttivi" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrFlussiAttivi]]></fieldDescription>
+	</field>
+	<field name="dataIn" class="java.lang.String">
+		<fieldDescription><![CDATA[dataIn]]></fieldDescription>
+	</field>
+	<field name="dataOut" class="java.lang.String">
+		<fieldDescription><![CDATA[dataOut]]></fieldDescription>
+	</field>
+	<field name="nrFlussiTerminati" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrFlussiTerminati]]></fieldDescription>
+	</field>
+	<field name="processDefinitionKey" class="java.lang.String">
+		<fieldDescription><![CDATA[processDefinitionKey]]></fieldDescription>
+	</field>
+	<field name="mediaGiorniFlusso" class="java.lang.Integer">
+		<fieldDescription><![CDATA[mediaGiorniFlusso]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="105" splitType="Stretch">
+			<staticText>
+				<reportElement x="187" y="15" width="181" height="33" uuid="f3ef9939-714b-45ea-b998-07444916519d"/>
+				<textElement textAlignment="Center">
+					<font size="24" isBold="true"/>
+				</textElement>
+				<text><![CDATA[STATISTICHE]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="155" y="48" width="244" height="33" uuid="87818ca3-aba9-40bd-92e3-024983f63933"/>
+				<textElement textAlignment="Center">
+					<font size="24"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{processDefinitionKey}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="155" y="81" width="244" height="20" uuid="ac7c9f7f-bfa5-410f-b597-4257bf105cd2"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["[" + $F{dataIn} + " - " + $F{dataOut} + "]"]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="211" splitType="Stretch">
+			<textField>
+				<reportElement style="table_TD" x="130" y="32" width="39" height="20" uuid="7054271f-d692-4d8c-a2ef-8a88d938e682"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nrFlussiTotali}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table_TH" x="11" y="32" width="119" height="20" uuid="9644e116-5619-42e9-9ae4-1cf1439eef50"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["nr flussi totali:"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table_TD" x="130" y="52" width="39" height="20" uuid="c9a3bd06-d234-40f5-b9aa-e7645ac8baac"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nrFlussiAttivi}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table_TH" x="11" y="52" width="119" height="20" uuid="58e648ea-8610-4b16-aa6d-295c53a6eb09"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["nr flussi attivi:"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table_TD" x="130" y="72" width="39" height="20" uuid="aee4ee62-f97e-470f-a5ff-b1187eebd781"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nrFlussiTerminati}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table_TH" x="11" y="72" width="119" height="20" uuid="881014ca-5c86-48b0-85d6-50e0c2a46bc0"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["nr flussi terminati:"]]></textFieldExpression>
+			</textField>
+			<pieChart>
+				<chart evaluationTime="Report">
+					<reportElement x="180" y="10" width="364" height="190" uuid="8e179b47-c7c2-4777-b5a9-bb85a7612fba"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<pieDataset>
+					<pieSeries>
+						<keyExpression><![CDATA["ATTIVI"]]></keyExpression>
+						<valueExpression><![CDATA[$F{nrFlussiAttivi}]]></valueExpression>
+						<labelExpression><![CDATA["ATTIVI"]]></labelExpression>
+					</pieSeries>
+					<pieSeries>
+						<keyExpression><![CDATA["TERMINATI"]]></keyExpression>
+						<valueExpression><![CDATA[$F{nrFlussiTerminati}]]></valueExpression>
+						<labelExpression><![CDATA["TERMINATI"]]></labelExpression>
+					</pieSeries>
+				</pieDataset>
+				<piePlot>
+					<plot/>
+					<itemLabel/>
+				</piePlot>
+			</pieChart>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="213" splitType="Stretch">
+			<barChart>
+				<chart>
+					<reportElement x="180" y="43" width="375" height="113" uuid="da021a49-e5e3-4274-b15a-f2418c2626c4"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<categoryDataset>
+					<dataset>
+						<datasetRun subDataset="Flussi Attivi" uuid="821cf782-aa24-42e1-add6-506440ab9341">
+							<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JsonDataSource)$P{REPORT_DATA_SOURCE}).subDataSource("StatiFlussiAttivi")]]></dataSourceExpression>
+						</datasetRun>
+					</dataset>
+					<categorySeries>
+						<seriesExpression><![CDATA[$F{Stato}]]></seriesExpression>
+						<categoryExpression><![CDATA[$F{Stato}]]></categoryExpression>
+						<valueExpression><![CDATA[$F{NrIstanze}]]></valueExpression>
+						<labelExpression><![CDATA[$F{Stato}]]></labelExpression>
+					</categorySeries>
+				</categoryDataset>
+				<barPlot>
+					<plot/>
+					<itemLabel/>
+					<categoryAxisFormat>
+						<axisFormat/>
+					</categoryAxisFormat>
+					<valueAxisFormat>
+						<axisFormat/>
+					</valueAxisFormat>
+				</barPlot>
+			</barChart>
+			<componentElement>
+				<reportElement key="table 1" style="table 1" x="5" y="43" width="164" height="60" uuid="9fb2da14-4515-485a-a1c8-bb30a8135f26"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Flussi Attivi" uuid="8e7c0085-e144-46ff-8d36-bc5eba6a03ad">
+						<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JsonDataSource)$P{REPORT_DATA_SOURCE}).subDataSource("StatiFlussiAttivi")]]></dataSourceExpression>
+					</datasetRun>
+					<jr:column width="90" uuid="881fd539-b8b7-4cb1-96fa-bc403e44a312">
+						<jr:columnHeader style="table 1_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="90" height="30" uuid="58ecdce2-1f16-402e-a70e-e535f7d078c5"/>
+								<textElement textAlignment="Center">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[STATO]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table 1_TD" height="20" rowSpan="1">
+							<textField>
+								<reportElement x="0" y="0" width="90" height="20" uuid="af67beba-9eff-4ef3-9935-a541edbb9329"/>
+								<textElement textAlignment="Center">
+									<font isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{Stato}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="90" uuid="5a5aea31-ba4e-4e43-bb9d-b01391f90e17">
+						<jr:columnHeader style="table 1_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="90" height="30" uuid="de945238-9b15-4303-b044-dafdb0b695c2"/>
+								<textElement textAlignment="Center">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[Nr. ISTANZE]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table 1_TD" height="20" rowSpan="1">
+							<textField>
+								<reportElement x="0" y="0" width="90" height="20" uuid="d012ea79-9254-4dbb-a16c-a485f2b8b01d"/>
+								<textElement textAlignment="Center">
+									<font isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{NrIstanze}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<textField>
+				<reportElement x="132" y="8" width="291" height="21" uuid="5c21ec67-bedd-4e41-9f9a-38c160091023"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["FLUSSI ATTIVI"]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="-3" y="-1" width="561" height="5" uuid="fe677373-4b01-4426-8035-898b53ecc20a"/>
+			</line>
+		</band>
+		<band height="119">
+			<textField>
+				<reportElement x="132" y="17" width="291" height="21" uuid="bcbdf373-e488-408a-9aaf-bbd3af16cbc1"/>
+				<box>
+					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["FLUSSI TERMINATI"]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="-3" y="8" width="561" height="5" uuid="6e4da1df-a3ae-4ad1-af6b-7e98bc189684"/>
+			</line>
+			<textField>
+				<reportElement style="table_TH" x="4" y="55" width="146" height="20" uuid="81c07864-9627-44a9-bbac-1533d68ceb05"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["durata media (nr. gg):"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table_TD" x="150" y="55" width="50" height="20" uuid="fc114c0d-3cd0-4534-b5a2-3b0d657e360a"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{mediaGiorniFlusso}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
