@@ -27,6 +27,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +35,8 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static it.cnr.si.flows.ng.utils.Utils.*;
 
@@ -61,7 +64,7 @@ public class FlowsProcessInstanceService {
     private ManagementService managementService;
     @Inject
     private RuntimeService runtimeService;
-    @Inject
+    @Autowired(required = false)
     private AceBridgeService aceBridgeService;
     @Inject
     PermissionEvaluatorImpl permissionEvaluator;
@@ -139,11 +142,17 @@ public class FlowsProcessInstanceService {
                             entity.put("historyTask", restResponseFactory.createHistoricTaskInstanceResponse(task));
 
                             // Sostituisco l'id interno del gruppo con la dicitura estesa
-                            List<HistoricIdentityLinkResponse> historicIdLinks = restResponseFactory.createHistoricIdentityLinkResponseList(links);
-                            historicIdLinks.stream().forEach(
-                                    l -> l.setGroupId(aceBridgeService.getExtendedGroupNome(l.getGroupId())));
-
-                            entity.put("historyIdentityLink", historicIdLinks);
+                            entity.put("historyIdentityLink", Optional.ofNullable(links)
+                                    .map(historicIdentityLinks -> restResponseFactory.createHistoricIdentityLinkResponseList(historicIdentityLinks))
+                                    .filter(historicIdentityLinkResponses -> !historicIdentityLinkResponses.isEmpty())
+                                    .map(historicIdentityLinkResponses -> historicIdentityLinkResponses.stream())
+                                    .orElse(Stream.empty())
+                                    .map(h -> {
+                                        if (Optional.ofNullable(aceBridgeService).isPresent()) {
+                                            h.setGroupId(aceBridgeService.getExtendedGroupNome(h.getGroupId()));
+                                        }
+                                        return h;
+                                    }).collect(Collectors.toList()));
                             history.add(entity);
                         });
         result.put("history", history);

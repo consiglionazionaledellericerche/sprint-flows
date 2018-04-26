@@ -12,6 +12,7 @@ import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ldap.core.AttributesMapper;
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/users")
+@Profile("!oiv")
 public class FlowsUserResourceAce {
 
     @Autowired
