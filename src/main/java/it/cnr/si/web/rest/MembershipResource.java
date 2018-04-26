@@ -1,8 +1,11 @@
 package it.cnr.si.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+
+import it.cnr.si.domain.FlowsUser;
 import it.cnr.si.domain.Membership;
 import it.cnr.si.domain.Relationship;
+import it.cnr.si.flows.ng.dto.MembershipElements;
 import it.cnr.si.security.SecurityUtils;
 import it.cnr.si.service.CnrgroupService;
 import it.cnr.si.service.FlowsUserService;
@@ -86,16 +89,25 @@ public class MembershipResource {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Membership> myCreateMembership(@RequestParam("groupName") String groupName,
-                                                         @RequestParam("userName") String userName,
-                                                         @RequestParam("groupRole") String groupRole) throws URISyntaxException {
+    public ResponseEntity<Membership> myCreateMembership(@Valid @RequestBody MembershipElements membershipElements) throws URISyntaxException {
 
+    	String groupName = membershipElements.getgroupName();
+    	String userName = membershipElements.getuserName();
+    	String groupRole = membershipElements.getgroupRole();
         log.debug("REST request to save Membership : groupName->{} , userName->{}, groupRole->{}", groupName, userName, groupRole);
 
         //se cerco di creare una relationship con username e groupname uguale ad una che già esiste restituisco errore
         if (membershipService.findOneByUsernameAndGroupname(userName, groupName) != null)
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("membership", "A membership with this Username AND groupname already exist", "A membership with this Username AND groupname already exist")).body(null);
 
+        if(cnrgroupService.findCnrgroupByName(groupName) == null) {
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("groupName", "A groupName with the name:"+ groupName + " doesn't exist", "A groupName with the name:"+ groupName + " doesn't exist")).body(null);
+        }
+              
+        if(!flowsUserService.getUserWithAuthoritiesByLogin(userName).isPresent()) {
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("userName", "A userName with the name:"+ userName + " doesn't exist", "A userName with the name:"+ userName + " doesn't exist")).body(null);
+        }
+        
         Membership membership = new Membership();
         membership.setCnrgroup(cnrgroupService.findCnrgroupByName(groupName));
         membership.setGrouprole(groupRole);
