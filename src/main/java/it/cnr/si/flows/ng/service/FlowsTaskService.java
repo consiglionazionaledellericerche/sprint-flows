@@ -5,6 +5,7 @@ import it.cnr.si.domain.View;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
 import it.cnr.si.flows.ng.resource.FlowsAttachmentResource;
+import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
 import it.cnr.si.security.FlowsUserDetailsService;
@@ -98,8 +99,8 @@ public class FlowsTaskService {
 		Map<String, Object> data = new HashMap<>();
 		List<String> parameterNames = Collections.list(req.getParameterNames());
 		parameterNames.stream().forEach(paramName -> {
-            // se ho un json non aggiungo i suoi singoli campi (Ed escludo il parametro "cacheBuster")
-            if ((!parameterNames.contains(paramName.split("\\[")[0] + "_json")) && (!paramName.equals("cacheBuster")))
+			// se ho un json non aggiungo i suoi singoli campi (Ed escludo il parametro "cacheBuster")
+			if ((!parameterNames.contains(paramName.split("\\[")[0] + "_json")) && (!paramName.equals("cacheBuster")))
 				data.put(paramName, req.getParameter(paramName));
 		});
 		return data;
@@ -320,7 +321,7 @@ public class FlowsTaskService {
 					//                    String gruppoAbilitati = groups.get(0);
 					//                    String idStrutturaString = gruppoAbilitati.substring(gruppoAbilitati.lastIndexOf('@') + 1);
 
-					data.put(title.name(), key);
+//					data.put(title.name(), key);
 					data.put(initiator.name(), username);
 					data.put(startDate.name(), new Date());
 
@@ -328,10 +329,22 @@ public class FlowsTaskService {
 
 					org.json.JSONObject name = new org.json.JSONObject();
 					//                    name.put(idStruttura.name(), idStrutturaString);
-					name.put(title.name(), data.get(title.name()));
-					name.put(titolo.name(), data.get(titolo.name()));
-					name.put(descrizione.name(), data.get(descrizione.name()));
-					name.put(initiator.name(), data.get(initiator.name()));
+
+					String titolo = (String) data.get(Enum.VariableEnum.titolo.name());
+					name.put(Enum.VariableEnum.titolo.name(),
+							 titolo.length() < 70 ? titolo: titolo.substring(0, 67) + "...");
+					String descrizione = (String) data.get(Enum.VariableEnum.descrizione.name());
+					name.put(Enum.VariableEnum.descrizione.name(),
+							 descrizione.length() < 80 ? descrizione : descrizione.substring(0, 77) + "...");
+					String initiator = (String) data.get(Enum.VariableEnum.initiator.name());
+					name.put(Enum.VariableEnum.initiator.name(),
+							 initiator.length() < 50 ? initiator : initiator.substring(0, 47) + "...");
+					String taskName = taskService.createTaskQuery()
+							.processInstanceId(instance.getProcessInstanceId())
+							.singleResult().getName();
+					name.put(fase.name(),
+							 taskName.length() < 50 ? taskName : taskName.substring(0, 47) + "...");
+
 					runtimeService.setProcessInstanceName(instance.getId(), name.toString());
 
 					LOGGER.info("Avviata istanza di processo {}, id: {}", key, instance.getId());
