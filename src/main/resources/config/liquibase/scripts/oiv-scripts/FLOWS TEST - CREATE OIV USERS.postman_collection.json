@@ -321,7 +321,7 @@
 			"response": []
 		},
 		{
-			"name": "NEW CREATE MEMBERSHIP USER1 abilitati#iscrizione-elenco-oiv@",
+			"name": "CREATE MEMBERSHIP USER1 abilitati#iscrizione-elenco-oiv@",
 			"request": {
 				"auth": {
 					"type": "bearer",
@@ -342,10 +342,10 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"userName\": \"utente4\",\r\n    \"groupName\": \"abilitati#iscrizione-elenco-oiv@99999\",\r\n    \"groupRole\": \"member\"\r\n  }"
+					"raw": "{\r\n    \"userName\": \"utente1\",\r\n    \"groupName\": \"abilitati#iscrizione-elenco-oiv@99999\",\r\n    \"groupRole\": \"member\"\r\n  }"
 				},
 				"url": {
-					"raw": "http://localhost:8080/api/createMemberships",
+					"raw": "http://localhost:8080/api/createMembershipsByRest",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -353,7 +353,7 @@
 					"port": "8080",
 					"path": [
 						"api",
-						"createMemberships"
+						"createMembershipsByRest"
 					]
 				},
 				"description": "create user"
@@ -385,7 +385,7 @@
 					"raw": "{\r\n    \"userName\": \"utente2\",\r\n    \"groupName\": \"istruttore@99999\",\r\n    \"groupRole\": \"member\"\r\n  }"
 				},
 				"url": {
-					"raw": "http://localhost:8080/api/createMemberships",
+					"raw": "http://localhost:8080/api/createMembershipsByRest",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -393,7 +393,7 @@
 					"port": "8080",
 					"path": [
 						"api",
-						"createMemberships"
+						"createMembershipsByRest"
 					]
 				},
 				"description": "create user"
@@ -425,7 +425,7 @@
 					"raw": "{\r\n    \"userName\": \"utente3\",\r\n    \"groupName\": \"coordinatoreresponsabile@99999\",\r\n    \"groupRole\": \"member\"\r\n  }"
 				},
 				"url": {
-					"raw": "http://localhost:8080/api/createMemberships",
+					"raw": "http://localhost:8080/api/createMembershipsByRest",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -433,7 +433,7 @@
 					"port": "8080",
 					"path": [
 						"api",
-						"createMemberships"
+						"createMembershipsByRest"
 					]
 				},
 				"description": "create user"
@@ -465,7 +465,7 @@
 					"raw": "{\r\n    \"userName\": \"utente4\",\r\n    \"groupName\": \"direttore@99999\",\r\n    \"groupRole\": \"member\"\r\n  }"
 				},
 				"url": {
-					"raw": "http://localhost:8080/api/createMemberships",
+					"raw": "http://localhost:8080/api/createMembershipsByRest",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -473,7 +473,7 @@
 					"port": "8080",
 					"path": [
 						"api",
-						"createMemberships"
+						"createMembershipsByRest"
 					]
 				},
 				"description": "create user"
@@ -505,7 +505,7 @@
 					"raw": "{\r\n    \"userName\": \"utente4\",\r\n    \"groupName\": \"firmaRigetto@99999\",\r\n    \"groupRole\": \"coordinator\"\r\n  }"
 				},
 				"url": {
-					"raw": "http://localhost:8080/api/memberships",
+					"raw": "http://localhost:8080/api/createMembershipsByRest",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -513,7 +513,7 @@
 					"port": "8080",
 					"path": [
 						"api",
-						"memberships"
+						"createMembershipsByRest"
 					]
 				},
 				"description": "create user"
@@ -545,7 +545,7 @@
 					"raw": "{\r\n    \"userName\": \"utente4\",\r\n    \"groupName\": \"firmaRigetto@99999\",\r\n    \"groupRole\": \"member\"\r\n  }"
 				},
 				"url": {
-					"raw": "http://localhost:8080/api/createMemberships",
+					"raw": "http://localhost:8080/api/createMembershipsByRest",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -553,7 +553,7 @@
 					"port": "8080",
 					"path": [
 						"api",
-						"createMemberships"
+						"createMembershipsByRest"
 					]
 				},
 				"description": "create user"
@@ -585,7 +585,7 @@
 					"raw": "{\r\n    \"userName\": \"utente5\",\r\n    \"groupName\": \"istruttore@99999\",\r\n    \"groupRole\": \"member\"\r\n  }"
 				},
 				"url": {
-					"raw": "http://localhost:8080/api/createMemberships",
+					"raw": "http://localhost:8080/api/createMembershipsByRest",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -593,7 +593,7 @@
 					"port": "8080",
 					"path": [
 						"api",
-						"createMemberships"
+						"createMembershipsByRest"
 					]
 				},
 				"description": "create user"
