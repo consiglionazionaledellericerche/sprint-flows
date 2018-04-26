@@ -85,7 +85,51 @@ public class MembershipResource {
      * @return the response entity
      * @throws URISyntaxException the uri syntax exception
      */
+    
+    /**
+     * Metodo di creazione delle membership customizzato
+     * (prende come parametri 3 stringhe e non l'oggetto "membership", in questo modo è più facile da richiamare da js)
+     *
+     * @param groupName the group name
+     * @param userName  the user name
+     * @param groupRole the group role
+     * @return the response entity
+     * @throws URISyntaxException the uri syntax exception
+     */
     @RequestMapping(value = "/createMemberships",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<Membership> myCreateMembership(@RequestParam("groupName") String groupName,
+                                                         @RequestParam("userName") String userName,
+                                                         @RequestParam("groupRole") String groupRole) throws URISyntaxException {
+
+        log.debug("REST request to save Membership : groupName->{} , userName->{}, groupRole->{}", groupName, userName, groupRole);
+
+        //se cerco di creare una relationship con username e groupname uguale ad una che già esiste restituisco errore
+        if (membershipService.findOneByUsernameAndGroupname(userName, groupName) != null)
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("membership", "A membership with this Username AND groupname already exist", "A membership with this Username AND groupname already exist")).body(null);
+
+        if(cnrgroupService.findCnrgroupByName(groupName) == null) {
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("groupName", "A groupName with the name:"+ groupName + " doesn't exist", "A groupName with the name:"+ groupName + " doesn't exist")).body(null);
+        }
+              
+        if(!flowsUserService.getUserWithAuthoritiesByLogin(userName).isPresent()) {
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("userName", "A userName with the name:"+ userName + " doesn't exist", "A userName with the name:"+ userName + " doesn't exist")).body(null);
+        }
+        
+        Membership membership = new Membership();
+        membership.setCnrgroup(cnrgroupService.findCnrgroupByName(groupName));
+        membership.setGrouprole(groupRole);
+        membership.setUser(flowsUserService.getUserWithAuthoritiesByLogin(userName).orElse(null));
+
+        Membership result = membershipService.save(membership);
+        return ResponseEntity.created(new URI("/api/memberships/" + result.getId()))
+                .headers(HeaderUtil.createEntityCreationAlert("membership", result.getId().toString()))
+                .body(result);
+    }
+    
+    @RequestMapping(value = "/createMembershipsByRest",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
