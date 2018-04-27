@@ -8,11 +8,10 @@ import org.activiti.engine.delegate.Expression;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-
-import it.cnr.si.flows.ng.listeners.cnr.acquisti.StartAcquistiSetGroupsAndVisibility;
-
+import it.cnr.si.flows.ng.service.AceBridgeService;
 
 import javax.inject.Inject;
 
@@ -22,9 +21,8 @@ public class ManageProcessAcquisti implements ExecutionListener {
 	private static final long serialVersionUID = 686169707042367215L;
 	private static final Logger LOGGER = LoggerFactory.getLogger(ManageProcessAcquisti.class);
 
-
-	@Inject
-	private StartAcquistiSetGroupsAndVisibility startAcquistiSetGroupsAndVisibility;
+	//@Inject
+	//private StartAcquistiSetGroupsAndVisibility startAcquistiSetGroupsAndVisibility;
 	@Inject
 	private ManageSceltaUtenteAcquisti manageSceltaUtenteAcquisti;
 	@Inject
@@ -52,7 +50,7 @@ public class ManageProcessAcquisti implements ExecutionListener {
 		// START
 		case "process-start": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
-			startAcquistiSetGroupsAndVisibility.configuraVariabiliStart(execution);
+			//startAcquistiSetGroupsAndVisibility.configuraVariabiliStart(execution);
 		};break;    
 		// START DECISIONE-CONTRATTARE
 		case "verifica-decisione-start": {
