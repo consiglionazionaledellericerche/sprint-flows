@@ -99,9 +99,10 @@ public class FlowsPdfService {
         if (variable.isPresent())
             titolo += variable.get().getValue() + "\n\n";
         else {
-            // Titolo nel file pdf in caso di Workflow Definition che non ha il titolo nella variabile "titolo"
+            // Titolo nel file pdf in caso di Workflow Definition che non ha il titolo
+            // nella variabile "titolo" ma nella vecchia variabile "title" Flussi CNR
             variable = variables.stream()
-                    .filter(a -> (a.getName()).equals(title.name()))
+                    .filter(a -> (a.getName()).equals(TITLE))
                     .findFirst();
 
             titolo += variable.get().getValue() + "\n\n";
@@ -199,7 +200,7 @@ public class FlowsPdfService {
         InputStream jasperFile = null;
         try {
             //carico le variabili della process instance
-            LOGGER.debug("Json con i dati da inserire nel pdf: {}", processvariables.toString());
+            LOGGER.debug("Json con i dati da inserire nel pdf: {0}", processvariables.toString());
             JRDataSource datasource = new JsonDataSource(new ByteArrayInputStream(processvariables.toString().getBytes(Charset.forName("UTF-8"))));
 
             final ResourceBundle resourceBundle = ResourceBundle.getBundle(
@@ -254,6 +255,40 @@ public class FlowsPdfService {
         return pdfByteArray;
     }
 
+
+    public byte[] makeStatisticPdf( JSONObject processvariables, String fileName, String processDefinitionKey) {
+        String dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir");
+        byte[] pdfByteArray = null;
+        HashMap<String, Object> parameters = new HashMap();
+        InputStream jasperFile = null;
+        try {
+            //carico le variabili della process instance
+            LOGGER.debug("Json con i dati da inserire nel pdf: {0}", processvariables.toString());
+            JRDataSource datasource = new JsonDataSource(new ByteArrayInputStream(processvariables.toString().getBytes(Charset.forName("UTF-8"))));
+
+            final ResourceBundle resourceBundle = ResourceBundle.getBundle(
+                    "net.sf.jasperreports.view.viewer", Locale.ITALIAN);
+
+            //carico un'immagine nel pdf "dinamicamente" (sostituisco una variabile nel file jsper con lo stream dell'immagine)
+            parameters.put("ANN_IMAGE", this.getClass().getResourceAsStream(dir.substring(dir.indexOf("/print")) + "logo_OIV.JPG"));
+            parameters.put(JRParameter.REPORT_LOCALE, Locale.ITALIAN);
+            parameters.put(JRParameter.REPORT_RESOURCE_BUNDLE, resourceBundle);
+            parameters.put(JRParameter.REPORT_DATA_SOURCE, datasource);
+
+            LocalJasperReportsContext ctx = new LocalJasperReportsContext(DefaultJasperReportsContext.getInstance());
+            ctx.setClassLoader(ClassLoader.getSystemClassLoader());
+            JasperFillManager fillmgr = JasperFillManager.getInstance(ctx);
+
+            //il nome del file jasper da caricare(dipende dal tipo di pdf da creare)
+            jasperFile = this.getClass().getResourceAsStream(dir.substring(dir.indexOf("/print")) + fileName + ".jasper");
+            JasperPrint jasperPrint = fillmgr.fill(jasperFile, parameters);
+
+            pdfByteArray = JasperExportManager.exportReportToPdf(jasperPrint);
+        } catch (JRException e) {
+            throw new ReportException("Errore JASPER nella creazione del pdf: {}", e);
+        }
+        return pdfByteArray;
+    }
 
     private String getPropertyName(Element metadatum, String attr) {
         String propertyName = "";

@@ -1,4 +1,4 @@
-package it.cnr.si.flows.ng.listeners.acquistitrasparenza;
+package it.cnr.si.flows.ng.listeners.cnr.acquisti;
 
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.utils.Utils;
@@ -9,6 +9,7 @@ import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 
 @Component
+@Profile("!oiv")
 public class StartAcquistiRevocaSetGroupsAndVisibility implements ExecutionListener {
     private static final long serialVersionUID = 686169707042367215L;
     private static final Logger LOGGER = LoggerFactory.getLogger(StartAcquistiRevocaSetGroupsAndVisibility.class);

@@ -1,4 +1,4 @@
-package it.cnr.si.flows.ng.listeners.acquistitrasparenza;
+package it.cnr.si.flows.ng.listeners.cnr.acquisti;
 
 import java.util.Calendar;
 import java.util.Date;
