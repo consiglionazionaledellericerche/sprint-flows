@@ -9,18 +9,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.inject.Inject;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Map;
+import java.util.Optional;
 
 @Profile(value = "oiv")
 @Service
@@ -139,7 +139,24 @@ public class CalcolaPunteggioFascia {
         // Chiamta REST applicazione Elenco OIV per il calcolo punteggio
         // invio campi json e recupero fascia e punteggio
         execution.setVariable("punteggioEsperienzeAttribuito", "42");
-        execution.setVariable("fasciaAppartenenzaAttribuita", "1");
+        execution.setVariable("fasciaAppartenenzaAttribuita", calcolaFascia(
+                Optional.ofNullable(execution.getVariable("idDomanda"))
+                    .filter(String.class::isInstance)
+                    .map(String.class::cast)
+                    .orElse(null)
+        ));
+    }
+
+    private String calcolaFascia(String id) {
+        final RelaxedPropertyResolver relaxedPropertyResolver = new RelaxedPropertyResolver(env, "oiv.");
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(relaxedPropertyResolver.getProperty("ricalcola-fascia"))
+                .queryParam("applicationId", id);
+        return Optional.ofNullable(oivRestTemplate.getForEntity(builder.buildAndExpand().toUri(), Map.class))
+                .filter(mapResponseEntity -> mapResponseEntity.getStatusCode() == HttpStatus.OK)
+                .map(ResponseEntity::getBody)
+                .map(map -> map.get("jconon_application:fascia_professionale_attribuita"))
+                .map(String.class::cast)
+                .orElse("0");
     }
 
     private void comunicaEsperienzaNonCoerente(String id, String motivazione) {
