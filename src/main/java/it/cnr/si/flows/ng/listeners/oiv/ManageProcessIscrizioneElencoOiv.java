@@ -20,7 +20,7 @@ import it.cnr.si.flows.ng.listeners.oiv.service.ManageControlli;
 import it.cnr.si.flows.ng.listeners.oiv.service.ManageSceltaUtente;
 import it.cnr.si.flows.ng.listeners.oiv.service.OivSetGroupsAndVisibility;
 import it.cnr.si.flows.ng.listeners.oiv.service.OperazioniTimer;
-import it.cnr.si.flows.ng.listeners.oiv.service.StartOivSetGroupsAndVisibility;
+import it.cnr.si.flows.ng.listeners.oiv.service.OivSetGroupsAndVisibility;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -42,14 +42,16 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 	@Inject
 	private CalcolaPunteggioFascia calcolaPunteggioFascia;
 	@Inject
+	@Autowired(required = false)
 	private OivSetGroupsAndVisibility oivSetGroupsAndVisibility;
 	@Inject
 	private ManageSceltaUtente manageSceltaUtente;
-	@Autowired(required = false)
+	//@Autowired(required = false)
 	private RestTemplate oivRestTemplate;
 	@Inject
 	private Environment env;
-	
+	@Inject
+	private ManageControlli manageControlli;
 
 	private Expression faseEsecuzione;
 
