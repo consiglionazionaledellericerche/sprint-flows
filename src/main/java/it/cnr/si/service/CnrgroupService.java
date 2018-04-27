@@ -49,6 +49,18 @@ public class CnrgroupService {
     }
 
     /**
+     *  Get display_name by groupName.
+     *
+     *  @param groupName the id of the entity
+     *  @return the entity
+     */
+    @Transactional(readOnly = true) 
+    public String findDisplayName(String groupName) {
+        log.debug("Request to get Cnrgroup : {}", groupName);
+        return cnrgroupRepository.findDisplayName(groupName);
+    }
+
+    /**
      *  Get one cnrgroup by id.
      *
      *  @param id the id of the entity
@@ -69,4 +81,16 @@ public class CnrgroupService {
         log.debug("Request to delete Cnrgroup : {}", id);
         cnrgroupRepository.delete(id);
     }
-}
+
+
+    /**
+     *  Get one cnrgroup by groupName.
+     *
+     *  @param groupName the groupName of the entity
+     *  @return the entity
+     */
+    @Transactional(readOnly = true)
+    public Cnrgroup findCnrgroupByName(String groupName) {
+        log.debug("Request to get Cnrgroup : {}", groupName);
+        return cnrgroupRepository.findCnrgroupByName(groupName);
+    }}

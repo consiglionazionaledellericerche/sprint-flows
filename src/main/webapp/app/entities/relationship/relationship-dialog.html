@@ -1,3 +1,4 @@
+
 <form name="editForm" role="form" novalidate ng-submit="vm.save()" show-validation>
 
     <div class="modal-header">
@@ -39,6 +40,13 @@
                     This field is required.
                 </p>
             </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="sprintApp.relationship.groupRole" for="field_groupRole">Group
+                                                                                                            Role</label>
+            <input type="text" class="form-control" name="groupRole" id="field_groupRole"
+                   ng-model="vm.relationship.groupRole"
+            />
         </div>
 
     </div>

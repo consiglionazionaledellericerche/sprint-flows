@@ -1,4 +1,4 @@
-package it.cnr.si.flows.ng.listeners.acquistitrasparenza;
+package it.cnr.si.flows.ng.listeners.cnr.acquisti;
 
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;

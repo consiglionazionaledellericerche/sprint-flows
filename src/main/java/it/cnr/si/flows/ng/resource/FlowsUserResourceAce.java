@@ -1,9 +1,11 @@
 package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
+import it.cnr.si.domain.FlowsUser;
 import it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.service.FlowsUserService;
 import org.activiti.engine.ManagementService;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.impl.interceptor.Command;
@@ -12,6 +14,7 @@ import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,11 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.inject.Inject;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -38,6 +37,9 @@ import java.util.stream.Collectors;
 @RequestMapping("api/users")
 @Profile("!oiv")
 public class FlowsUserResourceAce {
+
+    @Inject
+    private Environment env;
 
     @Autowired
     private LdapTemplate ldapTemplate;
@@ -51,21 +53,24 @@ public class FlowsUserResourceAce {
     @Inject
     private RestResponseFactory restResponseFactory;
 
+    @Inject
+    private FlowsUserService flowsUserService;
+
     @RequestMapping(value = "/ace/user/{username:.+}", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.ADMIN)
-    public List<String> getAce(@PathVariable String username) throws SQLException {
+    public List<String> getAce(@PathVariable String username) {
         return aceService.getAceGroupsForUser(username);
     }
 
     @RequestMapping(value = "/ace/group/{groupname:.+}", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.ADMIN)
-    public List<String> getAceGroup(@PathVariable String groupname) throws SQLException {
+    public List<String> getAceGroup(@PathVariable String groupname) {
         return aceService.getUsersinAceGroup(groupname);
     }
 
     @RequestMapping(value = "/ace/groupdetail/{id}", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.ADMIN)
-    public String getAceGroupDetail(@PathVariable Integer id) throws SQLException {
+    public String getAceGroupDetail(@PathVariable Integer id) {
         return aceService.getNomeStruturaById(id);
     }
 
@@ -73,17 +78,31 @@ public class FlowsUserResourceAce {
     @RequestMapping(value = "/{username:.+}/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
-    public ResponseEntity<Map<String, Object>> getMyTasks(@PathVariable String username) {
+    public ResponseEntity<Map<String, Object>> searchUsers(@PathVariable String username) {
 
         Map<String, Object> response = new HashMap<>();
 
-        List<SearchResult> search = ldapTemplate.search("", "(uid=*" + username + "*)", new AttributesMapper<SearchResult>() {
-            public SearchResult mapFromAttributes(Attributes attrs) throws NamingException {
-                return new SearchResult(attrs.get("uid").get().toString(),
-                                        attrs.get("cnrnome").get() + " " + attrs.get("cnrcognome").get() + " " +
-                                                "(" + attrs.get("uid").get().toString() + ")");
-            }
-        });
+        Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
+
+        List<SearchResult> search = new ArrayList();
+
+        if (activeProfiles.contains("cnr")) {
+            //con il profilo "CNR" faccio la ricerca per l'autocompletamento degli utenti su ldap
+            search = ldapTemplate.search("", "(uid=*" + username + "*)", new AttributesMapper<SearchResult>() {
+                public SearchResult mapFromAttributes(Attributes attrs) throws NamingException {
+                    return new SearchResult(attrs.get("uid").get().toString(),
+                                            attrs.get("cnrnome").get() + " " + attrs.get("cnrcognome").get() + " " +
+                                                    "(" + attrs.get("uid").get().toString() + ")");
+                }
+            });
+
+        } else if (activeProfiles.contains("oiv")) {
+            //con il profilo "OIV" faccio la ricerca per l'autocompletamento degli utenti sul DB
+            List<FlowsUser> result = flowsUserService.searchByLogin(username);
+            search = result.stream()
+                    .map(user -> new SearchResult(user.getLogin(), user.getLogin()))
+                    .collect(Collectors.toList());
+        }
 
         response.put("more", search.size() > 10);
         response.put("results", search.stream().limit(10).collect(Collectors.toList()));
@@ -110,7 +129,7 @@ public class FlowsUserResourceAce {
     //    todo: non vieme mai usato => cancellare?
     @RequestMapping(value = "/customquery", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.ADMIN)
-    public List<HistoricProcessInstanceResponse> customQuery() throws SQLException {
+    public List<HistoricProcessInstanceResponse> customQuery() {
 
         FlowsHistoricProcessInstanceQuery query = new FlowsHistoricProcessInstanceQuery(managementService);
         List<String> groups = new ArrayList<>();

@@ -1,8 +1,7 @@
 {
 	"info": {
-		"name": "FLOWS TEST - Start Oiv Flows",
 		"_postman_id": "2c375092-3d9f-3752-32df-5df169cc6a3a",
-		"description": "",
+		"name": "FLOWS TEST - Start Oiv Flows",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -54,7 +53,6 @@
 						{
 							"key": "scope",
 							"value": "read write",
-							"description": "",
 							"type": "text"
 						}
 					]
@@ -105,8 +103,7 @@
 					"query": [
 						{
 							"key": "impersonate_username",
-							"value": "utente1",
-							"equals": true
+							"value": "utente1"
 						}
 					]
 				},
@@ -144,102 +141,88 @@
 						{
 							"key": "processDefinitionId",
 							"value": "iscrizione-elenco-oiv:1:4",
-							"type": "text",
-							"description": ""
+							"type": "text"
 						},
 						{
 							"key": "titolo",
-							"value": "Domanda 50",
-							"type": "text",
-							"description": ""
+							"value": "Domanda 2",
+							"type": "text"
 						},
 						{
 							"key": "descrizione",
-							"value": "Domanda 50",
-							"type": "text",
-							"description": ""
+							"value": "Domanda 2",
+							"type": "text"
 						},
 						{
 							"key": "nomeRichiedente",
-							"value": "giovannetti",
-							"type": "text",
-							"description": ""
+							"value": "laila Setta",
+							"type": "text"
 						},
 						{
 							"key": "dataNascitaRichiedente",
-							"value": "1968-01-19T00:00:00.000Z",
-							"type": "text",
-							"description": ""
+							"value": "1962-01-19T00:00:00.000Z",
+							"type": "text"
 						},
 						{
 							"key": "sessoRichiedente",
-							"value": "M",
-							"type": "text",
-							"description": ""
-						},
-						{
-							"key": "codiceFiscaleRichiedente",
-							"value": "PPBAIUISH62J298",
-							"type": "text",
-							"description": ""
-						},
-						{
-							"key": "emailRichiedente",
-							"value": "mario.rossi@cnr.it",
-							"type": "text",
-							"description": ""
+							"value": "F",
+							"type": "text"
 						},
 						{
 							"key": "tipologiaRichiesta",
-							"value": "modifica_fascia",
-							"type": "text",
-							"description": ""
+							"value": "iscrizione",
+							"type": "text"
 						},
 						{
 							"key": "dataIscrizioneElenco",
 							"value": "2012-01-09T23:00:00.000Z",
-							"type": "text",
-							"description": ""
+							"type": "text"
 						},
 						{
 							"key": "codiceIscrizioneElenco",
 							"value": "USY-34",
-							"type": "text",
-							"description": ""
+							"type": "text"
 						},
 						{
 							"key": "dataInvioDomanda",
 							"value": "2108-02-19T00:00:00.000Z",
-							"type": "text",
-							"description": ""
+							"type": "text"
 						},
 						{
 							"key": "valutazioneEsperienze_json",
-							"value": "[{ \"numeroEsperienza\": 1, \"dataInizio\": \"22/12/2001\", \"dataFine\": \"22/12/2003\", \"tipologiaEsperienza\": \"esperienza 1\", \"ambitoEsperienza\": \"agraria\", \"attivitaSvolta\": \"dirigente\", \"annotazioniValutatore\": \"8556\", \"oggettoDiSoccorso\": \"SI\", \"motivazioneSoccorso\": \"5745\", \"giudizioFinale\": \"OK\" }, { \"numeroEsperienza\": 2, \"dataInizio\": \"02/04/2003\", \"dataFine\": \"13/12/2007\", \"tipologiaEsperienza\": \"esperienza 2 versione2\", \"ambitoEsperienza\": \"pubblico  versione2\", \"attivitaSvolta\": \"impiegato versione2\", \"annotazioniValutatore\": \"566i\", \"giudizioFinale\": \"OK\", \"oggettoDiSoccorso\": \"SI\", \"motivazioneSoccorso\": \"67\" }, { \"numeroEsperienza\": 3, \"dataInizio\": \"09/11/2007\", \"dataFine\": \"14/03/2011\", \"tipologiaEsperienza\": \"esperienza 3 versione2\", \"ambitoEsperienza\": \"settore privato versione2\", \"attivitaSvolta\": \"direttore versione2\", \"annotazioniValutatore\": \"758\", \"oggettoDiSoccorso\": \"SI\", \"motivazioneSoccorso\": \"ytr\", \"giudizioFinale\": \"KO\" }, { \"numeroEsperienza\": 4, \"dataInizio\": \"14/04/2011\", \"dataFine\": \"23/02/2017\", \"tipologiaEsperienza\": \"nuova esperienza post soccorso\", \"ambitoEsperienza\": \"professionale\", \"attivitaSvolta\": \"dirigente\" } ]",
-							"type": "text",
-							"description": ""
+							"value": "[{  \"idEsperienza\": \"a79bae55-0f60-460c-8341-c1430df9feca;1.1\",  \"numeroEsperienza\": 1,  \"dataInizio\": \"22/12/2001\",  \"dataFine\": \"22/12/2003\",  \"tipologiaEsperienza\": \"esperienza 1\",  \"ambitoEsperienza\": \"agraria\",  \"attivitaSvolta\": \"dirigente\",  \"nrDipendenti\": \"maggioreUguale250\",  \"annotazioniValutatore\": \"8556\",  \"oggettoDiSoccorso\": \"SI\",  \"motivazioneSoccorso\": \"5745\",  \"giudizioFinale\": \"OK\"   }, {  \"idEsperienza\": \"bbbbbbbb-0f60-460c-8341-c1430df9feca;1.1\",  \"numeroEsperienza\": 2,  \"dataInizio\": \"02/04/2003\",  \"dataFine\": \"13/12/2007\",  \"tipologiaEsperienza\": \"esperienza 2 versione2\",  \"ambitoEsperienza\": \"pubblico  versione2\",  \"attivitaSvolta\": \"impiegato versione2\",  \"nrDipendenti\": \"maggioreUguale250\",  \"annotazioniValutatore\": \"566i\",  \"oggettoDiSoccorso\": \"SI\",  \"motivazioneSoccorso\": \"67\",  \"giudizioFinale\": \"OK\"   }, {  \"idEsperienza\": \"cccccccccccc-0f60-460c-8341-c1430df9feca;1.1\",  \"numeroEsperienza\": 3,  \"dataInizio\": \"09/11/2007\",  \"dataFine\": \"14/03/2011\",  \"tipologiaEsperienza\": \"esperienza 3 versione2\",  \"ambitoEsperienza\": \"settore privato versione2\",  \"attivitaSvolta\": \"direttore versione2\",  \"nrDipendenti\": \"minoreDi250\",  \"annotazioniValutatore\": \"758\",  \"oggettoDiSoccorso\": \"SI\",  \"motivazioneSoccorso\": \"ytr\",  \"giudizioFinale\": \"KO\"   } ]",
+							"type": "text"
 						},
 						{
 							"key": "punteggioEsperienzeProposto",
 							"value": "123",
-							"type": "text",
-							"description": ""
+							"type": "text"
 						},
 						{
 							"key": "fasciaAppartenenzaProposta",
 							"value": "2",
-							"type": "text",
-							"description": ""
+							"type": "text"
 						},
 						{
 							"key": "domanda",
-							"type": "file",
-							"description": ""
+							"value": "",
+							"type": "file"
 						},
 						{
 							"key": "cv",
-							"description": "",
+							"value": "",
 							"type": "file"
+						},
+						{
+							"key": "codiceFiscaleRichiedente",
+							"value": "HSSDIE324L83901",
+							"type": "text"
+						},
+						{
+							"key": "idDomanda",
+							"value": "12381209",
+							"description": "",
+							"type": "text"
 						}
 					]
 				},
@@ -255,8 +238,7 @@
 						"tasks",
 						"complete"
 					]
-				},
-				"description": ""
+				}
 			},
 			"response": []
 		}

@@ -1,25 +1,29 @@
 {
-  "fluentMethods": true,
-  "relationships": [],
-  "fields": [
-    {
-      "fieldName": "groupName",
-      "fieldType": "String",
-      "fieldValidateRules": [
-        "required"
-      ]
-    },
-    {
-      "fieldName": "groupRelationship",
-      "fieldType": "String",
-      "fieldValidateRules": [
-        "required"
-      ]
-    }
-  ],
-  "changelogDate": "20171023125007",
-  "dto": "no",
-  "service": "no",
-  "entityTableName": "relationship",
-  "pagination": "pagination"
+    "fluentMethods": true,
+    "relationships": [],
+    "fields": [
+        {
+            "fieldName": "groupName",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "groupRelationship",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "groupRole",
+            "fieldType": "String"
+        }
+    ],
+    "changelogDate": "20171023125007",
+    "dto": "no",
+    "service": "no",
+    "entityTableName": "relationship",
+    "pagination": "pagination"
 }

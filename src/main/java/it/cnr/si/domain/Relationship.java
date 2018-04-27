@@ -30,6 +30,9 @@ public class Relationship implements Serializable {
     @Column(name = "group_relationship", nullable = false)
     private String groupRelationship;
 
+    @Column(name = "group_role")
+    private String groupRole;
+
     public Long getId() {
         return id;
     }
@@ -42,25 +45,38 @@ public class Relationship implements Serializable {
         return groupName;
     }
 
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
-    }
-
     public Relationship groupName(String groupName) {
         this.groupName = groupName;
         return this;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 
     public String getGroupRelationship() {
         return groupRelationship;
     }
 
+    public Relationship groupRelationship(String groupRelationship) {
+        this.groupRelationship = groupRelationship;
+        return this;
+    }
+
     public void setGroupRelationship(String groupRelationship) {
         this.groupRelationship = groupRelationship;
     }
 
-    public Relationship groupRelationship(String groupRelationship) {
-        this.groupRelationship = groupRelationship;
+    public String getGroupRole() {
+        return groupRole;
+    }
+
+    public void setGroupRole(String groupRole) {
+        this.groupRole = groupRole;
+    }
+
+    public Relationship groupRole(String groupRole) {
+        this.groupRole = groupRole;
         return this;
     }
 
@@ -90,6 +106,7 @@ public class Relationship implements Serializable {
                 "id=" + id +
                 ", groupName='" + groupName + "'" +
                 ", groupRelationship='" + groupRelationship + "'" +
+                ", groupRole='" + groupRole + "'" +
                 '}';
     }
 }
