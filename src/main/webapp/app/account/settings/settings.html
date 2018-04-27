@@ -78,9 +78,11 @@
                            ng-model="vm.settingsAccount.phone" ></input>
                 </div>
                 <div class="form-group">
-                    <label for="gender" translate="global.form.gender">Gender</label>
-                    <input id="gender" name="gender" class="form-control" ng-model="vm.settingsAccount.gender" placeholder="{{'global.form.gender.placeholder' | translate}}"
-                           ng-model="vm.settingsAccount.gender" ></input>
+                    <label translate="global.form.gender">Gender</label>
+                    <select class="form-control" name="gender" ng-model="vm.settingsAccount.gender"
+                            ng-options="gender as gender for gender in vm.gender track by gender"
+                            placeholder="{{'global.form.gender.placeholder' | translate}}">
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="langKey" translate="settings.form.language">Language</label>

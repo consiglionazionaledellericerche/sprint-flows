@@ -7,6 +7,11 @@
           <activiti:string><![CDATA[process-start]]></activiti:string>
         </activiti:field>
       </activiti:executionListener>
+      <activiti:executionListener event="end" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+        <activiti:field name="faseEsecuzione">
+          <activiti:string><![CDATA[process-end]]></activiti:string>
+        </activiti:field>
+      </activiti:executionListener>
     </extensionElements>
     <subProcess id="valutazione-domande" name="VALUTAZIONE DOMANDE">
       <startEvent id="startevent1" name="Start"></startEvent>
@@ -139,7 +144,7 @@
           </activiti:executionListener>
         </extensionElements>
       </userTask>
-      <endEvent id="endevent8" name="End">
+      <endEvent id="end-improcedibile" name="IMPROCEDIBILE">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
             <activiti:field name="faseEsecuzione">
@@ -170,7 +175,7 @@
       <sequenceFlow id="flow79" sourceRef="exclusivegateway12" targetRef="valutazione-preavviso">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'riproponi_in_valutazione'}]]></conditionExpression>
       </sequenceFlow>
-      <endEvent id="endevent10" name="End">
+      <endEvent id="end-respinta" name="RESPINTA">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
             <activiti:field name="faseEsecuzione">
@@ -179,18 +184,18 @@
           </activiti:executionListener>
         </extensionElements>
       </endEvent>
-      <sequenceFlow id="flow80" name="respinta" sourceRef="exclusivegateway12" targetRef="endevent10"></sequenceFlow>
+      <sequenceFlow id="flow80" name="respinta" sourceRef="exclusivegateway12" targetRef="end-respinta"></sequenceFlow>
       <sequenceFlow id="flow83" sourceRef="istruttoria-su-preavviso" targetRef="valutazione-preavviso"></sequenceFlow>
-      <sequenceFlow id="flow84" name="improcedibile" sourceRef="exclusivegateway1" targetRef="endevent8">
+      <sequenceFlow id="flow84" name="improcedibile" sourceRef="exclusivegateway1" targetRef="end-improcedibile">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'domanda_improcedibile'}]]></conditionExpression>
       </sequenceFlow>
       <exclusiveGateway id="exclusivegateway13" name="Exclusive Gateway" default="flow86"></exclusiveGateway>
-      <sequenceFlow id="flow86" name="approvata" sourceRef="exclusivegateway13" targetRef="endevent12"></sequenceFlow>
+      <sequenceFlow id="flow86" name="approvata" sourceRef="exclusivegateway13" targetRef="end-approvata"></sequenceFlow>
       <sequenceFlow id="flow88" sourceRef="valutazione" targetRef="exclusivegateway13"></sequenceFlow>
       <sequenceFlow id="flow89" sourceRef="exclusivegateway13" targetRef="soccorso-istruttorio">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'richiesta_soccorso_istruttorio' && soccorsoIstruttoriaFlag != '1'}]]></conditionExpression>
       </sequenceFlow>
-      <endEvent id="endevent12" name="End">
+      <endEvent id="end-approvata" name="APPROVATA">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
             <activiti:field name="faseEsecuzione">
@@ -199,17 +204,17 @@
           </activiti:executionListener>
         </extensionElements>
       </endEvent>
-      <sequenceFlow id="flow93" sourceRef="exclusivegateway11" targetRef="endevent12">
+      <sequenceFlow id="flow93" sourceRef="exclusivegateway11" targetRef="end-approvata">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'approva'}]]></conditionExpression>
       </sequenceFlow>
       <sequenceFlow id="flow94" sourceRef="exclusivegateway13" targetRef="preavviso-rigetto">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'invia_preavviso_di_rigetto'}]]></conditionExpression>
       </sequenceFlow>
       <sequenceFlow id="flow95" sourceRef="exclusivegateway13" targetRef="valutazione">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'genera_PDF_preavviso_di_rigetto' || sceltaUtente == 'calcola_punteggio' }]]></conditionExpression>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'genera_PDF_preavviso_di_rigetto' || sceltaUtente == 'calcola_punteggio' || sceltaUtente == 'aggiorna_PDF_preavviso_di_rigetto'}]]></conditionExpression>
       </sequenceFlow>
       <sequenceFlow id="flow96" sourceRef="exclusivegateway11" targetRef="valutazione-preavviso">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'genera_PDF_rigetto' || sceltaUtente == 'calcola_punteggio' }]]></conditionExpression>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'genera_PDF_rigetto' || sceltaUtente == 'calcola_punteggio'  ||  sceltaUtente == 'aggiorna_PDF_rigetto'}]]></conditionExpression>
       </sequenceFlow>
       <sequenceFlow id="flow98" sourceRef="exclusivegateway1" targetRef="soccorso-istruttorio">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'richiesta_soccorso_istruttorio' && soccorsoIstruttoriaFlag != '1'}]]></conditionExpression>
@@ -259,8 +264,8 @@
       <script>execution.setVariable('istruttoriaInevasa', true);
 			</script>
     </scriptTask>
-    <endEvent id="endevent11" name="End"></endEvent>
-    <sequenceFlow id="flow82" name="END" sourceRef="valutazione-domande" targetRef="endevent11"></sequenceFlow>
+    <endEvent id="fine" name="FINE"></endEvent>
+    <sequenceFlow id="flow82" name="END" sourceRef="valutazione-domande" targetRef="fine"></sequenceFlow>
     <scriptTask id="avviso-scadenza-tempi-procedurali" name="AVVISO SCADENZA TEMPI PROCEDURALI" scriptFormat="javascript" activiti:autoStoreVariables="false">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
@@ -320,7 +325,7 @@
       <bpmndi:BPMNShape bpmnElement="firma-dg-rigetto" id="BPMNShape_firma-dg-rigetto">
         <omgdc:Bounds height="66.0" width="105.0" x="413.0" y="463.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="endevent8" id="BPMNShape_endevent8">
+      <bpmndi:BPMNShape bpmnElement="end-improcedibile" id="BPMNShape_end-improcedibile">
         <omgdc:Bounds height="35.0" width="35.0" x="603.0" y="143.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="exclusivegateway11" id="BPMNShape_exclusivegateway11">
@@ -329,13 +334,13 @@
       <bpmndi:BPMNShape bpmnElement="exclusivegateway12" id="BPMNShape_exclusivegateway12">
         <omgdc:Bounds height="40.0" width="40.0" x="543.0" y="475.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="endevent10" id="BPMNShape_endevent10">
+      <bpmndi:BPMNShape bpmnElement="end-respinta" id="BPMNShape_end-respinta">
         <omgdc:Bounds height="35.0" width="35.0" x="603.0" y="478.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="exclusivegateway13" id="BPMNShape_exclusivegateway13">
         <omgdc:Bounds height="40.0" width="40.0" x="517.0" y="232.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="endevent12" id="BPMNShape_endevent12">
+      <bpmndi:BPMNShape bpmnElement="end-approvata" id="BPMNShape_end-approvata">
         <omgdc:Bounds height="35.0" width="35.0" x="603.0" y="304.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="smistamento" id="BPMNShape_smistamento">
@@ -356,7 +361,7 @@
       <bpmndi:BPMNShape bpmnElement="scadenza-tempi-procedurali" id="BPMNShape_scadenza-tempi-procedurali">
         <omgdc:Bounds height="85.0" width="105.0" x="700.0" y="21.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="endevent11" id="BPMNShape_endevent11">
+      <bpmndi:BPMNShape bpmnElement="fine" id="BPMNShape_fine">
         <omgdc:Bounds height="35.0" width="35.0" x="721.0" y="263.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="avviso-scadenza-tempi-procedurali" id="BPMNShape_avviso-scadenza-tempi-procedurali">

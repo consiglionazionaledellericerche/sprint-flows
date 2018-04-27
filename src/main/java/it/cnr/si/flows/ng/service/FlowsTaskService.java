@@ -68,7 +68,7 @@ public class FlowsTaskService {
 	private RestResponseFactory restResponseFactory;
 	@Inject
 	private TaskService taskService;
-	@Inject
+	@Autowired(required = false)
 	private AceBridgeService aceBridgeService;
 	@Inject
 	private FlowsAttachmentResource attachmentResource;
@@ -320,7 +320,7 @@ public class FlowsTaskService {
 					//                    String gruppoAbilitati = groups.get(0);
 					//                    String idStrutturaString = gruppoAbilitati.substring(gruppoAbilitati.lastIndexOf('@') + 1);
 
-					data.put(title.name(), key);
+					//data.put(title.name(), key);
 					data.put(initiator.name(), username);
 					data.put(startDate.name(), new Date());
 
@@ -328,7 +328,7 @@ public class FlowsTaskService {
 
 					org.json.JSONObject name = new org.json.JSONObject();
 					//                    name.put(idStruttura.name(), idStrutturaString);
-					name.put(title.name(), data.get(title.name()));
+					//name.put(title.name(), data.get(title.name()));
 					name.put(titolo.name(), data.get(titolo.name()));
 					name.put(descrizione.name(), data.get(descrizione.name()));
 					name.put(initiator.name(), data.get(initiator.name()));

@@ -29,6 +29,10 @@
                 <constraints nullable="false"/>
             </column>
 
+            <column name="group_role" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+
             <!-- jhipster-needle-liquibase-add-column - Jhipster will add columns here, do not remove-->
         </createTable>
 

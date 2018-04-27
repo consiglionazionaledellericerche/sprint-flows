@@ -6,6 +6,7 @@ import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.MembershipRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,9 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -28,85 +27,107 @@ import java.util.stream.Stream;
 public class MembershipService {
 
     private final Logger log = LoggerFactory.getLogger(MembershipService.class);
-
+    
     @Inject
     private MembershipRepository membershipRepository;
-    @Inject
+
+    @Autowired(required = false)
     private AceBridgeService aceService;
 
     /**
      * Save a membership.
-     *
-     * @param membership the entity to save
      * @return the persisted entity
      */
     public Membership save(Membership membership) {
         log.debug("Request to save Membership : {}", membership);
-        Membership result = membershipRepository.save(membership);
-        return result;
+        return membershipRepository.save(membership);
     }
 
     /**
-     *  Get all the memberships.
-     *
-     *  @param pageable the pagination information
+     *  get all the memberships.
      *  @return the list of entities
      */
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true) 
     public Page<Membership> findAll(Pageable pageable) {
         log.debug("Request to get all Memberships");
-        Page<Membership> result = membershipRepository.findAll(pageable);
-        return result;
+        return membershipRepository.findAll(pageable);
     }
 
     /**
-     *  Get one membership by id.
-     *
-     *  @param id the id of the entity
+     *  get one membership by id.
      *  @return the entity
      */
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true) 
     public Membership findOne(Long id) {
         log.debug("Request to get Membership : {}", id);
-        Membership membership = membershipRepository.findOne(id);
-        return membership;
+        return membershipRepository.findOne(id);
     }
 
     /**
-     *  Delete the  membership by id.
-     *
-     *  @param id the id of the entity
+     *  delete the  membership by id.
      */
     public void delete(Long id) {
         log.debug("Request to delete Membership : {}", id);
         membershipRepository.delete(id);
     }
 
-    public Set<String> getGroupsForUser(String username) {
-        return membershipRepository.findGroupsForUsername(username);
+
+    /**
+     * Get one membership by username and groupname.
+     *
+     * @param username  the username of the entity
+     * @param groupname the groupname of the entity
+     * @return the entity
+     */
+    @Transactional(readOnly = true)
+    public Membership findOneByUsernameAndGroupname(String username, String groupname) {
+        log.debug("Request to get Membership with username {} and groupname {}", username, groupname);
+        return membershipRepository.findOneByUsernameAndGroupname(username, groupname);
     }
 
+
+    public Set<String> getGroupNamesForUser(String username) {
+        return membershipRepository.findGroupNamesForUser(username);
+    }
+
+
     public List<GrantedAuthority> getAllAdditionalAuthoritiesForUser(String username) {
-        return Stream.concat(getGroupsForUser(username).stream(), getACEGroupsForUser(username).stream())
+        return Stream.concat(getGroupNamesForUser(username).stream(), getACEGroupsForUser(username).stream())
                 .distinct()
                 .map(Utils::addLeadingRole)
-                .map(g -> new SimpleGrantedAuthority(g))
+                .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
     }
 
     private Set<String> getACEGroupsForUser(String username) {
-
-        return new HashSet<String>(aceService.getAceGroupsForUser(username));
+        return Optional.ofNullable(aceService)
+                .map(aceBridgeService -> aceBridgeService.getAceGroupsForUser(username))
+                .map(strings -> strings.stream())
+                .orElse(Stream.empty())
+                .collect(Collectors.toSet());
     }
 
     public List<String> findMembersInGroup(String groupName) {
-
         List<String> result = membershipRepository.findMembersInGroup(groupName);
-
-        List<String> usersinAceGroup = aceService.getUsersinAceGroup(groupName);
-        if (usersinAceGroup != null)
-            result.addAll(usersinAceGroup);
-
+        Optional.ofNullable(aceService)
+                .map(aceBridgeService -> aceService.getUsersinAceGroup(groupName))
+                .filter(strings -> !strings.isEmpty())
+                .ifPresent(strings -> result.addAll(strings));
         return result;
+    }
+
+
+    public Page<Membership> getGroupsWithRole(Pageable pageable, String user, String role) {
+        return membershipRepository.getGroupsWithRole(role, user, pageable);
+    }
+
+
+    public List<Membership> getMembershipByGroupName(String groupName) {
+        return membershipRepository.getMembershipByGroupName(groupName);
+    }
+
+
+    public List<Membership> getGroupForUser(String userName) {
+        return membershipRepository.getGroupForUser(userName);
     }
 }

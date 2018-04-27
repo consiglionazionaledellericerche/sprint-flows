@@ -24,6 +24,8 @@
                         class="glyphicon glyphicon-sort"></span></th>
                 <th jh-sort-by="groupRelationship"><span translate="sprintApp.relationship.groupRelationship">Group Relationship</span>
                     <span class="glyphicon glyphicon-sort"></span></th>
+                <th jh-sort-by="groupRole"><span translate="sprintApp.relationship.groupRole">Group Role</span> <span
+                        class="glyphicon glyphicon-sort"></span></th>
                 <th></th>
             </tr>
             </thead>
@@ -32,6 +34,7 @@
                 <td><a ui-sref="relationship-detail({id:relationship.id})">{{relationship.id}}</a></td>
                 <td>{{relationship.groupName}}</td>
                 <td>{{relationship.groupRelationship}}</td>
+                <td>{{relationship.groupRole}}</td>
                 <td class="text-right">
                     <div class="btn-group flex-btn-group-container">
                         <button type="submit"

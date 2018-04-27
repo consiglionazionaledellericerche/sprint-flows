@@ -21,13 +21,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 
 /**
  * Test class for the MembershipResource REST controller.
@@ -37,10 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = SprintApp.class)
 public class MembershipResourceIntTest {
-    private static final String DEFAULT_USERNAME = "AAAAA";
-    private static final String UPDATED_USERNAME = "BBBBB";
-    private static final String DEFAULT_GROUPNAME = "AAAAA";
-    private static final String UPDATED_GROUPNAME = "BBBBB";
+
     private static final String DEFAULT_GROUPROLE = "AAAAA";
     private static final String UPDATED_GROUPROLE = "BBBBB";
 
@@ -56,9 +53,6 @@ public class MembershipResourceIntTest {
     @Inject
     private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
 
-    @Inject
-    private EntityManager em;
-
     private MockMvc restMembershipMockMvc;
 
     private Membership membership;
@@ -69,28 +63,14 @@ public class MembershipResourceIntTest {
         MembershipResource membershipResource = new MembershipResource();
         ReflectionTestUtils.setField(membershipResource, "membershipService", membershipService);
         this.restMembershipMockMvc = MockMvcBuilders.standaloneSetup(membershipResource)
-                .setCustomArgumentResolvers(pageableArgumentResolver)
-                .setMessageConverters(jacksonMessageConverter).build();
-    }
-
-    /**
-     * Create an entity for this test.
-     *
-     * This is a static method, as tests for other entities might also need it,
-     * if they test an entity which requires the current entity.
-     */
-    public static Membership createEntity(EntityManager em) {
-        Membership membership = new Membership();
-        membership = new Membership()
-                .username(DEFAULT_USERNAME)
-                .groupname(DEFAULT_GROUPNAME)
-                .grouprole(DEFAULT_GROUPROLE);
-        return membership;
+            .setCustomArgumentResolvers(pageableArgumentResolver)
+            .setMessageConverters(jacksonMessageConverter).build();
     }
 
     @Before
     public void initTest() {
-        membership = createEntity(em);
+        membership = new Membership();
+        membership.setGrouprole(DEFAULT_GROUPROLE);
     }
 
     @Test
@@ -101,49 +81,29 @@ public class MembershipResourceIntTest {
         // Create the Membership
 
         restMembershipMockMvc.perform(post("/api/memberships")
-                                              .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                                              .content(TestUtil.convertObjectToJsonBytes(membership)))
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(membership)))
                 .andExpect(status().isCreated());
 
         // Validate the Membership in the database
         List<Membership> memberships = membershipRepository.findAll();
         assertThat(memberships).hasSize(databaseSizeBeforeCreate + 1);
         Membership testMembership = memberships.get(memberships.size() - 1);
-        assertThat(testMembership.getUsername()).isEqualTo(DEFAULT_USERNAME);
-        assertThat(testMembership.getGroupname()).isEqualTo(DEFAULT_GROUPNAME);
         assertThat(testMembership.getGrouprole()).isEqualTo(DEFAULT_GROUPROLE);
     }
 
     @Test
     @Transactional
-    public void checkUsernameIsRequired() throws Exception {
+    public void checkGrouproleIsRequired() throws Exception {
         int databaseSizeBeforeTest = membershipRepository.findAll().size();
         // set the field null
-        membership.setUsername(null);
+        membership.setGrouprole(null);
 
         // Create the Membership, which fails.
 
         restMembershipMockMvc.perform(post("/api/memberships")
-                                              .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                                              .content(TestUtil.convertObjectToJsonBytes(membership)))
-                .andExpect(status().isBadRequest());
-
-        List<Membership> memberships = membershipRepository.findAll();
-        assertThat(memberships).hasSize(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
-    public void checkGroupnameIsRequired() throws Exception {
-        int databaseSizeBeforeTest = membershipRepository.findAll().size();
-        // set the field null
-        membership.setGroupname(null);
-
-        // Create the Membership, which fails.
-
-        restMembershipMockMvc.perform(post("/api/memberships")
-                                              .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                                              .content(TestUtil.convertObjectToJsonBytes(membership)))
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(membership)))
                 .andExpect(status().isBadRequest());
 
         List<Membership> memberships = membershipRepository.findAll();
@@ -159,10 +119,8 @@ public class MembershipResourceIntTest {
         // Get all the memberships
         restMembershipMockMvc.perform(get("/api/memberships?sort=id,desc"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(membership.getId().intValue())))
-                .andExpect(jsonPath("$.[*].username").value(hasItem(DEFAULT_USERNAME.toString())))
-                .andExpect(jsonPath("$.[*].groupname").value(hasItem(DEFAULT_GROUPNAME.toString())))
                 .andExpect(jsonPath("$.[*].grouprole").value(hasItem(DEFAULT_GROUPROLE.toString())));
     }
 
@@ -174,12 +132,10 @@ public class MembershipResourceIntTest {
 
         // Get the membership
         restMembershipMockMvc.perform(get("/api/memberships/{id}", membership.getId()))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.id").value(membership.getId().intValue()))
-                .andExpect(jsonPath("$.username").value(DEFAULT_USERNAME.toString()))
-                .andExpect(jsonPath("$.groupname").value(DEFAULT_GROUPNAME.toString()))
-                .andExpect(jsonPath("$.grouprole").value(DEFAULT_GROUPROLE.toString()));
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.id").value(membership.getId().intValue()))
+            .andExpect(jsonPath("$.grouprole").value(DEFAULT_GROUPROLE.toString()));
     }
 
     @Test
@@ -194,28 +150,22 @@ public class MembershipResourceIntTest {
     @Transactional
     public void updateMembership() throws Exception {
         // Initialize the database
-        membershipService.save(membership);
+        membershipRepository.saveAndFlush(membership);
 
-        int databaseSizeBeforeUpdate = membershipRepository.findAll().size();
+		int databaseSizeBeforeUpdate = membershipRepository.findAll().size();
 
         // Update the membership
-        Membership updatedMembership = membershipRepository.findOne(membership.getId());
-        updatedMembership
-                .username(UPDATED_USERNAME)
-                .groupname(UPDATED_GROUPNAME)
-                .grouprole(UPDATED_GROUPROLE);
+        membership.setGrouprole(UPDATED_GROUPROLE);
 
         restMembershipMockMvc.perform(put("/api/memberships")
-                                              .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                                              .content(TestUtil.convertObjectToJsonBytes(updatedMembership)))
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(membership)))
                 .andExpect(status().isOk());
 
         // Validate the Membership in the database
         List<Membership> memberships = membershipRepository.findAll();
         assertThat(memberships).hasSize(databaseSizeBeforeUpdate);
         Membership testMembership = memberships.get(memberships.size() - 1);
-        assertThat(testMembership.getUsername()).isEqualTo(UPDATED_USERNAME);
-        assertThat(testMembership.getGroupname()).isEqualTo(UPDATED_GROUPNAME);
         assertThat(testMembership.getGrouprole()).isEqualTo(UPDATED_GROUPROLE);
     }
 
@@ -223,13 +173,13 @@ public class MembershipResourceIntTest {
     @Transactional
     public void deleteMembership() throws Exception {
         // Initialize the database
-        membershipService.save(membership);
+        membershipRepository.saveAndFlush(membership);
 
-        int databaseSizeBeforeDelete = membershipRepository.findAll().size();
+		int databaseSizeBeforeDelete = membershipRepository.findAll().size();
 
         // Get the membership
         restMembershipMockMvc.perform(delete("/api/memberships/{id}", membership.getId())
-                                              .accept(TestUtil.APPLICATION_JSON_UTF8))
+                .accept(TestUtil.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk());
 
         // Validate the database is empty

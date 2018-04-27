@@ -64,6 +64,12 @@
                     <span class="hidden-sm">Ricerca</span>
                 </a>
             </li>
+            <li ng-if="app == 'oiv'" ui-sref-active="active" has-authority="ROLE_USER">
+                <a ui-sref="user-memberships" ng-click="vm.collapseNavbar()">
+                    <span class="glyphicon glyphicon-user"></span>
+                    <span class="hidden-sm">Membership Utente</span>
+                </a>
+            </li>
             <!-- jhipster-needle-add-element-to-menu - JHipster will add new menu items here -->
             <li ng-class="{active: vm.$state.includes('entity')}" ng-switch-when="true" has-authority="ROLE_ADMIN" uib-dropdown class="dropdown pointer">
                 <a class="dropdown-toggle" uib-dropdown-toggle href="" id="entity-menu">
@@ -94,36 +100,36 @@
                             <span translate="global.menu.entities.cnrgroup">Cnrgroup</span>
                         </a>
                     </li>
-                    <li ui-sref-active="active">
-                        <a ui-sref="relationship" ng-click="vm.collapseNavbar()">
+                    <li ui-sref-active="active" >
+                        <a ui-sref="dynamiclist" ng-click="vm.collapseNavbar()">
                             <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
-                            <span data-translate="global.menu.entities.relationship">Relationship</span>
+                            <span translate="global.menu.entities.dynamiclist">Dynamiclist</span>
                         </a>
                     </li>
                     <li ui-sref-active="active" >
-                            <a ui-sref="dynamiclist" ng-click="vm.collapseNavbar()">
-                                <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
-                                <span translate="global.menu.entities.dynamiclist">Dynamiclist</span>
-                            </a>
-                        </li>
+                        <a ui-sref="view" ng-click="vm.collapseNavbar()">
+                            <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
+                            <span translate="global.menu.entities.view">View</span>
+                        </a>
+                    </li>
                     <li ui-sref-active="active" >
-                            <a ui-sref="view" ng-click="vm.collapseNavbar()">
-                                <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
-                                <span translate="global.menu.entities.view">View</span>
-                            </a>
-                        </li>
+                        <a ui-sref="notification-rule" ng-click="vm.collapseNavbar()">
+                            <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
+                            <span translate="global.menu.entities.notificationRule">Notification Rule</span>
+                        </a>
+                    </li>
                     <li ui-sref-active="active" >
-                            <a ui-sref="notification-rule" ng-click="vm.collapseNavbar()">
-                                <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
-                                <span translate="global.menu.entities.notificationRule">Notification Rule</span>
-                            </a>
-                        </li>
-                    <li ui-sref-active="active" >
-                            <a ui-sref="membership" ng-click="vm.collapseNavbar()">
-                                <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
-                                <span translate="global.menu.entities.membership">Membership</span>
-                            </a>
-                        </li>
+                        <a ui-sref="membership" ng-click="vm.collapseNavbar()">
+                            <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
+                            <span translate="global.menu.entities.membership">Membership</span>
+                        </a>
+                    </li>
+                    <li ui-sref-active="active">
+                        <a ui-sref="relationship" ng-click="vm.collapseNavbar()">
+                            <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
+                            <span translate="global.menu.entities.relationship">Relationship</span>
+                        </a>
+                    </li>
                     <!-- jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here -->
                 </ul>
             </li>
@@ -138,13 +144,13 @@
                     </span>
                 </a>
                 <ul class="dropdown-menu" uib-dropdown-menu>
-                    <li ui-sref-active="active" ng-switch-when="true">
+                    <li ui-sref-active="active" ng-if="app == 'oiv'">
                         <a ui-sref="settings" ng-click="vm.collapseNavbar()">
                             <span class="glyphicon glyphicon-wrench"></span>&nbsp;
                             <span translate="global.menu.account.settings">Settings</span>
                         </a>
                     </li>
-                    <li ui-sref-active="active" ng-switch-when="true">
+                    <li ui-sref-active="active" ng-if="(app == 'oiv')||(app == 'cnr')">
                         <a ui-sref="password" ng-click="vm.collapseNavbar()">
                             <span class="glyphicon glyphicon-lock"></span>&nbsp;
                             <span translate="global.menu.account.password">Password</span>

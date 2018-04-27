@@ -1,35 +1,32 @@
-package it.cnr.si.flows.ng.listeners;
+package it.cnr.si.flows.ng.service;
 
 
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.service.FlowsAttachmentService;
+
 import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.ExecutionListener;
-import org.activiti.engine.delegate.Expression;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Protocollo;
 import static it.cnr.si.flows.ng.utils.Enum.Stato.Protocollato;
 
-@Component
-public class ProtocollaDocumento implements ExecutionListener {
-
-	private static final long serialVersionUID = -56001764662303256L;
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(ProtocollaDocumento.class);
-
-	private Expression nomeFileDaProtocollare;
+import java.io.IOException;
+import java.text.ParseException;
 
 
-	@Override
-	public void notify(DelegateExecution execution) throws Exception {
-		if (!execution.getEventName().equals(ExecutionListener.EVENTNAME_END))
-			throw new IllegalStateException("Questo Listener accetta solo eventi 'end'.");
-		if (nomeFileDaProtocollare.getValue(execution) == null)
+@Service
+public class ProtocolloDocumentoService {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ProtocolloDocumentoService.class);
+
+
+	public void protocolla(DelegateExecution execution, String nomeVariabileFile)  throws IOException, ParseException  {
+
+		if (nomeVariabileFile == null)
 			throw new IllegalStateException("Questo Listener ha bisogno del campo 'nomeFileDaProtocollare' nella process definition (nel Task Listener - Fields).");
 
-		String nomeVariabileFile = (String) nomeFileDaProtocollare.getValue(execution);
 		String valoreNumeroProtocollo = (String) execution.getVariable("numeroProtocolloInput");
 		String valoreDataProtocollo = (String) execution.getVariable("dataProtocolloInput");
 
@@ -42,11 +39,6 @@ public class ProtocollaDocumento implements ExecutionListener {
 		execution.setVariable(nomeVariabileFile, att);
 		execution.setVariable("numeroProtocollo_" + nomeVariabileFile, valoreNumeroProtocollo);
 		execution.setVariable("dataProtocollo_" + nomeVariabileFile, valoreDataProtocollo);
-
-		String isError = (String) execution.getVariable("error");
-		if ("true".equals(isError)) {
-			throw new IllegalStateException("L'utente ha selezionato l'opzione errore. Rollback.");
-		}
 
 	}
 

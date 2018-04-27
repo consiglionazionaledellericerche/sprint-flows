@@ -198,6 +198,19 @@ public class FlowsAttachmentService {
 				.collect(Collectors.toMap(k -> k.getKey(), v -> ((FlowsAttachment) v.getValue())));
 	}
 
+	public Map<String, FlowsAttachment> getAttachementsForProcessDefinitionKey(@PathVariable("processDefinitionKey") String processDefinitionKey) {
+		Map<String, Object> processVariables = historyService.createHistoricProcessInstanceQuery()
+				.processInstanceId(processDefinitionKey)
+				.includeProcessVariables()
+				.singleResult()
+				.getProcessVariables();
+
+		return processVariables.entrySet().stream()
+				.filter(e -> e.getValue() instanceof FlowsAttachment)
+				.collect(Collectors.toMap(k -> k.getKey(), v -> ((FlowsAttachment) v.getValue())));
+	}	
+	
+	
 	public void setPubblicabile(String executionId, String nomeVariabileFile, Boolean flagPubblicazione) {
 		FlowsAttachment att = (FlowsAttachment) runtimeService.getVariable(executionId, nomeVariabileFile);
 		if (att != null) {

@@ -16,9 +16,10 @@
             "detail": {
                 "title": "Membership"
             },
-            "username": "Username",
-          "groupname": "Groupname",
-          "grouprole": "Grouprole"
+            "grouprole": "Grouprole",
+            "cnrgroup": "Cnrgroup",
+            "user": "User",
+            "groupname": "Group Name"
         }
     }
 }

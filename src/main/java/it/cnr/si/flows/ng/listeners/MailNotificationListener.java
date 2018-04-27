@@ -13,6 +13,7 @@ import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.task.IdentityLink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -38,7 +39,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
     private FlowsMailService mailService;
     @Inject
     private RuntimeService runtimeService;
-    @Inject
+    @Autowired(required = false)
     private AceBridgeService aceBridgeService;
     @Inject
     private NotificationRuleRepository notificationService;
