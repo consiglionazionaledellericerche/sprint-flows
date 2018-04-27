@@ -1,0 +1,24 @@
+{
+  "sprintApp": {
+    "membership": {
+      "home": {
+        "title": "User Memberships",
+        "createLabel": "Create a new User Memberships",
+        "createOrEditLabel": "Create or edit a User Memberships",
+        "search": "Search for User Memberships"
+      },
+      "created": "A new User Memberships is created with identifier {{ param }}",
+      "updated": "A User Memberships is updated with identifier {{ param }}",
+      "deleted": "A User Memberships is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete User Memberships {{ id }}?"
+      },
+      "detail": {
+        "title": "User Memberships"
+      },
+      "username": "Username",
+      "groupname": "Groupname",
+      "grouprole": "Grouprole"
+    }
+  }
+}

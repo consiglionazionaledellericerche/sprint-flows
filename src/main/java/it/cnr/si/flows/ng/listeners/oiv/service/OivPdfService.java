@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 
+import static it.cnr.si.flows.ng.service.FlowsPdfService.TITLE;
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
 import static org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA_BOLD;
 
@@ -38,7 +39,6 @@ import static org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA_BOLD;
 @Service
 public class OivPdfService {
 
-	public static final String TITLE = "title";
 	private static final Logger LOGGER = LoggerFactory.getLogger(OivPdfService.class);
 	private static final float FONT_SIZE = 10;
 	private static final float TITLE_SIZE = 18;
@@ -81,17 +81,18 @@ public class OivPdfService {
 		ArrayList<Map> tasksSortedList = (ArrayList<Map>) map.get("history");
 		Collections.reverse(tasksSortedList);  //ordino i task rispetto alla data di creazione (in senso crescente)
 
-        //      genero il titolo del pdf (la bussineskey (es: "Acquisti Trasparenza-2017-1") + titolo (es: "acquisto pc")
+		//      genero il titolo del pdf (la bussineskey (es: "Acquisti Trasparenza-2017-1") + titolo (es: "acquisto pc")
 		String titolo = processInstance.getBusinessKey() + "\n";
 		Optional<RestVariable> variable = variables.stream()
-                .filter(a -> (a.getName().equals(Enum.VariableEnum.titolo.name())))
+				.filter(a -> (a.getName().equals(Enum.VariableEnum.titolo.name())))
 				.findFirst();
 		if (variable.isPresent())
 			titolo += variable.get().getValue() + "\n\n";
 		else {
-            // Titolo nel file pdf in caso di Workflow Definition che non ha il titolo nella variabile "titolo"
+			// Titolo nel file pdf in caso di Workflow Definition che non ha il titolo
+			// nella variabile "titolo" ma nella vecchia variabile "title" Flussi CNR
 			variable = variables.stream()
-					.filter(a -> (a.getName()).equals(title.name()))
+					.filter(a -> (a.getName()).equals(TITLE))
 					.findFirst();
 
 			titolo += variable.get().getValue() + "\n\n";

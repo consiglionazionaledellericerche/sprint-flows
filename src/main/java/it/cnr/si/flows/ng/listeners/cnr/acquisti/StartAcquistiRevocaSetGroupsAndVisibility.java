@@ -1,4 +1,4 @@
-package it.cnr.si.flows.ng.listeners.acquistitrasparenza;
+package it.cnr.si.flows.ng.listeners.cnr.acquisti;
 
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.utils.Utils;

@@ -1,0 +1,881 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="iscrizione-elenco-oiv-Statistics" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="1c2c891d-5323-4207-b491-e0a1cc0caf66">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab Data Text" hAlign="Center"/>
+	<style name="table 1">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Table Dataset 1" uuid="987c442d-b52d-4520-9c19-805ab09727ae"/>
+	<subDataset name="Table Dataset 2" uuid="697e1dbd-0d22-466e-a331-47e0e0447e25"/>
+	<field name="nrDomandeApprovate" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrDomandeApprovate]]></fieldDescription>
+	</field>
+	<field name="nrDomandeImprocedibili" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrDomandeImprocedibili]]></fieldDescription>
+	</field>
+	<field name="nrDomandeRespinte" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrDomandeRespinte]]></fieldDescription>
+	</field>
+	<field name="domandeAttive" class="java.lang.Integer">
+		<fieldDescription><![CDATA[domandeAttive]]></fieldDescription>
+	</field>
+	<field name="domandeTerminate" class="java.lang.Integer">
+		<fieldDescription><![CDATA[domandeTerminate]]></fieldDescription>
+	</field>
+	<field name="domandeTotali" class="java.lang.Integer">
+		<fieldDescription><![CDATA[domandeTotali]]></fieldDescription>
+	</field>
+	<field name="nrFaseSmistamento" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrFaseSmistamento]]></fieldDescription>
+	</field>
+	<field name="nrFaseIstruttoria" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrFaseIstruttoria]]></fieldDescription>
+	</field>
+	<field name="nrFaseCambioIstruttore" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrFaseCambioIstruttore]]></fieldDescription>
+	</field>
+	<field name="nrFaseSoccorsoIstruttorio" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrFaseSoccorsoIstruttorio]]></fieldDescription>
+	</field>
+	<field name="nrFaseValutazione" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrFaseValutazione]]></fieldDescription>
+	</field>
+	<field name="nrFasePreavvisoRigetto" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrFasePreavvisoRigetto]]></fieldDescription>
+	</field>
+	<field name="nrFaseIstruttoriaSuPreavviso" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrFaseIstruttoriaSuPreavviso]]></fieldDescription>
+	</field>
+	<field name="nrFaseValutazionePreavviso" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrFaseValutazionePreavviso]]></fieldDescription>
+	</field>
+	<field name="nrFaseFirmaDgRigetto" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrFaseFirmaDgRigetto]]></fieldDescription>
+	</field>
+	<field name="dataIn" class="java.lang.String">
+		<fieldDescription><![CDATA[dataIn]]></fieldDescription>
+	</field>
+	<field name="dataOut" class="java.lang.String">
+		<fieldDescription><![CDATA[dataOut]]></fieldDescription>
+	</field>
+	<field name="nrDomandeAttiveScadenza_0_5" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrDomandeAttiveScadenza_0_5]]></fieldDescription>
+	</field>
+	<field name="nrDomandeAttiveScadenza_5_10" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrDomandeAttiveScadenza_5_10]]></fieldDescription>
+	</field>
+	<field name="nrDomandeAttiveScadenza_10_more" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrDomandeAttiveScadenza_10_more]]></fieldDescription>
+	</field>
+	<field name="nrDomandeAttiveScadute_0_5" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrDomandeAttiveScadute_0_5]]></fieldDescription>
+	</field>
+	<field name="nrDomandeAttiveScadute_5_10" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrDomandeAttiveScadute_5_10]]></fieldDescription>
+	</field>
+	<field name="nrDomandeAttiveScadute_10_more" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrDomandeAttiveScadute_10_more]]></fieldDescription>
+	</field>
+	<field name="nrDomandeTempiProcedimentaliScaduti" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrDomandeTempiProcedimentaliScaduti]]></fieldDescription>
+	</field>
+	<field name="nrDomandeTempiProcedimentaliInScadenza" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrDomandeTempiProcedimentaliInScadenza]]></fieldDescription>
+	</field>
+	<field name="nrDomandeTempiPreavvisoRigettoScaduti" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrDomandeTempiPreavvisoRigettoScaduti]]></fieldDescription>
+	</field>
+	<field name="nrDomandeTempiSoccorsoIstruttorioScaduti" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrDomandeTempiSoccorsoIstruttorioScaduti]]></fieldDescription>
+	</field>
+	<field name="nrDomandeTerminateScadute_0_5" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrDomandeTerminateScadute_0_5]]></fieldDescription>
+	</field>
+	<field name="nrDomandeTerminateScadute_5_10" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrDomandeTerminateScadute_5_10]]></fieldDescription>
+	</field>
+	<field name="nrDomandeTerminateScadute_10_more" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrDomandeTerminateScadute_10_more]]></fieldDescription>
+	</field>
+	<field name="nrUominiFascia1" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrUominiFascia1]]></fieldDescription>
+	</field>
+	<field name="nrUominiFascia2" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrUominiFascia2]]></fieldDescription>
+	</field>
+	<field name="nrUominiFascia3" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrUominiFascia3]]></fieldDescription>
+	</field>
+	<field name="nrDonneFascia1" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrDonneFascia1]]></fieldDescription>
+	</field>
+	<field name="nrDonneFascia2" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrDonneFascia2]]></fieldDescription>
+	</field>
+	<field name="nrDonneFascia3" class="java.lang.Integer">
+		<fieldDescription><![CDATA[nrDonneFascia3]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="60" splitType="Stretch">
+			<textField>
+				<reportElement x="149" y="3" width="256" height="33" uuid="77b8a5fe-af81-4d89-ae10-003b223e86ce"/>
+				<textElement textAlignment="Center">
+					<font size="24" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["STATISTICHE"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="149" y="36" width="256" height="20" uuid="d73e16d9-4ae4-4eab-a3f2-3f445dbd20d2"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["[ " +$F{dataIn}+" - " + $F{dataOut} + " ]"]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="590" splitType="Stretch">
+			<textField>
+				<reportElement x="10" y="43" width="156" height="20" uuid="69c48e12-9d96-4d4e-8f8a-7dd8eb3e1c73"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Nr Domande Totali"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="177" y="43" width="45" height="20" uuid="3d4e1c4c-fb3a-4a01-91db-c00537a20f29"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{domandeTotali}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="177" y="90" width="45" height="20" uuid="390cf07a-f243-4aa9-a7db-7a9a0fd63fc9"/>
+				<textFieldExpression><![CDATA[$F{domandeTerminate}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="10" y="90" width="156" height="20" uuid="fc6a13a2-4886-4e64-a8f4-e3f7793ab8ce"/>
+				<textFieldExpression><![CDATA["nr Domande Terminate"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="177" y="120" width="45" height="20" uuid="7919026a-7c76-421b-82e7-d6fbad6c7a54"/>
+				<textFieldExpression><![CDATA[$F{domandeAttive}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="10" y="120" width="156" height="20" uuid="279a7663-b435-4af8-9efe-4398496cd33d"/>
+				<textFieldExpression><![CDATA["nr Domande Attive"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="149" y="4" width="256" height="25" uuid="15042387-cb9e-4337-83a5-9ba1095754bc"/>
+				<textElement textAlignment="Center">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["DOMANDE TOTALI"]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="10" y="76" width="212" height="1" uuid="170e104d-e34a-4025-9ab5-8a89ffe00f37"/>
+			</line>
+			<pieChart>
+				<chart>
+					<reportElement x="255" y="30" width="300" height="150" uuid="c65ede41-b2af-4451-aefc-70b051c36960"/>
+					<chartTitle position="Top"/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<pieDataset>
+					<pieSeries>
+						<keyExpression><![CDATA["Terminate"]]></keyExpression>
+						<valueExpression><![CDATA[$F{domandeTerminate}]]></valueExpression>
+						<labelExpression><![CDATA["Terminate"]]></labelExpression>
+					</pieSeries>
+					<pieSeries>
+						<keyExpression><![CDATA["Attive"]]></keyExpression>
+						<valueExpression><![CDATA[$F{domandeAttive}]]></valueExpression>
+						<labelExpression><![CDATA["Attive"]]></labelExpression>
+					</pieSeries>
+				</pieDataset>
+				<piePlot isShowLabels="true" isCircular="true" labelFormat="{2}">
+					<plot/>
+					<itemLabel/>
+				</piePlot>
+			</pieChart>
+			<line>
+				<reportElement x="0" y="0" width="555" height="1" uuid="7c61786c-2b05-44b0-9e75-35f5ee0d1235"/>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="223" width="241" height="20" uuid="caf7ae40-bec8-46c3-952a-5f34276d472f"/>
+				<textFieldExpression><![CDATA["Nr Domande Tempi Procedimentali in Scadenza"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="244" y="223" width="33" height="20" uuid="f3636987-e2f8-4a79-89b4-3f5d1e7dc73c"/>
+				<textFieldExpression><![CDATA[$F{nrDomandeTempiProcedimentaliInScadenza}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="243" y="247" width="34" height="20" uuid="c5a223d6-2c4e-4ff1-bf2e-a4b3d0dc3978"/>
+				<textFieldExpression><![CDATA[$F{nrDomandeTempiProcedimentaliScaduti}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="247" width="241" height="20" uuid="b2e603f9-05ba-4bd6-8d10-f0dfb926564e"/>
+				<textFieldExpression><![CDATA["Nr Domande Tempi Procedimentali Scaduti"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="244" y="269" width="33" height="20" uuid="6e93f382-171f-40e5-982b-5e9d79bb4ff9"/>
+				<textFieldExpression><![CDATA[$F{nrDomandeTempiPreavvisoRigettoScaduti}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="267" width="241" height="20" uuid="38448b82-6e1b-4de7-8789-448ad9aecbd9"/>
+				<textFieldExpression><![CDATA["Nr Domande Tempi Preavviso Rigetto Scaduti"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="244" y="293" width="33" height="20" uuid="dbe4a0f3-7fe7-4fd5-a3e4-88f79ff78e6f"/>
+				<textFieldExpression><![CDATA[$F{nrDomandeTempiSoccorsoIstruttorioScaduti}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="287" width="241" height="20" uuid="8f261b06-d8a1-4a62-a002-fad5fbca1b8a"/>
+				<textFieldExpression><![CDATA["Nr Domande Tempi Soccorso Istruttorio Scadutii"]]></textFieldExpression>
+			</textField>
+			<stackedBarChart>
+				<chart>
+					<reportElement x="255" y="439" width="302" height="131" uuid="482f6787-a6d3-4178-8fd7-158829c08789"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<categoryDataset>
+					<categorySeries>
+						<seriesExpression><![CDATA["UOMINI"]]></seriesExpression>
+						<categoryExpression><![CDATA["fascia1"]]></categoryExpression>
+						<valueExpression><![CDATA[$F{nrUominiFascia1}]]></valueExpression>
+						<labelExpression><![CDATA["fascia1"]]></labelExpression>
+					</categorySeries>
+					<categorySeries>
+						<seriesExpression><![CDATA["UOMINI"]]></seriesExpression>
+						<categoryExpression><![CDATA["fascia2"]]></categoryExpression>
+						<valueExpression><![CDATA[$F{nrUominiFascia2}]]></valueExpression>
+						<labelExpression><![CDATA["fascia2"]]></labelExpression>
+					</categorySeries>
+					<categorySeries>
+						<seriesExpression><![CDATA["DONNE"]]></seriesExpression>
+						<categoryExpression><![CDATA["fascia1"]]></categoryExpression>
+						<valueExpression><![CDATA[$F{nrDonneFascia1}]]></valueExpression>
+						<labelExpression><![CDATA["fascia1"]]></labelExpression>
+					</categorySeries>
+					<categorySeries>
+						<seriesExpression><![CDATA["DONNE"]]></seriesExpression>
+						<categoryExpression><![CDATA["fascia2"]]></categoryExpression>
+						<valueExpression><![CDATA[$F{nrDonneFascia2}]]></valueExpression>
+						<labelExpression><![CDATA["fascia2"]]></labelExpression>
+					</categorySeries>
+					<categorySeries>
+						<seriesExpression><![CDATA["UOMINI"]]></seriesExpression>
+						<categoryExpression><![CDATA["fascia3"]]></categoryExpression>
+						<valueExpression><![CDATA[$F{nrUominiFascia3}]]></valueExpression>
+						<labelExpression><![CDATA["fascia3"]]></labelExpression>
+					</categorySeries>
+					<categorySeries>
+						<seriesExpression><![CDATA["DONNE"]]></seriesExpression>
+						<categoryExpression><![CDATA["fascia3"]]></categoryExpression>
+						<valueExpression><![CDATA[$F{nrDonneFascia3}]]></valueExpression>
+						<labelExpression><![CDATA["fascia3"]]></labelExpression>
+					</categorySeries>
+				</categoryDataset>
+				<barPlot>
+					<plot/>
+					<itemLabel/>
+					<categoryAxisFormat>
+						<axisFormat/>
+					</categoryAxisFormat>
+					<valueAxisFormat>
+						<axisFormat/>
+					</valueAxisFormat>
+				</barPlot>
+			</stackedBarChart>
+			<textField>
+				<reportElement x="149" y="198" width="256" height="25" uuid="446aa8f2-c21e-406b-b983-0619efd898a0"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["SCADENZE DELLLE DOMANDE"]]></textFieldExpression>
+			</textField>
+			<pieChart>
+				<chart>
+					<reportElement x="277" y="223" width="278" height="162" uuid="51c330d8-9c4f-4aad-a826-f5e3c4894fb4"/>
+					<chartTitle position="Top"/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<pieDataset>
+					<pieSeries>
+						<keyExpression><![CDATA["Regolari"]]></keyExpression>
+						<valueExpression><![CDATA[$F{domandeTotali}-$F{nrDomandeTempiProcedimentaliScaduti}-$F{nrDomandeTempiProcedimentaliInScadenza}-$F{nrDomandeTempiPreavvisoRigettoScaduti}-$F{nrDomandeTempiSoccorsoIstruttorioScaduti}]]></valueExpression>
+						<labelExpression><![CDATA["Regolari"]]></labelExpression>
+					</pieSeries>
+					<pieSeries>
+						<keyExpression><![CDATA["In Scadenza"]]></keyExpression>
+						<valueExpression><![CDATA[$F{nrDomandeTempiProcedimentaliInScadenza}]]></valueExpression>
+						<labelExpression><![CDATA["In Scadenza"]]></labelExpression>
+					</pieSeries>
+					<pieSeries>
+						<keyExpression><![CDATA["Scadute"]]></keyExpression>
+						<valueExpression><![CDATA[$F{nrDomandeTempiProcedimentaliScaduti}]]></valueExpression>
+						<labelExpression><![CDATA["Scadute"]]></labelExpression>
+					</pieSeries>
+					<pieSeries>
+						<keyExpression><![CDATA["Rigetto"]]></keyExpression>
+						<valueExpression><![CDATA[$F{nrDomandeTempiPreavvisoRigettoScaduti}]]></valueExpression>
+						<labelExpression><![CDATA["Rigetto"]]></labelExpression>
+					</pieSeries>
+					<pieSeries>
+						<keyExpression><![CDATA["Soccorso Istruttorio"]]></keyExpression>
+						<valueExpression><![CDATA[$F{nrDomandeTempiSoccorsoIstruttorioScaduti}]]></valueExpression>
+						<labelExpression><![CDATA["Soccorso Istruttorio"]]></labelExpression>
+					</pieSeries>
+				</pieDataset>
+				<piePlot isShowLabels="true" isCircular="true" labelFormat="{2}">
+					<plot/>
+					<itemLabel/>
+				</piePlot>
+			</pieChart>
+			<textField>
+				<reportElement x="149" y="403" width="256" height="25" uuid="c0507961-3bce-4b5d-bfbd-78354c5d6800"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["UOMINI/DONNE per FASCIA"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="106" y="473" width="53" height="20" uuid="6634f213-a674-407f-8613-374b198141b8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{nrUominiFascia2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="193" y="453" width="53" height="20" uuid="1398f2f0-c76d-4ae4-8125-2bfdac68dd1d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["Fascia 3"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="105" y="544" width="53" height="20" uuid="e7a143f5-40fe-4d94-9e89-c19929052a7e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{nrDonneFascia2}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="11" y="473" width="53" height="20" uuid="556c1365-6b64-4974-bff6-aa86148679bf"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{nrUominiFascia1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="11" y="453" width="53" height="20" uuid="5ca1c5d5-f2a4-43e9-9806-c0896a80ad23"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["Fascia1"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="9" y="504" width="241" height="20" uuid="97180d7f-0099-4dc0-a302-35acd064520b"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["Nr Domande con termini Temporali Scadute"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="9" y="524" width="53" height="20" uuid="f16aa57a-351e-4ecf-9f6b-714892d37bd1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["Fascia1"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="9" y="433" width="241" height="20" uuid="7b418291-6a77-4d6c-a223-bfe37ae89e4d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["Nr Domande Uomini"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="195" y="524" width="53" height="20" uuid="8d7fdf00-ce6f-43ba-8671-4dc747c6c33a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["Fascia3"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="105" y="524" width="53" height="20" uuid="27ee9382-a26e-40ff-a4d8-911382added0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["Fascia2"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="195" y="544" width="53" height="20" uuid="69c2e4ed-d030-4e61-96c4-0f4c0a7419ce"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{nrDonneFascia3}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="9" y="544" width="53" height="20" uuid="3ab430f3-18d0-4cdd-9336-38339697f41b"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{nrDonneFascia1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="193" y="473" width="53" height="20" uuid="3aa092f7-2037-47ea-b7a3-061ce7862a7c"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{nrUominiFascia3}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="106" y="453" width="53" height="20" uuid="376f64cc-5433-404e-84d0-dd86f94b8e65"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["Fascia 2"]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="2" y="570" width="555" height="1" uuid="ade6b626-8862-48bb-aab5-132d4e3b576e"/>
+			</line>
+			<break>
+				<reportElement x="0" y="568" width="100" height="1" uuid="5e39e4d4-7788-4294-ab40-d0acaa587c6c"/>
+			</break>
+		</band>
+		<band height="378">
+			<pieChart>
+				<chart>
+					<reportElement x="255" y="37" width="300" height="150" uuid="42f41f8e-0b2f-4d01-90f8-f085619d9348"/>
+					<chartTitle position="Top"/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<pieDataset>
+					<pieSeries>
+						<keyExpression><![CDATA["Approvate"]]></keyExpression>
+						<valueExpression><![CDATA[$F{nrDomandeApprovate}]]></valueExpression>
+						<labelExpression><![CDATA["Approvate"]]></labelExpression>
+					</pieSeries>
+					<pieSeries>
+						<keyExpression><![CDATA["Improcedibili"]]></keyExpression>
+						<valueExpression><![CDATA[$F{nrDomandeImprocedibili}]]></valueExpression>
+						<labelExpression><![CDATA["Improcedibili"]]></labelExpression>
+					</pieSeries>
+					<pieSeries>
+						<keyExpression><![CDATA["Respinte"]]></keyExpression>
+						<valueExpression><![CDATA[$F{nrDomandeRespinte}]]></valueExpression>
+						<labelExpression><![CDATA["Respinte"]]></labelExpression>
+					</pieSeries>
+				</pieDataset>
+				<piePlot isShowLabels="true" isCircular="true" labelFormat="{2}">
+					<plot/>
+					<itemLabel/>
+				</piePlot>
+			</pieChart>
+			<textField>
+				<reportElement x="10" y="49" width="156" height="20" uuid="35b7ccef-9de7-4734-acf1-8bd3c68b13ea"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Nr Domande Terminate"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="177" y="49" width="45" height="20" uuid="45482f05-cb18-4fd1-b100-a4cf247d630d"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nrDomandeApprovate}+$F{nrDomandeImprocedibili}+$F{nrDomandeRespinte}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="177" y="96" width="45" height="20" uuid="4ba477a4-d53b-4e02-a734-0ce9999d40c8"/>
+				<textFieldExpression><![CDATA[$F{nrDomandeApprovate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="10" y="96" width="156" height="20" uuid="563be0f9-6e64-4236-8fdf-56aaeaacd0c2"/>
+				<textFieldExpression><![CDATA["Nr Domande Approvate"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="177" y="126" width="45" height="20" uuid="13931a03-5f57-4834-9ff8-937b17a3f618"/>
+				<textFieldExpression><![CDATA[$F{nrDomandeImprocedibili}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="10" y="126" width="156" height="20" uuid="6c543509-017c-46c6-b827-0cee009acdc8"/>
+				<textFieldExpression><![CDATA["Nr Domande Improcedibili"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="177" y="159" width="45" height="20" uuid="b1994110-3124-4ace-96b5-05380fc358fc"/>
+				<textFieldExpression><![CDATA[$F{nrDomandeRespinte}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="10" y="159" width="156" height="20" uuid="f331a372-e267-450a-8e9f-4f7098f14453"/>
+				<textFieldExpression><![CDATA["Nr Domande Respinte"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="152" y="10" width="256" height="25" uuid="19c84858-9656-4741-906c-f3bb6b390790"/>
+				<textElement textAlignment="Center">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["DOMANDE TERMINATE"]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="10" y="82" width="212" height="1" uuid="1a132e4f-9995-42c6-8396-e9b760516519"/>
+			</line>
+			<textField>
+				<reportElement x="111" y="205" width="332" height="25" uuid="e2cc28d8-1f54-426b-a663-dccda4770e23"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["nr gg scadenza tempi proceruramentali"]]></textFieldExpression>
+			</textField>
+			<stackedBarChart>
+				<chart>
+					<reportElement x="241" y="233" width="314" height="140" uuid="c022d8b8-ef5b-4113-8cbb-477039ddb96d"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<categoryDataset>
+					<categorySeries>
+						<seriesExpression><![CDATA["REGOLARI"]]></seriesExpression>
+						<categoryExpression><![CDATA["REGOLARI"]]></categoryExpression>
+						<valueExpression><![CDATA[$F{domandeTerminate}-$F{nrDomandeTerminateScadute_0_5}-$F{nrDomandeTerminateScadute_5_10}-$F{nrDomandeTerminateScadute_10_more}]]></valueExpression>
+						<labelExpression><![CDATA["REGOLARI"]]></labelExpression>
+					</categorySeries>
+					<categorySeries>
+						<seriesExpression><![CDATA["[0-5]"]]></seriesExpression>
+						<categoryExpression><![CDATA["SCADUTE"]]></categoryExpression>
+						<valueExpression><![CDATA[$F{nrDomandeTerminateScadute_0_5}]]></valueExpression>
+						<labelExpression><![CDATA["SCADUTE"]]></labelExpression>
+					</categorySeries>
+					<categorySeries>
+						<seriesExpression><![CDATA["[5-10]"]]></seriesExpression>
+						<categoryExpression><![CDATA["SCADUTE"]]></categoryExpression>
+						<valueExpression><![CDATA[$F{nrDomandeTerminateScadute_5_10}]]></valueExpression>
+						<labelExpression><![CDATA["SCADUTE"]]></labelExpression>
+					</categorySeries>
+					<categorySeries>
+						<seriesExpression><![CDATA["[>10]"]]></seriesExpression>
+						<categoryExpression><![CDATA["SCADUTE"]]></categoryExpression>
+						<valueExpression><![CDATA[$F{nrDomandeTerminateScadute_10_more}]]></valueExpression>
+						<labelExpression><![CDATA["SCADUTE"]]></labelExpression>
+					</categorySeries>
+				</categoryDataset>
+				<barPlot>
+					<plot/>
+					<itemLabel/>
+					<categoryAxisFormat>
+						<axisFormat/>
+					</categoryAxisFormat>
+					<valueAxisFormat>
+						<axisFormat/>
+					</valueAxisFormat>
+				</barPlot>
+			</stackedBarChart>
+			<textField>
+				<reportElement x="0" y="235" width="230" height="20" uuid="3b8944e6-4bba-4449-8f1a-474e3776f76e"/>
+				<textFieldExpression><![CDATA["Nr Domande con termini Temporali Scadute"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="257" width="53" height="20" uuid="8e06aa65-d589-48c0-8ad3-224a484ec3cb"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["0 - 5 gg"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="277" width="53" height="20" uuid="0daea58d-5e28-4ba5-9dad-913c554a0c9d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{nrDomandeTerminateScadute_0_5}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="90" y="257" width="53" height="20" uuid="5544cf67-df5c-4ca6-b9f7-b7da4016fc47"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["0 - 10 gg"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="90" y="277" width="53" height="20" uuid="f528c201-7f83-4bed-a671-8bf27b7c1473"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{nrDomandeTerminateScadute_5_10}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="177" y="257" width="53" height="20" uuid="343b9639-3efc-478d-acfb-5a106bef9bd9"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["> 10 gg"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="177" y="277" width="53" height="20" uuid="d5e021a5-0fb5-4536-b467-238608cd7060"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{nrDomandeTerminateScadute_10_more}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="196">
+			<textField>
+				<reportElement x="152" y="10" width="256" height="25" uuid="bbc26bd6-7a11-4054-bfb9-c4d20e75cedf"/>
+				<textElement textAlignment="Center">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["DOMANDE ATTIVE"]]></textFieldExpression>
+			</textField>
+			<barChart>
+				<chart>
+					<reportElement x="2" y="77" width="551" height="115" uuid="da4170fe-3c79-42f9-afdb-2df4ecea5166"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<categoryDataset>
+					<categorySeries>
+						<seriesExpression><![CDATA["Smistamento"]]></seriesExpression>
+						<categoryExpression><![CDATA["Smistamento"]]></categoryExpression>
+						<valueExpression><![CDATA[$F{nrFaseSmistamento}]]></valueExpression>
+						<labelExpression><![CDATA["Smistamento"]]></labelExpression>
+					</categorySeries>
+					<categorySeries>
+						<seriesExpression><![CDATA["Istruttoria"]]></seriesExpression>
+						<categoryExpression><![CDATA["Istruttoria"]]></categoryExpression>
+						<valueExpression><![CDATA[$F{nrFaseIstruttoria}]]></valueExpression>
+						<labelExpression><![CDATA["Istruttoria"]]></labelExpression>
+					</categorySeries>
+					<categorySeries>
+						<seriesExpression><![CDATA["Cambio Istruttore"]]></seriesExpression>
+						<categoryExpression><![CDATA["Cambio Istruttore"]]></categoryExpression>
+						<valueExpression><![CDATA[$F{nrFaseCambioIstruttore}]]></valueExpression>
+						<labelExpression><![CDATA["Cambio Istruttore"]]></labelExpression>
+					</categorySeries>
+					<categorySeries>
+						<seriesExpression><![CDATA["Soccorso Istruttorio"]]></seriesExpression>
+						<categoryExpression><![CDATA["Soccorso Istruttorio"]]></categoryExpression>
+						<valueExpression><![CDATA[$F{nrFaseSoccorsoIstruttorio}]]></valueExpression>
+						<labelExpression><![CDATA["Soccorso Istruttorio"]]></labelExpression>
+					</categorySeries>
+					<categorySeries>
+						<seriesExpression><![CDATA["Valutazione"]]></seriesExpression>
+						<categoryExpression><![CDATA["Valutazione"]]></categoryExpression>
+						<valueExpression><![CDATA[$F{nrFaseValutazione}]]></valueExpression>
+						<labelExpression><![CDATA["Valutazione"]]></labelExpression>
+					</categorySeries>
+					<categorySeries>
+						<seriesExpression><![CDATA["Preavviso Rigetto"]]></seriesExpression>
+						<categoryExpression><![CDATA["Preavviso Rigetto"]]></categoryExpression>
+						<valueExpression><![CDATA[$F{nrFasePreavvisoRigetto}]]></valueExpression>
+						<labelExpression><![CDATA["Preavviso Rigetto"]]></labelExpression>
+					</categorySeries>
+					<categorySeries>
+						<seriesExpression><![CDATA["Istruttoria Su Preavviso"]]></seriesExpression>
+						<categoryExpression><![CDATA["Istruttoria Su Preavviso"]]></categoryExpression>
+						<valueExpression><![CDATA[$F{nrFaseIstruttoriaSuPreavviso}]]></valueExpression>
+						<labelExpression><![CDATA["Istruttoria Su Preavviso"]]></labelExpression>
+					</categorySeries>
+					<categorySeries>
+						<seriesExpression><![CDATA["Valutazione Preavviso"]]></seriesExpression>
+						<categoryExpression><![CDATA["Valutazione Preavviso"]]></categoryExpression>
+						<valueExpression><![CDATA[$F{nrFaseValutazionePreavviso}]]></valueExpression>
+						<labelExpression><![CDATA["Valutazione Preavviso"]]></labelExpression>
+					</categorySeries>
+					<categorySeries>
+						<seriesExpression><![CDATA["Firma Dg Rigetto"]]></seriesExpression>
+						<categoryExpression><![CDATA["Firma Dg Rigetto"]]></categoryExpression>
+						<valueExpression><![CDATA[$F{nrFaseFirmaDgRigetto}]]></valueExpression>
+						<labelExpression><![CDATA["Firma Dg Rigetto"]]></labelExpression>
+					</categorySeries>
+				</categoryDataset>
+				<barPlot>
+					<plot/>
+					<itemLabel/>
+					<categoryAxisFormat>
+						<axisFormat/>
+					</categoryAxisFormat>
+					<valueAxisFormat>
+						<axisFormat/>
+					</valueAxisFormat>
+				</barPlot>
+			</barChart>
+			<line>
+				<reportElement x="0" y="0" width="555" height="1" uuid="dbbbf42e-86c8-4fa5-ae2b-07d0ce40aec7"/>
+			</line>
+			<textField>
+				<reportElement x="107" y="45" width="45" height="20" uuid="1a88e568-c339-4b45-b882-0578d10ec92f"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{domandeAttive}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="3" y="46" width="103" height="20" uuid="bcd0bb82-0ac6-4e06-97ee-72b61e60f702"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Nr Domande Attive"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="177" y="53" width="200" height="25" uuid="2b3a0b65-ad1e-494d-9695-be20ee28a685"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["stato domande attive"]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="181">
+			<line>
+				<reportElement x="0" y="0" width="555" height="1" uuid="d6b57272-298b-4b63-ba8b-1cf6cde16704"/>
+			</line>
+			<textField>
+				<reportElement x="105" y="1" width="345" height="25" uuid="9abf05ea-a1bc-4425-b3ed-2dd55868872c"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["nr gg scadenza tempi proceruramentali"]]></textFieldExpression>
+			</textField>
+			<stackedBarChart>
+				<chart>
+					<reportElement x="241" y="26" width="314" height="153" uuid="5926d094-98b5-4e3b-9cd8-205cb1558886"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<categoryDataset>
+					<categorySeries>
+						<seriesExpression><![CDATA["REGOLARI"]]></seriesExpression>
+						<categoryExpression><![CDATA["REGOLARI"]]></categoryExpression>
+						<valueExpression><![CDATA[$F{domandeAttive}-$F{nrDomandeAttiveScadenza_0_5}-$F{nrDomandeAttiveScadenza_5_10}-$F{nrDomandeAttiveScadenza_10_more}-$F{nrDomandeAttiveScadute_0_5}-$F{nrDomandeAttiveScadute_5_10}-$F{nrDomandeAttiveScadute_10_more}]]></valueExpression>
+						<labelExpression><![CDATA["REGOLARI"]]></labelExpression>
+					</categorySeries>
+					<categorySeries>
+						<seriesExpression><![CDATA["[0-5]"]]></seriesExpression>
+						<categoryExpression><![CDATA["IN SCADENZA"]]></categoryExpression>
+						<valueExpression><![CDATA[$F{nrDomandeAttiveScadenza_0_5}]]></valueExpression>
+						<labelExpression><![CDATA["IN SCADENZA"]]></labelExpression>
+					</categorySeries>
+					<categorySeries>
+						<seriesExpression><![CDATA["[5-10]"]]></seriesExpression>
+						<categoryExpression><![CDATA["IN SCADENZA"]]></categoryExpression>
+						<valueExpression><![CDATA[$F{nrDomandeAttiveScadenza_5_10}]]></valueExpression>
+						<labelExpression><![CDATA["IN SCADENZA"]]></labelExpression>
+					</categorySeries>
+					<categorySeries>
+						<seriesExpression><![CDATA["[>10]"]]></seriesExpression>
+						<categoryExpression><![CDATA["IN SCADENZA"]]></categoryExpression>
+						<valueExpression><![CDATA[$F{nrDomandeAttiveScadenza_10_more}]]></valueExpression>
+						<labelExpression><![CDATA["IN SCADENZA"]]></labelExpression>
+					</categorySeries>
+					<categorySeries>
+						<seriesExpression><![CDATA["[0-5]"]]></seriesExpression>
+						<categoryExpression><![CDATA["SCADUTE"]]></categoryExpression>
+						<valueExpression><![CDATA[$F{nrDomandeAttiveScadute_0_5}]]></valueExpression>
+						<labelExpression><![CDATA["SCADUTE"]]></labelExpression>
+					</categorySeries>
+					<categorySeries>
+						<seriesExpression><![CDATA["[5-10]"]]></seriesExpression>
+						<categoryExpression><![CDATA["SCADUTE"]]></categoryExpression>
+						<valueExpression><![CDATA[$F{nrDomandeAttiveScadute_5_10}]]></valueExpression>
+						<labelExpression><![CDATA["SCADUTE"]]></labelExpression>
+					</categorySeries>
+					<categorySeries>
+						<seriesExpression><![CDATA["[>10]"]]></seriesExpression>
+						<categoryExpression><![CDATA["SCADUTE"]]></categoryExpression>
+						<valueExpression><![CDATA[$F{nrDomandeAttiveScadute_10_more}]]></valueExpression>
+						<labelExpression><![CDATA["SCADUTE"]]></labelExpression>
+					</categorySeries>
+				</categoryDataset>
+				<barPlot>
+					<plot/>
+					<itemLabel/>
+					<categoryAxisFormat>
+						<axisFormat/>
+					</categoryAxisFormat>
+					<valueAxisFormat>
+						<axisFormat/>
+					</valueAxisFormat>
+				</barPlot>
+			</stackedBarChart>
+			<textField>
+				<reportElement x="0" y="108" width="241" height="20" uuid="81bcf184-c5bf-4d44-ad7c-19977b2f55e8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["Nr Domande tempi proceruramentali Scadute"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="97" y="77" width="53" height="20" uuid="d69a7089-9e04-4908-958e-87ee26490bf1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{nrDomandeAttiveScadenza_5_10}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="2" y="57" width="53" height="20" uuid="39d5fe43-01ef-458f-8bf3-1fe8dc2d9b16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["0 - 5 gg"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="2" y="77" width="53" height="20" uuid="856c517a-c8b7-4dbe-adec-b848ed7de38e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{nrDomandeAttiveScadenza_0_5}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="184" y="57" width="53" height="20" uuid="e2f255a4-5d83-49da-a64f-73fcf7038f68"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["> 10 gg"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="184" y="77" width="53" height="20" uuid="1bf2c98f-5e7f-4d12-a2a4-19816722965c"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{nrDomandeAttiveScadenza_10_more}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="97" y="57" width="53" height="20" uuid="fb33aa46-f3fc-478e-baae-980a03629be2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["0 - 10 gg"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="96" y="148" width="53" height="20" uuid="fa57fae9-fb4d-4589-ab5e-8a1483efe583"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{nrDomandeAttiveScadute_5_10}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="186" y="128" width="53" height="20" uuid="33da4048-c2d3-4db0-9834-2e776e93bffe"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["> 10 gg"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="148" width="53" height="20" uuid="f9eb9282-3532-4ccb-ab93-bcee34afcb05"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{nrDomandeAttiveScadute_0_5}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="128" width="53" height="20" uuid="f801cd71-dad8-49ed-ace0-6d5adc406b91"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["0 - 5 gg"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="186" y="148" width="53" height="20" uuid="ce21413a-522e-4056-a43c-ebda021504d8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{nrDomandeAttiveScadute_10_more}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="96" y="128" width="53" height="20" uuid="636a7ea3-dd23-441d-a376-760c68ab7179"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["0 - 10 gg"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="37" width="241" height="20" uuid="5ff5b4e5-2b2b-48d6-a70c-fc97dc314477"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["Nr Domande tempi proceruramentali in Scadenza"]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

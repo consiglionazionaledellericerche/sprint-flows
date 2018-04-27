@@ -1,56 +1,49 @@
 
-<form name="editForm" role="form" novalidate ng-submit="vm.save()" show-validation>
+<form name="editForm" role="form" novalidate ng-submit="save()" show-validation>
 
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
-                ng-click="vm.clear()">&times;</button>
+                ng-click="clear()">&times;</button>
         <h4 class="modal-title" id="myMembershipLabel" translate="sprintApp.membership.home.createOrEditLabel">Create or edit a Membership</h4>
     </div>
     <div class="modal-body">
-        <jhi-alert-error></jhi-alert-error>
-        <div class="form-group" ng-show="vm.membership.id">
+        <jh-alert-error></jh-alert-error>
+        <div class="form-group">
             <label for="id" translate="global.field.id">ID</label>
             <input type="text" class="form-control" id="id" name="id"
-                    ng-model="vm.membership.id" readonly />
+                    ng-model="membership.id" readonly />
         </div>
         <div class="form-group">
-            <label class="control-label" translate="sprintApp.membership.username" for="field_username">Username</label>
-            <input type="text" class="form-control" name="username" id="field_username"
-                    ng-model="vm.membership.username"
-                    required />
-            <div ng-show="editForm.username.$invalid">
-                <p class="help-block"
-                    ng-show="editForm.username.$error.required" translate="entity.validation.required">
-                    This field is required.
-                </p>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="control-label" translate="sprintApp.membership.groupname" for="field_groupname">Groupname</label>
-            <input type="text" class="form-control" name="groupname" id="field_groupname"
-                    ng-model="vm.membership.groupname"
-                    required />
-            <div ng-show="editForm.groupname.$invalid">
-                <p class="help-block"
-                    ng-show="editForm.groupname.$error.required" translate="entity.validation.required">
-                    This field is required.
-                </p>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="control-label" translate="sprintApp.membership.grouprole"
-                   for="field_grouprole">Grouprole</label>
+            <label class="control-label" translate="sprintApp.membership.grouprole" for="field_grouprole">Grouprole</label>
             <input type="text" class="form-control" name="grouprole" id="field_grouprole"
-                   ng-model="vm.membership.grouprole"
-            />
+                    ng-model="membership.grouprole"
+                    required />
+            <div ng-show="editForm.grouprole.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.grouprole.$error.required" translate="entity.validation.required">
+                    This field is required.
+                </p>
+            </div>
         </div>
 
+        <div class="form-group">
+            <label translate="sprintApp.membership.cnrgroup" for="field_cnrgroup">cnrgroup</label>
+            <select class="form-control" id="field_cnrgroup" name="cnrgroup" ng-model="membership.cnrgroup" ng-options="cnrgroup as cnrgroup.display_name for cnrgroup in cnrgroups track by cnrgroup.id">
+                <option value=""></option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label translate="sprintApp.membership.user" for="field_user">user</label>
+            <select class="form-control" id="field_user" name="user" ng-model="membership.user" ng-options="jhi_user as jhi_user.login for jhi_user in jhi_users track by jhi_user.id">
+                <option value=""></option>
+            </select>
+        </div>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="vm.clear()">
+        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="clear()">
             <span class="glyphicon glyphicon-ban-circle"></span>&nbsp;<span translate="entity.action.cancel">Cancel</span>
         </button>
-        <button type="submit" ng-disabled="editForm.$invalid || vm.isSaving" class="btn btn-primary">
+        <button type="submit" ng-disabled="editForm.$invalid || isSaving" class="btn btn-primary">
             <span class="glyphicon glyphicon-save"></span>&nbsp;<span translate="entity.action.save">Save</span>
         </button>
     </div>

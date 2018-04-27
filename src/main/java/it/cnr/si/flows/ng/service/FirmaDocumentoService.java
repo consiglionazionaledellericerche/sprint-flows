@@ -1,44 +1,40 @@
-package it.cnr.si.flows.ng.listeners;
+package it.cnr.si.flows.ng.service;
 
 import it.cnr.jada.firma.arss.ArubaSignServiceException;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.listeners.oiv.service.OivSetGroupsAndVisibility;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.service.FlowsFirmaService;
+
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.ExecutionListener;
-import org.activiti.engine.delegate.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Firma;
 import static it.cnr.si.flows.ng.utils.Enum.Stato.Firmato;
 
-@Component
-public class FirmaDocumento implements ExecutionListener {
+import java.io.IOException;
+import java.text.ParseException;
 
-	private static final long serialVersionUID = -56001764662303256L;
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(FirmaDocumento.class);
-
-	@Autowired
-	private FlowsFirmaService firmaService;
-	@Autowired
-	private FlowsAttachmentService attachmentService;
+import javax.inject.Inject;
 
 
-	private Expression nomeFileDaFirmare;
+@Service
+public class FirmaDocumentoService {
+	private static final Logger LOGGER = LoggerFactory.getLogger(FirmaDocumentoService.class);
 
-	@Override
-	public void notify(DelegateExecution execution) throws Exception {
-		if (!execution.getEventName().equals(ExecutionListener.EVENTNAME_END))
-			throw new IllegalStateException("Questo Listener accetta solo eventi 'end'.");
-		if (nomeFileDaFirmare.getValue(execution) == null)
+	@Inject
+	private FlowsFirmaService flowsFirmaService;
+	@Inject
+	private FlowsAttachmentService flowsAttachmentService;
+
+	public void eseguiFirma(DelegateExecution execution, String nomeVariabileFile)  throws IOException, ParseException  {
+
+		if (nomeVariabileFile == null)
 			throw new IllegalStateException("Questo Listener ha bisogno del campo 'nomeFileDaFirmare' nella process definition (nel Task Listener - Fields).");
 		if (execution.getVariable("sceltaUtente") != null && execution.getVariable("sceltaUtente").toString().equals("Firma")) {
-			String nomeVariabileFile = (String) nomeFileDaFirmare.getValue(execution);
 			String stringaOscurante = "******";
 			// TODO: validare presenza di queste tre variabili
 			String username = (String) execution.getVariable("username");
@@ -50,13 +46,13 @@ public class FirmaDocumento implements ExecutionListener {
 			byte[] bytes = att.getBytes();
 
 			try {
-				byte[] bytesfirmati = firmaService.firma(username, password, otp, bytes);
+				byte[] bytesfirmati = flowsFirmaService.firma(username, password, otp, bytes);
 				att.setBytes(bytesfirmati);
 				att.setFilename(getSignedFilename(att.getFilename()));
 				att.setAzione(Firma);
 				att.addStato(Firmato);
 
-				attachmentService.saveAttachment(execution, nomeVariabileFile, att);
+				flowsAttachmentService.saveAttachment(execution, nomeVariabileFile, att);
 				execution.setVariable("otp", stringaOscurante);
 				execution.setVariable("password", stringaOscurante);
 			} catch (ArubaSignServiceException e) {
