@@ -46,7 +46,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 	private OivSetGroupsAndVisibility oivSetGroupsAndVisibility;
 	@Inject
 	private ManageSceltaUtente manageSceltaUtente;
-	//@Autowired(required = false)
+	@Autowired(required = false)
 	private RestTemplate oivRestTemplate;
 	@Inject
 	private Environment env;
