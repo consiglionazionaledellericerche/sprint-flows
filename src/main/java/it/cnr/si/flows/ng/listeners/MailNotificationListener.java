@@ -17,10 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Component
@@ -68,15 +65,16 @@ public class MailNotificationListener  implements ActivitiEventListener {
         runtimeService.setVariable(executionId, "faseUltima", fase);
 
         Set<IdentityLink> candidates = ((TaskEntity)taskEvent.getEntity()).getCandidates();
-
-        candidates.forEach(c -> {
-            if (c.getGroupId() != null) {
-                List<String> members = aceBridgeService.getUsersinAceGroup(c.getGroupId());
-                members.forEach(m -> {
-                    mailService.sendFlowEventNotification(FlowsMailService.TASK_ASSEGNATO_AL_GRUPPO_HTML, variables, task.getName(), m, c.getGroupId());
-                });
-            }
-        });
+        if (Optional.ofNullable(aceBridgeService).isPresent()) {
+            candidates.forEach(c -> {
+                if (c.getGroupId() != null) {
+                    List<String> members = aceBridgeService.getUsersinAceGroup(c.getGroupId());
+                    members.forEach(m -> {
+                        mailService.sendFlowEventNotification(FlowsMailService.TASK_ASSEGNATO_AL_GRUPPO_HTML, variables, task.getName(), m, c.getGroupId());
+                    });
+                }
+            });
+        }
         return variables;
     }
 
@@ -145,15 +143,17 @@ public class MailNotificationListener  implements ActivitiEventListener {
                                     mailService.sendFlowEventNotification(nt, variables, tn, person, null);
                                 });
                     } else {
-                        Stream.of(rule.getRecipients().split(","))
-                                .map(s -> s.trim())
-                                .forEach(groupVariableName -> {
-                                    String groupName = (String) variables.get(groupVariableName);
-                                    List<String> members = aceBridgeService.getUsersinAceGroup(groupName);
-                                    members.forEach(member -> {
-                                        mailService.sendFlowEventNotification(nt, variables, tn, member, groupName);
+                        if (Optional.ofNullable(aceBridgeService).isPresent()) {
+                            Stream.of(rule.getRecipients().split(","))
+                                    .map(s -> s.trim())
+                                    .forEach(groupVariableName -> {
+                                        String groupName = (String) variables.get(groupVariableName);
+                                        List<String> members = aceBridgeService.getUsersinAceGroup(groupName);
+                                        members.forEach(member -> {
+                                            mailService.sendFlowEventNotification(nt, variables, tn, member, groupName);
+                                        });
                                     });
-                                });
+                        }
 
                     }
                 });

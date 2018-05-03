@@ -6,6 +6,7 @@ import it.cnr.si.repository.UserRepository;
 import it.cnr.si.service.RelationshipService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
@@ -35,12 +36,10 @@ public class FlowsUserDetailsService implements org.springframework.security.cor
 
     @Inject
     private UserRepository userRepository;
-    @Inject
+    @Autowired(required = false)
     private LdapUserDetailsService ldapUserDetailsService;
     @Inject
     private RelationshipService relationshipService;
-    @Inject
-    private Environment env;
     @Inject
     private Utils utils;
 
@@ -70,9 +69,9 @@ public class FlowsUserDetailsService implements org.springframework.security.cor
                                                                               grantedAuthorities);
             }).orElseGet(null);
         } else {
-            List<String> profiles = Arrays.asList(env.getActiveProfiles());
-            if (profiles.contains("cnr"))
-                userDetails = ldapUserDetailsService.loadUserByUsername(login);
+            userDetails = Optional.ofNullable(ldapUserDetailsService)
+                    .map(ldapUserDetailsService1 -> ldapUserDetailsService1.loadUserByUsername(login))
+                    .orElse(null);
         }
 
         if (userDetails == null)
