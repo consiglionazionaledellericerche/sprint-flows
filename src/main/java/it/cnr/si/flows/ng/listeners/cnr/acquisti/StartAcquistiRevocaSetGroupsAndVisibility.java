@@ -9,6 +9,7 @@ import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
@@ -27,7 +28,7 @@ public class StartAcquistiRevocaSetGroupsAndVisibility implements ExecutionListe
 
     @Inject
     private RelationshipService relationshipService;
-    @Inject
+    @Autowired(required = false)
     private AceBridgeService aceBridgeService;
     @Inject
     private RuntimeService runtimeService;
