@@ -168,7 +168,10 @@ public class FlowsPdfStatisticService {
 		//LISTA VARIABILI FLUSSI TERMINATI
 		Map<String, String> listaStatiFlussiTerminati = new HashMap<String, String>();
 		JSONArray arrayStatiFlussiTerminati = new JSONArray();
-		int mediaGiorniFlusso = allTerminatedProcessInstancesDurationInMillis/ (1000 * 60 * 60 * 24 * nrFlussiTerminati);
+		int mediaGiorniFlusso = 0;
+		if (allTerminatedProcessInstancesDurationInMillis > 0) {
+			mediaGiorniFlusso = allTerminatedProcessInstancesDurationInMillis/ (1000 * 60 * 60 * 24 * nrFlussiTerminati);
+		}
 		variableStatisticsJson.put("mediaGiorniFlusso", mediaGiorniFlusso);
 
 		for (Entry<String, Integer> pair : mapStatiFlussiTerminati.entrySet()) {
