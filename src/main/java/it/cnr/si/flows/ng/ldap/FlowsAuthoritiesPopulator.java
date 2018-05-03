@@ -4,6 +4,7 @@ import it.cnr.si.service.RelationshipService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,6 +19,7 @@ import java.util.List;
 /**
  * Modified my mtrycz on 26/05/17.
  */
+@Profile(value = {"!oiv"})
 public class FlowsAuthoritiesPopulator implements LdapAuthoritiesPopulator {
 
     public static final String DEPARTMENT_NUMBER = "departmentnumber";
