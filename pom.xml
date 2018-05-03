@@ -31,7 +31,7 @@
         <firmadigitale.version>1.11</firmadigitale.version>
         <gatling-maven-plugin.version>2.1.7</gatling-maven-plugin.version>
         <jacoco-maven-plugin.version>0.7.7.201606060606</jacoco-maven-plugin.version>
-        <jasperreports.version>5.5.1</jasperreports.version>
+        <jasperreports.version>6.5.1</jasperreports.version>
         <json-path.version>2.2.0</json-path.version>
         <liquibase-hibernate4.version>3.5</liquibase-hibernate4.version>
         <liquibase.version>3.4.2</liquibase.version>
@@ -50,6 +50,25 @@
         <sprint.version>2.0.1</sprint.version>
         <start-class>it.cnr.si.FlowsApp</start-class>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>jaspersoft-third-party</id>
+            <name>JasperReports third party</name>
+            <url>http://jaspersoft.jfrog.io/jaspersoft/third-party-ce-artifacts/</url>
+        </repository>
+        <repository>
+            <id>jr-ce-releases</id>
+            <name>JasperReports CE Releases</name>
+            <url>http://jaspersoft.jfrog.io/jaspersoft/jr-ce-releases</url>
+        </repository>
+        <repository>
+            <id>jr-snapshots</id>
+            <name>JasperReports snapshots</name>
+            <url>http://jaspersoft.jfrog.io/jaspersoft/jr-ce-snapshots/</url>
+        </repository>
+    </repositories>
+
 
     <dependencyManagement>
         <dependencies>
