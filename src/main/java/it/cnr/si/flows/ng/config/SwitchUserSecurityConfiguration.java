@@ -6,6 +6,7 @@ import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertyResolver;
@@ -48,15 +49,15 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
                 .and()
                 .addFilterAfter(switchUserFilter(), FilterSecurityInterceptor.class);
     }
-
+    @Profile(value = {"!oiv"})
     @Bean public LdapUserDetailsManager getLdapUserDetailsManager(LdapContextSource ctx) {
         return new LdapUserDetailsManager(ctx);
     }
-
+    @Profile(value = {"!oiv"})
     @Bean public LdapUserDetailsService getLdapUserDetailsService(LdapUserSearch search, FlowsAuthoritiesPopulator fap) {
         return new LdapUserDetailsService(search, fap);
     }
-
+    @Profile(value = {"!oiv"})
     @Bean public FlowsAuthoritiesPopulator getFlowsAuthoritiesPopulator(ApplicationContext appContext) {
         FlowsAuthoritiesPopulator cap = new FlowsAuthoritiesPopulator();
         appContext.getAutowireCapableBeanFactory().autowireBean(cap);
@@ -64,6 +65,7 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
     }
 
     @Bean
+    @Profile(value = {"!oiv"})
     public LdapUserSearch getLdapUserSearch(Environment env, LdapContextSource ctx) {
         PropertyResolver p = new RelaxedPropertyResolver(env, "spring.ldap.");
         String userSearchBase = ""; //p.getProperty("userSearchBase");
@@ -73,6 +75,7 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
     }
 
     @Bean
+    @Profile(value = {"!oiv"})
     public LdapContextSource getLdapContextSource(Environment env) {
         PropertyResolver p = new RelaxedPropertyResolver(env, "spring.ldap."); //
 
@@ -85,6 +88,7 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
     }
 
     @Bean
+    @Profile(value = {"!oiv"})
     public LdapTemplate getLdapTemplate(LdapContextSource contextSource) {
         return new LdapTemplate(contextSource);
     }
