@@ -60,6 +60,10 @@ public class FlowsTaskService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FlowsTaskService.class);
 	private static final String ERROR_MESSAGE = "message";
+	public static final int LENGTH_TITOLO = 65;
+	public static final int LENGTH_DESCTIZIONE = 75;
+	public static final int LENGTH_INITIATOR = 45;
+	public static final int LENGTH_FASE = 45;
 	@Autowired
 	@Qualifier("processEngine")
 	protected ProcessEngine engine;
@@ -69,7 +73,7 @@ public class FlowsTaskService {
 	private RestResponseFactory restResponseFactory;
 	@Inject
 	private TaskService taskService;
-	@Inject
+	@Autowired(required = false)
 	private AceBridgeService aceBridgeService;
 	@Inject
 	private FlowsAttachmentResource attachmentResource;
@@ -321,7 +325,6 @@ public class FlowsTaskService {
 					//                    String gruppoAbilitati = groups.get(0);
 					//                    String idStrutturaString = gruppoAbilitati.substring(gruppoAbilitati.lastIndexOf('@') + 1);
 
-//					data.put(title.name(), key);
 					data.put(initiator.name(), username);
 					data.put(startDate.name(), new Date());
 
@@ -332,18 +335,18 @@ public class FlowsTaskService {
 
 					String titolo = (String) data.get(Enum.VariableEnum.titolo.name());
 					name.put(Enum.VariableEnum.titolo.name(),
-							 titolo.length() < 70 ? titolo: titolo.substring(0, 67) + "...");
+							 titolo.length() < LENGTH_TITOLO ? titolo: titolo.substring(0, LENGTH_TITOLO - 3) + "...");
 					String descrizione = (String) data.get(Enum.VariableEnum.descrizione.name());
 					name.put(Enum.VariableEnum.descrizione.name(),
-							 descrizione.length() < 80 ? descrizione : descrizione.substring(0, 77) + "...");
+							 descrizione.length() < LENGTH_DESCTIZIONE ? descrizione : descrizione.substring(0, LENGTH_DESCTIZIONE - 3) + "...");
 					String initiator = (String) data.get(Enum.VariableEnum.initiator.name());
 					name.put(Enum.VariableEnum.initiator.name(),
-							 initiator.length() < 50 ? initiator : initiator.substring(0, 47) + "...");
+							 initiator.length() < LENGTH_INITIATOR ? initiator : initiator.substring(0, LENGTH_INITIATOR - 3) + "...");
 					String taskName = taskService.createTaskQuery()
 							.processInstanceId(instance.getProcessInstanceId())
 							.singleResult().getName();
 					name.put(fase.name(),
-							 taskName.length() < 50 ? taskName : taskName.substring(0, 47) + "...");
+							 taskName.length() < LENGTH_FASE ? taskName : taskName.substring(0, LENGTH_FASE - 3) + "...");
 
 					runtimeService.setProcessInstanceName(instance.getId(), name.toString());
 
