@@ -19,7 +19,7 @@ import org.springframework.core.io.Resource;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -44,12 +44,12 @@ public class FlowsListenersConfiguration {
 	private Environment env;
 
 	@PostConstruct
-	public void init() throws Exception {
+	public void init() throws IOException {
 		createDeployments();
 		addGlobalListeners();
 	}
 
-	private void createDeployments() throws Exception {
+	private void createDeployments() throws IOException {
 		Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
 		String dir = null;
 		if (activeProfiles.contains("cnr"))
@@ -60,7 +60,7 @@ public class FlowsListenersConfiguration {
 			System.exit(1);
 
 		for (Resource resource : appContext.getResources("classpath:processes/"+ dir +"/*.bpmn*")) {
-			LOGGER.info("\n ------- definition " + resource.getFilename());
+			LOGGER.info("\n ------- definition {}", resource.getFilename());
 			List<ProcessDefinition> processes = repositoryService.createProcessDefinitionQuery()
 					.processDefinitionKey(resource.getFilename().split("[.]")[0])
 					.list();
@@ -81,13 +81,11 @@ public class FlowsListenersConfiguration {
 																	  AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
 		runtimeService.addEventListener(processEndListener, PROCESS_COMPLETED);
 
-
-		SetFase beanSetFase = (SetFase)
-				appContext.getAutowireCapableBeanFactory().createBean(SetFase.class,
-																	  AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
+		SetFase beanSetFase = (SetFase) appContext.getAutowireCapableBeanFactory()
+				.createBean(SetFase.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
+		//quando viene "iniziato un task" e quando viene svolta una qualsiasi attività (serve per la "fine della Process Instance)
 		runtimeService.addEventListener(beanSetFase,
-										TASK_CREATED, PROCESS_COMPLETED);
-
+										TASK_CREATED, HISTORIC_ACTIVITY_INSTANCE_ENDED);
 
 		MailNotificationListener mailSender = (MailNotificationListener)
 				appContext.getAutowireCapableBeanFactory().createBean(MailNotificationListener.class,
