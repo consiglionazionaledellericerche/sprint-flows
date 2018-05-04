@@ -138,7 +138,6 @@ public class CalcolaPunteggioFascia {
         LOGGER.debug("--- elencoValutazioniNegative: {} ", elencoValutazioniNegative);
         // Chiamta REST applicazione Elenco OIV per il calcolo punteggio
         // invio campi json e recupero fascia e punteggio
-        execution.setVariable("punteggioEsperienzeAttribuito", "42");
         execution.setVariable("fasciaAppartenenzaAttribuita", calcolaFascia(
                 Optional.ofNullable(execution.getVariable("idDomanda"))
                     .filter(String.class::isInstance)
