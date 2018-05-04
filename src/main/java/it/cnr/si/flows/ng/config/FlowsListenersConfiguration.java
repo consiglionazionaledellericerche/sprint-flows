@@ -2,7 +2,7 @@ package it.cnr.si.flows.ng.config;
 
 import it.cnr.si.flows.ng.listeners.MailNotificationListener;
 import it.cnr.si.flows.ng.listeners.SaveSummaryAtProcessCompletion;
-import it.cnr.si.flows.ng.listeners.SetFase;
+import it.cnr.si.flows.ng.listeners.SetStato;
 import it.cnr.si.flows.ng.listeners.VisibilitySetter;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
@@ -81,10 +81,10 @@ public class FlowsListenersConfiguration {
 																	  AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
 		runtimeService.addEventListener(processEndListener, PROCESS_COMPLETED);
 
-		SetFase beanSetFase = (SetFase) appContext.getAutowireCapableBeanFactory()
-				.createBean(SetFase.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
+		SetStato beanSetStato = (SetStato) appContext.getAutowireCapableBeanFactory()
+				.createBean(SetStato.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
 		//quando viene "iniziato un task" e quando viene svolta una qualsiasi attività (serve per la "fine della Process Instance)
-		runtimeService.addEventListener(beanSetFase,
+		runtimeService.addEventListener(beanSetStato,
 										TASK_CREATED, HISTORIC_ACTIVITY_INSTANCE_ENDED);
 
 		MailNotificationListener mailSender = (MailNotificationListener)

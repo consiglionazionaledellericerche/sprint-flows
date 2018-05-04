@@ -345,7 +345,7 @@ public class FlowsTaskService {
 					String taskName = taskService.createTaskQuery()
 							.processInstanceId(instance.getProcessInstanceId())
 							.singleResult().getName();
-					name.put(fase.name(),
+					name.put(stato.name(),
 							 taskName.length() < LENGTH_FASE ? taskName : taskName.substring(0, LENGTH_FASE - 3) + "...");
 
 					runtimeService.setProcessInstanceName(instance.getId(), name.toString());
