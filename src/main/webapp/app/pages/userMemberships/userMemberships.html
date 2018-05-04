@@ -37,7 +37,7 @@
                     <div class="btn-group flex-btn-group-container">
                         <!--IMPORTANTE: Se ho l'id allora la membership è nella tabella del Db e posso fare le CRUD (altrimenti è "derivata" dalle relationship-->
                         <button type="submit"
-                                ui-sref="group-memberships({groupname:membership.cnrgroup.name})"
+                                ui-sref="group-memberships({groupname:membership.cnrgroup.name, displayName:membership.cnrgroup.displayName})"
                                 class="btn btn-info btn-sm">
                             <span class="glyphicon glyphicon-eye-open"></span>
                             <span class="hidden-xs hidden-sm" translate="entity.action.view"></span>

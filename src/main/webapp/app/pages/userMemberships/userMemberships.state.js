@@ -76,7 +76,8 @@
 						squash: true
 					},
 					search: null,
-					groupname: null
+					groupname: null,
+					displayName: null
 				},
 				resolve: {
 					modify: [function() {
@@ -183,7 +184,8 @@
 						}
 					}).result.then(function() {
 						$state.go('group-memberships-edit', {
-							groupname: $stateParams.groupname
+							groupname: $stateParams.groupname,
+							displayName: $stateParams.displayName
 						}, {
 							reload: 'group-memberships-edit'
 						});
