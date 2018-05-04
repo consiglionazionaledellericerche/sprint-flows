@@ -69,7 +69,7 @@ public class ManageSceltaUtente {
 					manageControlli.valutazioneEsperienzeGenerazionePdf(execution);
 					execution.setVariable("pdfPreavvisoRigettoFlag", "1");					
 					switch(execution.getVariable("tipologiaRichiesta").toString()){  
-					case "iscrizione": {
+					case "Iscrizione": {
 						createOivPdf.CreaPdfOiv(execution, preavvisoRigetto.name());
 					};break;
 					case "rinnovo": {
