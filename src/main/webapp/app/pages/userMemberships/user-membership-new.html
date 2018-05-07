@@ -19,7 +19,7 @@
             <div class="form-group">
                 <label class="control-label" translate="sprintApp.membership.user"
                        for="field_username">Username</label>
-                <typeaheadinput id="field_username" type="users" id="rup" ng-model="vm.membership.username"
+                <typeaheadinput id="field_username" type="flowsUsers" id="rup" ng-model="vm.membership.username"
                                 label-model="$parent.vm.data.rup_label" ng-required="true">
                 </typeaheadinput>
             </div>
@@ -29,6 +29,7 @@
                    for="field_groupname">Groupname</label>
             <input type="text" class="form-control" name="groupname" id="field_groupname"
                    ng-model="vm.membership.groupname"
+                   readonly
                    required/>
             <div ng-show="editForm.groupname.$invalid">
                 <p class="help-block"

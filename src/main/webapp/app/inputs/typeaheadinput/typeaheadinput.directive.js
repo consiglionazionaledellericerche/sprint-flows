@@ -2,7 +2,7 @@
   'use strict';
 
   angular.module('sprintApp')
-  .directive('typeaheadinput', typeaheadinput);
+    .directive('typeaheadinput', typeaheadinput);
 
   typeaheadinput.$inject = ['dataService', '$log'];
 
@@ -21,8 +21,7 @@
         type: '@',
         ngRequired: '@'
       },
-      link: function ($scope, element, attrs) {
-
+      link: function($scope, element, attrs) {
         $scope.localModel = undefined;
 
         $scope.$watch('localModel', function(newVal) {
@@ -33,23 +32,32 @@
         });
 
         $scope.loadRecords = function(filter) {
-          if ($scope.type === "users"){
+          switch ($scope.type) {
+            case 'users':
             return dataService.search.users(filter)
-            .then(function(response) {
-              $scope.hasMore = response.data.more;
-              return response.data.results;
-            });
-          } else if ($scope.type === "uo"){
-            return dataService.search.uo(filter)
-            .then(function(response) {
-              $scope.hasMore = response.data.more;
-              return response.data.results;
-            });
-          } else {
-            $log.error("Type non riconosciuto " + $scope.type);
+              .then(function(response) {
+                $scope.hasMore = response.data.more;
+                return response.data.results;
+              });
+            break;
+            case 'flowsUsers':
+              return dataService.search.flowsUsers(filter)
+                .then(function(response) {
+                  $scope.hasMore = response.data.more;
+                  return response.data.results;
+                });
+              break;
+            case 'uo':
+              return dataService.search.uo(filter)
+                .then(function(response) {
+                  $scope.hasMore = response.data.more;
+                  return response.data.results;
+                });
+            default:
+              $log.error('Type non riconosciuto ' + $scope.type);
           }
-        }
-      }
-    }
+        };
+      },
+    };
   }
 })();
