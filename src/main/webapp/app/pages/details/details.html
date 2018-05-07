@@ -2,7 +2,7 @@
 
     <div class="row">
         <div class="col-md-8">
-            <h4>{{vm.data.entity.title ? vm.data.entity.title : vm.data.entity.variabili.titolo}}
+            <h4>{{vm.data.entity.variabili.titolo}}
                 <span ng-class="{'label-warning': vm.data.entity.endTime != null , 'label-success': vm.data.entity.endTime == null}"
                       class="label">
                   {{vm.data.entity.endTime == null ? 'attivo' : 'completato'}}
