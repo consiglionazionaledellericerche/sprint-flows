@@ -1,11 +1,10 @@
 package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
-import it.cnr.si.domain.FlowsUser;
 import it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery;
 import it.cnr.si.flows.ng.service.AceBridgeService;
+import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.service.FlowsUserService;
 import org.activiti.engine.ManagementService;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.impl.interceptor.Command;
@@ -14,8 +13,8 @@ import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ldap.core.AttributesMapper;
@@ -35,7 +34,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/users")
-@Profile("!oiv")
+@Profile("cnr")
 public class FlowsUserResourceAce {
 
     @Inject
@@ -53,8 +52,6 @@ public class FlowsUserResourceAce {
     @Inject
     private RestResponseFactory restResponseFactory;
 
-    @Inject
-    private FlowsUserService flowsUserService;
 
     @RequestMapping(value = "/ace/user/{username:.+}", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.ADMIN)
@@ -82,27 +79,14 @@ public class FlowsUserResourceAce {
 
         Map<String, Object> response = new HashMap<>();
 
-        Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
-
-        List<SearchResult> search = new ArrayList();
-
-        if (activeProfiles.contains("cnr")) {
-            //con il profilo "CNR" faccio la ricerca per l'autocompletamento degli utenti su ldap
-            search = ldapTemplate.search("", "(uid=*" + username + "*)", new AttributesMapper<SearchResult>() {
-                public SearchResult mapFromAttributes(Attributes attrs) throws NamingException {
-                    return new SearchResult(attrs.get("uid").get().toString(),
-                                            attrs.get("cnrnome").get() + " " + attrs.get("cnrcognome").get() + " " +
-                                                    "(" + attrs.get("uid").get().toString() + ")");
-                }
-            });
-
-        } else if (activeProfiles.contains("oiv")) {
-            //con il profilo "OIV" faccio la ricerca per l'autocompletamento degli utenti sul DB
-            List<FlowsUser> result = flowsUserService.searchByLogin(username);
-            search = result.stream()
-                    .map(user -> new SearchResult(user.getLogin(), user.getLogin()))
-                    .collect(Collectors.toList());
-        }
+        //con il profilo "CNR" faccio la ricerca per l'autocompletamento degli utenti su ldap
+        List<Utils.SearchResult> search = ldapTemplate.search("", "(uid=*" + username + "*)", new AttributesMapper<Utils.SearchResult>() {
+            public Utils.SearchResult mapFromAttributes(Attributes attrs) throws NamingException {
+                return new Utils.SearchResult(attrs.get("uid").get().toString(),
+                                              attrs.get("cnrnome").get() + " " + attrs.get("cnrcognome").get() + " " +
+                                                "(" + attrs.get("uid").get().toString() + ")");
+            }
+        });
 
         response.put("more", search.size() > 10);
         response.put("results", search.stream().limit(10).collect(Collectors.toList()));
@@ -118,7 +102,7 @@ public class FlowsUserResourceAce {
         Map<String, Object> response = new HashMap<>();
 
         List<Pair<Integer, String>> results = aceService.getUoLike(struttura);
-        List<SearchResult> collect = results.stream().map(p -> new SearchResult(p.getLeft().toString(), p.getRight())).collect(Collectors.toList());
+        List<Utils.SearchResult> collect = results.stream().map(p -> new Utils.SearchResult(p.getLeft().toString(), p.getRight())).collect(Collectors.toList());
 
         response.put("more", collect.size() > 10);
         response.put("results", collect.stream().limit(10).collect(Collectors.toList()));
@@ -149,13 +133,4 @@ public class FlowsUserResourceAce {
     }
 
 
-    public class SearchResult {
-        public String value;
-        public String label;
-
-        public SearchResult(String v, String l) {
-            this.value = v;
-            this.label = l;
-        }
-    }
 }

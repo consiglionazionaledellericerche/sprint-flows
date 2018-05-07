@@ -126,6 +126,9 @@
 				users: function(filter) {
 					return $http.get('api/users/' + filter + '/search');
 				},
+				flowsUsers: function(filter) {
+					return $http.get('api/flows/users/' + filter + '/search');
+				},
 				uo: function(filter) {
 					return $http.get('api/users/struttura/' + filter + '/search');
 				},
@@ -171,7 +174,15 @@
 					});
 				},
 				createMembership: function(groupName, userName, groupRole) {
-					return $http.post('api/createMemberships?groupName=' + groupName + '&userName=' + userName + '&groupRole=' + groupRole);
+					return $http({
+						url: 'api/createMemberships?',
+						method: 'POST',
+						params: {
+							groupName: groupName,
+							userName: userName,
+							groupRole: groupRole
+						},
+					});
 				},
 			},
 		};
