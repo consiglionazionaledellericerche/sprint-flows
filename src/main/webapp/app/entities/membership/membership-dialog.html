@@ -11,32 +11,34 @@
         <div class="form-group">
             <label for="id" translate="global.field.id">ID</label>
             <input type="text" class="form-control" id="id" name="id"
-                    ng-model="membership.id" readonly />
+                   ng-model="membership.id" readonly />
         </div>
         <div class="form-group">
             <label class="control-label" translate="sprintApp.membership.grouprole" for="field_grouprole">Grouprole</label>
-            <input type="text" class="form-control" name="grouprole" id="field_grouprole"
-                    ng-model="membership.grouprole"
-                    required />
+            <select class="form-control" id="field_grouprole" name="grouprole" ng-model="membership.grouprole">
+                <option value="coordinator">Coordinator</option>
+                <option value="member">Member</option>
+            </select>
+
             <div ng-show="editForm.grouprole.$invalid">
                 <p class="help-block"
-                    ng-show="editForm.grouprole.$error.required" translate="entity.validation.required">
+                   ng-show="editForm.grouprole.$error.required" translate="entity.validation.required">
                     This field is required.
                 </p>
             </div>
         </div>
-
-        <div class="form-group">
+        <div id="field_cnrgroup" class="form-group">
             <label translate="sprintApp.membership.cnrgroup" for="field_cnrgroup">cnrgroup</label>
-            <select class="form-control" id="field_cnrgroup" name="cnrgroup" ng-model="membership.cnrgroup" ng-options="cnrgroup as cnrgroup.display_name for cnrgroup in cnrgroups track by cnrgroup.id">
-                <option value=""></option>
-            </select>
+            <typeaheadinput id="field_cnrgroup" type="flowsGroups" id="group" ng-model="membership.cnrgroup"
+                            ng-required="true">
+            </typeaheadinput>
         </div>
-        <div class="form-group">
-            <label translate="sprintApp.membership.user" for="field_user">user</label>
-            <select class="form-control" id="field_user" name="user" ng-model="membership.user" ng-options="jhi_user as jhi_user.login for jhi_user in jhi_users track by jhi_user.id">
-                <option value=""></option>
-            </select>
+        <div id="username" class="form-group">
+            <label class="control-label" translate="sprintApp.membership.user"
+                   for="username">Username</label>
+            <typeaheadinput id="field_username" type="flowsUsers" id="rup" ng-model="membership.username"
+                            label-model="$parent.vm.data.rup_label" ng-required="true">
+            </typeaheadinput>
         </div>
     </div>
     <div class="modal-footer">
