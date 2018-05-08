@@ -16,6 +16,7 @@ import javax.inject.Inject;
 import java.text.ParseException;
 import java.util.*;
 import java.util.Map.Entry;
+import it.cnr.si.flows.ng.utils.Enum;
 
 import static it.cnr.si.flows.ng.utils.Utils.*;
 
@@ -114,31 +115,23 @@ public class FlowsPdfStatisticService {
 			LOGGER.debug(" getDurationInMillis= " + pi.getDurationInMillis());
 			LOGGER.debug(" elementi= " + pi.getName());
 			String processInstanceId = pi.getId();
+
+
+
 			Map<String, Object> processInstanceDetails = flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId);
 			HistoricProcessInstanceResponse processInstance = (HistoricProcessInstanceResponse) processInstanceDetails.get("entity");
 			List<RestVariable> variables = processInstance.getVariables();
 			allTerminatedProcessInstancesDurationInMillis = (int) (allTerminatedProcessInstancesDurationInMillis + pi.getDurationInMillis());
-			String taskEndName;
-			for (RestVariable var : variables) {
-				String variableName = var.getName().toString();
-				switch(variableName){  
-				case "faseEsecuzione": {
-					LOGGER.info("-- " + var.getName() + ": " + var.getValue());
-					taskEndName = var.getValue().toString();
-					if (taskEndName.startsWith("end-")) {
-						//calcolo nr istanze per Stato
-						if(mapStatiFlussiTerminati.containsKey(taskEndName)) {
-							mapStatiFlussiTerminati.put(taskEndName, mapStatiFlussiTerminati.get(taskEndName) + 1);
-						} else {
-							mapStatiFlussiTerminati.put(taskEndName, 1);
-						}
-					}
-				};break; 
-				default:  {
-					//LOGGER.info("-- " + var.getName() + ": " + var.getValue());
-				};break;  
+			JSONObject json = new JSONObject(pi.getName());
+			//Rimuovo il VECCHIO stato
 
-				}
+			String taskEndName = json.getString(Enum.VariableEnum.stato.name());
+			LOGGER.info("-- taskEndName: " + taskEndName);
+			//calcolo nr istanze per Stato
+			if(mapStatiFlussiTerminati.containsKey(taskEndName)) {
+				mapStatiFlussiTerminati.put(taskEndName, mapStatiFlussiTerminati.get(taskEndName) + 1);
+			} else {
+				mapStatiFlussiTerminati.put(taskEndName, 1);
 			}
 		}
 
