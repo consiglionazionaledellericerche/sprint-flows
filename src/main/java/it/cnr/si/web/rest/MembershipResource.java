@@ -1,11 +1,8 @@
 package it.cnr.si.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-
-import it.cnr.si.domain.FlowsUser;
 import it.cnr.si.domain.Membership;
 import it.cnr.si.domain.Relationship;
-import it.cnr.si.flows.ng.dto.MembershipElements;
 import it.cnr.si.security.SecurityUtils;
 import it.cnr.si.service.CnrgroupService;
 import it.cnr.si.service.FlowsUserService;
@@ -25,7 +22,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -36,6 +32,8 @@ import java.util.stream.Collectors;
 import static it.cnr.si.flows.ng.utils.Enum.RoleOiv.coordinator;
 import static it.cnr.si.flows.ng.utils.Enum.RoleOiv.member;
 
+
+
 /**
  * REST controller for managing Membership.
  */
@@ -44,7 +42,6 @@ import static it.cnr.si.flows.ng.utils.Enum.RoleOiv.member;
 public class MembershipResource {
 
     private final Logger log = LoggerFactory.getLogger(MembershipResource.class);
-
     @Inject
     private MembershipService membershipService;
     @Inject
@@ -55,37 +52,7 @@ public class MembershipResource {
     private FlowsUserService flowsUserService;
 
 
-    @RequestMapping(value = "/memberships",
-            method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
-    public ResponseEntity<Membership> createMembership(@Valid @RequestBody Membership membership) throws URISyntaxException {
-        log.debug("REST request to save Membership : {}", membership);
-        if (membership.getId() != null) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("membership", "idexists", "A new membership cannot already have an ID")).body(null);
-        }
-        //se cerco di creare una relationship con username e groupname uguale ad una che già esiste restituisco errore
-        if (membershipService.findOneByUsernameAndGroupname(membership.getUser().getLogin(), membership.getCnrgroup().getName()) != null)
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("membership", "A membership with this Username AND groupname already exist", "A membership with this Username AND groupname already exist")).body(null);
 
-        Membership result = membershipService.save(membership);
-        return ResponseEntity.created(new URI("/api/memberships/" + result.getId()))
-                .headers(HeaderUtil.createEntityCreationAlert("membership", result.getId().toString()))
-                .body(result);
-    }
-
-
-    /**
-     * Metodo di creazione delle membership customizzato
-     * (prende come parametri 3 stringhe e non l'oggetto "membership", in questo modo è più facile da richiamare da js)
-     *
-     * @param groupName the group name
-     * @param userName  the user name
-     * @param groupRole the group role
-     * @return the response entity
-     * @throws URISyntaxException the uri syntax exception
-     */
-    
     /**
      * Metodo di creazione delle membership customizzato
      * (prende come parametri 3 stringhe e non l'oggetto "membership", in questo modo è più facile da richiamare da js)
@@ -113,45 +80,11 @@ public class MembershipResource {
         if(cnrgroupService.findCnrgroupByName(groupName) == null) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("groupName", "A groupName with the name:"+ groupName + " doesn't exist", "A groupName with the name:"+ groupName + " doesn't exist")).body(null);
         }
-              
+
         if(!flowsUserService.getUserWithAuthoritiesByLogin(userName).isPresent()) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("userName", "A userName with the name:"+ userName + " doesn't exist", "A userName with the name:"+ userName + " doesn't exist")).body(null);
         }
-        
-        Membership membership = new Membership();
-        membership.setCnrgroup(cnrgroupService.findCnrgroupByName(groupName));
-        membership.setGrouprole(groupRole);
-        membership.setUser(flowsUserService.getUserWithAuthoritiesByLogin(userName).orElse(null));
 
-        Membership result = membershipService.save(membership);
-        return ResponseEntity.created(new URI("/api/memberships/" + result.getId()))
-                .headers(HeaderUtil.createEntityCreationAlert("membership", result.getId().toString()))
-                .body(result);
-    }
-    
-    @RequestMapping(value = "/createMembershipsByRest",
-            method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
-    public ResponseEntity<Membership> myCreateMembership(@Valid @RequestBody MembershipElements membershipElements) throws URISyntaxException {
-
-    	String groupName = membershipElements.getgroupName();
-    	String userName = membershipElements.getuserName();
-    	String groupRole = membershipElements.getgroupRole();
-        log.debug("REST request to save Membership : groupName->{} , userName->{}, groupRole->{}", groupName, userName, groupRole);
-
-        //se cerco di creare una relationship con username e groupname uguale ad una che già esiste restituisco errore
-        if (membershipService.findOneByUsernameAndGroupname(userName, groupName) != null)
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("membership", "A membership with this Username AND groupname already exist", "A membership with this Username AND groupname already exist")).body(null);
-
-        if(cnrgroupService.findCnrgroupByName(groupName) == null) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("groupName", "A groupName with the name:"+ groupName + " doesn't exist", "A groupName with the name:"+ groupName + " doesn't exist")).body(null);
-        }
-              
-        if(!flowsUserService.getUserWithAuthoritiesByLogin(userName).isPresent()) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("userName", "A userName with the name:"+ userName + " doesn't exist", "A userName with the name:"+ userName + " doesn't exist")).body(null);
-        }
-        
         Membership membership = new Membership();
         membership.setCnrgroup(cnrgroupService.findCnrgroupByName(groupName));
         membership.setGrouprole(groupRole);
@@ -163,29 +96,6 @@ public class MembershipResource {
                 .body(result);
     }
 
-    /**
-     * PUT  /memberships : Updates an existing membership.
-     *
-     * @param membership the membership to update
-     * @return the ResponseEntity with status 200 (OK) and with body the updated membership,
-     * or with status 400 (Bad Request) if the membership is not valid,
-     * or with status 500 (Internal Server Error) if the membership couldnt be updated
-     * @throws URISyntaxException if the Location URI syntax is incorrect
-     */
-    @RequestMapping(value = "/memberships",
-            method = RequestMethod.PUT,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
-    public ResponseEntity<Membership> updateMembership(@Valid @RequestBody Membership membership) throws URISyntaxException {
-        log.debug("REST request to update Membership : {}", membership);
-        if (membership.getId() == null) {
-            return createMembership(membership);
-        }
-        Membership result = membershipService.save(membership);
-        return ResponseEntity.ok()
-                .headers(HeaderUtil.createEntityUpdateAlert("membership", membership.getId().toString()))
-                .body(result);
-    }
 
     /**
      * GET  /memberships : get all the memberships.
@@ -206,6 +116,7 @@ public class MembershipResource {
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 
+
     /**
      * GET  /memberships/:id : get the "id" membership.
      *
@@ -225,6 +136,7 @@ public class MembershipResource {
                         HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+
 
     /**
      * DELETE  /memberships/:id : delete the "id" membership.
@@ -273,13 +185,13 @@ public class MembershipResource {
             //le membership che recupero dalle relatrionship  devono avere lo stesso grouprole indicato nella relationship
             Set<Relationship> relationships = relationshipService.getAllRelationshipForGroup(groupname);
             for (Relationship relationship : relationships) {
-                    Membership membershipFromRelationship = new Membership();
+                Membership membershipFromRelationship = new Membership();
 
-                    membershipFromRelationship.setGrouprole(relationship.getGroupRole());
-                    membershipFromRelationship.setUser(membership.getUser());
-                    membershipFromRelationship.setCnrgroup(cnrgroupService.findCnrgroupByName(relationship.getGroupRelationship()));
+                membershipFromRelationship.setGrouprole(relationship.getGroupRole());
+                membershipFromRelationship.setUser(membership.getUser());
+                membershipFromRelationship.setCnrgroup(cnrgroupService.findCnrgroupByName(relationship.getGroupRelationship()));
 
-                    userGroup.add(membershipFromRelationship);
+                userGroup.add(membershipFromRelationship);
             }
         }
         //tolgo i gruppi "duplicati"
