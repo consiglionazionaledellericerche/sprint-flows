@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="OivRigetto" language="groovy" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c0187353-db16-46fc-a7a4-9ece39bc4976">
+<!-- Created with Jaspersoft Studio version 6.5.1.final utlizzo versione della libreria JasperReports6.5.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="OivRigetto" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="NoPages" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c0187353-db16-46fc-a7a4-9ece39bc4976">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
-	<style name="Title" fontName="Times New Roman" fontSize="50" isBold="true" pdfFontName="Times-Bold"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="oivPreavvisoRigetto"/>
+	<style name="Title" fontName="Times New Roman" fontSize="50" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
 	<style name="SubTitle" forecolor="#736343" fontName="Arial" fontSize="18"/>
 	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
 	<style name="Detail" fontName="Arial" fontSize="12"/>
@@ -333,7 +335,7 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="238" splitType="Stretch">
+		<band height="242" splitType="Stretch">
 			<textField isStretchWithOverflow="true">
 				<reportElement style="Detail" x="310" y="143" width="69" height="17" uuid="0b92db97-6423-4fe6-aa21-2c7b75c4dc9b"/>
 				<textElement>
@@ -366,20 +368,19 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{emailRichiedente}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
-				<reportElement x="89" y="193" width="453" height="40" uuid="e9825bfd-c98f-4489-83b3-1ceb9783f873"/>
-				<textElement textAlignment="Justified">
-					<font size="11" isBold="true"/>
-					<paragraph lineSpacing="Single"/>
-				</textElement>
-				<textFieldExpression><![CDATA["preavviso di rigetto della domanda di iscrizione nell’Elenco nazionale dei componenti degli Organismi indipendenti di valutazione ai sensi del D.M 2 dicembre 2016."]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true">
-				<reportElement style="Detail" x="34" y="193" width="53" height="17" uuid="2b247120-dc96-41bb-8eb9-084eecc0fda8"/>
+			<textField>
+				<reportElement x="19" y="193" width="100" height="30" uuid="cfa4daaf-6dcb-40f2-9881-83fce970ef94"/>
 				<textElement>
-					<font fontName="SansSerif" size="11" isBold="true"/>
+					<font isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Oggetto: "]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="130" y="193" width="412" height="42" uuid="126fd6fc-1a28-4bcc-98da-bd2779998024"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["preavviso di rigetto della domanda di iscrizione nell’Elenco nazionale dei componenti degli Organismi indipendenti di valutazione ai sensi del D.M 2 dicembre 2016."]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -402,7 +403,7 @@
 		</band>
 		<band height="93">
 			<textField isStretchWithOverflow="true">
-				<reportElement style="Detail" x="249" y="41" width="305" height="51" uuid="2d49c6fc-7ded-4f0d-94fb-e4cc1e708646"/>
+				<reportElement style="Detail" x="248" y="39" width="305" height="51" uuid="2d49c6fc-7ded-4f0d-94fb-e4cc1e708646"/>
 				<textElement textAlignment="Center">
 					<font fontName="SansSerif" size="11" isBold="false"/>
 					<paragraph lineSpacing="1_1_2"/>
