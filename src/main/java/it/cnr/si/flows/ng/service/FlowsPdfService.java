@@ -219,6 +219,7 @@ public class FlowsPdfService {
             //il nome del file jasper da caricare(dipende dal tipo di pdf da creare)
             jasperFile = this.getClass().getResourceAsStream(dir.substring(dir.indexOf("/print")) + pdfType.name() + ".jasper");
             JasperPrint jasperPrint = fillmgr.fill(jasperFile, parameters);
+			LOGGER.info("-- jasperFile: " +  pdfType.name() + ".jasper");
 
             pdfByteArray = JasperExportManager.exportReportToPdf(jasperPrint);
         } catch (JRException e) {

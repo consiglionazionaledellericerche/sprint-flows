@@ -45,8 +45,7 @@ public class SetStato implements ActivitiEventListener {
 					.processInstanceId(event.getProcessInstanceId())
 					.singleResult();
 			//sono in un'activity di tipo "finale" (quelle che hanno il prefisso "end-" nel name)
-			String appo = ((HistoricActivityInstanceEntity)((ActivitiEntityEventImpl) event).getEntity()).getActivityId();
-			stato = appo.contains("end-") ? appo.substring(4) : appo;
+			stato = ((HistoricActivityInstanceEntity)((ActivitiEntityEventImpl) event).getEntity()).getActivityName();
 			LOGGER.info("Setto lo stato finale ({}) della Process Instance {}", stato, processInstance.getId());
 		}
 
