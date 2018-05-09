@@ -59,10 +59,10 @@
 
         function loadAvailableDefinitions() {
             ProfileService.getProfileInfo().then(function(response) {
-                vm.inProduction = response.inProduction;
-                vm.swaggerEnabled = response.swaggerEnabled;
+                $rootScope.inProduction = response.inProduction;
                 //verifico qual è il profilo spring con cui è stata avviata l'app per caricare il corrispondente banner
-                $rootScope.app = response.activeProfiles.includes('oiv') ? 'oiv' : 'cnr'
+                $rootScope.app = (response.activeProfiles.includes('oiv') ? 'oiv' : 'cnr');
+                vm.swaggerEnabled = response.swaggerEnabled;
             });
 
             dataService.definitions.all()
