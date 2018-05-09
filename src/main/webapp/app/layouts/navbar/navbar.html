@@ -168,12 +168,12 @@
                             <span translate="global.menu.account.login">Sign in</span>
                         </a>
                     </li>
-<!--                     <li ui-sref-active="active" ng-switch-when="false"> -->
-<!--                         <a ui-sref="register" ng-click="vm.collapseNavbar()"> -->
-<!--                             <span class="glyphicon glyphicon-plus-sign"></span>&nbsp; -->
-<!--                             <span translate="global.menu.account.register">Register</span> -->
-<!--                         </a> -->
-<!--                     </li> -->
+                    <!--                     <li ui-sref-active="active" ng-switch-when="false"> -->
+                    <!--                         <a ui-sref="register" ng-click="vm.collapseNavbar()"> -->
+                    <!--                             <span class="glyphicon glyphicon-plus-sign"></span>&nbsp; -->
+                    <!--                             <span translate="global.menu.account.register">Register</span> -->
+                    <!--                         </a> -->
+                    <!--                     </li> -->
                 </ul>
             </li>
             <li ng-class="{active: vm.$state.includes('admin')}"  ng-switch-when="true" has-authority="ROLE_ADMIN" uib-dropdown class="dropdown pointer">
@@ -228,7 +228,7 @@
                         </a>
                     </li>
                     <!-- jhipster-needle-add-element-to-admin-menu - JHipster will add entities to the admin menu here -->
-                    <li ng-hide="vm.inProduction">
+                    <li ng-hide="inProduction">
                         <a href='/h2-console' target="_tab" ng-click="vm.collapseNavbar()">
                             <span class="glyphicon glyphicon-hdd"></span>&nbsp;
                             <span translate="global.menu.admin.database">Database</span>
