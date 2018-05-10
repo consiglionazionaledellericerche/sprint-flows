@@ -321,6 +321,47 @@
 			"response": []
 		},
 		{
+			"name": "CREATE user app.elenco-oiv",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":null,\"login\":\"app.elenco-oiv\",\"firstName\":\"Applicazione\",\"lastName\":\"Elenco OIV\",\"email\":\"app.elenco-oiv@cnr.it\",\"phone\":\"06 4343\",\"gender\":\"M\",\"activated\":true,\"langKey\":\"en\",\"createdBy\":null,\"createdDate\":null,\"lastModifiedBy\":null,\"lastModifiedDate\":null,\"resetDate\":null,\"resetKey\":null,\"authorities\":[\"ROLE_USER\"]}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/flows/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"flows",
+						"users"
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
 			"name": "CREATE MEMBERSHIP USER1 abilitati#iscrizione-elenco-oiv@",
 			"request": {
 				"auth": {
@@ -342,10 +383,10 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"userName\": \"utente1\",\r\n    \"groupName\": \"abilitati#iscrizione-elenco-oiv@99999\",\r\n    \"groupRole\": \"member\"\r\n  }"
+					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8080/api/createMembershipsByRest",
+					"raw": "http://localhost:8080/api/createMemberships?groupRole=member&groupName=abilitati%23iscrizione-elenco-oiv@99999&userName=utente1",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -353,7 +394,21 @@
 					"port": "8080",
 					"path": [
 						"api",
-						"createMembershipsByRest"
+						"createMemberships"
+					],
+					"query": [
+						{
+							"key": "groupRole",
+							"value": "member"
+						},
+						{
+							"key": "groupName",
+							"value": "abilitati%23iscrizione-elenco-oiv@99999"
+						},
+						{
+							"key": "userName",
+							"value": "utente1"
+						}
 					]
 				},
 				"description": "create user"
@@ -382,10 +437,10 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"userName\": \"utente2\",\r\n    \"groupName\": \"istruttore@99999\",\r\n    \"groupRole\": \"member\"\r\n  }"
+					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8080/api/createMembershipsByRest",
+					"raw": "http://localhost:8080/api/createMemberships?groupRole=member&groupName=istruttore%23iscrizione-elenco-oiv@99999&userName=utente2",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -393,7 +448,21 @@
 					"port": "8080",
 					"path": [
 						"api",
-						"createMembershipsByRest"
+						"createMemberships"
+					],
+					"query": [
+						{
+							"key": "groupRole",
+							"value": "member"
+						},
+						{
+							"key": "groupName",
+							"value": "istruttore%23iscrizione-elenco-oiv@99999"
+						},
+						{
+							"key": "userName",
+							"value": "utente2"
+						}
 					]
 				},
 				"description": "create user"
@@ -422,10 +491,10 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"userName\": \"utente3\",\r\n    \"groupName\": \"coordinatoreresponsabile@99999\",\r\n    \"groupRole\": \"member\"\r\n  }"
+					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8080/api/createMembershipsByRest",
+					"raw": "http://localhost:8080/api/createMemberships?groupRole=member&groupName=coordinatoreresponsabile@99999&userName=utente3",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -433,7 +502,21 @@
 					"port": "8080",
 					"path": [
 						"api",
-						"createMembershipsByRest"
+						"createMemberships"
+					],
+					"query": [
+						{
+							"key": "groupRole",
+							"value": "member"
+						},
+						{
+							"key": "groupName",
+							"value": "coordinatoreresponsabile@99999"
+						},
+						{
+							"key": "userName",
+							"value": "utente3"
+						}
 					]
 				},
 				"description": "create user"
@@ -462,10 +545,10 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"userName\": \"utente4\",\r\n    \"groupName\": \"direttore@99999\",\r\n    \"groupRole\": \"member\"\r\n  }"
+					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8080/api/createMembershipsByRest",
+					"raw": "http://localhost:8080/api/createMemberships?groupRole=member&groupName=direttore@99999&userName=utente4",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -473,7 +556,21 @@
 					"port": "8080",
 					"path": [
 						"api",
-						"createMembershipsByRest"
+						"createMemberships"
+					],
+					"query": [
+						{
+							"key": "groupRole",
+							"value": "member"
+						},
+						{
+							"key": "groupName",
+							"value": "direttore@99999"
+						},
+						{
+							"key": "userName",
+							"value": "utente4"
+						}
 					]
 				},
 				"description": "create user"
@@ -502,10 +599,10 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"userName\": \"utente4\",\r\n    \"groupName\": \"firmaRigetto@99999\",\r\n    \"groupRole\": \"coordinator\"\r\n  }"
+					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8080/api/createMembershipsByRest",
+					"raw": "http://localhost:8080/api/createMemberships?groupRole=member&groupName=delegatofirma@99999&userName=utente4",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -513,7 +610,21 @@
 					"port": "8080",
 					"path": [
 						"api",
-						"createMembershipsByRest"
+						"createMemberships"
+					],
+					"query": [
+						{
+							"key": "groupRole",
+							"value": "member"
+						},
+						{
+							"key": "groupName",
+							"value": "delegatofirma@99999"
+						},
+						{
+							"key": "userName",
+							"value": "utente4"
+						}
 					]
 				},
 				"description": "create user"
@@ -542,10 +653,10 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"userName\": \"utente4\",\r\n    \"groupName\": \"firmaRigetto@99999\",\r\n    \"groupRole\": \"member\"\r\n  }"
+					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8080/api/createMembershipsByRest",
+					"raw": "http://localhost:8080/api/createMemberships?groupRole=member&groupName=delegatofirma@99999&userName=utente4",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -553,7 +664,21 @@
 					"port": "8080",
 					"path": [
 						"api",
-						"createMembershipsByRest"
+						"createMemberships"
+					],
+					"query": [
+						{
+							"key": "groupRole",
+							"value": "member"
+						},
+						{
+							"key": "groupName",
+							"value": "delegatofirma@99999"
+						},
+						{
+							"key": "userName",
+							"value": "utente4"
+						}
 					]
 				},
 				"description": "create user"
@@ -582,10 +707,10 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"userName\": \"utente5\",\r\n    \"groupName\": \"istruttore@99999\",\r\n    \"groupRole\": \"member\"\r\n  }"
+					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8080/api/createMembershipsByRest",
+					"raw": "http://localhost:8080/api/createMemberships?groupRole=member&groupName=istruttore@99999&userName=utente5",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -593,7 +718,75 @@
 					"port": "8080",
 					"path": [
 						"api",
-						"createMembershipsByRest"
+						"createMemberships"
+					],
+					"query": [
+						{
+							"key": "groupRole",
+							"value": "member"
+						},
+						{
+							"key": "groupName",
+							"value": "istruttore@99999"
+						},
+						{
+							"key": "userName",
+							"value": "utente5"
+						}
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE MEMBERSHIP app.elenco-oiv istruttore@",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/createMemberships?groupRole=member&groupName=abilitati%23iscrizione-elenco-oiv&userName=app.elenco-oiv",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"createMemberships"
+					],
+					"query": [
+						{
+							"key": "groupRole",
+							"value": "member"
+						},
+						{
+							"key": "groupName",
+							"value": "abilitati%23iscrizione-elenco-oiv"
+						},
+						{
+							"key": "userName",
+							"value": "app.elenco-oiv"
+						}
 					]
 				},
 				"description": "create user"
@@ -952,6 +1145,83 @@
 				"body": {
 					"mode": "raw",
 					"raw": "utente5"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/account/change_password",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"account",
+						"change_password"
+					]
+				},
+				"description": "IMPERSONATE USER"
+			},
+			"response": []
+		},
+		{
+			"name": "IMPERSONATE app.elenco-oiv",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/impersonate/start?impersonate_username=app.elenco-oiv",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"impersonate",
+						"start"
+					],
+					"query": [
+						{
+							"key": "impersonate_username",
+							"value": "app.elenco-oiv"
+						}
+					]
+				},
+				"description": "IMPERSONATE USER"
+			},
+			"response": []
+		},
+		{
+			"name": "CHANGE PW app.elenco-oiv",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "app.elenco-oiv"
 				},
 				"url": {
 					"raw": "http://localhost:8080/api/account/change_password",
