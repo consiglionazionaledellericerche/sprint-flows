@@ -20,6 +20,9 @@
         vm.toggleNavbar = toggleNavbar;
         vm.collapseNavbar = collapseNavbar;
         vm.$state = $state;
+//        $rootScope.wfDefsStatistics = new Array();
+        $rootScope.wfDefsStatistics = [];
+//        $rootScope.wfDefsStatistics = {};
 
         function switchUser() {
             collapseNavbar();
@@ -46,6 +49,7 @@
             Auth.logout();
             $state.go('home');
             $rootScope.wfDefsBootable = []; // TODO la logica e' che gli oggetti non vanno svuotati qui
+            $rootScope.wfDefsStatistics = []; // TODO la logica e' che gli oggetti non vanno svuotati qui
             $rootScope.wfDefsAll = []; // TODO la logica e' che gli oggetti non vanno svuotati qui
         }
 
@@ -79,6 +83,24 @@
                         key: "all",
                         name: "ALL"
                     });
+
+
+        //popolo l'array delle process Definitions di cui l'utente loggato può vedere le statistiche
+                    vm.account.authorities.filter(function(authority){
+                        if(authority.includes('abilitati') || authority.includes('supervisore')){
+                            $rootScope.wfDefsStatistics.push(
+                                $rootScope.wfDefsAll.filter(function (el){
+                                    if(el.key == authority.split(/[#@]/)[1])
+                                        return el;
+
+                                })[0]
+                            )
+        //                		$rootScope.wfDefsStatistics.push({
+        //                            key: authority.split(/[#@]/)[1],
+        //                            name: authority.split(/[#@]/)[1]
+        //                        });
+                        }
+                    })
                 }, function(response) {
                     $log.error(response);
                 });
