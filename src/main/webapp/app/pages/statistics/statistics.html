@@ -1,0 +1,34 @@
+<div ng-cloak>
+	<div class="row">
+		<div class="col-md-3">
+
+			<label>Statistiche da</label>
+			<div class="form-group">
+				<input type="date"
+					   ng-model="vm.exportParams.startDateGreat"
+					   class="ng-pristine ng-untouched ng-valid ng-empty"
+					   aria-invalid="false">
+			</div>
+
+			<label> a </label>
+			<div class="form-group">
+				<input type="date"
+					   ng-model="vm.exportParams.startDateLess"
+					   class="ng-pristine ng-untouched ng-valid ng-empty"
+					   aria-invalid="false">
+			</div>
+			<button ng-click="exportFile(true, vm.processDefinition.key, vm.exportParams.startDateGreat, vm.exportParams.startDateLess, 'statistiche_' + vm.processDefinition.key + '.pdf')"
+					class="btn btn-primary" translate="statistics.home.exportPdfLabel">
+			</button>
+			<button ng-click="exportFile(false, vm.processDefinition.key, vm.exportParams.startDateGreat, vm.exportParams.startDateLess, 'statistiche_' + vm.processDefinition.key + '.csv')"
+					class="btn btn-primary" translate="statistics.home.exportCsvLabel">
+			</button>
+		</div>
+
+		<div class="col-md-9">
+			<h2 translate="statistics.home.title"></h2>
+			<h3> {{vm.processDefinition.name}}</h3>
+			<pre ng-if="!inProduction">$rootScope.wfDefsStatistics: {{$rootScope.wfDefsStatistics}}</pre>
+		</div>
+	</div>
+</div>

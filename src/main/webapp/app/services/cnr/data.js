@@ -188,6 +188,30 @@
                     });
                 },
             },
+            exportStatistics: {
+                pdf: function(processDefinitionKey, startDateGreat, startDateLess) {
+                    return $http({
+                        url: 'api/makeStatisticPdf?',
+                        method: 'GET',
+                        params: {
+                            processDefinitionKey: processDefinitionKey,
+                            startDateGreat: startDateGreat,
+                            startDateLess: startDateLess,
+                        },
+                    });
+                },
+                csv: function(processDefinitionKey, startDateGreat, startDateLess) {
+                    return $http({
+                        url: 'api/makeStatisticCsv?',
+                        method: 'GET',
+                        params: {
+                            processDefinitionKey: processDefinitionKey,
+                            startDateGreat: startDateGreat,
+                            startDateLess: startDateLess,
+                        },
+                    });
+                }
+            }
         };
     }
 })();
