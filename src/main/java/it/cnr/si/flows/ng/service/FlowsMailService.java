@@ -42,24 +42,26 @@ public class FlowsMailService extends MailService {
 	@Inject
 	private Environment env;
 	@Inject
-    private CnrgroupService cnrgroupService;
+	private CnrgroupService cnrgroupService;
 	@Autowired(required = false)
 	private AceBridgeService aceService;
-    @Inject
-    private FlowsUserService flowsUserService;
-    
-    @Async
+	@Inject
+	private FlowsUserService flowsUserService;
+
+	@Async
 	public void sendFlowEventNotification(String notificationType, Map<String, Object> variables, String taskName, String username, final String groupName) {
 		Context ctx = new Context();
 		ctx.setVariables(variables);
 		ctx.setVariable("username", username);
-		if (Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
-			ctx.setVariable("groupname", cnrgroupService.findDisplayName(groupName));
-		} else {
-			ctx.setVariable("groupname",  Optional.ofNullable(aceService)
-					.flatMap(aceBridgeService -> Optional.ofNullable(groupName))
-					.map(s ->   aceService.getExtendedGroupNome(s))
-					.orElse(groupName));
+		if (groupName != null) {
+			if (Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
+				ctx.setVariable("groupname", cnrgroupService.findDisplayName(groupName));
+			} else {
+				ctx.setVariable("groupname",  Optional.ofNullable(aceService)
+						.flatMap(aceBridgeService -> Optional.ofNullable(groupName))
+						.map(s ->   aceService.getExtendedGroupNome(s))
+						.orElse(groupName));
+			} 
 		}
 		ctx.setVariable("taskName", taskName);
 
