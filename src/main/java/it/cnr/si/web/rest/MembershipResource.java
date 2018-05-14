@@ -26,11 +26,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
-
-import static it.cnr.si.flows.ng.utils.Enum.RoleOiv.coordinator;
-import static it.cnr.si.flows.ng.utils.Enum.RoleOiv.member;
 
 
 
@@ -171,35 +167,11 @@ public class MembershipResource {
         String user = SecurityUtils.getCurrentUserLogin();
         log.debug("REST request dei gruppi di cui è coordinator l'utente {}", user);
 
-        //recupero le mebership in cui l'utente ha "role" coordinator
-        Page<Membership> pageCoordinator = membershipService.getGroupsWithRole(pageable, user, coordinator.name());
-        //recupero le mebership in cui l'utente ha "role" member
-        Page<Membership> pageMember = membershipService.getGroupsWithRole(pageable, user, member.name());
-
-        //recupero i gruppi di cui l'utente fa parte sia come "coordinator" che come "member"
-        List<Membership> userGroup = membershipService.getGroupForUser(user);
-
-        //di quelli di cui è "member" recupero anche le relationship
-        for (Membership membership : pageMember.getContent()) {
-            String groupname = membership.getCnrgroup().getName();
-            //le membership che recupero dalle relatrionship  devono avere lo stesso grouprole indicato nella relationship
-            Set<Relationship> relationships = relationshipService.getAllRelationshipForGroup(groupname);
-            for (Relationship relationship : relationships) {
-                Membership membershipFromRelationship = new Membership();
-
-                membershipFromRelationship.setGrouprole(relationship.getGroupRole());
-                membershipFromRelationship.setUser(membership.getUser());
-                membershipFromRelationship.setCnrgroup(cnrgroupService.findCnrgroupByName(relationship.getGroupRelationship()));
-
-                userGroup.add(membershipFromRelationship);
-            }
-        }
-        //tolgo i gruppi "duplicati"
-        userGroup = userGroup.stream().distinct().collect(Collectors.toList());
+        List<Membership> userGroup = flowsUserService.getGroupsForUser(user, pageable);
 
         PageImpl<Membership> resultPage = new PageImpl<>(userGroup, pageable, userGroup.size());
 
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(pageCoordinator, "/api/memberships");
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(resultPage, "/api/memberships");
         return Optional.ofNullable(resultPage.getContent())
                 .map(result -> new ResponseEntity<>(
                         result,
@@ -207,6 +179,7 @@ public class MembershipResource {
                         HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+
 
 
     /**
