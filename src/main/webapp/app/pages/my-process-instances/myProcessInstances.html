@@ -113,6 +113,6 @@
         </div>
 
     </div>
-    <pre ng-if="global.ribbon.dev">{{tasks| json}}</pre>
-    <pre ng-if="global.ribbon.dev">{{vm| json}}</pre>
+    <pre ng-if="!inProduction">{{tasks | json}}</pre>
+    <pre ng-if="!inProduction">{{vm | json}}</pre>
 </div>
