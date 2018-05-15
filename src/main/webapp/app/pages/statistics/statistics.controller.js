@@ -17,7 +17,7 @@
 			'processDefinitionKey=' + vm.processDefinition.key +
 			 '&startDateGreat=' + $filter('date')(vm.exportParams.startDateGreat, dateFormat) +
 			 '&startDateLess=' + $filter('date')(vm.exportParams.startDateLess, dateFormat);
-            utils.downloadFile(url, filename, 'application/pdf');
+            utils.downloadFile(url, filename, isPdf ? 'application/pdf' : 'application/vnd.ms-excel');
         };
     }
 })();
