@@ -154,11 +154,14 @@ public class MailNotificationListener  implements ActivitiEventListener {
 
 		notificationRules.stream()
 		.forEach(rule -> {
+			LOGGER.debug("rule.getRecipients(): {}", rule.getRecipients());
+
 			if (rule.isPersona()) {
 				Stream.of(rule.getRecipients().split(","))
 				.map(s -> s.trim())
 				.forEach(personVariableName -> {
-					String person = (String) variables.get(personVariableName);
+					LOGGER.debug("personVariableName: {}", personVariableName);
+					String person = (String) personVariableName;
 					mailService.sendFlowEventNotification(nt, variables, tn, person, null);
 				});
 			} else {
@@ -166,7 +169,8 @@ public class MailNotificationListener  implements ActivitiEventListener {
 					Stream.of(rule.getRecipients().split(","))
 					.map(s -> s.trim())
 					.forEach(groupVariableName -> {
-						String groupName = (String) variables.get(groupVariableName);
+						LOGGER.debug("groupVariableName: {}", groupVariableName);
+						String groupName = (String) groupVariableName;
 						List<String> members = membershipService.findMembersInGroup(groupName);
 						members.forEach(member -> {
 							mailService.sendFlowEventNotification(nt, variables, tn, member, groupName);
@@ -178,6 +182,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
 						Stream.of(rule.getRecipients().split(","))
 						.map(s -> s.trim())
 						.forEach(groupVariableName -> {
+							LOGGER.debug("variables.get(groupVariableName): {}", variables.get(groupVariableName));
 							String groupName = (String) variables.get(groupVariableName);
 							List<String> members = aceBridgeService.getUsersinAceGroup(groupName);
 							members.forEach(member -> {
