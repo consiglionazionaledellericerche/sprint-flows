@@ -46,6 +46,7 @@ import java.util.List;
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Aggiornamento;
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Caricamento;
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
+import static it.cnr.si.flows.ng.utils.Utils.parseInt;
 import static org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA_BOLD;
 
 @Service
@@ -70,6 +71,13 @@ public class FlowsPdfService {
     private Environment env;
     @Inject
     private TaskService taskService;
+
+    // ELENCO PARAMETRI STATISTICHE
+    private int nrFlussiTotali = 0;
+    private int nrFlussiAttivi = 0;
+    private int nrFlussiTerminati = 0;
+    private int allTerminatedProcessInstancesDurationInMillis = 0;
+    private Calendar newDate = Calendar.getInstance();
 
 
 
@@ -219,7 +227,7 @@ public class FlowsPdfService {
             //il nome del file jasper da caricare(dipende dal tipo di pdf da creare)
             jasperFile = this.getClass().getResourceAsStream(dir.substring(dir.indexOf("/print")) + pdfType.name() + ".jasper");
             JasperPrint jasperPrint = fillmgr.fill(jasperFile, parameters);
-			LOGGER.info("-- jasperFile: " +  pdfType.name() + ".jasper");
+			LOGGER.info("-- jasperFile: {}", pdfType.name() + ".jasper");
 
             pdfByteArray = JasperExportManager.exportReportToPdf(jasperPrint);
         } catch (JRException e) {
@@ -257,7 +265,7 @@ public class FlowsPdfService {
     }
 
 
-    public byte[] makeStatisticPdf( JSONObject processvariables, String fileName, String processDefinitionKey) {
+    public byte[] makeStatisticPdf( JSONObject processvariables, String fileName) {
         String dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir");
         byte[] pdfByteArray = null;
         HashMap<String, Object> parameters = new HashMap();
@@ -286,9 +294,122 @@ public class FlowsPdfService {
 
             pdfByteArray = JasperExportManager.exportReportToPdf(jasperPrint);
         } catch (JRException e) {
+        	LOGGER.error("Errore JASPER nella creazione del pdf: {}", e);
             throw new ReportException("Errore JASPER nella creazione del pdf: {}", e);
         }
         return pdfByteArray;
+    }
+
+
+    public JSONObject getPdfStatistics (String processDefinitionKey, String startDateGreat, String startDateLess) {
+        Map<String, String> req = new HashMap<>();
+        req.put("startDateGreat", startDateGreat);
+        req.put("startDateLess", startDateLess);
+        req.put(processDefinitionKey, processDefinitionKey);
+        String order = "ASC";
+        Integer firstResult = -1;
+        Integer maxResults = -1;
+        Boolean active = true;
+        Boolean finished = false;
+
+        resetStatisticvariables();
+
+        Map<String, Object>  flussiAttivi = flowsProcessInstanceService.search(req, processDefinitionKey, active, order, firstResult, maxResults);
+        Map<String, Object>  flussiTerminati = flowsProcessInstanceService.search(req, processDefinitionKey, finished, order, firstResult, maxResults);
+        Map<String, Integer> mapStatiFlussiAttivi = new HashMap<String, Integer>();
+        Map<String, Integer> mapStatiFlussiTerminati = new HashMap<String, Integer>();
+
+        //VALORIZZAZIONE PARAMETRI STATISTICHE
+        nrFlussiAttivi = parseInt(flussiAttivi.get("totalItems").toString());
+        nrFlussiTerminati  = parseInt(flussiTerminati.get("totalItems").toString());
+        nrFlussiTotali = nrFlussiAttivi + nrFlussiTerminati ;
+
+        LOGGER.debug("nr. nrFlussiAttivi: {} - nr. nrFlussiTerminati: {} - nr. nrFlussiTotali: {}", nrFlussiAttivi, nrFlussiTerminati, nrFlussiTotali);
+
+        // GESTIONE VARIABILI SINGOLE ISTANZE FLUSSI ATTIVI
+        List<HistoricProcessInstanceResponse> activeProcessInstances = (List<HistoricProcessInstanceResponse>) flussiAttivi.get("processInstances");
+        for (HistoricProcessInstanceResponse pi : activeProcessInstances) {
+            LOGGER.debug(" getId = {}", pi.getId());
+            LOGGER.debug(" getDurationInMillis = {}", pi.getDurationInMillis());
+            LOGGER.debug(" elementi = {}", pi.getName());
+            String processInstanceId = pi.getId();
+
+            // Calcolo gli stati nei flussi attivi)
+            String currentTaskName = taskService.createTaskQuery().processInstanceId(processInstanceId).active().singleResult().getName();
+            LOGGER.debug("--##  currentTaskName : {} ", currentTaskName);
+            //calcolo nr istanze per Stato
+            if(mapStatiFlussiAttivi.containsKey(currentTaskName)) {
+                mapStatiFlussiAttivi.put(currentTaskName, mapStatiFlussiAttivi.get(currentTaskName) + 1);
+            } else {
+                mapStatiFlussiAttivi.put(currentTaskName, 1);
+            }
+        }
+
+        // GESTIONE VARIABILI SINGOLE ISTANZE FLUSSI TERMINATI
+        List<HistoricProcessInstanceResponse> terminatedProcessInstances = (List<HistoricProcessInstanceResponse>) flussiTerminati.get("processInstances");
+        for (HistoricProcessInstanceResponse pi : terminatedProcessInstances) {
+            LOGGER.debug(" getId = {}", pi.getId());
+            LOGGER.debug(" getDurationInMillis = {}", pi.getDurationInMillis());
+            LOGGER.debug(" elementi = {}", pi.getName());
+
+            allTerminatedProcessInstancesDurationInMillis = (int) (allTerminatedProcessInstancesDurationInMillis + pi.getDurationInMillis());
+            JSONObject json = new JSONObject(pi.getName());
+            //Rimuovo il VECCHIO stato
+
+            String taskEndName = json.getString(Enum.VariableEnum.stato.name());
+            LOGGER.info("-- taskEndName: {}", taskEndName);
+            //calcolo nr istanze per Stato
+            if(mapStatiFlussiTerminati.containsKey(taskEndName)) {
+                mapStatiFlussiTerminati.put(taskEndName, mapStatiFlussiTerminati.get(taskEndName) + 1);
+            } else {
+                mapStatiFlussiTerminati.put(taskEndName, 1);
+            }
+        }
+
+        JSONObject variableStatisticsJson = new JSONObject();
+
+        //LISTA VARIABILI COMUNI
+        variableStatisticsJson.put("dataIn", startDateGreat);
+        variableStatisticsJson.put("dataOut", startDateLess);
+        variableStatisticsJson.put("processDefinitionKey", processDefinitionKey);
+        variableStatisticsJson.put("nrFlussiAttivi", nrFlussiAttivi);
+        variableStatisticsJson.put("nrFlussiTerminati", nrFlussiTerminati);
+        variableStatisticsJson.put("nrFlussiTotali", nrFlussiTotali);
+
+        //LISTA VARIABILI FLUSSI ATTIVI
+        Map<String, Object> listaStatiFlussiAttivi = new HashMap<String, Object>();
+        JSONArray arrayStatiFlussiAttivi = new JSONArray();
+        for (Map.Entry<String, Integer> pair : mapStatiFlussiAttivi.entrySet()) {
+            listaStatiFlussiAttivi.put("Stato", pair.getKey());
+            listaStatiFlussiAttivi.put("NrIstanze", pair.getValue());
+            arrayStatiFlussiAttivi.put(listaStatiFlussiAttivi);
+        }
+        variableStatisticsJson.put("StatiFlussiAttivi", arrayStatiFlussiAttivi);
+
+        //LISTA VARIABILI FLUSSI TERMINATI
+        Map<String, String> listaStatiFlussiTerminati = new HashMap<String, String>();
+        JSONArray arrayStatiFlussiTerminati = new JSONArray();
+        int mediaGiorniFlusso = 0;
+        if (allTerminatedProcessInstancesDurationInMillis > 0) {
+            mediaGiorniFlusso = allTerminatedProcessInstancesDurationInMillis/ (1000 * 60 * 60 * 24 * nrFlussiTerminati);
+        }
+        variableStatisticsJson.put("mediaGiorniFlusso", mediaGiorniFlusso);
+
+        for (Map.Entry<String, Integer> pair : mapStatiFlussiTerminati.entrySet()) {
+            listaStatiFlussiTerminati.put("Stato", pair.getKey());
+            listaStatiFlussiTerminati.put("NrIstanze", pair.getValue().toString());
+            arrayStatiFlussiTerminati.put(listaStatiFlussiTerminati);
+        }
+        variableStatisticsJson.put("StatiFlussiTerminati", arrayStatiFlussiTerminati);
+
+        return variableStatisticsJson;
+    }
+
+    //GESTIONE DEI PARAMETRI DA VISUALIZZARE
+    private void resetStatisticvariables() {
+        nrFlussiTotali = 0;
+        nrFlussiAttivi = 0;
+        nrFlussiTerminati = 0;
     }
 
     private String getPropertyName(Element metadatum, String attr) {
