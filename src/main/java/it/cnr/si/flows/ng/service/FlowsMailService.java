@@ -55,6 +55,7 @@ public class FlowsMailService extends MailService {
 		ctx.setVariable("username", username);
 		if (groupName != null) {
 			if (Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
+				ctx.setVariable("profile", "oiv");
 				ctx.setVariable("groupname", cnrgroupService.findDisplayName(groupName));
 			} else {
 				ctx.setVariable("groupname",  Optional.ofNullable(aceService)
@@ -64,19 +65,25 @@ public class FlowsMailService extends MailService {
 			} 
 		}
 		ctx.setVariable("taskName", taskName);
+		if (Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
+			ctx.setVariable("profile", "oiv");
+		} else {
+			ctx.setVariable("profile", "cnr");
+		}
+		
 
 		String htmlContent = templateEngine.process(notificationType, ctx);
 		String mailUtente = flowsUserService.getUserWithAuthoritiesByLogin(username).get().getEmail() ;
 
-		LOGGER.info("Invio mail a {} con titolo {} del tipo {} nella fase {} e con contenuto {}", mailUtente , "Notifica relativa al flusso " + variables.get("title"), notificationType, variables.get("faseUltima"), htmlContent);
+		LOGGER.info("Invio mail a {} con titolo {} del tipo {} nella fase {} e con contenuto {}", mailUtente , "Notifica relativa al flusso " + variables.get("businessKey"), notificationType, variables.get("faseUltima"), htmlContent);
 
 		if (!mailConfig.isMailActivated()) {
 			mailConfig.getMailRecipients()
-			.forEach(r -> 	sendEmail(r, "Notifica relativa al flusso " + variables.get("title"), htmlContent, false, true));
+			.forEach(r -> 	sendEmail(r, "Notifica relativa al flusso " + variables.get("businessKey"), htmlContent, false, true));
 		} else {
 			// TODO recuperare la mail da LDAP (vedi issue #66)
 			// TODO scommentare per la produzione
-			sendEmail(mailUtente, "Notifica relativa al flusso "+ variables.get("title"), htmlContent, false, true);
+			sendEmail(mailUtente, "Notifica relativa al flusso "+ variables.get("businessKey"), htmlContent, false, true);
 		}
 	}
 }
