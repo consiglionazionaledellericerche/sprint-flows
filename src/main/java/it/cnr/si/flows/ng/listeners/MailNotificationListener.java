@@ -3,6 +3,7 @@ package it.cnr.si.flows.ng.listeners;
 import it.cnr.si.domain.NotificationRule;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.FlowsMailService;
+import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.repository.NotificationRuleRepository;
 import it.cnr.si.service.MembershipService;
 
@@ -12,7 +13,11 @@ import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
 import org.activiti.engine.delegate.event.ActivitiEventType;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
+import org.activiti.engine.impl.persistence.entity.VariableInstance;
 import org.activiti.engine.task.IdentityLink;
+import org.activiti.rest.service.api.engine.variable.RestVariable;
+import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +52,10 @@ public class MailNotificationListener  implements ActivitiEventListener {
 	private Environment env;
 	@Inject
 	private MembershipService membershipService;
+	@Inject
+	private FlowsProcessInstanceService flowsProcessInstanceService;
+	
+	
 
 	@Override
 	public void onEvent(ActivitiEvent event) {
@@ -59,12 +68,32 @@ public class MailNotificationListener  implements ActivitiEventListener {
 			sendRuleNotification(event);
 	}
 
+	
+	private Map<String, Object> integrateVariables(ActivitiEvent event,  Map<String, Object> variables) {
+		String processInstanceId = event.getProcessInstanceId();
+		Map<String, Object> map = flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId);
+        HistoricProcessInstanceResponse processInstance = (HistoricProcessInstanceResponse) map.get("entity");
+        String nameVariables = processInstance.getName();
+        String businessKey = processInstance.getBusinessKey();
+        JSONObject jsonObj = new JSONObject(nameVariables);
+        jsonObj.get("fase");
+
+        variables.put("businessKey", businessKey);
+        variables.put("stato", jsonObj.get("stato"));
+        variables.put("descrizione", jsonObj.get("descrizione"));
+        variables.put("titolo", jsonObj.get("titolo"));
+        variables.put("fase", jsonObj.get("fase"));
+        variables.put("initiator", jsonObj.get("initiator"));
+		return variables;
+	}
+	
 	private Map<String, Object> sendStandardCandidateNotification(ActivitiEvent event) {
 
 		String executionId = event.getExecutionId();
 		Map<String, Object> variables = runtimeService.getVariables(executionId);
-
-
+		
+		//integro le variabili con quelle conservate nel name del processo
+		Map<String, Object> integratedVariables = integrateVariables(event, variables);
 		ActivitiEntityEvent taskEvent = (ActivitiEntityEvent) event;
 		TaskEntity task = (TaskEntity) taskEvent.getEntity();
 		//        String fase = ((TaskEntity)taskEvent.getEntity()).getTaskDefinitionKey();
@@ -77,7 +106,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
 				if (c.getGroupId() != null) {
 					List<String> members = membershipService.findMembersInGroup(c.getGroupId());
 					members.forEach(m -> {
-						mailService.sendFlowEventNotification(FlowsMailService.TASK_ASSEGNATO_AL_GRUPPO_HTML, variables, task.getName(), m, c.getGroupId());
+						mailService.sendFlowEventNotification(FlowsMailService.TASK_ASSEGNATO_AL_GRUPPO_HTML, integratedVariables, task.getName(), m, c.getGroupId());
 					});
 				}
 			});
@@ -88,13 +117,13 @@ public class MailNotificationListener  implements ActivitiEventListener {
 					if (c.getGroupId() != null) {
 						List<String> members = aceBridgeService.getUsersinAceGroup(c.getGroupId());
 						members.forEach(m -> {
-							mailService.sendFlowEventNotification(FlowsMailService.TASK_ASSEGNATO_AL_GRUPPO_HTML, variables, task.getName(), m, c.getGroupId());
+							mailService.sendFlowEventNotification(FlowsMailService.TASK_ASSEGNATO_AL_GRUPPO_HTML, integratedVariables, task.getName(), m, c.getGroupId());
 						});
 					}
 				});
 			}
 		}
-		return variables;
+		return integratedVariables;
 	}
 
 	private void sendRuleNotification(ActivitiEvent event) {
@@ -103,7 +132,10 @@ public class MailNotificationListener  implements ActivitiEventListener {
 		String executionId = event.getExecutionId();
 
 		Map<String, Object> variables = runtimeService.getVariables(executionId);
-
+		
+		
+		//integro le variabili con quelle conservate nel name del processo
+		Map<String, Object> integratedVariables = integrateVariables(event, variables);
 
 		// Notifiche personalizzate
 		List<NotificationRule> notificationRules;
@@ -118,19 +150,19 @@ public class MailNotificationListener  implements ActivitiEventListener {
 			ActivitiEntityEvent taskEvent = (ActivitiEntityEvent) event;
 			TaskEntity task = (TaskEntity) taskEvent.getEntity();
 			notificationRules = notificationService.findGroupsByProcessIdEventTypeTaskName(processDefinitionKey, type.toString(), task.getTaskDefinitionKey());
-			send(variables, notificationRules, FlowsMailService.TASK_NOTIFICATION, task.getName());
+			send(integratedVariables, notificationRules, FlowsMailService.TASK_NOTIFICATION, task.getName());
 			break;
 
 		case SEQUENCEFLOW_TAKEN:
 			notificationRules = notificationService.findGroupsByProcessIdEventType(processDefinitionKey, type.toString());
-			send(variables, notificationRules, FlowsMailService.FLOW_NOTIFICATION, null);
+			send(integratedVariables, notificationRules, FlowsMailService.FLOW_NOTIFICATION, null);
 			break;
 
 		case PROCESS_STARTED:
 		case PROCESS_COMPLETED:
 		case PROCESS_CANCELLED:
 			notificationRules = notificationService.findGroupsByProcessIdEventType(processDefinitionKey, type.toString());
-			send(variables, notificationRules, FlowsMailService.PROCESS_NOTIFICATION, null);
+			send(integratedVariables, notificationRules, FlowsMailService.PROCESS_NOTIFICATION, null);
 			break;
 
 		default:
