@@ -35,7 +35,7 @@ public class OivSetGroupsAndVisibility {
 	public void configuraVariabiliStart(DelegateExecution execution)  throws IOException, ParseException  {
 
 		String initiator = (String) execution.getVariable("initiator");
-		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
+		LOGGER.info("L'utente {} sta avviando il flusso {} (con identificativo: {})", initiator, execution.getId(), execution.getBusinessKey());
 
 		String struttura = "99999";
 		String gruppoIstruttori = "istruttore@"+ struttura;
