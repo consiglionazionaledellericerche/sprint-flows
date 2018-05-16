@@ -76,13 +76,11 @@ public class MailNotificationListener  implements ActivitiEventListener {
         String nameVariables = processInstance.getName();
         String businessKey = processInstance.getBusinessKey();
         JSONObject jsonObj = new JSONObject(nameVariables);
-        jsonObj.get("fase");
 
         variables.put("businessKey", businessKey);
         variables.put("stato", jsonObj.get("stato"));
         variables.put("descrizione", jsonObj.get("descrizione"));
         variables.put("titolo", jsonObj.get("titolo"));
-        variables.put("fase", jsonObj.get("fase"));
         variables.put("initiator", jsonObj.get("initiator"));
 		return variables;
 	}
@@ -96,9 +94,6 @@ public class MailNotificationListener  implements ActivitiEventListener {
 		Map<String, Object> integratedVariables = integrateVariables(event, variables);
 		ActivitiEntityEvent taskEvent = (ActivitiEntityEvent) event;
 		TaskEntity task = (TaskEntity) taskEvent.getEntity();
-		//        String fase = ((TaskEntity)taskEvent.getEntity()).getTaskDefinitionKey();
-		//        variables.put("faseUltima", fase);
-		//        runtimeService.setVariable(executionId, "faseUltima", fase);
 
 		Set<IdentityLink> candidates = ((TaskEntity)taskEvent.getEntity()).getCandidates();
 		if (Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
