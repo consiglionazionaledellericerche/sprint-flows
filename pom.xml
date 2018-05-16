@@ -51,25 +51,6 @@
         <start-class>it.cnr.si.FlowsApp</start-class>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>jaspersoft-third-party</id>
-            <name>JasperReports third party</name>
-            <url>http://jaspersoft.jfrog.io/jaspersoft/third-party-ce-artifacts/</url>
-        </repository>
-        <repository>
-            <id>jr-ce-releases</id>
-            <name>JasperReports CE Releases</name>
-            <url>http://jaspersoft.jfrog.io/jaspersoft/jr-ce-releases</url>
-        </repository>
-        <repository>
-            <id>jr-snapshots</id>
-            <name>JasperReports snapshots</name>
-            <url>http://jaspersoft.jfrog.io/jaspersoft/jr-ce-snapshots/</url>
-        </repository>
-    </repositories>
-
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -166,6 +147,11 @@
             <artifactId>pdfbox1-layout</artifactId>
             <version>0.8.1</version>
         </dependency>
+        <dependency>
+            <groupId>com.lowagie</groupId>
+            <artifactId>itext</artifactId>
+            <version>2.1.7.js2</version>
+        </dependency>
         <!--dipendenze exportCsv-->
         <dependency>
             <groupId>com.opencsv</groupId>
@@ -222,13 +208,21 @@
                     <artifactId>jdtcore</artifactId>
                     <groupId>eclipse</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>com.lowagie</artifactId>
+                    <groupId>itext</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>org.olap4j</artifactId>
+                    <groupId>olap4j</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
-		<dependency>
-			<groupId>net.sf.jasperreports</groupId>
-			<artifactId>jasperreports-fonts</artifactId>
-			<version>6.0.0</version>
-		</dependency>
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports-fonts</artifactId>
+            <version>6.0.0</version>
+        </dependency>
         <dependency>
             <groupId>org.activiti</groupId>
             <artifactId>activiti-spring-boot-starter-actuator</artifactId>
@@ -278,7 +272,11 @@
             <artifactId>jsoup</artifactId>
             <version>1.8.2</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.olap4j</groupId>
+            <artifactId>olap4j</artifactId>
+            <version>1.2.0</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
