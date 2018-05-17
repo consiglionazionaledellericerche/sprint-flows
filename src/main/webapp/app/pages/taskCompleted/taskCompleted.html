@@ -60,7 +60,7 @@
                                 ng-change="vm.transition(current)"></uib-pagination>
             </div>
 
-            <pre ng-if="!inProduction">{{vm.taskCompletedForMe | json}}</pre>
+            <pre ng-if="isDevelopment">{{vm.taskCompletedForMe | json}}</pre>
         </div>
     </div>
 </div>
