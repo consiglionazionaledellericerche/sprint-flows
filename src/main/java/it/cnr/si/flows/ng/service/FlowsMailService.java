@@ -75,7 +75,7 @@ public class FlowsMailService extends MailService {
 		String htmlContent = templateEngine.process(notificationType, ctx);
 		String mailUtente = flowsUserService.getUserWithAuthoritiesByLogin(username).get().getEmail() ;
 
-		LOGGER.info("Invio mail a {} con titolo {} del tipo {} nella fase {} e con contenuto {}", mailUtente , "Notifica relativa al flusso " + variables.get("businessKey"), notificationType, variables.get("faseUltima"), htmlContent);
+		LOGGER.info("Invio mail a {} con titolo {} del tipo {} nello stato {} e con contenuto {}", mailUtente , "Notifica relativa al flusso " + variables.get("businessKey"), notificationType, variables.get("stato"), htmlContent);
 
 		if (!mailConfig.isMailActivated()) {
 			mailConfig.getMailRecipients()
