@@ -2,7 +2,6 @@ package it.cnr.si.flows.ng.resource;
 
 
 import com.codahale.metrics.annotation.Timed;
-import it.cnr.si.flows.ng.listeners.oiv.service.StatisticOivService;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.service.FlowsPdfService;
 import it.cnr.si.flows.ng.utils.Enum;
@@ -53,8 +52,6 @@ public class FlowsPdfResource {
 	private HistoryService historyService;
 	@Inject
 	private RuntimeService runtimeService;
-	@Inject
-	private StatisticOivService statisticOivService;
 	@Inject
 	private Utils utils;
 

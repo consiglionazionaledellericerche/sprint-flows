@@ -212,7 +212,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 		manageSceltaUtente.azioneScelta(execution, faseEsecuzioneValue, sceltaUtente);
 		LOGGER.info("sceltaUtente: " + sceltaUtente);
 		//print della fase
-		LOGGER.info("faseUltima: " + execution.getVariable("faseUltima"));
+		LOGGER.info("dettagli Istanza di flusso: " + execution.getVariable("name"));
 
 	}
 
