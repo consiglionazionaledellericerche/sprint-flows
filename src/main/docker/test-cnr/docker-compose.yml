@@ -2,7 +2,7 @@ version: '2'
 services:
     sprint-flows-test_cnr:
 #        image: docker.si.cnr.it/sprint-flows-test
-        #todo: imagine locale (puntare a docker.si.cnr.it, da pushare)
+        #todo: immagine locale (puntare a docker.si.cnr.it, da pushare)
         image: sprint-flows-test_cnr
         links:
             - sprint-flows-test_cnr-pg:postgresql
