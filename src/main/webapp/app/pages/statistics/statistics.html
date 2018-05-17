@@ -28,7 +28,7 @@
 		<div class="col-md-9">
 			<h2 translate="statistics.home.title"></h2>
 			<h3> {{vm.processDefinition.name}}</h3>
-			<pre ng-if="!inProduction">$rootScope.wfDefsStatistics: {{$rootScope.wfDefsStatistics}}</pre>
+			<pre ng-if="isDevelopment">$rootScope.wfDefsStatistics: {{$rootScope.wfDefsStatistics}}</pre>
 		</div>
 	</div>
 </div>
