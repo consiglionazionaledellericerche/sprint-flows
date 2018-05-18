@@ -21,6 +21,10 @@ services:
             - POSTGRES_USER=activiti
             - POSTGRES_PASSWORD=activitipw
         volumes:
-           - /var/lib/postgresql/data
+           - spring-flows-test-oiv-pg-data:/var/lib/postgresql/data
         ports:
             - 8485:5432
+
+
+volumes:
+    spring-flows-test-oiv-pg-data:
