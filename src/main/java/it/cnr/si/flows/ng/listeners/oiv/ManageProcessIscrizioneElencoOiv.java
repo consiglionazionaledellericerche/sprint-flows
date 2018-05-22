@@ -17,13 +17,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import it.cnr.si.flows.ng.listeners.oiv.service.CalcolaPunteggioFascia;
+import it.cnr.si.flows.ng.listeners.oiv.service.CreateOivPdf;
 import it.cnr.si.flows.ng.listeners.oiv.service.ManageControlli;
 import it.cnr.si.flows.ng.listeners.oiv.service.ManageSceltaUtente;
 import it.cnr.si.flows.ng.listeners.oiv.service.OivSetGroupsAndVisibility;
 import it.cnr.si.flows.ng.listeners.oiv.service.OperazioniTimer;
-import it.cnr.si.flows.ng.listeners.oiv.service.OivSetGroupsAndVisibility;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import static it.cnr.si.flows.ng.utils.Enum.PdfType.*;
+
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -54,7 +56,9 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 	private Environment env;
 	@Inject
 	private ManageControlli manageControlli;
-
+	@Inject
+	private CreateOivPdf createOivPdf;
+	
 	private Expression faseEsecuzione;
 
 	@Override
@@ -169,6 +173,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 		case "end-improcedibile":  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
 			execution.setVariable("statoFinaleDomanda", "IMPROCEDIBILE");
+			createOivPdf.CreaPdfOiv(execution, improcedibile.name());
 		};break;           
 		case "end-approvata":  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
