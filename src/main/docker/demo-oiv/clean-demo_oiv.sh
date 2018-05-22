@@ -5,7 +5,7 @@ NC='\033[0m'
 echo -e "\n################################## Buildo il war #################################################\n"
 cd ../../../../
 mvn clean install -DskipTests
-cd src/main/docker/test-cnr
+cd src/main/docker/demo-oiv
 
 
 echo -e "\n################################## Copio il war nella folder di docker #################################################\n"
@@ -20,10 +20,10 @@ else
 fi
 
 echo -e "\n################################## BUILDING sprint-flows-demo #################################################\n"
-docker build --no-cache -t sprint-flows-test_cnr -f Dockerfile .
+docker build --no-cache -t sprint-flows-demo_oiv -f Dockerfile .
 
 
-echo -e "\n################################## RUN sprint-flows-test #################################################\n"
+echo -e "\n################################## RUN sprint-flows-demo #################################################\n"
 docker-compose up -d
 
 echo -e "\n########### IMPORTANTE PER MANTENERE IL DB usare ${RED}docker-compose stop${NC} ###############"
