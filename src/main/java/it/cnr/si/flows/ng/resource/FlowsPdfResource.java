@@ -11,6 +11,8 @@ import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.impl.persistence.entity.VariableInstance;
+import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.activiti.engine.impl.variable.SerializableType;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -124,8 +126,16 @@ public class FlowsPdfResource {
 			for (Entry<String, VariableInstance> entry : tutteVariabiliMap.entrySet()) {
 				String key = entry.getKey();
 				VariableInstance value = entry.getValue();
-				Object variableValuealue = value.getValue();
-				variableInstanceJson.put(key, variableValuealue);
+
+//				Object variableValuealue = null;
+//				if(!(((VariableInstanceEntity) value).getType() instanceof SerializableType))
+//					variableValuealue = value.getValue();
+//				variableInstanceJson.put(key, variableValuealue);
+
+				if(((VariableInstanceEntity) value).getType() instanceof SerializableType)
+					variableInstanceJson.put(key, java.util.Optional.empty());
+				else
+					variableInstanceJson.put(key, value.getValue());
 			}
 			LOGGER.info("variableInstanceJson: {}", variableInstanceJson);
 		}
