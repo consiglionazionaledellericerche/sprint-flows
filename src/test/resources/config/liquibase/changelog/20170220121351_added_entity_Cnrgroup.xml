@@ -48,9 +48,6 @@
                   separator=";"
                   tableName="cnrgroup"/>
 
-        <loadData encoding="UTF-8"
-                  file="config/liquibase/cnrgroup_parents.csv"
-                  separator=";"
-                  tableName="cnrgroup_parents"/>
+
     </changeSet>
 </databaseChangeLog>
