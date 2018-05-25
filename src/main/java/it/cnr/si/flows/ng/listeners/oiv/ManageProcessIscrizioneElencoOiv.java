@@ -112,6 +112,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 			//Sospendo i timer di scadenza tempi proderumantali (boundarytimer3) e avviso di scadenza tempi proderumantali (boundarytimer6)
 			operazioniTimer.sospendiTimerTempiProceduramentali(execution, "boundarytimer3", "boundarytimer6");
 			execution.setVariable("dataInizioSoccorsoIstruttorio", simpleDataNow);
+			createOivPdf.CreaPdfOiv(execution, soccorsoIstruttorio.name());
 		};break;    
 		case "soccorso-istruttorio-end":  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
