@@ -126,15 +126,9 @@ public class FlowsPdfResource {
 			for (Entry<String, VariableInstance> entry : tutteVariabiliMap.entrySet()) {
 				String key = entry.getKey();
 				VariableInstance value = entry.getValue();
-
-//				Object variableValuealue = null;
-//				if(!(((VariableInstanceEntity) value).getType() instanceof SerializableType))
-//					variableValuealue = value.getValue();
-//				variableInstanceJson.put(key, variableValuealue);
-
-				if(((VariableInstanceEntity) value).getType() instanceof SerializableType)
-					variableInstanceJson.put(key, java.util.Optional.empty());
-				else
+				//le variabili di tipo serializable (file) non vanno inseriti nel json delle variabili che verranno inseriti nel pdf
+				//(ho testato valutazioni esperienze_Json fino a 11000 caratteri ed a questo livello appare come longString)
+				if(!(((VariableInstanceEntity) value).getType() instanceof SerializableType))
 					variableInstanceJson.put(key, value.getValue());
 			}
 			LOGGER.info("variableInstanceJson: {}", variableInstanceJson);
