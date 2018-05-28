@@ -6,10 +6,19 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand logo" href="#/" ng-click="vm.collapseNavbar()">
-            <img class="logo-img" src="content/images/logosdcnr.png"/>
-            <span>Scrivania Digitale CNR</span> <!-- <span class="navbar-version">v{{VERSION}}</span> -->
-        </a>
+        <div ng-show="app == 'cnr'">
+            <a class="navbar-brand logo" href="#/" ng-click="vm.collapseNavbar()">
+                <img class="logo-img" src="content/images/logosdcnr.png"/>
+                <span>Scrivania Digitale CNR</span> <!-- <span class="navbar-version">v{{VERSION}}</span> -->
+            </a>
+        </div>
+        <div ng-show="app == 'oiv'">
+            <a class="navbar-brand logo" href="#/" ng-click="vm.collapseNavbar()">
+                <img class="logo-img" src="content/images/oiv-flows-banner.png"/>
+                <!--<span>Scrivania Digitale OIV</span> &lt;!&ndash; <span class="navbar-version">v{{VERSION}}</span> &ndash;&gt;-->
+            </a>
+        </div>
+
     </div>
     <div class="navbar-collapse" uib-collapse="vm.isNavbarCollapsed" ng-switch="vm.isAuthenticated()">
         <ul class="nav navbar-nav navbar-right">
@@ -48,10 +57,6 @@
             </li>
 
 
-			<!--wfDefsStatistics: {{wfDefsStatistics}}-->
-			<!--wfDefsStatistics.size: {{wfDefsStatistics.size}}-->
-			<!--wfDefsStatistics.length: {{wfDefsStatistics.length}}-->
-			<!--wfDefsStatistics[0].name: {{wfDefsStatistics[0].name}}-->
             <li ui-sref-active="active" ng-switch-when="true" ng-show="wfDefsStatistics.length >= 1" uib-dropdown
                 class="dropdown pointer">
                 <a class="dropdown-toggle" uib-dropdown-toggle href="" id="statistic-menu">
@@ -197,12 +202,6 @@
                             <span translate="global.menu.account.login">Sign in</span>
                         </a>
                     </li>
-                    <!--                     <li ui-sref-active="active" ng-switch-when="false"> -->
-                    <!--                         <a ui-sref="register" ng-click="vm.collapseNavbar()"> -->
-                    <!--                             <span class="glyphicon glyphicon-plus-sign"></span>&nbsp; -->
-                    <!--                             <span translate="global.menu.account.register">Register</span> -->
-                    <!--                         </a> -->
-                    <!--                     </li> -->
                 </ul>
             </li>
             <li ng-class="{active: vm.$state.includes('admin')}"  ng-switch-when="true" has-authority="ROLE_ADMIN" uib-dropdown class="dropdown pointer">
