@@ -55,6 +55,7 @@ public class TestServices {
     private static final String RA = "anna.penna";
     private static final String RA2 = "silvia.rossi";
     private static final String APP = "utente1";
+    private static final String ISTRUTTORE = "utente5" ;
 
 
     @Inject
@@ -97,7 +98,7 @@ public class TestServices {
         login("user", "user");
     }
 
-    public void loginApp() {
+    public void loginAbilitatiIscrizioneElencoOiv() {
         logout();
         login(TestServices.APP, "");
     }
@@ -115,6 +116,12 @@ public class TestServices {
     public void loginResponsabileAcquisti2() {
         logout();
         login(TestServices.RA2, "");
+    }
+
+
+    public void loginIstruttore() {
+        logout();
+        login(TestServices.ISTRUTTORE, "");
     }
 
     public void loginDirettore() {
@@ -185,7 +192,7 @@ public class TestServices {
                 req.setParameter("impegni_json", "[{\"numero\":\"1\",\"importoNetto\":100,\"importoLordo\":120,\"descrizione\":\"descrizione impegno\",\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"gae\":\"spaclient\"}]");
                 break;
             case iscrizioneElencoOiv:
-                loginApp();
+                loginAbilitatiIscrizioneElencoOiv();
                 req.setParameter("titolo", "titolo");
                 req.setParameter("descrizione", "descrizione");
                 req.setParameter("nomeRichiedente", "utenteRichiedente");

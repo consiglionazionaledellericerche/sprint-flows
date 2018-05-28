@@ -1,11 +1,9 @@
-package it.cnr.si.flows.ng.service;
+package it.cnr.si.flows.ng.resource;
 
 import com.google.common.net.MediaType;
 import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.TestServices;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.resource.FlowsAttachmentResource;
-import it.cnr.si.flows.ng.resource.FlowsTaskResource;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
@@ -15,10 +13,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -36,13 +36,14 @@ import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
 import static org.junit.Assert.*;
 import static org.springframework.http.HttpStatus.OK;
 
-@RunWith(SpringRunner.class)
+//todo: verificare quando sarà stabile ace
+@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "cnr")
-public class SummaryPdfServiceTest {
+@ActiveProfiles(profiles = "test,cnr")
+public class CnrSummaryPdfResouceTest {
 
     @Inject
-    private FlowsPdfService flowsPdfService;
+    private FlowsPdfResource flowsPdfResource;
     @Inject
     private TestServices util;
     @Inject
@@ -111,17 +112,20 @@ public class SummaryPdfServiceTest {
 
     @Test
     public void testSummaryPdfService() throws IOException, ParseException {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         processInstance = util.mySetUp(acquisti);
 
         util.loginSfd();
         completeTask();
 
-        flowsPdfService.makeSummaryPdf(processInstance.getId(), outputStream);
+        ResponseEntity<byte[]> resp = flowsPdfResource.makeSummaryPdf(processInstance.getId(), new MockHttpServletRequest());
+
+        assertEquals(resp.getStatusCode(), HttpStatus.OK);
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(resp.getBody().length);
+        outputStream.write(resp.getBody(), 0, resp.getBody().length);
         assertTrue(outputStream.size() > 0);
+
         util.makeFile(outputStream, "summaryCreato.pdf");
-
-
     }
 
     private void completeTask() throws IOException {

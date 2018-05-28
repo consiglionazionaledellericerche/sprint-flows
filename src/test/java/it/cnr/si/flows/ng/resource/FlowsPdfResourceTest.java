@@ -15,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -34,7 +33,6 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(profiles = "test,oiv")
-@TestPropertySource(locations={"classpath:/config/application.yml"})
 @Ignore //TODO: i pdf generati e le tipologie dei pdf stanno cambiando quindi conviene scrivere i test quando saranno stabili
 public class FlowsPdfResourceTest {
 
@@ -68,7 +66,7 @@ public class FlowsPdfResourceTest {
     public void testMakePdfRigetto() throws IOException {
 
         //creo il pdf "rigetto"
-        util.loginApp();
+        util.loginAbilitatiIscrizioneElencoOiv();
         ResponseEntity<byte[]> response = flowsPdfResource.makePdf(processInstance.getId(), rigetto.name());
 
         //sviluppare il flusso fino alla fase ""
@@ -89,7 +87,7 @@ public class FlowsPdfResourceTest {
     @Test
     public void testMakePdfPreavvisoRigetto() throws IOException {
         //creo il pdf "preavviso di rigetto"
-        util.loginApp();
+        util.loginAbilitatiIscrizioneElencoOiv();
         ResponseEntity<byte[]> response = flowsPdfResource.makePdf(processInstance.getId(), preavvisoRigetto.name());
 
         //sviluppare il flusso fino alla fase ""
