@@ -1,13 +1,13 @@
 version: '2'
 services:
-    sprint-flows-test_oiv:
-#        image: docker.si.cnr.it/sprint-flows-test
+    sprint-flows-demo_cnr:
+#        image: docker.si.cnr.it/sprint-flows-demo
         #todo: immagine locale (puntare a docker.si.cnr.it, da pushare)
-        image: sprint-flows-test_oiv
+        image: sprint-flows-demo_cnr
         links:
-            - sprint-flows-test_oiv-pg:postgresql
+            - sprint-flows-demo_cnr-pg:postgresql
         environment:
-            - SPRING_PROFILES_ACTIVE=test,oiv
+            - SPRING_PROFILES_ACTIVE=demo,cnr
             - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/activiti
             - SPRING_DATASOURCE_USERNAME=activiti
             - SPRING_DATASOURCE_PASSWORD=activitipw
@@ -15,16 +15,15 @@ services:
         command: java -Djava.security.egd=file:/dev/./urandom -jar /app.war
         ports:
             - 9200:8080
-    sprint-flows-test_oiv-pg:
+    sprint-flows-demo_cnr-pg:
         image: postgres:9.6.9-alpine
         environment:
             - POSTGRES_USER=activiti
             - POSTGRES_PASSWORD=activitipw
         volumes:
-           - spring-flows-test-oiv-pg-data:/var/lib/postgresql/data
+           - spring-flows-demo-cnr-pg-data:/var/lib/postgresql/data
         ports:
             - 8485:5432
 
-
 volumes:
-    spring-flows-test-oiv-pg-data:
+    spring-flows-demo-cnr-pg-data:

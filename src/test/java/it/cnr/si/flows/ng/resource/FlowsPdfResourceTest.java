@@ -13,7 +13,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -29,9 +33,14 @@ import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.iscrizioneElen
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
+@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "oiv")
+@ActiveProfiles(profiles = "test,oiv")
+//@TestPropertySource(locations="classpath:test.properties")
+@TestPropertySource(locations={"classpath:/config/application.yml"})
+//@ContextConfiguration(locations = { "classpath:/META-INF/cool-flows-test-context.xml" })
+//@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class FlowsPdfResourceTest {
 
     @Inject

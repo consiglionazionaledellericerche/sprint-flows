@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <databaseChangeLog
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
     <property name="now" value="now()" dbms="mysql,h2"/>
     <property name="now" value="current_timestamp" dbms="postgresql"/>
@@ -16,29 +16,36 @@
     <!--
         Added the entity Membership.
     -->
-    <changeSet id="20170418091241-1" author="jhipster">
+    <changeSet id="20180410115515" author="jhipster">
         <createTable tableName="membership">
             <column name="id" type="bigint" autoIncrement="${autoIncrement}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="username" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="groupname" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-
             <column name="grouprole" type="varchar(255)">
-                <constraints nullable="true"/>
+                <constraints nullable="false" />
             </column>
-
+            
+            <column name="cnrgroup_id" type="bigint"/>
+            <column name="user_id" type="bigint"/>
             <!-- jhipster-needle-liquibase-add-column - Jhipster will add columns here, do not remove-->
         </createTable>
+        
+        <addForeignKeyConstraint baseColumnNames="cnrgroup_id"
+                                 baseTableName="membership"
+                                 constraintName="fk_membership_cnrgroup_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="cnrgroup"/>
+
+        <addForeignKeyConstraint baseColumnNames="user_id"
+                                 baseTableName="membership"
+                                 constraintName="fk_membership_user_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="jhi_user"/>
 
         <loadData encoding="UTF-8"
                   file="config/liquibase/membership.csv"
                   separator=";"
                   tableName="membership"/>
+
     </changeSet>
 </databaseChangeLog>
