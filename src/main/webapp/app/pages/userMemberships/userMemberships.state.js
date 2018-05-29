@@ -110,7 +110,7 @@
 			})
 			.state('group-memberships-edit', {
 				parent: 'app',
-				url: '/group-membership-edit?page&sort&search',
+				url: '/group-memberships-edit?page&sort&search',
 				data: {
 					authorities: ['ROLE_USER'],
 					pageTitle: 'sprintApp.userMemberships.home.title'
@@ -132,7 +132,8 @@
 						squash: true
 					},
 					search: null,
-					groupname: null
+					groupname: null,
+					displayName: null
 				},
 				resolve: {
 					modify: [function() {
@@ -194,7 +195,8 @@
 					});
 				}],
 				params: {
-					groupname: null
+					groupname: null,
+					displayName: null
 				}
 			})
 			.state('user-membership-new', {
@@ -222,7 +224,8 @@
 						}
 					}).result.then(function() {
 						$state.go('group-memberships-edit', {
-							groupname: $stateParams.groupname
+							groupname: $stateParams.groupname,
+						    displayName: $stateParams.displayName
 						}, {
 							reload: 'group-memberships-edit'
 						});

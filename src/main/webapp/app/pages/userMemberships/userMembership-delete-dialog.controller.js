@@ -5,9 +5,9 @@
 		.module('sprintApp')
 		.controller('UserMembershipDeleteController', UserMembershipDeleteController);
 
-	UserMembershipDeleteController.$inject = ['$uibModalInstance' /*, '$state', '$stateParams'*/ , 'entity', 'Membership'];
+	UserMembershipDeleteController.$inject = ['$uibModalInstance', 'entity', 'Membership'];
 
-	function UserMembershipDeleteController($uibModalInstance /*, $state, $stateParams*/ , entity, Membership) {
+	function UserMembershipDeleteController($uibModalInstance, entity, Membership) {
 		var vm = this;
 
 		vm.membership = entity;
