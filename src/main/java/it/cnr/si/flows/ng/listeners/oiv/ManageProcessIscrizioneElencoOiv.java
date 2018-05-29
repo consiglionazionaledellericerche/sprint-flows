@@ -23,10 +23,12 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 
+import static it.cnr.si.flows.ng.utils.Enum.PdfType.improcedibile;
+
 
 @Component
 @Profile("oiv")
-public class ManageProcessIscrizioneElencoOiv implements ExecutionListener, FaseEsecuzione {
+public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
     private static final long serialVersionUID = 686169707042367215L;
     private static final Logger LOGGER = LoggerFactory.getLogger(ManageProcessIscrizioneElencoOiv.class);
 
@@ -46,6 +48,8 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener, Fase
     private Environment env;
     @Inject
     private ManageControlli manageControlli;
+    @Inject
+    private CreateOivPdf createOivPdf;
 
     private Expression faseEsecuzione;
 
@@ -63,10 +67,9 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener, Fase
 
 
         LOGGER.info("ProcessInstanceId: " + processInstanceId);
-        String faseEsecuzioneValue = "noValue";
         boolean aggiornaGiudizioFinale = true;
         boolean nonAggiornaGiudizioFinale = false;
-        faseEsecuzioneValue = faseEsecuzione.getValue(execution).toString();
+        FaseEsecuzioneEnum faseEsecuzioneValue = FaseEsecuzioneEnum.fromValue(faseEsecuzione.getValue(execution).toString());
         switch (faseEsecuzioneValue) {
             case PROCESS_START: {
                 LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
@@ -197,6 +200,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener, Fase
             case END_IMPROCEDIBILE: {
                 LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
                 execution.setVariable("statoFinaleDomanda", "IMPROCEDIBILE");
+                createOivPdf.CreaPdfOiv(execution, improcedibile.name());
             }
             ;
             break;
@@ -255,7 +259,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener, Fase
 
         }
         // Codice per gestire le Scelte
-        manageSceltaUtente.azioneScelta(execution, faseEsecuzioneValue, sceltaUtente);
+        manageSceltaUtente.azioneScelta(execution, faseEsecuzioneValue.getValue(), sceltaUtente);
         LOGGER.info("sceltaUtente: " + sceltaUtente);
         //print della fase
         LOGGER.info("dettagli Istanza di flusso: " + execution.getVariable("name"));
@@ -275,7 +279,4 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener, Fase
                 .orElse(null);
     }
 
-    private void soccorsoIstruttorio(DelegateExecution execution) {
-
-    }
 }
