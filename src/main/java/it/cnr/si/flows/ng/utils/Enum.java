@@ -110,6 +110,7 @@ public class Enum {
         rigettoDopoPreavviso,
         rigettoDopo10Giorni,
         RigettoDef10Giorni,
+        improcedibile,
         preavvisoRigetto,
         preavvisoRigettoDef10Giorni,
         preavvisoRigettoCambioFascia;
