@@ -3,15 +3,15 @@
         "membership" : {
             "home": {
                 "title": "Memberships",
-                "createLabel": "Genera un nuovo Membership",
-                "createOrEditLabel": "Genera o modifica un Membership",
+                "createLabel": "Genera una nuova Membership",
+                "createOrEditLabel": "Genera o modifica una Membership",
                 "search": "Cerca Membership"
             },
-            "created": "&Egrave; stato generato un nuovo Membership con identificatore { param }}",
-            "updated": "&Egrave; stato aggiornato Membership identificato da {{ param }}",
-            "deleted": "&Egrave; stato eliminato Membership con identificatore {{ param }}",
+            "created": "&Egrave; stata generata una nuova Membership con identificatore { param }}",
+            "updated": "&Egrave; stata aggiornata la Membership identificata da {{ param }}",
+            "deleted": "&Egrave; stata eliminata la Membership con identificatore {{ param }}",
             "delete": {
-                "question": "Sei sicuro di volere eliminare Membership {{ id }}?"
+                "question": "Sei sicuro di volere eliminare l'utente <b>{{ user }}</b> dal gruppo <b>{{displayName}}</b> come <i>{{grouprole}}</i>?"
             },
             "detail": {
                 "title": "Membership"

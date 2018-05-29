@@ -32,7 +32,7 @@
                         </button>
                         <div ng-if="membership.grouprole == 'coordinator'">
                             <button type="submit"
-                                    ui-sref="group-memberships-edit({groupname:membership.cnrgroup.name})"
+                                    ui-sref="group-memberships-edit({groupname:membership.cnrgroup.name, displayName:membership.cnrgroup.displayName})"
                                     class="btn btn-primary btn-sm">
                                 <span class="glyphicon glyphicon-pencil"></span>
                                 <span class="hidden-xs hidden-sm" translate="entity.action.edit"></span>
