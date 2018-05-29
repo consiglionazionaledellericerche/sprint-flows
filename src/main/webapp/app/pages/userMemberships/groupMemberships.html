@@ -4,7 +4,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-xs-4 no-padding-left">
-                <button class="btn btn-primary" ui-sref="user-membership-new({groupname:vm.groupname})">
+                <button class="btn btn-primary" ui-sref="user-membership-new({groupname:vm.groupname, displayName: vm.displayName})">
                     <span class="glyphicon glyphicon-plus"></span>
                     <span translate="sprintApp.userMembership.home.createLabel">
                         Create new User Membership
@@ -35,7 +35,7 @@
                 <td>{{membership.grouprole}}</td>
                 <td class="text-right">
                     <div ng-if="membership.id && vm.modify" class="btn-group flex-btn-group-container">
-                        <button ui-sref="userMembershipDelete({id:membership.id, groupname: membership.cnrgroup.name})"
+                        <button ui-sref="userMembershipDelete({id:membership.id, groupname: membership.cnrgroup.name, displayName: membership.cnrgroup.displayName})"
                                 class="btn btn-info btn-sm">
                             <span class="glyphicon glyphicon-remove-circle"></span>
                             <span class="hidden-xs hidden-sm" translate="entity.action.delete"></span>
