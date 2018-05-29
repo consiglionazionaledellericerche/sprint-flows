@@ -78,7 +78,7 @@ public class ManageSceltaUtente {
 						createOivPdf.CreaPdfOiv(execution, preavvisoRigetto.name());
 					};break;
 					case "modifica_fascia": {
-						createOivPdf.CreaPdfOiv(execution, preavvisoRigettoCambioFascia.name());
+						createOivPdf.CreaPdfOiv(execution, preavvisoRigetto.name());
 					};break;
 					default:  {
 						LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
