@@ -27,6 +27,7 @@ public class DeterminaAttore {
 		
 		String currentName = flowsUserService.getUserWithAuthorities().getFirstName() + " " + flowsUserService.getUserWithAuthorities().getLastName();
 		String currentUsername = flowsUserService.getUserWithAuthorities().getLogin();
+		String emailIstruttore = "nomail";
 		String userPhone = "1";
 		String sessoIstruttore = "M";
 		if(flowsUserService.getUserWithAuthorities().getPhone() != null){
@@ -35,13 +36,17 @@ public class DeterminaAttore {
 		if(flowsUserService.getUserWithAuthorities().getGender() != null){
 			sessoIstruttore = flowsUserService.getUserWithAuthorities().getGender();
 		}
+		if(flowsUserService.getUserWithAuthorities().getPhone() != null){
+			emailIstruttore = flowsUserService.getUserWithAuthorities().getPhone();
+		}
 
 		execution.setVariable("nomeIstruttore", currentName);
 		execution.setVariable("istruttoreIncaricato", currentUsername);
 		execution.setVariable("telefonoIstruttore", userPhone);
 		execution.setVariable("sessoIstruttore", sessoIstruttore);
+		execution.setVariable("emailIstruttore", emailIstruttore);
 		
-		LOGGER.debug("--- nomeIstruttore: {} - istruttoreIncaricato: {} - telefonoIstruttore: {}- sessoIstruttore: {}", currentName, currentUsername, userPhone, sessoIstruttore);
+		LOGGER.debug("--- nomeIstruttore: {} - istruttoreIncaricato: {} - telefonoIstruttore: {} - sessoIstruttore: {} - emailIstruttore: {}", currentName, currentUsername, userPhone, sessoIstruttore, emailIstruttore);
 
 	}
 

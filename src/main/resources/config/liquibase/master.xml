@@ -19,10 +19,7 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20170621121602_added_entity_NotificationRule.xml"
              relativeToChangelogFile="false"/>
-
     <include file="classpath:config/liquibase/changelog/addColumnInJHI_User.xml"
-             relativeToChangelogFile="false"/>
-    <include file="classpath:config/liquibase/changelog/addAuthorityForUser.xml"
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/changelog/20171023125007_added_entity_Relationship.xml"
              relativeToChangelogFile="false"/>

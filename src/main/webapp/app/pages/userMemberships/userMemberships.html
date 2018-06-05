@@ -1,18 +1,6 @@
 <div>
     <h2 translate="sprintApp.userMembership.home.title">User Memberships</h2>
     <jhi-alert></jhi-alert>
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-xs-4 no-padding-left">
-                <button class="btn btn-primary" ui-sref="user-membership-new">
-                    <span class="glyphicon glyphicon-plus"></span>
-                    <span translate="sprintApp.userMembership.home.createLabel">
-                        Create new User Membership
-                    </span>
-                </button>
-            </div>
-        </div>
-    </div>
     <br/>
     <div class="table-responsive">
         <table class="jh-table table table-striped">
@@ -37,14 +25,14 @@
                     <div class="btn-group flex-btn-group-container">
                         <!--IMPORTANTE: Se ho l'id allora la membership è nella tabella del Db e posso fare le CRUD (altrimenti è "derivata" dalle relationship-->
                         <button type="submit"
-                                ui-sref="group-memberships({groupname:membership.cnrgroup.name})"
+                                ui-sref="group-memberships({groupname:membership.cnrgroup.name, displayName:membership.cnrgroup.displayName})"
                                 class="btn btn-info btn-sm">
                             <span class="glyphicon glyphicon-eye-open"></span>
                             <span class="hidden-xs hidden-sm" translate="entity.action.view"></span>
                         </button>
                         <div ng-if="membership.grouprole == 'coordinator'">
                             <button type="submit"
-                                    ui-sref="group-memberships-edit({groupname:membership.cnrgroup.name})"
+                                    ui-sref="group-memberships-edit({groupname:membership.cnrgroup.name, displayName:membership.cnrgroup.displayName})"
                                     class="btn btn-primary btn-sm">
                                 <span class="glyphicon glyphicon-pencil"></span>
                                 <span class="hidden-xs hidden-sm" translate="entity.action.edit"></span>

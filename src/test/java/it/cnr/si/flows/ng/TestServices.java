@@ -55,6 +55,7 @@ public class TestServices {
     private static final String RA = "anna.penna";
     private static final String RA2 = "silvia.rossi";
     private static final String APP = "utente1";
+    private static final String ISTRUTTORE = "utente5" ;
 
 
     @Inject
@@ -97,7 +98,7 @@ public class TestServices {
         login("user", "user");
     }
 
-    public void loginApp() {
+    public void loginAbilitatiIscrizioneElencoOiv() {
         logout();
         login(TestServices.APP, "");
     }
@@ -115,6 +116,12 @@ public class TestServices {
     public void loginResponsabileAcquisti2() {
         logout();
         login(TestServices.RA2, "");
+    }
+
+
+    public void loginIstruttore() {
+        logout();
+        login(TestServices.ISTRUTTORE, "");
     }
 
     public void loginDirettore() {
@@ -185,47 +192,26 @@ public class TestServices {
                 req.setParameter("impegni_json", "[{\"numero\":\"1\",\"importoNetto\":100,\"importoLordo\":120,\"descrizione\":\"descrizione impegno\",\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"gae\":\"spaclient\"}]");
                 break;
             case iscrizioneElencoOiv:
-                loginApp();
-                //valutazione esperienza
-                req.setParameter("valutazioneEsperienze[0][numeroEsperienza]", "1");
-                req.setParameter("valutazioneEsperienze[0][dataInizio]", "2018-01-31T23:00:00.000Z");
-                req.setParameter("valutazioneEsperienze[0][dataFine]", "2018-02-01T23:00:00.000Z");
-                req.setParameter("valutazioneEsperienze[0][tipologiaEsperienza]", "Tipologia");
-                req.setParameter("valutazioneEsperienze[0][ambitoEsperienza]", "Ambito");
-                req.setParameter("valutazioneEsperienze[0][attivitaSvolta]", "Attività Svolta");
-                //valutazione esperienza
-                req.setParameter("valutazioneEsperienze[0][numeroEsperienza]", "2");
-                req.setParameter("valutazioneEsperienze[0][dataInizio]", "2018-01-31T23:00:00.000Z");
-                req.setParameter("valutazioneEsperienze[0][dataFine]", "2018-02-01T23:00:00.000Z");
-                req.setParameter("valutazioneEsperienze[0][tipologiaEsperienza]", "Tipologia 2");
-                req.setParameter("valutazioneEsperienze[0][ambitoEsperienza]", "Ambito 2");
-                req.setParameter("valutazioneEsperienze[0][attivitaSvolta]", "Attività Svolta 2");
-                //aggiungo i file alla request
-                req.addFile(new MockMultipartFile("domanda", "domanda.pdf", MediaType.APPLICATION_PDF.getType(),
-                                                  this.getClass().getResourceAsStream("/pdf-test/domanda.pdf")));
-                req.addFile(new MockMultipartFile("cartaIdentita", "cartaIdentita.pdf", MediaType.APPLICATION_PDF.getType(),
-                                                  this.getClass().getResourceAsStream("/pdf-test/cartaIdentita.pdf")));
-                req.addFile(new MockMultipartFile("cv", "cv.pdf", MediaType.APPLICATION_PDF.getType(),
-                                                  this.getClass().getResourceAsStream("/pdf-test/cv.pdf")));
-                req.addFile(new MockMultipartFile("__new__allegati[0]", "allegato.pdf", MediaType.APPLICATION_PDF.getType(),
-                                                  this.getClass().getResourceAsStream("/pdf-test/allegato.pdf")));
+                loginAbilitatiIscrizioneElencoOiv();
                 req.setParameter("titolo", "titolo");
                 req.setParameter("descrizione", "descrizione");
                 req.setParameter("nomeRichiedente", "utenteRichiedente");
                 req.setParameter("dataNascitaRichiedente", "2018-01-31T23:00:00.000Z");
                 req.setParameter("sessoRichiedente", "m");
-                req.setParameter("codiceFiscaleRichiedente", "Codice Fiscale");
-                req.setParameter("emailRichiedente", "e-mail@e-mail");
                 req.setParameter("tipologiaRichiesta", "iscrizione");
-                req.setParameter("punteggioEsperienzeProposto", "Punteggio Esperienze Proposto");
-                req.setParameter("fasciaAppartenenzaProposta", "1");
-                req.setParameter("dataIscrizioneElenco", "2018-02-07T23:00:00.000Z");
+                req.setParameter("dataIscrizioneElenco_json", "2018-02-07T23:00:00.000Z");
                 req.setParameter("codiceIscrizioneElenco", "Codice Iscrizione Elenco");
                 req.setParameter("dataInvioDomanda", "2018-02-17T23:00:00.000Z");
-                req.setParameter("valutazioneEsperienze_json", "[{\"numeroEsperienza\":1,\"dataInizio\":\"2018-02-13T23:00:00.000Z\",\"dataFine\":\"2018-02-13T23:00:00.000Z\",\"tipologiaEsperienza\":\"1\",\"ambitoEsperienza\":\"1\",\"attivitaSvolta\":\"1\"},{\"numeroEsperienza\":2,\"dataInizio\":\"2018-02-14T23:00:00.000Z\",\"dataFine\":\"2018-02-14T23:00:00.000Z\",\"tipologiaEsperienza\":\"2\",\"ambitoEsperienza\":\"2\",\"attivitaSvolta\":\"2\"}]");
-                req.setParameter("dataNascitaRichiedente_json", "2018-01-31T23:00:00.000Z");
-                req.setParameter("dataIscrizioneElenco_json", "2018-02-07T23:00:00.000Z");
-                req.setParameter("dataInvioDomanda_json", "2018-02-17T23:00:00.000Z");
+                req.setParameter("valutazioneEsperienze_json", "[{\"numeroEsperienza\": 1, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 2, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 3, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 4, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 5, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 6, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 7, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 8, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 9, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 10, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 11, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 12, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 13, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 14, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 15, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 16, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \" ifhalfhaldfhasdifhodhui fcyowieynoi4ynwòàoiyònowecywnoòeywòoeòr8ywènc0ynrwàeynòsoniysòoyenòsznò-8ynsc8yòàynà0e8ryàse0yràweyà\"}, {\"numeroEsperienza\": 17, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 18, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \" ifhalfhaldfhasdifhodhui fcyowieynoi4ynwòàoiyònowecywnoòeywòoeòr8ywènc0ynrwàeynòsoniysòoyenòsznò-8ynsc8yòàynà0e8ryàse0yràweyà\"}, {\"numeroEsperienza\": 19, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \" ifhalfhaldfhasdifhodhui fcyowieynoi4ynwòàoiyònowecywnoòeywòoeòr8ywènc0ynrwàeynòsoniysòoyenòsznò-8ynsc8yòàynà0e8ryàse0yràweyà\"}, {\"numeroEsperienza\": 20, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \" ifhalfhaldfhasdifhodhui fcyowieynoi4ynwòàoiyònowecywnoòeywòoeòr8ywènc0ynrwàeynòsoniysòoyenòsznò-8ynsc8yòàynà0e8ryàse0yràweyà\"}, {\"numeroEsperienza\": 21, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \" ifhalfhaldfhasdifhodhui fcyowieynoi4ynwòàoiyònowecywnoòeywòoeòr8ywènc0ynrwàeynòsoniysòoyenòsznò-8ynsc8yòàynà0e8ryàse0yràweyà\"}, {\"numeroEsperienza\": 22, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 23, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 21, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \" ifhalfhaldfhasdifhodhui fcyowieynoi4ynwòàoiyònowecywnoòeywòoeòr8ywènc0ynrwàeynòsoniysòoyenòsznò-8ynsc8yòàynà0e8ryàse0yràweyà\"}, {\"numeroEsperienza\": 22, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 23, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 21, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \" ifhalfhaldfhasdifhodhui fcyowieynoi4ynwòàoiyònowecywnoòeywòoeòr8ywènc0ynrwàeynòsoniysòoyenòsznò-8ynsc8yòàynà0e8ryàse0yràweyà\"}, {\"numeroEsperienza\": 22, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 23, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 21, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \" ifhalfhaldfhasdifhodhui fcyowieynoi4ynwòàoiyònowecywnoòeywòoeòr8ywènc0ynrwàeynòsoniysòoyenòsznò-8ynsc8yòàynà0e8ryàse0yràweyà\"}, {\"numeroEsperienza\": 22, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 23, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 21, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \" ifhalfhaldfhasdifhodhui fcyowieynoi4ynwòàoiyònowecywnoòeywòoeòr8ywènc0ynrwàeynòsoniysòoyenòsznò-8ynsc8yòàynà0e8ryàse0yràweyà\"}, {\"numeroEsperienza\": 22, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 23, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 21, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \" ifhalfhaldfhasdifhodhui fcyowieynoi4ynwòàoiyònowecywnoòeywòoeòr8ywènc0ynrwàeynòsoniysòoyenòsznò-8ynsc8yòàynà0e8ryàse0yràweyà\"}, {\"numeroEsperienza\": 22, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 23, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 21, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \" ifhalfhaldfhasdifhodhui fcyowieynoi4ynwòàoiyònowecywnoòeywòoeòr8ywènc0ynrwàeynòsoniysòoyenòsznò-8ynsc8yòàynà0e8ryàse0yràweyà\"}, {\"numeroEsperienza\": 22, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 23, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 21, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \" ifhalfhaldfhasdifhodhui fcyowieynoi4ynwòàoiyònowecywnoòeywòoeòr8ywènc0ynrwàeynòsoniysòoyenòsznò-8ynsc8yòàynà0e8ryàse0yràweyà\"}, {\"numeroEsperienza\": 22, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 23, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 21, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"ambitoEsperienza\": \"1\", \"attivitaSvolta\": \" ifhalfhaldfhasdifhodhui fcyowieynoi4ynwòàoiyònowecywnoòeywòoeòr8ywènc0ynrwàeynòsoniysòoyenòsznò-8ynsc8yòàynà0e8ryàse0yràweyà\"}, {\"numeroEsperienza\": 22, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 23, \"dataInizio\": \"2018-02-13T23:00:00.000Z\", \"dataFine\": \"2018-02-13T23:00:00.000Z\", \"tipologiaEsperienza\": \"1\", \"attivitaSvolta\": \"1\"}, {\"numeroEsperienza\": 24, \"dataInizio\": \"2018-02-14T23:00:00.000Z\", \"dataFine\": \"2018-02-14T23:00:00.000Z\", \"tipologiaEsperienza\": \"2\", \"attivitaSvolta\": \"2\"} ]");
+                req.setParameter("punteggioEsperienzeProposto", "Punteggio Esperienze Proposto");
+                req.setParameter("fasciaAppartenenzaProposta", "1");
+                req.setParameter("codiceFiscaleRichiedente", "Codice Fiscale");
+                req.setParameter("idDomanda", "123456");
+
+                req.addFile(new MockMultipartFile("domanda", "domanda.pdf", MediaType.APPLICATION_PDF.getType() + "/" + MediaType.APPLICATION_PDF.getSubtype(),
+                                                  this.getClass().getResourceAsStream("/pdf-test/domanda.pdf")));
+                req.addFile(new MockMultipartFile("cv", "cv.pdf", MediaType.APPLICATION_PDF.getType() + "/" + MediaType.APPLICATION_PDF.getSubtype(),
+                                                  this.getClass().getResourceAsStream("/pdf-test/cv.pdf")));
 
                 break;
         }

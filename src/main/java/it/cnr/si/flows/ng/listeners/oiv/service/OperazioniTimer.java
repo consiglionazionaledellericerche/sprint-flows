@@ -103,7 +103,10 @@ public class OperazioniTimer {
 	public void riprendiTimerTempiProceduramentali(DelegateExecution execution, String timerScadenzaTempiId, String timerAvvisoScadenzaId) throws IOException, ParseException {
 
 		String processInstanceId = execution.getProcessInstanceId();
-		int diffDays = Integer.parseInt(execution.getVariable("ggScadenzaTerminiDomanda").toString());
+		int diffDays = 0;
+		if (execution.getVariable("ggScadenzaTerminiDomanda") != null) {
+			diffDays = Integer.parseInt(execution.getVariable("ggScadenzaTerminiDomanda").toString());
+		}
 		int diffDaysAvviso = 0;
 		if (diffDays >5 ) {
 			diffDaysAvviso = diffDays - 5;

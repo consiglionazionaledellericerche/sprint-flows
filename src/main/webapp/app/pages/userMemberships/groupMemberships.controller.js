@@ -17,6 +17,7 @@
 		vm.transition = transition;
 		vm.itemsPerPage = paginationConstants.itemsPerPage;
 		//serve per visualizzarlo nell'html
+		vm.displayName = $stateParams.displayName;
 		vm.groupname = $stateParams.groupname;
 
 		loadAll();
