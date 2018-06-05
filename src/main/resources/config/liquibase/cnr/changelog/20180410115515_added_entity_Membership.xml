@@ -43,7 +43,7 @@
                                  referencedTableName="jhi_user"/>
 
         <loadData encoding="UTF-8"
-                  file="config/liquibase/membership.csv"
+                  file="config/liquibase/cnr/membership.csv"
                   separator=";"
                   tableName="membership"/>
 
