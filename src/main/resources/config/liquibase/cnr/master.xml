@@ -4,7 +4,12 @@
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
-    <include file="classpath:config/liquibase/cnr/changelog/00000000000000_initial_schema.xml" relativeToChangelogFile="false"/>
+    <!--initial_schema.xml sta in sprint-core -->
+    <include file="classpath:config/liquibase/changelog/00000000000000_initial_schema.xml"
+             relativeToChangelogFile="false"/>
+
+
+
     <include file="classpath:config/liquibase/cnr/changelog/20160922122807_added_entity_Counter.xml"
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/cnr/changelog/20170206085209_added_entity_Cnrauthority.xml"
