@@ -15,6 +15,10 @@
                    tableName="jhi_user">
             <column name="gender" type="varchar(10)"/>
         </addColumn>
-    </changeSet>
 
+        <loadData encoding="UTF-8"
+                  file="config/liquibase/users-oiv.csv"
+                  separator=";"
+                  tableName="jhi_user"/>
+    </changeSet>
 </databaseChangeLog>

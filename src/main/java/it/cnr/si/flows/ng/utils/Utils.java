@@ -310,4 +310,22 @@ public final class Utils {
         }
         return taskQuery;
     }
+
+	public static class SearchResult {
+		String value;
+        String label;
+
+        public SearchResult(String v, String l) {
+			value = v;
+			label = l;
+		}
+
+        public String getValue() {
+            return value;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+	}
 }

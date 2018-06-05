@@ -20,6 +20,7 @@
         vm.requestResetPassword = requestResetPassword;
         vm.username = null;
 
+//todo: serve per fare l'effetto "focus" sul nome dell'utente loggato che ora non c'è più?
         $timeout(function (){angular.element('#username').focus();});
 
         function cancel () {

@@ -13,8 +13,8 @@
         <p>
             Il compito
             <strong th:text="${taskName}"></strong>
-            per il flusso <strong th:text="${title}">TITOLO FLUSSO</strong>
-            <span th:if="${titolo}">
+            per il flusso <strong th:text="${businessKey}">TITOLO FLUSSO</strong>
+            <span th:if="${businessKey}">
               <br><i>dal titolo: "<bold th:text="${titolo}">OGGETTO FLUSSO</bold>"</i></span>
         <hr>
             è stato assegnato al gruppo <strong th:text="${groupname}">NOME GRUPPO</strong>
@@ -27,7 +27,14 @@
         <p th:if="${priorita}"> Priorita <strong th:text="${priorita}">CODICE VERDE</strong></p>
 
         <hr>
-        <footer>
+        <footer th:if="${profile == 'oiv'}">
+          <p>Si prega di non rispondere alla presente mail generata automaticamente dal sistema.
+          <p>Accedere alla scrivania digitale utlizzando il seguente il link:<br>
+            https://scrivaniadigitale.palazzochigi.it
+          <p>Cordiali saluti,<br>DIPARTIMENTO FUNZIONE PUBBLICA - Scrivania Digitale
+        </footer>
+        
+        <footer th:if="${profile != 'oiv'}">
           <p>Si prega di non rispondere alla presente mail generata automaticamente dal sistema.
           <p>Accedere alla scrivania digitale utlizzando il seguente il link:<br>
             https://scrivaniadigitale.cnr.it

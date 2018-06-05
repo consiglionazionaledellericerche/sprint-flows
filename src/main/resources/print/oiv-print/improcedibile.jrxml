@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.5.1.final utlizzo versione della libreria JasperReports6.5.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="OivImprocedibile" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="NoPages" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c0187353-db16-46fc-a7a4-9ece39bc4976">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="oivPreavvisoRigetto"/>
+	<style name="Title" fontName="Times New Roman" fontSize="50" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+	<style name="SubTitle" forecolor="#736343" fontName="Arial" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="Arial" fontSize="12"/>
+	<style name="Row" mode="Transparent">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+			<style backcolor="#E6DAC3"/>
+		</conditionalStyle>
+	</style>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 3">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 3_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 3_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 3_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 4">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 4_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 4_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 4_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 5">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 5_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 5_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 5_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 6">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 6_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 6_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 6_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="Esperienze" uuid="43718d59-fac1-44c4-8e31-33ea348b2df2">
+		<queryString language="json">
+			<![CDATA[]]>
+		</queryString>
+		<field name="numeroEsperienza" class="java.lang.String">
+			<fieldDescription><![CDATA[numeroEsperienza]]></fieldDescription>
+		</field>
+		<field name="tipologiaEsperienza" class="java.lang.String">
+			<fieldDescription><![CDATA[tipologiaEsperienza]]></fieldDescription>
+		</field>
+		<field name="attivitaSvolta" class="java.lang.String">
+			<fieldDescription><![CDATA[attivitaSvolta]]></fieldDescription>
+		</field>
+		<field name="ambitoEsperienza" class="java.lang.String">
+			<fieldDescription><![CDATA[ambitoEsperienza]]></fieldDescription>
+		</field>
+	</subDataset>
+	<parameter name="ANN_IMAGE" class="java.io.InputStream"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["C:\\CNR\\1_PROGETTI\\OIV\\PDF - JASPER REPORT\\print\\"]]></defaultValueExpression>
+	</parameter>
+	<queryString language="json">
+		<![CDATA[]]>
+	</queryString>
+	<field name="dataInvioDomanda" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="dataInvioDomanda"/>
+		<fieldDescription><![CDATA[dataInvioDomanda]]></fieldDescription>
+	</field>
+	<field name="nomeRichiedente" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="nomeRichiedente"/>
+		<fieldDescription><![CDATA[nomeRichiedente]]></fieldDescription>
+	</field>
+	<field name="emailRichiedente" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="emailRichiedente"/>
+		<fieldDescription><![CDATA[emailRichiedente]]></fieldDescription>
+	</field>
+	<field name="dataPreavviso" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="dataPreavviso"/>
+		<fieldDescription><![CDATA[dataPreavviso]]></fieldDescription>
+	</field>
+	<field name="protocolloPreavviso" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="protocolloPreavviso"/>
+		<fieldDescription><![CDATA[protocolloPreavviso]]></fieldDescription>
+	</field>
+	<field name="dataRigetto" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="dataRigetto"/>
+		<fieldDescription><![CDATA[dataRigetto]]></fieldDescription>
+	</field>
+	<field name="protocolloRigetto" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="protocolloRigetto"/>
+		<fieldDescription><![CDATA[protocolloRigetto]]></fieldDescription>
+	</field>
+	<field name="motivazioneStandard" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="motivazioneStandard"/>
+		<fieldDescription><![CDATA[motivazioneStandard]]></fieldDescription>
+	</field>
+	<field name="sessoRichiedente" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="sessoRichiedente"/>
+		<fieldDescription><![CDATA[sessoRichiedente]]></fieldDescription>
+	</field>
+	<field name="nomeIstruttore" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="nomeIstruttore"/>
+		<fieldDescription><![CDATA[nomeIstruttore]]></fieldDescription>
+	</field>
+	<field name="telefonoIstruttore" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="telefonoIstruttore"/>
+		<fieldDescription><![CDATA[telefonoIstruttore]]></fieldDescription>
+	</field>
+	<field name="sessoIstruttore" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="sessoIstruttore"/>
+		<fieldDescription><![CDATA[sessoIstruttore]]></fieldDescription>
+	</field>
+	<field name="dataInvioNuovaDomanda" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="dataInvioNuovaDomanda"/>
+		<fieldDescription><![CDATA[dataInvioNuovaDomanda]]></fieldDescription>
+	</field>
+	<field name="numeroValutazioniPositive" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="numeroValutazioniPositive"/>
+		<fieldDescription><![CDATA[numeroValutazioniPositive]]></fieldDescription>
+	</field>
+	<field name="numeroValutazioniNegative" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="numeroValutazioniNegative"/>
+		<fieldDescription><![CDATA[numeroValutazioniNegative]]></fieldDescription>
+	</field>
+	<field name="elencoValutazioniNegative" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="elencoValutazioniNegative"/>
+		<fieldDescription><![CDATA[elencoValutazioniNegative]]></fieldDescription>
+	</field>
+	<field name="numeroAmbitoPianificazioneKo" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="numeroAmbitoPianificazioneKo"/>
+		<fieldDescription><![CDATA[numeroAmbitoPianificazioneKo]]></fieldDescription>
+	</field>
+	<field name="numeroAmbitoControlloGestioneKo" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="numeroAmbitoControlloGestioneKo"/>
+		<fieldDescription><![CDATA[numeroAmbitoControlloGestioneKo]]></fieldDescription>
+	</field>
+	<field name="numeroAmbitoMisurazionePerformanceKo" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="numeroAmbitoMisurazionePerformanceKo"/>
+		<fieldDescription><![CDATA[numeroAmbitoMisurazionePerformanceKo]]></fieldDescription>
+	</field>
+	<field name="numeroAmbitoProgrammazioneFinanziariaKo" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="numeroAmbitoProgrammazioneFinanziariaKo"/>
+		<fieldDescription><![CDATA[numeroAmbitoProgrammazioneFinanziariaKo]]></fieldDescription>
+	</field>
+	<field name="numeroAmbitoRiskManagmentKo" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="numeroAmbitoRiskManagmentKo"/>
+		<fieldDescription><![CDATA[numeroAmbitoRiskManagmentKo]]></fieldDescription>
+	</field>
+	<field name="numeroAmbitiKo" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="numeroAmbitiKo"/>
+		<fieldDescription><![CDATA[numeroAmbitiKo]]></fieldDescription>
+	</field>
+	<field name="elencoAmbitiKo" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="elencoAmbitiKo"/>
+		<fieldDescription><![CDATA[elencoAmbitiKo]]></fieldDescription>
+	</field>
+	<field name="testoMotivazioneSpecifica" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="testoMotivazioneSpecifica"/>
+		<fieldDescription><![CDATA[testoMotivazioneSpecifica]]></fieldDescription>
+	</field>
+	<field name="tipologiaRichiesta" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="tipologiaRichiesta"/>
+		<fieldDescription><![CDATA[tipologiaRichiesta]]></fieldDescription>
+	</field>
+	<field name="domanda_non_firmata" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="domanda_non_firmata"/>
+		<fieldDescription><![CDATA[domanda_non_firmata]]></fieldDescription>
+	</field>
+	<field name="anomalie_certificato" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="anomalie_certificato"/>
+		<fieldDescription><![CDATA[anomalie_certificato]]></fieldDescription>
+	</field>
+	<field name="valutazioneEsperienze_json" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="valutazioneEsperienze_json"/>
+		<fieldDescription><![CDATA[valutazioneEsperienze_json]]></fieldDescription>
+	</field>
+	<field name="domanda_priva_dettagli_esperienze" class="java.lang.String">
+		<fieldDescription><![CDATA[domanda_priva_dettagli_esperienze]]></fieldDescription>
+	</field>
+	<field name="domanda_provvisoria" class="java.lang.String">
+		<fieldDescription><![CDATA[domanda_provvisoria]]></fieldDescription>
+	</field>
+	<field name="domanda_incompleta" class="java.lang.String">
+		<fieldDescription><![CDATA[domanda_incompleta]]></fieldDescription>
+	</field>
+	<field name="documento_non_valido" class="java.lang.String">
+		<fieldDescription><![CDATA[documento_non_valido]]></fieldDescription>
+	</field>
+	<field name="domanda_firmata_non_leggibile" class="java.lang.String">
+		<fieldDescription><![CDATA[domanda_firmata_non_leggibile]]></fieldDescription>
+	</field>
+	<field name="cv_non_allegato" class="java.lang.String">
+		<fieldDescription><![CDATA[cv_non_allegato]]></fieldDescription>
+	</field>
+	<field name="documento_non_allegato" class="java.lang.String">
+		<fieldDescription><![CDATA[documento_non_allegato]]></fieldDescription>
+	</field>
+	<field name="documento_non_presente" class="java.lang.String">
+		<fieldDescription><![CDATA[documento_non_presente]]></fieldDescription>
+	</field>
+	<field name="fascia_professionale_indeterminata" class="java.lang.String">
+		<fieldDescription><![CDATA[fascia_professionale_indeterminata]]></fieldDescription>
+	</field>
+	<field name="documento_scaduto" class="java.lang.String">
+		<fieldDescription><![CDATA[documento_scaduto]]></fieldDescription>
+	</field>
+	<field name="documento_illegibile" class="java.lang.String">
+		<fieldDescription><![CDATA[documento_illegibile]]></fieldDescription>
+	</field>
+	<field name="documento_non_completo" class="java.lang.String">
+		<fieldDescription><![CDATA[documento_non_completo]]></fieldDescription>
+	</field>
+	<field name="domanda_senza_dati_documento" class="java.lang.String">
+		<fieldDescription><![CDATA[domanda_senza_dati_documento]]></fieldDescription>
+	</field>
+	<group name="Group2" isStartNewColumn="true" footerPosition="StackAtBottom">
+		<groupExpression><![CDATA[(int)($V{REPORT_COUNT}/5)]]></groupExpression>
+		<groupHeader>
+			<band height="250" splitType="Stretch">
+				<textField isStretchWithOverflow="true">
+					<reportElement style="Detail" positionType="Float" x="30" y="0" width="505" height="40" uuid="7ac903fa-55d2-4e21-a610-fa7dda8d3df3"/>
+					<textElement textAlignment="Justified" markup="styled">
+						<font fontName="SansSerif" size="11" isBold="false" isItalic="false"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["\t Con riferimento alla Sua richiesta si informa che non è stata presa in esame dal Dipartimento in quanto " + "<style  isBold=\"true\">" + " si è perfezionata secondo le modalità previste dall’art. 3 del D.M. in oggetto, in quanto "  + "</style>" ]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement style="Detail" positionType="Float" x="30" y="40" width="505" height="60" uuid="ae569f93-4b65-45b7-8ff9-06ecb89dfdb5"/>
+					<textElement textAlignment="Justified" markup="styled">
+						<font fontName="SansSerif" size="11" isBold="false" isItalic="false"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA[($F{fascia_professionale_indeterminata}.equals( "true" )  ? ("\r\nil sistema non ha attribuito la fascia professionale ") : "" ) + ($F{domanda_priva_dettagli_esperienze}.equals( "true" )  ? ("\r\nla domanda è priva delle esperienze professionali") : "" )+ ($F{domanda_provvisoria}.equals( "true" )  ? ("\r\nla domanda inviata è in versione provvisoria ") : "") + ($F{domanda_non_firmata}.equals( "true" )  ? ("\r\nla domanda non è firmata ") : "") + ($F{anomalie_certificato}.equals( "true" )  ? ("\r\nil certificato della firma digitale presenta delle anomalie ") : "") + ($F{domanda_incompleta}.equals( "true" )  ? ("\r\nla scansione della domanda è incompleta") : "" )+ ($F{documento_scaduto}.equals( "true" )  ? ("\r\nil documento di identità è scaduto ") : "" ) + ($F{documento_illegibile}.equals( "true" )  ? ("\r\nla scansione del documento di identità è illeggibile ") : "" ) + ($F{domanda_firmata_non_leggibile}.equals( "true" )  ? ("\r\nla domanda firmata digitalmente non è in un formato leggibile ") : "" ) + ($F{cv_non_allegato}.equals( "true" )  ? ("\r\nla domanda non è corredata dal CV ") : "" ) + ($F{documento_non_allegato}.equals( "true" )  ? ("\r\nla domanda non è corredata dal documento di identità ") : "" ) + ($F{documento_non_completo}.equals( "true" )  ? ("\r\nil documento di identità è incompleto")  : "") + ($F{domanda_senza_dati_documento}.equals( "true" )  ? ("\r\nla domanda non presenta i dati relativi al documento di identità")  : "") +"." 
+]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement style="Detail" positionType="Float" x="30" y="100" width="505" height="60" uuid="b420b75b-f40b-4349-bff9-9bba77f18bad"/>
+					<textElement textAlignment="Justified" markup="styled">
+						<font fontName="SansSerif" size="11" isBold="false" isItalic="false"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["\r\n\tLa S.V. potrà comunque, in ogni momento, ripresentare una nuova istanza."+"\r\n\tAl riguardo si consiglia di prendere visione del &quot;Manuale Utente&quot; pubblicato sul sito del Portale della performance e consultabile al seguente link: " + "<style  isBold=\"true\">" + "\r\nhttps://performance.gov.it/system/files/Manuale%20Elenco%20Nazionale%20v%203.0.pdf"  + "</style>" ]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement positionType="Float" x="30" y="160" width="505" height="80" uuid="d7b7e47d-30b0-40ae-8f62-33489ba02aef"/>
+					<textElement textAlignment="Justified">
+						<font size="11"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["\r\n\tPer altri eventuali chiarimenti è possibile contattare " + ( $F{sessoIstruttore}.equals( "M" )  ?  ("il dott. ") : ("la dott.ssa ") )+ $F{nomeIstruttore} + " dalle 11.00 alle 13.00, telefono 06 6899 "+ $F{telefonoIstruttore} +"."]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="106" splitType="Stretch">
+				<textField isStretchWithOverflow="true">
+					<reportElement style="Detail" x="237" y="11" width="305" height="51" uuid="2d49c6fc-7ded-4f0d-94fb-e4cc1e708646"/>
+					<textElement textAlignment="Center">
+						<font fontName="SansSerif" size="11" isBold="false"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["per il Direttore dell’Ufficio\r\ndott.ssa Alessandra Barberi\r\n(Dirigente del Servizio per la valutazione indipendente)"]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="24">
+				<textField isStretchWithOverflow="true">
+					<reportElement style="Detail" positionType="FixRelativeToBottom" x="4" y="5" width="505" height="19" uuid="33f2da54-0668-4db7-ac94-d1a49ef00fb5"/>
+					<textElement>
+						<font fontName="SansSerif" size="11" isBold="false" isItalic="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Il presente rigetto è firmato digitalmente ai sensi dell’art. 24 del D.lgs 7 marzo 2005, n. 82"]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="235" splitType="Stretch">
+			<textField isStretchWithOverflow="true">
+				<reportElement style="Detail" x="310" y="143" width="69" height="17" uuid="0b92db97-6423-4fe6-aa21-2c7b75c4dc9b"/>
+				<textElement>
+					<font fontName="SansSerif" size="11" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[( $F{sessoRichiedente}.equalsIgnoreCase( "M" )  ? ("Al dott.: ") : ("Alla dott.ssa: ") )]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="1" y="2" width="329" height="130" uuid="6beae08d-439c-499c-9fc8-d7d0aa6d351e"/>
+				<imageExpression><![CDATA[$P{ANN_IMAGE}]]></imageExpression>
+			</image>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="Detail" x="392" y="143" width="160" height="17" uuid="73aefea6-9311-45d7-9f1f-84cad715b43c"/>
+				<textElement>
+					<font fontName="SansSerif" size="11" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nomeRichiedente}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="19" y="193" width="100" height="30" uuid="cfa4daaf-6dcb-40f2-9881-83fce970ef94"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Oggetto: "]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="130" y="193" width="412" height="42" uuid="126fd6fc-1a28-4bcc-98da-bd2779998024"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Elenco nazionale dei componenti degli Organismi indipendenti di valutazione ai sensi del D.M. 2 dicembre 2016. Improcedibilità per mancato perfezionamento dell’istanza presentata il " +$F{dataInvioDomanda} + ".\n\ril sistema non ha attribuito la fascia professionale "]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="4" splitType="Stretch"/>
+	</columnHeader>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="11" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>
