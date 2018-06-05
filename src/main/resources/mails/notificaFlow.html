@@ -5,7 +5,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     </head>
     <body>
-        <h1> Notifica relativa al flusso <span th:text="${title}">NOME FLUSSO</span></h1>
+        <h1> Notifica relativa al flusso <span th:text="${businessKey}">NOME FLUSSO</span></h1>
         <span th:if="${titolo}">
               <br><i>dal titolo: "<bold th:text="${titolo}">OGGETTO FLUSSO</bold>"</i></span>
         <hr>
@@ -25,7 +25,14 @@
         <p th:if="${priorita}"> Priorita <strong th:text="${priorita}">CODICE VERDE</strong></p>
 
         <hr>
-        <footer style="color: dark-gray; font-size: 0.8em;">
+        <footer th:if="${profile == 'oiv'}" style="color: dark-gray; font-size: 0.8em;">
+          <p>Si prega di non rispondere alla presente mail generata automaticamente dal sistema.
+          <p>Accedere alla scrivania digitale utlizzando il seguente il link:<br>
+            https://scrivaniadigitale.palazzochigi.it
+          <p>Cordiali saluti,<br>DIPARTIMENTO FUNZIONE PUBBLICA - Scrivania Digitale
+        </footer>
+        
+        <footer th:if="${profile != 'oiv'}" style="color: dark-gray; font-size: 0.8em;">
           <p>Si prega di non rispondere alla presente mail generata automaticamente dal sistema.
           <p>Accedere alla scrivania digitale utlizzando il seguente il link:<br>
             https://scrivaniadigitale.cnr.it

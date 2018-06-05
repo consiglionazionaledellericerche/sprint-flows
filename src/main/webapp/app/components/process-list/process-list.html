@@ -18,6 +18,9 @@
                         <h4>Descrizione: {{process.name | get: 'descrizione'}}</h4>
                     </li>
                     <li>
+                        <h4>Stato: {{process.name | get: 'stato'}}</h4>
+                    </li>
+                    <li>
                         Avviato il <strong>{{process.startTime | dataora}}</strong> da <strong> {{process.name | get:
                                                                                                 'initiator'}} </strong>
                     </li>

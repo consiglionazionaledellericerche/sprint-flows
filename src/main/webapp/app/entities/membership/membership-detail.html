@@ -23,7 +23,7 @@
                     <span translate="sprintApp.membership.cnrgroup">cnrgroup</span>
                 </td>
                 <td>
-                    <a class="form-control-static" ui-sref="cnrgroup.detail({id:membership.cnrgroup.id})">{{membership.cnrgroup.display_name}}</a>
+                    {{membership.cnrgroup.displayName}}
                 </td>
             </tr>
             <tr>
@@ -31,7 +31,7 @@
                     <span translate="sprintApp.membership.user">user</span>
                 </td>
                 <td>
-                    <a class="form-control-static" ui-sref="jhi_user.detail({id:membership.user.id})">{{membership.user.login}}</a>
+                    {{membership.user.login}}
                 </td>
             </tr>
             </tbody>

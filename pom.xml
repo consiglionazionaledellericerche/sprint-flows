@@ -31,7 +31,7 @@
         <firmadigitale.version>1.11</firmadigitale.version>
         <gatling-maven-plugin.version>2.1.7</gatling-maven-plugin.version>
         <jacoco-maven-plugin.version>0.7.7.201606060606</jacoco-maven-plugin.version>
-        <jasperreports.version>5.5.1</jasperreports.version>
+        <jasperreports.version>6.5.1</jasperreports.version>
         <json-path.version>2.2.0</json-path.version>
         <liquibase-hibernate4.version>3.5</liquibase-hibernate4.version>
         <liquibase.version>3.4.2</liquibase.version>
@@ -147,6 +147,11 @@
             <artifactId>pdfbox1-layout</artifactId>
             <version>0.8.1</version>
         </dependency>
+        <dependency>
+            <groupId>com.lowagie</groupId>
+            <artifactId>itext</artifactId>
+            <version>2.1.7.js2</version>
+        </dependency>
         <!--dipendenze exportCsv-->
         <dependency>
             <groupId>com.opencsv</groupId>
@@ -203,7 +208,20 @@
                     <artifactId>jdtcore</artifactId>
                     <groupId>eclipse</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>com.lowagie</artifactId>
+                    <groupId>itext</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>org.olap4j</artifactId>
+                    <groupId>olap4j</groupId>
+                </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports-fonts</artifactId>
+            <version>6.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.activiti</groupId>
@@ -254,7 +272,11 @@
             <artifactId>jsoup</artifactId>
             <version>1.8.2</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.olap4j</groupId>
+            <artifactId>olap4j</artifactId>
+            <version>1.2.0</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
