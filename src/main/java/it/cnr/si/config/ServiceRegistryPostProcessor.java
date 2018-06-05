@@ -17,8 +17,7 @@ import org.springframework.stereotype.Component;
 public class ServiceRegistryPostProcessor implements BeanDefinitionRegistryPostProcessor {
 
     @Override
-    public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry)
-            throws BeansException {
+    public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
         GenericBeanDefinition gbd = new GenericBeanDefinition();
 
         gbd.setScope("singleton");
@@ -36,6 +35,8 @@ public class ServiceRegistryPostProcessor implements BeanDefinitionRegistryPostP
         registry.registerBeanDefinition("liquibase", gbd );
     }
 
-    @Override
-    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {}
+
+    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+        //TODO: metodo vuoto perchè presente nell'interfaccia BeanDefinitionRegistryPostProcessor ma non mi serve per iniettare il singleton di liquibase
+    }
 }
