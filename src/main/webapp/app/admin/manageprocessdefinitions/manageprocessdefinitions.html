@@ -1,27 +1,19 @@
 <div ng-cloak>
-
-  <div class="row">
-
-    <div class="col-md-6 col-md-offset-3">
-
-      <h1>Processi Caricati</h1>
-
-      <ul>
-        <li class="row" ng-repeat="procDef in vm.procDefs">
-          {{procDef.id}}
-        </li>
-      </ul>
-
-      <h1>Carica o aggiorna Process Definition</h1>
-      <h4>Da grandi poteri derivano grandi responsabilita'</h4>
-      <form novalidate class="flows-form" name="processDefinitionForm" ng-submit="submitProcessDefinition(picFile)">
-        <fileinput name="procDef" label="Process Definition" multiple=false cnr-required=true />
-        <button class="btn btn-primary" type="submit" ng-disabled="processDefinitionForm.$invalid"> invia <span class="glyphicon glyphicon-arrow-right"></span></button>
-      </form>
-
-    </div>
-
-  </div>
-
-  <pre>{{vm | json}}</pre>
+	<div class="row">
+		<div class="col-md-6 col-md-offset-3">
+			<h1>Processi Caricati</h1>
+			<ul>
+				<li class="row" ng-repeat="procDef in vm.procDefs">
+					{{procDef.id}}
+				</li>
+			</ul>
+			<h1>Carica o aggiorna Process Definition</h1>
+			<h4>Da grandi poteri derivano grandi responsabilita'</h4>
+			<form novalidate class="flows-form" name="processDefinitionForm" ng-submit="submitProcessDefinition(picFile)">
+				<fileinput name="procDef" label="Process Definition" multiple=false cnr-required=true />
+				<button class="btn btn-primary" type="submit" ng-disabled="processDefinitionForm.$invalid"> invia <span class="glyphicon glyphicon-arrow-right"></span></button>
+			</form>
+		</div>
+	</div>
+	<pre ng-if="isDevelopment">	{{vm | json}} </pre>
 </div>

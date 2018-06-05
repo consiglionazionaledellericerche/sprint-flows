@@ -6,10 +6,19 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand logo" href="#/" ng-click="vm.collapseNavbar()">
-            <img class="logo-img" src="content/images/logosdcnr.png"/>
-            <span>Scrivania Digitale CNR</span> <!-- <span class="navbar-version">v{{VERSION}}</span> -->
-        </a>
+        <div ng-show="app == 'cnr'">
+            <a class="navbar-brand logo" href="#/" ng-click="vm.collapseNavbar()">
+                <img class="logo-img" src="content/images/logosdcnr.png"/>
+                <span>Scrivania Digitale CNR</span> <!-- <span class="navbar-version">v{{VERSION}}</span> -->
+            </a>
+        </div>
+        <div ng-show="app == 'oiv'">
+            <a class="navbar-brand logo" href="#/" ng-click="vm.collapseNavbar()">
+                <img class="logo-img" src="content/images/oiv-flows-banner.png"/>
+                <!--<span>Scrivania Digitale OIV</span> &lt;!&ndash; <span class="navbar-version">v{{VERSION}}</span> &ndash;&gt;-->
+            </a>
+        </div>
+
     </div>
     <div class="navbar-collapse" uib-collapse="vm.isNavbarCollapsed" ng-switch="vm.isAuthenticated()">
         <ul class="nav navbar-nav navbar-right">
@@ -46,6 +55,31 @@
                     </li>
                 </ul>
             </li>
+
+
+            <li ui-sref-active="active" ng-switch-when="true" ng-show="wfDefsStatistics.length >= 1" uib-dropdown
+                class="dropdown pointer">
+                <a class="dropdown-toggle" uib-dropdown-toggle href="" id="statistic-menu">
+                    <span>
+                        <span class="glyphicon glyphicon-stats"></span>
+                        <span class="hidden-sm">
+                            Statistiche
+                        </span>
+                        <b class="caret"></b>
+                    </span>
+                </a>
+                <ul class="dropdown-menu" uib-dropdown-menu>
+                    <li ng-repeat="wfDef in wfDefsStatistics">
+                        <a ui-sref="statistics({processDefinition: wfDef})"
+                           ng-click="vm.collapseNavbar()">
+                            {{wfDef.name}}
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+
+
             <li ui-sref-active="active" has-authority="ROLE_USER">
                 <a ui-sref="task-completed" ng-click="vm.collapseNavbar()">
                     <span class=" glyphicon glyphicon-ok"></span>
@@ -168,12 +202,6 @@
                             <span translate="global.menu.account.login">Sign in</span>
                         </a>
                     </li>
-<!--                     <li ui-sref-active="active" ng-switch-when="false"> -->
-<!--                         <a ui-sref="register" ng-click="vm.collapseNavbar()"> -->
-<!--                             <span class="glyphicon glyphicon-plus-sign"></span>&nbsp; -->
-<!--                             <span translate="global.menu.account.register">Register</span> -->
-<!--                         </a> -->
-<!--                     </li> -->
                 </ul>
             </li>
             <li ng-class="{active: vm.$state.includes('admin')}"  ng-switch-when="true" has-authority="ROLE_ADMIN" uib-dropdown class="dropdown pointer">
@@ -228,7 +256,7 @@
                         </a>
                     </li>
                     <!-- jhipster-needle-add-element-to-admin-menu - JHipster will add entities to the admin menu here -->
-                    <li ng-hide="vm.inProduction">
+                    <li ng-hide="inProduction">
                         <a href='/h2-console' target="_tab" ng-click="vm.collapseNavbar()">
                             <span class="glyphicon glyphicon-hdd"></span>&nbsp;
                             <span translate="global.menu.admin.database">Database</span>

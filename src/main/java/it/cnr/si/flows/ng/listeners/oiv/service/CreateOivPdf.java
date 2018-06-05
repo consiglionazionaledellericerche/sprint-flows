@@ -1,51 +1,36 @@
 package it.cnr.si.flows.ng.listeners.oiv.service;
 
-import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.resource.FlowsPdfResource;
-
-
 import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.ExecutionListener;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.google.common.net.MediaType;
-
 import javax.inject.Inject;
-
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 
-import java.util.Date;
-
-
-import static it.cnr.si.flows.ng.utils.Enum.Azione.Caricamento;
-
-
 
 @Service
-public class CreateOivPdf  {
-	private static final Logger LOGGER = LoggerFactory.getLogger(CreateOivPdf.class);
+public class CreateOivPdf {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CreateOivPdf.class);
 
-//	@Inject
+    //	@Inject
 //	private OivPdfService oivPdfService;
-	@Inject
-	private FlowsPdfResource flowsPdfResource;
-	
-	public void CreaPdfOiv(DelegateExecution execution, String tipologiaDoc) throws IOException, ParseException {
-		//(OivPdfService oivPdfService = new OivPdfService();
-		
-		
-		String processInstanceId =  execution.getProcessInstanceId();	
-		LOGGER.info("ProcessInstanceId: " + processInstanceId);
-		LOGGER.info("STAMPA la seguente tipologia di documento: " + tipologiaDoc);
-		
-		flowsPdfResource.makePdf(processInstanceId, tipologiaDoc);
-		
-		
+    @Inject
+    private FlowsPdfResource flowsPdfResource;
+
+    public void CreaPdfOiv(DelegateExecution execution, String tipologiaDoc) throws IOException, ParseException {
+        //(OivPdfService oivPdfService = new OivPdfService();
+
+
+        String processInstanceId = execution.getProcessInstanceId();
+        LOGGER.info("ProcessInstanceId: " + processInstanceId);
+        LOGGER.info("STAMPA la seguente tipologia di documento: " + tipologiaDoc);
+
+        flowsPdfResource.makePdf(processInstanceId, tipologiaDoc);
+
+
 //        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 //        String fileName = null;
 //        try {
@@ -69,4 +54,5 @@ public class CreateOivPdf  {
 //        pdfToDB.setMimetype(MediaType.PDF.toString());
 //        execution.setVariable(variableFileName, pdfToDB);
 
-	}}
+    }
+}

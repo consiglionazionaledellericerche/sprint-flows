@@ -1,0 +1,9 @@
+{
+  "statistics": {
+    "home": {
+      "title": "Statistics for Process Definition:",
+      "exportPdfLabel": "Export Pdf",
+      "exportCsvLabel": "Export Csv"
+    }
+  }
+}
