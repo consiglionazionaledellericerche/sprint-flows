@@ -6,12 +6,15 @@ import it.cnr.si.domain.Authority;
 import it.cnr.si.domain.FlowsUser;
 import it.cnr.si.flows.ng.dto.FlowsUserDto;
 import it.cnr.si.flows.ng.service.FlowsMailService;
+import it.cnr.si.flows.ng.utils.Utils;
+import it.cnr.si.flows.ng.utils.Utils.SearchResult;
 import it.cnr.si.repository.FlowsUserRepository;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.SecurityUtils;
 import it.cnr.si.service.FlowsUserService;
 import it.cnr.si.web.rest.util.HeaderUtil;
 import it.cnr.si.web.rest.util.PaginationUtil;
+import org.activiti.rest.service.api.RestResponseFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -28,10 +31,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -43,7 +43,11 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/flows")
 public class FlowsUserResource {
 
-    private final Logger log = LoggerFactory.getLogger(UserResource.class);
+	public static final String USER_MANAGEMENT = "userManagement";
+	public static final String USER_EXISTS = "userexists";
+	public static final String LOGIN_ALREADY_IN_USE = "Login already in use";
+	public static final String EMAIL_EXISTS = "emailexists";
+	private final Logger log = LoggerFactory.getLogger(UserResource.class);
 
     @Inject
     private FlowsUserRepository flowsUserRepository;
@@ -51,6 +55,8 @@ public class FlowsUserResource {
     private FlowsMailService flowsMailService;
     @Inject
     private FlowsUserService flowsUserService;
+    @Inject
+    private RestResponseFactory restResponseFactory;
 
 
     /**
@@ -77,11 +83,11 @@ public class FlowsUserResource {
         //Lowercase the user login before comparing with database
         if (flowsUserRepository.findOneByLogin(flowsUser.getLogin().toLowerCase()).isPresent()) {
             return ResponseEntity.badRequest()
-                    .headers(HeaderUtil.createFailureAlert("userManagement", "userexists", "Login already in use"))
+                    .headers(HeaderUtil.createFailureAlert(USER_MANAGEMENT, USER_EXISTS, LOGIN_ALREADY_IN_USE))
                     .body(null);
         } else if (flowsUserRepository.findOneByEmail(flowsUser.getEmail()).isPresent()) {
             return ResponseEntity.badRequest()
-                    .headers(HeaderUtil.createFailureAlert("userManagement", "emailexists", "Email already in use"))
+                    .headers(HeaderUtil.createFailureAlert(USER_MANAGEMENT, EMAIL_EXISTS, "Email already in use"))
                     .body(null);
         } else {
             FlowsUserDto flowsUserDto = new FlowsUserDto(flowsUser.getId(), flowsUser.getLogin(), flowsUser.getPassword(), flowsUser.getFirstName(),
@@ -118,12 +124,12 @@ public class FlowsUserResource {
 
             Optional<FlowsUser> existingUser = flowsUserRepository.findOneByEmail(flowsUserDto.getEmail());
             if (existingUser.isPresent() && (!existingUser.get().getId().equals(flowsUserDto.getId()))) {
-                return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("userManagement", "emailexists", "E-mail already in use")).body(null);
+                return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(USER_MANAGEMENT, EMAIL_EXISTS, "E-mail already in use")).body(null);
             }
 
             existingUser = flowsUserRepository.findOneByLogin(flowsUserDto.getLogin().toLowerCase());
             if (existingUser.isPresent() && (!existingUser.get().getId().equals(flowsUserDto.getId()))) {
-                return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("userManagement", "userexists", "Login already in use")).body(null);
+                return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(USER_MANAGEMENT, USER_EXISTS, LOGIN_ALREADY_IN_USE)).body(null);
             }
 
             flowsUserService.updateUser(flowsUserDto.getId(), flowsUserDto.getLogin(), flowsUserDto.getFirstName(),
@@ -146,12 +152,12 @@ public class FlowsUserResource {
                 log.debug("L'utente {} sta modificando i propri campi", flowsUserDto.getLogin());
                 Optional<FlowsUser> existingUser = flowsUserRepository.findOneByEmail(flowsUserDto.getEmail());
                 if (existingUser.isPresent() && (!existingUser.get().getId().equals(flowsUserDto.getId()))) {
-                    return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("userManagement", "emailexists", "E-mail already in use")).body(null);
+                    return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(USER_MANAGEMENT, EMAIL_EXISTS, "E-mail already in use")).body(null);
                 }
 
                 existingUser = flowsUserRepository.findOneByLogin(flowsUserDto.getLogin().toLowerCase());
                 if (existingUser.isPresent() && (!existingUser.get().getId().equals(flowsUserDto.getId()))) {
-                    return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("userManagement", "userexists", "Login already in use")).body(null);
+                    return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(USER_MANAGEMENT, USER_EXISTS, LOGIN_ALREADY_IN_USE)).body(null);
                 }
 
                 Long id = existingUser.orElse(new FlowsUser()).getId();
@@ -240,5 +246,26 @@ public class FlowsUserResource {
         log.debug("REST request to delete User: {}", login);
         flowsUserService.deleteUser(login);
         return ResponseEntity.ok().headers(HeaderUtil.createAlert("userManagement.deleted", login)).build();
+    }
+
+
+
+    @RequestMapping(value = "/users/{username:.+}/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
+    @Timed
+    public ResponseEntity<Map<String, Object>> searchUsers(@PathVariable String username) {
+
+        Map<String, Object> response = new HashMap<>();
+
+        //con il profilo "OIV" faccio la ricerca per l'autocompletamento degli utenti sul DB
+        List<FlowsUser> result = flowsUserService.searchByLogin(username);
+		List<SearchResult> search = result.stream()
+                .map(user -> new SearchResult(user.getLogin(), user.getLogin()))
+                .collect(Collectors.toList());
+
+        response.put("more", search.size() > 10);
+        response.put("results", search.stream().limit(10).collect(Collectors.toList()));
+
+        return ResponseEntity.ok(response);
     }
 }

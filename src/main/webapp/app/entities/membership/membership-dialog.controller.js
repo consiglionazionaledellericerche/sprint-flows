@@ -1,45 +1,28 @@
 (function() {
-	'use strict';
+    'use strict';
 
-	angular
-		.module('sprintApp')
-		.controller('MembershipDialogController', MembershipDialogController);
+    angular
+        .module('sprintApp')
+        .controller('MembershipDialogController', MembershipDialogController);
 
-	MembershipDialogController.$inject = ['$scope', '$stateParams', '$uibModalInstance', 'entity', 'Membership', 'Cnrgroup', 'Jhi_user'];
+    MembershipDialogController.$inject = ['$scope', 'dataService', '$uibModalInstance'];
 
-	function MembershipDialogController($scope, $stateParams, $uibModalInstance, entity, Membership, Cnrgroup, Jhi_user) {
-		$scope.membership = entity;
-		$scope.cnrgroups = Cnrgroup.query();
-		$scope.jhi_users = Jhi_user.query();
-		$scope.load = function(id) {
-			Membership.get({
-				id: id
-			}, function(result) {
-				$scope.membership = result;
-			});
-		};
+    function MembershipDialogController($scope, dataService, $uibModalInstance) {
+        $scope.save = function() {
+            $scope.isSaving = true;
 
-		var onSaveSuccess = function(result) {
-			$scope.$emit('sprintApp:membershipUpdate', result);
-			$uibModalInstance.close(result);
-			$scope.isSaving = false;
-		};
+            dataService.userMemberships.createMembership($scope.membership.cnrgroup, $scope.membership.username, $scope.membership.grouprole)
+                .then(function onSaveSuccess(result) {
+                    $scope.$emit('sprintApp:membershipUpdate', result);
+                    $uibModalInstance.close(result);
+                    vm.isSaving = false;
+                }, function onSaveError() {
+                    vm.isSaving = false;
+                });
+        };
 
-		var onSaveError = function(result) {
-			$scope.isSaving = false;
-		};
-
-		$scope.save = function() {
-			$scope.isSaving = true;
-			if ($scope.membership.id != null) {
-				Membership.update($scope.membership, onSaveSuccess, onSaveError);
-			} else {
-				Membership.save($scope.membership, onSaveSuccess, onSaveError);
-			}
-		};
-
-		$scope.clear = function() {
-			$uibModalInstance.dismiss('cancel');
-		};
-	}
+        $scope.clear = function() {
+            $uibModalInstance.dismiss('cancel');
+        };
+    }
 })();

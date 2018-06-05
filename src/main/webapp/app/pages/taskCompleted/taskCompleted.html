@@ -1,4 +1,3 @@
-{{tasks}}
 <div ng-cloak>
     <div class="row">
         <div class="col-md-3">
@@ -61,7 +60,7 @@
                                 ng-change="vm.transition(current)"></uib-pagination>
             </div>
 
-            <pre ng-if="global.ribbon.dev">{{vm.taskCompletedForMe | json}}</pre>
+            <pre ng-if="isDevelopment">{{vm.taskCompletedForMe | json}}</pre>
         </div>
     </div>
 </div>

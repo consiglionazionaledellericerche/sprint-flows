@@ -95,7 +95,7 @@ public class Enum {
     public enum VariableEnum {
         initiator,
         titolo,
-        fase,
+        stato,
         descrizione,
         idStruttura,
         startDate,
@@ -110,7 +110,9 @@ public class Enum {
         rigettoDopoPreavviso,
         rigettoDopo10Giorni,
         RigettoDef10Giorni,
+        improcedibile,
         preavvisoRigetto,
+        soccorsoIstruttorio,
         preavvisoRigettoDef10Giorni,
         preavvisoRigettoCambioFascia;
 

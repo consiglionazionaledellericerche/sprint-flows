@@ -1,25 +1,24 @@
 (function() {
-	'use strict';
+    'use strict';
 
-	angular
-		.module('sprintApp')
-		.controller('MembershipDialogController', MembershipDialogController);
+    angular
+        .module('sprintApp')
+        .controller('MembershipDeleteController', MembershipDeleteController);
 
-	MembershipDialogController.$inject = ['$timeout', '$scope', '$uibModalInstance', 'entity', 'Membership'];
+    MembershipDeleteController.$inject = ['$timeout', '$scope', '$uibModalInstance', 'entity', 'Membership'];
 
-	function MembershipDialogController($timeout, $scope, $uibModalInstance, entity, Membership) {
-
-		$scope.membership = entity;
-		$scope.clear = function() {
-			$uibModalInstance.dismiss('cancel');
-		};
-		$scope.confirmDelete = function(id) {
-			Membership.delete({
-					id: id
-				},
-				function() {
-					$uibModalInstance.close(true);
-				});
-		};
-	}
+    function MembershipDeleteController($timeout, $scope, $uibModalInstance, entity, Membership) {
+        $scope.membership = entity;
+        $scope.clear = function() {
+            $uibModalInstance.dismiss('cancel');
+        };
+        $scope.confirmDelete = function(id) {
+            Membership.delete({
+                    id: id,
+                },
+                function() {
+                    $uibModalInstance.close(true);
+                });
+        };
+    }
 })();
