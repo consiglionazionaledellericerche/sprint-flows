@@ -18,9 +18,9 @@ echo '################ BOWER install ###########################################
 bower install
 
 
-echo '################ spastamento bower_components ###############################################'
-#cp -r bower_components src/main/webapp
-mv bower_components src/main/webapp
+#echo '################ spastamento bower_components ###############################################'
+##cp -r bower_components src/main/webapp
+#mv bower_components src/main/webapp
 
 
 

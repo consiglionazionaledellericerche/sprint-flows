@@ -23,4 +23,7 @@ public interface CnrgroupRepository extends JpaRepository<Cnrgroup,Long> {
 
     @Query("select cnrgroup from Cnrgroup cnrgroup where cnrgroup.name =:name")
     public Cnrgroup findCnrgroupByName(@Param("name") String name);
+
+    @Query("select cnrgroup from Cnrgroup cnrgroup where cnrgroup.name LIKE CONCAT('%',:groupName,'%')")
+    List<Cnrgroup> searchByGroupName(@Param("groupName") String groupName);
 }

@@ -2,14 +2,19 @@ package it.cnr.si.service;
 
 import it.cnr.si.domain.Authority;
 import it.cnr.si.domain.FlowsUser;
+import it.cnr.si.domain.Membership;
+import it.cnr.si.domain.Relationship;
 import it.cnr.si.flows.ng.dto.FlowsUserDto;
 import it.cnr.si.repository.AuthorityRepository;
 import it.cnr.si.repository.FlowsUserRepository;
+import it.cnr.si.repository.MembershipRepository;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.SecurityUtils;
 import it.cnr.si.service.util.RandomUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
@@ -22,6 +27,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import static it.cnr.si.flows.ng.utils.Enum.RoleOiv.member;
 
 
 /**
@@ -41,6 +49,14 @@ public class FlowsUserService {
     private FlowsUserRepository flowsUserRepository;
     @Inject
     private AuthorityRepository authorityRepository;
+    @Inject
+    private MembershipService membershipService;
+    @Inject
+    private RelationshipService relationshipService;
+    @Inject
+    private MembershipRepository membershipRepository;
+    @Inject
+    private CnrgroupService cnrgroupService;
 
 
     public Optional<FlowsUser> activateRegistration(String key) {
@@ -235,5 +251,34 @@ public class FlowsUserService {
 
     public List<FlowsUser> searchByLogin(String username) {
         return flowsUserRepository.searchByLogin(username);
+    }
+
+
+
+    public List<Membership> getGroupsForUser(String user, Pageable pageable) {
+
+        //recupero le mebership in cui l'utente ha "role" member
+        Page<Membership> pageMember = membershipService.getGroupsWithRole(pageable, user, member.name());
+        //recupero i gruppi di cui l'utente fa parte sia come "coordinator" che come "member"
+        List<Membership> userGroup = membershipRepository.getGroupForUser(user);
+
+        //di quelli di cui è "member" recupero anche le relationship
+        for (Membership membership : pageMember.getContent()) {
+            String groupname = membership.getCnrgroup().getName();
+            //le membership che recupero dalle relatrionship devono avere lo stesso grouprole indicato nella relationship
+            Set<Relationship> relationships = relationshipService.getAllRelationshipForGroup(groupname);
+            for (Relationship relationship : relationships) {
+                Membership membershipFromRelationship = new Membership();
+
+                membershipFromRelationship.setGrouprole(relationship.getGroupRole());
+                membershipFromRelationship.setUser(membership.getUser());
+                membershipFromRelationship.setCnrgroup(cnrgroupService.findCnrgroupByName(relationship.getGroupRelationship()));
+
+                userGroup.add(membershipFromRelationship);
+            }
+        }
+        //tolgo i gruppi "duplicati"
+        userGroup = userGroup.stream().distinct().collect(Collectors.toList());
+        return userGroup;
     }
 }

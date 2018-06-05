@@ -1,6 +1,6 @@
 <div ng-cloak>
 
-    <!-- intestazione -->
+  <!-- intestazione -->
   <div class="row text-center" ng-if="vm.taskId">
     <h3>{{vm.definition.name}}</h3>
     <p class="text-muted">{{vm.definition.description}}</p>
@@ -12,20 +12,20 @@
         <li><strong>{{vm.taskVariables.titolo}}</strong></li>
         <li>Avviato il <strong>{{vm.taskVariables.startDate | data}}</strong> da <strong>{{vm.taskVariables.initiator}}</strong></li>
         <li>Fase: <strong>{{vm.taskVariables.activityId}}</strong></li>
-          <ng-include src="vm.detailsView"/>
+        <ng-include src="vm.detailsView"/>
       </ul>
     </div>
 
     <div class="col-xs-4">
       Documenti
-        <attachments task-id="{{vm.taskId}}"
-                     attachments="{{vm.attachments}}" show-history="false"/>
+      <attachments task-id="{{vm.taskId}}"
+                   attachments="{{vm.attachments}}" show-history="false"/>
     </div>
 
     <div class="col-xs-4">
       Diagramma
       <a ng-click="openDiagramModal(vm.diagramUrl)">
-          <img class="img-bordered" ng-src="{{vm.diagramUrl}}" title="{{vm.definition.name}}" style="max-width: 100%"/>
+        <img class="img-bordered" ng-src="{{vm.diagramUrl}}" title="{{vm.definition.name}}" style="max-width: 100%"/>
       </a>
     </div>
   </div>
@@ -54,9 +54,9 @@
               <div class="btn-group" role="group">
                 <button class="btn btn-primary" type="button" back><span class="glyphicon glyphicon-arrow-left"></span> Ritorna</button>
               </div>
-                <!--               <div class="btn-group" role="group"> -->
-                <!--                 <button class="btn btn-primary" type="reset"><span class="glyphicon glyphicon-refresh"> Reimposta</button> -->
-                <!--               </div> -->
+              <!--               <div class="btn-group" role="group"> -->
+              <!--                 <button class="btn btn-primary" type="reset"><span class="glyphicon glyphicon-refresh"> Reimposta</button> -->
+              <!--               </div> -->
               <div class="btn-group" role="group">
                 <button class="btn btn-primary" type="submit" ng-class="{'btn-warning': taskForm.$invalid}">{{ vm.taskId ? "Invia" : "Avvia Flusso"}} <span class="glyphicon glyphicon-arrow-right"></span></button>
               </div>
@@ -67,6 +67,6 @@
     </div>
   </div>
   <hr>
-    <!--   <pre>{{taskForm | json}}</pre> -->
-  <pre ng-if="development">{{vm | json}}</pre>
+  <!--   <pre ng-if="!isDevelopment">{{taskForm | json}}</pre> -->
+  <pre ng-if="isDevelopment">{{vm | json}}</pre>
 </div>
