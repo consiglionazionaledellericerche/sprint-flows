@@ -1,9 +1,10 @@
 package it.cnr.si.flows.ng.listeners.oiv.service;
 
-import it.cnr.si.flows.ng.resource.FlowsPdfResource;
+import it.cnr.si.flows.ng.service.FlowsPdfService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -15,44 +16,18 @@ import java.text.ParseException;
 public class CreateOivPdf {
     private static final Logger LOGGER = LoggerFactory.getLogger(CreateOivPdf.class);
 
-    //	@Inject
-//	private OivPdfService oivPdfService;
     @Inject
-    private FlowsPdfResource flowsPdfResource;
+    private FlowsPdfService flowsPdfService;
 
-    public void CreaPdfOiv(DelegateExecution execution, String tipologiaDoc) throws IOException, ParseException {
-        //(OivPdfService oivPdfService = new OivPdfService();
-
+    public Pair<String, byte[]> creaPdfOiv(DelegateExecution execution, String tipologiaDoc) throws IOException, ParseException {
 
         String processInstanceId = execution.getProcessInstanceId();
+
+
         LOGGER.info("ProcessInstanceId: " + processInstanceId);
         LOGGER.info("STAMPA la seguente tipologia di documento: " + tipologiaDoc);
 
-        flowsPdfResource.makePdf(processInstanceId, tipologiaDoc);
-
-
-//        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-//        String fileName = null;
-//        try {
-//            fileName = oivPdfService.createPdf(processInstanceId, outputStream, tipologiaDoc);
-//        } catch (IOException | ParseException e) {
-//            LOGGER.error("Errore nella creazione del file pdf  per la Process Instance {}. \n" +
-//                                 "Errore: {}", processInstanceId, e.getMessage());
-//        }
-//        //String variableFileName = fileName.replaceAll(" ", "_");
-//        //variableFileName = variableFileName.replace(".pdf", "");
-//        String variableFileName = tipologiaDoc;
-//		LOGGER.info("avvio la generazione del pdf: " + fileName + " con variabile: " + variableFileName);
-//        FlowsAttachment pdfToDB = new FlowsAttachment();
-//        pdfToDB.setBytes(outputStream.toByteArray());
-//        pdfToDB.setAzione(Caricamento);
-//        pdfToDB.setTaskId(null);
-//        pdfToDB.setTaskName(null);
-//        pdfToDB.setTime(new Date());
-//        pdfToDB.setName(variableFileName);
-//        pdfToDB.setFilename(fileName);
-//        pdfToDB.setMimetype(MediaType.PDF.toString());
-//        execution.setVariable(variableFileName, pdfToDB);
+        return flowsPdfService.makePdf(tipologiaDoc, processInstanceId);
 
     }
 }
