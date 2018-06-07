@@ -37,7 +37,7 @@
         </createTable>
 
         <loadData encoding="UTF-8"
-                  file="config/liquibase/relationship.csv"
+                  file="config/liquibase/oiv/relationship.csv"
                   separator=";"
                   tableName="relationship"/>
     </changeSet>
