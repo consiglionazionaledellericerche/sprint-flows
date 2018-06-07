@@ -9,7 +9,13 @@ import it.cnr.si.repository.ViewRepository;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JsonDataSource;
 import net.sf.jasperreports.engine.util.LocalJasperReportsContext;
+import org.activiti.engine.HistoryService;
+import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.impl.persistence.entity.VariableInstance;
+import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.activiti.engine.impl.variable.SerializableType;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricIdentityLinkResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
@@ -24,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.core.env.Environment;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import rst.pdfbox.layout.elements.ControlElement;
 import rst.pdfbox.layout.elements.Document;
@@ -56,6 +63,7 @@ public class FlowsPdfService {
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsPdfService.class);
     private static final float FONT_SIZE = 10;
     private static final float TITLE_SIZE = 18;
+    private static final String VALUTAZIONE_ESPERIENZE_JSON = "valutazioneEsperienze_json";
 
     @Inject
     private FlowsProcessInstanceService flowsProcessInstanceService;
@@ -71,6 +79,10 @@ public class FlowsPdfService {
     private Environment env;
     @Inject
     private TaskService taskService;
+    @Inject
+    private HistoryService historyService;
+    @Inject
+    private RuntimeService runtimeService;
 
     // ELENCO PARAMETRI STATISTICHE
     private int nrFlussiTotali = 0;
@@ -200,6 +212,54 @@ public class FlowsPdfService {
         return fileName;
     }
 
+    //Sotituisco il mapping direttamente con il json delle variabili sttuali
+    private JSONObject mappingVariables(JSONObject variables) {
+
+        //refactoring della stringona contenete le esperienze in un jsonArray
+        if (variables.has(VALUTAZIONE_ESPERIENZE_JSON)) {
+            JSONArray esperienze = new JSONArray(variables.getString(VALUTAZIONE_ESPERIENZE_JSON));
+            variables.put(VALUTAZIONE_ESPERIENZE_JSON, esperienze);
+        }
+
+        return variables;
+    }
+
+    public Pair<String, byte[]>  makePdf(String tipologiaDoc, String processInstanceId) {
+
+        //Sotituisco la lista di variabili da quelle storiche (historicProcessInstance.getProcessVariables() )a quelle attuali (variableInstanceJson)
+        JSONObject variableInstanceJson = new JSONObject();
+
+        HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                .includeProcessVariables()
+                .processInstanceId(processInstanceId)
+                .singleResult();
+
+        // Verifico se il workflow sia terminato
+        if(historicProcessInstance.getEndTime() != null){
+            //carico le processVariables e rimappo in formato json il campo stringa "valutazioneEsperienze_json"
+            variableInstanceJson = new JSONObject(historicProcessInstance.getProcessVariables());
+        } else {
+            Map<String, VariableInstance> tutteVariabiliMap = runtimeService.getVariableInstances(processInstanceId);
+            for (Map.Entry<String, VariableInstance> entry : tutteVariabiliMap.entrySet()) {
+                String key = entry.getKey();
+                VariableInstance value = entry.getValue();
+                //le variabili di tipo serializable (file) non vanno inseriti nel json delle variabili che verranno inseriti nel pdf
+                //(ho testato valutazioni esperienze_Json fino a 11000 caratteri ed a questo livello appare come longString)
+                if(!(((VariableInstanceEntity) value).getType() instanceof SerializableType))
+                    variableInstanceJson.put(key, value.getValue());
+            }
+            LOGGER.info("variableInstanceJson: {}", variableInstanceJson);
+        }
+
+        //Sotituisco la lista di variabili da quelle storiche (historicProcessInstance.getProcessVariables() )a quelle attuali (variableInstanceJson)
+        JSONObject processVariables = mappingVariables(variableInstanceJson);
+
+        //creo il pdf corrispondente
+        String utenteRichiedente = processVariables.getString("nomeRichiedente");
+        String fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
+
+        return Pair.of(fileName, makePdf(Enum.PdfType.valueOf(tipologiaDoc), processVariables, fileName, utenteRichiedente, processInstanceId));
+    }
 
     public byte[] makePdf(Enum.PdfType pdfType, JSONObject processvariables, String fileName, String utenteRichiedente, String processInstanceId) {
         String dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir");
