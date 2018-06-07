@@ -11,9 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.data.util.Pair;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -113,7 +115,12 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
                 //Sospendo i timer di scadenza tempi proderumantali (boundarytimer3) e avviso di scadenza tempi proderumantali (boundarytimer6)
                 operazioniTimer.sospendiTimerTempiProceduramentali(execution, "boundarytimer3", "boundarytimer6");
                 execution.setVariable("dataInizioSoccorsoIstruttorio", simpleDataNow);
-                createOivPdf.CreaPdfOiv(execution, soccorsoIstruttorio.name());
+                final Pair<String, byte[]> pair = createOivPdf.creaPdfOiv(execution, soccorsoIstruttorio.name());
+                soccorsoIstruttorio(
+                        Optional.ofNullable(execution.getVariable("idDomanda"))
+                        .filter(String.class::isInstance)
+                        .map(String.class::cast)
+                        .orElse(null), pair.getFirst(), pair.getSecond());
             }
             ;
             break;
@@ -203,7 +210,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
             case END_IMPROCEDIBILE: {
                 LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
                 execution.setVariable("statoFinaleDomanda", "IMPROCEDIBILE");
-                createOivPdf.CreaPdfOiv(execution, improcedibile.name());
+                createOivPdf.creaPdfOiv(execution, improcedibile.name());
             }
             ;
             break;
@@ -282,4 +289,22 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
                 .orElse(null);
     }
 
+    private void soccorsoIstruttorio(String id, String fileName, byte[] bytes) {
+        final RelaxedPropertyResolver relaxedPropertyResolver = new RelaxedPropertyResolver(env, "oiv.");
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(relaxedPropertyResolver.getProperty("soccorso-istruttorio"))
+                .queryParam("idDomanda", id).queryParam("fileName", fileName);
+        LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
+        map.add("file", new ByteArrayResource(bytes) {
+            @Override
+            public String getFilename() {
+                return fileName;
+            }
+        });
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<LinkedMultiValueMap<String, Object>>(map, headers);
+
+        oivRestTemplate.postForEntity(builder.buildAndExpand().toUri(), requestEntity, Void.class);
+
+    }
 }
