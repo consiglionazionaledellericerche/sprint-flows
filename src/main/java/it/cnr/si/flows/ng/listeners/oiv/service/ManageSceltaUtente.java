@@ -72,13 +72,13 @@ public class ManageSceltaUtente {
 					execution.setVariable("pdfPreavvisoRigettoFlag", "1");					
 					switch(execution.getVariable("tipologiaRichiesta").toString()){  
 					case "Iscrizione": {
-						createOivPdf.CreaPdfOiv(execution, preavvisoRigetto.name());
+						createOivPdf.creaPdfOiv(execution, preavvisoRigetto.name());
 					};break;
 					case "rinnovo": {
-						createOivPdf.CreaPdfOiv(execution, preavvisoRigetto.name());
+						createOivPdf.creaPdfOiv(execution, preavvisoRigetto.name());
 					};break;
 					case "modifica_fascia": {
-						createOivPdf.CreaPdfOiv(execution, preavvisoRigetto.name());
+						createOivPdf.creaPdfOiv(execution, preavvisoRigetto.name());
 					};break;
 					default:  {
 						LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
@@ -131,9 +131,9 @@ public class ManageSceltaUtente {
 					manageControlli.valutazioneEsperienzeGenerazionePdf(execution);
 					execution.setVariable("pdfRigettoFlag", "1");
 					if(((execution.getVariable("tempiPreavvisoRigetto")  != null) && (execution.getVariable("tempiPreavvisoRigetto").toString().equals("SCADUTI")))){
-						createOivPdf.CreaPdfOiv(execution, RigettoDef10Giorni.name());
+						createOivPdf.creaPdfOiv(execution, RigettoDef10Giorni.name());
 					} else {
-						createOivPdf.CreaPdfOiv(execution, rigettoMotivato.name());
+						createOivPdf.creaPdfOiv(execution, rigettoMotivato.name());
 					}
 				}
 				if(sceltaUtente.equals("approva")) {
