@@ -2,6 +2,7 @@ package it.cnr.si.flows.ng.listeners.oiv.service;
 
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.listeners.oiv.FaseEsecuzioneEnum;
+import it.cnr.si.flows.ng.listeners.oiv.ManageProcessIscrizioneElencoOiv;
 import it.cnr.si.flows.ng.listeners.oiv.SceltaUtenteEnum;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.service.FlowsControlService;
@@ -9,7 +10,16 @@ import org.activiti.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.bind.RelaxedPropertyResolver;
+import org.springframework.core.env.Environment;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -46,6 +56,10 @@ public class ManageSceltaUtente {
     private DeterminaAttore determinaAttore;
     @Inject
     private FlowsControlService flowsControlService;
+    @Inject
+    private Environment env;
+    @Autowired(required = false)
+    private RestTemplate oivRestTemplate;
 
     public void azioneScelta(DelegateExecution execution, String faseEsecuzioneValue, SceltaUtenteEnum sceltaUtente) throws IOException, ParseException {
         String processInstanceId = execution.getProcessInstanceId();
@@ -163,6 +177,11 @@ public class ManageSceltaUtente {
                         }
                         LOGGER.info("-- verificaFileFirmatoP7m: nomeFileRigetto: {}", nomeFileRigetto);
                         flowsControlService.verificaFileFirmato_Cades_Pades(execution, nomeFileRigetto);
+                        preavvisoRigetto(
+                                Optional.ofNullable(execution.getVariable(ManageProcessIscrizioneElencoOiv.ID_DOMANDA))
+                                        .filter(String.class::isInstance)
+                                        .map(String.class::cast)
+                                        .orElse(null), nomeFileRigetto, fileRecuperato.getBytes());
                     }
                 }
                 ;
@@ -174,5 +193,24 @@ public class ManageSceltaUtente {
                 break;
             }
         }
+    }
+
+    private void preavvisoRigetto(String id, String fileName, byte[] bytes) {
+        final RelaxedPropertyResolver relaxedPropertyResolver = new RelaxedPropertyResolver(env, ManageProcessIscrizioneElencoOiv.OIV);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(relaxedPropertyResolver.getProperty(ManageProcessIscrizioneElencoOiv.PREAVVISO_RIGETTO))
+                .queryParam(ManageProcessIscrizioneElencoOiv.ID_DOMANDA, id).queryParam(ManageProcessIscrizioneElencoOiv.FILE_NAME, fileName);
+        LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
+        map.add("file", new ByteArrayResource(bytes) {
+            @Override
+            public String getFilename() {
+                return fileName;
+            }
+        });
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<LinkedMultiValueMap<String, Object>>(map, headers);
+
+        oivRestTemplate.postForEntity(builder.buildAndExpand().toUri(), requestEntity, Void.class);
+
     }
 }
