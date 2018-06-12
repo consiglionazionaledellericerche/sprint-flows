@@ -1,7 +1,9 @@
 package it.cnr.si.flows.ng.listeners.oiv;
 
 
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.listeners.oiv.service.*;
+import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
@@ -24,9 +26,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
-import static it.cnr.si.flows.ng.utils.Enum.PdfType.improcedibile;
-import static it.cnr.si.flows.ng.utils.Enum.PdfType.soccorsoIstruttorio;
+import static it.cnr.si.flows.ng.utils.Enum.PdfType.*;
 
 
 @Component
@@ -75,6 +77,8 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
     private ManageControlli manageControlli;
     @Inject
     private CreateOivPdf createOivPdf;
+    @Autowired
+    private FlowsAttachmentService attachmentService;
 
     private Expression faseEsecuzione;
 
@@ -163,6 +167,12 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
                 // Estende  il timer di avviso scadenza tempi proderumantali (boundarytimer6) a 25 giorni
                 operazioniTimer.setTimerScadenzaTermini(execution, BOUNDARYTIMER_6, 1, 0, 0, 0, 0);
                 execution.setVariable(DATA_INIZIO_PREAVVISO_RIGETTO, simpleDataNow);
+                FlowsAttachment fileRecuperato = attachmentService.getAttachementsForProcessInstance(processInstanceId).get("preavvisoRigetto");
+                preavvisoRigetto(
+                        Optional.ofNullable(execution.getVariable(ManageProcessIscrizioneElencoOiv.ID_DOMANDA))
+                                .filter(String.class::isInstance)
+                                .map(String.class::cast)
+                                .orElse(null), fileRecuperato.getName(), fileRecuperato.getBytes());
             }
             ;
             break;
@@ -192,7 +202,28 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
             break;
             case FIRMA_DG_RIGETTO_START:
             break;
-            case FIRMA_DG_RIGETTO_END:
+            case FIRMA_DG_RIGETTO_END: {
+                final Optional<FlowsAttachment> flowsAttachment = Optional.ofNullable(attachmentService.getAttachementsForProcessInstance(processInstanceId))
+                        .map(stringFlowsAttachmentMap -> stringFlowsAttachmentMap.entrySet().stream())
+                        .filter(entryStream -> {
+                            return entryStream.anyMatch(stringFlowsAttachmentEntry -> {
+                                return stringFlowsAttachmentEntry.getKey().equals(rigetto.name()) ||
+                                        stringFlowsAttachmentEntry.getKey().equals(rigettoMotivato.name()) ||
+                                        stringFlowsAttachmentEntry.getKey().equals(rigettoDopoPreavviso.name()) ||
+                                        stringFlowsAttachmentEntry.getKey().equals(rigettoDopo10Giorni.name()) ||
+                                        stringFlowsAttachmentEntry.getKey().equals(RigettoDef10Giorni.name());
+                            });
+                        })
+                        .map(entryStream -> entryStream.findAny())
+                        .map(stringFlowsAttachmentEntry -> stringFlowsAttachmentEntry.get().getValue());
+                if (flowsAttachment.isPresent()) {
+                    comunicazioni(
+                            Optional.ofNullable(execution.getVariable(ID_DOMANDA))
+                                    .filter(String.class::isInstance)
+                                    .map(String.class::cast)
+                                    .orElse(null), flowsAttachment.get().getName(), flowsAttachment.get().getBytes(), rigetto.name());
+                }
+            }
             break;
             case END_IMPROCEDIBILE: {
                 execution.setVariable(STATO_FINALE_DOMANDA, "IMPROCEDIBILE");
@@ -284,15 +315,31 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<LinkedMultiValueMap<String, Object>>(map, headers);
-
         oivRestTemplate.postForEntity(builder.buildAndExpand().toUri(), requestEntity, Void.class);
-
     }
 
     private void comunicazioni(String id, String fileName, byte[] bytes, String type) {
         final RelaxedPropertyResolver relaxedPropertyResolver = new RelaxedPropertyResolver(env, OIV);
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(relaxedPropertyResolver.getProperty(COMUNICAZIONI))
                 .queryParam(ID_DOMANDA, id).queryParam(FILE_NAME, fileName).queryParam("type", type);
+        LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
+        map.add("file", new ByteArrayResource(bytes) {
+            @Override
+            public String getFilename() {
+                return fileName;
+            }
+        });
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<LinkedMultiValueMap<String, Object>>(map, headers);
+        oivRestTemplate.postForEntity(builder.buildAndExpand().toUri(), requestEntity, Void.class);
+    }
+
+
+    private void preavvisoRigetto(String id, String fileName, byte[] bytes) {
+        final RelaxedPropertyResolver relaxedPropertyResolver = new RelaxedPropertyResolver(env, ManageProcessIscrizioneElencoOiv.OIV);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(relaxedPropertyResolver.getProperty(ManageProcessIscrizioneElencoOiv.PREAVVISO_RIGETTO))
+                .queryParam(ManageProcessIscrizioneElencoOiv.ID_DOMANDA, id).queryParam(ManageProcessIscrizioneElencoOiv.FILE_NAME, fileName);
         LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
         map.add("file", new ByteArrayResource(bytes) {
             @Override

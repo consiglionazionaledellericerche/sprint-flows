@@ -3,6 +3,7 @@ package it.cnr.si.flows.ng.listeners.oiv;
 import java.util.Arrays;
 
 public enum SceltaUtenteEnum {
+    START("start"),
     PRENDO_IN_CARICO_LA_DOMANDA("prendo_in_carico_la_domanda"),
     ICHIESTA_SOCCORSO_ISTRUTTORIO("richiesta_soccorso_istruttorio"),
     INVIO_VALUTAZIONE("invio_valutazione"),
@@ -12,7 +13,8 @@ public enum SceltaUtenteEnum {
     APPROVA("approva"),
     INVIA_ALLA_VALUTAZIONE("invia_alla_valutazione"),
     GENERA_PDF_RIGETTO("genera_PDF_rigetto"),
-    INVIA_RIGETTO_FIRMATO("invia_rigetto_firmato");
+    INVIA_RIGETTO_FIRMATO("invia_rigetto_firmato"),
+    NOT_DEFINED("not_defined");
 
     private String value;
 
@@ -28,7 +30,7 @@ public enum SceltaUtenteEnum {
         return Arrays.asList(SceltaUtenteEnum.values()).stream()
                 .filter(s -> s.getValue().equals(v))
                 .findAny()
-                .orElseThrow(() -> new IllegalArgumentException(v));
+                .orElse(NOT_DEFINED);
     }
 
 }

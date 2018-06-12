@@ -56,10 +56,6 @@ public class ManageSceltaUtente {
     private DeterminaAttore determinaAttore;
     @Inject
     private FlowsControlService flowsControlService;
-    @Inject
-    private Environment env;
-    @Autowired(required = false)
-    private RestTemplate oivRestTemplate;
 
     public void azioneScelta(DelegateExecution execution, String faseEsecuzioneValue, SceltaUtenteEnum sceltaUtente) throws IOException, ParseException {
         String processInstanceId = execution.getProcessInstanceId();
@@ -177,11 +173,6 @@ public class ManageSceltaUtente {
                         }
                         LOGGER.info("-- verificaFileFirmatoP7m: nomeFileRigetto: {}", nomeFileRigetto);
                         flowsControlService.verificaFileFirmato_Cades_Pades(execution, nomeFileRigetto);
-                        preavvisoRigetto(
-                                Optional.ofNullable(execution.getVariable(ManageProcessIscrizioneElencoOiv.ID_DOMANDA))
-                                        .filter(String.class::isInstance)
-                                        .map(String.class::cast)
-                                        .orElse(null), nomeFileRigetto, fileRecuperato.getBytes());
                     }
                 }
                 ;
@@ -195,22 +186,4 @@ public class ManageSceltaUtente {
         }
     }
 
-    private void preavvisoRigetto(String id, String fileName, byte[] bytes) {
-        final RelaxedPropertyResolver relaxedPropertyResolver = new RelaxedPropertyResolver(env, ManageProcessIscrizioneElencoOiv.OIV);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(relaxedPropertyResolver.getProperty(ManageProcessIscrizioneElencoOiv.PREAVVISO_RIGETTO))
-                .queryParam(ManageProcessIscrizioneElencoOiv.ID_DOMANDA, id).queryParam(ManageProcessIscrizioneElencoOiv.FILE_NAME, fileName);
-        LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
-        map.add("file", new ByteArrayResource(bytes) {
-            @Override
-            public String getFilename() {
-                return fileName;
-            }
-        });
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<LinkedMultiValueMap<String, Object>>(map, headers);
-
-        oivRestTemplate.postForEntity(builder.buildAndExpand().toUri(), requestEntity, Void.class);
-
-    }
 }
