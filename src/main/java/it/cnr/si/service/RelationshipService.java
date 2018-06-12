@@ -89,6 +89,7 @@ public class RelationshipService {
      *
      * @param id the id of the entity
      */
+    @CacheEvict(value = {"allGroups", "user"}, allEntries = true)
     public void delete(Long id) {
         log.debug("Request to delete Relationship : {}", id);
         relationshipRepository.delete(id);
