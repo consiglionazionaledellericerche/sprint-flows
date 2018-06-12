@@ -50,6 +50,12 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
     public static final String GIORNI_DURATA_PREAVVISO_RIGETTO = "giorniDurataPreavvisoRigetto";
     public static final String SCELTA_UTENTE = "sceltaUtente";
     public static final String ID_DOMANDA = "idDomanda";
+    public static final String OIV = "oiv.";
+    public static final String ISCRIVI_INELENCO = "iscrivi-inelenco";
+    public static final String SOCCORSO_ISTRUTTORIO = "soccorso-istruttorio";
+    public static final String PREAVVISO_RIGETTO = "preavviso-rigetto";
+    public static final String COMUNICAZIONI = "comunicazioni";
+    public static final String FILE_NAME = "fileName";
 
 
     @Inject
@@ -161,7 +167,8 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
             ;
             break;
             case PREAVVISO_RIGETTO_END: {
-                // Estende  il timer di scadenza tempi proderumantali (boundarytimer3) a 30 giorni                operazioniTimer.setTimerScadenzaTermini(execution, "boundarytimer3", 0, 0, 30, 0, 0);
+                // Estende  il timer di scadenza tempi proderumantali (boundarytimer3) a 30 giorni
+                operazioniTimer.setTimerScadenzaTermini(execution, BOUNDARYTIMER_3, 0, 0, 30, 0, 0);
                 // Estende  il timer di avviso scadenza tempi proderumantali (boundarytimer6) a 25 giorni
                 operazioniTimer.setTimerScadenzaTermini(execution, BOUNDARYTIMER_6, 0, 0, 25, 0, 0);
                 execution.setVariable(DATA_FINE_PREAVVISO_RIGETTO, simpleDataNow);
@@ -251,8 +258,8 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
     }
 
     private String iscriviInElenco(String id) {
-        final RelaxedPropertyResolver relaxedPropertyResolver = new RelaxedPropertyResolver(env, "oiv.");
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(relaxedPropertyResolver.getProperty("iscrivi-inelenco"))
+        final RelaxedPropertyResolver relaxedPropertyResolver = new RelaxedPropertyResolver(env, OIV);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(relaxedPropertyResolver.getProperty(ISCRIVI_INELENCO))
                 .queryParam(ID_DOMANDA, id);
         return Optional.ofNullable(oivRestTemplate.getForEntity(builder.buildAndExpand().toUri(), Map.class))
                 .filter(mapResponseEntity -> mapResponseEntity.getStatusCode() == HttpStatus.OK)
@@ -264,9 +271,9 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
     }
 
     private void soccorsoIstruttorio(String id, String fileName, byte[] bytes) {
-        final RelaxedPropertyResolver relaxedPropertyResolver = new RelaxedPropertyResolver(env, "oiv.");
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(relaxedPropertyResolver.getProperty("soccorso-istruttorio"))
-                .queryParam(ID_DOMANDA, id).queryParam("fileName", fileName);
+        final RelaxedPropertyResolver relaxedPropertyResolver = new RelaxedPropertyResolver(env, OIV);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(relaxedPropertyResolver.getProperty(SOCCORSO_ISTRUTTORIO))
+                .queryParam(ID_DOMANDA, id).queryParam(FILE_NAME, fileName);
         LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
         map.add("file", new ByteArrayResource(bytes) {
             @Override
@@ -283,9 +290,9 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
     }
 
     private void comunicazioni(String id, String fileName, byte[] bytes, String type) {
-        final RelaxedPropertyResolver relaxedPropertyResolver = new RelaxedPropertyResolver(env, "oiv.");
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(relaxedPropertyResolver.getProperty("comunicazioni"))
-                .queryParam(ID_DOMANDA, id).queryParam("fileName", fileName).queryParam("type", type);
+        final RelaxedPropertyResolver relaxedPropertyResolver = new RelaxedPropertyResolver(env, OIV);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(relaxedPropertyResolver.getProperty(COMUNICAZIONI))
+                .queryParam(ID_DOMANDA, id).queryParam(FILE_NAME, fileName).queryParam("type", type);
         LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
         map.add("file", new ByteArrayResource(bytes) {
             @Override
