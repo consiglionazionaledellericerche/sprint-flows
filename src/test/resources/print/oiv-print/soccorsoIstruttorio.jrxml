@@ -411,28 +411,26 @@
 	<detail>
 		<band height="40">
 			<componentElement>
-				<reportElement x="37" y="0" width="521" height="30" uuid="04333226-daf1-4ae5-b491-7b4f6a8d6855"/>
+				<reportElement positionType="Float" stretchType="ContainerBottom" x="31" y="5" width="510" height="30" isRemoveLineWhenBlank="true" uuid="04333226-daf1-4ae5-b491-7b4f6a8d6855">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.HorizontalRowLayout"/>
+				</reportElement>
 				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
 					<datasetRun subDataset="Esperienze" uuid="5c4bcf38-5213-4c81-bae1-c6b0b767ae80">
 						<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JsonDataSource)$P{REPORT_DATA_SOURCE}).subDataSource("valutazioneEsperienze_json")]]></dataSourceExpression>
 					</datasetRun>
-					<jr:listContents height="30" width="521">
-						<staticText>
-							<reportElement x="0" y="3" width="120" height="20" uuid="e7d3b57f-51c4-4d34-aff5-6f5a58bb9e11">
+					<jr:listContents height="30" width="510">
+						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+							<reportElement x="0" y="0" width="255" height="30" uuid="c76d5669-e350-4482-9b22-f97c2fbc1c7d">
 								<printWhenExpression><![CDATA[$F{oggettoDiSoccorso}.equalsIgnoreCase( "SI" )]]></printWhenExpression>
 							</reportElement>
-							<text><![CDATA[Esperienza professionale]]></text>
-						</staticText>
-						<textField>
-							<reportElement x="120" y="3" width="50" height="20" uuid="c76d5669-e350-4482-9b22-f97c2fbc1c7d">
-								<printWhenExpression><![CDATA[$F{oggettoDiSoccorso}.equalsIgnoreCase( "SI" )]]></printWhenExpression>
-							</reportElement>
-							<textFieldExpression><![CDATA[$F{numeroEsperienza}]]></textFieldExpression>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA["Esperienza professionale nr." + $F{numeroEsperienza}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-							<reportElement x="170" y="3" width="350" height="20" uuid="414ac89b-2df8-45dd-b9ef-6e25b4d62a02">
+							<reportElement x="255" y="0" width="255" height="30" uuid="414ac89b-2df8-45dd-b9ef-6e25b4d62a02">
 								<printWhenExpression><![CDATA[$F{oggettoDiSoccorso}.equalsIgnoreCase( "SI" )]]></printWhenExpression>
 							</reportElement>
+							<textElement verticalAlignment="Middle"/>
 							<textFieldExpression><![CDATA[$F{motivazioneSoccorso}]]></textFieldExpression>
 						</textField>
 					</jr:listContents>
