@@ -342,7 +342,17 @@
 						<font size="11"/>
 						<paragraph lineSpacing="1_1_2"/>
 					</textElement>
-					<textFieldExpression><![CDATA["\tSi chiede, dunque, alla S.V. di fornire i chiarimenti richiesti, relativi alle sole esperienze in argomento, " + "<style isBold=\"true\">" + " corredate da idonea documentazione dell’ente attestante l’attività dichiarata, " + "</style>" +  "entro  il termine di 30 giorni dal ricevimento della presente comunicazione tramite l’apposita funzionalità disponibile nella sua area personale del Portale della performance.\r\n\tAl riguardo si rammenta ciò che rileva ai fini dell’accoglimento dell’istanza:" + "<ol type=\"1\"><li>" + "l’attività effettivamente svolta nel periodo di riferimento;"+"<li>"+" la prevalenza e la continuità dell’attività indicata nel periodo di riferimento anche ai fini del corretto computo degli anni di esperienza;"+"</li><li>" +"la riconducibilità dell’attività alla singola società o al singolo ente pubblico presso cui si è svolta, da indicare nel campo Datore di lavoro/committente;"+"</li><li>"+" la riconducibilità, nel caso  di attività di docenza e/o di ricerca, ad un settore scientifico-disciplinare (SSD) coerente con gli ambiti individuati dal DM 2/12/2016 e documentate esperienze pratiche (laboratori, esercitazioni, realizzazione di case study ecc.);"+"</li><li>"+" la coerenza tra quanto riportato in domanda e quanto rappresentato nel curriculum vitae."+"</ol>"]]></textFieldExpression>
+					<textFieldExpression><![CDATA["\tSi chiede, dunque, alla S.V. di fornire i chiarimenti richiesti, relativi alle sole esperienze in argomento, " + "<style isBold=\"true\">" + " corredate da idonea documentazione dell’ente attestante l’attività dichiarata, " + "</style>" +  "entro  il termine di 30 giorni dal ricevimento della presente comunicazione tramite l’apposita funzionalità disponibile nella sua area personale del Portale della performance."]]></textFieldExpression>
+				</textField>
+			</band>
+			<band height="59">
+				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+					<reportElement x="30" y="0" width="505" height="59" uuid="014f15b4-9521-49c4-8dd1-a3924095a4a7"/>
+					<textElement textAlignment="Justified" markup="html">
+						<font size="11"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["\r\n\tAl riguardo si rammenta ciò che rileva ai fini dell’accoglimento dell’istanza:" + "<ol type=\"1\"><li>" + "l’attività effettivamente svolta nel periodo di riferimento;"+"<li>"+" la prevalenza e la continuità dell’attività indicata nel periodo di riferimento anche ai fini del corretto computo degli anni di esperienza;"+"</li><li>" +"la riconducibilità dell’attività alla singola società o al singolo ente pubblico presso cui si è svolta, da indicare nel campo Datore di lavoro/committente;"+"</li><li>"+" la riconducibilità, nel caso  di attività di docenza e/o di ricerca, ad un settore scientifico-disciplinare (SSD) coerente con gli ambiti individuati dal DM 2/12/2016 e documentate esperienze pratiche (laboratori, esercitazioni, realizzazione di case study ecc.);"+"</li><li>"+" la coerenza tra quanto riportato in domanda e quanto rappresentato nel curriculum vitae."+"</ol>"]]></textFieldExpression>
 				</textField>
 			</band>
 			<band height="38">
