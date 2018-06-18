@@ -90,6 +90,6 @@ public class FlowsProcessDefinitionResource {
 
         Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         return authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") ||
-                a.getAuthority().startsWith("ROLE_abilitati#" + definitionKey + "@"));
+                a.getAuthority().startsWith("abilitati#" + definitionKey + "@"));
     }
 }
