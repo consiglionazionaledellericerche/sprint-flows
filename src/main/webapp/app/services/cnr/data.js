@@ -63,8 +63,10 @@
                 },
             },
             processInstances: {
-                byProcessInstanceId: function(processInstanceId) {
-                    return $http.get('api/processInstances?processInstanceId=' + processInstanceId);
+                byProcessInstanceId: function(processInstanceId, detail) {
+                    return $http.get('api/processInstances' +
+                        '?processInstanceId=' + processInstanceId +
+                        '&detail=' + ((detail !== undefined) ? true : false));
                 },
                 myProcessInstances: function(active, processDefinition, order, firstResult, maxResults) {
                     return $http.get('api/processInstances/myProcessInstances?active=' + active +
@@ -98,6 +100,11 @@
                         '&variableName=' + variableName +
                         '&value=' + value);
                 },
+                getVariable: function(processInstanceId, variableName) {
+                    return $http.get('api/processInstances/variable?' +
+                        'processInstanceId=' + processInstanceId +
+                        '&variableName=' + variableName);
+                }
             },
             attachments: {
                 pubblicaDocumento: function(processInstanceId, attachmentName, flag) {

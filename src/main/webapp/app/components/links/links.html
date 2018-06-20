@@ -1,0 +1,13 @@
+<div ng-show="links.length > 0">
+  <hr>
+    <ul class="list-unstyled">
+    <h4>Link ad altri workflow</h4>
+    <br>
+    <li ng-repeat="link in links">
+        <strong>
+            <a ng-href="#/details?processInstanceId={{link['processInstanceId']}}">{{link['titolo']}}</a>
+        </strong>
+    </li>
+  </ul>
+</div>
+
