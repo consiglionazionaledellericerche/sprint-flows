@@ -164,9 +164,7 @@ public class FlowsProcessInstanceResource {
     @Secured(AuthoritiesConstants.USER)
     @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
     @Timed
-    public ResponseEntity<?> getProcessInstanceById(HttpServletRequest req,
-                                                    @RequestParam("processInstanceId") String processInstanceId,
-                                                    @RequestParam(value = "detail", required = false, defaultValue = "true") Boolean detail) {
+    public ResponseEntity<?> getProcessInstanceById(HttpServletRequest req, @RequestParam("processInstanceId") String processInstanceId, @RequestParam(value = "detail", required = false, defaultValue = "true") Boolean detail) {
         if (!detail) {
             return new ResponseEntity<>(flowsProcessInstanceService.getProcessInstance(processInstanceId), HttpStatus.OK);
         } else {
@@ -258,24 +256,6 @@ public class FlowsProcessInstanceResource {
             @RequestParam("value") String value) {
         runtimeService.setVariable(processInstanceId, variableName, value);
         return ResponseEntity.ok().build();
-    }
-
-
-    /**
-     * Restituisce l'istanza della variabile della Process Instance
-     *
-     * @param processInstanceId il process instance id della ProcessInstance di cui si vuole "recuperare la variabile
-     * @param variableName      il nome della variable
-     * @return la variableInstance
-     */
-    @RequestMapping(value = "/variable", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Timed
-    @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity getVariable(
-            @RequestParam("processInstanceId") String processInstanceId,
-            @RequestParam("variableName") String variableName) {
-
-        return new ResponseEntity<>(runtimeService.getVariableInstance(processInstanceId, variableName), HttpStatus.OK);
     }
 
     private static Map<String, Object> trasformaVariabiliPerTrasparenza(HistoricProcessInstance instance, List<String> viewExportTrasparenza) {
