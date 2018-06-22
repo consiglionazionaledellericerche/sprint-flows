@@ -1,0 +1,1427 @@
+{
+	"info": {
+		"_postman_id": "9241a6f1-7c5f-41d3-a301-7581d3720242",
+		"name": "FLOWS DEMO - CREATE REAL OIV USERS",
+		"description": "crwa utenti oiv",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Richiesta token FLOWS",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"postman.setGlobalVariable(\"ACCESS_TOKEN\", data.access_token);",
+							"postman.setGlobalVariable(\"REFRESH_TOKEN\", data.refresh_token);"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic c3ByaW50YXBwOm15LXNlY3JldC10b2tlbi10by1jaGFuZ2UtaW4tcHJvZHVjdGlvbg=="
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "Sp@si@n0!",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "read write",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/oauth/token",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"oauth",
+						"token"
+					]
+				},
+				"description": "Ottiene il token (impostare una passoword)."
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE user Manuela Volpe",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":null,\"login\":\"ma.volpe\",\"firstName\":\"Manuela\",\"lastName\":\"Volpe\",\"email\":\"ma.volpe@palazzochigi.it\",\"phone\":\"06 6899 7273\",\"gender\":\"F\",\"activated\":true,\"langKey\":\"en\",\"createdBy\":null,\"createdDate\":null,\"lastModifiedBy\":null,\"lastModifiedDate\":null,\"resetDate\":null,\"resetKey\":null,\"authorities\":[\"ROLE_USER\"]}"
+				},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/api/flows/users",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"api",
+						"flows",
+						"users"
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE user app.elenco-oiv",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":null,\"login\":\"app.elenco-oiv\",\"firstName\":\"Applicazione\",\"lastName\":\"Elenco OIV\",\"email\":\"app.elenco-oiv@cnr.it\",\"phone\":\"06 4343\",\"gender\":\"M\",\"activated\":true,\"langKey\":\"en\",\"createdBy\":null,\"createdDate\":null,\"lastModifiedBy\":null,\"lastModifiedDate\":null,\"resetDate\":null,\"resetKey\":null,\"authorities\":[\"ROLE_USER\"]}"
+				},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/api/flows/users",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"api",
+						"flows",
+						"users"
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE USER Germana Cavicchioli",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":null,\"login\":\"g.cavicchioli\",\"firstName\":\"Germana\",\"lastName\":\"Cavicchioli\",\"email\":\"g.cavicchioli@governo.it\",\"phone\":\"06 6899 7177\",\"gender\":\"F\",\"activated\":true,\"langKey\":\"en\",\"createdBy\":null,\"createdDate\":null,\"lastModifiedBy\":null,\"lastModifiedDate\":null,\"resetDate\":null,\"resetKey\":null,\"authorities\":[\"ROLE_USER\"]}"
+				},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/api/flows/users",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"api",
+						"flows",
+						"users"
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE USER Marco Pintauro",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":null,\"login\":\"m.pintauro\",\"firstName\":\"Marco\",\"lastName\":\"Pintauro\",\"email\":\"m.pintauro@funzionepubblica.it\",\"phone\":\"06 6899 7505\",\"gender\":\"M\",\"activated\":true,\"langKey\":\"en\",\"createdBy\":null,\"createdDate\":null,\"lastModifiedBy\":null,\"lastModifiedDate\":null,\"resetDate\":null,\"resetKey\":null,\"authorities\":[\"ROLE_USER\"]}"
+				},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/api/flows/users",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"api",
+						"flows",
+						"users"
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE USER Luca Andreoletti",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":null,\"login\":\"l.andreoletti\",\"firstName\":\"Luca\",\"lastName\":\"Andreoletti\",\"email\":\"l.andreoletti@governo.it\",\"phone\":\"06 6899 7257\",\"gender\":\"M\",\"activated\":true,\"langKey\":\"en\",\"createdBy\":null,\"createdDate\":null,\"lastModifiedBy\":null,\"lastModifiedDate\":null,\"resetDate\":null,\"resetKey\":null,\"authorities\":[\"ROLE_USER\"]}"
+				},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/api/flows/users",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"api",
+						"flows",
+						"users"
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE USER Maria Laura Secreto",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":null,\"login\":\"m.secreto\",\"firstName\":\"Maria Laura\",\"lastName\":\"Secreto\",\"email\":\"m.secreto@funzionepubblica.it\",\"phone\":\"06 6899 7330\",\"gender\":\"F\",\"activated\":true,\"langKey\":\"en\",\"createdBy\":null,\"createdDate\":null,\"lastModifiedBy\":null,\"lastModifiedDate\":null,\"resetDate\":null,\"resetKey\":null,\"authorities\":[\"ROLE_USER\"]}"
+				},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/api/flows/users",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"api",
+						"flows",
+						"users"
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE USER Alessandra Barberi",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"id\":null,\"login\":\"a.barberi\",\"firstName\":\"Alessandra\",\"lastName\":\"Barberi\",\"email\":\"a.barberi@palazzochigi.it\",\"phone\":\"06 6899 7135\",\"gender\":\"F\",\"activated\":true,\"langKey\":\"en\",\"createdBy\":null,\"createdDate\":null,\"lastModifiedBy\":null,\"lastModifiedDate\":null,\"resetDate\":null,\"resetKey\":null,\"authorities\":[\"ROLE_USER\"]}"
+				},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/api/flows/users",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"api",
+						"flows",
+						"users"
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE MEMBERSHIP ma.volpe istruttore@",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/api/createMemberships?groupRole=member&groupName=istruttore@99999&userName=ma.volpe",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"api",
+						"createMemberships"
+					],
+					"query": [
+						{
+							"key": "groupRole",
+							"value": "member"
+						},
+						{
+							"key": "groupName",
+							"value": "istruttore@99999"
+						},
+						{
+							"key": "userName",
+							"value": "ma.volpe"
+						}
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE MEMBERSHIP app.elenco-oiv istruttore@",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/api/createMemberships?groupRole=member&groupName=istruttore@99999&userName=app.elenco-oiv",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"api",
+						"createMemberships"
+					],
+					"query": [
+						{
+							"key": "groupRole",
+							"value": "member"
+						},
+						{
+							"key": "groupName",
+							"value": "istruttore@99999"
+						},
+						{
+							"key": "userName",
+							"value": "app.elenco-oiv"
+						}
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE MEMBERSHIP app.elenco-oiv abilitati#iscrizione-elenco-oiv@ Copy",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/api/createMemberships?groupRole=member&groupName=abilitati%23iscrizione-elenco-oiv@99999&userName=app.elenco-oiv",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"api",
+						"createMemberships"
+					],
+					"query": [
+						{
+							"key": "groupRole",
+							"value": "member"
+						},
+						{
+							"key": "groupName",
+							"value": "abilitati%23iscrizione-elenco-oiv@99999"
+						},
+						{
+							"key": "userName",
+							"value": "app.elenco-oiv"
+						}
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE MEMBERSHIP g.cavicchioli istruttore@",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/api/createMemberships?groupRole=member&groupName=istruttore@99999&userName=g.cavicchioli",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"api",
+						"createMemberships"
+					],
+					"query": [
+						{
+							"key": "groupRole",
+							"value": "member"
+						},
+						{
+							"key": "groupName",
+							"value": "istruttore@99999"
+						},
+						{
+							"key": "userName",
+							"value": "g.cavicchioli"
+						}
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE MEMBERSHIP m.pintauro istruttore@",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/api/createMemberships?groupRole=member&groupName=istruttore@99999&userName=m.pintauro",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"api",
+						"createMemberships"
+					],
+					"query": [
+						{
+							"key": "groupRole",
+							"value": "member"
+						},
+						{
+							"key": "groupName",
+							"value": "istruttore@99999"
+						},
+						{
+							"key": "userName",
+							"value": "m.pintauro"
+						}
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE MEMBERSHIP l.andreoletti istruttore@",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/api/createMemberships?groupRole=member&groupName=istruttore@99999&userName=l.andreoletti",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"api",
+						"createMemberships"
+					],
+					"query": [
+						{
+							"key": "groupRole",
+							"value": "member"
+						},
+						{
+							"key": "groupName",
+							"value": "istruttore@99999"
+						},
+						{
+							"key": "userName",
+							"value": "l.andreoletti"
+						}
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE MEMBERSHIP m.secreto coordinatoreresponsabile@",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/api/createMemberships?groupRole=member&groupName=coordinatoreresponsabile@99999&userName=m.secreto",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"api",
+						"createMemberships"
+					],
+					"query": [
+						{
+							"key": "groupRole",
+							"value": "member"
+						},
+						{
+							"key": "groupName",
+							"value": "coordinatoreresponsabile@99999"
+						},
+						{
+							"key": "userName",
+							"value": "m.secreto"
+						}
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE MEMBERSHIP a.barberi coordinatoreresponsabile@",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/api/createMemberships?groupRole=member&groupName=coordinatoreresponsabile@99999&userName=a.barberi",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"api",
+						"createMemberships"
+					],
+					"query": [
+						{
+							"key": "groupRole",
+							"value": "member"
+						},
+						{
+							"key": "groupName",
+							"value": "coordinatoreresponsabile@99999"
+						},
+						{
+							"key": "userName",
+							"value": "a.barberi"
+						}
+					]
+				},
+				"description": "create user"
+			},
+			"response": []
+		},
+		{
+			"name": "IMPERSONATE app.elenco-oiv",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/impersonate/start?impersonate_username=app.elenco-oiv",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"impersonate",
+						"start"
+					],
+					"query": [
+						{
+							"key": "impersonate_username",
+							"value": "app.elenco-oiv"
+						}
+					]
+				},
+				"description": "IMPERSONATE USER"
+			},
+			"response": []
+		},
+		{
+			"name": "CHANGE PW app.elenco-oiv",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "app.elenco-oiv"
+				},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/api/account/change_password",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"api",
+						"account",
+						"change_password"
+					]
+				},
+				"description": "IMPERSONATE USER"
+			},
+			"response": []
+		},
+		{
+			"name": "IMPERSONATE ma.volpe",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/impersonate/start?impersonate_username=ma.volpe",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"impersonate",
+						"start"
+					],
+					"query": [
+						{
+							"key": "impersonate_username",
+							"value": "ma.volpe"
+						}
+					]
+				},
+				"description": "IMPERSONATE USER"
+			},
+			"response": []
+		},
+		{
+			"name": "CHANGE PW ma.volpe",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "manuela"
+				},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/api/account/change_password",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"api",
+						"account",
+						"change_password"
+					]
+				},
+				"description": "IMPERSONATE USER"
+			},
+			"response": []
+		},
+		{
+			"name": "IMPERSONATE g.cavicchioli",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/impersonate/start?impersonate_username=g.cavicchioli",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"impersonate",
+						"start"
+					],
+					"query": [
+						{
+							"key": "impersonate_username",
+							"value": "g.cavicchioli"
+						}
+					]
+				},
+				"description": "IMPERSONATE USER"
+			},
+			"response": []
+		},
+		{
+			"name": "CHANGE PW g.cavicchioli",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "germana"
+				},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/api/account/change_password",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"api",
+						"account",
+						"change_password"
+					]
+				},
+				"description": "IMPERSONATE USER"
+			},
+			"response": []
+		},
+		{
+			"name": "IMPERSONATE m.pintauro",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/impersonate/start?impersonate_username=m.pintauro",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"impersonate",
+						"start"
+					],
+					"query": [
+						{
+							"key": "impersonate_username",
+							"value": "m.pintauro"
+						}
+					]
+				},
+				"description": "IMPERSONATE USER"
+			},
+			"response": []
+		},
+		{
+			"name": "CHANGE PW m.pintauro",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "marco"
+				},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/api/account/change_password",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"api",
+						"account",
+						"change_password"
+					]
+				},
+				"description": "IMPERSONATE USER"
+			},
+			"response": []
+		},
+		{
+			"name": "IMPERSONATE l.andreoletti",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/impersonate/start?impersonate_username=l.andreoletti",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"impersonate",
+						"start"
+					],
+					"query": [
+						{
+							"key": "impersonate_username",
+							"value": "l.andreoletti"
+						}
+					]
+				},
+				"description": "IMPERSONATE USER"
+			},
+			"response": []
+		},
+		{
+			"name": "CHANGE PW l.andreoletti",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "luca"
+				},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/api/account/change_password",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"api",
+						"account",
+						"change_password"
+					]
+				},
+				"description": "IMPERSONATE USER"
+			},
+			"response": []
+		},
+		{
+			"name": "IMPERSONATE m.secreto",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/impersonate/start?impersonate_username=m.secreto",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"impersonate",
+						"start"
+					],
+					"query": [
+						{
+							"key": "impersonate_username",
+							"value": "m.secreto"
+						}
+					]
+				},
+				"description": "IMPERSONATE USER"
+			},
+			"response": []
+		},
+		{
+			"name": "CHANGE PW m.secreto",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "marialaura"
+				},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/api/account/change_password",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"api",
+						"account",
+						"change_password"
+					]
+				},
+				"description": "IMPERSONATE USER"
+			},
+			"response": []
+		},
+		{
+			"name": "IMPERSONATE a.barberi",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/impersonate/start?impersonate_username=a.barberi",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"impersonate",
+						"start"
+					],
+					"query": [
+						{
+							"key": "impersonate_username",
+							"value": "a.barberi"
+						}
+					]
+				},
+				"description": "IMPERSONATE USER"
+			},
+			"response": []
+		},
+		{
+			"name": "CHANGE PW a.barberi",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "alessandra"
+				},
+				"url": {
+					"raw": "http://as3dock.si.cnr.it:9201/api/account/change_password",
+					"protocol": "http",
+					"host": [
+						"as3dock",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "9201",
+					"path": [
+						"api",
+						"account",
+						"change_password"
+					]
+				},
+				"description": "IMPERSONATE USER"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "4db676b7-98d4-437f-aa2f-e0491e91980c",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "68cb4eb4-2112-4f99-8826-ce0b8f76c0bd",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
