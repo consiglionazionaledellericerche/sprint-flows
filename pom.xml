@@ -618,8 +618,8 @@
                     <defaultSchemaName>public</defaultSchemaName>
                     <username>activiti</username>
                     <password>activitipw</password>
-                    <url>jdbc:h2:file:./DB-H2/flows-cnr;DB_CLOSE_DELAY=-1</url>
-                    <!--<url>jdbc:h2:file:./DB-H2/flows-oiv;DB_CLOSE_DELAY=-1</url>-->
+                    <!--<url>jdbc:h2:file:./DB-H2/flows-cnr;DB_CLOSE_DELAY=-1</url>-->
+                    <url>jdbc:h2:file:./DB-H2/flows-oiv;DB_CLOSE_DELAY=-1</url>
                     <username>flows</username>
                     <password />
                     <referenceUrl>hibernate:spring:it.cnr.si.domain?dialect=&amp;hibernate.ejb.naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringNamingStrategy</referenceUrl>
