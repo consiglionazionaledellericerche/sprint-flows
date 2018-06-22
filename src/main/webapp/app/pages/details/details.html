@@ -35,6 +35,9 @@
 			<ul class="list-unstyled">
 				<ng-include src="vm.detailsView"/>
 			</ul>
+			<!--link ad altre Process Instances-->
+			<links links="vm.links"></links>
+
 			<h4>Documenti</h4>
 			<attachments process-instance-id="{{processInstanceId}}"
 						 attachments="{{vm.data.attachments}}"/>

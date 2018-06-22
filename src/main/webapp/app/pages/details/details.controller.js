@@ -14,7 +14,7 @@
         $scope.processInstanceId = $state.params.processInstanceId; // mi torna comodo per gli attachments -martin
 
         if ($state.params.processInstanceId) {
-            dataService.processInstances.byProcessInstanceId($state.params.processInstanceId).then(
+            dataService.processInstances.byProcessInstanceId($state.params.processInstanceId, true).then(
                 function(response) {
                     vm.data.entity = utils.refactoringVariables([response.data.entity])[0];
                     vm.data.history = response.data.history;
@@ -23,6 +23,18 @@
                     vm.data.attachments = utils.parseAttachments(response.data.attachments);
                     vm.data.identityLinks = response.data.identityLinks;
                     vm.diagramUrl = '/rest/diagram/processInstance/' + vm.data.entity.id + "?" + new Date().getTime();
+
+                    if (response.data.entity.variabili.hasOwnProperty('linkToOtherWorkflows')) {
+                        vm.links = [];
+                        response.data.entity.variabili.linkToOtherWorkflows.split(',').forEach(function(processInstanceId) {
+                            dataService.processInstances.getVariable(processInstanceId, 'titolo').success(function(titolo) {
+                                vm.links.push({
+                                    titolo: titolo.value,
+                                    processInstanceId: processInstanceId
+                                });
+                            });
+                        });
+                    }
 
                     var processDefinitionKey = response.data.entity.processDefinitionId.split(":")[0];
                     vm.detailsView = 'api/views/' + processDefinitionKey + '/detail';
