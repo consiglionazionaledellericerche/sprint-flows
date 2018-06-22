@@ -17,6 +17,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -44,7 +45,6 @@ import java.util.Map.Entry;
 public class FlowsPdfResource {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FlowsPdfResource.class);
-	private static final String VALUTAZIONE_ESPERIENZE_JSON = "valutazioneEsperienze_json";
 
 	@Inject
 	private FlowsPdfService pdfService;
@@ -109,46 +109,15 @@ public class FlowsPdfResource {
 			@RequestParam("processInstanceId") String processInstanceId,
 			@RequestParam("tipologiaDoc") String tipologiaDoc) {
 
-		//Sotituisco la lista di variabili da quelle storiche (historicProcessInstance.getProcessVariables() )a quelle attuali (variableInstanceJson)
-		JSONObject variableInstanceJson = new JSONObject();
+        final Pair<String, byte[]> filePair = pdfService.makePdf(tipologiaDoc, processInstanceId);
 
-		HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
-				.includeProcessVariables()
-				.processInstanceId(processInstanceId)
-				.singleResult();
-
-		// Verifico se il workflow sia terminato
-		if(historicProcessInstance.getEndTime() != null){
-			//carico le processVariables e rimappo in formato json il campo stringa "valutazioneEsperienze_json"
-			variableInstanceJson = new JSONObject(historicProcessInstance.getProcessVariables());
-		} else {
-			Map<String, VariableInstance> tutteVariabiliMap = runtimeService.getVariableInstances(processInstanceId);
-			for (Entry<String, VariableInstance> entry : tutteVariabiliMap.entrySet()) {
-				String key = entry.getKey();
-				VariableInstance value = entry.getValue();
-				//le variabili di tipo serializable (file) non vanno inseriti nel json delle variabili che verranno inseriti nel pdf
-				//(ho testato valutazioni esperienze_Json fino a 11000 caratteri ed a questo livello appare come longString)
-				if(!(((VariableInstanceEntity) value).getType() instanceof SerializableType))
-					variableInstanceJson.put(key, value.getValue());
-			}
-			LOGGER.info("variableInstanceJson: {}", variableInstanceJson);
-		}
-
-		//Sotituisco la lista di variabili da quelle storiche (historicProcessInstance.getProcessVariables() )a quelle attuali (variableInstanceJson)
-		JSONObject processVariables = mappingVariables(variableInstanceJson);
-
-		//creo il pdf corrispondente
-		String utenteRichiedente = processVariables.getString("nomeRichiedente");
-		String fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
-		byte[] pdfByteArray = pdfService.makePdf(Enum.PdfType.valueOf(tipologiaDoc), processVariables, fileName, utenteRichiedente, processInstanceId);
-
-		//popolo gli headers della response
+        //popolo gli headers della response
 		HttpHeaders headers = new HttpHeaders();
-		headers.set("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+		headers.set("Content-Disposition", "attachment; filename=\"" + filePair.getFirst() + "\"");
 		headers.setContentType(MediaType.parseMediaType("application/pdf"));
-		headers.setContentLength(pdfByteArray.length);
+		headers.setContentLength(filePair.getSecond().length);
 
-		return new ResponseEntity<>(pdfByteArray, headers, HttpStatus.OK);
+		return new ResponseEntity<>(filePair.getSecond(), headers, HttpStatus.OK);
 	}
 
 
@@ -187,17 +156,4 @@ public class FlowsPdfResource {
 		return new ResponseEntity<>(pdfByteArray, headers, HttpStatus.OK);
 	}
 
-
-
-	//Sotituisco il mapping direttamente con il json delle variabili sttuali
-	private JSONObject mappingVariables(JSONObject variables) {
-
-		//refactoring della stringona contenete le esperienze in un jsonArray
-		if (variables.has(VALUTAZIONE_ESPERIENZE_JSON)) {
-			JSONArray esperienze = new JSONArray(variables.getString(VALUTAZIONE_ESPERIENZE_JSON));
-			variables.put(VALUTAZIONE_ESPERIENZE_JSON, esperienze);
-		}
-
-		return variables;
-	}
 }

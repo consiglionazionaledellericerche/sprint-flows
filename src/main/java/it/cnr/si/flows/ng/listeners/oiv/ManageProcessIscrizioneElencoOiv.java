@@ -1,7 +1,9 @@
 package it.cnr.si.flows.ng.listeners.oiv;
 
 
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.listeners.oiv.service.*;
+import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
@@ -11,9 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.data.util.Pair;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -22,9 +26,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
-import static it.cnr.si.flows.ng.utils.Enum.PdfType.improcedibile;
-import static it.cnr.si.flows.ng.utils.Enum.PdfType.soccorsoIstruttorio;
+import static it.cnr.si.flows.ng.utils.Enum.PdfType.*;
 
 
 @Component
@@ -33,6 +37,27 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 
     private static final long serialVersionUID = 686169707042367215L;
     private static final Logger LOGGER = LoggerFactory.getLogger(ManageProcessIscrizioneElencoOiv.class);
+    public static final String STATO_FINALE_DOMANDA = "statoFinaleDomanda";
+    public static final String TEMPI_PROCEDIMENTALI_DOMANDA = "tempiProcedimentaliDomanda";
+    public static final String TEMPI_SOCCORSO_ISTRUTTORIO = "tempiSoccorsoIstruttorio";
+    public static final String TEMPI_PREAVVISO_RIGETTO = "tempiPreavvisoRigetto";
+    public static final String DATA_INIZIO_SOCCORSO_ISTRUTTORIO = "dataInizioSoccorsoIstruttorio";
+    public static final String DATA_FINE_SOCCORSO_ISTRUTTORIO = "dataFineSoccorsoIstruttorio";
+    public static final String GIORNI_DURATA_SOCCORSO_ISTRUTTORIO = "giorniDurataSoccorsoIstruttorio";
+    public static final String BOUNDARYTIMER_3 = "boundarytimer3";
+    public static final String BOUNDARYTIMER_6 = "boundarytimer6";
+    public static final String SOCCORSO_ISTRUTTORIA_FLAG = "soccorsoIstruttoriaFlag";
+    public static final String DATA_INIZIO_PREAVVISO_RIGETTO = "dataInizioPreavvisoRigetto";
+    public static final String DATA_FINE_PREAVVISO_RIGETTO = "dataFinePreavvisoRigetto";
+    public static final String GIORNI_DURATA_PREAVVISO_RIGETTO = "giorniDurataPreavvisoRigetto";
+    public static final String SCELTA_UTENTE = "sceltaUtente";
+    public static final String ID_DOMANDA = "idDomanda";
+    public static final String OIV = "oiv.";
+    public static final String ISCRIVI_INELENCO = "iscrivi-inelenco";
+    public static final String SOCCORSO_ISTRUTTORIO = "soccorso-istruttorio";
+    public static final String PREAVVISO_RIGETTO = "preavviso-rigetto";
+    public static final String COMUNICAZIONI = "comunicazioni";
+    public static final String FILE_NAME = "fileName";
 
 
     @Inject
@@ -52,17 +77,19 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
     private ManageControlli manageControlli;
     @Inject
     private CreateOivPdf createOivPdf;
+    @Autowired
+    private FlowsAttachmentService attachmentService;
 
     private Expression faseEsecuzione;
 
     @Override
     public void notify(DelegateExecution execution) throws Exception {
-
         String processInstanceId = execution.getProcessInstanceId();
-        String sceltaUtente = "start";
-        if (execution.getVariable("sceltaUtente") != null) {
-            sceltaUtente = (String) execution.getVariable("sceltaUtente");
-        }
+        String sceltaUtente = Optional.ofNullable(execution.getVariable(SCELTA_UTENTE))
+                .filter(String.class::isInstance)
+                .map(String.class::cast)
+                .orElse("start");
+
         Date dataNow = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         String simpleDataNow = formatter.format(dataNow);
@@ -72,29 +99,24 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
         boolean aggiornaGiudizioFinale = true;
         boolean nonAggiornaGiudizioFinale = false;
         FaseEsecuzioneEnum faseEsecuzioneValue = FaseEsecuzioneEnum.fromValue(faseEsecuzione.getValue(execution).toString());
+        LOGGER.info("-- faseEsecuzione: {}", faseEsecuzioneValue);
         switch (faseEsecuzioneValue) {
             case PROCESS_START: {
-                LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
                 oivSetGroupsAndVisibility.configuraVariabiliStart(execution);
                 manageControlli.verificaUnicaDomandaAttivaUtente(execution);
                 calcolaPunteggioFascia.settaNoAllOggettoSoccrso(execution);
             }
             ;
             break;
-            case SMISTAMENTO_START: {
-                LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
-            }
-            ;
-            break;
+            case SMISTAMENTO_START:
+                break;
             case SMISTAMENTO_END: {
-                LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
-                operazioniTimer.determinaTimerScadenzaTermini(execution, "boundarytimer3");
+                operazioniTimer.determinaTimerScadenzaTermini(execution, BOUNDARYTIMER_3);
             }
             ;
             break;
             case ISTRUTTORIA_START: {
-                LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
-                if ((execution.getVariable("soccorsoIstruttoriaFlag") != null) && (execution.getVariable("soccorsoIstruttoriaFlag").toString().equals("1"))) {
+                if ( Optional.ofNullable(execution.getVariable(SOCCORSO_ISTRUTTORIA_FLAG)).filter(o -> o.equals("1")).isPresent()) {
                     calcolaPunteggioFascia.calcolaAggiornaGiudizioFinale(execution, aggiornaGiudizioFinale);
                 } else {
                     calcolaPunteggioFascia.calcolaAggiornaGiudizioFinale(execution, nonAggiornaGiudizioFinale);
@@ -103,176 +125,173 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
             ;
             break;
             case ISTRUTTORIA_END: {
-                LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
                 calcolaPunteggioFascia.calcolaAggiornaGiudizioFinale(execution, aggiornaGiudizioFinale);
             }
             ;
             break;
             case SOCCORSO_ISTRUTTORIO_START: {
-                LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
                 //Sospendo i timer di scadenza tempi proderumantali (boundarytimer3) e avviso di scadenza tempi proderumantali (boundarytimer6)
-                operazioniTimer.sospendiTimerTempiProceduramentali(execution, "boundarytimer3", "boundarytimer6");
-                execution.setVariable("dataInizioSoccorsoIstruttorio", simpleDataNow);
-                createOivPdf.CreaPdfOiv(execution, soccorsoIstruttorio.name());
+                operazioniTimer.sospendiTimerTempiProceduramentali(execution, BOUNDARYTIMER_3, BOUNDARYTIMER_6);
+                execution.setVariable(DATA_INIZIO_SOCCORSO_ISTRUTTORIO, simpleDataNow);
+                final Pair<String, byte[]> pair = createOivPdf.creaPdfOiv(execution, soccorsoIstruttorio.name());
+                soccorsoIstruttorio(
+                        Optional.ofNullable(execution.getVariable(ID_DOMANDA))
+                                .filter(String.class::isInstance)
+                                .map(String.class::cast)
+                                .orElse(null), pair.getFirst(), pair.getSecond());
             }
             ;
             break;
             case SOCCORSO_ISTRUTTORIO_END: {
-                LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
                 //Riprendo i timer di scadenza tempi proderumantali (boundarytimer3) e avviso di scadenza tempi proderumantali (boundarytimer6)
-                operazioniTimer.riprendiTimerTempiProceduramentali(execution, "boundarytimer3", "boundarytimer6");
-                execution.setVariable("dataFineSoccorsoIstruttorio", simpleDataNow);
-                execution.setVariable("giorniDurataSoccorsoIstruttorio", operazioniTimer.calcolaGiorniTraDateString(execution.getVariable("dataInizioSoccorsoIstruttorio").toString(), execution.getVariable("dataFineSoccorsoIstruttorio").toString()));
+                operazioniTimer.riprendiTimerTempiProceduramentali(execution, BOUNDARYTIMER_3, BOUNDARYTIMER_6);
+                execution.setVariable(DATA_FINE_SOCCORSO_ISTRUTTORIO, simpleDataNow);
+                execution.setVariable(GIORNI_DURATA_SOCCORSO_ISTRUTTORIO, operazioniTimer.calcolaGiorniTraDateString(execution.getVariable(DATA_INIZIO_SOCCORSO_ISTRUTTORIO).toString(), execution.getVariable(DATA_FINE_SOCCORSO_ISTRUTTORIO).toString()));
             }
             ;
             break;
-            case CAMBIO_ISTRUTTORE_START: {
-                LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
-            }
-            ;
+            case CAMBIO_ISTRUTTORE_START:
             break;
-            case CAMBIO_ISTRUTTORE_END: {
-                LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
-            }
-            ;
+            case CAMBIO_ISTRUTTORE_END:
             break;
-            case VALUTAZIONE_START: {
-                LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
-            }
-            ;
+            case VALUTAZIONE_START:
             break;
             case VALUTAZIONE_END: {
-                LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
                 calcolaPunteggioFascia.calcolaAggiornaGiudizioFinale(execution, nonAggiornaGiudizioFinale);
             }
             ;
             break;
             case PREAVVISO_RIGETTO_START: {
-                LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
                 // Estende  il timer di scadenza tempi proderumantali (boundarytimer3) a 1 anno
-                operazioniTimer.setTimerScadenzaTermini(execution, "boundarytimer3", 1, 0, 0, 0, 0);
+                operazioniTimer.setTimerScadenzaTermini(execution, BOUNDARYTIMER_3, 1, 0, 0, 0, 0);
                 // Estende  il timer di avviso scadenza tempi proderumantali (boundarytimer6) a 25 giorni
-                operazioniTimer.setTimerScadenzaTermini(execution, "boundarytimer6", 1, 0, 0, 0, 0);
-                execution.setVariable("dataInizioPreavvisoRigetto", simpleDataNow);
+                operazioniTimer.setTimerScadenzaTermini(execution, BOUNDARYTIMER_6, 1, 0, 0, 0, 0);
+                execution.setVariable(DATA_INIZIO_PREAVVISO_RIGETTO, simpleDataNow);
+                FlowsAttachment fileRecuperato = attachmentService.getAttachementsForProcessInstance(processInstanceId).get("preavvisoRigetto");
+                preavvisoRigetto(
+                        Optional.ofNullable(execution.getVariable(ManageProcessIscrizioneElencoOiv.ID_DOMANDA))
+                                .filter(String.class::isInstance)
+                                .map(String.class::cast)
+                                .orElse(null), fileRecuperato.getName(), fileRecuperato.getBytes());
             }
             ;
             break;
             case PREAVVISO_RIGETTO_END: {
-                LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
                 // Estende  il timer di scadenza tempi proderumantali (boundarytimer3) a 30 giorni
-                operazioniTimer.setTimerScadenzaTermini(execution, "boundarytimer3", 0, 0, 30, 0, 0);
+                operazioniTimer.setTimerScadenzaTermini(execution, BOUNDARYTIMER_3, 0, 0, 30, 0, 0);
                 // Estende  il timer di avviso scadenza tempi proderumantali (boundarytimer6) a 25 giorni
-                operazioniTimer.setTimerScadenzaTermini(execution, "boundarytimer6", 0, 0, 25, 0, 0);
-                execution.setVariable("dataFinePreavvisoRigetto", simpleDataNow);
-                execution.setVariable("giorniDurataPreavvisoRigetto", operazioniTimer.calcolaGiorniTraDateString(execution.getVariable("dataInizioPreavvisoRigetto").toString(), execution.getVariable("dataFinePreavvisoRigetto").toString()));
+                operazioniTimer.setTimerScadenzaTermini(execution, BOUNDARYTIMER_6, 0, 0, 25, 0, 0);
+                execution.setVariable(DATA_FINE_PREAVVISO_RIGETTO, simpleDataNow);
+                execution.setVariable(GIORNI_DURATA_PREAVVISO_RIGETTO, operazioniTimer.calcolaGiorniTraDateString(execution.getVariable(DATA_INIZIO_PREAVVISO_RIGETTO).toString(), execution.getVariable(DATA_FINE_PREAVVISO_RIGETTO).toString()));
             }
             ;
             break;
-            case ISTRUTTORIA_SU_PREAVVISO_START: {
-                LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
-            }
-            ;
+            case ISTRUTTORIA_SU_PREAVVISO_START:
             break;
             case ISTRUTTORIA_SU_PREAVVISO_END: {
-                LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
                 calcolaPunteggioFascia.calcolaAggiornaGiudizioFinale(execution, aggiornaGiudizioFinale);
             }
             ;
             break;
-            case VALUTAZIONE_PREAVVISO_START: {
-                LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
-            }
-            ;
+            case VALUTAZIONE_PREAVVISO_START:
             break;
             case VALUTAZIONE_PREAVVISO_END: {
-                LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
                 calcolaPunteggioFascia.calcolaAggiornaGiudizioFinale(execution, nonAggiornaGiudizioFinale);
             }
             ;
             break;
-            case FIRMA_DG_RIGETTO_START: {
-                LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
-            }
-            ;
+            case FIRMA_DG_RIGETTO_START:
             break;
             case FIRMA_DG_RIGETTO_END: {
-                LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
+                final Optional<FlowsAttachment> flowsAttachment = Optional.ofNullable(attachmentService.getAttachementsForProcessInstance(processInstanceId))
+                        .map(stringFlowsAttachmentMap -> stringFlowsAttachmentMap.entrySet().stream())
+                        .filter(entryStream -> {
+                            return entryStream.anyMatch(stringFlowsAttachmentEntry -> {
+                                return stringFlowsAttachmentEntry.getKey().equals(rigetto.name()) ||
+                                        stringFlowsAttachmentEntry.getKey().equals(rigettoMotivato.name()) ||
+                                        stringFlowsAttachmentEntry.getKey().equals(rigettoDopoPreavviso.name()) ||
+                                        stringFlowsAttachmentEntry.getKey().equals(rigettoDopo10Giorni.name()) ||
+                                        stringFlowsAttachmentEntry.getKey().equals(RigettoDef10Giorni.name());
+                            });
+                        })
+                        .map(entryStream -> entryStream.findAny())
+                        .map(stringFlowsAttachmentEntry -> stringFlowsAttachmentEntry.get().getValue());
+                if (flowsAttachment.isPresent()) {
+                    comunicazioni(
+                            Optional.ofNullable(execution.getVariable(ID_DOMANDA))
+                                    .filter(String.class::isInstance)
+                                    .map(String.class::cast)
+                                    .orElse(null), flowsAttachment.get().getName(), flowsAttachment.get().getBytes(), rigetto.name());
+                }
             }
-            ;
             break;
             case END_IMPROCEDIBILE: {
-                LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
-                execution.setVariable("statoFinaleDomanda", "IMPROCEDIBILE");
-                createOivPdf.CreaPdfOiv(execution, improcedibile.name());
+                execution.setVariable(STATO_FINALE_DOMANDA, "IMPROCEDIBILE");
+                final Pair<String, byte[]> pair = createOivPdf.creaPdfOiv(execution, improcedibile.name());
+                comunicazioni(
+                        Optional.ofNullable(execution.getVariable(ID_DOMANDA))
+                                .filter(String.class::isInstance)
+                                .map(String.class::cast)
+                                .orElse(null), pair.getFirst(), pair.getSecond(), improcedibile.name());
+
             }
             ;
             break;
             case END_APPROVATA: {
-                LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
                 execution.setVariable("numeroIscrizioneInElenco",
-                        iscriviInElenco(Optional.ofNullable(execution.getVariable("idDomanda"))
+                        iscriviInElenco(Optional.ofNullable(execution.getVariable(ID_DOMANDA))
                                 .filter(String.class::isInstance)
                                 .map(String.class::cast)
                                 .orElse(null)));
-                execution.setVariable("statoFinaleDomanda", "DOMANDA APPROVATA");
+                execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA APPROVATA");
             }
             ;
             break;
             case END_RESPINTA: {
-                LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
-                execution.setVariable("statoFinaleDomanda", "RESPINTA");
+                execution.setVariable(STATO_FINALE_DOMANDA, "RESPINTA");
             }
             ;
             break;
             case AVVISO_SCADENZA_TEMPI_PROCEDURALI_START: {
-                LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
-                execution.setVariable("tempiProcedimentaliDomanda", "IN SCADENZA");
+                execution.setVariable(TEMPI_PROCEDIMENTALI_DOMANDA, "IN SCADENZA");
             }
             ;
             break;
             case SCADENZA_TEMPI_PROCEDURALI_START: {
-                LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
-                execution.setVariable("tempiProcedimentaliDomanda", "SCADUTI");
+                execution.setVariable(TEMPI_PROCEDIMENTALI_DOMANDA, "SCADUTI");
             }
             ;
             break;
             case SCADENZA_TEMPI_SOCCORSO_ISTRUTTORIO: {
-                LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
-                execution.setVariable("tempiSoccorsoIstruttorio", "SCADUTI");
+                execution.setVariable(TEMPI_SOCCORSO_ISTRUTTORIO, "SCADUTI");
             }
             ;
             break;
             case SCADENZA_TEMPI_PREAVVISO_RIGETTO: {
-                LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
-                execution.setVariable("tempiPreavvisoRigetto", "SCADUTI");
+                execution.setVariable(TEMPI_PREAVVISO_RIGETTO, "SCADUTI");
             }
             ;
             break;
             case PROCESS_END: {
-                LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
                 oivSetGroupsAndVisibility.configuraVariabiliEnd(execution);
             }
             ;
             break;
-            default: {
-                LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
-            }
-            ;
+            default:
             break;
-
         }
         // Codice per gestire le Scelte
-        manageSceltaUtente.azioneScelta(execution, faseEsecuzioneValue.getValue(), sceltaUtente);
-        LOGGER.info("sceltaUtente: " + sceltaUtente);
+        manageSceltaUtente.azioneScelta(execution, faseEsecuzioneValue.getValue(), SceltaUtenteEnum.fromValue(sceltaUtente));
+        LOGGER.info("sceltaUtente: {}", sceltaUtente);
         //print della fase
-        LOGGER.info("dettagli Istanza di flusso: " + execution.getVariable("name"));
+        LOGGER.info("dettagli Istanza di flusso: {}", execution.getVariable("name"));
 
     }
 
     private String iscriviInElenco(String id) {
-        final RelaxedPropertyResolver relaxedPropertyResolver = new RelaxedPropertyResolver(env, "oiv.");
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(relaxedPropertyResolver.getProperty("iscrivi-inelenco"))
-                .queryParam("idDomanda", id);
+        final RelaxedPropertyResolver relaxedPropertyResolver = new RelaxedPropertyResolver(env, OIV);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(relaxedPropertyResolver.getProperty(ISCRIVI_INELENCO))
+                .queryParam(ID_DOMANDA, id);
         return Optional.ofNullable(oivRestTemplate.getForEntity(builder.buildAndExpand().toUri(), Map.class))
                 .filter(mapResponseEntity -> mapResponseEntity.getStatusCode() == HttpStatus.OK)
                 .map(ResponseEntity::getBody)
@@ -282,4 +301,57 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
                 .orElse(null);
     }
 
+    private void soccorsoIstruttorio(String id, String fileName, byte[] bytes) {
+        final RelaxedPropertyResolver relaxedPropertyResolver = new RelaxedPropertyResolver(env, OIV);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(relaxedPropertyResolver.getProperty(SOCCORSO_ISTRUTTORIO))
+                .queryParam(ID_DOMANDA, id).queryParam(FILE_NAME, fileName);
+        LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
+        map.add("file", new ByteArrayResource(bytes) {
+            @Override
+            public String getFilename() {
+                return fileName;
+            }
+        });
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<LinkedMultiValueMap<String, Object>>(map, headers);
+        oivRestTemplate.postForEntity(builder.buildAndExpand().toUri(), requestEntity, Void.class);
+    }
+
+    private void comunicazioni(String id, String fileName, byte[] bytes, String type) {
+        final RelaxedPropertyResolver relaxedPropertyResolver = new RelaxedPropertyResolver(env, OIV);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(relaxedPropertyResolver.getProperty(COMUNICAZIONI))
+                .queryParam(ID_DOMANDA, id).queryParam(FILE_NAME, fileName).queryParam("type", type);
+        LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
+        map.add("file", new ByteArrayResource(bytes) {
+            @Override
+            public String getFilename() {
+                return fileName;
+            }
+        });
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<LinkedMultiValueMap<String, Object>>(map, headers);
+        oivRestTemplate.postForEntity(builder.buildAndExpand().toUri(), requestEntity, Void.class);
+    }
+
+
+    private void preavvisoRigetto(String id, String fileName, byte[] bytes) {
+        final RelaxedPropertyResolver relaxedPropertyResolver = new RelaxedPropertyResolver(env, ManageProcessIscrizioneElencoOiv.OIV);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(relaxedPropertyResolver.getProperty(ManageProcessIscrizioneElencoOiv.PREAVVISO_RIGETTO))
+                .queryParam(ManageProcessIscrizioneElencoOiv.ID_DOMANDA, id).queryParam(ManageProcessIscrizioneElencoOiv.FILE_NAME, fileName);
+        LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
+        map.add("file", new ByteArrayResource(bytes) {
+            @Override
+            public String getFilename() {
+                return fileName;
+            }
+        });
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<LinkedMultiValueMap<String, Object>>(map, headers);
+
+        oivRestTemplate.postForEntity(builder.buildAndExpand().toUri(), requestEntity, Void.class);
+
+    }
 }

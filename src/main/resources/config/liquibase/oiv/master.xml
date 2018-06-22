@@ -25,8 +25,14 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/oiv/changelog/addColumnInJHI_User.xml"
              relativeToChangelogFile="false"/>
+
     <include file="classpath:config/liquibase/oiv/changelog/20171023125007_added_entity_Relationship.xml"
              relativeToChangelogFile="false"/>
+
+
     <include file="classpath:config/liquibase/oiv/changelog/20180410115515_added_entity_Membership.xml"
+             relativeToChangelogFile="false"/>
+
+    <include file="classpath:config/liquibase/oiv/changelog/addAuthorityForUser.xml"
              relativeToChangelogFile="false"/>
 </databaseChangeLog>

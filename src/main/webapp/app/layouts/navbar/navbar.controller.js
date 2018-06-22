@@ -20,9 +20,16 @@
         vm.toggleNavbar = toggleNavbar;
         vm.collapseNavbar = collapseNavbar;
         vm.$state = $state;
-//        $rootScope.wfDefsStatistics = new Array();
         $rootScope.wfDefsStatistics = [];
-//        $rootScope.wfDefsStatistics = {};
+
+        //in ogni caso questa chiamata viene cachata e non viene richiamata ad ogni caricamento della navbar
+        ProfileService.getProfileInfo().then(function(response) {
+            $rootScope.inDevelopment = (response.activeProfiles.includes('dev') ? 'true' : 'false');
+            //verifico qual è il profilo spring con cui è stata avviata l'app per caricare il corrispondente banner
+            $rootScope.app = (response.activeProfiles.includes('oiv') ? 'oiv' : 'cnr');
+            vm.swaggerEnabled = response.swaggerEnabled;
+        });
+
 
         function switchUser() {
             collapseNavbar();
@@ -62,13 +69,6 @@
         }
 
         function loadAvailableDefinitions() {
-            ProfileService.getProfileInfo().then(function(response) {
-                $rootScope.inDevelopment = (response.activeProfiles.includes('dev') ? 'true' : 'false');
-                //verifico qual è il profilo spring con cui è stata avviata l'app per caricare il corrispondente banner
-                $rootScope.app = (response.activeProfiles.includes('oiv') ? 'oiv' : 'cnr');
-                vm.swaggerEnabled = response.swaggerEnabled;
-            });
-
             dataService.definitions.all()
                 .then(function(response) {
                     //lista delle Process Definition che l'utente può avviare

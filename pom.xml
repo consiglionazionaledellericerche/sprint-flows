@@ -533,6 +533,29 @@
                     </options>
                 </configuration>
             </plugin>
+            <!-- jhipster-needle-maven-add-plugin -->
+
+            <!--prova-->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <executable>bower</executable>
+                    <arguments>
+                        <argument>install</argument>
+                    </arguments>
+                    <!--<workingDirectory>${basedir}/src/main/webapp</workingDirectory>-->
+                    <workingDirectory>${basedir}</workingDirectory>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -595,8 +618,8 @@
                     <defaultSchemaName>public</defaultSchemaName>
                     <username>activiti</username>
                     <password>activitipw</password>
-                    <url>jdbc:h2:file:./DB-H2/flows-cnr;DB_CLOSE_DELAY=-1</url>
-                    <!--<url>jdbc:h2:file:./DB-H2/flows-oiv;DB_CLOSE_DELAY=-1</url>-->
+                    <!--<url>jdbc:h2:file:./DB-H2/flows-cnr;DB_CLOSE_DELAY=-1</url>-->
+                    <url>jdbc:h2:file:./DB-H2/flows-oiv;DB_CLOSE_DELAY=-1</url>
                     <username>flows</username>
                     <password />
                     <referenceUrl>hibernate:spring:it.cnr.si.domain?dialect=&amp;hibernate.ejb.naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringNamingStrategy</referenceUrl>
@@ -643,7 +666,25 @@
                         your application on port 5005 <jvmArguments>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005</jvmArguments> -->
                 </configuration>
             </plugin>
-            <!-- jhipster-needle-maven-add-plugin -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <executable>bower</executable>
+                    <arguments>
+                        <argument>install</argument>
+                    </arguments>
+                    <workingDirectory>${basedir}</workingDirectory>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
