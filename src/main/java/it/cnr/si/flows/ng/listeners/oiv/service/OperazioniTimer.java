@@ -55,17 +55,23 @@ public class OperazioniTimer {
 
 		String processInstanceId = execution.getProcessInstanceId();
 		// Estende  il timer 
-		flowsTimerService.setTimerValuesFromNow(processInstanceId, timerId, years, months, days, hours, minutes);
-		LOGGER.info("------ DATA FINE PROCEDURA: " + execution.getVariable("dataScadenzaTerminiDomanda"));
+		List<Job> timerJobs = flowsTimerService.getTimer(processInstanceId, timerId);
+		if(timerJobs.size() > 0){
+			flowsTimerService.setTimerValuesFromNow(processInstanceId, timerId, years, months, days, hours, minutes);
+			LOGGER.info("------ DATA FINE PROCEDURA: " + execution.getVariable("dataScadenzaTerminiDomanda"));
+		}
 
 	}
 	public void setTimerScadenzaTermini(DelegateExecution execution, String timerId, int years, int months, int days, int hours, int minutes) throws IOException, ParseException {
 
 		String processInstanceId = execution.getProcessInstanceId();
-		// Estende  il timer 
-		flowsTimerService.setTimerValuesFromNow(processInstanceId, timerId, years, months, days, hours, minutes);
-		determinaTimerScadenzaTermini(execution, timerId);
-		LOGGER.info("------ DATA FINE PROCEDURA: " + execution.getVariable("dataScadenzaTerminiDomanda"));
+		List<Job> timerJobs = flowsTimerService.getTimer(processInstanceId, timerId);
+		if(timerJobs.size() > 0){
+			// Estende  il timer 
+			flowsTimerService.setTimerValuesFromNow(processInstanceId, timerId, years, months, days, hours, minutes);
+			determinaTimerScadenzaTermini(execution, timerId);
+			LOGGER.info("------ DATA FINE PROCEDURA: " + execution.getVariable("dataScadenzaTerminiDomanda"));
+		}
 	}
 
 
@@ -73,31 +79,34 @@ public class OperazioniTimer {
 
 		String processInstanceId = execution.getProcessInstanceId();
 		List<Job> timerScadenzaTempiJobs = flowsTimerService.getTimer(processInstanceId, timerScadenzaTempiId);
-		Calendar newDate = Calendar.getInstance();
-		Date timerScadenzaTempi = newDate.getTime();
-		Date timerAvvisoScadenza = newDate.getTime();
-		if (!timerScadenzaTempiJobs.isEmpty()) {
-			timerScadenzaTempi = timerScadenzaTempiJobs.get(0).getDuedate();
-			List<Job> timerAvvisoScadenzaJobs = flowsTimerService.getTimer(processInstanceId, timerAvvisoScadenzaId);
-			if (!timerAvvisoScadenzaJobs.isEmpty()) {
-				timerAvvisoScadenza = timerAvvisoScadenzaJobs.get(0).getDuedate(); 
+		if(timerScadenzaTempiJobs.size() > 0){
+			Calendar newDate = Calendar.getInstance();
+			Date timerScadenzaTempi = newDate.getTime();
+			Date timerAvvisoScadenza = newDate.getTime();
+			if (!timerScadenzaTempiJobs.isEmpty()) {
+				timerScadenzaTempi = timerScadenzaTempiJobs.get(0).getDuedate();
+				List<Job> timerAvvisoScadenzaJobs = flowsTimerService.getTimer(processInstanceId, timerAvvisoScadenzaId);
+				if(timerAvvisoScadenzaJobs.size() > 0){
+					timerAvvisoScadenza = timerAvvisoScadenzaJobs.get(0).getDuedate(); 
+				}
+				LOGGER.info("------ Si SOSPENDONO LE DATE: ScadenzaTempiProceduramentali: {} e AvvisoScadenzaTempiProceduramentali: {}" + timerScadenzaTempi, timerAvvisoScadenza);
+
+				//Calcolo giorni mancanti alla scadenza vengono salvati nella variabile di processo "ggScadenzaTerminiDomanda"
+				long diffTime = timerScadenzaTempi.getTime() - newDate.getTime().getTime();
+				long diffDays = diffTime / (1000 * 60 * 60 * 24);
+				LOGGER.debug("--- La differenza di giorni sarà: {}", diffDays);
+				execution.setVariable("ggScadenzaTerminiDomanda", diffDays);
+				LOGGER.info("------ gg Scadenza Termini Domanda: " + execution.getVariable("ggScadenzaTerminiDomanda"));
+
+				// Estende  il timer di scadenza tempi proderumantali (boundarytimer3) a 1 anno
+				flowsTimerService.setTimerValuesFromNow(processInstanceId, timerScadenzaTempiId, 1, 0, 0, 0, 0);
+				determinaTimerScadenzaTermini(execution, "boundarytimer3");
+				// Estende  il timer di avviso scadenza tempi proderumantali (boundarytimer6) a 1 anno
+				if(timerAvvisoScadenzaJobs.size() > 0){
+					flowsTimerService.setTimerValuesFromNow(processInstanceId, timerAvvisoScadenzaId, 1, 0, 0, 0, 0);			
+				}
 			}
-			LOGGER.info("------ Si SOSPENDONO LE DATE: ScadenzaTempiProceduramentali: {} e AvvisoScadenzaTempiProceduramentali: {}" + timerScadenzaTempi, timerAvvisoScadenza);
-
-			//Calcolo giorni mancanti alla scadenza vengono salvati nella variabile di processo "ggScadenzaTerminiDomanda"
-			long diffTime = timerScadenzaTempi.getTime() - newDate.getTime().getTime();
-			long diffDays = diffTime / (1000 * 60 * 60 * 24);
-			LOGGER.debug("--- La differenza di giorni sarà: {}", diffDays);
-			execution.setVariable("ggScadenzaTerminiDomanda", diffDays);
-			LOGGER.info("------ gg Scadenza Termini Domanda: " + execution.getVariable("ggScadenzaTerminiDomanda"));
-
-			// Estende  il timer di scadenza tempi proderumantali (boundarytimer3) a 1 anno
-			flowsTimerService.setTimerValuesFromNow(processInstanceId, timerScadenzaTempiId, 1, 0, 0, 0, 0);
-			determinaTimerScadenzaTermini(execution, "boundarytimer3");
-			// Estende  il timer di scadenza tempi proderumantali (boundarytimer3) a 1 anno
-			flowsTimerService.setTimerValuesFromNow(processInstanceId, timerAvvisoScadenzaId, 1, 0, 0, 0, 0);			
 		}
-
 	}
 
 	public void riprendiTimerTempiProceduramentali(DelegateExecution execution, String timerScadenzaTempiId, String timerAvvisoScadenzaId) throws IOException, ParseException {
@@ -111,12 +120,19 @@ public class OperazioniTimer {
 		if (diffDays >5 ) {
 			diffDaysAvviso = diffDays - 5;
 		}
-		// Estende  il timer di scadenza tempi proderumantali (boundarytimer3) a 1 anno
-		flowsTimerService.setTimerValuesFromNow(processInstanceId, timerScadenzaTempiId, 0, 0, diffDays, 0, 0);
-		// Estende  il timer di scadenza tempi proderumantali (boundarytimer3) a 1 anno
-		flowsTimerService.setTimerValuesFromNow(processInstanceId, timerAvvisoScadenzaId, 0, 0, diffDaysAvviso, 0, 0);
-		determinaTimerScadenzaTermini(execution, "boundarytimer3");
-		LOGGER.info("------ DATA FINE PROCEDURA: " + execution.getVariable("dataScadenzaTerminiDomanda"));
+		List<Job> timerScadenzaTempiJobs = flowsTimerService.getTimer(processInstanceId, timerScadenzaTempiId);
+		if(timerScadenzaTempiJobs.size() > 0){
+			// Estende  il timer di scadenza tempi proderumantali (boundarytimer3) a 1 anno
+			flowsTimerService.setTimerValuesFromNow(processInstanceId, timerScadenzaTempiId, 0, 0, diffDays, 0, 0);
+
+			List<Job> timerAvvisoScadenzaJobs = flowsTimerService.getTimer(processInstanceId, timerAvvisoScadenzaId);
+			if(timerAvvisoScadenzaJobs.size() > 0){
+				// Estende  il timer di scadenza tempi proderumantali (boundarytimer6) a 1 anno
+				flowsTimerService.setTimerValuesFromNow(processInstanceId, timerAvvisoScadenzaId, 0, 0, diffDaysAvviso, 0, 0);
+			}
+			determinaTimerScadenzaTermini(execution, "boundarytimer6");
+			LOGGER.info("------ DATA FINE PROCEDURA: " + execution.getVariable("dataScadenzaTerminiDomanda"));
+		}
 	}
 
 	public int calcolaGiorniTraDateString(String stringDateInf, String stringDateSup) throws ParseException {
