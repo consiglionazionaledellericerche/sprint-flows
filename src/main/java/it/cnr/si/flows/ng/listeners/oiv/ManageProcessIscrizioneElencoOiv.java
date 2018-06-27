@@ -4,9 +4,12 @@ package it.cnr.si.flows.ng.listeners.oiv;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.listeners.oiv.service.*;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
+
+import org.activiti.engine.HistoryService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
+import org.activiti.engine.history.HistoricVariableInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +27,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.inject.Inject;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -77,6 +81,8 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
     private ManageControlli manageControlli;
     @Inject
     private CreateOivPdf createOivPdf;
+    @Inject
+    private HistoryService historyService;
     @Autowired
     private FlowsAttachmentService attachmentService;
 
@@ -167,7 +173,8 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
                 // Estende  il timer di avviso scadenza tempi proderumantali (boundarytimer6) a 25 giorni
                 operazioniTimer.setTimerScadenzaTermini(execution, BOUNDARYTIMER_6, 1, 0, 0, 0, 0);
                 execution.setVariable(DATA_INIZIO_PREAVVISO_RIGETTO, simpleDataNow);
-                FlowsAttachment fileRecuperato = attachmentService.getAttachementsForProcessInstance(processInstanceId).get("preavvisoRigetto");
+    			FlowsAttachment fileRecuperato = (FlowsAttachment) execution.getVariable("preavvisoRigetto");
+
                 preavvisoRigetto(
                         Optional.ofNullable(execution.getVariable(ManageProcessIscrizioneElencoOiv.ID_DOMANDA))
                                 .filter(String.class::isInstance)
