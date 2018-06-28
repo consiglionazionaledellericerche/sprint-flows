@@ -1,9 +1,8 @@
 version: '2'
 services:
     sprint-flows-demo_cnr:
-#        image: docker.si.cnr.it/sprint-flows-demo
-        #todo: immagine locale (puntare a docker.si.cnr.it, da pushare)
-        image: sprint-flows-demo_cnr
+        image: docker.si.cnr.it/sprint-flows-demo
+#        image: sprint-flows-demo_cnr
         links:
             - sprint-flows-demo_cnr-pg:postgresql
         environment:
@@ -12,7 +11,6 @@ services:
             - SPRING_DATASOURCE_USERNAME=activiti
             - SPRING_DATASOURCE_PASSWORD=activitipw
             - JHIPSTER_SLEEP=10 # gives time for the database to boot before the application
-        command: java -Djava.security.egd=file:/dev/./urandom -jar /app.war
         ports:
             - 9200:8080
     sprint-flows-demo_cnr-pg:
