@@ -1,4 +1,4 @@
-#Immagine che mi serve per installare i font
+# Immagine che mi serve per installare i font
 FROM node:8-alpine as nodejs-builder
 LABEL maintainer="cironepa@gmail.com"
 USER noRoot
@@ -8,11 +8,11 @@ RUN apk update
 RUN apk add ttf-dejavu
 
 
-#Immagine da cui prendo le librerie che non ci sono nella distroless
+# Immagine da cui prendo le librerie che non ci sono nella distroless
 FROM openjdk:8-jdk-slim as jdk
 
 
-#Jmmagine distroless java dove gira effettivamente il jar di spring-flows
+# Immagine distroless java dove gira effettivamente il jar di spring-flows
 FROM gcr.io/distroless/java
 LABEL maintainer="cironepa@gmail.com"
 USER noRoot
