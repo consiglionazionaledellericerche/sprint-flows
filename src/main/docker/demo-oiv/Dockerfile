@@ -8,11 +8,11 @@ RUN apk update
 RUN apk add ttf-dejavu
 
 
-#Immagine da cui prendo le librerie che non ci sono nella distroless
+# Immagine da cui prendo le librerie che non ci sono nella distroless
 FROM openjdk:8-jdk-slim as jdk
 
 
-#Jmmagine distroless java dove gira effettivamente il jar di spring-flows
+# Immagine distroless java dove gira effettivamente il jar di spring-flows
 FROM gcr.io/distroless/java
 LABEL maintainer="cironepa@gmail.com"
 USER noRoot
@@ -29,7 +29,7 @@ COPY --from=jdk /usr/lib/x86_64-linux-gnu/libfontconfig.so.1.8.0 /usr/lib/x86_64
 COPY --from=jdk /usr/share/fontconfig /usr/share/fontconfig
 COPY --from=jdk /usr/share/fonts/truetype/dejavu /usr/share/fonts/truetype/dejavu
 COPY --from=jdk /lib/x86_64-linux-gnu/libexpat.so.1 /lib/x86_64-linux-gnu/libexpat.so.1
-#COPY --from=jdk /etc/fonts /etc/fonts
+# COPY --from=jdk /etc/fonts /etc/fonts
 
 EXPOSE 8080 5701/udp
 
