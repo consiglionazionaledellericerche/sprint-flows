@@ -1,7 +1,8 @@
 #Immagine che mi serve per installare i font
 FROM node:8-alpine as nodejs-builder
 LABEL maintainer="cironepa@gmail.com"
-USER noRoot
+
+#USER nonroot
 
 # Activiti genera i diagrammi, e' importante installare i font (legato ad application.yml)
 RUN apk update
@@ -15,7 +16,7 @@ FROM openjdk:8-jdk-slim as jdk
 # Immagine distroless java dove gira effettivamente il jar di spring-flows
 FROM gcr.io/distroless/java
 LABEL maintainer="cironepa@gmail.com"
-USER noRoot
+#USER nonroot
 
 # Copy over dependancies for Apache FOP, which are lacking from the JRE supplied in gcr.io/distroless/java
 # Make sure java versions match both in JDK image and the distroless image
@@ -36,4 +37,5 @@ EXPOSE 8080 5701/udp
 ADD app.war /app/app.war
 WORKDIR /app
 
-CMD ["-Djava.security.egd=file:/dev/./urandom", "app.war"]
+#CMD ["-Djava.security.egd=file:/dev/./urandom", "app.war"]
+CMD ["-Djava.security.egd=file:/dev/./urandom -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5701", "app.war"]
