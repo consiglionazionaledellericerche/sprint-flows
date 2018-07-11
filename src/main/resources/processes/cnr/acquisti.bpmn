@@ -43,7 +43,7 @@
           </activiti:executionListener>
         </extensionElements>
       </userTask>
-      <userTask id="firma-decisione" name="Firma Decisione" activiti:candidateGroups="${gruppoDirettore}">
+      <userTask id="firma-decisione" name="Firma Decisione" activiti:candidateGroups="${gruppoFirmaAcquisti}">
         <extensionElements>
           <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
             <activiti:field name="faseEsecuzione">
@@ -338,7 +338,7 @@
           </activiti:executionListener>
         </extensionElements>
       </endEvent>
-      <userTask id="firma-provvedimento-aggiudicazione" name="Firma Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoDirettore}">
+      <userTask id="firma-provvedimento-aggiudicazione" name="Firma Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoFirmaAcquisti}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
             <activiti:field name="faseEsecuzione">
@@ -423,7 +423,7 @@
           </activiti:executionListener>
         </extensionElements>
       </endEvent>
-      <userTask id="firma-revoca" name="Firma Revoca" activiti:candidateGroups="${gruppoDirettore}">
+      <userTask id="firma-revoca" name="Firma Revoca" activiti:candidateGroups="${gruppoFirmaAcquisti}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
             <activiti:field name="faseEsecuzione">
@@ -727,7 +727,7 @@
           </activiti:executionListener>
         </extensionElements>
       </userTask>
-      <userTask id="firma-contratto" name="Firma Contratto" activiti:candidateGroups="${gruppoDirettore}">
+      <userTask id="firma-contratto" name="Firma Contratto" activiti:candidateGroups="${gruppoFirmaAcquisti}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
             <activiti:field name="faseEsecuzione">
