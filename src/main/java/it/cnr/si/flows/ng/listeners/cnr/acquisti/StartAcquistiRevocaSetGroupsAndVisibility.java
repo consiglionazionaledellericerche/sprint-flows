@@ -55,12 +55,12 @@ public class StartAcquistiRevocaSetGroupsAndVisibility implements ExecutionListe
             String struttura = gruppoRT.substring(gruppoRT.lastIndexOf('@') +1);
             // idStruttura variabile che indica che il flusso è diviso per strutture (implica la visibilità distinta tra strutture)
             execution.setVariable("idStruttura", struttura);
-            String gruppoDirettore = "direttore@"+ struttura;
+            String gruppoFirmaAcquisti = "responsabileFirmaAcquisti@"+ struttura;
             String gruppoRA = "ra@"+ struttura;
             String gruppoSFD = "sfd@"+ struttura;
             String rup = execution.getVariable("rup", String.class);
 
-            LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoRT, gruppoSFD, gruppoRA, gruppoDirettore);
+            LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoRT, gruppoSFD, gruppoRA, gruppoFirmaAcquisti);
 
             //Check se il gruppo SFD ha membri
             List<String> members = aceBridgeService.getUsersinAceGroup(gruppoSFD);
@@ -70,14 +70,14 @@ public class StartAcquistiRevocaSetGroupsAndVisibility implements ExecutionListe
                 execution.setVariable("organizzazioneStruttura", "Complessa");
             }
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoRT, PROCESS_VISUALIZER);
-            runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoDirettore, PROCESS_VISUALIZER);
+            runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoFirmaAcquisti, PROCESS_VISUALIZER);
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoRA, PROCESS_VISUALIZER);
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoSFD, PROCESS_VISUALIZER);
             runtimeService.addUserIdentityLink(execution.getProcessInstanceId(), rup, PROCESS_VISUALIZER);
 //            runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), "segreteria@" + struttura, PROCESS_VISUALIZER);
 
             execution.setVariable("gruppoRT", gruppoRT);
-            execution.setVariable("gruppoDirettore", gruppoDirettore);
+            execution.setVariable("gruppoFirmaAcquisti", gruppoFirmaAcquisti);
             execution.setVariable("gruppoRA", gruppoRA);
             execution.setVariable("gruppoSFD", gruppoSFD);
 
