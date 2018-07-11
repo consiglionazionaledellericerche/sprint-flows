@@ -26,7 +26,7 @@ docker build --no-cache -t sprint-flows-demo_oiv -f Dockerfile .
 echo -e "\n################################## RUN sprint-flows-demo #################################################\n"
 docker-compose up -d
 
-echo -e "\n########### IMPORTANTE PER MANTENERE IL DB usare ${RED}docker-compose stop${NC} ###############"
+echo -e "\n########### IMPORTANTE PER ELIMINARE IL DB usare ${RED}docker-compose down -v${NC} ###############"
 echo -e "\n########### PER VEDERE LE LOG DEI CONTAINER, USARE ${RED}docker-compose logs -f ${NC} ###############\n"
 
 
