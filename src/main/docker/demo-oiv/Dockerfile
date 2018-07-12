@@ -13,12 +13,12 @@ LABEL maintainer="cironepa@gmail.com"
 COPY --from=0 ["lib/x86_64-linux-gnu/libexpat.so.1", "lib/x86_64-linux-gnu/libexpat.so.1"]
 COPY --from=0 ["usr/lib/x86_64-linux-gnu/libfontconfig.so.1.8.0", "usr/lib/x86_64-linux-gnu/libfontconfig.so.1"]
 
-COPY --from=0 ["/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", "/usr/share/fonts/truetype/dejavu/"]
-COPY --from=0 ["/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", "/usr/share/fonts/truetype/dejavu/"]
-COPY --from=0 ["/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf", "/usr/share/fonts/truetype/dejavu/"]
-COPY --from=0 ["/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", "/usr/share/fonts/truetype/dejavu/"]
-COPY --from=0 ["/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf", "/usr/share/fonts/truetype/dejavu/"]
-COPY --from=0 ["/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf", "/usr/share/fonts/truetype/dejavu/"]
+COPY --from=0 ["/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"]
+COPY --from=0 ["/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"]
+COPY --from=0 ["/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf", "/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf"]
+COPY --from=0 ["/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"]
+COPY --from=0 ["/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf", "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf"]
+COPY --from=0 ["/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf", "/usr/share/fonts/truetype/dejavu/dejavu/DejaVuSerif.ttf"]
 # Copy over dependancies for Apache FOP, which are lacking from the JRE supplied in gcr.io/distroless/java
 # Make sure java versions match both in JDK image and the distroless image
 COPY --from=0 ["usr/lib/x86_64-linux-gnu/libfreetype.so.6.12.3", "usr/lib/x86_64-linux-gnu/libfreetype.so.6"]
