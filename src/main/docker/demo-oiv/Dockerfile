@@ -3,7 +3,7 @@ FROM openjdk:8-jdk-slim
 
 # Immagine distroless java dove gira effettivamente il jar di spring-flows
 FROM gcr.io/distroless/java
-LABEL maintainer="cironepa@gmail.com"
+#LABEL maintainer="cironepa@gmail.com"
 
 #todo: provare ad avviare i processi con un'utenza che non suia root
 #USER nonroot
@@ -25,9 +25,9 @@ COPY usr/lib/x86_64-linux-gnu/libpng16.so.16.28.0 /usr/lib/x86_64-linux-gnu/libp
 COPY lib/x86_64-linux-gnu/libexpat.so.1 /lib/x86_64-linux-gnu/libexpat.so.1
 
 
-EXPOSE 8080 5701/udp
+#EXPOSE 8080 5701/udp
 
-#ADD app.war /app/app.war
+ADD app.war /app/app.war
 WORKDIR /app
 
 CMD ["-Djava.security.egd=file:/dev/./urandom -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5701", "app.war"]
