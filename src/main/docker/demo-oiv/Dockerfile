@@ -11,7 +11,7 @@ LABEL maintainer="cironepa@gmail.com"
 
 # Copy over dependancies for Apache Batik (used by Apache FOP to handle SVG rendering)
 COPY --from=0 ["lib/x86_64-linux-gnu/libexpat.so.1", "lib/x86_64-linux-gnu/libexpat.so.1"]
-COPY --from=0 ["usr/share/fonts/truetype/dejavu", "usr/share/fonts/truetype/dejavu"]
+COPY --from=0 ["usr/share/fonts/truetype/dejavu/*", "usr/share/fonts/truetype/dejavu/"]
 COPY --from=0 ["usr/lib/x86_64-linux-gnu/libfontconfig.so.1.8.0", "usr/lib/x86_64-linux-gnu/libfontconfig.so.1"]
 # Copy over dependancies for Apache FOP, which are lacking from the JRE supplied in gcr.io/distroless/java
 # Make sure java versions match both in JDK image and the distroless image
