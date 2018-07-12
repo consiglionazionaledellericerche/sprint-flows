@@ -1,7 +1,6 @@
 # Immagine da cui prendo le librerie che non ci sono nella distroless
 FROM openjdk:8-jdk-slim as jdk
 
-
 # Immagine distroless java dove gira effettivamente il jar di spring-flows
 FROM gcr.io/distroless/java
 LABEL maintainer="cironepa@gmail.com"
@@ -20,7 +19,7 @@ COPY --from=jdk /lib/x86_64-linux-gnu/libexpat.so.1 /lib/x86_64-linux-gnu/libexp
 
 EXPOSE 8080 5701/udp
 
-ADD app.war /app/app.war
+#ADD app.war /app/app.war
 WORKDIR /app
 
 CMD ["-Djava.security.egd=file:/dev/./urandom -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5701", "app.war"]
