@@ -10,12 +10,12 @@ LABEL maintainer="cironepa@gmail.com"
 
 # Copy over dependancies for Apache FOP, which are lacking from the JRE supplied in gcr.io/distroless/java
 # Make sure java versions match both in JDK image and the distroless image
-COPY --from=openjdk:8-jdk-slim /usr/lib/x86_64-linux-gnu/libfreetype.so.6.12.3 /usr/lib/x86_64-linux-gnu/libfreetype.so.6
-COPY --from=openjdk:8-jdk-slim /usr/lib/x86_64-linux-gnu/libpng16.so.16.28.0 /usr/lib/x86_64-linux-gnu/libpng16.so.16
+COPY --from=openjdk:8-jdk-slim ["/usr/lib/x86_64-linux-gnu/libfreetype.so.6.12.3", "/usr/lib/x86_64-linux-gnu/libfreetype.so.6"]
+COPY --from=openjdk:8-jdk-slim ["/usr/lib/x86_64-linux-gnu/libpng16.so.16.28.0", "/usr/lib/x86_64-linux-gnu/libpng16.so.16"]
 # Copy over dependancies for Apache Batik (used by Apache FOP to handle SVG rendering)
-COPY --from=openjdk:8-jdk-slim /usr/lib/x86_64-linux-gnu/libfontconfig.so.1.8.0 /usr/lib/x86_64-linux-gnu/libfontconfig.so.1
-COPY --from=openjdk:8-jdk-slim /usr/share/fonts/truetype/dejavu /usr/share/fonts/truetype/dejavu
-COPY --from=openjdk:8-jdk-slim /lib/x86_64-linux-gnu/libexpat.so.1 /lib/x86_64-linux-gnu/libexpat.so.1
+COPY --from=openjdk:8-jdk-slim ["/usr/lib/x86_64-linux-gnu/libfontconfig.so.1.8.0", "/usr/lib/x86_64-linux-gnu/libfontconfig.so.1"]
+COPY --from=openjdk:8-jdk-slim ["/usr/share/fonts/truetype/dejavu", "/usr/share/fonts/truetype/dejavu"]
+COPY --from=openjdk:8-jdk-slim ["/lib/x86_64-linux-gnu/libexpat.so.1", "/lib/x86_64-linux-gnu/libexpat.so.1"]
 
 EXPOSE 8080 5701/udp
 
