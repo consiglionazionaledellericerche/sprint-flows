@@ -2,7 +2,7 @@
 FROM openjdk:8-jdk-slim
 
 # Immagine distroless java dove gira effettivamente il jar di spring-flows
-FROM gcr.io/distroless/java
+FROM gcr.io/distroless/java:latest
 LABEL maintainer="cironepa@gmail.com"
 
 #todo: provare ad avviare i processi con un'utenza che non suia root
