@@ -310,7 +310,7 @@
 						<font size="11" isBold="true"/>
 						<paragraph lineSpacing="Single"/>
 					</textElement>
-					<textFieldExpression><![CDATA["Oggetto:\t Elenco nazionale dei componenti degli Organismi indipendenti di valutazione ai sensi del D.M 2 dicembre 2016. Soccorso istruttorio."]]></textFieldExpression>
+					<textFieldExpression><![CDATA["Oggetto:\t Elenco nazionale dei componenti degli Organismi indipendenti di valutazione ai sensi del D.M 2 dicembre 2016. Soccorso istruttorio." ]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 					<reportElement x="30" y="80" width="505" height="116" uuid="f268cea9-49bb-4966-bc1d-bb4675fea055"/>
