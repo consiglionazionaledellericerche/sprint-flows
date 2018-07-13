@@ -1,6 +1,6 @@
 version: '2'
 services:
-    sprint-flows-demo-oiv:
+    sprint-flows-demo_oiv:
         image: docker.si.cnr.it/sprint-flows-demo
 #        image: sprint-flows-demo-oiv
         links:
