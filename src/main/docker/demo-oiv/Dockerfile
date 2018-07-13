@@ -1,34 +1,20 @@
-# Immagine da cui prendo le librerie che non ci sono nella distroless
-FROM openjdk:8-jdk-slim
+FROM java:openjdk-8-jre-alpine
 
-# Immagine distroless java dove gira effettivamente il jar di spring-flows
-FROM gcr.io/distroless/java:latest
 LABEL maintainer="cironepa@gmail.com"
 
-#todo: provare ad avviare i processi con un'utenza che non sia root
-#USER nonroot
+ENV JHIPSTER_SLEEP 0
+
+# Activiti genera i diagrammi, e' importante installare i font (legato ad application.yml)
+RUN apk update
+RUN apk add ttf-dejavu
 
 
-# Copy over dependancies for Apache Batik (used by Apache FOP to handle SVG rendering)
+# add directly the war
+ADD app.war /app.war
 
-COPY --from=0 usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf /usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf
-COPY --from=0 usr/share/fonts/truetype/dejavu/DejaVuSans.ttf /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
-COPY --from=0 usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf
-COPY --from=0 usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf /usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf
-COPY --from=0 usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf /usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf
-COPY --from=0 usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf /usr/share/fonts/truetype/dejavu/dejavu/DejaVuSerif.ttf
-# Copy over dependancies for Apache FOP, which are lacking from the JRE supplied in gcr.io/distroless/java
-# Make sure java versions match both in JDK image and the distroless image
-COPY --from=0 usr/lib/x86_64-linux-gnu/libfontconfig.so.1.8.0 /usr/lib/x86_64-linux-gnu/libfontconfig.so.1
-COPY --from=0 usr/lib/x86_64-linux-gnu/libfreetype.so.6.12.3 /usr/lib/x86_64-linux-gnu/libfreetype.so.6
-COPY --from=0 usr/lib/x86_64-linux-gnu/libpng16.so.16.28.0 /usr/lib/x86_64-linux-gnu/libpng16.so.16
-COPY --from=0 lib/x86_64-linux-gnu/libexpat.so.1 /lib/x86_64-linux-gnu/libexpat.so.1
-
-
+RUN sh -c 'touch /app.war'
+VOLUME /tmp
 EXPOSE 8080 5701/udp
-
-ADD app.war /app/app.war
-WORKDIR /app
-
-CMD ["-Djava.security.egd=file:/dev/./urandom -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5701", "app.war"]
-#CMD ["app.war"]
+CMD echo "The application will start in ${JHIPSTER_SLEEP}s..." && \
+    sleep ${JHIPSTER_SLEEP} && \
+    java -Djava.security.egd=file:/dev/./urandom -jar /app.war
