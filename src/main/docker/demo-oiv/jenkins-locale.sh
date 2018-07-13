@@ -21,7 +21,7 @@ else
 fi
 
 echo -e "\n################################## BUILDING sprint-flows-demo #################################################\n"
-docker build --no-cache -t sprint-flows-demo-oiv .
+docker build --no-cache -t sprint-flows-demo_oiv .
 #docker build -t sprint-flows-demo-oiv .
 
 
