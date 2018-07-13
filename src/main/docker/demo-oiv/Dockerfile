@@ -19,10 +19,10 @@ LABEL maintainer="cironepa@gmail.com"
 #COPY usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf /usr/share/fonts/truetype/dejavu/dejavu/DejaVuSerif.ttf
 ## Copy over dependancies for Apache FOP, which are lacking from the JRE supplied in gcr.io/distroless/java
 ## Make sure java versions match both in JDK image and the distroless image
-COPY usr/lib/x86_64-linux-gnu/libfontconfig.so.1.8.0 /usr/lib/x86_64-linux-gnu/libfontconfig.so.1
-COPY usr/lib/x86_64-linux-gnu/libfreetype.so.6.12.3 /usr/lib/x86_64-linux-gnu/libfreetype.so.6
-COPY usr/lib/x86_64-linux-gnu/libpng16.so.16.28.0 /usr/lib/x86_64-linux-gnu/libpng16.so.16
-COPY lib/x86_64-linux-gnu/libexpat.so.1 /lib/x86_64-linux-gnu/libexpat.so.1
+COPY ["usr/lib/x86_64-linux-gnu/libfontconfig.so.1.8.0" "/usr/lib/x86_64-linux-gnu/libfontconfig.so.1"]
+#COPY usr/lib/x86_64-linux-gnu/libfreetype.so.6.12.3 /usr/lib/x86_64-linux-gnu/libfreetype.so.6
+#COPY usr/lib/x86_64-linux-gnu/libpng16.so.16.28.0 /usr/lib/x86_64-linux-gnu/libpng16.so.16
+#COPY lib/x86_64-linux-gnu/libexpat.so.1 /lib/x86_64-linux-gnu/libexpat.so.1
 
 
 EXPOSE 8080 5701/udp
