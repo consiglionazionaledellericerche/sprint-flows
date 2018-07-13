@@ -5,6 +5,7 @@ NC='\033[0m'
 echo -e "\n################################## Buildo il war #################################################\n"
 cd ../../../../
 mvn clean install -DskipTests
+#mvn clean spring-boot:repackage -DskipTests
 cd src/main/docker/demo-oiv
 
 
@@ -20,11 +21,13 @@ else
 fi
 
 echo -e "\n################################## BUILDING sprint-flows-demo #################################################\n"
-docker build --no-cache -t sprint-flows-demo_oiv -f Dockerfile .
+docker build --no-cache -t sprint-flows-demo-oiv .
+#docker build -t sprint-flows-demo-oiv .
 
 
 echo -e "\n################################## RUN sprint-flows-demo #################################################\n"
-docker-compose up -d
+#docker-compose up -d
+docker-compose up
 
 echo -e "\n########### IMPORTANTE PER ELIMINARE IL DB usare ${RED}docker-compose down -v${NC} ###############"
 echo -e "\n########### PER VEDERE LE LOG DEI CONTAINER, USARE ${RED}docker-compose logs -f ${NC} ###############\n"

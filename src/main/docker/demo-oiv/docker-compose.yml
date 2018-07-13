@@ -1,28 +1,29 @@
 version: '2'
 services:
-    sprint-flows-demo_oiv:
+    sprint-flows-demo-oiv:
         image: docker.si.cnr.it/sprint-flows-demo
-#        image: sprint-flows-demo_oiv
+#        image: sprint-flows-demo-oiv
         links:
-            - sprint-flows-demo_oiv-pg:postgresql
+            - sprint-flows-demo-oiv-pg:postgresql
         environment:
-            - SPRING_PROFILES_ACTIVE=demo,oiv
+            - SPRING_PROFILES_ACTIVE=demo,oiv,swagger
+            #sovrascrivo l'url del DB in modo che punti alla macchina postgres avviata
             - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/flows
             - SPRING_DATASOURCE_USERNAME=activiti
             - SPRING_DATASOURCE_PASSWORD=activitipw
             - JHIPSTER_SLEEP=10 # gives time for the database to boot before the application
         ports:
-            - 9200:8080
-    sprint-flows-demo_oiv-pg:
+            - "9201:8080"
+    sprint-flows-demo-oiv-pg:
+        container_name: sprint-flows-demo-oiv-pg
         image: postgres:9.6.9-alpine
         environment:
             - POSTGRES_USER=activiti
             - POSTGRES_PASSWORD=activitipw
             - POSTGRES_DB=flows-oiv #"-oiv" viene aggiunto a runtime a seconda del profilo con cui l'app viene avviata
         volumes:
-           - spring-flows-demo-oiv-pg-data:/var/lib/postgresql/data
+            - spring-flows-demo-oiv-pg-data:/var/lib/postgresql/data
         ports:
-            - 8485:5432
-
+            - "8487:5432"
 volumes:
     spring-flows-demo-oiv-pg-data:
