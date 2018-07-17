@@ -5,7 +5,7 @@ FROM openjdk:8-jdk-slim
 FROM gcr.io/distroless/java
 LABEL maintainer="cironepa@gmail.com"
 
-#todo: provare ad avviare i processi con un'utenza che non suia root
+#todo: provare ad avviare i processi con un'utenza che non sia root
 #USER nonroot
 
 
