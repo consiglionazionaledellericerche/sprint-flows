@@ -20,6 +20,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.inject.Inject;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.ZoneId;
@@ -32,6 +33,11 @@ import java.util.stream.Collectors;
 @Service
 @Profile("!oiv")
 public class AceBridgeService {
+
+    // e' necessario iniettare un'istanza di se stessa per potere utilizzare le cache
+    // vedi l'uso di getIdRuoloBySigla
+    @Inject
+    private AceBridgeService aceService;
 
     @Deprecated
     @Resource(name = "aceJdbcTemplate")
@@ -140,7 +146,7 @@ public class AceBridgeService {
                 .encoder(new GsonEncoder(gson))
                 .target(Ace.class, aceUrl);
 
-        int idRuolo = ace.ruoloBySigla(sigla).getId();
+        int idRuolo = aceService.getIdRuoloBySigla(sigla);
 
         return ace.utentiInRuoloEo(idRuolo, idEo)
                 .stream()
@@ -167,6 +173,28 @@ public class AceBridgeService {
                 return Pair.of(idUo, cdsuo + "-" + sigla + "-" + denominazione );
             }
         });
+    }
+
+    @Cacheable("idRuoloBySigla")
+    public int getIdRuoloBySigla(String sigla) {
+
+        final AceJwt token = getAceJwtToken();
+
+        DateTimeFormatter formatter = DateTimeFormatter
+                .ofPattern("yyyy-MM-dd HH:mm:ss.SSS", Locale.ITALIAN)
+                .withZone(ZoneId.of("Europe/Rome"));
+        GsonJava8TypeAdapterFactory typeAdapterFactory = new GsonJava8TypeAdapterFactory()
+                .setInstantFormatter(formatter);
+        Gson gson = new GsonBuilder().registerTypeAdapterFactory(typeAdapterFactory).create();
+
+        Ace ace = Feign.builder()
+                // Aggiunge l'header con il token per tutte le richieste fatte da questo servizio
+                .requestInterceptor(new TokenRequestInterceptor(token.getAccess_token()))
+                .decoder(new GsonDecoder(gson))
+                .encoder(new GsonEncoder(gson))
+                .target(Ace.class, aceUrl);
+
+        return ace.ruoloBySigla(sigla).getId();
     }
 
     @Cacheable("nomiStrutture")
