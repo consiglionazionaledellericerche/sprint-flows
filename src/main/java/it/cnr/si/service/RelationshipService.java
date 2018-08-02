@@ -204,7 +204,7 @@ public class RelationshipService {
         if (!Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
             //filtro in ACE gli utenti che appartengono agli stessi gruppi dell'utente loggato
             for (String myGroup : myGroups) {
-                usersInMyGroups.addAll(aceService.getUsersinAceGroup(myGroup) != null ? aceService.getUsersinAceGroup(myGroup) : new ArrayList<>());
+                usersInMyGroups.addAll(aceService.getUsersInAceGroup(myGroup) != null ? aceService.getUsersInAceGroup(myGroup) : new ArrayList<>());
             }
         } else {
             //filtro in Membership gli utenti che appartengono agli stessi gruppi dell'utente loggato            

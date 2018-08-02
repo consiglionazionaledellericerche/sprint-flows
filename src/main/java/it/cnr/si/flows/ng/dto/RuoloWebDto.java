@@ -8,15 +8,15 @@ import lombok.Setter;
 @Setter
 public class RuoloWebDto extends WebDto {
 
-    private String contesti;
+//    private String contesti;
 
     private String descr;
 
-    private String figli;
+//    private String figli;
 
     private String padre;
 
     private String sigla;
 
-    private String tipiEntitaOrganizzativa;
+//    private String tipiEntitaOrganizzativa;
 }
