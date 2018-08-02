@@ -277,18 +277,18 @@
                     </span>
                 </a>
                 <ul class="dropdown-menu" uib-dropdown-menu>
-                    <li ui-sref-active="active" ng-if="app == 'oiv'">
+                    <li ui-sref-active="active" ng-if="app == 'oiv'" ng-switch-when="true">
                         <a ui-sref="settings" ng-click="vm.collapseNavbar()">
                             <span class="glyphicon glyphicon-wrench"></span>&nbsp;
                             <span translate="global.menu.account.settings">Settings</span>
                         </a>
                     </li>
-                    <li ui-sref-active="active" ng-if="(app == 'oiv')||(app == 'cnr')">
-                        <a ui-sref="password" ng-click="vm.collapseNavbar()">
-                            <span class="glyphicon glyphicon-lock"></span>&nbsp;
-                            <span translate="global.menu.account.password">Password</span>
-                        </a>
-                    </li>
+                    <!--<li ui-sref-active="active" ng-if="(app == 'oiv')||(app == 'cnr')">-->
+                        <!--<a ui-sref="password" ng-click="vm.collapseNavbar()">-->
+                            <!--<span class="glyphicon glyphicon-lock"></span>&nbsp;-->
+                            <!--<span translate="global.menu.account.password">Password</span>-->
+                        <!--</a>-->
+                    <!--</li>-->
                     <li ui-sref-active="active" ng-switch-when="true">
                         <a href="" ng-click="vm.logout()" id="logout">
                             <span class="glyphicon glyphicon-log-out"></span>&nbsp;
