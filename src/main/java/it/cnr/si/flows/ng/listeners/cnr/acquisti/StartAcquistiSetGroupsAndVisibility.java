@@ -68,7 +68,7 @@ public class StartAcquistiSetGroupsAndVisibility implements ExecutionListener {
             LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoRT, gruppoSFD, gruppoRA, gruppoFirmaAcquisti);
 
             //Check se il gruppo SFD ha membri
-            List<String> members = aceBridgeService.getUsersinAceGroup(gruppoSFD);
+            List<String> members = aceBridgeService.getUsersInAceGroup(gruppoSFD);
             if (members.isEmpty()) {
                 execution.setVariable("organizzazioneStruttura", "Semplice");
             } else {

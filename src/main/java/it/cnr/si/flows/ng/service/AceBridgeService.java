@@ -6,6 +6,7 @@ import feign.Feign;
 import feign.form.FormEncoder;
 import feign.gson.GsonDecoder;
 import feign.gson.GsonEncoder;
+import it.cnr.si.flows.ng.dto.PersonaWebDto;
 import it.cnr.si.flows.ng.dto.RuoloUtenteWebDto;
 import it.cnr.si.flows.ng.utils.AceJwt;
 import net.dongliu.gson.GsonJava8TypeAdapterFactory;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 @Profile("!oiv")
 public class AceBridgeService {
 
+    @Deprecated
     @Resource(name = "aceJdbcTemplate")
     private JdbcTemplate aceJdbcTemplate;
 
@@ -44,7 +46,7 @@ public class AceBridgeService {
     private String aceUsername;
 
 
-
+    @Deprecated
     private static final String GROUPS_FOR_USER = "SELECT persona.nome, persona.cognome, persona.userid, persona.id, ruolo.sigla, ruolo.descr, ruolo.id,entitaorganizzativa.sigla as eosigla, entitaorganizzativa.denominazione, entitaorganizzativa.id as eoid " +
             "FROM ace_old.assegnazioneruolo "+
             "INNER JOIN ace_old.persona ON persona.id = assegnazioneruolo.ass_persona_id "+
@@ -52,6 +54,7 @@ public class AceBridgeService {
             "INNER JOIN ace_old.entitaorganizzativa ON entitaorganizzativa.id = assegnazioneruolo.entitaorganizzativa_id "+
             "where assegnazioneruolo.ass_persona_id = (SELECT id FROM ace_old.persona WHERE persona.userid = ?)";
 
+    @Deprecated
     private static final String USERS_IN_ROLE = "SELECT persona.nome, persona.cognome, persona.id, persona.userid, ruolo.sigla, ruolo.descr, ruolo.id,entitaorganizzativa.sigla as eosigla, entitaorganizzativa.denominazione, entitaorganizzativa.id as eoid " +
             "FROM ace_old.assegnazioneruolo "+
             "INNER JOIN ace_old.persona ON persona.id = assegnazioneruolo.ass_persona_id "+
@@ -60,6 +63,7 @@ public class AceBridgeService {
             "where ruolo.sigla = ?  "+
             "and entitaorganizzativa.id = ?";
 
+    @Deprecated
     private static final String UO_LIKE = "select distinct entitaorganizzativa.id, entitaorganizzativa.sigla, entitaorganizzativa.denominazione, entitaorganizzativa.cdsuo " +
             "from ace_old.entitaorganizzativa " +
             "INNER JOIN ace_old.tipoentitaorganizzativa ON tipoentitaorganizzativa.id = entitaorganizzativa.tipo_id " +
@@ -74,10 +78,12 @@ public class AceBridgeService {
             "AND (entitaorganizzativa.finevalidita IS NULL AND entitaorganizzativa.cdsuo <> 'SOPPRE') " +
             "AND (entitaorganizzativa.sigla ilike ? OR entitaorganizzativa.denominazione ilike ?)";
 
+    @Deprecated
     private static final String DENOMINAZIONE_STRUTTURA = "Select entitaorganizzativa.denominazione, entitaorganizzativa.sigla, entitaorganizzativa.denominazionebreve "
             + "from ace_old.entitaorganizzativa "
             + "where entitaorganizzativa.id = ?";
 
+    @Deprecated
     private static final String DENOMINAZIONE_RUOLO = "Select ruolo.descr, ruolo.sigla, ruolo.id "
             + "from ace_old.ruolo "
             + "where ruolo.sigla = ?";
@@ -85,14 +91,7 @@ public class AceBridgeService {
 
     public List<String> getAceGroupsForUser(String loginUsername) {
 
-        final AceAuthService service = Feign.builder()
-                .decoder(new GsonDecoder())
-                .encoder(new FormEncoder(new GsonEncoder()))
-                .target(AceAuthService.class, aceUrl + "api");
-
-        final AceJwt token = service.getToken(aceUsername, acePassword);
-//           todo: fare il refresh anzicchè il login?
-//        final AceJwt refreshed = service.getRefreshedToken(token.getRefresh_token());
+        final AceJwt token = getAceJwtToken();
 
         DateTimeFormatter formatter = DateTimeFormatter
                 .ofPattern("yyyy-MM-dd HH:mm:ss.SSS", Locale.ITALIAN)
@@ -115,22 +114,39 @@ public class AceBridgeService {
                 .collect(Collectors.toList());
     }
 
-    public List<String> getUsersinAceGroup(String groupName) {
+    public List<String> getUsersInAceGroup(String groupName) {
 
         if (!groupName.contains("@"))
             return new ArrayList<>();
 
         String[] split = groupName.split("@");
         String sigla = split[0];
-        Integer eo = Integer.parseInt(split[1]);
-        Object[] args = new Object[] {sigla, eo};
+        int idEo = Integer.parseInt(split[1]);
 
-        return aceJdbcTemplate.query(USERS_IN_ROLE, args, new RowMapper<String>() {
-            @Override
-            public String mapRow(ResultSet rs, int rowNum) throws SQLException {
-                return rs.getString("userid");
-            }
-        });
+
+        final AceJwt token = getAceJwtToken();
+
+        DateTimeFormatter formatter = DateTimeFormatter
+                .ofPattern("yyyy-MM-dd HH:mm:ss.SSS", Locale.ITALIAN)
+                .withZone(ZoneId.of("Europe/Rome"));
+        GsonJava8TypeAdapterFactory typeAdapterFactory = new GsonJava8TypeAdapterFactory()
+                .setInstantFormatter(formatter);
+        Gson gson = new GsonBuilder().registerTypeAdapterFactory(typeAdapterFactory).create();
+
+        Ace ace = Feign.builder()
+                // Aggiunge l'header con il token per tutte le richieste fatte da questo servizio
+                .requestInterceptor(new TokenRequestInterceptor(token.getAccess_token()))
+                .decoder(new GsonDecoder(gson))
+                .encoder(new GsonEncoder(gson))
+                .target(Ace.class, aceUrl);
+
+        int idRuolo = ace.ruoloBySigla(sigla).getId();
+
+        return ace.utentiInRuoloEo(idRuolo, idEo)
+                .stream()
+                .map(p -> p.getUsername())
+                .collect(Collectors.toList());
+
     }
 
     public List<Pair<Integer, String>> getUoLike(String uoName) {
@@ -185,6 +201,18 @@ public class AceBridgeService {
             }
         });
         return (descrizioneRuolo + "@" + descrizioneStruttura);
+    }
+
+
+    // todo: fare il refresh anzicchè il login?
+    private AceJwt getAceJwtToken() {
+        final AceAuthService service = Feign.builder()
+                .decoder(new GsonDecoder())
+                .encoder(new FormEncoder(new GsonEncoder()))
+                .target(AceAuthService.class, aceUrl + "api");
+
+        // final AceJwt refreshed = service.getRefreshedToken(token.getRefresh_token());
+        return service.getToken(aceUsername, acePassword);
     }
 
 }

@@ -7,6 +7,7 @@ import feign.Param;
 import feign.RequestLine;
 import it.cnr.si.flows.ng.dto.PersonaWebDto;
 import it.cnr.si.flows.ng.dto.RuoloUtenteWebDto;
+import it.cnr.si.flows.ng.dto.RuoloWebDto;
 import org.json.JSONObject;
 import springfox.documentation.spring.web.json.Json;
 
@@ -61,5 +62,10 @@ public interface Ace {
 //  PersonaEntitaOrganizzativaWebDto updatePersonaEntitaOrganizzativa(
 //      PersonaEntitaOrganizzativaDto personaDto);
 
+  @RequestLine("GET api/ace/v1/ruolopersona/persone/{idRuolo}/{idEo}")
+  ArrayList<PersonaWebDto> utentiInRuoloEo(@Param("idRuolo") int idRuolo, @Param("idEo") int idEo);
+
+  @RequestLine("GET api/ace/v1/ruolo/{sigla}")
+  RuoloWebDto ruoloBySigla(@Param("sigla") String sigla);
 
 }
