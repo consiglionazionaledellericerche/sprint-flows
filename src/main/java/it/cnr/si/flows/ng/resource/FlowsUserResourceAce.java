@@ -62,7 +62,7 @@ public class FlowsUserResourceAce {
     @RequestMapping(value = "/ace/group/{groupname:.+}", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.ADMIN)
     public List<String> getAceGroup(@PathVariable String groupname) {
-        return aceService.getUsersinAceGroup(groupname);
+        return aceService.getUsersInAceGroup(groupname);
     }
 
     @RequestMapping(value = "/ace/groupdetail/{id}", method = RequestMethod.GET)
