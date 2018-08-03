@@ -53,23 +53,6 @@ public class AceBridgeService {
 
 
     @Deprecated
-    private static final String GROUPS_FOR_USER = "SELECT persona.nome, persona.cognome, persona.userid, persona.id, ruolo.sigla, ruolo.descr, ruolo.id,entitaorganizzativa.sigla as eosigla, entitaorganizzativa.denominazione, entitaorganizzativa.id as eoid " +
-            "FROM ace_old.assegnazioneruolo "+
-            "INNER JOIN ace_old.persona ON persona.id = assegnazioneruolo.ass_persona_id "+
-            "INNER JOIN ace_old.ruolo ON ruolo.id = assegnazioneruolo.ruolo_id "+
-            "INNER JOIN ace_old.entitaorganizzativa ON entitaorganizzativa.id = assegnazioneruolo.entitaorganizzativa_id "+
-            "where assegnazioneruolo.ass_persona_id = (SELECT id FROM ace_old.persona WHERE persona.userid = ?)";
-
-    @Deprecated
-    private static final String USERS_IN_ROLE = "SELECT persona.nome, persona.cognome, persona.id, persona.userid, ruolo.sigla, ruolo.descr, ruolo.id,entitaorganizzativa.sigla as eosigla, entitaorganizzativa.denominazione, entitaorganizzativa.id as eoid " +
-            "FROM ace_old.assegnazioneruolo "+
-            "INNER JOIN ace_old.persona ON persona.id = assegnazioneruolo.ass_persona_id "+
-            "INNER JOIN ace_old.ruolo ON ruolo.id = assegnazioneruolo.ruolo_id "+
-            "INNER JOIN ace_old.entitaorganizzativa ON entitaorganizzativa.id = assegnazioneruolo.entitaorganizzativa_id "+
-            "where ruolo.sigla = ?  "+
-            "and entitaorganizzativa.id = ?";
-
-    @Deprecated
     private static final String UO_LIKE = "select distinct entitaorganizzativa.id, entitaorganizzativa.sigla, entitaorganizzativa.denominazione, entitaorganizzativa.cdsuo " +
             "from ace_old.entitaorganizzativa " +
             "INNER JOIN ace_old.tipoentitaorganizzativa ON tipoentitaorganizzativa.id = entitaorganizzativa.tipo_id " +
