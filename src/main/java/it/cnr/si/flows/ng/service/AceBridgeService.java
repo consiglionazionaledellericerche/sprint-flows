@@ -80,21 +80,7 @@ public class AceBridgeService {
 
     public List<String> getAceGroupsForUser(String loginUsername) {
 
-        final AceJwt token = getAceJwtToken();
-
-        DateTimeFormatter formatter = DateTimeFormatter
-                .ofPattern("yyyy-MM-dd HH:mm:ss.SSS", Locale.ITALIAN)
-                .withZone(ZoneId.of("Europe/Rome"));
-        GsonJava8TypeAdapterFactory typeAdapterFactory = new GsonJava8TypeAdapterFactory()
-                .setInstantFormatter(formatter);
-        Gson gson = new GsonBuilder().registerTypeAdapterFactory(typeAdapterFactory).create();
-
-        Ace ace = Feign.builder()
-                // Aggiunge l'header con il token per tutte le richieste fatte da questo servizio
-                .requestInterceptor(new TokenRequestInterceptor(token.getAccess_token()))
-                .decoder(new GsonDecoder(gson))
-                .encoder(new GsonEncoder(gson))
-                .target(Ace.class, aceUrl);
+        Ace ace = getAce();
 
         ArrayList<RuoloUtenteWebDto> ruoliUtente = ace.ruoloUtente(loginUsername);
 
@@ -113,21 +99,7 @@ public class AceBridgeService {
         int idEo = Integer.parseInt(split[1]);
 
 
-        final AceJwt token = getAceJwtToken();
-
-        DateTimeFormatter formatter = DateTimeFormatter
-                .ofPattern("yyyy-MM-dd HH:mm:ss.SSS", Locale.ITALIAN)
-                .withZone(ZoneId.of("Europe/Rome"));
-        GsonJava8TypeAdapterFactory typeAdapterFactory = new GsonJava8TypeAdapterFactory()
-                .setInstantFormatter(formatter);
-        Gson gson = new GsonBuilder().registerTypeAdapterFactory(typeAdapterFactory).create();
-
-        Ace ace = Feign.builder()
-                // Aggiunge l'header con il token per tutte le richieste fatte da questo servizio
-                .requestInterceptor(new TokenRequestInterceptor(token.getAccess_token()))
-                .decoder(new GsonDecoder(gson))
-                .encoder(new GsonEncoder(gson))
-                .target(Ace.class, aceUrl);
+        Ace ace = getAce();
 
         int idRuolo = aceService.getIdRuoloBySigla(sigla);
 
@@ -137,6 +109,8 @@ public class AceBridgeService {
                 .collect(Collectors.toList());
 
     }
+
+
 
     public List<Pair<Integer, String>> getUoLike(String uoName) {
         uoName = "%" + uoName + "%";
@@ -161,21 +135,7 @@ public class AceBridgeService {
     @Cacheable("idRuoloBySigla")
     public int getIdRuoloBySigla(String sigla) {
 
-        final AceJwt token = getAceJwtToken();
-
-        DateTimeFormatter formatter = DateTimeFormatter
-                .ofPattern("yyyy-MM-dd HH:mm:ss.SSS", Locale.ITALIAN)
-                .withZone(ZoneId.of("Europe/Rome"));
-        GsonJava8TypeAdapterFactory typeAdapterFactory = new GsonJava8TypeAdapterFactory()
-                .setInstantFormatter(formatter);
-        Gson gson = new GsonBuilder().registerTypeAdapterFactory(typeAdapterFactory).create();
-
-        Ace ace = Feign.builder()
-                // Aggiunge l'header con il token per tutte le richieste fatte da questo servizio
-                .requestInterceptor(new TokenRequestInterceptor(token.getAccess_token()))
-                .decoder(new GsonDecoder(gson))
-                .encoder(new GsonEncoder(gson))
-                .target(Ace.class, aceUrl);
+        Ace ace = getAce();
 
         return ace.ruoloBySigla(sigla).getId();
     }
@@ -213,17 +173,30 @@ public class AceBridgeService {
         });
         return (descrizioneRuolo + "@" + descrizioneStruttura);
     }
-
-
-    // todo: fare il refresh anzicchè il login?
-    private AceJwt getAceJwtToken() {
+    
+    private Ace getAce() {
         final AceAuthService service = Feign.builder()
                 .decoder(new GsonDecoder())
                 .encoder(new FormEncoder(new GsonEncoder()))
                 .target(AceAuthService.class, aceUrl + "api");
 
         // final AceJwt refreshed = service.getRefreshedToken(token.getRefresh_token());
-        return service.getToken(aceUsername, acePassword);
-    }
+        final AceJwt token = service.getToken(aceUsername, acePassword);
 
+        DateTimeFormatter formatter = DateTimeFormatter
+                .ofPattern("yyyy-MM-dd HH:mm:ss.SSS", Locale.ITALIAN)
+                .withZone(ZoneId.of("Europe/Rome"));
+        GsonJava8TypeAdapterFactory typeAdapterFactory = new GsonJava8TypeAdapterFactory()
+                .setInstantFormatter(formatter);
+        Gson gson = new GsonBuilder().registerTypeAdapterFactory(typeAdapterFactory).create();
+
+        Ace ace = Feign.builder()
+                // Aggiunge l'header con il token per tutte le richieste fatte da questo servizio
+                .requestInterceptor(new TokenRequestInterceptor(token.getAccess_token()))
+                .decoder(new GsonDecoder(gson))
+                .encoder(new GsonEncoder(gson))
+                .target(Ace.class, aceUrl);
+        return ace;
+    }
+    
 }
