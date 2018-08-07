@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import springfox.documentation.spring.web.json.Json;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Ace.
@@ -72,4 +73,7 @@ public interface Ace {
   @RequestLine("GET api/ace//v1/entitaorganizzativa/{id}")
   EntitaOrganizzativaWebDto entitaOrganizzativaById(@Param("id") int id);
   
+  // TODO modificare questa richeista quando ACE l'avra' pronta, per ora e' un placeholder
+  @RequestLine("GET api/ace//v1/entitaorganizzativa/find?sigla={sigla}")
+  List<EntitaOrganizzativaWebDto> entitaOrganizzativaFind(@Param("sigla") String sigla);
 }
