@@ -139,15 +139,20 @@ public class AceBridgeService {
 
         return ace.ruoloBySigla(sigla).getId();
     }
+    
+    @Cacheable("nuomeRuoloBySigla")
+    public String getNomeRuoloBySigla(String sigla) {
+
+        Ace ace = getAce();
+
+        return ace.ruoloBySigla(sigla).getDescr();
+    }
 
     @Cacheable("nomiStrutture")
     public String getNomeStruturaById(Integer id) {
-        return aceJdbcTemplate.query(DENOMINAZIONE_STRUTTURA, new Object[]{id}, new ResultSetExtractor<String>() {
-            public String extractData(ResultSet rs) throws SQLException {
-                rs.next();
-                return rs.getString("denominazione");
-            }
-        });
+        Ace ace = getAce();
+
+        return ace.entitaOrganizzativaById(id).getDenominazione();
     }
 
     @Cacheable("nomiEstesiGruppiRuoloStruttura")
@@ -159,18 +164,9 @@ public class AceBridgeService {
         String ruoloName = splitGroupRuoloStrutturaName[0];
         Integer strutturaId = Integer.parseInt(splitGroupRuoloStrutturaName[1]) ;
 
-        String descrizioneRuolo = aceJdbcTemplate.query(DENOMINAZIONE_RUOLO, new Object[]{ruoloName}, new ResultSetExtractor<String>() {
-            public String extractData(ResultSet rs) throws SQLException {
-                rs.next();
-                return rs.getString("descr");
-            }
-        });
-        String descrizioneStruttura = aceJdbcTemplate.query(DENOMINAZIONE_STRUTTURA, new Object[]{strutturaId}, new ResultSetExtractor<String>() {
-            public String extractData(ResultSet rs) throws SQLException {
-                rs.next();
-                return rs.getString("sigla");
-            }
-        });
+        String descrizioneRuolo = aceService.getNomeRuoloBySigla(ruoloName);
+        String descrizioneStruttura = aceService.getNomeStruturaById(strutturaId);
+        
         return (descrizioneRuolo + "@" + descrizioneStruttura);
     }
     
