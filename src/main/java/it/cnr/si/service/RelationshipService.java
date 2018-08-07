@@ -204,12 +204,15 @@ public class RelationshipService {
         if (!Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
             //filtro in ACE gli utenti che appartengono agli stessi gruppi dell'utente loggato
             for (String myGroup : myGroups) {
-                usersInMyGroups.addAll(aceService.getUsersInAceGroup(myGroup) != null ? aceService.getUsersInAceGroup(myGroup) : new ArrayList<>());
+                usersInMyGroups.addAll(aceService.getUsersInAceGroup(myGroup));
             }
         } else {
             //filtro in Membership gli utenti che appartengono agli stessi gruppi dell'utente loggato            
             for (String myGroup : myGroups) {
-                usersInMyGroups.addAll(membershipService.findMembersInGroup(myGroup) != null ? membershipService.findMembersInGroup(myGroup) : new ArrayList<>());
+                // se qui dovesse throware null, 
+                // reipostare usersInMyGroups.addAll(membershipService.findMembersInGroup(myGroup) != null ? membershipService.findMembersInGroup(myGroup) : new ArrayList<>());
+                // Martin
+                usersInMyGroups.addAll(membershipService.findMembersInGroup(myGroup));
             }
         }
 
