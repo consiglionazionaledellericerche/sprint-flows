@@ -5,6 +5,7 @@ package it.cnr.si.flows.ng.service;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
+import it.cnr.si.flows.ng.dto.EntitaOrganizzativaWebDto;
 import it.cnr.si.flows.ng.dto.PersonaWebDto;
 import it.cnr.si.flows.ng.dto.RuoloUtenteWebDto;
 import it.cnr.si.flows.ng.dto.RuoloWebDto;
@@ -67,5 +68,8 @@ public interface Ace {
 
   @RequestLine("GET api/ace/v1/ruolo/{sigla}")
   RuoloWebDto ruoloBySigla(@Param("sigla") String sigla);
-
+  
+  @RequestLine("GET api/ace//v1/entitaorganizzativa/{id}")
+  EntitaOrganizzativaWebDto entitaOrganizzativaById(@Param("id") int id);
+  
 }
