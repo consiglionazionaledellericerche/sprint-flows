@@ -1,6 +1,9 @@
 package it.cnr.si.flows.ng.listeners.cnr.acquisti;
 
+import it.cnr.si.flows.ng.listeners.oiv.service.OivSetGroupsAndVisibility;
+import it.cnr.si.flows.ng.listeners.oiv.service.OperazioniTimer;
 import it.cnr.si.flows.ng.service.AceBridgeService;
+import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.service.RelationshipService;
@@ -14,8 +17,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,8 +31,9 @@ import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 
 @Component
 @Profile("!oiv")
-public class StartAcquistiSetGroupsAndVisibility implements ExecutionListener {
-    private static final long serialVersionUID = 686169707042367215L;
+
+@Service
+public class StartAcquistiSetGroupsAndVisibility {
     private static final Logger LOGGER = LoggerFactory.getLogger(StartAcquistiSetGroupsAndVisibility.class);
 
     @Inject
@@ -35,8 +43,8 @@ public class StartAcquistiSetGroupsAndVisibility implements ExecutionListener {
     @Inject
     private RuntimeService runtimeService;
 
-    @Override
-    public void notify(DelegateExecution execution) throws Exception {
+	public void configuraVariabiliStart(DelegateExecution execution)  throws IOException, ParseException  {
+
 
         String initiator = (String) execution.getVariable(Enum.VariableEnum.initiator.name());
        // LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable(Enum.VariableEnum.title.name()));
