@@ -12,6 +12,9 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import javax.inject.Inject;
 
+import it.cnr.si.flows.ng.dto.RisultatoRicercaWebDto;
+import it.cnr.si.flows.ng.utils.Enum;
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
@@ -83,13 +86,14 @@ public class AceBridgeService {
 
 
 
-    public List<Pair<Integer, String>> getUoLike(String uoName) {
+    public List<EntitaOrganizzativaWebDto> getUoLike(String uoName) {
         Ace ace = getAce();
 
-        List<EntitaOrganizzativaWebDto> entitaOrganizzativaFind = ace.entitaOrganizzativaFind(uoName);
-        
-        return entitaOrganizzativaFind.stream()
-                .map(e -> Pair.of(e.getId(), e.getDenominazione()))
+        return ace.entitaOrganizzativaFind(uoName)
+                .getItems()
+                .stream()
+                .filter(e -> Enum.TipiEOPerAutocomplete.contains(e.getTipo().getId()))
+//                .map(e -> Pair.of(e.getId(), e.getCdsuo() +" - "+ e.getDenominazione()))
                 .collect(Collectors.toList());
     }
 

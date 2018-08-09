@@ -5,10 +5,7 @@ package it.cnr.si.flows.ng.service;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
-import it.cnr.si.flows.ng.dto.EntitaOrganizzativaWebDto;
-import it.cnr.si.flows.ng.dto.PersonaWebDto;
-import it.cnr.si.flows.ng.dto.RuoloUtenteWebDto;
-import it.cnr.si.flows.ng.dto.RuoloWebDto;
+import it.cnr.si.flows.ng.dto.*;
 import org.json.JSONObject;
 import springfox.documentation.spring.web.json.Json;
 
@@ -74,6 +71,6 @@ public interface Ace {
   EntitaOrganizzativaWebDto entitaOrganizzativaById(@Param("id") int id);
   
   // TODO modificare questa richeista quando ACE l'avra' pronta, per ora e' un placeholder
-  @RequestLine("GET api/ace//v1/entitaorganizzativa/find?sigla={sigla}")
-  List<EntitaOrganizzativaWebDto> entitaOrganizzativaFind(@Param("sigla") String sigla);
+  @RequestLine("GET api/ace//v1/entitaorganizzativa?term={term}")
+  RisultatoRicercaWebDto<EntitaOrganizzativaWebDto> entitaOrganizzativaFind(@Param("term") String term);
 }
