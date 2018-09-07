@@ -1,6 +1,8 @@
 package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
+
+import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.repository.DeploymentBuilder;
@@ -90,6 +92,6 @@ public class FlowsProcessDefinitionResource {
 
         Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
         return authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") ||
-                a.getAuthority().startsWith("abilitati#" + definitionKey + "@"));
+                Utils.removeLeadingRole(a.getAuthority()).startsWith("abilitati#" + definitionKey + "@"));
     }
 }
