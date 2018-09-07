@@ -1,31 +1,7 @@
 package it.cnr.si.flows.ng.service;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
-
-import javax.annotation.Resource;
-import javax.inject.Inject;
-
-import it.cnr.si.flows.ng.dto.RisultatoRicercaWebDto;
-import it.cnr.si.flows.ng.utils.Enum;
-import org.apache.commons.lang3.EnumUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.annotation.Profile;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Service;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import feign.Feign;
 import feign.form.FormEncoder;
 import feign.gson.GsonDecoder;
@@ -33,7 +9,20 @@ import feign.gson.GsonEncoder;
 import it.cnr.si.flows.ng.dto.EntitaOrganizzativaWebDto;
 import it.cnr.si.flows.ng.dto.RuoloUtenteWebDto;
 import it.cnr.si.flows.ng.utils.AceJwt;
+import it.cnr.si.flows.ng.utils.Enum;
 import net.dongliu.gson.GsonJava8TypeAdapterFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 @Service
 @Profile("!oiv")
@@ -44,7 +33,7 @@ public class AceBridgeService {
     @Inject
     private AceBridgeService aceService;
 
-    @Value("${spring.ace.url}")
+    @Value("${spring.datasource.ace.url}")
     private String aceUrl;
 
     @Value("${spring.ace.password}")
@@ -85,7 +74,6 @@ public class AceBridgeService {
     }
 
 
-
     public List<EntitaOrganizzativaWebDto> getUoLike(String uoName) {
         Ace ace = getAce();
 
@@ -104,7 +92,7 @@ public class AceBridgeService {
 
         return ace.ruoloBySigla(sigla).getId();
     }
-    
+
     @Cacheable("nuomeRuoloBySigla")
     public String getNomeRuoloBySigla(String sigla) {
 
@@ -127,14 +115,14 @@ public class AceBridgeService {
 
         String[] splitGroupRuoloStrutturaName = groupRuoloStrutturaName.split("@");
         String ruoloName = splitGroupRuoloStrutturaName[0];
-        Integer strutturaId = Integer.parseInt(splitGroupRuoloStrutturaName[1]) ;
+        Integer strutturaId = Integer.parseInt(splitGroupRuoloStrutturaName[1]);
 
         String descrizioneRuolo = aceService.getNomeRuoloBySigla(ruoloName);
         String descrizioneStruttura = aceService.getNomeStruturaById(strutturaId);
-        
+
         return (descrizioneRuolo + "@" + descrizioneStruttura);
     }
-    
+
     private Ace getAce() {
         final AceAuthService service = Feign.builder()
                 .decoder(new GsonDecoder())
@@ -159,5 +147,5 @@ public class AceBridgeService {
                 .target(Ace.class, aceUrl);
         return ace;
     }
-    
+
 }
