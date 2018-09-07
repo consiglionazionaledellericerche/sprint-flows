@@ -537,7 +537,7 @@
     </sequenceFlow>
     <subProcess id="stipulamepa" name="STIPULA MEPA">
       <startEvent id="startevent9" name="Start"></startEvent>
-      <userTask id="carica-stipula-mepa" name="Carica Stipula Mepa" activiti:candidateGroups="${gruppoDirettore}">
+      <userTask id="carica-stipula-mepa" name="Carica Stipula Mepa" activiti:candidateGroups="${gruppoFirmaAcquisti}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
             <activiti:field name="faseEsecuzione">
