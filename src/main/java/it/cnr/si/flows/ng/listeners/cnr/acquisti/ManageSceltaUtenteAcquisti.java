@@ -18,6 +18,7 @@ import it.cnr.si.flows.ng.service.ProtocolloDocumentoService;
 @Service
 public class ManageSceltaUtenteAcquisti {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ManageSceltaUtenteAcquisti.class);
+	public static final String STATO_FINALE_DOMANDA = "statoFinaleDomanda";
 
 	@Inject
 	private FirmaDocumentoService firmaDocumentoService;
@@ -70,19 +71,27 @@ public class ManageSceltaUtenteAcquisti {
 					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 					protocolloDocumentoService.protocolla(execution, "stipulaMepa");
 				}
-			};break;	  
+			};break; 
+			case "protocollo-revoca-end": {
+				if(sceltaUtente.equals("Protocolla")) {
+					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
+					protocolloDocumentoService.protocolla(execution, "provvedimentoRevoca");
+				}
+			};break;			  
 			case "firma-revoca-end": {
 				if(sceltaUtente.equals("Firma")) {
 					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 					firmaDocumentoService.eseguiFirma(execution, "provvedimentoRevoca");
 				}
 			};break;  
-			case "protocollo-revoca-end": {
-				if(sceltaUtente.equals("Protocolla")) {
-					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
-					protocolloDocumentoService.protocolla(execution, "provvedimentoRevoca");
-				}
-			};break;		
+			case "end-stipulato": {
+				execution.setVariable(STATO_FINALE_DOMANDA, "STIPULATO");
+				LOGGER.info("-- FLUSSO TERMINATO in stato STIPULATO");
+			};break;  
+			case "end-revocato": {
+				execution.setVariable(STATO_FINALE_DOMANDA, "REVOCATO");
+				LOGGER.info("-- FLUSSO TERMINATO in stato REVOCATO");
+			};break;
 			default:  {
 				LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
 			};break;    

@@ -12,6 +12,7 @@
     <artifactId>sprint-flows</artifactId>
     <version>0.2.1-SNAPSHOT</version>
     <packaging>war</packaging>
+    <!--<packaging>jar</packaging>-->
 
     <name>sprint-flows</name>
 
@@ -28,6 +29,7 @@
     <properties>
         <activiti.version>5.22.0</activiti.version>
         <assertj-core.version>3.5.2</assertj-core.version>
+        <feign.version>9.7.0</feign.version>
         <firmadigitale.version>1.11</firmadigitale.version>
         <gatling-maven-plugin.version>2.1.7</gatling-maven-plugin.version>
         <jacoco-maven-plugin.version>0.7.7.201606060606</jacoco-maven-plugin.version>
@@ -287,6 +289,35 @@
             <groupId>org.thymeleaf</groupId>
             <artifactId>thymeleaf-spring4</artifactId>
             <version>3.0.6.RELEASE</version>
+        </dependency>
+
+
+        <!--prova dipendenze ace-->
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-core</artifactId>
+            <version>${feign.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-gson</artifactId>
+            <version>${feign.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.openfeign.form</groupId>
+            <artifactId>feign-form</artifactId>
+            <version>3.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.dongliu</groupId>
+            <artifactId>gson-java8-datatype</artifactId>
+            <version>1.1.0</version>
         </dependency>
     </dependencies>
 
@@ -616,41 +647,25 @@
                     <diffChangeLogFile>src/main/resources/config/liquibase/changelog/${maven.build.timestamp}_changelog.xml</diffChangeLogFile>
                     <driver />
                     <defaultSchemaName>public</defaultSchemaName>
-                    <username>activiti</username>
-                    <password>activitipw</password>
-                    <!--<url>jdbc:h2:file:./DB-H2/flows-cnr;DB_CLOSE_DELAY=-1</url>-->
-                    <url>jdbc:h2:file:./DB-H2/flows-oiv;DB_CLOSE_DELAY=-1</url>
+                    <!--USR, PSW E URL DOCKER-COMPOSE (locale)-->
+                    <!--<username>activiti</username>-->
+                    <!--<password>activitipw</password>-->
+                    <!--<url>jdbc:postgresql://172.19.0.2:5432/flows-oiv</url>-->
+                    <!--USR, PSW E URL DB LOCALE-->
                     <username>flows</username>
                     <password />
+                    <!--<url>jdbc:h2:file:./DB-H2/flows-cnr;DB_CLOSE_DELAY=-1</url>-->
+                    <url>jdbc:h2:file:./DB-H2/flows-oiv;DB_CLOSE_DELAY=-1</url>
                     <referenceUrl>hibernate:spring:it.cnr.si.domain?dialect=&amp;hibernate.ejb.naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringNamingStrategy</referenceUrl>
                     <verbose>true</verbose>
                     <logging>debug</logging>
                     <diffExcludeObjects>oauth_access_token,
                         oauth_approvals,
                         oauth_client_details,
-                        oauth_client_token, oauth_code,
+                        oauth_client_token,
+                        oauth_code,
                         oauth_refresh_token</diffExcludeObjects>
                 </configuration>
-                <!--<configuration>-->
-                <!--&lt;!&ndash;todo:&ndash;&gt;-->
-                <!--&lt;!&ndash;<changeLogFile>src/main/resources/config/liquibase/master.xml</changeLogFile>&ndash;&gt;-->
-                <!--<diffChangeLogFile>src/main/resources/config/liquibase/changelog/${maven.build.timestamp}_changelog.xml</diffChangeLogFile>-->
-                <!--<driver />-->
-                <!--<defaultSchemaName>public</defaultSchemaName>-->
-                <!--<username>activiti</username>-->
-                <!--<password>activitipw</password>-->
-                <!--<url>jdbc:h2:file:./DB-H2/flows;DB_CLOSE_DELAY=-1</url>-->
-                <!--<username>flows</username>-->
-                <!--<password />-->
-                <!--<referenceUrl>hibernate:spring:it.cnr.si.domain?dialect=&amp;hibernate.ejb.naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringNamingStrategy</referenceUrl>-->
-                <!--<verbose>true</verbose>-->
-                <!--<logging>debug</logging>-->
-                <!--<diffExcludeObjects>oauth_access_token,-->
-                <!--oauth_approvals,-->
-                <!--oauth_client_details,-->
-                <!--oauth_client_token, oauth_code,-->
-                <!--oauth_refresh_token</diffExcludeObjects>-->
-                <!--</configuration>-->
             </plugin>
             <plugin>
                 <groupId>org.sonarsource.scanner.maven</groupId>
@@ -664,25 +679,6 @@
                     <executable>true</executable>
                     <!-- Enable the line below to have remote debugging of
                         your application on port 5005 <jvmArguments>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005</jvmArguments> -->
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <executable>bower</executable>
-                    <arguments>
-                        <argument>install</argument>
-                    </arguments>
-                    <workingDirectory>${basedir}</workingDirectory>
                 </configuration>
             </plugin>
         </plugins>
