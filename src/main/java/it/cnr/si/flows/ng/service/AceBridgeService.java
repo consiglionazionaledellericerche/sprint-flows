@@ -33,7 +33,7 @@ public class AceBridgeService {
     @Inject
     private AceBridgeService aceService;
 
-    @Value("${spring.datasource.ace.url}")
+    @Value("${spring.ace.url}")
     private String aceUrl;
 
     @Value("${spring.ace.password}")
