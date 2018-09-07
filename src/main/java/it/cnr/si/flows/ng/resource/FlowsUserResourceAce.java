@@ -1,6 +1,7 @@
 package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
+import it.cnr.si.flows.ng.dto.EntitaOrganizzativaWebDto;
 import it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.utils.Utils;
@@ -62,7 +63,7 @@ public class FlowsUserResourceAce {
     @RequestMapping(value = "/ace/group/{groupname:.+}", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.ADMIN)
     public List<String> getAceGroup(@PathVariable String groupname) {
-        return aceService.getUsersinAceGroup(groupname);
+        return aceService.getUsersInAceGroup(groupname);
     }
 
     @RequestMapping(value = "/ace/groupdetail/{id}", method = RequestMethod.GET)
@@ -101,8 +102,10 @@ public class FlowsUserResourceAce {
 
         Map<String, Object> response = new HashMap<>();
 
-        List<Pair<Integer, String>> results = aceService.getUoLike(struttura);
-        List<Utils.SearchResult> collect = results.stream().map(p -> new Utils.SearchResult(p.getLeft().toString(), p.getRight())).collect(Collectors.toList());
+        List<Utils.SearchResult> collect = aceService.getUoLike(struttura)
+                .stream()
+                .map(p -> new Utils.SearchResult(p.getId().toString(), p.getCdsuo() +" - "+ p.getDenominazione()))
+                .collect(Collectors.toList());
 
         response.put("more", collect.size() > 10);
         response.put("results", collect.stream().limit(10).collect(Collectors.toList()));

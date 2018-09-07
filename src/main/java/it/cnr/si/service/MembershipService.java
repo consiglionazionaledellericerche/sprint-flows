@@ -110,7 +110,7 @@ public class MembershipService {
     public List<String> findMembersInGroup(String groupName) {
         List<String> result = membershipRepository.findMembersInGroup(groupName);
         Optional.ofNullable(aceService)
-                .map(aceBridgeService -> aceService.getUsersinAceGroup(groupName))
+                .map(aceBridgeService -> aceService.getUsersInAceGroup(groupName))
                 .filter(strings -> !strings.isEmpty())
                 .ifPresent(strings -> result.addAll(strings));
         return result;
