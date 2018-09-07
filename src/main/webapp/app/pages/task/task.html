@@ -6,24 +6,24 @@
     <p class="text-muted">{{vm.definition.description}}</p>
 
     <div class="col-xs-4">
-      Metadati
+      METADATI
       <ul class="list-unstyled">
-        <li><strong>{{vm.taskVariables.title}}</strong></li>
-        <li><strong>{{vm.taskVariables.titolo}}</strong></li>
+        <li>Titolo: <strong>{{vm.taskVariables.titolo}}</strong></li>
+        <li>Descrizione: <strong>{{vm.taskVariables.descrizione}}</strong></li>
         <li>Avviato il <strong>{{vm.taskVariables.startDate | data}}</strong> da <strong>{{vm.taskVariables.initiator}}</strong></li>
-        <li>Fase: <strong>{{vm.taskVariables.activityId}}</strong></li>
+        <li>Fase: <strong>{{vm.data.entity.name}}</strong></li>
         <ng-include src="vm.detailsView"/>
       </ul>
     </div>
 
     <div class="col-xs-4">
-      Documenti
+      DOCUMENTI
       <attachments task-id="{{vm.taskId}}"
                    attachments="{{vm.attachments}}" show-history="false"/>
     </div>
 
     <div class="col-xs-4">
-      Diagramma
+      DIAGRAMMA
       <a ng-click="openDiagramModal(vm.diagramUrl)">
         <img class="img-bordered" ng-src="{{vm.diagramUrl}}" title="{{vm.definition.name}}" style="max-width: 100%"/>
       </a>

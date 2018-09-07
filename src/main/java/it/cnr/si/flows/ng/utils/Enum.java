@@ -119,4 +119,32 @@ public class Enum {
         PdfType() {
         }
     }
+
+    public enum TipiEOPerAutocomplete {
+        Istituto(1),
+        Gruppi(7),
+        Dipartimento(21),
+        Ufficio(41),
+        Ufficionondirigenziale(42),
+        Strutturadiparticolarerilievo(43);
+
+        private int value;
+
+        TipiEOPerAutocomplete(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        public static boolean contains(int id) {
+            for (TipiEOPerAutocomplete t : TipiEOPerAutocomplete.values()) {
+                if (t.value == id)
+                    return true;
+            }
+            return false;
+        }
+    }
+
 }

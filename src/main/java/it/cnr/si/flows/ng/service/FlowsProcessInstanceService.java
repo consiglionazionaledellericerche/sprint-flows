@@ -257,7 +257,41 @@ public class FlowsProcessInstanceService {
 			}
 		});
 	}
+	
+	
+	public void updateSearchTerms(String executionId, String processInstanceId, String stato) {
 
+		String initiator =   runtimeService.getVariable(executionId , "initiator").toString();
+		String titolo =  runtimeService.getVariable(executionId , "titolo").toString();
+		String descrizione =  runtimeService.getVariable(executionId , "descrizione").toString();
+
+		JSONObject name = new JSONObject();
+		
+		name.put("descrizione", descrizione);
+		name.put("titolo", titolo);
+		name.put("stato", stato);
+		name.put("initiator", initiator);
+		
+		runtimeService.setProcessInstanceName(processInstanceId, name.toString());
+
+		
+//		String appo = "";
+//
+//		//i campi "titolo, "title", "initiator", "descrizione" sono salvati in un json in name e non come variabili di Process Instance
+//		if (stato != null || titolo != null || initiator != null || descrizione != null) {
+//			//l'ordine delle field di ricerca è importante nella query sul campo singolo "name"
+//			//todo: è una porcata ma avere i campi in "name" migliora di moltissimo le prestazioni della ricerca
+//			if (descrizione != null)
+//				appo += "%\"descrizione\":\"%" + descrizione.substring(descrizione.indexOf('=') + 1) + "%\"%";
+//			if (titolo != null)
+//				appo += "%\"titolo\":\"%" + titolo.substring(titolo.indexOf('=') + 1) + "%\"%";
+//			if (initiator != null)
+//				appo += "%\"initiator\":\"%" + initiator.substring(initiator.indexOf('=') + 1) + "%\"%";
+//			if (stato != null)
+//				appo += "%\"stato\":\"%" + stato.substring(stato.indexOf('=') + 1) + "%\"%";
+//		}
+
+	}
 
 	public void buildCsv(List<HistoricProcessInstanceResponse> processInstances, PrintWriter printWriter, String processDefinitionKey) throws IOException {
 		// vista (campi e variabili) da inserire nel csv in base alla tipologia di flusso selezionato
