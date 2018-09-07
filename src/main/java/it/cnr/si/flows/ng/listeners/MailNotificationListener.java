@@ -13,9 +13,7 @@ import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
 import org.activiti.engine.delegate.event.ActivitiEventType;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
-import org.activiti.engine.impl.persistence.entity.VariableInstance;
 import org.activiti.engine.task.IdentityLink;
-import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -110,7 +108,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
 			if (Optional.ofNullable(aceBridgeService).isPresent()) {
 				candidates.forEach(c -> {
 					if (c.getGroupId() != null) {
-						List<String> members = aceBridgeService.getUsersinAceGroup(c.getGroupId());
+						List<String> members = aceBridgeService.getUsersInAceGroup(c.getGroupId());
 						members.forEach(m -> {
 							mailService.sendFlowEventNotification(FlowsMailService.TASK_ASSEGNATO_AL_GRUPPO_HTML, integratedVariables, task.getName(), m, c.getGroupId());
 						});
@@ -211,7 +209,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
 						.forEach(groupVariableName -> {
 							LOGGER.debug("variables.get(groupVariableName): {}", variables.get(groupVariableName));
 							String groupName = (String) variables.get(groupVariableName);
-							List<String> members = aceBridgeService.getUsersinAceGroup(groupName);
+							List<String> members = aceBridgeService.getUsersInAceGroup(groupName);
 							members.forEach(member -> {
 								mailService.sendFlowEventNotification(nt, variables, tn, member, groupName);
 							});

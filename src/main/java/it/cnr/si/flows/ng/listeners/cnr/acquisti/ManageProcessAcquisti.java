@@ -9,25 +9,30 @@ import org.activiti.engine.delegate.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import it.cnr.si.flows.ng.service.AceBridgeService;
+import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 
 import javax.inject.Inject;
 
 
 @Component
+@Profile("cnr")
 public class ManageProcessAcquisti implements ExecutionListener {
 	private static final long serialVersionUID = 686169707042367215L;
 	private static final Logger LOGGER = LoggerFactory.getLogger(ManageProcessAcquisti.class);
 
-	//@Inject
-	//private StartAcquistiSetGroupsAndVisibility startAcquistiSetGroupsAndVisibility;
+	@Inject
+	private StartAcquistiSetGroupsAndVisibility startAcquistiSetGroupsAndVisibility;
 	@Inject
 	private ManageSceltaUtenteAcquisti manageSceltaUtenteAcquisti;
 	@Inject
-	private DittaCandidata dittaCandidata;
-
+	private DittaCandidata dittaCandidata;	
+	@Inject
+	private FlowsProcessInstanceService flowsProcessInstanceService;
+		
 	private Expression faseEsecuzione;
 
 	@Override
@@ -36,6 +41,8 @@ public class ManageProcessAcquisti implements ExecutionListener {
 
 
 		String processInstanceId =  execution.getProcessInstanceId();
+		String executionId =  execution.getId();
+		String stato =  execution.getCurrentActivityName();
 		String sceltaUtente = "start";
 		if(execution.getVariable("sceltaUtente") != null) {
 			sceltaUtente =  (String) execution.getVariable("sceltaUtente");	
@@ -50,11 +57,12 @@ public class ManageProcessAcquisti implements ExecutionListener {
 		// START
 		case "process-start": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
-			//startAcquistiSetGroupsAndVisibility.configuraVariabiliStart(execution);
+			startAcquistiSetGroupsAndVisibility.configuraVariabiliStart(execution);
 		};break;    
 		// START DECISIONE-CONTRATTARE
 		case "verifica-decisione-start": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
+			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
 		};break;     
 		case "verifica-decisione-end": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
