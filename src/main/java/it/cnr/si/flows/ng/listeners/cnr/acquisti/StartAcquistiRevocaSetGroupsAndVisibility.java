@@ -63,7 +63,7 @@ public class StartAcquistiRevocaSetGroupsAndVisibility implements ExecutionListe
             LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoRT, gruppoSFD, gruppoRA, gruppoFirmaAcquisti);
 
             //Check se il gruppo SFD ha membri
-            List<String> members = aceBridgeService.getUsersinAceGroup(gruppoSFD);
+            List<String> members = aceBridgeService.getUsersInAceGroup(gruppoSFD);
             if ( members.size() == 0 ) {
                 execution.setVariable("organizzazioneStruttura", "Semplice");
             } else {

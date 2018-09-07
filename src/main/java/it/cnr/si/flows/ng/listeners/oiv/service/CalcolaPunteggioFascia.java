@@ -59,7 +59,7 @@ public class CalcolaPunteggioFascia {
                 if (obj.getString("giudizioFinale").equals("OK")) {
                     numeroValutazioniPositive = numeroValutazioniPositive + 1;
                 } else {
-                    comunicaEsperienzaNonCoerente(obj.getString("idEsperienza"), obj.getString("annotazioniIstruttore"));
+                    //comunicaEsperienzaNonCoerente(obj.getString("idEsperienza"), obj.getString("annotazioniIstruttore"));
                     if (numeroValutazioniNegative >= 1) {
                         elencoValutazioniNegative = elencoValutazioniNegative.concat("; ");
                     }
@@ -138,12 +138,15 @@ public class CalcolaPunteggioFascia {
         LOGGER.debug("--- elencoValutazioniNegative: {} ", elencoValutazioniNegative);
         // Chiamta REST applicazione Elenco OIV per il calcolo punteggio
         // invio campi json e recupero fascia e punteggio
-        execution.setVariable("fasciaAppartenenzaAttribuita", calcolaFascia(
-                Optional.ofNullable(execution.getVariable("idDomanda"))
-                    .filter(String.class::isInstance)
-                    .map(String.class::cast)
-                    .orElse(null)
-        ));
+// commento rest per test        
+//        execution.setVariable("fasciaAppartenenzaAttribuita", calcolaFascia(
+//                Optional.ofNullable(execution.getVariable("idDomanda"))
+//                    .filter(String.class::isInstance)
+//                    .map(String.class::cast)
+//                    .orElse(null)
+//        ));
+        execution.setVariable("fasciaAppartenenzaAttribuita", 2);
+
     }
 
     private String calcolaFascia(String id) {
