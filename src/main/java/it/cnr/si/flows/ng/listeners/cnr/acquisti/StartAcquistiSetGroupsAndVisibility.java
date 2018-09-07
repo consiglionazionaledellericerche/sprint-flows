@@ -72,6 +72,7 @@ public class StartAcquistiSetGroupsAndVisibility {
             String gruppoRA = "ra@"+ struttura;
             String gruppoSFD = "sfd@"+ struttura;
             String rup = execution.getVariable("rup", String.class);
+            String applicazioneSigla = "app.sigla";
 
             LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoRT, gruppoSFD, gruppoRA, gruppoFirmaAcquisti);
 
@@ -93,6 +94,7 @@ public class StartAcquistiSetGroupsAndVisibility {
             execution.setVariable("gruppoFirmaAcquisti", gruppoFirmaAcquisti);
             execution.setVariable(Enum.VariableEnum.gruppoRA.name(), gruppoRA);
             execution.setVariable("gruppoSFD", gruppoSFD);
+            execution.setVariable("sigla", applicazioneSigla);
 
         }
 
