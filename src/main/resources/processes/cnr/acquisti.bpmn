@@ -358,7 +358,7 @@
       <exclusiveGateway id="exclusivegateway26" name="Exclusive Gateway" default="flow140"></exclusiveGateway>
       <sequenceFlow id="flow137" sourceRef="protocollo-provvedimento-aggiudicazione" targetRef="exclusivegateway26"></sequenceFlow>
       <sequenceFlow id="flow138" sourceRef="exclusivegateway26" targetRef="endevent-provvedimento-aggiudicazione-protocollo">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${verificheRequisitiid == '1' || verificheRequisitiid == '3'}]]></conditionExpression>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${verificheRequisitiid == '1'}]]></conditionExpression>
       </sequenceFlow>
       <userTask id="verifica-requisiti" name="Verifica Requisiti" activiti:assignee="${rup}">
         <extensionElements>
