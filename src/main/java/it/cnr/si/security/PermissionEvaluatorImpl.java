@@ -187,9 +187,10 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
                 canVisualize = true;
             } else {
                 //controllo gli Identity Link con groupId(tutti gli altri)
+            	//TODO controllo su supervisore/responsabile da rivedere 
                 if (ilv.stream()
                         .filter(il -> il.getGroupId() != null)
-                        .filter(il -> !(il.getGroupId().startsWith(String.valueOf(responsabile)) || il.getGroupId().startsWith(String.valueOf(supervisore))))
+                        .filter(il -> !(il.getGroupId().startsWith(String.valueOf(responsabile)+"#") || il.getGroupId().startsWith(String.valueOf(supervisore)+"#") || il.getGroupId().startsWith(String.valueOf(responsabile)+"@") || il.getGroupId().startsWith(String.valueOf(supervisore)+"@") || il.getGroupId().startsWith(String.valueOf(responsabile)+"Struttura@") || il.getGroupId().startsWith(String.valueOf(supervisore)+"Struttura@")))
                         .anyMatch(il -> authorities.contains(il.getGroupId())))
                     canVisualize = true;
             }

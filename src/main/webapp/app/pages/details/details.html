@@ -10,26 +10,29 @@
 				<br><br>
 			</h4>
 			<div>
-				<b>Titolo: </b>{{vm.data.entity.variabili.titolo}} <br><br>
+				<b>Titolo: </b>{{vm.data.entity.name | get: 'titolo'}} <br>
 			</div>
 			<div>
-				<b>Descrizione: </b>{{vm.data.entity.name | get: 'descrizione'}} <br><br>
+				<b>Descrizione: </b>{{vm.data.entity.name | get: 'descrizione'}} <br>
 			</div>
 			<div>
-				<b>Avviato da: </b>{{vm.data.entity.variabili.initiator}} il {{vm.data.entity.variabili.startDate | data}} <br><br>
+				<b>Avviato da: </b>{{vm.data.entity.variabili.initiator}} il {{vm.data.entity.variabili.startDate | data}} <br>
 			</div>
 			<div ng-hide="!vm.data.entity.variabili.completed">
-				<b>completato il:</b>{{vm.data.entity.variabili.endDate | data}}<br><br>
+				<b>completato il:</b>{{vm.data.entity.variabili.endDate | data}}<br>
 			</div>
 			<div ng-show="vm.data.entity.endTime == null">
-				<b>Fase: </b>{{vm.data.fase}} <br><br>
+				<b>Stato: </b>{{vm.data.entity.name | get: 'stato'}} <br>
+			</div>
+			<div ng-show="vm.data.entity.endTime != null">
+				<b>Stato Finale: </b>{{vm.data.entity.name | get: 'stato'}} <br>
 			</div>
 			<!--gruppo/utente assegnatario del task in esecuzione-->
 			<div ng-show="vm.data.groupCandidate">
-				<b>Gruppo Assegnatario: </b>{{vm.data.groupCandidate}} <br><br>
+				<b>Gruppo Assegnatario: </b>{{vm.data.groupCandidate}} <br>
 			</div>
 			<div ng-show="vm.data.history[0].historyTask.assignee">
-				<b>Utente Assegnatario: </b>{{vm.data.history[0].historyTask.assignee}} <br><br>
+				<b>Utente Assegnatario: </b>{{vm.data.history[0].historyTask.assignee}} <br>
 			</div>
 
 			<ul class="list-unstyled">
