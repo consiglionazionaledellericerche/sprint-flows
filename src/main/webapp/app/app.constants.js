@@ -5,5 +5,5 @@
         .module('sprintApp')
         .constant('VERSION', "0.2.18-SNAPSHOT")
         .constant('DEBUG_INFO_ENABLED', false)
-;
+; 
 })();
