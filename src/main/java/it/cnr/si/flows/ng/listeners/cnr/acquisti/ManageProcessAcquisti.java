@@ -233,6 +233,12 @@ public class ManageProcessAcquisti implements ExecutionListener {
 		// END CONSUNTIVO  
 
 		// START STIPULA MEPA  
+		case "stipula-mepa-start": {
+			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
+		};break;      
+		case "stipula-mepa-end": {
+			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
+		};break;   
 		case "carica-stipula-mepa-start": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
 		};break;     
