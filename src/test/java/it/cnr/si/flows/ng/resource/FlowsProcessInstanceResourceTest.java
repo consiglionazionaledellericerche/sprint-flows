@@ -5,6 +5,9 @@ import it.cnr.si.flows.ng.TestServices;
 import it.cnr.si.flows.ng.utils.Utils;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
+import org.activiti.engine.task.IdentityLink;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
@@ -13,6 +16,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
@@ -24,6 +28,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.StopWatch;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -34,24 +39,27 @@ import java.util.*;
 
 import static it.cnr.si.flows.ng.TestServices.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
 import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
+import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.iscrizioneElencoOiv;
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
 import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
 import static it.cnr.si.flows.ng.utils.Utils.ASC;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @RunWith(SpringRunner.class)
-@ActiveProfiles(profiles = "cnr")
+@ActiveProfiles(profiles = "test,cnr")
+//@ActiveProfiles(profiles = "test,oiv")
 public class FlowsProcessInstanceResourceTest {
 
     private static final int LOAD_TEST_PROCESS_INSTANCES = 700;
     private static int processDeleted = 0;
+    @Autowired
+    RuntimeService runtimeService;
     @Inject
-    HistoryService historyService;
+    private HistoryService historyService;
     @Inject
     private FlowsTaskResource flowsTaskResource;
     @Inject
@@ -104,7 +112,7 @@ public class FlowsProcessInstanceResourceTest {
 
 
     @Test(expected = AccessDeniedException.class)
-    public void testGetProcessInstanceById() throws Exception {
+    public void testGetProcessInstanceById() throws IOException {
         processInstance = util.mySetUp(acquisti);
 
         ResponseEntity<Map<String, Object>> response = (ResponseEntity<Map<String, Object>>) flowsProcessInstanceResource.getProcessInstanceById(new MockHttpServletRequest(), processInstance.getId(), false);
@@ -206,7 +214,7 @@ public class FlowsProcessInstanceResourceTest {
 
 
     @Test
-    public void testSuspend() throws Exception {
+    public void testSuspend() throws IOException {
         processInstance = util.mySetUp(acquisti);
         assertEquals(false, processInstance.isSuspended());
         //solo admin può sospendere il flow
@@ -214,6 +222,97 @@ public class FlowsProcessInstanceResourceTest {
         ProcessInstanceResponse response = flowsProcessInstanceResource.suspend(new MockHttpServletRequest(), processInstance.getId());
         assertEquals(true, response.isSuspended());
     }
+
+    @Test
+    public void testGetVariable() throws IOException {
+        processInstance = util.mySetUp(acquisti);
+//        processInstance = util.mySetUp(iscrizioneElencoOiv);
+
+
+
+    }
+
+
+
+
+    @Test
+    public void testAddAndDeleteGroupIdentityLink() throws IOException {
+        processInstance = util.mySetUp(acquisti);
+        //le funzionalità può essere acceduta solo con privileggi "ADMIN"
+        util.loginAdmin();
+
+        //test-junit@2216 come GRUPPO "VISUALIZZATORE"
+        String groupId = "test-junit@2216";
+        String userId = null;
+        List<IdentityLink> identityLinks = runtimeService.getIdentityLinksForProcessInstance(processInstance.getId());
+        assertFalse(identityLinks.stream()
+                            .anyMatch(a -> a.getGroupId() == groupId &&
+                                    a.getProcessInstanceId().equals(processInstance.getId())  &&
+                                    a.getType() == Utils.PROCESS_VISUALIZER));
+
+        ResponseEntity<Void> response = flowsProcessInstanceResource.setIdentityLink(processInstance.getId(), Utils.PROCESS_VISUALIZER, groupId, userId);
+
+        assertEquals(OK, response.getStatusCode());
+        List<IdentityLink> newIdentityLinks = runtimeService.getIdentityLinksForProcessInstance(processInstance.getId());
+        assertEquals(newIdentityLinks.size(), identityLinks.size() + 1);
+
+        assertTrue(newIdentityLinks.stream()
+                           .anyMatch(a -> a.getGroupId() == groupId &&
+                                   a.getProcessInstanceId().equals(processInstance.getId())  &&
+                                   a.getType() == Utils.PROCESS_VISUALIZER));
+
+        //cancellazione IdentityLink aggiunto prima
+        response = flowsProcessInstanceResource.deleteIdentityLink(processInstance.getId(), Utils.PROCESS_VISUALIZER, groupId, userId);
+
+        newIdentityLinks = runtimeService.getIdentityLinksForProcessInstance(processInstance.getId());
+        assertEquals(OK, response.getStatusCode());
+        assertFalse(newIdentityLinks.stream()
+                           .anyMatch(a -> a.getGroupId() == groupId &&
+                                   a.getProcessInstanceId().equals(processInstance.getId())  &&
+                                   a.getType() == Utils.PROCESS_VISUALIZER));
+    }
+
+
+
+
+    @Test
+    public void testAddAndDeleteUserIdentityLink() throws IOException {
+        processInstance = util.mySetUp(acquisti);
+        //le funzionalità può essere acceduta solo con privileggi "ADMIN"
+        util.loginAdmin();
+
+        //test-junit come UTENTE "VISUALIZZATORE"
+        String groupId = null;
+        String userId = "test-junit";
+        List<IdentityLink> identityLinks = runtimeService.getIdentityLinksForProcessInstance(processInstance.getId());
+        assertFalse(identityLinks.stream()
+                            .anyMatch(a -> a.getUserId() == userId &&
+                                    a.getProcessInstanceId().equals(processInstance.getId())  &&
+                                    a.getType() == Utils.PROCESS_VISUALIZER));
+
+        ResponseEntity<Void> response = flowsProcessInstanceResource.setIdentityLink(processInstance.getId(), Utils.PROCESS_VISUALIZER, groupId, userId);
+
+        assertEquals(OK, response.getStatusCode());
+        List<IdentityLink> newIdentityLinks = runtimeService.getIdentityLinksForProcessInstance(processInstance.getId());
+        assertEquals(newIdentityLinks.size(), identityLinks.size() + 1);
+
+        assertTrue(newIdentityLinks.stream()
+                           .anyMatch(a -> a.getUserId() == userId &&
+                                   a.getProcessInstanceId().equals(processInstance.getId())  &&
+                                   a.getType() == Utils.PROCESS_VISUALIZER));
+
+        //cancellazione IdentityLink aggiunto prima
+        response = flowsProcessInstanceResource.deleteIdentityLink(processInstance.getId(), Utils.PROCESS_VISUALIZER, groupId, userId);
+
+        newIdentityLinks = runtimeService.getIdentityLinksForProcessInstance(processInstance.getId());
+        assertEquals(OK, response.getStatusCode());
+        assertFalse(newIdentityLinks.stream()
+                           .anyMatch(a -> a.getUserId() == userId &&
+                                   a.getProcessInstanceId().equals(processInstance.getId())  &&
+                                   a.getType() == Utils.PROCESS_VISUALIZER));
+    }
+
+
 
 
     private String verifyMyProcesses(int startedByRA, int startedBySpaclient) {
