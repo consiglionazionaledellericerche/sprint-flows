@@ -537,7 +537,7 @@
     </sequenceFlow>
     <subProcess id="stipulamepa" name="STIPULA MEPA">
       <startEvent id="startevent9" name="Start"></startEvent>
-      <userTask id="carica-stipula-mepa" name="Carica Stipula Mepa" activiti:candidateGroups="${gruppoFirmaAcquisti}">
+      <userTask id="carica-stipula-mepa" name="Carica Stipula Mepa" activiti:assignee="${rup}" activiti:candidateGroups="${gruppoFirmaAcquisti}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
             <activiti:field name="faseEsecuzione">
@@ -565,7 +565,7 @@
           </activiti:executionListener>
         </extensionElements>
       </userTask>
-      <sequenceFlow id="flow73" sourceRef="startevent9" targetRef="carica-stipula-mepa">
+      <sequenceFlow id="flow73" sourceRef="startevent9" targetRef="stipula-mepa">
         <extensionElements>
           <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
             <activiti:field name="nomeFileDaPubblicare">
@@ -585,10 +585,7 @@
           </activiti:executionListener>
         </extensionElements>
       </sequenceFlow>
-      <sequenceFlow id="flow74" sourceRef="carica-stipula-mepa" targetRef="exclusivegateway18"></sequenceFlow>
       <sequenceFlow id="flow75" sourceRef="protocollo-invio-stipula-mepa" targetRef="endevent-stipula-mepa-protocollo"></sequenceFlow>
-      <exclusiveGateway id="exclusivegateway18" name="Exclusive Gateway" default="flow90"></exclusiveGateway>
-      <sequenceFlow id="flow90" sourceRef="exclusivegateway18" targetRef="protocollo-invio-stipula-mepa"></sequenceFlow>
       <userTask id="revoca-stipula-mepa" name="Revoca Stipula Mepa" activiti:candidateGroups="${gruppoRA}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
@@ -605,11 +602,8 @@
       </userTask>
       <exclusiveGateway id="exclusivegateway19" name="Exclusive Gateway" default="flow94"></exclusiveGateway>
       <sequenceFlow id="flow91" sourceRef="revoca-stipula-mepa" targetRef="exclusivegateway19"></sequenceFlow>
-      <sequenceFlow id="flow92" sourceRef="exclusivegateway19" targetRef="carica-stipula-mepa">
+      <sequenceFlow id="flow92" sourceRef="exclusivegateway19" targetRef="stipula-mepa">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Annulla'}]]></conditionExpression>
-      </sequenceFlow>
-      <sequenceFlow id="flow93" sourceRef="exclusivegateway18" targetRef="revoca-stipula-mepa">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Revoca'}]]></conditionExpression>
       </sequenceFlow>
       <endEvent id="endevent-stipula-mepa-revoca" name="endevent-stipula-mepa-revoca">
         <extensionElements>
@@ -640,6 +634,19 @@
           </activiti:executionListener>
         </extensionElements>
       </endEvent>
+      <userTask id="stipula-mepa" name="Stipula Mepa" activiti:candidateGroups="${gruppoFirmaAcquisti}"></userTask>
+      <exclusiveGateway id="exclusivegateway33" name="Exclusive Gateway" default="flow172"></exclusiveGateway>
+      <sequenceFlow id="flow171" sourceRef="carica-stipula-mepa" targetRef="exclusivegateway33"></sequenceFlow>
+      <sequenceFlow id="flow172" sourceRef="exclusivegateway33" targetRef="protocollo-invio-stipula-mepa"></sequenceFlow>
+      <sequenceFlow id="flow173" sourceRef="exclusivegateway33" targetRef="revoca-stipula-mepa">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Revoca'}]]></conditionExpression>
+      </sequenceFlow>
+      <exclusiveGateway id="exclusivegateway34" name="Exclusive Gateway" default="flow175"></exclusiveGateway>
+      <sequenceFlow id="flow174" sourceRef="stipula-mepa" targetRef="exclusivegateway34"></sequenceFlow>
+      <sequenceFlow id="flow175" sourceRef="exclusivegateway34" targetRef="carica-stipula-mepa"></sequenceFlow>
+      <sequenceFlow id="flow176" sourceRef="exclusivegateway34" targetRef="revoca-stipula-mepa">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Revoca'}]]></conditionExpression>
+      </sequenceFlow>
     </subProcess>
     <exclusiveGateway id="exclusivegateway15" name="Exclusive Gateway" default="flow81"></exclusiveGateway>
     <sequenceFlow id="flow78" sourceRef="espletamento-procedura" targetRef="exclusivegateway15">
@@ -764,8 +771,6 @@
           </activiti:executionListener>
         </extensionElements>
       </sequenceFlow>
-      <sequenceFlow id="flow106" sourceRef="predisposizione-contratto" targetRef="firma-contratto"></sequenceFlow>
-      <sequenceFlow id="flow107" sourceRef="firma-contratto" targetRef="exclusivegateway23"></sequenceFlow>
       <userTask id="revoca-contratto" name="Revoca Contratto" activiti:candidateGroups="${gruppoRA}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
@@ -797,7 +802,6 @@
       <sequenceFlow id="flow108" sourceRef="exclusivegateway23" targetRef="modifica-contratto">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Modifica'}]]></conditionExpression>
       </sequenceFlow>
-      <sequenceFlow id="flow109" sourceRef="modifica-contratto" targetRef="firma-contratto"></sequenceFlow>
       <sequenceFlow id="flow110" sourceRef="exclusivegateway23" targetRef="revoca-contratto">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Revoca'}]]></conditionExpression>
       </sequenceFlow>
@@ -815,7 +819,7 @@
           </activiti:executionListener>
         </extensionElements>
       </userTask>
-      <sequenceFlow id="flow111" sourceRef="exclusivegateway23" targetRef="protocollo-contratto"></sequenceFlow>
+      <sequenceFlow id="flow111" sourceRef="exclusivegateway23" targetRef="firma-contratto"></sequenceFlow>
       <endEvent id="endevent-contratto-fuori-mepa-revoca" name="endevent-contratto-fuori-mepa-revoca">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
@@ -1061,28 +1065,34 @@
         <omgdc:Bounds height="207.0" width="626.0" x="107.0" y="826.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="startevent9" id="BPMNShape_startevent9">
-        <omgdc:Bounds height="35.0" width="35.0" x="130.0" y="901.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="120.0" y="899.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="carica-stipula-mepa" id="BPMNShape_carica-stipula-mepa">
-        <omgdc:Bounds height="71.0" width="105.0" x="190.0" y="883.0"></omgdc:Bounds>
+        <omgdc:Bounds height="56.0" width="105.0" x="288.0" y="963.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="protocollo-invio-stipula-mepa" id="BPMNShape_protocollo-invio-stipula-mepa">
-        <omgdc:Bounds height="71.0" width="119.0" x="521.0" y="950.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="exclusivegateway18" id="BPMNShape_exclusivegateway18">
-        <omgdc:Bounds height="40.0" width="40.0" x="330.0" y="898.0"></omgdc:Bounds>
+        <omgdc:Bounds height="61.0" width="119.0" x="493.0" y="960.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="revoca-stipula-mepa" id="BPMNShape_revoca-stipula-mepa">
-        <omgdc:Bounds height="68.0" width="105.0" x="410.0" y="883.0"></omgdc:Bounds>
+        <omgdc:Bounds height="68.0" width="105.0" x="500.0" y="883.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="exclusivegateway19" id="BPMNShape_exclusivegateway19">
-        <omgdc:Bounds height="40.0" width="40.0" x="560.0" y="896.0"></omgdc:Bounds>
+        <omgdc:Bounds height="40.0" width="40.0" x="628.0" y="896.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="endevent-stipula-mepa-revoca" id="BPMNShape_endevent-stipula-mepa-revoca">
         <omgdc:Bounds height="35.0" width="35.0" x="690.0" y="899.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="endevent-stipula-mepa-protocollo" id="BPMNShape_endevent-stipula-mepa-protocollo">
-        <omgdc:Bounds height="35.0" width="35.0" x="690.0" y="968.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="690.0" y="973.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="stipula-mepa" id="BPMNShape_stipula-mepa">
+        <omgdc:Bounds height="60.0" width="105.0" x="170.0" y="887.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway33" id="BPMNShape_exclusivegateway33">
+        <omgdc:Bounds height="40.0" width="40.0" x="420.0" y="970.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway34" id="BPMNShape_exclusivegateway34">
+        <omgdc:Bounds height="40.0" width="40.0" x="320.0" y="896.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="exclusivegateway15" id="BPMNShape_exclusivegateway15">
         <omgdc:Bounds height="40.0" width="40.0" x="35.0" y="686.0"></omgdc:Bounds>
@@ -1346,39 +1356,51 @@
         <omgdi:waypoint x="945.0" y="850.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow73" id="BPMNEdge_flow73">
-        <omgdi:waypoint x="165.0" y="918.0"></omgdi:waypoint>
-        <omgdi:waypoint x="190.0" y="918.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow74" id="BPMNEdge_flow74">
-        <omgdi:waypoint x="295.0" y="918.0"></omgdi:waypoint>
-        <omgdi:waypoint x="330.0" y="918.0"></omgdi:waypoint>
+        <omgdi:waypoint x="155.0" y="916.0"></omgdi:waypoint>
+        <omgdi:waypoint x="170.0" y="917.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow75" id="BPMNEdge_flow75">
-        <omgdi:waypoint x="640.0" y="985.0"></omgdi:waypoint>
-        <omgdi:waypoint x="690.0" y="985.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow90" id="BPMNEdge_flow90">
-        <omgdi:waypoint x="350.0" y="938.0"></omgdi:waypoint>
-        <omgdi:waypoint x="350.0" y="985.0"></omgdi:waypoint>
-        <omgdi:waypoint x="521.0" y="985.0"></omgdi:waypoint>
+        <omgdi:waypoint x="612.0" y="990.0"></omgdi:waypoint>
+        <omgdi:waypoint x="690.0" y="990.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow91" id="BPMNEdge_flow91">
-        <omgdi:waypoint x="515.0" y="917.0"></omgdi:waypoint>
-        <omgdi:waypoint x="560.0" y="916.0"></omgdi:waypoint>
+        <omgdi:waypoint x="605.0" y="917.0"></omgdi:waypoint>
+        <omgdi:waypoint x="628.0" y="916.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow92" id="BPMNEdge_flow92">
-        <omgdi:waypoint x="580.0" y="896.0"></omgdi:waypoint>
-        <omgdi:waypoint x="581.0" y="868.0"></omgdi:waypoint>
-        <omgdi:waypoint x="242.0" y="868.0"></omgdi:waypoint>
-        <omgdi:waypoint x="242.0" y="883.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow93" id="BPMNEdge_flow93">
-        <omgdi:waypoint x="370.0" y="918.0"></omgdi:waypoint>
-        <omgdi:waypoint x="410.0" y="917.0"></omgdi:waypoint>
+        <omgdi:waypoint x="648.0" y="896.0"></omgdi:waypoint>
+        <omgdi:waypoint x="647.0" y="866.0"></omgdi:waypoint>
+        <omgdi:waypoint x="222.0" y="866.0"></omgdi:waypoint>
+        <omgdi:waypoint x="222.0" y="887.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow94" id="BPMNEdge_flow94">
-        <omgdi:waypoint x="600.0" y="916.0"></omgdi:waypoint>
+        <omgdi:waypoint x="668.0" y="916.0"></omgdi:waypoint>
         <omgdi:waypoint x="690.0" y="916.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow171" id="BPMNEdge_flow171">
+        <omgdi:waypoint x="393.0" y="991.0"></omgdi:waypoint>
+        <omgdi:waypoint x="420.0" y="990.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow172" id="BPMNEdge_flow172">
+        <omgdi:waypoint x="460.0" y="990.0"></omgdi:waypoint>
+        <omgdi:waypoint x="493.0" y="990.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow173" id="BPMNEdge_flow173">
+        <omgdi:waypoint x="440.0" y="970.0"></omgdi:waypoint>
+        <omgdi:waypoint x="440.0" y="916.0"></omgdi:waypoint>
+        <omgdi:waypoint x="500.0" y="917.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow174" id="BPMNEdge_flow174">
+        <omgdi:waypoint x="275.0" y="917.0"></omgdi:waypoint>
+        <omgdi:waypoint x="320.0" y="916.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow175" id="BPMNEdge_flow175">
+        <omgdi:waypoint x="340.0" y="936.0"></omgdi:waypoint>
+        <omgdi:waypoint x="340.0" y="963.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow176" id="BPMNEdge_flow176">
+        <omgdi:waypoint x="360.0" y="916.0"></omgdi:waypoint>
+        <omgdi:waypoint x="500.0" y="917.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow78" id="BPMNEdge_flow78">
         <omgdi:waypoint x="55.0" y="306.0"></omgdi:waypoint>
@@ -1434,30 +1456,18 @@
         <omgdi:waypoint x="155.0" y="685.0"></omgdi:waypoint>
         <omgdi:waypoint x="180.0" y="685.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow106" id="BPMNEdge_flow106">
-        <omgdi:waypoint x="285.0" y="685.0"></omgdi:waypoint>
-        <omgdi:waypoint x="310.0" y="685.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow107" id="BPMNEdge_flow107">
-        <omgdi:waypoint x="415.0" y="685.0"></omgdi:waypoint>
-        <omgdi:waypoint x="440.0" y="685.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow108" id="BPMNEdge_flow108">
         <omgdi:waypoint x="460.0" y="705.0"></omgdi:waypoint>
         <omgdi:waypoint x="460.0" y="776.0"></omgdi:waypoint>
         <omgdi:waypoint x="415.0" y="775.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow109" id="BPMNEdge_flow109">
-        <omgdi:waypoint x="362.0" y="740.0"></omgdi:waypoint>
-        <omgdi:waypoint x="362.0" y="721.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow110" id="BPMNEdge_flow110">
         <omgdi:waypoint x="480.0" y="685.0"></omgdi:waypoint>
         <omgdi:waypoint x="500.0" y="685.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow111" id="BPMNEdge_flow111">
-        <omgdi:waypoint x="460.0" y="705.0"></omgdi:waypoint>
-        <omgdi:waypoint x="552.0" y="740.0"></omgdi:waypoint>
+        <omgdi:waypoint x="440.0" y="685.0"></omgdi:waypoint>
+        <omgdi:waypoint x="415.0" y="685.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow116" id="BPMNEdge_flow116">
         <omgdi:waypoint x="605.0" y="685.0"></omgdi:waypoint>
