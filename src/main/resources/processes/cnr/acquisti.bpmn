@@ -492,7 +492,7 @@
         <activiti:executionListener event="take" delegateExpression="${pubblicaTuttiAllegatiPubblicabili}"></activiti:executionListener>
       </extensionElements>
     </sequenceFlow>
-    <userTask id="consuntivo" name="Consuntivo" activiti:candidateGroups="${gruppoRA}">
+    <userTask id="consuntivo" name="Consuntivo" activiti:assignee="${rup}">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
           <activiti:field name="faseEsecuzione">
@@ -537,7 +537,7 @@
     </sequenceFlow>
     <subProcess id="stipulamepa" name="STIPULA MEPA">
       <startEvent id="startevent9" name="Start"></startEvent>
-      <userTask id="carica-stipula-mepa" name="Carica Stipula Mepa" activiti:assignee="${rup}" activiti:candidateGroups="${gruppoFirmaAcquisti}">
+      <userTask id="carica-stipula-mepa" name="Carica Stipula Mepa" activiti:assignee="${rup}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
             <activiti:field name="faseEsecuzione">
@@ -855,9 +855,11 @@
         </extensionElements>
       </endEvent>
       <sequenceFlow id="flow123" sourceRef="protocollo-contratto" targetRef="endevent-contratto-fuori-mepa-protocollo"></sequenceFlow>
+      <sequenceFlow id="flow177" sourceRef="predisposizione-contratto" targetRef="firma-contratto"></sequenceFlow>
+      <sequenceFlow id="flow178" sourceRef="modifica-contratto" targetRef="predisposizione-contratto"></sequenceFlow>
     </subProcess>
     <sequenceFlow id="flow119" sourceRef="exclusivegateway15" targetRef="contratto-fuori-mepa">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${(strumentoAcquisizioneId == '12'  || strumentoAcquisizioneId == '13') && sceltaUtente != 'Revoca'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${strumentoAcquisizioneId == '13' && sceltaUtente != 'Revoca'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow120" sourceRef="contratto-fuori-mepa" targetRef="exclusivegateway22">
       <extensionElements>
@@ -1486,6 +1488,15 @@
       <bpmndi:BPMNEdge bpmnElement="flow123" id="BPMNEdge_flow123">
         <omgdi:waypoint x="605.0" y="775.0"></omgdi:waypoint>
         <omgdi:waypoint x="690.0" y="775.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow177" id="BPMNEdge_flow177">
+        <omgdi:waypoint x="285.0" y="685.0"></omgdi:waypoint>
+        <omgdi:waypoint x="310.0" y="685.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow178" id="BPMNEdge_flow178">
+        <omgdi:waypoint x="310.0" y="775.0"></omgdi:waypoint>
+        <omgdi:waypoint x="232.0" y="775.0"></omgdi:waypoint>
+        <omgdi:waypoint x="232.0" y="721.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow119" id="BPMNEdge_flow119">
         <omgdi:waypoint x="75.0" y="706.0"></omgdi:waypoint>
