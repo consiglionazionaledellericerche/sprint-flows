@@ -59,6 +59,7 @@ public class StartAcquistiRevocaSetGroupsAndVisibility implements ExecutionListe
             String gruppoRA = "ra@"+ struttura;
             String gruppoSFD = "sfd@"+ struttura;
             String rup = execution.getVariable("rup", String.class);
+            String applicazioneSigla = "app.sigla";
 
             LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoRT, gruppoSFD, gruppoRA, gruppoFirmaAcquisti);
 
@@ -74,12 +75,15 @@ public class StartAcquistiRevocaSetGroupsAndVisibility implements ExecutionListe
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoRA, PROCESS_VISUALIZER);
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoSFD, PROCESS_VISUALIZER);
             runtimeService.addUserIdentityLink(execution.getProcessInstanceId(), rup, PROCESS_VISUALIZER);
+            runtimeService.addUserIdentityLink(execution.getProcessInstanceId(), applicazioneSigla, PROCESS_VISUALIZER);
 //            runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), "segreteria@" + struttura, PROCESS_VISUALIZER);
 
             execution.setVariable("gruppoRT", gruppoRT);
             execution.setVariable("gruppoFirmaAcquisti", gruppoFirmaAcquisti);
             execution.setVariable("gruppoRA", gruppoRA);
             execution.setVariable("gruppoSFD", gruppoSFD);
+            execution.setVariable("sigla", applicazioneSigla);
+            
 
         }
 
