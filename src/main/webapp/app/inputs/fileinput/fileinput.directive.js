@@ -25,6 +25,12 @@
                 $scope.attrs = attrs;
                 $scope.model = attrs.model;
 
+                if ($scope.attrs.multiple == 'false')
+                    $scope.document = $scope.$parent.vm.attachments.find(function(el) {
+                        return el.name === $scope.attrs.name;
+                    })
+
+
                 $scope.filterNames = function(value) {
                     var reg = "^"+$scope.attrs.name+"\\[\\d+\\]";
                     var tester = new RegExp(reg, 'g');
