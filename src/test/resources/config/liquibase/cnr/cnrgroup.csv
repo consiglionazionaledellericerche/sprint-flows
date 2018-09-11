@@ -1,0 +1,6 @@
+id;name;display_name
+1;root;Root
+2;gestori_flussi@4000;Gestori Flussi
+3;gestori#permessi-ferie@4000;Gestori Flusso Permessi e Ferie
+4;responsabile#permessi-ferie@4000;Responsabile Flusso Ferie
+5;supervisore#permessi-ferie@4000;Supervisore Flusso Permessi e Ferie
