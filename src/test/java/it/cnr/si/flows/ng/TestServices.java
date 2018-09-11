@@ -51,7 +51,7 @@ public class TestServices {
     //    private static final String SFD = "supportofunzionidirigenziali";
     private static final String SFD = "roberto.puccinelli";
     //    private static final String RA = "responsabileacquisti";
-    private static final String DIRETTORE = "direttore";
+    private static final String DIRETTORE = "maurizio.lancia";
     private static final String RA = "anna.penna";
     private static final String RA2 = "silvia.rossi";
     private static final String APP = "utente1";
