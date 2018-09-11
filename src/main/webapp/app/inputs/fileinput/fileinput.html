@@ -1,65 +1,65 @@
-<div class="form-group" ng-if="attrs.multiple == 'false'">
-  <label for="attrs.id">{{attrs.label}}</label><br>
-  <a
-    href
-    ng-click="downloadFile('/api/attachments/task/'+ vm.data.taskId +'/'+ vm.attachments[attrs.name].name +'/data', vm.attachments[attrs.name].name, vm.attachments[attrs.name].mimetype)" >
-      {{vm.attachments[attrs.name].filename}}
-  </a>
-      <button class="btn btn-xs btn-info" ng-class="{'btn-warning': vm.attachments[attrs.name].name}"
-          ng-model="$parent.vm.data[attrs.name]"
-          ngf-select
-          name="$parent.vm.data[attrs.name]"
-          accept="{{attrs.accept}}"
-          ngf-multiple="false"
-          ng-required="attrs['cnrRequired'] == 'true'" >
-            <span ng-show="!vm.attachments[attrs.name]" class="glyphicon glyphicon-upload"></span>
-            <span ng-show="vm.attachments[attrs.name].name" class="glyphicon glyphicon-repeat"></span>
-            <span ng-show="!vm.attachments[attrs.name]">Carica Documento</span>
-            <span ng-show="vm.attachments[attrs.name].name">Aggiorna</span>
-      </button>
-      <span ng-show="$parent.vm.data[attrs.name]">
+<div class="form-group well" ng-if="attrs.multiple == 'false'">
+    <label for="attrs.id">{{attrs.label}}</label><br>
+    <a
+            href
+            ng-click="downloadFile('/api/attachments/task/'+ vm.data.taskId +'/'+ document.name +'/data', document.name, document.mimetype)" >
+        {{document.filename}}
+    </a>
+    <button class="btn btn-xs btn-info" ng-class="{'btn-warning': vm.attachments[attrs.name].name}"
+            ng-model="$parent.vm.data[attrs.name]"
+            ngf-select
+            name="$parent.vm.data[attrs.name]"
+            accept="{{attrs.accept}}"
+            ngf-multiple="false"
+            ng-required="attrs['cnrRequired'] == 'true'" >
+        <span ng-show="!document" class="glyphicon glyphicon-upload"></span>
+        <span ng-show="document.name" class="glyphicon glyphicon-repeat"></span>
+        <span ng-show="!document">Carica Documento</span>
+        <span ng-show="document.name">Aggiorna</span>
+    </button>
+    <span ng-show="$parent.vm.data[attrs.name]">
           {{$parent.vm.data[attrs.name].name}}
           <a href ng-click="$parent.vm.data[attrs.name] = undefined"><span
-              class="glyphicon glyphicon-remove" title="Rimuovi"></span></a>
+                  class="glyphicon glyphicon-remove" title="Rimuovi"></span></a>
       </span>
 </div>
 
-<div class="form-group" ng-if="attrs.multiple == 'true'">
-  <div ng-repeat="(name, attachment) in vm.attachments" ng-if="filterNames(attachment)">
-    <label for="attrs.id">{{attrs.label}}</label><br>
-    <a
-      href
-      ng-click="downloadFile('/api/attachments/task/'+ vm.data.taskId +'/'+ attachment.name +'/data', attachment.name,attachment.mimetype)" >
-        {{attachment.filename}}
-    </a>
-      <button class="btn btn-xs btn-warning"
-          ng-model="$parent.vm.data[attachment.name]"
-          ngf-select
-          name="$parent.vm.data[attachment.name]"
-          accept="{{attrs.accept}}"
-          ngf-multiple="false"
-          ng-required="attrs['cnrRequired'] == 'true'" >
+<div class="form-group well" ng-if="attrs.multiple == 'true'">
+    <div ng-repeat="(name, attachment) in vm.attachments" ng-if="filterNames(attachment)">
+        <label for="attrs.id">{{attrs.label}}</label><br>
+        <a
+                href
+                ng-click="downloadFile('/api/attachments/task/'+ vm.data.taskId +'/'+ attachment.name +'/data', attachment.name,attachment.mimetype)" >
+            {{attachment.filename}}
+        </a>
+        <button class="btn btn-xs btn-info"
+                ng-model="$parent.vm.data[attachment.name]"
+                ngf-select
+                name="$parent.vm.data[attachment.name]"
+                accept="{{attrs.accept}}"
+                ngf-multiple="false"
+                ng-required="attrs['cnrRequired'] == 'true'" >
             <span class="glyphicon glyphicon-repeat"></span> Aggiorna
-      </button>
-      {{$parent.vm.data[attachment.name].name}}
-  </div>
+        </button>
+        {{$parent.vm.data[attachment.name].name}}
+    </div>
     <label for="attrs.id">Altri {{attrs.labelplural || attrs.label}}</label><br>
-      <button class="btn btn-xs btn-info"
-          ng-model="$parent.vm.data['__new__'+attrs.name]"
-          ngf-select
-          name="$parent.vm.data['__new__'+attrs.name]"
-          accept="{{attrs.accept}}"
-          ngf-multiple="true"
-          ng-required="attrs['cnrRequired'] == 'true'" >
-            <span class="glyphicon glyphicon-upload"></span>
-            <span ng-show="!$parent.vm.data[attrs.name].name"> Carica Documenti</span>
-      </button>
-      <span ng-show="$parent.vm.data['__new__'+attrs.name].length">
+    <button class="btn btn-xs btn-info"
+            ng-model="$parent.vm.data['__new__'+attrs.name]"
+            ngf-select
+            name="$parent.vm.data['__new__'+attrs.name]"
+            accept="{{attrs.accept}}"
+            ngf-multiple="true"
+            ng-required="attrs['cnrRequired'] == 'true'" >
+        <span class="glyphicon glyphicon-upload"></span>
+        <span ng-show="!$parent.vm.data[attrs.name].name"> Carica Documenti</span>
+    </button>
+    <span ng-show="$parent.vm.data['__new__'+attrs.name].length">
         Documenti selezionati:
         <span ng-repeat="att in $parent.vm.data['__new__'+attrs.name]">
           {{att.name}}
                   <a href ng-click="$parent.vm.data['__new__'+attrs.name].splice($index, 1)"><span
-                class="glyphicon glyphicon-remove" title="Rimuovi"></span></a><span ng-if="!$last">  </span>, </span>
+                          class="glyphicon glyphicon-remove" title="Rimuovi"></span></a><span ng-if="!$last">  </span>, </span>
         </span>
-      </span>
+    </span>
 </div>
