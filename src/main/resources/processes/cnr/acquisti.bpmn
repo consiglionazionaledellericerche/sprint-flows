@@ -551,7 +551,7 @@
           </activiti:executionListener>
         </extensionElements>
       </userTask>
-      <userTask id="protocollo-invio-stipula-mepa" name="Protocollo e Invio Stipula Mepa" activiti:assignee="${sigla}">
+      <userTask id="protocollo-invio-stipula-mepa" name="Protocollo e Invio Stipula Mepa" activiti:candidateGroups="${gruppoRA}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
             <activiti:field name="faseEsecuzione">
@@ -750,7 +750,7 @@
           <activiti:taskListener event="complete" expression="${task.setVariable(&quot;password&quot;, &quot;******&quot;)}"></activiti:taskListener>
         </extensionElements>
       </userTask>
-      <exclusiveGateway id="exclusivegateway23" name="Exclusive Gateway" default="flow111"></exclusiveGateway>
+      <exclusiveGateway id="exclusivegateway23" name="Exclusive Gateway" default="flow179"></exclusiveGateway>
       <sequenceFlow id="flow105" sourceRef="startevent10" targetRef="predisposizione-contratto">
         <extensionElements>
           <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
@@ -819,7 +819,6 @@
           </activiti:executionListener>
         </extensionElements>
       </userTask>
-      <sequenceFlow id="flow111" sourceRef="exclusivegateway23" targetRef="firma-contratto"></sequenceFlow>
       <endEvent id="endevent-contratto-fuori-mepa-revoca" name="endevent-contratto-fuori-mepa-revoca">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
@@ -857,6 +856,8 @@
       <sequenceFlow id="flow123" sourceRef="protocollo-contratto" targetRef="endevent-contratto-fuori-mepa-protocollo"></sequenceFlow>
       <sequenceFlow id="flow177" sourceRef="predisposizione-contratto" targetRef="firma-contratto"></sequenceFlow>
       <sequenceFlow id="flow178" sourceRef="modifica-contratto" targetRef="predisposizione-contratto"></sequenceFlow>
+      <sequenceFlow id="flow179" sourceRef="exclusivegateway23" targetRef="protocollo-contratto"></sequenceFlow>
+      <sequenceFlow id="flow180" sourceRef="firma-contratto" targetRef="exclusivegateway23"></sequenceFlow>
     </subProcess>
     <sequenceFlow id="flow119" sourceRef="exclusivegateway15" targetRef="contratto-fuori-mepa">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${strumentoAcquisizioneId == '13' && sceltaUtente != 'Revoca'}]]></conditionExpression>
@@ -1467,10 +1468,6 @@
         <omgdi:waypoint x="480.0" y="685.0"></omgdi:waypoint>
         <omgdi:waypoint x="500.0" y="685.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow111" id="BPMNEdge_flow111">
-        <omgdi:waypoint x="440.0" y="685.0"></omgdi:waypoint>
-        <omgdi:waypoint x="415.0" y="685.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow116" id="BPMNEdge_flow116">
         <omgdi:waypoint x="605.0" y="685.0"></omgdi:waypoint>
         <omgdi:waypoint x="630.0" y="685.0"></omgdi:waypoint>
@@ -1497,6 +1494,14 @@
         <omgdi:waypoint x="310.0" y="775.0"></omgdi:waypoint>
         <omgdi:waypoint x="232.0" y="775.0"></omgdi:waypoint>
         <omgdi:waypoint x="232.0" y="721.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow179" id="BPMNEdge_flow179">
+        <omgdi:waypoint x="460.0" y="705.0"></omgdi:waypoint>
+        <omgdi:waypoint x="552.0" y="740.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow180" id="BPMNEdge_flow180">
+        <omgdi:waypoint x="415.0" y="685.0"></omgdi:waypoint>
+        <omgdi:waypoint x="440.0" y="685.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow119" id="BPMNEdge_flow119">
         <omgdi:waypoint x="75.0" y="706.0"></omgdi:waypoint>
