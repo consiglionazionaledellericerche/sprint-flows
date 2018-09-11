@@ -32,7 +32,7 @@ public class ManageProcessAcquisti implements ExecutionListener {
 	private DittaCandidata dittaCandidata;	
 	@Inject
 	private FlowsProcessInstanceService flowsProcessInstanceService;
-		
+
 	private Expression faseEsecuzione;
 
 	@Override
@@ -175,6 +175,9 @@ public class ManageProcessAcquisti implements ExecutionListener {
 		// START CONTRATTO FUORI MEPA  
 		case "predisposizione-contratto-start": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
+			if (execution.getVariable("gestioneRTIDittaAggiudicataria").toString().equals("SI")) {
+				dittaCandidata.aggiornaDittaRTICandidata(execution);
+			}
 		};break;     
 		case "predisposizione-contratto-end": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
@@ -235,6 +238,9 @@ public class ManageProcessAcquisti implements ExecutionListener {
 		// START STIPULA MEPA  
 		case "stipula-mepa-start": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
+			if (execution.getVariable("gestioneRTIDittaAggiudicataria").toString().equals("SI")) {
+				dittaCandidata.aggiornaDittaRTICandidata(execution);
+			}			
 		};break;      
 		case "stipula-mepa-end": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
@@ -318,7 +324,7 @@ public class ManageProcessAcquisti implements ExecutionListener {
 		case "process-end": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
 		};break;  
-		
+
 		// DEFAULT  
 		default:  {
 			LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
