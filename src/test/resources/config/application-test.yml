@@ -13,12 +13,10 @@ spring:
 #       url: jdbc:h2:file:./DB-H2/flows-test;DB_CLOSE_DELAY=-1
         username: flows
         password:
-        ace:
-            type: com.zaxxer.hikari.HikariDataSource
-            url: jdbc:postgresql://dbtest1.si.cnr.it:5432/anagrafica
-            name: ace_old
-            username: acereader
-            password: anagraficapw
+    ace:
+        url: http://acebuntudock.si.cnr.it:5555/
+        username: app.scrivaniadigitale
+        password: bubbazza
     jpa:
         database-platform: it.cnr.si.domain.util.FixedH2Dialect
         database: H2
@@ -46,6 +44,9 @@ oiv:
      esperienza-noncoerente: ${oiv.baseurl}/rest/application-fp/esperienza-noncoerente
      ricalcola-fascia: ${oiv.baseurl}/rest/application-fp/applications-ricalcola-fascia
      iscrivi-inelenco: ${oiv.baseurl}/rest/application-fp/iscrivi-inelenco
+     soccorso-istruttorio: ${oiv.baseurl}/rest/application-fp/soccorso-istruttorio
+     preavviso-rigetto: ${oiv.baseurl}/rest/application-fp/preavviso-rigetto
+     comunicazioni: ${oiv.baseurl}/rest/application-fp/comunicazioni
      usr: admin
      psw: admin
      mail:
