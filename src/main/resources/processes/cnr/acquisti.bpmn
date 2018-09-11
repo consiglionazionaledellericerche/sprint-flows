@@ -634,7 +634,20 @@
           </activiti:executionListener>
         </extensionElements>
       </endEvent>
-      <userTask id="stipula-mepa" name="Stipula Mepa" activiti:candidateGroups="${gruppoFirmaAcquisti}"></userTask>
+      <userTask id="stipula-mepa" name="Stipula Mepa" activiti:candidateGroups="${gruppoFirmaAcquisti}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[stipula-mepa-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[stipula-mepa-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
       <exclusiveGateway id="exclusivegateway33" name="Exclusive Gateway" default="flow172"></exclusiveGateway>
       <sequenceFlow id="flow171" sourceRef="carica-stipula-mepa" targetRef="exclusivegateway33"></sequenceFlow>
       <sequenceFlow id="flow172" sourceRef="exclusivegateway33" targetRef="protocollo-invio-stipula-mepa"></sequenceFlow>
