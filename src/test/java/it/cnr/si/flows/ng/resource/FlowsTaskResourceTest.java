@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 import static it.cnr.si.flows.ng.TestServices.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
@@ -43,7 +44,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "cnr")
+@ActiveProfiles(profiles = "test,cnr")
 public class FlowsTaskResourceTest {
 
     private static final String FIRST_TASK_NAME = "Verifica Decisione";
@@ -58,6 +59,8 @@ public class FlowsTaskResourceTest {
     private ProcessInstanceResponse processInstance;
     @Autowired
     private TaskService taskService;
+    @Autowired
+    private FlowsSearchResource flowsSearchResource;
 
     @Before
     public void setUp() {
@@ -170,15 +173,15 @@ public class FlowsTaskResourceTest {
         assertEquals(OK, flowsTaskResource.completeTask(req).getStatusCode());
 
         //verifico che il task completato sia avanzato
-        String content = "{\"processParams\":[],\"taskParams\":[]}";
-        MockMultipartHttpServletRequest searchRequest = new MockMultipartHttpServletRequest();
-        searchRequest.setContent(content.getBytes());
-        
-        // TODO fix test con la ricerca
-        
-//        ResponseEntity<Object> response = flowsTaskResource.search(searchRequest, ALL_PROCESS_INSTANCES, true, ASC, 0, 100);
-//        assertEquals(OK, response.getStatusCode());
-//        assertEquals(SECOND_TASK_NAME, ((ArrayList<HistoricTaskInstanceResponse>) ((HashMap) response.getBody()).get("tasks")).get(0).getName());
+        Map<String, String> searchParam = new HashMap<>();
+        searchParam.put("order", ASC);
+        searchParam.put("active", "true");
+        searchParam.put("isTaskQuery", "true");
+        searchParam.put("page", "1");
+
+        ResponseEntity<Object> response = flowsSearchResource.search(searchParam);
+        assertEquals(OK, response.getStatusCode());
+        assertEquals(SECOND_TASK_NAME, ((ArrayList<HistoricTaskInstanceResponse>) ((HashMap) response.getBody()).get("tasks")).get(0).getName());
     }
 
     @Test
