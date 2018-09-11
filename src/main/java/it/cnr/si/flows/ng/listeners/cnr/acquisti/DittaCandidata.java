@@ -38,4 +38,23 @@ public class DittaCandidata {
 		execution.setVariable("ragioneSocialeDittaCandidata", dittaCorrente.get("ragioneSocialeDittaCandidata"));
 		execution.setVariable("gestioneRTIDittaCandidata", dittaCorrente.get("gestioneRTIDittaCandidata"));
 	}
+
+	public void aggiornaDittaRTICandidata(DelegateExecution execution) throws IOException, ParseException {
+
+
+		String ditteRTIString = (String) execution.getVariable("ditteRTI_json");
+		LOGGER.info("ditteRTI_json: " + ditteRTIString);
+
+		JSONArray ditteRTI = new JSONArray(ditteRTIString);
+		int nrTotaleDitteRTI = ditteRTI.length();
+		LOGGER.info("nrTotaleDitteRTI: " + nrTotaleDitteRTI);
+		for(int i=0; i<nrTotaleDitteRTI; i++) {
+			JSONObject dittaCorrente = ditteRTI.getJSONObject(i);
+			if (dittaCorrente.get("tipologiaRTI").equals("MANDATARIA") || dittaCorrente.get("tipologiaRTI").equals("CAPOGRUPPO")) {
+				execution.setVariable("pIvaCodiceFiscaleDittaAggiudicataria", dittaCorrente.get("pIvaCodiceFiscaleDittaCandidata"));
+				execution.setVariable("ragioneSocialeDittaAggiudicataria", dittaCorrente.get("ragioneSocialeDittaCandidata"));
+			}
+		}
+	}
+
 }

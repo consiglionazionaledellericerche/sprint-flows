@@ -31,9 +31,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -116,7 +114,7 @@ public class FlowsProcessInstanceResource {
      * @param active booleano che indica se recuperare le MIE Process Instancess attive o quelle terminate
      * @return the my processes
      */
-    @RequestMapping(value = "/myProcessInstances", method = RequestMethod.GET)
+    @GetMapping(value = "/myProcessInstances")
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<DataResponse> getMyProcessInstances(
@@ -160,21 +158,22 @@ public class FlowsProcessInstanceResource {
     }
 
 
-    @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
     @Timed
-    public ResponseEntity<?> getProcessInstanceById(HttpServletRequest req,
-                                                    @RequestParam("processInstanceId") String processInstanceId,
-                                                    @RequestParam(value = "detail", required = false, defaultValue = "true") Boolean detail) {
+    public ResponseEntity getProcessInstanceById(
+            HttpServletRequest req,
+            @RequestParam("processInstanceId") String processInstanceId,
+            @RequestParam(value = "detail", required = false, defaultValue = "true") Boolean detail) {
         if (!detail) {
-            return new ResponseEntity<>(flowsProcessInstanceService.getProcessInstance(processInstanceId), HttpStatus.OK);
+            return new ResponseEntity(flowsProcessInstanceService.getProcessInstance(processInstanceId), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId), HttpStatus.OK);
+            return new ResponseEntity(flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId), HttpStatus.OK);
         }
     }
 
-    @RequestMapping(value = "/currentTask", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/currentTask", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
     @Timed
@@ -184,7 +183,7 @@ public class FlowsProcessInstanceResource {
         return new ResponseEntity(result, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "deleteProcessInstance", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "deleteProcessInstance", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.ADMIN)
     @Timed
     public HttpServletResponse delete(
@@ -197,7 +196,7 @@ public class FlowsProcessInstanceResource {
 
 
     // TODO ???
-    @RequestMapping(value = "suspendProcessInstance", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "suspendProcessInstance", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured({AuthoritiesConstants.ADMIN})
     @Timed
     public ProcessInstanceResponse suspend(
@@ -214,7 +213,7 @@ public class FlowsProcessInstanceResource {
      * @param active boolean active
      * @return le process Instance attive o terminate
      */
-    @RequestMapping(value = "/getProcessInstances", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/getProcessInstances", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity getProcessInstances(
@@ -249,7 +248,7 @@ public class FlowsProcessInstanceResource {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/variable", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/variable", produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Void> setVariable(
@@ -268,7 +267,7 @@ public class FlowsProcessInstanceResource {
      * @param variableName      il nome della variable
      * @return la variableInstance
      */
-    @RequestMapping(value = "/variable", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/variable", produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity getVariable(
@@ -289,7 +288,7 @@ public class FlowsProcessInstanceResource {
         return mappedVariables;
     }
 
-    @RequestMapping(value = "/getProcessInstancesForTrasparenza", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/getProcessInstancesForTrasparenza", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.ADMIN)
     @Timed
     public ResponseEntity<List<Map<String, Object>>> getProcessInstancesForTrasparenza(
@@ -328,7 +327,7 @@ public class FlowsProcessInstanceResource {
         return new ResponseEntity<>(mappedProcessInstances, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/getProcessInstancesForCigs", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/getProcessInstancesForCigs", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.ADMIN)
     @Timed
     public ResponseEntity<List<Map<String, Object>>> getProcessInstancesForCigs(
@@ -370,5 +369,50 @@ public class FlowsProcessInstanceResource {
         }
 
         return new ResponseEntity<>(mappedProcessInstances, HttpStatus.OK);
+    }
+
+
+    @PostMapping(value = "/identityLinks", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @Secured(AuthoritiesConstants.ADMIN)
+    public ResponseEntity<Void> setIdentityLink(
+            @RequestParam("processInstanceId") String processInstanceId,
+            @RequestParam("identityLinkType") String identityLinkType,
+            @RequestParam(value = "groupId", required = false) String groupId,
+            @RequestParam(value = "userId", required = false) String userId) {
+
+        if (groupId != null && !groupId.isEmpty()) {
+            LOGGER.info("Aggiunta IdentityLink - Pi: {}, groupId: {}, type: {}", processInstanceId, groupId, identityLinkType);
+            runtimeService.addGroupIdentityLink(processInstanceId, groupId, identityLinkType);
+        } else {
+            if (userId != null && !userId.isEmpty()){
+                LOGGER.info("Aggiunta IdentityLink - Pi: {}, userId: {}, type: {}", processInstanceId, userId, identityLinkType);
+                runtimeService.addUserIdentityLink(processInstanceId,userId,identityLinkType);
+            }
+        }
+        return ResponseEntity.ok().build();
+    }
+
+
+
+    @DeleteMapping(value = "/identityLinks", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    @Secured(AuthoritiesConstants.ADMIN)
+    public ResponseEntity<Void> deleteIdentityLink(
+            @RequestParam("processInstanceId") String processInstanceId,
+            @RequestParam("identityLinkType") String identityLinkType,
+            @RequestParam(value = "groupId", required=false) String groupId,
+            @RequestParam(value = "userId", required=false) String userId) {
+
+        if(groupId != null && !groupId.isEmpty()) {
+            LOGGER.info("Cancellazione IdentityLink - Pi: {}, groupId: {}, type: {}", processInstanceId, groupId, identityLinkType);
+            runtimeService.deleteGroupIdentityLink(processInstanceId, groupId, identityLinkType);
+        }else{
+            if(userId != null && !userId.isEmpty()) {
+                LOGGER.info("Cancellazione IdentityLink - Pi: {}, userId: {}, type: {}", processInstanceId, userId, identityLinkType);
+                runtimeService.deleteUserIdentityLink(processInstanceId, userId, identityLinkType);
+            }
+        }
+        return ResponseEntity.ok().build();
     }
 }
