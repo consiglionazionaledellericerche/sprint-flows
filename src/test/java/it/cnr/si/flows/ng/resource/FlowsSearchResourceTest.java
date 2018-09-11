@@ -36,7 +36,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "cnr")
+@ActiveProfiles(profiles = "test,cnr")
 @RunWith(SpringRunner.class)
 public class FlowsSearchResourceTest {
 
@@ -80,16 +80,13 @@ public class FlowsSearchResourceTest {
         Date yesterday = cal.getTime();
 
         Map<String, String> requestParams = new HashMap<>();
-
-        requestParams.put(titolo.name(), "textEqual=" + TITOLO_DELL_ISTANZA_DEL_FLUSSO);
+        requestParams.put(titolo.name(), "text=" + TITOLO_DELL_ISTANZA_DEL_FLUSSO);
         requestParams.put(initiator.name(), "text="+ TestServices.getRA());
-        requestParams.put(startDate + "Great", "date=" + utils.formattaData(yesterday));
-        requestParams.put(startDate + "Less", "date=" + utils.formattaData(tomorrow));
         requestParams.put("processDefinitionKey", util.getProcessDefinition().split(":")[0]);
         requestParams.put("order", ASC);
         requestParams.put("active", "true");
-        requestParams.put("firstResult", "0");
-        requestParams.put("maxResults", "20");
+        requestParams.put("isTaskQuery", "false");
+        requestParams.put("page", "1");
 
         //verifico la richiesta normale
         ResponseEntity<Object> response = flowsSearchResource.search(requestParams);
