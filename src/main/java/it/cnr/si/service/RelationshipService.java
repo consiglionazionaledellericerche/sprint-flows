@@ -95,7 +95,7 @@ public class RelationshipService {
         relationshipRepository.delete(id);
     }
 
-    @Cacheable(value = "allGroups", key = "#username")
+//    @Cacheable(value = "allGroups", key = "#username")
     @Timed
     public List<GrantedAuthority> getAllGroupsForUser(String username) {
 
