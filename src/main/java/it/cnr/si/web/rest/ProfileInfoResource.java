@@ -22,7 +22,7 @@ public class ProfileInfoResource {
     private JHipsterProperties jHipsterProperties;
 
     //questa cache non viene "evictata" perchè il profilo può cambiare solo se si riavvia l'applicazione
-    @Cacheable(value = "profile-info")
+//    @Cacheable(value = "profile-info")
     @RequestMapping(value = "/profile-info",
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)

@@ -49,7 +49,7 @@ public class FlowsUserDetailsService implements org.springframework.security.cor
 	@Override
 	@Transactional
 	//la cache "user" attivata solo per il profilo cnr perchè in oiv abbiamo pochi utenti e la cache fa casini con la creazione dei nuovi utenti
-	@Cacheable(value = "user", key = "#login", condition = "@utils.isProfileActive(\"cnr\")")
+//	@Cacheable(value = "user", key = "#login", condition = "@utils.isProfileActive(\"cnr\")")
 	public UserDetails loadUserByUsername(final String login) {
 		UserDetails userDetails = null;
 
