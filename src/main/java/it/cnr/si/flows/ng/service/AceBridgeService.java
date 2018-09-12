@@ -85,7 +85,7 @@ public class AceBridgeService {
                 .collect(Collectors.toList());
     }
 
-    @Cacheable("idRuoloBySigla")
+//    @Cacheable("idRuoloBySigla")
     public int getIdRuoloBySigla(String sigla) {
 
         Ace ace = getAce();
@@ -93,7 +93,7 @@ public class AceBridgeService {
         return ace.ruoloBySigla(sigla).getId();
     }
 
-    @Cacheable("nuomeRuoloBySigla")
+//    @Cacheable("nuomeRuoloBySigla")
     public String getNomeRuoloBySigla(String sigla) {
 
         Ace ace = getAce();
@@ -101,14 +101,14 @@ public class AceBridgeService {
         return ace.ruoloBySigla(sigla).getDescr();
     }
 
-    @Cacheable("nomiStrutture")
+//    @Cacheable("nomiStrutture")
     public String getNomeStruturaById(Integer id) {
         Ace ace = getAce();
 
         return ace.entitaOrganizzativaById(id).getDenominazione();
     }
 
-    @Cacheable("nomiEstesiGruppiRuoloStruttura")
+//    @Cacheable("nomiEstesiGruppiRuoloStruttura")
     public String getExtendedGroupNome(String groupRuoloStrutturaName) {
         if (groupRuoloStrutturaName == null)
             return null;
