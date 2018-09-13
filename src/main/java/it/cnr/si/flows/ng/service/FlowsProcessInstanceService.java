@@ -20,7 +20,6 @@ import org.activiti.engine.impl.task.TaskDefinition;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
-import org.activiti.rest.service.api.history.HistoricIdentityLinkResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -97,7 +96,9 @@ public class FlowsProcessInstanceService {
 				.processInstanceId(processInstanceId)
 				.includeProcessVariables()
 				.singleResult();
-		result.put("entity", restResponseFactory.createHistoricProcessInstanceResponse(processInstance));
+		//Durante la fase di creazione di una Process Instance viene richiamato questo metodo ma la query sarà vuota perchè la Pi effettivamente non è stata ancora creata
+		if(processInstance != null)
+			result.put("entity", restResponseFactory.createHistoricProcessInstanceResponse(processInstance));
 
 		// ProcessDefinition (static) metadata
 		ReadOnlyProcessDefinition processDefinition = ((RepositoryServiceImpl) repositoryService).getDeployedProcessDefinition(processInstance.getProcessDefinitionId());
@@ -257,8 +258,8 @@ public class FlowsProcessInstanceService {
 			}
 		});
 	}
-	
-	
+
+
 	public void updateSearchTerms(String executionId, String processInstanceId, String stato) {
 
 		String initiator =   runtimeService.getVariable(executionId , "initiator").toString();
@@ -266,15 +267,15 @@ public class FlowsProcessInstanceService {
 		String descrizione =  runtimeService.getVariable(executionId , "descrizione").toString();
 
 		JSONObject name = new JSONObject();
-		
+
 		name.put("descrizione", descrizione);
 		name.put("titolo", titolo);
 		name.put("stato", stato);
 		name.put("initiator", initiator);
-		
+
 		runtimeService.setProcessInstanceName(processInstanceId, name.toString());
 
-		
+
 //		String appo = "";
 //
 //		//i campi "titolo, "title", "initiator", "descrizione" sono salvati in un json in name e non come variabili di Process Instance
