@@ -238,8 +238,12 @@ public class ManageProcessAcquisti implements ExecutionListener {
 		// START STIPULA MEPA  
 		case "stipula-mepa-start": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
-			if (execution.getVariable("gestioneRTIDittaAggiudicataria").toString().equals("SI")) {
-				dittaCandidata.aggiornaDittaRTICandidata(execution);
+			if (execution.getVariable("strumentoAcquisizioneId").toString().equals("21")) {
+				dittaCandidata.evidenzia(execution);
+			} else {
+				if (execution.getVariable("gestioneRTIDittaAggiudicataria").toString().equals("SI")) {
+					dittaCandidata.aggiornaDittaRTICandidata(execution);
+				}
 			}			
 		};break;      
 		case "stipula-mepa-end": {
