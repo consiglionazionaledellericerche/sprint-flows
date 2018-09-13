@@ -45,11 +45,15 @@
                 json: '=',
                 label: '@',
                 multiple: '@',
-                subformName: '@'
+                subformName: '@',
+                min: '@?',
+                max: '@?'
             },
             link: function ($scope, element, attrs) {
                 var subform = this;
                 $scope.subform = subform;
+                $scope.min = $scope.min || 1;
+                $scope.max = $scope.max || 999;
 
                 if ($scope.json !== undefined)
                   $scope.ngModel = JSON.parse($scope.json);
@@ -57,11 +61,13 @@
                 subform.formUrl = 'api/forms/'+ $scope.$parent.vm.processDefinitionKey +"/"+$scope.$parent.vm.processVersion +"/"+ $scope.subformName;
 
                 $scope.addRow = function() {
-                    $scope.ngModel.push({});
+                    if ($scope.ngModel.length < $scope.max)
+                        $scope.ngModel.push({});
                     return false;
                 };
                 $scope.removeRow = function() {
-                    $scope.ngModel.pop();
+                    if ($scope.ngModel.length > $scope.min)
+                        $scope.ngModel.pop();
                     return false;
                 };
             }
