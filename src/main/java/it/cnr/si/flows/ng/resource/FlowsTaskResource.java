@@ -6,7 +6,6 @@ import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.SecurityUtils;
 import org.activiti.engine.TaskService;
 import org.activiti.rest.common.api.DataResponse;
-import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +16,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -111,7 +108,7 @@ public class FlowsTaskResource {
 
 
     @RequestMapping(value = "/claim/{taskId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-//    @PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.canAssignTask(#taskId, @flowsUserDetailsService)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canAssignTask(#taskId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Map<String, Object>> unclaimTask(@PathVariable("taskId") String taskId) {
         taskService.unclaim(taskId);
@@ -122,8 +119,7 @@ public class FlowsTaskResource {
     @RequestMapping(value = "/{id}/{user}", method = RequestMethod.PUT)
     @Secured(AuthoritiesConstants.USER)
     @Timed
-////    todo: scommentare quando sarà pronta anche l'interfaccia grafica
-////    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canAssignTask(#id, #user)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canAssignTask(#id, #user)")
     public ResponseEntity<Map<String, Object>> assignTask(
             HttpServletRequest req,
             @PathVariable("id") String id,
@@ -137,6 +133,7 @@ public class FlowsTaskResource {
 
 
     @RequestMapping(value = "complete", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+//    todo: rivedere se reintrodurre il controllo "canCompleteTaskOrStartProcessInstance"
 //    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canCompleteTaskOrStartProcessInstance(#req, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Object> completeTask(MultipartHttpServletRequest req) throws IOException {
