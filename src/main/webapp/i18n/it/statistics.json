@@ -1,7 +1,7 @@
 {
   "statistics": {
     "home": {
-      "title": "Statistiche per la Process Definition:",
+      "title": "Statistiche per il Flusso:",
       "exportPdfLabel": "Esporta Pdf",
       "exportCsvLabel": "Esporta Csv"
     }
