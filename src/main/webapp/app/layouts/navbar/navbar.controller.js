@@ -87,7 +87,7 @@
 
         //popolo l'array delle process Definitions di cui l'utente loggato può vedere le statistiche
                     vm.account.authorities.filter(function(authority){
-                        if(authority.includes('abilitati') || authority.includes('supervisore')){
+                        if(authority.includes('responsabile#') || authority.includes('supervisore#')){
                             $rootScope.wfDefsStatistics.push(
                                 $rootScope.wfDefsAll.filter(function (el){
                                     if(el.key == authority.split(/[#@]/)[1])
