@@ -5,6 +5,7 @@ import it.cnr.si.domain.FlowsUser;
 import it.cnr.si.domain.Membership;
 import it.cnr.si.domain.Relationship;
 import it.cnr.si.flows.ng.dto.FlowsUserDto;
+import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.repository.AuthorityRepository;
 import it.cnr.si.repository.FlowsUserRepository;
 import it.cnr.si.repository.MembershipRepository;
@@ -57,6 +58,8 @@ public class FlowsUserService {
     private MembershipRepository membershipRepository;
     @Inject
     private CnrgroupService cnrgroupService;
+    @Inject
+    private AceBridgeService aceBridgeService;
 
 
     public Optional<FlowsUser> activateRegistration(String key) {
@@ -208,6 +211,8 @@ public class FlowsUserService {
 
     @Transactional(readOnly = true)
     public Optional<FlowsUser> getUserWithAuthoritiesByLogin(String login) {
+//        todo: cambiarlo perchè non prendiamo più gli utenti dal DB ma da ace
+//        aceBridgeService.getAceGroupsForUser(login); //restituisce i gruppi di cui l'utente fa parte ma non il FlowsUser
         return flowsUserRepository.findOneByLogin(login).map(u -> {
             u.getAuthorities().size();
             return u;

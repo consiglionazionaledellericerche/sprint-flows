@@ -17,6 +17,7 @@
 		vm.searchParams.active = $location.search().active || true;
 		vm.searchParams.order = $location.search().order || "ASC";
 		vm.searchParams.page = $location.search().page || 1;
+		vm.searchParams.processDefinitionKey = 'all';
 		if ($location.search().isTaskQuery === undefined)
 			vm.searchParams.isTaskQuery = false;
 		else
