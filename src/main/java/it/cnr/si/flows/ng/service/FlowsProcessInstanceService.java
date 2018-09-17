@@ -133,29 +133,29 @@ public class FlowsProcessInstanceService {
 		//History
 		ArrayList<Map<String, Object>> history = new ArrayList<>();
 		historyService.createHistoricTaskInstanceQuery()
-				.includeTaskLocalVariables()
-				.processInstanceId(processInstanceId)
-				.list()
-				.forEach(
-						task -> {
-							List<HistoricIdentityLink> links = historyService.getHistoricIdentityLinksForTask(task.getId());
-							HashMap<String, Object> entity = new HashMap<>();
-							entity.put("historyTask", restResponseFactory.createHistoricTaskInstanceResponse(task));
+		.includeTaskLocalVariables()
+		.processInstanceId(processInstanceId)
+		.list()
+		.forEach(
+				task -> {
+					List<HistoricIdentityLink> links = historyService.getHistoricIdentityLinksForTask(task.getId());
+					HashMap<String, Object> entity = new HashMap<>();
+					entity.put("historyTask", restResponseFactory.createHistoricTaskInstanceResponse(task));
 
-							// Sostituisco l'id interno del gruppo con la dicitura estesa
-							entity.put("historyIdentityLink", Optional.ofNullable(links)
-									.map(historicIdentityLinks -> restResponseFactory.createHistoricIdentityLinkResponseList(historicIdentityLinks))
-									.filter(historicIdentityLinkResponses -> !historicIdentityLinkResponses.isEmpty())
-									.map(historicIdentityLinkResponses -> historicIdentityLinkResponses.stream())
-									.orElse(Stream.empty())
-									.map(h -> {
-										if (Optional.ofNullable(aceBridgeService).isPresent()) {
-											h.setGroupId(aceBridgeService.getExtendedGroupNome(h.getGroupId()));
-										}
-										return h;
-									}).collect(Collectors.toList()));
-							history.add(entity);
-						});
+					// Sostituisco l'id interno del gruppo con la dicitura estesa
+					entity.put("historyIdentityLink", Optional.ofNullable(links)
+							.map(historicIdentityLinks -> restResponseFactory.createHistoricIdentityLinkResponseList(historicIdentityLinks))
+							.filter(historicIdentityLinkResponses -> !historicIdentityLinkResponses.isEmpty())
+							.map(historicIdentityLinkResponses -> historicIdentityLinkResponses.stream())
+							.orElse(Stream.empty())
+							.map(h -> {
+								if (Optional.ofNullable(aceBridgeService).isPresent()) {
+									h.setGroupId(aceBridgeService.getExtendedGroupNome(h.getGroupId()));
+								}
+								return h;
+							}).collect(Collectors.toList()));
+					history.add(entity);
+				});
 		result.put("history", history);
 		return result;
 	}
@@ -236,8 +236,10 @@ public class FlowsProcessInstanceService {
 			if (typevalue.contains("=")) {
 				String type = typevalue.substring(0, typevalue.indexOf('='));
 				String value = typevalue.substring(typevalue.indexOf('=')+1);
-
-				switch (type) {
+				if (key.equals("businessKey")) {
+					processQuery.processInstanceBusinessKey(value);
+				} else {
+					switch (type) {
 					case "textEqual":
 						processQuery.variableValueEquals(key, value);
 						break;
@@ -249,8 +251,9 @@ public class FlowsProcessInstanceService {
 						//variabili con la wildcard  (%value%)
 						processQuery.variableValueLikeIgnoreCase(key, "%" + value + "%");
 						break;
-				}
-			} else {
+					}
+				} 
+			}else {
 				//per <input type="date"' non funziona "input-prepend" quindi rimetto la vecchia implementazione
 				if ("startDateGreat".equals(key) || "startDateLess".equals(key)) {
 					processDate(processQuery, key, typevalue);
@@ -276,21 +279,21 @@ public class FlowsProcessInstanceService {
 		runtimeService.setProcessInstanceName(processInstanceId, name.toString());
 
 
-//		String appo = "";
-//
-//		//i campi "titolo, "title", "initiator", "descrizione" sono salvati in un json in name e non come variabili di Process Instance
-//		if (stato != null || titolo != null || initiator != null || descrizione != null) {
-//			//l'ordine delle field di ricerca è importante nella query sul campo singolo "name"
-//			//todo: è una porcata ma avere i campi in "name" migliora di moltissimo le prestazioni della ricerca
-//			if (descrizione != null)
-//				appo += "%\"descrizione\":\"%" + descrizione.substring(descrizione.indexOf('=') + 1) + "%\"%";
-//			if (titolo != null)
-//				appo += "%\"titolo\":\"%" + titolo.substring(titolo.indexOf('=') + 1) + "%\"%";
-//			if (initiator != null)
-//				appo += "%\"initiator\":\"%" + initiator.substring(initiator.indexOf('=') + 1) + "%\"%";
-//			if (stato != null)
-//				appo += "%\"stato\":\"%" + stato.substring(stato.indexOf('=') + 1) + "%\"%";
-//		}
+		//		String appo = "";
+		//
+		//		//i campi "titolo, "title", "initiator", "descrizione" sono salvati in un json in name e non come variabili di Process Instance
+		//		if (stato != null || titolo != null || initiator != null || descrizione != null) {
+		//			//l'ordine delle field di ricerca è importante nella query sul campo singolo "name"
+		//			//todo: è una porcata ma avere i campi in "name" migliora di moltissimo le prestazioni della ricerca
+		//			if (descrizione != null)
+		//				appo += "%\"descrizione\":\"%" + descrizione.substring(descrizione.indexOf('=') + 1) + "%\"%";
+		//			if (titolo != null)
+		//				appo += "%\"titolo\":\"%" + titolo.substring(titolo.indexOf('=') + 1) + "%\"%";
+		//			if (initiator != null)
+		//				appo += "%\"initiator\":\"%" + initiator.substring(initiator.indexOf('=') + 1) + "%\"%";
+		//			if (stato != null)
+		//				appo += "%\"stato\":\"%" + stato.substring(stato.indexOf('=') + 1) + "%\"%";
+		//		}
 
 	}
 
