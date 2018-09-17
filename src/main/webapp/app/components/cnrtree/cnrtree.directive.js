@@ -23,7 +23,12 @@
 			link: function link($scope, elementt, attrs) {
 
 				$scope.treeConfig = {
-					version: 1
+					version: 1,
+					core: {
+					    themes : {
+					        name: "default"
+					    }
+					}
 				};
 				$scope.jsonlist = [];
 				$scope.ignoreModelChanges = function() {
