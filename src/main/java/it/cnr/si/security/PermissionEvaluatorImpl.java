@@ -187,7 +187,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
                 canVisualize = true;
             } else {
                 //controllo gli Identity Link con groupId(tutti gli altri)
-            	//TODO controllo su supervisore/responsabile da rivedere 
+                //TODO controllo su supervisore/responsabile da rivedere
                 if (ilv.stream()
                         .filter(il -> il.getGroupId() != null)
                         .filter(il -> !(il.getGroupId().startsWith(String.valueOf(responsabile)+"#") || il.getGroupId().startsWith(String.valueOf(supervisore)+"#") || il.getGroupId().startsWith(String.valueOf(responsabile)+"@") || il.getGroupId().startsWith(String.valueOf(supervisore)+"@") || il.getGroupId().startsWith(String.valueOf(responsabile)+"Struttura@") || il.getGroupId().startsWith(String.valueOf(supervisore)+"Struttura@")))
@@ -259,8 +259,8 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
      */
     /*        riassegnazione         */
     public boolean canAssignTask(String taskId, String username) {
-        boolean resut = false;
-//        todo: da fare insieme all'interfaccia grafica da cui richiamare la funzione
+        boolean result = false;
+//        todo: da fare con Massimo?
 
 ///in caso di assegnazione ad altro utente
 //        (può farlo solo il responsabile di struttura per fluso ->
@@ -269,7 +269,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 //        responsabili#flusso x @ generico (flusso definito per più strutture)
 
 //        può essere assegnato solo a membri dei gruppi candidate del task in esecuzione
-        return resut;
+        return result;
     }
 
 

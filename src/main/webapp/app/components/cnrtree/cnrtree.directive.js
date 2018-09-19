@@ -20,10 +20,15 @@
 			templateUrl: 'app/components/cnrtree/cnrtree.html',
 
 
-			link: function link($scope) {
+			link: function link($scope, elementt, attrs) {
 
 				$scope.treeConfig = {
-					version: 1
+					version: 1,
+					core: {
+					    themes : {
+					        name: "default"
+					    }
+					}
 				};
 				$scope.jsonlist = [];
 				$scope.ignoreModelChanges = function() {
@@ -60,6 +65,22 @@
 						}
 					);
 				}
+
+				$scope.readyCB = function() {
+				    $log.info($scope.ngModelid);
+				    if ('autofill' in attrs) {
+
+				        if ($scope.ngModelid) {
+				            $scope.treeInstance.jstree(true).select_node($scope.ngModelid);
+
+                        } else {
+                            var nomeModelId = attrs.ngModelid.split('.').pop();
+                            var idDaSelezionare = $scope.$parent.vm.taskVariables[nomeModelId];
+                            $scope.treeInstance.jstree(true).select_node(idDaSelezionare);
+                        }
+				    }
+				}
+
 				$scope.select_node = function(discard, selection) {
 					if (selection.node.children.length === 0) {
 						$scope.ngModel = selection.node.text;
