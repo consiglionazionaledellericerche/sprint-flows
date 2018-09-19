@@ -42,7 +42,7 @@
             templateUrl: 'app/components/subform/subform.html',
             scope: {
                 ngModel: '=',
-                json: '=',
+                json: '@?',
                 label: '@',
                 multiple: '@',
                 subformName: '@',
