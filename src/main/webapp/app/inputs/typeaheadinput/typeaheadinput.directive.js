@@ -31,37 +31,11 @@
                 });
 
                 $scope.loadRecords = function(filter) {
-                    switch ($scope.type) {
-                        case 'users':
-                            return dataService.search.users(filter)
-                                .then(function(response) {
-                                    $scope.hasMore = response.data.more;
-                                    return response.data.results;
-                                });
-                            break;
-                        case 'uo':
-                            return dataService.search.uo(filter)
-                                .then(function(response) {
-                                    $scope.hasMore = response.data.more;
-                                    return response.data.results;
-                                });
-                        case 'flowsUsers':
-                            return dataService.search.flowsUsers(filter)
-                                .then(function(response) {
-                                    $scope.hasMore = response.data.more;
-                                    return response.data.results;
-                                });
-                            break;
-                        case 'flowsGroups':
-                            return dataService.search.flowsGroups(filter)
-                                .then(function(response) {
-                                    $scope.hasMore = response.data.more;
-                                    return response.data.results;
-                                });
-                            break;
-                        default:
-                            $log.error('Type non riconosciuto ' + $scope.type);
-                    }
+                    return dataService.search[$scope.type](filter)
+                       .then(function(response) {
+                           $scope.hasMore = response.data.more;
+                           return response.data.results;
+                       });
                 };
             },
         };
