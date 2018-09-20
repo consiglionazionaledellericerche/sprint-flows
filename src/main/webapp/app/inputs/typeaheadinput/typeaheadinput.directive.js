@@ -30,6 +30,8 @@
                     }
                 });
 
+                init();
+
                 $scope.loadRecords = function(filter) {
                     return dataService.search[$scope.type](filter)
                        .then(function(response) {
@@ -37,7 +39,23 @@
                            return response.data.results;
                        });
                 };
-            },
+
+                function init() {
+
+                    if ('autofill' in attrs) {
+                        var nomeModelId = attrs.ngModel.split('.').pop();
+                        $scope.ngModel = $scope.$parent.vm.data.entity.variabili[nomeModelId];
+                    }
+
+                    if ($scope.ngModel) {
+
+                        dataService.lookup[$scope.type]($scope.ngModel)
+                            .then(function (response) {
+                                $scope.localModel = response.data;
+                            });
+                    }
+                }
+            }
         };
     }
 })();
