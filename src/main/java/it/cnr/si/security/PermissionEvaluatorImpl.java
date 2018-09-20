@@ -40,7 +40,7 @@ import static it.cnr.si.flows.ng.utils.Enum.Role.*;
 public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
 
-    private static final String CNR_CODE = "4000";
+    public static final String CNR_CODE = "0000";
     private final Logger log = LoggerFactory.getLogger(PermissionEvaluatorImpl.class);
 
     @Inject
