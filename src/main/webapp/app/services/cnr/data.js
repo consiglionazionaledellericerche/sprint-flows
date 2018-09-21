@@ -156,6 +156,14 @@
                         '&maxResults=' + maxResults, searchParams);
                 },
             },
+            lookup: {
+                uo: function(id) {
+                    return $http.get('api/lookup/ace/uo/'+ id);
+                },
+                users: function(username) {
+                    return $http.get('api/lookup/ldap/user/'+ username);
+                }
+            },
             mail: {
                 isActive: function() {
                     return $http.get('api/mail/active');
