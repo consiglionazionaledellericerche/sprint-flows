@@ -84,6 +84,10 @@ public class AceBridgeService {
 
     }
 
+    public EntitaOrganizzativaWebDto getUoById(int id) {
+
+        return getAce().entitaOrganizzativaById(id);
+    }
 
     public List<EntitaOrganizzativaWebDto> getUoLike(String uoName) {
         Ace ace = getAce();

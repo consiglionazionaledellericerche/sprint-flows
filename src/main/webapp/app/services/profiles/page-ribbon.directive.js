@@ -23,6 +23,9 @@
                     scope.ribbonEnv = response.ribbonEnv;
                     element.addClass(response.ribbonEnv);
                     element.removeClass('hidden');
+
+                    // flag per vedere le informazioni di debug
+                    $rootScope.isDevelopment = true;
                 }
             });
         }

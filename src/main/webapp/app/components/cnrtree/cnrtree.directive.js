@@ -67,7 +67,7 @@
 				}
 
 				$scope.readyCB = function() {
-				    $log.info($scope.ngModelid);
+
 				    if ('autofill' in attrs) {
 
 				        if ($scope.ngModelid) {
