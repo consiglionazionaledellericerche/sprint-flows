@@ -70,7 +70,7 @@
                 </a>
                 <ul class="dropdown-menu" uib-dropdown-menu>
                     <li ng-repeat="wfDef in wfDefsStatistics track by $index">
-                        <a ui-sref="statistics({processDefinition: wfDef})"
+                        <a ui-sref="statistics({processDefinition: wfDef.id})"
                            ng-click="vm.collapseNavbar()">
                             {{wfDef.name}}
                         </a>
