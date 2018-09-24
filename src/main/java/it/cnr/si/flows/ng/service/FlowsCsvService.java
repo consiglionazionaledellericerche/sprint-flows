@@ -39,11 +39,14 @@ public class FlowsCsvService {
 	private Utils utils;
 
 
-	public List<HistoricProcessInstanceResponse> getProcessesStatistics(String processDefinitionKey, String startDateGreat, String startDateLess, boolean activeFlag) {
+	public List<HistoricProcessInstanceResponse> getProcessesStatistics(String processDefinitionKey, String idStruttura,String startDateGreat, String startDateLess, boolean activeFlag) {
 		Map<String, String> req = new HashMap<>();
 		req.put("startDateGreat", startDateGreat);
 		req.put("startDateLess", startDateLess);
-		req.put(processDefinitionKey, processDefinitionKey);
+		if (idStruttura != null && !idStruttura.equals("0000")) {
+			req.put("idStruttura", "text="+idStruttura);
+		}
+		//req.put(processDefinitionKey, processDefinitionKey);
 		String order = "ASC";
 		Integer firstResult = -1;
 		Integer maxResults = -1;

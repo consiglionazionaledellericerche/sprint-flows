@@ -18,9 +18,10 @@
 		vm.isNavbarCollapsed = true;
 		vm.isAuthenticated = Principal.isAuthenticated;
 
-		$scope.exportFile = function(isPdf, processDefinitionKey, startDateGreat, startDateLess, filename) {
+		$scope.exportFile = function(isPdf, processDefinitionKey, idStruttura, startDateGreat, startDateLess, filename) {
 			let url = (isPdf ? '/api/makeStatisticPdf?' : '/api/makeStatisticCsv?') +
 			'processDefinitionKey=' + vm.processDefinition +
+			'&idStruttura=' + vm.exportParams.struttura +
 			'&startDateGreat=' + $filter('date')(vm.exportParams.startDateGreat, dateFormat) +
 			'&startDateLess=' + $filter('date')(vm.exportParams.startDateLess, dateFormat);
 			utils.downloadFile(url, filename, isPdf ? 'application/pdf' : 'application/vnd.ms-excel');
@@ -34,13 +35,25 @@
 				var authority = Principal.identity().$$state.value.authorities[i];
 				if(authority.includes('responsabile#' + vm.processDefinition) || authority.includes('supervisore#' + vm.processDefinition)){
 					var newStruttura = authority.split(/[#@]/)[2];
-					if(newStruttura != null  ){
-						if(appoStruttura.indexOf(newStruttura) == -1) {
-							appoStruttura.push(newStruttura);
-							dataService.lookup.uo(newStruttura).then(function(response){
-								$scope.strutture.push(response.data)
+					if(newStruttura != null){
+						if(newStruttura == "0000"){
+							appoStruttura.push({
+								value: newStruttura,
+								label: "CNR"
 							})
-						}}
+							$scope.strutture.push({
+								value: newStruttura,
+								label: "CNR"
+							})
+						} else {
+							if(appoStruttura.indexOf(newStruttura) == -1) {
+								appoStruttura.push(newStruttura);
+								dataService.lookup.uo(newStruttura).then(function(response){
+									$scope.strutture.push(response.data)
+								})
+							}
+						}
+					}
 				}
 			}
 		};
