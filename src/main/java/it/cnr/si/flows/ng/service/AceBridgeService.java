@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
+import static it.cnr.si.security.PermissionEvaluatorImpl.CNR_CODE;
 
 @Service
 @Profile("!oiv")
@@ -46,11 +47,21 @@ public class AceBridgeService {
         Ace ace = getAce();
 
         ArrayList<RuoloUtenteWebDto> ruoliUtente = ace.ruoloUtente(loginUsername);
+        
+        
 
         return ruoliUtente.stream()
-                .map(ruoloUtente -> ruoloUtente.getRuolo().getSigla() + "@" + ruoloUtente.getEntitaOrganizzativa().getId())
+                .map(ruoloUtente -> {
+                    if ( ruoloUtente.getEntitaOrganizzativa() != null) {
+                        return ruoloUtente.getRuolo().getSigla() + "@" + ruoloUtente.getEntitaOrganizzativa().getId();
+                    } else {
+                    	return ruoloUtente.getRuolo().getSigla() + "@" + CNR_CODE;
+                    }
+                    })
                 .collect(Collectors.toList());
-    }
+        
+        
+    } 	
 
     public List<String> getUsersInAceGroup(String groupName) {
 
@@ -73,6 +84,10 @@ public class AceBridgeService {
 
     }
 
+    public EntitaOrganizzativaWebDto getUoById(int id) {
+
+        return getAce().entitaOrganizzativaById(id);
+    }
 
     public List<EntitaOrganizzativaWebDto> getUoLike(String uoName) {
         Ace ace = getAce();
