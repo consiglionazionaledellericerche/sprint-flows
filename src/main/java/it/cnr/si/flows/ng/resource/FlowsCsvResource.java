@@ -48,14 +48,15 @@ public class FlowsCsvResource {
 	public void makeStatisticCsv(
 			HttpServletResponse res,
 			@RequestParam("processDefinitionKey") String processDefinitionKey,
+			@RequestParam("idStruttura") String idStruttura,
 			@RequestParam("startDateGreat") String startDateGreat,
 			@RequestParam("startDateLess") String startDateLess) throws IOException {
 
 		// Lista processi attivi
-		List<HistoricProcessInstanceResponse> activeProcessInstances = flowsCsvService.getProcessesStatistics(processDefinitionKey, startDateGreat, startDateLess, true);
+		List<HistoricProcessInstanceResponse> activeProcessInstances = flowsCsvService.getProcessesStatistics(processDefinitionKey, idStruttura, startDateGreat, startDateLess, true);
 
 		// Lista processi terminati
-		List<HistoricProcessInstanceResponse> terminatedProcessInstances = flowsCsvService.getProcessesStatistics(processDefinitionKey, startDateGreat, startDateLess, false);
+		List<HistoricProcessInstanceResponse> terminatedProcessInstances = flowsCsvService.getProcessesStatistics(processDefinitionKey, idStruttura, startDateGreat, startDateLess, false);
 
 		// Lista processi totali
 		activeProcessInstances.addAll(terminatedProcessInstances);
