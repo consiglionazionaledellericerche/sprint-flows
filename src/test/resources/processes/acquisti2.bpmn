@@ -1,0 +1,1565 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="acquisti" name="Acquisti" isExecutable="true">
+    <extensionElements>
+      <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+        <activiti:field name="faseEsecuzione">
+          <activiti:string><![CDATA[process-start]]></activiti:string>
+        </activiti:field>
+      </activiti:executionListener>
+      <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+        <activiti:field name="faseEsecuzione">
+          <activiti:string><![CDATA[process-end]]></activiti:string>
+        </activiti:field>
+      </activiti:executionListener>
+    </extensionElements>
+    <startEvent id="startevent1" name="Predisposizione Decisione"></startEvent>
+    <subProcess id="DECISIONE-CONTRATTARE" name="DECISIONE A CONTRATTARE">
+      <endEvent id="endevent-decisione-contrattare-protocollo" name="endevent-decisione-contrattare-protocollo">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[endevent-decisione-contrattare-protocollo-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[endevent-decisione-contrattare-protocollo-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </endEvent>
+      <userTask id="verifica-decisione" name="Verifica Decisione" activiti:candidateGroups="${gruppoSFD}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[verifica-decisione-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[verifica-decisione-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <userTask id="firma-decisione" name="Firma Decisione" activiti:candidateGroups="${gruppoFirmaAcquisti}">
+        <extensionElements>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[firma-decisione-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[firma-decisione-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:taskListener event="complete" expression="${task.setVariable(&quot;password&quot;, &quot;******&quot;)}"></activiti:taskListener>
+          <activiti:taskListener event="complete" expression="${task.setVariable(&quot;otp&quot;, &quot;******&quot;)}"></activiti:taskListener>
+        </extensionElements>
+      </userTask>
+      <sequenceFlow id="flow8" sourceRef="verifica-decisione" targetRef="exclusivegateway1"></sequenceFlow>
+      <userTask id="modifica-decisione" name="Modifica Decisione" activiti:candidateGroups="${gruppoRA}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[modifica-decisione-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[modifica-decisione-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <sequenceFlow id="flow9" sourceRef="modifica-decisione" targetRef="exclusivegateway28">
+        <extensionElements>
+          <activiti:executionListener event="take" delegateExpression="${calcolaTotaleImpegniAcquisti}"></activiti:executionListener>
+        </extensionElements>
+      </sequenceFlow>
+      <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway" default="flow10"></exclusiveGateway>
+      <sequenceFlow id="flow10" sourceRef="exclusivegateway1" targetRef="firma-decisione"></sequenceFlow>
+      <sequenceFlow id="flow11" sourceRef="exclusivegateway1" targetRef="modifica-decisione">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Modifica'}]]></conditionExpression>
+      </sequenceFlow>
+      <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway" default="flow14"></exclusiveGateway>
+      <sequenceFlow id="flow12" sourceRef="firma-decisione" targetRef="exclusivegateway2"></sequenceFlow>
+      <sequenceFlow id="flow13" sourceRef="exclusivegateway2" targetRef="modifica-decisione">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Modifica'}]]></conditionExpression>
+      </sequenceFlow>
+      <userTask id="protocollo-decisione" name="Protocollo Decisione" activiti:candidateGroups="${gruppoRA}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[protocollo-decisione-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[protocollo-decisione-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <sequenceFlow id="flow14" sourceRef="exclusivegateway2" targetRef="protocollo-decisione"></sequenceFlow>
+      <sequenceFlow id="flow15" sourceRef="protocollo-decisione" targetRef="endevent-decisione-contrattare-protocollo"></sequenceFlow>
+      <userTask id="revoca-decisione" name="Revoca Decisione" activiti:candidateGroups="${gruppoRA}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[revoca-decisione-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[revoca-decisione-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <sequenceFlow id="flow28" sourceRef="exclusivegateway2" targetRef="revoca-decisione">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Revoca'}]]></conditionExpression>
+      </sequenceFlow>
+      <exclusiveGateway id="exclusivegateway5" name="Exclusive Gateway" default="flow30"></exclusiveGateway>
+      <sequenceFlow id="flow29" sourceRef="revoca-decisione" targetRef="exclusivegateway5"></sequenceFlow>
+      <sequenceFlow id="flow30" sourceRef="exclusivegateway5" targetRef="endevent-decisione-contrattare-revoca"></sequenceFlow>
+      <sequenceFlow id="flow31" sourceRef="exclusivegateway5" targetRef="firma-decisione">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Annulla'}]]></conditionExpression>
+      </sequenceFlow>
+      <endEvent id="endevent-decisione-contrattare-revoca" name="endevent-decisione-contrattare-revoca">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[endevent-decisione-contrattare-revoca-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[endevent-decisione-contrattare-revoca-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </endEvent>
+      <startEvent id="startevent11" name="Start Decisione a Contrattare"></startEvent>
+      <exclusiveGateway id="exclusivegateway28" name="Exclusive Gateway" default="flow148"></exclusiveGateway>
+      <sequenceFlow id="flow147" sourceRef="startevent11" targetRef="exclusivegateway28">
+        <extensionElements>
+          <activiti:executionListener event="take" delegateExpression="${calcolaTotaleImpegniAcquisti}"></activiti:executionListener>
+        </extensionElements>
+      </sequenceFlow>
+      <sequenceFlow id="flow148" sourceRef="exclusivegateway28" targetRef="verifica-decisione"></sequenceFlow>
+      <sequenceFlow id="flow149" sourceRef="exclusivegateway28" targetRef="firma-decisione">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${organizzazioneStruttura == 'Semplice'}]]></conditionExpression>
+      </sequenceFlow>
+    </subProcess>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="DECISIONE-CONTRATTARE"></sequenceFlow>
+    <userTask id="espletamento-procedura" name="Espletamento Procedura" activiti:assignee="${rup}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[espletamento-procedura-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[espletamento-procedura-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <subProcess id="PROVVEDIMENTO-AGGIUDICAZIONE" name="PROVVEDIMENTO DI AGGIUDICAZIONE">
+      <userTask id="predisposizione-provvedimento-aggiudicazione" name="Predisposizione Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoRA}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[predisposizione-provvedimento-aggiudicazione-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[predisposizione-provvedimento-aggiudicazione-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <startEvent id="startevent6" name="Start"></startEvent>
+      <sequenceFlow id="flow17" sourceRef="startevent6" targetRef="predisposizione-provvedimento-aggiudicazione">
+        <extensionElements>
+          <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
+            <activiti:field name="nomeFileDaPubblicare">
+              <activiti:string><![CDATA[elencoVerbali]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="fileDaPubblicareFlag">
+              <activiti:string><![CDATA[true]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
+            <activiti:field name="nomeFileDaPubblicare">
+              <activiti:string><![CDATA[giustificazioniAnomalie]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="fileDaPubblicareFlag">
+              <activiti:string><![CDATA[true]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
+            <activiti:field name="nomeFileDaPubblicare">
+              <activiti:string><![CDATA[provvedimentoNominaCommissione]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="fileDaPubblicareFlag">
+              <activiti:string><![CDATA[true]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
+            <activiti:field name="nomeFileDaPubblicare">
+              <activiti:string><![CDATA[provvedimentoAmmessiEsclusi]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="fileDaPubblicareFlag">
+              <activiti:string><![CDATA[true]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
+            <activiti:field name="nomeFileDaPubblicare">
+              <activiti:string><![CDATA[bandoAvvisi]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="fileDaPubblicareFlag">
+              <activiti:string><![CDATA[true]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
+            <activiti:field name="nomeFileDaPubblicare">
+              <activiti:string><![CDATA[letteraInvito]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="fileDaPubblicareFlag">
+              <activiti:string><![CDATA[true]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </sequenceFlow>
+      <exclusiveGateway id="exclusivegateway3" name="Exclusive Gateway" default="flow20"></exclusiveGateway>
+      <sequenceFlow id="flow20" sourceRef="exclusivegateway3" targetRef="firma-provvedimento-aggiudicazione"></sequenceFlow>
+      <userTask id="modifica-provvedimento-aggiudicazione" name="Modifica Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoRA}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[modifica-provvedimento-aggiudicazione-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[modifica-provvedimento-aggiudicazione-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <userTask id="protocollo-provvedimento-aggiudicazione" name="Protocollo Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoRA}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[protocollo-provvedimento-aggiudicazione-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[protocollo-provvedimento-aggiudicazione-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <endEvent id="endevent-provvedimento-aggiudicazione-protocollo" name="endevent-provvedimento-aggiudicazione-protocollo">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[endevent-provvedimento-aggiudicazione-protocollo-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[endevent-provvedimento-aggiudicazione-protocollo-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </endEvent>
+      <userTask id="revoca-proposta-aggiudicazione" name="Revoca Proposta Aggiudicazione" activiti:candidateGroups="${gruppoRA}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[revoca-proposta-aggiudicazione-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[revoca-proposta-aggiudicazione-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <exclusiveGateway id="exclusivegateway6" name="Exclusive Gateway" default="flow48"></exclusiveGateway>
+      <sequenceFlow id="flow33" sourceRef="revoca-proposta-aggiudicazione" targetRef="exclusivegateway6"></sequenceFlow>
+      <sequenceFlow id="flow34" sourceRef="exclusivegateway6" targetRef="firma-provvedimento-aggiudicazione">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Annulla'}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="flow48" sourceRef="exclusivegateway6" targetRef="endevent-provvedimento-aggiudicazione"></sequenceFlow>
+      <exclusiveGateway id="exclusivegateway11" name="Exclusive Gateway" default="flow53"></exclusiveGateway>
+      <sequenceFlow id="flow52" sourceRef="exclusivegateway11" targetRef="revoca-proposta-aggiudicazione">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Revoca'}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="flow54" sourceRef="exclusivegateway11" targetRef="modifica-provvedimento-aggiudicazione">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Modifica'}]]></conditionExpression>
+      </sequenceFlow>
+      <userTask id="verifica-provvedimento-aggiudicazione" name="Verifica Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoSFD}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[verifica-provvedimento-aggiudicazione-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[verifica-provvedimento-aggiudicazione-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <sequenceFlow id="flow56" sourceRef="verifica-provvedimento-aggiudicazione" targetRef="exclusivegateway3"></sequenceFlow>
+      <sequenceFlow id="flow57" sourceRef="modifica-provvedimento-aggiudicazione" targetRef="exclusivegateway29"></sequenceFlow>
+      <endEvent id="endevent-provvedimento-aggiudicazione" name="endevent-provvedimento-aggiudicazione">
+        <extensionElements>
+          <activiti:executionListener event="start" expression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[endevent-provvedimento-aggiudicazione-revoca-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[endevent-provvedimento-aggiudicazione-revoca-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </endEvent>
+      <userTask id="firma-provvedimento-aggiudicazione" name="Firma Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoFirmaAcquisti}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[firma-provvedimento-aggiudicazione-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[firma-provvedimento-aggiudicazione-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:taskListener event="complete" expression="${task.setVariable(&quot;password&quot;, &quot;******&quot;)}"></activiti:taskListener>
+          <activiti:taskListener event="complete" expression="${task.setVariable(&quot;otp&quot;, &quot;******&quot;)}"></activiti:taskListener>
+        </extensionElements>
+      </userTask>
+      <sequenceFlow id="flow51" sourceRef="firma-provvedimento-aggiudicazione" targetRef="exclusivegateway11"></sequenceFlow>
+      <exclusiveGateway id="exclusivegateway26" name="Exclusive Gateway" default="flow140"></exclusiveGateway>
+      <sequenceFlow id="flow137" sourceRef="protocollo-provvedimento-aggiudicazione" targetRef="exclusivegateway26"></sequenceFlow>
+      <sequenceFlow id="flow138" sourceRef="exclusivegateway26" targetRef="endevent-provvedimento-aggiudicazione-protocollo">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${verificheRequisitiid == '1'}]]></conditionExpression>
+      </sequenceFlow>
+      <userTask id="verifica-requisiti" name="Verifica Requisiti" activiti:assignee="${rup}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[verifica-requisiti-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[verifica-requisiti-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <sequenceFlow id="flow53" sourceRef="exclusivegateway11" targetRef="protocollo-provvedimento-aggiudicazione"></sequenceFlow>
+      <exclusiveGateway id="exclusivegateway27" name="Exclusive Gateway" default="flow143"></exclusiveGateway>
+      <sequenceFlow id="flow140" sourceRef="exclusivegateway26" targetRef="verifica-requisiti"></sequenceFlow>
+      <sequenceFlow id="flow141" sourceRef="verifica-requisiti" targetRef="exclusivegateway27">
+        <extensionElements>
+          <activiti:executionListener event="take" delegateExpression="${scorriElencoDitteCandidate}"></activiti:executionListener>
+        </extensionElements>
+      </sequenceFlow>
+      <sequenceFlow id="flow143" sourceRef="exclusivegateway27" targetRef="predisposizione-provvedimento-aggiudicazione">
+        <extensionElements>
+          <activiti:executionListener event="take" delegateExpression="${sostituisciDocumentoListener}">
+            <activiti:field name="nomeFileDaSostituire">
+              <activiti:string><![CDATA[provvedimentoAggiudicazione]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </sequenceFlow>
+      <sequenceFlow id="flow145" sourceRef="exclusivegateway27" targetRef="endevent-provvedimento-aggiudicazione">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${esitoVerificaRequisiti == 'revocaConProvvedimento'}]]></conditionExpression>
+      </sequenceFlow>
+      <exclusiveGateway id="exclusivegateway29" name="Exclusive Gateway" default="flow151"></exclusiveGateway>
+      <sequenceFlow id="flow150" sourceRef="predisposizione-provvedimento-aggiudicazione" targetRef="exclusivegateway29"></sequenceFlow>
+      <sequenceFlow id="flow151" sourceRef="exclusivegateway29" targetRef="verifica-provvedimento-aggiudicazione"></sequenceFlow>
+      <sequenceFlow id="flow152" sourceRef="exclusivegateway29" targetRef="firma-provvedimento-aggiudicazione">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${organizzazioneStruttura == 'Semplice'}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="flow21" sourceRef="exclusivegateway3" targetRef="modifica-provvedimento-aggiudicazione">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Modifica'}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="flow153" sourceRef="exclusivegateway27" targetRef="endevent-provvedimento-aggiudicazione-protocollo">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${esitoVerificaRequisiti == 'inviaRisultato'}]]></conditionExpression>
+      </sequenceFlow>
+    </subProcess>
+    <subProcess id="revoca" name="REVOCA">
+      <startEvent id="startevent7" name="Start"></startEvent>
+      <endEvent id="endevent-revoca" name="endevent-revoca">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[endevent-revoca-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[endevent-revoca-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </endEvent>
+      <userTask id="firma-revoca" name="Firma Revoca" activiti:candidateGroups="${gruppoFirmaAcquisti}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[firma-revoca-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[firma-revoca-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:taskListener event="complete" expression="${task.setVariable(&quot;password&quot;, &quot;******&quot;)}"></activiti:taskListener>
+          <activiti:taskListener event="complete" expression="${task.setVariable(&quot;otp&quot;, &quot;******&quot;)}"></activiti:taskListener>
+        </extensionElements>
+      </userTask>
+      <userTask id="modifica-revoca" name="Modifica Revoca" activiti:candidateGroups="${gruppoRA}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[modifica-revoca-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[modifica-revoca-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <exclusiveGateway id="exclusivegateway9" name="Exclusive Gateway" default="flow42"></exclusiveGateway>
+      <sequenceFlow id="flow39" sourceRef="firma-revoca" targetRef="exclusivegateway9"></sequenceFlow>
+      <sequenceFlow id="flow40" sourceRef="exclusivegateway9" targetRef="modifica-revoca">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Modifica'}]]></conditionExpression>
+      </sequenceFlow>
+      <userTask id="protocollo-revoca" name="Protocollo Revocasdfasdfa" activiti:candidateGroups="${gruppoRA}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[protocollo-revoca-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[protocollo-revoca-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <sequenceFlow id="flow42" sourceRef="exclusivegateway9" targetRef="protocollo-revoca"></sequenceFlow>
+      <sequenceFlow id="flow43" sourceRef="protocollo-revoca" targetRef="endevent-revoca"></sequenceFlow>
+      <sequenceFlow id="flow129" sourceRef="startevent7" targetRef="firma-revoca"></sequenceFlow>
+      <sequenceFlow id="flow130" sourceRef="modifica-revoca" targetRef="firma-revoca"></sequenceFlow>
+    </subProcess>
+    <exclusiveGateway id="exclusivegateway13" name="Exclusive Gateway" default="flow61"></exclusiveGateway>
+    <sequenceFlow id="flow60" sourceRef="DECISIONE-CONTRATTARE" targetRef="exclusivegateway13"></sequenceFlow>
+    <sequenceFlow id="flow61" sourceRef="exclusivegateway13" targetRef="espletamento-procedura">
+      <extensionElements>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
+          <activiti:field name="nomeFileDaPubblicare">
+            <activiti:string><![CDATA[decisioneContrattare]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="fileDaPubblicareFlag">
+            <activiti:string><![CDATA[true]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaTuttiAllegatiPubblicabili}"></activiti:executionListener>
+      </extensionElements>
+    </sequenceFlow>
+    <userTask id="consuntivo" name="Consuntivo" activiti:assignee="${rup}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[consuntivo-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[consuntivo-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <endEvent id="end-stipulato" name="STIPULATO">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[end-stipulato-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[end-stipulato-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="flow71" sourceRef="consuntivo" targetRef="end-stipulato">
+      <extensionElements>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaTuttiAllegatiPubblicabili}"></activiti:executionListener>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumentoSePresente}">
+          <activiti:field name="nomeFileDaPubblicare">
+            <activiti:string><![CDATA[avvisoPostInformazione]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumentoSePresente}">
+          <activiti:field name="nomeFileDaPubblicare">
+            <activiti:string><![CDATA[modificheVariantiArt106]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </sequenceFlow>
+    <subProcess id="stipulamepa" name="STIPULA MEPA">
+      <startEvent id="startevent9" name="Start"></startEvent>
+      <userTask id="carica-stipula-mepa" name="Carica Stipula Mepa" activiti:assignee="${rup}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[carica-stipula-mepa-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[carica-stipula-mepa-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <userTask id="protocollo-invio-stipula-mepa" name="Protocollo e Invio Stipula Mepa" activiti:candidateGroups="${gruppoRA}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[protocollo-invio-stipula-mepa-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[protocollo-invio-stipula-mepa-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <sequenceFlow id="flow73" sourceRef="startevent9" targetRef="stipula-mepa">
+        <extensionElements>
+          <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
+            <activiti:field name="nomeFileDaPubblicare">
+              <activiti:string><![CDATA[bandoAvvisi]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="fileDaPubblicareFlag">
+              <activiti:string><![CDATA[true]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
+            <activiti:field name="nomeFileDaPubblicare">
+              <activiti:string><![CDATA[letteraInvito]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="fileDaPubblicareFlag">
+              <activiti:string><![CDATA[true]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </sequenceFlow>
+      <sequenceFlow id="flow75" sourceRef="protocollo-invio-stipula-mepa" targetRef="endevent-stipula-mepa-protocollo"></sequenceFlow>
+      <userTask id="revoca-stipula-mepa" name="Revoca Stipula Mepa" activiti:candidateGroups="${gruppoRA}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[revoca-stipula-mepa-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[revoca-stipula-mepa-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <exclusiveGateway id="exclusivegateway19" name="Exclusive Gateway" default="flow94"></exclusiveGateway>
+      <sequenceFlow id="flow91" sourceRef="revoca-stipula-mepa" targetRef="exclusivegateway19"></sequenceFlow>
+      <sequenceFlow id="flow92" sourceRef="exclusivegateway19" targetRef="stipula-mepa">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Annulla'}]]></conditionExpression>
+      </sequenceFlow>
+      <endEvent id="endevent-stipula-mepa-revoca" name="endevent-stipula-mepa-revoca">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[endevent-stipula-mepa-revoca-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[endevent-stipula-mepa-revoca-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </endEvent>
+      <sequenceFlow id="flow94" sourceRef="exclusivegateway19" targetRef="endevent-stipula-mepa-revoca"></sequenceFlow>
+      <endEvent id="endevent-stipula-mepa-protocollo" name="endevent-stipula-mepa-protocollo">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[endevent-stipula-mepa-protocollo-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[endevent-stipula-mepa-protocollo-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </endEvent>
+      <userTask id="stipula-mepa" name="Stipula Mepa" activiti:candidateGroups="${gruppoFirmaAcquisti}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[stipula-mepa-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[stipula-mepa-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <exclusiveGateway id="exclusivegateway33" name="Exclusive Gateway" default="flow172"></exclusiveGateway>
+      <sequenceFlow id="flow171" sourceRef="carica-stipula-mepa" targetRef="exclusivegateway33"></sequenceFlow>
+      <sequenceFlow id="flow172" sourceRef="exclusivegateway33" targetRef="protocollo-invio-stipula-mepa"></sequenceFlow>
+      <sequenceFlow id="flow173" sourceRef="exclusivegateway33" targetRef="revoca-stipula-mepa">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Revoca'}]]></conditionExpression>
+      </sequenceFlow>
+      <exclusiveGateway id="exclusivegateway34" name="Exclusive Gateway" default="flow175"></exclusiveGateway>
+      <sequenceFlow id="flow174" sourceRef="stipula-mepa" targetRef="exclusivegateway34"></sequenceFlow>
+      <sequenceFlow id="flow175" sourceRef="exclusivegateway34" targetRef="carica-stipula-mepa"></sequenceFlow>
+      <sequenceFlow id="flow176" sourceRef="exclusivegateway34" targetRef="revoca-stipula-mepa">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Revoca'}]]></conditionExpression>
+      </sequenceFlow>
+    </subProcess>
+    <exclusiveGateway id="exclusivegateway15" name="Exclusive Gateway" default="flow81"></exclusiveGateway>
+    <sequenceFlow id="flow78" sourceRef="espletamento-procedura" targetRef="exclusivegateway15">
+      <extensionElements>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaTuttiAllegatiPubblicabili}"></activiti:executionListener>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumentoSePresente}">
+          <activiti:field name="nomeFileDaPubblicare">
+            <activiti:string><![CDATA[bandoAvvisi]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumentoSePresente}">
+          <activiti:field name="nomeFileDaPubblicare">
+            <activiti:string><![CDATA[letteraInvito]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumentoSePresente}">
+          <activiti:field name="nomeFileDaPubblicare">
+            <activiti:string><![CDATA[provvedimentoAmmessiEsclusi]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumentoSePresente}">
+          <activiti:field name="nomeFileDaPubblicare">
+            <activiti:string><![CDATA[provvedimentoNominaCommissione]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumentoSePresente}">
+          <activiti:field name="nomeFileDaPubblicare">
+            <activiti:string><![CDATA[elencoVerbali]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="flow79" sourceRef="exclusivegateway15" targetRef="PROVVEDIMENTO-AGGIUDICAZIONE">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${strumentoAcquisizioneId == '23'  && sceltaUtente != 'Revoca'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow81" sourceRef="exclusivegateway15" targetRef="stipulamepa"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway16" name="Exclusive Gateway" default="flow84"></exclusiveGateway>
+    <sequenceFlow id="flow84" sourceRef="exclusivegateway16" targetRef="consuntivo">
+      <extensionElements>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumentoSePresente}">
+          <activiti:field name="nomeFileDaPubblicare">
+            <activiti:string><![CDATA[stipula]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="flow85" sourceRef="exclusivegateway16" targetRef="revoca">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaConProvvedimento'}]]></conditionExpression>
+    </sequenceFlow>
+    <exclusiveGateway id="exclusivegateway20" name="Exclusive Gateway" default="flow122"></exclusiveGateway>
+    <sequenceFlow id="flow97" sourceRef="PROVVEDIMENTO-AGGIUDICAZIONE" targetRef="exclusivegateway20"></sequenceFlow>
+    <sequenceFlow id="flow99" sourceRef="exclusivegateway20" targetRef="revoca">
+      <extensionElements>
+        <activiti:executionListener event="take" delegateExpression="${depubblicaTuttiDocumenti}"></activiti:executionListener>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaConProvvedimento'}]]></conditionExpression>
+    </sequenceFlow>
+    <exclusiveGateway id="exclusivegateway22" name="Exclusive Gateway" default="flow102"></exclusiveGateway>
+    <sequenceFlow id="flow101" sourceRef="exclusivegateway22" targetRef="revoca">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaConProvvedimento'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow102" sourceRef="exclusivegateway22" targetRef="consuntivo">
+      <extensionElements>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaTuttiAllegatiPubblicabili}"></activiti:executionListener>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="flow103" sourceRef="stipulamepa" targetRef="exclusivegateway16">
+      <extensionElements>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaTuttiAllegatiPubblicabili}"></activiti:executionListener>
+      </extensionElements>
+    </sequenceFlow>
+    <subProcess id="contratto-fuori-mepa" name="CONTRATTO FUORI MEPA">
+      <startEvent id="startevent10" name="Start"></startEvent>
+      <userTask id="predisposizione-contratto" name="Predisposizione Contratto" activiti:candidateGroups="${gruppoRA}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[predisposizione-contratto-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[predisposizione-contratto-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <userTask id="firma-contratto" name="Firma Contratto" activiti:candidateGroups="${gruppoFirmaAcquisti}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[firma-contratto-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[firma-contratto-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:taskListener event="complete" expression="${task.setVariable(&quot;otp&quot;, &quot;******&quot;)}"></activiti:taskListener>
+          <activiti:taskListener event="complete" expression="${task.setVariable(&quot;password&quot;, &quot;******&quot;)}"></activiti:taskListener>
+        </extensionElements>
+      </userTask>
+      <exclusiveGateway id="exclusivegateway23" name="Exclusive Gateway" default="flow179"></exclusiveGateway>
+      <sequenceFlow id="flow105" sourceRef="startevent10" targetRef="predisposizione-contratto">
+        <extensionElements>
+          <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
+            <activiti:field name="nomeFileDaPubblicare">
+              <activiti:string><![CDATA[bandoAvvisi]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="fileDaPubblicareFlag">
+              <activiti:string><![CDATA[true]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
+            <activiti:field name="nomeFileDaPubblicare">
+              <activiti:string><![CDATA[letteraInvito]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="fileDaPubblicareFlag">
+              <activiti:string><![CDATA[true]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </sequenceFlow>
+      <userTask id="revoca-contratto" name="Revoca Contratto" activiti:candidateGroups="${gruppoRA}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[revoca-contratto-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[revoca-contratto-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <userTask id="modifica-contratto" name="Modifica Contratto" activiti:candidateGroups="${gruppoRA}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[modifica-contratto-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[modifica-contratto-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <sequenceFlow id="flow108" sourceRef="exclusivegateway23" targetRef="modifica-contratto">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Modifica'}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="flow110" sourceRef="exclusivegateway23" targetRef="revoca-contratto">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Revoca'}]]></conditionExpression>
+      </sequenceFlow>
+      <userTask id="protocollo-contratto" name="Protocollo Contratto" activiti:candidateGroups="${gruppoRA}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[protocollo-contratto-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[protocollo-contratto-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <endEvent id="endevent-contratto-fuori-mepa-revoca" name="endevent-contratto-fuori-mepa-revoca">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[endevent-contratto-fuori-mepa-revoca-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[endevent-contratto-fuori-mepa-revoca-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </endEvent>
+      <exclusiveGateway id="exclusivegateway25" name="Exclusive Gateway" default="flow117"></exclusiveGateway>
+      <sequenceFlow id="flow116" sourceRef="revoca-contratto" targetRef="exclusivegateway25"></sequenceFlow>
+      <sequenceFlow id="flow117" sourceRef="exclusivegateway25" targetRef="endevent-contratto-fuori-mepa-revoca"></sequenceFlow>
+      <sequenceFlow id="flow118" sourceRef="exclusivegateway25" targetRef="firma-contratto">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Annulla'}]]></conditionExpression>
+      </sequenceFlow>
+      <endEvent id="endevent-contratto-fuori-mepa-protocollo" name="endevent-contratto-fuori-mepa-protocollo">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[endevent-contratto-fuori-mepa-protocollo-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[endevent-contratto-fuori-mepa-protocollo-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </endEvent>
+      <sequenceFlow id="flow123" sourceRef="protocollo-contratto" targetRef="endevent-contratto-fuori-mepa-protocollo"></sequenceFlow>
+      <sequenceFlow id="flow177" sourceRef="predisposizione-contratto" targetRef="firma-contratto"></sequenceFlow>
+      <sequenceFlow id="flow178" sourceRef="modifica-contratto" targetRef="predisposizione-contratto"></sequenceFlow>
+      <sequenceFlow id="flow179" sourceRef="exclusivegateway23" targetRef="protocollo-contratto"></sequenceFlow>
+      <sequenceFlow id="flow180" sourceRef="firma-contratto" targetRef="exclusivegateway23"></sequenceFlow>
+    </subProcess>
+    <sequenceFlow id="flow119" sourceRef="exclusivegateway15" targetRef="contratto-fuori-mepa">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${strumentoAcquisizioneId == '13' && sceltaUtente != 'Revoca'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow120" sourceRef="contratto-fuori-mepa" targetRef="exclusivegateway22">
+      <extensionElements>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumentoSePresente}">
+          <activiti:field name="nomeFileDaPubblicare">
+            <activiti:string><![CDATA[contratto]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="flow122" sourceRef="exclusivegateway20" targetRef="contratto-fuori-mepa">
+      <extensionElements>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
+          <activiti:field name="nomeFileDaPubblicare">
+            <activiti:string><![CDATA[provvedimentoAggiudicazione]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="fileDaPubblicareFlag">
+            <activiti:string><![CDATA[true]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="take" delegateExpression="${pubblicaTuttiAllegatiPubblicabili}"></activiti:executionListener>
+      </extensionElements>
+    </sequenceFlow>
+    <endEvent id="end-revocato" name="REVOCATO">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[end-revocato-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[end-revocato-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="flow125" sourceRef="revoca" targetRef="end-revocato"></sequenceFlow>
+    <sequenceFlow id="flow128" sourceRef="exclusivegateway13" targetRef="end-revocato">
+      <extensionElements>
+        <activiti:executionListener event="take" delegateExpression="${depubblicaTuttiDocumenti}"></activiti:executionListener>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaSemplice'}]]></conditionExpression>
+    </sequenceFlow>
+    <userTask id="conferma-revoca" name="Conferma Revoca" activiti:candidateGroups="${gruppoRA}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[conferma-revoca-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[conferma-revoca-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow160" sourceRef="exclusivegateway15" targetRef="conferma-revoca">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Revoca'}]]></conditionExpression>
+    </sequenceFlow>
+    <exclusiveGateway id="exclusivegateway30" name="Exclusive Gateway" default="flow162"></exclusiveGateway>
+    <sequenceFlow id="flow161" sourceRef="conferma-revoca" targetRef="exclusivegateway30"></sequenceFlow>
+    <sequenceFlow id="flow162" sourceRef="exclusivegateway30" targetRef="revoca"></sequenceFlow>
+    <sequenceFlow id="flow163" sourceRef="exclusivegateway30" targetRef="espletamento-procedura">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Annulla'}]]></conditionExpression>
+    </sequenceFlow>
+    <dataObject id="valore" name="valore" itemSubjectRef="xsd:int">
+      <extensionElements>
+        <activiti:value>1</activiti:value>
+      </extensionElements>
+    </dataObject>
+    <dataObject id="sceltaUtente" name="sceltaUtente" itemSubjectRef="xsd:string"></dataObject>
+    <dataObject id="sceltaPercorso" name="sceltaPercorso" itemSubjectRef="xsd:string"></dataObject>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_acquisti">
+    <bpmndi:BPMNPlane bpmnElement="acquisti" id="BPMNPlane_acquisti">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="38.0" y="111.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="DECISIONE-CONTRATTARE" id="BPMNShape_DECISIONE-CONTRATTARE">
+        <omgdc:Bounds height="224.0" width="795.0" x="107.0" y="17.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent-decisione-contrattare-protocollo" id="BPMNShape_endevent-decisione-contrattare-protocollo">
+        <omgdc:Bounds height="35.0" width="35.0" x="853.0" y="183.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="verifica-decisione" id="BPMNShape_verifica-decisione">
+        <omgdc:Bounds height="74.0" width="105.0" x="240.0" y="76.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="firma-decisione" id="BPMNShape_firma-decisione">
+        <omgdc:Bounds height="73.0" width="105.0" x="440.0" y="77.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="modifica-decisione" id="BPMNShape_modifica-decisione">
+        <omgdc:Bounds height="68.0" width="105.0" x="240.0" y="169.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="370.0" y="93.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway2" id="BPMNShape_exclusivegateway2">
+        <omgdc:Bounds height="40.0" width="40.0" x="570.0" y="92.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="protocollo-decisione" id="BPMNShape_protocollo-decisione">
+        <omgdc:Bounds height="72.0" width="105.0" x="640.0" y="165.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="revoca-decisione" id="BPMNShape_revoca-decisione">
+        <omgdc:Bounds height="73.0" width="105.0" x="640.0" y="77.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway5" id="BPMNShape_exclusivegateway5">
+        <omgdc:Bounds height="40.0" width="40.0" x="770.0" y="93.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent-decisione-contrattare-revoca" id="BPMNShape_endevent-decisione-contrattare-revoca">
+        <omgdc:Bounds height="35.0" width="35.0" x="853.0" y="96.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="startevent11" id="BPMNShape_startevent11">
+        <omgdc:Bounds height="35.0" width="35.0" x="130.0" y="96.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway28" id="BPMNShape_exclusivegateway28">
+        <omgdc:Bounds height="40.0" width="40.0" x="180.0" y="93.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="espletamento-procedura" id="BPMNShape_espletamento-procedura">
+        <omgdc:Bounds height="69.0" width="105.0" x="3.0" y="237.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="PROVVEDIMENTO-AGGIUDICAZIONE" id="BPMNShape_PROVVEDIMENTO-AGGIUDICAZIONE">
+        <omgdc:Bounds height="291.0" width="851.0" x="107.0" y="300.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="predisposizione-provvedimento-aggiudicazione" id="BPMNShape_predisposizione-provvedimento-aggiudicazione">
+        <omgdc:Bounds height="81.0" width="105.0" x="170.0" y="350.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="startevent6" id="BPMNShape_startevent6">
+        <omgdc:Bounds height="35.0" width="35.0" x="123.0" y="373.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway3" id="BPMNShape_exclusivegateway3">
+        <omgdc:Bounds height="40.0" width="40.0" x="460.0" y="370.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="modifica-provvedimento-aggiudicazione" id="BPMNShape_modifica-provvedimento-aggiudicazione">
+        <omgdc:Bounds height="88.0" width="105.0" x="340.0" y="447.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="protocollo-provvedimento-aggiudicazione" id="BPMNShape_protocollo-provvedimento-aggiudicazione">
+        <omgdc:Bounds height="89.0" width="105.0" x="608.0" y="446.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent-provvedimento-aggiudicazione-protocollo" id="BPMNShape_endevent-provvedimento-aggiudicazione-protocollo">
+        <omgdc:Bounds height="35.0" width="35.0" x="844.0" y="473.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="revoca-proposta-aggiudicazione" id="BPMNShape_revoca-proposta-aggiudicazione">
+        <omgdc:Bounds height="81.0" width="105.0" x="740.0" y="350.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway6" id="BPMNShape_exclusivegateway6">
+        <omgdc:Bounds height="40.0" width="40.0" x="890.0" y="370.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway11" id="BPMNShape_exclusivegateway11">
+        <omgdc:Bounds height="40.0" width="40.0" x="640.0" y="370.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="verifica-provvedimento-aggiudicazione" id="BPMNShape_verifica-provvedimento-aggiudicazione">
+        <omgdc:Bounds height="81.0" width="105.0" x="340.0" y="350.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent-provvedimento-aggiudicazione" id="BPMNShape_endevent-provvedimento-aggiudicazione">
+        <omgdc:Bounds height="35.0" width="35.0" x="893.0" y="431.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="firma-provvedimento-aggiudicazione" id="BPMNShape_firma-provvedimento-aggiudicazione">
+        <omgdc:Bounds height="81.0" width="105.0" x="520.0" y="350.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway26" id="BPMNShape_exclusivegateway26">
+        <omgdc:Bounds height="40.0" width="40.0" x="723.0" y="470.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="verifica-requisiti" id="BPMNShape_verifica-requisiti">
+        <omgdc:Bounds height="67.0" width="105.0" x="763.0" y="512.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway27" id="BPMNShape_exclusivegateway27">
+        <omgdc:Bounds height="40.0" width="40.0" x="890.0" y="525.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway29" id="BPMNShape_exclusivegateway29">
+        <omgdc:Bounds height="40.0" width="40.0" x="290.0" y="370.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="revoca" id="BPMNShape_revoca">
+        <omgdc:Bounds height="195.0" width="508.0" x="221.0" y="1040.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="startevent7" id="BPMNShape_startevent7">
+        <omgdc:Bounds height="35.0" width="35.0" x="243.0" y="1082.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent-revoca" id="BPMNShape_endevent-revoca">
+        <omgdc:Bounds height="35.0" width="35.0" x="662.0" y="1085.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="firma-revoca" id="BPMNShape_firma-revoca">
+        <omgdc:Bounds height="75.0" width="105.0" x="311.0" y="1062.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="modifica-revoca" id="BPMNShape_modifica-revoca">
+        <omgdc:Bounds height="74.0" width="105.0" x="311.0" y="1152.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway9" id="BPMNShape_exclusivegateway9">
+        <omgdc:Bounds height="40.0" width="40.0" x="442.0" y="1082.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="protocollo-revoca" id="BPMNShape_protocollo-revoca">
+        <omgdc:Bounds height="75.0" width="105.0" x="512.0" y="1065.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway13" id="BPMNShape_exclusivegateway13">
+        <omgdc:Bounds height="40.0" width="40.0" x="946.0" y="107.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="consuntivo" id="BPMNShape_consuntivo">
+        <omgdc:Bounds height="71.0" width="105.0" x="893.0" y="749.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="end-stipulato" id="BPMNShape_end-stipulato">
+        <omgdc:Bounds height="35.0" width="35.0" x="928.0" y="850.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="stipulamepa" id="BPMNShape_stipulamepa">
+        <omgdc:Bounds height="207.0" width="626.0" x="107.0" y="826.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="startevent9" id="BPMNShape_startevent9">
+        <omgdc:Bounds height="35.0" width="35.0" x="120.0" y="899.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="carica-stipula-mepa" id="BPMNShape_carica-stipula-mepa">
+        <omgdc:Bounds height="56.0" width="105.0" x="288.0" y="963.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="protocollo-invio-stipula-mepa" id="BPMNShape_protocollo-invio-stipula-mepa">
+        <omgdc:Bounds height="61.0" width="119.0" x="493.0" y="960.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="revoca-stipula-mepa" id="BPMNShape_revoca-stipula-mepa">
+        <omgdc:Bounds height="68.0" width="105.0" x="500.0" y="883.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway19" id="BPMNShape_exclusivegateway19">
+        <omgdc:Bounds height="40.0" width="40.0" x="628.0" y="896.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent-stipula-mepa-revoca" id="BPMNShape_endevent-stipula-mepa-revoca">
+        <omgdc:Bounds height="35.0" width="35.0" x="690.0" y="899.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent-stipula-mepa-protocollo" id="BPMNShape_endevent-stipula-mepa-protocollo">
+        <omgdc:Bounds height="35.0" width="35.0" x="690.0" y="973.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="stipula-mepa" id="BPMNShape_stipula-mepa">
+        <omgdc:Bounds height="60.0" width="105.0" x="170.0" y="887.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway33" id="BPMNShape_exclusivegateway33">
+        <omgdc:Bounds height="40.0" width="40.0" x="420.0" y="970.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway34" id="BPMNShape_exclusivegateway34">
+        <omgdc:Bounds height="40.0" width="40.0" x="320.0" y="896.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway15" id="BPMNShape_exclusivegateway15">
+        <omgdc:Bounds height="40.0" width="40.0" x="35.0" y="686.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway16" id="BPMNShape_exclusivegateway16">
+        <omgdc:Bounds height="40.0" width="40.0" x="807.0" y="909.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway20" id="BPMNShape_exclusivegateway20">
+        <omgdc:Bounds height="40.0" width="40.0" x="990.0" y="433.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway22" id="BPMNShape_exclusivegateway22">
+        <omgdc:Bounds height="40.0" width="40.0" x="923.0" y="686.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="contratto-fuori-mepa" id="BPMNShape_contratto-fuori-mepa">
+        <omgdc:Bounds height="226.0" width="626.0" x="107.0" y="594.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="startevent10" id="BPMNShape_startevent10">
+        <omgdc:Bounds height="35.0" width="35.0" x="120.0" y="668.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="predisposizione-contratto" id="BPMNShape_predisposizione-contratto">
+        <omgdc:Bounds height="71.0" width="105.0" x="180.0" y="650.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="firma-contratto" id="BPMNShape_firma-contratto">
+        <omgdc:Bounds height="71.0" width="105.0" x="310.0" y="650.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway23" id="BPMNShape_exclusivegateway23">
+        <omgdc:Bounds height="40.0" width="40.0" x="440.0" y="665.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="revoca-contratto" id="BPMNShape_revoca-contratto">
+        <omgdc:Bounds height="71.0" width="105.0" x="500.0" y="650.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="modifica-contratto" id="BPMNShape_modifica-contratto">
+        <omgdc:Bounds height="71.0" width="105.0" x="310.0" y="740.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="protocollo-contratto" id="BPMNShape_protocollo-contratto">
+        <omgdc:Bounds height="71.0" width="105.0" x="500.0" y="740.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent-contratto-fuori-mepa-revoca" id="BPMNShape_endevent-contratto-fuori-mepa-revoca">
+        <omgdc:Bounds height="35.0" width="35.0" x="690.0" y="668.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway25" id="BPMNShape_exclusivegateway25">
+        <omgdc:Bounds height="40.0" width="40.0" x="630.0" y="665.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent-contratto-fuori-mepa-protocollo" id="BPMNShape_endevent-contratto-fuori-mepa-protocollo">
+        <omgdc:Bounds height="35.0" width="35.0" x="690.0" y="758.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="end-revocato" id="BPMNShape_end-revocato">
+        <omgdc:Bounds height="35.0" width="35.0" x="1040.0" y="1180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="conferma-revoca" id="BPMNShape_conferma-revoca">
+        <omgdc:Bounds height="77.0" width="105.0" x="38.0" y="1113.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway30" id="BPMNShape_exclusivegateway30">
+        <omgdc:Bounds height="40.0" width="40.0" x="165.0" y="1133.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="345.0" y="113.0"></omgdi:waypoint>
+        <omgdi:waypoint x="370.0" y="113.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="240.0" y="203.0"></omgdi:waypoint>
+        <omgdi:waypoint x="200.0" y="202.0"></omgdi:waypoint>
+        <omgdi:waypoint x="200.0" y="133.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="410.0" y="113.0"></omgdi:waypoint>
+        <omgdi:waypoint x="440.0" y="113.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
+        <omgdi:waypoint x="390.0" y="133.0"></omgdi:waypoint>
+        <omgdi:waypoint x="390.0" y="202.0"></omgdi:waypoint>
+        <omgdi:waypoint x="345.0" y="203.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow12" id="BPMNEdge_flow12">
+        <omgdi:waypoint x="545.0" y="113.0"></omgdi:waypoint>
+        <omgdi:waypoint x="570.0" y="112.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow13" id="BPMNEdge_flow13">
+        <omgdi:waypoint x="590.0" y="132.0"></omgdi:waypoint>
+        <omgdi:waypoint x="590.0" y="203.0"></omgdi:waypoint>
+        <omgdi:waypoint x="345.0" y="203.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow14" id="BPMNEdge_flow14">
+        <omgdi:waypoint x="590.0" y="132.0"></omgdi:waypoint>
+        <omgdi:waypoint x="692.0" y="165.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow15" id="BPMNEdge_flow15">
+        <omgdi:waypoint x="745.0" y="201.0"></omgdi:waypoint>
+        <omgdi:waypoint x="853.0" y="200.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow28" id="BPMNEdge_flow28">
+        <omgdi:waypoint x="610.0" y="112.0"></omgdi:waypoint>
+        <omgdi:waypoint x="640.0" y="113.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow29" id="BPMNEdge_flow29">
+        <omgdi:waypoint x="745.0" y="113.0"></omgdi:waypoint>
+        <omgdi:waypoint x="770.0" y="113.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow30" id="BPMNEdge_flow30">
+        <omgdi:waypoint x="810.0" y="113.0"></omgdi:waypoint>
+        <omgdi:waypoint x="853.0" y="113.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow31" id="BPMNEdge_flow31">
+        <omgdi:waypoint x="790.0" y="93.0"></omgdi:waypoint>
+        <omgdi:waypoint x="789.0" y="52.0"></omgdi:waypoint>
+        <omgdi:waypoint x="493.0" y="52.0"></omgdi:waypoint>
+        <omgdi:waypoint x="492.0" y="77.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow147" id="BPMNEdge_flow147">
+        <omgdi:waypoint x="165.0" y="113.0"></omgdi:waypoint>
+        <omgdi:waypoint x="180.0" y="113.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow148" id="BPMNEdge_flow148">
+        <omgdi:waypoint x="220.0" y="113.0"></omgdi:waypoint>
+        <omgdi:waypoint x="240.0" y="113.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow149" id="BPMNEdge_flow149">
+        <omgdi:waypoint x="200.0" y="93.0"></omgdi:waypoint>
+        <omgdi:waypoint x="200.0" y="55.0"></omgdi:waypoint>
+        <omgdi:waypoint x="492.0" y="55.0"></omgdi:waypoint>
+        <omgdi:waypoint x="492.0" y="77.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="73.0" y="128.0"></omgdi:waypoint>
+        <omgdi:waypoint x="107.0" y="129.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow17" id="BPMNEdge_flow17">
+        <omgdi:waypoint x="158.0" y="390.0"></omgdi:waypoint>
+        <omgdi:waypoint x="170.0" y="390.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow20" id="BPMNEdge_flow20">
+        <omgdi:waypoint x="500.0" y="390.0"></omgdi:waypoint>
+        <omgdi:waypoint x="520.0" y="390.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow33" id="BPMNEdge_flow33">
+        <omgdi:waypoint x="845.0" y="390.0"></omgdi:waypoint>
+        <omgdi:waypoint x="890.0" y="390.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow34" id="BPMNEdge_flow34">
+        <omgdi:waypoint x="910.0" y="370.0"></omgdi:waypoint>
+        <omgdi:waypoint x="909.0" y="322.0"></omgdi:waypoint>
+        <omgdi:waypoint x="571.0" y="322.0"></omgdi:waypoint>
+        <omgdi:waypoint x="572.0" y="350.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow48" id="BPMNEdge_flow48">
+        <omgdi:waypoint x="910.0" y="410.0"></omgdi:waypoint>
+        <omgdi:waypoint x="910.0" y="431.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow52" id="BPMNEdge_flow52">
+        <omgdi:waypoint x="680.0" y="390.0"></omgdi:waypoint>
+        <omgdi:waypoint x="740.0" y="390.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow54" id="BPMNEdge_flow54">
+        <omgdi:waypoint x="660.0" y="410.0"></omgdi:waypoint>
+        <omgdi:waypoint x="566.0" y="490.0"></omgdi:waypoint>
+        <omgdi:waypoint x="445.0" y="491.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow56" id="BPMNEdge_flow56">
+        <omgdi:waypoint x="445.0" y="390.0"></omgdi:waypoint>
+        <omgdi:waypoint x="460.0" y="390.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow57" id="BPMNEdge_flow57">
+        <omgdi:waypoint x="340.0" y="491.0"></omgdi:waypoint>
+        <omgdi:waypoint x="309.0" y="490.0"></omgdi:waypoint>
+        <omgdi:waypoint x="310.0" y="410.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow51" id="BPMNEdge_flow51">
+        <omgdi:waypoint x="625.0" y="390.0"></omgdi:waypoint>
+        <omgdi:waypoint x="640.0" y="390.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow137" id="BPMNEdge_flow137">
+        <omgdi:waypoint x="713.0" y="490.0"></omgdi:waypoint>
+        <omgdi:waypoint x="723.0" y="490.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow138" id="BPMNEdge_flow138">
+        <omgdi:waypoint x="763.0" y="490.0"></omgdi:waypoint>
+        <omgdi:waypoint x="844.0" y="490.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow53" id="BPMNEdge_flow53">
+        <omgdi:waypoint x="660.0" y="410.0"></omgdi:waypoint>
+        <omgdi:waypoint x="660.0" y="446.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow140" id="BPMNEdge_flow140">
+        <omgdi:waypoint x="743.0" y="510.0"></omgdi:waypoint>
+        <omgdi:waypoint x="742.0" y="544.0"></omgdi:waypoint>
+        <omgdi:waypoint x="763.0" y="545.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow141" id="BPMNEdge_flow141">
+        <omgdi:waypoint x="868.0" y="545.0"></omgdi:waypoint>
+        <omgdi:waypoint x="890.0" y="545.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow143" id="BPMNEdge_flow143">
+        <omgdi:waypoint x="910.0" y="565.0"></omgdi:waypoint>
+        <omgdi:waypoint x="910.0" y="581.0"></omgdi:waypoint>
+        <omgdi:waypoint x="222.0" y="581.0"></omgdi:waypoint>
+        <omgdi:waypoint x="222.0" y="431.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow145" id="BPMNEdge_flow145">
+        <omgdi:waypoint x="910.0" y="525.0"></omgdi:waypoint>
+        <omgdi:waypoint x="910.0" y="466.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow150" id="BPMNEdge_flow150">
+        <omgdi:waypoint x="275.0" y="390.0"></omgdi:waypoint>
+        <omgdi:waypoint x="290.0" y="390.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow151" id="BPMNEdge_flow151">
+        <omgdi:waypoint x="330.0" y="390.0"></omgdi:waypoint>
+        <omgdi:waypoint x="340.0" y="390.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow152" id="BPMNEdge_flow152">
+        <omgdi:waypoint x="310.0" y="370.0"></omgdi:waypoint>
+        <omgdi:waypoint x="309.0" y="326.0"></omgdi:waypoint>
+        <omgdi:waypoint x="571.0" y="326.0"></omgdi:waypoint>
+        <omgdi:waypoint x="572.0" y="350.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow21" id="BPMNEdge_flow21">
+        <omgdi:waypoint x="480.0" y="410.0"></omgdi:waypoint>
+        <omgdi:waypoint x="480.0" y="491.0"></omgdi:waypoint>
+        <omgdi:waypoint x="445.0" y="491.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow153" id="BPMNEdge_flow153">
+        <omgdi:waypoint x="910.0" y="525.0"></omgdi:waypoint>
+        <omgdi:waypoint x="861.0" y="508.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow39" id="BPMNEdge_flow39">
+        <omgdi:waypoint x="416.0" y="1099.0"></omgdi:waypoint>
+        <omgdi:waypoint x="442.0" y="1102.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow40" id="BPMNEdge_flow40">
+        <omgdi:waypoint x="462.0" y="1122.0"></omgdi:waypoint>
+        <omgdi:waypoint x="461.0" y="1188.0"></omgdi:waypoint>
+        <omgdi:waypoint x="416.0" y="1189.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow42" id="BPMNEdge_flow42">
+        <omgdi:waypoint x="482.0" y="1102.0"></omgdi:waypoint>
+        <omgdi:waypoint x="512.0" y="1102.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow43" id="BPMNEdge_flow43">
+        <omgdi:waypoint x="617.0" y="1102.0"></omgdi:waypoint>
+        <omgdi:waypoint x="662.0" y="1102.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow129" id="BPMNEdge_flow129">
+        <omgdi:waypoint x="278.0" y="1099.0"></omgdi:waypoint>
+        <omgdi:waypoint x="311.0" y="1099.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow130" id="BPMNEdge_flow130">
+        <omgdi:waypoint x="363.0" y="1152.0"></omgdi:waypoint>
+        <omgdi:waypoint x="363.0" y="1137.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow60" id="BPMNEdge_flow60">
+        <omgdi:waypoint x="902.0" y="129.0"></omgdi:waypoint>
+        <omgdi:waypoint x="946.0" y="127.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow61" id="BPMNEdge_flow61">
+        <omgdi:waypoint x="966.0" y="147.0"></omgdi:waypoint>
+        <omgdi:waypoint x="965.0" y="271.0"></omgdi:waypoint>
+        <omgdi:waypoint x="108.0" y="271.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow71" id="BPMNEdge_flow71">
+        <omgdi:waypoint x="945.0" y="820.0"></omgdi:waypoint>
+        <omgdi:waypoint x="945.0" y="850.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow73" id="BPMNEdge_flow73">
+        <omgdi:waypoint x="155.0" y="916.0"></omgdi:waypoint>
+        <omgdi:waypoint x="170.0" y="917.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow75" id="BPMNEdge_flow75">
+        <omgdi:waypoint x="612.0" y="990.0"></omgdi:waypoint>
+        <omgdi:waypoint x="690.0" y="990.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow91" id="BPMNEdge_flow91">
+        <omgdi:waypoint x="605.0" y="917.0"></omgdi:waypoint>
+        <omgdi:waypoint x="628.0" y="916.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow92" id="BPMNEdge_flow92">
+        <omgdi:waypoint x="648.0" y="896.0"></omgdi:waypoint>
+        <omgdi:waypoint x="647.0" y="866.0"></omgdi:waypoint>
+        <omgdi:waypoint x="222.0" y="866.0"></omgdi:waypoint>
+        <omgdi:waypoint x="222.0" y="887.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow94" id="BPMNEdge_flow94">
+        <omgdi:waypoint x="668.0" y="916.0"></omgdi:waypoint>
+        <omgdi:waypoint x="690.0" y="916.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow171" id="BPMNEdge_flow171">
+        <omgdi:waypoint x="393.0" y="991.0"></omgdi:waypoint>
+        <omgdi:waypoint x="420.0" y="990.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow172" id="BPMNEdge_flow172">
+        <omgdi:waypoint x="460.0" y="990.0"></omgdi:waypoint>
+        <omgdi:waypoint x="493.0" y="990.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow173" id="BPMNEdge_flow173">
+        <omgdi:waypoint x="440.0" y="970.0"></omgdi:waypoint>
+        <omgdi:waypoint x="440.0" y="916.0"></omgdi:waypoint>
+        <omgdi:waypoint x="500.0" y="917.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow174" id="BPMNEdge_flow174">
+        <omgdi:waypoint x="275.0" y="917.0"></omgdi:waypoint>
+        <omgdi:waypoint x="320.0" y="916.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow175" id="BPMNEdge_flow175">
+        <omgdi:waypoint x="340.0" y="936.0"></omgdi:waypoint>
+        <omgdi:waypoint x="340.0" y="963.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow176" id="BPMNEdge_flow176">
+        <omgdi:waypoint x="360.0" y="916.0"></omgdi:waypoint>
+        <omgdi:waypoint x="500.0" y="917.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow78" id="BPMNEdge_flow78">
+        <omgdi:waypoint x="55.0" y="306.0"></omgdi:waypoint>
+        <omgdi:waypoint x="55.0" y="686.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow79" id="BPMNEdge_flow79">
+        <omgdi:waypoint x="55.0" y="686.0"></omgdi:waypoint>
+        <omgdi:waypoint x="87.0" y="483.0"></omgdi:waypoint>
+        <omgdi:waypoint x="107.0" y="445.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow81" id="BPMNEdge_flow81">
+        <omgdi:waypoint x="55.0" y="726.0"></omgdi:waypoint>
+        <omgdi:waypoint x="55.0" y="926.0"></omgdi:waypoint>
+        <omgdi:waypoint x="107.0" y="929.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow84" id="BPMNEdge_flow84">
+        <omgdi:waypoint x="827.0" y="909.0"></omgdi:waypoint>
+        <omgdi:waypoint x="827.0" y="784.0"></omgdi:waypoint>
+        <omgdi:waypoint x="893.0" y="784.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow85" id="BPMNEdge_flow85">
+        <omgdi:waypoint x="827.0" y="949.0"></omgdi:waypoint>
+        <omgdi:waypoint x="827.0" y="1136.0"></omgdi:waypoint>
+        <omgdi:waypoint x="729.0" y="1137.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow97" id="BPMNEdge_flow97">
+        <omgdi:waypoint x="958.0" y="445.0"></omgdi:waypoint>
+        <omgdi:waypoint x="965.0" y="453.0"></omgdi:waypoint>
+        <omgdi:waypoint x="990.0" y="453.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow99" id="BPMNEdge_flow99">
+        <omgdi:waypoint x="1030.0" y="453.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1048.0" y="452.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1048.0" y="1136.0"></omgdi:waypoint>
+        <omgdi:waypoint x="729.0" y="1137.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow101" id="BPMNEdge_flow101">
+        <omgdi:waypoint x="963.0" y="706.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1049.0" y="705.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1049.0" y="1137.0"></omgdi:waypoint>
+        <omgdi:waypoint x="729.0" y="1137.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow102" id="BPMNEdge_flow102">
+        <omgdi:waypoint x="943.0" y="726.0"></omgdi:waypoint>
+        <omgdi:waypoint x="943.0" y="742.0"></omgdi:waypoint>
+        <omgdi:waypoint x="945.0" y="749.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow103" id="BPMNEdge_flow103">
+        <omgdi:waypoint x="733.0" y="929.0"></omgdi:waypoint>
+        <omgdi:waypoint x="807.0" y="929.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow105" id="BPMNEdge_flow105">
+        <omgdi:waypoint x="155.0" y="685.0"></omgdi:waypoint>
+        <omgdi:waypoint x="180.0" y="685.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow108" id="BPMNEdge_flow108">
+        <omgdi:waypoint x="460.0" y="705.0"></omgdi:waypoint>
+        <omgdi:waypoint x="460.0" y="776.0"></omgdi:waypoint>
+        <omgdi:waypoint x="415.0" y="775.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow110" id="BPMNEdge_flow110">
+        <omgdi:waypoint x="480.0" y="685.0"></omgdi:waypoint>
+        <omgdi:waypoint x="500.0" y="685.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow116" id="BPMNEdge_flow116">
+        <omgdi:waypoint x="605.0" y="685.0"></omgdi:waypoint>
+        <omgdi:waypoint x="630.0" y="685.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow117" id="BPMNEdge_flow117">
+        <omgdi:waypoint x="670.0" y="685.0"></omgdi:waypoint>
+        <omgdi:waypoint x="690.0" y="685.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow118" id="BPMNEdge_flow118">
+        <omgdi:waypoint x="650.0" y="665.0"></omgdi:waypoint>
+        <omgdi:waypoint x="649.0" y="621.0"></omgdi:waypoint>
+        <omgdi:waypoint x="363.0" y="621.0"></omgdi:waypoint>
+        <omgdi:waypoint x="362.0" y="650.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow123" id="BPMNEdge_flow123">
+        <omgdi:waypoint x="605.0" y="775.0"></omgdi:waypoint>
+        <omgdi:waypoint x="690.0" y="775.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow177" id="BPMNEdge_flow177">
+        <omgdi:waypoint x="285.0" y="685.0"></omgdi:waypoint>
+        <omgdi:waypoint x="310.0" y="685.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow178" id="BPMNEdge_flow178">
+        <omgdi:waypoint x="310.0" y="775.0"></omgdi:waypoint>
+        <omgdi:waypoint x="232.0" y="775.0"></omgdi:waypoint>
+        <omgdi:waypoint x="232.0" y="721.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow179" id="BPMNEdge_flow179">
+        <omgdi:waypoint x="460.0" y="705.0"></omgdi:waypoint>
+        <omgdi:waypoint x="552.0" y="740.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow180" id="BPMNEdge_flow180">
+        <omgdi:waypoint x="415.0" y="685.0"></omgdi:waypoint>
+        <omgdi:waypoint x="440.0" y="685.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow119" id="BPMNEdge_flow119">
+        <omgdi:waypoint x="75.0" y="706.0"></omgdi:waypoint>
+        <omgdi:waypoint x="107.0" y="707.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow120" id="BPMNEdge_flow120">
+        <omgdi:waypoint x="733.0" y="707.0"></omgdi:waypoint>
+        <omgdi:waypoint x="923.0" y="706.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow122" id="BPMNEdge_flow122">
+        <omgdi:waypoint x="1010.0" y="473.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1009.0" y="624.0"></omgdi:waypoint>
+        <omgdi:waypoint x="733.0" y="707.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow125" id="BPMNEdge_flow125">
+        <omgdi:waypoint x="729.0" y="1137.0"></omgdi:waypoint>
+        <omgdi:waypoint x="829.0" y="1197.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1040.0" y="1197.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow128" id="BPMNEdge_flow128">
+        <omgdi:waypoint x="986.0" y="127.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1057.0" y="127.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1057.0" y="1180.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow160" id="BPMNEdge_flow160">
+        <omgdi:waypoint x="35.0" y="706.0"></omgdi:waypoint>
+        <omgdi:waypoint x="11.0" y="706.0"></omgdi:waypoint>
+        <omgdi:waypoint x="11.0" y="1149.0"></omgdi:waypoint>
+        <omgdi:waypoint x="38.0" y="1151.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow161" id="BPMNEdge_flow161">
+        <omgdi:waypoint x="143.0" y="1151.0"></omgdi:waypoint>
+        <omgdi:waypoint x="165.0" y="1153.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow162" id="BPMNEdge_flow162">
+        <omgdi:waypoint x="205.0" y="1153.0"></omgdi:waypoint>
+        <omgdi:waypoint x="221.0" y="1137.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow163" id="BPMNEdge_flow163">
+        <omgdi:waypoint x="185.0" y="1173.0"></omgdi:waypoint>
+        <omgdi:waypoint x="185.0" y="1213.0"></omgdi:waypoint>
+        <omgdi:waypoint x="-25.0" y="1213.0"></omgdi:waypoint>
+        <omgdi:waypoint x="-25.0" y="272.0"></omgdi:waypoint>
+        <omgdi:waypoint x="3.0" y="271.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
