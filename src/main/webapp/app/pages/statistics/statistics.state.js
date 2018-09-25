@@ -10,7 +10,7 @@
     function stateConfig($stateProvider) {
         $stateProvider.state('statistics', {
             parent: 'app',
-            url: '/statistics',
+            url: '/statistics?processDefinition',
             data: {
                 authorities: ['ROLE_USER'],
             },

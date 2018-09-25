@@ -70,7 +70,6 @@ public interface Ace {
   @RequestLine("GET api/ace//v1/entitaorganizzativa/{id}")
   EntitaOrganizzativaWebDto entitaOrganizzativaById(@Param("id") int id);
   
-  // TODO modificare questa richeista quando ACE l'avra' pronta, per ora e' un placeholder
   @RequestLine("GET api/ace//v1/entitaorganizzativa?term={term}")
   RisultatoRicercaWebDto<EntitaOrganizzativaWebDto> entitaOrganizzativaFind(@Param("term") String term);
 }

@@ -138,11 +138,12 @@ public class FlowsPdfResource {
 	@Secured(AuthoritiesConstants.USER)
 	public ResponseEntity<byte[]> makeStatisticPdf(
 			@RequestParam("processDefinitionKey") String processDefinitionKey,
+			@RequestParam("idStruttura") String idStruttura,
 			@RequestParam("startDateGreat") String startDateGreat,
 			@RequestParam("startDateLess") String startDateLess) {
 
 		//Sotituisco la lista di variabili da quelle storiche (historicProcessInstance.getProcessVariables() )a quelle attuali (variableInstanceJson)
-		JSONObject processvariables = pdfService.getPdfStatistics(processDefinitionKey, startDateGreat, startDateLess);
+		JSONObject processvariables = pdfService.getPdfStatistics(processDefinitionKey, idStruttura, startDateGreat, startDateLess);
 
 		//creo il pdf corrispondente
 		byte[] pdfByteArray = pdfService.makeStatisticPdf(processvariables, "statisticheGeneraliFlows");

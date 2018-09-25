@@ -77,7 +77,7 @@ public class FlowsUserDetailsService implements org.springframework.security.cor
 					.map(ldapUserDetailsService1 -> ldapUserDetailsService1.loadUserByUsername(login))
 					.orElse(null);
 		}
-
+//todo:sostituire orElse con orElseThrow
 		if (userDetails == null)
 			throw new UsernameNotFoundException("User " + lowercaseLogin + " was not found in the " +
 					                                    "database or LDAP");
