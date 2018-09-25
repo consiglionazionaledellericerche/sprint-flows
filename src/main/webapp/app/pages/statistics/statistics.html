@@ -4,31 +4,41 @@
 
 			<label>Statistiche dal</label>
 			<div class="form-group">
-				<input type="date"
-					   ng-model="vm.exportParams.startDateGreat"
-					   class="ng-pristine ng-untouched ng-valid ng-empty"
-					   aria-invalid="false">
+				<input type="date" ng-model="vm.exportParams.startDateGreat"
+					class="ng-pristine ng-untouched ng-valid ng-empty"
+					aria-invalid="false">
 			</div>
 
 			<label> al </label>
 			<div class="form-group">
-				<input type="date"
-					   ng-model="vm.exportParams.startDateLess"
-					   class="ng-pristine ng-untouched ng-valid ng-empty"
-					   aria-invalid="false">
+				<input type="date" ng-model="vm.exportParams.startDateLess"
+					class="ng-pristine ng-untouched ng-valid ng-empty"
+					aria-invalid="false">
 			</div>
-			<button ng-click="exportFile(true, vm.processDefinition.key, vm.exportParams.startDateGreat, vm.exportParams.startDateLess, 'statistiche_' + vm.processDefinition.key + '.pdf')"
-					class="btn btn-primary" translate="statistics.home.exportPdfLabel">
+
+			<div class="form-group">
+				<label>Struttura</label> <select
+					ng-model="vm.exportParams.struttura">
+
+					<option ng-repeat="struttura in strutture" value="{{struttura.value}}">{{struttura.label}}</option>
+
+				</select>
+			</div>
+
+			<button
+				ng-click="exportFile(true, vm.processDefinition.key, vm.exportParams.startDateGreat, vm.exportParams.startDateLess, 'statistiche_' + vm.processDefinition.key + '.pdf')"
+				class="btn btn-primary" translate="statistics.home.exportPdfLabel">
 			</button>
-			<button ng-click="exportFile(false, vm.processDefinition.key, vm.exportParams.startDateGreat, vm.exportParams.startDateLess, 'statistiche_' + vm.processDefinition.key + '.csv')"
-					class="btn btn-primary" translate="statistics.home.exportCsvLabel">
+			<button
+				ng-click="exportFile(false, vm.processDefinition.key, vm.exportParams.startDateGreat, vm.exportParams.startDateLess, 'statistiche_' + vm.processDefinition.key + '.csv')"
+				class="btn btn-primary" translate="statistics.home.exportCsvLabel">
 			</button>
 		</div>
 
 		<div class="col-md-9">
 			<h2 translate="statistics.home.title"></h2>
-			<h3> {{vm.processDefinition.name}}</h3>
-			<pre ng-if="isDevelopment">$rootScope.wfDefsStatistics: {{$rootScope.wfDefsStatistics}}</pre>
+			<h3>{{vm.processDefinition.name}}</h3>
+			<pre ng-if="isDevelopment">{{vm | json	}}</pre>
 		</div>
 	</div>
 </div>
