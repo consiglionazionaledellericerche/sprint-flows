@@ -453,7 +453,7 @@ public class FlowsPdfService {
 		Map<String, String> listaStatiFlussiTerminati = new HashMap<String, String>();
 		JSONArray arrayStatiFlussiTerminati = new JSONArray();
 		int mediaGiorniFlusso = 0;
-		if (allTerminatedProcessInstancesDurationInMillis > 0) {
+		if (allTerminatedProcessInstancesDurationInMillis > 0 && nrFlussiTerminati > 0) {
 			mediaGiorniFlusso = allTerminatedProcessInstancesDurationInMillis/ (1000 * 60 * 60 * 24 * nrFlussiTerminati);
 		}
 		variableStatisticsJson.put("mediaGiorniFlusso", mediaGiorniFlusso);
