@@ -167,13 +167,11 @@ public class TestServices {
         ProcessInstanceResponse processInstanceResponse = null;
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
 
-        List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().latestVersion().list();
-        for (ProcessDefinition pd : processDefinitions) {
-            if (pd.getId().contains(processDefinitionKey.getValue())) {
-                processDefinition = pd.getId();
-                break;
-            }
-        }
+        processDefinition = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionKey(processDefinitionKey.getValue())
+                .latestVersion()
+                .singleResult()
+                .getId();
         req.setParameter("processDefinitionId", processDefinition);
 
         switch (processDefinitionKey) {
@@ -219,9 +217,12 @@ public class TestServices {
         ResponseEntity<Object> response = flowsTaskResource.completeTask(req);
         assertEquals(OK, response.getStatusCode());
 
+        ProcessInstanceResponse body = (ProcessInstanceResponse) response.getBody();
+
+
         // Recupero il TaskId del primo task del flusso
 //        firstTaskId = taskService.createTaskQuery().singleResult().getId();
-        firstTaskId = taskService.createTaskQuery().list().get(0).getId();
+        firstTaskId = taskService.createTaskQuery().processInstanceId(body.getId()).list().get(0).getId();
 
         return (ProcessInstanceResponse) response.getBody();
     }

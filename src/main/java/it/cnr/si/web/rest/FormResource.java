@@ -161,14 +161,17 @@ public class FormResource {
 
         log.debug("REST request to get Form : {}/{}/{}", processDefinitionKey, version, taskId);
 
+        int intVersion = Integer.parseInt(version);
 
-        Form form = formRepository.findOneByProcessDefinitionKeyAndVersionAndTaskId(processDefinitionKey, version, taskId);
+        while (intVersion > 0) {
+            Form form = formRepository.findOneByProcessDefinitionKeyAndVersionAndTaskId(processDefinitionKey, String.valueOf(intVersion), taskId);
+            if (form != null)
+                return new ResponseEntity<>(form.getForm(), HttpStatus.OK);
+            else
+                intVersion--;
+        }
 
-        return Optional.ofNullable(form)
-            .map(result -> new ResponseEntity<>(
-                result.getForm(),
-                HttpStatus.OK))
-            .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @RequestMapping(value = "/forms/task/{taskId}",
