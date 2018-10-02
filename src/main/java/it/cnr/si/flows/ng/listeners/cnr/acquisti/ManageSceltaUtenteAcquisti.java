@@ -2,6 +2,7 @@ package it.cnr.si.flows.ng.listeners.cnr.acquisti;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import it.cnr.si.flows.ng.service.FirmaDocumentoService;
 import it.cnr.si.flows.ng.service.ProtocolloDocumentoService;
+import it.cnr.si.security.SecurityUtils;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 
@@ -36,6 +38,9 @@ public class ManageSceltaUtenteAcquisti {
 		String processInstanceId =  execution.getProcessInstanceId();
 		LOGGER.info("-- azioneScelta: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 		Map<String, FlowsAttachment> attachmentList;
+
+
+
 
 		if (sceltaUtente != null){
 			switch(faseEsecuzioneValue){  
@@ -99,28 +104,22 @@ public class ManageSceltaUtenteAcquisti {
 						attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
 					}
 				} else {					
-					for (String key : attachmentList.keySet()) {
-						FlowsAttachment value = attachmentList.get(key);
-						if	(value != null && ( value.getName().startsWith("allegatiPubblicabili") 
-								|| value.getName().equals("decisioneContrattare"))){
-							attachmentService.setPubblicabile(execution.getId(), value.getName(), true);					
-						}
-					}
+					attachmentService.setPubblicabile(execution.getId(), "decisioneContrattare", true);
+					pubblicaFileMultipli(execution, "allegatiPubblicabili", true);
 				}
 			};break;
-			
+
 			case "PROVVEDIMENTO-AGGIUDICAZIONE-start": {
 				LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
-				
 				attachmentService.setPubblicabile(execution.getId(), "giustificazioniAnomalie", true);
 				attachmentService.setPubblicabile(execution.getId(), "provvedimentoNominaCommissione", true);
 				attachmentService.setPubblicabile(execution.getId(), "provvedimentoAmmessiEsclusi", true);
 				attachmentService.setPubblicabile(execution.getId(), "esitoValutazioneAnomalie", true);
 				attachmentService.setPubblicabile(execution.getId(), "elencoDitteCandidate", true);
 				attachmentService.setPubblicabile(execution.getId(), "elencoVerbali", true);
-				
-				// TODO aggiungere anche gli array bandoAvvisi letteraInvito allegatiPubblicabili
-				
+				pubblicaFileMultipli(execution, "bandoAvvisi", true);
+				pubblicaFileMultipli(execution, "letteraInvito", true);
+				pubblicaFileMultipli(execution, "allegatiPubblicabili", true);
 			};break;	
 
 			case "PROVVEDIMENTO-AGGIUDICAZIONE-end": {
@@ -133,13 +132,8 @@ public class ManageSceltaUtenteAcquisti {
 						attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
 					}
 				} else {					
-					for (String key : attachmentList.keySet()) {
-						FlowsAttachment value = attachmentList.get(key);
-						if	(value != null && ( value.getName().startsWith("allegatiPubblicabili")
-								 || value.getName().equals("provvedimentoAggiudicazione"))){
-							attachmentService.setPubblicabile(execution.getId(), value.getName(), true);					
-						}
-					}
+						attachmentService.setPubblicabile(execution.getId(), "provvedimentoAggiudicazione", true);
+						pubblicaFileMultipli(execution, "allegatiPubblicabili", true);
 				}
 			};break;	
 
@@ -147,18 +141,12 @@ public class ManageSceltaUtenteAcquisti {
 			case "CONTRATTO-FUORI-MEPA-start": {
 				LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 				attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);		
-					for (String key : attachmentList.keySet()) {
-						FlowsAttachment value = attachmentList.get(key);
-						if	(value != null && ( value.getName().startsWith("allegatiPubblicabili") 
-								 || value.getName().equals("bandoAvvisi")
-								 || value.getName().equals("letteraInvito")
-								 )){
-							attachmentService.setPubblicabile(execution.getId(), value.getName(), true);					
-						}
-				}
+				pubblicaFileMultipli(execution, "bandoAvvisi", true);
+				pubblicaFileMultipli(execution, "letteraInvito", true);
+				pubblicaFileMultipli(execution, "allegatiPubblicabili", true);
 			};break;	
-			
-			
+
+
 			case "CONTRATTO-FUORI-MEPA-end": {
 				LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 				attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);
@@ -169,14 +157,8 @@ public class ManageSceltaUtenteAcquisti {
 						attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
 					}
 				} else {					
-					for (String key : attachmentList.keySet()) {
-						FlowsAttachment value = attachmentList.get(key);
-						if	(value != null && ( value.getName().startsWith("allegatiPubblicabili") 
-								 || value.getName().equals("contratto")
-								 )){
-							attachmentService.setPubblicabile(execution.getId(), value.getName(), true);					
-						}
-					}
+					attachmentService.setPubblicabile(execution.getId(), "contratto", true);
+					pubblicaFileMultipli(execution, "allegatiPubblicabili", true);
 				}
 			};break;
 
@@ -185,17 +167,11 @@ public class ManageSceltaUtenteAcquisti {
 			case "STIPULA-MEPA-start": {
 				LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 				attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);		
-					for (String key : attachmentList.keySet()) {
-						FlowsAttachment value = attachmentList.get(key);
-						if	(value != null && ( value.getName().startsWith("allegatiPubblicabili") 
-								 || value.getName().equals("bandoAvvisi")
-								 || value.getName().equals("letteraInvito")
-								 )){
-							attachmentService.setPubblicabile(execution.getId(), value.getName(), true);					
-						}
-				}
+				pubblicaFileMultipli(execution, "bandoAvvisi", true);
+				pubblicaFileMultipli(execution, "letteraInvito", true);
+				pubblicaFileMultipli(execution, "allegatiPubblicabili", true);
 			};break;	
-			
+
 			case "STIPULA-MEPA-end": {
 				LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 				attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);
@@ -206,16 +182,11 @@ public class ManageSceltaUtenteAcquisti {
 						attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
 					}
 				} else {					
-					for (String key : attachmentList.keySet()) {
-						FlowsAttachment value = attachmentList.get(key);
-						if	(value != null && ( value.getName().startsWith("allegatiPubblicabili")
-								|| value.getName().equals("stipula"))){
-							attachmentService.setPubblicabile(execution.getId(), value.getName(), true);					
-						}
-					}
+					attachmentService.setPubblicabile(execution.getId(), "stipula", true);
+					pubblicaFileMultipli(execution, "allegatiPubblicabili", true);
 				}
 			};break;		
-			
+
 
 			case "REVOCA-end": {
 				LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
@@ -231,14 +202,9 @@ public class ManageSceltaUtenteAcquisti {
 			case "consuntivo-end": {
 				LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 				attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);
-				for (String key : attachmentList.keySet()) {
-					FlowsAttachment value = attachmentList.get(key);
-					if	(value != null && ( value.getName().startsWith("allegatiPubblicabili")
-							|| value.getName().equals("avvisoPostInformazione")
-							|| value.getName().equals("modificheVariantiArt106"))){
-						attachmentService.setPubblicabile(execution.getId(), value.getName(), true);					
-					}
-				}
+				attachmentService.setPubblicabile(execution.getId(), "avvisoPostInformazione", true);
+				attachmentService.setPubblicabile(execution.getId(), "modificheVariantiArt106", true);
+				pubblicaFileMultipli(execution, "allegatiPubblicabili", true);
 			};break;			
 
 
@@ -259,6 +225,18 @@ public class ManageSceltaUtenteAcquisti {
 			default:  {
 				LOGGER.info("--faseEsecuzione: " + faseEsecuzioneValue);
 			};break;    
+			}
+		}
+	}
+	
+	public void pubblicaFileMultipli(DelegateExecution execution, String nomeDocumento, Boolean pubblicaFlag) {
+		for (int i = 0; i < 1000; i++) {
+			if(execution.getVariable(nomeDocumento +"[" + i + "]") != null) {
+				FlowsAttachment documentoCorrente = (FlowsAttachment) execution.getVariable(nomeDocumento +"[" + i + "]");
+				LOGGER.info("-- documentoCorrente: " + documentoCorrente );
+				attachmentService.setPubblicabile(execution.getId(), documentoCorrente.getName(), pubblicaFlag);
+			} else {
+				break;
 			}
 		}
 	}
