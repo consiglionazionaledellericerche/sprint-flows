@@ -329,7 +329,8 @@ public class FlowsTaskService {
 					data.put(startDate.name(), new Date());
 
 					ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
-
+					runtimeService.setVariable(instance.getId(), "processInstanceId", instance.getId());
+					
 					org.json.JSONObject name = new org.json.JSONObject();
 					//                    name.put(idStruttura.name(), idStrutturaString);
 
