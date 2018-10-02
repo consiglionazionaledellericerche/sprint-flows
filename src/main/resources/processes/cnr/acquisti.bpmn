@@ -15,6 +15,18 @@
     </extensionElements>
     <startEvent id="startevent1" name="Predisposizione Decisione"></startEvent>
     <subProcess id="DECISIONE-CONTRATTARE" name="DECISIONE A CONTRATTARE">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[DECISIONE-CONTRATTARE-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[DECISIONE-CONTRATTARE-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
       <endEvent id="endevent-decisione-contrattare-protocollo" name="endevent-decisione-contrattare-protocollo">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
@@ -170,6 +182,18 @@
       </extensionElements>
     </userTask>
     <subProcess id="PROVVEDIMENTO-AGGIUDICAZIONE" name="PROVVEDIMENTO DI AGGIUDICAZIONE">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[PROVVEDIMENTO-AGGIUDICAZIONE-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[PROVVEDIMENTO-AGGIUDICAZIONE-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
       <userTask id="predisposizione-provvedimento-aggiudicazione" name="Predisposizione Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoRA}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
@@ -185,58 +209,7 @@
         </extensionElements>
       </userTask>
       <startEvent id="startevent6" name="Start"></startEvent>
-      <sequenceFlow id="flow17" sourceRef="startevent6" targetRef="predisposizione-provvedimento-aggiudicazione">
-        <extensionElements>
-          <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
-            <activiti:field name="nomeFileDaPubblicare">
-              <activiti:string><![CDATA[elencoVerbali]]></activiti:string>
-            </activiti:field>
-            <activiti:field name="fileDaPubblicareFlag">
-              <activiti:string><![CDATA[true]]></activiti:string>
-            </activiti:field>
-          </activiti:executionListener>
-          <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
-            <activiti:field name="nomeFileDaPubblicare">
-              <activiti:string><![CDATA[giustificazioniAnomalie]]></activiti:string>
-            </activiti:field>
-            <activiti:field name="fileDaPubblicareFlag">
-              <activiti:string><![CDATA[true]]></activiti:string>
-            </activiti:field>
-          </activiti:executionListener>
-          <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
-            <activiti:field name="nomeFileDaPubblicare">
-              <activiti:string><![CDATA[provvedimentoNominaCommissione]]></activiti:string>
-            </activiti:field>
-            <activiti:field name="fileDaPubblicareFlag">
-              <activiti:string><![CDATA[true]]></activiti:string>
-            </activiti:field>
-          </activiti:executionListener>
-          <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
-            <activiti:field name="nomeFileDaPubblicare">
-              <activiti:string><![CDATA[provvedimentoAmmessiEsclusi]]></activiti:string>
-            </activiti:field>
-            <activiti:field name="fileDaPubblicareFlag">
-              <activiti:string><![CDATA[true]]></activiti:string>
-            </activiti:field>
-          </activiti:executionListener>
-          <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
-            <activiti:field name="nomeFileDaPubblicare">
-              <activiti:string><![CDATA[bandoAvvisi]]></activiti:string>
-            </activiti:field>
-            <activiti:field name="fileDaPubblicareFlag">
-              <activiti:string><![CDATA[true]]></activiti:string>
-            </activiti:field>
-          </activiti:executionListener>
-          <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
-            <activiti:field name="nomeFileDaPubblicare">
-              <activiti:string><![CDATA[letteraInvito]]></activiti:string>
-            </activiti:field>
-            <activiti:field name="fileDaPubblicareFlag">
-              <activiti:string><![CDATA[true]]></activiti:string>
-            </activiti:field>
-          </activiti:executionListener>
-        </extensionElements>
-      </sequenceFlow>
+      <sequenceFlow id="flow17" sourceRef="startevent6" targetRef="predisposizione-provvedimento-aggiudicazione"></sequenceFlow>
       <exclusiveGateway id="exclusivegateway3" name="Exclusive Gateway" default="flow20"></exclusiveGateway>
       <sequenceFlow id="flow20" sourceRef="exclusivegateway3" targetRef="firma-provvedimento-aggiudicazione"></sequenceFlow>
       <userTask id="modifica-provvedimento-aggiudicazione" name="Modifica Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoRA}">
@@ -407,7 +380,19 @@
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${esitoVerificaRequisiti == 'inviaRisultato'}]]></conditionExpression>
       </sequenceFlow>
     </subProcess>
-    <subProcess id="revoca" name="REVOCA">
+    <subProcess id="REVOCA" name="REVOCA">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[REVOCA-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[REVOCA-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
       <startEvent id="startevent7" name="Start"></startEvent>
       <endEvent id="endevent-revoca" name="endevent-revoca">
         <extensionElements>
@@ -479,19 +464,7 @@
     </subProcess>
     <exclusiveGateway id="exclusivegateway13" name="Exclusive Gateway" default="flow61"></exclusiveGateway>
     <sequenceFlow id="flow60" sourceRef="DECISIONE-CONTRATTARE" targetRef="exclusivegateway13"></sequenceFlow>
-    <sequenceFlow id="flow61" sourceRef="exclusivegateway13" targetRef="espletamento-procedura">
-      <extensionElements>
-        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
-          <activiti:field name="nomeFileDaPubblicare">
-            <activiti:string><![CDATA[decisioneContrattare]]></activiti:string>
-          </activiti:field>
-          <activiti:field name="fileDaPubblicareFlag">
-            <activiti:string><![CDATA[true]]></activiti:string>
-          </activiti:field>
-        </activiti:executionListener>
-        <activiti:executionListener event="take" delegateExpression="${pubblicaTuttiAllegatiPubblicabili}"></activiti:executionListener>
-      </extensionElements>
-    </sequenceFlow>
+    <sequenceFlow id="flow61" sourceRef="exclusivegateway13" targetRef="espletamento-procedura"></sequenceFlow>
     <userTask id="consuntivo" name="Consuntivo" activiti:assignee="${rup}">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
@@ -520,22 +493,20 @@
         </activiti:executionListener>
       </extensionElements>
     </endEvent>
-    <sequenceFlow id="flow71" sourceRef="consuntivo" targetRef="end-stipulato">
+    <sequenceFlow id="flow71" sourceRef="consuntivo" targetRef="end-stipulato"></sequenceFlow>
+    <subProcess id="STIPULA-MEPA" name="STIPULA MEPA">
       <extensionElements>
-        <activiti:executionListener event="take" delegateExpression="${pubblicaTuttiAllegatiPubblicabili}"></activiti:executionListener>
-        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumentoSePresente}">
-          <activiti:field name="nomeFileDaPubblicare">
-            <activiti:string><![CDATA[avvisoPostInformazione]]></activiti:string>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[STIPULA-MEPA-start]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
-        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumentoSePresente}">
-          <activiti:field name="nomeFileDaPubblicare">
-            <activiti:string><![CDATA[modificheVariantiArt106]]></activiti:string>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[STIPULA-MEPA-end]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
       </extensionElements>
-    </sequenceFlow>
-    <subProcess id="stipulamepa" name="STIPULA MEPA">
       <startEvent id="startevent9" name="Start"></startEvent>
       <userTask id="carica-stipula-mepa" name="Carica Stipula Mepa" activiti:assignee="${rup}">
         <extensionElements>
@@ -565,26 +536,7 @@
           </activiti:executionListener>
         </extensionElements>
       </userTask>
-      <sequenceFlow id="flow73" sourceRef="startevent9" targetRef="stipula-mepa">
-        <extensionElements>
-          <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
-            <activiti:field name="nomeFileDaPubblicare">
-              <activiti:string><![CDATA[bandoAvvisi]]></activiti:string>
-            </activiti:field>
-            <activiti:field name="fileDaPubblicareFlag">
-              <activiti:string><![CDATA[true]]></activiti:string>
-            </activiti:field>
-          </activiti:executionListener>
-          <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
-            <activiti:field name="nomeFileDaPubblicare">
-              <activiti:string><![CDATA[letteraInvito]]></activiti:string>
-            </activiti:field>
-            <activiti:field name="fileDaPubblicareFlag">
-              <activiti:string><![CDATA[true]]></activiti:string>
-            </activiti:field>
-          </activiti:executionListener>
-        </extensionElements>
-      </sequenceFlow>
+      <sequenceFlow id="flow73" sourceRef="startevent9" targetRef="stipula-mepa"></sequenceFlow>
       <sequenceFlow id="flow75" sourceRef="protocollo-invio-stipula-mepa" targetRef="endevent-stipula-mepa-protocollo"></sequenceFlow>
       <userTask id="revoca-stipula-mepa" name="Revoca Stipula Mepa" activiti:candidateGroups="${gruppoRA}">
         <extensionElements>
@@ -662,76 +614,40 @@
       </sequenceFlow>
     </subProcess>
     <exclusiveGateway id="exclusivegateway15" name="Exclusive Gateway" default="flow81"></exclusiveGateway>
-    <sequenceFlow id="flow78" sourceRef="espletamento-procedura" targetRef="exclusivegateway15">
-      <extensionElements>
-        <activiti:executionListener event="take" delegateExpression="${pubblicaTuttiAllegatiPubblicabili}"></activiti:executionListener>
-        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumentoSePresente}">
-          <activiti:field name="nomeFileDaPubblicare">
-            <activiti:string><![CDATA[bandoAvvisi]]></activiti:string>
-          </activiti:field>
-        </activiti:executionListener>
-        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumentoSePresente}">
-          <activiti:field name="nomeFileDaPubblicare">
-            <activiti:string><![CDATA[letteraInvito]]></activiti:string>
-          </activiti:field>
-        </activiti:executionListener>
-        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumentoSePresente}">
-          <activiti:field name="nomeFileDaPubblicare">
-            <activiti:string><![CDATA[provvedimentoAmmessiEsclusi]]></activiti:string>
-          </activiti:field>
-        </activiti:executionListener>
-        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumentoSePresente}">
-          <activiti:field name="nomeFileDaPubblicare">
-            <activiti:string><![CDATA[provvedimentoNominaCommissione]]></activiti:string>
-          </activiti:field>
-        </activiti:executionListener>
-        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumentoSePresente}">
-          <activiti:field name="nomeFileDaPubblicare">
-            <activiti:string><![CDATA[elencoVerbali]]></activiti:string>
-          </activiti:field>
-        </activiti:executionListener>
-      </extensionElements>
-    </sequenceFlow>
+    <sequenceFlow id="flow78" sourceRef="espletamento-procedura" targetRef="exclusivegateway15"></sequenceFlow>
     <sequenceFlow id="flow79" sourceRef="exclusivegateway15" targetRef="PROVVEDIMENTO-AGGIUDICAZIONE">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${strumentoAcquisizioneId == '23'  && sceltaUtente != 'Revoca'}]]></conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="flow81" sourceRef="exclusivegateway15" targetRef="stipulamepa"></sequenceFlow>
+    <sequenceFlow id="flow81" sourceRef="exclusivegateway15" targetRef="STIPULA-MEPA"></sequenceFlow>
     <exclusiveGateway id="exclusivegateway16" name="Exclusive Gateway" default="flow84"></exclusiveGateway>
-    <sequenceFlow id="flow84" sourceRef="exclusivegateway16" targetRef="consuntivo">
-      <extensionElements>
-        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumentoSePresente}">
-          <activiti:field name="nomeFileDaPubblicare">
-            <activiti:string><![CDATA[stipula]]></activiti:string>
-          </activiti:field>
-        </activiti:executionListener>
-      </extensionElements>
-    </sequenceFlow>
-    <sequenceFlow id="flow85" sourceRef="exclusivegateway16" targetRef="revoca">
+    <sequenceFlow id="flow84" sourceRef="exclusivegateway16" targetRef="consuntivo"></sequenceFlow>
+    <sequenceFlow id="flow85" sourceRef="exclusivegateway16" targetRef="REVOCA">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaConProvvedimento'}]]></conditionExpression>
     </sequenceFlow>
     <exclusiveGateway id="exclusivegateway20" name="Exclusive Gateway" default="flow122"></exclusiveGateway>
     <sequenceFlow id="flow97" sourceRef="PROVVEDIMENTO-AGGIUDICAZIONE" targetRef="exclusivegateway20"></sequenceFlow>
-    <sequenceFlow id="flow99" sourceRef="exclusivegateway20" targetRef="revoca">
-      <extensionElements>
-        <activiti:executionListener event="take" delegateExpression="${depubblicaTuttiDocumenti}"></activiti:executionListener>
-      </extensionElements>
+    <sequenceFlow id="flow99" sourceRef="exclusivegateway20" targetRef="REVOCA">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaConProvvedimento'}]]></conditionExpression>
     </sequenceFlow>
     <exclusiveGateway id="exclusivegateway22" name="Exclusive Gateway" default="flow102"></exclusiveGateway>
-    <sequenceFlow id="flow101" sourceRef="exclusivegateway22" targetRef="revoca">
+    <sequenceFlow id="flow101" sourceRef="exclusivegateway22" targetRef="REVOCA">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaConProvvedimento'}]]></conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="flow102" sourceRef="exclusivegateway22" targetRef="consuntivo">
+    <sequenceFlow id="flow102" sourceRef="exclusivegateway22" targetRef="consuntivo"></sequenceFlow>
+    <sequenceFlow id="flow103" sourceRef="STIPULA-MEPA" targetRef="exclusivegateway16"></sequenceFlow>
+    <subProcess id="CONTRATTO-FUORI-MEPA" name="CONTRATTO FUORI MEPA">
       <extensionElements>
-        <activiti:executionListener event="take" delegateExpression="${pubblicaTuttiAllegatiPubblicabili}"></activiti:executionListener>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[CONTRATTO-FUORI-MEPA-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[CONTRATTO-FUORI-MEPA-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
       </extensionElements>
-    </sequenceFlow>
-    <sequenceFlow id="flow103" sourceRef="stipulamepa" targetRef="exclusivegateway16">
-      <extensionElements>
-        <activiti:executionListener event="take" delegateExpression="${pubblicaTuttiAllegatiPubblicabili}"></activiti:executionListener>
-      </extensionElements>
-    </sequenceFlow>
-    <subProcess id="contratto-fuori-mepa" name="CONTRATTO FUORI MEPA">
       <startEvent id="startevent10" name="Start"></startEvent>
       <userTask id="predisposizione-contratto" name="Predisposizione Contratto" activiti:candidateGroups="${gruppoRA}">
         <extensionElements>
@@ -764,26 +680,7 @@
         </extensionElements>
       </userTask>
       <exclusiveGateway id="exclusivegateway23" name="Exclusive Gateway" default="flow179"></exclusiveGateway>
-      <sequenceFlow id="flow105" sourceRef="startevent10" targetRef="predisposizione-contratto">
-        <extensionElements>
-          <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
-            <activiti:field name="nomeFileDaPubblicare">
-              <activiti:string><![CDATA[bandoAvvisi]]></activiti:string>
-            </activiti:field>
-            <activiti:field name="fileDaPubblicareFlag">
-              <activiti:string><![CDATA[true]]></activiti:string>
-            </activiti:field>
-          </activiti:executionListener>
-          <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
-            <activiti:field name="nomeFileDaPubblicare">
-              <activiti:string><![CDATA[letteraInvito]]></activiti:string>
-            </activiti:field>
-            <activiti:field name="fileDaPubblicareFlag">
-              <activiti:string><![CDATA[true]]></activiti:string>
-            </activiti:field>
-          </activiti:executionListener>
-        </extensionElements>
-      </sequenceFlow>
+      <sequenceFlow id="flow105" sourceRef="startevent10" targetRef="predisposizione-contratto"></sequenceFlow>
       <userTask id="revoca-contratto" name="Revoca Contratto" activiti:candidateGroups="${gruppoRA}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
@@ -872,31 +769,11 @@
       <sequenceFlow id="flow179" sourceRef="exclusivegateway23" targetRef="protocollo-contratto"></sequenceFlow>
       <sequenceFlow id="flow180" sourceRef="firma-contratto" targetRef="exclusivegateway23"></sequenceFlow>
     </subProcess>
-    <sequenceFlow id="flow119" sourceRef="exclusivegateway15" targetRef="contratto-fuori-mepa">
+    <sequenceFlow id="flow119" sourceRef="exclusivegateway15" targetRef="CONTRATTO-FUORI-MEPA">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${strumentoAcquisizioneId == '13' && sceltaUtente != 'Revoca'}]]></conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="flow120" sourceRef="contratto-fuori-mepa" targetRef="exclusivegateway22">
-      <extensionElements>
-        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumentoSePresente}">
-          <activiti:field name="nomeFileDaPubblicare">
-            <activiti:string><![CDATA[contratto]]></activiti:string>
-          </activiti:field>
-        </activiti:executionListener>
-      </extensionElements>
-    </sequenceFlow>
-    <sequenceFlow id="flow122" sourceRef="exclusivegateway20" targetRef="contratto-fuori-mepa">
-      <extensionElements>
-        <activiti:executionListener event="take" delegateExpression="${pubblicaDocumento}">
-          <activiti:field name="nomeFileDaPubblicare">
-            <activiti:string><![CDATA[provvedimentoAggiudicazione]]></activiti:string>
-          </activiti:field>
-          <activiti:field name="fileDaPubblicareFlag">
-            <activiti:string><![CDATA[true]]></activiti:string>
-          </activiti:field>
-        </activiti:executionListener>
-        <activiti:executionListener event="take" delegateExpression="${pubblicaTuttiAllegatiPubblicabili}"></activiti:executionListener>
-      </extensionElements>
-    </sequenceFlow>
+    <sequenceFlow id="flow120" sourceRef="CONTRATTO-FUORI-MEPA" targetRef="exclusivegateway22"></sequenceFlow>
+    <sequenceFlow id="flow122" sourceRef="exclusivegateway20" targetRef="CONTRATTO-FUORI-MEPA"></sequenceFlow>
     <endEvent id="end-revocato" name="REVOCATO">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
@@ -911,11 +788,8 @@
         </activiti:executionListener>
       </extensionElements>
     </endEvent>
-    <sequenceFlow id="flow125" sourceRef="revoca" targetRef="end-revocato"></sequenceFlow>
+    <sequenceFlow id="flow125" sourceRef="REVOCA" targetRef="end-revocato"></sequenceFlow>
     <sequenceFlow id="flow128" sourceRef="exclusivegateway13" targetRef="end-revocato">
-      <extensionElements>
-        <activiti:executionListener event="take" delegateExpression="${depubblicaTuttiDocumenti}"></activiti:executionListener>
-      </extensionElements>
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaSemplice'}]]></conditionExpression>
     </sequenceFlow>
     <userTask id="conferma-revoca" name="Conferma Revoca" activiti:candidateGroups="${gruppoRA}">
@@ -937,7 +811,7 @@
     </sequenceFlow>
     <exclusiveGateway id="exclusivegateway30" name="Exclusive Gateway" default="flow162"></exclusiveGateway>
     <sequenceFlow id="flow161" sourceRef="conferma-revoca" targetRef="exclusivegateway30"></sequenceFlow>
-    <sequenceFlow id="flow162" sourceRef="exclusivegateway30" targetRef="revoca"></sequenceFlow>
+    <sequenceFlow id="flow162" sourceRef="exclusivegateway30" targetRef="REVOCA"></sequenceFlow>
     <sequenceFlow id="flow163" sourceRef="exclusivegateway30" targetRef="espletamento-procedura">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Annulla'}]]></conditionExpression>
     </sequenceFlow>
@@ -1047,7 +921,7 @@
       <bpmndi:BPMNShape bpmnElement="exclusivegateway29" id="BPMNShape_exclusivegateway29">
         <omgdc:Bounds height="40.0" width="40.0" x="290.0" y="370.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="revoca" id="BPMNShape_revoca">
+      <bpmndi:BPMNShape bpmnElement="REVOCA" id="BPMNShape_REVOCA">
         <omgdc:Bounds height="195.0" width="508.0" x="221.0" y="1040.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="startevent7" id="BPMNShape_startevent7">
@@ -1077,7 +951,7 @@
       <bpmndi:BPMNShape bpmnElement="end-stipulato" id="BPMNShape_end-stipulato">
         <omgdc:Bounds height="35.0" width="35.0" x="928.0" y="850.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="stipulamepa" id="BPMNShape_stipulamepa">
+      <bpmndi:BPMNShape bpmnElement="STIPULA-MEPA" id="BPMNShape_STIPULA-MEPA">
         <omgdc:Bounds height="207.0" width="626.0" x="107.0" y="826.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="startevent9" id="BPMNShape_startevent9">
@@ -1122,7 +996,7 @@
       <bpmndi:BPMNShape bpmnElement="exclusivegateway22" id="BPMNShape_exclusivegateway22">
         <omgdc:Bounds height="40.0" width="40.0" x="923.0" y="686.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="contratto-fuori-mepa" id="BPMNShape_contratto-fuori-mepa">
+      <bpmndi:BPMNShape bpmnElement="CONTRATTO-FUORI-MEPA" id="BPMNShape_CONTRATTO-FUORI-MEPA">
         <omgdc:Bounds height="226.0" width="626.0" x="107.0" y="594.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="startevent10" id="BPMNShape_startevent10">
