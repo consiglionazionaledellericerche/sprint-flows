@@ -379,6 +379,20 @@
       <sequenceFlow id="flow153" sourceRef="exclusivegateway27" targetRef="endevent-provvedimento-aggiudicazione-protocollo">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${esitoVerificaRequisiti == 'inviaRisultato'}]]></conditionExpression>
       </sequenceFlow>
+      <userTask id="carica-stipula-mepa-consip" name="Carica Stipula" activiti:assignee="${rup}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[carica-stipula-mepa-consip-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[carica-stipula-mepa-consip-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
     </subProcess>
     <subProcess id="REVOCA" name="REVOCA">
       <extensionElements>
@@ -494,123 +508,88 @@
       </extensionElements>
     </endEvent>
     <sequenceFlow id="flow71" sourceRef="consuntivo" targetRef="end-stipulato"></sequenceFlow>
-    <subProcess id="STIPULA-MEPA" name="STIPULA MEPA">
+    <subProcess id="STIPULA-MEPA-CONSIP" name="STIPULA MEPA o CONSIP">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
           <activiti:field name="faseEsecuzione">
-            <activiti:string><![CDATA[STIPULA-MEPA-start]]></activiti:string>
+            <activiti:string><![CDATA[STIPULA-MEPA-CONSIP-start]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
         <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
           <activiti:field name="faseEsecuzione">
-            <activiti:string><![CDATA[STIPULA-MEPA-end]]></activiti:string>
+            <activiti:string><![CDATA[STIPULA-MEPA-CONSIP-end]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
       </extensionElements>
       <startEvent id="startevent9" name="Start"></startEvent>
-      <userTask id="carica-stipula-mepa" name="Carica Stipula Mepa" activiti:assignee="${rup}">
+      <sequenceFlow id="flow73" sourceRef="startevent9" targetRef="stipula-mepa-consip"></sequenceFlow>
+      <userTask id="revoca-stipula-mepa-consip" name="Revoca Stipula" activiti:candidateGroups="${gruppoRA}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
             <activiti:field name="faseEsecuzione">
-              <activiti:string><![CDATA[carica-stipula-mepa-start]]></activiti:string>
+              <activiti:string><![CDATA[revoca-stipula-mepa-consip-start]]></activiti:string>
             </activiti:field>
           </activiti:executionListener>
           <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
             <activiti:field name="faseEsecuzione">
-              <activiti:string><![CDATA[carica-stipula-mepa-end]]></activiti:string>
+              <activiti:string><![CDATA[revoca-stipula-mepa-consip-end]]></activiti:string>
             </activiti:field>
           </activiti:executionListener>
         </extensionElements>
       </userTask>
-      <userTask id="protocollo-invio-stipula-mepa" name="Protocollo e Invio Stipula Mepa" activiti:candidateGroups="${gruppoRA}">
+      <endEvent id="endevent-stipula-mepa-consip-revoca" name="endevent-stipula-mepa-consip-revoca">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
             <activiti:field name="faseEsecuzione">
-              <activiti:string><![CDATA[protocollo-invio-stipula-mepa-start]]></activiti:string>
+              <activiti:string><![CDATA[endevent-stipula-mepa-consip-revoca-start]]></activiti:string>
             </activiti:field>
           </activiti:executionListener>
           <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
             <activiti:field name="faseEsecuzione">
-              <activiti:string><![CDATA[protocollo-invio-stipula-mepa-end]]></activiti:string>
+              <activiti:string><![CDATA[endevent-stipula-mepa-consip-revoca-end]]></activiti:string>
             </activiti:field>
           </activiti:executionListener>
         </extensionElements>
-      </userTask>
-      <sequenceFlow id="flow73" sourceRef="startevent9" targetRef="stipula-mepa"></sequenceFlow>
-      <sequenceFlow id="flow75" sourceRef="protocollo-invio-stipula-mepa" targetRef="endevent-stipula-mepa-protocollo"></sequenceFlow>
-      <userTask id="revoca-stipula-mepa" name="Revoca Stipula Mepa" activiti:candidateGroups="${gruppoRA}">
+      </endEvent>
+      <endEvent id="endevent-stipula-mepa-consip-protocollo" name="endevent-stipula-mepa-consip-protocollo">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
             <activiti:field name="faseEsecuzione">
-              <activiti:string><![CDATA[revoca-stipula-mepa-start]]></activiti:string>
+              <activiti:string><![CDATA[endevent-stipula-mepa-consip-ok-start]]></activiti:string>
             </activiti:field>
           </activiti:executionListener>
           <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
             <activiti:field name="faseEsecuzione">
-              <activiti:string><![CDATA[revoca-stipula-mepa-end]]></activiti:string>
+              <activiti:string><![CDATA[endevent-stipula-mepa-consip-ok-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </endEvent>
+      <userTask id="stipula-mepa-consip" name="Stipula Mepa o Consip" activiti:candidateGroups="${gruppoFirmaAcquisti}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[stipula-mepa-consip-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[stipula-mepa-consip-end]]></activiti:string>
             </activiti:field>
           </activiti:executionListener>
         </extensionElements>
       </userTask>
-      <exclusiveGateway id="exclusivegateway19" name="Exclusive Gateway" default="flow94"></exclusiveGateway>
-      <sequenceFlow id="flow91" sourceRef="revoca-stipula-mepa" targetRef="exclusivegateway19"></sequenceFlow>
-      <sequenceFlow id="flow92" sourceRef="exclusivegateway19" targetRef="stipula-mepa">
+      <exclusiveGateway id="exclusivegateway31" name="Exclusive Gateway" default="flow183"></exclusiveGateway>
+      <sequenceFlow id="flow181" sourceRef="stipula-mepa-consip" targetRef="exclusivegateway31"></sequenceFlow>
+      <sequenceFlow id="flow182" sourceRef="exclusivegateway31" targetRef="revoca-stipula-mepa-consip">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Revoca'}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="flow183" sourceRef="exclusivegateway31" targetRef="endevent-stipula-mepa-consip-protocollo"></sequenceFlow>
+      <exclusiveGateway id="exclusivegateway32" name="Exclusive Gateway" default="flow185"></exclusiveGateway>
+      <sequenceFlow id="flow184" sourceRef="revoca-stipula-mepa-consip" targetRef="exclusivegateway32"></sequenceFlow>
+      <sequenceFlow id="flow185" sourceRef="exclusivegateway32" targetRef="endevent-stipula-mepa-consip-revoca"></sequenceFlow>
+      <sequenceFlow id="flow186" sourceRef="exclusivegateway32" targetRef="stipula-mepa-consip">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Annulla'}]]></conditionExpression>
-      </sequenceFlow>
-      <endEvent id="endevent-stipula-mepa-revoca" name="endevent-stipula-mepa-revoca">
-        <extensionElements>
-          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
-            <activiti:field name="faseEsecuzione">
-              <activiti:string><![CDATA[endevent-stipula-mepa-revoca-start]]></activiti:string>
-            </activiti:field>
-          </activiti:executionListener>
-          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
-            <activiti:field name="faseEsecuzione">
-              <activiti:string><![CDATA[endevent-stipula-mepa-revoca-end]]></activiti:string>
-            </activiti:field>
-          </activiti:executionListener>
-        </extensionElements>
-      </endEvent>
-      <sequenceFlow id="flow94" sourceRef="exclusivegateway19" targetRef="endevent-stipula-mepa-revoca"></sequenceFlow>
-      <endEvent id="endevent-stipula-mepa-protocollo" name="endevent-stipula-mepa-protocollo">
-        <extensionElements>
-          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
-            <activiti:field name="faseEsecuzione">
-              <activiti:string><![CDATA[endevent-stipula-mepa-protocollo-start]]></activiti:string>
-            </activiti:field>
-          </activiti:executionListener>
-          <activiti:executionListener event="end" delegateExpression="${manageProcessAcquisti}">
-            <activiti:field name="faseEsecuzione">
-              <activiti:string><![CDATA[endevent-stipula-mepa-protocollo-end]]></activiti:string>
-            </activiti:field>
-          </activiti:executionListener>
-        </extensionElements>
-      </endEvent>
-      <userTask id="stipula-mepa" name="Stipula Mepa" activiti:candidateGroups="${gruppoFirmaAcquisti}">
-        <extensionElements>
-          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
-            <activiti:field name="faseEsecuzione">
-              <activiti:string><![CDATA[stipula-mepa-start]]></activiti:string>
-            </activiti:field>
-          </activiti:executionListener>
-          <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
-            <activiti:field name="faseEsecuzione">
-              <activiti:string><![CDATA[stipula-mepa-end]]></activiti:string>
-            </activiti:field>
-          </activiti:executionListener>
-        </extensionElements>
-      </userTask>
-      <exclusiveGateway id="exclusivegateway33" name="Exclusive Gateway" default="flow172"></exclusiveGateway>
-      <sequenceFlow id="flow171" sourceRef="carica-stipula-mepa" targetRef="exclusivegateway33"></sequenceFlow>
-      <sequenceFlow id="flow172" sourceRef="exclusivegateway33" targetRef="protocollo-invio-stipula-mepa"></sequenceFlow>
-      <sequenceFlow id="flow173" sourceRef="exclusivegateway33" targetRef="revoca-stipula-mepa">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Revoca'}]]></conditionExpression>
-      </sequenceFlow>
-      <exclusiveGateway id="exclusivegateway34" name="Exclusive Gateway" default="flow175"></exclusiveGateway>
-      <sequenceFlow id="flow174" sourceRef="stipula-mepa" targetRef="exclusivegateway34"></sequenceFlow>
-      <sequenceFlow id="flow175" sourceRef="exclusivegateway34" targetRef="carica-stipula-mepa"></sequenceFlow>
-      <sequenceFlow id="flow176" sourceRef="exclusivegateway34" targetRef="revoca-stipula-mepa">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Revoca'}]]></conditionExpression>
       </sequenceFlow>
     </subProcess>
     <exclusiveGateway id="exclusivegateway15" name="Exclusive Gateway" default="flow81"></exclusiveGateway>
@@ -618,7 +597,7 @@
     <sequenceFlow id="flow79" sourceRef="exclusivegateway15" targetRef="PROVVEDIMENTO-AGGIUDICAZIONE">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${strumentoAcquisizioneId == '23'  && sceltaUtente != 'Revoca'}]]></conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="flow81" sourceRef="exclusivegateway15" targetRef="STIPULA-MEPA"></sequenceFlow>
+    <sequenceFlow id="flow81" sourceRef="exclusivegateway15" targetRef="STIPULA-MEPA-CONSIP"></sequenceFlow>
     <exclusiveGateway id="exclusivegateway16" name="Exclusive Gateway" default="flow84"></exclusiveGateway>
     <sequenceFlow id="flow84" sourceRef="exclusivegateway16" targetRef="consuntivo"></sequenceFlow>
     <sequenceFlow id="flow85" sourceRef="exclusivegateway16" targetRef="REVOCA">
@@ -634,7 +613,7 @@
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaConProvvedimento'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow102" sourceRef="exclusivegateway22" targetRef="consuntivo"></sequenceFlow>
-    <sequenceFlow id="flow103" sourceRef="STIPULA-MEPA" targetRef="exclusivegateway16"></sequenceFlow>
+    <sequenceFlow id="flow103" sourceRef="STIPULA-MEPA-CONSIP" targetRef="exclusivegateway16"></sequenceFlow>
     <subProcess id="CONTRATTO-FUORI-MEPA" name="CONTRATTO FUORI MEPA">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti}">
@@ -921,6 +900,9 @@
       <bpmndi:BPMNShape bpmnElement="exclusivegateway29" id="BPMNShape_exclusivegateway29">
         <omgdc:Bounds height="40.0" width="40.0" x="290.0" y="370.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="carica-stipula-mepa-consip" id="BPMNShape_carica-stipula-mepa-consip">
+        <omgdc:Bounds height="56.0" width="105.0" x="338.0" y="963.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="REVOCA" id="BPMNShape_REVOCA">
         <omgdc:Bounds height="195.0" width="508.0" x="221.0" y="1040.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
@@ -951,38 +933,29 @@
       <bpmndi:BPMNShape bpmnElement="end-stipulato" id="BPMNShape_end-stipulato">
         <omgdc:Bounds height="35.0" width="35.0" x="928.0" y="850.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="STIPULA-MEPA" id="BPMNShape_STIPULA-MEPA">
+      <bpmndi:BPMNShape bpmnElement="STIPULA-MEPA-CONSIP" id="BPMNShape_STIPULA-MEPA-CONSIP">
         <omgdc:Bounds height="207.0" width="626.0" x="107.0" y="826.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="startevent9" id="BPMNShape_startevent9">
         <omgdc:Bounds height="35.0" width="35.0" x="120.0" y="899.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="carica-stipula-mepa" id="BPMNShape_carica-stipula-mepa">
-        <omgdc:Bounds height="56.0" width="105.0" x="288.0" y="963.0"></omgdc:Bounds>
+      <bpmndi:BPMNShape bpmnElement="revoca-stipula-mepa-consip" id="BPMNShape_revoca-stipula-mepa-consip">
+        <omgdc:Bounds height="68.0" width="105.0" x="470.0" y="883.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="protocollo-invio-stipula-mepa" id="BPMNShape_protocollo-invio-stipula-mepa">
-        <omgdc:Bounds height="61.0" width="119.0" x="493.0" y="960.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="revoca-stipula-mepa" id="BPMNShape_revoca-stipula-mepa">
-        <omgdc:Bounds height="68.0" width="105.0" x="500.0" y="883.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="exclusivegateway19" id="BPMNShape_exclusivegateway19">
-        <omgdc:Bounds height="40.0" width="40.0" x="628.0" y="896.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="endevent-stipula-mepa-revoca" id="BPMNShape_endevent-stipula-mepa-revoca">
+      <bpmndi:BPMNShape bpmnElement="endevent-stipula-mepa-consip-revoca" id="BPMNShape_endevent-stipula-mepa-consip-revoca">
         <omgdc:Bounds height="35.0" width="35.0" x="690.0" y="899.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="endevent-stipula-mepa-protocollo" id="BPMNShape_endevent-stipula-mepa-protocollo">
-        <omgdc:Bounds height="35.0" width="35.0" x="690.0" y="973.0"></omgdc:Bounds>
+      <bpmndi:BPMNShape bpmnElement="endevent-stipula-mepa-consip-protocollo" id="BPMNShape_endevent-stipula-mepa-consip-protocollo">
+        <omgdc:Bounds height="35.0" width="35.0" x="690.0" y="970.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="stipula-mepa" id="BPMNShape_stipula-mepa">
-        <omgdc:Bounds height="60.0" width="105.0" x="170.0" y="887.0"></omgdc:Bounds>
+      <bpmndi:BPMNShape bpmnElement="stipula-mepa-consip" id="BPMNShape_stipula-mepa-consip">
+        <omgdc:Bounds height="60.0" width="105.0" x="210.0" y="887.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="exclusivegateway33" id="BPMNShape_exclusivegateway33">
-        <omgdc:Bounds height="40.0" width="40.0" x="420.0" y="970.0"></omgdc:Bounds>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway31" id="BPMNShape_exclusivegateway31">
+        <omgdc:Bounds height="40.0" width="40.0" x="370.0" y="896.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="exclusivegateway34" id="BPMNShape_exclusivegateway34">
-        <omgdc:Bounds height="40.0" width="40.0" x="320.0" y="896.0"></omgdc:Bounds>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway32" id="BPMNShape_exclusivegateway32">
+        <omgdc:Bounds height="40.0" width="40.0" x="610.0" y="896.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="exclusivegateway15" id="BPMNShape_exclusivegateway15">
         <omgdc:Bounds height="40.0" width="40.0" x="35.0" y="686.0"></omgdc:Bounds>
@@ -1247,50 +1220,34 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow73" id="BPMNEdge_flow73">
         <omgdi:waypoint x="155.0" y="916.0"></omgdi:waypoint>
-        <omgdi:waypoint x="170.0" y="917.0"></omgdi:waypoint>
+        <omgdi:waypoint x="210.0" y="917.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow75" id="BPMNEdge_flow75">
-        <omgdi:waypoint x="612.0" y="990.0"></omgdi:waypoint>
-        <omgdi:waypoint x="690.0" y="990.0"></omgdi:waypoint>
+      <bpmndi:BPMNEdge bpmnElement="flow181" id="BPMNEdge_flow181">
+        <omgdi:waypoint x="315.0" y="917.0"></omgdi:waypoint>
+        <omgdi:waypoint x="370.0" y="916.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow91" id="BPMNEdge_flow91">
-        <omgdi:waypoint x="605.0" y="917.0"></omgdi:waypoint>
-        <omgdi:waypoint x="628.0" y="916.0"></omgdi:waypoint>
+      <bpmndi:BPMNEdge bpmnElement="flow182" id="BPMNEdge_flow182">
+        <omgdi:waypoint x="410.0" y="916.0"></omgdi:waypoint>
+        <omgdi:waypoint x="470.0" y="917.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow92" id="BPMNEdge_flow92">
-        <omgdi:waypoint x="648.0" y="896.0"></omgdi:waypoint>
-        <omgdi:waypoint x="647.0" y="866.0"></omgdi:waypoint>
-        <omgdi:waypoint x="222.0" y="866.0"></omgdi:waypoint>
-        <omgdi:waypoint x="222.0" y="887.0"></omgdi:waypoint>
+      <bpmndi:BPMNEdge bpmnElement="flow183" id="BPMNEdge_flow183">
+        <omgdi:waypoint x="390.0" y="936.0"></omgdi:waypoint>
+        <omgdi:waypoint x="389.0" y="987.0"></omgdi:waypoint>
+        <omgdi:waypoint x="690.0" y="987.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow94" id="BPMNEdge_flow94">
-        <omgdi:waypoint x="668.0" y="916.0"></omgdi:waypoint>
+      <bpmndi:BPMNEdge bpmnElement="flow184" id="BPMNEdge_flow184">
+        <omgdi:waypoint x="575.0" y="917.0"></omgdi:waypoint>
+        <omgdi:waypoint x="610.0" y="916.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow185" id="BPMNEdge_flow185">
+        <omgdi:waypoint x="650.0" y="916.0"></omgdi:waypoint>
         <omgdi:waypoint x="690.0" y="916.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow171" id="BPMNEdge_flow171">
-        <omgdi:waypoint x="393.0" y="991.0"></omgdi:waypoint>
-        <omgdi:waypoint x="420.0" y="990.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow172" id="BPMNEdge_flow172">
-        <omgdi:waypoint x="460.0" y="990.0"></omgdi:waypoint>
-        <omgdi:waypoint x="493.0" y="990.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow173" id="BPMNEdge_flow173">
-        <omgdi:waypoint x="440.0" y="970.0"></omgdi:waypoint>
-        <omgdi:waypoint x="440.0" y="916.0"></omgdi:waypoint>
-        <omgdi:waypoint x="500.0" y="917.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow174" id="BPMNEdge_flow174">
-        <omgdi:waypoint x="275.0" y="917.0"></omgdi:waypoint>
-        <omgdi:waypoint x="320.0" y="916.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow175" id="BPMNEdge_flow175">
-        <omgdi:waypoint x="340.0" y="936.0"></omgdi:waypoint>
-        <omgdi:waypoint x="340.0" y="963.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow176" id="BPMNEdge_flow176">
-        <omgdi:waypoint x="360.0" y="916.0"></omgdi:waypoint>
-        <omgdi:waypoint x="500.0" y="917.0"></omgdi:waypoint>
+      <bpmndi:BPMNEdge bpmnElement="flow186" id="BPMNEdge_flow186">
+        <omgdi:waypoint x="630.0" y="896.0"></omgdi:waypoint>
+        <omgdi:waypoint x="630.0" y="858.0"></omgdi:waypoint>
+        <omgdi:waypoint x="263.0" y="858.0"></omgdi:waypoint>
+        <omgdi:waypoint x="262.0" y="887.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow78" id="BPMNEdge_flow78">
         <omgdi:waypoint x="55.0" y="306.0"></omgdi:waypoint>

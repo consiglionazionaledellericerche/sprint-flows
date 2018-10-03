@@ -236,7 +236,7 @@ public class ManageProcessAcquisti implements ExecutionListener {
 		// END CONSUNTIVO  
 
 		// START STIPULA MEPA  
-		case "stipula-mepa-start": {
+		case "stipula-mepa-consip-start": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
 			if (execution.getVariable("strumentoAcquisizioneId").toString().equals("21")) {
 				dittaCandidata.evidenzia(execution);
@@ -246,37 +246,25 @@ public class ManageProcessAcquisti implements ExecutionListener {
 				}
 			}			
 		};break;      
-		case "stipula-mepa-end": {
+		case "stipula-mepa-consip-end": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
 		};break;   
-		case "carica-stipula-mepa-start": {
+		case "revoca-stipula-mepa-consip-start": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
 		};break;     
-		case "carica-stipula-mepa-end": {
-			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
-		};break;  
-		case "revoca-stipula-mepa-start": {
-			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
-		};break;     
-		case "revoca-stipula-mepa-end": {
+		case "revoca-stipula-mepa-consip-end": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
 		};break;   
-		case "protocollo-invio-stipula-mepa-start": {
+		case "endevent-stipula-mepa-consip-revoca-start": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
 		};break;     
-		case "protocollo-invio-stipula-mepa-end": {
-			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
-		};break;    
-		case "endevent-stipula-mepa-revoca-start": {
+		case "endevent-stipula-mepa-consip-revoca-end": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
 		};break;     
-		case "endevent-stipula-mepa-revoca-end": {
+		case "endevent-stipula-mepa-consip-ok-start": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
 		};break;     
-		case "endevent-stipula-mepa-protocollo-start": {
-			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
-		};break;     
-		case "endevent-stipula-mepa-protocollo-end": {
+		case "endevent-stipula-mepa-consip-ok-end": {
 			LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue);
 		};break; 
 		// END STIPULA MEPA  
