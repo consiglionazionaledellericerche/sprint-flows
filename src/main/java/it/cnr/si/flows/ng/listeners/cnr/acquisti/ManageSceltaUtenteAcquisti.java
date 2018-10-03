@@ -79,11 +79,7 @@ public class ManageSceltaUtenteAcquisti {
 					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 					protocolloDocumentoService.protocolla(execution, "contratto");
 				}
-			};break;	  
-//			case "carica-stipula-mepa-consip-end": {
-//					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
-//					protocolloDocumentoService.protocolla(execution, "stipulaMepa");
-//			};break; 
+			};break;
 			case "protocollo-revoca-end": {
 				if(sceltaUtente.equals("Protocolla")) {
 					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
@@ -202,6 +198,7 @@ public class ManageSceltaUtenteAcquisti {
 				attachmentService.setPubblicabile(execution.getId(), "avvisoPostInformazione", true);
 				attachmentService.setPubblicabile(execution.getId(), "modificheVariantiArt106", true);
 				attachmentService.setPubblicabile(execution.getId(), "stipula", true);
+				protocolloDocumentoService.protocollaDocumento(execution, "stipula", execution.getVariable("numeroProtocollo_stipula").toString(), execution.getVariable("dataProtocollo_stipula").toString());
 				pubblicaFileMultipli(execution, "allegatiPubblicabili", true);
 			};break;			
 
