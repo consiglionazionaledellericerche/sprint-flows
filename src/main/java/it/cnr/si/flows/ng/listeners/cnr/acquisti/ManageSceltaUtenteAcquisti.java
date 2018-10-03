@@ -35,11 +35,12 @@ public class ManageSceltaUtenteAcquisti {
 	private Expression nomeFileDaPubblicare;
 
 	public void azioneScelta(DelegateExecution execution, String faseEsecuzioneValue, String sceltaUtente) throws IOException, ParseException {
+
 		String processInstanceId =  execution.getProcessInstanceId();
 		LOGGER.info("-- azioneScelta: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
+		LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
+
 		Map<String, FlowsAttachment> attachmentList;
-
-
 
 
 		if (sceltaUtente != null){
