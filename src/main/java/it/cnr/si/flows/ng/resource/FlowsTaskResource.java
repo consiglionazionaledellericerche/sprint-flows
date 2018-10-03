@@ -133,8 +133,7 @@ public class FlowsTaskResource {
 
 
     @RequestMapping(value = "complete", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-//    todo: rivedere se reintrodurre il controllo "canCompleteTaskOrStartProcessInstance"
-//    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canCompleteTaskOrStartProcessInstance(#req, @flowsUserDetailsService)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canCompleteTaskOrStartProcessInstance(#req, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Object> completeTask(MultipartHttpServletRequest req) throws IOException {
 
