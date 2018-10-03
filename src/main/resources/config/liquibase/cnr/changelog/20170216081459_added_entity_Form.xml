@@ -44,5 +44,9 @@
                   file="config/liquibase/cnr/form.csv"
                   separator=";"
                   tableName="form"/>
+        <loadData encoding="UTF-8"
+                  file="config/liquibase/cnr/form-acquisti-v1.csv"
+                  separator=";"
+                  tableName="form"/>
     </changeSet>
 </databaseChangeLog>
