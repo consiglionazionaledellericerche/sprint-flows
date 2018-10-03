@@ -80,12 +80,10 @@ public class ManageSceltaUtenteAcquisti {
 					protocolloDocumentoService.protocolla(execution, "contratto");
 				}
 			};break;	  
-			case "protocollo-invio-stipula-mepa-end": {
-				if(sceltaUtente.equals("Protocolla")) {
-					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
-					protocolloDocumentoService.protocolla(execution, "stipulaMepa");
-				}
-			};break; 
+//			case "carica-stipula-mepa-consip-end": {
+//					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
+//					protocolloDocumentoService.protocolla(execution, "stipulaMepa");
+//			};break; 
 			case "protocollo-revoca-end": {
 				if(sceltaUtente.equals("Protocolla")) {
 					LOGGER.info("-- faseEsecuzione: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
@@ -182,7 +180,6 @@ public class ManageSceltaUtenteAcquisti {
 						attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
 					}
 				} else {					
-					attachmentService.setPubblicabile(execution.getId(), "stipula", true);
 					pubblicaFileMultipli(execution, "allegatiPubblicabili", true);
 				}
 			};break;		
@@ -204,6 +201,7 @@ public class ManageSceltaUtenteAcquisti {
 				attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);
 				attachmentService.setPubblicabile(execution.getId(), "avvisoPostInformazione", true);
 				attachmentService.setPubblicabile(execution.getId(), "modificheVariantiArt106", true);
+				attachmentService.setPubblicabile(execution.getId(), "stipula", true);
 				pubblicaFileMultipli(execution, "allegatiPubblicabili", true);
 			};break;			
 
