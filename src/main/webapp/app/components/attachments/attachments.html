@@ -5,10 +5,10 @@
            ng-click="downloadFile('/api/attachments/'+ processInstanceId +'/'+ attachment.name +'/data', attachment.filename, attachment.mimetype)">
             {{attachment.filename}}
         </a>
-        <a href ng-if="showHistory === true" ng-click="showFileHistory(attachment.name)"><span
-                class="glyphicon glyphicon-time" title="Cronologia"></span></a>
-        <a href ng-if="isPubblicatore === true" ng-click="showFileActions(attachment)"><span
-                class="glyphicon glyphicon-cog" title="Azioni"></span></a>
+        <a href ng-if="showHistory === true" ng-click="showFileHistory(attachment.name)">
+            <span class="glyphicon glyphicon-time" title="Cronologia"></span></a>
+        <a href ng-if="canPublish || canUpdateAttachments" ng-click="showFileActions(attachment)">
+            <span class="glyphicon glyphicon-cog" title="Azioni"></span></a>
         <span ng-repeat="stato in attachment.metadati.stati">
         <span class="label label-primary label-{{stato}}">{{stato}}</span>
         </span>
