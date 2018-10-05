@@ -217,7 +217,9 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);
 			attachmentService.setPubblicabile(execution.getId(), "avvisoPostInformazione", true);
 			attachmentService.setPubblicabile(execution.getId(), "modificheVariantiArt106", true);
-			attachmentService.setPubblicabile(execution.getId(), "stipula", true);
+			if ( execution.getVariable("importoTotaleNetto") != null && Double.compare(Double.parseDouble(execution.getVariable("importoTotaleNetto").toString()), 1000000) > 0) {
+				attachmentService.setPubblicabile(execution.getId(), "stipula", true);
+			}
 			protocolloDocumentoService.protocollaDocumento(execution, "stipula", execution.getVariable("numeroProtocollo_stipula").toString(), execution.getVariable("dataProtocollo_stipula").toString());
 			pubblicaFileMultipli(execution, "allegatiPubblicabili", true);
 		};break; 
@@ -353,8 +355,10 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 					LOGGER.info("Key = " + key + ", Value = " + value);
 					attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
 				}
-			} else {					
-				attachmentService.setPubblicabile(execution.getId(), "contratto", true);
+			} else {	
+				if ( execution.getVariable("importoTotaleNetto") != null && Double.parseDouble(execution.getVariable("importoTotaleNetto").toString()) > 1000000) {
+					attachmentService.setPubblicabile(execution.getId(), "contratto", true);
+				}
 				pubblicaFileMultipli(execution, "allegatiPubblicabili", true);
 			}
 		};break;
