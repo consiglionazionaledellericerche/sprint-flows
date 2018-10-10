@@ -255,14 +255,27 @@ public class FlowsPdfService {
 		JSONObject processVariables = mappingVariables(variableInstanceJson);
 
 		//creo il pdf corrispondente
-		String utenteRichiedente = processVariables.getString("nomeRichiedente");
-		String fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
+		String utenteRichiedente = "sistema";
+		String fileName = tipologiaDoc + ".pdf";			
 
+		if(processVariables.has("nomeRichiedente")) {
+			utenteRichiedente = processVariables.getString("nomeRichiedente");
+			fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
+		} 
+		
 		return Pair.of(fileName, makePdf(Enum.PdfType.valueOf(tipologiaDoc), processVariables, fileName, utenteRichiedente, processInstanceId));
 	}
 
 	public byte[] makePdf(Enum.PdfType pdfType, JSONObject processvariables, String fileName, String utenteRichiedente, String processInstanceId) {
-		String dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir");
+        Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
+
+		String dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-cnr");
+        if(activeProfiles.contains("oiv")) {
+	        dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-oiv");
+        }
+        else if(activeProfiles.contains("cnr")) {
+            dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-cnr");
+        }
 		byte[] pdfByteArray = null;
 		HashMap<String, Object> parameters = new HashMap();
 		InputStream jasperFile = null;
@@ -275,7 +288,12 @@ public class FlowsPdfService {
 					"net.sf.jasperreports.view.viewer", Locale.ITALIAN);
 
 			//carico un'immagine nel pdf "dinamicamente" (sostituisco una variabile nel file jsper con lo stream dell'immagine)
-			parameters.put("ANN_IMAGE", this.getClass().getResourceAsStream(dir.substring(dir.indexOf("/print")) + "logo_OIV.JPG"));
+	        if(activeProfiles.contains("oiv")) {
+		        parameters.put("ANN_IMAGE", this.getClass().getResourceAsStream(dir.substring(dir.indexOf("/print")) + "logo_OIV.JPG"));
+	        }
+	        else if(activeProfiles.contains("cnr")) {
+		        parameters.put("ANN_IMAGE", this.getClass().getResourceAsStream(dir.substring(dir.indexOf("/print")) + "logo_CNR.JPG"));
+	        }
 			parameters.put(JRParameter.REPORT_LOCALE, Locale.ITALIAN);
 			parameters.put(JRParameter.REPORT_RESOURCE_BUNDLE, resourceBundle);
 			parameters.put(JRParameter.REPORT_DATA_SOURCE, datasource);
