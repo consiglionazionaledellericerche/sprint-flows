@@ -51,7 +51,9 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			if(execution.getVariable(nomeDocumento +"[" + i + "]") != null) {
 				FlowsAttachment documentoCorrente = (FlowsAttachment) execution.getVariable(nomeDocumento +"[" + i + "]");
 				LOGGER.info("-- documentoCorrente: " + documentoCorrente );
-				attachmentService.setPubblicabile(execution.getId(), documentoCorrente.getName(), pubblicaFlag);
+				if(!(nomeDocumento.equals("allegatiPubblicazioneTrasparenza") && documentoCorrente.getMetadati().toString().contains("RimozioneDaPubblicazione"))) {
+					attachmentService.setPubblicabile(execution.getId(), documentoCorrente.getName(), pubblicaFlag);
+				}
 			} else {
 				break;
 			}
@@ -128,7 +130,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 		// START PROVVEDIMENTO-AGGIUDICAZIONE  
 		case "predisposizione-provvedimento-aggiudicazione-start": {
 			if (execution.getVariable("nrElencoDitteInit") != null) {
-//				acquistiService.SostituisciDocumento(execution, "provvedimentoAggiudicazione");
+				//				acquistiService.SostituisciDocumento(execution, "provvedimentoAggiudicazione");
 				acquistiService.ScorriElencoDitteCandidate(execution);	
 			}
 			dittaCandidata.evidenzia(execution);
