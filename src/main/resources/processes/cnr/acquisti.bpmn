@@ -1222,7 +1222,7 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow85" id="BPMNEdge_flow85">
         <omgdi:waypoint x="827.0" y="949.0"></omgdi:waypoint>
-        <omgdi:waypoint x="827.0" y="1136.0"></omgdi:waypoint>
+        <omgdi:waypoint x="826.0" y="1136.0"></omgdi:waypoint>
         <omgdi:waypoint x="729.0" y="1137.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow97" id="BPMNEdge_flow97">
