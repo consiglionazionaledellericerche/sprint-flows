@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.5.1.final utlizzo versione della libreria JasperReports6.5.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Acquisti-avvisoPostinformazione" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="NoPages" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c0187353-db16-46fc-a7a4-9ece39bc4976">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Acquisti"/>
+	<style name="Title" fontName="Times New Roman" fontSize="50" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+	<style name="SubTitle" forecolor="#736343" fontName="Arial" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="Arial" fontSize="12"/>
+	<style name="Row" mode="Transparent">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
+			<style backcolor="#E6DAC3"/>
+		</conditionalStyle>
+	</style>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 3">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 3_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 3_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 3_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 4">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 4_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 4_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 4_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 5">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 5_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 5_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 5_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 6">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 6_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 6_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 6_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="impegni_json" uuid="43718d59-fac1-44c4-8e31-33ea348b2df2">
+		<queryString language="json">
+			<![CDATA[]]>
+		</queryString>
+		<field name="descrizione" class="java.lang.String">
+			<fieldDescription><![CDATA[descrizione]]></fieldDescription>
+		</field>
+		<field name="vocedispesa" class="java.lang.String">
+			<fieldDescription><![CDATA[vocedispesa]]></fieldDescription>
+		</field>
+		<field name="uo" class="java.lang.String">
+			<fieldDescription><![CDATA[uo]]></fieldDescription>
+		</field>
+		<field name="gae" class="java.lang.String">
+			<fieldDescription><![CDATA[gae]]></fieldDescription>
+		</field>
+	</subDataset>
+	<parameter name="ANN_IMAGE" class="java.io.InputStream"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["C:\\CNR\\1_PROGETTI\\OIV\\PDF - JASPER REPORT\\print\\"]]></defaultValueExpression>
+	</parameter>
+	<queryString language="json">
+		<![CDATA[]]>
+	</queryString>
+	<field name="titolo" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="titolo"/>
+		<fieldDescription><![CDATA[titolo]]></fieldDescription>
+	</field>
+	<field name="priorita" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="priorita"/>
+		<fieldDescription><![CDATA[priorita]]></fieldDescription>
+	</field>
+	<field name="initiator" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="initiator"/>
+		<fieldDescription><![CDATA[initiator]]></fieldDescription>
+	</field>
+	<field name="rup" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="rup"/>
+		<fieldDescription><![CDATA[rup]]></fieldDescription>
+	</field>
+	<field name="organizzazioneStruttura" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="organizzazioneStruttura"/>
+		<fieldDescription><![CDATA[organizzazioneStruttura]]></fieldDescription>
+	</field>
+	<field name="idStruttura" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="idStruttura"/>
+		<fieldDescription><![CDATA[idStruttura]]></fieldDescription>
+	</field>
+	<field name="rup_label" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="rup_label"/>
+		<fieldDescription><![CDATA[rup_label]]></fieldDescription>
+	</field>
+	<field name="importoTotaleNetto" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="importoTotaleNetto"/>
+		<fieldDescription><![CDATA[importoTotaleNetto]]></fieldDescription>
+	</field>
+	<field name="processDefinitionId" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="processDefinitionId"/>
+		<fieldDescription><![CDATA[processDefinitionId]]></fieldDescription>
+	</field>
+	<field name="processInstanceId" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="processInstanceId"/>
+		<fieldDescription><![CDATA[processInstanceId]]></fieldDescription>
+	</field>
+	<field name="strumentoAcquisizione" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="strumentoAcquisizione"/>
+		<fieldDescription><![CDATA[strumentoAcquisizione]]></fieldDescription>
+	</field>
+	<field name="tipologiaAcquisizione" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="tipologiaAcquisizione"/>
+		<fieldDescription><![CDATA[tipologiaAcquisizione]]></fieldDescription>
+	</field>
+	<field name="descrizione" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="descrizione"/>
+		<fieldDescription><![CDATA[descrizione]]></fieldDescription>
+	</field>
+	<field name="importoTotaleLordo" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="importoTotaleLordo"/>
+		<fieldDescription><![CDATA[importoTotaleLordo]]></fieldDescription>
+	</field>
+	<field name="startDate" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="startDate"/>
+		<fieldDescription><![CDATA[startDate]]></fieldDescription>
+	</field>
+	<field name="impegni_json" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="impegni_json"/>
+		<fieldDescription><![CDATA[impegni_json]]></fieldDescription>
+	</field>
+	<group name="Group2" isStartNewColumn="true" footerPosition="StackAtBottom">
+		<groupExpression><![CDATA[(int)($V{REPORT_COUNT}/5)]]></groupExpression>
+		<groupHeader>
+			<band height="174" splitType="Stretch">
+				<textField isStretchWithOverflow="true">
+					<reportElement style="Detail" positionType="Float" x="30" y="0" width="505" height="40" uuid="7ac903fa-55d2-4e21-a610-fa7dda8d3df3"/>
+					<textElement textAlignment="Justified" markup="styled">
+						<font fontName="SansSerif" size="11" isBold="false" isItalic="false"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["\t Acquisto del flusso id " + $F{processInstanceId}+ " con priorità: "+ $F{priorita} +" ha importo totale pari ad €: "+ $F{importoTotaleNetto}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement style="Detail" positionType="Float" x="30" y="50" width="505" height="40" uuid="ae569f93-4b65-45b7-8ff9-06ecb89dfdb5"/>
+					<textElement textAlignment="Justified" markup="styled">
+						<font fontName="SansSerif" size="11" isBold="false" isItalic="false"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Strumento di Acquisizione: " + $F{strumentoAcquisizione}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="true">
+					<reportElement style="Detail" positionType="Float" x="30" y="100" width="505" height="60" uuid="b420b75b-f40b-4349-bff9-9bba77f18bad"/>
+					<textElement textAlignment="Justified" markup="styled">
+						<font fontName="SansSerif" size="11" isBold="false" isItalic="false"/>
+						<paragraph lineSpacing="1_1_2"/>
+					</textElement>
+					<textFieldExpression><![CDATA["tipologia di Acquisizione: " + $F{tipologiaAcquisizione}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="235" splitType="Stretch">
+			<textField>
+				<reportElement x="19" y="193" width="100" height="30" uuid="cfa4daaf-6dcb-40f2-9881-83fce970ef94"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Oggetto: "]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="130" y="193" width="412" height="30" uuid="126fd6fc-1a28-4bcc-98da-bd2779998024"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["il RUP è: " +$F{rup} + "[" + $F{rup_label} + "]"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="80" y="20" width="391" height="40" uuid="1c38430f-18c4-4353-b5a3-4c46137ce2cb"/>
+				<textElement textAlignment="Center">
+					<font size="26" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Avviso di Post Informazione"]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="4" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="142">
+			<componentElement>
+				<reportElement stretchType="ElementGroupBottom" x="0" y="-14" width="540" height="130" isRemoveLineWhenBlank="true" uuid="95f783c6-0366-45c0-ace4-a72f847edf88">
+					<property name="net.sf.jasperreports.export.headertoolbar.table.name" value=""/>
+				</reportElement>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" ignoreWidth="true">
+					<datasetRun subDataset="impegni_json" uuid="4c502478-3bc9-40f1-a35e-86f63a8f5485">
+						<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JsonDataSource)$P{REPORT_DATA_SOURCE}).subDataSource("impegni_json")]]></dataSourceExpression>
+					</datasetRun>
+					<jr:listContents height="130" width="540">
+						<textField>
+							<reportElement x="200" y="10" width="340" height="30" uuid="f7f0ae76-6be5-4efa-af52-e24e9d2f8c40"/>
+							<textElement>
+								<font size="14"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$F{descrizione}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement stretchType="ContainerBottom" x="200" y="100" width="340" height="30" uuid="f92aab71-f863-4185-8ea3-c8c52ac088a7"/>
+							<textElement>
+								<font size="14"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$F{vocedispesa}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="200" y="70" width="340" height="30" uuid="12a41b73-4db7-408b-92d1-5805b04136a1"/>
+							<textElement>
+								<font size="14"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$F{uo}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="200" y="40" width="340" height="30" uuid="d63762da-5fb3-4c80-81e9-549697b805f2"/>
+							<textElement>
+								<font size="14"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$F{gae}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="60" y="10" width="130" height="30" uuid="0245f10a-a8ac-470b-8acb-afdb82630195"/>
+							<textElement>
+								<font size="14"/>
+							</textElement>
+							<textFieldExpression><![CDATA["Descrizione: "]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="60" y="42" width="130" height="30" uuid="45a975b5-f545-48b8-a487-01ec26666c7c"/>
+							<textElement>
+								<font size="14"/>
+							</textElement>
+							<textFieldExpression><![CDATA["GAE: "]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="60" y="70" width="130" height="30" uuid="824bec78-329a-4336-825c-1b33a492ba65"/>
+							<textElement>
+								<font size="14"/>
+							</textElement>
+							<textFieldExpression><![CDATA["UO: "]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="60" y="100" width="130" height="30" uuid="391aaaa6-80fd-4c61-b9a4-bb3e69ce7795"/>
+							<textElement>
+								<font size="14"/>
+							</textElement>
+							<textFieldExpression><![CDATA["Voce di Spesa: "]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="179" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>
