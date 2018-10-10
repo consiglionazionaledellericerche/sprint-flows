@@ -16,11 +16,11 @@ import it.cnr.si.flows.ng.service.FirmaDocumentoService;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.service.ProtocolloDocumentoService;
+import it.cnr.si.flows.ng.listeners.cnr.acquisti.service.AcquistiService;
 
 import java.util.Map;
 
 import javax.inject.Inject;
-
 
 @Component
 @Profile("cnr")
@@ -41,6 +41,8 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 	private DittaCandidata dittaCandidata;	
 	@Inject
 	private FlowsProcessInstanceService flowsProcessInstanceService;
+	@Inject
+	private AcquistiService acquistiService;
 
 	private Expression faseEsecuzione;
 
@@ -125,6 +127,10 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 
 		// START PROVVEDIMENTO-AGGIUDICAZIONE  
 		case "predisposizione-provvedimento-aggiudicazione-start": {
+			if (execution.getVariable("nrElencoDitteInit") != null) {
+//				acquistiService.SostituisciDocumento(execution, "provvedimentoAggiudicazione");
+				acquistiService.ScorriElencoDitteCandidate(execution);	
+			}
 			dittaCandidata.evidenzia(execution);
 		};break;     
 		case "predisposizione-provvedimento-aggiudicazione-end": {
@@ -220,7 +226,12 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			if ( execution.getVariable("importoTotaleNetto") != null && Double.compare(Double.parseDouble(execution.getVariable("importoTotaleNetto").toString()), 1000000) > 0) {
 				attachmentService.setPubblicabile(execution.getId(), "stipula", true);
 			}
-			protocolloDocumentoService.protocollaDocumento(execution, "stipula", execution.getVariable("numeroProtocollo_stipula").toString(), execution.getVariable("dataProtocollo_stipula").toString());
+			if(execution.getVariable("numeroProtocollo_stipula") != null) {
+				protocolloDocumentoService.protocollaDocumento(execution, "stipula", execution.getVariable("numeroProtocollo_stipula").toString(), execution.getVariable("dataProtocollo_stipula").toString());
+			}
+			if(execution.getVariable("numeroProtocollo_contratto") != null) {
+				protocolloDocumentoService.protocollaDocumento(execution, "contratto", execution.getVariable("numeroProtocollo_contratto").toString(), execution.getVariable("dataProtocollo_contratto").toString());
+			}
 			pubblicaFileMultipli(execution, "allegatiPubblicabili", true);
 		};break; 
 		case "end-stipulato-start": {
