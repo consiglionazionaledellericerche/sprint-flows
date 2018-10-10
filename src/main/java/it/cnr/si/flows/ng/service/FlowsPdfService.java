@@ -344,10 +344,17 @@ public class FlowsPdfService {
 
 
 	public byte[] makeStatisticPdf( JSONObject processvariables, String fileName) {
-		String dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir");
 		byte[] pdfByteArray = null;
 		HashMap<String, Object> parameters = new HashMap();
 		InputStream jasperFile = null;
+        Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
+		String dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-cnr");
+        if(activeProfiles.contains("oiv")) {
+	        dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-oiv");
+        }
+        else if(activeProfiles.contains("cnr")) {
+            dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-cnr");
+        }
 		try {
 			//carico le variabili della process instance
 			LOGGER.debug("Json con i dati da inserire nel pdf: {0}", processvariables.toString());
