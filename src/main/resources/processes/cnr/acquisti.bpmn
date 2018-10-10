@@ -296,7 +296,6 @@
         </extensionElements>
       </userTask>
       <sequenceFlow id="flow56" sourceRef="verifica-provvedimento-aggiudicazione" targetRef="exclusivegateway3"></sequenceFlow>
-      <sequenceFlow id="flow57" sourceRef="modifica-provvedimento-aggiudicazione" targetRef="predisposizione-provvedimento-aggiudicazione"></sequenceFlow>
       <endEvent id="endevent-provvedimento-aggiudicazione" name="endevent-provvedimento-aggiudicazione">
         <extensionElements>
           <activiti:executionListener event="start" expression="${manageProcessAcquisti_v1}">
@@ -359,6 +358,7 @@
       <sequenceFlow id="flow188" sourceRef="exclusivegateway29" targetRef="endevent-provvedimento-aggiudicazione">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${verificheRequisitiid == '2' && ditteRimanenti == '0'}]]></conditionExpression>
       </sequenceFlow>
+      <sequenceFlow id="flow191" sourceRef="modifica-provvedimento-aggiudicazione" targetRef="exclusivegateway29"></sequenceFlow>
     </subProcess>
     <subProcess id="REVOCA" name="REVOCA">
       <extensionElements>
@@ -1082,12 +1082,6 @@
         <omgdi:waypoint x="475.0" y="414.0"></omgdi:waypoint>
         <omgdi:waypoint x="500.0" y="414.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow57" id="BPMNEdge_flow57">
-        <omgdi:waypoint x="468.0" y="515.0"></omgdi:waypoint>
-        <omgdi:waypoint x="307.0" y="514.0"></omgdi:waypoint>
-        <omgdi:waypoint x="220.0" y="514.0"></omgdi:waypoint>
-        <omgdi:waypoint x="220.0" y="455.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow51" id="BPMNEdge_flow51">
         <omgdi:waypoint x="665.0" y="414.0"></omgdi:waypoint>
         <omgdi:waypoint x="700.0" y="414.0"></omgdi:waypoint>
@@ -1132,6 +1126,11 @@
         <omgdi:waypoint x="941.0" y="336.0"></omgdi:waypoint>
         <omgdi:waypoint x="941.0" y="472.0"></omgdi:waypoint>
         <omgdi:waypoint x="926.0" y="472.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow191" id="BPMNEdge_flow191">
+        <omgdi:waypoint x="468.0" y="515.0"></omgdi:waypoint>
+        <omgdi:waypoint x="422.0" y="514.0"></omgdi:waypoint>
+        <omgdi:waypoint x="330.0" y="434.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow39" id="BPMNEdge_flow39">
         <omgdi:waypoint x="416.0" y="1099.0"></omgdi:waypoint>
