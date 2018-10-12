@@ -300,6 +300,13 @@
 				</textElement>
 				<textFieldExpression><![CDATA["Avviso di Post Informazione"]]></textFieldExpression>
 			</textField>
+			<textField>
+				<reportElement x="100" y="113" width="350" height="61" uuid="34639f49-4225-42a1-a30d-4e24330aba5e"/>
+				<textElement markup="styled">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["DAJEEEEEEEEEEEEEEEEEEEEEEEEE"]]></textFieldExpression>
+			</textField>
 		</band>
 	</title>
 	<pageHeader>
@@ -314,7 +321,7 @@
 				<reportElement stretchType="ElementGroupBottom" x="0" y="-14" width="540" height="130" isRemoveLineWhenBlank="true" uuid="95f783c6-0366-45c0-ace4-a72f847edf88">
 					<property name="net.sf.jasperreports.export.headertoolbar.table.name" value=""/>
 				</reportElement>
-				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" ignoreWidth="true">
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical" ignoreWidth="true">
 					<datasetRun subDataset="impegni_json" uuid="4c502478-3bc9-40f1-a35e-86f63a8f5485">
 						<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JsonDataSource)$P{REPORT_DATA_SOURCE}).subDataSource("impegni_json")]]></dataSourceExpression>
 					</datasetRun>

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.FirmaDocumentoService;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
+import it.cnr.si.flows.ng.service.FlowsPdfService;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.service.ProtocolloDocumentoService;
 import it.cnr.si.flows.ng.listeners.cnr.acquisti.service.AcquistiService;
@@ -43,7 +44,9 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 	private FlowsProcessInstanceService flowsProcessInstanceService;
 	@Inject
 	private AcquistiService acquistiService;
-
+	@Inject
+	private FlowsPdfService flowsPdfService;
+	
 	private Expression faseEsecuzione;
 
 	public void pubblicaFileMultipli(DelegateExecution execution, String nomeDocumento, Boolean pubblicaFlag) {
@@ -220,6 +223,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 
 		// START CONSUNTIVO  
 		case "consuntivo-start": {
+			flowsPdfService.makePdf("avvisoPostInformazione", processInstanceId);
 		};break;     
 		case "consuntivo-end": {
 			attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);
@@ -235,6 +239,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				protocolloDocumentoService.protocollaDocumento(execution, "contratto", execution.getVariable("numeroProtocollo_contratto").toString(), execution.getVariable("dataProtocollo_contratto").toString());
 			}
 			pubblicaFileMultipli(execution, "allegatiPubblicazioneTrasparenza", true);
+			
 		};break; 
 		case "end-stipulato-start": {
 			execution.setVariable(STATO_FINALE_DOMANDA, "STIPULATO");
