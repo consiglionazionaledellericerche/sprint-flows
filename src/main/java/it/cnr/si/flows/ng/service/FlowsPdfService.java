@@ -64,6 +64,9 @@ public class FlowsPdfService {
 	private static final float FONT_SIZE = 10;
 	private static final float TITLE_SIZE = 18;
 	private static final String VALUTAZIONE_ESPERIENZE_JSON = "valutazioneEsperienze_json";
+	private static final String IMPEGNI_JSON = "impegni_json";
+	
+	
 
 	@Inject
 	private FlowsProcessInstanceService flowsProcessInstanceService;
@@ -221,6 +224,10 @@ public class FlowsPdfService {
 			variables.put(VALUTAZIONE_ESPERIENZE_JSON, esperienze);
 		}
 
+		if (variables.has(IMPEGNI_JSON)) {
+			JSONArray esperienze = new JSONArray(variables.getString(IMPEGNI_JSON));
+			variables.put(IMPEGNI_JSON, esperienze);
+		}
 		return variables;
 	}
 
@@ -281,8 +288,9 @@ public class FlowsPdfService {
 		InputStream jasperFile = null;
 		try {
 			//carico le variabili della process instance
-			LOGGER.debug("Json con i dati da inserire nel pdf: {0}", processvariables.toString());
+			LOGGER.debug("Json con i dati da inserire nel pdf: {0}", processvariables.toString().replaceAll("\\\\\"","\""));
 			JRDataSource datasource = new JsonDataSource(new ByteArrayInputStream(processvariables.toString().getBytes(Charset.forName("UTF-8"))));
+			//JRDataSource datasource = new JsonDataSource(new ByteArrayInputStream(processvariables.toString().replaceAll("\\\\\"","\"").getBytes(Charset.forName("UTF-8"))));
 
 			final ResourceBundle resourceBundle = ResourceBundle.getBundle(
 					"net.sf.jasperreports.view.viewer", Locale.ITALIAN);
