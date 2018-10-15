@@ -163,12 +163,12 @@
                 <boolProp name="HTTPArgument.use_equals">true</boolProp>
                 <stringProp name="Argument.name">__new__allegati[0]&quot;; filename=&quot;Romaeuropa Festival 2017 __ Citynews Shop_backup.pdf&quot; Content-Type: application/pdf </stringProp>
               </elementProp>
-              <elementProp name="__new__allegatiPubblicabili[0]&quot;; filename=&quot;IIRISU6A32WK2S-001 (1).pdf&quot; Content-Type: application/pdf " elementType="HTTPArgument">
+              <elementProp name="__new__allegatiPubblicazioneTrasparenza[0]&quot;; filename=&quot;IIRISU6A32WK2S-001 (1).pdf&quot; Content-Type: application/pdf " elementType="HTTPArgument">
                 <boolProp name="HTTPArgument.always_encode">false</boolProp>
                 <stringProp name="Argument.value"></stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
                 <boolProp name="HTTPArgument.use_equals">true</boolProp>
-                <stringProp name="Argument.name">__new__allegatiPubblicabili[0]&quot;; filename=&quot;IIRISU6A32WK2S-001 (1).pdf&quot; Content-Type: application/pdf </stringProp>
+                <stringProp name="Argument.name">__new__allegatiPubblicazioneTrasparenza[0]&quot;; filename=&quot;IIRISU6A32WK2S-001 (1).pdf&quot; Content-Type: application/pdf </stringProp>
               </elementProp>
               <elementProp name="oggetto" elementType="HTTPArgument">
                 <boolProp name="HTTPArgument.always_encode">false</boolProp>
