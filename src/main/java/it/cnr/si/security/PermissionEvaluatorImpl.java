@@ -306,8 +306,17 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
         String username = SecurityUtils.getCurrentUserLogin();
 
         if (instance.getProcessDefinitionKey().equals(acquisti.getValue())) {
+
             String rup = runtimeService.getVariable(processInstanceId, "rup", String.class);
-            return username.equals(rup);
+            if (username.equals(rup))
+                return true;
+
+            List<String> authorities = it.cnr.si.flows.ng.utils.SecurityUtils.getCurrentUserAuthorities();
+            String idStruttura = String.valueOf(instance.getProcessVariables().get("idStruttura"));
+            String nomeGruppoFirma = "responsabileFirmaAcquisti@" + idStruttura;
+
+            if (authorities.contains(nomeGruppoFirma))
+                return true;
         }
 
         return false;
