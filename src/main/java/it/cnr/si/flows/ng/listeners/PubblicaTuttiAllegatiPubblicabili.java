@@ -36,7 +36,7 @@ public class PubblicaTuttiAllegatiPubblicabili implements ExecutionListener {
 			if (entry.getValue() != null){
 				if (entry.getValue() instanceof FlowsAttachment) {
 					FlowsAttachment allegato = (FlowsAttachment) entry.getValue();
-					if	(allegato != null && allegato.getName().startsWith("allegatiPubblicabili")){
+					if	(allegato != null && allegato.getName().startsWith("allegatiPubblicazioneTrasparenza")){
 						LOGGER.info("pubblico: " + allegato.getFilename() + "(" + entry.getKey() + ") per il flusso: " + execution.getId() );
 						attachmentService.setPubblicabile(execution.getId(), entry.getKey(), true);
 					}
