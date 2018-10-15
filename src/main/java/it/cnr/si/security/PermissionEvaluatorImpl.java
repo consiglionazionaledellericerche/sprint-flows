@@ -279,9 +279,12 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
         if(SecurityUtils.isCurrentUserInRole("ROLE_ADMIN"))
             return true;
 
-        ProcessInstance instance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .includeProcessVariables()
+                .singleResult();
         String processDefinitionKey = instance.getProcessDefinitionKey();
-        String idStruttura = runtimeService.getVariable(processInstanceId, "idStruttura", String.class);
+        String idStruttura = String.valueOf(instance.getProcessVariables().get("idStruttura"));
 
         String username = SecurityUtils.getCurrentUserLogin();
         List<String> authorities = getAuthorities(username, flowsUserDetailsService);
@@ -302,12 +305,15 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
         if(SecurityUtils.isCurrentUserInRole("ROLE_ADMIN"))
             return true;
 
-        ProcessInstance instance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .includeProcessVariables()
+                .singleResult();
         String username = SecurityUtils.getCurrentUserLogin();
 
         if (instance.getProcessDefinitionKey().equals(acquisti.getValue())) {
 
-            String rup = runtimeService.getVariable(processInstanceId, "rup", String.class);
+            String rup = String.valueOf(instance.getProcessVariables().get("rup"));
             if (username.equals(rup))
                 return true;
 
