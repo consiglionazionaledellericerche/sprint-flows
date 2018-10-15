@@ -21,6 +21,7 @@ public class DittaCandidata {
 
 		String ditteCandidateString = (String) execution.getVariable("ditteCandidate_json");
 		LOGGER.info("ditteCandidate_json: " + ditteCandidateString);
+		execution.setVariable("nrElencoDitteInit", true);
 
 		JSONArray ditteCandidate = new JSONArray(ditteCandidateString);
 		int nrTotaleDitte = ditteCandidate.length();
@@ -31,7 +32,7 @@ public class DittaCandidata {
 		} 
 		if (execution.getVariable("nrElencoDitteCorrente") == null) {
 			execution.setVariable("nrElencoDitteCorrente", 0);
-		} 
+		}
 		int nrElencoDitteCorrente = (int) execution.getVariable("nrElencoDitteCorrente");
 		JSONObject dittaCorrente = ditteCandidate.getJSONObject(nrElencoDitteCorrente);
 		execution.setVariable("pIvaCodiceFiscaleDittaCandidata", dittaCorrente.get("pIvaCodiceFiscaleDittaCandidata"));
