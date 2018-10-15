@@ -3,9 +3,15 @@ package it.cnr.si.flows.ng.listeners.cnr.acquisti.service;
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Sostituzione;
 import static it.cnr.si.flows.ng.utils.Enum.Stato.Sostituito;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import javax.inject.Inject;
 
 import org.activiti.engine.delegate.DelegateExecution;
+import org.activiti.engine.impl.util.json.JSONException;
 import org.apache.commons.lang3.SerializationUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,7 +32,52 @@ public class AcquistiService {
     @Inject
     private FlowsAttachmentService attachmentService;
     
+	public void OrdinaElencoDitteCandidate(DelegateExecution execution) {
+		String ditteCandidateString = (String) execution.getVariable("ditteCandidate_json");
+		LOGGER.info("ditteCandidate_json: " + ditteCandidateString);
+
+		JSONArray ditteCandidate = new JSONArray(ditteCandidateString);
+		int nrTotaleDitte = ditteCandidate.length();
+		LOGGER.info("nrTotaleDitte: " + nrTotaleDitte);
+
+	    JSONArray sortedJsonArray = new JSONArray();
+
+	    List<JSONObject> jsonValues = new ArrayList<JSONObject>();
+	    for (int i = 0; i < ditteCandidate.length(); i++) {
+	        jsonValues.add(ditteCandidate.getJSONObject(i));
+	    }
+	    Collections.sort( jsonValues, new Comparator<JSONObject>() {
+	        //You can change "Name" with "ID" if you want to sort by ID
+	        private static final String KEY_NAME = "valutazioneDittaCandidata";
+
+	        @Override
+	        public int compare(JSONObject a, JSONObject b) {
+	            int valA = 0;
+	            int valB = 0;
+
+	            try {
+	                valA = (int) a.get(KEY_NAME);
+	                valB = (int) b.get(KEY_NAME);
+	            } 
+	            catch (JSONException e) {
+	                //do something
+	            }
+
+	            return Integer.compare(valA, valB);
+	            //if you want to change the sort order, simply use the following:
+	            //return -valA.compareTo(valB);
+	        }
+	    });
+
+	    for (int i = 0; i < ditteCandidate.length(); i++) {
+	        sortedJsonArray.put(jsonValues.get(i));
+	    }
+		LOGGER.info("sortedJsonArray: " + sortedJsonArray);
+
+	    execution.setVariable("ditteCandidate_json", sortedJsonArray.toString());
+	}
     
+	
 	public void ScorriElencoDitteCandidate(DelegateExecution execution) {
 		String ditteCandidateString = (String) execution.getVariable("ditteCandidate_json");
 		LOGGER.info("ditteCandidate_json: " + ditteCandidateString);

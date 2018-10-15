@@ -46,7 +46,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 	private AcquistiService acquistiService;
 	@Inject
 	private FlowsPdfService flowsPdfService;
-	
+
 	private Expression faseEsecuzione;
 
 	public void pubblicaFileMultipli(DelegateExecution execution, String nomeDocumento, Boolean pubblicaFlag) {
@@ -127,7 +127,10 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 
 		case "espletamento-procedura-start": {
 		};break;     
-		case "espletamento-procedura-end": {
+		case "espletamento-procedura-end": {	
+			if (execution.getVariable("strumentoAcquisizioneId") != null && execution.getVariable("strumentoAcquisizioneId").equals("23")) {
+				acquistiService.OrdinaElencoDitteCandidate(execution);
+			}
 		};break;
 
 		// START PROVVEDIMENTO-AGGIUDICAZIONE  
@@ -239,7 +242,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				protocolloDocumentoService.protocollaDocumento(execution, "contratto", execution.getVariable("numeroProtocollo_contratto").toString(), execution.getVariable("dataProtocollo_contratto").toString());
 			}
 			pubblicaFileMultipli(execution, "allegatiPubblicazioneTrasparenza", true);
-			
+
 		};break; 
 		case "end-stipulato-start": {
 			execution.setVariable(STATO_FINALE_DOMANDA, "STIPULATO");
@@ -335,7 +338,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			attachmentService.setPubblicabile(execution.getId(), "provvedimentoNominaCommissione", true);
 			attachmentService.setPubblicabile(execution.getId(), "provvedimentoAmmessiEsclusi", true);
 			attachmentService.setPubblicabile(execution.getId(), "esitoValutazioneAnomalie", true);
-			attachmentService.setPubblicabile(execution.getId(), "elencoDitteCandidate", true);
+			attachmentService.setPubblicabile(execution.getId(), "elencoDitteInvitate", true);
 			attachmentService.setPubblicabile(execution.getId(), "elencoVerbali", true);
 			pubblicaFileMultipli(execution, "bandoAvvisi", true);
 			pubblicaFileMultipli(execution, "letteraInvito", true);
