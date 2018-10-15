@@ -91,5 +91,7 @@
 			} else
 				$scope.formUrl = undefined;
 		});
+
+		$scope.search();
 	}
 })();
