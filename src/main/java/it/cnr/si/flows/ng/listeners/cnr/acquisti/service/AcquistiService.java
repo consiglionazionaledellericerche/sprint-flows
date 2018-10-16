@@ -63,7 +63,7 @@ public class AcquistiService {
 	                //do something
 	            }
 
-	            return Integer.compare(valA, valB);
+	            return -Integer.compare(valA, valB);
 	            //if you want to change the sort order, simply use the following:
 	            //return -valA.compareTo(valB);
 	        }
