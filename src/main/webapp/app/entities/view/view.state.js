@@ -127,6 +127,7 @@
                                 processId: null,
                                 type: null,
                                 view: null,
+                                version: null,
                                 id: null
                             };
                         }

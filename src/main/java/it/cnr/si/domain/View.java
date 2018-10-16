@@ -34,6 +34,9 @@ public class View implements Serializable {
     @Column(name = "view", nullable = false)
     private String view;
 
+    @Column(name = "version")
+    private String version;
+
     public Long getId() {
         return id;
     }
@@ -81,6 +84,19 @@ public class View implements Serializable {
         this.view = view;
     }
 
+    public String getVersion() {
+        return version;
+    }
+
+    public View version(String version) {
+        this.version = version;
+        return this;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -108,6 +124,7 @@ public class View implements Serializable {
             ", processId='" + processId + "'" +
             ", type='" + type + "'" +
             ", view='" + view + "'" +
+            ", version='" + version + "'" +
             '}';
     }
 }
