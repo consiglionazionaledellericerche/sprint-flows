@@ -113,8 +113,7 @@ public class FlowsAttachment implements Serializable {
 
     @SuppressWarnings("unchecked")
     public Set<Enum.Stato> getStati() {
-        if (this.getMetadati().get("stati") == null)
-            this.getMetadati().put("stati", new HashSet<Enum.Stato>());
+        getMetadati().putIfAbsent("stati",new HashSet<Enum.Stato>());
         return (Set<Enum.Stato>) this.getMetadati().get("stati");
     }
 
