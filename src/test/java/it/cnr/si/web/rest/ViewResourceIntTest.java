@@ -4,10 +4,12 @@ import it.cnr.si.SprintApp;
 import it.cnr.si.domain.View;
 import it.cnr.si.flows.ng.TestUtil;
 import it.cnr.si.repository.ViewRepository;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import static org.hamcrest.Matchers.hasItem;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
@@ -46,6 +48,8 @@ public class ViewResourceIntTest {
     private static final String UPDATED_TYPE = "BBBBB";
     private static final String DEFAULT_VIEW = "AAAAA";
     private static final String UPDATED_VIEW = "BBBBB";
+    private static final String DEFAULT_VERSION = "AAAAA";
+    private static final String UPDATED_VERSION = "BBBBB";
 
     @Inject
     private ViewRepository viewRepository;
@@ -84,7 +88,8 @@ public class ViewResourceIntTest {
         view = new View()
                 .processId(DEFAULT_PROCESS_ID)
                 .type(DEFAULT_TYPE)
-                .view(DEFAULT_VIEW);
+                .view(DEFAULT_VIEW)
+                .version(DEFAULT_VERSION);
         return view;
     }
 
@@ -112,6 +117,7 @@ public class ViewResourceIntTest {
         assertThat(testView.getProcessId()).isEqualTo(DEFAULT_PROCESS_ID);
         assertThat(testView.getType()).isEqualTo(DEFAULT_TYPE);
         assertThat(testView.getView()).isEqualTo(DEFAULT_VIEW);
+        assertThat(testView.getVersion()).isEqualTo(DEFAULT_VERSION);
     }
 
     @Test
@@ -181,7 +187,8 @@ public class ViewResourceIntTest {
                 .andExpect(jsonPath("$.[*].id").value(hasItem(view.getId().intValue())))
                 .andExpect(jsonPath("$.[*].processId").value(hasItem(DEFAULT_PROCESS_ID.toString())))
                 .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())))
-                .andExpect(jsonPath("$.[*].view").value(hasItem(DEFAULT_VIEW.toString())));
+                .andExpect(jsonPath("$.[*].view").value(hasItem(DEFAULT_VIEW.toString())))
+                .andExpect(jsonPath("$.[*].version").value(hasItem(DEFAULT_VERSION.toString())));
     }
 
     @Test
@@ -197,7 +204,8 @@ public class ViewResourceIntTest {
             .andExpect(jsonPath("$.id").value(view.getId().intValue()))
             .andExpect(jsonPath("$.processId").value(DEFAULT_PROCESS_ID.toString()))
             .andExpect(jsonPath("$.type").value(DEFAULT_TYPE.toString()))
-            .andExpect(jsonPath("$.view").value(DEFAULT_VIEW.toString()));
+            .andExpect(jsonPath("$.view").value(DEFAULT_VIEW.toString()))
+            .andExpect(jsonPath("$.version").value(DEFAULT_VERSION.toString()));
     }
 
     @Test
@@ -220,7 +228,8 @@ public class ViewResourceIntTest {
         updatedView
                 .processId(UPDATED_PROCESS_ID)
                 .type(UPDATED_TYPE)
-                .view(UPDATED_VIEW);
+                .view(UPDATED_VIEW)
+                .version(UPDATED_VERSION);
 
         restViewMockMvc.perform(put("/api/views")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -234,6 +243,7 @@ public class ViewResourceIntTest {
         assertThat(testView.getProcessId()).isEqualTo(UPDATED_PROCESS_ID);
         assertThat(testView.getType()).isEqualTo(UPDATED_TYPE);
         assertThat(testView.getView()).isEqualTo(UPDATED_VIEW);
+        assertThat(testView.getVersion()).isEqualTo(UPDATED_VERSION);
     }
 
     @Test
