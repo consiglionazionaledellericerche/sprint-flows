@@ -1,10 +1,12 @@
 package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
+import it.cnr.si.flows.ng.service.CoolFlowsBridgeService;
 import it.cnr.si.flows.ng.service.FlowsTaskService;
+import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.security.SecurityUtils;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.task.TaskQuery;
 import org.activiti.rest.common.api.DataResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,6 +19,8 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,6 +36,8 @@ public class FlowsTaskResource {
     @Inject
     private FlowsTaskService flowsTaskService;
 
+    @Inject @Deprecated
+    private CoolFlowsBridgeService coolBridgeService;
 
 
 
@@ -154,6 +160,43 @@ public class FlowsTaskResource {
         DataResponse response = flowsTaskService.getTasksCompletedByMe(req, processDefinition, firstResult, maxResults, order);
 
         return ResponseEntity.ok(response);
+    }
+
+    @Deprecated
+    @RequestMapping(value = "/coolAvailableTasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
+    @Timed
+    public ResponseEntity<Map<String, Long>> getCoolAvailableTasks() {
+
+        String username = SecurityUtils.getCurrentUserLogin();
+        Map<String, Long> result = new HashMap<String, Long>() {{
+            put("acquisti", 0L);
+            put("flussoApprovvigionamentiIT", 0L);
+            put("flussoAttestati", 0L);
+            put("flussoDetermineAcquisti", 0L);
+            put("flussoMissioniOrdine", 0L);
+            put("flussoMissioniRevoca", 0L);
+            put("flussoMissioniRimborso", 0L);
+            put("flussoRelazioniCDA", 0L);
+        }};
+
+        long sprintTasks = taskService.createTaskQuery()
+                .taskAssignee(username)
+                .or()
+                .taskCandidateGroupIn(SecurityUtils.getCurrentUserAuthorities())
+                .count();
+        result.put("acquisti", sprintTasks);
+
+        List<Map> coolTasks = coolBridgeService.getCoolAvailableAndAssignedTasks(username);
+
+        coolTasks.forEach(t -> {
+            Map<String, String> entry = (Map<String, String>) t.get("entry");
+            String procDefId = entry.get("processDefinitionId").split(":")[0];
+            result.compute(procDefId, (k,v) -> v+1);
+        });
+
+
+        return ResponseEntity.ok(result);
     }
 
 }

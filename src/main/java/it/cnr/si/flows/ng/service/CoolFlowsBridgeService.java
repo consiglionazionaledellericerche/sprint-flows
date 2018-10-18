@@ -8,45 +8,58 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import javax.security.auth.login.LoginException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Service
 public class CoolFlowsBridgeService {
 
-    // https://scrivaniadigitale.cnr.it/rest/taskinstances/mytasks?maxItems=10000&skipCount=0&where=(status=active+AND+assignee+=+'marcinireneusz.trycz')
-    // https://scrivaniadigitale.cnr.it/rest/taskinstances/mytasks?maxItems=10000&skipCount=0&where=(status=active+AND+candidateUser+=+'marcinireneusz.trycz')
-    // https://scrivaniadigitale.cnr.it/rest/taskinstances/mytasks?maxItems=1000&skipCount=0&where=(includeTaskVariables+=+true+AND+includeProcessVariables+=+true+AND+status+=+active+AND+assignee+=+'marcinireneusz.trycz')
-    // https://scrivaniadigitale.cnr.it/rest/taskinstances/mytasks?maxItems=1000&skipCount=0&where=(includeTaskVariables+=+true+AND+includeProcessVariables+=+true+AND+status+=+active+AND+assignee+=+'marcinireneusz.trycz')
+    private static final String ASSIGNED_URL = "https://scrivaniadigitale.cnr.it/rest/taskinstances/mytasks?maxItems=10000&skipCount=0&where=(status=active+AND+assignee+=+'{username}')";
+    private static final String CANDIDATE_URL ="https://scrivaniadigitale.cnr.it/rest/taskinstances/mytasks?maxItems=10000&skipCount=0&where=(status=active+AND+candidateUser+=+'{username}')";
 
     @Inject
     private CoolFlowsRestConfiguration.CoolRestTemplate coolRestTemplate;
 
 
-    public Object getCoolAvailableAndAssignedTasks(String username) {
+    public List<Map> getCoolAvailableAndAssignedTasks(String username) {
 
         try {
 
-            Map tasks = getAvailableAndAssignedTasks(username);
+            Map assignedTasks = getAssignedTasks(username);
+            Map availableTasks = getAvailableTasks(username);
+
+            List<Map> tasks = new ArrayList<>();
+
+            tasks = (List<Map>) ((Map)assignedTasks.get("list")).get("entries");
+            tasks.addAll((List<Map>) ((Map)availableTasks.get("list")).get("entries"));
 
             return tasks;
 
-        } catch (URISyntaxException | LoginException e) {
+        } catch (LoginException e) {
 
-            return null; //defaultvalue
+            return new ArrayList<>(); //defaultvalue TODO
         }
 
     }
 
-    private Map getAvailableAndAssignedTasks(String username) throws LoginException, URISyntaxException {
+    private Map getAssignedTasks(String username) throws LoginException {
 
-        String url = "https://scrivaniadigitale.cnr.it/rest/taskinstances/mytasks?maxItems=10000&skipCount=0&where=(status=active+AND+candidateUser+=+'"+ username +"')";
-
-        ResponseEntity<Map> response = coolRestTemplate.loginAndExchange(url, Map.class);
+        ResponseEntity<Map> response = coolRestTemplate.loginAndExchange(ASSIGNED_URL, Map.class, username);
 
         if (response.getStatusCode() != HttpStatus.OK)
             throw new LoginException("" + response.getStatusCode() + response.getBody());
 
         return response.getBody();
+    }
 
+    private Map getAvailableTasks(String username) throws LoginException {
+
+        ResponseEntity<Map> response = coolRestTemplate.loginAndExchange(CANDIDATE_URL, Map.class, username);
+
+        if (response.getStatusCode() != HttpStatus.OK)
+            throw new LoginException("" + response.getStatusCode() + response.getBody());
+
+        return response.getBody();
     }
 }
