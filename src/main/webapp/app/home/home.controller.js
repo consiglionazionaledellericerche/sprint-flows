@@ -5,9 +5,9 @@
         .module('sprintApp')
         .controller('HomeController', HomeController);
 
-    HomeController.$inject = ['$scope', 'Principal', 'LoginService', '$state'];
+    HomeController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService'];
 
-    function HomeController ($scope, Principal, LoginService, $state) {
+    function HomeController ($scope, Principal, LoginService, $state, dataService) {
         var vm = this;
 
         vm.account = null;
@@ -20,10 +20,20 @@
 
         getAccount();
 
+        /* --- */
+
+        function getTasksCount() {
+            dataService.tasks.coolAvailableTasks().then(function(response) {
+                vm.coolTasks = response.data;
+            });
+        }
+
         function getAccount() {
             Principal.identity().then(function(account) {
                 vm.account = account;
                 vm.isAuthenticated = Principal.isAuthenticated;
+                if (vm.isAuthenticated)
+                    getTasksCount();
             });
         }
         function register () {

@@ -61,6 +61,10 @@
                 search: function(params) {
                     return $http.post('api/tasks/search/', params);
                 },
+                coolAvailableTasks: function() {
+                    return $http.get('api/tasks/coolAvailableTasks');
+                }
+
             },
             processInstances: {
                 byProcessInstanceId: function(processInstanceId, detail) {

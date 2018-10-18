@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
 import javax.security.auth.login.LoginException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -33,16 +34,26 @@ public class CoolFlowsRestConfiguration {
 
     public class CoolRestTemplate extends RestTemplate {
 
-        public <T> ResponseEntity<T> loginAndExchange(String url, Class<T> responseType)
-                throws RestClientException {
+        @Deprecated
+        private String ticket;
 
+        @PostConstruct
+        public void init() {
+            try {
+                login();
+            } catch (LoginException e) {}
+        }
+
+        @Deprecated
+        private void login() throws LoginException {
             RequestEntity<Map> loginRequest = null;
+
             try {
                 loginRequest = RequestEntity
                         .post(new URI("https://scrivaniadigitale.cnr.it/rest/security/login"))
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(new HashMap<String, String>(){{
+                        .body(new HashMap<String, String>() {{
                             put("username", username);
                             put("password", password);
                         }});
@@ -52,20 +63,32 @@ public class CoolFlowsRestConfiguration {
                 if (response.getStatusCode() != HttpStatus.OK)
                     throw new LoginException("" + response.getStatusCode() + response.getBody());
 
-                String ticket = (String) response.getBody().get("ticket");
+                this.ticket = (String) response.getBody().get("ticket");
+            } catch (URISyntaxException e) {};
+        }
 
-                RequestEntity<Void> payloadRequest = RequestEntity
-                        .get(new URI(url))
-                        .header("cookie", String.valueOf("ticket=" + ticket))
-                        .accept(MediaType.APPLICATION_JSON)
-                        .build();
+        public <T> ResponseEntity<T> loginAndExchange(String url, Class<T> responseType, String username)
+                throws RestClientException {
 
-                return super.exchange(payloadRequest, responseType);
+            try {
+                login();
+                ResponseEntity<T> response = doTheExchange(url, responseType, username);
+
+                return response;
 
             } catch (URISyntaxException | LoginException e) {
                 throw new RuntimeException(e);
             }
         }
 
+        private <T> ResponseEntity<T> doTheExchange(String url, Class<T> responseType, String username) throws URISyntaxException {
+            RequestEntity<Void> payloadRequest = RequestEntity
+                    .get(new URI(url.replace("{username}", username)))
+                    .header("cookie", String.valueOf("ticket=" + ticket))
+                    .accept(MediaType.APPLICATION_JSON)
+                    .build();
+
+            return super.exchange(payloadRequest, responseType);
+        }
     }
 }
