@@ -6,6 +6,10 @@ import it.cnr.si.domain.View;
 import it.cnr.si.repository.ViewRepository;
 import it.cnr.si.web.rest.util.HeaderUtil;
 import it.cnr.si.web.rest.util.PaginationUtil;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
+import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -34,6 +38,10 @@ public class ViewResource {
         
     @Inject
     private ViewRepository viewRepository;
+    @Inject
+    private RuntimeService runtimeService;
+    @Inject
+    private TaskService taskService;
 
     /**
      * POST  /views : Create a new view.
@@ -134,6 +142,48 @@ public class ViewResource {
         log.debug("REST request to delete View : {}", id);
         viewRepository.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("view", id.toString())).build();
+    }
+
+    @RequestMapping(value = "/views/{processId}/{version}/{type}",
+            method = RequestMethod.GET,
+            produces = MediaType.TEXT_HTML_VALUE)
+    @Timed
+    public ResponseEntity<String> getViewByTrittico(
+            @PathVariable String processId,
+            @PathVariable String version,
+            @PathVariable String type) {
+
+        log.debug("REST request to get View : {}/{}/{}", processId, version, type);
+
+        int intVersion = Integer.parseInt(version);
+
+        while (intVersion > 0) {
+            View view = viewRepository.findOneByProcessDefinitionKeyAndVersionAndTaskId(processId, String.valueOf(intVersion), type);
+            if (view != null)
+                return new ResponseEntity<>(view.getView(), HttpStatus.OK);
+            else
+                intVersion--;
+        }
+
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @RequestMapping(value = "/views/task/{taskId}",
+            method = RequestMethod.GET,
+            produces = MediaType.TEXT_HTML_VALUE)
+    @Timed
+    public ResponseEntity<String> getViewByTaskId(
+            @PathVariable String taskId) {
+
+        log.debug("REST request to get Form for task: {}",  taskId);
+
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        ProcessInstance process = runtimeService.createProcessInstanceQuery().processDefinitionId(task.getProcessDefinitionId()).list().get(0);
+
+        return getViewByTrittico(
+                process.getProcessDefinitionKey(),
+                process.getProcessDefinitionVersion().toString(),
+                task.getTaskDefinitionKey());
     }
 
 }

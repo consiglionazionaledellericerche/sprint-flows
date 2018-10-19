@@ -36,8 +36,8 @@
                         });
                     }
 
-                    var processDefinitionKey = response.data.entity.processDefinitionId.split(":")[0];
-                    vm.detailsView = 'api/views/' + processDefinitionKey + '/detail';
+                    var processDefinition = response.data.entity.processDefinitionId.split(":");
+                    vm.detailsView = 'api/views/' + processDefinition[0] + '/' + processDefinition[1] + '/detail';
 
                     if(vm.data.entity.variabili.valutazioneEsperienze_json)
                         vm.experiences = jQuery.parseJSON(vm.data.entity.variabili.valutazioneEsperienze_json);
