@@ -34,7 +34,7 @@
  		vm.data.processDefinitionId = $state.params.processDefinitionId;
  		vm.processDefinitionKey = vm.data.processDefinitionId.split(":")[0];
  		vm.processVersion = vm.data.processDefinitionId.split(":")[1];
- 		vm.detailsView = 'api/views/' + vm.processDefinitionKey + '/detail';
+ 		vm.detailsView = 'api/views/' + vm.processDefinitionKey + '/' + vm.processVersion + '/detail';
 
  		// Ho bisogno di caricare piu' risorse contemporaneamente (form e data);
  		// quando sono finite entrambe, autofillo la form
@@ -59,7 +59,7 @@
  					vm.data.taskId = $state.params.taskId;
  					//visualizzazione dei metadati del task in esecuzione
  					var processDefinitionKey = response.data.task.processDefinitionId.split(":")[0];
- 					vm.detailsView = 'api/views/' + processDefinitionKey + '/detail';
+ 					vm.detailsView = 'api/views/' + processDefinitionKey + '/' + processVersion + '/detail';
  					vm.data.entity = utils.refactoringVariables([response.data.task])[0];
 
  					vm.taskVariables = vm.data.entity.variabili;
