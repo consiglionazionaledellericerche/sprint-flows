@@ -58,8 +58,8 @@
  					dataPromise.resolve();
  					vm.data.taskId = $state.params.taskId;
  					//visualizzazione dei metadati del task in esecuzione
- 					var processDefinitionKey = response.data.task.processDefinitionId.split(":")[0];
- 					vm.detailsView = 'api/views/' + processDefinitionKey + '/' + processVersion + '/detail';
+ 					var processDefinition = response.data.task.processDefinitionId.split(":");
+ 					vm.detailsView = 'api/views/' + processDefinition[0] + '/' + processDefinition[1] + '/detail';
  					vm.data.entity = utils.refactoringVariables([response.data.task])[0];
 
  					vm.taskVariables = vm.data.entity.variabili;
