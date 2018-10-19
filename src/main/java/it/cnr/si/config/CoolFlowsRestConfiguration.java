@@ -41,7 +41,7 @@ public class CoolFlowsRestConfiguration {
         public void init() {
             try {
                 login();
-            } catch (LoginException e) {}
+            } catch (LoginException | RestClientException e) {}
         }
 
         @Deprecated
