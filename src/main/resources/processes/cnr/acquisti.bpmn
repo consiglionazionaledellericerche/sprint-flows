@@ -276,7 +276,7 @@
       <sequenceFlow id="flow48" sourceRef="exclusivegateway6" targetRef="endevent-provvedimento-aggiudicazione-revoca"></sequenceFlow>
       <exclusiveGateway id="exclusivegateway11" name="Exclusive Gateway" default="flow53"></exclusiveGateway>
       <sequenceFlow id="flow52" sourceRef="exclusivegateway11" targetRef="predisposizione-revoca">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Revoca'}]]></conditionExpression>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaConProvvedimento'}]]></conditionExpression>
       </sequenceFlow>
       <sequenceFlow id="flow54" sourceRef="exclusivegateway11" targetRef="modifica-provvedimento-aggiudicazione">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Modifica'}]]></conditionExpression>
