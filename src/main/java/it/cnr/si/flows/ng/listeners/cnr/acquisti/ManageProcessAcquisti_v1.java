@@ -89,44 +89,27 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 		// START DECISIONE-CONTRATTARE
 		case "verifica-decisione-start": {
 			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
-		};break;     
-		case "verifica-decisione-end": {
-		};break;    
-		case "modifica-decisione-start": {
-		};break;     
-		case "modifica-decisione-end": {
-		};break;    
-		case "firma-decisione-start": {
-		};break;     
+		};break;  
 		case "firma-decisione-end": {
 			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
 				firmaDocumentoService.eseguiFirma(execution, "decisioneContrattare");
 			}
-		};break;   
-		case "revoca-decisione-start": {
-		};break;     
-		case "revoca-decisione-end": {
-		};break;   
-		case "protocollo-decisione-start": {
-		};break;     
+		};break; 
 		case "protocollo-decisione-end": {
 			if(sceltaUtente != null && sceltaUtente.equals("Protocolla")) {
 				protocolloDocumentoService.protocolla(execution, "decisioneContrattare");
 			}
 		};break;  
 		case "endevent-decisione-contrattare-revoca-start": {
-			execution.setVariable("sceltaUtente", "RevocaSemplice");
 		};break;     
 		case "endevent-decisione-contrattare-revoca-end": {
-		};break;  
-		case "endevent-decisione-contrattare-protocollo-start": {
-		};break;     
+			execution.setVariable("direzioneFlusso", "RevocaSemplice");
+		};break;   
 		case "endevent-decisione-contrattare-protocollo-end": {
+			execution.setVariable("direzioneFlusso", "Stipula");
 		};break;
 		// END DECISIONE-CONTRATTARE 
-
-		case "espletamento-procedura-start": {
-		};break;     
+ 
 		case "espletamento-procedura-end": {	
 			if (execution.getVariable("strumentoAcquisizioneId") != null && execution.getVariable("strumentoAcquisizioneId").equals("23")) {
 				acquistiService.OrdinaElencoDitteCandidate(execution);
@@ -140,48 +123,27 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				acquistiService.ScorriElencoDitteCandidate(execution);	
 			}
 			dittaCandidata.evidenzia(execution);
-		};break;     
-		case "predisposizione-provvedimento-aggiudicazione-end": {
-		};break;  
-		case "verifica-provvedimento-aggiudicazione-start": {
-		};break;     
-		case "verifica-provvedimento-aggiudicazione-end": {
-		};break;  
-		case "modifica-provvedimento-aggiudicazione-start": {
-		};break;     
-		case "modifica-provvedimento-aggiudicazione-end": {
-		};break;  
-		case "firma-provvedimento-aggiudicazione-start": {
-		};break;     
+		};break; 
 		case "firma-provvedimento-aggiudicazione-end": {
 			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
 				firmaDocumentoService.eseguiFirma(execution, "provvedimentoAggiudicazione");
 			}
 		};break;  
-		case "protocollo-provvedimento-aggiudicazione-start": {
-		};break;     
 		case "protocollo-provvedimento-aggiudicazione-end": {
 			if(sceltaUtente != null && sceltaUtente.equals("Protocolla")) {
 				protocolloDocumentoService.protocolla(execution, "provvedimentoAggiudicazione");
 			}
-		};break;  
-		case "revoca-proposta-aggiudicazione-start": {
-		};break;     
-		case "revoca-proposta-aggiudicazione-end": {
-		};break;  
-		case "verifica-requisiti-start": {
-		};break;     
-		case "verifica-requisiti-end": {
-		};break;  
-		case "endevent-provvedimento-aggiudicazione-revoca-start": {
-			execution.setVariable("sceltaUtente", "RevocaConProvvedimento");
-		};break;     
-		case "endevent-provvedimento-aggiudicazione-revoca-end": {
-		};break;  
-		case "endevent-provvedimento-aggiudicazione-protocollo-start": {
-		};break;     
-		case "endevent-provvedimento-aggiudicazione-protocollo-end": {
 		};break;
+		case "endevent-provvedimento-aggiudicazione-revoca-end": {
+			execution.setVariable("direzioneFlusso", "RevocaConProvvedimento");
+		};break;    
+		case "endevent-provvedimento-aggiudicazione-protocollo-end": {
+			execution.setVariable("direzioneFlusso", "Stipula");
+		};break;     
+		case "endevent-provvedimento-aggiudicazione-altro-candidato-end": {
+			execution.setVariable("direzioneFlusso", "SelezionaAltroCandidato");
+		};break;
+				
 		// END PROVVEDIMENTO-AGGIUDICAZIONE
 
 		// START CONTRATTO FUORI MEPA  
@@ -189,38 +151,25 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			if (execution.getVariable("gestioneRTIDittaAggiudicataria").toString().equals("SI")) {
 				dittaCandidata.aggiornaDittaRTICandidata(execution);
 			}
-		};break;     
-		case "predisposizione-contratto-end": {
-		};break;  
-		case "firma-contratto-start": {
-		};break;     
+		};break;
 		case "firma-contratto-end": {
 			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
 				firmaDocumentoService.eseguiFirma(execution, "contratto");
 			}
-		};break;  
-		case "modifica-contratto-start": {
-		};break;     
-		case "modifica-contratto-end": {
-		};break;  
-		case "protocollo-contratto-start": {
-		};break;     
+		};break; 
 		case "protocollo-contratto-end": {
 			if(sceltaUtente != null && sceltaUtente.equals("Protocolla")) {
 				protocolloDocumentoService.protocolla(execution, "contratto");
 			}
 		};break;  
-		case "revoca-contratto-start": {
-		};break;     
-		case "revoca-contratto-end": {
-		};break;  
-		case "endevent-contratto-fuori-mepa-revoca-start": {
-		};break;     
 		case "endevent-contratto-fuori-mepa-revoca-end": {
+			execution.setVariable("direzioneFlusso", "RevocaConProvvedimento");
 		};break; 
-		case "endevent-contratto-fuori-mepa-protocollo-start": {
-		};break;     
 		case "endevent-contratto-fuori-mepa-protocollo-end": {
+			execution.setVariable("direzioneFlusso", "Stipula");
+		};break;     
+		case "endevent-contratto-fuori-mepa-altro-candidato-end": {
+			execution.setVariable("direzioneFlusso", "SelezionaAltroCandidato");
 		};break;
 		// END CONTRATTO FUORI MEPA
 
@@ -260,48 +209,24 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 					dittaCandidata.aggiornaDittaRTICandidata(execution);
 				}
 			}			
-		};break;      
-		case "stipula-mepa-consip-end": {
-		};break;   
-		case "revoca-stipula-mepa-consip-start": {
-		};break;     
-		case "revoca-stipula-mepa-consip-end": {
-		};break;   
-		case "endevent-stipula-mepa-consip-revoca-start": {
-		};break;     
+		};break; 
 		case "endevent-stipula-mepa-consip-revoca-end": {
-		};break;     
-		case "endevent-stipula-mepa-consip-ok-start": {
-		};break;     
-		case "endevent-stipula-mepa-consip-ok-end": {
+			execution.setVariable("direzioneFlusso", "RevocaConProvvedimento");
+		};break;
+		case "endevent-stipula-mepa-consip-protocollo-end": {
+			execution.setVariable("direzioneFlusso", "Stipula");
 		};break; 
 		// END STIPULA MEPA  
 
-		case "conferma-revoca-start": {
-		};break;     
-		case "conferma-revoca-end": {
-		};break; 
-
 		// START REVOCA
-		case "firma-revoca-start": {
-		};break;     
+   
 		case "firma-revoca-end": {
 			firmaDocumentoService.eseguiFirma(execution, "provvedimentoRevoca");
-		};break;  
-		case "modifica-revoca-start": {
-		};break;     
-		case "modifica-revoca-end": {
-		};break;  
-		case "protocollo-revoca-start": {
-		};break;     
+		};break; 
 		case "protocollo-revoca-end": {
 			if(sceltaUtente != null && sceltaUtente.equals("Protocolla")) {
 				protocolloDocumentoService.protocolla(execution, "provvedimentoRevoca");
 			}
-		};break;   
-		case "endevent-revoca-start": {
-		};break;     
-		case "endevent-revoca-end": {
 		};break;  
 		// END REVOCA  
 
@@ -309,10 +234,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 
 		case "end-revocato-start": {
 			execution.setVariable(STATO_FINALE_DOMANDA, "REVOCATO");
-
-		};break;     
-		case "end-revocato-end": {
-		};break;  
+		};break;
 
 		// FINE FLUSSO  
 		case "process-end": {
