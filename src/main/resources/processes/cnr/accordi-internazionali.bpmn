@@ -1,49 +1,205 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
-  <process id="myProcess" name="My process" isExecutable="true">
+  <process id="accordi-internazionali" name="Accordi Internazionali" isExecutable="true">
+    <extensionElements>
+      <activiti:executionListener event="start" delegateExpression="${manageProcessAccordiInternazionali_v1}">
+        <activiti:field name="faseEsecuzione">
+          <activiti:string><![CDATA[process-start]]></activiti:string>
+        </activiti:field>
+      </activiti:executionListener>
+      <activiti:executionListener event="end" delegateExpression="${manageProcessAccordiInternazionali_v1}">
+        <activiti:field name="faseEsecuzione">
+          <activiti:string><![CDATA[process-end]]></activiti:string>
+        </activiti:field>
+      </activiti:executionListener>
+    </extensionElements>
     <startEvent id="startevent1" name="Start"></startEvent>
-    <userTask id="validazione" name="VALIDAZIONE"></userTask>
-    <userTask id="valutazione-scientifica" name="VALUTAZIONE SCIENTIFICA"></userTask>
+    <userTask id="validazione" name="VALIDAZIONE" activiti:candidateGroups="${gruppoValidatoriAccordiInternazionali}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAccordiInternazionali_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[validazione-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAccordiInternazionali_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[validazione-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="valutazione-scientifica" name="VALUTAZIONE SCIENTIFICA" activiti:candidateGroups="${gruppoValutatoreScientificoDipartimento}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAccordiInternazionali_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[valutazione-scientifica-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAccordiInternazionali_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[valutazione-scientifica-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="validazione"></sequenceFlow>
-    <userTask id="autorizzazione-finanziamento" name="AUTORIZZAZIONE FINANZIAMENTO"></userTask>
-    <userTask id="approvazione" name="APPROVAZIONE"></userTask>
-    <userTask id="firma-verbale" name="FIRMA VERBALE"></userTask>
-    <userTask id="protocollo-verbale" name="PROTOCOLLO VERBALE"></userTask>
-    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <userTask id="autorizzazione-finanziamento" name="AUTORIZZAZIONE FINANZIAMENTO" activiti:candidateGroups="${gruppoValidatoriAccordiInternazionali}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAccordiInternazionali_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[autorizzazione-finanziamento-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAccordiInternazionali_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[autorizzazione-finanziamento-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="approvazione" name="APPROVAZIONE" activiti:candidateGroups="${gruppoResponsabileAccordiInternazionali}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAccordiInternazionali_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[approvazione-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAccordiInternazionali_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[approvazione-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="firma-verbale" name="FIRMA VERBALE" activiti:candidateGroups="${gruppoResponsabileAccordiInternazionali}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAccordiInternazionali_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[firma-verbale-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAccordiInternazionali_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[firma-verbale-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="protocollo-verbale" name="PROTOCOLLO VERBALE" activiti:candidateGroups="${gruppoUfficioProtocollo}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAccordiInternazionali_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[protocollo-verbale-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAccordiInternazionali_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[protocollo-verbale-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway" default="flow7"></exclusiveGateway>
     <sequenceFlow id="flow2" sourceRef="validazione" targetRef="exclusivegateway1"></sequenceFlow>
-    <userTask id="modifica-domanda" name="MODIFICA DOMANDA"></userTask>
-    <sequenceFlow id="flow3" sourceRef="exclusivegateway1" targetRef="modifica-domanda"></sequenceFlow>
-    <endEvent id="endevent1" name="ANNULLATA"></endEvent>
+    <userTask id="modifica-domanda" name="MODIFICA DOMANDA" activiti:assignee="${applicazioneAccordiInternazionali}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAccordiInternazionali_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[modifica-domanda-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAccordiInternazionali_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[modifica-domanda-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow3" sourceRef="exclusivegateway1" targetRef="modifica-domanda">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Modifica'}]]></conditionExpression>
+    </sequenceFlow>
+    <endEvent id="endevent1" name="ANNULLATA">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAccordiInternazionali_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[endevent-annullata-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
     <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway"></exclusiveGateway>
     <sequenceFlow id="flow4" sourceRef="modifica-domanda" targetRef="exclusivegateway2"></sequenceFlow>
     <sequenceFlow id="flow5" name="ANNULLATA" sourceRef="exclusivegateway2" targetRef="endevent1"></sequenceFlow>
     <sequenceFlow id="flow6" sourceRef="exclusivegateway2" targetRef="validazione"></sequenceFlow>
     <sequenceFlow id="flow7" sourceRef="exclusivegateway1" targetRef="valutazione-scientifica"></sequenceFlow>
-    <exclusiveGateway id="exclusivegateway3" name="Exclusive Gateway"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway3" name="Exclusive Gateway" default="flow9"></exclusiveGateway>
     <sequenceFlow id="flow8" sourceRef="valutazione-scientifica" targetRef="exclusivegateway3"></sequenceFlow>
-    <endEvent id="endevent2" name="End"></endEvent>
+    <endEvent id="endevent2" name="End">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAccordiInternazionali_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[endevent-non-finanziata-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
     <sequenceFlow id="flow9" sourceRef="exclusivegateway3" targetRef="autorizzazione-finanziamento"></sequenceFlow>
-    <exclusiveGateway id="exclusivegateway4" name="Exclusive Gateway"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway4" name="Exclusive Gateway" default="flow11"></exclusiveGateway>
     <sequenceFlow id="flow10" sourceRef="autorizzazione-finanziamento" targetRef="exclusivegateway4"></sequenceFlow>
     <sequenceFlow id="flow11" sourceRef="exclusivegateway4" targetRef="approvazione"></sequenceFlow>
-    <sequenceFlow id="flow12" name="NON FINANZIATA" sourceRef="exclusivegateway4" targetRef="endevent2"></sequenceFlow>
-    <exclusiveGateway id="exclusivegateway5" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow12" name="NON FINANZIATA" sourceRef="exclusivegateway4" targetRef="endevent2">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Negativa'}]]></conditionExpression>
+    </sequenceFlow>
+    <exclusiveGateway id="exclusivegateway5" name="Exclusive Gateway" default="flow14"></exclusiveGateway>
     <sequenceFlow id="flow13" sourceRef="approvazione" targetRef="exclusivegateway5"></sequenceFlow>
     <sequenceFlow id="flow14" sourceRef="exclusivegateway5" targetRef="caricamento-verbale"></sequenceFlow>
-    <endEvent id="endevent3" name="End"></endEvent>
-    <exclusiveGateway id="exclusivegateway6" name="Exclusive Gateway"></exclusiveGateway>
+    <endEvent id="endevent3" name="End">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAccordiInternazionali_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[endevent-approvata-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
+    <exclusiveGateway id="exclusivegateway6" name="Exclusive Gateway" default="flow16"></exclusiveGateway>
     <sequenceFlow id="flow15" sourceRef="firma-verbale" targetRef="exclusivegateway6"></sequenceFlow>
     <sequenceFlow id="flow16" sourceRef="exclusivegateway6" targetRef="protocollo-verbale"></sequenceFlow>
-    <sequenceFlow id="flow17" name="OK" sourceRef="protocollo-verbale" targetRef="endevent3"></sequenceFlow>
-    <endEvent id="endevent4" name="End"></endEvent>
+    <sequenceFlow id="flow17" name="APPROVATA" sourceRef="protocollo-verbale" targetRef="endevent3"></sequenceFlow>
+    <endEvent id="endevent4" name="End">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAccordiInternazionali_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[endevent-negativa-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
     <sequenceFlow id="flow18" name="NEGATIVA" sourceRef="exclusivegateway3" targetRef="endevent4"></sequenceFlow>
-    <userTask id="caricamento-verbale" name="CARICAMENTO VERBALE"></userTask>
-    <sequenceFlow id="flow20" sourceRef="exclusivegateway5" targetRef="autorizzazione-finanziamento"></sequenceFlow>
+    <userTask id="caricamento-verbale" name="CARICAMENTO VERBALE" activiti:candidateGroups="${gruppoValidatoriAccordiInternazionali}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAccordiInternazionali_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[caricamento-verbale-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAccordiInternazionali_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[caricamento-verbale-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow20" sourceRef="exclusivegateway5" targetRef="autorizzazione-finanziamento">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Modifica'}]]></conditionExpression>
+    </sequenceFlow>
     <sequenceFlow id="flow21" sourceRef="caricamento-verbale" targetRef="firma-verbale"></sequenceFlow>
-    <sequenceFlow id="flow22" sourceRef="exclusivegateway6" targetRef="caricamento-verbale"></sequenceFlow>
+    <sequenceFlow id="flow22" sourceRef="exclusivegateway6" targetRef="caricamento-verbale">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Modifica'}]]></conditionExpression>
+    </sequenceFlow>
   </process>
-  <bpmndi:BPMNDiagram id="BPMNDiagram_myProcess">
-    <bpmndi:BPMNPlane bpmnElement="myProcess" id="BPMNPlane_myProcess">
+  <bpmndi:BPMNDiagram id="BPMNDiagram_accordi-internazionali">
+    <bpmndi:BPMNPlane bpmnElement="accordi-internazionali" id="BPMNPlane_accordi-internazionali">
       <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
         <omgdc:Bounds height="35.0" width="35.0" x="0.0" y="69.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
@@ -121,7 +277,7 @@
         <omgdi:waypoint x="480.0" y="92.0"></omgdi:waypoint>
         <omgdi:waypoint x="620.0" y="92.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="549.0" y="72.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="63.0" x="549.0" y="72.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
@@ -154,7 +310,7 @@
         <omgdi:waypoint x="454.0" y="248.0"></omgdi:waypoint>
         <omgdi:waypoint x="620.0" y="248.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="534.0" y="228.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="86.0" x="534.0" y="228.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow13" id="BPMNEdge_flow13">
@@ -177,14 +333,14 @@
         <omgdi:waypoint x="575.0" y="499.0"></omgdi:waypoint>
         <omgdi:waypoint x="620.0" y="499.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="599.0" y="482.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="65.0" x="573.0" y="469.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow18" id="BPMNEdge_flow18">
         <omgdi:waypoint x="353.0" y="170.0"></omgdi:waypoint>
         <omgdi:waypoint x="620.0" y="170.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="559.0" y="150.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="53.0" x="559.0" y="150.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow20" id="BPMNEdge_flow20">
