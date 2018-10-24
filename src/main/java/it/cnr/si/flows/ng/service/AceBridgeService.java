@@ -119,8 +119,11 @@ public class AceBridgeService {
 	//    @Cacheable("nomiStrutture")
 	public String getNomeStruturaById(Integer id) {
 		Ace ace = getAce();
-
-		return ace.entitaOrganizzativaById(id).getDenominazione();
+		if (id == 0) {
+			return "CNR";
+		} else {
+			return ace.entitaOrganizzativaById(id).getDenominazione();
+		}
 	}
 
 	//    @Cacheable("nomiEstesiGruppiRuoloStruttura")

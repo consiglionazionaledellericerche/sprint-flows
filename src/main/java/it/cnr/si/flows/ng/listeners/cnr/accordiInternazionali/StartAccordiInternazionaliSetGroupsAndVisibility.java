@@ -34,9 +34,9 @@ public class StartAccordiInternazionaliSetGroupsAndVisibility {
 		// LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable(Enum.VariableEnum.title.name()));
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
 
-		String gruppoValidatoriAccordiInternazionali = "validatoriAccordiInternazionali";
-		String gruppoUfficioProtocollo = "ufficioProtocolloAccordiInternazionali";
-		String gruppoResponsabileAccordiInternazionali = "responsabileAccordiInternazionali";
+		String gruppoValidatoriAccordiInternazionali = "validatoriAccordiInternazionali@0000";
+		String gruppoUfficioProtocollo = "ufficioProtocolloAccordiInternazionali@0000";
+		String gruppoResponsabileAccordiInternazionali = "responsabileAccordiInternazionali@0000";
 		String applicazioneAccordiInternazionali = "app.accordiInternazionali";
 
 		LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}",  gruppoValidatoriAccordiInternazionali, gruppoResponsabileAccordiInternazionali, gruppoUfficioProtocollo);
