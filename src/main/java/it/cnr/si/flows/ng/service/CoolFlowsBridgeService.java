@@ -1,6 +1,7 @@
 package it.cnr.si.flows.ng.service;
 
 import it.cnr.si.config.CoolFlowsRestConfiguration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Profile("cnr")
 public class CoolFlowsBridgeService {
 
     private static final String ASSIGNED_URL = "https://scrivaniadigitale.cnr.it/rest/taskinstances/mytasks?maxItems=10000&skipCount=0&where=(status=active+AND+assignee+=+'{username}')";

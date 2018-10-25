@@ -8,6 +8,8 @@ import it.cnr.si.security.AuthoritiesConstants;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.task.TaskQuery;
 import org.activiti.rest.common.api.DataResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -36,9 +38,8 @@ public class FlowsTaskResource {
     @Inject
     private FlowsTaskService flowsTaskService;
 
-    @Inject @Deprecated
+    @Autowired(required = false) @Deprecated
     private CoolFlowsBridgeService coolBridgeService;
-
 
 
     @RequestMapping(value = "/mytasks", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -162,6 +163,7 @@ public class FlowsTaskResource {
         return ResponseEntity.ok(response);
     }
 
+    @Profile("cnr")
     @Deprecated
     @RequestMapping(value = "/coolAvailableTasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
