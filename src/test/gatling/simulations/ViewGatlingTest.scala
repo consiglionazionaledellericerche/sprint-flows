@@ -80,7 +80,7 @@ class ViewGatlingTest extends Simulation {
             .exec(http("Create new view")
             .post("/api/views")
             .headers(headers_http_authenticated)
-            .body(StringBody("""{"id":null, "processId":"SAMPLE_TEXT", "type":"SAMPLE_TEXT", "view":"SAMPLE_TEXT"}""")).asJSON
+            .body(StringBody("""{"id":null, "processId":"SAMPLE_TEXT", "type":"SAMPLE_TEXT", "view":"SAMPLE_TEXT", "version":"SAMPLE_TEXT"}""")).asJSON
             .check(status.is(201))
             .check(headerRegex("Location", "(.*)").saveAs("new_view_url"))).exitHereIfFailed
             .pause(10)

@@ -1,12 +1,14 @@
 package it.cnr.si.security;
 
 import it.cnr.si.flows.ng.resource.FlowsProcessDefinitionResource;
+import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.IdentityLinkType;
 import org.activiti.engine.task.Task;
@@ -27,6 +29,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
 import static it.cnr.si.flows.ng.utils.Enum.Role.*;
 
 
@@ -86,6 +89,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
      */
     public boolean canCompleteTaskOrStartProcessInstance(MultipartHttpServletRequest req, FlowsUserDetailsService flowsUserDetailsService) {
         String taskId = req.getParameter("taskId");
+
         if (taskId != null) {
             String username = SecurityUtils.getCurrentUserLogin();
             String assignee = taskService.createTaskQuery()
@@ -95,6 +99,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
             // l'utente puo' completare il task se e' lui l'assegnatario
             if (assignee != null) {
                 return assignee.equals(username);
+
             } else {
                 // Se l'assegnatario non c'e', L'utente deve essere nei gruppi candidati
                 List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
@@ -139,23 +144,20 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
     //controllo che l'utente abbia un authorities di tipo "supervisore" o "responsabile" della struttura o del tipo di flusso
     private boolean verifyAuthorities(String idStruttura, String processDefinitionKey, List<String> authorities) {
         Boolean canVisualize = false;
-        if (authorities.stream()
+        return authorities.stream()
                 .anyMatch(
                         a -> a.contains(supervisore + "@" + CNR_CODE) ||
-                                a.contains(responsabile + "@" + CNR_CODE) ||
-                                a.contains(supervisoreStruttura + "@" + idStruttura) ||
-                                a.contains(responsabileStruttura + "@" + idStruttura) ||
-                                a.contains(supervisore + "#" + processDefinitionKey + "@" + CNR_CODE) ||
-                                a.contains(responsabile + "#" + processDefinitionKey + "@" + CNR_CODE) ||
-                                a.contains(supervisore + "#" + processDefinitionKey + "@" + idStruttura) ||
-                                a.contains(responsabile + "#" + processDefinitionKey + "@" + idStruttura) ||
-                                a.contains(supervisore + "#flussi@" + CNR_CODE) ||
-                                a.contains(responsabile + "#flussi@" + CNR_CODE) ||
-                                a.contains(supervisore + "#flussi@" + idStruttura) ||
-                                a.contains(responsabile + "#flussi@" + idStruttura))) {
-            canVisualize = true;
-        }
-        return canVisualize;
+                        a.contains(responsabile + "@" + CNR_CODE) ||
+                        a.contains(supervisoreStruttura + "@" + idStruttura) ||
+                        a.contains(responsabileStruttura + "@" + idStruttura) ||
+                        a.contains(supervisore + "#" + processDefinitionKey + "@" + CNR_CODE) ||
+                        a.contains(responsabile + "#" + processDefinitionKey + "@" + CNR_CODE) ||
+                        a.contains(supervisore + "#" + processDefinitionKey + "@" + idStruttura) ||
+                        a.contains(responsabile + "#" + processDefinitionKey + "@" + idStruttura) ||
+                        a.contains(supervisore + "#flussi@" + CNR_CODE) ||
+                        a.contains(responsabile + "#flussi@" + CNR_CODE) ||
+                        a.contains(supervisore + "#flussi@" + idStruttura) ||
+                        a.contains(responsabile + "#flussi@" + idStruttura));
     }
 
 
@@ -272,6 +274,59 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
         return result;
     }
 
+    public boolean canUpdateAttachment(String processInstanceId, FlowsUserDetailsService flowsUserDetailsService) {
+
+        if(SecurityUtils.isCurrentUserInRole("ROLE_ADMIN"))
+            return true;
+
+        HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .includeProcessVariables()
+                .singleResult();
+        String processDefinitionKey = instance.getProcessDefinitionKey();
+        String idStruttura = String.valueOf(instance.getProcessVariables().get("idStruttura"));
+
+        String username = SecurityUtils.getCurrentUserLogin();
+        List<String> authorities = getAuthorities(username, flowsUserDetailsService);
+
+
+        return authorities.stream()
+                .anyMatch(
+                        a ->    a.contains(responsabile + "@" + CNR_CODE) ||
+                                a.contains(responsabileStruttura + "@" + idStruttura) ||
+                                a.contains(responsabile + "#" + processDefinitionKey + "@" + CNR_CODE) ||
+                                a.contains(responsabile + "#" + processDefinitionKey + "@" + idStruttura) ||
+                                a.contains(responsabile + "#flussi@" + CNR_CODE) ||
+                                a.contains(responsabile + "#flussi@" + idStruttura));
+    }
+
+    public boolean canPublishAttachment(String processInstanceId) {
+
+        if(SecurityUtils.isCurrentUserInRole("ROLE_ADMIN"))
+            return true;
+
+        HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .includeProcessVariables()
+                .singleResult();
+        String username = SecurityUtils.getCurrentUserLogin();
+
+        if (instance.getProcessDefinitionKey().equals(acquisti.getValue())) {
+
+            String rup = String.valueOf(instance.getProcessVariables().get("rup"));
+            if (username.equals(rup))
+                return true;
+
+            List<String> authorities = it.cnr.si.flows.ng.utils.SecurityUtils.getCurrentUserAuthorities();
+            String idStruttura = String.valueOf(instance.getProcessVariables().get("idStruttura"));
+            String nomeGruppoFirma = "responsabileFirmaAcquisti@" + idStruttura;
+
+            if (authorities.contains(nomeGruppoFirma))
+                return true;
+        }
+
+        return false;
+    }
 
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {

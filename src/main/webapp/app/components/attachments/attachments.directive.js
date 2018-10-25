@@ -15,7 +15,9 @@
                 processInstanceId: '@?',
                 attachments: '@?',
                 taskId: '@?',
-                showHistory: '@?'
+                showHistory: '@?',
+                canPublish: '=',
+                canUpdateAttachments: '='
             },
             link: function($scope, element, attrs) {
                 $scope.showHistory = $scope.showHistory === undefined ? true : $scope.showHistory;
@@ -69,10 +71,6 @@
                             });
                         });
                 };
-
-                Principal.hasAuthority("ROLE_ADMIN").then(function(result) {
-                    $scope.isPubblicatore = result;
-                });
 
                 $scope.showFileActions = function(attachment) {
                     $uibModal.open({
