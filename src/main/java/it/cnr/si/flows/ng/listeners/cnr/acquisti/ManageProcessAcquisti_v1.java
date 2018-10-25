@@ -149,7 +149,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 		// START CONTRATTO FUORI MEPA  
 		case "predisposizione-contratto-start": {
 			if (execution.getVariable("gestioneRTIDittaAggiudicataria").toString().equals("SI")) {
-				dittaCandidata.aggiornaDittaRTICandidata(execution);
+				dittaCandidata.aggiornaDittaRTIInvitata(execution);
 			}
 		};break;
 		case "firma-contratto-end": {
@@ -206,7 +206,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				dittaCandidata.evidenzia(execution);
 			} else {
 				if (execution.getVariable("gestioneRTIDittaAggiudicataria").toString().equals("SI")) {
-					dittaCandidata.aggiornaDittaRTICandidata(execution);
+					dittaCandidata.aggiornaDittaRTIInvitata(execution);
 				}
 			}			
 		};break; 

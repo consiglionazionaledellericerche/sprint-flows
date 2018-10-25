@@ -35,12 +35,12 @@ public class DittaCandidata {
 		}
 		int nrElencoDitteCorrente = (int) execution.getVariable("nrElencoDitteCorrente");
 		JSONObject dittaCorrente = ditteCandidate.getJSONObject(nrElencoDitteCorrente);
-		execution.setVariable("pIvaCodiceFiscaleDittaCandidata", dittaCorrente.get("pIvaCodiceFiscaleDittaCandidata"));
-		execution.setVariable("ragioneSocialeDittaCandidata", dittaCorrente.get("ragioneSocialeDittaCandidata"));
-		execution.setVariable("gestioneRTIDittaCandidata", dittaCorrente.get("gestioneRTIDittaCandidata"));
+		execution.setVariable("pIvaCodiceFiscaleDittaCandidata", dittaCorrente.get("pIvaCodiceFiscaleDittaInvitata"));
+		execution.setVariable("ragioneSocialeDittaCandidata", dittaCorrente.get("ragioneSocialeDittaInvitata"));
+		execution.setVariable("gestioneRTIDittaCandidata", dittaCorrente.get("gestioneRTIDittaInvitata"));
 	}
 
-	public void aggiornaDittaRTICandidata(DelegateExecution execution) throws IOException, ParseException {
+	public void aggiornaDittaRTIInvitata(DelegateExecution execution) throws IOException, ParseException {
 
 
 		String ditteRTIString = (String) execution.getVariable("ditteRTI_json");
@@ -52,8 +52,8 @@ public class DittaCandidata {
 		for(int i=0; i<nrTotaleDitteRTI; i++) {
 			JSONObject dittaCorrente = ditteRTI.getJSONObject(i);
 			if (dittaCorrente.get("tipologiaRTI").equals("MANDATARIA") || dittaCorrente.get("tipologiaRTI").equals("CAPOGRUPPO")) {
-				execution.setVariable("pIvaCodiceFiscaleDittaAggiudicataria", dittaCorrente.get("pIvaCodiceFiscaleDittaCandidata"));
-				execution.setVariable("ragioneSocialeDittaAggiudicataria", dittaCorrente.get("ragioneSocialeDittaCandidata"));
+				execution.setVariable("pIvaCodiceFiscaleDittaAggiudicataria", dittaCorrente.get("pIvaCodiceFiscaleDittaInvitata"));
+				execution.setVariable("ragioneSocialeDittaAggiudicataria", dittaCorrente.get("ragioneSocialeDittaInvitata"));
 			}
 		}
 	}
