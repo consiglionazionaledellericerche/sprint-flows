@@ -5,8 +5,6 @@
  		.module('sprintApp')
  		.controller('TaskController', HomeController);
 
- 	HomeController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log', '$http', '$q', 'Upload', 'utils'];
-
  	/**
  	 * Questo e' un po' il cuore di tutta l'applicazione, per questo e' un pochino piu' complicato di altri
  	 * Innanzitutto c'e' una promise composta che aspetta che sia la form che le variabili siano caricate,
@@ -27,6 +25,8 @@
  	 *
  	 * @author mtrycz
  	 */
+ 	HomeController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log', '$http', '$q', 'Upload', 'utils'];
+
  	function HomeController($scope, Principal, LoginService, $state, dataService, AlertService, $log, $http, $q, Upload, utils) {
  		var vm = this;
  		vm.data = {};
@@ -34,7 +34,7 @@
  		vm.data.processDefinitionId = $state.params.processDefinitionId;
  		vm.processDefinitionKey = vm.data.processDefinitionId.split(":")[0];
  		vm.processVersion = vm.data.processDefinitionId.split(":")[1];
- 		vm.detailsView = 'api/views/' + vm.processDefinitionKey + '/detail';
+ 		vm.detailsView = 'api/views/' + vm.processDefinitionKey + '/' + vm.processVersion + '/detail';
 
  		// Ho bisogno di caricare piu' risorse contemporaneamente (form e data);
  		// quando sono finite entrambe, autofillo la form
@@ -58,8 +58,8 @@
  					dataPromise.resolve();
  					vm.data.taskId = $state.params.taskId;
  					//visualizzazione dei metadati del task in esecuzione
- 					var processDefinitionKey = response.data.task.processDefinitionId.split(":")[0];
- 					vm.detailsView = 'api/views/' + processDefinitionKey + '/detail';
+ 					var processDefinition = response.data.task.processDefinitionId.split(":");
+ 					vm.detailsView = 'api/views/' + processDefinition[0] + '/' + processDefinition[1] + '/detail';
  					vm.data.entity = utils.refactoringVariables([response.data.task])[0];
 
  					vm.taskVariables = vm.data.entity.variabili;

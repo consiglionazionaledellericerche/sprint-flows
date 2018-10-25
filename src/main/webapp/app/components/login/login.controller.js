@@ -48,7 +48,7 @@
                 }
 
                 if ($state.current.name === 'home')
-                    $state.go('availabletasks');
+                    $state.go('home');
 
                 $rootScope.$broadcast('authenticationSuccess');
 

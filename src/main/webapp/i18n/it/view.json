@@ -18,7 +18,8 @@
             },
             "processId": "Process Id",
             "type": "Type",
-            "view": "View"
+            "view": "View",
+            "version": "Version"
         }
     }
 }

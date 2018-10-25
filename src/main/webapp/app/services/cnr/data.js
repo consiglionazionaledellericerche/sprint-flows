@@ -61,6 +61,10 @@
                 search: function(params) {
                     return $http.post('api/tasks/search/', params);
                 },
+                coolAvailableTasks: function() {
+                    return $http.get('api/tasks/coolAvailableTasks');
+                }
+
             },
             processInstances: {
                 byProcessInstanceId: function(processInstanceId, detail) {
@@ -126,8 +130,8 @@
                     return $http.get('api/sigladynamiclist/byname/' + name);
                 },
             },
-            view: function(processid, type) {
-                return $http.get('api/views/' + processid + '/' + type);
+            view: function(processid, version, type) {
+                return $http.get('api/views/' + processid + '/' + version + '/' + type);
             },
             search: {
                 users: function(filter) {
