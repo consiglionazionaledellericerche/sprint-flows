@@ -9,8 +9,11 @@
                     You are logged in as user "{{vm.account.login}}".
                 </div>
 
-                <div class="row" ng-switch-when="true">
+                <div class="row" ng-switch-when="true" ng-If="app == 'cnr'">
                     <div class="col-md-6 well">
+                        <div>
+                            <a class="btn btn-primary btn-block" style="margin: 10px;" href="https://scrivaniadigitale.cnr.it">Cliccare qui per autenticarsi con la<br/>versione precedente della Scrivania Digitale</a>
+                        </div>
                         <div>
                             Nella <strong>versione precedente</strong> della Scrivania Digitale sono presenti i seguenti compiti:
                         </div>
@@ -49,12 +52,12 @@
                                 Flusso Relazioni CDA: {{vm.coolTasks.flussoRelazioniCDA}}
                             </div>
                         </div>
-                        <div>
-                            <a class="btn btn-primary btn-block" style="margin: 10px;" href="https://scrivaniadigitale.cnr.it">Cliccare qui per autenticarsi con la<br/>versione precedente della Scrivania Digitale</a>
-                        </div>
 
                     </div>
                     <div class="col-md-6 well">
+                        <div>
+                            <a class="btn btn-primary btn-block" style="margin: 10px" ui-sref="availabletasks">Cliccare qui per visualizzare i compiti sulla<br/>versione attuale della Scrivania Digitale</a>
+                        </div>
                         <div>
                             Nella <strong>versione attuale</strong> della Scrivania Digitale sono presenti i seguenti compiti:
                         </div>
@@ -63,9 +66,6 @@
                                 Flusso Acquisti: {{vm.coolTasks.acquisti}}
                             </div>
                         </div>
-                        <p>
-                            <a class="btn btn-primary btn-block" style="margin: 10px" ui-sref="availabletasks">Cliccare qui per visualizzare i compiti sulla<br/>versione attuale della Scrivania Digitale</a>
-                        </p>
                     </div>
                 </div>
 
