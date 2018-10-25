@@ -5,8 +5,6 @@
  		.module('sprintApp')
  		.controller('TaskController', HomeController);
 
- 	HomeController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log', '$http', '$q', 'Upload', 'utils'];
-
  	/**
  	 * Questo e' un po' il cuore di tutta l'applicazione, per questo e' un pochino piu' complicato di altri
  	 * Innanzitutto c'e' una promise composta che aspetta che sia la form che le variabili siano caricate,
@@ -27,6 +25,8 @@
  	 *
  	 * @author mtrycz
  	 */
+ 	HomeController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log', '$http', '$q', 'Upload', 'utils'];
+
  	function HomeController($scope, Principal, LoginService, $state, dataService, AlertService, $log, $http, $q, Upload, utils) {
  		var vm = this;
  		vm.data = {};
