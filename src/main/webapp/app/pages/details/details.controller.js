@@ -36,9 +36,13 @@
                         });
                     }
 
-                    var processDefinitionKey = response.data.entity.processDefinitionId.split(":")[0];
-                    vm.detailsView = 'api/views/' + processDefinitionKey + '/detail';
-                    vm.experiences = jQuery.parseJSON(vm.data.entity.variabili.valutazioneEsperienze_json);
+                    var processDefinition = response.data.entity.processDefinitionId.split(":");
+                    vm.detailsView = 'api/views/' + processDefinition[0] + '/' + processDefinition[1] + '/detail';
+
+                    if(vm.data.entity.variabili.valutazioneEsperienze_json)
+                        vm.experiences = jQuery.parseJSON(vm.data.entity.variabili.valutazioneEsperienze_json);
+
+
                     vm.data.history.forEach(function(el) {
                         //recupero l'ultimo task (quello ancora da eseguire)
                         if (el.historyTask.endTime === null) {
@@ -54,6 +58,9 @@
                             })
                         }
                     });
+
+                    $scope.canPublish = response.data.canPublish;
+                    $scope.canUpdateAttachments = response.data.canUpdateAttachments;
                 });
         }
 

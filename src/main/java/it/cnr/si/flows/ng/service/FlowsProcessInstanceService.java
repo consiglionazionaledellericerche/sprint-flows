@@ -157,6 +157,12 @@ public class FlowsProcessInstanceService {
 					history.add(entity);
 				});
 		result.put("history", history);
+
+		// permessi aggiuntivi
+		result.put("canPublish", permissionEvaluator.canPublishAttachment(processInstanceId));
+		result.put("canUpdateAttachments", permissionEvaluator.canUpdateAttachment(processInstanceId, flowsUserDetailsService));
+
+
 		return result;
 	}
 

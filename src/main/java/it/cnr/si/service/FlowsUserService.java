@@ -58,8 +58,7 @@ public class FlowsUserService {
     private MembershipRepository membershipRepository;
     @Inject
     private CnrgroupService cnrgroupService;
-    @Inject
-    private AceBridgeService aceBridgeService;
+
 
 
     public Optional<FlowsUser> activateRegistration(String key) {
