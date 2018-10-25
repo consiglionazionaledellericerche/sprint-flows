@@ -50,25 +50,29 @@ public class FlowsListenersConfiguration {
 	}
 
 	private void createDeployments() throws IOException {
+
 		Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
-		String dir = null;
-		if (activeProfiles.contains("cnr"))
-			dir = "cnr";
-		else if (activeProfiles.contains("oiv"))
-			dir = "oiv";
-		else
-			System.exit(1);
+		if (activeProfiles.contains("dev") || activeProfiles.contains("test")) {
 
-		for (Resource resource : appContext.getResources("classpath:processes/"+ dir +"/*.bpmn*")) {
-			LOGGER.info("\n ------- definition {}", resource.getFilename());
-			List<ProcessDefinition> processes = repositoryService.createProcessDefinitionQuery()
-					.processDefinitionKey(resource.getFilename().split("[.]")[0])
-					.list();
+			String dir = null;
+			if (activeProfiles.contains("cnr"))
+				dir = "cnr";
+			else if (activeProfiles.contains("oiv"))
+				dir = "oiv";
+			else
+				System.exit(1);
 
-			if (processes.size() == 0) {
-				DeploymentBuilder builder = repositoryService.createDeployment();
-				builder.addInputStream(resource.getFilename(), resource.getInputStream());
-				builder.deploy();
+			for (Resource resource : appContext.getResources("classpath:processes/" + dir + "/*.bpmn*")) {
+				LOGGER.info("\n ------- definition {}", resource.getFilename());
+				List<ProcessDefinition> processes = repositoryService.createProcessDefinitionQuery()
+						.processDefinitionKey(resource.getFilename().split("[.]")[0])
+						.list();
+
+				if (processes.size() == 0) {
+					DeploymentBuilder builder = repositoryService.createDeployment();
+					builder.addInputStream(resource.getFilename(), resource.getInputStream());
+					builder.deploy();
+				}
 			}
 		}
 	}

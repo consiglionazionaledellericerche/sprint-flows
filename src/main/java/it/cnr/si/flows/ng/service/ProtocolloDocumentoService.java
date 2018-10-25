@@ -42,4 +42,17 @@ public class ProtocolloDocumentoService {
 
 	}
 
+	// se il numero e data di protocollo sono già variabili con la sintassi  <numeroProtocollo_ + nomeVariabileFile>
+	public void protocollaDocumento(DelegateExecution execution, String nomeVariabileFile, String valoreNumeroProtocollo, String valoreDataProtocollo)  throws IOException, ParseException  {
+
+		if (nomeVariabileFile == null)
+			throw new IllegalStateException("Questo Listener ha bisogno del campo 'nomeFileDaProtocollare' nella process definition (nel Task Listener - Fields).");
+
+		FlowsAttachment att = (FlowsAttachment) execution.getVariable(nomeVariabileFile);
+		att.setAzione(Protocollo);
+		att.addStato(Protocollato);
+		att.setMetadato("numeroProtocollo", valoreNumeroProtocollo);
+		att.setMetadato("dataProtocollo", valoreDataProtocollo);
+		execution.setVariable(nomeVariabileFile, att);
+	}
 }

@@ -64,6 +64,9 @@ public class FlowsPdfService {
 	private static final float FONT_SIZE = 10;
 	private static final float TITLE_SIZE = 18;
 	private static final String VALUTAZIONE_ESPERIENZE_JSON = "valutazioneEsperienze_json";
+	private static final String IMPEGNI_JSON = "impegni_json";
+	
+	
 
 	@Inject
 	private FlowsProcessInstanceService flowsProcessInstanceService;
@@ -221,6 +224,10 @@ public class FlowsPdfService {
 			variables.put(VALUTAZIONE_ESPERIENZE_JSON, esperienze);
 		}
 
+		if (variables.has(IMPEGNI_JSON)) {
+			JSONArray esperienze = new JSONArray(variables.getString(IMPEGNI_JSON));
+			variables.put(IMPEGNI_JSON, esperienze);
+		}
 		return variables;
 	}
 
@@ -255,27 +262,46 @@ public class FlowsPdfService {
 		JSONObject processVariables = mappingVariables(variableInstanceJson);
 
 		//creo il pdf corrispondente
-		String utenteRichiedente = processVariables.getString("nomeRichiedente");
-		String fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
+		String utenteRichiedente = "sistema";
+		String fileName = tipologiaDoc + ".pdf";			
 
+		if(processVariables.has("nomeRichiedente")) {
+			utenteRichiedente = processVariables.getString("nomeRichiedente");
+			fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
+		} 
+		
 		return Pair.of(fileName, makePdf(Enum.PdfType.valueOf(tipologiaDoc), processVariables, fileName, utenteRichiedente, processInstanceId));
 	}
 
 	public byte[] makePdf(Enum.PdfType pdfType, JSONObject processvariables, String fileName, String utenteRichiedente, String processInstanceId) {
-		String dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir");
+        Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
+
+		String dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-cnr");
+        if(activeProfiles.contains("oiv")) {
+	        dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-oiv");
+        }
+        else if(activeProfiles.contains("cnr")) {
+            dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-cnr");
+        }
 		byte[] pdfByteArray = null;
 		HashMap<String, Object> parameters = new HashMap();
 		InputStream jasperFile = null;
 		try {
 			//carico le variabili della process instance
-			LOGGER.debug("Json con i dati da inserire nel pdf: {0}", processvariables.toString());
+			LOGGER.debug("Json con i dati da inserire nel pdf: {0}", processvariables.toString().replaceAll("\\\\\"","\""));
 			JRDataSource datasource = new JsonDataSource(new ByteArrayInputStream(processvariables.toString().getBytes(Charset.forName("UTF-8"))));
+			//JRDataSource datasource = new JsonDataSource(new ByteArrayInputStream(processvariables.toString().replaceAll("\\\\\"","\"").getBytes(Charset.forName("UTF-8"))));
 
 			final ResourceBundle resourceBundle = ResourceBundle.getBundle(
 					"net.sf.jasperreports.view.viewer", Locale.ITALIAN);
 
 			//carico un'immagine nel pdf "dinamicamente" (sostituisco una variabile nel file jsper con lo stream dell'immagine)
-			parameters.put("ANN_IMAGE", this.getClass().getResourceAsStream(dir.substring(dir.indexOf("/print")) + "logo_OIV.JPG"));
+	        if(activeProfiles.contains("oiv")) {
+		        parameters.put("ANN_IMAGE", this.getClass().getResourceAsStream(dir.substring(dir.indexOf("/print")) + "logo_OIV.JPG"));
+	        }
+	        else if(activeProfiles.contains("cnr")) {
+		        parameters.put("ANN_IMAGE", this.getClass().getResourceAsStream(dir.substring(dir.indexOf("/print")) + "logo_CNR.JPG"));
+	        }
 			parameters.put(JRParameter.REPORT_LOCALE, Locale.ITALIAN);
 			parameters.put(JRParameter.REPORT_RESOURCE_BUNDLE, resourceBundle);
 			parameters.put(JRParameter.REPORT_DATA_SOURCE, datasource);
@@ -326,10 +352,17 @@ public class FlowsPdfService {
 
 
 	public byte[] makeStatisticPdf( JSONObject processvariables, String fileName) {
-		String dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir");
 		byte[] pdfByteArray = null;
 		HashMap<String, Object> parameters = new HashMap();
 		InputStream jasperFile = null;
+        Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
+		String dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-cnr");
+        if(activeProfiles.contains("oiv")) {
+	        dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-oiv");
+        }
+        else if(activeProfiles.contains("cnr")) {
+            dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-cnr");
+        }
 		try {
 			//carico le variabili della process instance
 			LOGGER.debug("Json con i dati da inserire nel pdf: {0}", processvariables.toString());

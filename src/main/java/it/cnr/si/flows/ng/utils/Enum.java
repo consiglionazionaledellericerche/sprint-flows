@@ -105,6 +105,7 @@ public class Enum {
 
 
     public enum PdfType {
+        avvisoPostInformazione,
         rigetto,
         rigettoMotivato,
         rigettoDopoPreavviso,

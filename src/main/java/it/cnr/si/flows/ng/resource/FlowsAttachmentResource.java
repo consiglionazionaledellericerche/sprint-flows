@@ -48,9 +48,9 @@ public class FlowsAttachmentResource {
     @Inject
     private FlowsAttachmentService flowsAttachmentService;
     @Inject
-    FlowsUserDetailsService flowsUserDetailsService;
+    private FlowsUserDetailsService flowsUserDetailsService;
     @Inject
-    PermissionEvaluatorImpl permissionEvaluator;
+    private PermissionEvaluatorImpl permissionEvaluator;
 
 
 
@@ -154,6 +154,7 @@ public class FlowsAttachmentResource {
     @RequestMapping(value = "{processInstanceId}/{attachmentName}/data", method = RequestMethod.POST)
     @ResponseBody
     @Secured(AuthoritiesConstants.USER)
+    @PreAuthorize("@permissionEvaluator.canUpdateAttachment(#processInstanceId, @flowsUserDetailsService)")
     @Timed
     public void setAttachment(@PathVariable("processInstanceId") String processInstanceId,
                               @PathVariable("attachmentName") String attachmentName,
@@ -206,6 +207,7 @@ public class FlowsAttachmentResource {
     @RequestMapping(value = "{processInstanceId}/{attachmentName}/pubblica", method = RequestMethod.POST)
     @ResponseBody
     @Secured(AuthoritiesConstants.USER)
+    @PreAuthorize("@permissionEvaluator.canPublishAttachment(#processInstanceId)")
     @Timed
     public void setPubblicabile(
             HttpServletResponse response,
