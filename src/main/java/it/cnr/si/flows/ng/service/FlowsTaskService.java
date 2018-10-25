@@ -10,7 +10,7 @@ import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
 import it.cnr.si.security.FlowsUserDetailsService;
 import it.cnr.si.security.PermissionEvaluatorImpl;
-import it.cnr.si.security.SecurityUtils;
+import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.*;
 import org.activiti.engine.delegate.BpmnError;
@@ -21,9 +21,7 @@ import org.activiti.engine.impl.util.json.JSONArray;
 import org.activiti.engine.impl.util.json.JSONObject;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.IdentityLinkType;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.task.TaskQuery;
+import org.activiti.engine.task.*;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
@@ -251,6 +249,14 @@ public class FlowsTaskService {
 	public DataResponse taskAssignedInMyGroups(HttpServletRequest req, String processDefinition, int firstResult, int maxResults, String order) {
 		String username = SecurityUtils.getCurrentUserLogin();
 
+        List<String> userAuthorities = SecurityUtils.getCurrentUserAuthorities();
+
+//        String authorithiesList = userAuthorities.stream().map(s -> "'"+s+"'").collect(Collectors.joining(","));
+
+//        NativeTaskQuery nativeTaskQuery = taskService.createNativeTaskQuery().sql(
+//				"SELECT task.* FROM ACT_RU_TASK task, ACT_RU_IDENTITYLINK link " +
+//						" WHERE task.ID_ = link.TASK_ID_ AND link.GROUP_ID_ IN("+ authorithiesList +")");
+
 		TaskQuery taskQuery = (TaskQuery) utils.searchParamsForTasks(req, taskService.createTaskQuery().includeProcessVariables());
 
 		if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
@@ -264,8 +270,17 @@ public class FlowsTaskService {
 		List<String> usersInMyGroups = relationshipService.getUsersInMyGroups(username);
 
 		//      prendo i task assegnati agli utenti trovati
-		for (String user : usersInMyGroups)
-			result.addAll(restResponseFactory.createTaskResponseList(taskQuery.taskAssignee(user).list()));
+		for (String user : usersInMyGroups) {
+            List<Task> tasks = taskQuery.taskAssignee(user).list()
+                    .stream()
+                    .filter(t ->
+                            taskService.getIdentityLinksForTask(t.getId()).stream().anyMatch(il ->
+                                    il.getType() == IdentityLinkType.CANDIDATE && userAuthorities.contains(il.getGroupId()) )
+                    ).collect(Collectors.toList());
+
+            result.addAll(restResponseFactory.createTaskResponseList(tasks));
+        }
+
 
 		List<TaskResponse> responseList = result.subList(firstResult <= result.size() ? firstResult : result.size(),
 														 maxResults <= result.size() ? maxResults : result.size());
