@@ -17,4 +17,9 @@ public interface ViewRepository extends JpaRepository<View,Long> {
     @Query("SELECT v from View v where v.processId = :processId and v.type = :type")
     public View getViewByProcessidType(@Param("processId") String processId, @Param("type") String type);
 
+    @Query("select v from View v where v.processId =:processId and v.version = :version and v.type =:type")
+    public View findOneByProcessDefinitionKeyAndVersionAndTaskId(
+            @Param("processId") String processId,
+            @Param("version") String version,
+            @Param("type") String type);
 }

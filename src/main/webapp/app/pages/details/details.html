@@ -43,7 +43,9 @@
 
 			<h4>Documenti</h4>
 			<attachments process-instance-id="{{processInstanceId}}"
-						 attachments="{{vm.data.attachments}}"/>
+						 attachments="{{vm.data.attachments}}"
+						 can-publish="canPublish"
+						 can-update-attachments="canUpdateAttachments"/>
 
 			<div has-authority="ROLE_ADMIN">
 				<h4>Tutte le variabili</h4>
@@ -114,7 +116,7 @@
 	<div class="row dev">
 		<hr>
 		<div class="col-md-12">
-			<pre ng-if="isDevelopment">{{vm | json}}</pre>
+			<pre ng-if="isDevelopment">{{ canPublish }}{{vm | json}}</pre>
 		</div>
 	</div>
 </div>

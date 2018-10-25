@@ -9,6 +9,7 @@ import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.FlowsUserDetailsService;
+import it.cnr.si.security.PermissionEvaluatorImpl;
 import it.cnr.si.security.SecurityUtils;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
@@ -65,7 +66,9 @@ public class FlowsProcessInstanceResource {
 	@Inject
 	private ViewRepository viewRepository;
 	@Inject
-	FlowsUserDetailsService flowsUserDetailsService;
+	private FlowsUserDetailsService flowsUserDetailsService;
+	@Inject
+	private PermissionEvaluatorImpl permissionEvaluator;
 	@Inject
 	private Utils utils;
 

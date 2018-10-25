@@ -3,7 +3,7 @@
 </div>
 <div class="modal-body">
 
-  <div class="row">
+  <div class="row" ng-if="canPublish">
     <div class="col-md-12">
       <h4>Pubblica Documento</h4>
       <div class="btn-group">
@@ -18,7 +18,7 @@
     </div>
   </div>
 
-  <div class="row">
+  <div class="row" ng-if="canUpdateAttachments">
     <div class="col-md-12">
       <h4>Aggiorna Documento</h4>
       <form novalidate class="flows-form" name="aggiornaDocumentoForm" ng-submit="submitAggiornaDocumento(picFile)">

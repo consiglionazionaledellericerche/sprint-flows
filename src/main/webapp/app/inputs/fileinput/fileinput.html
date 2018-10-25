@@ -43,7 +43,7 @@
         </button>
         {{$parent.vm.data[attachment.name].name}}
     </div>
-    <label for="attrs.id">Altri {{attrs.labelplural || attrs.label}}</label><br>
+    <label for="attrs.id">{{attrs.labelplural || attrs.label}}</label><br>
     <button class="btn btn-xs btn-info"
             ng-model="$parent.vm.data['__new__'+attrs.name]"
             ngf-select

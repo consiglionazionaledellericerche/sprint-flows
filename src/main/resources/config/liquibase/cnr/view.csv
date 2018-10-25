@@ -1,2 +1,2 @@
-ID;PROCESS_ID;TYPE;VIEW
-1;permessi-ferie;detail;<metadatum label="Impegni" type="table" columns="[{'field': 'numero', 'label': 'Numero'}, {field: 'importo', label: 'Importo'},{field: 'descrizione', label: 'Descrizione'},{field: 'vocedispesa', label: 'Voce di Spesa'}, {field: 'gae', label: 'GAE'}]" rows="vm.data.entity.variabili.impegni_json"></metadatum>
+ID;PROCESS_ID;VERSION;TYPE;VIEW
+1;permessi-ferie;1;detail;<metadatum label="Impegni" type="table" columns="[{'field': 'numero', 'label': 'Numero'}, {field: 'importo', label: 'Importo'},{field: 'descrizione', label: 'Descrizione'},{field: 'vocedispesa', label: 'Voce di Spesa'}, {field: 'gae', label: 'GAE'}]" rows="vm.data.entity.variabili.impegni_json"></metadatum>
