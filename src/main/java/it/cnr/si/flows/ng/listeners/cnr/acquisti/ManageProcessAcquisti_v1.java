@@ -273,7 +273,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				for (String key : attachmentList.keySet()) {
 					FlowsAttachment value = attachmentList.get(key);
 					LOGGER.info("Key = " + key + ", Value = " + value);
-					attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
+					//attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
 				}
 			} else {					
 				attachmentService.setPubblicabile(execution.getId(), "provvedimentoAggiudicazione", true);
@@ -296,7 +296,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				for (String key : attachmentList.keySet()) {
 					FlowsAttachment value = attachmentList.get(key);
 					LOGGER.info("Key = " + key + ", Value = " + value);
-					attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
+					//attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
 				}
 			} else {	
 				if ( execution.getVariable("importoTotaleNetto") != null && Double.parseDouble(execution.getVariable("importoTotaleNetto").toString()) > 1000000) {
@@ -321,7 +321,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				for (String key : attachmentList.keySet()) {
 					FlowsAttachment value = attachmentList.get(key);
 					LOGGER.info("Key = " + key + ", Value = " + value);
-					attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
+					//attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
 				}
 			} else {					
 				pubblicaFileMultipli(execution, "allegatiPubblicazioneTrasparenza", true);
@@ -332,7 +332,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			for (String key : attachmentList.keySet()) {
 				FlowsAttachment value = attachmentList.get(key);
 				LOGGER.info("Key = " + key + ", Value = " + value);
-				attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
+				//attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
 			}
 
 		};break;	
