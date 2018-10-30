@@ -750,7 +750,7 @@
       <exclusiveGateway id="exclusivegateway33" name="Exclusive Gateway" default="flow189"></exclusiveGateway>
       <sequenceFlow id="flow189" sourceRef="exclusivegateway33" targetRef="firma-contratto"></sequenceFlow>
       <sequenceFlow id="flow190" sourceRef="exclusivegateway33" targetRef="endevent-contratto-fuori-mepa-revoca">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${verificheRequisitiid != '1'}]]></conditionExpression>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaConProvvedimento'}]]></conditionExpression>
       </sequenceFlow>
     </subProcess>
     <sequenceFlow id="flow119" sourceRef="exclusivegateway15" targetRef="CONTRATTO-FUORI-MEPA">
