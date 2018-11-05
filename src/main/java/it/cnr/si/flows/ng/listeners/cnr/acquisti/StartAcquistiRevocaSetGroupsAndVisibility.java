@@ -50,7 +50,6 @@ public class StartAcquistiRevocaSetGroupsAndVisibility implements ExecutionListe
         if ( groups.size() == 0 )
             throw new BpmnError("403", "L'utente non e' abilitato ad avviare questo flusso");
         else {
-
             String gruppoRT = groups.get(0);
             String struttura = gruppoRT.substring(gruppoRT.lastIndexOf('@') +1);
             // idStruttura variabile che indica che il flusso è diviso per strutture (implica la visibilità distinta tra strutture)
@@ -70,6 +69,8 @@ public class StartAcquistiRevocaSetGroupsAndVisibility implements ExecutionListe
             } else {
                 execution.setVariable("organizzazioneStruttura", "Complessa");
             }
+            execution.setVariable("nomeStruttura", aceBridgeService.getNomeStruturaById(Integer.parseInt(struttura)));
+            
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoRT, PROCESS_VISUALIZER);
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoFirmaAcquisti, PROCESS_VISUALIZER);
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoRA, PROCESS_VISUALIZER);
