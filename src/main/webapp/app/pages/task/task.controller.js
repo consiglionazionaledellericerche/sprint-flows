@@ -21,7 +21,7 @@
  	 *
  	 * NB: non posso usare angular.copy() o altrimenti duplicare i dati per la submit
  	 *     perche' non vengono gestiti bene gli oggetti del nuovo tipo File/Blob
- 	 *     Sono costretto a inviare il vm.data originale
+ 	 *     Sono costretto a inviare il $scope.data originale
  	 *
  	 * @author mtrycz
  	 */
@@ -29,12 +29,13 @@
 
  	function HomeController($scope, Principal, LoginService, $state, dataService, AlertService, $log, $http, $q, Upload, utils) {
  		var vm = this;
- 		vm.data = {};
+ 		$scope.data = {};
  		vm.taskId = $state.params.taskId;
- 		vm.data.processDefinitionId = $state.params.processDefinitionId;
- 		vm.processDefinitionKey = vm.data.processDefinitionId.split(":")[0];
- 		vm.processVersion = vm.data.processDefinitionId.split(":")[1];
- 		vm.detailsView = 'api/views/' + vm.processDefinitionKey + '/' + vm.processVersion + '/detail';
+ 		$scope.data.processDefinitionId = $state.params.processDefinitionId;
+ 		$scope.processDefinitionKey = $scope.data.processDefinitionId.split(":")[0];
+ 		$scope.processVersion = $scope.data.processDefinitionId.split(":")[1];
+ 		$scope.attachments = [];
+ 		vm.detailsView = 'api/views/' + $scope.processDefinitionKey + '/' + $scope.processVersion + '/detail';
 
  		// Ho bisogno di caricare piu' risorse contemporaneamente (form e data);
  		// quando sono finite entrambe, autofillo la form
@@ -48,7 +49,7 @@
  			.then(function(value) {
  				angular.forEach(taskForm, function(el) {
  					if (el.attributes.autofill)
- 						vm.data[el.id] = vm.taskVariables[el.id];
+ 						$scope.data[el.id] = vm.taskVariables[el.id];
  				});
  			});
 
@@ -56,28 +57,26 @@
  			dataService.tasks.getTask($state.params.taskId).then(
  				function(response) {
  					dataPromise.resolve();
- 					vm.data.taskId = $state.params.taskId;
+ 					$scope.data.taskId = $state.params.taskId;
  					//visualizzazione dei metadati del task in esecuzione
  					var processDefinition = response.data.task.processDefinitionId.split(":");
  					vm.detailsView = 'api/views/' + processDefinition[0] + '/' + processDefinition[1] + '/detail';
- 					vm.data.entity = utils.refactoringVariables([response.data.task])[0];
+ 					$scope.data.entity = utils.refactoringVariables([response.data.task])[0];
 
- 					vm.taskVariables = vm.data.entity.variabili;
- 					vm.attachments = utils.parseAttachments(response.data.attachments);
- 					vm.attachmentsList = response.data.attachmentsList;
- 					vm.diagramUrl = '/rest/diagram/taskInstance/' + vm.data.taskId + "?" + new Date().getTime();
- 					vm.formUrl = 'api/forms/task/' + vm.data.taskId;
+ 					vm.taskVariables = $scope.data.entity.variabili;
+ 					$scope.attachments = utils.parseAttachments(response.data.attachments);
+ 					$scope.attachmentsList = response.data.attachmentsList;
+ 					vm.diagramUrl = '/rest/diagram/taskInstance/' + $scope.data.taskId + "?" + new Date().getTime();
+ 					vm.formUrl = 'api/forms/task/' + $scope.data.taskId;
  				});
  		} else {
  			dataPromise.reject("");
 
  			vm.diagramUrl = "/rest/diagram/processDefinition/" + $state.params.processDefinitionId + "?" + new Date().getTime();
- 			vm.formUrl = 'api/forms/' + vm.processDefinitionKey + "/" + vm.processVersion + "/" + $state.params.taskName
+ 			vm.formUrl = 'api/forms/' + $scope.processDefinitionKey + "/" + $scope.processVersion + "/" + $state.params.taskName
  		}
 
  		$scope.submitTask = function(file) {
-
- 			$log.info(Object.keys(vm.data));
 
  			if ($scope.taskForm.$invalid) {
  				angular.forEach($scope.taskForm.$error, function(field) {
@@ -91,11 +90,11 @@
  				// Serializzo gli oggetti complessi in stringhe
  				// E' necessario copiarli in un nuovo campo, senno' angular si incasina
  				// Non posso usare angular.copy() perche' ho degli oggetti File non gestiti bene
- 				if (_.has(vm.data, 'entity')) {
- 					delete vm.data.entity;
+ 				if (_.has($scope.data, 'entity')) {
+ 					delete $scope.data.entity;
  				}
  				// aggiunto (&& obj[key].constructor.name !== 'Date') per non rendere json le date
- 				angular.forEach(vm.data, function(value, key, obj) {
+ 				angular.forEach($scope.data, function(value, key, obj) {
  					if (isObject(value) && key !== 'entity' && obj[key].constructor.name !== 'Date') {
  						obj[key + "_json"] = JSON.stringify(value);
  					}
@@ -103,7 +102,7 @@
 
  				Upload.upload({
  					url: 'api/tasks/complete',
- 					data: vm.data,
+ 					data: $scope.data,
  				}).then(function(response) {
 
  					$log.info(response);

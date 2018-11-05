@@ -16,16 +16,8 @@
      *    multiple=true
      *    subform-name="X"
      *    label="Questa e' una subform"
-     *    ng-model="vm.data.nomeDelModel"
-     *    json="'[{}]'" />
-     *
-     *  Il parametro json serve per inizializzare il valore della subform ed e' una stringa
-     *
-     *  Per inizializzare una subform vuota usare
-     *  json="'[{}]'" (ricordarsi le virgolette interne - e' una stringa)
-     *
-     *  Per inizializzare una subform con parametri inseriti precedentemente usare (per esempio)
-     *  json="vm.data.entity.variabili['nomeDelModel_json']"
+     *    ng-model="data.nomeDelModel"
+     *    autofill />
      *
      *  Con questo meccanismo e' possibile inizializzare il model con qualunque valore arbitrario
      */
@@ -42,23 +34,28 @@
             templateUrl: 'app/components/subform/subform.html',
             scope: {
                 ngModel: '=',
-                json: '@?',
                 label: '@',
                 multiple: '@',
                 subformName: '@',
                 min: '@?',
-                max: '@?'
+                max: '@?',
+                autofill: '@?'
             },
             link: function ($scope, element, attrs) {
-                var subform = this;
-                $scope.subform = subform;
                 $scope.min = $scope.min || 1;
                 $scope.max = $scope.max || 999;
+                $scope.ngModel = $scope.ngModel || [{}]
 
-                if ($scope.json !== undefined)
-                  $scope.ngModel = JSON.parse($scope.json);
+                $scope.processDefinitionKey = $scope.processDefinitionKey || $scope.$parent.processDefinitionKey;
+                $scope.processVersion = $scope.processVersion || $scope.$parent.processVersion;
+                $scope.formUrl = 'api/forms/'+ $scope.processDefinitionKey +"/"+ $scope.processVersion +"/"+ $scope.subformName;
 
-                subform.formUrl = 'api/forms/'+ $scope.$parent.vm.processDefinitionKey +"/"+$scope.$parent.vm.processVersion +"/"+ $scope.subformName;
+//                if ($scope.json !== undefined)
+//                  $scope.ngModel = JSON.parse($scope.json);
+                if ('autofill' in attrs) {
+                    var jsonName = attrs.ngModel.split('.').pop() + "_json";
+                    $scope.ngModel = JSON.parse($scope.$parent.data.entity.variabili[jsonName]);
+                }
 
                 $scope.addRow = function() {
                     if ($scope.ngModel.length < $scope.max)
