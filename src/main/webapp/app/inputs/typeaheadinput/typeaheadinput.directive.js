@@ -44,7 +44,7 @@
 
                     if ('autofill' in attrs) {
                         var nomeModelId = attrs.ngModel.split('.').pop();
-                        $scope.ngModel = $scope.$parent.vm.data.entity.variabili[nomeModelId];
+                        $scope.ngModel = $scope.$parent.data.entity.variabili[nomeModelId];
                     }
 
                     if ($scope.ngModel) {

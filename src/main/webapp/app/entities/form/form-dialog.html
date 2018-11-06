@@ -72,7 +72,8 @@
         <hr>
         <div class="row">
           <div class="col-md-6 col-md-offset-3">
-            <div ng-bind-html="vm.preview"></div>
+              <div compile="vm.preview"></div>
+              <pre>{{data | json}}</pre>
           </div>
         </div>
     </div>
@@ -80,7 +81,7 @@
         <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="vm.clear()">
             <span class="glyphicon glyphicon-ban-circle"></span>&nbsp;<span translate="entity.action.cancel">Cancel</span>
         </button>
-        <button type="submit" ng-disabled="editForm.$invalid || vm.isSaving" class="btn btn-primary">
+        <button type="submit" ng-disabled="vm.isSaving" class="btn btn-primary">
             <span class="glyphicon glyphicon-save"></span>&nbsp;<span translate="entity.action.save">Save</span>
         </button>
     </div>
