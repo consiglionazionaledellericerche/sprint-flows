@@ -1,5 +1,4 @@
 <div ng-cloak>
-
   <!-- intestazione -->
   <div class="row text-center" ng-if="vm.taskId">
     <h3>{{vm.definition.name}}</h3>
@@ -19,7 +18,7 @@
     <div class="col-xs-4">
       DOCUMENTI
       <attachments task-id="{{vm.taskId}}"
-                   attachments="{{vm.attachments}}" show-history="false"/>
+                   attachments="{{attachments}}" show-history="false"/>
     </div>
 
     <div class="col-xs-4">
@@ -42,7 +41,7 @@
     <div class="col-md-6 col-md-offset-3">
       <form novalidate class="flows-form" name="taskForm" ng-submit="submitTask(picFile)">
         <input type="hidden" name="taskId" value="{{vm.data.taskId}}" />
-        <input type="hidden" name="processDefinitionId" value="{{vm.data.processDefinitionId}}" />
+        <input type="hidden" name="processDefinitionId" value="{{data.processDefinitionId}}" />
 
         <ng-include src="vm.formUrl" onload="autofill()" ></ng-include>
 
@@ -68,5 +67,6 @@
   </div>
   <hr>
   <!--   <pre ng-if="!isDevelopment">{{taskForm | json}}</pre> -->
-  <pre ng-if="isDevelopment">{{vm | json}}</pre>
+  <pre ng-if="isDevelopment">{{data | json}}</pre>
+  <pre ng-if="isDevelopment">{{taskForm | json}}</pre>
 </div>
