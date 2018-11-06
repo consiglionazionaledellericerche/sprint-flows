@@ -5,9 +5,9 @@
     .module('sprintApp')
     .controller('FormDialogController', FormDialogController);
 
-    FormDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'entity', 'Form', '$sce'];
+    FormDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'entity', 'Form', '$sce', '$compile'];
 
-    function FormDialogController ($timeout, $scope, $stateParams, $uibModalInstance, entity, Form, $sce) {
+    function FormDialogController ($timeout, $scope, $stateParams, $uibModalInstance, entity, Form, $sce, $compile) {
         var vm = this;
 
         vm.form = entity;
@@ -41,6 +41,9 @@
 //            "wrap": 100
           }
         vm.preview = "";
+        vm.attachments = {};
+        $scope.processVersion = vm.form.version;
+        $scope.processDefinitionKey = vm.form.processDefinitionKey;
 
         $timeout(function (){
             angular.element('.form-group:eq(1)>input').focus();
@@ -74,7 +77,31 @@
             vm.reloadHtml();
         }
         vm.reloadHtml = function() {
-            vm.preview = $sce.trustAsHtml(vm.form.form);
+            vm.preview = vm.form.form;
         }
     }
+
+    angular
+    .module('sprintApp').directive('compile', ['$compile', function ($compile) {
+    return function(scope, element, attrs) {
+      scope.$watch(
+        function(scope) {
+          // watch the 'compile' expression for changes
+          return scope.$eval(attrs.compile);
+        },
+        function(value) {
+          // when the 'compile' expression changes
+          // assign it into the current DOM
+          element.html(value);
+
+          // compile the new DOM and link it to the current
+          // scope.
+          // NOTE: we only compile .childNodes so that
+          // we don't get into infinite loop compiling ourselves
+          $compile(element.contents())(scope);
+        }
+    );
+  };
+}]);
 })();
+
