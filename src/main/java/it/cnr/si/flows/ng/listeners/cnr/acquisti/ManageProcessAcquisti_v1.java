@@ -149,7 +149,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 		// START CONTRATTO FUORI MEPA  
 		case "predisposizione-contratto-start": {
 			if (execution.getVariable("gestioneRTIDittaAggiudicataria").toString().equals("SI")) {
-				dittaCandidata.aggiornaDittaRTICandidata(execution);
+				//dittaCandidata.aggiornaDittaRTIInvitata(execution);
 			}
 		};break;
 		case "firma-contratto-end": {
@@ -206,7 +206,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				dittaCandidata.evidenzia(execution);
 			} else {
 				if (execution.getVariable("gestioneRTIDittaAggiudicataria").toString().equals("SI")) {
-					dittaCandidata.aggiornaDittaRTICandidata(execution);
+					dittaCandidata.aggiornaDittaRTIInvitata(execution);
 				}
 			}			
 		};break; 
@@ -221,11 +221,11 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 		// START REVOCA
    
 		case "firma-revoca-end": {
-			firmaDocumentoService.eseguiFirma(execution, "provvedimentoRevoca");
+			firmaDocumentoService.eseguiFirma(execution, "ProvvedimentoDiRevoca");
 		};break; 
 		case "protocollo-revoca-end": {
 			if(sceltaUtente != null && sceltaUtente.equals("Protocolla")) {
-				protocolloDocumentoService.protocolla(execution, "provvedimentoRevoca");
+				protocolloDocumentoService.protocolla(execution, "ProvvedimentoDiRevoca");
 			}
 		};break;  
 		// END REVOCA  
@@ -273,7 +273,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				for (String key : attachmentList.keySet()) {
 					FlowsAttachment value = attachmentList.get(key);
 					LOGGER.info("Key = " + key + ", Value = " + value);
-					attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
+					//attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
 				}
 			} else {					
 				attachmentService.setPubblicabile(execution.getId(), "provvedimentoAggiudicazione", true);
@@ -296,7 +296,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				for (String key : attachmentList.keySet()) {
 					FlowsAttachment value = attachmentList.get(key);
 					LOGGER.info("Key = " + key + ", Value = " + value);
-					attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
+					//attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
 				}
 			} else {	
 				if ( execution.getVariable("importoTotaleNetto") != null && Double.parseDouble(execution.getVariable("importoTotaleNetto").toString()) > 1000000) {
@@ -321,7 +321,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				for (String key : attachmentList.keySet()) {
 					FlowsAttachment value = attachmentList.get(key);
 					LOGGER.info("Key = " + key + ", Value = " + value);
-					attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
+					//attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
 				}
 			} else {					
 				pubblicaFileMultipli(execution, "allegatiPubblicazioneTrasparenza", true);
@@ -332,7 +332,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			for (String key : attachmentList.keySet()) {
 				FlowsAttachment value = attachmentList.get(key);
 				LOGGER.info("Key = " + key + ", Value = " + value);
-				attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
+				//attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
 			}
 
 		};break;	

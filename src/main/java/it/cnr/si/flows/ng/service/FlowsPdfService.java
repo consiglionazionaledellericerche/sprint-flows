@@ -65,6 +65,8 @@ public class FlowsPdfService {
 	private static final float TITLE_SIZE = 18;
 	private static final String VALUTAZIONE_ESPERIENZE_JSON = "valutazioneEsperienze_json";
 	private static final String IMPEGNI_JSON = "impegni_json";
+	private static final String DITTECANDIDATEJSON = "ditteCandidate_json";
+	private static final String DITTEINVITATEJSON = "ditteInvitate_json";
 	
 	
 
@@ -216,8 +218,14 @@ public class FlowsPdfService {
 	}
 
 	//Sotituisco il mapping direttamente con il json delle variabili sttuali
-	private JSONObject mappingVariables(JSONObject variables) {
+	private JSONObject mappingVariables(JSONObject variables, String processInstanceId) {
+		
+		Map<String, Object> map = flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId);
 
+		HistoricProcessInstanceResponse processInstance = (HistoricProcessInstanceResponse) map.get("entity");
+		variables.put("businessKey", processInstance.getBusinessKey());
+
+		 
 		//refactoring della stringona contenete le esperienze in un jsonArray
 		if (variables.has(VALUTAZIONE_ESPERIENZE_JSON)) {
 			JSONArray esperienze = new JSONArray(variables.getString(VALUTAZIONE_ESPERIENZE_JSON));
@@ -228,8 +236,19 @@ public class FlowsPdfService {
 			JSONArray esperienze = new JSONArray(variables.getString(IMPEGNI_JSON));
 			variables.put(IMPEGNI_JSON, esperienze);
 		}
+		
+		if (variables.has(DITTEINVITATEJSON)) {
+			JSONArray esperienze = new JSONArray(variables.getString(DITTEINVITATEJSON));
+			variables.put(DITTEINVITATEJSON, esperienze);
+		}
+		
+		if (variables.has(DITTECANDIDATEJSON)) {
+			JSONArray esperienze = new JSONArray(variables.getString(DITTECANDIDATEJSON));
+			variables.put(DITTECANDIDATEJSON, esperienze);
+		}
 		return variables;
 	}
+
 
 	public Pair<String, byte[]>  makePdf(String tipologiaDoc, String processInstanceId) {
 
@@ -259,8 +278,7 @@ public class FlowsPdfService {
 		}
 
 		//Sotituisco la lista di variabili da quelle storiche (historicProcessInstance.getProcessVariables() )a quelle attuali (variableInstanceJson)
-		JSONObject processVariables = mappingVariables(variableInstanceJson);
-
+		JSONObject processVariables = mappingVariables(variableInstanceJson, processInstanceId);
 		//creo il pdf corrispondente
 		String utenteRichiedente = "sistema";
 		String fileName = tipologiaDoc + ".pdf";			
