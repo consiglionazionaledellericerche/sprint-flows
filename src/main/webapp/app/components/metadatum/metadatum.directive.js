@@ -16,6 +16,8 @@
         value: '@',
         type: '@?',
         columns: '=?',
+        modalColumns: '=?',
+        detailsLabel: '@?',
         rows: '=?',
         details: '@'
       },
@@ -37,19 +39,25 @@
           });
 
 
-          $scope.experience = function(experience, columns) {
+          $scope.detailsModal = function(row) {
               $uibModal.open({
                   templateUrl: 'app/components/metadatum/detailsMetadatum.modal.html',
                   controller: 'DetailsMetadatumModalController',
                   controllerAs: 'vm',
                   size: 'md',
                   resolve: {
-                      experience: function() {
-                          return experience;
+                      row: function() {
+                          return row;
                       },
                       columns: function() {
-                          return columns;
-                      }
+                          return $scope.columns;
+                      },
+                      modalColumns: function() {
+                          return $scope.modalColumns;
+                      },
+                      detailsLabel: function() {
+                          return $scope.detailsLabel;
+                      },
                   }
               })
           };
