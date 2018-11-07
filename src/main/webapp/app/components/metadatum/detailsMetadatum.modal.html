@@ -1,10 +1,26 @@
 <div class="modal-header">
-    <h4>Esperienze</h4>
+    <h4>{{vm.detailsLabel}}</h4>
     <div class="task-history">
         <div ng-repeat="column in vm.columns">
-            <h5>
-                <b>{{column.label}}:</b> {{vm.experience[column.field]}}
+            <h5 ng-if="!column.table">
+                <b>{{column.label}}:</b> {{vm.row[column.field]}}
             </h5>
+            <div ng-if="column.table" class="well">
+                <h5><b>{{column.label}}</b></h5>
+                <table class="table table-striped table-bordered table-condensed table-hover">
+                    <thead>
+                    <tr>
+                        <th ng-repeat="innerColumn in column.table">{{innerColumn.label}}</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr ng-repeat="innerRow in vm.row[column.field]">
+                        <td ng-repeat="innerColumn in column.table">{{ innerRow[innerColumn.field] }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
