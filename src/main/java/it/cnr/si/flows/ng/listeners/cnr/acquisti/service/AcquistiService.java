@@ -105,14 +105,9 @@ public class AcquistiService {
 		execution.setVariable("pIvaCodiceFiscaleDittaInvitata", null);
 		execution.setVariable("ragioneSocialeDittaInvitata", null);
 		execution.setVariable("gestioneRTIDittaInvitata", null);
-		if (codiceVerificheRequisiti.equals("1"))
-		{
+		if (codiceVerificheRequisiti.equals("1")) {
 			execution.setVariable("esitoVerificaRequisiti", "inviaRisultato");
-			execution.setVariable("pIvaCodiceFiscaleDittaAggiudicataria", dittaCorrente.get("pIvaCodiceFiscaleDittaInvitata"));
-			execution.setVariable("ragioneSocialeDittaAggiudicataria", dittaCorrente.get("ragioneSocialeDittaInvitata"));
-			execution.setVariable("gestioneRTIDittaAggiudicataria", dittaCorrente.get("gestioneRTIDittaInvitata"));
-		} else if (nrTotaleDitte <= (int) execution.getVariable("nrElencoDitteCorrente")) 
-		{
+		} else if (nrTotaleDitte <= (int) execution.getVariable("nrElencoDitteCorrente")) {
 			execution.setVariable("pIvaCodiceFiscaleDittaAggiudicataria", "NESSUNA");
 			execution.setVariable("ragioneSocialeDittaAggiudicataria", "NESSUNA");
 			execution.setVariable("ditteRTI_json", null);
@@ -120,13 +115,17 @@ public class AcquistiService {
 		} else {
 			dittaCorrente = ditteCandidate.getJSONObject(nrElencoDitteCorrente);
 			execution.setVariable("ditteRTI_json", null);
-			execution.setVariable("pIvaCodiceFiscaleDittaAggiudicataria", dittaCorrente.get("pIvaCodiceFiscaleDittaInvitata"));
-			execution.setVariable("ragioneSocialeDittaAggiudicataria", dittaCorrente.get("ragioneSocialeDittaInvitata"));
-			execution.setVariable("gestioneRTIDittaAggiudicataria", dittaCorrente.get("gestioneRTIDittaInvitata"));
 			execution.setVariable("esitoVerificaRequisiti", "procediAltroCandidato");
 			execution.setVariable("verificheRequisiti", "da verificare");
 		}
+	}
 
+	public void ProponiDittaAggiudicataria(DelegateExecution execution) {
+		if (execution.getVariable("verificheRequisitiid") != null && execution.getVariable("verificheRequisitiid").toString().equals("1")) {
+			execution.setVariable("pIvaCodiceFiscaleDittaAggiudicataria", execution.getVariable("pIvaCodiceFiscaleDittaCandidata"));
+			execution.setVariable("ragioneSocialeDittaAggiudicataria", execution.getVariable("ragioneSocialeDittaCandidata"));
+			execution.setVariable("gestioneRTIDittaAggiudicataria", execution.getVariable("gestioneRTIDittaCandidata"));
+		}
 	}
 
 	public void SostituisciDocumento(DelegateExecution execution, String nomeFileDaSostituire) {

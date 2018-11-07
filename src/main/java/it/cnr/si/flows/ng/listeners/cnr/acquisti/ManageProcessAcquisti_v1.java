@@ -109,13 +109,12 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			execution.setVariable("direzioneFlusso", "Stipula");
 		};break;
 		// END DECISIONE-CONTRATTARE 
- 
+
 		case "espletamento-procedura-end": {	
 			if (execution.getVariable("strumentoAcquisizioneId") != null && execution.getVariable("strumentoAcquisizioneId").equals("23")) {
 				acquistiService.OrdinaElencoDitteCandidate(execution);
 			}
 		};break;
-
 		// START PROVVEDIMENTO-AGGIUDICAZIONE  
 		case "predisposizione-provvedimento-aggiudicazione-start": {
 			if (execution.getVariable("nrElencoDitteInit") != null) {
@@ -123,7 +122,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				acquistiService.ScorriElencoDitteCandidate(execution);	
 			}
 			dittaCandidata.evidenzia(execution);
-		};break; 
+		};break;
 		case "firma-provvedimento-aggiudicazione-end": {
 			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
 				firmaDocumentoService.eseguiFirma(execution, "provvedimentoAggiudicazione");
@@ -143,12 +142,12 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 		case "endevent-provvedimento-aggiudicazione-altro-candidato-end": {
 			execution.setVariable("direzioneFlusso", "SelezionaAltroCandidato");
 		};break;
-				
+
 		// END PROVVEDIMENTO-AGGIUDICAZIONE
 
 		// START CONTRATTO FUORI MEPA  
 		case "predisposizione-contratto-start": {
-			if (execution.getVariable("gestioneRTIDittaAggiudicataria").toString().equals("SI")) {
+			if ((execution.getVariable("gestioneRTIDittaAggiudicataria") != null) && (execution.getVariable("gestioneRTIDittaAggiudicataria").toString().equals("SI"))) {
 				//dittaCandidata.aggiornaDittaRTIInvitata(execution);
 			}
 		};break;
@@ -175,8 +174,9 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 
 		// START CONSUNTIVO  
 		case "consuntivo-start": {
+			acquistiService.ProponiDittaAggiudicataria(execution);
 			flowsPdfService.makePdf("avvisoPostInformazione", processInstanceId);
-		};break;     
+		};break;
 		case "consuntivo-end": {
 			attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);
 			attachmentService.setPubblicabile(execution.getId(), "avvisoPostInformazione", true);
@@ -205,7 +205,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			if (execution.getVariable("strumentoAcquisizioneId").toString().equals("21")) {
 				dittaCandidata.evidenzia(execution);
 			} else {
-				if (execution.getVariable("gestioneRTIDittaAggiudicataria").toString().equals("SI")) {
+				if ((execution.getVariable("gestioneRTIDittaAggiudicataria") != null) && (execution.getVariable("gestioneRTIDittaAggiudicataria").toString().equals("SI"))) {
 					dittaCandidata.aggiornaDittaRTIInvitata(execution);
 				}
 			}			
@@ -219,7 +219,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 		// END STIPULA MEPA  
 
 		// START REVOCA
-   
+
 		case "firma-revoca-end": {
 			firmaDocumentoService.eseguiFirma(execution, "ProvvedimentoDiRevoca");
 		};break; 
