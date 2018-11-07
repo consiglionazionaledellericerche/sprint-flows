@@ -122,10 +122,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				acquistiService.ScorriElencoDitteCandidate(execution);	
 			}
 			dittaCandidata.evidenzia(execution);
-		};break;   
-		case "predisposizione-provvedimento-aggiudicazione-end": {
-				acquistiService.ProponiDittaAggiudicataria(execution);
-		};break; 
+		};break;
 		case "firma-provvedimento-aggiudicazione-end": {
 			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
 				firmaDocumentoService.eseguiFirma(execution, "provvedimentoAggiudicazione");
@@ -177,8 +174,9 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 
 		// START CONSUNTIVO  
 		case "consuntivo-start": {
+			acquistiService.ProponiDittaAggiudicataria(execution);
 			flowsPdfService.makePdf("avvisoPostInformazione", processInstanceId);
-		};break;     
+		};break;
 		case "consuntivo-end": {
 			attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);
 			attachmentService.setPubblicabile(execution.getId(), "avvisoPostInformazione", true);
