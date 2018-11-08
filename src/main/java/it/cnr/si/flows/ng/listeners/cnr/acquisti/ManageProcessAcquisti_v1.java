@@ -201,15 +201,15 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 		// END CONSUNTIVO  
 
 		// START STIPULA MEPA  
-		case "stipula-mepa-consip-start": {
-			if (execution.getVariable("strumentoAcquisizioneId").toString().equals("21")) {
-				dittaCandidata.evidenzia(execution);
-			} else {
-				if ((execution.getVariable("gestioneRTIDittaAggiudicataria") != null) && (execution.getVariable("gestioneRTIDittaAggiudicataria").toString().equals("SI"))) {
-					dittaCandidata.aggiornaDittaRTIInvitata(execution);
-				}
-			}			
-		};break; 
+//		case "stipula-mepa-consip-start": {
+//			if (execution.getVariable("strumentoAcquisizioneId").toString().equals("21")) {
+//				dittaCandidata.evidenzia(execution);
+//			} else {
+//				if ((execution.getVariable("gestioneRTIDittaAggiudicataria") != null) && (execution.getVariable("gestioneRTIDittaAggiudicataria").toString().equals("SI"))) {
+//					dittaCandidata.aggiornaDittaRTIInvitata(execution);
+//				}
+//			}			
+//		};break; 
 		case "endevent-stipula-mepa-consip-revoca-end": {
 			execution.setVariable("direzioneFlusso", "RevocaConProvvedimento");
 		};break;
