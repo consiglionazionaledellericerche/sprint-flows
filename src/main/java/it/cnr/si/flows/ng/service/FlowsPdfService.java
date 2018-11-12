@@ -67,8 +67,7 @@ public class FlowsPdfService {
 	private static final String IMPEGNI_JSON = "impegni_json";
 	private static final String DITTECANDIDATEJSON = "ditteCandidate_json";
 	private static final String DITTEINVITATEJSON = "ditteInvitate_json";
-	
-	
+	private static final String DITTERTIJSON = "ditteRTI_json";
 
 	@Inject
 	private FlowsProcessInstanceService flowsProcessInstanceService;
@@ -245,6 +244,11 @@ public class FlowsPdfService {
 		if (variables.has(DITTECANDIDATEJSON)) {
 			JSONArray esperienze = new JSONArray(variables.getString(DITTECANDIDATEJSON));
 			variables.put(DITTECANDIDATEJSON, esperienze);
+		}
+		
+		if (variables.has(DITTERTIJSON)) {
+			JSONArray esperienze = new JSONArray(variables.getString(DITTERTIJSON));
+			variables.put(DITTERTIJSON, esperienze);
 		}
 		return variables;
 	}
