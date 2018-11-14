@@ -24,7 +24,7 @@
                         Avviato il <strong>{{process.startTime | dataora}}</strong> da <strong> {{process.name | get:
                                                                                                 'initiator'}} </strong>
                     </li>
-                    <ng-include src="'api/views/' + process.processDefinitionId.split(':')[0] + '' + process.processDefinitionId.split(':')[1] + '/search'" />
+                    <ng-include src="'api/views/' + process.processDefinitionId.split(':')[0] + '/' + process.processDefinitionId.split(':')[1] + '/search'" />
                 </ul>
             </div>
         </div>

@@ -147,7 +147,7 @@
                     return $http.get('api/users/struttura/' + filter + '/search');
                 },
                 exportCsv: function(searchParams, firstResult, maxResults) {
-                    let processDefinitionKey;
+                    var processDefinitionKey;
                     if (searchParams.processDefinitionKey !== undefined) {
                         processDefinitionKey = searchParams.processDefinitionKey;
                     } else {
