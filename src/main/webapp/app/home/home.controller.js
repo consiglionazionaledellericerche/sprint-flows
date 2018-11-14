@@ -34,9 +34,9 @@
 
             $q.all([principalPromise, profilePromise]).then(function(data) {
                 vm.account = data[0];
-                vm.profile = data[1];
+                vm.profiles = data[1].activeProfiles;
                 vm.isAuthenticated = Principal.isAuthenticated;
-                if (vm.isAuthenticated && vm.profile == 'cnr')
+                if ( vm.isAuthenticated && vm.profiles.includes('cnr') )
                     getTasksCount();
             });
         }
