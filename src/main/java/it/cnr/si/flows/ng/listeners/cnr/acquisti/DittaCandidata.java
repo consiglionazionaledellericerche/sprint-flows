@@ -38,6 +38,11 @@ public class DittaCandidata {
 		execution.setVariable("pIvaCodiceFiscaleDittaCandidata", dittaCorrente.get("pIvaCodiceFiscaleDittaInvitata"));
 		execution.setVariable("ragioneSocialeDittaCandidata", dittaCorrente.get("ragioneSocialeDittaInvitata"));
 		execution.setVariable("gestioneRTIDittaCandidata", dittaCorrente.get("gestioneRTIDittaInvitata"));
+		if (dittaCorrente.get("gestioneRTIDittaInvitata").toString().equals("SI")) {
+			execution.setVariable("ditteRTI_json", dittaCorrente.get("ditteRTI").toString());
+		} else {
+			execution.setVariable("ditteRTI_json", null);
+		}
 	}
 
 	public void aggiornaDittaRTIInvitata(DelegateExecution execution) throws IOException, ParseException {
