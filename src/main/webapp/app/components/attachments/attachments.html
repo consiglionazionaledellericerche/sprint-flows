@@ -15,6 +15,11 @@
     </li>
 </ul>
 
+<button class="btn btn-xs btn-primary" ng-if="canUpdateAttachments" ng-click="addFile()">
+    <span class="glyphicon glyphicon-plus-sign"></span>
+    Carica un ulteriore documento
+</button>
+
 <script type="text/ng-template" id="fileHistoryModal.html">
     <div class="modal-header">
         <h4 class="modal-title">Storia del file {{name}}</h4>
