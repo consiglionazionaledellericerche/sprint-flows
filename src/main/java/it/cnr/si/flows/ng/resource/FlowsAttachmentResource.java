@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Aggiornamento;
+import static it.cnr.si.flows.ng.utils.Enum.Azione.Caricamento;
 
 @Controller
 @RequestMapping("api/attachments")
@@ -162,7 +163,14 @@ public class FlowsAttachmentResource {
 
         FlowsAttachment attachment = runtimeService.getVariable(processInstanceId, attachmentName, FlowsAttachment.class);
 
-        attachment.setAzione(Aggiornamento);
+        if (attachment != null) {
+            attachment.setAzione(Aggiornamento);
+        } else {
+            attachment = new FlowsAttachment();
+            attachment.setName(attachmentName);
+            attachment.setAzione(Caricamento);
+        }
+
         attachment.setBytes(file.getBytes());
         attachment.setFilename(file.getOriginalFilename());
         attachment.setMimetype(file.getContentType());
