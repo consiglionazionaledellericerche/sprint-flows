@@ -6,7 +6,6 @@ import it.cnr.si.flows.ng.utils.Utils;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
@@ -28,18 +27,17 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.StopWatch;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.*;
 
 import static it.cnr.si.flows.ng.TestServices.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
 import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
-import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.iscrizioneElencoOiv;
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
 import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
 import static it.cnr.si.flows.ng.utils.Utils.ASC;
@@ -267,9 +265,9 @@ public class FlowsProcessInstanceResourceTest {
         newIdentityLinks = runtimeService.getIdentityLinksForProcessInstance(processInstance.getId());
         assertEquals(OK, response.getStatusCode());
         assertFalse(newIdentityLinks.stream()
-                           .anyMatch(a -> a.getGroupId() == groupId &&
-                                   a.getProcessInstanceId().equals(processInstance.getId())  &&
-                                   a.getType() == Utils.PROCESS_VISUALIZER));
+                            .anyMatch(a -> a.getGroupId() == groupId &&
+                                    a.getProcessInstanceId().equals(processInstance.getId())  &&
+                                    a.getType() == Utils.PROCESS_VISUALIZER));
     }
 
 
@@ -307,12 +305,46 @@ public class FlowsProcessInstanceResourceTest {
         newIdentityLinks = runtimeService.getIdentityLinksForProcessInstance(processInstance.getId());
         assertEquals(OK, response.getStatusCode());
         assertFalse(newIdentityLinks.stream()
-                           .anyMatch(a -> a.getUserId() == userId &&
-                                   a.getProcessInstanceId().equals(processInstance.getId())  &&
-                                   a.getType() == Utils.PROCESS_VISUALIZER));
+                            .anyMatch(a -> a.getUserId() == userId &&
+                                    a.getProcessInstanceId().equals(processInstance.getId())  &&
+                                    a.getType() == Utils.PROCESS_VISUALIZER));
     }
 
 
+    @Test
+    public void getProcessInstancesForTrasparenzaTest() throws IOException, ParseException {
+        processInstance = util.mySetUp(acquisti);
+
+        util.loginAdmin();
+        ResponseEntity<List<Map<String, Object>>> res = flowsProcessInstanceResource
+                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, 2018, 0, 10, ASC);
+
+        assertEquals(OK, res.getStatusCode());
+        assertEquals(1, res.getBody().size());
+
+        //prova recupero 10 elementi dopo il quinto (result = 0 perchè ho una sola Process Instance)
+        res = flowsProcessInstanceResource
+                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, 2018, 5, 10, ASC);
+
+        assertEquals(OK, res.getStatusCode());
+        assertEquals(0, res.getBody().size());
+
+
+        //prova senza ordinamento (recupera la process instance)
+        res = flowsProcessInstanceResource
+                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, 2018, 0, 10, null);
+
+        assertEquals(OK, res.getStatusCode());
+        assertEquals(1, res.getBody().size());
+
+
+        //prova anni sbagliati
+        res = flowsProcessInstanceResource
+                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2016, 2016, 0, 10, ASC);
+
+        assertEquals(OK, res.getStatusCode());
+        assertEquals(0, res.getBody().size());
+    }
 
 
     private String verifyMyProcesses(int startedByRA, int startedBySpaclient) {
