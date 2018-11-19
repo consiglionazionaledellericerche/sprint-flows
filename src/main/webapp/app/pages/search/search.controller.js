@@ -5,9 +5,9 @@
 		.module('sprintApp')
 		.controller('SearchController', SearchController);
 
-	SearchController.$inject = ['$scope', '$rootScope', '$state', 'dataService', 'AlertService', 'paginationConstants', 'utils', '$log', '$location'];
+	SearchController.$inject = ['$scope', '$rootScope', 'dataService', 'utils', '$log', '$location'];
 
-	function SearchController($scope, $rootScope, $state, dataService, AlertService, paginationConstants, utils, $log, $location) {
+	function SearchController($scope, dataService, utils, $log, $location) {
 		var vm = this,
 			oldUrl = $scope.formUrl;
 
@@ -15,13 +15,15 @@
 
 		vm.searchParams = $location.search();
 		vm.searchParams.active = $location.search().active || true;
-		vm.searchParams.order = $location.search().order || "ASC";
+		vm.searchParams.order = $location.search().order || 'ASC';
 		vm.searchParams.page = $location.search().page || 1;
 		vm.searchParams.processDefinitionKey = 'all';
-		if ($location.search().isTaskQuery === undefined)
+		
+		if ($location.search().isTaskQuery === undefined){
 			vm.searchParams.isTaskQuery = false;
-		else
+		}else{
 			vm.searchParams.isTaskQuery = ($location.search().isTaskQuery === true || $location.search().isTaskQuery == 'true');
+		}
 
 		$scope.hasPendingRequests = function() {
 			return httpRequestTracker.hasPendingRequests();
@@ -37,10 +39,12 @@
 			if (vm.searchParams.processDefinitionKey === null)
 				vm.searchParams.processDefinitionKey = undefined;
 
-			$log.info(vm.searchParams)
+			$log.info(vm.searchParams);
 
 			$location.search(vm.searchParams);
 
+			//ripulisco i valori con null(tipo quando annullo la data selezionata)
+			Object.keys(vm.searchParams).forEach((key) => (vm.searchParams[key] == null) && delete vm.searchParams[key]);
 			dataService.processInstances.search(vm.searchParams)
 				.then(function(response) {
 					if (vm.searchParams.isTaskQuery)
@@ -64,14 +68,15 @@
 			cleanParams.page = 1;
 			cleanParams.isTaskQuery = vm.searchParams.isTaskQuery;
 			cleanParams.processDefinitionKey = vm.searchParams.processDefinitionKey;
+			cleanParams.numeriProtocollo = vm.searchParams.numeriProtocollo;
 
 			vm.searchParams = cleanParams;
-		}
+		};
 
 		$scope.exportCsv = function() {
 			dataService.search.exportCsv(vm.searchParams, -1, -1)
 				.success(function(response) {
-					var filename = new Date().toISOString().slice(0, 10) + ".xls",
+					var filename = new Date().toISOString().slice(0, 10) + '.xls',
 						file = new Blob([response], {
 							type: 'application/vnd.ms-excel'
 						});
@@ -80,7 +85,7 @@
 				});
 		};
 
-		$scope.$watchGroup(['vm.searchParams.processDefinitionKey'], function(newVal) {
+		$scope.$watchGroup(['vm.searchParams.processDefinitionKey'], function() {
 
 			if (vm.searchParams.processDefinitionKey) {
 				if (vm.searchParams.isTaskQuery) {
@@ -88,8 +93,9 @@
 				} else {
 					$scope.formUrl = 'api/forms/' + vm.searchParams.processDefinitionKey + '/1/search-pi';
 				}
-			} else
+			} else{
 				$scope.formUrl = undefined;
+			}
 		});
 
 		$scope.search();
