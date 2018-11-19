@@ -239,26 +239,28 @@ public class FlowsProcessInstanceService {
 		}
 
 		params.forEach((key, typevalue) -> {
-			if (typevalue.contains("=")) {
+			if (typevalue != null && typevalue.contains("=")) {
 				String type = typevalue.substring(0, typevalue.indexOf('='));
 				String value = typevalue.substring(typevalue.indexOf('=')+1);
-				if (key.equals("businessKey")) {
-					processQuery.processInstanceBusinessKey(value);
-				} else {
-					switch (type) {
-					case "textEqual":
-						processQuery.variableValueEquals(key, value);
-						break;
-					case "boolean":
-						// gestione variabili booleane
-						processQuery.variableValueEquals(key, Boolean.valueOf(value));
-						break;
-					default:
-						//variabili con la wildcard  (%value%)
-						processQuery.variableValueLikeIgnoreCase(key, "%" + value + "%");
-						break;
+				if(!value.isEmpty()) {
+					if (key.equals("businessKey")) {
+						processQuery.processInstanceBusinessKey(value);
+					} else {
+						switch (type) {
+							case "textEqual":
+								processQuery.variableValueEquals(key, value);
+								break;
+							case "boolean":
+								// gestione variabili booleane
+								processQuery.variableValueEquals(key, Boolean.valueOf(value));
+								break;
+							default:
+								//variabili con la wildcard  (%value%)
+								processQuery.variableValueLikeIgnoreCase(key, "%" + value + "%");
+								break;
+						}
 					}
-				} 
+				}
 			}else {
 				//per <input type="date"' non funziona "input-prepend" quindi rimetto la vecchia implementazione
 				if ("startDateGreat".equals(key) || "startDateLess".equals(key)) {
