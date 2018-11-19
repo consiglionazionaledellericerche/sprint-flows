@@ -5,7 +5,7 @@
 		.module('sprintApp')
 		.controller('SearchController', SearchController);
 
-	SearchController.$inject = ['$scope', '$rootScope', 'dataService', 'utils', '$log', '$location'];
+	SearchController.$inject = ['$scope', 'dataService', 'utils', '$log', '$location'];
 
 	function SearchController($scope, dataService, utils, $log, $location) {
 		var vm = this,
