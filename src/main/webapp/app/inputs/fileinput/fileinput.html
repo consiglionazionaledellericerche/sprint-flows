@@ -1,65 +1,122 @@
-<div class="form-group well" ng-if="attrs.multiple == 'false'">
-    <label for="attrs.id">{{attrs.label}}</label><br>
-    <a
-            href
-            ng-click="downloadFile('/api/attachments/task/'+ data.taskId +'/'+ document.name +'/data', document.name, document.mimetype)" >
-        {{document.filename}}
-    </a>
-    <button class="btn btn-xs btn-info" ng-class="{'btn-warning': attachments[attrs.name].name}"
-            ng-model="$parent.data[attrs.name]"
-            ngf-select
-            name="$parent.data[attrs.name]"
-            accept="{{attrs.accept}}"
-            ngf-multiple="false"
-            ng-required="attrs['cnrRequired'] == 'true'" >
-        <span ng-show="!document" class="glyphicon glyphicon-upload"></span>
-        <span ng-show="document.name" class="glyphicon glyphicon-repeat"></span>
-        <span ng-show="!document">Carica Documento</span>
-        <span ng-show="document.name">Aggiorna</span>
-    </button>
-    <span ng-show="$parent.data[attrs.name]">
-          {{$parent.data[attrs.name].name}}
-          <a href ng-click="$parent.data[attrs.name] = undefined"><span
-                  class="glyphicon glyphicon-remove" title="Rimuovi"></span></a>
-      </span>
-</div>
-
-<div class="form-group well" ng-if="attrs.multiple == 'true'">
-    <div ng-repeat="(name, attachment) in attachments" ng-if="filterNames(attachment)">
-        <label for="attrs.id">{{attrs.label}}</label><br>
-        <a
-                href
-                ng-click="downloadFile('/api/attachments/task/'+ data.taskId +'/'+ attachment.name +'/data', attachment.name,attachment.mimetype)" >
-            {{attachment.filename}}
-        </a>
-        <button class="btn btn-xs btn-info"
-                ng-model="$parent.data[attachment.name]"
-                ngf-select
-                name="$parent.data[attachment.name]"
-                accept="{{attrs.accept}}"
-                ngf-multiple="false"
-                ng-required="attrs['cnrRequired'] == 'true'" >
-            <span class="glyphicon glyphicon-repeat"></span> Aggiorna
-        </button>
-        {{$parent.data[attachment.name].name}}
-    </div>
-    <label for="attrs.id">{{attrs.labelplural || attrs.label}}</label><br>
-    <button class="btn btn-xs btn-info"
-            ng-model="$parent.data['__new__'+attrs.name]"
-            ngf-select
-            name="$parent.data['__new__'+attrs.name]"
-            accept="{{attrs.accept}}"
-            ngf-multiple="true"
-            ng-required="attrs['cnrRequired'] == 'true'" >
-        <span class="glyphicon glyphicon-upload"></span>
-        <span ng-show="!$parent.data[attrs.name].name"> Carica Documenti</span>
-    </button>
-    <span ng-show="$parent.data['__new__'+attrs.name].length">
-        Documenti selezionati:
-        <span ng-repeat="att in $parent.data['__new__'+attrs.name]">
-          {{att.name}}
-                  <a href ng-click="$parent.data['__new__'+attrs.name].splice($index, 1)"><span
-                          class="glyphicon glyphicon-remove" title="Rimuovi"></span></a><span ng-if="!$last">  </span>, </span>
+<fieldset>
+    <legend ng-if="legend">{{legend}}
+        <span class="glyphicon glyphicon-question-sign" ng-show="item.placeholder" data-toggle="tooltip" data-placement="top" title="{{item.placeholder}}"></span>
+        <span class="pull-right" ng-if="multiple">
+          <button type="button" class="btn btn-success btn-xs" ng-click="addRow()" ng-disabled="ngModel.length >= max">
+            <span class="glyphicon glyphicon-plus"></span>
+          </button>
+          <button type="button" class="btn btn-danger btn-xs" ng-click="removeRow()" ng-disabled="ngModel.length <= min">
+            <span class="glyphicon glyphicon-minus"></span>
+          </button>
         </span>
-    </span>
-</div>
+    </legend>
+
+    <div class="well" ng-if="rows.length == 0">
+        Usare il bottone
+        <button type="button" class="btn btn-success btn-xs" ng-click="addRow()" ng-disabled="ngModel.length >= max">
+        <span class="glyphicon glyphicon-plus"></span>
+        </button>
+        per aggiungere eventuali altri allegati.
+    </div>
+
+    <div class="well" ng-repeat="row in rows track by $index" ng-init="name = attrs.name || 'allegato'+$index">
+
+        <div class="form-group" ng-if="attrs.name === undefined">
+            <label>Tipo Documento</label>
+            <input type="text" class="form-control" ng-model="data[name+'_name']" required>
+        </div>
+        <div class="form-group" ng-if="attrs.name !== undefined">
+            <h3>{{label}}</h3>
+        </div>
+
+        <div ng-if="metadatiPubblicazione">
+            <div class="row form-group">
+                <div class="col-md-5">
+                    Pubblicazione in URP
+                </div>
+                <div class="col-md-7">
+                    <toggle-switch
+                        class="switch-success btn-group btn-group-justified"
+                        ng-init="data[name+'_pubblicazioneUrp'] = (pubblicazioneUrp == 'true')"
+                        ng-model="data[name+'_pubblicazioneUrp']"
+                        off-label="Non pubblicare"
+                        on-label="Pubblica"
+                        is-disabled="attrs.pubblicazioneUrp !== undefined">
+                    </toggle-switch>
+                </div>
+            </div>
+
+            <div class="row form-group">
+                <div class="col-md-5">
+                    Pubblicazione in Trasparenza
+                </div>
+                <div class="col-md-7">
+                    <toggle-switch
+                        class="switch-success btn-group btn-group-justified"
+                        ng-model="data[name+'_pubblicazioneTrasparenza']"
+                        ng-init="data[name+'_pubblicazioneTrasparenza'] = (pubblicazioneTrasparenza == 'true')"
+                        off-label="Non pubblicare"
+                        on-label="Pubblica"
+                        is-disabled="attrs.pubblicazioneTrasparenza !== undefined">
+                    </toggle-switch>
+                </div>
+            </div>
+        </div>
+
+        <div ng-if="metadatiProtocollo">
+            <div class="row form-group">
+                <div class="col-md-5">
+                    Protocollo
+                </div>
+                <div class="col-md-7">
+                    <toggle-switch
+                        class="btn-group btn-group-justified"
+                        ng-model="data[name+'_protocollo']"
+                        ng-init="data[name+'_protocollo'] = (protocollo == 'true')"
+                        off-label="Non Protocollato"
+                        on-label="Protocollato"
+                        is-disabled="attrs.protocollo !== undefined">
+                    </toggle-switch>
+                </div>
+            </div>
+
+            <div class="row form-group">
+                <div class="col-md-5" ng-if="data[name+'_protocollo']">
+                    <label>Data protocollo</label>
+                    <input type="date" class="form-control" ng-model="data[name+'_dataprotocollo']" required>
+                </div>
+                <div class="col-md-7" ng-if="data[name+'_protocollo']">
+                    <label>Numero protocollo</label>
+                    <input type="text" class="form-control" ng-model="data[name+'_numeroprotocollo']" required>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row form-group">
+            <div class="col-md-12">
+                <button class="btn btn-sm"
+                        ng-class="{'btn-success': data[name].name, 'btn-info': !data[name].name}"
+                        ng-model="data[name]"
+                        ngf-select
+                        name="data[name]"
+                        accept="{{accept}}"
+                        ngf-multiple="false"
+                        ng-required="true" >
+                    <span ng-show="!document" class="glyphicon glyphicon-upload"></span>
+                    <span ng-show="document.name" class="glyphicon glyphicon-repeat"></span>
+                    <span ng-show="!document">Seleziona File</span>
+                    <span ng-show="document.name">Aggiorna</span>
+                </button>
+                <span ng-show="data[name]">
+                      {{data[name].name}}
+                      <a href ng-click="data[name] = undefined"><span
+                              class="glyphicon glyphicon-remove" title="Rimuovi"></span></a>
+                  </span>
+            </div>
+        </div>
+
+    </div>
+</fieldset>
+
+<hr ng-if="multiple">

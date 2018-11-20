@@ -325,7 +325,7 @@ public class FlowsTaskService {
 				String counterId = processDefinition.getName() + "-" + Calendar.getInstance().get(Calendar.YEAR);
 				String key = counterId + "-" + counterService.getNext(counterId);
 
-				//recupero l'idStruttura dell'RA che sta avviando il flusso
+				//recupero l'idStruttura dell'utente che sta avviando il flusso
 				List<GrantedAuthority> authorities = relationshipService.getAllGroupsForUser(username);
 				List<String> groups = authorities.stream()
 						.map(GrantedAuthority::<String>getAuthority)
