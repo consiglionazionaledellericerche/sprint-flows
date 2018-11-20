@@ -587,3 +587,15 @@ input.ng-touched.ng-invalid, button.ng-touched.ng-invalid, textarea.ng-touched.n
 }
 
 /* END workflow */
+
+
+.toggle-switch {
+    border: 1px solid lightgray;
+    cursor: pointer;
+    display: inline-block;
+    text-align: left;
+    overflow: hidden;
+    line-height: 8px;
+    min-width: 100px;
+    border-radius: 5px;
+}
