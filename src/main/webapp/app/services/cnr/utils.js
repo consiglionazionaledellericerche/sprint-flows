@@ -39,6 +39,7 @@
                         saveAs(file, filename);
                     });
             },
+            //todo: viene usato SOLO in active-flows.controller.js: rimuovere la pagina o aggiornare la chiamata
             oldPopulateTaskParams: function (fields) {
                 var processParams = [], //alcuni parametri delle ricerche dei task riguardano anche la ProcessInstance
                     taskParams = [];
@@ -85,6 +86,16 @@
                     'processParams': processParams,
                     'taskParams': taskParams,
                 };
+            },
+            oldPopulateProcessParams: function (fields) {
+                var processParams = {};
+
+                fields.forEach(function (field) {
+                    var fieldName = field.getAttribute('id').replace('searchField-', '');
+                    if (field.value !== "")
+                        processParams[fieldName] = field.getAttribute("type") + "=" + field.value;
+                });
+                return processParams;
             },
             populateProcessParams: function (fields) {
                 var processParams = {};

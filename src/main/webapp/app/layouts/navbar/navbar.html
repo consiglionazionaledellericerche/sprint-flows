@@ -29,7 +29,7 @@
                 </a>
             </li>
             <li ui-sref-active="active" has-authority="ROLE_USER">
-                <a ui-sref="availabletasks" ng-click="vm.collapseNavbar()">
+                <a ui-sref="availableTasks" ng-click="vm.collapseNavbar()">
                     <span class="glyphicon glyphicon-inbox"></span>
                     <span class="hidden-sm">I miei compiti</span>
                 </a>
@@ -89,7 +89,7 @@
 
 
             <li ui-sref-active="active" has-authority="ROLE_USER">
-                <a ui-sref="my-process-instances" ng-click="vm.collapseNavbar()">
+                <a ui-sref="myProcessInstances" ng-click="vm.collapseNavbar()">
                     <span class="glyphicon glyphicon-pushpin"></span>
                     <span class="hidden-sm">Flussi avviati da me</span>
                 </a>
@@ -306,7 +306,7 @@
                 </ul>
             </li>
             <li ng-switch-when="true" has-authority="ROLE_PREVIOUS_ADMINISTRATOR">
-                <a ui-sref="availabletasks" ng-click="vm.cancelSwitchUser()">
+                <a ui-sref="availableTasks" ng-click="vm.cancelSwitchUser()">
                     <span class="label label-warning" >
                         <span class="glyphicon glyphicon-user"></span>
                         Impersonating: {{vm.account.login}}

@@ -2,28 +2,28 @@
     'use strict';
 
     angular
-        .module('sprintApp')
-        .config(stateConfig);
+            .module('sprintApp')
+            .config(stateConfig);
 
     stateConfig.$inject = ['$stateProvider'];
 
     function stateConfig($stateProvider) {
-        $stateProvider.state('availabletasks', {
+        $stateProvider.state('availableTasks', {
             parent: 'app',
-            url: '/availabletasks',
+            url: '/available-tasks',
             data: {
                 authorities: ['ROLE_USER']
             },
             views: {
                 'content@': {
-                    templateUrl: 'app/pages/availabletasks/availabletasks.html',
+                    templateUrl: 'app/pages/availableTasks/availableTasks.html',
                     controller: 'AvailableTasksController',
                     controllerAs: 'vm'
                 }
             },
             resolve: {
                 mainTranslatePartialLoader: ['$translate', '$translatePartialLoader', function ($translate,$translatePartialLoader) {
-                    $translatePartialLoader.addPart('availabletasks');
+                    $translatePartialLoader.addPart('global');
                     return $translate.refresh();
                 }]
             }
