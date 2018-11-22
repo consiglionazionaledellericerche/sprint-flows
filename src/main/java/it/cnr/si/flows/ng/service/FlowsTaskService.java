@@ -317,7 +317,7 @@ public class FlowsTaskService {
 			throw new ProcessDefinitionAndTaskIdEmptyException();
 
 		Map<String, Object> data = extractParameters(req);
-		data.putAll(attachmentService.extractAttachmentsVariables(req));
+		data.putAll(attachmentService.extractAttachmentVariables(req));
 
 		if (isEmpty(taskId)) {
 			ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitionId).singleResult();

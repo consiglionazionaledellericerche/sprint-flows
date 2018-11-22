@@ -17,10 +17,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static it.cnr.si.flows.ng.utils.Enum.Azione.*;
@@ -55,12 +52,11 @@ public class FlowsAttachmentService {
 	 * IMPORTANTE: gli <input file multiple> devono avere il prefisso NEW_ATTACHMENT_PREFIX
 	 * (dovrebbe essere automatizzato nel componente, e non riguardare l'API pubblica)
 	 */
-	public Map<String, FlowsAttachment> extractAttachmentsVariables(MultipartHttpServletRequest req) throws IOException {
+	public Map<String, FlowsAttachment> extractAttachmentVariables(MultipartHttpServletRequest req) throws IOException {
 		Map<String, FlowsAttachment> attachments = new HashMap<>();
 		Map<String, Integer> nextIndexTable = new HashMap<>();
 		String taskId, taskName;
 
-		String username = SecurityUtils.getCurrentUserLogin();
 		if (req.getParameter("taskId") != null) {
 			taskId = (String) req.getParameter("taskId");
 			taskName = taskService.createTaskQuery().taskId(taskId).singleResult().getName();
@@ -72,41 +68,54 @@ public class FlowsAttachmentService {
 		Iterator<String> i = req.getFileNames();
 		while (i.hasNext()) {
 			String fileName = i.next();
-			MultipartFile file = req.getFile(fileName);
-			boolean hasPrefix = fileName.startsWith(NEW_ATTACHMENT_PREFIX);
-			if (hasPrefix) {
-				fileName = fileName.substring(NEW_ATTACHMENT_PREFIX.length());
-				fileName = fileName.replaceAll(ARRAY_SUFFIX_REGEX, "");
-				int index = getNextIndex(taskId, fileName, nextIndexTable);
-				fileName = fileName +"["+ index +"]";
-			}
-
-			boolean nuovo = taskId.equals("start") || taskService.getVariable(taskId, fileName) == null;
-            LOGGER.info("inserisco come variabile il file {}", fileName);
-
-			FlowsAttachment att = new FlowsAttachment();
-			att.setName(fileName);
-			att.setFilename(file.getOriginalFilename());
-			att.setTime(new Date());
-			att.setTaskId(taskId);
-			att.setTaskName(taskName);
-			att.setUsername(username);
-			att.setMimetype(getMimetype(file));
-			att.setBytes(file.getBytes());
-
-			if (nuovo) {
-                att.setAzione(Caricamento);
-			} else {
-                att.setAzione(Aggiornamento);
-			}
-
+			FlowsAttachment att = extractSingleAttachment(req, nextIndexTable, taskId, taskName, fileName);
 			attachments.put(fileName, att);
 		}
 
 		return attachments;
 	}
 
-    public void saveAttachment(DelegateExecution execution, String variableName, FlowsAttachment att) {
+	private FlowsAttachment extractSingleAttachment(MultipartHttpServletRequest req, Map<String, Integer> nextIndexTable, String taskId, String taskName, String fileName) throws IOException {
+		MultipartFile file = req.getFile(fileName);
+        String username = SecurityUtils.getCurrentUserLogin();
+
+		boolean hasPrefix = fileName.startsWith(NEW_ATTACHMENT_PREFIX);
+		if (hasPrefix) {
+			fileName = fileName.substring(NEW_ATTACHMENT_PREFIX.length());
+			fileName = fileName.replaceAll(ARRAY_SUFFIX_REGEX, "");
+			int index = getNextIndex(taskId, fileName, nextIndexTable);
+			fileName = fileName +"["+ index +"]";
+		}
+
+		boolean nuovo = taskId.equals("start") || taskService.getVariable(taskId, fileName) == null;
+		LOGGER.info("inserisco come variabile il file {}", fileName);
+
+		FlowsAttachment att = new FlowsAttachment();
+		att.setName(fileName);
+		att.setFilename(file.getOriginalFilename());
+		att.setTime(new Date());
+		att.setTaskId(taskId);
+		att.setTaskName(taskName);
+		att.setUsername(username);
+		att.setMimetype(getMimetype(file));
+		att.setBytes(file.getBytes());
+
+		// aggiungo eventuali ulteriori metadati associati all'allegato
+        final String fileNameDef = fileName;
+		Collections.list(req.getParameterNames()).stream()
+            .filter(name -> name.startsWith(fileNameDef))
+            .forEach(name -> att.setMetadato(name.replace(fileNameDef+"_", ""), req.getParameter(name)));
+
+		if (nuovo) {
+			att.setAzione(Caricamento);
+		} else {
+			att.setAzione(Aggiornamento);
+		}
+
+		return att;
+	}
+
+	public void saveAttachment(DelegateExecution execution, String variableName, FlowsAttachment att) {
 
         att.setTime(new Date());
         att.setTaskName(execution.getCurrentActivityName());
