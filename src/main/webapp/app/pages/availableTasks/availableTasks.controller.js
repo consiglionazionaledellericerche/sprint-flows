@@ -5,13 +5,7 @@
 		.module('sprintApp')
 		.controller('AvailableTasksController', AvailableTasksController);
 
-	AvailableTasksController.$inject = [
-		'$scope',
-		'paginationConstants',
-		'dataService',
-		'utils',
-		'$log',
-	];
+	AvailableTasksController.$inject = ['$scope', 'paginationConstants', 'dataService',	'utils', '$log'];
 
 	function AvailableTasksController($scope, paginationConstants, dataService, utils, $log) {
 		var vm = this;

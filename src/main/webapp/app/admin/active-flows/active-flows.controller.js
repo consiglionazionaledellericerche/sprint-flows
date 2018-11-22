@@ -34,7 +34,7 @@
             activeFirstResult = vm.itemsPerPage * (vm.activePage - 1);
             activeMaxResults = vm.itemsPerPage;
 
-            dataService.processInstances.getProcessInstances($scope.current, true, activeFirstResult, activeMaxResults, vm.order, utils.populateProcessParams(Array.from($("input[id^='searchField-']"))))
+            dataService.processInstances.getProcessInstances($scope.current, true, activeFirstResult, activeMaxResults, vm.order, utils.oldPopulateTaskParams(Array.from($("input[id^='searchField-']"))))
                 .then(function(response) {
                     vm.activeProcess = utils.refactoringVariables(response.data.data);
                     // variabili per la gestione della paginazione
@@ -55,7 +55,7 @@
             maxResultsTerminated = vm.itemsPerPage;
 
             //buono (da adattare)
-            dataService.processInstances.getProcessInstances($scope.current, false, firstResultTerminated, maxResultsTerminated, vm.order, utils.populateProcessParams(Array.from($("input[id^='searchField-']"))))
+            dataService.processInstances.getProcessInstances($scope.current, false, firstResultTerminated, maxResultsTerminated, vm.order, utils.oldPopulateTaskParams(Array.from($("input[id^='searchField-']"))))
                 .then(function(response) {
                     vm.terminatedProcess = utils.refactoringVariables(response.data.data);
                     // variabili per la gestione della paginazione
