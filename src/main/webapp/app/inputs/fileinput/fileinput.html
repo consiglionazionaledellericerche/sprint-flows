@@ -19,13 +19,13 @@
         per aggiungere eventuali altri allegati.
     </div>
 
-    <div class="well" ng-repeat="row in rows track by $index" ng-init="name = attrs.name || 'allegato'+$index">
-
-        <div class="form-group" ng-if="attrs.name === undefined">
+    <div class="well" ng-repeat="row in rows track by $index" ng-init="rowname = multiple ? name+$index : name; document = findDocument(rowname);">
+        <pre>{{ document | json }}</pre>
+        <div class="form-group" ng-if="label === undefined">
             <label>Tipo Documento</label>
-            <input type="text" class="form-control" ng-model="data[name+'_name']" required>
+            <input type="text" class="form-control" ng-model="data[rowname+'_name']" required>
         </div>
-        <div class="form-group" ng-if="attrs.name !== undefined">
+        <div class="form-group" ng-if="label !== undefined">
             <h3>{{label}}</h3>
         </div>
 
@@ -37,8 +37,8 @@
                 <div class="col-md-7">
                     <toggle-switch
                         class="switch-success btn-group btn-group-justified"
-                        ng-init="data[name+'_pubblicazioneUrp'] = (pubblicazioneUrp == 'true')"
-                        ng-model="data[name+'_pubblicazioneUrp']"
+                        ng-init="data[rowname+'_pubblicazioneUrp'] = (pubblicazioneUrp == 'true')"
+                        ng-model="data[rowname+'_pubblicazioneUrp']"
                         off-label="Non pubblicare"
                         on-label="Pubblica"
                         is-disabled="attrs.pubblicazioneUrp !== undefined">
@@ -53,8 +53,8 @@
                 <div class="col-md-7">
                     <toggle-switch
                         class="switch-success btn-group btn-group-justified"
-                        ng-model="data[name+'_pubblicazioneTrasparenza']"
-                        ng-init="data[name+'_pubblicazioneTrasparenza'] = (pubblicazioneTrasparenza == 'true')"
+                        ng-model="data[rowname+'_pubblicazioneTrasparenza']"
+                        ng-init="data[rowname+'_pubblicazioneTrasparenza'] = (pubblicazioneTrasparenza == 'true')"
                         off-label="Non pubblicare"
                         on-label="Pubblica"
                         is-disabled="attrs.pubblicazioneTrasparenza !== undefined">
@@ -71,8 +71,8 @@
                 <div class="col-md-7">
                     <toggle-switch
                         class="btn-group btn-group-justified"
-                        ng-model="data[name+'_protocollo']"
-                        ng-init="data[name+'_protocollo'] = (protocollo == 'true')"
+                        ng-model="data[rowname+'_protocollo']"
+                        ng-init="data[rowname+'_protocollo'] = (protocollo == 'true')"
                         off-label="Non Protocollato"
                         on-label="Protocollato"
                         is-disabled="attrs.protocollo !== undefined">
@@ -81,36 +81,43 @@
             </div>
 
             <div class="row form-group">
-                <div class="col-md-5" ng-if="data[name+'_protocollo']">
+                <div class="col-md-5" ng-if="data[rowname+'_protocollo']">
                     <label>Data protocollo</label>
-                    <input type="date" class="form-control" ng-model="data[name+'_dataprotocollo']" required>
+                    <input type="date" class="form-control" ng-model="data[rowname+'_dataprotocollo']" required>
                 </div>
-                <div class="col-md-7" ng-if="data[name+'_protocollo']">
+                <div class="col-md-7" ng-if="data[rowname+'_protocollo']">
                     <label>Numero protocollo</label>
-                    <input type="text" class="form-control" ng-model="data[name+'_numeroprotocollo']" required>
+                    <input type="text" class="form-control" ng-model="data[rowname+'_numeroprotocollo']" required>
                 </div>
             </div>
 
         </div>
 
+
+        <a
+                href
+                ng-click="downloadFile('/api/attachments/task/'+ data.taskId +'/'+ document.name +'/data', document.filename, document.mimetype)" >
+            {{document.filename}}
+        </a>
+
         <div class="row form-group">
             <div class="col-md-12">
                 <button class="btn btn-sm"
-                        ng-class="{'btn-success': data[name].name, 'btn-info': !data[name].name}"
-                        ng-model="data[name]"
+                        ng-class="{'btn-success': data[rowname].name, 'btn-info': !data[rowname].name}"
+                        ng-model="data[rowname]"
                         ngf-select
-                        name="data[name]"
+                        name="data[rowname]"
                         accept="{{accept}}"
                         ngf-multiple="false"
-                        ng-required="true" >
+                        ng-required="cnrRequired" >
                     <span ng-show="!document" class="glyphicon glyphicon-upload"></span>
                     <span ng-show="document.name" class="glyphicon glyphicon-repeat"></span>
                     <span ng-show="!document">Seleziona File</span>
                     <span ng-show="document.name">Aggiorna</span>
                 </button>
-                <span ng-show="data[name]">
-                      {{data[name].name}}
-                      <a href ng-click="data[name] = undefined"><span
+                <span ng-show="data[rowname]">
+                      {{data[rowname].name}}
+                      <a href ng-click="data[rowname] = undefined"><span
                               class="glyphicon glyphicon-remove" title="Rimuovi"></span></a>
                   </span>
             </div>

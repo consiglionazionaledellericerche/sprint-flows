@@ -4,7 +4,7 @@
     angular.module('sprintApp')
     .directive('fileinput', fileinput);
 
-    fileinput.$inject = ['dataService', '$log'];
+    fileinput.$inject = ['dataService', '$log', 'utils'];
 
     /**
      *  Questa direttiva collabora in stretto contatto con FlowsAttachmentService
@@ -15,21 +15,22 @@
      *
      *  Per fare sto widget ho fatto una serie di hack non bruttissimi, ma poco manutenibili, cerchiamo di lasciarlo cosi' ~Martin
      */
-    function fileinput(dataService, $log) {
+    function fileinput(dataService, $log, utils) {
 
         return {
             restrict: 'E',
             templateUrl: 'app/inputs/fileinput/fileinput.html',
             scope: {
-                pubblicazioneUrp: '@?',
-                pubblicazioneTrasparenza: '@?',
-                protocollo: '@?',
+                name: '@',
+                label: '@?',
+                legend: '@?',
+                multiple: '=?',
+                cnrRequired: '=?',
                 metadatiPubblicazione: '@?',
                 metadatiProtocollo: '@?',
-                multiple: '@?',
-                name: '@?',
-                label: '@?',
-                legend: '@?'
+                pubblicazioneUrp: '@?',
+                pubblicazioneTrasparenza: '@?',
+                protocollo: '@?'
             },
             link: function ($scope, element, attrs) {
 
@@ -39,27 +40,45 @@
 
                     $scope.data = $scope.$parent.data;
 
-                    $scope.metadatiPubblicazione = ($scope.metadatiPubblicazione == 'true');
                     $scope.pubblicazioneUrp = ($scope.pubblicazioneUrp == 'true');
                     $scope.pubblicazioneTrasparenza = ($scope.pubblicazioneTrasparenza == 'true');
+                    $scope.metadatiPubblicazione = ($scope.metadatiPubblicazione == 'true' || ($scope.pubblicazioneUrp || $scope.pubblicazioneTrasparenza));
                     $scope.metadatiProtocollo = ($scope.metadatiProtocollo == 'true');
                     $scope.protocollo = ($scope.protocollo == 'true');
 
                     $scope.scope = $scope;
                     $scope.attrs = attrs;
 
-                    $scope.rows = $scope.name ? [{}] : [];
+                    if ($scope.multiple) {
+                        $scope.rows = [];
+                        $scope.$parent.attachments.forEach(function (el) {
+                            if (el.name.startsWith($scope.name))
+                                $scope.rows.push({});
+                        })
+                    } else {
+                        $scope.rows = [{}]
+                    }
+
 
                     if ($scope.$parent.attachments === undefined)
                         $scope.$parent.attachments = [];
 
-                    if ($scope.multiple == 'false')
-                        $scope.document = $scope.$parent.attachments.find(function(el) {
-                            return el.name === $scope.attrs.name;
-                        })
-                 }
+                }
+
+                $scope.$watch($scope.rows, function(newValue) {
+
+                    // copy over newValue to $scope.$parent.data
+
+                }, true);
+
 
                 init();
+
+                $scope.findDocument = function(name) {
+                    return $scope.$parent.attachments.find(function(el) {
+                        return el.name === name;
+                    });
+                }
 
                 $scope.filterNames = function(value) {
                     var reg = "^"+$scope.attrs.name+"\\[\\d+\\]";
@@ -77,7 +96,7 @@
                         $scope.rows.pop();
 
                     // elimino i dati dell'ultimo alloegato aggiunto
-                    var name = 'allegato'+$scope.rows.length;
+                    var name = $scope.name+$scope.rows.length;
                     delete $scope.$parent.data[name];
                     delete $scope.$parent.data[name+'_name'];
                     delete $scope.$parent.data[name+'_pubblicazioneUrp'];
@@ -88,6 +107,9 @@
                     return false;
                 };
 
+                $scope.downloadFile = function(url, filename, mimetype) {
+                    utils.downloadFile(url, filename, mimetype);
+                }
             }
         }
     }
