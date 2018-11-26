@@ -396,7 +396,17 @@ input.ng-touched.ng-invalid, button.ng-touched.ng-invalid, textarea.ng-touched.n
     flex: 1;
 }
 
+.banner {
+  height: 250px;
+}
 
+.cnr-banner {
+    background: url("../images/cnr-flows-banner.png") center no-repeat;
+}
+
+.oiv-banner {
+    background: url("../images/oiv-flows-banner.png") center no-repeat;
+}
 
 /* CSS per editor ACE */
 .ace_editor {

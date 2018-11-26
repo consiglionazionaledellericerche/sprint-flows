@@ -1,0 +1,23 @@
+<div class="modal-header">
+    <h4 class="modal-title">Carica un ulteriore documento</h4>
+</div>
+<div class="modal-body">
+
+    <div class="row">
+        <div class="col-md-12">
+            <h4>Carica Documento</h4>
+
+            <form novalidate class="flows-form" name="aggiornaDocumentoForm" ng-submit="submitDocumento(picFile)">
+
+                <fileinput name="file" multiple=false cnr-required=true />
+                <button class="btn btn-primary" type="submit" ng-disabled="aggiornaDocumentoForm.$invalid">
+                    Invia
+                    <span class="glyphicon glyphicon-arrow-right"></span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-click="$dismiss()">Chiudi</button>
+</div>
