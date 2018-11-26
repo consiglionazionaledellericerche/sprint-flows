@@ -55,12 +55,12 @@ public class StartAcquistiRevocaSetGroupsAndVisibility implements ExecutionListe
             // idStruttura variabile che indica che il flusso è diviso per strutture (implica la visibilità distinta tra strutture)
             execution.setVariable("idStruttura", struttura);
             String gruppoFirmaAcquisti = "responsabileFirmaAcquisti@"+ struttura;
-            String gruppoRA = "ra@"+ struttura;
+            String gruppoStaffAmministrativo = "staffAmministrativo@"+ struttura;
             String gruppoSFD = "sfd@"+ struttura;
             String rup = execution.getVariable("rup", String.class);
             String applicazioneSigla = "app.sigla";
 
-            LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoRT, gruppoSFD, gruppoRA, gruppoFirmaAcquisti);
+            LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoRT, gruppoSFD, gruppoStaffAmministrativo, gruppoFirmaAcquisti);
 
             //Check se il gruppo SFD ha membri
             List<String> members = aceBridgeService.getUsersInAceGroup(gruppoSFD);
@@ -73,7 +73,7 @@ public class StartAcquistiRevocaSetGroupsAndVisibility implements ExecutionListe
             
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoRT, PROCESS_VISUALIZER);
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoFirmaAcquisti, PROCESS_VISUALIZER);
-            runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoRA, PROCESS_VISUALIZER);
+            runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoStaffAmministrativo, PROCESS_VISUALIZER);
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoSFD, PROCESS_VISUALIZER);
             runtimeService.addUserIdentityLink(execution.getProcessInstanceId(), rup, PROCESS_VISUALIZER);
             runtimeService.addUserIdentityLink(execution.getProcessInstanceId(), applicazioneSigla, PROCESS_VISUALIZER);
@@ -81,7 +81,7 @@ public class StartAcquistiRevocaSetGroupsAndVisibility implements ExecutionListe
 
             execution.setVariable("gruppoRT", gruppoRT);
             execution.setVariable("gruppoFirmaAcquisti", gruppoFirmaAcquisti);
-            execution.setVariable("gruppoRA", gruppoRA);
+            execution.setVariable("gruppoStaffAmministrativo", gruppoStaffAmministrativo);
             execution.setVariable("gruppoSFD", gruppoSFD);
             execution.setVariable("sigla", applicazioneSigla);
             
