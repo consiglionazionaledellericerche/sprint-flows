@@ -7,7 +7,7 @@
     Membership.$inject = ['$resource'];
 
     function Membership($resource) {
-        let resourceUrl = 'api/memberships/:id';
+        var resourceUrl = 'api/memberships/:id';
 
         return $resource(resourceUrl, {}, {
             'query': {

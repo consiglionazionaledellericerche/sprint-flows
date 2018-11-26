@@ -25,6 +25,9 @@
                 $scope.attrs = attrs;
                 $scope.model = attrs.model;
 
+                if ($scope.$parent.attachments === undefined)
+                    $scope.$parent.attachments = [];
+
                 if ($scope.attrs.multiple == 'false')
                     $scope.document = $scope.$parent.attachments.find(function(el) {
                         return el.name === $scope.attrs.name;

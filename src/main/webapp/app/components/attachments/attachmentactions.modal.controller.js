@@ -5,15 +5,16 @@
   .controller('AttachmentActionsModalController', AttachmentActionsModalController);
 
 
-  AttachmentActionsModalController.$inject = ['$scope', '$uibModalInstance', 'dataService', 'attachment', 'processInstanceId', 'Upload', 'AlertService'];
+  AttachmentActionsModalController.$inject = ['$scope', '$uibModalInstance', 'dataService', 'attachment', 'processInstanceId', 'Upload', 'AlertService', '$log'];
 
-  function AttachmentActionsModalController ($scope, $uibModalInstance, dataService, attachment, processInstanceId, Upload, AlertService) {
+  function AttachmentActionsModalController ($scope, $uibModalInstance, dataService, attachment, processInstanceId, Upload, AlertService, $log) {
 
     var vm = this;
 
     vm.attachment = attachment;
 
     vm.pubblicato = vm.attachment.stati.indexOf("Pubblicato") >= 0;
+    $scope.data = {};
 
     $scope.pubblicaDocumento = function(flag) {
       dataService.attachments.pubblicaDocumento(processInstanceId, attachment.name, flag)
@@ -30,7 +31,7 @@
 
       Upload.upload({
         url: 'api/attachments/'+ processInstanceId +'/'+ attachment.name +'/data',
-        data: vm.data,
+        data: $scope.data,
       }).then(function (response) {
         $scope.loadAttachments();
         $uibModalInstance.close();
