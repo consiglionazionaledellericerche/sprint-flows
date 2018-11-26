@@ -1,4 +1,4 @@
-(function() {
+(function () {
     'use strict';
 
     angular.module('sprintApp')
@@ -10,14 +10,14 @@
 
         function swap(entity) {
             entity.variabili = {};
-            entity.variables.forEach(function(el) {
+            entity.variables.forEach(function (el) {
                 entity.variabili[el.name] = el.valueUrl ? el.valueUrl : el.value;
             });
             return entity;
         }
 
         return {
-            refactoringVariables: function(input) {
+            refactoringVariables: function (input) {
                 if (Array.isArray(input)) {
                     input.forEach(swap);
                     return input;
@@ -26,12 +26,12 @@
                 }
             },
 
-            downloadFile: function(url, filename, mimetype) {
+            downloadFile: function (url, filename, mimetype) {
                 $log.info(url);
                 $http.get(url, {
                         responseType: 'arraybuffer'
                     })
-                    .success(function(data) {
+                    .success(function (data) {
                         var file = new Blob([data], {
                             type: mimetype
                         });
@@ -39,11 +39,11 @@
                         saveAs(file, filename);
                     });
             },
-            populateTaskParams: function(fields) {
+            oldPopulateTaskParams: function (fields) {
                 var processParams = [], //alcuni parametri delle ricerche dei task riguardano anche la ProcessInstance
                     taskParams = [];
 
-                fields.forEach(function(field) {
+                fields.forEach(function (field) {
                     var fieldName = field.getAttribute('id').replace('searchField-', ''),
                         appo = {};
                     if (field.value !== "") {
@@ -62,17 +62,41 @@
                     "taskParams": taskParams
                 };
             },
-            populateProcessParams: function(fields) {
+            populateTaskParams: function (searchParams) {
+                var processParams = [],
+                    taskParams = [];
+                if (searchParams) {
+                    $.map(searchParams, function (value, key) {
+                        if (value){
+                            var appo = {};
+                            appo.type = value.substr(0, value.indexOf('=') + 1);
+                            appo.key = key;
+                            appo.value = value.substr(value.indexOf('=') + 1);
+
+                            if (key.includes('initiator') || key.includes('titolo')) {
+                                processParams.push(appo);
+                            } else {
+                                taskParams.push(appo);
+                            }
+                        }
+                    });
+                }
+                return {
+                    'processParams': processParams,
+                    'taskParams': taskParams,
+                };
+            },
+            populateProcessParams: function (fields) {
                 var processParams = {};
 
-                fields.forEach(function(field) {
+                fields.forEach(function (field) {
                     var fieldName = field.getAttribute('id').replace('searchField-', '');
-                    if (field.value !== "") 
-                    	processParams[fieldName] = field.getAttribute("type") +"="+ field.value;
+                    if (field.value !== "")
+                        processParams[fieldName] = field.getAttribute("type") + "=" + field.value;
                 });
                 return processParams;
             },
-            parseAttachments: function(attachments) {
+            parseAttachments: function (attachments) {
                 var appo = [];
                 for (var attachment in attachments) {
                     delete attachments[attachment].bytes;
@@ -80,17 +104,17 @@
                 }
                 return appo;
             },
-            loadSearchFields: function(processDefinitionKey, isTaskQuery){
+            loadSearchFields: function (processDefinitionKey, isTaskQuery) {
                 var formUrl = undefined;
                 //Di default, al caricamento della pagina, la processDefinitionKey è 'undefined'
                 // quindi carico la form per tutte le Process Definitions ('all')
                 if (processDefinitionKey === undefined) {
                     processDefinitionKey = 'all';
                 }
-                if(isTaskQuery) {
-                    formUrl = 'api/forms/'+ processDefinitionKey + '/1/search-ti';
+                if (isTaskQuery) {
+                    formUrl = 'api/forms/' + processDefinitionKey + '/1/search-ti';
                 } else {
-                    formUrl = 'api/forms/'+ processDefinitionKey + '/1/search-pi';
+                    formUrl = 'api/forms/' + processDefinitionKey + '/1/search-pi';
                 }
                 return formUrl;
             }

@@ -67,7 +67,7 @@ public interface Ace {
   @RequestLine("GET api/ace/v1/ruolo/{sigla}")
   RuoloWebDto ruoloBySigla(@Param("sigla") String sigla);
   
-  @RequestLine("GET api/ace//v1/entitaorganizzativa/{id}")
+  @RequestLine("GET api/ace/v1/entitaorganizzativa/{id}")
   EntitaOrganizzativaWebDto entitaOrganizzativaById(@Param("id") int id);
   
   @RequestLine("GET api/ace/v1/entitaorganizzativa?term={term}")
