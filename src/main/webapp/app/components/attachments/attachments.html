@@ -1,6 +1,6 @@
 <ul class="list-unstyled">
     <li ng-repeat="attachment in attachments track by $index">
-        <strong>{{ attachment.metadati.name || attachment.name}}:</strong>
+        <strong>{{ attachment.metadati.label || attachment.name}}:</strong>
         <a href
            ng-click="downloadFile('/api/attachments/'+ processInstanceId +'/'+ attachment.name +'/data', attachment.filename, attachment.mimetype)">
             {{attachment.filename}}

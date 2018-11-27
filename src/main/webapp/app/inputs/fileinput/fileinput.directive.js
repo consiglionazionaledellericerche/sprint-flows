@@ -24,13 +24,15 @@
                 name: '@',
                 label: '@?',
                 legend: '@?',
+                note: '@?',
+                accept: '@?',
                 multiple: '=?',
                 cnrRequired: '=?',
-                metadatiPubblicazione: '@?',
-                metadatiProtocollo: '@?',
-                pubblicazioneUrp: '@?',
-                pubblicazioneTrasparenza: '@?',
-                protocollo: '@?'
+                metadatiPubblicazione: '=?',
+                metadatiProtocollo: '=?',
+                pubblicazioneUrp: '=?',
+                pubblicazioneTrasparenza: '=?',
+                protocollo: '=?'
             },
             link: function ($scope, element, attrs) {
 
@@ -38,46 +40,51 @@
                     $scope.min = $scope.min || 0;
                     $scope.max = $scope.max || 999;
 
-                    $scope.data = $scope.$parent.data;
-
-                    $scope.pubblicazioneUrp = ($scope.pubblicazioneUrp == 'true');
-                    $scope.pubblicazioneTrasparenza = ($scope.pubblicazioneTrasparenza == 'true');
-                    $scope.metadatiPubblicazione = ($scope.metadatiPubblicazione == 'true' || ($scope.pubblicazioneUrp || $scope.pubblicazioneTrasparenza));
-                    $scope.metadatiProtocollo = ($scope.metadatiProtocollo == 'true');
-                    $scope.protocollo = ($scope.protocollo == 'true');
-
-                    $scope.scope = $scope;
                     $scope.attrs = attrs;
 
+                    if ($scope.$parent.attachments === undefined)
+                        $scope.$parent.attachments = {};
+
+                    $scope.attachments = $scope.$parent.attachments;
+
+                    // se sono in modifica, reimposto i dati
                     if ($scope.multiple) {
                         $scope.rows = [];
-                        $scope.$parent.attachments.forEach(function (el) {
+                        for (var el in $scope.$parent.attachments) {
                             if (el.name.startsWith($scope.name))
                                 $scope.rows.push({});
-                        })
+                        }
                     } else {
                         $scope.rows = [{}]
                     }
-
-
-                    if ($scope.$parent.attachments === undefined)
-                        $scope.$parent.attachments = [];
-
                 }
-
-                $scope.$watch($scope.rows, function(newValue) {
-
-                    // copy over newValue to $scope.$parent.data
-
-                }, true);
-
 
                 init();
 
+//                $scope.$watch('rows', function(newValue) {
+//
+//                    for (var i = 0; i < $scope.rows.length; i++) {
+//                        var row = $scope.rows[i];
+//                        var name = $scope.name + ($scope.multiple ? i : '');
+//                        $scope.$parent.data[name] = row.data;
+//                        $scope.$parent.data[name+'_name'] = row.name;
+//                        $scope.$parent.data[name+'_pubblicazioneUrp'] = row.pubblicazioneUrp;
+//                        $scope.$parent.data[name+'_pubblicazioneTrasparenza'] = row.pubblicazioneTrasparenza;
+//                        $scope.$parent.data[name+'_protocollo'] = row.protocollo;
+//                        $scope.$parent.data[name+'_dataprotocollo'] = row.dataprotocollo;
+//                        $scope.$parent.data[name+'_numeroprotocollo'] = row.numeroprotocollo;
+//                    }
+//
+//                });
+
+
                 $scope.findDocument = function(name) {
-                    return $scope.$parent.attachments.find(function(el) {
-                        return el.name === name;
-                    });
+                    var result = {};
+                    for (var el in $scope.$parent.attachments) {
+                        if (el.name === name)
+                            result = el;
+                    };
+                    return result;
                 }
 
                 $scope.filterNames = function(value) {
@@ -96,15 +103,15 @@
                         $scope.rows.pop();
 
                     // elimino i dati dell'ultimo alloegato aggiunto
-                    var name = $scope.name+$scope.rows.length;
-                    delete $scope.$parent.data[name];
-                    delete $scope.$parent.data[name+'_name'];
-                    delete $scope.$parent.data[name+'_pubblicazioneUrp'];
-                    delete $scope.$parent.data[name+'_pubblicazioneTrasparenza'];
-                    delete $scope.$parent.data[name+'_protocollo'];
-                    delete $scope.$parent.data[name+'_dataprotocollo'];
-                    delete $scope.$parent.data[name+'_numeroprotocollo'];
-                    return false;
+//                    var name = $scope.name+$scope.rows.length;
+//                    delete $scope.$parent.data[name];
+//                    delete $scope.$parent.data[name+'_name'];
+//                    delete $scope.$parent.data[name+'_pubblicazioneUrp'];
+//                    delete $scope.$parent.data[name+'_pubblicazioneTrasparenza'];
+//                    delete $scope.$parent.data[name+'_protocollo'];
+//                    delete $scope.$parent.data[name+'_dataprotocollo'];
+//                    delete $scope.$parent.data[name+'_numeroprotocollo'];
+//                    return false;
                 };
 
                 $scope.downloadFile = function(url, filename, mimetype) {

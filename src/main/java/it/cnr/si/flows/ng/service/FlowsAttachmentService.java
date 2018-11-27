@@ -79,6 +79,7 @@ public class FlowsAttachmentService {
 		MultipartFile file = req.getFile(fileName);
         String username = SecurityUtils.getCurrentUserLogin();
 
+        // TODO: seccare?
 		boolean hasPrefix = fileName.startsWith(NEW_ATTACHMENT_PREFIX);
 		if (hasPrefix) {
 			fileName = fileName.substring(NEW_ATTACHMENT_PREFIX.length());
@@ -86,6 +87,9 @@ public class FlowsAttachmentService {
 			int index = getNextIndex(taskId, fileName, nextIndexTable);
 			fileName = fileName +"["+ index +"]";
 		}
+		// fine TODO
+
+		fileName = fileName.replace("_data", "");
 
 		boolean nuovo = taskId.equals("start") || taskService.getVariable(taskId, fileName) == null;
 		LOGGER.info("inserisco come variabile il file {}", fileName);
