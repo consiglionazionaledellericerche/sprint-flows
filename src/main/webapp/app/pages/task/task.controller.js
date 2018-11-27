@@ -34,7 +34,7 @@
  		$scope.data.processDefinitionId = $state.params.processDefinitionId;
  		$scope.processDefinitionKey = $scope.data.processDefinitionId.split(":")[0];
  		$scope.processVersion = $scope.data.processDefinitionId.split(":")[1];
- 		$scope.attachments = [];
+ 		$scope.attachments = {};
  		vm.detailsView = 'api/views/' + $scope.processDefinitionKey + '/' + $scope.processVersion + '/detail';
 
  		// Ho bisogno di caricare piu' risorse contemporaneamente (form e data);
@@ -85,14 +85,23 @@
  					});
  				});
  				AlertService.warning("Inserire tutti i valori obbligatori.");
+
  			} else {
 
  				// Serializzo gli oggetti complessi in stringhe
  				// E' necessario copiarli in un nuovo campo, senno' angular si incasina
  				// Non posso usare angular.copy() perche' ho degli oggetti File non gestiti bene
+                for (var attName in $scope.attachments) {
+                    var att = $scope.attachments[attName];
+                    for (var property in att) {
+                        $scope.data[attName +"_"+ property] = att[property];
+                    }
+                }
+
  				if (_.has($scope.data, 'entity')) {
  					delete $scope.data.entity;
  				}
+
  				// aggiunto (&& obj[key].constructor.name !== 'Date') per non rendere json le date
  				angular.forEach($scope.data, function(value, key, obj) {
  					if (isObject(value) && key !== 'entity' && obj[key].constructor.name !== 'Date') {
