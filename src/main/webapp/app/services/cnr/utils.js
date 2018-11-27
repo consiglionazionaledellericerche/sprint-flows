@@ -98,14 +98,23 @@
                 return processParams;
             },
             populateProcessParams: function (fields) {
-                var processParams = {};
-
-                fields.forEach(function (field) {
-                    var fieldName = field.getAttribute('id').replace('searchField-', '');
-                    if (field.value !== "")
-                        processParams[fieldName] = field.getAttribute("type") + "=" + field.value;
-                });
-                return processParams;
+              var processParams = [],
+                  taskParams = [];
+              if (searchParams) {
+                  $.map(searchParams, function (value, key) {
+                      if (value){
+                          var appo = {};
+                          appo.type = value.substr(0, value.indexOf('=') + 1);
+                          appo.key = key;
+                          appo.value = value.substr(value.indexOf('=') + 1);
+                          processParams.push(appo);
+                      }
+                  });
+              }
+              return {
+                  'processParams': processParams,
+                  'taskParams': taskParams,
+              };
             },
             parseAttachments: function (attachments) {
                 var appo = [];
@@ -119,7 +128,7 @@
                 var formUrl = undefined;
                 //Di default, al caricamento della pagina, la processDefinitionKey è 'undefined'
                 // quindi carico la form per tutte le Process Definitions ('all')
-                if (processDefinitionKey === undefined) {
+                if (processDefinitionKey === undefined || processDefinitionKey === null) {
                     processDefinitionKey = 'all';
                 }
                 if (isTaskQuery) {
