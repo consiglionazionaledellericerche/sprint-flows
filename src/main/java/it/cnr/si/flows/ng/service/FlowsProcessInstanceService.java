@@ -167,11 +167,11 @@ public class FlowsProcessInstanceService {
 	}
 
 
-	public Map<String, Object> search(Map<String, String> req, String processDefinitionKey, boolean active, String order, int firstResult, int maxResults) {
+	public Map<String, Object> search(Map<String, String> searchParams, String processDefinitionKey, boolean active, String order, int firstResult, int maxResults) {
 
 		FlowsHistoricProcessInstanceQuery processQuery = new FlowsHistoricProcessInstanceQuery(managementService);
 
-		setSearchTerms(req, processQuery);
+		setSearchTerms(searchParams, processQuery);
 
 		List<String> authorities = Utils.getCurrentUserAuthorities();
 

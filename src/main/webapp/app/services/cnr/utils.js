@@ -39,6 +39,7 @@
                         saveAs(file, filename);
                     });
             },
+            //todo: viene usato SOLO in active-flows.controller.js: rimuovere la pagina o aggiornare la chiamata
             oldPopulateTaskParams: function (fields) {
                 var processParams = [], //alcuni parametri delle ricerche dei task riguardano anche la ProcessInstance
                     taskParams = [];
@@ -86,7 +87,7 @@
                     'taskParams': taskParams,
                 };
             },
-            populateProcessParams: function (fields) {
+            oldPopulateProcessParams: function (fields) {
                 var processParams = {};
 
                 fields.forEach(function (field) {
@@ -95,6 +96,25 @@
                         processParams[fieldName] = field.getAttribute("type") + "=" + field.value;
                 });
                 return processParams;
+            },
+            populateProcessParams: function (fields) {
+              var processParams = [],
+                  taskParams = [];
+              if (searchParams) {
+                  $.map(searchParams, function (value, key) {
+                      if (value){
+                          var appo = {};
+                          appo.type = value.substr(0, value.indexOf('=') + 1);
+                          appo.key = key;
+                          appo.value = value.substr(value.indexOf('=') + 1);
+                          processParams.push(appo);
+                      }
+                  });
+              }
+              return {
+                  'processParams': processParams,
+                  'taskParams': taskParams,
+              };
             },
             parseAttachments: function (attachments) {
                 var appo = [];
@@ -108,7 +128,7 @@
                 var formUrl = undefined;
                 //Di default, al caricamento della pagina, la processDefinitionKey è 'undefined'
                 // quindi carico la form per tutte le Process Definitions ('all')
-                if (processDefinitionKey === undefined) {
+                if (processDefinitionKey === undefined || processDefinitionKey === null) {
                     processDefinitionKey = 'all';
                 }
                 if (isTaskQuery) {

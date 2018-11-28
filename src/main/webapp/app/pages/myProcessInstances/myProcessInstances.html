@@ -45,7 +45,7 @@
                 <h4>Ordinamento temporale</h4>
                 <div>
                     <button class="btn btn-default btn-block margin-top-20"
-                            ng-click="vm.order ===  'ASC' ?  vm.order='DESC' : vm.order = 'ASC'">
+                            ng-click="vm.searchParams.order ===  'ASC' ?  vm.searchParams.order='DESC' : vm.searchParams.order = 'ASC'">
                         <span class="glyphicon glyphicon-sort"></span>
                         {{vm.order === 'ASC' ? 'Crescente' : 'Descrescente'}}
                     </button>
@@ -69,8 +69,12 @@
             </div>
             <br>
             <div>
-                <ng-include id="searchFields" src="formUrl"></ng-include>
+                <ng-include id="searchFields" src="formUrl" onload="removeUserDiv()"></ng-include>
             </div>
+            <button ng-click="loadMyProcessInstances()" class="btn btn-primary">
+                <span class="glyphicon glyphicon-filter"></span>
+                Filtra
+            </button>
         </div>
 
         <div class="col-md-9" ng-show="activeContent == 'active'">
@@ -87,7 +91,7 @@
             <!--paginazione Flussi Attivi-->
             <div class="text-center">
                 <jhi-item-count page="vm.pageActive" total="vm.queryCountActive"
-                                items-per-page="vm.itemsPerPage"></jhi-item-count>
+                                items-per-page="vm.itemsForPage"></jhi-item-count>
                 <uib-pagination class="pagination-sm" total-items="vm.totalItemsActive" ng-model="vm.pageActive"
                                 ng-change="vm.transition()"></uib-pagination>
             </div>
@@ -105,9 +109,9 @@
             </process-list>
             <!--paginazione Flussi Terminati-->
             <div class="text-center">
-                <jhi-item-count page="vm.pageTerminated" total="vm.queryCountTerminated"
+                <jhi-item-count page="vm.TAIMGPage" total="vm.TAIMGQueryCount"
                                 items-per-page="vm.itemsPerPage"></jhi-item-count>
-                <uib-pagination class="pagination-sm" total-items="vm.totalItemsTerminated" ng-model="vm.pageTerminated"
+                <uib-pagination class="pagination-sm" total-items="vm.TAIMGTotalItems" ng-model="vm.TAIMGPage"
                                 ng-change="vm.transition()"></uib-pagination>
             </div>
         </div>

@@ -8,7 +8,7 @@
     stateConfig.$inject = ['$stateProvider'];
 
     function stateConfig($stateProvider) {
-        $stateProvider.state('my-process-instances', {
+        $stateProvider.state('myProcessInstances', {
             parent: 'app',
             url: '/my-process-instances',
             data: {
@@ -16,8 +16,8 @@
             },
             views: {
                 'content@': {
-                    templateUrl: 'app/pages/my-process-instances/myProcessInstances.html',
-                    controller: 'MyProcessInstancesController',
+                     templateUrl: 'app/pages/myProcessInstances/myProcessInstances.html',
+                    controller: 'MyPIController',
                     controllerAs: 'vm'
                 }
             },
