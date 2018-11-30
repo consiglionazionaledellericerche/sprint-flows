@@ -12,12 +12,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.FirmaDocumentoService;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
-import it.cnr.si.flows.ng.service.FlowsPdfService;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.service.ProtocolloDocumentoService;
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.listeners.cnr.acquisti.service.AcquistiService;
 
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
@@ -38,13 +37,7 @@ public class ManageProcessAccordiInternazionali_v1 implements ExecutionListener 
 	@Inject
 	private ProtocolloDocumentoService protocolloDocumentoService;
 	@Inject
-	private FlowsAttachmentService attachmentService;
-	@Inject
 	private FlowsProcessInstanceService flowsProcessInstanceService;
-	@Inject
-	private AcquistiService acquistiService;
-	@Inject
-	private FlowsPdfService flowsPdfService;
 	@Inject
 	private StartAccordiInternazionaliSetGroupsAndVisibility startAccordiInternazionaliSetGroupsAndVisibility;
 	@Inject
@@ -84,7 +77,7 @@ public class ManageProcessAccordiInternazionali_v1 implements ExecutionListener 
 		};break;  
 		case "validazione-end": {
 			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
-			String idDipartimento = execution.getVariable("idDipartimento").toString();
+			String idDipartimento = execution.getVariable("codiceDipartimento").toString();
 			String gruppoValutatoreScientificoDipartimento = "valutatoreScientificoDipartimento@" + idDipartimento;
 			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValutatoreScientificoDipartimento, PROCESS_VISUALIZER);
 			execution.setVariable("gruppoValutatoreScientificoDipartimento", gruppoValutatoreScientificoDipartimento);
@@ -113,7 +106,24 @@ public class ManageProcessAccordiInternazionali_v1 implements ExecutionListener 
 		case "endevent-approvata-start": {
 			execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA APPROVATA");
 		};break;  
-
+		//TIMERS
+		case "timer2-end": {
+			int nrNotifiche = 1;
+			if(execution.getVariable("numeroNotificheTimer2") != null) {
+				nrNotifiche = (Integer.parseInt(execution.getVariable("numeroNotificheTimer2").toString()) + 1);
+			} 
+			execution.setVariable("numeroNotificheTimer2", nrNotifiche);
+			LOGGER.debug("Timer2 nrNotifiche: {}", nrNotifiche);
+		};break;  
+		case "timer2-end-script": {
+			int nrNotifiche = 1;
+			if(execution.getVariable("numeroNotificheTimer2") != null) {
+				nrNotifiche = (Integer.parseInt(execution.getVariable("numeroNotificheTimer2").toString()) + 1);
+			} 
+			execution.setVariable("numeroNotificheTimer2", nrNotifiche);
+			LOGGER.debug("Timer2 nrNotifiche: {}", nrNotifiche);
+		};break;  
+		
 		// DEFAULT  
 		default:  {
 		};break;    
