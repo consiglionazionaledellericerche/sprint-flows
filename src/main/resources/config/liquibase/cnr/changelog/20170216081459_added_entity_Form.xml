@@ -53,4 +53,21 @@
                   separator=";"
                   tableName="form"/>
     </changeSet>
+
+    <!--OGNI update dei contenuti caricati nella tabella all`avvio dell`applicazione ha bisogno di un NUOVO changeSet (con stesso "id"-"identificativo incrementale")-->
+    <!--non occorre eseguire il clear check sum ma basta un maven clean-->
+    <changeSet id="20170216081459-2" author="Paolo" runOnChange='true'>
+        <loadUpdateData encoding="UTF-8"
+                        file="config/liquibase/cnr/modifiche/form-modificate.csv"
+                        primaryKey="id"
+                        schemaName="public"
+                        separator=";"
+                        tableName="form">
+            <column name="id" type="numeric"/>
+            <column name="process_definition_key" type="string"/>
+            <column name="version" type="string"/>
+            <column name="task_id" type="string"/>
+            <column name="form" type="string"/>
+        </loadUpdateData>
+    </changeSet>
 </databaseChangeLog>
