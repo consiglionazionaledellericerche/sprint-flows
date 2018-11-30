@@ -64,7 +64,6 @@
                 coolAvailableTasks: function() {
                     return $http.get('api/tasks/coolAvailableTasks');
                 }
-
             },
             processInstances: {
                 byProcessInstanceId: function(processInstanceId, detail) {
