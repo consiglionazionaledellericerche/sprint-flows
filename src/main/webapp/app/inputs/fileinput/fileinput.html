@@ -19,7 +19,8 @@
         per aggiungere eventuali altri allegati.
     </div>
 
-    <div class="well" ng-repeat="row in rows track by $index" ng-init="rowname = multiple ? name+$index : name; $parent.attachments[rowname] = {}; document = findDocument(rowname);">
+    <div class="well" ng-repeat="row in rows track by $index"
+         ng-init="rowname = multiple ? name+$index : name; $parent.attachments[rowname] = $parent.attachments[rowname] || {}; $parent.attachments[rowname].name = rowname">
         <pre>{{rowname}}{{ $parent.attachments[rowname] | json }}</pre>
         <div class="form-group" ng-if="label === undefined">
             <label>Tipo Documento</label>
@@ -41,7 +42,7 @@
                         ng-init="$parent.attachments[rowname].pubblicazioneUrp = pubblicazioneUrp"
                         off-label="Non pubblicare"
                         on-label="Pubblica"
-                        is-disabled="attrs.pubblicazioneUrp !== undefined">
+                        is-disabled="pubblicazioneUrpDisabled">
                     </toggle-switch>
                 </div>
             </div>
@@ -57,7 +58,7 @@
                         ng-init="$parent.attachments[rowname].pubblicazioneTrasparenza = pubblicazioneTrasparenza"
                         off-label="Non pubblicare"
                         on-label="Pubblica"
-                        is-disabled="attrs.pubblicazioneTrasparenza !== undefined">
+                        is-disabled="pubblicazioneTrasparenzaDisabled">
                     </toggle-switch>
                 </div>
             </div>
@@ -75,7 +76,7 @@
                         ng-init="$parent.attachments[rowname].protocollo = protocollo"
                         off-label="Non Protocollato"
                         on-label="Protocollato"
-                        is-disabled="attrs.protocollo !== undefined">
+                        is-disabled="protocolloDisabled">
                     </toggle-switch>
                 </div>
             </div>
@@ -83,11 +84,11 @@
             <div class="row form-group">
                 <div class="col-md-5" ng-if="$parent.attachments[rowname].protocollo">
                     <label>Data protocollo</label>
-                    <input type="date" class="form-control" ng-model="$parent.attachments[rowname].dataprotocollo" required>
+                    <input type="date" class="form-control" ng-model="$parent.attachments[rowname].dataprotocollo" ng-readonly="protocolloDettagliDisabled" required>
                 </div>
                 <div class="col-md-7" ng-if="$parent.attachments[rowname].protocollo">
                     <label>Numero protocollo</label>
-                    <input type="text" class="form-control" ng-model="$parent.attachments[rowname].numeroprotocollo" required>
+                    <input type="text" class="form-control" ng-model="$parent.attachments[rowname].numeroprotocollo" ng-readonly="protocolloDettagliDisabled" required>
                 </div>
             </div>
 
@@ -96,24 +97,24 @@
 
         <a
                 href
-                ng-click="downloadFile('/api/attachments/task/'+ data.taskId +'/'+ document.name +'/data', document.filename, document.mimetype)" >
-            {{document.filename}}
+                ng-click="downloadFile('/api/attachments/task/'+ $parent.data.taskId +'/'+ $parent.attachments[rowname].name +'/data', $parent.attachments[rowname].filename, $parent.attachments[rowname].mimetype)" >
+            {{$parent.attachments[rowname].filename}}
         </a>
 
         <div class="row form-group">
             <div class="col-md-12">
                 <button class="btn btn-sm"
-                        ng-class="{'btn-success': $parent.attachments[rowname].name, 'btn-info': !$parent.attachments[rowname].name}"
+                        ng-class="{'btn-success': $parent.attachments[rowname].data, 'btn-info': !$parent.attachments[rowname].data}"
                         ng-model="$parent.attachments[rowname].data"
                         ngf-select
                         name="$parent.attachments[rowname].data"
                         accept="{{accept}}"
                         ngf-multiple="false"
                         ng-required="cnrRequired" >
-                    <span ng-show="!document" class="glyphicon glyphicon-upload"></span>
-                    <span ng-show="document.name" class="glyphicon glyphicon-repeat"></span>
-                    <span ng-show="!document">Seleziona File</span>
-                    <span ng-show="document.name">Aggiorna</span>
+                    <span ng-show="!$parent.attachments[rowname].data" class="glyphicon glyphicon-upload"></span>
+                    <span ng-show="$parent.attachments[rowname].data" class="glyphicon glyphicon-repeat"></span>
+                    <span ng-show="!$parent.attachments[rowname].data">Seleziona File</span>
+                    <span ng-show="$parent.attachments[rowname].data">Aggiorna</span>
                 </button>
                 <span ng-show="$parent.attachments[rowname].data">
                       {{$parent.attachments[rowname].data.name}}

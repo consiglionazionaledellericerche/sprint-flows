@@ -47,10 +47,8 @@ public class FlowsAttachmentService {
 
 	/**
 	 * Servizio che trasforma i multipart file in FlowsAttachment
-	 * per il successivo salbvataggio sul db
+	 * per il successivo salvataggio sul db
 	 *
-	 * IMPORTANTE: gli <input file multiple> devono avere il prefisso NEW_ATTACHMENT_PREFIX
-	 * (dovrebbe essere automatizzato nel componente, e non riguardare l'API pubblica)
 	 */
 	public Map<String, FlowsAttachment> extractAttachmentVariables(MultipartHttpServletRequest req) throws IOException {
 		Map<String, FlowsAttachment> attachments = new HashMap<>();
@@ -68,6 +66,7 @@ public class FlowsAttachmentService {
 		Iterator<String> i = req.getFileNames();
 		while (i.hasNext()) {
 			String fileName = i.next();
+			fileName = fileName.replace("_data", "");
 			FlowsAttachment att = extractSingleAttachment(req, nextIndexTable, taskId, taskName, fileName);
 			attachments.put(fileName, att);
 		}
@@ -76,7 +75,7 @@ public class FlowsAttachmentService {
 	}
 
 	private FlowsAttachment extractSingleAttachment(MultipartHttpServletRequest req, Map<String, Integer> nextIndexTable, String taskId, String taskName, String fileName) throws IOException {
-		MultipartFile file = req.getFile(fileName);
+		MultipartFile file = req.getFile(fileName + "_data");
         String username = SecurityUtils.getCurrentUserLogin();
 
         // TODO: seccare?
@@ -89,12 +88,17 @@ public class FlowsAttachmentService {
 		}
 		// fine TODO
 
-		fileName = fileName.replace("_data", "");
-
 		boolean nuovo = taskId.equals("start") || taskService.getVariable(taskId, fileName) == null;
 		LOGGER.info("inserisco come variabile il file {}", fileName);
 
 		FlowsAttachment att = new FlowsAttachment();
+
+		// aggiungo eventuali ulteriori metadati associati all'allegato
+        final String fileNameDef = fileName;
+		Collections.list(req.getParameterNames()).stream()
+            .filter(name -> name.startsWith(fileNameDef))
+            .forEach(name -> att.setMetadato(name.replace(fileNameDef+"_", ""), req.getParameter(name)));
+
 		att.setName(fileName);
 		att.setFilename(file.getOriginalFilename());
 		att.setTime(new Date());
@@ -103,12 +107,6 @@ public class FlowsAttachmentService {
 		att.setUsername(username);
 		att.setMimetype(getMimetype(file));
 		att.setBytes(file.getBytes());
-
-		// aggiungo eventuali ulteriori metadati associati all'allegato
-        final String fileNameDef = fileName;
-		Collections.list(req.getParameterNames()).stream()
-            .filter(name -> name.startsWith(fileNameDef))
-            .forEach(name -> att.setMetadato(name.replace(fileNameDef+"_", ""), req.getParameter(name)));
 
 		if (nuovo) {
 			att.setAzione(Caricamento);
@@ -147,6 +145,7 @@ public class FlowsAttachmentService {
         runtimeService.setVariable(task.getExecutionId(), variableName, att);
     }
 
+	@Deprecated // TODO
 	public void saveAttachmentInArray(DelegateExecution execution, String arrayName, FlowsAttachment att) {
 
 		att.setTime(new Date());
