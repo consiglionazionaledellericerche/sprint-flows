@@ -65,7 +65,8 @@
 
  					vm.taskVariables = $scope.data.entity.variabili;
  					$scope.attachments = utils.parseAttachments(response.data.attachments);
- 					$scope.attachmentsList = response.data.attachmentsList;
+//                    $scope.attachments = response.data.attachments;
+
  					vm.diagramUrl = '/rest/diagram/taskInstance/' + $scope.data.taskId + "?" + new Date().getTime();
  					vm.formUrl = 'api/forms/task/' + $scope.data.taskId;
  				});
@@ -93,8 +94,10 @@
  				// Non posso usare angular.copy() perche' ho degli oggetti File non gestiti bene
                 for (var attName in $scope.attachments) {
                     var att = $scope.attachments[attName];
-                    for (var property in att) {
-                        $scope.data[attName +"_"+ property] = att[property];
+                    if (att.data) { // non copiare allegati non aggiornati
+                        for (var property in att) {
+                            $scope.data[attName +"_"+ property] = att[property];
+                        }
                     }
                 }
 

@@ -73,12 +73,16 @@
                 return processParams;
             },
             parseAttachments: function(attachments) {
-                var appo = [];
+//                var appo = [];
+
                 for (var attachment in attachments) {
+                    for (var metadato in attachments[attachment].metadati)
+                        attachments[attachment][metadato] = attachments[attachment][metadato] || attachments[attachment].metadati[metadato];
                     delete attachments[attachment].bytes;
-                    appo.push(attachments[attachment]);
+                    delete attachments[attachment].metadati
+//                    appo.push(attachments[attachment]);
                 }
-                return appo;
+                return attachments;
             },
             loadSearchFields: function(processDefinitionKey, isTaskQuery){
                 var formUrl = undefined;

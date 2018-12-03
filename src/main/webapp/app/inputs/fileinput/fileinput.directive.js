@@ -51,47 +51,23 @@
                     if ($scope.multiple) {
                         $scope.rows = [];
                         for (var el in $scope.$parent.attachments) {
-                            if (el.name.startsWith($scope.name))
+                            if (el.startsWith($scope.name))
                                 $scope.rows.push({});
                         }
                     } else {
                         $scope.rows = [{}]
                     }
+
+                    $scope.metadatiPubblicazione = $scope.metadatiPubblicazione || $scope.pubblicazioneTrasparenza || $scope.pubblicazioneUrp;
+                    $scope.metadatiProtocollo = $scope.metadatiProtocollo || $scope.protocollo;
+
+                    $scope.pubblicazioneUrpDisabled = attrs.pubblicazioneUrp !== undefined;
+                    $scope.pubblicazioneTrasparenzaDisabled = attrs.pubblicazioneTrasparenza !== undefined;
+                    $scope.protocolloDisabled = attrs.protocollo !== undefined;
+
                 }
 
                 init();
-
-//                $scope.$watch('rows', function(newValue) {
-//
-//                    for (var i = 0; i < $scope.rows.length; i++) {
-//                        var row = $scope.rows[i];
-//                        var name = $scope.name + ($scope.multiple ? i : '');
-//                        $scope.$parent.data[name] = row.data;
-//                        $scope.$parent.data[name+'_name'] = row.name;
-//                        $scope.$parent.data[name+'_pubblicazioneUrp'] = row.pubblicazioneUrp;
-//                        $scope.$parent.data[name+'_pubblicazioneTrasparenza'] = row.pubblicazioneTrasparenza;
-//                        $scope.$parent.data[name+'_protocollo'] = row.protocollo;
-//                        $scope.$parent.data[name+'_dataprotocollo'] = row.dataprotocollo;
-//                        $scope.$parent.data[name+'_numeroprotocollo'] = row.numeroprotocollo;
-//                    }
-//
-//                });
-
-
-                $scope.findDocument = function(name) {
-                    var result = {};
-                    for (var el in $scope.$parent.attachments) {
-                        if (el.name === name)
-                            result = el;
-                    };
-                    return result;
-                }
-
-                $scope.filterNames = function(value) {
-                    var reg = "^"+$scope.attrs.name+"\\[\\d+\\]";
-                    var tester = new RegExp(reg, 'g');
-                    return tester.test(value.name);
-                }
 
                 $scope.addRow = function() {
                     if ($scope.rows.length < $scope.max)
@@ -99,19 +75,10 @@
                     return false;
                 };
                 $scope.removeRow = function() {
-                    if ($scope.rows.length > $scope.min)
+                    if ($scope.rows.length > $scope.min) {
                         $scope.rows.pop();
-
-                    // elimino i dati dell'ultimo alloegato aggiunto
-//                    var name = $scope.name+$scope.rows.length;
-//                    delete $scope.$parent.data[name];
-//                    delete $scope.$parent.data[name+'_name'];
-//                    delete $scope.$parent.data[name+'_pubblicazioneUrp'];
-//                    delete $scope.$parent.data[name+'_pubblicazioneTrasparenza'];
-//                    delete $scope.$parent.data[name+'_protocollo'];
-//                    delete $scope.$parent.data[name+'_dataprotocollo'];
-//                    delete $scope.$parent.data[name+'_numeroprotocollo'];
-//                    return false;
+                        $scope.$parent.attachments[$scope.name+($scope.rows.length)] = undefined;
+                    }
                 };
 
                 $scope.downloadFile = function(url, filename, mimetype) {
