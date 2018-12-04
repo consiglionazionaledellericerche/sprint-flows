@@ -31,6 +31,7 @@
  		var vm = this;
  		$scope.data = {};
  		vm.taskId = $state.params.taskId;
+ 		$scope.taskId = $state.params.taskId;
  		$scope.data.processDefinitionId = $state.params.processDefinitionId;
  		$scope.processDefinitionKey = $scope.data.processDefinitionId.split(":")[0];
  		$scope.processVersion = $scope.data.processDefinitionId.split(":")[1];
