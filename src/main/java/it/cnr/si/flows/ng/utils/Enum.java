@@ -100,7 +100,8 @@ public class Enum {
         idStruttura,
         startDate,
         endDate,
-        gruppoRA;
+        gruppoRA,
+    	gruppoStaffAmministrativo;
     }
 
 

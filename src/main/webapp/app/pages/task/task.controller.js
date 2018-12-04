@@ -119,7 +119,7 @@
 
  					$log.info(response);
  					AlertService.success("Richiesta completata con successo");
- 					$state.go('availabletasks');
+ 					$state.go('availableTasks');
 
  				}, function(err) {
  					$log.error(err);
