@@ -21,7 +21,7 @@
 
     <div class="well" ng-repeat="row in rows track by $index"
          ng-init="initRow(row, $index);">
-
+        <pre>{{$parent.attachments[row.rowname]|json}}</pre>
         <div class="form-group" ng-if="label === undefined">
             <label>Tipo Documento</label>
             <input type="text" class="form-control" ng-model="$parent.attachments[row.rowname].label" required>
@@ -73,6 +73,7 @@
                         ng-model="$parent.attachments[row.rowname].protocollo"
                         off-label="Non Protocollato"
                         on-label="Protocollato"
+                        ng-click="onClickProtocollo(row);"
                         is-disabled="metadatiDisabilitati || protocolloDisabled">
                     </toggle-switch>
                 </div>
