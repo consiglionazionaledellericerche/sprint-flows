@@ -120,8 +120,12 @@
 //                var appo = [];
 
                 for (var attachment in attachments) {
-                    for (var metadato in attachments[attachment].metadati)
+                    for (var metadato in attachments[attachment].metadati) {
                         attachments[attachment][metadato] = attachments[attachment][metadato] || attachments[attachment].metadati[metadato];
+                        // TODO martin ricontrollare le date
+                        var date = moment(attachments[attachment][metadato]);
+                        attachments[attachment][metadato] = date.isValid() ? date.toDate() : attachments[attachment][metadato];
+                    }
                     delete attachments[attachment].bytes;
                     delete attachments[attachment].metadati
 //                    appo.push(attachments[attachment]);
