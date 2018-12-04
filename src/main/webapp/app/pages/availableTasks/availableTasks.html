@@ -82,7 +82,7 @@
             </div>
             <br>
             <div>
-                <button ng-click="loadAvailableTasks()" class="btn btn-primary">Filtra</button>
+                <button ng-click="showProcessInstances()" class="btn btn-primary">Filtra</button>
             </div>
         </div>
 
@@ -144,7 +144,7 @@
                 <!--paginazione availabletasks-->
                 <div class="text-center">
                     <jhi-item-count page="vm.TAIMGPage" total="vm.TAIMGQueryCount"
-                                    items-per-page="vm.itemsPerPage"></jhi-item-count>
+                                    items-per-page="vm.itemsForPage"></jhi-item-count>
                     <uib-pagination class="pagination-sm" total-items="vm.TAIMGTotalItems" ng-model="vm.TAIMGPage"
                                     ng-change="vm.transition()"></uib-pagination>
                 </div>

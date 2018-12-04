@@ -22,7 +22,7 @@
             //carico le form di ricerca specifiche per ogni tipologia di Process Definitions
             $scope.formUrl = utils.loadSearchFields(vm.processDefinitionKey, true);
 
-            dataService.tasks.getTaskCompletedByMe($rootScope.current, firstResult, maxResults, vm.order, utils.populateTaskParams(Array.from($("input[id^='searchField-']"))))
+            dataService.tasks.getTaskCompletedByMe($rootScope.current, firstResult, maxResults, vm.order, utils.oldPopulateTaskParams(Array.from($("input[id^='searchField-']"))))
                 .then(function(response) {
                     response.data.data.forEach(function(task) {
                         utils.refactoringVariables(task);
