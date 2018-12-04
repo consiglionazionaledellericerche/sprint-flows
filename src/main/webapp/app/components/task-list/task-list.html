@@ -1,24 +1,12 @@
 <div class="row vertical-align-center well" ng-class="{'row-slim': !advanced}" ng-repeat="task in tasks">
     <div class="col-md-9">
-        <strong>{{task.variabili.titolo}}</strong> <br>
         <strong>Flusso avviato da</strong>
-        <em>{{task.variabili.initiator}}</em>
+        <em>{{task.name | get: 'initiator'}}</em>
         <strong>il</strong>
-        <em>{{task.variabili.startDate | data}}</em>
+        <em>{{task.startTime | data}}</em> <br>
         <span ng-bind-html="task.priority | priority"></span>
-        <div ng-show="task.variabili.titolo">
-            <strong>Titolo:</strong> {{task.variabili.titolo}} <br>
-        </div>
-        <div ng-show="task.name">
-            <strong>Stato:</strong> {{task.name}}</span> <br>
-        </div>
-
-        <div ng-show="task.variabili.sceltaUtente">
-            <strong>Scelta utente:</strong> {{task.variabili.sceltaUtente}} <br>
-        </div>
-        <div ng-show="task.endTime">
-            <strong>Compito completato il </strong>{{task.endTime | data}}
-        </div>
+        <strong>Titolo:</strong> {{task.name | get: 'titolo'}}<br>
+        <strong>Stato:</strong> {{task.name | get: 'stato'}}</span> <br>
         <div ng-show="advanced">
             <ng-include src="task.searchView"/>
         </div>
@@ -28,11 +16,12 @@
         <div class="btn-group-vertical btn-block" role="group">
             <!--uso il campo completati impropriamente per non far apparire il bottone con le azioni della pagina dei dettagli-->
             <a ng-show="{{completed}}" class="btn btn-primary" ng-class="{'btn-xs': !advanced}"
-               ui-sref="details({processInstanceId: task.processInstanceId})">
+               ui-sref="details({processInstanceId: task.id})">
                 <span class="glyphicon glyphicon-th-list"></span> Dettagli Flusso
             </a>
+            <!--todo: da sistemare-->
             <a ng-show="{{!completed}}" class="btn btn-primary" ng-class="{'btn-xs': !advanced}"
-               ui-sref="details({processInstanceId: task.processInstanceId, taskId: task.id})">
+               ui-sref="details({processInstanceId: task.id, taskId: task.id})">
                 <span class="glyphicon glyphicon-th-list"></span> Dettagli Flusso
             </a>
             <a class="btn btn-default" ng-class="{'btn-xs': !advanced}"
