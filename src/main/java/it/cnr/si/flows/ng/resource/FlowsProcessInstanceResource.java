@@ -4,7 +4,6 @@ import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.domain.View;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
-import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
 import it.cnr.si.security.AuthoritiesConstants;
@@ -46,7 +45,8 @@ import java.util.stream.Collectors;
 
 import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
 import static it.cnr.si.flows.ng.utils.Enum.Stato.Pubblicato;
-import static it.cnr.si.flows.ng.utils.Utils.*;
+import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
+import static it.cnr.si.flows.ng.utils.Utils.DESC;
 
 @Controller
 @RequestMapping("api/processInstances")
@@ -113,53 +113,30 @@ public class FlowsProcessInstanceResource {
         return documentiPubblicabili;
     }
 
+
     /**
      * Restituisce le Processs Instances avviate dall'utente loggato
      *
-     * @param active booleano che indica se recuperare le MIE Process Instancess attive o quelle terminate
+     * @param params the params
      * @return the my processes
      */
-    @GetMapping(value = "/myProcessInstances")
+    @PostMapping(value = "/myProcessInstances")
     @Secured(AuthoritiesConstants.USER)
     @Timed
-    public ResponseEntity<DataResponse> getMyProcessInstances(
-            @RequestParam boolean active,
-            @RequestParam String processDefinition,
-            @RequestParam String order,
-            @RequestParam int firstResult,
-            @RequestParam int maxResults) {
+    public ResponseEntity<Map<String, Object>> getMyProcessInstances(
+            @RequestBody Map<String, String> params) {
 
-        String username = SecurityUtils.getCurrentUserLogin();
-        List<HistoricProcessInstance> list;
-        HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
+        String processDefinitionKey = utils.getString(params, "processDefinitionKey", "all");
+        String order = utils.getString(params, "order", "ASC");
+        boolean active = utils.getBoolean(params, "active", true);
+        int page = utils.getInteger(params, "page", 1);
+        Integer maxResults = 10;
+        Integer firstResult = maxResults * (page-1) ;
 
-        if (active) {
-            historicProcessInstanceQuery.variableValueEquals(Enum.VariableEnum.initiator.name(), username)
-                    .unfinished()
-                    .includeProcessVariables();
-        } else {
-            historicProcessInstanceQuery.variableValueEquals(Enum.VariableEnum.initiator.name(), username)
-                    .finished()
-                    .includeProcessVariables();
-        }
+        params.put("initiator", SecurityUtils.getCurrentUserLogin());
+        Map<String, Object> result = flowsProcessInstanceService.search(params, processDefinitionKey, active, order, firstResult, maxResults);
 
-        if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
-            historicProcessInstanceQuery.processDefinitionKey(processDefinition);
-        if (order.equals(ASC))
-            historicProcessInstanceQuery.orderByProcessInstanceStartTime().asc();
-        else
-            historicProcessInstanceQuery.orderByProcessInstanceStartTime().desc();
-
-        list = historicProcessInstanceQuery.listPage(firstResult, maxResults);
-
-        DataResponse response = new DataResponse();
-        response.setStart(firstResult);
-        response.setSize(list.size()); //numero flussi restituito
-        response.setTotal(historicProcessInstanceQuery.count()); //totale Flussi
-        response.setData(restResponseFactory.createHistoricProcessInstanceResponseList(list));
-        response.setOrder(order);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(result);
     }
 
 

@@ -113,7 +113,7 @@ public class FlowsProcessInstanceResourceTest {
     public void testGetProcessInstanceById() throws IOException {
         processInstance = util.mySetUp(acquisti);
 
-        ResponseEntity<Map<String, Object>> response = (ResponseEntity<Map<String, Object>>) flowsProcessInstanceResource.getProcessInstanceById(new MockHttpServletRequest(), processInstance.getId(), false);
+        ResponseEntity<Map<String, Object>> response = (ResponseEntity<Map<String, Object>>) flowsProcessInstanceResource.getProcessInstanceById(new MockHttpServletRequest(), processInstance.getId(), true);
         assertEquals(OK, response.getStatusCode());
 
         HistoricProcessInstanceResponse entity = (HistoricProcessInstanceResponse) ((HashMap) response.getBody()).get("entity");
@@ -320,22 +320,25 @@ public class FlowsProcessInstanceResourceTest {
                 .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, 2018, 0, 10, ASC);
 
         assertEquals(OK, res.getStatusCode());
-        assertEquals(1, res.getBody().size());
+        //prendo anche le Pi create negli altri test
+        assertEquals(8, res.getBody().size());
 
-        //prova recupero 10 elementi dopo il quinto (result = 0 perchè ho una sola Process Instance)
+        //prova recupero 10 elementi dopo il quinto (result = 3 perchè ho 8 Process Instance in totale - anche quelle generate negli altri test)
         res = flowsProcessInstanceResource
                 .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, 2018, 5, 10, ASC);
 
+        //prendo anche le Pi create negli altri test
         assertEquals(OK, res.getStatusCode());
-        assertEquals(0, res.getBody().size());
+        assertEquals(3, res.getBody().size());
 
 
-        //prova senza ordinamento (recupera la process instance)
+        //prova senza ordinamento (recupera le 8 process instances - anche quelle generate negli altri test)
         res = flowsProcessInstanceResource
                 .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, 2018, 0, 10, null);
 
         assertEquals(OK, res.getStatusCode());
-        assertEquals(1, res.getBody().size());
+        //prendo anche le Pi create negli altri test
+        assertEquals(8, res.getBody().size());
 
 
         //prova anni sbagliati
@@ -350,20 +353,24 @@ public class FlowsProcessInstanceResourceTest {
     private String verifyMyProcesses(int startedByRA, int startedBySpaclient) {
         String proceeeInstanceID = null;
         // Admin vede la Process Instance che ha avviato
-        ResponseEntity<DataResponse> response = flowsProcessInstanceResource.getMyProcessInstances(true, ALL_PROCESS_INSTANCES, ASC, 0, 100);
+        Map<String, String> searchParams = new HashMap<>();
+        searchParams.put("active", "true");
+        searchParams.put("page", "1");
+        searchParams.put("processDefinitionKey", ALL_PROCESS_INSTANCES);
+        searchParams.put("order", ASC);
+
+        ResponseEntity<Map<String, Object>> response = flowsProcessInstanceResource.getMyProcessInstances(searchParams);
         assertEquals(OK, response.getStatusCode());
-        assertEquals(startedByRA, response.getBody().getSize());
-        List<HistoricProcessInstanceResponse> processInstances = ((List<HistoricProcessInstanceResponse>) response.getBody().getData());
+        ArrayList<HistoricProcessInstanceResponse> processInstances = (ArrayList<HistoricProcessInstanceResponse>)response.getBody().get("processInstances");
         assertEquals(startedByRA, processInstances.size());
         if (processInstances.size() > 0)
-            proceeeInstanceID = processInstances.get(0).getId();
-
+            proceeeInstanceID = processInstances.get(0).getId() ;
+//
         // User NON vede la Process Instance avviata da Admin
         util.loginUser();
-        response = flowsProcessInstanceResource.getMyProcessInstances(true, "all", ASC, 0, 100);
+        response = flowsProcessInstanceResource.getMyProcessInstances(searchParams);
         assertEquals(OK, response.getStatusCode());
-        assertEquals(startedBySpaclient, response.getBody().getSize());
-        assertEquals(startedBySpaclient, ((List<HistoricProcessInstanceResponse>) response.getBody().getData()).size());
+        assertEquals(startedBySpaclient, ((ArrayList<HistoricProcessInstanceResponse>)response.getBody().get("processInstances")).size());
         util.loginResponsabileAcquisti();
         return proceeeInstanceID;
     }
