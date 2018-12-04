@@ -20,17 +20,17 @@
     </div>
 
     <div class="well" ng-repeat="row in rows track by $index"
-         ng-init="rowname = multiple ? name+$index : name; $parent.attachments[rowname] = $parent.attachments[rowname] || {}; $parent.attachments[rowname].name = rowname">
-        <pre>{{rowname}}{{ $parent.attachments[rowname] | json }}</pre>
+         ng-init="initRow(row, $index);">
+
         <div class="form-group" ng-if="label === undefined">
             <label>Tipo Documento</label>
-            <input type="text" class="form-control" ng-model="$parent.attachments[rowname].label" required>
+            <input type="text" class="form-control" ng-model="$parent.attachments[row.rowname].label" required>
         </div>
-        <div class="form-group" ng-if="label !== undefined" ng-init="$parent.attachments[rowname].label = label">
+        <div class="form-group" ng-if="label !== undefined" ng-init="$parent.attachments[row.rowname].label = label">
             <h3>{{label}}</h3>
         </div>
 
-        <div ng-if="metadatiPubblicazione">
+        <div ng-if="metadatiPubblicazione || row.modifica">
             <div class="row form-group">
                 <div class="col-md-5">
                     Pubblicazione in URP
@@ -38,11 +38,10 @@
                 <div class="col-md-7">
                     <toggle-switch
                         class="switch-success btn-group btn-group-justified"
-                        ng-model="$parent.attachments[rowname].pubblicazioneUrp"
-                        ng-init="$parent.attachments[rowname].pubblicazioneUrp = pubblicazioneUrp"
+                        ng-model="$parent.attachments[row.rowname].pubblicazioneUrp"
                         off-label="Non pubblicare"
                         on-label="Pubblica"
-                        is-disabled="pubblicazioneUrpDisabled">
+                        is-disabled="metadatiDisabilitati || pubblicazioneUrpDisabled">
                     </toggle-switch>
                 </div>
             </div>
@@ -54,17 +53,16 @@
                 <div class="col-md-7">
                     <toggle-switch
                         class="switch-success btn-group btn-group-justified"
-                        ng-model="$parent.attachments[rowname].pubblicazioneTrasparenza"
-                        ng-init="$parent.attachments[rowname].pubblicazioneTrasparenza = pubblicazioneTrasparenza"
+                        ng-model="$parent.attachments[row.rowname].pubblicazioneTrasparenza"
                         off-label="Non pubblicare"
                         on-label="Pubblica"
-                        is-disabled="pubblicazioneTrasparenzaDisabled">
+                        is-disabled="metadatiDisabilitati || pubblicazioneTrasparenzaDisabled">
                     </toggle-switch>
                 </div>
             </div>
         </div>
 
-        <div ng-if="metadatiProtocollo">
+        <div ng-if="metadatiProtocollo || row.modifica">
             <div class="row form-group">
                 <div class="col-md-5">
                     Protocollo
@@ -72,23 +70,22 @@
                 <div class="col-md-7">
                     <toggle-switch
                         class="btn-group btn-group-justified"
-                        ng-model="$parent.attachments[rowname].protocollo"
-                        ng-init="$parent.attachments[rowname].protocollo = protocollo"
+                        ng-model="$parent.attachments[row.rowname].protocollo"
                         off-label="Non Protocollato"
                         on-label="Protocollato"
-                        is-disabled="protocolloDisabled">
+                        is-disabled="metadatiDisabilitati || protocolloDisabled">
                     </toggle-switch>
                 </div>
             </div>
 
             <div class="row form-group">
-                <div class="col-md-5" ng-if="$parent.attachments[rowname].protocollo">
+                <div class="col-md-5" ng-if="$parent.attachments[row.rowname].protocollo">
                     <label>Data protocollo</label>
-                    <input type="date" class="form-control" ng-model="$parent.attachments[rowname].dataprotocollo" ng-readonly="protocolloDettagliDisabled" required>
+                    <input type="date" class="form-control" ng-model="$parent.attachments[row.rowname].dataprotocollo" ng-readonly="metadatiDisabilitati || protocolloDettagliDisabled" required>
                 </div>
-                <div class="col-md-7" ng-if="$parent.attachments[rowname].protocollo">
+                <div class="col-md-7" ng-if="$parent.attachments[row.rowname].protocollo">
                     <label>Numero protocollo</label>
-                    <input type="text" class="form-control" ng-model="$parent.attachments[rowname].numeroprotocollo" ng-readonly="protocolloDettagliDisabled" required>
+                    <input type="text" class="form-control" ng-model="$parent.attachments[row.rowname].numeroprotocollo" ng-readonly="metadatiDisabilitati || protocolloDettagliDisabled" required>
                 </div>
             </div>
 
@@ -97,28 +94,28 @@
 
         <a
                 href
-                ng-click="downloadFile('/api/attachments/task/'+ $parent.data.taskId +'/'+ $parent.attachments[rowname].name +'/data', $parent.attachments[rowname].filename, $parent.attachments[rowname].mimetype)" >
-            {{$parent.attachments[rowname].filename}}
+                ng-click="downloadFile('/api/attachments/task/'+ taskId +'/'+ $parent.attachments[row.rowname].name +'/data', $parent.attachments[row.rowname].filename, $parent.attachments[row.rowname].mimetype)" >
+            {{$parent.attachments[row.rowname].filename}}
         </a>
 
         <div class="row form-group">
             <div class="col-md-12">
                 <button class="btn btn-sm"
-                        ng-class="{'btn-success': $parent.attachments[rowname].data, 'btn-info': !$parent.attachments[rowname].data}"
-                        ng-model="$parent.attachments[rowname].data"
+                        ng-class="{'btn-success': $parent.attachments[row.rowname].data, 'btn-info': !$parent.attachments[row.rowname].data}"
+                        ng-model="$parent.attachments[row.rowname].data"
                         ngf-select
-                        name="$parent.attachments[rowname].data"
+                        name="$parent.attachments[row.rowname].data"
                         accept="{{accept}}"
                         ngf-multiple="false"
                         ng-required="cnrRequired" >
-                    <span ng-show="!$parent.attachments[rowname].data" class="glyphicon glyphicon-upload"></span>
-                    <span ng-show="$parent.attachments[rowname].data" class="glyphicon glyphicon-repeat"></span>
-                    <span ng-show="!$parent.attachments[rowname].data">Seleziona File</span>
-                    <span ng-show="$parent.attachments[rowname].data">Aggiorna</span>
+                    <span ng-show="!$parent.attachments[row.rowname].data" class="glyphicon glyphicon-upload"></span>
+                    <span ng-show="$parent.attachments[row.rowname].data" class="glyphicon glyphicon-repeat"></span>
+                    <span ng-show="!$parent.attachments[row.rowname].data">Seleziona File</span>
+                    <span ng-show="$parent.attachments[row.rowname].data">Aggiorna</span>
                 </button>
-                <span ng-show="$parent.attachments[rowname].data">
-                      {{$parent.attachments[rowname].data.name}}
-                      <a href ng-click="$parent.attachments[rowname].data = undefined"><span
+                <span ng-show="$parent.attachments[row.rowname].data">
+                      {{$parent.attachments[row.rowname].data.name}}
+                      <a href ng-click="$parent.attachments[row.rowname].data = undefined"><span
                               class="glyphicon glyphicon-remove" title="Rimuovi"></span></a>
                   </span>
             </div>
