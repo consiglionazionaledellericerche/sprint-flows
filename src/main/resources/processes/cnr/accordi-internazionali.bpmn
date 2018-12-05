@@ -127,9 +127,11 @@
         </activiti:executionListener>
       </extensionElements>
     </endEvent>
-    <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway" default="flow6"></exclusiveGateway>
     <sequenceFlow id="flow4" sourceRef="modifica-domanda" targetRef="exclusivegateway2"></sequenceFlow>
-    <sequenceFlow id="flow5" name="ANNULLATA" sourceRef="exclusivegateway2" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow5" name="ANNULLATA" sourceRef="exclusivegateway2" targetRef="endevent1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Annulla'}]]></conditionExpression>
+    </sequenceFlow>
     <sequenceFlow id="flow6" sourceRef="exclusivegateway2" targetRef="validazione"></sequenceFlow>
     <sequenceFlow id="flow7" sourceRef="exclusivegateway1" targetRef="valutazione-dirigente"></sequenceFlow>
     <exclusiveGateway id="exclusivegateway3" name="Exclusive Gateway" default="flow9"></exclusiveGateway>
@@ -206,7 +208,7 @@
     <sequenceFlow id="flow24" name="RESPINTA" sourceRef="exclusivegateway1" targetRef="endevent5">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Respingi'}]]></conditionExpression>
     </sequenceFlow>
-    <userTask id="valutazione-dirigente" name="VALUTAZIONE DIRIGENTE"></userTask>
+    <userTask id="valutazione-dirigente" name="VALUTAZIONE DIRIGENTE" activiti:candidateGroups="${gruppoDirigenteRichiedente}"></userTask>
     <exclusiveGateway id="exclusivegateway7" name="Exclusive Gateway" default="flow27"></exclusiveGateway>
     <sequenceFlow id="flow25" sourceRef="valutazione-dirigente" targetRef="exclusivegateway7"></sequenceFlow>
     <endEvent id="endevent6" name="End"></endEvent>
