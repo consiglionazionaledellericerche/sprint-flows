@@ -40,7 +40,7 @@ public class StartAccordiInternazionaliSetGroupsAndVisibility {
 		String gruppoResponsabileAccordiInternazionali = "responsabileAccordiInternazionali@0000";
 		//DA CAMBIARE - ricavando il direttore della persona che afferisce alla sua struttura
 		String gruppoDirigenteRichiedente = "responsabileFirmaAcquisti@2216";
-		String applicazioneAccordiInternazionali = "app.accordiInternazionali";
+		String applicazioneAccordiInternazionali = "app.abil";
 
 		LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}",  gruppoValidatoriAccordiInternazionali, gruppoResponsabileAccordiInternazionali, gruppoUfficioProtocollo);
 
