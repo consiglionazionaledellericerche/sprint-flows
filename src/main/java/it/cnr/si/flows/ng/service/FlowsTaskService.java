@@ -317,9 +317,10 @@ public class FlowsTaskService {
 			throw new ProcessDefinitionAndTaskIdEmptyException();
 
 		Map<String, Object> data = extractParameters(req);
-		data.putAll(attachmentService.extractAttachmentVariables(req));
+		attachmentService.extractAttachmentVariables(req, data);
 
 		if (isEmpty(taskId)) {
+
 			ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitionId).singleResult();
 			try {
 				String counterId = processDefinition.getName() + "-" + Calendar.getInstance().get(Calendar.YEAR);

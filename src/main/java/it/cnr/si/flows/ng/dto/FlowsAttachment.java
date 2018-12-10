@@ -30,6 +30,11 @@ public class FlowsAttachment implements Serializable {
     private String url;
     private byte[] bytes;
     private Map<String, Object> metadati;
+    private boolean pubblicazioneUrp;
+    private boolean pubblicazioneTrasparenza;
+    private boolean protocollo;
+    private String numeroProtocollo;
+    private String dataProtocollo;
 
     public FlowsAttachment() {}
 
@@ -136,5 +141,45 @@ public class FlowsAttachment implements Serializable {
 
     public void setAzione(Enum.Azione a) {
         this.getMetadati().put("azione", a);
+    }
+
+    public boolean isPubblicazioneUrp() {
+        return pubblicazioneUrp;
+    }
+
+    public void setPubblicazioneUrp(boolean pubblicazioneUrp) {
+        this.pubblicazioneUrp = pubblicazioneUrp;
+    }
+
+    public boolean isPubblicazioneTrasparenza() {
+        return pubblicazioneTrasparenza;
+    }
+
+    public void setPubblicazioneTrasparenza(boolean pubblicazioneTrasparenza) {
+        this.pubblicazioneTrasparenza = pubblicazioneTrasparenza;
+    }
+
+    public boolean isProtocollo() {
+        return protocollo;
+    }
+
+    public void setProtocollo(boolean protocollo) {
+        this.protocollo = protocollo;
+    }
+
+    public String getNumeroProtocollo() {
+        return numeroProtocollo;
+    }
+
+    public void setNumeroProtocollo(String numeroProtocollo) {
+        this.numeroProtocollo = numeroProtocollo;
+    }
+
+    public String getDataProtocollo() {
+        return dataProtocollo;
+    }
+
+    public void setDataProtocollo(String dataProtocollo) {
+        this.dataProtocollo = dataProtocollo;
     }
 }

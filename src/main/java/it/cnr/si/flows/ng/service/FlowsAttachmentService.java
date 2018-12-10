@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static it.cnr.si.flows.ng.utils.Enum.Azione.*;
 import static it.cnr.si.flows.ng.utils.Enum.Stato.Pubblicato;
@@ -33,8 +34,11 @@ public class FlowsAttachmentService {
 	public static final String MIMETYPE_SUFFIX = "_mimetype";
 	public static final String NEW_ATTACHMENT_PREFIX = "__new__";
 	public static final String ARRAY_SUFFIX_REGEX = "\\[\\d+\\]";
+    public static final String NUMERI_PROTOCOLLO = "numeriProtocollo";
+    public static final String NUMERI_PROTOCOLLO_SEPARATOR = "::";
 
-	public static final String[] SUFFIXES = new String[] {USER_SUFFIX, STATO_SUFFIX, FILENAME_SUFFIX, MIMETYPE_SUFFIX};
+
+    public static final String[] SUFFIXES = new String[] {USER_SUFFIX, STATO_SUFFIX, FILENAME_SUFFIX, MIMETYPE_SUFFIX};
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FlowsAttachmentService.class);
 
@@ -50,7 +54,7 @@ public class FlowsAttachmentService {
 	 * per il successivo salvataggio sul db
 	 *
 	 */
-	public Map<String, FlowsAttachment> extractAttachmentVariables(MultipartHttpServletRequest req) throws IOException {
+	public void extractAttachmentVariables(MultipartHttpServletRequest req, Map<String, Object> data) throws IOException {
 		Map<String, FlowsAttachment> attachments = new HashMap<>();
 		Map<String, Integer> nextIndexTable = new HashMap<>();
 		String taskId, taskName;
@@ -67,14 +71,17 @@ public class FlowsAttachmentService {
 		while (i.hasNext()) {
 			String fileName = i.next();
 			fileName = fileName.replace("_data", "");
-			FlowsAttachment att = extractSingleAttachment(req, nextIndexTable, taskId, taskName, fileName);
+			FlowsAttachment att = extractSingleAttachment(req, nextIndexTable, taskId, taskName, fileName, data);
 			attachments.put(fileName, att);
 		}
 
-		return attachments;
+		data.putAll(attachments);
+
+        String protocolliUniti = mergeProtocolli(attachments, taskId);
+        data.put(NUMERI_PROTOCOLLO, protocolliUniti);
 	}
 
-	private FlowsAttachment extractSingleAttachment(MultipartHttpServletRequest req, Map<String, Integer> nextIndexTable, String taskId, String taskName, String fileName) throws IOException {
+    private FlowsAttachment extractSingleAttachment(MultipartHttpServletRequest req, Map<String, Integer> nextIndexTable, String taskId, String taskName, String fileName, Map<String, Object> data) throws IOException {
 		MultipartFile file = req.getFile(fileName + "_data");
         String username = SecurityUtils.getCurrentUserLogin();
 
@@ -93,13 +100,7 @@ public class FlowsAttachmentService {
 
 		FlowsAttachment att = new FlowsAttachment();
 
-		// aggiungo eventuali ulteriori metadati associati all'allegato
-        final String fileNameDef = fileName;
-		Collections.list(req.getParameterNames()).stream()
-            .filter(name -> name.startsWith(fileNameDef))
-            .forEach(name -> att.setMetadato(name.replace(fileNameDef+"_", ""), req.getParameter(name)));
-
-		att.setName(fileName);
+        att.setName(fileName);
 		att.setFilename(file.getOriginalFilename());
 		att.setTime(new Date());
 		att.setTaskId(taskId);
@@ -107,6 +108,18 @@ public class FlowsAttachmentService {
 		att.setUsername(username);
 		att.setMimetype(getMimetype(file));
 		att.setBytes(file.getBytes());
+
+		att.setPubblicazioneUrp(		"true".equals(data.remove(fileName+"_pubblicazioneUrp")));
+		att.setPubblicazioneTrasparenza("true".equals(data.remove(fileName+"_pubblicazioneTrasparenza")));
+		att.setProtocollo(				"true".equals(data.remove(fileName+"_protocollo")));
+
+		if (att.isProtocollo()) {
+			att.setDataProtocollo(String.valueOf(data.remove(fileName+"_dataprotocollo")));
+			att.setNumeroProtocollo(String.valueOf(data.remove(fileName+"_numeroprotocollo")));
+		} else {
+			att.setDataProtocollo(null);
+			att.setNumeroProtocollo(null);
+		}
 
 		if (nuovo) {
 			att.setAzione(Caricamento);
@@ -245,4 +258,36 @@ public class FlowsAttachmentService {
 		runtimeService.setVariable(executionId, nomeVariabileFile, att);
 	}
 
+    public String mergeProtocolli(Map<String, FlowsAttachment> attachments, String taskId) {
+        List<String> numeriProtocollo = attachments.entrySet().stream()
+                .map(key -> key.getValue())
+                .map(FlowsAttachment::getNumeroProtocollo)
+                .collect(Collectors.toList());
+
+        String vecchiNumeriProtocollo = null;
+        if (!taskId.equals("start"))
+            vecchiNumeriProtocollo = runtimeService.getVariable(taskId, NUMERI_PROTOCOLLO, String.class);
+
+
+        return mergeProtocolli(vecchiNumeriProtocollo, numeriProtocollo);
+    }
+
+    public static String addProtocollo(String vecchiProtocolli, String nuovoProtocollo) {
+	    return mergeProtocolli(vecchiProtocolli, Arrays.asList(nuovoProtocollo));
+    }
+
+    public static String mergeProtocolli(String vecchiProtocolli, List<String> nuoviProtocolli) {
+
+	    Stream<String> protocolliStream = nuoviProtocolli.stream();
+
+        if (vecchiProtocolli != null) {
+            Stream<String> vecchiProtocolliStream = Arrays.stream(vecchiProtocolli.split(NUMERI_PROTOCOLLO_SEPARATOR));
+            protocolliStream = Stream.concat(vecchiProtocolliStream, protocolliStream);
+        }
+
+        return protocolliStream
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.joining(NUMERI_PROTOCOLLO_SEPARATOR));
+    }
 }
