@@ -22,7 +22,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static it.cnr.si.flows.ng.utils.Enum.Azione.*;
-import static it.cnr.si.flows.ng.utils.Enum.Stato.Pubblicato;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.PubblicatoTrasparenza;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.PubblicatoUrp;
 import static it.cnr.si.flows.ng.utils.MimetypeUtils.getMimetype;
 
 @Service
@@ -237,20 +238,38 @@ public class FlowsAttachmentService {
 	}	
 	
 	
-	public void setPubblicabile(String executionId, String nomeVariabileFile, Boolean flagPubblicazione) {
+	public void setPubblicabileTrasparenza(String executionId, String nomeVariabileFile, Boolean flagPubblicazione) {
 		FlowsAttachment att = (FlowsAttachment) runtimeService.getVariable(executionId, nomeVariabileFile);
 		if (att != null) {
 			if (flagPubblicazione) {
-                att.setAzione(Pubblicazione);
-                att.addStato(Pubblicato);
+                att.setAzione(PubblicazioneTrasparenza);
+                att.addStato(PubblicatoTrasparenza);
+                att.setPubblicazioneTrasparenza(false);
 			} else {
                 att.setAzione(RimozioneDaPubblicazione);
-                att.removeStato(Pubblicato);
+                att.removeStato(PubblicatoTrasparenza);
+                att.setPubblicazioneTrasparenza(false);
+			}
+			saveAttachmentFuoriTask(executionId, nomeVariabileFile, att);
+		}
+	}	
+	
+	public void setPubblicabileUrp(String executionId, String nomeVariabileFile, Boolean flagPubblicazione) {
+		FlowsAttachment att = (FlowsAttachment) runtimeService.getVariable(executionId, nomeVariabileFile);
+		if (att != null) {
+			if (flagPubblicazione) {
+                att.setAzione(PubblicazioneUrp);
+                att.addStato(PubblicatoUrp);
+                att.setPubblicazioneUrp(false);
+			} else {
+                att.setAzione(RimozioneDaPubblicazione);
+                att.removeStato(PubblicatoUrp);
+                att.setPubblicazioneUrp(false);
 			}
 			saveAttachmentFuoriTask(executionId, nomeVariabileFile, att);
 		}
 	}
-
+	
 	public void saveAttachmentFuoriTask(String executionId, String nomeVariabileFile, FlowsAttachment att) {
 		att.setUsername(SecurityUtils.getCurrentUserLogin());
 		att.setTime(new Date());

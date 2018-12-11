@@ -217,13 +217,13 @@ public class FlowsAttachmentResource {
     @Secured(AuthoritiesConstants.USER)
     @PreAuthorize("@permissionEvaluator.canPublishAttachment(#processInstanceId)")
     @Timed
-    public void setPubblicabile(
+    public void setPubblicabileTrasparenza(
             HttpServletResponse response,
             @PathVariable("processInstanceId") String processInstanceId,
             @PathVariable("attachmentName") String attachmentName,
             @RequestParam("pubblica") boolean pubblica ) {
 
-        flowsAttachmentService.setPubblicabile(processInstanceId, attachmentName, pubblica);
+        flowsAttachmentService.setPubblicabileTrasparenza(processInstanceId, attachmentName, pubblica);
 
     }
 }

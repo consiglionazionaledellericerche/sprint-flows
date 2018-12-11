@@ -52,7 +52,8 @@ public class Enum {
         Firmato,
         Controfirmato,
         Annullato,
-        Pubblicato,
+        PubblicatoUrp,
+        PubblicatoTrasparenza,
         Sostituito
     }
 
@@ -62,7 +63,8 @@ public class Enum {
         Aggiornamento,
         Firma,
         Controfirma,
-        Pubblicazione,
+        PubblicazioneUrp,
+        PubblicazioneTrasparenza,
         Protocollo,
         Validazione,
         Annullo,

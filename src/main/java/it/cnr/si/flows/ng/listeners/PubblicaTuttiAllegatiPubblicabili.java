@@ -38,7 +38,7 @@ public class PubblicaTuttiAllegatiPubblicabili implements ExecutionListener {
 					FlowsAttachment allegato = (FlowsAttachment) entry.getValue();
 					if	(allegato != null && allegato.getName().startsWith("allegatiPubblicazioneTrasparenza")){
 						LOGGER.info("pubblico: " + allegato.getFilename() + "(" + entry.getKey() + ") per il flusso: " + execution.getId() );
-						attachmentService.setPubblicabile(execution.getId(), entry.getKey(), true);
+						attachmentService.setPubblicabileTrasparenza(execution.getId(), entry.getKey(), true);
 					}
 				}				
 			}
