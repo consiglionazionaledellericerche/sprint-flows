@@ -115,8 +115,8 @@ public class FlowsAttachmentService {
 		att.setProtocollo(				"true".equals(data.remove(fileName+"_protocollo")));
 
 		if (att.isProtocollo()) {
-			att.setDataProtocollo(  String.valueOf(data.remove(fileName+"_dataprotocollo")));
-			att.setNumeroProtocollo(String.valueOf(data.remove(fileName+"_numeroprotocollo")));
+			att.setDataProtocollo(  String.valueOf(data.remove(fileName+"_dataProtocollo")));
+			att.setNumeroProtocollo(String.valueOf(data.remove(fileName+"_numeroProtocollo")));
 		} else {
 			att.setDataProtocollo(null);
 			att.setNumeroProtocollo(null);
