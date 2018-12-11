@@ -24,7 +24,7 @@
                 name: '@',                          // diventera' il nome della variabile nel processo (es. decisioneContrattare o allegati)
                 label: '@?',                        // la label di un documento predefinito (quella visualizzata, es. Decisione a Contrattare)
                 legend: '@?',                       // la legend in caso di allegati multipli (es. Altri Allegati)
-                note: '@?',                         // TODO non ancora implementato
+                nota: '@?',                         // TODO non ancora implementato
                 accept: '@?',                       // tipi di file da prendere come allegati
                 multiple: '=?',                     // se ci saranno piu' file
                 cnrRequired: '=?',                  // tendenzialmente true
@@ -33,7 +33,8 @@
                 pubblicazioneUrp: '=?',             // impostare manualmente il valore, lo slider sara' disabilitato
                 pubblicazioneTrasparenza: '=?',     // impostare manualmente il valore, lo slider sara' disabilitato
                 protocollo: '=?',                   // impostare manualmente il valore, lo slider sara' disabilitato
-                metadatiDisabilitati: '=?'          // disabilitare tutti gli slider senza impostare i valori
+                pubblicazioneDisabilitato: '=?',    // disabilitare gli slider di pubblicazione senza impostare i valori
+                protocolloDisabilitato: '=?'        // disabilitare gli slider di protocollo senza impostare i valori
             },
             link: function ($scope, element, attrs) {
 
@@ -61,13 +62,6 @@
                     $scope.min = $scope.min || $scope.rows.length || 0;
                     $scope.max = $scope.max || 999;
 
-                    $scope.metadatiPubblicazione = $scope.metadatiPubblicazione || $scope.pubblicazioneTrasparenza || $scope.pubblicazioneUrp;
-                    $scope.metadatiProtocollo = $scope.metadatiProtocollo || $scope.protocollo;
-
-                    $scope.pubblicazioneUrpDisabled = attrs.pubblicazioneUrp !== undefined;
-                    $scope.pubblicazioneTrasparenzaDisabled = attrs.pubblicazioneTrasparenza !== undefined;
-                    $scope.protocolloDisabled = attrs.protocollo !== undefined;
-
                 }
 
                 init();
@@ -94,13 +88,10 @@
                     $scope.$parent.attachments[row.rowname].name = row.rowname;
                     row.modifica = $scope.$parent.attachments[row.rowname].time !== undefined;
 
-                    if (row.modifica) {
-
-                    } else {
+                    if (!row.modifica)  {
                         $scope.$parent.attachments[row.rowname].pubblicazioneUrp = $scope.pubblicazioneUrp;
                         $scope.$parent.attachments[row.rowname].pubblicazioneTrasparenza = $scope.pubblicazioneTrasparenza;
                         $scope.$parent.attachments[row.rowname].protocollo = $scope.protocollo;
-
                     }
                 }
 

@@ -109,12 +109,13 @@ public class FlowsAttachmentService {
 		att.setMimetype(getMimetype(file));
 		att.setBytes(file.getBytes());
 
+        att.setLabel(                  String.valueOf(data.remove(fileName+"_label")));
 		att.setPubblicazioneUrp(		"true".equals(data.remove(fileName+"_pubblicazioneUrp")));
 		att.setPubblicazioneTrasparenza("true".equals(data.remove(fileName+"_pubblicazioneTrasparenza")));
 		att.setProtocollo(				"true".equals(data.remove(fileName+"_protocollo")));
 
 		if (att.isProtocollo()) {
-			att.setDataProtocollo(String.valueOf(data.remove(fileName+"_dataprotocollo")));
+			att.setDataProtocollo(  String.valueOf(data.remove(fileName+"_dataprotocollo")));
 			att.setNumeroProtocollo(String.valueOf(data.remove(fileName+"_numeroprotocollo")));
 		} else {
 			att.setDataProtocollo(null);
@@ -265,9 +266,10 @@ public class FlowsAttachmentService {
                 .collect(Collectors.toList());
 
         String vecchiNumeriProtocollo = null;
-        if (!taskId.equals("start"))
-            vecchiNumeriProtocollo = runtimeService.getVariable(taskId, NUMERI_PROTOCOLLO, String.class);
-
+        if (!taskId.equals("start")) {
+            String processId = taskService.createTaskQuery().taskId(taskId).singleResult().getProcessInstanceId();
+            vecchiNumeriProtocollo = runtimeService.getVariable(processId, NUMERI_PROTOCOLLO, String.class);
+        }
 
         return mergeProtocolli(vecchiNumeriProtocollo, numeriProtocollo);
     }

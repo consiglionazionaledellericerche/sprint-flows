@@ -9,8 +9,14 @@
             <span class="glyphicon glyphicon-time" title="Cronologia"></span></a>
         <a href ng-if="canPublish || canUpdateAttachments" ng-click="showFileActions(attachment)">
             <span class="glyphicon glyphicon-cog" title="Azioni"></span></a>
+
+        <span class="label label-primary" ng-if="attachment.pubblicazioneUrp">Pubblicabile Urp</span>
+        <span class="label label-primary" ng-if="attachment.pubblicazioneTrasparenza">Pubblicabile in Trasparenza</span>
+        <span class="label label-primary" ng-if="attachment.protocollo">Protocollo ({{attachment.numeroProtocollo}})</span>
+
+
         <span ng-repeat="stato in attachment.metadati.stati">
-        <span class="label label-primary label-{{stato}}">{{stato}}</span>
+            <span class="label label-primary label-{{stato}}">{{stato}}</span>
         </span>
 
         <p has-authority="ROLE_ADMIN">{{ attachment | json }}</p>
