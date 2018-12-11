@@ -19,18 +19,24 @@
         per aggiungere eventuali altri allegati.
     </div>
 
+    <div ng-if="legend && nota"class="bg-warning cnr-descrizione-task">
+        {{nota}}
+    </div>
+
     <div class="well" ng-repeat="row in rows track by $index"
          ng-init="initRow(row, $index);">
-        <pre>{{$parent.attachments[row.rowname]|json}}</pre>
         <div class="form-group" ng-if="label === undefined">
             <label>Tipo Documento</label>
             <input type="text" class="form-control" ng-model="$parent.attachments[row.rowname].label" required>
         </div>
-        <div class="form-group" ng-if="label !== undefined" ng-init="$parent.attachments[row.rowname].label = label">
+        <div class="form-group" ng-if="label !== undefined" ng-init="$parent.attachments[row.rowname].label = $parent.attachments[row.rowname].label || label">
             <h3>{{label}}</h3>
+            <div ng-if="nota" class="bg-warning cnr-descrizione-file">
+                {{nota}}
+            </div>
         </div>
 
-        <div ng-if="metadatiPubblicazione || row.modifica">
+        <div ng-if="metadatiPubblicazione">
             <div class="row form-group">
                 <div class="col-md-5">
                     Pubblicazione in URP
@@ -41,7 +47,7 @@
                         ng-model="$parent.attachments[row.rowname].pubblicazioneUrp"
                         off-label="Non pubblicare"
                         on-label="Pubblica"
-                        is-disabled="metadatiDisabilitati || pubblicazioneUrpDisabled">
+                        is-disabled="pubblicazioneDisabilitato">
                     </toggle-switch>
                 </div>
             </div>
@@ -56,13 +62,13 @@
                         ng-model="$parent.attachments[row.rowname].pubblicazioneTrasparenza"
                         off-label="Non pubblicare"
                         on-label="Pubblica"
-                        is-disabled="metadatiDisabilitati || pubblicazioneTrasparenzaDisabled">
+                        is-disabled="pubblicazioneDisabilitato">
                     </toggle-switch>
                 </div>
             </div>
         </div>
 
-        <div ng-if="metadatiProtocollo || row.modifica">
+        <div ng-if="metadatiProtocollo">
             <div class="row form-group">
                 <div class="col-md-5">
                     Protocollo
@@ -74,7 +80,7 @@
                         off-label="Non Protocollato"
                         on-label="Protocollato"
                         ng-click="onClickProtocollo(row);"
-                        is-disabled="metadatiDisabilitati || protocolloDisabled">
+                        is-disabled="protocolloDisabilitato">
                     </toggle-switch>
                 </div>
             </div>
@@ -82,11 +88,11 @@
             <div class="row form-group">
                 <div class="col-md-5" ng-if="$parent.attachments[row.rowname].protocollo">
                     <label>Data protocollo</label>
-                    <input type="date" class="form-control" ng-model="$parent.attachments[row.rowname].dataprotocollo" ng-readonly="metadatiDisabilitati || protocolloDettagliDisabled" required>
+                    <input type="date" class="form-control" ng-model="$parent.attachments[row.rowname].dataProtocollo" ng-readonly="protocolloDisabilitato" required>
                 </div>
                 <div class="col-md-7" ng-if="$parent.attachments[row.rowname].protocollo">
                     <label>Numero protocollo</label>
-                    <input type="text" class="form-control" ng-model="$parent.attachments[row.rowname].numeroprotocollo" ng-readonly="metadatiDisabilitati || protocolloDettagliDisabled" required>
+                    <input type="text" class="form-control" ng-model="$parent.attachments[row.rowname].numeroProtocollo" ng-readonly="protocolloDisabilitato" required>
                 </div>
             </div>
 
