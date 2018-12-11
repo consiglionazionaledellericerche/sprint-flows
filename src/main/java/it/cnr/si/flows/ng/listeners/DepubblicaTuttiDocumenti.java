@@ -37,7 +37,7 @@ public class DepubblicaTuttiDocumenti implements ExecutionListener {
 				if (entry.getValue() instanceof FlowsAttachment) {
 					FlowsAttachment allegato = (FlowsAttachment) entry.getValue();
 					LOGGER.info("depubblico: " + allegato.getFilename() + "(" + entry.getKey() + ") per il flusso: " + execution.getId() );
-					attachmentService.setPubblicabile(execution.getId(), entry.getKey(), false);
+					attachmentService.setPubblicabileTrasparenza(execution.getId(), entry.getKey(), false);
 				}				
 			}
 		}

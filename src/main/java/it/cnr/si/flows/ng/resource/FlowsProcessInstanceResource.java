@@ -44,7 +44,8 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
-import static it.cnr.si.flows.ng.utils.Enum.Stato.Pubblicato;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.PubblicatoTrasparenza;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.PubblicatoUrp;
 import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
 import static it.cnr.si.flows.ng.utils.Utils.DESC;
 
@@ -100,7 +101,7 @@ public class FlowsProcessInstanceResource {
 
             if (value instanceof FlowsAttachment) {
                 FlowsAttachment attachment = (FlowsAttachment) value;
-                if (attachment.getStati().contains(Pubblicato)) {
+                if (attachment.getStati().contains(PubblicatoTrasparenza)) {
 
                     Map<String, Object> metadatiDocumento = new HashMap<>();
                     metadatiDocumento.put("filename", attachment.getFilename());

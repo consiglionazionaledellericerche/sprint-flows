@@ -454,6 +454,13 @@ input.ng-touched.ng-invalid, button.ng-touched.ng-invalid, textarea.ng-touched.n
   background-color: #5cb85c;
 }
 
+.label-PubblicatoTrasparenza {
+  background-color: #5cb85c;
+}
+
+.label-PubblicatoUrp {
+  background-color: #ff8000;
+}
 /* START SPINNER */
 @-moz-keyframes sprint-loader {
   0% {
