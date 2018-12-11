@@ -21,6 +21,8 @@ public class FlowsAttachment implements Serializable {
             this.metadati = new HashMap<>();
         return this.metadati;
     }
+
+    private String label;
     private String filename;
     private Date   time;
     private String taskId;
@@ -181,5 +183,13 @@ public class FlowsAttachment implements Serializable {
 
     public void setDataProtocollo(String dataProtocollo) {
         this.dataProtocollo = dataProtocollo;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 }

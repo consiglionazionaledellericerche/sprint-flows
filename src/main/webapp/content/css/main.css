@@ -424,6 +424,13 @@ input.ng-touched.ng-invalid, button.ng-touched.ng-invalid, textarea.ng-touched.n
     margin: 10px;
 }
 
+.cnr-descrizione-file {
+     border: 1px solid gold;
+     padding: 15px;
+     margin: 10px;
+ }
+
+
 .alerts .alert {
   box-shadow: 4px 4px 10px -3px rgba(0,0,0,0.75);
 }
