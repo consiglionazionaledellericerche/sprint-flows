@@ -246,7 +246,7 @@ public class FlowsAttachmentService {
                 att.addStato(PubblicatoTrasparenza);
                 att.setPubblicazioneTrasparenza(false);
 			} else {
-                att.setAzione(RimozioneDaPubblicazione);
+                att.setAzione(RimozioneDaPubblicazioneTrasparenza);
                 att.removeStato(PubblicatoTrasparenza);
                 att.setPubblicazioneTrasparenza(false);
 			}
@@ -262,7 +262,7 @@ public class FlowsAttachmentService {
                 att.addStato(PubblicatoUrp);
                 att.setPubblicazioneUrp(false);
 			} else {
-                att.setAzione(RimozioneDaPubblicazione);
+                att.setAzione(RimozioneDaPubblicazioneUrp);
                 att.removeStato(PubblicatoUrp);
                 att.setPubblicazioneUrp(false);
 			}
