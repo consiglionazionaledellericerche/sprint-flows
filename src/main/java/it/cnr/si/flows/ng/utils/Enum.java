@@ -69,7 +69,8 @@ public class Enum {
         Validazione,
         Annullo,
         Sostituzione,
-        RimozioneDaPubblicazione
+        RimozioneDaPubblicazioneTrasparenza,
+        RimozioneDaPubblicazioneUrp
     }
 
 

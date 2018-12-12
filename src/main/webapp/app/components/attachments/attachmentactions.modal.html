@@ -5,19 +5,32 @@
 
   <div class="row" ng-if="canPublish">
     <div class="col-md-12">
-      <h4>Pubblica Documento</h4>
+      <h4>Pubblica Documento in Trasparenza</h4>
       <div class="btn-group">
         <p>
           Stato attuale del documento:
           <span ng-if="vm.attachment.stati.indexOf('PubblicatoTrasparenza') == -1">Non</span>
-          Pubblico
+          Pubblico in Trasparenza
         <p>
-          <button type="button" ng-if="vm.attachment.stati.indexOf('PubblicatoTrasparenza') == -1" class="btn btn-success btn-sm" ng-click="pubblicaDocumento(true)"><span class="glyphicon glyphicon-eye-open"></span> Pubblica in Trasparenza</button>
-          <button type="button" ng-if="vm.attachment.stati.indexOf('PubblicatoTrasparenza') !== -1" class="btn btn-danger btn-sm" ng-click="pubblicaDocumento(false)"><span class="glyphicon glyphicon-eye-closez"></span> Rimuovi da Trasparenza</button>
+          <button type="button" ng-if="vm.attachment.stati.indexOf('PubblicatoTrasparenza') == -1" class="btn btn-success btn-sm" ng-click="pubblicaDocumentoTrasparenza(true)"><span class="glyphicon glyphicon-eye-open"></span> Pubblica in Trasparenza</button>
+          <button type="button" ng-if="vm.attachment.stati.indexOf('PubblicatoTrasparenza') !== -1" class="btn btn-danger btn-sm" ng-click="pubblicaDocumentoTrasparenza(false)"><span class="glyphicon glyphicon-eye-closez"></span> Rimuovi da Trasparenza</button>
       </div>
     </div>
   </div>
-
+  <div class="row" ng-if="canPublish">
+    <div class="col-md-12">
+      <h4>Pubblica Documento in Urp</h4>
+      <div class="btn-group">
+        <p>
+          Stato attuale del documento:
+          <span ng-if="vm.attachment.stati.indexOf('PubblicatoUrp') == -1">Non</span>
+          Pubblico in Urp
+        <p>
+          <button type="button" ng-if="vm.attachment.stati.indexOf('PubblicatoUrp') == -1" class="btn btn-success btn-sm" ng-click="pubblicaDocumentoUrp(true)"><span class="glyphicon glyphicon-eye-open"></span> Pubblica in Urp</button>
+          <button type="button" ng-if="vm.attachment.stati.indexOf('PubblicatoUrp') !== -1" class="btn btn-danger btn-sm" ng-click="pubblicaDocumentoUrp(false)"><span class="glyphicon glyphicon-eye-closez"></span> Rimuovi da Urp</button>
+      </div>
+    </div>
+  </div>
   <div class="row" ng-if="canUpdateAttachments">
     <div class="col-md-12">
       <h4>Aggiorna Documento</h4>

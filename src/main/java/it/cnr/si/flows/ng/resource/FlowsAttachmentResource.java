@@ -212,7 +212,7 @@ public class FlowsAttachmentResource {
         getAttachment(response, processInstanceId, attachmentName);
     }
 
-    @RequestMapping(value = "{processInstanceId}/{attachmentName}/pubblica", method = RequestMethod.POST)
+    @RequestMapping(value = "{processInstanceId}/{attachmentName}/pubblicaTrasparenza", method = RequestMethod.POST)
     @ResponseBody
     @Secured(AuthoritiesConstants.USER)
     @PreAuthorize("@permissionEvaluator.canPublishAttachment(#processInstanceId)")
@@ -224,6 +224,21 @@ public class FlowsAttachmentResource {
             @RequestParam("pubblica") boolean pubblica ) {
 
         flowsAttachmentService.setPubblicabileTrasparenza(processInstanceId, attachmentName, pubblica);
+
+    }
+
+    @RequestMapping(value = "{processInstanceId}/{attachmentName}/pubblicaUrp", method = RequestMethod.POST)
+    @ResponseBody
+    @Secured(AuthoritiesConstants.USER)
+    @PreAuthorize("@permissionEvaluator.canPublishAttachment(#processInstanceId)")
+    @Timed
+    public void setPubblicabileUrp(
+            HttpServletResponse response,
+            @PathVariable("processInstanceId") String processInstanceId,
+            @PathVariable("attachmentName") String attachmentName,
+            @RequestParam("pubblica") boolean pubblica ) {
+
+        flowsAttachmentService.setPubblicabileUrp(processInstanceId, attachmentName, pubblica);
 
     }
 }

@@ -13,11 +13,11 @@
 
     vm.attachment = attachment;
 
-    vm.pubblicato = vm.attachment.stati.indexOf("Pubblicato") >= 0;
+    vm.pubblicatoTrasparenza = vm.attachment.stati.indexOf("PubblicatoTrasparenza") >= 0;
     $scope.data = {};
 
-    $scope.pubblicaDocumento = function(flag) {
-      dataService.attachments.pubblicaDocumento(processInstanceId, attachment.name, flag)
+    $scope.pubblicaDocumentoTrasparenza = function(flag) {
+      dataService.attachments.pubblicaDocumentoTrasparenza(processInstanceId, attachment.name, flag)
       .then(function() {
         $scope.loadAttachments();
         $uibModalInstance.close();
@@ -26,6 +26,20 @@
         console.log("error")
       })
     }
+    
+    vm.pubblicatoUrp = vm.attachment.stati.indexOf("PubblicatoUrp") >= 0;
+    $scope.data = {};
+    
+    $scope.pubblicaDocumentoUrp = function(flag) {
+        dataService.attachments.pubblicaDocumentoUrp(processInstanceId, attachment.name, flag)
+        .then(function() {
+          $scope.loadAttachments();
+          $uibModalInstance.close();
+          AlertService.success("Richiesta completata con successo");
+        }, function() {
+          console.log("error")
+        })
+      }
 
     $scope.submitAggiornaDocumento = function(file) {
 

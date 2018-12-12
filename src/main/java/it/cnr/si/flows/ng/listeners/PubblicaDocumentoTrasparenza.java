@@ -13,18 +13,17 @@ import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 
 @Component
-public class PubblicaDocumento implements ExecutionListener {
+public class PubblicaDocumentoTrasparenza implements ExecutionListener {
 
     private static final long serialVersionUID = -56001764662303256L;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PubblicaDocumento.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PubblicaDocumentoTrasparenza.class);
     
     @Inject
     private FlowsAttachmentService attachmentService;
     
     private Expression nomeFileDaPubblicare;
     private Expression fileDaPubblicareFlag;
-    private Expression destinazionePubblicazione;
 
 
     @Override
@@ -33,18 +32,11 @@ public class PubblicaDocumento implements ExecutionListener {
             throw new IllegalStateException("Questo Listener ha bisogno del campo 'nomeFileDaPubblicare' nella process definition (nel Task Listener - Fields).");
         if (fileDaPubblicareFlag.getValue(execution) == null)
             throw new IllegalStateException("Questo Listener ha bisogno del campo 'fileDaPubblicareFlag' nella process definition (nel Task Listener - Fields).");
-        if (destinazionePubblicazione.getValue(execution) == null)
-            throw new IllegalStateException("Questo Listener ha bisogno del campo 'destinazionePubblicazione' nella process definition (nel Task Listener - Fields).");
+
 
         String nomeVariabileFile = (String) nomeFileDaPubblicare.getValue(execution);
         Boolean flagPubblicazione =  Boolean.parseBoolean((String) fileDaPubblicareFlag.getValue(execution));
-        String destinazione = (String) destinazionePubblicazione.getValue(execution);
-        if (destinazione.equals("Trasparenza")) {
-            attachmentService.setPubblicabileTrasparenza(execution.getId(), nomeVariabileFile, flagPubblicazione);
-        } else {
-            attachmentService.setPubblicabileUrp(execution.getId(), nomeVariabileFile, flagPubblicazione);
-
-        }
+        attachmentService.setPubblicabileTrasparenza(execution.getId(), nomeVariabileFile, flagPubblicazione);
     }
 
 }
