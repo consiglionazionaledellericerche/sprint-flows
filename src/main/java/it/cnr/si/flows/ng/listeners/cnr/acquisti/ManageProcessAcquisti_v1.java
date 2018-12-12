@@ -283,8 +283,8 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			attachmentService.setPubblicabileTrasparenza(execution.getId(), "esitoValutazioneAnomalie", true);
 			attachmentService.setPubblicabileTrasparenza(execution.getId(), "elencoDitteInvitate", true);
 			attachmentService.setPubblicabileTrasparenza(execution.getId(), "elencoVerbali", true);
-			pubblicaFileMultipliPubblicabili(execution, "bandoAvvisi", true);
-			pubblicaFileMultipliPubblicabili(execution, "letteraInvito", true);
+			attachmentService.setPubblicabileTrasparenza(execution.getId(), "bandoAvvisi", true);
+			attachmentService.setPubblicabileTrasparenza(execution.getId(), "letteraInvito", true);
 			pubblicaFilePubblicabili(execution, true);
 		};break;	
 
