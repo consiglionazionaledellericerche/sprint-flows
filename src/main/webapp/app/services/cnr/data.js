@@ -109,6 +109,12 @@
                 pubblicaDocumento: function(processInstanceId, attachmentName, flag) {
                     return $http.post('/api/attachments/' + processInstanceId + '/' + attachmentName + '/pubblica?pubblica=' + flag);
                 },
+            	pubblicaDocumentoTrasparenza: function(processInstanceId, attachmentName, flag) {
+                    return $http.post('/api/attachments/' + processInstanceId + '/' + attachmentName + '/pubblicaTrasparenza?pubblica=' + flag);
+                },
+            	pubblicaDocumentoUrp: function(processInstanceId, attachmentName, flag) {
+                    return $http.post('/api/attachments/' + processInstanceId + '/' + attachmentName + '/pubblicaUrp?pubblica=' + flag);
+                },
             },
             definitions: {
                 all: function() {
