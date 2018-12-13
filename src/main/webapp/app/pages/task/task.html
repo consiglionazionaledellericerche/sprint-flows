@@ -4,27 +4,20 @@
     <h3>{{vm.definition.name}}</h3>
     <p class="text-muted">{{vm.definition.description}}</p>
 
-    <div class="col-xs-4">
-      METADATI
+    <div class="col-xs-8">
       <ul class="list-unstyled">
+        <li><h3>{{vm.taskVariables.key}}</h3></li>
+        <li><h4>Fase: <strong>{{data.entity.name}}</strong></h4></li>
         <li>Titolo: <strong>{{vm.taskVariables.titolo}}</strong></li>
         <li>Descrizione: <strong>{{vm.taskVariables.descrizione}}</strong></li>
         <li>Avviato il <strong>{{vm.taskVariables.startDate | data}}</strong> da <strong>{{vm.taskVariables.initiator}}</strong></li>
-        <li>Fase: <strong>{{vm.data.entity.name}}</strong></li>
-        <ng-include src="vm.detailsView"/>
       </ul>
     </div>
 
     <div class="col-xs-4">
-      DOCUMENTI
-      <attachments task-id="{{vm.taskId}}"
-                   attachments="{{attachments}}" show-history="false"/>
-    </div>
-
-    <div class="col-xs-4">
-      DIAGRAMMA
+      DIAGRAMMA<br>
       <a ng-click="openDiagramModal(vm.diagramUrl)">
-        <img class="img-bordered" ng-src="{{vm.diagramUrl}}" title="{{vm.definition.name}}" style="max-width: 100%"/>
+        <img class="img-bordered" ng-src="{{vm.diagramUrl}}" title="{{vm.definition.name}}" style="max-width: 100%; max-height: 100px;"/>
       </a>
     </div>
   </div>
@@ -69,5 +62,6 @@
   <!--   <pre ng-if="!isDevelopment">{{taskForm | json}}</pre> -->
   <pre ng-if="isDevelopment">{{attachments | json}}</pre>
   <pre ng-if="isDevelopment">{{data | json}}</pre>
+  <pre ng-if="isDevelopment">{{vm | json}}</pre>
   <pre ng-if="isDevelopment">{{taskForm | json}}</pre>
 </div>

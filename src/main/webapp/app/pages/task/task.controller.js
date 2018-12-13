@@ -36,7 +36,6 @@
  		$scope.processDefinitionKey = $scope.data.processDefinitionId.split(":")[0];
  		$scope.processVersion = $scope.data.processDefinitionId.split(":")[1];
  		$scope.attachments = {};
- 		vm.detailsView = 'api/views/' + $scope.processDefinitionKey + '/' + $scope.processVersion + '/detail';
 
  		// Ho bisogno di caricare piu' risorse contemporaneamente (form e data);
  		// quando sono finite entrambe, autofillo la form

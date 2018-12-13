@@ -343,6 +343,7 @@ public class FlowsTaskService {
 
 					data.put(initiator.name(), username);
 					data.put(startDate.name(), new Date());
+					data.put("key", key);
 
 					ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
 					runtimeService.setVariable(instance.getId(), "processInstanceId", instance.getId());
