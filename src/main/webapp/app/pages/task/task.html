@@ -6,11 +6,10 @@
 
     <div class="col-xs-8">
       <ul class="list-unstyled">
-        <li><h3>{{vm.taskVariables.key}}</h3></li>
-        <li><h4>Fase: <strong>{{data.entity.name}}</strong></h4></li>
-        <li>Titolo: <strong>{{vm.taskVariables.titolo}}</strong></li>
-        <li>Descrizione: <strong>{{vm.taskVariables.descrizione}}</strong></li>
-        <li>Avviato il <strong>{{vm.taskVariables.startDate | data}}</strong> da <strong>{{vm.taskVariables.initiator}}</strong></li>
+        <li><h3><strong>{{vm.taskVariables.key}} [{{data.entity.name}}]</strong></h3></li>
+        <li class="text-left" >Titolo: <strong>{{vm.taskVariables.titolo}}</strong></li>
+        <li class="text-left" >Descrizione: <strong>{{vm.taskVariables.descrizione}}</strong></li>
+        <li class="text-left" >Avviato il <strong>{{vm.taskVariables.startDate | data}}</strong> da <strong>{{vm.taskVariables.initiator}}</strong></li>
       </ul>
     </div>
 
