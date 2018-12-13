@@ -298,6 +298,10 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				}
 			} else {					
 				attachmentService.setPubblicabileTrasparenza(execution.getId(), "provvedimentoAggiudicazione", true);
+				FlowsAttachment provvedimentoAggiudicazioneFile = (FlowsAttachment) execution.getVariable("provvedimentoAggiudicazione");
+				if(provvedimentoAggiudicazioneFile.isPubblicazioneUrp()) {
+					attachmentService.setPubblicabileUrp(execution.getId(), "provvedimentoAggiudicazione", true);
+				}
 				pubblicaFilePubblicabili(execution, true);
 			}
 		};break;	
