@@ -33,7 +33,6 @@ public class FlowsAttachmentService {
 	public static final String STATO_SUFFIX = "_stato";
 	public static final String FILENAME_SUFFIX = "_filename";
 	public static final String MIMETYPE_SUFFIX = "_mimetype";
-	public static final String NEW_ATTACHMENT_PREFIX = "__new__";
 	public static final String ARRAY_SUFFIX_REGEX = "\\[\\d+\\]";
     public static final String NUMERI_PROTOCOLLO = "numeriProtocollo";
     public static final String NUMERI_PROTOCOLLO_SEPARATOR = "::";
@@ -57,7 +56,6 @@ public class FlowsAttachmentService {
 	 */
 	public void extractAttachmentVariables(MultipartHttpServletRequest req, Map<String, Object> data) throws IOException {
 		Map<String, FlowsAttachment> attachments = new HashMap<>();
-		Map<String, Integer> nextIndexTable = new HashMap<>();
 		String taskId, taskName;
 
 		if (req.getParameter("taskId") != null) {
@@ -68,11 +66,14 @@ public class FlowsAttachmentService {
 			taskName = "Avvio del flusso";
 		}
 
-		Iterator<String> i = req.getFileNames();
-		while (i.hasNext()) {
-			String fileName = i.next();
-			fileName = fileName.replace("_data", "");
-			FlowsAttachment att = extractSingleAttachment(req, nextIndexTable, taskId, taskName, fileName, data);
+		List<String> nomiFileDaInserire = Collections.list(req.getParameterNames()).stream()
+				.filter(name -> name.endsWith("_aggiorna"))
+                .filter(name -> "true".equals(req.getParameter(name)) )
+				.map(name -> name.replace("_aggiorna", ""))
+				.collect(Collectors.toList());
+
+		for (String fileName : nomiFileDaInserire ) {
+			FlowsAttachment att = extractSingleAttachment(req, taskId, taskName, fileName, data);
 			attachments.put(fileName, att);
 		}
 
@@ -82,33 +83,29 @@ public class FlowsAttachmentService {
         data.put(NUMERI_PROTOCOLLO, protocolliUniti);
 	}
 
-    private FlowsAttachment extractSingleAttachment(MultipartHttpServletRequest req, Map<String, Integer> nextIndexTable, String taskId, String taskName, String fileName, Map<String, Object> data) throws IOException {
-		MultipartFile file = req.getFile(fileName + "_data");
-        String username = SecurityUtils.getCurrentUserLogin();
+    private FlowsAttachment extractSingleAttachment(MultipartHttpServletRequest req, String taskId, String taskName, String fileName, Map<String, Object> data) throws IOException {
 
-        // TODO: seccare?
-		boolean hasPrefix = fileName.startsWith(NEW_ATTACHMENT_PREFIX);
-		if (hasPrefix) {
-			fileName = fileName.substring(NEW_ATTACHMENT_PREFIX.length());
-			fileName = fileName.replaceAll(ARRAY_SUFFIX_REGEX, "");
-			int index = getNextIndex(taskId, fileName, nextIndexTable);
-			fileName = fileName +"["+ index +"]";
-		}
-		// fine TODO
-
-		boolean nuovo = taskId.equals("start") || taskService.getVariable(taskId, fileName) == null;
 		LOGGER.info("inserisco come variabile il file {}", fileName);
+		boolean nuovo = taskId.equals("start") || taskService.getVariable(taskId, fileName) == null;
+        String username = SecurityUtils.getCurrentUserLogin();
+        FlowsAttachment att = null;
 
-		FlowsAttachment att = new FlowsAttachment();
+        if (nuovo)
+            att = new FlowsAttachment();
+        else
+		    att = taskService.getVariable(taskId, fileName, FlowsAttachment.class);
 
-        att.setName(fileName);
-		att.setFilename(file.getOriginalFilename());
+		MultipartFile file = req.getFile(fileName + "_data");
+		att.setName(fileName);
 		att.setTime(new Date());
 		att.setTaskId(taskId);
 		att.setTaskName(taskName);
 		att.setUsername(username);
-		att.setMimetype(getMimetype(file));
-		att.setBytes(file.getBytes());
+		if (file != null) {
+			att.setFilename(file.getOriginalFilename());
+			att.setMimetype(getMimetype(file));
+			att.setBytes(file.getBytes());
+		}
 
         att.setLabel(                  String.valueOf(data.remove(fileName+"_label")));
 		att.setPubblicazioneUrp(		"true".equals(data.remove(fileName+"_pubblicazioneUrp")));
@@ -169,7 +166,7 @@ public class FlowsAttachmentService {
 
 		int nextIndex = getNextIndexByProcessInstanceId(execution.getId(), arrayName);
 
-		execution.setVariable(arrayName +"["+ nextIndex +"]", att);
+		execution.setVariable(arrayName + nextIndex, att);
 	}
 
 	/**
@@ -180,35 +177,12 @@ public class FlowsAttachmentService {
 	 * invece se ne sto caricando uno nuovo, ho bisogno di sapere l'ultimo indice non ancora utilizzato
 	 */
 
-	public int getNextIndex(String taskId, String fileName, Map<String, Integer> nextIndexTable) {
-
-		Integer index = nextIndexTable.get(fileName);
-		if (index != null) {
-			nextIndexTable.put(fileName, index+1);
-			LOGGER.info("index gia' in tabella, restituisco {}", index);
-			return index;
-		} else {
-			if (taskId.equals("start")) {
-				nextIndexTable.put(fileName, 1);
-				return 0;
-			} else {
-				index = 0;
-				String variableName = fileName + "[" + index + "]";
-				while ( taskService.hasVariable(taskId, variableName) == true ) {
-					variableName = fileName + "[" + (++index) + "]";
-				}
-				nextIndexTable.put(fileName, index+1);
-				LOGGER.info("index non ancora in tabella, restituisco {}", index);
-				return index;
-			}
-		}
-	}
 
 	public int getNextIndexByProcessInstanceId(String processInstanceId, String fileName) {
 		int index = 0;
-		String variableName = fileName + "[" + index + "]";
+		String variableName = fileName + index;
 		while ( runtimeService.hasVariable(processInstanceId, variableName) == true ) {
-			variableName = fileName + "[" + (++index) + "]";
+			variableName = fileName + (++index);
 		}
 		return index;
 	}
