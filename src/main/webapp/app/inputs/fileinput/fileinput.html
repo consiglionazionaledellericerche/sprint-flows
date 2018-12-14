@@ -26,7 +26,7 @@
     <div class="well" ng-repeat="row in rows track by $index"
          ng-init="initRow(row, $index);">
 
-        <div ng-if="row.modifica">
+        <div ng-if="$parent.attachments[row.rowname].aggiorna != true">
             <h3>{{$parent.attachments[row.rowname].label}}</h3>
             <a
                     href
@@ -35,12 +35,14 @@
             </a>
             <div class="row form-group">
                 <div class="col-md-12">
-                    <button class="btn btn-primary" ng-click="row.modifica = !row.modifica;">Modifica</button>
+                    <button class="btn btn-primary" ng-click="$parent.attachments[row.rowname].aggiorna = true">
+                        <span class="glyphicon glyphicon-edit"></span> Modifica
+                    </button>
                 </div>
             </div>
         </div>
 
-        <div ng-if="!row.modifica">
+        <div ng-if="$parent.attachments[row.rowname].aggiorna">
 
             <div class="form-group" ng-if="label === undefined">
                 <label>Tipo Documento</label>
@@ -53,35 +55,41 @@
                 </div>
             </div>
 
-            <div ng-if="metadatiPubblicazione">
-                <div class="row form-group">
-                    <div class="col-md-5">
-                        Pubblicazione in URP
-                    </div>
-                    <div class="col-md-7">
-                        <toggle-switch
-                            class="switch-success btn-group btn-group-justified"
-                            ng-model="$parent.attachments[row.rowname].pubblicazioneUrp"
-                            off-label="Non pubblicare"
-                            on-label="Pubblica"
-                            is-disabled="pubblicazioneDisabilitato">
-                        </toggle-switch>
-                    </div>
+            <div class="row form-group" ng-show="row.modifica">
+                <div class="col-md-12">
+                    <button class="btn btn-primary" ng-click="$parent.attachments[row.rowname].aggiorna = false">
+                        <span class="glyphicon glyphicon-remove-sign"></span> Annulla Modifica
+                    </button>
                 </div>
+            </div>
 
-                <div class="row form-group">
-                    <div class="col-md-5">
-                        Pubblicazione in Trasparenza
-                    </div>
-                    <div class="col-md-7">
-                        <toggle-switch
-                            class="switch-success btn-group btn-group-justified"
-                            ng-model="$parent.attachments[row.rowname].pubblicazioneTrasparenza"
-                            off-label="Non pubblicare"
-                            on-label="Pubblica"
-                            is-disabled="pubblicazioneDisabilitato">
-                        </toggle-switch>
-                    </div>
+            <div class="row form-group" ng-if="metadatiPubblicazione || metadatiPubblicazioneUrp">
+                <div class="col-md-5">
+                    Pubblicazione in URP
+                </div>
+                <div class="col-md-7">
+                    <toggle-switch
+                        class="switch-success btn-group btn-group-justified"
+                        ng-model="$parent.attachments[row.rowname].pubblicazioneUrp"
+                        off-label="Non pubblicare"
+                        on-label="Pubblica"
+                        is-disabled="pubblicazioneDisabilitato || pubblicazioneUrpDisabilitato">
+                    </toggle-switch>
+                </div>
+            </div>
+
+            <div class="row form-group" ng-if="metadatiPubblicazione || metadatiPubblicazioneTrasparenza">
+                <div class="col-md-5">
+                    Pubblicazione in Trasparenza
+                </div>
+                <div class="col-md-7">
+                    <toggle-switch
+                        class="switch-success btn-group btn-group-justified"
+                        ng-model="$parent.attachments[row.rowname].pubblicazioneTrasparenza"
+                        off-label="Non pubblicare"
+                        on-label="Pubblica"
+                        is-disabled="pubblicazioneDisabilitato || pubblicazioneTrasparenzaDisabilitato">
+                    </toggle-switch>
                 </div>
             </div>
 
@@ -131,7 +139,7 @@
                             name="$parent.attachments[row.rowname].data"
                             accept="{{accept}}"
                             ngf-multiple="false"
-                            ng-required="cnrRequired" >
+                            ng-required="cnrRequired || !row.modifica" >
                         <span ng-show="!$parent.attachments[row.rowname].data" class="glyphicon glyphicon-upload"></span>
                         <span ng-show="$parent.attachments[row.rowname].data" class="glyphicon glyphicon-repeat"></span>
                         <span ng-show="!$parent.attachments[row.rowname].data">Seleziona File</span>
