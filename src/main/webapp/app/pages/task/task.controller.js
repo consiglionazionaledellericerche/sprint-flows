@@ -94,7 +94,7 @@
  				// Non posso usare angular.copy() perche' ho degli oggetti File non gestiti bene
                 for (var attName in $scope.attachments) {
                     var att = $scope.attachments[attName];
-                    if (att.data) { // non copiare allegati non aggiornati
+                    if (att.aggiorna) { // non copiare allegati non aggiornati
                         for (var property in att) {
                             $scope.data[attName +"_"+ property] = att[property];
                         }

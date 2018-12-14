@@ -29,11 +29,15 @@
                 multiple: '=?',                     // se ci saranno piu' file
                 cnrRequired: '=?',                  // tendenzialmente true
                 metadatiPubblicazione: '=?',        // se visualizzare gli slider per Urp e Trasparenza
+                metadatiPubblicazioneUrp: '=?',
+                metadatiPubblicazioneTrasparenza: '=?',
                 metadatiProtocollo: '=?',           // se visualizzare lo slider per il Protocollo
                 pubblicazioneUrp: '=?',             // impostare manualmente il valore, lo slider sara' disabilitato
                 pubblicazioneTrasparenza: '=?',     // impostare manualmente il valore, lo slider sara' disabilitato
                 protocollo: '=?',                   // impostare manualmente il valore, lo slider sara' disabilitato
                 pubblicazioneDisabilitato: '=?',    // disabilitare gli slider di pubblicazione senza impostare i valori
+                pubblicazioneUrpDisabilitato: '=?',    // disabilitare gli slider di pubblicazione senza impostare i valori
+                pubblicazioneTrasparenzaDisabilitato: '=?',    // disabilitare gli slider di pubblicazione senza impostare i valori
                 protocolloDisabilitato: '=?'        // disabilitare gli slider di protocollo senza impostare i valori
             },
             link: function ($scope, element, attrs) {
@@ -56,7 +60,11 @@
                                 $scope.rows.push({});
                         }
                     } else {
-                        $scope.rows = [{}]
+                        $scope.rows = [{}];
+                        if (!$scope.$parent.attachments[$scope.name]) {
+                            $scope.$parent.attachments[$scope.name] = {};
+                            $scope.$parent.attachments[$scope.name].aggiorna = true;
+                        }
                     }
 
                     $scope.min = $scope.min || $scope.rows.length || 0;
@@ -69,6 +77,8 @@
                 $scope.addRow = function() {
                     if ($scope.rows.length < $scope.max)
                         $scope.rows.push({});
+                    $scope.$parent.attachments[$scope.name+($scope.rows.length-1)] = {};
+                    $scope.$parent.attachments[$scope.name+($scope.rows.length-1)].aggiorna = true;
                     return false;
                 };
                 $scope.removeRow = function() {
