@@ -139,7 +139,7 @@
                             name="$parent.attachments[row.rowname].data"
                             accept="{{accept}}"
                             ngf-multiple="false"
-                            ng-required="cnrRequired || !row.modifica" >
+                            ng-required="cnrRequired" >
                         <span ng-show="!$parent.attachments[row.rowname].data" class="glyphicon glyphicon-upload"></span>
                         <span ng-show="$parent.attachments[row.rowname].data" class="glyphicon glyphicon-repeat"></span>
                         <span ng-show="!$parent.attachments[row.rowname].data">Seleziona File</span>
