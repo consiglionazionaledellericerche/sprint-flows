@@ -132,10 +132,11 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 					|| documentoCorrente.getName().equals("letteraInvito")
 					|| documentoCorrente.getName().equals("provvedimentoAmmessiEsclusi")
 					|| documentoCorrente.getName().equals("provvedimentoNominaCommissione")
+					|| documentoCorrente.getName().equals("provvedimentoAggiudicazione")
 					|| documentoCorrente.getName().equals("elencoVerbali")
 					|| documentoCorrente.getName().equals("modificheVariantiArt106")
 					|| documentoCorrente.getName().equals("avvisoPostInformazione"))
-					&& !documentoCorrente.getStati().toString().contains("PubblicatoTrasparenza")) {
+					&& (!documentoCorrente.getStati().toString().contains("PubblicatoTrasparenza"))) {
 				nrFilesMancanti = nrFilesMancanti +1;
 				errorMessage = errorMessage + " - " + documentoCorrente.getName();					
 			}
