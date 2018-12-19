@@ -2,6 +2,7 @@ package it.cnr.si.flows.ng.listeners.cnr.acquisti;
 
 
 
+import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
@@ -48,8 +49,13 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 	private AcquistiService acquistiService;
 	@Inject
 	private FlowsPdfService flowsPdfService;
+	@Inject
+	private RuntimeService runtimeService;
+	@Inject
+	private FlowsAttachmentService flowsAttachmentService;
 
 	private Expression faseEsecuzione;
+	private FlowsAttachment attachment;
 
 	public void pubblicaFilePubblicabili(DelegateExecution execution, Boolean pubblicaFlag) {
 		for (int i = 0; i < 1000; i++) {
@@ -259,21 +265,31 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 
 		// START CONSUNTIVO  
 		case "consuntivo-start": {
+			String nomeFile="avvisoPostInformazione";
+			String labelFile="Avviso di Post-Informazione";
 			acquistiService.ProponiDittaAggiudicataria(execution);
-			flowsPdfService.makePdf("avvisoPostInformazione", processInstanceId);
+			flowsPdfService.makePdf(nomeFile, processInstanceId);
+			FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
+			documentoGenerato.setLabel(labelFile);
+			documentoGenerato.setPubblicazioneTrasparenza(true);
+			flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato);
+
 		};break;
 		case "consuntivo-end": {
-			attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);
-			attachmentService.setPubblicabileTrasparenza(execution.getId(), "avvisoPostInformazione", true);
-			attachmentService.setPubblicabileTrasparenza(execution.getId(), "modificheVariantiArt106", true);
-			if ( execution.getVariable("importoTotaleNetto") != null && Double.compare(Double.parseDouble(execution.getVariable("importoTotaleNetto").toString()), 1000000) > 0) {
-				attachmentService.setPubblicabileTrasparenza(execution.getId(), "stipula", true);
-			}
-			if(execution.getVariable("numeroProtocollo_stipula") != null) {
-				protocolloDocumentoService.protocollaDocumento(execution, "stipula", execution.getVariable("numeroProtocollo_stipula").toString(), execution.getVariable("dataProtocollo_stipula").toString());
-			}
-			if(execution.getVariable("numeroProtocollo_contratto") != null) {
-				protocolloDocumentoService.protocollaDocumento(execution, "contratto", execution.getVariable("numeroProtocollo_contratto").toString(), execution.getVariable("dataProtocollo_contratto").toString());
+			if(sceltaUtente != null && !sceltaUtente.equals("RevocaConProvvedimento")) {
+				pubblicaTuttiFilePubblicabili(execution);
+				attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);
+				//attachmentService.setPubblicabileTrasparenza(execution.getId(), "avvisoPostInformazione", true);
+				//attachmentService.setPubblicabileTrasparenza(execution.getId(), "modificheVariantiArt106", true);
+				if ( execution.getVariable("importoTotaleNetto") != null && Double.compare(Double.parseDouble(execution.getVariable("importoTotaleNetto").toString()), 1000000) > 0) {
+					attachmentService.setPubblicabileTrasparenza(execution.getId(), "stipula", true);
+				}
+				if(execution.getVariable("numeroProtocollo_stipula") != null) {
+					protocolloDocumentoService.protocollaDocumento(execution, "stipula", execution.getVariable("numeroProtocollo_stipula").toString(), execution.getVariable("dataProtocollo_stipula").toString());
+				}
+				if(execution.getVariable("numeroProtocollo_contratto") != null) {
+					protocolloDocumentoService.protocollaDocumento(execution, "contratto", execution.getVariable("numeroProtocollo_contratto").toString(), execution.getVariable("dataProtocollo_contratto").toString());
+				}
 			}
 		};break; 
 		case "end-stipulato-start": {
