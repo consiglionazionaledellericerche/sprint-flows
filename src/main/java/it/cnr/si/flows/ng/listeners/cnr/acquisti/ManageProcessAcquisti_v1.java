@@ -10,6 +10,7 @@ import org.activiti.engine.delegate.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
@@ -276,6 +277,8 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			}
 		};break; 
 		case "end-stipulato-start": {
+			pubblicaTuttiFilePubblicabili(execution);
+			controllaFilePubblicabiliTrasparenza(execution);
 			execution.setVariable(STATO_FINALE_DOMANDA, "STIPULATO");
 		};break;     
 		case "end-stipulato-end": {
@@ -424,11 +427,6 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			}
 
 		};break;	
-		case "end-stipulato": {
-			pubblicaTuttiFilePubblicabili(execution);
-			controllaFilePubblicabiliTrasparenza(execution);
-			execution.setVariable(STATO_FINALE_DOMANDA, "STIPULATO");
-		};break;  
 		case "end-revocato": {
 		};break;
 
