@@ -121,7 +121,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 	// FUNZIONE CHE CONTROLLA LA LISTA DEI SOCUMENTI CHE DEVONO ESSERE PUBBLICATI IN TRASPARENZA (SE PRESENTI DEVONO ESSERE PUBBLICATI ALTRIMENTI IL FLUSSO SI BLOCCA)
 	public void controllaFilePubblicabiliTrasparenza(DelegateExecution execution) {
 		Map<String, FlowsAttachment> attachmentList = attachmentService.getAttachementsForProcessInstance(execution.getProcessInstanceId());
-		String errorMessage = "il flusso non puù essere terminato perché i seguenti file devono risulare pubblicati in trasparenza:";
+		String errorMessage = "<b>il flusso non può essere terminato perché<br>i seguenti file devono risulare pubblicati in trasparenza:<br>";
 		int nrFilesMancanti = 0;
 		for (String key : attachmentList.keySet()) {
 			FlowsAttachment documentoCorrente = attachmentList.get(key);
@@ -136,13 +136,13 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 					|| documentoCorrente.getName().equals("elencoVerbali")
 					|| documentoCorrente.getName().equals("modificheVariantiArt106")
 					|| documentoCorrente.getName().equals("avvisoPostInformazione"))
-					&& (!documentoCorrente.getStati().toString().contains("PubblicatoTrasparenza"))) {
+					& (!documentoCorrente.getStati().toString().contains("PubblicatoTrasparenza"))) {
 				nrFilesMancanti = nrFilesMancanti +1;
 				errorMessage = errorMessage + " - " + documentoCorrente.getName();					
 			}
 		}
 		if (nrFilesMancanti>0) {
-			throw new BpmnError("500", errorMessage);
+			throw new BpmnError("500", errorMessage+"</b><br>");
 		}
 
 	}
@@ -274,8 +274,6 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			if(execution.getVariable("numeroProtocollo_contratto") != null) {
 				protocolloDocumentoService.protocollaDocumento(execution, "contratto", execution.getVariable("numeroProtocollo_contratto").toString(), execution.getVariable("dataProtocollo_contratto").toString());
 			}
-			pubblicaTuttiFilePubblicabili(execution);
-			controllaFilePubblicabiliTrasparenza(execution);
 		};break; 
 		case "end-stipulato-start": {
 			execution.setVariable(STATO_FINALE_DOMANDA, "STIPULATO");
@@ -427,6 +425,8 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 
 		};break;	
 		case "end-stipulato": {
+			pubblicaTuttiFilePubblicabili(execution);
+			controllaFilePubblicabiliTrasparenza(execution);
 			execution.setVariable(STATO_FINALE_DOMANDA, "STIPULATO");
 		};break;  
 		case "end-revocato": {
