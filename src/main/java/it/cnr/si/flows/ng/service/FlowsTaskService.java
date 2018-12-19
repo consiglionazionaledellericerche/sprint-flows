@@ -395,7 +395,7 @@ public class FlowsTaskService {
 					taskService.deleteUserIdentityLink(taskId, username, TASK_EXECUTOR);
 					return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(mapOf(ERROR_MESSAGE, errorMessage));
 				} else {
-					String errorMessage = String.format("Errore durante il tentativo di completamento del task %s da parte dell'utente %s: %s", taskId, username, e.getMessage());
+					String errorMessage = String.format("%s<br>Errore durante il tentativo di completamento del task %s da parte dell'utente %s", e.getMessage(), taskId, username);
 					LOGGER.error(errorMessage);
 					taskService.deleteUserIdentityLink(taskId, username, TASK_EXECUTOR);
 					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mapOf(ERROR_MESSAGE, errorMessage));}
