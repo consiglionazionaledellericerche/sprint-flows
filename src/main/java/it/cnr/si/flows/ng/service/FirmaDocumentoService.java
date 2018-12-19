@@ -56,15 +56,15 @@ public class FirmaDocumentoService {
             } catch (ArubaSignServiceException e) {
                 LOGGER.error("FIRMA NON ESEGUITA", e);
                 if (e.getMessage().indexOf("error code 0001") != -1) {
-                    textMessage = "controlla il formato del file sottopsto alla firma";
+                    textMessage = "controlla il formato del file sottopsto alla firma<br>";
                 } else if(e.getMessage().indexOf("error code 0003") != -1) {
-                    textMessage = "CREDENZIALI ERRATE";
+                    textMessage = "CREDENZIALI ERRATE<br>";
                 } else if(e.getMessage().indexOf("error code 0004") != -1) {
-                    textMessage = "PIN ERRATO";
+                    textMessage = "PIN ERRATO<br>";
                 } else {
-                    textMessage = "errore generico";
+                    textMessage = "errore generico<br>";
                 }
-                throw new BpmnError("500", "<b>firma non riuscita<br>" + textMessage + "</b>");
+                throw new BpmnError("500", "<b>FIRMA NON ESEGUITA<br>" + textMessage + "</b>");
             }
 
         }
