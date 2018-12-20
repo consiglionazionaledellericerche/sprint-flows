@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -174,6 +175,10 @@ public class FlowsAttachmentResource {
         attachmentService.setAttachmentProperties(file, null, "Fuori Task", attachmentName, data, false, username, att);
 
         flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, attachmentName, att);
+        if(att.isProtocollo()) {
+            String vecchiProtocolli = runtimeService.getVariable(processInstanceId, flowsAttachmentService.NUMERI_PROTOCOLLO, String.class);
+            flowsAttachmentService.addProtocollo(vecchiProtocolli, att.getNumeroProtocollo());
+        }
     }
 
     @RequestMapping(value = "{processInstanceId}/data/new", method = RequestMethod.POST)
@@ -195,6 +200,11 @@ public class FlowsAttachmentResource {
         att.setName(attachmentName);
 
         flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, attachmentName, att);
+
+        if(att.isProtocollo()) {
+            String vecchiProtocolli = runtimeService.getVariable(processInstanceId, flowsAttachmentService.NUMERI_PROTOCOLLO, String.class);
+            flowsAttachmentService.addProtocollo(vecchiProtocolli, att.getNumeroProtocollo());
+        }
     }
 
     @RequestMapping(value = "{variableId}/data", method = RequestMethod.GET)
