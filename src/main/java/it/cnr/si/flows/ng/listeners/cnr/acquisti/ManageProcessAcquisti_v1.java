@@ -81,10 +81,10 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			FlowsAttachment documentoCorrente = attachmentList.get(key);
 			LOGGER.info("Key = " + key + ", documentoCorrente = " + documentoCorrente);
 			if(documentoCorrente.isPubblicazioneUrp()) {
-				attachmentService.setPubblicabileUrp(execution.getId(), documentoCorrente.getName(), true);					
+				attachmentService.setPubblicabileUrp(execution.getProcessInstanceId(), documentoCorrente.getName(), true);					
 			}
 			if(documentoCorrente.isPubblicazioneTrasparenza()) {
-				attachmentService.setPubblicabileTrasparenza(execution.getId(), documentoCorrente.getName(), true);					
+				attachmentService.setPubblicabileTrasparenza(execution.getProcessInstanceId(), documentoCorrente.getName(), true);					
 			}
 		}
 	}
