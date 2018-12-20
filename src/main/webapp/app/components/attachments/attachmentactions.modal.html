@@ -13,7 +13,7 @@
           Pubblico in Trasparenza
         <p>
           <button type="button" ng-if="vm.attachment.stati.indexOf('PubblicatoTrasparenza') == -1" class="btn btn-success btn-sm" ng-click="pubblicaDocumentoTrasparenza(true)"><span class="glyphicon glyphicon-eye-open"></span> Pubblica in Trasparenza</button>
-          <button type="button" ng-if="vm.attachment.stati.indexOf('PubblicatoTrasparenza') !== -1" class="btn btn-danger btn-sm" ng-click="pubblicaDocumentoTrasparenza(false)"><span class="glyphicon glyphicon-eye-closez"></span> Rimuovi da Trasparenza</button>
+          <button type="button" ng-if="vm.attachment.stati.indexOf('PubblicatoTrasparenza') !== -1" class="btn btn-danger btn-sm" ng-click="pubblicaDocumentoTrasparenza(false)"><span class="glyphicon glyphicon-eye-close"></span> Rimuovi da Trasparenza</button>
       </div>
     </div>
   </div>
@@ -27,7 +27,7 @@
           Pubblico in Urp
         <p>
           <button type="button" ng-if="vm.attachment.stati.indexOf('PubblicatoUrp') == -1" class="btn btn-success btn-sm" ng-click="pubblicaDocumentoUrp(true)"><span class="glyphicon glyphicon-eye-open"></span> Pubblica in Urp</button>
-          <button type="button" ng-if="vm.attachment.stati.indexOf('PubblicatoUrp') !== -1" class="btn btn-danger btn-sm" ng-click="pubblicaDocumentoUrp(false)"><span class="glyphicon glyphicon-eye-closez"></span> Rimuovi da Urp</button>
+          <button type="button" ng-if="vm.attachment.stati.indexOf('PubblicatoUrp') !== -1" class="btn btn-danger btn-sm" ng-click="pubblicaDocumentoUrp(false)"><span class="glyphicon glyphicon-eye-close"></span> Rimuovi da Urp</button>
       </div>
     </div>
   </div>
@@ -36,7 +36,7 @@
       <h4>Aggiorna Documento</h4>
       <form novalidate class="flows-form" name="aggiornaDocumentoForm" ng-submit="submitAggiornaDocumento(picFile)">
 
-        <fileinput name="file" multiple=false cnr-required=true />
+        <fileinput name="{{vm.attachment.name}}" label="{{vm.attachment.label}}" multiple=false cnr-required=true />
         <button class="btn btn-primary" type="submit" ng-disabled="processDefinitionForm.$invalid">
           invia
           <span class="glyphicon glyphicon-arrow-right"></span>
@@ -48,5 +48,5 @@
   </div>
 </div>
 <div class="modal-footer">
-  <button class="btn btn-primary" type="button" ng-click="$dismiss()">Chiudi</button>
+  <button class="btn btn-primary" type="button" ng-click="$dismiss()"><span class="glyphicon glyphicon-remove"></span> Chiudi</button>
 </div>

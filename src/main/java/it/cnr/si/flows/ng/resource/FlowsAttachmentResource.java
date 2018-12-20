@@ -4,6 +4,7 @@ import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.service.FlowsTaskService;
+import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.FlowsUserDetailsService;
 import it.cnr.si.security.PermissionEvaluatorImpl;
@@ -160,14 +161,40 @@ public class FlowsAttachmentResource {
     @Secured(AuthoritiesConstants.USER)
     @PreAuthorize("@permissionEvaluator.canUpdateAttachment(#processInstanceId, @flowsUserDetailsService)")
     @Timed
-    public void setAttachment(@PathVariable("processInstanceId") String processInstanceId,
-                              @PathVariable("attachmentName") String attachmentName,
-                              MultipartHttpServletRequest request) throws IOException {
+    public void updateAttachment(@PathVariable("processInstanceId") String processInstanceId,
+                                 @PathVariable("attachmentName") String attachmentName,
+                                 MultipartHttpServletRequest request) throws IOException {
 
         Map<String, Object> data = FlowsTaskService.extractParameters(request);
-        FlowsAttachment attachment = attachmentService.extractSingleAttachment(request, null, "Fuori Task", "file", data);
+        String username = SecurityUtils.getCurrentUserLogin();
 
-        flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, attachmentName, attachment);
+        FlowsAttachment att = runtimeService.getVariable(processInstanceId, attachmentName, FlowsAttachment.class);
+        MultipartFile file = request.getFile(attachmentName + "_data");
+
+        attachmentService.setAttachmentProperties(file, null, "Fuori Task", attachmentName, data, false, username, att);
+
+        flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, attachmentName, att);
+    }
+
+    @RequestMapping(value = "{processInstanceId}/data/new", method = RequestMethod.POST)
+    @ResponseBody
+    @Secured(AuthoritiesConstants.USER)
+    @PreAuthorize("@permissionEvaluator.canUpdateAttachment(#processInstanceId, @flowsUserDetailsService)")
+    @Timed
+    public void uploadNewAttachment(@PathVariable("processInstanceId") String processInstanceId,
+                                 MultipartHttpServletRequest request) throws IOException {
+
+        Map<String, Object> data = FlowsTaskService.extractParameters(request);
+        String username = SecurityUtils.getCurrentUserLogin();
+
+        FlowsAttachment att = new FlowsAttachment();
+        MultipartFile file = request.getFile("newfile_data");
+        String attachmentName = "allegati"+ attachmentService.getNextIndexByProcessInstanceId(processInstanceId, "allegati");
+
+        attachmentService.setAttachmentProperties(file, null, "Fuori Task", "newfile", data, true, username, att);
+        att.setName(attachmentName);
+
+        flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, attachmentName, att);
     }
 
     @RequestMapping(value = "{variableId}/data", method = RequestMethod.GET)

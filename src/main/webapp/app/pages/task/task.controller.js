@@ -92,25 +92,6 @@
  				// Serializzo gli oggetti complessi in stringhe
  				// E' necessario copiarli in un nuovo campo, senno' angular si incasina
  				// Non posso usare angular.copy() perche' ho degli oggetti File non gestiti bene
-                for (var attName in $scope.attachments) {
-                    var att = $scope.attachments[attName];
-                    if (att.aggiorna) { // non copiare allegati non aggiornati
-                        for (var property in att) {
-                            $scope.data[attName +"_"+ property] = att[property];
-                        }
-                    }
-                }
-
- 				if (_.has($scope.data, 'entity')) {
- 					delete $scope.data.entity;
- 				}
-
- 				// aggiunto (&& obj[key].constructor.name !== 'Date') per non rendere json le date
- 				angular.forEach($scope.data, function(value, key, obj) {
- 					if (isObject(value) && key !== 'entity' && obj[key].constructor.name !== 'Date') {
- 						obj[key + "_json"] = JSON.stringify(value);
- 					}
- 				});
 
  				Upload.upload({
  					url: 'api/tasks/complete',
@@ -134,16 +115,6 @@
 
  		$scope.downloadFile = function(url, filename, mimetype) {
  			utils.downloadFile(url, filename, mimetype);
- 		}
-
- 		function isObject(value) {
- 			if (value === null ||
- 				typeof value !== 'object' ||
- 				Object.prototype.toString.call(value) === "[object File]" ||
- 				(Object.prototype.toString.call(value) === "[object Array]" && value.length > 0 && Object.prototype.toString.call(value[0]) === "[object File]"))
- 				return false;
-
- 			return true;
  		}
  	}
  })();
