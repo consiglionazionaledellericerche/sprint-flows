@@ -31,8 +31,9 @@
       </div>
     </div>
   </div>
+
   <div class="row" ng-if="canUpdateAttachments">
-    <div class="col-md-12">
+    <div class="col-md-12" ng-if="!vm.attachment.protocollo">
       <h4>Aggiorna Documento</h4>
       <form novalidate class="flows-form" name="aggiornaDocumentoForm" ng-submit="submitAggiornaDocumento(picFile)">
 
@@ -43,8 +44,72 @@
         </button>
 
       </form>
+    </div>
+
+    <div class="col-md-12" ng-if="vm.attachment.protocollo">
+      <h4>Aggiorna Documento Protocollato</h4>
+
+      <div class="col-lg-20 col-lg-offset-0 bg-info cnr-descrizione-task">I documenti protocollati non possono essere sostituiti allo stesso modo dei documenti non protocollati. Selezionare se inserire una RETTIFICA a un documento protocollato, o una SOSTITUZIONE di un nuovo file con un nuovo protocollo</div>
+
+        <div class="form-group text-center">
+          <label for="tipoModifica">Tipo Modifica</label>
+          <select id="tipoModifica" style="width: auto;" ng-model="data.tipoModifica">
+            <option value="sostituzione">Sostituzione</option>
+            <option value="rettifica">Rettifica</option>
+          </select>
+        </div>
+
+        <div class="row" ng-if="data.tipoModifica == 'sostituzione'">
+          <div class="col-md-12">
+            <form novalidate class="flows-form" name="aggiornaDocumentoForm" ng-submit="submitAggiornaDocumento(picFile)">
+              <fileinput
+                      name="{{vm.attachment.name}}"
+                      label="{{vm.attachment.label}}"
+                      multiple="false"
+                      cnr-required="true"
+                      metadati-protocollo="true"
+                      metadati-pubblicazione="true"
+                      pubblicazione-trasparenza="vm.attachment.pubblicazioneTrasparenza"
+                      pubblicazione-urp="vm.attachment.pubblicazioneUrp"
+                      pubblicazione-disabilitato="true"
+
+              />
+
+              <button class="btn btn-primary" type="submit" ng-disabled="processDefinitionForm.$invalid">
+                invia
+                <span class="glyphicon glyphicon-arrow-right"></span>
+              </button>
+            </form>
+          </div>
+        </div>
+
+      <div class="row" ng-if="data.tipoModifica == 'rettifica'">
+        <div class="col-md-12">
+          <form novalidate class="flows-form" name="aggiornaDocumentoForm" ng-submit="submitAggiornaDocumento(picFile)">
+            <fileinput
+                    name="{{vm.attachment.name}}_rettifica"
+                    label="Rettifica {{vm.attachment.label}}"
+                    multiple="false"
+                    cnr-required="true"
+                    metadati-protocollo="true"
+                    protocollo="true"
+                    metadati-pubblicazione="true"
+                    pubblicazione-trasparenza="vm.attachment.pubblicazioneTrasparenza"
+                    pubblicazione-urp="vm.attachment.pubblicazioneUrp"
+                    pubblicazione-disabilitato="true"
+
+            />
+
+            <button class="btn btn-primary" type="submit" ng-disabled="processDefinitionForm.$invalid">
+              invia
+              <span class="glyphicon glyphicon-arrow-right"></span>
+            </button>
+          </form>
+        </div>
+      </div>
 
     </div>
+
   </div>
 </div>
 <div class="modal-footer">
