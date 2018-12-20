@@ -25,7 +25,7 @@
 
     <div class="well" ng-repeat="row in rows track by $index"
          ng-init="initRow(row, $index);">
-
+        <pre>{{ $parent.attachments[row.rowname] | json }}</pre>
         <div ng-if="$parent.attachments[row.rowname].aggiorna != true">
             <h3>{{$parent.attachments[row.rowname].label}}</h3>
             <a
