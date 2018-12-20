@@ -96,7 +96,7 @@ public class FlowsTaskService {
 
 
 	// TODO magari un giorno avremo degli array, ma per adesso ce lo facciamo andare bene cosi'
-	private static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
+	public static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
 
 		Map<String, Object> data = new HashMap<>();
 		List<String> parameterNames = Collections.list(req.getParameterNames());

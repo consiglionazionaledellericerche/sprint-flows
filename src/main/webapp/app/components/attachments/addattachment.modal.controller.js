@@ -11,13 +11,13 @@
 
     var vm = this;
     vm.data = {processInstanceId: processInstanceId};
-    $scope.data = {};
+    $scope.attachments = {};
 
     $scope.submitDocumento = function(file) {
 
       Upload.upload({
-        url: 'api/attachments/'+ processInstanceId +'/'+ 'nuovoDocumento' +'/data',
-        data: $scope.data,
+        url: 'api/attachments/'+ processInstanceId +'/'+ 'nuovoDocumento' + '/data',
+        data: $scope.attachments,
       }).then(function (response) {
         $scope.loadAttachments();
         $uibModalInstance.close();

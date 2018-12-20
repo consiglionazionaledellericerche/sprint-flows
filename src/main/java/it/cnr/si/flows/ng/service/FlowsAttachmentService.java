@@ -48,6 +48,8 @@ public class FlowsAttachmentService {
 	private RuntimeService runtimeService;
 	@Inject
 	private HistoryService historyService;
+	@Inject
+	private FlowsAttachmentService attachmentService;
 
 	/**
 	 * Servizio che trasforma i multipart file in FlowsAttachment
@@ -83,7 +85,7 @@ public class FlowsAttachmentService {
         data.put(NUMERI_PROTOCOLLO, protocolliUniti);
 	}
 
-    private FlowsAttachment extractSingleAttachment(MultipartHttpServletRequest req, String taskId, String taskName, String fileName, Map<String, Object> data) throws IOException {
+    public FlowsAttachment extractSingleAttachment(MultipartHttpServletRequest req, String taskId, String taskName, String fileName, Map<String, Object> data) throws IOException {
 
 		LOGGER.info("inserisco come variabile il file {}", fileName);
 		boolean nuovo = taskId.equals("start") || taskService.getVariable(taskId, fileName) == null;
@@ -107,7 +109,7 @@ public class FlowsAttachmentService {
 			att.setBytes(file.getBytes());
 		}
 
-        att.setLabel(                  String.valueOf(data.remove(fileName+"_label")));
+		att.setLabel(                  String.valueOf(data.remove(fileName+"_label")));
 		att.setPubblicazioneUrp(		"true".equals(data.remove(fileName+"_pubblicazioneUrp")));
 		att.setPubblicazioneTrasparenza("true".equals(data.remove(fileName+"_pubblicazioneTrasparenza")));
 		att.setProtocollo(				"true".equals(data.remove(fileName+"_protocollo")));
