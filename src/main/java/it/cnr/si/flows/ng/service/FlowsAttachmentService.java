@@ -98,6 +98,14 @@ public class FlowsAttachmentService {
 		    att = taskService.getVariable(taskId, fileName, FlowsAttachment.class);
 
 		MultipartFile file = req.getFile(fileName + "_data");
+
+		setAttachmentProperties(file, taskId, taskName, fileName, data, nuovo, username, att);
+
+		return att;
+	}
+
+	public static void setAttachmentProperties(MultipartFile file, String taskId, String taskName, String fileName, Map<String, Object> data, boolean nuovo, String username, FlowsAttachment att) throws IOException {
+
 		att.setName(fileName);
 		att.setTime(new Date());
 		att.setTaskId(taskId);
@@ -127,8 +135,6 @@ public class FlowsAttachmentService {
 		} else {
 			att.setAzione(Aggiornamento);
 		}
-
-		return att;
 	}
 
 	public void saveAttachment(DelegateExecution execution, String variableName, FlowsAttachment att) {
