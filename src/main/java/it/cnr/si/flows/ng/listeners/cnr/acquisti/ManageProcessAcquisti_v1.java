@@ -2,6 +2,8 @@ package it.cnr.si.flows.ng.listeners.cnr.acquisti;
 
 
 
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
@@ -9,6 +11,7 @@ import org.activiti.engine.delegate.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
@@ -46,8 +49,13 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 	private AcquistiService acquistiService;
 	@Inject
 	private FlowsPdfService flowsPdfService;
+	@Inject
+	private RuntimeService runtimeService;
+	@Inject
+	private FlowsAttachmentService flowsAttachmentService;
 
 	private Expression faseEsecuzione;
+	private FlowsAttachment attachment;
 
 	public void pubblicaFilePubblicabili(DelegateExecution execution, Boolean pubblicaFlag) {
 		for (int i = 0; i < 1000; i++) {
@@ -63,6 +71,41 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				}
 			} else {
 				break;
+			}
+		}
+	}
+
+	public void pubblicaTuttiFilePubblicabili(DelegateExecution execution) {
+		Map<String, FlowsAttachment> attachmentList = attachmentService.getAttachementsForProcessInstance(execution.getProcessInstanceId());
+		for (String key : attachmentList.keySet()) {
+			FlowsAttachment documentoCorrente = attachmentList.get(key);
+			LOGGER.info("Key = " + key + ", documentoCorrente = " + documentoCorrente);
+			if(documentoCorrente.isPubblicazioneUrp()) {
+				attachmentService.setPubblicabileUrp(execution.getId(), documentoCorrente.getName(), true);					
+			}
+			if(documentoCorrente.isPubblicazioneTrasparenza()) {
+				attachmentService.setPubblicabileTrasparenza(execution.getId(), documentoCorrente.getName(), true);					
+			}
+		}
+	}
+	public void pubblicaFilePubblicabiliURP(DelegateExecution execution) {
+		Map<String, FlowsAttachment> attachmentList = attachmentService.getAttachementsForProcessInstance(execution.getProcessInstanceId());
+		for (String key : attachmentList.keySet()) {
+			FlowsAttachment documentoCorrente = attachmentList.get(key);
+			LOGGER.info("Key = " + key + ", documentoCorrente = " + documentoCorrente);
+			if(documentoCorrente.isPubblicazioneUrp()) {
+				attachmentService.setPubblicabileUrp(execution.getId(), documentoCorrente.getName(), true);					
+			}
+		}
+	}
+
+	public void pubblicaFilePubblicabiliTrasparenza(DelegateExecution execution) {
+		Map<String, FlowsAttachment> attachmentList = attachmentService.getAttachementsForProcessInstance(execution.getProcessInstanceId());
+		for (String key : attachmentList.keySet()) {
+			FlowsAttachment documentoCorrente = attachmentList.get(key);
+			LOGGER.info("Key = " + key + ", documentoCorrente = " + documentoCorrente);
+			if(documentoCorrente.isPubblicazioneTrasparenza()) {
+				attachmentService.setPubblicabileTrasparenza(execution.getId(), documentoCorrente.getName(), true);					
 			}
 		}
 	}
@@ -82,7 +125,34 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			}
 		}
 	}
+	// FUNZIONE CHE CONTROLLA LA LISTA DEI SOCUMENTI CHE DEVONO ESSERE PUBBLICATI IN TRASPARENZA (SE PRESENTI DEVONO ESSERE PUBBLICATI ALTRIMENTI IL FLUSSO SI BLOCCA)
+	public void controllaFilePubblicabiliTrasparenza(DelegateExecution execution) {
+		Map<String, FlowsAttachment> attachmentList = attachmentService.getAttachementsForProcessInstance(execution.getProcessInstanceId());
+		String errorMessage = "<b>il flusso non può essere terminato perché<br>i seguenti file devono risulare pubblicati in trasparenza:<br>";
+		int nrFilesMancanti = 0;
+		for (String key : attachmentList.keySet()) {
+			FlowsAttachment documentoCorrente = attachmentList.get(key);
+			LOGGER.info("Key = " + key + ", documentoCorrente = " + documentoCorrente.getFilename());
+			if((documentoCorrente.getName().equals("decisioneContrattare")  
+					|| documentoCorrente.getName().equals("modificheVariantiArt106")
+					|| documentoCorrente.getName().equals("bandoAvvisi")
+					|| documentoCorrente.getName().equals("letteraInvito")
+					|| documentoCorrente.getName().equals("provvedimentoAmmessiEsclusi")
+					|| documentoCorrente.getName().equals("provvedimentoNominaCommissione")
+					|| documentoCorrente.getName().equals("provvedimentoAggiudicazione")
+					|| documentoCorrente.getName().equals("elencoVerbali")
+					|| documentoCorrente.getName().equals("modificheVariantiArt106")
+					|| documentoCorrente.getName().equals("avvisoPostInformazione"))
+					& (!documentoCorrente.getStati().toString().contains("PubblicatoTrasparenza"))) {
+				nrFilesMancanti = nrFilesMancanti +1;
+				errorMessage = errorMessage + " - " + documentoCorrente.getName();					
+			}
+		}
+		if (nrFilesMancanti>0) {
+			throw new BpmnError("500", errorMessage+"</b><br>");
+		}
 
+	}
 	@Override
 	public void notify(DelegateExecution execution) throws Exception {
 		//(OivPdfService oivPdfService = new OivPdfService();
@@ -134,7 +204,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			if (execution.getVariable("strumentoAcquisizioneId") != null && execution.getVariable("strumentoAcquisizioneId").equals("23")) {
 				acquistiService.OrdinaElencoDitteCandidate(execution);
 			}
-			pubblicaFilePubblicabili(execution, true);
+			pubblicaTuttiFilePubblicabili(execution);
 		};break;
 		// START PROVVEDIMENTO-AGGIUDICAZIONE  
 		case "predisposizione-provvedimento-aggiudicazione-start": {
@@ -195,26 +265,36 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 
 		// START CONSUNTIVO  
 		case "consuntivo-start": {
+			String nomeFile="avvisoPostInformazione";
+			String labelFile="Avviso di Post-Informazione";
 			acquistiService.ProponiDittaAggiudicataria(execution);
-			flowsPdfService.makePdf("avvisoPostInformazione", processInstanceId);
+			flowsPdfService.makePdf(nomeFile, processInstanceId);
+			FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
+			documentoGenerato.setLabel(labelFile);
+			documentoGenerato.setPubblicazioneTrasparenza(true);
+			flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato);
+
 		};break;
 		case "consuntivo-end": {
-			attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);
-			attachmentService.setPubblicabileTrasparenza(execution.getId(), "avvisoPostInformazione", true);
-			attachmentService.setPubblicabileTrasparenza(execution.getId(), "modificheVariantiArt106", true);
-			if ( execution.getVariable("importoTotaleNetto") != null && Double.compare(Double.parseDouble(execution.getVariable("importoTotaleNetto").toString()), 1000000) > 0) {
-				attachmentService.setPubblicabileTrasparenza(execution.getId(), "stipula", true);
+			if(sceltaUtente != null && !sceltaUtente.equals("RevocaConProvvedimento")) {
+				pubblicaTuttiFilePubblicabili(execution);
+				attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);
+				//attachmentService.setPubblicabileTrasparenza(execution.getId(), "avvisoPostInformazione", true);
+				//attachmentService.setPubblicabileTrasparenza(execution.getId(), "modificheVariantiArt106", true);
+				if ( execution.getVariable("importoTotaleNetto") != null && Double.compare(Double.parseDouble(execution.getVariable("importoTotaleNetto").toString()), 1000000) > 0) {
+					attachmentService.setPubblicabileTrasparenza(execution.getId(), "stipula", true);
+				}
+				if(execution.getVariable("numeroProtocollo_stipula") != null) {
+					protocolloDocumentoService.protocollaDocumento(execution, "stipula", execution.getVariable("numeroProtocollo_stipula").toString(), execution.getVariable("dataProtocollo_stipula").toString());
+				}
+				if(execution.getVariable("numeroProtocollo_contratto") != null) {
+					protocolloDocumentoService.protocollaDocumento(execution, "contratto", execution.getVariable("numeroProtocollo_contratto").toString(), execution.getVariable("dataProtocollo_contratto").toString());
+				}
 			}
-			if(execution.getVariable("numeroProtocollo_stipula") != null) {
-				protocolloDocumentoService.protocollaDocumento(execution, "stipula", execution.getVariable("numeroProtocollo_stipula").toString(), execution.getVariable("dataProtocollo_stipula").toString());
-			}
-			if(execution.getVariable("numeroProtocollo_contratto") != null) {
-				protocolloDocumentoService.protocollaDocumento(execution, "contratto", execution.getVariable("numeroProtocollo_contratto").toString(), execution.getVariable("dataProtocollo_contratto").toString());
-			}
-			pubblicaFilePubblicabili(execution, true);
-
 		};break; 
 		case "end-stipulato-start": {
+			pubblicaTuttiFilePubblicabili(execution);
+			controllaFilePubblicabiliTrasparenza(execution);
 			execution.setVariable(STATO_FINALE_DOMANDA, "STIPULATO");
 		};break;     
 		case "end-stipulato-end": {
@@ -222,15 +302,15 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 		// END CONSUNTIVO  
 
 		// START STIPULA MEPA  
-//		case "stipula-mepa-consip-start": {
-//			if (execution.getVariable("strumentoAcquisizioneId").toString().equals("21")) {
-//				dittaCandidata.evidenzia(execution);
-//			} else {
-//				if ((execution.getVariable("gestioneRTIDittaAggiudicataria") != null) && (execution.getVariable("gestioneRTIDittaAggiudicataria").toString().equals("SI"))) {
-//					dittaCandidata.aggiornaDittaRTIInvitata(execution);
-//				}
-//			}			
-//		};break; 
+		//		case "stipula-mepa-consip-start": {
+		//			if (execution.getVariable("strumentoAcquisizioneId").toString().equals("21")) {
+		//				dittaCandidata.evidenzia(execution);
+		//			} else {
+		//				if ((execution.getVariable("gestioneRTIDittaAggiudicataria") != null) && (execution.getVariable("gestioneRTIDittaAggiudicataria").toString().equals("SI"))) {
+		//					dittaCandidata.aggiornaDittaRTIInvitata(execution);
+		//				}
+		//			}			
+		//		};break; 
 		case "endevent-stipula-mepa-consip-revoca-end": {
 			execution.setVariable("direzioneFlusso", "RevocaConProvvedimento");
 		};break;
@@ -271,21 +351,21 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 					attachmentService.setPubblicabileTrasparenza(execution.getId(), value.getName(), false);					
 				}
 			} else {					
-				attachmentService.setPubblicabileTrasparenza(execution.getId(), "decisioneContrattare", true);
-				pubblicaFilePubblicabili(execution, true);
+				//attachmentService.setPubblicabileTrasparenza(execution.getId(), "decisioneContrattare", true);
+				pubblicaTuttiFilePubblicabili(execution);
 			}
 		};break;
 
 		case "PROVVEDIMENTO-AGGIUDICAZIONE-start": {
-			attachmentService.setPubblicabileTrasparenza(execution.getId(), "giustificazioniAnomalie", true);
-			attachmentService.setPubblicabileTrasparenza(execution.getId(), "provvedimentoNominaCommissione", true);
-			attachmentService.setPubblicabileTrasparenza(execution.getId(), "provvedimentoAmmessiEsclusi", true);
-			attachmentService.setPubblicabileTrasparenza(execution.getId(), "esitoValutazioneAnomalie", true);
-			attachmentService.setPubblicabileTrasparenza(execution.getId(), "elencoDitteInvitate", true);
-			attachmentService.setPubblicabileTrasparenza(execution.getId(), "elencoVerbali", true);
-			attachmentService.setPubblicabileTrasparenza(execution.getId(), "bandoAvvisi", true);
-			attachmentService.setPubblicabileTrasparenza(execution.getId(), "letteraInvito", true);
-			pubblicaFilePubblicabili(execution, true);
+			//			attachmentService.setPubblicabileTrasparenza(execution.getId(), "giustificazioniAnomalie", true);
+			//			attachmentService.setPubblicabileTrasparenza(execution.getId(), "provvedimentoNominaCommissione", true);
+			//			attachmentService.setPubblicabileTrasparenza(execution.getId(), "provvedimentoAmmessiEsclusi", true);
+			//			attachmentService.setPubblicabileTrasparenza(execution.getId(), "esitoValutazioneAnomalie", true);
+			//			attachmentService.setPubblicabileTrasparenza(execution.getId(), "elencoDitteInvitate", true);
+			//			attachmentService.setPubblicabileTrasparenza(execution.getId(), "elencoVerbali", true);
+			//			attachmentService.setPubblicabileTrasparenza(execution.getId(), "bandoAvvisi", true);
+			//			attachmentService.setPubblicabileTrasparenza(execution.getId(), "letteraInvito", true);
+			pubblicaTuttiFilePubblicabili(execution);
 		};break;	
 
 		case "PROVVEDIMENTO-AGGIUDICAZIONE-end": {
@@ -302,16 +382,17 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				if(provvedimentoAggiudicazioneFile.isPubblicazioneUrp()) {
 					attachmentService.setPubblicabileUrp(execution.getId(), "provvedimentoAggiudicazione", true);
 				}
-				pubblicaFilePubblicabili(execution, true);
+				pubblicaTuttiFilePubblicabili(execution);
 			}
 		};break;	
 
 
 		case "CONTRATTO-FUORI-MEPA-start": {
-			attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);		
-			pubblicaFileMultipliPubblicabili(execution, "bandoAvvisi", true);
-			pubblicaFileMultipliPubblicabili(execution, "letteraInvito", true);
-			pubblicaFilePubblicabili(execution, true);
+			//			attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);		
+			//			pubblicaFileMultipliPubblicabili(execution, "bandoAvvisi", true);
+			//			pubblicaFileMultipliPubblicabili(execution, "letteraInvito", true);
+			pubblicaTuttiFilePubblicabili(execution);
+
 		};break;	
 
 
@@ -327,17 +408,18 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				if ( execution.getVariable("importoTotaleNetto") != null && Double.parseDouble(execution.getVariable("importoTotaleNetto").toString()) > 1000000) {
 					attachmentService.setPubblicabileTrasparenza(execution.getId(), "contratto", true);
 				}
-				pubblicaFilePubblicabili(execution, true);
+				pubblicaTuttiFilePubblicabili(execution);
 			}
 		};break;
 
 
 
 		case "STIPULA-MEPA-start": {
-			attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);		
-			pubblicaFileMultipliPubblicabili(execution, "bandoAvvisi", true);
-			pubblicaFileMultipliPubblicabili(execution, "letteraInvito", true);
-			pubblicaFilePubblicabili(execution, true);
+			//			attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);		
+			//			pubblicaFileMultipliPubblicabili(execution, "bandoAvvisi", true);
+			//			pubblicaFileMultipliPubblicabili(execution, "letteraInvito", true);
+			pubblicaTuttiFilePubblicabili(execution);
+
 		};break;	
 
 		case "STIPULA-MEPA-end": {
@@ -349,7 +431,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 					//attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
 				}
 			} else {					
-				pubblicaFilePubblicabili(execution, true);
+				pubblicaTuttiFilePubblicabili(execution);
 			}
 		};break;		
 		case "REVOCA-end": {
@@ -361,9 +443,6 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			}
 
 		};break;	
-		case "end-stipulato": {
-			execution.setVariable(STATO_FINALE_DOMANDA, "STIPULATO");
-		};break;  
 		case "end-revocato": {
 		};break;
 
