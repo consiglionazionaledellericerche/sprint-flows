@@ -328,4 +328,25 @@ public final class Utils {
             return label;
         }
 	}
+
+
+	public String getString(Map<String, String> params, String paramName, String defaultValue) {
+        String value = params.get(paramName);
+        return value != null ? value : defaultValue;
+    }
+
+
+    public int getInteger(Map<String, String> params, String paramName, int defaultValue) {
+        try {
+            return Integer.parseInt( getString(params, paramName, String.valueOf(defaultValue)) ) ;
+        } catch (NumberFormatException e) {
+            LOGGER.info("Number Format Exception per il parametro {} con valore {}", paramName, params.get(paramName));
+            return defaultValue;
+        }
+    }
+
+
+    public boolean getBoolean(Map<String, String> params, String paramName, boolean defaultValue) {
+        return Boolean.parseBoolean( getString(params, paramName, String.valueOf(defaultValue)) ) ;
+    }
 }

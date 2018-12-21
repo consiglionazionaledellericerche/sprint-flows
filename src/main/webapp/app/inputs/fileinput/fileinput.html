@@ -1,65 +1,160 @@
-<div class="form-group well" ng-if="attrs.multiple == 'false'">
-    <label for="attrs.id">{{attrs.label}}</label><br>
-    <a
-            href
-            ng-click="downloadFile('/api/attachments/task/'+ data.taskId +'/'+ document.name +'/data', document.name, document.mimetype)" >
-        {{document.filename}}
-    </a>
-    <button class="btn btn-xs btn-info" ng-class="{'btn-warning': attachments[attrs.name].name}"
-            ng-model="$parent.data[attrs.name]"
-            ngf-select
-            name="$parent.data[attrs.name]"
-            accept="{{attrs.accept}}"
-            ngf-multiple="false"
-            ng-required="attrs['cnrRequired'] == 'true'" >
-        <span ng-show="!document" class="glyphicon glyphicon-upload"></span>
-        <span ng-show="document.name" class="glyphicon glyphicon-repeat"></span>
-        <span ng-show="!document">Carica Documento</span>
-        <span ng-show="document.name">Aggiorna</span>
-    </button>
-    <span ng-show="$parent.data[attrs.name]">
-          {{$parent.data[attrs.name].name}}
-          <a href ng-click="$parent.data[attrs.name] = undefined"><span
-                  class="glyphicon glyphicon-remove" title="Rimuovi"></span></a>
-      </span>
-</div>
-
-<div class="form-group well" ng-if="attrs.multiple == 'true'">
-    <div ng-repeat="(name, attachment) in attachments" ng-if="filterNames(attachment)">
-        <label for="attrs.id">{{attrs.label}}</label><br>
-        <a
-                href
-                ng-click="downloadFile('/api/attachments/task/'+ data.taskId +'/'+ attachment.name +'/data', attachment.name,attachment.mimetype)" >
-            {{attachment.filename}}
-        </a>
-        <button class="btn btn-xs btn-info"
-                ng-model="$parent.data[attachment.name]"
-                ngf-select
-                name="$parent.data[attachment.name]"
-                accept="{{attrs.accept}}"
-                ngf-multiple="false"
-                ng-required="attrs['cnrRequired'] == 'true'" >
-            <span class="glyphicon glyphicon-repeat"></span> Aggiorna
-        </button>
-        {{$parent.data[attachment.name].name}}
-    </div>
-    <label for="attrs.id">{{attrs.labelplural || attrs.label}}</label><br>
-    <button class="btn btn-xs btn-info"
-            ng-model="$parent.data['__new__'+attrs.name]"
-            ngf-select
-            name="$parent.data['__new__'+attrs.name]"
-            accept="{{attrs.accept}}"
-            ngf-multiple="true"
-            ng-required="attrs['cnrRequired'] == 'true'" >
-        <span class="glyphicon glyphicon-upload"></span>
-        <span ng-show="!$parent.data[attrs.name].name"> Carica Documenti</span>
-    </button>
-    <span ng-show="$parent.data['__new__'+attrs.name].length">
-        Documenti selezionati:
-        <span ng-repeat="att in $parent.data['__new__'+attrs.name]">
-          {{att.name}}
-                  <a href ng-click="$parent.data['__new__'+attrs.name].splice($index, 1)"><span
-                          class="glyphicon glyphicon-remove" title="Rimuovi"></span></a><span ng-if="!$last">  </span>, </span>
+<fieldset>
+    <legend ng-if="legend">{{legend}}
+        <span class="glyphicon glyphicon-question-sign" ng-show="item.placeholder" data-toggle="tooltip" data-placement="top" title="{{item.placeholder}}"></span>
+        <span class="pull-right" ng-if="multiple">
+          <button type="button" class="btn btn-success btn-xs" ng-click="addRow()" ng-disabled="ngModel.length >= max">
+            <span class="glyphicon glyphicon-plus"></span>
+          </button>
+          <button type="button" class="btn btn-danger btn-xs" ng-click="removeRow()" ng-disabled="ngModel.length <= min">
+            <span class="glyphicon glyphicon-minus"></span>
+          </button>
         </span>
-    </span>
-</div>
+    </legend>
+
+    <div class="well" ng-if="rows.length == 0">
+        Usare il bottone
+        <button type="button" class="btn btn-success btn-xs" ng-click="addRow()" ng-disabled="ngModel.length >= max">
+        <span class="glyphicon glyphicon-plus"></span>
+        </button>
+        per aggiungere eventuali altri allegati.
+    </div>
+
+    <div ng-if="legend && nota"class="bg-warning cnr-descrizione-task">
+        {{nota}}
+    </div>
+
+    <div class="well" ng-repeat="row in rows track by $index"
+         ng-init="initRow(row, $index);">
+
+        <div ng-if="$parent.attachments[row.rowname].aggiorna != true">
+            <h3>{{$parent.attachments[row.rowname].label}}</h3>
+            <a
+                    href
+                    ng-click="downloadFile('/api/attachments/task/'+ taskId +'/'+ $parent.attachments[row.rowname].name +'/data', $parent.attachments[row.rowname].filename, $parent.attachments[row.rowname].mimetype)" >
+                {{$parent.attachments[row.rowname].filename}}
+            </a>
+            <div class="row form-group">
+                <div class="col-md-12">
+                    <button class="btn btn-primary btn-xs" ng-click="$parent.attachments[row.rowname].aggiorna = true">
+                        <span class="glyphicon glyphicon-edit"></span> Modifica
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div ng-if="$parent.attachments[row.rowname].aggiorna">
+
+            <div class="form-group" ng-if="label === undefined">
+                <label>Tipo Documento</label>
+                <input type="text" class="form-control" ng-model="$parent.attachments[row.rowname].label" required>
+            </div>
+            <div class="form-group" ng-if="label !== undefined" ng-init="$parent.attachments[row.rowname].label = $parent.attachments[row.rowname].label || label">
+                <h3>{{label}}</h3>
+                <div ng-if="nota" class="bg-warning cnr-descrizione-file">
+                    {{nota}}
+                </div>
+            </div>
+
+            <div class="row form-group" ng-show="row.modifica">
+                <div class="col-md-12">
+                    <button class="btn btn-primary btn-xs" ng-click="$parent.attachments[row.rowname].aggiorna = false">
+                        <span class="glyphicon glyphicon-remove-sign"></span> Annulla Modifica
+                    </button>
+                </div>
+            </div>
+
+            <div class="row form-group" ng-if="metadatiPubblicazione || metadatiPubblicazioneUrp">
+                <div class="col-md-5">
+                    Pubblicazione in URP
+                </div>
+                <div class="col-md-7">
+                    <toggle-switch
+                        class="switch-success btn-group btn-group-justified"
+                        ng-model="$parent.attachments[row.rowname].pubblicazioneUrp"
+                        off-label="Non pubblicare"
+                        on-label="Pubblica"
+                        is-disabled="pubblicazioneDisabilitato || pubblicazioneUrpDisabilitato">
+                    </toggle-switch>
+                </div>
+            </div>
+
+            <div class="row form-group" ng-if="metadatiPubblicazione || metadatiPubblicazioneTrasparenza">
+                <div class="col-md-5">
+                    Pubblicazione in Trasparenza
+                </div>
+                <div class="col-md-7">
+                    <toggle-switch
+                        class="switch-success btn-group btn-group-justified"
+                        ng-model="$parent.attachments[row.rowname].pubblicazioneTrasparenza"
+                        off-label="Non pubblicare"
+                        on-label="Pubblica"
+                        is-disabled="pubblicazioneDisabilitato || pubblicazioneTrasparenzaDisabilitato">
+                    </toggle-switch>
+                </div>
+            </div>
+
+            <div ng-if="metadatiProtocollo">
+                <div class="row form-group">
+                    <div class="col-md-5">
+                        Protocollo
+                    </div>
+                    <div class="col-md-7">
+                        <toggle-switch
+                            class="btn-group btn-group-justified"
+                            ng-model="$parent.attachments[row.rowname].protocollo"
+                            off-label="Non Protocollato"
+                            on-label="Protocollato"
+                            ng-click="onClickProtocollo(row);"
+                            is-disabled="protocolloDisabilitato">
+                        </toggle-switch>
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <div class="col-md-5" ng-if="$parent.attachments[row.rowname].protocollo">
+                        <label>Data protocollo</label>
+                        <input type="date" class="form-control" ng-model="$parent.attachments[row.rowname].dataProtocollo" ng-readonly="protocolloDisabilitato" required>
+                    </div>
+                    <div class="col-md-7" ng-if="$parent.attachments[row.rowname].protocollo">
+                        <label>Numero protocollo</label>
+                        <input type="text" class="form-control" ng-model="$parent.attachments[row.rowname].numeroProtocollo" ng-readonly="protocolloDisabilitato" required>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <a
+                    href
+                    ng-click="downloadFile('/api/attachments/task/'+ taskId +'/'+ $parent.attachments[row.rowname].name +'/data', $parent.attachments[row.rowname].filename, $parent.attachments[row.rowname].mimetype)" >
+                {{$parent.attachments[row.rowname].filename}}
+            </a>
+
+            <div class="row form-group">
+                <div class="col-md-12">
+                    <button class="btn btn-sm"
+                            ng-class="{'btn-success': $parent.attachments[row.rowname].data, 'btn-info': !$parent.attachments[row.rowname].data}"
+                            ng-model="$parent.attachments[row.rowname].data"
+                            ngf-select
+                            name="$parent.attachments[row.rowname].data"
+                            accept="{{accept}}"
+                            ngf-multiple="false"
+                            ng-required="cnrRequired" >
+                        <span ng-show="!$parent.attachments[row.rowname].data" class="glyphicon glyphicon-upload"></span>
+                        <span ng-show="$parent.attachments[row.rowname].data" class="glyphicon glyphicon-repeat"></span>
+                        <span ng-show="!$parent.attachments[row.rowname].data">Seleziona File</span>
+                        <span ng-show="$parent.attachments[row.rowname].data">Cambia File</span>
+                    </button>
+                    <span ng-show="$parent.attachments[row.rowname].data">
+                          {{$parent.attachments[row.rowname].data.name}}
+                          <a href ng-click="$parent.attachments[row.rowname].data = undefined"><span
+                                  class="glyphicon glyphicon-remove" title="Rimuovi"></span></a>
+                      </span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</fieldset>
+
+<hr ng-if="multiple">

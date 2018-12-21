@@ -89,6 +89,20 @@
                     });
                 };
 
+                $scope.addFile = function() {
+                    $uibModal.open({
+                        templateUrl: 'app/components/attachments/addattachment.modal.html',
+                        controller: 'AddAttachmentModalController',
+                        controllerAs: 'vm',
+                        scope: $scope,
+                        resolve: {
+                            processInstanceId: function() {
+                                return $scope.processInstanceId;
+                            }
+                        }
+                    });
+                };
+
             }
         }
     }
