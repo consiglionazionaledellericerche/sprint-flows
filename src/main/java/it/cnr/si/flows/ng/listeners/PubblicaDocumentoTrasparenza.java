@@ -36,7 +36,7 @@ public class PubblicaDocumentoTrasparenza implements ExecutionListener {
 
         String nomeVariabileFile = (String) nomeFileDaPubblicare.getValue(execution);
         Boolean flagPubblicazione =  Boolean.parseBoolean((String) fileDaPubblicareFlag.getValue(execution));
-        attachmentService.setPubblicabileTrasparenza(execution.getId(), nomeVariabileFile, flagPubblicazione);
+        attachmentService.setPubblicabileTrasparenza(execution, nomeVariabileFile, flagPubblicazione);
     }
 
 }
