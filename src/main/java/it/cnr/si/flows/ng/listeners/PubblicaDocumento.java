@@ -40,9 +40,9 @@ public class PubblicaDocumento implements ExecutionListener {
         Boolean flagPubblicazione =  Boolean.parseBoolean((String) fileDaPubblicareFlag.getValue(execution));
         String destinazione = (String) destinazionePubblicazione.getValue(execution);
         if (destinazione.equals("Trasparenza")) {
-            attachmentService.setPubblicabileTrasparenza(execution.getId(), nomeVariabileFile, flagPubblicazione);
+            attachmentService.setPubblicabileTrasparenza(execution, nomeVariabileFile, flagPubblicazione);
         } else {
-            attachmentService.setPubblicabileUrp(execution.getId(), nomeVariabileFile, flagPubblicazione);
+            attachmentService.setPubblicabileUrp(execution, nomeVariabileFile, flagPubblicazione);
 
         }
     }
