@@ -96,7 +96,7 @@ public class FlowsTaskService {
 
 
 	// TODO magari un giorno avremo degli array, ma per adesso ce lo facciamo andare bene cosi'
-	private static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
+	public static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
 
 		Map<String, Object> data = new HashMap<>();
 		List<String> parameterNames = Collections.list(req.getParameterNames());
@@ -317,15 +317,16 @@ public class FlowsTaskService {
 			throw new ProcessDefinitionAndTaskIdEmptyException();
 
 		Map<String, Object> data = extractParameters(req);
-		data.putAll(attachmentService.extractAttachmentsVariables(req));
+		attachmentService.extractAttachmentVariables(req, data);
 
 		if (isEmpty(taskId)) {
+
 			ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitionId).singleResult();
 			try {
 				String counterId = processDefinition.getName() + "-" + Calendar.getInstance().get(Calendar.YEAR);
 				String key = counterId + "-" + counterService.getNext(counterId);
 
-				//recupero l'idStruttura dell'RA che sta avviando il flusso
+				//recupero l'idStruttura dell'utente che sta avviando il flusso
 				List<GrantedAuthority> authorities = relationshipService.getAllGroupsForUser(username);
 				List<String> groups = authorities.stream()
 						.map(GrantedAuthority::<String>getAuthority)
@@ -342,6 +343,7 @@ public class FlowsTaskService {
 
 					data.put(initiator.name(), username);
 					data.put(startDate.name(), new Date());
+					data.put("key", key);
 
 					ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
 					runtimeService.setVariable(instance.getId(), "processInstanceId", instance.getId());
@@ -393,7 +395,7 @@ public class FlowsTaskService {
 					taskService.deleteUserIdentityLink(taskId, username, TASK_EXECUTOR);
 					return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(mapOf(ERROR_MESSAGE, errorMessage));
 				} else {
-					String errorMessage = String.format("Errore durante il tentativo di completamento del task %s da parte dell'utente %s: %s", taskId, username, e.getMessage());
+					String errorMessage = String.format("%s<br>Errore durante il tentativo di completamento del task %s da parte dell'utente %s", e.getMessage(), taskId, username);
 					LOGGER.error(errorMessage);
 					taskService.deleteUserIdentityLink(taskId, username, TASK_EXECUTOR);
 					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mapOf(ERROR_MESSAGE, errorMessage));}

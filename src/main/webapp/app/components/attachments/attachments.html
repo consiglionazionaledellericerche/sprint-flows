@@ -1,6 +1,6 @@
 <ul class="list-unstyled">
     <li ng-repeat="attachment in attachments track by $index">
-        <strong>{{attachment.name}}:</strong>
+        <strong>{{ attachment.label || attachment.name}}:</strong>
         <a href
            ng-click="downloadFile('/api/attachments/'+ processInstanceId +'/'+ attachment.name +'/data', attachment.filename, attachment.mimetype)">
             {{attachment.filename}}
@@ -9,11 +9,26 @@
             <span class="glyphicon glyphicon-time" title="Cronologia"></span></a>
         <a href ng-if="canPublish || canUpdateAttachments" ng-click="showFileActions(attachment)">
             <span class="glyphicon glyphicon-cog" title="Azioni"></span></a>
-        <span ng-repeat="stato in attachment.metadati.stati">
-        <span class="label label-primary label-{{stato}}">{{stato}}</span>
+
+        <span class="label label-primary" ng-if="attachment.pubblicazioneUrp">Pubblicabile Urp</span>
+        <span class="label label-primary" ng-if="attachment.pubblicazioneTrasparenza">Pubblicabile in Trasparenza</span>
+        <span class="label label-primary" ng-if="attachment.protocollo">Protocollo ({{attachment.numeroProtocollo}})</span>
+
+
+        <span ng-repeat="stato in attachment.stati">
+            <span class="label label-primary label-{{stato}}">{{stato}}</span>
         </span>
+
+        <p has-authority="ROLE_ADMIN">{{ attachment | json }}</p>
+
+
     </li>
 </ul>
+
+<button class="btn btn-xs btn-primary" ng-if="canUpdateAttachments" ng-click="addFile()">
+    <span class="glyphicon glyphicon-plus-sign"></span>
+    Carica un ulteriore documento
+</button>
 
 <script type="text/ng-template" id="fileHistoryModal.html">
     <div class="modal-header">

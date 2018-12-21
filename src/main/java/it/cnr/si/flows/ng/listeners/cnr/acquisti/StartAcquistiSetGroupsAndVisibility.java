@@ -55,13 +55,13 @@ public class StartAcquistiSetGroupsAndVisibility {
         List<String> groups = authorities.stream()
                 .map(GrantedAuthority::getAuthority)
                 .map(Utils::removeLeadingRole)
-                .filter(g -> g.startsWith("ra@"))
+                .filter(g -> g.startsWith("staffAmministrativo@"))
                 .collect(Collectors.toList());
 
         if (groups.isEmpty())
             throw new BpmnError("403", "L'utente non e' abilitato ad avviare questo flusso");
         else if ( groups.size() > 1 )
-            throw new BpmnError("500", "L'utente appartiene a piu' di un gruppo Responsabile Acquisti");
+            throw new BpmnError("500", "L'utente appartiene a piu' di un gruppo Staff Amministrativo");
         else {
 
             String gruppoRT = groups.get(0);
@@ -69,12 +69,12 @@ public class StartAcquistiSetGroupsAndVisibility {
             // idStruttura variabile che indica che il flusso è diviso per strutture (implica la visibilità distinta tra strutture)
             execution.setVariable(idStruttura.name(), struttura);
             String gruppoFirmaAcquisti = "responsabileFirmaAcquisti@"+ struttura;
-            String gruppoRA = "ra@"+ struttura;
+            String gruppoStaffAmministrativo = "staffAmministrativo@"+ struttura;
             String gruppoSFD = "sfd@"+ struttura;
             String rup = execution.getVariable("rup", String.class);
             String applicazioneSigla = "app.sigla";
 
-            LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoRT, gruppoSFD, gruppoRA, gruppoFirmaAcquisti);
+            LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoRT, gruppoSFD, gruppoStaffAmministrativo, gruppoFirmaAcquisti);
 
             //Check se il gruppo SFD ha membri
             List<String> members = aceBridgeService.getUsersInAceGroup(gruppoSFD);
@@ -87,7 +87,7 @@ public class StartAcquistiSetGroupsAndVisibility {
 
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoRT, PROCESS_VISUALIZER);
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoFirmaAcquisti, PROCESS_VISUALIZER);
-            runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoRA, PROCESS_VISUALIZER);
+            runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoStaffAmministrativo, PROCESS_VISUALIZER);
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoSFD, PROCESS_VISUALIZER);
             runtimeService.addUserIdentityLink(execution.getProcessInstanceId(), rup, PROCESS_VISUALIZER);
             runtimeService.addUserIdentityLink(execution.getProcessInstanceId(), applicazioneSigla, PROCESS_VISUALIZER);
@@ -95,7 +95,7 @@ public class StartAcquistiSetGroupsAndVisibility {
 
             execution.setVariable("gruppoRT", gruppoRT);
             execution.setVariable("gruppoFirmaAcquisti", gruppoFirmaAcquisti);
-            execution.setVariable(Enum.VariableEnum.gruppoRA.name(), gruppoRA);
+            execution.setVariable(Enum.VariableEnum.gruppoStaffAmministrativo.name(), gruppoStaffAmministrativo);
             execution.setVariable("gruppoSFD", gruppoSFD);
             execution.setVariable("sigla", applicazioneSigla);
 

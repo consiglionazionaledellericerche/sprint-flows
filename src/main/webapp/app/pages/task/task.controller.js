@@ -31,11 +31,11 @@
  		var vm = this;
  		$scope.data = {};
  		vm.taskId = $state.params.taskId;
+ 		$scope.taskId = $state.params.taskId;
  		$scope.data.processDefinitionId = $state.params.processDefinitionId;
  		$scope.processDefinitionKey = $scope.data.processDefinitionId.split(":")[0];
  		$scope.processVersion = $scope.data.processDefinitionId.split(":")[1];
- 		$scope.attachments = [];
- 		vm.detailsView = 'api/views/' + $scope.processDefinitionKey + '/' + $scope.processVersion + '/detail';
+ 		$scope.attachments = {};
 
  		// Ho bisogno di caricare piu' risorse contemporaneamente (form e data);
  		// quando sono finite entrambe, autofillo la form
@@ -65,7 +65,8 @@
 
  					vm.taskVariables = $scope.data.entity.variabili;
  					$scope.attachments = utils.parseAttachments(response.data.attachments);
- 					$scope.attachmentsList = response.data.attachmentsList;
+//                    $scope.attachments = response.data.attachments;
+
  					vm.diagramUrl = '/rest/diagram/taskInstance/' + $scope.data.taskId + "?" + new Date().getTime();
  					vm.formUrl = 'api/forms/task/' + $scope.data.taskId;
  				});
@@ -85,20 +86,14 @@
  					});
  				});
  				AlertService.warning("Inserire tutti i valori obbligatori.");
+
  			} else {
 
  				// Serializzo gli oggetti complessi in stringhe
  				// E' necessario copiarli in un nuovo campo, senno' angular si incasina
  				// Non posso usare angular.copy() perche' ho degli oggetti File non gestiti bene
- 				if (_.has($scope.data, 'entity')) {
- 					delete $scope.data.entity;
- 				}
- 				// aggiunto (&& obj[key].constructor.name !== 'Date') per non rendere json le date
- 				angular.forEach($scope.data, function(value, key, obj) {
- 					if (isObject(value) && key !== 'entity' && obj[key].constructor.name !== 'Date') {
- 						obj[key + "_json"] = JSON.stringify(value);
- 					}
- 				});
+
+                utils.prepareForSubmit($scope.data, $scope.attachments);
 
  				Upload.upload({
  					url: 'api/tasks/complete',
@@ -107,7 +102,7 @@
 
  					$log.info(response);
  					AlertService.success("Richiesta completata con successo");
- 					$state.go('availabletasks');
+ 					$state.go('availableTasks');
 
  				}, function(err) {
  					$log.error(err);
@@ -122,16 +117,6 @@
 
  		$scope.downloadFile = function(url, filename, mimetype) {
  			utils.downloadFile(url, filename, mimetype);
- 		}
-
- 		function isObject(value) {
- 			if (value === null ||
- 				typeof value !== 'object' ||
- 				Object.prototype.toString.call(value) === "[object File]" ||
- 				(Object.prototype.toString.call(value) === "[object Array]" && value.length > 0 && Object.prototype.toString.call(value[0]) === "[object File]"))
- 				return false;
-
- 			return true;
  		}
  	}
  })();
