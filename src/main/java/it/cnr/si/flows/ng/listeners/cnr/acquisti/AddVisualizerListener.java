@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.gruppoRA;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.gruppoStaffAmministrativo;
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 
 @Component
@@ -34,7 +34,7 @@ public class AddVisualizerListener implements ExecutionListener {
         ProcessDefinitionEnum processDefinition = Enum.ProcessDefinitionEnum.valueOf(processDefinitionString.substring(0, processDefinitionString.indexOf(":")));
         switch (processDefinition) {
             case acquisti:
-                String struttura = (String) execution.getVariable(gruppoRA.name());
+                String struttura = (String) execution.getVariable(gruppoStaffAmministrativo.name());
                 struttura = struttura.substring(struttura.indexOf('@') + 1, struttura.length());
 
                 runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), "ra@" + struttura, PROCESS_VISUALIZER);

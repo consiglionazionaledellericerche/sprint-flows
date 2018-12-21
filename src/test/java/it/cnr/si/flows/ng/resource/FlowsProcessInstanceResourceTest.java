@@ -6,7 +6,6 @@ import it.cnr.si.flows.ng.utils.Utils;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
@@ -28,18 +27,17 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.StopWatch;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.*;
 
 import static it.cnr.si.flows.ng.TestServices.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
 import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
-import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.iscrizioneElencoOiv;
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
 import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
 import static it.cnr.si.flows.ng.utils.Utils.ASC;
@@ -115,7 +113,7 @@ public class FlowsProcessInstanceResourceTest {
     public void testGetProcessInstanceById() throws IOException {
         processInstance = util.mySetUp(acquisti);
 
-        ResponseEntity<Map<String, Object>> response = (ResponseEntity<Map<String, Object>>) flowsProcessInstanceResource.getProcessInstanceById(new MockHttpServletRequest(), processInstance.getId(), false);
+        ResponseEntity<Map<String, Object>> response = (ResponseEntity<Map<String, Object>>) flowsProcessInstanceResource.getProcessInstanceById(new MockHttpServletRequest(), processInstance.getId(), true);
         assertEquals(OK, response.getStatusCode());
 
         HistoricProcessInstanceResponse entity = (HistoricProcessInstanceResponse) ((HashMap) response.getBody()).get("entity");
@@ -267,9 +265,9 @@ public class FlowsProcessInstanceResourceTest {
         newIdentityLinks = runtimeService.getIdentityLinksForProcessInstance(processInstance.getId());
         assertEquals(OK, response.getStatusCode());
         assertFalse(newIdentityLinks.stream()
-                           .anyMatch(a -> a.getGroupId() == groupId &&
-                                   a.getProcessInstanceId().equals(processInstance.getId())  &&
-                                   a.getType() == Utils.PROCESS_VISUALIZER));
+                            .anyMatch(a -> a.getGroupId() == groupId &&
+                                    a.getProcessInstanceId().equals(processInstance.getId())  &&
+                                    a.getType() == Utils.PROCESS_VISUALIZER));
     }
 
 
@@ -307,31 +305,72 @@ public class FlowsProcessInstanceResourceTest {
         newIdentityLinks = runtimeService.getIdentityLinksForProcessInstance(processInstance.getId());
         assertEquals(OK, response.getStatusCode());
         assertFalse(newIdentityLinks.stream()
-                           .anyMatch(a -> a.getUserId() == userId &&
-                                   a.getProcessInstanceId().equals(processInstance.getId())  &&
-                                   a.getType() == Utils.PROCESS_VISUALIZER));
+                            .anyMatch(a -> a.getUserId() == userId &&
+                                    a.getProcessInstanceId().equals(processInstance.getId())  &&
+                                    a.getType() == Utils.PROCESS_VISUALIZER));
     }
 
 
+    @Test
+    public void getProcessInstancesForTrasparenzaTest() throws IOException, ParseException {
+        processInstance = util.mySetUp(acquisti);
+
+        util.loginAdmin();
+        ResponseEntity<List<Map<String, Object>>> res = flowsProcessInstanceResource
+                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, 2018, 0, 10, ASC);
+
+        assertEquals(OK, res.getStatusCode());
+        //prendo anche le Pi create negli altri test
+        assertEquals(8, res.getBody().size());
+
+        //prova recupero 10 elementi dopo il quinto (result = 3 perchè ho 8 Process Instance in totale - anche quelle generate negli altri test)
+        res = flowsProcessInstanceResource
+                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, 2018, 5, 10, ASC);
+
+        //prendo anche le Pi create negli altri test
+        assertEquals(OK, res.getStatusCode());
+        assertEquals(3, res.getBody().size());
+
+
+        //prova senza ordinamento (recupera le 8 process instances - anche quelle generate negli altri test)
+        res = flowsProcessInstanceResource
+                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, 2018, 0, 10, null);
+
+        assertEquals(OK, res.getStatusCode());
+        //prendo anche le Pi create negli altri test
+        assertEquals(8, res.getBody().size());
+
+
+        //prova anni sbagliati
+        res = flowsProcessInstanceResource
+                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2016, 2016, 0, 10, ASC);
+
+        assertEquals(OK, res.getStatusCode());
+        assertEquals(0, res.getBody().size());
+    }
 
 
     private String verifyMyProcesses(int startedByRA, int startedBySpaclient) {
         String proceeeInstanceID = null;
         // Admin vede la Process Instance che ha avviato
-        ResponseEntity<DataResponse> response = flowsProcessInstanceResource.getMyProcessInstances(true, ALL_PROCESS_INSTANCES, ASC, 0, 100);
+        Map<String, String> searchParams = new HashMap<>();
+        searchParams.put("active", "true");
+        searchParams.put("page", "1");
+        searchParams.put("processDefinitionKey", ALL_PROCESS_INSTANCES);
+        searchParams.put("order", ASC);
+
+        ResponseEntity<Map<String, Object>> response = flowsProcessInstanceResource.getMyProcessInstances(searchParams);
         assertEquals(OK, response.getStatusCode());
-        assertEquals(startedByRA, response.getBody().getSize());
-        List<HistoricProcessInstanceResponse> processInstances = ((List<HistoricProcessInstanceResponse>) response.getBody().getData());
+        ArrayList<HistoricProcessInstanceResponse> processInstances = (ArrayList<HistoricProcessInstanceResponse>)response.getBody().get("processInstances");
         assertEquals(startedByRA, processInstances.size());
         if (processInstances.size() > 0)
-            proceeeInstanceID = processInstances.get(0).getId();
-
+            proceeeInstanceID = processInstances.get(0).getId() ;
+//
         // User NON vede la Process Instance avviata da Admin
         util.loginUser();
-        response = flowsProcessInstanceResource.getMyProcessInstances(true, "all", ASC, 0, 100);
+        response = flowsProcessInstanceResource.getMyProcessInstances(searchParams);
         assertEquals(OK, response.getStatusCode());
-        assertEquals(startedBySpaclient, response.getBody().getSize());
-        assertEquals(startedBySpaclient, ((List<HistoricProcessInstanceResponse>) response.getBody().getData()).size());
+        assertEquals(startedBySpaclient, ((ArrayList<HistoricProcessInstanceResponse>)response.getBody().get("processInstances")).size());
         util.loginResponsabileAcquisti();
         return proceeeInstanceID;
     }
