@@ -93,6 +93,8 @@
  				// E' necessario copiarli in un nuovo campo, senno' angular si incasina
  				// Non posso usare angular.copy() perche' ho degli oggetti File non gestiti bene
 
+                utils.prepareForSubmit($scope.data, $scope.attachments);
+
  				Upload.upload({
  					url: 'api/tasks/complete',
  					data: $scope.data,
