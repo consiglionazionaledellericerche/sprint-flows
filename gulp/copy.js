@@ -20,7 +20,8 @@ module.exports = {
     swagger: swagger,
     images: images,
     jstree: jstree,
-    ace: ace
+    ace: ace,
+    customjs: customjs
 }
 
 //var yorc = require('../.yo-rc.json')['generator-jhipster'];
@@ -78,6 +79,12 @@ function ace() {
     return gulp.src(config.app + 'content/js/ace/*.js')
         .pipe(plumber({errorHandler: handleErrors}))
         .pipe(gulp.dest(config.dist + 'content/js/ace/'));
+}
+
+function customjs() {
+    return gulp.src(config.app + 'content/js/*.js')
+        .pipe(plumber({errorHandler: handleErrors}))
+        .pipe(gulp.dest(config.dist + 'content/js/'));
 }
 
 function common() {

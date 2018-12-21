@@ -72,7 +72,7 @@
         </extensionElements>
       </userTask>
       <sequenceFlow id="flow8" sourceRef="verifica-decisione" targetRef="exclusivegateway1"></sequenceFlow>
-      <userTask id="modifica-decisione" name="Modifica Decisione" activiti:candidateGroups="${gruppoRA}">
+      <userTask id="modifica-decisione" name="Modifica Decisione" activiti:candidateGroups="${gruppoStaffAmministrativo}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti_v1}">
             <activiti:field name="faseEsecuzione">
@@ -101,7 +101,7 @@
       <sequenceFlow id="flow13" sourceRef="exclusivegateway2" targetRef="modifica-decisione">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Modifica'}]]></conditionExpression>
       </sequenceFlow>
-      <userTask id="protocollo-decisione" name="Protocollo Decisione" activiti:candidateGroups="${gruppoRA}">
+      <userTask id="protocollo-decisione" name="Protocollo Decisione" activiti:candidateGroups="${gruppoStaffAmministrativo}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti_v1}">
             <activiti:field name="faseEsecuzione">
@@ -117,7 +117,7 @@
       </userTask>
       <sequenceFlow id="flow14" sourceRef="exclusivegateway2" targetRef="protocollo-decisione"></sequenceFlow>
       <sequenceFlow id="flow15" sourceRef="protocollo-decisione" targetRef="endevent-decisione-contrattare-protocollo"></sequenceFlow>
-      <userTask id="revoca-decisione" name="Revoca Decisione" activiti:candidateGroups="${gruppoRA}">
+      <userTask id="revoca-decisione" name="Revoca Decisione" activiti:candidateGroups="${gruppoStaffAmministrativo}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti_v1}">
             <activiti:field name="faseEsecuzione">
@@ -194,7 +194,7 @@
           </activiti:field>
         </activiti:executionListener>
       </extensionElements>
-      <userTask id="predisposizione-provvedimento-aggiudicazione" name="Predisposizione Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoRA}">
+      <userTask id="predisposizione-provvedimento-aggiudicazione" name="Predisposizione Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoStaffAmministrativo}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti_v1}">
             <activiti:field name="faseEsecuzione">
@@ -212,7 +212,7 @@
       <sequenceFlow id="flow17" sourceRef="startevent6" targetRef="predisposizione-provvedimento-aggiudicazione"></sequenceFlow>
       <exclusiveGateway id="exclusivegateway3" name="Exclusive Gateway" default="flow20"></exclusiveGateway>
       <sequenceFlow id="flow20" sourceRef="exclusivegateway3" targetRef="firma-provvedimento-aggiudicazione"></sequenceFlow>
-      <userTask id="modifica-provvedimento-aggiudicazione" name="Modifica Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoRA}">
+      <userTask id="modifica-provvedimento-aggiudicazione" name="Modifica Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoStaffAmministrativo}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti_v1}">
             <activiti:field name="faseEsecuzione">
@@ -226,7 +226,7 @@
           </activiti:executionListener>
         </extensionElements>
       </userTask>
-      <userTask id="protocollo-provvedimento-aggiudicazione" name="Protocollo Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoRA}">
+      <userTask id="protocollo-provvedimento-aggiudicazione" name="Protocollo Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoStaffAmministrativo}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti_v1}">
             <activiti:field name="faseEsecuzione">
@@ -254,7 +254,7 @@
           </activiti:executionListener>
         </extensionElements>
       </endEvent>
-      <userTask id="predisposizione-revoca" name="Predisposizione Revoca" activiti:candidateGroups="${gruppoRA}">
+      <userTask id="predisposizione-revoca" name="Predisposizione Revoca" activiti:candidateGroups="${gruppoStaffAmministrativo}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti_v1}">
             <activiti:field name="faseEsecuzione">
@@ -421,7 +421,7 @@
           <activiti:taskListener event="complete" expression="${task.setVariable(&quot;otp&quot;, &quot;******&quot;)}"></activiti:taskListener>
         </extensionElements>
       </userTask>
-      <userTask id="modifica-revoca" name="Modifica Revoca" activiti:candidateGroups="${gruppoRA}">
+      <userTask id="modifica-revoca" name="Modifica Revoca" activiti:candidateGroups="${gruppoStaffAmministrativo}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti_v1}">
             <activiti:field name="faseEsecuzione">
@@ -440,7 +440,7 @@
       <sequenceFlow id="flow40" sourceRef="exclusivegateway9" targetRef="modifica-revoca">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Modifica'}]]></conditionExpression>
       </sequenceFlow>
-      <userTask id="protocollo-revoca" name="Protocollo Revoca" activiti:candidateGroups="${gruppoRA}">
+      <userTask id="protocollo-revoca" name="Protocollo Revoca" activiti:candidateGroups="${gruppoStaffAmministrativo}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti_v1}">
             <activiti:field name="faseEsecuzione">
@@ -506,7 +506,7 @@
       </extensionElements>
       <startEvent id="startevent9" name="Start"></startEvent>
       <sequenceFlow id="flow73" sourceRef="startevent9" targetRef="stipula-mepa-consip"></sequenceFlow>
-      <userTask id="revoca-stipula-mepa-consip" name="Revoca Stipula" activiti:candidateGroups="${gruppoRA}">
+      <userTask id="revoca-stipula-mepa-consip" name="Revoca Stipula" activiti:candidateGroups="${gruppoStaffAmministrativo}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti_v1}">
             <activiti:field name="faseEsecuzione">
@@ -611,7 +611,7 @@
         </activiti:executionListener>
       </extensionElements>
       <startEvent id="startevent10" name="Start"></startEvent>
-      <userTask id="predisposizione-contratto" name="Predisposizione Contratto" activiti:candidateGroups="${gruppoRA}">
+      <userTask id="predisposizione-contratto" name="Predisposizione Contratto" activiti:candidateGroups="${gruppoStaffAmministrativo}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti_v1}">
             <activiti:field name="faseEsecuzione">
@@ -643,7 +643,7 @@
       </userTask>
       <exclusiveGateway id="exclusivegateway23" name="Exclusive Gateway" default="flow179"></exclusiveGateway>
       <sequenceFlow id="flow105" sourceRef="startevent10" targetRef="predisposizione-contratto"></sequenceFlow>
-      <userTask id="predisposizione-revoca-2" name="Predisposizione Revoca" activiti:candidateGroups="${gruppoRA}">
+      <userTask id="predisposizione-revoca-2" name="Predisposizione Revoca" activiti:candidateGroups="${gruppoStaffAmministrativo}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti_v1}">
             <activiti:field name="faseEsecuzione">
@@ -657,7 +657,7 @@
           </activiti:executionListener>
         </extensionElements>
       </userTask>
-      <userTask id="modifica-contratto" name="Modifica Contratto" activiti:candidateGroups="${gruppoRA}">
+      <userTask id="modifica-contratto" name="Modifica Contratto" activiti:candidateGroups="${gruppoStaffAmministrativo}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti_v1}">
             <activiti:field name="faseEsecuzione">
@@ -677,7 +677,7 @@
       <sequenceFlow id="flow110" sourceRef="exclusivegateway23" targetRef="predisposizione-revoca-2">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'RevocaConProvvedimento'}]]></conditionExpression>
       </sequenceFlow>
-      <userTask id="protocollo-contratto" name="Protocollo Contratto" activiti:candidateGroups="${gruppoRA}">
+      <userTask id="protocollo-contratto" name="Protocollo Contratto" activiti:candidateGroups="${gruppoStaffAmministrativo}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti_v1}">
             <activiti:field name="faseEsecuzione">
@@ -776,7 +776,7 @@
     <sequenceFlow id="flow128" sourceRef="exclusivegateway13" targetRef="end-revocato">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${direzioneFlusso == 'RevocaSemplice'}]]></conditionExpression>
     </sequenceFlow>
-    <userTask id="conferma-revoca" name="Conferma Revoca" activiti:candidateGroups="${gruppoRA}">
+    <userTask id="conferma-revoca" name="Conferma Revoca" activiti:candidateGroups="${gruppoStaffAmministrativo}">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti_v1}">
           <activiti:field name="faseEsecuzione">

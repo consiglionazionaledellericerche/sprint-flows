@@ -3,6 +3,7 @@ package it.cnr.si.flows.ng.resource;
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.service.FlowsTaskService;
+import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
@@ -33,13 +34,13 @@ public class FlowsSearchResource {
     private FlowsProcessInstanceService flowsProcessInstanceService;
     @Inject
     private FlowsTaskService flowsTaskService;
+    @Inject
+    private Utils util;
 
     /**
      * Funzionalità di Ricerca delle Process Instances.
      *
-     * @param processInstanceId Il processInstanceId della ricerca
-     * @param active            Boolean che indica se ricercare le Process Instances attive o terminate
-     * @param order             L'ordine in cui vogliamo i risltati ('ASC' o 'DESC')
+     * @param params the params
      * @return le response entity frutto della ricerca
      */
     @RequestMapping(value = "/", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -47,11 +48,11 @@ public class FlowsSearchResource {
     @Timed
     public ResponseEntity<Object> search(@RequestBody Map<String, String> params) {
 
-        String processDefinitionKey = getString(params, "processDefinitionKey", "all");
-        String order = getString(params, "order", "ASC");
-        boolean active = getBoolean(params, "active", true);
-        boolean isTaskQuery = getBoolean(params, "isTaskQuery", false);
-        int page = getInteger(params, "page", 1);
+        String processDefinitionKey = util.getString(params, "processDefinitionKey", "all");
+        String order = util.getString(params, "order", "ASC");
+        boolean active = util.getBoolean(params, "active", true);
+        boolean isTaskQuery = util.getBoolean(params, "isTaskQuery", false);
+        int page = util.getInteger(params, "page", 1);
 
         Integer maxResults = 20;
         Integer firstResult = maxResults * (page-1) ;
@@ -82,11 +83,11 @@ public class FlowsSearchResource {
             @PathVariable("processDefinitionKey") String processDefinitionKey,
             @RequestBody Map<String, String> params) throws IOException {
 
-        String order = getString(params, "order", "ASC");
-        boolean active = Boolean.parseBoolean(getString(params, "active", "true"));
-        boolean isTaskQuery = getBoolean(params, "isTaskQuery", false);
-        Integer firstResult = Integer.parseInt(getString(params, "firstResult", "0"));
-        Integer maxResults = Integer.parseInt(getString(params, "maxResults", "99999"));
+        String order = util.getString(params, "order", "ASC");
+        boolean active = Boolean.parseBoolean(util.getString(params, "active", "true"));
+        boolean isTaskQuery = util.getBoolean(params, "isTaskQuery", false);
+        Integer firstResult = Integer.parseInt(util.getString(params, "firstResult", "0"));
+        Integer maxResults = Integer.parseInt(util.getString(params, "maxResults", "99999"));
 
         if (isTaskQuery) {
             Map<String, Object> result = flowsTaskService.search(
@@ -104,25 +105,4 @@ public class FlowsSearchResource {
                     res.getWriter(), processDefinitionKey);
         }
     }
-
-    /* */
-
-    private static String getString(Map<String, String> params, String paramName, String defaultValue) {
-        String value = params.get(paramName);
-        return value != null ? value : defaultValue;
-    }
-
-    private static int getInteger(Map<String, String> params, String paramName, int defaultValue) {
-        try {
-            return Integer.parseInt( getString(params, paramName, String.valueOf(defaultValue)) ) ;
-        } catch (NumberFormatException e) {
-            LOGGER.info("Number Format Exception per il parametro "+ paramName +" con valore "+ params.get(paramName));
-            return defaultValue;
-        }
-    }
-
-    private static boolean getBoolean(Map<String, String> params, String paramName, boolean defaultValue) {
-        return Boolean.parseBoolean( getString(params, paramName, String.valueOf(defaultValue)) ) ;
-    }
-
 }

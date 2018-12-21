@@ -3,6 +3,8 @@ package it.cnr.si.flows.ng.resource;
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
+import it.cnr.si.flows.ng.service.FlowsTaskService;
+import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.FlowsUserDetailsService;
 import it.cnr.si.security.PermissionEvaluatorImpl;
@@ -21,6 +23,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.inject.Inject;
 import javax.servlet.ServletOutputStream;
@@ -28,11 +31,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Aggiornamento;
+import static it.cnr.si.flows.ng.utils.Enum.Azione.Caricamento;
 
 @Controller
 @RequestMapping("api/attachments")
@@ -51,7 +56,8 @@ public class FlowsAttachmentResource {
     private FlowsUserDetailsService flowsUserDetailsService;
     @Inject
     private PermissionEvaluatorImpl permissionEvaluator;
-
+    @Inject
+    private FlowsAttachmentService attachmentService;
 
 
     @RequestMapping(value = "{processInstanceId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -156,18 +162,49 @@ public class FlowsAttachmentResource {
     @Secured(AuthoritiesConstants.USER)
     @PreAuthorize("@permissionEvaluator.canUpdateAttachment(#processInstanceId, @flowsUserDetailsService)")
     @Timed
-    public void setAttachment(@PathVariable("processInstanceId") String processInstanceId,
-                              @PathVariable("attachmentName") String attachmentName,
-                              @RequestParam("file") MultipartFile file) throws IOException {
+    public void updateAttachment(@PathVariable("processInstanceId") String processInstanceId,
+                                 @PathVariable("attachmentName") String attachmentName,
+                                 MultipartHttpServletRequest request) throws IOException {
 
-        FlowsAttachment attachment = runtimeService.getVariable(processInstanceId, attachmentName, FlowsAttachment.class);
+        Map<String, Object> data = FlowsTaskService.extractParameters(request);
+        String username = SecurityUtils.getCurrentUserLogin();
 
-        attachment.setAzione(Aggiornamento);
-        attachment.setBytes(file.getBytes());
-        attachment.setFilename(file.getOriginalFilename());
-        attachment.setMimetype(file.getContentType());
+        FlowsAttachment att = runtimeService.getVariable(processInstanceId, attachmentName, FlowsAttachment.class);
+        MultipartFile file = request.getFile(attachmentName + "_data");
 
-        flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, attachmentName, attachment);
+        attachmentService.setAttachmentProperties(file, null, "Fuori Task", attachmentName, data, false, username, att);
+
+        flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, attachmentName, att);
+        if(att.isProtocollo()) {
+            String vecchiProtocolli = runtimeService.getVariable(processInstanceId, flowsAttachmentService.NUMERI_PROTOCOLLO, String.class);
+            flowsAttachmentService.addProtocollo(vecchiProtocolli, att.getNumeroProtocollo());
+        }
+    }
+
+    @RequestMapping(value = "{processInstanceId}/data/new", method = RequestMethod.POST)
+    @ResponseBody
+    @Secured(AuthoritiesConstants.USER)
+    @PreAuthorize("@permissionEvaluator.canUpdateAttachment(#processInstanceId, @flowsUserDetailsService)")
+    @Timed
+    public void uploadNewAttachment(@PathVariable("processInstanceId") String processInstanceId,
+                                 MultipartHttpServletRequest request) throws IOException {
+
+        Map<String, Object> data = FlowsTaskService.extractParameters(request);
+        String username = SecurityUtils.getCurrentUserLogin();
+
+        FlowsAttachment att = new FlowsAttachment();
+        MultipartFile file = request.getFile("newfile_data");
+        String attachmentName = "allegati"+ attachmentService.getNextIndexByProcessInstanceId(processInstanceId, "allegati");
+
+        attachmentService.setAttachmentProperties(file, null, "Fuori Task", "newfile", data, true, username, att);
+        att.setName(attachmentName);
+
+        flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, attachmentName, att);
+
+        if(att.isProtocollo()) {
+            String vecchiProtocolli = runtimeService.getVariable(processInstanceId, flowsAttachmentService.NUMERI_PROTOCOLLO, String.class);
+            flowsAttachmentService.addProtocollo(vecchiProtocolli, att.getNumeroProtocollo());
+        }
     }
 
     @RequestMapping(value = "{variableId}/data", method = RequestMethod.GET)
@@ -204,18 +241,33 @@ public class FlowsAttachmentResource {
         getAttachment(response, processInstanceId, attachmentName);
     }
 
-    @RequestMapping(value = "{processInstanceId}/{attachmentName}/pubblica", method = RequestMethod.POST)
+    @RequestMapping(value = "{processInstanceId}/{attachmentName}/pubblicaTrasparenza", method = RequestMethod.POST)
     @ResponseBody
     @Secured(AuthoritiesConstants.USER)
     @PreAuthorize("@permissionEvaluator.canPublishAttachment(#processInstanceId)")
     @Timed
-    public void setPubblicabile(
+    public void setPubblicabileTrasparenza(
             HttpServletResponse response,
             @PathVariable("processInstanceId") String processInstanceId,
             @PathVariable("attachmentName") String attachmentName,
             @RequestParam("pubblica") boolean pubblica ) {
 
-        flowsAttachmentService.setPubblicabile(processInstanceId, attachmentName, pubblica);
+        flowsAttachmentService.setPubblicabileTrasparenzaByProcessInstanceId(processInstanceId, attachmentName, pubblica);
+
+    }
+
+    @RequestMapping(value = "{processInstanceId}/{attachmentName}/pubblicaUrp", method = RequestMethod.POST)
+    @ResponseBody
+    @Secured(AuthoritiesConstants.USER)
+    @PreAuthorize("@permissionEvaluator.canPublishAttachment(#processInstanceId)")
+    @Timed
+    public void setPubblicabileUrp(
+            HttpServletResponse response,
+            @PathVariable("processInstanceId") String processInstanceId,
+            @PathVariable("attachmentName") String attachmentName,
+            @RequestParam("pubblica") boolean pubblica ) {
+
+        flowsAttachmentService.setPubblicabileTrasparenzaByProcessInstanceId(processInstanceId, attachmentName, pubblica);
 
     }
 }

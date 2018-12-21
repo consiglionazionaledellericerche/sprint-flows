@@ -5,35 +5,113 @@
 
   <div class="row" ng-if="canPublish">
     <div class="col-md-12">
-      <h4>Pubblica Documento</h4>
+      <h4>Pubblica Documento in Trasparenza</h4>
       <div class="btn-group">
         <p>
           Stato attuale del documento:
-          <span ng-if="!vm.pubblicato">Non</span>
-          Pubblico
+          <span ng-if="vm.attachment.stati.indexOf('PubblicatoTrasparenza') == -1">Non</span>
+          Pubblico in Trasparenza
         <p>
-          <button type="button" ng-if="!vm.pubblicato" class="btn btn-success btn-sm" ng-click="pubblicaDocumento(true)"><span class="glyphicon glyphicon-eye-open"></span> Pubblica in Trasparenza</button>
-          <button type="button" ng-if="vm.pubblicato" class="btn btn-danger btn-sm" ng-click="pubblicaDocumento(false)"><span class="glyphicon glyphicon-eye-closez"></span> Rimuovi da Trasparenza</button>
+          <button type="button" ng-if="vm.attachment.stati.indexOf('PubblicatoTrasparenza') == -1" class="btn btn-success btn-sm" ng-click="pubblicaDocumentoTrasparenza(true)"><span class="glyphicon glyphicon-eye-open"></span> Pubblica in Trasparenza</button>
+          <button type="button" ng-if="vm.attachment.stati.indexOf('PubblicatoTrasparenza') !== -1" class="btn btn-danger btn-sm" ng-click="pubblicaDocumentoTrasparenza(false)"><span class="glyphicon glyphicon-eye-close"></span> Rimuovi da Trasparenza</button>
+      </div>
+    </div>
+  </div>
+  <div class="row" ng-if="canPublish">
+    <div class="col-md-12">
+      <h4>Pubblica Documento in Urp</h4>
+      <div class="btn-group">
+        <p>
+          Stato attuale del documento:
+          <span ng-if="vm.attachment.stati.indexOf('PubblicatoUrp') == -1">Non</span>
+          Pubblico in Urp
+        <p>
+          <button type="button" ng-if="vm.attachment.stati.indexOf('PubblicatoUrp') == -1" class="btn btn-success btn-sm" ng-click="pubblicaDocumentoUrp(true)"><span class="glyphicon glyphicon-eye-open"></span> Pubblica in Urp</button>
+          <button type="button" ng-if="vm.attachment.stati.indexOf('PubblicatoUrp') !== -1" class="btn btn-danger btn-sm" ng-click="pubblicaDocumentoUrp(false)"><span class="glyphicon glyphicon-eye-close"></span> Rimuovi da Urp</button>
       </div>
     </div>
   </div>
 
   <div class="row" ng-if="canUpdateAttachments">
-    <div class="col-md-12">
+    <div class="col-md-12" ng-if="!vm.attachment.protocollo">
       <h4>Aggiorna Documento</h4>
       <form novalidate class="flows-form" name="aggiornaDocumentoForm" ng-submit="submitAggiornaDocumento(picFile)">
 
-        <fileinput name="file" multiple=false cnr-required=true />
+        <fileinput name="{{vm.attachment.name}}" label="{{vm.attachment.label}}" multiple=false cnr-required=true />
         <button class="btn btn-primary" type="submit" ng-disabled="processDefinitionForm.$invalid">
           invia
           <span class="glyphicon glyphicon-arrow-right"></span>
         </button>
 
       </form>
+    </div>
+
+    <div class="col-md-12" ng-if="vm.attachment.protocollo">
+      <h4>Aggiorna Documento Protocollato</h4>
+
+      <div class="col-lg-20 col-lg-offset-0 bg-info cnr-descrizione-task">I documenti protocollati non possono essere sostituiti allo stesso modo dei documenti non protocollati. Selezionare se inserire una RETTIFICA a un documento protocollato, o una SOSTITUZIONE di un nuovo file con un nuovo protocollo</div>
+
+        <div class="form-group text-center">
+          <label for="tipoModifica">Tipo Modifica</label>
+          <select id="tipoModifica" style="width: auto;" ng-model="data.tipoModifica">
+            <option value="sostituzione">Sostituzione</option>
+            <option value="rettifica">Rettifica</option>
+          </select>
+        </div>
+
+        <div class="row" ng-if="data.tipoModifica == 'sostituzione'">
+          <div class="col-md-12">
+            <form novalidate class="flows-form" name="aggiornaDocumentoForm" ng-submit="submitAggiornaDocumento(picFile)">
+              <fileinput
+                      name="{{vm.attachment.name}}"
+                      label="{{vm.attachment.label}}"
+                      multiple="false"
+                      cnr-required="true"
+                      metadati-protocollo="true"
+                      metadati-pubblicazione="true"
+                      pubblicazione-trasparenza="vm.attachment.pubblicazioneTrasparenza"
+                      pubblicazione-urp="vm.attachment.pubblicazioneUrp"
+                      pubblicazione-disabilitato="true"
+
+              />
+
+              <button class="btn btn-primary" type="submit" ng-disabled="processDefinitionForm.$invalid">
+                invia
+                <span class="glyphicon glyphicon-arrow-right"></span>
+              </button>
+            </form>
+          </div>
+        </div>
+
+      <div class="row" ng-if="data.tipoModifica == 'rettifica'">
+        <div class="col-md-12">
+          <form novalidate class="flows-form" name="aggiornaDocumentoForm" ng-submit="submitAggiornaDocumento(picFile)">
+            <fileinput
+                    name="{{vm.attachment.name}}_rettifica"
+                    label="Rettifica {{vm.attachment.label}}"
+                    multiple="false"
+                    cnr-required="true"
+                    metadati-protocollo="true"
+                    protocollo="true"
+                    metadati-pubblicazione="true"
+                    pubblicazione-trasparenza="vm.attachment.pubblicazioneTrasparenza"
+                    pubblicazione-urp="vm.attachment.pubblicazioneUrp"
+                    pubblicazione-disabilitato="true"
+
+            />
+
+            <button class="btn btn-primary" type="submit" ng-disabled="processDefinitionForm.$invalid">
+              invia
+              <span class="glyphicon glyphicon-arrow-right"></span>
+            </button>
+          </form>
+        </div>
+      </div>
 
     </div>
+
   </div>
 </div>
 <div class="modal-footer">
-  <button class="btn btn-primary" type="button" ng-click="$dismiss()">Chiudi</button>
+  <button class="btn btn-primary" type="button" ng-click="$dismiss()"><span class="glyphicon glyphicon-remove"></span> Chiudi</button>
 </div>

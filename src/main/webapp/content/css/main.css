@@ -396,7 +396,17 @@ input.ng-touched.ng-invalid, button.ng-touched.ng-invalid, textarea.ng-touched.n
     flex: 1;
 }
 
+.banner {
+  height: 250px;
+}
 
+.cnr-banner {
+    background: url("../images/cnr-flows-banner.png") center no-repeat;
+}
+
+.oiv-banner {
+    background: url("../images/oiv-flows-banner.png") center no-repeat;
+}
 
 /* CSS per editor ACE */
 .ace_editor {
@@ -413,6 +423,13 @@ input.ng-touched.ng-invalid, button.ng-touched.ng-invalid, textarea.ng-touched.n
     padding: 15px;
     margin: 10px;
 }
+
+.cnr-descrizione-file {
+     border: 1px solid gold;
+     padding: 15px;
+     margin: 10px;
+ }
+
 
 .alerts .alert {
   box-shadow: 4px 4px 10px -3px rgba(0,0,0,0.75);
@@ -437,6 +454,13 @@ input.ng-touched.ng-invalid, button.ng-touched.ng-invalid, textarea.ng-touched.n
   background-color: #5cb85c;
 }
 
+.label-PubblicatoTrasparenza {
+  background-color: #5cb85c;
+}
+
+.label-PubblicatoUrp {
+  background-color: #ff8000;
+}
 /* START SPINNER */
 @-moz-keyframes sprint-loader {
   0% {
@@ -577,3 +601,15 @@ input.ng-touched.ng-invalid, button.ng-touched.ng-invalid, textarea.ng-touched.n
 }
 
 /* END workflow */
+
+
+.toggle-switch {
+    border: 1px solid lightgray;
+    cursor: pointer;
+    display: inline-block;
+    text-align: left;
+    overflow: hidden;
+    line-height: 8px;
+    min-width: 100px;
+    border-radius: 5px;
+}
