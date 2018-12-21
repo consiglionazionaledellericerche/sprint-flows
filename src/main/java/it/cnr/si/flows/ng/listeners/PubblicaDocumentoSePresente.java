@@ -38,7 +38,7 @@ public class PubblicaDocumentoSePresente implements ExecutionListener {
 					FlowsAttachment documento = (FlowsAttachment) entry.getValue();
 					if	(documento != null && documento.getName().startsWith((String) nomeFileDaPubblicare.getValue(execution))){
 						LOGGER.info("pubblico: " + documento.getFilename() + "(" + entry.getKey() + ") per il flusso: " + execution.getId() );
-						attachmentService.setPubblicabileTrasparenza(execution.getId(), entry.getKey(), true);
+						attachmentService.setPubblicabileTrasparenza(execution, entry.getKey(), true);
 					}
 				}				
 			}

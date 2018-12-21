@@ -36,7 +36,7 @@ public class PubblicaDocumentoUrp implements ExecutionListener {
 
         String nomeVariabileFile = (String) nomeFileDaPubblicare.getValue(execution);
         Boolean flagPubblicazione =  Boolean.parseBoolean((String) fileDaPubblicareFlag.getValue(execution));
-        attachmentService.setPubblicabileUrp(execution.getId(), nomeVariabileFile, flagPubblicazione);
+        attachmentService.setPubblicabileUrp(execution, nomeVariabileFile, flagPubblicazione);
     }
 
 }
