@@ -10,16 +10,21 @@
     function ManageProcessDefinitionsController($scope, paginationConstants, dataService, utils, $log, Upload, AlertService) {
         var vm = this;
 
+        $scope.data = {};
+        $scope.attachments = {};
+
         dataService.definitions.all().then(function(response) {
            vm.procDefs = response.data.data
         });
 
         $scope.submitProcessDefinition = function(file) {
-            $log.info(Object.keys(vm.data));
+//            $log.info(Object.keys(vm.data));
+
+            utils.prepareForSubmit($scope.data, $scope.attachments)
 
             Upload.upload({
                 url: 'api/processDefinitions/send',
-                data: vm.data,
+                data: $scope.data,
             }).then(function (response) {
                 $log.info(response);
                 AlertService.success("Richiesta completata con successo");
