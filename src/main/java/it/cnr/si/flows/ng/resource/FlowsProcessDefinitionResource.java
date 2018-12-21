@@ -77,7 +77,7 @@ public class FlowsProcessDefinitionResource {
     @RequestMapping(value = "/send", method = RequestMethod.POST)
     @Secured(AuthoritiesConstants.ADMIN)
     @Timed
-    public ResponseEntity<Void> updateProcessDefinition(@RequestParam("procDef") MultipartFile procDef) throws IOException {
+    public ResponseEntity<Void> updateProcessDefinition(@RequestParam("procDef_data") MultipartFile procDef) throws IOException {
 
         DeploymentBuilder builder = repositoryService.createDeployment();
         builder.addInputStream(procDef.getOriginalFilename(), procDef.getInputStream());
