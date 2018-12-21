@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -206,6 +207,18 @@ public class FlowsAttachmentService {
 				.filter(e -> e.getValue() instanceof FlowsAttachment)
 				.collect(Collectors.toMap(k -> k.getKey(), v -> ((FlowsAttachment) v.getValue())));
 	}
+	
+	public Map<String, FlowsAttachment> getCurrentAttachments(DelegateExecution execution) {
+
+		Map<String, FlowsAttachment> attachments = new HashMap<>();
+
+		for (Entry<String, Object> entry : execution.getVariables().entrySet()) 
+			if (entry.getValue() instanceof FlowsAttachment)
+				attachments.put(entry.getKey(), (FlowsAttachment) entry.getValue());
+
+		return attachments;
+
+	}
 
 	public Map<String, FlowsAttachment> getAttachementsForProcessDefinitionKey(@PathVariable("processDefinitionKey") String processDefinitionKey) {
 		Map<String, Object> processVariables = historyService.createHistoricProcessInstanceQuery()
@@ -220,8 +233,9 @@ public class FlowsAttachmentService {
 	}	
 	
 	
-	public void setPubblicabileTrasparenza(String executionId, String nomeVariabileFile, Boolean flagPubblicazione) {
-		FlowsAttachment att = (FlowsAttachment) runtimeService.getVariable(executionId, nomeVariabileFile);
+	public void setPubblicabileTrasparenza(DelegateExecution execution, String nomeFile, Boolean flagPubblicazione) {
+ 		Map<String, FlowsAttachment> attachmentList = getCurrentAttachments(execution);
+		FlowsAttachment att = attachmentList.get(nomeFile);
 		if (att != null) {
 			if (flagPubblicazione) {
                 att.setAzione(PubblicazioneTrasparenza);
@@ -232,12 +246,15 @@ public class FlowsAttachmentService {
                 att.removeStato(PubblicatoTrasparenza);
                 att.setPubblicazioneTrasparenza(false);
 			}
-			saveAttachmentFuoriTask(executionId, nomeVariabileFile, att);
+			saveAttachmentFuoriTask(execution.getProcessInstanceId(), nomeFile, att);
 		}
 	}	
 	
-	public void setPubblicabileUrp(String executionId, String nomeVariabileFile, Boolean flagPubblicazione) {
-		FlowsAttachment att = (FlowsAttachment) runtimeService.getVariable(executionId, nomeVariabileFile);
+	public void setPubblicabileUrp(DelegateExecution execution, String nomeFile, Boolean flagPubblicazione) {
+ 		//Map<String, FlowsAttachment> attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);
+ 		Map<String, FlowsAttachment> attachmentList = getCurrentAttachments(execution);
+ 		
+		FlowsAttachment att = attachmentList.get(nomeFile);
 		if (att != null) {
 			if (flagPubblicazione) {
                 att.setAzione(PubblicazioneUrp);
@@ -248,7 +265,39 @@ public class FlowsAttachmentService {
                 att.removeStato(PubblicatoUrp);
                 att.setPubblicazioneUrp(false);
 			}
-			saveAttachmentFuoriTask(executionId, nomeVariabileFile, att);
+			saveAttachmentFuoriTask(execution.getProcessInstanceId(), nomeFile, att);
+		}
+	}
+	
+	public void setPubblicabileTrasparenzaByProcessInstanceId(String processInstanceId, String nomeVariabileFile, Boolean flagPubblicazione) {
+		FlowsAttachment att = (FlowsAttachment) runtimeService.getVariable(processInstanceId, nomeVariabileFile);
+		if (att != null) {
+			if (flagPubblicazione) {
+                att.setAzione(PubblicazioneTrasparenza);
+                att.addStato(PubblicatoTrasparenza);
+                att.setPubblicazioneTrasparenza(false);
+			} else {
+                att.setAzione(RimozioneDaPubblicazioneTrasparenza);
+                att.removeStato(PubblicatoTrasparenza);
+                att.setPubblicazioneTrasparenza(false);
+			}
+			saveAttachmentFuoriTask(processInstanceId, nomeVariabileFile, att);
+		}
+	}	
+	
+	public void setPubblicabileUrpByProcessInstanceId(String processInstanceId, String nomeVariabileFile, Boolean flagPubblicazione) {
+		FlowsAttachment att = (FlowsAttachment) runtimeService.getVariable(processInstanceId, nomeVariabileFile);
+		if (att != null) {
+			if (flagPubblicazione) {
+                att.setAzione(PubblicazioneUrp);
+                att.addStato(PubblicatoUrp);
+                att.setPubblicazioneUrp(false);
+			} else {
+                att.setAzione(RimozioneDaPubblicazioneUrp);
+                att.removeStato(PubblicatoUrp);
+                att.setPubblicazioneUrp(false);
+			}
+			saveAttachmentFuoriTask(processInstanceId, nomeVariabileFile, att);
 		}
 	}
 	
