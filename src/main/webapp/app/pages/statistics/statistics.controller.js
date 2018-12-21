@@ -12,14 +12,14 @@
 		//var vm = this;
 
 
-		let vm = this,
+		var vm = this,
 		dateFormat = 'yyyy-MM-dd';
 		vm.processDefinition = $stateParams.processDefinition.split(":")[0];
 		vm.isNavbarCollapsed = true;
 		vm.isAuthenticated = Principal.isAuthenticated;
 
 		$scope.exportFile = function(isPdf, processDefinitionKey, idStruttura, startDateGreat, startDateLess, filename) {
-			let url = (isPdf ? '/api/makeStatisticPdf?' : '/api/makeStatisticCsv?') +
+			var url = (isPdf ? '/api/makeStatisticPdf?' : '/api/makeStatisticCsv?') +
 			'processDefinitionKey=' + vm.processDefinition +
 			'&idStruttura=' + vm.exportParams.struttura +
 			'&startDateGreat=' + $filter('date')(vm.exportParams.startDateGreat, dateFormat) +
