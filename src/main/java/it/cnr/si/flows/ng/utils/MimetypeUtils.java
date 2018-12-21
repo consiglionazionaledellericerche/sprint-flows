@@ -5,15 +5,21 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import org.apache.tika.Tika;
+import org.apache.tika.mime.MimeTypes;
 import org.springframework.web.multipart.MultipartFile;
 
 public class MimetypeUtils {
 
 
-    public static String getMimetype(MultipartFile file) throws IOException {
-        // Firefox non gioca pulito coi mimetypes e sbaglia i pdf
-        ByteArrayInputStream bais = getBais(file);
-        return getMimetype(bais);
+    public static String getMimetype(MultipartFile file) {
+
+        try {
+            // Firefox non gioca pulito coi mimetypes e sbaglia i pdf
+            ByteArrayInputStream bais = getBais(file);
+            return getMimetype(bais);
+        } catch (IOException e) {
+            return MimeTypes.OCTET_STREAM;
+        }
     }
 
     private static String getMimetype(ByteArrayInputStream bais) throws IOException {

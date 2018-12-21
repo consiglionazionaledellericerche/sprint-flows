@@ -289,15 +289,25 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
         String username = SecurityUtils.getCurrentUserLogin();
         List<String> authorities = getAuthorities(username, flowsUserDetailsService);
 
-
-        return authorities.stream()
+        boolean isResponsabile = authorities.stream()
                 .anyMatch(
-                        a ->    a.contains(responsabile + "@" + CNR_CODE) ||
+                        a -> a.contains(responsabile + "@" + CNR_CODE) ||
                                 a.contains(responsabileStruttura + "@" + idStruttura) ||
                                 a.contains(responsabile + "#" + processDefinitionKey + "@" + CNR_CODE) ||
                                 a.contains(responsabile + "#" + processDefinitionKey + "@" + idStruttura) ||
                                 a.contains(responsabile + "#flussi@" + CNR_CODE) ||
                                 a.contains(responsabile + "#flussi@" + idStruttura));
+        boolean isRuoloFlusso = false;
+
+        if (instance.getProcessDefinitionKey().equals(acquisti.getValue())) {
+
+            String rup = String.valueOf(instance.getProcessVariables().get("rup"));
+            String nomeGruppoFirma = "responsabileFirmaAcquisti@" + idStruttura;
+
+            isRuoloFlusso = username.equals(rup) || authorities.contains(nomeGruppoFirma);
+        }
+
+        return isResponsabile || isRuoloFlusso;
     }
 
     public boolean canPublishAttachment(String processInstanceId) {

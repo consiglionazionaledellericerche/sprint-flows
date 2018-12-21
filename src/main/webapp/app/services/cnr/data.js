@@ -64,7 +64,6 @@
                 coolAvailableTasks: function() {
                     return $http.get('api/tasks/coolAvailableTasks');
                 }
-
             },
             processInstances: {
                 byProcessInstanceId: function(processInstanceId, detail) {
@@ -72,12 +71,8 @@
                         '?processInstanceId=' + processInstanceId +
                         '&detail=' + ((detail !== undefined) ? true : false));
                 },
-                myProcessInstances: function(active, processDefinition, order, firstResult, maxResults) {
-                    return $http.get('api/processInstances/myProcessInstances?active=' + active +
-                        '&processDefinition=' + (processDefinition ? processDefinition.key : 'all') +
-                        '&order=' + order +
-                        '&firstResult=' + firstResult +
-                        '&maxResults=' + maxResults);
+                myProcessInstances: function(searchParams) {
+                    return $http.post('api/processInstances/myProcessInstances', searchParams);
                 },
                 getProcessInstances: function(processDefinition, active, firstResult, maxResults, order, params) {
                     return $http.post('api/processInstances/getProcessInstances?active=' + active +
@@ -114,6 +109,12 @@
                 pubblicaDocumento: function(processInstanceId, attachmentName, flag) {
                     return $http.post('/api/attachments/' + processInstanceId + '/' + attachmentName + '/pubblica?pubblica=' + flag);
                 },
+            	pubblicaDocumentoTrasparenza: function(processInstanceId, attachmentName, flag) {
+                    return $http.post('/api/attachments/' + processInstanceId + '/' + attachmentName + '/pubblicaTrasparenza?pubblica=' + flag);
+                },
+            	pubblicaDocumentoUrp: function(processInstanceId, attachmentName, flag) {
+                    return $http.post('/api/attachments/' + processInstanceId + '/' + attachmentName + '/pubblicaUrp?pubblica=' + flag);
+                },
             },
             definitions: {
                 all: function() {
@@ -147,7 +148,7 @@
                     return $http.get('api/users/struttura/' + filter + '/search');
                 },
                 exportCsv: function(searchParams, firstResult, maxResults) {
-                    let processDefinitionKey;
+                    var processDefinitionKey;
                     if (searchParams.processDefinitionKey !== undefined) {
                         processDefinitionKey = searchParams.processDefinitionKey;
                     } else {

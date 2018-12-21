@@ -1,5 +1,5 @@
 ID;GROUP_NAME;GROUP_RELATIONSHIP;GROUP_ROLE
-1;ra@STRUTTURA;supervisore#acquisti@STRUTTURA;member
+1;staffAmministrativo@STRUTTURA;supervisore#acquisti@STRUTTURA;member
 2;afferenza@2216;gestori_strutture@2216;member
-3;ra@STRUTTURA;abilitati#acquisti@STRUTTURA;coordinator
+3;staffAmministrativo@STRUTTURA;abilitati#acquisti@STRUTTURA;coordinator
 4;direttore@99999;delegatofirma@99999;coordinator

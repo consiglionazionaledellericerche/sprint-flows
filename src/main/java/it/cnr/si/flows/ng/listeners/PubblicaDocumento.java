@@ -24,6 +24,7 @@ public class PubblicaDocumento implements ExecutionListener {
     
     private Expression nomeFileDaPubblicare;
     private Expression fileDaPubblicareFlag;
+    private Expression destinazionePubblicazione;
 
 
     @Override
@@ -32,10 +33,18 @@ public class PubblicaDocumento implements ExecutionListener {
             throw new IllegalStateException("Questo Listener ha bisogno del campo 'nomeFileDaPubblicare' nella process definition (nel Task Listener - Fields).");
         if (fileDaPubblicareFlag.getValue(execution) == null)
             throw new IllegalStateException("Questo Listener ha bisogno del campo 'fileDaPubblicareFlag' nella process definition (nel Task Listener - Fields).");
+        if (destinazionePubblicazione.getValue(execution) == null)
+            throw new IllegalStateException("Questo Listener ha bisogno del campo 'destinazionePubblicazione' nella process definition (nel Task Listener - Fields).");
 
         String nomeVariabileFile = (String) nomeFileDaPubblicare.getValue(execution);
         Boolean flagPubblicazione =  Boolean.parseBoolean((String) fileDaPubblicareFlag.getValue(execution));
-        attachmentService.setPubblicabile(execution.getId(), nomeVariabileFile, flagPubblicazione);
+        String destinazione = (String) destinazionePubblicazione.getValue(execution);
+        if (destinazione.equals("Trasparenza")) {
+            attachmentService.setPubblicabileTrasparenza(execution, nomeVariabileFile, flagPubblicazione);
+        } else {
+            attachmentService.setPubblicabileUrp(execution, nomeVariabileFile, flagPubblicazione);
+
+        }
     }
 
 }
