@@ -12,12 +12,17 @@
         $scope.data = {};
         $scope.attachments = [];
 
+        $scope.data = {};
+        $scope.attachments = {};
+
         dataService.definitions.all().then(function(response) {
            vm.procDefs = response.data.data
         });
 
         $scope.submitProcessDefinition = function(file) {
-            //$log.info(Object.keys(vm.data));
+//            $log.info(Object.keys(vm.data));
+
+            utils.prepareForSubmit($scope.data, $scope.attachments)
 
             Upload.upload({
                 url: 'api/processDefinitions/send',
