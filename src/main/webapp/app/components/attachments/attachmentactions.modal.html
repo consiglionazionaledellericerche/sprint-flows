@@ -33,7 +33,7 @@
   </div>
 
   <div class="row" ng-if="canUpdateAttachments">
-    <div class="col-md-12" ng-if="!vm.attachment.protocollo">
+    <div class="col-md-12" ng-if="vm.attachment.stati.indexOf('Protocollato') == -1">
       <h4>Aggiorna Documento</h4>
       <form novalidate class="flows-form" name="aggiornaDocumentoForm" ng-submit="submitAggiornaDocumento(picFile)">
 
@@ -46,7 +46,7 @@
       </form>
     </div>
 
-    <div class="col-md-12" ng-if="vm.attachment.protocollo">
+    <div class="col-md-12" ng-if="vm.attachment.stati.indexOf('Protocollato') != -1">
       <h4>Aggiorna Documento Protocollato</h4>
 
       <div class="col-lg-20 col-lg-offset-0 bg-info cnr-descrizione-task">I documenti protocollati non possono essere sostituiti allo stesso modo dei documenti non protocollati. Selezionare se inserire una RETTIFICA a un documento protocollato, o una SOSTITUZIONE di un nuovo file con un nuovo protocollo</div>
