@@ -124,6 +124,10 @@ public class FlowsAttachment implements Serializable {
         return (Set<Enum.Stato>) this.getMetadati().get("stati");
     }
 
+    public void setStati(Set<Enum.Stato> stati) {
+        getMetadati().put("stati", stati);
+    }
+
     @SuppressWarnings("unchecked")
     public void removeStato(Enum.Stato s) {
         Set<Enum.Stato> stati = getStati();

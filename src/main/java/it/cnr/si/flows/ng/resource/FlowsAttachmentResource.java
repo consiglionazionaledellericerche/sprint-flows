@@ -4,6 +4,7 @@ import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.service.FlowsTaskService;
+import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.FlowsUserDetailsService;
@@ -38,6 +39,7 @@ import java.util.stream.Collectors;
 
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Aggiornamento;
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Caricamento;
+import static it.cnr.si.flows.ng.utils.MimetypeUtils.getMimetype;
 
 @Controller
 @RequestMapping("api/attachments")
@@ -168,6 +170,7 @@ public class FlowsAttachmentResource {
 
         Map<String, Object> data = FlowsTaskService.extractParameters(request);
         String username = SecurityUtils.getCurrentUserLogin();
+        String tipoModifica = request.getParameter("tipoModifica");
 
         FlowsAttachment att = runtimeService.getVariable(processInstanceId, attachmentName, FlowsAttachment.class);
         MultipartFile file = request.getFile(attachmentName + "_data");
@@ -175,6 +178,69 @@ public class FlowsAttachmentResource {
         attachmentService.setAttachmentProperties(file, null, "Fuori Task", attachmentName, data, false, username, att);
 
         flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, attachmentName, att);
+        if(att.isProtocollo()) {
+            String vecchiProtocolli = runtimeService.getVariable(processInstanceId, flowsAttachmentService.NUMERI_PROTOCOLLO, String.class);
+            flowsAttachmentService.addProtocollo(vecchiProtocolli, att.getNumeroProtocollo());
+        }
+    }
+
+
+    @RequestMapping(value = "{processInstanceId}/{attachmentName}/data/sostituzione", method = RequestMethod.POST)
+    @ResponseBody
+    @Secured(AuthoritiesConstants.USER)
+    @PreAuthorize("@permissionEvaluator.canUpdateAttachment(#processInstanceId, @flowsUserDetailsService)")
+    @Timed
+    public void updateAttachmentSostituzioneProtocollo(@PathVariable("processInstanceId") String processInstanceId,
+                                 @PathVariable("attachmentName") String attachmentName,
+                                 MultipartHttpServletRequest request) throws IOException {
+
+        Map<String, Object> data = FlowsTaskService.extractParameters(request);
+
+        FlowsAttachment att = runtimeService.getVariable(processInstanceId, attachmentName, FlowsAttachment.class);
+        MultipartFile file = request.getFile(attachmentName + "_sostituzione_data");
+        att.setFilename(file.getOriginalFilename());
+        att.setBytes(file.getBytes());
+        att.setMimetype(getMimetype(file));
+        att.setMetadato("motivoSostituzione", request.getParameter("motivoSostituzione"));
+        att.setAzione(Enum.Azione.SostituzioneProtocollo);
+
+        flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, attachmentName, att);
+        if(att.isProtocollo()) {
+            String vecchiProtocolli = runtimeService.getVariable(processInstanceId, flowsAttachmentService.NUMERI_PROTOCOLLO, String.class);
+            flowsAttachmentService.addProtocollo(vecchiProtocolli, att.getNumeroProtocollo());
+        }
+    }
+
+    @RequestMapping(value = "{processInstanceId}/{attachmentName}/data/rettifica", method = RequestMethod.POST)
+    @ResponseBody
+    @Secured(AuthoritiesConstants.USER)
+    @PreAuthorize("@permissionEvaluator.canUpdateAttachment(#processInstanceId, @flowsUserDetailsService)")
+    @Timed
+    public void updateAttachmentRettificaProtocollo(@PathVariable("processInstanceId") String processInstanceId,
+                                           @PathVariable("attachmentName") String attachmentName,
+                                           MultipartHttpServletRequest request) throws IOException {
+
+        Map<String, Object> data = FlowsTaskService.extractParameters(request);
+
+        FlowsAttachment old = runtimeService.getVariable(processInstanceId, attachmentName, FlowsAttachment.class);
+        FlowsAttachment att = new FlowsAttachment();
+
+        MultipartFile file = request.getFile(attachmentName + "_rettifica_data");
+        att.setFilename(file.getOriginalFilename());
+        att.setBytes(file.getBytes());
+        att.setMimetype(getMimetype(file));
+        att.setName("rettifica"+ old.getName());
+        att.setLabel("Rettifica "+ old.getLabel());
+
+        att.setPubblicazioneUrp(old.isPubblicazioneUrp());
+        att.setPubblicazioneTrasparenza(old.isPubblicazioneTrasparenza());
+        att.setDataProtocollo( String.valueOf(data.get(attachmentName + "_rettifica_dataProtocollo")) );
+        att.setNumeroProtocollo( String.valueOf(data.get(attachmentName + "_rettifica_numeroProtocollo")) );
+        att.setStati(old.getStati());
+
+        att.setAzione(Enum.Azione.RettificaProtocollo);
+
+        flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, att.getName(), att);
         if(att.isProtocollo()) {
             String vecchiProtocolli = runtimeService.getVariable(processInstanceId, flowsAttachmentService.NUMERI_PROTOCOLLO, String.class);
             flowsAttachmentService.addProtocollo(vecchiProtocolli, att.getNumeroProtocollo());

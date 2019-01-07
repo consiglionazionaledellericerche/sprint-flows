@@ -47,9 +47,10 @@
     $scope.submitAggiornaDocumento = function(file) {
 
       utils.prepareForSubmit($scope.data, $scope.attachments);
+      var suffix = $scope.data.tipoModifica || "";
 
       Upload.upload({
-        url: 'api/attachments/'+ processInstanceId +'/'+ attachment.name +'/data',
+        url: 'api/attachments/'+ processInstanceId +'/'+ attachment.name +'/data/'+ suffix,
         data: $scope.data,
       }).then(function (response) {
         $scope.loadAttachments();
