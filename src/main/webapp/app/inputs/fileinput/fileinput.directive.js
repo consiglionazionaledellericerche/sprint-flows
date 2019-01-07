@@ -38,7 +38,8 @@
                 pubblicazioneDisabilitato: '=?',    // disabilitare gli slider di pubblicazione senza impostare i valori
                 pubblicazioneUrpDisabilitato: '=?',    // disabilitare gli slider di pubblicazione senza impostare i valori
                 pubblicazioneTrasparenzaDisabilitato: '=?',    // disabilitare gli slider di pubblicazione senza impostare i valori
-                protocolloDisabilitato: '=?'        // disabilitare gli slider di protocollo senza impostare i valori
+                protocolloDisabilitato: '=?',        // disabilitare gli slider di protocollo senza impostare i valori
+                sliderProtocolloDisabilitato: '=?'
             },
             link: function ($scope, element, attrs) {
 
