@@ -225,11 +225,15 @@ public class FlowsAttachmentResource {
         FlowsAttachment old = runtimeService.getVariable(processInstanceId, attachmentName, FlowsAttachment.class);
         FlowsAttachment att = new FlowsAttachment();
 
+        String baseName = "rettifica"+ old.getName();
+        int index = flowsAttachmentService.getNextIndexByProcessInstanceId(processInstanceId, baseName);
+        String name = baseName + index;
+        att.setName(name);
+
         MultipartFile file = request.getFile(attachmentName + "_rettifica_data");
         att.setFilename(file.getOriginalFilename());
         att.setBytes(file.getBytes());
         att.setMimetype(getMimetype(file));
-        att.setName("rettifica"+ old.getName());
         att.setLabel("Rettifica "+ old.getLabel());
 
         att.setPubblicazioneUrp(old.isPubblicazioneUrp());
@@ -333,7 +337,7 @@ public class FlowsAttachmentResource {
             @PathVariable("attachmentName") String attachmentName,
             @RequestParam("pubblica") boolean pubblica ) {
 
-        flowsAttachmentService.setPubblicabileTrasparenzaByProcessInstanceId(processInstanceId, attachmentName, pubblica);
+        flowsAttachmentService.setPubblicabileUrpByProcessInstanceId(processInstanceId, attachmentName, pubblica);
 
     }
 }
