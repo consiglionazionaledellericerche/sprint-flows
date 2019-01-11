@@ -1,5 +1,5 @@
 <ul class="list-unstyled">
-    <li ng-repeat="attachment in attachments track by $index">
+    <li ng-repeat="attachment in attachments track by $index">Sistemato bottone pubblicazione URP
         <strong>{{ attachment.label || attachment.name}}:</strong>
         <a href
            ng-click="downloadFile('/api/attachments/'+ processInstanceId +'/'+ attachment.name +'/data', attachment.filename, attachment.mimetype)">
