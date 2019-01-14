@@ -1,10 +1,10 @@
 package it.cnr.si.flows.ng.resource;
 
-import it.cnr.si.flows.ng.dto.EntitaOrganizzativaWebDto;
 import it.cnr.si.flows.ng.ldap.LdapPersonToSearchResultMapper;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
 import org.activiti.engine.ManagementService;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
