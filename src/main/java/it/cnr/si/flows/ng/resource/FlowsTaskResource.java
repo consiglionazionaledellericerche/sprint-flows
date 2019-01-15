@@ -123,7 +123,7 @@ public class FlowsTaskResource {
     }
 
 
-    @RequestMapping(value = "/{id}/{user}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{id}/{user:.*}", method = RequestMethod.PUT)
     @Secured(AuthoritiesConstants.USER)
     @Timed
     @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canAssignTask(#id, #user)")
