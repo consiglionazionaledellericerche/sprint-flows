@@ -201,6 +201,8 @@ public class FlowsAttachmentResource {
         att.setFilename(file.getOriginalFilename());
         att.setBytes(file.getBytes());
         att.setMimetype(getMimetype(file));
+        att.setNumeroProtocollo(request.getParameter(attachmentName + "_dataProtocollo"));
+        att.setDataProtocollo(request.getParameter(attachmentName + "_sostituzione_numeroProtocollo"));
         att.setMetadato("motivoSostituzione", request.getParameter("motivoSostituzione"));
         att.setAzione(Enum.Azione.SostituzioneProtocollo);
 

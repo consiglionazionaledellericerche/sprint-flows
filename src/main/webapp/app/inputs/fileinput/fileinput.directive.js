@@ -39,7 +39,8 @@
                 pubblicazioneUrpDisabilitato: '=?',    // disabilitare gli slider di pubblicazione senza impostare i valori
                 pubblicazioneTrasparenzaDisabilitato: '=?',    // disabilitare gli slider di pubblicazione senza impostare i valori
                 protocolloDisabilitato: '=?',        // disabilitare gli slider di protocollo senza impostare i valori
-                sliderProtocolloDisabilitato: '=?'
+                sliderProtocolloDisabilitato: '=?',
+                mostraModifica: '=?'                // visualizzare la versione breve (espandibile) in modifica?
             },
             link: function ($scope, element, attrs) {
 
@@ -67,6 +68,9 @@
                             $scope.$parent.attachments[$scope.name].aggiorna = true;
                         }
                     }
+
+                    if ($scope.mostraModifica === undefined)
+                        $scope.mostraModifica = true;
 
                     $scope.min = $scope.min || $scope.rows.length || 0;
                     $scope.max = $scope.max || 999;
@@ -107,7 +111,6 @@
                 }
 
                 $scope.onClickProtocollo = function(row) {
-                $log.info('pippo')
                     if (!$scope.$parent.attachments[row.rowname].protocollo) {
                         $scope.$parent.attachments[row.rowname].dataprotocollo = undefined;
                         $scope.$parent.attachments[row.rowname].numeroprotocollo = undefined;
