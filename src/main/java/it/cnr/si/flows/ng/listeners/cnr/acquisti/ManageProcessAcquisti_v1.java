@@ -449,6 +449,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				//attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
 			}
 			attachmentService.setPubblicabileTrasparenza(execution, "ProvvedimentoDiRevoca", true);
+			pubblicaTuttiFilePubblicabili(execution);
 		};break;	
 		case "end-revocato": {
 		};break;
