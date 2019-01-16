@@ -296,6 +296,10 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 					protocolloDocumentoService.protocollaDocumento(execution, "contratto", execution.getVariable("numeroProtocollo_contratto").toString(), execution.getVariable("dataProtocollo_contratto").toString());
 				}
 			}
+			if(sceltaUtente != null && sceltaUtente.equals("RevocaConProvvedimento")) {
+					attachmentService.setPubblicabileTrasparenza(execution, "ProvvedimentoDiRevoca", true);
+			}
+
 		};break; 
 		case "end-stipulato-start": {
 			pubblicaTuttiFilePubblicabili(execution);
@@ -444,7 +448,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				LOGGER.info("Key = " + key + ", Value = " + value);
 				//attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
 			}
-
+			attachmentService.setPubblicabileTrasparenza(execution, "ProvvedimentoDiRevoca", true);
 		};break;	
 		case "end-revocato": {
 		};break;
