@@ -402,10 +402,12 @@ input.ng-touched.ng-invalid, button.ng-touched.ng-invalid, textarea.ng-touched.n
 
 .cnr-banner {
     background: url("../images/cnr-flows-banner.png") center no-repeat;
+    background-size: contain;
 }
 
 .oiv-banner {
     background: url("../images/oiv-flows-banner.png") center no-repeat;
+    background-size: contain;
 }
 
 /* CSS per editor ACE */
