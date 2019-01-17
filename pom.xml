@@ -27,12 +27,14 @@
     </scm>
 
     <properties>
+        <ace-client.version>2.2.3</ace-client.version>
         <activiti.version>5.22.0</activiti.version>
         <assertj-core.version>3.5.2</assertj-core.version>
         <feign.version>9.7.0</feign.version>
         <firmadigitale.version>1.11</firmadigitale.version>
         <gatling-maven-plugin.version>2.1.7</gatling-maven-plugin.version>
         <jacoco-maven-plugin.version>0.7.7.201606060606</jacoco-maven-plugin.version>
+        <jada.version>2.9</jada.version>
         <jasperreports.version>6.6.0</jasperreports.version>
         <json-path.version>2.2.0</json-path.version>
         <liquibase-hibernate4.version>3.5</liquibase-hibernate4.version>
@@ -50,7 +52,6 @@
         <spring.security.version>4.1.1.RELEASE</spring.security.version>
         <spring.version>4.3.2.RELEASE</spring.version>
         <sprint.version>2.0.1</sprint.version>
-        <ace-client.version>2.2.3</ace-client.version>
         <start-class>it.cnr.si.FlowsApp</start-class>
     </properties>
 
@@ -178,17 +179,28 @@
             <artifactId>feign-form</artifactId>
             <version>3.3.0</version>
         </dependency>
-
         <dependency>
-            <groupId>it.cnr.si</groupId>
-            <artifactId>ace-client</artifactId>
-            <version>${ace-client.version}</version>
+            <groupId>it.cnr</groupId>
+            <artifactId>jada-ejb3</artifactId>
+            <version>${jada.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>persistence-api</artifactId>
+                    <groupId>javax.persistence</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
             <groupId>it.cnr.commons</groupId>
             <artifactId>firmadigitale</artifactId>
             <version>${firmadigitale.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>it.cnr.si</groupId>
+            <artifactId>ace-client</artifactId>
+            <version>${ace-client.version}</version>
         </dependency>
         <dependency>
             <groupId>it.cnr.si.sprint</groupId>
@@ -650,7 +662,8 @@
                     </dependency>
                 </dependencies>
                 <configuration>
-                    <changeLogFile>src/main/resources/config/liquibase/master.xml</changeLogFile>
+                    <changeLogFile>src/main/resources/config/liquibase/cnr/master.xml</changeLogFile>
+                    <!--<changeLogFile>src/main/resources/config/liquibase/oiv/master.xml</changeLogFile>-->
                     <diffChangeLogFile>src/main/resources/config/liquibase/changelog/${maven.build.timestamp}_changelog.xml</diffChangeLogFile>
                     <driver />
                     <defaultSchemaName>public</defaultSchemaName>
@@ -661,8 +674,8 @@
                     <!--USR, PSW E URL DB LOCALE-->
                     <username>flows</username>
                     <password />
-                    <!--<url>jdbc:h2:file:./DB-H2/flows-cnr;DB_CLOSE_DELAY=-1</url>-->
-                    <url>jdbc:h2:file:./DB-H2/flows-oiv;DB_CLOSE_DELAY=-1</url>
+                    <url>jdbc:h2:file:./DB-H2/flows-cnr;DB_CLOSE_DELAY=-1</url>
+                    <!--<url>jdbc:h2:file:./DB-H2/flows-oiv;DB_CLOSE_DELAY=-1</url>-->
                     <referenceUrl>hibernate:spring:it.cnr.si.domain?dialect=&amp;hibernate.ejb.naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringNamingStrategy</referenceUrl>
                     <verbose>true</verbose>
                     <logging>debug</logging>
@@ -671,7 +684,8 @@
                         oauth_client_details,
                         oauth_client_token,
                         oauth_code,
-                        oauth_refresh_token</diffExcludeObjects>
+                        oauth_refresh_token,
+                        form</diffExcludeObjects>
                 </configuration>
             </plugin>
             <plugin>
