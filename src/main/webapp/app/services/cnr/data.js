@@ -20,13 +20,13 @@
             },
             tasks: {
                 myTasks: function(processDefinition, firstResult, maxResults, order, params) {
-                    return $http.post('api/tasks/mytasks?processDefinition=' + (processDefinition ? processDefinition.key : 'all') +
+                    return $http.post('api/tasks/mytasks?processDefinition=' + (processDefinition ? processDefinition : 'all') +
                         '&firstResult=' + firstResult +
                         '&maxResults=' + maxResults +
                         '&order=' + order, params);
                 },
                 myTasksAvailable: function(processDefinition, firstResult, maxResults, order, params) {
-                    return $http.post('api/tasks/availabletasks?processDefinition=' + (processDefinition ? processDefinition.key : 'all') +
+                    return $http.post('api/tasks/availabletasks?processDefinition=' + (processDefinition ? processDefinition : 'all') +
                         '&firstResult=' + firstResult +
                         '&maxResults=' + maxResults +
                         '&order=' + order, params);
@@ -50,7 +50,7 @@
                         '&order=' + order, params);
                 },
                 taskAssignedInMyGroups: function(processDefinition, firstResult, maxResults, order, params) {
-                    return $http.post('api/tasks/taskAssignedInMyGroups?processDefinition=' + (processDefinition ? processDefinition.key : 'all') +
+                    return $http.post('api/tasks/taskAssignedInMyGroups?processDefinition=' + (processDefinition ? processDefinition : 'all') +
                         '&firstResult=' + firstResult +
                         '&maxResults=' + maxResults +
                         '&order=' + order, params);
@@ -230,6 +230,18 @@
                             startDateLess: startDateLess,
                         },
                     });
+                }
+            },
+            helpdesk: {
+                // sendWithAttachment: function(hd, attachment){
+                //     return $http({
+                //         url: 'api/helpdesk/sendWithAttachment',
+                //         method: 'Post',
+                //         params: {}
+                //     });
+                // },
+                sendWithoutAttachment: function(hdDataModel){
+                    return $http.post("api/helpdesk/sendWithoutAttachment", hdDataModel)
                 }
             }
         };

@@ -1,0 +1,13 @@
+{
+  "helpdesk": {
+    "title": "HelpDesk",
+    "form": {
+      "avviso": "Before sending a helpdesk message, check if the anomaly is registered in the FAQ, request the appropriate menu item. Fill in all the data to send a helpdesk report. It is not necessary to attach files.",
+      "oggetto": "Object",
+      "messaggio": "Message",
+      "nota": "Annotation",
+      "categoria": "Category",
+      "invia": "Send"
+    }
+  }
+}
