@@ -5,5 +5,19 @@
         .module('sprintApp')
         .constant('VERSION', "0.2.1-SNAPSHOT")
         .constant('DEBUG_INFO_ENABLED', true)
+        .constant('URL_REST', {
+                'PROXY': 'proxy/',
+                'STANDARD': 'api/proxy/'
+        })
+        .constant('OIL_REST', {
+                'ISTANZA': 'HDSiper',
+                'CATEGORIE': 'catg/HDSiper/56',
+                'NEW_PROBLEM': 'pest/'
+        })
+        .constant('APP_FOR_REST', {
+                'SIGLA': 'SIGLA',
+                'SIPER': 'SIPER',
+                'OIL': 'OIL'
+        })
 ;
 })();

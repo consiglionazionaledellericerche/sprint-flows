@@ -100,6 +100,12 @@
                     <span class="hidden-sm">Ricerca</span>
                 </a>
             </li>
+            <li ui-sref-active="active" has-authority="ROLE_USER">
+                <a ui-sref="helpdesk" ng-click="vm.collapseNavbar()">
+                    <span class="glyphicon glyphicon-envelope"></span>
+                    <span class="hidden-sm">Helpdesk</span>
+                </a>
+            </li>
             <li ng-if="app == 'oiv'" ui-sref-active="active" has-authority="ROLE_USER">
                 <a ui-sref="user-memberships" ng-click="vm.collapseNavbar()">
                     <span class="glyphicon glyphicon-user"></span>
