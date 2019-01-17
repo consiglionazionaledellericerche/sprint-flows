@@ -1,0 +1,13 @@
+{
+	"helpdesk": {
+		"title": "HelpDesk",
+		"form": {
+			"avviso": "Prima di inviare una segnalazione di helpdesk controllare se l'anomalia è censita tra le FAQ, utilizzando l'apposita voce di menu. Compilare tutti i dati per inviare una segnalazione helpdesk. Non è necessario allegare files.",
+			"oggetto": "Oggetto",
+			"messaggio": "Messaggio",
+			"nota": "Annotazione",
+			"categoria": "Categoria",
+			"invia": "Invia"
+		}
+	}
+}
