@@ -1,36 +1,48 @@
 <div class="row vertical-align-center well" ng-class="{'row-slim': !advanced}" ng-repeat="task in tasks">
-    <div class="col-md-9">
-        <strong>{{task.variabili.titolo}}</strong> <br>
-        <strong>Flusso avviato da</strong>
-        <em>{{task.variabili.initiator}}</em>
-        <strong>il</strong>
-        <em>{{task.variabili.startDate | data}}</em>
-        <span ng-bind-html="task.priority | priority"></span>
-        <div ng-show="task.variabili.titolo">
-            <strong>Titolo:</strong> {{task.variabili.titolo}} <br>
-        </div>
-        <div ng-show="task.name">
-            <strong>Stato:</strong> {{task.name}}</span> <br>
-        </div>
-
-        <div ng-show="task.variabili.sceltaUtente">
-            <strong>Scelta utente:</strong> {{task.variabili.sceltaUtente}} <br>
-        </div>
-        <div ng-show="task.endTime">
-            <strong>Compito completato il </strong>{{task.endTime | data}}
-        </div>
-        <div ng-show="advanced">
-            <ng-include src="task.searchView"/>
-        </div>
+    <div class="col-xs-8">
+        <ul class="list-unstyled">
+            <li>
+                <small class="label"
+                       ng-class="{'label-info' : process.endTime, 'label-primary' : !process.endTime}">
+                    {{task.variabili.key}}
+                </small>
+            </li>
+            <li>
+                <strong>{{task.variabili.titolo}}</strong> <br>
+            </li>
+            <li>
+                <strong>Flusso avviato da</strong> <em>{{task.variabili.initiator}}</em>
+                <strong>il</strong> <em>{{task.variabili.startDate | data}}</em>
+            </li>
+            <li>
+                <span ng-bind-html="task.priority | priority"></span>
+            </li>
+            <li>
+                <div ng-show="task.variabili.titolo">
+                    <strong>Titolo:</strong> {{task.variabili.titolo}} <br>
+                </div>
+            </li>
+            <li>
+                <div ng-show="task.name">
+                    <strong>Stato:</strong> {{task.name}}</span> <br>
+                </div>
+            </li>
+            <li>
+                <div ng-show="task.variabili.sceltaUtente">
+                    <strong>Scelta utente:</strong> {{task.variabili.sceltaUtente}} <br>
+                </div>
+            </li>
+            <li>
+                <div ng-show="advanced">
+                    <ng-include src="task.searchView"/>
+                </div>
+            </li>
+        </ul>
     </div>
 
-    <div class="col-md-3 pull-right">
+    <div class="col-xs-4 pull-right">
         <div class="btn-group-vertical btn-block" role="group">
             <!--uso il campo completati impropriamente per non far apparire il bottone con le azioni della pagina dei dettagli-->
-            <a ng-show="{{completed}}" class="btn btn-primary" ng-class="{'btn-xs': !advanced}"
-               ui-sref="details({processInstanceId: task.processInstanceId})">
-                <span class="glyphicon glyphicon-th-list"></span> Dettagli Flusso
-            </a>
             <a ng-show="{{!completed}}" class="btn btn-primary" ng-class="{'btn-xs': !advanced}"
                ui-sref="details({processInstanceId: task.processInstanceId, taskId: task.id})">
                 <span class="glyphicon glyphicon-th-list"></span> Dettagli Flusso
@@ -51,4 +63,4 @@
     <div class="loading-spiner spinner-loader"></div>
 </div>
 
-<span ng-show="tasks.length == 0">nessun Compito</span>
+<span ng-show="tasks.length == 0">Nessun Compito</span>

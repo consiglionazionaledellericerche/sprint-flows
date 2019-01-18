@@ -56,34 +56,6 @@ public class DatasourcesConfiguration {
     }
 
 
-    // TODO preferirei affidarmi all'autoconfigurazione di JHipster e non dover creare un dataSource @Primary per poter creare questo secondo... - Martin
-    @Bean(name = {"aceDataSourceProperties"})
-    @ConfigurationProperties(prefix="spring.datasource.ace")
-    public DataSourceProperties aceDataSourceProperties() {
-        return new DataSourceProperties();
-    }
-
-
-    @Bean(name = {"aceDataSource"})
-    public HikariDataSource aceDataSource(@Qualifier("aceDataSourceProperties") DataSourceProperties properties) {
-
-        return (HikariDataSource) DataSourceBuilder
-                .create(properties.getClassLoader())
-                .type(HikariDataSource.class)
-                .driverClassName(properties.determineDriverClassName())
-                .url(properties.determineUrl())
-                .username(properties.determineUsername())
-                .password(properties.determinePassword())
-                .build();
-    }
-
-
-    @Bean(name= {"aceJdbcTemplate"})
-    public JdbcTemplate aceJdbcTemplate(@Qualifier("aceDataSource") DataSource aceDataSource) {
-        return new JdbcTemplate(aceDataSource);
-    }
-
-
     //serve per far puntare db diversi se uso il profilo "oiv" o il profilo "cnr"
     private String getDbUrl(String dbUrl, Collection<String> springActiveProfiles) {
 
