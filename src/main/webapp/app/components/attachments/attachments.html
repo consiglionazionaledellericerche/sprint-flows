@@ -14,9 +14,10 @@
         <span class="label label-primary" ng-if="attachment.pubblicazioneTrasparenza">Pubblicabile in Trasparenza</span>
         <span class="label label-primary" ng-if="attachment.protocollo">Protocollo ({{attachment.numeroProtocollo}})</span>
 
-
         <span ng-repeat="stato in attachment.stati">
-            <span class="label label-primary label-{{stato}}">{{stato}}</span>
+            <span class="label label-primary label-{{stato}}">{{stato}}
+                <span ng-if="stato == 'Protocollato'"> ({{attachment.numeroProtocollo}})</span>
+            </span>
         </span>
 
         <p has-authority="ROLE_ADMIN">{{ attachment | json }}</p>
@@ -41,6 +42,7 @@
                 <strong>{{file.time | dataora}}:</strong> <br>
                 L'utente <strong>{{file.username}}</strong> <br>
                 <span ng-if="file.metadati.azione">ha compiuto l'azione <strong>{{file.metadati.azione}}</strong><br></span>
+                <span ng-if="file.metadati.azione == 'SostituzioneProtocollo'">con motivo <strong>{{file.metadati.motivoSostituzione}}</strong><br></span>
                 sul file <a href ng-click="downloadFile(file.url, file.filename, file.mimetype)">{{file.filename}}</a>
                 <span ng-repeat="state in file.metadati.stati"
                       class="label label-primary label-{{state}}">{{state}}</span> <br>

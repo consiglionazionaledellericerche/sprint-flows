@@ -205,6 +205,7 @@ public class FlowsAttachmentService {
 
 		return processVariables.entrySet().stream()
 				.filter(e -> e.getValue() instanceof FlowsAttachment)
+				.peek(e -> ((FlowsAttachment) e.getValue()).setBytes(null))
 				.collect(Collectors.toMap(k -> k.getKey(), v -> ((FlowsAttachment) v.getValue())));
 	}
 	

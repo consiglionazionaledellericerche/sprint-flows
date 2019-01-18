@@ -20,10 +20,14 @@
                 canUpdateAttachments: '='
             },
             link: function($scope, element, attrs) {
-                $scope.showHistory = $scope.showHistory === undefined ? true : $scope.showHistory;
+
+                function init() {
+                    $scope.showHistory = $scope.showHistory === undefined ? true : $scope.showHistory;
+                    $scope.loadAttachments();
+                }
 
                 function setResponse(response) {
-                    $scope.attachments = response.data;
+                    $scope.attachments = utils.parseAttachments(response.data);
                 }
 
                 function logError(response) {
@@ -33,12 +37,10 @@
 
                 $scope.loadAttachments = function() {
                     if ($scope.processInstanceId !== undefined) {
-                        $log.info("id in attachments " + $scope.processInstanceId);
                         dataService.processInstances.getAttachments($scope.processInstanceId)
                             .then(setResponse, logError);
                     } else {
                         if ($scope.taskId !== undefined) {
-                            $log.info("id in attachments " + $scope.taskId);
                             dataService.tasks.getAttachments($scope.taskId)
                                 .then(setResponse, logError);
                         } else {
@@ -73,6 +75,8 @@
                 };
 
                 $scope.showFileActions = function(attachment) {
+                    attachment.aggiorna = true;
+
                     $uibModal.open({
                         templateUrl: 'app/components/attachments/attachmentactions.modal.html',
                         controller: 'AttachmentActionsModalController',
@@ -103,6 +107,7 @@
                     });
                 };
 
+                init();
             }
         }
     }

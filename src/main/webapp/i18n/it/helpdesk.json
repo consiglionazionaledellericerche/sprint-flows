@@ -1,0 +1,13 @@
+{
+	"helpdesk": {
+		"title": "HelpDesk",
+		"form": {
+			"avviso": "Compilare tutti i dati per inviare una segnalazione helpdesk.",
+			"oggetto": "Oggetto",
+			"messaggio": "Messaggio",
+			"nota": "Annotazione",
+			"categoria": "Categoria",
+			"invia": "Invia"
+		}
+	}
+}
