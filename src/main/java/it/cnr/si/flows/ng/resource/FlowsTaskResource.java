@@ -5,7 +5,10 @@ import it.cnr.si.flows.ng.service.CoolFlowsBridgeService;
 import it.cnr.si.flows.ng.service.FlowsTaskService;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.security.AuthoritiesConstants;
+
+import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.activiti.rest.common.api.DataResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,9 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+
+import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +47,8 @@ public class FlowsTaskResource {
     @Autowired(required = false) @Deprecated
     private CoolFlowsBridgeService coolBridgeService;
 
+    @Inject
+    private RuntimeService runtimeService;
 
     @RequestMapping(value = "/mytasks", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
@@ -123,8 +131,7 @@ public class FlowsTaskResource {
     }
 
 
-    @RequestMapping(value = "/{id}/{user}", method = RequestMethod.PUT)
-    @Secured(AuthoritiesConstants.USER)
+    @RequestMapping(value = "/{id}/{user:.*}", method = RequestMethod.PUT)
     @Timed
     @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canAssignTask(#id, #user)")
     public ResponseEntity<Map<String, Object>> assignTask(
@@ -134,7 +141,8 @@ public class FlowsTaskResource {
 
         //    todo: non è ancora usata nell'interfaccia, fare i test
         taskService.setAssignee(id, user);
-
+        Task task = taskService.createTaskQuery().taskId(id).singleResult();
+        runtimeService.addUserIdentityLink(task.getProcessInstanceId(), user, PROCESS_VISUALIZER);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
