@@ -55,7 +55,7 @@
                 </div>
             </div>
 
-            <div class="row form-group" ng-show="row.modifica">
+            <div class="row form-group" ng-show="row.modifica && mostraModifica">
                 <div class="col-md-12">
                     <button class="btn btn-primary btn-xs" ng-click="$parent.attachments[row.rowname].aggiorna = false">
                         <span class="glyphicon glyphicon-remove-sign"></span> Annulla Modifica
@@ -105,17 +105,17 @@
                             off-label="Non Protocollato"
                             on-label="Protocollato"
                             ng-click="onClickProtocollo(row);"
-                            is-disabled="protocolloDisabilitato">
+                            is-disabled="protocolloDisabilitato || sliderProtocolloDisabilitato">
                         </toggle-switch>
                     </div>
                 </div>
 
                 <div class="row form-group">
-                    <div class="col-md-5" ng-if="$parent.attachments[row.rowname].protocollo">
+                    <div class="col-xs-5" ng-if="$parent.attachments[row.rowname].protocollo">
                         <label>Data protocollo</label>
                         <input type="date" class="form-control" ng-model="$parent.attachments[row.rowname].dataProtocollo" ng-readonly="protocolloDisabilitato" required>
                     </div>
-                    <div class="col-md-7" ng-if="$parent.attachments[row.rowname].protocollo">
+                    <div class="col-xs-7" ng-if="$parent.attachments[row.rowname].protocollo">
                         <label>Numero protocollo</label>
                         <input type="text" class="form-control" ng-model="$parent.attachments[row.rowname].numeroProtocollo" ng-readonly="protocolloDisabilitato" required>
                     </div>
@@ -139,7 +139,7 @@
                             name="$parent.attachments[row.rowname].data"
                             accept="{{accept}}"
                             ngf-multiple="false"
-                            ng-required="cnrRequired" >
+                            ng-required="cnrRequired || (multiple && !row.modifica)" >
                         <span ng-show="!$parent.attachments[row.rowname].data" class="glyphicon glyphicon-upload"></span>
                         <span ng-show="$parent.attachments[row.rowname].data" class="glyphicon glyphicon-repeat"></span>
                         <span ng-show="!$parent.attachments[row.rowname].data">Seleziona File</span>

@@ -70,7 +70,9 @@ public class Enum {
         Annullo,
         Sostituzione,
         RimozioneDaPubblicazioneTrasparenza,
-        RimozioneDaPubblicazioneUrp
+        RimozioneDaPubblicazioneUrp,
+        SostituzioneProtocollo,
+        RettificaProtocollo
     }
 
 

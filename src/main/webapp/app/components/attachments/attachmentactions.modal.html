@@ -32,13 +32,20 @@
     </div>
   </div>
 
+  <hr>
   <div class="row" ng-if="canUpdateAttachments">
     <div class="col-md-12" ng-if="vm.attachment.stati.indexOf('Protocollato') == -1">
       <h4>Aggiorna Documento</h4>
       <form novalidate class="flows-form" name="aggiornaDocumentoForm" ng-submit="submitAggiornaDocumento(picFile)">
 
-        <fileinput name="{{vm.attachment.name}}" label="{{vm.attachment.label}}" multiple=false cnr-required=true />
-        <button class="btn btn-primary" type="submit" ng-disabled="processDefinitionForm.$invalid">
+        <fileinput
+                name="{{vm.attachment.name}}"
+                label="{{vm.attachment.label}}"
+                multiple=false
+                metadati-protocollo="true"
+                mostra-modifica="false"
+                cnr-required=true />
+        <button class="btn btn-primary" type="submit" ng-disabled="aggiornaDocumentoForm.$invalid">
           invia
           <span class="glyphicon glyphicon-arrow-right"></span>
         </button>
@@ -61,21 +68,27 @@
 
         <div class="row" ng-if="data.tipoModifica == 'sostituzione'">
           <div class="col-md-12">
-            <form novalidate class="flows-form" name="aggiornaDocumentoForm" ng-submit="submitAggiornaDocumento(picFile)">
+            <form novalidate class="flows-form" name="aggiornaSostituzioneForm" ng-submit="submitAggiornaDocumento(picFile)">
               <fileinput
-                      name="{{vm.attachment.name}}"
+                      name="{{vm.attachment.name}}_sostituzione"
                       label="{{vm.attachment.label}}"
                       multiple="false"
                       cnr-required="true"
                       metadati-protocollo="true"
+                      protocollo="true"
                       metadati-pubblicazione="true"
                       pubblicazione-trasparenza="vm.attachment.pubblicazioneTrasparenza"
                       pubblicazione-urp="vm.attachment.pubblicazioneUrp"
                       pubblicazione-disabilitato="true"
-
+                      slider-protocollo-disabilitato="true"
               />
 
-              <button class="btn btn-primary" type="submit" ng-disabled="processDefinitionForm.$invalid">
+              <div class="form-group">
+                <label for="motivoSostituzione">Motivo sostituzione</label>
+                <input type="text" id="motivoSostituzione" ng-model="data.motivoSostituzione" class="form-control" required>
+
+              </div>
+              <button class="btn btn-primary" type="submit" ng-disabled="aggiornaSostituzioneForm.$invalid">
                 invia
                 <span class="glyphicon glyphicon-arrow-right"></span>
               </button>
@@ -85,7 +98,7 @@
 
       <div class="row" ng-if="data.tipoModifica == 'rettifica'">
         <div class="col-md-12">
-          <form novalidate class="flows-form" name="aggiornaDocumentoForm" ng-submit="submitAggiornaDocumento(picFile)">
+          <form novalidate class="flows-form" name="rettificaForm" ng-submit="submitAggiornaDocumento(picFile)">
             <fileinput
                     name="{{vm.attachment.name}}_rettifica"
                     label="Rettifica {{vm.attachment.label}}"
@@ -97,10 +110,10 @@
                     pubblicazione-trasparenza="vm.attachment.pubblicazioneTrasparenza"
                     pubblicazione-urp="vm.attachment.pubblicazioneUrp"
                     pubblicazione-disabilitato="true"
-
+                    slider-protocollo-disabilitato="true"
             />
 
-            <button class="btn btn-primary" type="submit" ng-disabled="processDefinitionForm.$invalid">
+            <button class="btn btn-primary" type="submit" ng-disabled="rettificaForm.$invalid">
               invia
               <span class="glyphicon glyphicon-arrow-right"></span>
             </button>
