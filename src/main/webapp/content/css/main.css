@@ -356,7 +356,11 @@ ui bootstrap tweaks
   box-shadow: 4px 4px 13px 2px rgba(0, 0, 0, 0.5)
 }
 
-input.ng-touched.ng-invalid, button.ng-touched.ng-invalid, textarea.ng-touched.ng-invalid, div.ng-touched.ng-invalid {
+input.ng-touched.ng-invalid,
+button.ng-touched.ng-invalid,
+textarea.ng-touched.ng-invalid,
+div.ng-touched.ng-invalid,
+cnr-tree.ng-touched.ng-invalid > .jstree-bootstrap {
   border: solid 1px red;
 }
 
@@ -402,10 +406,12 @@ input.ng-touched.ng-invalid, button.ng-touched.ng-invalid, textarea.ng-touched.n
 
 .cnr-banner {
     background: url("../images/cnr-flows-banner.png") center no-repeat;
+    background-size: contain;
 }
 
 .oiv-banner {
     background: url("../images/oiv-flows-banner.png") center no-repeat;
+    background-size: contain;
 }
 
 /* CSS per editor ACE */
