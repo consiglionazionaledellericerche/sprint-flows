@@ -2,6 +2,9 @@ package it.cnr.si.flows.ng.service;
 
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.security.SecurityUtils;
+import it.cnr.si.spring.storage.StorageObject;
+import it.cnr.si.spring.storage.StoreService;
+import it.cnr.si.spring.storage.config.StoragePropertyNames;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -16,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.inject.Inject;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
@@ -51,6 +55,8 @@ public class FlowsAttachmentService {
 	private HistoryService historyService;
 	@Inject
 	private FlowsAttachmentService attachmentService;
+	@Inject
+	private StoreService storeService;
 
 	/**
 	 * Servizio che trasforma i multipart file in FlowsAttachment
@@ -105,7 +111,7 @@ public class FlowsAttachmentService {
 		return att;
 	}
 
-	public static void setAttachmentProperties(MultipartFile file, String taskId, String taskName, String fileName, Map<String, Object> data, boolean nuovo, String username, FlowsAttachment att) throws IOException {
+	public void setAttachmentProperties(MultipartFile file, String taskId, String taskName, String fileName, Map<String, Object> data, boolean nuovo, String username, FlowsAttachment att) throws IOException {
 
 		att.setName(fileName);
 		att.setTime(new Date());
@@ -115,7 +121,8 @@ public class FlowsAttachmentService {
 		if (file != null) {
 			att.setFilename(file.getOriginalFilename());
 			att.setMimetype(getMimetype(file));
-			att.setBytes(file.getBytes());
+			// att.setBytes(file.getBytes());
+			att.setUrl(saveBytes(file.getBytes(), file.getOriginalFilename()));
 		}
 
 		att.setLabel(                  String.valueOf(data.remove(fileName+"_label")));
@@ -343,4 +350,26 @@ public class FlowsAttachmentService {
                 .distinct()
                 .collect(Collectors.joining(NUMERI_PROTOCOLLO_SEPARATOR));
     }
+
+    private String saveBytes(byte[] bytes, String fileName) {
+
+		Map<String, Object> documentMetadata = new HashMap();
+		documentMetadata.put(StoragePropertyNames.NAME.value(), UUID.randomUUID().toString());
+		documentMetadata.put(StoragePropertyNames.DESCRIPTION.value(), fileName);
+		documentMetadata.put(StoragePropertyNames.SECONDARY_OBJECT_TYPE_IDS.value(), Arrays.asList(StoragePropertyNames.ASPECT_TITLED.value()));
+		documentMetadata.put(StoragePropertyNames.OBJECT_TYPE_ID.value(), StoragePropertyNames.CMIS_DOCUMENT.value());
+
+
+		ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+//		storeService.createFolderIfNotPresent("/root", "flows", "Flows", "Documenti di Flows");
+		StorageObject storageObject = storeService.storeSimpleDocument(bais,
+				getMimetype(bais),
+				"/",
+				documentMetadata
+		);
+
+
+
+		return storageObject.getKey();
+	}
 }
