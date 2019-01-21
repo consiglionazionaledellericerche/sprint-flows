@@ -9,6 +9,8 @@ import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.FlowsUserDetailsService;
 import it.cnr.si.security.PermissionEvaluatorImpl;
+import it.cnr.si.spring.storage.StorageObject;
+import it.cnr.si.spring.storage.StoreService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -31,6 +33,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -60,6 +63,8 @@ public class FlowsAttachmentResource {
     private PermissionEvaluatorImpl permissionEvaluator;
     @Inject
     private FlowsAttachmentService attachmentService;
+    @Inject
+    private StoreService storeService;
 
 
     @RequestMapping(value = "{processInstanceId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -152,11 +157,10 @@ public class FlowsAttachmentResource {
                 .list();
         FlowsAttachment attachment = (FlowsAttachment) list.get(0).getValue();
 
-        response.setContentLength(attachment.getBytes().length);
-        ServletOutputStream output = response.getOutputStream();
+        InputStream is = storeService.getResource(attachment.getUrl());
+
         response.setContentType(attachment.getMimetype());
-        ByteArrayInputStream baos = new ByteArrayInputStream(attachment.getBytes());
-        IOUtils.copy(baos, output);
+        IOUtils.copy(is, response.getOutputStream());
     }
 
     @RequestMapping(value = "{processInstanceId}/{attachmentName}/data", method = RequestMethod.POST)
