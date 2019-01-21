@@ -51,6 +51,7 @@
         <spring.version>4.3.2.RELEASE</spring.version>
         <sprint.version>2.0.1</sprint.version>
         <ace-client.version>2.2.3</ace-client.version>
+        <storage-cloud-cmis.version>0.0.5</storage-cloud-cmis.version>
         <start-class>it.cnr.si.FlowsApp</start-class>
     </properties>
 
@@ -183,6 +184,12 @@
             <groupId>it.cnr.si</groupId>
             <artifactId>ace-client</artifactId>
             <version>${ace-client.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>it.cnr.si</groupId>
+            <artifactId>storage-cloud-cmis</artifactId>
+            <version>${storage-cloud-cmis.version}</version>
         </dependency>
 
         <dependency>
