@@ -1,0 +1,13 @@
+{
+  "helpdesk": {
+    "title": "HelpDesk",
+    "form": {
+      "avviso": "Fill in all the data to send a helpdesk report",
+      "oggetto": "Object",
+      "messaggio": "Message",
+      "nota": "Annotation",
+      "categoria": "Category",
+      "invia": "Send"
+    }
+  }
+}
