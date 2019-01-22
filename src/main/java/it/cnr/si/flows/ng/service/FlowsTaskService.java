@@ -275,7 +275,7 @@ public class FlowsTaskService {
                     .stream()
                     .filter(t ->
                             taskService.getIdentityLinksForTask(t.getId()).stream().anyMatch(il ->
-                                    il.getType() == IdentityLinkType.CANDIDATE && userAuthorities.contains(il.getGroupId()) )
+                                    il.getType().equals(IdentityLinkType.CANDIDATE) && userAuthorities.contains(il.getGroupId()) )
                     ).collect(Collectors.toList());
 
             result.addAll(restResponseFactory.createTaskResponseList(tasks));
