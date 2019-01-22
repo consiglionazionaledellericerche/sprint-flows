@@ -22,7 +22,7 @@ import java.util.HashMap;
 @RequestMapping("/api")
 public class HelpdeskResource {
 
-	public static final String PREFISSO_TITOLO = "[FLOWS] - ";
+	public static final String PREFISSO_TITOLO = "[flows] - ";
 	@Autowired
 	private HelpdeskService helpdeskService;
 	private final Logger log = LoggerFactory.getLogger(HelpdeskResource.class);
