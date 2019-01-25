@@ -1,0 +1,22 @@
+{
+    "fluentMethods": true,
+    "relationships": [],
+    "fields": [
+        {
+            "fieldName": "contenuto",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "attivo",
+            "fieldType": "Boolean"
+        }
+    ],
+    "changelogDate": "20190125124942",
+    "dto": "no",
+    "service": "serviceClass",
+    "entityTableName": "avviso",
+    "pagination": "pagination"
+}
