@@ -15,6 +15,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.ldap.search.LdapUserSearch;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +39,8 @@ public class FlowsUserDetailsService implements org.springframework.security.cor
 	private UserRepository userRepository;
 	@Autowired(required = false)
 	private LdapUserDetailsService ldapUserDetailsService;
+	@Autowired(required = false)
+	private LdapUserSearch ldapUserSearch;
 	@Inject
 	private MembershipService membershipService;
 	@Inject
@@ -83,5 +86,17 @@ public class FlowsUserDetailsService implements org.springframework.security.cor
 					                                    "database or LDAP");
 		else
 			return userDetails;
+	}
+
+	public String getEmailByUsername(final String username) {
+
+		Optional<User> userFromDatabase = userRepository.findOneByLogin(username);
+		if(userFromDatabase.isPresent()) {
+			return userFromDatabase.get().getEmail();
+		} else {
+			return Optional.ofNullable(ldapUserSearch)
+					.map(s -> s.searchForUser(username).getStringAttribute("mail"))
+					.orElse(null);
+		}
 	}
 }

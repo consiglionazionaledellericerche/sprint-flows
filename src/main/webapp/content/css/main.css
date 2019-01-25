@@ -360,7 +360,8 @@ input.ng-touched.ng-invalid,
 button.ng-touched.ng-invalid,
 textarea.ng-touched.ng-invalid,
 div.ng-touched.ng-invalid,
-cnr-tree.ng-touched.ng-invalid > .jstree-bootstrap {
+cnr-tree.ng-touched.ng-invalid > .jstree-bootstrap,
+select.ng-touched.ng-invalid {
   border: solid 1px red;
 }
 

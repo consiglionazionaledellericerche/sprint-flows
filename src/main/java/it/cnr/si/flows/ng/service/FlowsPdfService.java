@@ -171,11 +171,7 @@ public class FlowsPdfService {
 						for (int j = 0; j < keys.length(); j++) {
 							String key = keys.getString(j);
 							Object value = impegno.get(key);
-							String stringValue;
-							if (value instanceof Integer)
-								stringValue = ((Integer) value).toString();
-							else
-								stringValue = (String) value;
+							String stringValue = String.valueOf(value);
 							addLine(paragraphField, key, stringValue, true, true);
 						}
 					}
@@ -310,7 +306,7 @@ public class FlowsPdfService {
 		InputStream jasperFile = null;
 		try {
 			//carico le variabili della process instance
-			LOGGER.debug("Json con i dati da inserire nel pdf: {0}", processvariables.toString().replaceAll("\\\\\"","\""));
+			LOGGER.debug("Json con i dati da inserire nel pdf: {}", processvariables.toString().replaceAll("\\\\\"","\""));
 			JRDataSource datasource = new JsonDataSource(new ByteArrayInputStream(processvariables.toString().getBytes(Charset.forName("UTF-8"))));
 			//JRDataSource datasource = new JsonDataSource(new ByteArrayInputStream(processvariables.toString().replaceAll("\\\\\"","\"").getBytes(Charset.forName("UTF-8"))));
 
@@ -387,7 +383,7 @@ public class FlowsPdfService {
         }
 		try {
 			//carico le variabili della process instance
-			LOGGER.debug("Json con i dati da inserire nel pdf: {0}", processvariables.toString());
+			LOGGER.debug("Json con i dati da inserire nel pdf: {}", processvariables.toString());
 			JRDataSource datasource = new JsonDataSource(new ByteArrayInputStream(processvariables.toString().getBytes(Charset.forName("UTF-8"))));
 
 			final ResourceBundle resourceBundle = ResourceBundle.getBundle(

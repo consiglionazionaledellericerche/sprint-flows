@@ -22,7 +22,7 @@ import java.util.HashMap;
 @RequestMapping("/api")
 public class HelpdeskResource {
 
-	public static final String PREFISSO_TITOLO = "FLOWS";
+	public static final String PREFISSO_TITOLO = "[flows] - ";
 	@Autowired
 	private HelpdeskService helpdeskService;
 	private final Logger log = LoggerFactory.getLogger(HelpdeskResource.class);
@@ -30,9 +30,11 @@ public class HelpdeskResource {
 
 	@PostMapping(value = "/helpdesk/sendWithAttachment", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity sendWithAttachment(HttpServletRequest req, @RequestParam("file") MultipartFile uploadedMultipartFile) {
-		log.info("Invio mail helpdesk con allegato");
+//		todo: riscrivere perchè hd viene inizializzato nel service
+	    log.info("Invio mail helpdesk con allegato");
 		ExternalProblem hd = new ExternalProblem();
-		hd.setTitolo(PREFISSO_TITOLO + " - " + req.getParameter("titolo"));
+
+		hd.setTitolo(PREFISSO_TITOLO + req.getParameter("titolo"));
 		if (StringUtils.hasLength(req.getParameter("idHelpdesk"))){
 			hd.setIdSegnalazione(new Long (req.getParameter("idHelpdesk")));
 			hd.setNota(req.getParameter("nota"));
@@ -51,6 +53,7 @@ public class HelpdeskResource {
 	public ResponseEntity sendWithoutAttachment(@RequestBody ExternalProblem hdDataModel) {
 		log.info("InvHashmaio mail helpdesk senza allegato");
 		HashMap response = new HashMap();
+		hdDataModel.setTitolo(PREFISSO_TITOLO + hdDataModel.getTitolo());
 		response.put("segnalazioneId" ,helpdeskService.newProblem(hdDataModel));
 
 		return JSONResponseEntity.ok(response);

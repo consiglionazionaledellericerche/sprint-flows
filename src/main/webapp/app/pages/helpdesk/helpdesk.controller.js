@@ -26,7 +26,8 @@
     OIL_REST,
     $uibModal
   ) {
-    var dataTree = [];
+    var dataTree = [],
+      hdDataModel = {};
 
     function appo(jsonOil) {
       jsonOil.forEach(element => {
@@ -34,10 +35,8 @@
         el.text = element.descrizione;
         if (element.idPadre === 56) {
           el.parent = "#";
-          // el.icon = "glyphicon glyphicon-folder-open";
         } else {
           el.parent = element.idPadre;
-          // el.icon = "glyphicon glyphicon-folder-open";
         }
         el.icon = "glyphicon glyphicon-folder-close";
         el.id = element.id;
@@ -74,9 +73,19 @@
             tree.core.data = dataTree;
 
             $("#categorieTree")
-              .jstree({ core: { data: dataTree } })
+              .jstree({
+                core: {
+                  data: dataTree
+                },
+                plugins: ["wholerow"]
+              })
               .on("changed.jstree", function(e, data) {
-                vm.categoria = data.node;
+                if (data.instance.is_leaf(data.node)) {
+                  vm.categoria = data.node;
+                } else {
+                  data.instance.deselect_node(data.node, false)
+                  vm.categoria = undefined;
+                }
               })
               .on("open_node.jstree", function(e, data) {
                 data.instance.set_icon(
@@ -92,8 +101,8 @@
               });
           }
         });
-	};
-	
+    };
+
     var initMapHelpDesk = function() {
       $scope.restCategorie();
       delete $scope.helpdeskModel;
@@ -102,24 +111,23 @@
         .remove();
       $('button[name="sendMail"]').unbind("click");
       $('button[name="sendMail"]').click(function() {
-        var hdDataModel = {};
         hdDataModel.titolo = $scope.helpdeskModel.titolo;
         hdDataModel.descrizione = $scope.helpdeskModel.descrizione;
-        hdDataModel.nota = $scope.helpdeskModel.nota;
         hdDataModel.categoria = vm.categoria.id;
-        hdDataModel.idSegnalazione = $scope.idHelpdesk;
         hdDataModel.categoriaDescrizione = vm.categoria.text;
 
         dataService.helpdesk.sendWithoutAttachment(hdDataModel).then(
           function(response) {
-            $uibModal.open({
-              template: `<div class="modal-header">
+            if (response.segnalazioneId) {
+              $uibModal.open({
+                template: `<div class="modal-header">
 									<h4 class="modal-title">Segnalazione inviata correttamente</h4>
 								  </div>
 								  <div class="modal-body">
 									<button class="btn btn-primary" type="button" ng-click="$dismiss()"><span class="glyphicon glyphicon-remove"></span> Chiudi</button>
 								  </div>`
-            });
+              });
+            }
           },
           function(error) {
             $log.error(error);
@@ -186,20 +194,15 @@
     // .prop('disabled', !$.support.fileInput)
     // .parent().addClass($.support.fileInput ? undefined : 'disabled');
 
-    // $scope.sendMailButtonDisable = function(attestatoBuoniPasto) {
-    $scope.sendMailButtonDisable = function() {
-      // return (
-      //   (($scope.helpdeskModel === undefined ||
-      //     $scope.helpdeskModel.titolo === undefined ||
-      //     $scope.helpdeskModel.descrizione === undefined ||
-      //     $scope.helpdeskModel.categoria === undefined) &&
-      //     !$scope.idHelpdesk) ||
-      //   (($scope.helpdeskModel === undefined ||
-      //     $scope.helpdeskModel.nota === undefined) &&
-      //     $scope.idHelpdesk)
-      // );
-
-      return false;
+    vm.sendMailButtonDisable = function() {
+      // todo: la validazione avviene solo dopo aver cambiato il contenuto delle aree di testo
+      return !(
+        vm.categoria !== undefined &&
+        vm.categoria.id !== undefined &&
+        vm.categoria.children.length == 0 &&
+        $scope.helpdeskModel.descrizione !== undefined &&
+        $scope.helpdeskModel.titolo !== undefined
+      );
     };
 
     $scope.trustAsHtml = function(html) {

@@ -1,5 +1,5 @@
 <div ng-show="processes" class="margin-bottom-helper tasks">
-    <div class="row vertical-align-center" ng-repeat="process in processes">
+    <div class="row vertical-align-center well" ng-repeat="process in processes">
         <div class="col-md-10 col-sm-10">
             <a ng-href="#/details?processInstanceId={{process.id}}"
                title="dettagli del flusso {{process.id}}">
@@ -43,4 +43,4 @@
 <div ng-show="paging" style="text-align: center">
     <paginator paging="paging"></paginator>
 </div>
-<span ng-show="processes.length == 0">Nessun Flusso</span>
+<span ng-show="processes.length == 0">nessun Flusso</span>
