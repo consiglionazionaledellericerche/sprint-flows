@@ -1,28 +1,15 @@
 # Immagine da cui prendo le librerie che non ci sono nella distroless
-FROM openjdk:8-jdk-slim
-
-# Immagine distroless java dove gira effettivamente il jar di spring-flows
-FROM gcr.io/distroless/java
+FROM openjdk:8-jdk-alpine
 LABEL maintainer="cironepa@gmail.com"
 
-#todo: provare ad avviare i processi con un'utenza che non sia root
-#USER nonroot
-
-
-# Copy over dependancies for Apache Batik (used by Apache FOP to handle SVG rendering)
-COPY --from=0 ["/usr/lib/x86_64-linux-gnu/libfontconfig.so.1.8.0", "/usr/lib/x86_64-linux-gnu/libfontconfig.so.1"]
-COPY --from=0 ["/usr/share/fonts/truetype/dejavu", "/usr/share/fonts/truetype/dejavu"]
-COPY --from=0 ["/lib/x86_64-linux-gnu/libexpat.so.1", "/lib/x86_64-linux-gnu/libexpat.so.1"]
-# Copy over dependancies for Apache FOP, which are lacking from the JRE supplied in gcr.io/distroless/java
-# Make sure java versions match both in JDK image and the distroless image
-COPY --from=0 ["/usr/lib/x86_64-linux-gnu/libfreetype.so.6.12.3", "/usr/lib/x86_64-linux-gnu/libfreetype.so.6"]
-COPY --from=0 ["/usr/lib/x86_64-linux-gnu/libpng16.so.16.28.0", "/usr/lib/x86_64-linux-gnu/libpng16.so.16"]
-
+RUN apk update
+RUN apk add ttf-dejavu
 
 EXPOSE 8080 5701/udp
 
 ADD app.war /app/app.war
 WORKDIR /app
 
-CMD ["-Djava.security.egd=file:/dev/./urandom -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5701", "app.war"]
+CMD ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "app.war"]
+#CMD ["-Djava.security.egd=file:/dev/./urandom -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5701", "app.war"]
 #CMD ["app.war"]

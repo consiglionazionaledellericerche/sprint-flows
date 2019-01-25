@@ -15,6 +15,7 @@
                 "view": "View",
                 "notificationRule": "Notification Rule",
                 "membership": "Membership",
+                "avviso": "Avviso",
                 "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
             },
             "account": {
