@@ -20,6 +20,10 @@
 
         getAccount();
 
+        dataService.avvisi.getAttivi().then(function(response) {
+            vm.avvisi = response.data;
+        })
+
         /* --- */
 
         function getTasksCount() {

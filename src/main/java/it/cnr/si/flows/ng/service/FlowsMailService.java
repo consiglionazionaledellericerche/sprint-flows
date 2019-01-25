@@ -1,6 +1,7 @@
 package it.cnr.si.flows.ng.service;
 
 import it.cnr.si.flows.ng.config.MailConfguration;
+import it.cnr.si.security.FlowsUserDetailsService;
 import it.cnr.si.service.CnrgroupService;
 import it.cnr.si.service.FlowsUserService;
 import it.cnr.si.service.MailService;
@@ -40,6 +41,8 @@ public class FlowsMailService extends MailService {
     private AceBridgeService aceService;
     @Inject
     private FlowsUserService flowsUserService;
+    @Autowired
+    private FlowsUserDetailsService flowsUserDetailsService;
 
     @Async
     public void sendFlowEventNotification(String notificationType, Map<String, Object> variables, String taskName, String username, final String groupName) {
@@ -65,10 +68,12 @@ public class FlowsMailService extends MailService {
         }
 
         String htmlContent = templateEngine.process(notificationType, ctx);
-        String mailUtente = flowsUserService.getUserWithAuthoritiesByLogin(username).get().getEmail();
+        String mailUtente = flowsUserDetailsService.getEmailByUsername(username);
 
+        LOGGER.info("Invio della mail all'utente "+ username +" con indirizzo "+ mailUtente);
 
         if (!mailConfig.isMailActivated()) {
+            // Per le prove mando *tutte* le email agli indirizzi di prova (e non ai veri destinatari)
             mailConfig.getMailRecipients().stream()
                     .filter(s -> !s.isEmpty())
                     .forEach(s -> {
@@ -81,9 +86,13 @@ public class FlowsMailService extends MailService {
                         sendEmail(s, "Notifica relativa al flusso " + variables.get("businessKey"), htmlContent, false, true);
                     });
         } else {
-            // TODO recuperare la mail da LDAP (vedi issue #66)
-            // TODO scommentare per la produzione
-            sendEmail(mailUtente, "Notifica relativa al flusso " + variables.get("businessKey"), htmlContent, false, true);
+            // In produzione mando le email ai veri destinatari
+            if(mailUtente != null)
+                sendEmail(mailUtente,
+                        "Notifica relativa al flusso " + variables.get("businessKey"),
+                        htmlContent,
+                        false,
+                        true);
         }
     }
 }

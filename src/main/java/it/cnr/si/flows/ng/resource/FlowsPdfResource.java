@@ -132,7 +132,7 @@ public class FlowsPdfResource {
 	 * @throws ParseException the parse exception
 	 */
 //    todo:  TEST
-	@RequestMapping(value = "/makeStatisticPdf", headers = "Accept=application/pdf", method = RequestMethod.GET, produces = "application/pdf")
+	@RequestMapping(value = "/makeStatisticPdf", method = RequestMethod.GET, produces = "application/pdf")
 	@ResponseBody
 	@Timed
 	@Secured(AuthoritiesConstants.USER)
