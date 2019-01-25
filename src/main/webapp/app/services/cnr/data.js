@@ -10,6 +10,11 @@
     function Data($http) {
         return {
 
+            avvisi: {
+                getAttivi: function() {
+                    return $http.get('api/avvisiattivi');
+                }
+            },
             authentication: {
                 impersonate: function(username) {
                     return $http.get('impersonate/start?impersonate_username=' + username);
