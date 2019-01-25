@@ -358,10 +358,10 @@ public class FlowsAttachmentService {
 		documentMetadata.put(StoragePropertyNames.DESCRIPTION.value(), fileName);
 		documentMetadata.put(StoragePropertyNames.SECONDARY_OBJECT_TYPE_IDS.value(), Arrays.asList(StoragePropertyNames.ASPECT_TITLED.value()));
 		documentMetadata.put(StoragePropertyNames.OBJECT_TYPE_ID.value(), StoragePropertyNames.CMIS_DOCUMENT.value());
-
+		// documentMetadata.put("pubblicabileTrasparenza", true); TODO: non ho l'aspect -> non posso settare il metadato
 
 		ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-//		storeService.createFolderIfNotPresent("/root", "flows", "Flows", "Documenti di Flows");
+
 		StorageObject storageObject = storeService.storeSimpleDocument(bais,
 				getMimetype(bais),
 				"/",
