@@ -4,6 +4,6 @@
     angular
         .module('sprintApp')
         .constant('paginationConstants', {
-            'itemsPerPage': 20
+            'itemsPerPage': 20 //todo: refactoring itemsPerPage => itemsForPage
         });
 })();
