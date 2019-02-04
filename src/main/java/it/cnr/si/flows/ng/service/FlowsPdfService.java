@@ -16,6 +16,7 @@ import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.impl.persistence.entity.VariableInstance;
 import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.activiti.engine.impl.variable.SerializableType;
+import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricIdentityLinkResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
@@ -423,25 +424,23 @@ public class FlowsPdfService {
 		String order = "ASC";
 		Integer firstResult = -1;
 		Integer maxResults = -1;
-		Boolean active = true;
-		Boolean finished = false;
 
 		resetStatisticvariables();
 
-		Map<String, Object>  flussiAttivi = flowsProcessInstanceService.search(req, processDefinitionKey, active, order, firstResult, maxResults);
-		Map<String, Object>  flussiTerminati = flowsProcessInstanceService.search(req, processDefinitionKey, finished, order, firstResult, maxResults);
-		Map<String, Integer> mapStatiFlussiAttivi = new HashMap<String, Integer>();
-		Map<String, Integer> mapStatiFlussiTerminati = new HashMap<String, Integer>();
+		DataResponse flussiAttivi = flowsProcessInstanceService.search(req, processDefinitionKey, true, order, firstResult, maxResults, false);
+		DataResponse flussiTerminati = flowsProcessInstanceService.search(req, processDefinitionKey, false, order, firstResult, maxResults, false);
+		Map<String, Integer> mapStatiFlussiAttivi = new HashMap();
+		Map<String, Integer> mapStatiFlussiTerminati = new HashMap();
 
 		//VALORIZZAZIONE PARAMETRI STATISTICHE
-		nrFlussiAttivi = parseInt(flussiAttivi.get("totalItems").toString());
-		nrFlussiTerminati  = parseInt(flussiTerminati.get("totalItems").toString());
+		nrFlussiAttivi = (int) flussiAttivi.getTotal();
+		nrFlussiTerminati  = (int) flussiTerminati.getTotal();
 		nrFlussiTotali = nrFlussiAttivi + nrFlussiTerminati ;
 
 		LOGGER.debug("nr. nrFlussiAttivi: {} - nr. nrFlussiTerminati: {} - nr. nrFlussiTotali: {}", nrFlussiAttivi, nrFlussiTerminati, nrFlussiTotali);
 
 		// GESTIONE VARIABILI SINGOLE ISTANZE FLUSSI ATTIVI
-		List<HistoricProcessInstanceResponse> activeProcessInstances = (List<HistoricProcessInstanceResponse>) flussiAttivi.get("processInstances");
+		List<HistoricProcessInstanceResponse> activeProcessInstances = (List<HistoricProcessInstanceResponse>) flussiAttivi.getData();
 		for (HistoricProcessInstanceResponse pi : activeProcessInstances) {
 			LOGGER.debug(" getId = {}", pi.getId());
 			LOGGER.debug(" getDurationInMillis = {}", pi.getDurationInMillis());
@@ -460,7 +459,7 @@ public class FlowsPdfService {
 		}
 
 		// GESTIONE VARIABILI SINGOLE ISTANZE FLUSSI TERMINATI
-		List<HistoricProcessInstanceResponse> terminatedProcessInstances = (List<HistoricProcessInstanceResponse>) flussiTerminati.get("processInstances");
+		List<HistoricProcessInstanceResponse> terminatedProcessInstances = (List<HistoricProcessInstanceResponse>) flussiTerminati.getData();
 		for (HistoricProcessInstanceResponse pi : terminatedProcessInstances) {
 			LOGGER.debug(" getId = {}", pi.getId());
 			LOGGER.debug(" getDurationInMillis = {}", pi.getDurationInMillis());
