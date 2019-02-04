@@ -12,6 +12,7 @@ import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.impl.util.json.JSONArray;
 import org.activiti.engine.impl.util.json.JSONObject;
+import org.activiti.rest.common.api.DataResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -41,13 +42,16 @@ public class ManageControlli {
 		//Map<String, String> req = new HashMap<String, String>();
         Map<String, String> req = new HashMap<>();
 
+//todo:oiv
 		req.put("codiceFiscaleRichiedente", codiceFiscaleRichiedente);
-		Map<String, Object> map = flowsProcessInstanceService.search(req, processDefinitionKey, active, order, firstResult, maxResults);
-		
+//		Map<String, Object> map = flowsProcessInstanceService.search(req, processDefinitionKey, active, order, firstResult, maxResults);
+		DataResponse map = flowsProcessInstanceService.search(req, processDefinitionKey, active, order, firstResult, maxResults, false);
+
 
 		//LOGGER.info("-- map[0]: " +  map[0]);
 		//if(map.size() > 0){
-		if(!map.get("totalItems").toString().equals("0")){
+//		if(!map.get("totalItems").toString().equals("0")){
+		if(map.getTotal() != 0 ){
 			LOGGER.info("-- Impossibile avviare il flusso un altro flusso risulta giù attivo per il codice fiscale '"+ codiceFiscaleRichiedente +"'" );
 			throw new BpmnError("412", "Impossibile avviare il flusso<br>un altro flusso risulta giù attivo per il codice fiscale '"+ codiceFiscaleRichiedente +"'<br>");
 		}
