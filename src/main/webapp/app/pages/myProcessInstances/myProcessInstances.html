@@ -84,10 +84,7 @@
                     Flussi avviati da me ed ancora ATTIVI
                 </span>
             </h3>
-            <process-list
-                    processes="vm.myProcessInstancesActive"
-                    paging="paging">
-            </process-list>
+            <process-list processes="vm.myProcessInstancesActive"  paging="paging"></process-list>
             <!--paginazione Flussi Attivi-->
             <div class="text-center">
                 <jhi-item-count page="vm.pageActive" total="vm.queryCountActive"
@@ -103,15 +100,12 @@
                     Flussi avviati da me e TERMINATI
                 </span>
             </h3>
-            <process-list
-                    processes="vm.myProcessInstancesTerminated"
-                    paging="paging">
-            </process-list>
+            <process-list processes="vm.myProcessInstancesTerminated" paging="paging"></process-list>
             <!--paginazione Flussi Terminati-->
             <div class="text-center">
-                <jhi-item-count page="vm.TAIMGPage" total="vm.TAIMGQueryCount"
-                                items-per-page="vm.itemsPerPage"></jhi-item-count>
-                <uib-pagination class="pagination-sm" total-items="vm.TAIMGTotalItems" ng-model="vm.TAIMGPage"
+                <jhi-item-count page="vm.pageTerminated" total="vm.queryCountTerminated"
+                                items-per-page="vm.itemsForPage"></jhi-item-count>
+                <uib-pagination class="pagination-sm" total-items="vm.totalItemsTerminated" ng-model="vm.pageTerminated"
                                 ng-change="vm.transition()"></uib-pagination>
             </div>
         </div>
