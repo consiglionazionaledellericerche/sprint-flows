@@ -18,6 +18,7 @@ import org.activiti.engine.impl.pvm.PvmActivity;
 import org.activiti.engine.impl.pvm.ReadOnlyProcessDefinition;
 import org.activiti.engine.impl.task.TaskDefinition;
 import org.activiti.engine.task.IdentityLink;
+import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
@@ -29,8 +30,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
@@ -167,7 +170,7 @@ public class FlowsProcessInstanceService {
 	}
 
 
-	public Map<String, Object> search(Map<String, String> searchParams, String processDefinitionKey, boolean active, String order, int firstResult, int maxResults) {
+	public DataResponse search(Map<String, String> searchParams, String processDefinitionKey, boolean active, String order, int firstResult, int maxResults, boolean includeVariables) {
 
 		FlowsHistoricProcessInstanceQuery processQuery = new FlowsHistoricProcessInstanceQuery(managementService);
 
@@ -175,14 +178,17 @@ public class FlowsProcessInstanceService {
 
 		List<String> authorities = Utils.getCurrentUserAuthorities();
 
-		// solo l'admin ignora le regole di visibilita'
-		if (!authorities.contains("ADMIN")) {
+		// solo l'admin e se sto facendo una query per "flussi avvaiti da me" IGNORO LE REGOLE DI VISIBILITÀ
+		if (!authorities.contains("ADMIN") || searchParams.containsKey(Utils.INITIATOR) ) {
 			processQuery.setVisibleToGroups(authorities);
 			processQuery.setVisibleToUser(SecurityContextHolder.getContext().getAuthentication().getName());
 		}
 
 		if (!processDefinitionKey.equals(ALL_PROCESS_INSTANCES))
 			processQuery.processDefinitionKey(processDefinitionKey);
+
+		if(includeVariables)
+			processQuery.includeProcessVariables();
 
 		if (active)
 			processQuery.unfinished();
@@ -195,31 +201,29 @@ public class FlowsProcessInstanceService {
 			processQuery.orderByProcessInstanceStartTime().desc();
 
 
-		Map<String, Object> result = new HashMap<>();
-
-		long totalItems = processQuery.count();
-		result.put("totalItems", totalItems);
 
 		List<HistoricProcessInstance> processesRaw;
-
 		if (firstResult != -1 && maxResults != -1)
 			processesRaw = processQuery.listPage(firstResult, maxResults);
 		else
 			processesRaw = processQuery.list();
 
-		List<HistoricProcessInstanceResponse> processes = restResponseFactory.createHistoricProcessInstanceResponseList(processesRaw);
-		result.put("processInstances", processes);
+		DataResponse response = new DataResponse();
+		response.setStart(firstResult);
+		response.setSize(processesRaw.size());// numero di task restituiti
+		response.setTotal(processQuery.count()); //numero totale di task avviati da me
+		response.setData(restResponseFactory.createHistoricProcessInstanceResponseList(processesRaw));
 
-		return result;
+		return response;
 	}
 
 
 	private void setSearchTerms(Map<String, String> params, FlowsHistoricProcessInstanceQuery processQuery) {
 
 		String title = params.remove("title");
-		String titolo = params.remove("titolo");
-		String initiator = params.remove("initiator");
-		String descrizione = params.remove("descrizione");
+		String titolo = params.remove(TITOLO);
+		String initiator = params.remove(INITIATOR);
+		String descrizione = params.remove(DESCRIZIONE);
 
 		//i campi "titolo, "title", "initiator", "descrizione" sono salvati in un json in name e non come variabili di Process Instance
 		if (title != null || titolo != null || initiator != null || descrizione != null) {
@@ -273,16 +277,16 @@ public class FlowsProcessInstanceService {
 
 	public void updateSearchTerms(String executionId, String processInstanceId, String stato) {
 
-		String initiator =   runtimeService.getVariable(executionId , "initiator").toString();
-		String titolo =  runtimeService.getVariable(executionId , "titolo").toString();
-		String descrizione =  runtimeService.getVariable(executionId , "descrizione").toString();
+		String initiator =   runtimeService.getVariable(executionId , INITIATOR).toString();
+		String titolo =  runtimeService.getVariable(executionId , TITOLO).toString();
+		String descrizione =  runtimeService.getVariable(executionId , DESCRIZIONE).toString();
 
 		JSONObject name = new JSONObject();
 
-		name.put("descrizione", descrizione);
-		name.put("titolo", titolo);
+		name.put(DESCRIZIONE, descrizione);
+		name.put(TITOLO, titolo);
 		name.put("stato", stato);
-		name.put("initiator", initiator);
+		name.put(INITIATOR, initiator);
 
 		runtimeService.setProcessInstanceName(processInstanceId, name.toString());
 
@@ -359,5 +363,24 @@ public class FlowsProcessInstanceService {
 			processQuery.startedBefore(calendar.getTime());
 		else if (key.contains("Great"))
 			processQuery.startedAfter(calendar.getTime());
+	}
+
+
+
+	public HistoricProcessInstanceQuery getProcessInstances(HttpServletRequest req, @RequestParam("active") boolean active, @RequestParam("processDefinition") String processDefinition, @RequestParam("order") String order) {
+		HistoricProcessInstanceQuery historicProcessQuery = historyService.createHistoricProcessInstanceQuery().includeProcessVariables();
+
+		historicProcessQuery = utils.orderProcess(order, historicProcessQuery);
+
+		historicProcessQuery = (HistoricProcessInstanceQuery) utils.searchParamsForProcess(req, historicProcessQuery);
+		if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
+			historicProcessQuery.processDefinitionKey(processDefinition);
+
+		if (active) {
+			historicProcessQuery.unfinished();
+		} else {
+			historicProcessQuery.finished().or().deleted();
+		}
+		return historicProcessQuery;
 	}
 }
