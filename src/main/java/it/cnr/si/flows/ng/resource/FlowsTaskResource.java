@@ -5,11 +5,9 @@ import it.cnr.si.flows.ng.service.CoolFlowsBridgeService;
 import it.cnr.si.flows.ng.service.FlowsTaskService;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.security.AuthoritiesConstants;
-
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.task.Task;
-import org.activiti.engine.task.TaskQuery;
 import org.activiti.rest.common.api.DataResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -23,13 +21,12 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-
-import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 
 /**
  * @author mtrycz
@@ -50,7 +47,9 @@ public class FlowsTaskResource {
     @Inject
     private RuntimeService runtimeService;
 
-    @RequestMapping(value = "/mytasks", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+
+
+    @PostMapping(value = "/mytasks", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<DataResponse> getMyTasks(
@@ -66,7 +65,8 @@ public class FlowsTaskResource {
     }
 
 
-    @RequestMapping(value = "/availabletasks", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+
+    @PostMapping(value = "/availabletasks", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<DataResponse> getAvailableTasks(
@@ -82,7 +82,8 @@ public class FlowsTaskResource {
     }
 
 
-    @RequestMapping(value = "/taskAssignedInMyGroups", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+
+    @PostMapping(value = "/taskAssignedInMyGroups", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<DataResponse> taskAssignedInMyGroups(
@@ -98,7 +99,8 @@ public class FlowsTaskResource {
     }
 
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Map<String, Object>> getTask(@PathVariable("id") String taskId) {
@@ -110,7 +112,7 @@ public class FlowsTaskResource {
 
 
 
-    @RequestMapping(value = "/claim/{taskId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/claim/{taskId}", produces = MediaType.APPLICATION_JSON_VALUE)
 //    @PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.canAssignTask(#taskId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Map<String, Object>> claimTask(@PathVariable("taskId") String taskId) {
@@ -122,7 +124,8 @@ public class FlowsTaskResource {
     }
 
 
-    @RequestMapping(value = "/claim/{taskId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+
+    @DeleteMapping(value = "/claim/{taskId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canAssignTask(#taskId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Map<String, Object>> unclaimTask(@PathVariable("taskId") String taskId) {
@@ -131,7 +134,8 @@ public class FlowsTaskResource {
     }
 
 
-    @RequestMapping(value = "/{id}/{user:.*}", method = RequestMethod.PUT)
+
+    @PutMapping(value = "/{id}/{user:.*}")
     @Timed
     @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canAssignTask(#id, #user)")
     public ResponseEntity<Map<String, Object>> assignTask(
@@ -147,7 +151,8 @@ public class FlowsTaskResource {
     }
 
 
-    @RequestMapping(value = "complete", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+
+    @PostMapping(value = "complete",consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canCompleteTaskOrStartProcessInstance(#req, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Object> completeTask(MultipartHttpServletRequest req) throws IOException {
@@ -156,7 +161,8 @@ public class FlowsTaskResource {
     }
 
 
-    @RequestMapping(value = "/taskCompletedByMe", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+
+    @PostMapping(value = "/taskCompletedByMe", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<Object> getTasksCompletedByMe(
@@ -171,9 +177,11 @@ public class FlowsTaskResource {
         return ResponseEntity.ok(response);
     }
 
+
+
     @Profile("cnr")
     @Deprecated
-    @RequestMapping(value = "/coolAvailableTasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/coolAvailableTasks", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<Map<String, Long>> getCoolAvailableTasks() {
@@ -205,8 +213,6 @@ public class FlowsTaskResource {
             result.compute(procDefId, (k,v) -> v+1);
         });
 
-
         return ResponseEntity.ok(result);
     }
-
 }
