@@ -52,13 +52,11 @@ public class FlowsUserResourceAce {
         Map<String, String> query = new HashMap<String, String>() {{put("term", username);}};
         PageDto<PersonaWebDto> persone = aceService.getPersone(query);
 
-//
-//        //con il profilo "CNR" faccio la ricerca per l'autocompletamento degli utenti su ldap
-//        List<Utils.SearchResult> search = ldapTemplate.search("", "(uid=*" + username + "*)", new LdapPersonToSearchResultMapper());
-//
-
         response.put("more", persone.getCount() > 10);
-        response.put("results", persone.getItems().stream().limit(10).collect(Collectors.toList()));
+        response.put("results", persone.getItems().stream()
+                .limit(10)
+                .map(p -> new Utils.SearchResult(p.getUsername(), p.getNome() +" "+ p.getCognome()))
+                .collect(Collectors.toList()));
 
         return ResponseEntity.ok(response);
     }
