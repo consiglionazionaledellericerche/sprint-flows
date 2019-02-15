@@ -13,7 +13,8 @@
     "URL_REST",
     "APP_FOR_REST",
     "OIL_REST",
-    "$uibModal"
+    "$uibModal",
+    "$state"
   ];
 
   function HelpdeskController(
@@ -24,7 +25,8 @@
     URL_REST,
     APP_FOR_REST,
     OIL_REST,
-    $uibModal
+    $uibModal,
+    $state
   ) {
     var dataTree = [],
       hdDataModel = {};
@@ -124,8 +126,9 @@
 									<h4 class="modal-title">Segnalazione inviata correttamente</h4>
 								  </div>
 								  <div class="modal-body">
-									<button class="btn btn-primary" type="button" ng-click="$dismiss()"><span class="glyphicon glyphicon-remove"></span> Chiudi</button>
-								  </div>`
+									<button class="btn btn-primary" type="button" ng-click="fatto()"><span class="glyphicon glyphicon-remove"></span> Chiudi</button>
+								  </div>`,
+				scope: $scope
               });
             }
           },
@@ -208,5 +211,9 @@
     $scope.trustAsHtml = function(html) {
       return $scope.trustAsHtml(html);
     };
+
+    $scope.fatto = function() {
+      $state.go('home');
+    }
   }
 })();
