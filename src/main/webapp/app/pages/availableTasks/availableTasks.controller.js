@@ -34,7 +34,7 @@
       // carico le form di ricerca specifiche per ogni tipologia di Process Definitions
       $scope.formUrl = utils.loadSearchFields(vm.processDefinitionKey, true);
 
-      vm.itemsForPage = paginationConstants.itemsPerPage;
+      vm.itemsPerPage = paginationConstants.itemsPerPage;
       vm.myTotalItems = vm.itemsPerPage * vm.myPage;
       myFirstResult = vm.itemsPerPage * (vm.myPage - 1);
       myMaxResults = vm.itemsPerPage;
