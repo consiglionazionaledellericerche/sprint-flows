@@ -120,7 +120,7 @@
 
         dataService.helpdesk.sendWithoutAttachment(hdDataModel).then(
           function(response) {
-            if (response.segnalazioneId) {
+            if (response.data.segnalazioneId) {
               $uibModal.open({
                 template: `<div class="modal-header">
 									<h4 class="modal-title">Segnalazione inviata correttamente</h4>
