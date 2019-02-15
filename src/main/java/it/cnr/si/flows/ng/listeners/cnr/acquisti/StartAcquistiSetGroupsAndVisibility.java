@@ -98,7 +98,11 @@ public class StartAcquistiSetGroupsAndVisibility {
             execution.setVariable(Enum.VariableEnum.gruppoStaffAmministrativo.name(), gruppoStaffAmministrativo);
             execution.setVariable("gruppoSFD", gruppoSFD);
             execution.setVariable("sigla", applicazioneSigla);
-
+            //SET VARIABILI Direzione flusso
+			execution.setVariable("statoImpegni", "provvisori"); 
+			if (execution.getVariable("tipologiaAffidamentoDiretto") == null) {
+				execution.setVariable("tipologiaAffidamentoDiretto", "normale"); 
+			}
         }
 
     }
