@@ -10,7 +10,7 @@
     vm.order = "ASC";
 
     //variabili usate nella paginazione
-    vm.itemsForPage = paginationConstants.itemsPerPage;
+    vm.itemsPerPage = paginationConstants.itemsPerPage;
     vm.pageActive = 1;
     vm.pageTerminated = 1;
     vm.totalItemsActive = vm.itemsPerPage * vm.pageActive;
