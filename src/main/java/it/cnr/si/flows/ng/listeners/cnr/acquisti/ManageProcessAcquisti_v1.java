@@ -195,10 +195,10 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				protocolloDocumentoService.protocolla(execution, "decisioneContrattare");
 			}
 		};break;  
-		case "endevent-decisione-contrattare-revoca-start": {
+		case "endevent-decisione-contrattare-annulla-start": {
 		};break;     
-		case "endevent-decisione-contrattare-revoca-end": {
-			execution.setVariable("direzioneFlusso", "RevocaSemplice");
+		case "endevent-decisione-contrattare-annulla-end": {
+			execution.setVariable("direzioneFlusso", "Annulla");
 		};break;   
 		case "endevent-decisione-contrattare-protocollo-end": {
 			execution.setVariable("direzioneFlusso", "Stipula");
@@ -206,19 +206,30 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 		// END DECISIONE-CONTRATTARE 
 
 		case "espletamento-procedura-end": {	
-			if (execution.getVariable("strumentoAcquisizioneId") != null && execution.getVariable("strumentoAcquisizioneId").equals("23")) {
+			if (execution.getVariable("strumentoAcquisizioneId") != null && (execution.getVariable("strumentoAcquisizioneId").equals("21") || execution.getVariable("strumentoAcquisizioneId").equals("23"))) {
 				acquistiService.OrdinaElencoDitteCandidate(execution);
+			}
+			if (execution.getVariable("tipologiaAffidamentoDiretto") != null && (execution.getVariable("tipologiaAffidamentoDiretto").toString().equals("semplificata"))) {
+				execution.setVariable("statoImpegni", "definitivi"); 	
+			} else {
+				execution.setVariable("tipologiaAffidamentoDiretto", "normale"); 
 			}
 			pubblicaTuttiFilePubblicabili(execution);
 		};break;
 		// START PROVVEDIMENTO-AGGIUDICAZIONE  
 		case "predisposizione-provvedimento-aggiudicazione-start": {
-			if (execution.getVariable("nrElencoDitteInit") != null) {
-				//				acquistiService.SostituisciDocumento(execution, "provvedimentoAggiudicazione");
-				acquistiService.ScorriElencoDitteCandidate(execution);	
+			if (execution.getVariable("strumentoAcquisizioneId") != null && (execution.getVariable("strumentoAcquisizioneId").equals("21") || execution.getVariable("strumentoAcquisizioneId").equals("23"))) {
+
+				if (execution.getVariable("nrElencoDitteInit") != null) {
+					//				acquistiService.SostituisciDocumento(execution, "provvedimentoAggiudicazione");
+					acquistiService.ScorriElencoDitteCandidate(execution);	
+				}
+				dittaCandidata.evidenzia(execution);
 			}
-			dittaCandidata.evidenzia(execution);
 		};break;
+		case "predisposizione-provvedimento-aggiudicazione-end": {
+			execution.setVariable("statoImpegni", "definitivi"); 
+		};break; 
 		case "firma-provvedimento-aggiudicazione-end": {
 			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
 				firmaDocumentoService.eseguiFirma(execution, "provvedimentoAggiudicazione");
@@ -297,7 +308,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				}
 			}
 			if(sceltaUtente != null && sceltaUtente.equals("RevocaConProvvedimento")) {
-					attachmentService.setPubblicabileTrasparenza(execution, "ProvvedimentoDiRevoca", true);
+				attachmentService.setPubblicabileTrasparenza(execution, "ProvvedimentoDiRevoca", true);
 			}
 
 		};break; 
