@@ -177,9 +177,10 @@ public class FlowsAttachmentResource {
         String tipoModifica = request.getParameter("tipoModifica");
 
         FlowsAttachment att = runtimeService.getVariable(processInstanceId, attachmentName, FlowsAttachment.class);
+        String key = runtimeService.getVariable(processInstanceId, "key", String.class);
         MultipartFile file = request.getFile(attachmentName + "_data");
 
-        attachmentService.setAttachmentProperties(file, null, "Fuori Task", attachmentName, data, false, username, att);
+        attachmentService.setAttachmentProperties(file, null, "Fuori Task", attachmentName, data, false, username, att, key);
 
         flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, attachmentName, att);
         if(att.isProtocollo()) {
@@ -270,9 +271,10 @@ public class FlowsAttachmentResource {
 
         FlowsAttachment att = new FlowsAttachment();
         MultipartFile file = request.getFile("newfile_data");
+        String key = runtimeService.getVariable(processInstanceId, "key", String.class);
         String attachmentName = "allegati"+ attachmentService.getNextIndexByProcessInstanceId(processInstanceId, "allegati");
 
-        attachmentService.setAttachmentProperties(file, null, "Fuori Task", "newfile", data, true, username, att);
+        attachmentService.setAttachmentProperties(file, null, "Fuori Task", "newfile", data, true, username, att, key);
         att.setName(attachmentName);
 
         flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, attachmentName, att);
