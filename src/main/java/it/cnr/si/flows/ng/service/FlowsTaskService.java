@@ -316,15 +316,15 @@ public class FlowsTaskService {
 		if (isEmpty(taskId) && isEmpty(definitionId))
 			throw new ProcessDefinitionAndTaskIdEmptyException();
 
-		Map<String, Object> data = extractParameters(req);
-		attachmentService.extractAttachmentVariables(req, data);
-
 		if (isEmpty(taskId)) {
 
 			ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitionId).singleResult();
 			try {
 				String counterId = processDefinition.getName() + "-" + Calendar.getInstance().get(Calendar.YEAR);
 				String key = counterId + "-" + counterService.getNext(counterId);
+
+				Map<String, Object> data = extractParameters(req);
+				attachmentService.extractAttachmentVariables(req, data, key);
 
 				//recupero l'idStruttura dell'utente che sta avviando il flusso
 				List<GrantedAuthority> authorities = relationshipService.getAllGroupsForUser(username);
@@ -380,6 +380,10 @@ public class FlowsTaskService {
 			}
 		} else {
 			try {
+				String key = taskService.getVariable(taskId, "key", String.class);
+				Map<String, Object> data = extractParameters(req);
+				attachmentService.extractAttachmentVariables(req, data, key);
+
 				// aggiungo l'identityLink che indica l'utente che esegue il task
 				taskService.addUserIdentityLink(taskId, username, TASK_EXECUTOR);
 				taskService.setVariablesLocal(taskId, data);

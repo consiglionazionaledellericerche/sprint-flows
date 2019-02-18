@@ -2,6 +2,7 @@ package it.cnr.si.flows.ng.service;
 
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.security.SecurityUtils;
+import it.cnr.si.spring.storage.StorageException;
 import it.cnr.si.spring.storage.StorageObject;
 import it.cnr.si.spring.storage.StoreService;
 import it.cnr.si.spring.storage.config.StoragePropertyNames;
@@ -63,7 +64,7 @@ public class FlowsAttachmentService {
 	 * per il successivo salvataggio sul db
 	 *
 	 */
-	public void extractAttachmentVariables(MultipartHttpServletRequest req, Map<String, Object> data) throws IOException {
+	public void extractAttachmentVariables(MultipartHttpServletRequest req, Map<String, Object> data, String key) throws IOException {
 		Map<String, FlowsAttachment> attachments = new HashMap<>();
 		String taskId, taskName;
 
@@ -82,7 +83,7 @@ public class FlowsAttachmentService {
 				.collect(Collectors.toList());
 
 		for (String fileName : nomiFileDaInserire ) {
-			FlowsAttachment att = extractSingleAttachment(req, taskId, taskName, fileName, data);
+			FlowsAttachment att = extractSingleAttachment(req, taskId, taskName, fileName, data, key);
 			attachments.put(fileName, att);
 		}
 
@@ -92,7 +93,7 @@ public class FlowsAttachmentService {
         data.put(NUMERI_PROTOCOLLO, protocolliUniti);
 	}
 
-    public FlowsAttachment extractSingleAttachment(MultipartHttpServletRequest req, String taskId, String taskName, String fileName, Map<String, Object> data) throws IOException {
+    public FlowsAttachment extractSingleAttachment(MultipartHttpServletRequest req, String taskId, String taskName, String fileName, Map<String, Object> data, String key) throws IOException {
 
 		LOGGER.info("inserisco come variabile il file {}", fileName);
 		boolean nuovo = taskId.equals("start") || taskService.getVariable(taskId, fileName) == null;
@@ -106,12 +107,12 @@ public class FlowsAttachmentService {
 
 		MultipartFile file = req.getFile(fileName + "_data");
 
-		setAttachmentProperties(file, taskId, taskName, fileName, data, nuovo, username, att);
+		setAttachmentProperties(file, taskId, taskName, fileName, data, nuovo, username, att, key);
 
 		return att;
 	}
 
-	public void setAttachmentProperties(MultipartFile file, String taskId, String taskName, String fileName, Map<String, Object> data, boolean nuovo, String username, FlowsAttachment att) throws IOException {
+	public void setAttachmentProperties(MultipartFile file, String taskId, String taskName, String fileName, Map<String, Object> data, boolean nuovo, String username, FlowsAttachment att, String key) throws IOException {
 
 		att.setName(fileName);
 		att.setTime(new Date());
@@ -122,7 +123,7 @@ public class FlowsAttachmentService {
 			att.setFilename(file.getOriginalFilename());
 			att.setMimetype(getMimetype(file));
 			// att.setBytes(file.getBytes());
-			att.setUrl(saveBytes(file.getBytes(), file.getOriginalFilename()));
+			att.setUrl(saveOrUpdateBytes(file.getBytes(), fileName, file.getOriginalFilename(), key));
 		}
 
 		att.setLabel(                  String.valueOf(data.remove(fileName+"_label")));
@@ -351,25 +352,31 @@ public class FlowsAttachmentService {
                 .collect(Collectors.joining(NUMERI_PROTOCOLLO_SEPARATOR));
     }
 
-    private String saveBytes(byte[] bytes, String fileName) {
+    private String saveOrUpdateBytes(byte[] bytes, String attachmentName, String fileName, String key) {
+
+	    // save new document
 
 		Map<String, Object> documentMetadata = new HashMap();
-		documentMetadata.put(StoragePropertyNames.NAME.value(), UUID.randomUUID().toString());
+		documentMetadata.put(StoragePropertyNames.NAME.value(), attachmentName);
 		documentMetadata.put(StoragePropertyNames.DESCRIPTION.value(), fileName);
 		documentMetadata.put(StoragePropertyNames.SECONDARY_OBJECT_TYPE_IDS.value(), Arrays.asList(StoragePropertyNames.ASPECT_TITLED.value()));
 		documentMetadata.put(StoragePropertyNames.OBJECT_TYPE_ID.value(), StoragePropertyNames.CMIS_DOCUMENT.value());
-		// documentMetadata.put("pubblicabileTrasparenza", true); TODO: non ho l'aspect -> non posso settare il metadato
 
 		ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
 
-		StorageObject storageObject = storeService.storeSimpleDocument(bais,
-				getMimetype(bais),
-				"/",
-				documentMetadata
-		);
-
-
-
-		return storageObject.getKey();
+		try {
+            return storeService.storeSimpleDocument(bais,
+                    getMimetype(bais),
+                    "/Comiuncazioni al CNR/flows/" + key,
+                    documentMetadata
+            ).getKey();
+        } catch (StorageException e) {
+		    if (e.getType() == StorageException.Type.CONSTRAINT_VIOLATED) {
+		        // il documento e' gia' presente
+                StorageObject so = storeService.getStorageObjectByPath("/Comunicazioni al CNR/flows/" + key +"/"+ attachmentName);
+                return storeService.updateStream(so.getKey(), bais, getMimetype(bais)).getKey();
+            } else
+                throw e;
+        }
 	}
 }
