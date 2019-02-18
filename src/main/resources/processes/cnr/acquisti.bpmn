@@ -754,7 +754,7 @@
       </sequenceFlow>
     </subProcess>
     <sequenceFlow id="flow119" sourceRef="exclusivegateway15" targetRef="CONTRATTO-FUORI-MEPA">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${strumentoAcquisizioneId == '13' && sceltaUtente != 'Revoca && tipologiaAffidamentoDiretto!= 'normale''}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${strumentoAcquisizioneId == '13' && sceltaUtente != 'Revoca' && tipologiaAffidamentoDiretto != 'normale'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow120" sourceRef="CONTRATTO-FUORI-MEPA" targetRef="exclusivegateway22"></sequenceFlow>
     <sequenceFlow id="flow122" sourceRef="exclusivegateway20" targetRef="CONTRATTO-FUORI-MEPA">
