@@ -10,6 +10,11 @@
     function Data($http) {
         return {
 
+            avvisi: {
+                getAttivi: function() {
+                    return $http.get('api/avvisiattivi');
+                }
+            },
             authentication: {
                 impersonate: function(username) {
                     return $http.get('impersonate/start?impersonate_username=' + username);
@@ -20,13 +25,13 @@
             },
             tasks: {
                 myTasks: function(processDefinition, firstResult, maxResults, order, params) {
-                    return $http.post('api/tasks/mytasks?processDefinition=' + (processDefinition ? processDefinition.key : 'all') +
+                    return $http.post('api/tasks/mytasks?processDefinition=' + (processDefinition ? processDefinition : 'all') +
                         '&firstResult=' + firstResult +
                         '&maxResults=' + maxResults +
                         '&order=' + order, params);
                 },
                 myTasksAvailable: function(processDefinition, firstResult, maxResults, order, params) {
-                    return $http.post('api/tasks/availabletasks?processDefinition=' + (processDefinition ? processDefinition.key : 'all') +
+                    return $http.post('api/tasks/availabletasks?processDefinition=' + (processDefinition ? processDefinition : 'all') +
                         '&firstResult=' + firstResult +
                         '&maxResults=' + maxResults +
                         '&order=' + order, params);
@@ -50,7 +55,7 @@
                         '&order=' + order, params);
                 },
                 taskAssignedInMyGroups: function(processDefinition, firstResult, maxResults, order, params) {
-                    return $http.post('api/tasks/taskAssignedInMyGroups?processDefinition=' + (processDefinition ? processDefinition.key : 'all') +
+                    return $http.post('api/tasks/taskAssignedInMyGroups?processDefinition=' + (processDefinition ? processDefinition : 'all') +
                         '&firstResult=' + firstResult +
                         '&maxResults=' + maxResults +
                         '&order=' + order, params);
@@ -71,8 +76,12 @@
                         '?processInstanceId=' + processInstanceId +
                         '&detail=' + ((detail !== undefined) ? true : false));
                 },
-                myProcessInstances: function(searchParams) {
-                    return $http.post('api/processInstances/myProcessInstances', searchParams);
+                myProcessInstances: function(processDefinitionKey, active, firstResult, maxResults, order, params) {
+                    return $http.post('api/processInstances/myProcessInstances?active=' + active +
+                        '&processDefinitionKey=' + (processDefinitionKey ? processDefinitionKey : 'all') +
+                        '&order=' + order +
+                        '&firstResult=' + firstResult +
+                        '&maxResults=' + maxResults, params);
                 },
                 getProcessInstances: function(processDefinition, active, firstResult, maxResults, order, params) {
                     return $http.post('api/processInstances/getProcessInstances?active=' + active +
@@ -230,6 +239,18 @@
                             startDateLess: startDateLess,
                         },
                     });
+                }
+            },
+            helpdesk: {
+                // sendWithAttachment: function(hd, attachment){
+                //     return $http({
+                //         url: 'api/helpdesk/sendWithAttachment',
+                //         method: 'Post',
+                //         params: {}
+                //     });
+                // },
+                sendWithoutAttachment: function(hdDataModel){
+                    return $http.post("api/helpdesk/sendWithoutAttachment", hdDataModel)
                 }
             }
         };

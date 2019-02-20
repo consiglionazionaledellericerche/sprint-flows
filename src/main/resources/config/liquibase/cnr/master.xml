@@ -30,4 +30,6 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/cnr/changelog/20180410115515_added_entity_Membership.xml"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/cnr/changelog/20190125124942_added_entity_Avviso.xml"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>
