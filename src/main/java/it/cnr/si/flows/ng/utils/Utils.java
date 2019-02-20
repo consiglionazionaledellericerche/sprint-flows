@@ -30,6 +30,10 @@ public final class Utils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
 
+    public static final String INITIATOR = "initiator";
+    public static final String TITOLO = "titolo";
+    public static final String DESCRIZIONE = "descrizione";
+
     public static final String TASK_EXECUTOR = "esecutore";
     public static final String PROCESS_VISUALIZER = "visualizzatore";
 

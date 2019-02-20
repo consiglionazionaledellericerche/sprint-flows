@@ -136,8 +136,7 @@ public class FlowsTaskService {
 		return response;
 	}
 
-	public Map<String, Object> search(Map<String, String> params, String processInstanceId, boolean active, String order, int firstResult, int maxResults) {
-		Map<String, Object> result = new HashMap<>();
+	public DataResponse search(Map<String, String> params, String processInstanceId, boolean active, String order, int firstResult, int maxResults) {
 		HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery();
 
 		if (!processInstanceId.equals(ALL_PROCESS_INSTANCES))
@@ -152,13 +151,15 @@ public class FlowsTaskService {
 
 		taskQuery = (HistoricTaskInstanceQuery) utils.orderTasks(order, taskQuery);
 
-		long totalItems = taskQuery.count();
-		result.put("totalItems", totalItems);
-
 		List<HistoricTaskInstance> taskRaw = taskQuery.includeProcessVariables().listPage(firstResult, maxResults);
-		List<HistoricTaskInstanceResponse> tasks = restResponseFactory.createHistoricTaskInstanceResponseList(taskRaw);
-		result.put("tasks", tasks);
-		return result;
+
+		DataResponse response = new DataResponse();
+		response.setStart(firstResult);
+		response.setSize(taskRaw.size());// numero di task restituiti
+		response.setTotal(taskQuery.count()); //numero totale di task avviati da me
+		response.setData(restResponseFactory.createHistoricTaskInstanceResponseList(taskRaw));
+
+		return response;
 	}
 
 	// TODO questo metodo e' duplicato di uno in utils (controllare)
@@ -178,7 +179,10 @@ public class FlowsTaskService {
 					taskQuery.processVariableValueLikeIgnoreCase(key, "%" + value + "%");
 				else if (key.contains("Fase"))
 					taskQuery.taskNameLikeIgnoreCase("%" + value + "%");
-				else {
+                else if (key.contains("titolo"))
+                    taskQuery.processVariableValueLike("titolo", "%" + value + "%");
+
+                else {
 					//wildcard ("%") di default ma non a TUTTI i campi
 					switch (type) {
 						case "textEqual":
@@ -251,12 +255,6 @@ public class FlowsTaskService {
 
         List<String> userAuthorities = SecurityUtils.getCurrentUserAuthorities();
 
-//        String authorithiesList = userAuthorities.stream().map(s -> "'"+s+"'").collect(Collectors.joining(","));
-
-//        NativeTaskQuery nativeTaskQuery = taskService.createNativeTaskQuery().sql(
-//				"SELECT task.* FROM ACT_RU_TASK task, ACT_RU_IDENTITYLINK link " +
-//						" WHERE task.ID_ = link.TASK_ID_ AND link.GROUP_ID_ IN("+ authorithiesList +")");
-
 		TaskQuery taskQuery = (TaskQuery) utils.searchParamsForTasks(req, taskService.createTaskQuery().includeProcessVariables());
 
 		if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
@@ -275,7 +273,7 @@ public class FlowsTaskService {
                     .stream()
                     .filter(t ->
                             taskService.getIdentityLinksForTask(t.getId()).stream().anyMatch(il ->
-                                    il.getType() == IdentityLinkType.CANDIDATE && userAuthorities.contains(il.getGroupId()) )
+                                    il.getType().equals(IdentityLinkType.CANDIDATE) && userAuthorities.contains(il.getGroupId()) )
                     ).collect(Collectors.toList());
 
             result.addAll(restResponseFactory.createTaskResponseList(tasks));

@@ -1,6 +1,6 @@
 spring:
     ldap:
-        userSearchBase: o=cnr, c=it
+        userSearchBase: o=cnr,c=it
         userSearchFilter: uid={0}
         url: ldap://virtest1.si.cnr.it:389
         managerDn: cn=mastercnrapp2,ou=account,o=cnr,c=it
@@ -10,17 +10,27 @@ spring:
         # l'url del db viene modificata all'avvio dell'applicazione a seconda del profilo (cnr => flows-cnr,
         # oiv => flows-oiv) in modo che l'applicazione punti un db diverso a seconda del profilo
         url: jdbc:h2:mem:flows-test;DB_CLOSE_DELAY=-1
-#       url: jdbc:h2:file:./DB-H2/flows-test;DB_CLOSE_DELAY=-1
+        #       url: jdbc:h2:file:./DB-H2/flows-test;DB_CLOSE_DELAY=-1
         username: flows
         password:
-    ace:
-        url: http://acebuntudock.si.cnr.it:5555/
-        username: app.scrivaniadigitale
-        password: bubbazza
     jpa:
         database-platform: it.cnr.si.domain.util.FixedH2Dialect
         database: H2
         show-sql: false
+        properties:
+          hibernate.cache.use_second_level_cache: false
+          hibernate.cache.use_query_cache: false
+          hibernate.generate_statistics: false
+          hibernate.cache.region.factory_class: it.cnr.si.config.hazelcast.HazelcastCacheRegionFactory
+          hibernate.cache.use_minimal_puts: true
+          hibernate.cache.hazelcast.use_lite_member: true
+    proxy:
+        OIL:
+            username: admin
+            password: ubiquitous
+            url: http://helpwildfly.si.cnr.it:8080/rest/
+            newProblem: pest
+            instance: /HDSiper
 
 cnr:
     activiti:
@@ -39,6 +49,9 @@ cnr:
          mail.port: 25
          mail.send.error.to: marcinireneusz.trycz@cnr.it
          mail.from: no-reply@scrivaniadigitale
+    coolflows:
+         username: utente1
+         password: HggHjhUIuhedfwUI788yasdfiuh897
 oiv:
      baseurl: http://cool-jconon-funzione-pubblica.test.si.cnr.it
      esperienza-noncoerente: ${oiv.baseurl}/rest/application-fp/esperienza-noncoerente
@@ -71,4 +84,12 @@ jhipster:
         license:
         licenseUrl:
 jasper-report:
-    dir: /src/main/resources/print/oiv-print/
+    dir-oiv: /src/main/resources/print/oiv-print/
+    dir-cnr: /src/main/resources/print/cnr-print/
+
+ace:
+    url: "http://acebuntudock.si.cnr.it:5555/api"
+    username: app.scrivaniadigitale
+    password: bubbazza
+    cache.hazelcast.port: 5709
+    cache.hazelcast.packages: it.cnr.si
