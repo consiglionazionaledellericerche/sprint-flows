@@ -1,0 +1,23 @@
+{
+    "sprintApp": {
+        "avviso" : {
+            "home": {
+                "title": "Avvisos",
+                "createLabel": "Genera un nuovo Avviso",
+                "createOrEditLabel": "Genera o modifica un Avviso",
+                "search": "Cerca Avviso"
+            },
+            "created": "&Egrave; stato generato un nuovo Avviso con identificatore { param }}",
+            "updated": "&Egrave; stato aggiornato Avviso identificato da {{ param }}",
+            "deleted": "&Egrave; stato eliminato Avviso con identificatore {{ param }}",
+            "delete": {
+                "question": "Sei sicuro di volere eliminare Avviso {{ id }}?"
+            },
+            "detail": {
+                "title": "Avviso"
+            },
+            "contenuto": "Contenuto",
+            "attivo": "Attivo"
+        }
+    }
+}
