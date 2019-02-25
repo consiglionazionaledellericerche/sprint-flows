@@ -299,10 +299,9 @@ public class FlowsAttachmentResource {
                         .singleResult();
         FlowsAttachment attachment = (FlowsAttachment) variable.getValue();
 
-        response.setContentLength(attachment.getBytes().length);
         ServletOutputStream output = response.getOutputStream();
         response.setContentType(attachment.getMimetype());
-        ByteArrayInputStream baos = new ByteArrayInputStream(attachment.getBytes());
+        InputStream baos = flowsAttachmentService.getAttachmentBytes(attachment.getUrl());
         IOUtils.copy(baos, output);
     }
 
