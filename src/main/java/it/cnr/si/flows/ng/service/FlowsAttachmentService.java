@@ -358,71 +358,24 @@ public class FlowsAttachmentService {
 
     private String saveOrUpdateBytes(byte[] bytes, String attachmentName, String fileName, String key) {
 
-        HashMap<String, Object> documentMetadata = new HashMap();
-        documentMetadata.put(StoragePropertyNames.NAME.value(), attachmentName);
-        documentMetadata.put(StoragePropertyNames.DESCRIPTION.value(), fileName);
-        documentMetadata.put(StoragePropertyNames.SECONDARY_OBJECT_TYPE_IDS.value(), Arrays.asList(StoragePropertyNames.ASPECT_TITLED.value()));
-        documentMetadata.put(StoragePropertyNames.OBJECT_TYPE_ID.value(), StoragePropertyNames.CMIS_DOCUMENT.value());
-
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
 
-        StorageObject old = storeService.getStorageObjectByPath("/test/test.xml");
+        StorageFile storageFile = new StorageFile(bais,
+                getMimetype(bais),
+                attachmentName);
 
-//        if(old == null) {
+        storageFile.setTitle(fileName);
+        storageFile.setDescription(fileName);
 
-            //			storageService.createDocument()
-            //            return storeService.storeSimpleDocument(bais,
-            //                    getMimetype(bais),
-            //                    "/Comiuncazioni al CNR/flows/" + key,
-            //                    documentMetadata
-            //            ).getKey();
+        StorageObject so = storeService.restoreSimpleDocument(
+                storageFile,
+                new ByteArrayInputStream(storageFile.getBytes()),
+                storageFile.getContentType(),
+                attachmentName,
+                "/Comunicazioni al CNR/flows/" + key,
+                true);
 
-            StorageFile storageFile = new StorageFile(bais,
-                    getMimetype(bais),
-                    attachmentName);
-
-            storageFile.setTitle(fileName);
-            storageFile.setDescription(fileName);
-
-            //            final StorageObject storageObject = storeService.restoreSimpleDocument(
-            //                    storageFile,
-            //                    new ByteArrayInputStream(storageFile.getBytes()),
-            //                    storageFile.getContentType(),
-            //                    storageFile.getFileName(),
-            //                    "/Comunicazioni al CNR/flows/" + key +"/"+ attachmentName,
-            //                    true);
-            //
-            //            return storageObject.getKey();
-
-//            StorageObject so = storeService.storeSimpleDocument(storageFile,
-//                    bais,
-//                    storageFile.getContentType(),
-//                    storageFile.getFileName(),
-//                    "/Comunicazioni al CNR/flows/" + key,
-//                    StoragePropertyNames.CMIS_DOCUMENT.value(),
-//                    true
-//            );
-
-            StorageObject so = storeService.restoreSimpleDocument(
-                    storageFile,
-                    new ByteArrayInputStream(storageFile.getBytes()),
-                    storageFile.getContentType(),
-                    attachmentName,
-                    "/Comunicazioni al CNR/flows/" + key,
-                    true);
-
-            return so.getKey();
-
-//        } else {
-//
-//            StorageObject so2 = storeService.updateStream(
-//                    old.getKey(),
-//                    bais,
-//                    getMimetype(bais));
-//
-//            return so2.getKey();
-//
-//        }
+        return so.getKey();
     }
 
     public InputStream getAttachmentBytes(String key) {
