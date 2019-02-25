@@ -50,6 +50,8 @@
         <spring.security.version>4.1.1.RELEASE</spring.security.version>
         <spring.version>4.3.2.RELEASE</spring.version>
         <sprint.version>2.0.1</sprint.version>
+        <ace-client.version>2.2.3</ace-client.version>
+        <storage-cloud-cmis.version>0.0.5</storage-cloud-cmis.version>
         <start-class>it.cnr.si.FlowsApp</start-class>
     </properties>
 
@@ -160,6 +162,36 @@
             <artifactId>opencsv</artifactId>
             <version>3.9</version>
         </dependency>
+
+        <!--prova dipendenze ace-->
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-core</artifactId>
+            <version>${feign.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-gson</artifactId>
+            <version>${feign.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.openfeign.form</groupId>
+            <artifactId>feign-form</artifactId>
+            <version>3.3.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>it.cnr.si</groupId>
+            <artifactId>ace-client</artifactId>
+            <version>${ace-client.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>it.cnr.si</groupId>
+            <artifactId>storage-cloud-cmis</artifactId>
+            <version>${storage-cloud-cmis.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>it.cnr.commons</groupId>
             <artifactId>firmadigitale</artifactId>
@@ -180,6 +212,11 @@
             <groupId>it.cnr.si.sprint</groupId>
             <artifactId>sprint-ldap</artifactId>
             <version>${sprint.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.dongliu</groupId>
+            <artifactId>gson-java8-datatype</artifactId>
+            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>net.sf.jasperreports</groupId>
@@ -280,6 +317,12 @@
             <version>1.2.0</version>
         </dependency>
         <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <version>${spring-boot.version}</version>
@@ -289,35 +332,6 @@
             <groupId>org.thymeleaf</groupId>
             <artifactId>thymeleaf-spring4</artifactId>
             <version>3.0.6.RELEASE</version>
-        </dependency>
-
-
-        <!--prova dipendenze ace-->
-        <dependency>
-            <groupId>io.github.openfeign</groupId>
-            <artifactId>feign-core</artifactId>
-            <version>${feign.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.openfeign</groupId>
-            <artifactId>feign-gson</artifactId>
-            <version>${feign.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.openfeign.form</groupId>
-            <artifactId>feign-form</artifactId>
-            <version>3.3.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.dongliu</groupId>
-            <artifactId>gson-java8-datatype</artifactId>
-            <version>1.1.0</version>
         </dependency>
     </dependencies>
 
