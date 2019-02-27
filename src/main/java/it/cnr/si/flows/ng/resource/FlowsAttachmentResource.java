@@ -9,6 +9,7 @@ import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.FlowsUserDetailsService;
 import it.cnr.si.security.PermissionEvaluatorImpl;
+import it.cnr.si.spring.storage.StoreService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -29,16 +30,13 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.inject.Inject;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static it.cnr.si.flows.ng.utils.Enum.Azione.Aggiornamento;
-import static it.cnr.si.flows.ng.utils.Enum.Azione.Caricamento;
 import static it.cnr.si.flows.ng.utils.MimetypeUtils.getMimetype;
 
 @Controller
@@ -60,6 +58,8 @@ public class FlowsAttachmentResource {
     private PermissionEvaluatorImpl permissionEvaluator;
     @Inject
     private FlowsAttachmentService attachmentService;
+    @Inject
+    private StoreService storeService;
 
 
     @RequestMapping(value = "{processInstanceId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -126,7 +126,7 @@ public class FlowsAttachmentResource {
                         return a;
                     })
                     .sorted( (l, r) -> l.getTime().compareTo(r.getTime()) )
-                    .map(h -> {h.setBytes(null); return h;})
+//                    .map(h -> {h.setBytes(null); return h;})
                     .collect(Collectors.toList());
 
             return ResponseEntity.ok(result);
@@ -152,11 +152,10 @@ public class FlowsAttachmentResource {
                 .list();
         FlowsAttachment attachment = (FlowsAttachment) list.get(0).getValue();
 
-        response.setContentLength(attachment.getBytes().length);
-        ServletOutputStream output = response.getOutputStream();
+        InputStream is = storeService.getResource(attachment.getUrl());
+
         response.setContentType(attachment.getMimetype());
-        ByteArrayInputStream baos = new ByteArrayInputStream(attachment.getBytes());
-        IOUtils.copy(baos, output);
+        IOUtils.copy(is, response.getOutputStream());
     }
 
     @RequestMapping(value = "{processInstanceId}/{attachmentName}/data", method = RequestMethod.POST)
@@ -173,11 +172,12 @@ public class FlowsAttachmentResource {
         String tipoModifica = request.getParameter("tipoModifica");
 
         FlowsAttachment att = runtimeService.getVariable(processInstanceId, attachmentName, FlowsAttachment.class);
+        String key = runtimeService.getVariable(processInstanceId, "key", String.class);
         MultipartFile file = request.getFile(attachmentName + "_data");
 
-        attachmentService.setAttachmentProperties(file, null, "Fuori Task", attachmentName, data, false, username, att);
+        attachmentService.setAttachmentPropertiesAndBytes(att, null, "Fuori Task", attachmentName, data, key, false, username, file);
+        flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, attachmentName, att, null);
 
-        flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, attachmentName, att);
         if(att.isProtocollo()) {
             String vecchiProtocolli = runtimeService.getVariable(processInstanceId, flowsAttachmentService.NUMERI_PROTOCOLLO, String.class);
             flowsAttachmentService.addProtocollo(vecchiProtocolli, att.getNumeroProtocollo());
@@ -199,14 +199,13 @@ public class FlowsAttachmentResource {
         FlowsAttachment att = runtimeService.getVariable(processInstanceId, attachmentName, FlowsAttachment.class);
         MultipartFile file = request.getFile(attachmentName + "_sostituzione_data");
         att.setFilename(file.getOriginalFilename());
-        att.setBytes(file.getBytes());
         att.setMimetype(getMimetype(file));
-        att.setNumeroProtocollo(request.getParameter(attachmentName + "_dataProtocollo"));
-        att.setDataProtocollo(request.getParameter(attachmentName + "_sostituzione_numeroProtocollo"));
+        att.setNumeroProtocollo(request.getParameter(attachmentName + "_sostituzione_numeroProtocollo"));
+        att.setDataProtocollo(request.getParameter(attachmentName + "_dataProtocollo"));
         att.setMetadato("motivoSostituzione", request.getParameter("motivoSostituzione"));
         att.setAzione(Enum.Azione.SostituzioneProtocollo);
 
-        flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, attachmentName, att);
+        flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, attachmentName, att, file.getBytes());
         if(att.isProtocollo()) {
             String vecchiProtocolli = runtimeService.getVariable(processInstanceId, flowsAttachmentService.NUMERI_PROTOCOLLO, String.class);
             flowsAttachmentService.addProtocollo(vecchiProtocolli, att.getNumeroProtocollo());
@@ -234,7 +233,6 @@ public class FlowsAttachmentResource {
 
         MultipartFile file = request.getFile(attachmentName + "_rettifica_data");
         att.setFilename(file.getOriginalFilename());
-        att.setBytes(file.getBytes());
         att.setMimetype(getMimetype(file));
         att.setLabel("Rettifica "+ old.getLabel());
 
@@ -246,7 +244,7 @@ public class FlowsAttachmentResource {
 
         att.setAzione(Enum.Azione.RettificaProtocollo);
 
-        flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, att.getName(), att);
+        flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, att.getName(), att, file.getBytes());
         if(att.isProtocollo()) {
             String vecchiProtocolli = runtimeService.getVariable(processInstanceId, flowsAttachmentService.NUMERI_PROTOCOLLO, String.class);
             flowsAttachmentService.addProtocollo(vecchiProtocolli, att.getNumeroProtocollo());
@@ -266,12 +264,12 @@ public class FlowsAttachmentResource {
 
         FlowsAttachment att = new FlowsAttachment();
         MultipartFile file = request.getFile("newfile_data");
+        String key = runtimeService.getVariable(processInstanceId, "key", String.class);
         String attachmentName = "allegati"+ attachmentService.getNextIndexByProcessInstanceId(processInstanceId, "allegati");
 
-        attachmentService.setAttachmentProperties(file, null, "Fuori Task", "newfile", data, true, username, att);
+        attachmentService.setAttachmentPropertiesAndBytes(att, null, "Fuori Task", "newfile", data, key, true, username, file);
         att.setName(attachmentName);
-
-        flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, attachmentName, att);
+        flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, attachmentName, att, null);
 
         if(att.isProtocollo()) {
             String vecchiProtocolli = runtimeService.getVariable(processInstanceId, flowsAttachmentService.NUMERI_PROTOCOLLO, String.class);
@@ -293,10 +291,9 @@ public class FlowsAttachmentResource {
                         .singleResult();
         FlowsAttachment attachment = (FlowsAttachment) variable.getValue();
 
-        response.setContentLength(attachment.getBytes().length);
         ServletOutputStream output = response.getOutputStream();
         response.setContentType(attachment.getMimetype());
-        ByteArrayInputStream baos = new ByteArrayInputStream(attachment.getBytes());
+        InputStream baos = flowsAttachmentService.getAttachmentContent(attachment.getUrl());
         IOUtils.copy(baos, output);
     }
 
@@ -324,7 +321,7 @@ public class FlowsAttachmentResource {
             @PathVariable("attachmentName") String attachmentName,
             @RequestParam("pubblica") boolean pubblica ) {
 
-        flowsAttachmentService.setPubblicabileTrasparenzaByProcessInstanceId(processInstanceId, attachmentName, pubblica);
+        flowsAttachmentService.setPubblicabileTrasparenza(processInstanceId, attachmentName, pubblica);
 
     }
 
@@ -339,7 +336,7 @@ public class FlowsAttachmentResource {
             @PathVariable("attachmentName") String attachmentName,
             @RequestParam("pubblica") boolean pubblica ) {
 
-        flowsAttachmentService.setPubblicabileUrpByProcessInstanceId(processInstanceId, attachmentName, pubblica);
+        flowsAttachmentService.setPubblicabileUrp(processInstanceId, attachmentName, pubblica);
 
     }
 }
