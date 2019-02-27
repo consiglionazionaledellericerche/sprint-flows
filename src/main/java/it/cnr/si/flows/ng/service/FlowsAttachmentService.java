@@ -4,18 +4,18 @@ import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.security.SecurityUtils;
 import it.cnr.si.spring.storage.*;
 import it.cnr.si.spring.storage.bulk.StorageFile;
-import it.cnr.si.spring.storage.config.StoragePropertyNames;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.DelegateExecution;
+import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
+import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -23,7 +23,6 @@ import javax.inject.Inject;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -111,24 +110,28 @@ public class FlowsAttachmentService {
 
         MultipartFile file = req.getFile(fileName + "_data");
 
-        setAttachmentProperties(file, taskId, taskName, fileName, data, nuovo, username, att, key);
+        setAttachmentPropertiesAndBytes(att, taskId, taskName, fileName, data, key, nuovo, username, file);
 
         return att;
     }
 
-    public void setAttachmentProperties(MultipartFile file, String taskId, String taskName, String fileName, Map<String, Object> data, boolean nuovo, String username, FlowsAttachment att, String key) throws IOException {
+    public void setAttachmentPropertiesAndBytes(FlowsAttachment att, String taskId, String taskName, String fileName, Map<String, Object> data, String key, boolean nuovo, String username, MultipartFile file) throws IOException {
+        setAttachmentProperties(att, taskId, taskName, fileName, data, nuovo, username);
+
+        if (file != null) {
+            att.setFilename(file.getOriginalFilename());
+            att.setMimetype(getMimetype(file));
+            att.setUrl(saveOrUpdateBytes(file.getBytes(), att.getFilename(), file.getOriginalFilename(), key));
+        }
+    }
+
+    public void setAttachmentProperties(FlowsAttachment att, String taskId, String taskName, String fileName, Map<String, Object> data, boolean nuovo, String username) throws IOException {
 
         att.setName(fileName);
         att.setTime(new Date());
         att.setTaskId(taskId);
         att.setTaskName(taskName);
         att.setUsername(username);
-        if (file != null) {
-            att.setFilename(file.getOriginalFilename());
-            att.setMimetype(getMimetype(file));
-            // att.setBytes(file.getBytes());
-            att.setUrl(saveOrUpdateBytes(file.getBytes(), fileName, file.getOriginalFilename(), key));
-        }
 
         att.setLabel(                  String.valueOf(data.remove(fileName+"_label")));
         att.setPubblicazioneUrp(		"true".equals(data.remove(fileName+"_pubblicazioneUrp")));
@@ -150,11 +153,24 @@ public class FlowsAttachmentService {
         }
     }
 
-    public void saveAttachment(DelegateExecution execution, String variableName, FlowsAttachment att) {
+    /**
+     * Salva gli attachment di un Process Instance dai listners (e non dai service)
+     * (HA BISOGNO del DelegateExecution).
+     * *
+     * @param execution    l'execution (processInstance) in cui inserire l'allegato
+     * @param variableName Nome della "tipologia" dell'allegato ("rigetto", "carta d'identità", cv", ecc.)
+     * @param att          l'attachment vero e proprio
+     */
+    public void saveAttachment(DelegateExecution execution, String variableName, FlowsAttachment att, byte[] content) {
 
         att.setTime(new Date());
-        att.setTaskName(execution.getCurrentActivityName());
         att.setTaskId((String) execution.getVariable("taskId"));
+        att.setTaskName(execution.getCurrentActivityName());
+
+        if (content != null) {
+            String key = execution.getVariable("key", String.class);
+            att.setUrl(saveOrUpdateBytes(content, variableName, att.getFilename(), key));
+        }
 
         execution.setVariable(variableName, att);
     }
@@ -164,18 +180,35 @@ public class FlowsAttachmentService {
      * Salva gli attachment di un Process Instance NON dai listners ma dai service
      * (NON ha bisogno del DelegateExecution).
      * *
-     *
      * @param variableName Nome della "tipologia" dell'allegato ("rigetto", "carta d'identità", cv", ecc.)
-     * @param att          l'attachment vero e proprio
      * @param taskId       l'id del task in cui viene "allegato" il documento
+     * @param att          l'attachment vero e proprio
      */
-    public void saveAttachment(String variableName, FlowsAttachment att, String taskId) {
+    public void saveAttachment(String variableName, String taskId, FlowsAttachment att, byte[] content) {
         att.setTime(new Date());
         att.setTaskId(taskId);
         Task task = taskService.createTaskQuery().active().taskId(taskId).singleResult();
         att.setTaskName(task.getName());
 
+        if (content != null) {
+            String key = runtimeService.getVariable(task.getExecutionId(), "key", String.class);
+            att.setUrl(saveOrUpdateBytes(content, variableName, att.getFilename(), key));
+        }
+
         runtimeService.setVariable(task.getExecutionId(), variableName, att);
+    }
+
+    public void saveAttachmentFuoriTask(String executionId, String variableName, FlowsAttachment att, byte[] content) {
+        att.setUsername(SecurityUtils.getCurrentUserLogin());
+        att.setTime(new Date());
+        att.setTaskName("Fuori task");
+
+        if (content != null) {
+            String key = runtimeService.getVariable(executionId, "key", String.class);
+            att.setUrl(saveOrUpdateBytes(content, variableName, att.getFilename(), key));
+        }
+
+        runtimeService.setVariable(executionId, variableName, att);
     }
 
     @Deprecated // TODO
@@ -197,8 +230,6 @@ public class FlowsAttachmentService {
      * Per cui, se sto aggiornando un file, vado dritto col nomefile (es. allegato[1])
      * invece se ne sto caricando uno nuovo, ho bisogno di sapere l'ultimo indice non ancora utilizzato
      */
-
-
     public int getNextIndexByProcessInstanceId(String processInstanceId, String fileName) {
         int index = 0;
         String variableName = fileName + index;
@@ -208,7 +239,19 @@ public class FlowsAttachmentService {
         return index;
     }
 
-    public Map<String, FlowsAttachment> getAttachementsForProcessInstance(@PathVariable("processInstanceId") String processInstanceId) {
+    public Map<String, FlowsAttachment> getCurrentAttachments(DelegateExecution execution) {
+
+        Map<String, FlowsAttachment> attachments = new HashMap<>();
+
+        for (Entry<String, Object> entry : runtimeService.getVariables(execution.getId()).entrySet() )
+            if (entry.getValue() instanceof FlowsAttachment)
+                attachments.put(entry.getKey(), (FlowsAttachment) entry.getValue());
+
+        return attachments;
+
+    }
+
+    public Map<String, FlowsAttachment> getAttachementsForProcessInstance(String processInstanceId) {
         Map<String, Object> processVariables = historyService.createHistoricProcessInstanceQuery()
                 .processInstanceId(processInstanceId)
                 .includeProcessVariables()
@@ -217,31 +260,7 @@ public class FlowsAttachmentService {
 
         return processVariables.entrySet().stream()
                 .filter(e -> e.getValue() instanceof FlowsAttachment)
-                .peek(e -> ((FlowsAttachment) e.getValue()).setBytes(null))
-                .collect(Collectors.toMap(k -> k.getKey(), v -> ((FlowsAttachment) v.getValue())));
-    }
-
-    public Map<String, FlowsAttachment> getCurrentAttachments(DelegateExecution execution) {
-
-        Map<String, FlowsAttachment> attachments = new HashMap<>();
-
-        for (Entry<String, Object> entry : execution.getVariables().entrySet())
-            if (entry.getValue() instanceof FlowsAttachment)
-                attachments.put(entry.getKey(), (FlowsAttachment) entry.getValue());
-
-        return attachments;
-
-    }
-
-    public Map<String, FlowsAttachment> getAttachementsForProcessDefinitionKey(@PathVariable("processDefinitionKey") String processDefinitionKey) {
-        Map<String, Object> processVariables = historyService.createHistoricProcessInstanceQuery()
-                .processInstanceId(processDefinitionKey)
-                .includeProcessVariables()
-                .singleResult()
-                .getProcessVariables();
-
-        return processVariables.entrySet().stream()
-                .filter(e -> e.getValue() instanceof FlowsAttachment)
+//                .peek(e -> ((FlowsAttachment) e.getValue()).setBytes(null))
                 .collect(Collectors.toMap(k -> k.getKey(), v -> ((FlowsAttachment) v.getValue())));
     }
 
@@ -259,7 +278,7 @@ public class FlowsAttachmentService {
                 att.removeStato(PubblicatoTrasparenza);
                 att.setPubblicazioneTrasparenza(false);
             }
-            saveAttachmentFuoriTask(execution.getProcessInstanceId(), nomeFile, att);
+            saveAttachmentFuoriTask(execution.getProcessInstanceId(), nomeFile, att, null);
         }
     }
 
@@ -278,24 +297,14 @@ public class FlowsAttachmentService {
                 att.removeStato(PubblicatoUrp);
                 att.setPubblicazioneUrp(false);
             }
-            saveAttachmentFuoriTask(execution.getProcessInstanceId(), nomeFile, att);
+            saveAttachmentFuoriTask(execution.getProcessInstanceId(), nomeFile, att, null);
         }
     }
 
     public void setPubblicabileTrasparenzaByProcessInstanceId(String processInstanceId, String nomeVariabileFile, Boolean flagPubblicazione) {
-        FlowsAttachment att = (FlowsAttachment) runtimeService.getVariable(processInstanceId, nomeVariabileFile);
-        if (att != null) {
-            if (flagPubblicazione) {
-                att.setAzione(PubblicazioneTrasparenza);
-                att.addStato(PubblicatoTrasparenza);
-                att.setPubblicazioneTrasparenza(false);
-            } else {
-                att.setAzione(RimozioneDaPubblicazioneTrasparenza);
-                att.removeStato(PubblicatoTrasparenza);
-                att.setPubblicazioneTrasparenza(false);
-            }
-            saveAttachmentFuoriTask(processInstanceId, nomeVariabileFile, att);
-        }
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        setPubblicabileTrasparenza((ExecutionEntity) processInstance, nomeVariabileFile, flagPubblicazione);
     }
 
     public void setPubblicabileUrpByProcessInstanceId(String processInstanceId, String nomeVariabileFile, Boolean flagPubblicazione) {
@@ -310,16 +319,8 @@ public class FlowsAttachmentService {
                 att.removeStato(PubblicatoUrp);
                 att.setPubblicazioneUrp(false);
             }
-            saveAttachmentFuoriTask(processInstanceId, nomeVariabileFile, att);
+            saveAttachmentFuoriTask(processInstanceId, nomeVariabileFile, att, null);
         }
-    }
-
-    public void saveAttachmentFuoriTask(String executionId, String nomeVariabileFile, FlowsAttachment att) {
-        att.setUsername(SecurityUtils.getCurrentUserLogin());
-        att.setTime(new Date());
-        att.setTaskName("Fuori task");
-
-        runtimeService.setVariable(executionId, nomeVariabileFile, att);
     }
 
     public String mergeProtocolli(Map<String, FlowsAttachment> attachments, String taskId) {
@@ -378,7 +379,23 @@ public class FlowsAttachmentService {
         return so.getKey();
     }
 
-    public InputStream getAttachmentBytes(String key) {
+    public InputStream getAttachmentContent(String key) {
         return storeService.getResource(key);
+    }
+
+    public byte[] getAttachmentContentBytes(String key) {
+        try {
+            return IOUtils.toByteArray(getAttachmentContent(key));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public InputStream getAttachmentContent(FlowsAttachment att) {
+        return getAttachmentContent(att.getUrl());
+    }
+
+    public byte[] getAttachmentContentBytes(FlowsAttachment att) {
+        return getAttachmentContentBytes(att.getUrl());
     }
 }
