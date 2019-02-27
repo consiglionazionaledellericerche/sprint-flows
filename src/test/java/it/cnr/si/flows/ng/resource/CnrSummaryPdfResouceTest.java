@@ -4,6 +4,7 @@ import com.google.common.net.MediaType;
 import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.TestServices;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
@@ -50,6 +51,8 @@ public class CnrSummaryPdfResouceTest {
     private FlowsTaskResource flowsTaskResource;
     @Inject
     private FlowsAttachmentResource flowsAttachmentResource;
+    @Inject
+    private FlowsAttachmentService attachmentService;
     @Inject
     private RuntimeService runtimeService;
     @Inject
@@ -107,7 +110,7 @@ public class CnrSummaryPdfResouceTest {
         assertEquals(summary.getFilename(), titoloPdf);
         assertEquals(summary.getName(), titoloPdf);
         assertEquals(summary.getMimetype(), MediaType.PDF.toString());
-        assertTrue(summary.getBytes().length > 0);
+        assertTrue(attachmentService.getAttachmentContentBytes(summary).length > 0);
     }
 
     @Test

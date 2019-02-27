@@ -288,7 +288,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
 			documentoGenerato.setLabel(labelFile);
 			documentoGenerato.setPubblicazioneTrasparenza(true);
-			flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato);
+			flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
 
 		};break;
 		case "consuntivo-end": {
