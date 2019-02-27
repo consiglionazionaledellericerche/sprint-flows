@@ -139,7 +139,7 @@ public class AcquistiService {
 		LOGGER.debug("Ricarico il file {} originale, ma con gli stati puliti", nomeFileDaSostituire);
 		originale.clearStato();
 		originale.setAzione(Sostituzione);
-		attachmentService.saveAttachment(execution, nomeFileDaSostituire, originale);
+		attachmentService.saveAttachment(execution, nomeFileDaSostituire, originale, null);
 
 		LOGGER.debug("Salvo una copia per futuro riferimento");
 		copia.setAzione(Sostituzione);

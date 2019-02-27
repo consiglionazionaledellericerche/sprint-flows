@@ -89,14 +89,6 @@ public class FlowsAttachment implements Serializable {
         this.name = name;
     }
 
-    public byte[] getBytes() {
-        return bytes;
-    }
-
-    public void setBytes(byte[] bytes) {
-        this.bytes = bytes;
-    }
-
     public String getTaskName() {
         return taskName;
     }
