@@ -36,8 +36,8 @@
         function login (event) {
             event.preventDefault();
             Auth.login({
-                username: vm.username,
-                password: vm.password,
+                username: vm.username.toLowerCase(),
+                password: vm.password.toLowerCase(),
                 rememberMe: vm.rememberMe
             }).then(function () {
                 vm.authenticationError = false;
