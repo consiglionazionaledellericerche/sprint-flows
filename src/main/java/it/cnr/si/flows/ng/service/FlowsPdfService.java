@@ -54,7 +54,6 @@ import java.util.List;
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Aggiornamento;
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Caricamento;
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
-import static it.cnr.si.flows.ng.utils.Utils.parseInt;
 import static org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA_BOLD;
 
 @Service
@@ -348,12 +347,10 @@ public class FlowsPdfService {
 			attachment.setFilename(fileName);
 			attachment.setName(pdfType.name());
 			attachment.setAzione(Aggiornamento);
-			attachment.setBytes(pdfByteArray);
 			attachment.setUsername(utenteRichiedente);
 		} else {
 			//salvo il pdf nel flusso
 			attachment = new FlowsAttachment();
-			attachment.setBytes(pdfByteArray);
 			attachment.setAzione(Caricamento);
 			attachment.setTaskId(null);
 			attachment.setTaskName(null);
@@ -364,7 +361,7 @@ public class FlowsPdfService {
 			attachment.setUsername(utenteRichiedente);
 		}
 		String taskId = taskService.createTaskQuery().processInstanceId(processInstanceId).active().singleResult().getId();
-		flowsAttachmentService.saveAttachment(pdfType.name(), attachment, taskId);
+		flowsAttachmentService.saveAttachment(taskId, pdfType.name(), attachment, pdfByteArray);
 
 		return pdfByteArray;
 	}
