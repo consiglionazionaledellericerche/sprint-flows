@@ -2,6 +2,7 @@ package it.cnr.si.flows.ng.listeners;
 
 import com.google.common.net.MediaType;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.service.FlowsPdfService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.event.ActivitiEvent;
@@ -9,6 +10,7 @@ import org.activiti.engine.delegate.event.ActivitiEventListener;
 import org.activiti.engine.delegate.event.ActivitiEventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
@@ -21,6 +23,9 @@ import static it.cnr.si.flows.ng.utils.Enum.Azione.Caricamento;
 
 @Component
 public class SaveSummaryAtProcessCompletion implements ActivitiEventListener {
+
+    @Autowired
+    private FlowsAttachmentService attachmentService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveSummaryAtProcessCompletion.class);
 
@@ -44,7 +49,6 @@ public class SaveSummaryAtProcessCompletion implements ActivitiEventListener {
             }
 
             FlowsAttachment pdfToDB = new FlowsAttachment();
-            pdfToDB.setBytes(outputStream.toByteArray());
             pdfToDB.setAzione(Caricamento);
             pdfToDB.setTaskId(null);
             pdfToDB.setTaskName(null);
@@ -53,7 +57,7 @@ public class SaveSummaryAtProcessCompletion implements ActivitiEventListener {
             pdfToDB.setFilename(fileName);
             pdfToDB.setMimetype(MediaType.PDF.toString());
 
-            runtimeService.setVariable(event.getExecutionId(), fileName, pdfToDB);
+            attachmentService.saveAttachment(event.getExecutionId(), fileName, pdfToDB, outputStream.toByteArray());
         }
     }
 

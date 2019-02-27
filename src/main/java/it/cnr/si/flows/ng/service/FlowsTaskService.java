@@ -301,7 +301,7 @@ public class FlowsTaskService {
 		// attachments
 		ResponseEntity<Map<String, FlowsAttachment>> attachementsEntity = attachmentResource.getAttachementsForTask(taskId);
 		Map<String, FlowsAttachment> attachments = attachementsEntity.getBody();
-		attachments.values().stream().forEach(e -> e.setBytes(null)); // il contenuto dei file non mi serve, e rallenta l'UI
+
 		response.put("attachments", attachments);
 		return response;
 	}
