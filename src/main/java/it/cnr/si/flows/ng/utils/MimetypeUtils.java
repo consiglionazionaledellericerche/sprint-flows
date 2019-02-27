@@ -22,9 +22,14 @@ public class MimetypeUtils {
         }
     }
 
-    private static String getMimetype(ByteArrayInputStream bais) throws IOException {
-        String mimeType = new Tika().detect(bais);
-        return mimeType;
+    public static String getMimetype(ByteArrayInputStream bais) {
+        try {
+            // Firefox non gioca pulito coi mimetypes e sbaglia i pdf
+            String mimeType = new Tika().detect(bais);
+            return mimeType;
+        } catch (IOException e) {
+            return MimeTypes.OCTET_STREAM;
+        }
     }
 
     public static ByteArrayInputStream getBais(MultipartFile file) throws IOException {
