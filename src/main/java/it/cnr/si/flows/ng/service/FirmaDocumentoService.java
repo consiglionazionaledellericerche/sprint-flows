@@ -38,11 +38,10 @@ public class FirmaDocumentoService {
             String textMessage = "";
 
             FlowsAttachment att = (FlowsAttachment) execution.getVariable(nomeVariabileFile);
-            byte[] bytes = att.getBytes();
+            byte[] bytes = flowsAttachmentService.getAttachmentContentBytes(att);
 
             try {
                 byte[] bytesfirmati = flowsFirmaService.firma(username, password, otp, bytes);
-                att.setBytes(bytesfirmati);
                 att.setFilename(getSignedFilename(att.getFilename()));
                 att.setAzione(Firma);
                 att.addStato(Firmato);
@@ -50,7 +49,7 @@ public class FirmaDocumentoService {
                 att.setUsername(SecurityUtils.getCurrentUserLogin());
                 att.setTime(new Date());
 
-                flowsAttachmentService.saveAttachment(execution, nomeVariabileFile, att);
+                flowsAttachmentService.saveAttachment(execution, nomeVariabileFile, att, bytesfirmati);
                 execution.setVariable("otp", stringaOscurante);
                 execution.setVariable("password", stringaOscurante);
             } catch (ArubaSignServiceException e) {
