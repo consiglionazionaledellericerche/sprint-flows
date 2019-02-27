@@ -361,7 +361,7 @@ public class FlowsPdfService {
 			attachment.setUsername(utenteRichiedente);
 		}
 		String taskId = taskService.createTaskQuery().processInstanceId(processInstanceId).active().singleResult().getId();
-		flowsAttachmentService.saveAttachment(pdfType.name(), taskId, attachment, pdfByteArray);
+		flowsAttachmentService.saveAttachment(taskId, pdfType.name(), attachment, pdfByteArray);
 
 		return pdfByteArray;
 	}

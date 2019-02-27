@@ -321,7 +321,7 @@ public class FlowsAttachmentResource {
             @PathVariable("attachmentName") String attachmentName,
             @RequestParam("pubblica") boolean pubblica ) {
 
-        flowsAttachmentService.setPubblicabileTrasparenzaByProcessInstanceId(processInstanceId, attachmentName, pubblica);
+        flowsAttachmentService.setPubblicabileTrasparenza(processInstanceId, attachmentName, pubblica);
 
     }
 
@@ -336,7 +336,7 @@ public class FlowsAttachmentResource {
             @PathVariable("attachmentName") String attachmentName,
             @RequestParam("pubblica") boolean pubblica ) {
 
-        flowsAttachmentService.setPubblicabileUrpByProcessInstanceId(processInstanceId, attachmentName, pubblica);
+        flowsAttachmentService.setPubblicabileUrp(processInstanceId, attachmentName, pubblica);
 
     }
 }
