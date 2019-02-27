@@ -122,9 +122,11 @@ public class AcquistiService {
 
 	public void ProponiDittaAggiudicataria(DelegateExecution execution) {
 		if (execution.getVariable("verificheRequisitiid") != null && execution.getVariable("verificheRequisitiid").toString().equals("1")) {
-			execution.setVariable("pIvaCodiceFiscaleDittaAggiudicataria", execution.getVariable("pIvaCodiceFiscaleDittaCandidata"));
-			execution.setVariable("ragioneSocialeDittaAggiudicataria", execution.getVariable("ragioneSocialeDittaCandidata"));
-			execution.setVariable("gestioneRTIDittaAggiudicataria", execution.getVariable("gestioneRTIDittaCandidata"));
+			if (execution.getVariable("pIvaCodiceFiscaleDittaAggiudicataria") == null) {
+				execution.setVariable("pIvaCodiceFiscaleDittaAggiudicataria", execution.getVariable("pIvaCodiceFiscaleDittaCandidata"));
+				execution.setVariable("ragioneSocialeDittaAggiudicataria", execution.getVariable("ragioneSocialeDittaCandidata"));
+				execution.setVariable("gestioneRTIDittaAggiudicataria", execution.getVariable("gestioneRTIDittaCandidata"));
+			}
 		}
 	}
 
