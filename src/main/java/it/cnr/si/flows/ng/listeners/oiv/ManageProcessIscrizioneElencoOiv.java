@@ -131,7 +131,9 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
             ;
             break;
             case ISTRUTTORIA_END: {
-                calcolaPunteggioFascia.calcolaAggiornaGiudizioFinale(execution, aggiornaGiudizioFinale);
+        		if(!execution.getVariable("sceltaUtente").equals("richiesta_soccorso_istruttorio")) {
+                    calcolaPunteggioFascia.calcolaAggiornaGiudizioFinale(execution, aggiornaGiudizioFinale);
+        		}
             }
             ;
             break;
@@ -163,7 +165,9 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
             case VALUTAZIONE_START:
             break;
             case VALUTAZIONE_END: {
-                calcolaPunteggioFascia.calcolaAggiornaGiudizioFinale(execution, nonAggiornaGiudizioFinale);
+        		if(!execution.getVariable("sceltaUtente").equals("richiesta_soccorso_istruttorio")) {
+                    calcolaPunteggioFascia.calcolaAggiornaGiudizioFinale(execution, nonAggiornaGiudizioFinale);
+        		}
             }
             ;
             break;
