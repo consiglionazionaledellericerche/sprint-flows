@@ -57,7 +57,7 @@ public class SaveSummaryAtProcessCompletion implements ActivitiEventListener {
             pdfToDB.setFilename(fileName);
             pdfToDB.setMimetype(MediaType.PDF.toString());
 
-            attachmentService.saveAttachment(event.getExecutionId(), fileName, pdfToDB, outputStream.toByteArray());
+            attachmentService.saveAttachmentFuoriTask( event.getExecutionId(), fileName, pdfToDB, outputStream.toByteArray());
         }
     }
 
