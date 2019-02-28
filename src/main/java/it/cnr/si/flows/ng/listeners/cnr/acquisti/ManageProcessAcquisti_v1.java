@@ -7,7 +7,9 @@ import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
-
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -129,6 +131,33 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			}
 		}
 	}
+	public void CalcolaTotaleImpegni(DelegateExecution execution) {
+		double importoTotaleNetto = 0.0;
+		double importoTotaleLordo = 0.0;
+
+		String impegniString = (String) execution.getVariable("impegni_json");
+		JSONArray impegni = new JSONArray(impegniString);
+
+		for ( int i = 0; i < impegni.length(); i++) {
+
+			JSONObject impegno = impegni.getJSONObject(i);
+			try {
+				importoTotaleNetto += impegno.getDouble("importoNetto");
+			} catch (JSONException e) {
+				LOGGER.error("Formato Impegno Non Valido {} nel flusso {} - {}", impegno.getString("importoNetto"), execution.getId(), execution.getVariable("title"));
+				throw new BpmnError("400", "Formato Impegno Non Valido: " + impegno.getString("importoNetto"));
+			}
+			try {
+				importoTotaleLordo += impegno.getDouble("importoLordo");
+			} catch (JSONException e) {
+				LOGGER.error("Formato Impegno Non Valido {} nel flusso {} - {}", impegno.getString("importoLordo"), execution.getId(), execution.getVariable("title"));
+				throw new BpmnError("400", "Formato Impegno Non Valido: " + impegno.getString("importoLordo"));
+			}
+		}
+
+		execution.setVariable("importoTotaleNetto", importoTotaleNetto);
+		execution.setVariable("importoTotaleLordo", importoTotaleLordo);
+	}
 	// FUNZIONE CHE CONTROLLA LA LISTA DEI SOCUMENTI CHE DEVONO ESSERE PUBBLICATI IN TRASPARENZA (SE PRESENTI DEVONO ESSERE PUBBLICATI ALTRIMENTI IL FLUSSO SI BLOCCA)
 	public void controllaFilePubblicabiliTrasparenza(DelegateExecution execution) {
 		Map<String, FlowsAttachment> attachmentList = attachmentService.getCurrentAttachments(execution);
@@ -182,6 +211,12 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			startAcquistiSetGroupsAndVisibility.configuraVariabiliStart(execution);
 		};break;    
 		// START DECISIONE-CONTRATTARE
+		case "DECISIONE-CONTRATTARE-start": {
+			CalcolaTotaleImpegni(execution);
+		};break;  
+		case "modifica-decisione-end": {
+			CalcolaTotaleImpegni(execution);
+		};break;		
 		case "verifica-decisione-start": {
 			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
 		};break;  
@@ -229,6 +264,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 		};break;
 		case "predisposizione-provvedimento-aggiudicazione-end": {
 			execution.setVariable("statoImpegni", "definitivi"); 
+			CalcolaTotaleImpegni(execution);
 		};break; 
 		case "firma-provvedimento-aggiudicazione-end": {
 			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
@@ -249,7 +285,9 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 		case "endevent-provvedimento-aggiudicazione-altro-candidato-end": {
 			execution.setVariable("direzioneFlusso", "SelezionaAltroCandidato");
 		};break;
-
+		case "modifica-provvedimento-aggiudicazione-end": {
+			CalcolaTotaleImpegni(execution);
+		};break;  
 		// END PROVVEDIMENTO-AGGIUDICAZIONE
 
 		// START CONTRATTO FUORI MEPA  

@@ -160,9 +160,11 @@ public class FlowsAttachmentService {
      * @param execution    l'execution (processInstance) in cui inserire l'allegato
      * @param variableName Nome della "tipologia" dell'allegato ("rigetto", "carta d'identità", cv", ecc.)
      * @param att          l'attachment vero e proprio
+     * @param content      il contenuto binario dell'attachment o null per aggiornare solo i metadati
      */
     public void saveAttachment(DelegateExecution execution, String variableName, FlowsAttachment att, byte[] content) {
 
+        att.setUsername(SecurityUtils.getCurrentUserLogin());
         att.setTime(new Date());
         att.setTaskId((String) execution.getVariable("taskId"));
         att.setTaskName(execution.getCurrentActivityName());
@@ -172,7 +174,8 @@ public class FlowsAttachmentService {
             att.setUrl(saveOrUpdateBytes(content, variableName, att.getFilename(), key));
         }
 
-        execution.setVariable(variableName, att);
+//        execution.setVariable(variableName, att);
+        runtimeService.setVariable(execution.getId(), variableName, att);
     }
 
 
@@ -180,11 +183,14 @@ public class FlowsAttachmentService {
      * Salva gli attachment di un Process Instance NON dai listners ma dai service
      * (NON ha bisogno del DelegateExecution).
      * *
-     * @param variableName Nome della "tipologia" dell'allegato ("rigetto", "carta d'identità", cv", ecc.)
      * @param taskId       l'id del task in cui viene "allegato" il documento
+     * @param variableName Nome della "tipologia" dell'allegato ("rigetto", "carta d'identità", cv", ecc.)
      * @param att          l'attachment vero e proprio
+     * @param content      il contenuto binario dell'attachment o null per aggiornare solo i metadati
      */
-    public void saveAttachment(String variableName, String taskId, FlowsAttachment att, byte[] content) {
+    public void saveAttachment(String taskId, String variableName, FlowsAttachment att, byte[] content) {
+
+        att.setUsername(SecurityUtils.getCurrentUserLogin());
         att.setTime(new Date());
         att.setTaskId(taskId);
         Task task = taskService.createTaskQuery().active().taskId(taskId).singleResult();
@@ -199,6 +205,7 @@ public class FlowsAttachmentService {
     }
 
     public void saveAttachmentFuoriTask(String executionId, String variableName, FlowsAttachment att, byte[] content) {
+
         att.setUsername(SecurityUtils.getCurrentUserLogin());
         att.setTime(new Date());
         att.setTaskName("Fuori task");
@@ -301,26 +308,16 @@ public class FlowsAttachmentService {
         }
     }
 
-    public void setPubblicabileTrasparenzaByProcessInstanceId(String processInstanceId, String nomeVariabileFile, Boolean flagPubblicazione) {
+    public void setPubblicabileTrasparenza(String processInstanceId, String nomeVariabileFile, Boolean flagPubblicazione) {
 
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
         setPubblicabileTrasparenza((ExecutionEntity) processInstance, nomeVariabileFile, flagPubblicazione);
     }
 
-    public void setPubblicabileUrpByProcessInstanceId(String processInstanceId, String nomeVariabileFile, Boolean flagPubblicazione) {
-        FlowsAttachment att = (FlowsAttachment) runtimeService.getVariable(processInstanceId, nomeVariabileFile);
-        if (att != null) {
-            if (flagPubblicazione) {
-                att.setAzione(PubblicazioneUrp);
-                att.addStato(PubblicatoUrp);
-                att.setPubblicazioneUrp(false);
-            } else {
-                att.setAzione(RimozioneDaPubblicazioneUrp);
-                att.removeStato(PubblicatoUrp);
-                att.setPubblicazioneUrp(false);
-            }
-            saveAttachmentFuoriTask(processInstanceId, nomeVariabileFile, att, null);
-        }
+    public void setPubblicabileUrp(String processInstanceId, String nomeVariabileFile, Boolean flagPubblicazione) {
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        setPubblicabileUrp((ExecutionEntity) processInstance, nomeVariabileFile, flagPubblicazione);
     }
 
     public String mergeProtocolli(Map<String, FlowsAttachment> attachments, String taskId) {
