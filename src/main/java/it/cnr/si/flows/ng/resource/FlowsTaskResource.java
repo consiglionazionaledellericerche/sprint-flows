@@ -113,7 +113,7 @@ public class FlowsTaskResource {
 
 
     @PutMapping(value = "/claim/{taskId}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    @PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.canAssignTask(#taskId, @flowsUserDetailsService)")
+//    @PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.canClaimTask(#taskId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Map<String, Object>> claimTask(@PathVariable("taskId") String taskId) {
 
@@ -125,28 +125,38 @@ public class FlowsTaskResource {
 
 
 
-    @DeleteMapping(value = "/claim/{taskId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canAssignTask(#taskId, @flowsUserDetailsService)")
+    @PutMapping(value = "/reassign/{assignee:.*}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.isResponsabile(#taskId, #processInstanceId, @flowsUserDetailsService)")
     @Timed
-    public ResponseEntity<Map<String, Object>> unclaimTask(@PathVariable("taskId") String taskId) {
-        taskService.unclaim(taskId);
+    public ResponseEntity<Map<String, Object>> reassignTask(
+            @RequestParam(name = "processInstanceId", required=false) String processInstanceId,
+            @RequestParam(name = "taskId", required=false) String taskId,
+            @PathVariable(value = "assignee") String assignee) {
+
+        if(taskId == null) {
+            // se vengo da pagine in cui ho solo il processInstanceId (tipo ricerca) trovo il taskId
+            Task task = taskService.createTaskQuery()
+                    .processInstanceId(processInstanceId)
+                    .includeProcessVariables()
+                    .singleResult();
+            taskId = task.getId();
+        }
+        taskService.setAssignee(taskId, assignee);
+
+        // Aggiungo l`identityLink per la visualizzazione
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        runtimeService.addUserIdentityLink(task.getProcessInstanceId(), taskId, PROCESS_VISUALIZER);
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
 
 
-    @PutMapping(value = "/{id}/{user:.*}")
+    @DeleteMapping(value = "/claim/{taskId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canClaimTask(#taskId, @flowsUserDetailsService)")
     @Timed
-    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canAssignTask(#id, #user)")
-    public ResponseEntity<Map<String, Object>> assignTask(
-            HttpServletRequest req,
-            @PathVariable("id") String id,
-            @PathVariable("user") String user) {
-
-        //    todo: non è ancora usata nell'interfaccia, fare i test
-        taskService.setAssignee(id, user);
-        Task task = taskService.createTaskQuery().taskId(id).singleResult();
-        runtimeService.addUserIdentityLink(task.getProcessInstanceId(), user, PROCESS_VISUALIZER);
+    public ResponseEntity<Map<String, Object>> unclaimTask(@PathVariable("taskId") String taskId) {
+        taskService.unclaim(taskId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
