@@ -165,7 +165,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
             case VALUTAZIONE_START:
             break;
             case VALUTAZIONE_END: {
-                LOGGER.info("VALUTAZIONE_END");
+                LOGGER.info("VALUTAZIONE_END_PIPPO");
         		if(!execution.getVariable("sceltaUtente").equals("richiesta_soccorso_istruttorio")) {
                     calcolaPunteggioFascia.calcolaAggiornaGiudizioFinale(execution, nonAggiornaGiudizioFinale);
         		}
