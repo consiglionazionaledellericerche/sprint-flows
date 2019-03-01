@@ -9,6 +9,13 @@
                 </span>
 				<br><br>
 			</h4>
+			<div ng-show="isResponsabile">
+				<button class="btn btn-default btn-xs"
+						ng-click="reassign(vm.taskId, processInstanceId)"><span
+						class="glyphicon glyphicon-hand-right"></span> Riassegna Compito
+				</button>
+				<hr>
+			</div>
 			<div>
 				<b>Titolo: </b>{{vm.data.entity.name | get: 'titolo'}} <br>
 			</div>

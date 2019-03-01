@@ -5,13 +5,17 @@
         .module('sprintApp')
         .controller('DetailsController', DetailsController);
 
-    DetailsController.$inject = ['$scope', '$state', 'dataService', '$log', 'utils', '$uibModal', '$window'];
+    DetailsController.$inject = ['$scope', 'Principal', '$state', 'dataService', '$log', 'utils', '$uibModal'];
 
-    function DetailsController($scope, $state, dataService, $log, utils, $uibModal, $window) {
+    function DetailsController($scope, Principal, $state, dataService, $log, utils, $uibModal) {
         var vm = this;
         vm.data = {};
         vm.taskId = $state.params.taskId;
         $scope.processInstanceId = $state.params.processInstanceId; // mi torna comodo per gli attachments -martin
+
+        Principal.identity().then(function(account) {
+            vm.authorities = account.authorities;
+        });
 
         if ($state.params.processInstanceId) {
             dataService.processInstances.byProcessInstanceId($state.params.processInstanceId, true).then(
@@ -39,9 +43,9 @@
                     var processDefinition = response.data.entity.processDefinitionId.split(":");
                     vm.detailsView = 'api/views/' + processDefinition[0] + '/' + processDefinition[1] + '/detail';
 
-                    if(vm.data.entity.variabili.valutazioneEsperienze_json)
+                    if(vm.data.entity.variabili.valutazioneEsperienze_json){
                         vm.experiences = jQuery.parseJSON(vm.data.entity.variabili.valutazioneEsperienze_json);
-
+                    }
 
                     vm.data.history.forEach(function(el) {
                         //recupero l'ultimo task (quello ancora da eseguire)
@@ -61,7 +65,12 @@
 
                     $scope.canPublish = response.data.canPublish;
                     $scope.canUpdateAttachments = response.data.canUpdateAttachments;
-                });
+
+                    $scope.isResponsabile = (vm.authorities.includes("ROLE_responsabile-struttura@" + vm.data.entity.variabili.idStruttura) ||
+                        vm.authorities.includes("ROLE_responsabile#flussi") ||
+                        vm.authorities.includes("ROLE_responsabile#" + vm.data.entity.processDefinitionId.split(':')[0] + "@0000") ||
+                        vm.authorities.includes("ROLE_responsabile#" + vm.data.entity.processDefinitionId.split(':')[0] + "@" + vm.data.entity.variabili.idStruttura))
+                });   
         }
 
 
@@ -104,6 +113,25 @@
                     },
                     startTask: function() {
                         return startTask;
+                    }
+                }
+            })
+        };
+
+
+
+        $scope.reassign = function(taskId, processInstanceId) {
+            $uibModal.open({
+                templateUrl: 'app/pages/details/reassign.modal.html',
+                controller: 'ReassignModalController',
+                controllerAs: 'vm',
+                size: 'md',
+                resolve: {
+                    taskId: function() {
+                        return taskId;
+                    },
+                    processInstanceId: function() {
+                        return processInstanceId;
                     }
                 }
             })

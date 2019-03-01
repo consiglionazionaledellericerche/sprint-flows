@@ -45,6 +45,14 @@
                         method: take ? 'PUT' : 'DELETE',
                     });
                 },
+                reassign: function(taskId, processInstanceId, assignee) {
+                    return $http({
+                        url: 'api/tasks/reassign/' + assignee + '?' +
+                         (taskId ? 'taskId='+ taskId + '&' : '') +
+                         (processInstanceId ? 'processInstanceId='+ processInstanceId : '') ,
+                        method: 'PUT',
+                    });
+                },
                 getTask: function(id) {
                     return $http.get('api/tasks/' + id);
                 },
