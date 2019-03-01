@@ -326,18 +326,14 @@ public class FlowsTaskService {
 
 				//recupero l'idStruttura dell'utente che sta avviando il flusso
 				List<GrantedAuthority> authorities = relationshipService.getAllGroupsForUser(username);
-				List<String> groups = authorities.stream()
+				boolean isAuthorized = authorities.stream()
 						.map(GrantedAuthority::<String>getAuthority)
 						.map(Utils::removeLeadingRole)
-						.filter(g -> g.startsWith("abilitati#"+ processDefinition.getKey() +"@"))
-						.collect(Collectors.toList());
+						.anyMatch(g -> g.startsWith("abilitati#"+ processDefinition.getKey() +"@"));
 
-				if (groups.isEmpty()) {
+				if (!isAuthorized) {
 					throw new BpmnError("403", "L'utente non e' abilitato ad avviare questo flusso");
 				} else {
-					// TODO la struttura va inserita nei listener specifico del flusso e non allo start
-					//                    String gruppoAbilitati = groups.get(0);
-					//                    String idStrutturaString = gruppoAbilitati.substring(gruppoAbilitati.lastIndexOf('@') + 1);
 
 					data.put(initiator.name(), username);
 					data.put(startDate.name(), new Date());

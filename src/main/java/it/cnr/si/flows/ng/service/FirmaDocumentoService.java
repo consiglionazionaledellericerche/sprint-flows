@@ -55,7 +55,7 @@ public class FirmaDocumentoService {
             } catch (ArubaSignServiceException e) {
                 LOGGER.error("FIRMA NON ESEGUITA", e);
                 if (e.getMessage().indexOf("error code 0001") != -1) {
-                    textMessage = "controlla il formato del file sottopsto alla firma<br>";
+                    textMessage = "controlla il formato del file sottoposto alla firma<br>";
                 } else if(e.getMessage().indexOf("error code 0003") != -1) {
                     textMessage = "CREDENZIALI ERRATE<br>";
                 } else if(e.getMessage().indexOf("error code 0004") != -1) {
@@ -70,7 +70,7 @@ public class FirmaDocumentoService {
     }
 
 
-    private static String getSignedFilename(String filename) {
+    public static String getSignedFilename(String filename) {
         String result = filename.substring(0, filename.lastIndexOf('.'));
         result += ".signed";
         result += filename.substring(filename.lastIndexOf('.'));
