@@ -23,7 +23,9 @@ import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.service.ProtocolloDocumentoService;
 import it.cnr.si.flows.ng.listeners.cnr.acquisti.service.AcquistiService;
 
-
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 
 
@@ -249,6 +251,15 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			} else {
 				execution.setVariable("tipologiaAffidamentoDiretto", "normale"); 
 			}
+			if(sceltaUtente != null && !sceltaUtente.equals("Revoca") && !execution.getVariable("tempiCompletamentoProceduraFine").equals("null")) {
+				DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+				Date dateStart = format.parse(execution.getVariable("tempiCompletamentoProceduraInizio").toString());
+				Date dateEnd = format.parse(execution.getVariable("tempiCompletamentoProceduraFine").toString());
+				if(dateStart.after(dateEnd)) {
+	                throw new BpmnError("500", "<b>Data Completamento Procedura Inizio posteriore alla data di Fine<br></b>");
+				}
+			}
+
 			pubblicaTuttiFilePubblicabili(execution);
 		};break;
 		// START PROVVEDIMENTO-AGGIUDICAZIONE  
