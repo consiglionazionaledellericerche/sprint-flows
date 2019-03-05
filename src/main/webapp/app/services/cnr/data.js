@@ -110,6 +110,9 @@
                 exportSummary: function(processInstaceId) {
                     return $http.get('api/summaryPdf?processInstanceId=' + processInstaceId);
                 },
+                deleteProcessInstance: function(processInstaceId, deleteReason) {
+                    return $http.delete('api/processInstances/deleteProcessInstance?processInstanceId=' + processInstaceId + '&deleteReason=' + deleteReason);
+                },
                 setVariable: function(processInstanceId, variableName, value) {
                     return $http.post('api/processInstances/variable' +
                         '?processInstanceId=' + processInstanceId +

@@ -249,7 +249,7 @@ public class FlowsTaskResourceTest {
         assertEquals(OK, response.getStatusCode());
 
         //assegno il task a user
-        flowsTaskResource.assignTask(req, taskService.createTaskQuery().singleResult().getId(), "user");
+        //flowsTaskResource.assignTask(req, taskService.createTaskQuery().singleResult().getId(), "user");
         //Setto user come owner dello stesso task
         taskService.setOwner(taskService.createTaskQuery().singleResult().getId(), "user");
 
