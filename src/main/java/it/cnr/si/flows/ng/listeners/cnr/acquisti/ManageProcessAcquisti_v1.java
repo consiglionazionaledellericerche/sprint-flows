@@ -365,6 +365,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			pubblicaTuttiFilePubblicabili(execution);
 			controllaFilePubblicabiliTrasparenza(execution);
 			execution.setVariable(STATO_FINALE_DOMANDA, "STIPULATO");
+			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "STIPULATO");
 		};break;     
 		case "end-stipulato-end": {
 		};break;
@@ -404,6 +405,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 
 		case "end-revocato-start": {
 			execution.setVariable(STATO_FINALE_DOMANDA, "REVOCATO");
+			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "REVOCATO");
 		};break;
 
 		// FINE FLUSSO  

@@ -69,7 +69,8 @@
                     $scope.isResponsabile = (vm.authorities.includes("ROLE_responsabile-struttura@" + vm.data.entity.variabili.idStruttura) ||
                         vm.authorities.includes("ROLE_responsabile#flussi") ||
                         vm.authorities.includes("ROLE_responsabile#" + vm.data.entity.processDefinitionId.split(':')[0] + "@0000") ||
-                        vm.authorities.includes("ROLE_responsabile#" + vm.data.entity.processDefinitionId.split(':')[0] + "@" + vm.data.entity.variabili.idStruttura))
+                        vm.authorities.includes("ROLE_responsabile#" + vm.data.entity.processDefinitionId.split(':')[0] + "@" + vm.data.entity.variabili.idStruttura) ||
+                        vm.authorities.includes("ROLE_ADMIN")) 
                 });   
         }
 
@@ -130,6 +131,20 @@
                     taskId: function() {
                         return taskId;
                     },
+                    processInstanceId: function() {
+                        return processInstanceId;
+                    }
+                }
+            })
+        };
+        
+        $scope.deleteProcessInstance = function(processInstanceId) {
+            $uibModal.open({
+                templateUrl: 'app/pages/details/deleteProcess.modal.html',
+                controller: 'DeleteProcessModalController',
+                controllerAs: 'vm',
+                size: 'md',
+                resolve: {
                     processInstanceId: function() {
                         return processInstanceId;
                     }
