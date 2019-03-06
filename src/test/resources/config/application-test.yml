@@ -94,10 +94,3 @@ ace:
     cache.hazelcast.port: 5709
     cache.hazelcast.packages: it.cnr.si
 
-org:
-    apache:
-        chemistry:
-            opencmis:
-                binding:
-                    browser:
-                      url: ${repository.base.url}api/-default-/public/cmis/versions/1.1/atom
