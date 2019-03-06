@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.FirmaDocumentoService;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.service.FlowsPdfService;
@@ -24,8 +25,11 @@ import it.cnr.si.flows.ng.service.ProtocolloDocumentoService;
 import it.cnr.si.flows.ng.listeners.cnr.acquisti.service.AcquistiService;
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 
 
@@ -58,6 +62,8 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 	private RuntimeService runtimeService;
 	@Inject
 	private FlowsAttachmentService flowsAttachmentService;
+	@Inject
+	private AceBridgeService aceBridgeService;
 
 	private Expression faseEsecuzione;
 
@@ -143,20 +149,24 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 		for ( int i = 0; i < impegni.length(); i++) {
 
 			JSONObject impegno = impegni.getJSONObject(i);
+
 			try {
 				importoTotaleNetto += impegno.getDouble("importoNetto");
 			} catch (JSONException e) {
 				LOGGER.error("Formato Impegno Non Valido {} nel flusso {} - {}", impegno.getString("importoNetto"), execution.getId(), execution.getVariable("title"));
 				throw new BpmnError("400", "Formato Impegno Non Valido: " + impegno.getString("importoNetto"));
 			}
+			impegno.put("importoLordo", (double) Math.round(100*((impegno.getDouble("importoNetto")) * (1+(impegno.getDouble("percentualeIva"))/100)))/100);
 			try {
 				importoTotaleLordo += impegno.getDouble("importoLordo");
 			} catch (JSONException e) {
 				LOGGER.error("Formato Impegno Non Valido {} nel flusso {} - {}", impegno.getString("importoLordo"), execution.getId(), execution.getVariable("title"));
 				throw new BpmnError("400", "Formato Impegno Non Valido: " + impegno.getString("importoLordo"));
-			}
+			}			
+			impegno.put("uo_label", aceBridgeService.getUoById(Integer.parseInt(impegno.get("uo").toString())).getDenominazione());
 		}
 
+		execution.setVariable("impegni_json", impegni.toString());
 		execution.setVariable("importoTotaleNetto", importoTotaleNetto);
 		execution.setVariable("importoTotaleLordo", importoTotaleLordo);
 	}
@@ -256,7 +266,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				Date dateStart = format.parse(execution.getVariable("tempiCompletamentoProceduraInizio").toString());
 				Date dateEnd = format.parse(execution.getVariable("tempiCompletamentoProceduraFine").toString());
 				if(dateStart.after(dateEnd)) {
-	                throw new BpmnError("500", "<b>Data Completamento Procedura Inizio posteriore alla data di Fine<br></b>");
+					throw new BpmnError("500", "<b>Data Completamento Procedura Inizio posteriore alla data di Fine<br></b>");
 				}
 			}
 
