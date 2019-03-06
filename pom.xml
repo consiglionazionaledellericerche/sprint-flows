@@ -27,6 +27,7 @@
     </scm>
 
     <properties>
+        <ace-client.version>2.2.3</ace-client.version>
         <activiti.version>5.22.0</activiti.version>
         <assertj-core.version>3.5.2</assertj-core.version>
         <feign.version>9.7.0</feign.version>
@@ -51,7 +52,6 @@
         <spring.security.version>4.1.1.RELEASE</spring.security.version>
         <spring.version>4.3.2.RELEASE</spring.version>
         <sprint.version>2.0.1</sprint.version>
-        <ace-client.version>2.2.3</ace-client.version>
         <start-class>it.cnr.si.FlowsApp</start-class>
         <storage-cloud-cmis.version>0.0.6</storage-cloud-cmis.version>
     </properties>
@@ -68,6 +68,27 @@
                 <artifactId>opencsv</artifactId>
                 <version>3.9</version>
             </dependency>
+
+            <!--PROVA TEST-->
+            <dependency>
+                <groupId>it.cnr.si</groupId>
+                <artifactId>storage-cloud-cmis</artifactId>
+                <version>${storage-cloud-cmis.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>it.cnr.si</groupId>
+                <artifactId>storage-cloud-commons</artifactId>
+                <version>${storage-cloud-cmis.version}</version>
+            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>org.apache.chemistry.opencmis</groupId>-->
+                <!--<artifactId>chemistry-opencmis-commons-api</artifactId>-->
+                <!--<version>1.0.0</version>-->
+            <!--</dependency>-->
+
+            <!--/home/paolo/.m2/repository/-->
+            <!--org/apache/chemistry/opencmis/chemistry-opencmis-commons-api/1.0.0/chemistry-opencmis-commons-api-1.0.0.jar-->
+
             <dependency>
                 <groupId>org.apache.pdfbox</groupId>
                 <artifactId>pdfbox</artifactId>
@@ -192,6 +213,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>it.cnr.commons</groupId>
+            <artifactId>firmadigitale</artifactId>
+            <version>${firmadigitale.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>it.cnr.si</groupId>
@@ -209,11 +235,11 @@
             <artifactId>storage-cloud-commons</artifactId>
             <version>${storage-cloud-cmis.version}</version>
         </dependency>
-        <dependency>
-            <groupId>it.cnr.commons</groupId>
-            <artifactId>firmadigitale</artifactId>
-            <version>${firmadigitale.version}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.apache.chemistry.opencmis</groupId>-->
+            <!--<artifactId>chemistry-opencmis-commons-api</artifactId>-->
+            <!--<version>1.0.0</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>it.cnr.si.sprint</groupId>
             <artifactId>sprint-core</artifactId>
@@ -685,8 +711,8 @@
                     <!--USR, PSW E URL DB LOCALE-->
                     <username>flows</username>
                     <password />
-                    <!--<url>jdbc:h2:file:./DB-H2/flows-cnr;DB_CLOSE_DELAY=-1</url>-->
-                    <url>jdbc:h2:file:./DB-H2/flows-oiv;DB_CLOSE_DELAY=-1</url>
+                    <url>jdbc:h2:file:./DB-H2/flows-cnr;DB_CLOSE_DELAY=-1</url>
+                    <!--<url>jdbc:h2:file:./DB-H2/flows-oiv;DB_CLOSE_DELAY=-1</url>-->
                     <referenceUrl>hibernate:spring:it.cnr.si.domain?dialect=&amp;hibernate.ejb.naming_strategy=org.springframework.boot.orm.jpa.hibernate.SpringNamingStrategy</referenceUrl>
                     <verbose>true</verbose>
                     <logging>debug</logging>
