@@ -3,6 +3,7 @@ package it.cnr.si.flows.ng.listeners.cnr.acquisti;
 import it.cnr.si.flows.ng.listeners.oiv.service.OivSetGroupsAndVisibility;
 import it.cnr.si.flows.ng.listeners.oiv.service.OperazioniTimer;
 import it.cnr.si.flows.ng.service.AceBridgeService;
+import it.cnr.si.flows.ng.service.CounterService;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
@@ -23,6 +24,7 @@ import javax.inject.Inject;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,7 +44,9 @@ public class StartAcquistiSetGroupsAndVisibility {
     private AceBridgeService aceBridgeService;
     @Inject
     private RuntimeService runtimeService;
-
+    @Inject
+    private CounterService counterService;
+    
 	public void configuraVariabiliStart(DelegateExecution execution)  throws IOException, ParseException  {
 
 
@@ -103,6 +107,10 @@ public class StartAcquistiSetGroupsAndVisibility {
 			if (execution.getVariable("tipologiaAffidamentoDiretto") == null) {
 				execution.setVariable("tipologiaAffidamentoDiretto", "normale"); 
 			}
+            //SET CONTATORE ACQUISTO STRUTTURA		
+			String counterId = aceBridgeService.getUoById(Integer.parseInt(struttura)).getCdsuo() + "-ACQ-" + Calendar.getInstance().get(Calendar.YEAR);
+			String key = counterId + "-" + counterService.getNext(counterId);
+			execution.setVariable("codiceAcquistoStruttura", key); 
         }
 
     }
