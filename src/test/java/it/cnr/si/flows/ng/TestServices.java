@@ -53,7 +53,6 @@ public class TestServices {
     //    private static final String RA = "responsabileacquisti";
     private static final String DIRETTORE = "maurizio.lancia";
     private static final String RA = "anna.penna";
-    private static final String RFAS = "marcinireneusz.trycz";
     private static final String RA2 = "silvia.rossi";
     private static final String APP = "utente1";
     private static final String ISTRUTTORE = "utente5" ;
@@ -112,11 +111,6 @@ public class TestServices {
     public void loginResponsabileAcquisti() {
         logout();
         login(TestServices.RA, "");
-    }
-
-    public void loginResponsabileFlussoAcquistiForStruttura() {
-        logout();
-        login(TestServices.RFAS, "");
     }
 
     public void loginResponsabileAcquisti2() {
