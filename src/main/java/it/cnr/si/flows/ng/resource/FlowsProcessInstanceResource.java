@@ -177,14 +177,14 @@ public class FlowsProcessInstanceResource {
     @Secured(AuthoritiesConstants.ADMIN)
     @Timed
     public ResponseEntity delete(
-            //HttpServletResponse response,
             @RequestParam(value = "processInstanceId", required = true) String processInstanceId,
             @RequestParam(value = "deleteReason", required = true) String deleteReason) {
-        //processInstanceResource.deleteProcessInstance(processInstanceId, deleteReason, response);
+
         runtimeService.setVariable(processInstanceId, STATO_FINALE_DOMANDA, "ELIMINATO");
         runtimeService.setVariable(processInstanceId, "motivazioneEliminazione", deleteReason);
 		flowsProcessInstanceService.updateSearchTerms(flowsProcessInstanceService.getCurrentTaskOfProcessInstance(processInstanceId).getExecutionId(), processInstanceId, "ELIMINATO");
-        runtimeService.deleteProcessInstance(processInstanceId, deleteReason);
+
+		runtimeService.deleteProcessInstance(processInstanceId, deleteReason);
         return new ResponseEntity(HttpStatus.OK);
     }
 
