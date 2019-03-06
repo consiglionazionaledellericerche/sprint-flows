@@ -170,16 +170,16 @@ public class FlowsTaskResourceTest {
         processInstance = util.mySetUp(acquisti);
 
         util.loginResponsabileFlussoAcquistiForStruttura();
-        flowsTaskResource.reassignTask(util.getFirstTaskId(), null,  "anna.penna");
+        flowsTaskResource.reassignTask("", util.getFirstTaskId(),  "anna.penna");
 //        verifico che il tasck sia stato assegnato ad anna.penna
         util.loginResponsabileAcquisti();
         ResponseEntity<DataResponse> res = flowsTaskResource.getMyTasks(mockHttpServletRequest, ALL_PROCESS_INSTANCES, 0, 100, ASC);
         assertEquals(OK, res.getStatusCode());
-        assertEquals(util.getFirstTaskId(), ((ArrayList<HistoricTaskInstanceResponse>) ((DataResponse) res.getBody()).getData()).get(0).getId());
+        assertEquals(util.getFirstTaskId(), ((ArrayList<TaskResponse>) res.getBody().getData()).get(0).getId());
 
 //      provo a riassegnare il task se NON sono un membro dei vari gruppi che lo possono riassegnare (gruppi "responsabili")
         util.loginSfd();
-        flowsTaskResource.reassignTask(util.getFirstTaskId(), null, "anna.penna");
+        flowsTaskResource.reassignTask("", util.getFirstTaskId(), "anna.penna");
     }
 
 
@@ -269,7 +269,7 @@ public class FlowsTaskResourceTest {
         assertEquals(OK, response.getStatusCode());
 
         //assegno il task a user
-        flowsTaskResource.reassignTask(util.getFirstTaskId(), null, "user");
+        flowsTaskResource.reassignTask("", util.getFirstTaskId(), "user");
         //Setto user come owner dello stesso task
         taskService.setOwner(taskService.createTaskQuery().singleResult().getId(), "user");
 
