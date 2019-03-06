@@ -5,9 +5,9 @@
         .module('sprintApp')
         .controller('ManualisticaController', ManualisticaController);
 
-    ManualisticaController.$inject = ['$scope', '$state', 'dataService'];
+    ManualisticaController.$inject = ['$scope', '$state', 'dataService', 'utils'];
 
-    function ManualisticaController($scope, $state, dataService) {
+    function ManualisticaController($scope, $state, dataService, utils) {
         var vm = this;
 
         dataService.manuali.getElenco().then(function(response) {
@@ -15,9 +15,13 @@
         });
 
         $scope.downloadManuale = function(manuale) {
+
             dataService.manuali.getManuale(manuale).then(
                 function(response) {
-                    //console.log(response.data);
+                    var file = new Blob([response.data], {
+                        type: "application/pdf"
+                    });
+                    saveAs(file, manuale+".pdf");
                 }
             )
         }
