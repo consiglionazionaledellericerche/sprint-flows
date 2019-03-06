@@ -103,7 +103,7 @@ public class FlowsProcessInstanceResourceTest {
         //testo che sospendendo una Process Instances NON la vedo tra i processi avviati da me
         util.loginAdmin();
         MockHttpServletResponse response = new MockHttpServletResponse();
-        flowsProcessInstanceResource.delete(response, processInstanceID, "TEST");
+        flowsProcessInstanceResource.delete(processInstanceID, "TEST");
         assertEquals(NO_CONTENT.value(), response.getStatus());
         util.loginResponsabileAcquisti();
         verifyMyProcesses(0, 0);
@@ -189,7 +189,7 @@ public class FlowsProcessInstanceResourceTest {
         MockHttpServletResponse response = new MockHttpServletResponse();
         String activeId = entities.get(0).getId();
         String notActiveId = entities.get(1).getId();
-        flowsProcessInstanceResource.delete(response, notActiveId, "test");
+        flowsProcessInstanceResource.delete(notActiveId, "test");
         assertEquals(response.getStatus(), NO_CONTENT.value());
 
         // verifico che RA veda UN processo terminato/cancellato in più (quello appena concellato + quelli cancellati nel tearDown dei test precedenti)

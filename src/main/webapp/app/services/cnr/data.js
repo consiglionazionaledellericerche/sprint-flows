@@ -263,6 +263,14 @@
                 sendWithoutAttachment: function(hdDataModel){
                     return $http.post("api/helpdesk/sendWithoutAttachment", hdDataModel)
                 }
+            },
+            manuali: {
+                getElenco: function() {
+                    return $http.get("api/manual/");
+                },
+                getManuale: function(nome) {
+                    return $http.get("api/manual/"+ nome);
+                }
             }
         };
     }
