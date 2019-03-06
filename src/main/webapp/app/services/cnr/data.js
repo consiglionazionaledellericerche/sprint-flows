@@ -269,7 +269,7 @@
                     return $http.get("api/manual/");
                 },
                 getManuale: function(nome) {
-                    return $http.get("api/manual/"+ nome);
+                    return $http.get("api/manual/"+ nome, {responseType: 'arraybuffer'});
                 }
             }
         };
