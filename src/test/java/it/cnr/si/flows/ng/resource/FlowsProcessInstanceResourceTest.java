@@ -21,7 +21,6 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ActiveProfiles;
@@ -43,7 +42,6 @@ import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
 import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
 import static it.cnr.si.flows.ng.utils.Utils.ASC;
 import static org.junit.Assert.*;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 
@@ -94,17 +92,17 @@ public class FlowsProcessInstanceResourceTest {
     public void testGetMyProcesses() throws IOException {
         processInstance = util.mySetUp(acquisti);
         String processInstanceID = verifyMyProcesses(1, 0);
-        // testo che, anche se una Process Instance viene sospesa, la vedo ugualmente
+//        La sospensione non viene usata dall`applicazione
+//        // testo che, anche se una Process Instance viene sospesa, la vedo ugualmente
+//        util.loginAdmin();
+//        flowsProcessInstanceResource.suspend(new MockHttpServletRequest(), processInstanceID);
+//
+//        util.loginResponsabileAcquisti();
+//        processInstanceID = verifyMyProcesses(1, 0);
+        //testo che cancellandola una Process Instances NON la vedo tra i processi avviati da me
         util.loginAdmin();
-        flowsProcessInstanceResource.suspend(new MockHttpServletRequest(), processInstanceID);
-
-        util.loginResponsabileAcquisti();
-        processInstanceID = verifyMyProcesses(1, 0);
-        //testo che sospendendo una Process Instances NON la vedo tra i processi avviati da me
-        util.loginAdmin();
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        flowsProcessInstanceResource.delete(processInstanceID, "TEST");
-        assertEquals(NO_CONTENT.value(), response.getStatus());
+        ResponseEntity response = flowsProcessInstanceResource.delete(processInstanceID, "TEST");
+        assertEquals(OK, response.getStatusCode());
         util.loginResponsabileAcquisti();
         verifyMyProcesses(0, 0);
     }
@@ -163,7 +161,8 @@ public class FlowsProcessInstanceResourceTest {
         req.setParameter("strumentoAcquisizioneId", "11");
         req.setParameter("priorita", "Alta");
         req.setParameter("rup", "spaclient");
-        req.setParameter("impegni_json", "[{\"numero\":\"1\",\"importoNetto\":100,\"importoLordo\":120,\"descrizione\":\"descrizione impegno\",\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"gae\":\"spaclient\"}]");
+//        req.setParameter("impegni_json", "[{\"numero\":\"1\",\"importoNetto\":100,\"importoLordo\":120,\"descrizione\":\"descrizione impegno\",\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"gae\":\"spaclient\"}]");
+        req.setParameter("impegni_json", "[{\"descrizione\":\"Impegno numero 1\",\"percentualeIva\":20,\"importoNetto\":100,\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"uo\":\"2216\",\"gae\":\"spaclient\",\"progetto\":\"Progetto impegno 1\"}]");
 
         ResponseEntity<Object> resp = flowsTaskResource.completeTask(req);
         assertEquals(OK, resp.getStatusCode());
@@ -186,11 +185,10 @@ public class FlowsProcessInstanceResourceTest {
         assertEquals(acquistiTrasparenzaId, entities.get(1).getProcessDefinitionId());
 
         //cancello un processo
-        MockHttpServletResponse response = new MockHttpServletResponse();
         String activeId = entities.get(0).getId();
         String notActiveId = entities.get(1).getId();
-        flowsProcessInstanceResource.delete(notActiveId, "test");
-        assertEquals(response.getStatus(), NO_CONTENT.value());
+        ResponseEntity response = flowsProcessInstanceResource.delete(notActiveId, "test");
+        assertEquals(response.getStatusCode(), OK);
 
         // verifico che RA veda UN processo terminato/cancellato in più (quello appena concellato + quelli cancellati nel tearDown dei test precedenti)
         util.loginResponsabileAcquisti();
