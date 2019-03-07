@@ -16,7 +16,7 @@
     <!--
         Added the entity Membership.
     -->
-    <changeSet id="20180410115515" author="jhipster">
+    <changeSet id="20180410115515-1" author="jhipster">
         <createTable tableName="membership">
             <column name="id" type="bigint" autoIncrement="${autoIncrement}">
                 <constraints primaryKey="true" nullable="false"/>
@@ -47,5 +47,21 @@
                   separator=";"
                   tableName="membership"/>
 
+    </changeSet>
+
+    <!--Vengono sovrascritte le tuple con lo stesso id nei csv nella cartella "modified"-->
+    <!--non occorre eseguire il clear check sum ma basta un maven clean-->
+    <changeSet id="20180410115515-2" author="Paolo" runOnChange='true'>
+        <loadUpdateData encoding="UTF-8"
+                        file="config/liquibase/cnr/modifiche/membership-modified.csv"
+                        primaryKey="id"
+                        schemaName="public"
+                        separator=";"
+                        tableName="membership">
+            <column name="id" type="numeric"/>
+            <column name="grouprole" type="string"/>
+            <column name="cnrgroup_id" type="string"/>
+            <column name="user_id" type="string"/>
+        </loadUpdateData>
     </changeSet>
 </databaseChangeLog>
