@@ -1,14 +1,32 @@
 package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
+import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
 import it.cnr.si.flows.ng.service.CoolFlowsBridgeService;
+import it.cnr.si.flows.ng.service.CounterService;
+import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.service.FlowsTaskService;
+import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
+import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.service.RelationshipService;
+import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.delegate.BpmnError;
+import org.activiti.engine.repository.ProcessDefinition;
+import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.IdentityLinkType;
 import org.activiti.engine.task.Task;
+import org.activiti.engine.task.TaskQuery;
 import org.activiti.rest.common.api.DataResponse;
+import org.activiti.rest.service.api.RestResponseFactory;
+import org.activiti.rest.service.api.engine.variable.RestVariable;
+import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
+import org.activiti.rest.service.api.runtime.task.TaskResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
@@ -16,17 +34,18 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
+import static it.cnr.si.flows.ng.utils.Utils.*;
 
 /**
  * @author mtrycz
@@ -36,17 +55,29 @@ import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 @RequestMapping("api/tasks")
 public class FlowsTaskResource {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlowsTaskResource.class);
+    private static final String ERROR_MESSAGE = "message";
+
     @Inject
     private TaskService taskService;
     @Inject
     private FlowsTaskService flowsTaskService;
+    @Inject
+    private RestResponseFactory restResponseFactory;
+    @Inject
+    private RepositoryService repositoryService;
 
     @Autowired(required = false) @Deprecated
     private CoolFlowsBridgeService coolBridgeService;
 
     @Inject
     private RuntimeService runtimeService;
-
+    @Inject
+    private RelationshipService relationshipService;
+    @Inject
+    private CounterService counterService;
+    @Inject
+    private FlowsAttachmentService attachmentService;
 
 
     @PostMapping(value = "/mytasks", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -59,7 +90,30 @@ public class FlowsTaskResource {
             @RequestParam("maxResults") int maxResults,
             @RequestParam("order") String order) {
 
-        DataResponse response = flowsTaskService.getMyTask(req, processDefinition, firstResult, maxResults, order);
+        String username = SecurityUtils.getCurrentUserLogin();
+
+        TaskQuery taskQuery = taskService.createTaskQuery()
+                .taskAssignee(username)
+                .includeProcessVariables();
+
+        if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
+            taskQuery.processDefinitionKey(processDefinition);
+
+        taskQuery = (TaskQuery) Utils.searchParamsForTasks(req, taskQuery);
+
+        Utils.orderTasks(order, taskQuery);
+
+        List<TaskResponse> tasksList = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
+
+        //aggiungo ad ogni singola TaskResponse la variabile che indica se il task è restituibile ad un gruppo (true)
+        // o se è stato assegnato ad un utente specifico "dal sistema" (false)
+        addIsReleasableVariables(tasksList);
+
+        DataResponse response = new DataResponse();
+        response.setStart(firstResult);
+        response.setSize(tasksList.size());
+        response.setTotal(taskQuery.count());
+        response.setData(tasksList);
 
         return ResponseEntity.ok(response);
     }
@@ -113,7 +167,7 @@ public class FlowsTaskResource {
 
 
     @PutMapping(value = "/claim/{taskId}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    @PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.canAssignTask(#taskId, @flowsUserDetailsService)")
+//    @PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.canClaimTask(#taskId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Map<String, Object>> claimTask(@PathVariable("taskId") String taskId) {
 
@@ -125,28 +179,38 @@ public class FlowsTaskResource {
 
 
 
-    @DeleteMapping(value = "/claim/{taskId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canAssignTask(#taskId, @flowsUserDetailsService)")
+    @PutMapping(value = "/reassign/{assignee:.*}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.isResponsabile(#taskId, #processInstanceId, @flowsUserDetailsService)")
     @Timed
-    public ResponseEntity<Map<String, Object>> unclaimTask(@PathVariable("taskId") String taskId) {
-        taskService.unclaim(taskId);
+    public ResponseEntity<Map<String, Object>> reassignTask(
+            @RequestParam(name = "processInstanceId", required=false) String processInstanceId,
+            @RequestParam(name = "taskId", required=false) String taskId,
+            @PathVariable(value = "assignee") String assignee) {
+
+        if(taskId == null) {
+            // se vengo da pagine in cui ho solo il processInstanceId (tipo ricerca) trovo il taskId
+            Task task = taskService.createTaskQuery()
+                    .processInstanceId(processInstanceId)
+                    .includeProcessVariables()
+                    .singleResult();
+            taskId = task.getId();
+        }
+        taskService.setAssignee(taskId, assignee);
+
+        // Aggiungo l`identityLink per la visualizzazione
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        runtimeService.addUserIdentityLink(task.getProcessInstanceId(), taskId, PROCESS_VISUALIZER);
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
 
 
-    @PutMapping(value = "/{id}/{user:.*}")
+    @DeleteMapping(value = "/claim/{taskId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canClaimTask(#taskId, @flowsUserDetailsService)")
     @Timed
-    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canAssignTask(#id, #user)")
-    public ResponseEntity<Map<String, Object>> assignTask(
-            HttpServletRequest req,
-            @PathVariable("id") String id,
-            @PathVariable("user") String user) {
-
-        //    todo: non è ancora usata nell'interfaccia, fare i test
-        taskService.setAssignee(id, user);
-        Task task = taskService.createTaskQuery().taskId(id).singleResult();
-        runtimeService.addUserIdentityLink(task.getProcessInstanceId(), user, PROCESS_VISUALIZER);
+    public ResponseEntity<Map<String, Object>> unclaimTask(@PathVariable("taskId") String taskId) {
+        taskService.unclaim(taskId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -157,7 +221,75 @@ public class FlowsTaskResource {
     @Timed
     public ResponseEntity<Object> completeTask(MultipartHttpServletRequest req) throws IOException {
 
-        return flowsTaskService.completeTask(req);
+        String username = SecurityUtils.getCurrentUserLogin();
+
+        String taskId = (String) req.getParameter("taskId");
+        String definitionId = (String) req.getParameter("processDefinitionId");
+
+
+        if (isEmpty(taskId) && isEmpty(definitionId))
+            throw new ProcessDefinitionAndTaskIdEmptyException();
+
+        if (isEmpty(taskId)) {
+
+            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitionId).singleResult();
+
+            try {
+                String counterId = processDefinition.getName() + "-" + Calendar.getInstance().get(Calendar.YEAR);
+                String key = counterId + "-" + counterService.getNext(counterId);
+
+                Map<String, Object> data = extractParameters(req);
+                attachmentService.extractAttachmentVariables(req, data, key);
+
+                //recupero l'idStruttura dell'utente che sta avviando il flusso
+                List<GrantedAuthority> authorities = relationshipService.getAllGroupsForUser(username);
+                List<String> groups = authorities.stream()
+                        .map(GrantedAuthority::<String>getAuthority)
+                        .map(Utils::removeLeadingRole)
+                        .filter(g -> g.startsWith("abilitati#"+ processDefinition.getKey() +"@"))
+                        .collect(Collectors.toList());
+
+                if (groups.isEmpty()) {
+                    throw new BpmnError("403", "L'utente non e' abilitato ad avviare questo flusso");
+                } else {
+
+                    ProcessInstance instance = flowsTaskService.startProcessInstance(data, definitionId, key);
+
+                    ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
+                    return new ResponseEntity<>(response, HttpStatus.OK);
+                }
+            } catch (Exception e) {
+                String errorMessage = String.format("Errore nell'avvio della Process Instance di tipo %s con eccezione:", processDefinition);
+                LOGGER.error(errorMessage, e);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mapOf(ERROR_MESSAGE, errorMessage));
+            }
+        } else {
+            try {
+                String key = taskService.getVariable(taskId, "key", String.class);
+                Map<String, Object> data = extractParameters(req);
+                attachmentService.extractAttachmentVariables(req, data, key);
+
+                // aggiungo l'identityLink che indica l'utente che esegue il task
+                taskService.addUserIdentityLink(taskId, username, TASK_EXECUTOR);
+                taskService.setVariablesLocal(taskId, data);
+                taskService.complete(taskId, data);
+
+                return new ResponseEntity<>(HttpStatus.OK);
+            } catch (Exception e) {
+                //Se non riesco a completare il task rimuovo l'identityLink che indica "l'esecutore" del task e restituisco un INTERNAL_SERVER_ERROR
+                if(((BpmnError) e).getErrorCode() == "412"){
+                    String errorMessage = String.format("%s", e.getMessage());
+                    LOGGER.warn(errorMessage);
+                    taskService.deleteUserIdentityLink(taskId, username, TASK_EXECUTOR);
+                    return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(mapOf(ERROR_MESSAGE, errorMessage));
+                } else {
+                    String errorMessage = String.format("%s<br>Errore durante il tentativo di completamento del task %s da parte dell'utente %s", e.getMessage(), taskId, username);
+                    LOGGER.error(errorMessage);
+                    taskService.deleteUserIdentityLink(taskId, username, TASK_EXECUTOR);
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mapOf(ERROR_MESSAGE, errorMessage));
+                }
+            }
+        }
     }
 
 
@@ -214,5 +346,30 @@ public class FlowsTaskResource {
         });
 
         return ResponseEntity.ok(result);
+    }
+
+    // TODO magari un giorno avremo degli array, ma per adesso ce lo facciamo andare bene cosi'
+    public static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
+
+        Map<String, Object> data = new HashMap<>();
+        List<String> parameterNames = Collections.list(req.getParameterNames());
+        parameterNames.stream().forEach(paramName -> {
+            // se ho un json non aggiungo i suoi singoli campi (Ed escludo il parametro "cacheBuster")
+            if ((!parameterNames.contains(paramName.split("\\[")[0] + "_json")) && (!paramName.equals("cacheBuster")))
+                data.put(paramName, req.getParameter(paramName));
+        });
+        return data;
+    }
+
+    private void addIsReleasableVariables(List<TaskResponse> tasks) {
+        for (TaskResponse task : tasks) {
+            RestVariable isUnclaimableVariable = new RestVariable();
+            isUnclaimableVariable.setName("isReleasable");
+            // if has candidate groups or users -> can release
+            isUnclaimableVariable.setValue(taskService.getIdentityLinksForTask(task.getId())
+                    .stream()
+                    .anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
+            task.getVariables().add(isUnclaimableVariable);
+        }
     }
 }

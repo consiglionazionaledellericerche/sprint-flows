@@ -45,6 +45,14 @@
                         method: take ? 'PUT' : 'DELETE',
                     });
                 },
+                reassign: function(taskId, processInstanceId, assignee) {
+                    return $http({
+                        url: 'api/tasks/reassign/' + assignee + '?' +
+                         (taskId ? 'taskId='+ taskId + '&' : '') +
+                         (processInstanceId ? 'processInstanceId='+ processInstanceId : '') ,
+                        method: 'PUT',
+                    });
+                },
                 getTask: function(id) {
                     return $http.get('api/tasks/' + id);
                 },
@@ -101,6 +109,9 @@
                 },
                 exportSummary: function(processInstaceId) {
                     return $http.get('api/summaryPdf?processInstanceId=' + processInstaceId);
+                },
+                deleteProcessInstance: function(processInstaceId, deleteReason) {
+                    return $http.delete('api/processInstances/deleteProcessInstance?processInstanceId=' + processInstaceId + '&deleteReason=' + deleteReason);
                 },
                 setVariable: function(processInstanceId, variableName, value) {
                     return $http.post('api/processInstances/variable' +
@@ -251,6 +262,14 @@
                 // },
                 sendWithoutAttachment: function(hdDataModel){
                     return $http.post("api/helpdesk/sendWithoutAttachment", hdDataModel)
+                }
+            },
+            manuali: {
+                getElenco: function() {
+                    return $http.get("api/manual/");
+                },
+                getManuale: function(nome) {
+                    return $http.get("api/manual/"+ nome, {responseType: 'arraybuffer'});
                 }
             }
         };

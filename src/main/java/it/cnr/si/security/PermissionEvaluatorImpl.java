@@ -1,14 +1,13 @@
 package it.cnr.si.security;
 
 import it.cnr.si.flows.ng.resource.FlowsProcessDefinitionResource;
-import it.cnr.si.flows.ng.utils.Enum;
+import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.utils.Utils;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.IdentityLinkType;
 import org.activiti.engine.task.Task;
@@ -24,6 +23,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.inject.Inject;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -56,7 +56,8 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
     HistoryService historyService;
     @Inject
     RestResponseFactory restResponseFactory;
-
+    @Inject
+    private AceBridgeService aceBridgeService;
 
 
     /**
@@ -147,17 +148,17 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
         return authorities.stream()
                 .anyMatch(
                         a -> a.contains(supervisore + "@" + CNR_CODE) ||
-                        a.contains(responsabile + "@" + CNR_CODE) ||
-                        a.contains(supervisoreStruttura + "@" + idStruttura) ||
-                        a.contains(responsabileStruttura + "@" + idStruttura) ||
-                        a.contains(supervisore + "#" + processDefinitionKey + "@" + CNR_CODE) ||
-                        a.contains(responsabile + "#" + processDefinitionKey + "@" + CNR_CODE) ||
-                        a.contains(supervisore + "#" + processDefinitionKey + "@" + idStruttura) ||
-                        a.contains(responsabile + "#" + processDefinitionKey + "@" + idStruttura) ||
-                        a.contains(supervisore + "#flussi@" + CNR_CODE) ||
-                        a.contains(responsabile + "#flussi@" + CNR_CODE) ||
-                        a.contains(supervisore + "#flussi@" + idStruttura) ||
-                        a.contains(responsabile + "#flussi@" + idStruttura));
+                                a.contains(responsabile + "@" + CNR_CODE) ||
+                                a.contains(supervisoreStruttura + "@" + idStruttura) ||
+                                a.contains(responsabileStruttura + "@" + idStruttura) ||
+                                a.contains(supervisore + "#" + processDefinitionKey + "@" + CNR_CODE) ||
+                                a.contains(responsabile + "#" + processDefinitionKey + "@" + CNR_CODE) ||
+                                a.contains(supervisore + "#" + processDefinitionKey + "@" + idStruttura) ||
+                                a.contains(responsabile + "#" + processDefinitionKey + "@" + idStruttura) ||
+                                a.contains(supervisore + "#flussi@" + CNR_CODE) ||
+                                a.contains(responsabile + "#flussi@" + CNR_CODE) ||
+                                a.contains(supervisore + "#flussi@" + idStruttura) ||
+                                a.contains(responsabile + "#flussi@" + idStruttura));
     }
 
 
@@ -210,7 +211,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
      *                               una dipendenza ciclica visto che anche le classi che lo richiamano potrebbero averlo iniettato
      * @return risultato della verifica dei permessi (booleano)
      */
-    public boolean canAssignTask(String taskId, FlowsUserDetailsService flowsUserDetailsService) {
+    public boolean canClaimTask(String taskId, FlowsUserDetailsService flowsUserDetailsService) {
         boolean result = false;
         String username = SecurityUtils.getCurrentUserLogin();
         Task task = taskService.createTaskQuery()
@@ -251,28 +252,33 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
 
 
-    /**
-     * Verifico che l'utente che è anche "responsabile" del flusso possa assegnare
-     * un task ad un utente che appartiene ai gruppi assegnatari dello stesso
-     *
-     * @param taskId   il task id
-     * @param username lo username dell'utente a cui si vuole assegnare il task
-     * @return risultato della verifica dei permessi (booleano)
-     */
-    /*        riassegnazione         */
-    public boolean canAssignTask(String taskId, String username) {
-        boolean result = false;
-//        todo: da fare con Massimo?
+    public boolean isResponsabile(String taskId, String processInstanceId, FlowsUserDetailsService flowsUserDetailsService) {
+        String user = SecurityUtils.getCurrentUserLogin();
+        List<String> groups = aceBridgeService.getAceGroupsForUser(user);
+        Task task;
+        if(!processInstanceId.isEmpty()){
+            task = taskService.createTaskQuery()
+                    .processInstanceId(processInstanceId)
+                    .includeProcessVariables()
+                    .singleResult();
+        } else{
+            task = taskService.createTaskQuery()
+                    .taskId(taskId)
+                    .includeProcessVariables()
+                    .singleResult();
+        }
 
-///in caso di assegnazione ad altro utente
-//        (può farlo solo il responsabile di struttura per fluso ->
-//        responsabili#flusso x @ struttura
-//        responsabili@ struttura (se è un flusso di struttura, c'è una variabile "vincolata" nel flusso)
-//        responsabili#flusso x @ generico (flusso definito per più strutture)
+        String idStruttura = (String) ((HashMap) task.getProcessVariables()).get("idStruttura");
 
-//        può essere assegnato solo a membri dei gruppi candidate del task in esecuzione
-        return result;
+        String tipoFlusso = (String) task.getProcessDefinitionId().split(":")[0];
+
+        return (groups.contains("responsabile-struttura@" + idStruttura) ||
+                groups.contains("responsabile#flussi") ||
+                groups.contains("responsabile#" + tipoFlusso + "@" + CNR_CODE)||
+                groups.contains("responsabile#" + tipoFlusso + "@" + idStruttura));
     }
+
+
 
     public boolean canUpdateAttachment(String processInstanceId, FlowsUserDetailsService flowsUserDetailsService) {
 

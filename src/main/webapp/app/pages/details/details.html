@@ -9,6 +9,20 @@
                 </span>
 				<br><br>
 			</h4>
+			<div ng-show="isResponsabile">
+				<button class="btn btn-default btn-xs"
+						ng-click="reassign(vm.taskId, processInstanceId)"><span
+						class="glyphicon glyphicon-hand-right"></span> Riassegna Compito
+				</button>
+				<hr>
+			</div>
+			<div ng-show="isResponsabile">
+				<button class="btn btn-default btn-xs"
+						ng-click="deleteProcessInstance(processInstanceId)"><span
+						class="glyphicon glyphicon-hand-right"></span> Elimina Flusso
+				</button>
+				<hr>
+			</div>
 			<div>
 				<b>Titolo: </b>{{vm.data.entity.name | get: 'titolo'}} <br>
 			</div>
@@ -26,6 +40,9 @@
 			</div>
 			<div ng-show="vm.data.entity.endTime != null">
 				<b>Stato Finale: </b>{{vm.data.entity.name | get: 'stato'}} <br>
+			</div>
+			<div ng-show="vm.data.entity.deleteReason != null">
+				<b>Motivazione Eliminazione: </b>{{vm.data.entity.deleteReason}} <br>
 			</div>
 			<!--gruppo/utente assegnatario del task in esecuzione-->
 			<div ng-show="vm.data.groupCandidate">
