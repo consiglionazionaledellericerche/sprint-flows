@@ -65,13 +65,13 @@ public class OivSummaryPdfResouceTest {
     }
 
     @Test
-    public void testSummaryPdfProcessCompleted() throws IOException {
+    public void testSummaryPdfProcessCompleted() throws Exception {
         processInstance = util.mySetUp(iscrizioneElencoOiv);
         //todo: da fare quando l'ambiente sarà più stabile
     }
 
     @Test
-    public void testSummaryPdfService() throws IOException, ParseException {
+    public void testSummaryPdfService() throws Exception {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         processInstance = util.mySetUp(iscrizioneElencoOiv);
 
@@ -85,7 +85,7 @@ public class OivSummaryPdfResouceTest {
 
     }
 
-    private void completeTask() throws IOException {
+    private void completeTask() throws Exception {
         //completo il primo task
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
         req.setParameter("taskId", taskService.createTaskQuery().singleResult().getId());
