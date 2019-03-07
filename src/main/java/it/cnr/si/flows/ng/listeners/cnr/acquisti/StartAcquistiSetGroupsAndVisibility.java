@@ -75,7 +75,6 @@ public class StartAcquistiSetGroupsAndVisibility {
             String gruppoFirmaAcquisti = "responsabileFirmaAcquisti@"+ struttura;
             String gruppoStaffAmministrativo = "staffAmministrativo@"+ struttura;
             String gruppoSFD = "sfd@"+ struttura;
-            String rup = execution.getVariable("rup", String.class);
             String applicazioneSigla = "app.sigla";
 
             LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoRT, gruppoSFD, gruppoStaffAmministrativo, gruppoFirmaAcquisti);
@@ -93,7 +92,6 @@ public class StartAcquistiSetGroupsAndVisibility {
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoFirmaAcquisti, PROCESS_VISUALIZER);
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoStaffAmministrativo, PROCESS_VISUALIZER);
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoSFD, PROCESS_VISUALIZER);
-            runtimeService.addUserIdentityLink(execution.getProcessInstanceId(), rup, PROCESS_VISUALIZER);
             runtimeService.addUserIdentityLink(execution.getProcessInstanceId(), applicazioneSigla, PROCESS_VISUALIZER);
 //            runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), "segreteria@" + struttura, PROCESS_VISUALIZER);
 
