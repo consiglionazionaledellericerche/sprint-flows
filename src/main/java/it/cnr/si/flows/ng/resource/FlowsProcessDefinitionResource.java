@@ -90,8 +90,10 @@ public class FlowsProcessDefinitionResource {
 
     public boolean canStartProcesByDefinitionKey(String definitionKey) {
 
-        Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-        return authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") ||
-                Utils.removeLeadingRole(a.getAuthority()).startsWith("abilitati#" + definitionKey + "@"));
+        return SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                .stream()
+                .map(GrantedAuthority::<String>getAuthority)
+                .map(Utils::removeLeadingRole)
+                .anyMatch(a -> a.startsWith("abilitati#" + definitionKey + "@") );
     }
 }

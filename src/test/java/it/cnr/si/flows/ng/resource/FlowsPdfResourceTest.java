@@ -46,7 +46,7 @@ public class FlowsPdfResourceTest {
     private FlowsProcessInstanceResource flowsProcessInstanceResource;
 
     @Before
-    public void setUp() throws IOException {
+    public void setUp() throws Exception {
         // setto correttamente il request contexHolder
         mockRequest = new MockHttpServletRequest();
         ServletRequestAttributes servletRequestAttributes = new ServletRequestAttributes(mockRequest);

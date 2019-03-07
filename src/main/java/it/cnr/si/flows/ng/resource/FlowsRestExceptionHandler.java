@@ -36,6 +36,7 @@ import java.util.Map;
 public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsRestExceptionHandler.class);
+    private static final String ERROR_MESSAGE = "message";
 
 
     @ExceptionHandler(NullPointerException.class)
@@ -51,7 +52,6 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
         String bodyOfResponse = "Fornire almeno un taskId o un definitionId";
         return handleExceptionInternal(ex, bodyOfResponse,
                                        new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
-
     }
 
 
@@ -73,9 +73,28 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
         String taskId = request.getParameter("taskId");
         String definitionId = request.getParameter("definitionId");
 
+        //Se non riesco a completare il task rimuovo l'identityLink che indica "l'esecutore" del task e restituisco un INTERNAL_SERVER_ERROR
+        if( ex.getErrorCode() == "412" ) {
+            String errorMessage = String.format("%s", ex.getMessage());
+            LOGGER.warn(errorMessage);
+            return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(Utils.mapOf(ERROR_MESSAGE, errorMessage));
+        }
+
         LOGGER.error("L'utente {} ha cercato di a completare il task {} / avviare il flusso {}, ma c'e' stato un errore: {}", username, taskId, definitionId, ex.getMessage());
         return handleExceptionInternal(ex, Utils.mapOf("message", ex.getMessage()),
                                        new HttpHeaders(), Utils.getStatus(ex.getErrorCode()), request);
+    }
+
+
+    @ExceptionHandler(ReportException.class)
+    protected ResponseEntity<Object> HandleMakePdfException(Exception ex, WebRequest request) {
+
+        long rif = Instant.now().toEpochMilli();
+        LOGGER.error("(Riferimento " + rif + ") Errore nella creazione del pdf ");
+
+        Map<String, Object> res = Utils.mapOf("message", "Errore nella creazione del pdf. Contattare gli amminstratori specificando il numero di riferimento: " + rif);
+        return handleExceptionInternal(ex, res,
+                new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
     /* --- DEFAULT EXCEPTION HANDLERS --- */
@@ -103,15 +122,4 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
 
     }
 
-
-    @ExceptionHandler(ReportException.class)
-    protected ResponseEntity<Object> HandleMakePdfException(Exception ex, WebRequest request) {
-
-        long rif = Instant.now().toEpochMilli();
-        LOGGER.error("(Riferimento " + rif + ") Errore nella creazione del pdf ");
-
-        Map<String, Object> res = Utils.mapOf("message", "Errore nella creazione del pdf. Contattare gli amminstratori specificando il numero di riferimento: " + rif);
-        return handleExceptionInternal(ex, res,
-                                       new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
-    }
 }
