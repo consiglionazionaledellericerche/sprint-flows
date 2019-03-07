@@ -24,6 +24,8 @@ import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.service.ProtocolloDocumentoService;
 import it.cnr.si.flows.ng.listeners.cnr.acquisti.service.AcquistiService;
 
+import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
+
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -221,10 +223,22 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 		// START
 		case "process-start": {
 			startAcquistiSetGroupsAndVisibility.configuraVariabiliStart(execution);
-		};break;    
+		};break;
+		case "pre-determina-start": {
+		pubblicaTuttiFilePubblicabili(execution);
+		};break;
+		case "pre-determina-end": {
+		pubblicaTuttiFilePubblicabili(execution);
+		};break;     
+		case "end-annullato-start": {
+			execution.setVariable(STATO_FINALE_DOMANDA, "ANNULLATO");
+			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "ANNULLATO");
+		};break;     
 		// START DECISIONE-CONTRATTARE
 		case "DECISIONE-CONTRATTARE-start": {
-			CalcolaTotaleImpegni(execution);
+            String rup = execution.getVariable("rup", String.class);
+            runtimeService.addUserIdentityLink(execution.getProcessInstanceId(), rup, PROCESS_VISUALIZER);
+            CalcolaTotaleImpegni(execution);
 		};break;  
 		case "modifica-decisione-end": {
 			CalcolaTotaleImpegni(execution);
