@@ -182,6 +182,60 @@
 			<rightPen lineWidth="0.5" lineColor="#000000"/>
 		</box>
 	</style>
+	<style name="Table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 1_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 2_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 2_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 2_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
 	<subDataset name="impegni_json" uuid="43718d59-fac1-44c4-8e31-33ea348b2df2">
 		<queryString language="json">
 			<![CDATA[]]>
@@ -197,6 +251,38 @@
 		</field>
 		<field name="gae" class="java.lang.String">
 			<fieldDescription><![CDATA[gae]]></fieldDescription>
+		</field>
+		<field name="uo_label" class="java.lang.String">
+			<fieldDescription><![CDATA[uo_label]]></fieldDescription>
+		</field>
+	</subDataset>
+	<subDataset name="ditteInvitate_json" uuid="eef62cf4-2b7b-484b-8ffe-88dc754bde57">
+		<queryString language="json">
+			<![CDATA[]]>
+		</queryString>
+		<field name="ragioneSocialeDittaInvitata" class="java.lang.String">
+			<fieldDescription><![CDATA[ragioneSocialeDittaInvitata]]></fieldDescription>
+		</field>
+		<field name="pIvaCodiceFiscaleDittaInvitata" class="java.lang.String">
+			<fieldDescription><![CDATA[pIvaCodiceFiscaleDittaInvitata]]></fieldDescription>
+		</field>
+		<field name="valutazioneDittaInvitata" class="java.lang.String">
+			<fieldDescription><![CDATA[valutazioneDittaInvitata]]></fieldDescription>
+		</field>
+		<field name="offertaPresentataDittaInvitata" class="java.lang.String">
+			<fieldDescription><![CDATA[offertaPresentataDittaInvitata]]></fieldDescription>
+		</field>
+	</subDataset>
+	<subDataset name="ditteRTI_json" uuid="219b88f3-c360-4469-8343-3d58e24a749b">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Acquisti"/>
+		<queryString language="json">
+			<![CDATA[]]>
+		</queryString>
+		<field name="ragioneSocialeDittaInvitata" class="java.lang.String">
+			<fieldDescription><![CDATA[ragioneSocialeDittaInvitata]]></fieldDescription>
+		</field>
+		<field name="pIvaCodiceFiscaleDittaInvitata" class="java.lang.String">
+			<fieldDescription><![CDATA[pIvaCodiceFiscaleDittaInvitata]]></fieldDescription>
 		</field>
 	</subDataset>
 	<parameter name="ANN_IMAGE" class="java.io.InputStream"/>
@@ -270,33 +356,151 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="impegni_json"/>
 		<fieldDescription><![CDATA[impegni_json]]></fieldDescription>
 	</field>
+	<field name="ragioneSocialeDittaAggiudicataria" class="java.lang.String">
+		<fieldDescription><![CDATA[ragioneSocialeDittaAggiudicataria]]></fieldDescription>
+	</field>
+	<field name="pIvaCodiceFiscaleDittaAggiudicataria" class="java.lang.String">
+		<fieldDescription><![CDATA[pIvaCodiceFiscaleDittaAggiudicataria]]></fieldDescription>
+	</field>
+	<field name="gestioneRTIDittaAggiudicataria" class="java.lang.String">
+		<fieldDescription><![CDATA[gestioneRTIDittaAggiudicataria]]></fieldDescription>
+	</field>
+	<field name="identificativoStipula" class="java.lang.String">
+		<fieldDescription><![CDATA[identificativoStipula]]></fieldDescription>
+	</field>
+	<field name="verificheRequisiti" class="java.lang.String">
+		<fieldDescription><![CDATA[verificheRequisiti]]></fieldDescription>
+	</field>
+	<field name="strutturaSigla_label" class="java.lang.String">
+		<fieldDescription><![CDATA[strutturaSigla_label]]></fieldDescription>
+	</field>
+	<field name="cig" class="java.lang.String">
+		<fieldDescription><![CDATA[cig]]></fieldDescription>
+	</field>
+	<field name="ditteInvitate_json" class="java.lang.String">
+		<fieldDescription><![CDATA[ditteInvitate_json]]></fieldDescription>
+	</field>
+	<field name="businessKey" class="java.lang.String">
+		<fieldDescription><![CDATA[businessKey]]></fieldDescription>
+	</field>
+	<field name="nomeStruttura" class="java.lang.String">
+		<fieldDescription><![CDATA[nomeStruttura]]></fieldDescription>
+	</field>
+	<field name="ditteRTI_json" class="java.lang.String">
+		<fieldDescription><![CDATA[ditteRTI_json]]></fieldDescription>
+	</field>
 	<group name="Group2" isStartNewColumn="true" footerPosition="StackAtBottom">
 		<groupExpression><![CDATA[(int)($V{REPORT_COUNT}/5)]]></groupExpression>
 		<groupHeader>
-			<band height="174" splitType="Stretch">
+			<band height="30">
 				<textField isStretchWithOverflow="true">
-					<reportElement style="Detail" positionType="Float" x="30" y="0" width="505" height="40" uuid="7ac903fa-55d2-4e21-a610-fa7dda8d3df3"/>
-					<textElement textAlignment="Justified" markup="styled">
-						<font fontName="SansSerif" size="11" isBold="false" isItalic="false"/>
-						<paragraph lineSpacing="1_1_2"/>
+					<reportElement x="0" y="0" width="555" height="30" uuid="34639f49-4225-42a1-a30d-4e24330aba5e"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="styled">
+						<font size="16" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA["\t Acquisto del flusso id " + $F{processInstanceId}+ " con priorità: "+ $F{priorita} +" ha importo totale pari ad €: "+ $F{importoTotaleNetto}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{titolo}]]></textFieldExpression>
 				</textField>
+			</band>
+			<band height="36">
 				<textField isStretchWithOverflow="true">
-					<reportElement style="Detail" positionType="Float" x="30" y="50" width="505" height="40" uuid="ae569f93-4b65-45b7-8ff9-06ecb89dfdb5"/>
-					<textElement textAlignment="Justified" markup="styled">
-						<font fontName="SansSerif" size="11" isBold="false" isItalic="false"/>
-						<paragraph lineSpacing="1_1_2"/>
+					<reportElement x="0" y="0" width="555" height="30" uuid="4f214ac5-1b60-4da5-9c89-1cbd6db078dd"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font isItalic="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA["Strumento di Acquisizione: " + $F{strumentoAcquisizione}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{descrizione}]]></textFieldExpression>
 				</textField>
-				<textField isStretchWithOverflow="true">
-					<reportElement style="Detail" positionType="Float" x="30" y="100" width="505" height="60" uuid="b420b75b-f40b-4349-bff9-9bba77f18bad"/>
-					<textElement textAlignment="Justified" markup="styled">
-						<font fontName="SansSerif" size="11" isBold="false" isItalic="false"/>
-						<paragraph lineSpacing="1_1_2"/>
+			</band>
+			<band height="183">
+				<textField>
+					<reportElement x="0" y="41" width="200" height="20" uuid="cfa4daaf-6dcb-40f2-9881-83fce970ef94"/>
+					<textElement textAlignment="Left">
+						<font size="12" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA["tipologia di Acquisizione: " + $F{tipologiaAcquisizione}]]></textFieldExpression>
+					<textFieldExpression><![CDATA["Avviato da : "]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="63" width="200" height="20" uuid="2ee35969-083a-4027-a3dc-f80d37f68047"/>
+					<textElement textAlignment="Left">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["in data: "]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="85" width="200" height="20" uuid="8e513d02-1f0c-40cd-b8dc-6132e4757503"/>
+					<textElement textAlignment="Left" verticalAlignment="Justified">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["RUP: "]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="107" width="200" height="20" uuid="5d6522a2-b6b0-4961-9e77-9969e6dd9281"/>
+					<textElement textAlignment="Left">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Codice Identificativo Gara (CIG): "]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="129" width="200" height="20" uuid="11fe45de-102b-4c94-b481-6aaa788e7cbe"/>
+					<textElement textAlignment="Left">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["pIva/Codice Fiscale Ditta Aggiudicataria:"]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="151" width="200" height="20" uuid="6ca8b797-400a-434a-8908-5897e363b486"/>
+					<textElement textAlignment="Left">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Ragione Sociale Ditta Aggiudicataria: "]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="199" y="151" width="350" height="20" uuid="43fe6389-6b64-431a-8f64-a984f720fc20"/>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{ragioneSocialeDittaAggiudicataria}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="199" y="129" width="350" height="20" uuid="57aa76e5-f17e-46a1-9285-bd2df28e959a"/>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{pIvaCodiceFiscaleDittaAggiudicataria}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="199" y="107" width="350" height="20" uuid="4ca93f6a-ca17-4bc7-b901-24db5406f40e"/>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{cig}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="199" y="85" width="350" height="20" uuid="3e52ff3f-483e-4920-b355-25d51972e403"/>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{rup_label}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="199" y="63" width="350" height="20" uuid="a42f969f-ee1d-448e-9caf-0e69d466bdc8"/>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{startDate}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="198" y="41" width="351" height="20" uuid="126fd6fc-1a28-4bcc-98da-bd2779998024"/>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{initiator}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="0" y="14" width="549" height="20" uuid="410d787a-4aca-46a3-b201-85c7d3f714b7"/>
+					<textElement textAlignment="Center">
+						<font size="14" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{nomeStruttura}]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupHeader>
@@ -305,34 +509,20 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="235" splitType="Stretch">
+		<band height="63" splitType="Stretch">
 			<textField>
-				<reportElement x="19" y="193" width="100" height="30" uuid="cfa4daaf-6dcb-40f2-9881-83fce970ef94"/>
-				<textElement>
-					<font isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Oggetto: "]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="130" y="193" width="412" height="30" uuid="126fd6fc-1a28-4bcc-98da-bd2779998024"/>
-				<textElement>
-					<font isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA["il RUP è: " +$F{rup} + "[" + $F{rup_label} + "]"]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="80" y="20" width="391" height="40" uuid="1c38430f-18c4-4353-b5a3-4c46137ce2cb"/>
+				<reportElement x="82" y="4" width="391" height="40" uuid="1c38430f-18c4-4353-b5a3-4c46137ce2cb"/>
 				<textElement textAlignment="Center">
 					<font size="26" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["Avviso di Post Informazione"]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement x="100" y="113" width="350" height="61" uuid="34639f49-4225-42a1-a30d-4e24330aba5e"/>
-				<textElement markup="styled">
-					<font size="16" isBold="true"/>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="42" width="555" height="21" uuid="10119319-030e-4176-a69a-e86a174f58cc"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isItalic="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["DAJEEEEEEEEEEEEEEEEEEEEEEEEE"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Identificativo Flusso: " + $F{businessKey}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -340,88 +530,105 @@
 		<band splitType="Stretch"/>
 	</pageHeader>
 	<columnHeader>
-		<band height="4" splitType="Stretch"/>
+		<band splitType="Stretch"/>
 	</columnHeader>
 	<detail>
-		<band height="142">
+		<band height="85">
+			<printWhenExpression><![CDATA[$F{ditteRTI_json}  != null]]></printWhenExpression>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="Detail" positionType="Float" x="-1" y="1" width="556" height="19" uuid="cfeca3ef-1456-4773-9fc9-fc86ffcb576a"/>
+				<textElement textAlignment="Justified" markup="styled">
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="true"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["DITTE MANDANTI RTI"]]></textFieldExpression>
+			</textField>
 			<componentElement>
-				<reportElement stretchType="ElementGroupBottom" x="0" y="-14" width="540" height="130" isRemoveLineWhenBlank="true" uuid="95f783c6-0366-45c0-ace4-a72f847edf88">
-					<property name="net.sf.jasperreports.export.headertoolbar.table.name" value=""/>
+				<reportElement style="Title" x="0" y="21" width="556" height="60" uuid="7a67cd79-e578-4424-a150-77bde51e5678">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<property name="com.jaspersoft.studio.table.style.table_header" value="Table 2_TH"/>
+					<property name="com.jaspersoft.studio.table.style.column_header" value="Table 2_CH"/>
+					<property name="com.jaspersoft.studio.table.style.detail" value="Table 2_TD"/>
 				</reportElement>
-				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical" ignoreWidth="true">
-					<datasetRun subDataset="impegni_json" uuid="4c502478-3bc9-40f1-a35e-86f63a8f5485">
-						<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JsonDataSource)$P{REPORT_DATA_SOURCE}).subDataSource("impegni_json")]]></dataSourceExpression>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="ditteRTI_json" uuid="d5654bb7-43ed-4c14-bcb1-fd96d5d44112">
+						<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JsonDataSource)$P{REPORT_DATA_SOURCE}).subDataSource("ditteRTI_json")]]></dataSourceExpression>
 					</datasetRun>
-					<jr:listContents height="130" width="540">
-						<textField>
-							<reportElement x="200" y="10" width="340" height="30" uuid="f7f0ae76-6be5-4efa-af52-e24e9d2f8c40"/>
-							<textElement>
-								<font size="14"/>
-							</textElement>
-							<textFieldExpression><![CDATA[$F{descrizione}]]></textFieldExpression>
-						</textField>
-						<textField>
-							<reportElement stretchType="ContainerBottom" x="200" y="100" width="340" height="30" uuid="f92aab71-f863-4185-8ea3-c8c52ac088a7"/>
-							<textElement>
-								<font size="14"/>
-							</textElement>
-							<textFieldExpression><![CDATA[$F{vocedispesa}]]></textFieldExpression>
-						</textField>
-						<textField>
-							<reportElement x="200" y="70" width="340" height="30" uuid="12a41b73-4db7-408b-92d1-5805b04136a1"/>
-							<textElement>
-								<font size="14"/>
-							</textElement>
-							<textFieldExpression><![CDATA[$F{uo}]]></textFieldExpression>
-						</textField>
-						<textField>
-							<reportElement x="200" y="40" width="340" height="30" uuid="d63762da-5fb3-4c80-81e9-549697b805f2"/>
-							<textElement>
-								<font size="14"/>
-							</textElement>
-							<textFieldExpression><![CDATA[$F{gae}]]></textFieldExpression>
-						</textField>
-						<textField>
-							<reportElement x="60" y="10" width="130" height="30" uuid="0245f10a-a8ac-470b-8acb-afdb82630195"/>
-							<textElement>
-								<font size="14"/>
-							</textElement>
-							<textFieldExpression><![CDATA["Descrizione: "]]></textFieldExpression>
-						</textField>
-						<textField>
-							<reportElement x="60" y="42" width="130" height="30" uuid="45a975b5-f545-48b8-a487-01ec26666c7c"/>
-							<textElement>
-								<font size="14"/>
-							</textElement>
-							<textFieldExpression><![CDATA["GAE: "]]></textFieldExpression>
-						</textField>
-						<textField>
-							<reportElement x="60" y="70" width="130" height="30" uuid="824bec78-329a-4336-825c-1b33a492ba65"/>
-							<textElement>
-								<font size="14"/>
-							</textElement>
-							<textFieldExpression><![CDATA["UO: "]]></textFieldExpression>
-						</textField>
-						<textField>
-							<reportElement x="60" y="100" width="130" height="30" uuid="391aaaa6-80fd-4c61-b9a4-bb3e69ce7795"/>
-							<textElement>
-								<font size="14"/>
-							</textElement>
-							<textFieldExpression><![CDATA["Voce di Spesa: "]]></textFieldExpression>
-						</textField>
-					</jr:listContents>
-				</jr:list>
+					<jr:column width="280" uuid="47f9a3c8-8946-4ad1-b180-aea0f625bf4a">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Colonna1"/>
+						<jr:columnHeader style="Table 2_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="280" height="30" uuid="f572b13b-4be7-401b-b9ed-982f8e650c7f"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<text><![CDATA[RAGIONE SOCIALE]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table 2_TD" height="30">
+							<textField>
+								<reportElement positionType="Float" x="0" y="0" width="280" height="30" uuid="bc925241-c5fc-48f1-84ba-bc42feadd0d0"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$F{ragioneSocialeDittaInvitata}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="276" uuid="2320a426-46ea-4893-9b0c-41b81ba3d5ae">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Colonna2"/>
+						<jr:columnHeader style="Table 2_CH" height="30" rowSpan="1">
+							<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+							<staticText>
+								<reportElement x="0" y="0" width="276" height="30" uuid="c5d39d22-2c18-47dd-b603-60435bf66b49"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<text><![CDATA[PARTITA IVA]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table 2_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="276" height="30" uuid="594229b0-a44d-47ca-b002-c335cc05582f"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$F{pIvaCodiceFiscaleDittaInvitata}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
 			</componentElement>
 		</band>
-	</detail>
-	<columnFooter>
-		<band splitType="Stretch"/>
-	</columnFooter>
-	<pageFooter>
-		<band height="285" splitType="Stretch">
-			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.HorizontalRowLayout"/>
+		<band height="87">
+			<textField isStretchWithOverflow="true">
+				<reportElement positionType="Float" x="0" y="7" width="556" height="17" uuid="4cfea49b-9713-48e6-82db-09b68941541c"/>
+				<textElement textAlignment="Justified" markup="styled">
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Importo totale netto: €: "+ $F{importoTotaleNetto} +" (lordo: " + $F{importoTotaleLordo} + ")"]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement positionType="Float" x="0" y="62" width="556" height="17" uuid="b420b75b-f40b-4349-bff9-9bba77f18bad"/>
+				<textElement textAlignment="Justified" markup="styled">
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Tipologia di Acquisizione: " + $F{tipologiaAcquisizione}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement positionType="Float" x="0" y="25" width="556" height="17" uuid="7ac903fa-55d2-4e21-a610-fa7dda8d3df3"/>
+				<textElement textAlignment="Justified" markup="styled">
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Struttura operante in SIGLA: "+ $F{strutturaSigla_label}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement positionType="Float" x="0" y="43" width="556" height="17" uuid="ae569f93-4b65-45b7-8ff9-06ecb89dfdb5"/>
+				<textElement textAlignment="Justified" markup="styled">
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Strumento di Acquisizione: " + $F{strumentoAcquisizione}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="88">
 			<componentElement>
-				<reportElement x="0" y="0" width="555" height="285" uuid="8f4563a0-63ee-4e2e-be93-977f56eb2d38">
+				<reportElement stretchType="RelativeToTallestObject" x="0" y="20" width="555" height="60" uuid="8f4563a0-63ee-4e2e-be93-977f56eb2d38">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
 					<property name="com.jaspersoft.studio.table.style.table_header" value="Table_TH"/>
 					<property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
@@ -432,75 +639,209 @@
 						<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JsonDataSource)$P{REPORT_DATA_SOURCE}).subDataSource("impegni_json")]]></dataSourceExpression>
 					</datasetRun>
 					<jr:column width="140" uuid="690e1979-3f46-4ac2-9dde-6d8161c43836">
-						<jr:tableHeader style="Table_TH" height="30"/>
-						<jr:tableFooter style="Table_TH" height="30"/>
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Colonna1"/>
 						<jr:columnHeader style="Table_CH" height="30">
 							<staticText>
 								<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="140" height="30" uuid="33fcb676-cc8d-4eaa-87b4-f01df785e185"/>
-								<text><![CDATA[descrizione]]></text>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="12" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Descrizione]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="30"/>
 						<jr:detailCell style="Table_TD" height="30">
 							<textField>
 								<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="140" height="30" uuid="34115c98-03f5-4c0c-b2e3-23b04f615133"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$F{descrizione}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
 					<jr:column width="138" uuid="12356727-f8b1-436d-99d0-afb55d9d9c9c">
-						<jr:tableHeader style="Table_TH" height="30"/>
-						<jr:tableFooter style="Table_TH" height="30"/>
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Colonna2"/>
 						<jr:columnHeader style="Table_CH" height="30">
 							<staticText>
 								<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="138" height="30" uuid="ce35cd3c-db98-4b86-9b64-480c6e790928"/>
-								<text><![CDATA[vocedispesa]]></text>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="12" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Voce di Spesa]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="30"/>
 						<jr:detailCell style="Table_TD" height="30">
 							<textField>
 								<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="138" height="30" uuid="09057b77-e26f-4c9a-99d1-ba42db86f3e8"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$F{vocedispesa}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
 					<jr:column width="140" uuid="21f6b4e6-d9e2-41b2-a0fb-a5f1e2cfcb11">
-						<jr:tableHeader style="Table_TH" height="30"/>
-						<jr:tableFooter style="Table_TH" height="30"/>
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Colonna3"/>
 						<jr:columnHeader style="Table_CH" height="30">
 							<staticText>
 								<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="140" height="30" uuid="11a97977-2df9-4ec3-a820-e77d2da3a989"/>
-								<text><![CDATA[uo]]></text>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="12" isBold="true"/>
+								</textElement>
+								<text><![CDATA[UO]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="30"/>
 						<jr:detailCell style="Table_TD" height="30">
 							<textField>
 								<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="140" height="30" uuid="1b4994a1-e5c9-4a2a-93f3-f34ee8b8c19c"/>
-								<textFieldExpression><![CDATA[$F{uo}]]></textFieldExpression>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$F{uo_label}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
 					<jr:column width="137" uuid="58901f38-c45e-4694-9b6c-df6938d6f6da">
-						<jr:tableHeader style="Table_TH" height="30"/>
-						<jr:tableFooter style="Table_TH" height="30"/>
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Colonna4"/>
 						<jr:columnHeader style="Table_CH" height="30">
 							<staticText>
 								<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="137" height="30" uuid="adc2d934-01f1-43e7-9d73-3f2b9e612ded"/>
-								<text><![CDATA[gae]]></text>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="12" isBold="true"/>
+								</textElement>
+								<text><![CDATA[GAE]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="30"/>
 						<jr:detailCell style="Table_TD" height="30">
 							<textField>
 								<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="137" height="30" uuid="2fec638e-e0b1-4875-a965-398c16311f0f"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$F{gae}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
 				</jr:table>
 			</componentElement>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="Detail" positionType="Float" x="-1" y="1" width="556" height="19" uuid="7606a3dc-032b-45d1-8aa2-84ddaf07c8c6"/>
+				<textElement textAlignment="Justified" markup="styled">
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="true"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["LISTA IMPEGNI"]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="90">
+			<printWhenExpression><![CDATA[$F{ditteInvitate_json}  != null]]></printWhenExpression>
+			<componentElement>
+				<reportElement x="0" y="23" width="555" height="60" uuid="81bb1d35-e4ed-4a11-ab5f-788290e7b9f1">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<property name="com.jaspersoft.studio.table.style.table_header" value="Table 1_TH"/>
+					<property name="com.jaspersoft.studio.table.style.column_header" value="Table 1_CH"/>
+					<property name="com.jaspersoft.studio.table.style.detail" value="Table 1_TD"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="ditteInvitate_json" uuid="f6f926e2-96e8-4174-8231-f4b426ea96f4">
+						<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JsonDataSource)$P{REPORT_DATA_SOURCE}).subDataSource("ditteInvitate_json")]]></dataSourceExpression>
+					</datasetRun>
+					<jr:column width="220" uuid="f7c99f53-19fb-4b01-a0d9-b4b8473d428a">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Colonna1"/>
+						<jr:columnHeader style="Table 1_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="220" height="30" uuid="77480c0c-0fcd-4fdc-ab91-3a81ba89c8b5"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[Ragione Sociale Ditta Invitata]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table 1_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="220" height="30" uuid="7b72a57c-ca5b-45a7-a62b-4e47a292bef0"/>
+								<textElement verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$F{ragioneSocialeDittaInvitata}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="220" uuid="799d54b2-7c2d-4b81-bfb2-9813302e15eb">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Colonna2"/>
+						<jr:columnHeader style="Table 1_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="220" height="30" uuid="5389dbdc-06c7-4945-9a14-fa6d92610536"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[PIva/ Codice Fiscale Ditta Invitata]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table 1_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="220" height="30" uuid="6a564f85-8cd1-4e7f-8a0b-18dde09a4b49"/>
+								<textElement verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$F{pIvaCodiceFiscaleDittaInvitata}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="60" uuid="4e372c86-d3f5-431c-863a-d13201e7e12c">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Colonna3"/>
+						<jr:columnHeader style="Table 1_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="60" height="30" uuid="31ea5c68-0208-4f27-8596-faf59cdd4974"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[Valutazione]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table 1_TD" height="30">
+							<textField isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="60" height="30" uuid="858eb3fa-05d5-480c-9e20-e59aef147e95"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$F{valutazioneDittaInvitata}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="55" uuid="b31b280b-533c-4aa4-97ce-b029cba44515">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Colonna4"/>
+						<jr:columnHeader style="Table 1_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="55" height="30" uuid="60a37310-d5ac-4070-adf0-370ac1dbc52a"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[Offerta Presentata]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table 1_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="55" height="30" uuid="565cd9e5-014a-4df9-9551-589ea39552cf"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$F{offertaPresentataDittaInvitata}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<textField isStretchWithOverflow="true">
+				<reportElement style="Detail" positionType="Float" x="-1" y="3" width="556" height="19" uuid="45e99edc-d503-41e1-bb0e-db22296c25c2"/>
+				<textElement textAlignment="Justified" markup="styled">
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false" isUnderline="true"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ELENCO OPERATORI INVITATI A PRESENTARE OFFERTE"]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="9"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="24" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.HorizontalRowLayout"/>
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="0" y="0" width="278" height="24" uuid="dacc5f7c-bbbe-42dd-819e-e2a5e9bd9417"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="278" y="0" width="277" height="24" uuid="7d7a58c9-4fc7-4299-9d45-04299337ceb4"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Pagina " + $V{PAGE_NUMBER} + "/" +$V{PAGE_COUNT}]]></textFieldExpression>
+			</textField>
 		</band>
 	</pageFooter>
 	<summary>

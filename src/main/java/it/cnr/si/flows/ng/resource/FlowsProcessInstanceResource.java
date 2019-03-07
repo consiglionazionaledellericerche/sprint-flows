@@ -12,6 +12,7 @@ import it.cnr.si.security.PermissionEvaluatorImpl;
 import it.cnr.si.security.SecurityUtils;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.delegate.event.impl.ActivitiProcessCancelledEventImpl;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.history.HistoricTaskInstance;
@@ -22,6 +23,7 @@ import org.activiti.rest.service.api.runtime.process.ProcessInstanceResource;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -47,6 +49,9 @@ import java.util.stream.Collectors;
 import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
 import static it.cnr.si.flows.ng.utils.Enum.Stato.PubblicatoTrasparenza;
 import static it.cnr.si.flows.ng.utils.Utils.DESC;
+import static it.cnr.si.flows.ng.utils.Utils.DESCRIZIONE;
+import static it.cnr.si.flows.ng.utils.Utils.INITIATOR;
+import static it.cnr.si.flows.ng.utils.Utils.TITOLO;
 
 @Controller
 @RequestMapping("api/processInstances")
@@ -54,6 +59,7 @@ public class FlowsProcessInstanceResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsProcessInstanceResource.class);
     public static final String EXPORT_TRASPARENZA = "export-trasparenza";
+	public static final String STATO_FINALE_DOMANDA = "statoFinaleDomanda";
 
     @Inject
     private RestResponseFactory restResponseFactory;
@@ -170,19 +176,21 @@ public class FlowsProcessInstanceResource {
     @DeleteMapping(value = "deleteProcessInstance", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.ADMIN)
     @Timed
-    public HttpServletResponse delete(
-            HttpServletResponse response,
+    public ResponseEntity delete(
+            //HttpServletResponse response,
             @RequestParam(value = "processInstanceId", required = true) String processInstanceId,
             @RequestParam(value = "deleteReason", required = true) String deleteReason) {
-        processInstanceResource.deleteProcessInstance(processInstanceId, deleteReason, response);
-        return response;
+        //processInstanceResource.deleteProcessInstance(processInstanceId, deleteReason, response);
+        runtimeService.setVariable(processInstanceId, STATO_FINALE_DOMANDA, "ELIMINATO");
+        runtimeService.setVariable(processInstanceId, "motivazioneEliminazione", deleteReason);
+		flowsProcessInstanceService.updateSearchTerms(flowsProcessInstanceService.getCurrentTaskOfProcessInstance(processInstanceId).getExecutionId(), processInstanceId, "ELIMINATO");
+        runtimeService.deleteProcessInstance(processInstanceId, deleteReason);
+        return new ResponseEntity(HttpStatus.OK);
     }
-
-
 
     // TODO ???
     @DeleteMapping(value = "suspendProcessInstance", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured({AuthoritiesConstants.ADMIN})
+    @PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.isResponsabile(#taskId, #processInstanceId, @flowsUserDetailsService)")
     @Timed
     public ProcessInstanceResponse suspend(
             HttpServletRequest request,
