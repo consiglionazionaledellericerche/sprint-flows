@@ -169,7 +169,7 @@ public class TestServices {
         return firstTaskId;
     }
 
-    public ProcessInstanceResponse mySetUp(Enum.ProcessDefinitionEnum processDefinitionKey) throws IOException {
+    public ProcessInstanceResponse mySetUp(Enum.ProcessDefinitionEnum processDefinitionKey) throws Exception {
         ProcessInstanceResponse processInstanceResponse = null;
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
 
@@ -222,10 +222,10 @@ public class TestServices {
                 break;
         }
         //Recupero la ProcessInstance
-        ResponseEntity<Object> response = flowsTaskResource.completeTask(req);
+        ResponseEntity<ProcessInstanceResponse> response = flowsTaskResource.completeTask(req);
         assertEquals(OK, response.getStatusCode());
 
-        ProcessInstanceResponse body = (ProcessInstanceResponse) response.getBody();
+        ProcessInstanceResponse body = response.getBody();
 
 
         // Recupero il TaskId del primo task del flusso

@@ -56,7 +56,6 @@ import static it.cnr.si.flows.ng.utils.Utils.*;
 public class FlowsTaskResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsTaskResource.class);
-    private static final String ERROR_MESSAGE = "message";
 
     @Inject
     private TaskService taskService;
@@ -219,13 +218,12 @@ public class FlowsTaskResource {
     @PostMapping(value = "complete",consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canCompleteTaskOrStartProcessInstance(#req, @flowsUserDetailsService)")
     @Timed
-    public ResponseEntity<Object> completeTask(MultipartHttpServletRequest req) throws IOException {
+    public ResponseEntity<ProcessInstanceResponse> completeTask(MultipartHttpServletRequest req) throws Exception {
 
         String username = SecurityUtils.getCurrentUserLogin();
 
         String taskId = (String) req.getParameter("taskId");
         String definitionId = (String) req.getParameter("processDefinitionId");
-
 
         if (isEmpty(taskId) && isEmpty(definitionId))
             throw new ProcessDefinitionAndTaskIdEmptyException();
@@ -234,35 +232,17 @@ public class FlowsTaskResource {
 
             ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitionId).singleResult();
 
-            try {
-                String counterId = processDefinition.getName() + "-" + Calendar.getInstance().get(Calendar.YEAR);
-                String key = counterId + "-" + counterService.getNext(counterId);
+            String counterId = processDefinition.getName() + "-" + Calendar.getInstance().get(Calendar.YEAR);
+            String key = counterId + "-" + counterService.getNext(counterId);
 
-                Map<String, Object> data = extractParameters(req);
-                attachmentService.extractAttachmentVariables(req, data, key);
+            Map<String, Object> data = extractParameters(req);
+            attachmentService.extractAttachmentVariables(req, data, key);
 
-                //recupero l'idStruttura dell'utente che sta avviando il flusso
-                List<GrantedAuthority> authorities = relationshipService.getAllGroupsForUser(username);
-                List<String> groups = authorities.stream()
-                        .map(GrantedAuthority::<String>getAuthority)
-                        .map(Utils::removeLeadingRole)
-                        .filter(g -> g.startsWith("abilitati#"+ processDefinition.getKey() +"@"))
-                        .collect(Collectors.toList());
+            ProcessInstance instance = flowsTaskService.startProcessInstance(data, definitionId, key);
 
-                if (groups.isEmpty()) {
-                    throw new BpmnError("403", "L'utente non e' abilitato ad avviare questo flusso");
-                } else {
+            ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
+            return new ResponseEntity<>(response, HttpStatus.OK);
 
-                    ProcessInstance instance = flowsTaskService.startProcessInstance(data, definitionId, key);
-
-                    ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
-                    return new ResponseEntity<>(response, HttpStatus.OK);
-                }
-            } catch (Exception e) {
-                String errorMessage = String.format("Errore nell'avvio della Process Instance di tipo %s con eccezione:", processDefinition);
-                LOGGER.error(errorMessage, e);
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mapOf(ERROR_MESSAGE, errorMessage));
-            }
         } else {
             try {
                 String key = taskService.getVariable(taskId, "key", String.class);
@@ -275,19 +255,10 @@ public class FlowsTaskResource {
                 taskService.complete(taskId, data);
 
                 return new ResponseEntity<>(HttpStatus.OK);
+
             } catch (Exception e) {
-                //Se non riesco a completare il task rimuovo l'identityLink che indica "l'esecutore" del task e restituisco un INTERNAL_SERVER_ERROR
-                if(((BpmnError) e).getErrorCode() == "412"){
-                    String errorMessage = String.format("%s", e.getMessage());
-                    LOGGER.warn(errorMessage);
-                    taskService.deleteUserIdentityLink(taskId, username, TASK_EXECUTOR);
-                    return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(mapOf(ERROR_MESSAGE, errorMessage));
-                } else {
-                    String errorMessage = String.format("%s<br>Errore durante il tentativo di completamento del task %s da parte dell'utente %s", e.getMessage(), taskId, username);
-                    LOGGER.error(errorMessage);
-                    taskService.deleteUserIdentityLink(taskId, username, TASK_EXECUTOR);
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mapOf(ERROR_MESSAGE, errorMessage));
-                }
+                taskService.deleteUserIdentityLink(taskId, username, TASK_EXECUTOR);
+                throw e;
             }
         }
     }
