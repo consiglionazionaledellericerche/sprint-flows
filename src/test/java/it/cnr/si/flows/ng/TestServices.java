@@ -190,10 +190,12 @@ public class TestServices {
                 req.setParameter("tipologiaAcquisizioneId", "11");
                 req.setParameter("strumentoAcquisizione", "AFFIDAMENTO DIRETTO - MEPA o CONSIP\n");
                 req.setParameter("strumentoAcquisizioneId", "11");
-                req.setParameter("priorita", "Alta");
                 req.setParameter("rup", "marco.spasiano");
                 req.setParameter("rup_label", "MARCO SPASIANO (marco.spasiano)");
-                req.setParameter("impegni_json", "[{\"numero\":\"1\",\"importoNetto\":100,\"importoLordo\":120,\"descrizione\":\"descrizione impegno\",\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"gae\":\"spaclient\"}]");
+                req.setParameter("impegni_json", "[{\"descrizione\":\"Impegno numero 1\",\"percentualeIva\":20,\"importoNetto\":100,\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"uo\":\"2216\",\"gae\":\"spaclient\",\"progetto\":\"Progetto impegno 1\"}]");
+                req.setParameter("richiestaDiAcquisto_label", "Richiesta di Acquisto");
+                req.setParameter("tipologiaAffidamentoDiretto", "semplificata");
+
                 break;
             case iscrizioneElencoOiv:
                 loginAbilitatiIscrizioneElencoOiv();
