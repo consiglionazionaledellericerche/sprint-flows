@@ -370,7 +370,7 @@ public class FlowsAttachmentService {
                 new ByteArrayInputStream(storageFile.getBytes()),
                 storageFile.getContentType(),
                 attachmentName,
-                "/Comunicazioni al CNR/flows/" + key,
+                "/Comunicazioni al CNR/flows/martin/" + key,
                 true);
 
         return so.getKey();
