@@ -87,7 +87,8 @@ public class FlowsAttachmentService {
 
         for (String fileName : nomiFileDaInserire ) {
             FlowsAttachment att = extractSingleAttachment(req, taskId, taskName, fileName, data, key);
-            attachments.put(fileName, att);
+            if (att != null)
+                attachments.put(fileName, att);
         }
 
         data.putAll(attachments);
@@ -103,14 +104,30 @@ public class FlowsAttachmentService {
         String username = SecurityUtils.getCurrentUserLogin();
         FlowsAttachment att = null;
 
-        if (nuovo)
-            att = new FlowsAttachment();
-        else
+        if (nuovo) {
+            MultipartFile file = req.getFile(fileName + "_data");
+            if (file != null) {
+                att = new FlowsAttachment();
+
+                setAttachmentProperties(att, taskId, taskName, fileName, data, nuovo, username);
+
+                att.setFilename(file.getOriginalFilename());
+                att.setMimetype(getMimetype(file));
+                att.setUrl(saveOrUpdateBytes(file.getBytes(), att.getFilename(), file.getOriginalFilename(), key));
+            }
+
+        } else {
             att = taskService.getVariable(taskId, fileName, FlowsAttachment.class);
+            MultipartFile file = req.getFile(fileName + "_data");
 
-        MultipartFile file = req.getFile(fileName + "_data");
+                setAttachmentProperties(att, taskId, taskName, fileName, data, nuovo, username);
+                if (file != null) {
 
-        setAttachmentPropertiesAndBytes(att, taskId, taskName, fileName, data, key, nuovo, username, file);
+                att.setFilename(file.getOriginalFilename());
+                att.setMimetype(getMimetype(file));
+                att.setUrl(saveOrUpdateBytes(file.getBytes(), att.getFilename(), file.getOriginalFilename(), key));
+            }
+        }
 
         return att;
     }
