@@ -37,4 +37,20 @@
                   separator=";"
                   tableName="dynamiclist"/>
     </changeSet>
+
+
+    <!--Vengono sovrascritte le tuple con lo stesso id nei csv nella cartella "modified"-->
+    <!--non occorre eseguire il clear check sum ma basta un maven clean-->
+    <changeSet id="20170503122545-2" author="Paolo" runOnChange='true'>
+        <loadUpdateData encoding="UTF-8"
+                        file="config/liquibase/cnr/modifiche/dynamiclist-modified.csv"
+                        primaryKey="id"
+                        schemaName="public"
+                        separator=";"
+                        tableName="dynamiclist">
+            <column name="id" type="numeric"/>
+            <column name="name" type="string"/>
+            <column name="listjson" type="string"/>
+        </loadUpdateData>
+    </changeSet>
 </databaseChangeLog>

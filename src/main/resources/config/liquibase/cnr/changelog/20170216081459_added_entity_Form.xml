@@ -54,11 +54,11 @@
                   tableName="form"/>
     </changeSet>
 
-    <!--OGNI update dei contenuti caricati nella tabella all`avvio dell`applicazione ha bisogno di un NUOVO changeSet (con stesso "id"-"identificativo incrementale")-->
+    <!--Vengono sovrascritte le tuple con lo stesso id nei csv nella cartella "modified"-->
     <!--non occorre eseguire il clear check sum ma basta un maven clean-->
     <changeSet id="20170216081459-2" author="Paolo" runOnChange='true'>
         <loadUpdateData encoding="UTF-8"
-                        file="config/liquibase/cnr/modifiche/form-modificate.csv"
+                        file="config/liquibase/cnr/modifiche/form-modified.csv"
                         primaryKey="id"
                         schemaName="public"
                         separator=";"
