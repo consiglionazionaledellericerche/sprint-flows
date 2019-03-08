@@ -16,8 +16,9 @@
             templateUrl: 'app/components/task-list/task-list.html',
             link: function (scope, element, attrs) {
                 scope.actionButtons = attrs.actionButtons;
+                scope.canSign = true;
 
-                scope.completed = (attrs.completed == 'true');
+                scope.completed = attrs.completed == 'true';
 
                 scope.pooled = [];
 
