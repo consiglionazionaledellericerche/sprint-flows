@@ -371,7 +371,8 @@ public class FlowsAttachmentService {
                 .collect(Collectors.joining(NUMERI_PROTOCOLLO_SEPARATOR));
     }
 
-    private String saveOrUpdateBytes(byte[] bytes, String attachmentName, String fileName, String key) {
+    // TODO public?
+    public String saveOrUpdateBytes(byte[] bytes, String attachmentName, String fileName, String key) {
 
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
 

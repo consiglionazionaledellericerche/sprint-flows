@@ -20,6 +20,7 @@
 		vm.toggleNavbar = toggleNavbar;
 		vm.collapseNavbar = collapseNavbar;
 		vm.$state = $state;
+		vm.canSign = true;
 		$rootScope.wfDefsStatistics = [];
 
 		//in ogni caso questa chiamata viene cachata e non viene richiamata ad ogni caricamento della navbar

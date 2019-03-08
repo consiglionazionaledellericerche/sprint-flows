@@ -1,11 +1,11 @@
 package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
+import it.cnr.jada.firma.arss.ArubaSignServiceException;
+import it.cnr.jada.firma.arss.stub.ArubaSignService;
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
-import it.cnr.si.flows.ng.service.CoolFlowsBridgeService;
-import it.cnr.si.flows.ng.service.CounterService;
-import it.cnr.si.flows.ng.service.FlowsAttachmentService;
-import it.cnr.si.flows.ng.service.FlowsTaskService;
+import it.cnr.si.flows.ng.service.*;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.flows.ng.utils.Utils;
@@ -77,6 +77,10 @@ public class FlowsTaskResource {
     private CounterService counterService;
     @Inject
     private FlowsAttachmentService attachmentService;
+    @Inject
+    private FlowsFirmaService flowsFirmaService;
+    @Inject
+    private FlowsAttachmentService flowsAttachmentService;
 
 
     @PostMapping(value = "/mytasks", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -249,10 +253,7 @@ public class FlowsTaskResource {
                 Map<String, Object> data = extractParameters(req);
                 attachmentService.extractAttachmentVariables(req, data, key);
 
-                // aggiungo l'identityLink che indica l'utente che esegue il task
-                taskService.addUserIdentityLink(taskId, username, TASK_EXECUTOR);
-                taskService.setVariablesLocal(taskId, data);
-                taskService.complete(taskId, data);
+                flowsTaskService.completeTask(taskId, data);
 
                 return new ResponseEntity<>(HttpStatus.OK);
 
@@ -262,7 +263,6 @@ public class FlowsTaskResource {
             }
         }
     }
-
 
 
     @PostMapping(value = "/taskCompletedByMe", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -280,6 +280,35 @@ public class FlowsTaskResource {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping(value = "/signMany")
+    public ResponseEntity<Void> signMany(@RequestParam("username") String username,
+                                         @RequestParam("password") String password,
+                                         @RequestParam("otp") String otp,
+                                         @RequestParam("taskIds") List<String> taskIds) throws ArubaSignServiceException {
+
+        List<FlowsAttachment> decisioniContrattare = taskIds.stream()
+                .map(id -> taskService.getVariable(id, "decisioneContrattare", FlowsAttachment.class))
+                .collect(Collectors.toList());
+
+        List<byte[]> decisioniContrattareContent = decisioniContrattare.stream()
+                .map(att -> flowsAttachmentService.getAttachmentContentBytes(att))
+                .collect(Collectors.toList());
+
+        List<byte[]> files = flowsFirmaService.firmaMultipla(username, password, otp, decisioniContrattareContent);
+
+        for (int i = 0; i < taskIds.size(); i++) {
+            String taskId = taskIds.get(i);
+            FlowsAttachment att = decisioniContrattare.get(i);
+            String key = taskService.getVariable(taskId, "key", String.class);
+            String uid = flowsAttachmentService.saveOrUpdateBytes(files.get(i), "decisioneContrattare", "signed", key);
+            att.setUrl(uid);
+
+            Map<String, Object> data = new HashMap<String, Object>() {{put("decisioneContrattare", att);}};
+            flowsTaskService.completeTask(taskId, data);
+        }
+
+        return ResponseEntity.ok().build();
+    }
 
 
     @Profile("cnr")

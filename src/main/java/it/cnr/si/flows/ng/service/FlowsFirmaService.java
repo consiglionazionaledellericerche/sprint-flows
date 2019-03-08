@@ -2,25 +2,20 @@ package it.cnr.si.flows.ng.service;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
 import javax.xml.namespace.QName;
 
+import it.cnr.jada.firma.arss.stub.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import it.cnr.jada.firma.arss.ArubaSignServiceClient;
 import it.cnr.jada.firma.arss.ArubaSignServiceException;
-import it.cnr.jada.firma.arss.stub.ArubaSignService;
-import it.cnr.jada.firma.arss.stub.ArubaSignServiceService;
-import it.cnr.jada.firma.arss.stub.Auth;
-import it.cnr.jada.firma.arss.stub.PdfProfile;
-import it.cnr.jada.firma.arss.stub.PdfSignApparence;
-import it.cnr.jada.firma.arss.stub.SignRequestV2;
-import it.cnr.jada.firma.arss.stub.SignReturnV2;
-import it.cnr.jada.firma.arss.stub.TypeOfTransportNotImplemented_Exception;
-import it.cnr.jada.firma.arss.stub.TypeTransport;
 
 /**
  * 
@@ -54,18 +49,22 @@ public class FlowsFirmaService {
     @Value("${cnr.firma.pdfprofile}")
     private String RemotePdfprofile;
 
-    public byte[] firma(String username, String password, String otp, byte[] bytes) throws ArubaSignServiceException {
-        
-        // TODO verificare se poter usare un singolo client, e non ricrearlo ogni volta
-        ArubaSignServiceClient client = new ArubaSignServiceClient();
-
+    @PostConstruct
+    public void init() {
         Properties props = new Properties();
         props.setProperty("arubaRemoteSignService.url", RemoteSignServiceUrl);
         props.setProperty("arubaRemoteSignService.typeOtpAuth", RemoteSignServiceTypeOtpAuth);
         props.setProperty("arubaRemoteSignService.certId", RemoteSignServiceCertId);
         props.setProperty("arubaRemoteSignService.pdfprofile", RemotePdfprofile);
-        
+
         this.props = props;
+    }
+
+    public byte[] firma(String username, String password, String otp, byte[] bytes) throws ArubaSignServiceException {
+        
+        // TODO verificare se poter usare un singolo client, e non ricrearlo ogni volta
+        ArubaSignServiceClient client = new ArubaSignServiceClient();
+
         client.setProps(props);
 
         PdfSignApparence apparence = getApparence();
@@ -75,6 +74,30 @@ public class FlowsFirmaService {
 //        byte[] out = client.verify(signed);
 
         return signed;
+    }
+
+    public List<byte[]> firmaMultipla(String username, String password, String otp, List<byte[]> files) throws ArubaSignServiceException {
+
+        ArubaSignService service = getServicePort();
+
+        PdfSignApparence apparence = getApparence();
+        Auth identity = getIdentity(username, password, otp);
+
+        try {
+
+            List<SignRequestV2> requests = files.stream()
+                    .map(b -> getRequest(identity, b))
+                    .collect(Collectors.toList());
+
+            SignReturnV2Multiple signReturnV2Multiple =
+                    service.pdfsignatureV2Multiple(identity, requests, null, PdfProfile.fromValue(RemotePdfprofile));
+
+            return signReturnV2Multiple.getReturnSigns().stream().map(s -> s.getBinaryoutput()).collect(Collectors.toList());
+
+
+        } catch (TypeOfTransportNotImplemented_Exception e) {
+            throw new ArubaSignServiceException("error while invoking pdfsignatureV2", e);
+        }
     }
     
     /**
@@ -95,7 +118,7 @@ public class FlowsFirmaService {
 //      apparence.setTesto("Firmato digitalmente da "+ username +" in data "+ new Date());
         return null;
     }
-    
+
     /**
      *  Questo e' il metodo personalizzato da firmadigitale-1.11.jar 
      */
