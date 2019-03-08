@@ -56,6 +56,10 @@
                ng-click="claimTask(task.id, true)">
                 <span class="glyphicon glyphicon-hand-up" aria-hidden="true"></span> Prendi in carico
             </a>
+            <a class="btn btn-default" ng-class="{'btn-xs': !advanced}" ng-if="actionButtons && canSign"
+               ng-click="addToCart(task.id)">
+                <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Aggiungi al Carrello Firma
+            </a>
         </div>
     </div>
 </div>
