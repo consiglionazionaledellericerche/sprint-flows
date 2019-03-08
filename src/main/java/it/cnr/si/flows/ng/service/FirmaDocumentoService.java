@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.Date;
+import java.util.List;
 
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Firma;
 import static it.cnr.si.flows.ng.utils.Enum.Stato.Firmato;
@@ -65,10 +66,8 @@ public class FirmaDocumentoService {
                 }
                 throw new BpmnError("500", "<b>FIRMA NON ESEGUITA<br>" + textMessage + "</b>");
             }
-
         }
     }
-
 
     public static String getSignedFilename(String filename) {
         String result = filename.substring(0, filename.lastIndexOf('.'));

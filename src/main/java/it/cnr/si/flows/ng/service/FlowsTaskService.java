@@ -289,6 +289,17 @@ public class FlowsTaskService {
 		return instance;
 	}
 
+
+	public void completeTask(String taskId, Map<String, Object> data) {
+
+        String username = SecurityUtils.getCurrentUserLogin();
+
+        // aggiungo l'identityLink che indica l'utente che esegue il task
+		taskService.addUserIdentityLink(taskId, username, TASK_EXECUTOR);
+		taskService.setVariablesLocal(taskId, data);
+		taskService.complete(taskId, data);
+	}
+
 	public DataResponse getTasksCompletedByMe(HttpServletRequest req, @RequestParam("processDefinition") String processDefinition, @RequestParam("firstResult") int firstResult, @RequestParam("maxResults") int maxResults, @RequestParam("order") String order) {
 		String username = SecurityUtils.getCurrentUserLogin();
 
