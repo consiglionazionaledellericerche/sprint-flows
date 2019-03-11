@@ -113,7 +113,7 @@ public class FlowsAttachmentService {
 
                 att.setFilename(file.getOriginalFilename());
                 att.setMimetype(getMimetype(file));
-                att.setUrl(saveOrUpdateBytes(file.getBytes(), att.getFilename(), file.getOriginalFilename(), key));
+                att.setUrl(saveOrUpdateBytes(file.getBytes(), fileName, file.getOriginalFilename(), key));
             }
 
         } else {
@@ -125,7 +125,7 @@ public class FlowsAttachmentService {
 
                 att.setFilename(file.getOriginalFilename());
                 att.setMimetype(getMimetype(file));
-                att.setUrl(saveOrUpdateBytes(file.getBytes(), att.getFilename(), file.getOriginalFilename(), key));
+                att.setUrl(saveOrUpdateBytes(file.getBytes(), fileName, file.getOriginalFilename(), key));
             }
         }
 
@@ -138,7 +138,7 @@ public class FlowsAttachmentService {
         if (file != null) {
             att.setFilename(file.getOriginalFilename());
             att.setMimetype(getMimetype(file));
-            att.setUrl(saveOrUpdateBytes(file.getBytes(), att.getFilename(), file.getOriginalFilename(), key));
+            att.setUrl(saveOrUpdateBytes(file.getBytes(), fileName, file.getOriginalFilename(), key));
         }
     }
 
@@ -391,7 +391,10 @@ public class FlowsAttachmentService {
                 "/Comunicazioni al CNR/flows/martin/" + key,
                 true);
 
-        return so.getKey();
+        StorageObject updatedSo = storeService.getStorageObjectBykey(
+                so.<String>getPropertyValue("cmis:objectId").split(";")[0]);
+
+        return updatedSo.getPropertyValue("cmis:objectId");
     }
 
     public InputStream getAttachmentContent(String key) {
