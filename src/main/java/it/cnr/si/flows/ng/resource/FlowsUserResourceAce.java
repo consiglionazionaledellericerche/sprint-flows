@@ -79,28 +79,4 @@ public class FlowsUserResourceAce {
         return ResponseEntity.ok(response);
     }
 
-    //    todo: non vieme mai usato => cancellare?
-    // todo: se non si e' rotto niente, cancellare entro 30/10/18 - martin
-//    @RequestMapping(value = "/customquery", method = RequestMethod.GET)
-//    @Secured(AuthoritiesConstants.ADMIN)
-//    public List<HistoricProcessInstanceResponse> customQuery() {
-//
-//        FlowsHistoricProcessInstanceQuery query = new FlowsHistoricProcessInstanceQuery(managementService);
-//        List<String> groups = new ArrayList<>();
-//        groups.add("sfd@2216");
-//        query.setVisibleToGroups(groups);
-//
-//        List<HistoricProcessInstance> processes = managementService.executeCommand(new Command<List<HistoricProcessInstance>>() {
-//
-//            @SuppressWarnings("unchecked")
-//            @Override
-//            public List<HistoricProcessInstance> execute(CommandContext commandContext) {
-//                return (List<HistoricProcessInstance>) commandContext.getDbSqlSession().selectList("selectFlowsHistoricProcessInstancesWithVariablesByQueryCriteria", query);
-//            }
-//        });
-//
-//        return restResponseFactory.createHistoricProcessInstanceResponseList(processes);
-//    }
-
-
 }
