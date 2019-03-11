@@ -41,7 +41,8 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(NullPointerException.class)
     protected ResponseEntity<Object> HandleNull(RuntimeException ex, WebRequest request) {
-        String bodyOfResponse = "E' stato ricevuto un null pointer";
+        String bodyOfResponse = "E' stato ricevuto un null pointer per la richiesta "+ request.getContextPath();
+        LOGGER.error(bodyOfResponse);
         return handleExceptionInternal(ex, bodyOfResponse,
                                        new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
@@ -103,7 +104,7 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> HandleUnknownException(Exception ex, WebRequest request) {
 
         long rif = Instant.now().toEpochMilli();
-        LOGGER.error("(Riferimento " + rif + ") Errore non gestito con messaggio " + ex.getMessage(), ex);
+        LOGGER.error("(Riferimento " + rif + ") Errore non gestito per la richiesta "+ request.getContextPath() +" con messaggio " + ex.getMessage(), ex);
 
         Map<String, Object> res = Utils.mapOf("message", "Errore non gestito. Contattare gli amminstratori specificando il numero di riferimento: " + rif);
         return handleExceptionInternal(ex, res,
