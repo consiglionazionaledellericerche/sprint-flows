@@ -37,7 +37,7 @@
         </createTable>
 
         <loadData encoding="UTF-8"
-                  file="config/liquibase/cnr/relationship.csv"
+                  file="config/liquibase/cnr/base-relationship.csv"
                   separator=";"
                   tableName="relationship"/>
     </changeSet>
@@ -47,7 +47,7 @@
     <!--non occorre eseguire il clear check sum ma basta un maven clean-->
     <changeSet id="20171023125007-2" author="Paolo" runOnChange='true'>
         <loadUpdateData encoding="UTF-8"
-                        file="config/liquibase/cnr/modifiche/relationship-modified.csv"
+                        file="config/liquibase/cnr/new/relationship.csv"
                         primaryKey="id"
                         schemaName="public"
                         separator=";"

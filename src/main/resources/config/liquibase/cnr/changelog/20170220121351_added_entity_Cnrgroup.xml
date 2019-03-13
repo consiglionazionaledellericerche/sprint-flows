@@ -44,7 +44,7 @@
         <addPrimaryKey columnNames="cnrgroups_id, parents_id" tableName="cnrgroup_parents"/>
 
         <loadData encoding="UTF-8"
-                  file="config/liquibase/cnr/cnrgroup.csv"
+                  file="config/liquibase/cnr/base-cnrgroup.csv"
                   separator=";"
                   tableName="cnrgroup"/>
 
@@ -55,7 +55,7 @@
     <!--non occorre eseguire il clear check sum ma basta un maven clean-->
     <changeSet id="20170220121351-2" author="Paolo" runOnChange='true'>
         <loadUpdateData encoding="UTF-8"
-                        file="config/liquibase/cnr/modifiche/cnrgroup-modified.csv"
+                        file="config/liquibase/cnr/new/cnrgroup.csv"
                         primaryKey="id"
                         schemaName="public"
                         separator=";"
