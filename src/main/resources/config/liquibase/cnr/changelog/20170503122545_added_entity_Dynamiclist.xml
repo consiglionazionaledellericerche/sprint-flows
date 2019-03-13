@@ -33,7 +33,7 @@
         </createTable>
 
         <loadData encoding="UTF-8"
-                  file="config/liquibase/cnr/dynamiclist.csv"
+                  file="config/liquibase/cnr/base-dynamiclist.csv"
                   separator=";"
                   tableName="dynamiclist"/>
     </changeSet>
@@ -43,7 +43,7 @@
     <!--non occorre eseguire il clear check sum ma basta un maven clean-->
     <changeSet id="20170503122545-2" author="Paolo" runOnChange='true'>
         <loadUpdateData encoding="UTF-8"
-                        file="config/liquibase/cnr/modifiche/dynamiclist-modified.csv"
+                        file="config/liquibase/cnr/new/dynamiclist.csv"
                         primaryKey="id"
                         schemaName="public"
                         separator=";"

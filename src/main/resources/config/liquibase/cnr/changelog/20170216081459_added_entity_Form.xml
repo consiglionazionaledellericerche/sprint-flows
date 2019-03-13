@@ -41,15 +41,7 @@
         </createTable>
 
         <loadData encoding="UTF-8"
-                  file="config/liquibase/cnr/form.csv"
-                  separator=";"
-                  tableName="form"/>
-        <loadData encoding="UTF-8"
-                  file="config/liquibase/cnr/form-acquisti-v1.csv"
-                  separator=";"
-                  tableName="form"/>
-        <loadData encoding="UTF-8"
-                  file="config/liquibase/cnr/form-accordi-internazionali-v1.csv"
+                  file="config/liquibase/cnr/base-form.csv"
                   separator=";"
                   tableName="form"/>
     </changeSet>
@@ -58,7 +50,31 @@
     <!--non occorre eseguire il clear check sum ma basta un maven clean-->
     <changeSet id="20170216081459-2" author="Paolo" runOnChange='true'>
         <loadUpdateData encoding="UTF-8"
-                        file="config/liquibase/cnr/modifiche/form-modified.csv"
+                        file="config/liquibase/cnr/new/form.csv"
+                        primaryKey="id"
+                        schemaName="public"
+                        separator=";"
+                        tableName="form">
+            <column name="id" type="numeric"/>
+            <column name="process_definition_key" type="string"/>
+            <column name="version" type="string"/>
+            <column name="task_id" type="string"/>
+            <column name="form" type="string"/>
+        </loadUpdateData>
+        <loadUpdateData encoding="UTF-8"
+                        file="config/liquibase/cnr/new/acquisti-form.csv"
+                        primaryKey="id"
+                        schemaName="public"
+                        separator=";"
+                        tableName="form">
+            <column name="id" type="numeric"/>
+            <column name="process_definition_key" type="string"/>
+            <column name="version" type="string"/>
+            <column name="task_id" type="string"/>
+            <column name="form" type="string"/>
+        </loadUpdateData>
+        <loadUpdateData encoding="UTF-8"
+                        file="config/liquibase/cnr/new/accordi-internazionali-form.csv"
                         primaryKey="id"
                         schemaName="public"
                         separator=";"
