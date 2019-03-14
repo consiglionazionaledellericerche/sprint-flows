@@ -71,7 +71,7 @@
         </activiti:executionListener>
       </extensionElements>
     </userTask>
-    <userTask id="firma-verbale" name="FIRMA VERBALE" activiti:candidateGroups="${gruppoResponsabileAccordiInternazionali}">
+    <userTask id="firma-verbale" name="FIRMA VERBALE" activiti:candidateGroups="${gruppoResponsabileAccordiInternazionali}" activiti:category="firma">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessAccordiInternazionali_v1}">
           <activiti:field name="faseEsecuzione">
@@ -234,9 +234,6 @@
       </timerEventDefinition>
     </boundaryEvent>
     <sequenceFlow id="flow30" sourceRef="boundarytimer3" targetRef="endevent6"></sequenceFlow>
-    <sequenceFlow id="flow31" sourceRef="exclusivegateway7" targetRef="modifica-domanda">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Modifica'}]]></conditionExpression>
-    </sequenceFlow>
     <scriptTask id="notificatask" name="notifica mail" scriptFormat="javascript" activiti:autoStoreVariables="false">
       <script>execution.setVariable('notifica', true);</script>
     </scriptTask>
@@ -345,7 +342,7 @@
         <omgdi:waypoint x="101.0" y="191.0"></omgdi:waypoint>
         <omgdi:waypoint x="36.0" y="191.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="7.0" y="221.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="63.0" x="7.0" y="221.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
@@ -460,11 +457,6 @@
       <bpmndi:BPMNEdge bpmnElement="flow30" id="BPMNEdge_flow30">
         <omgdi:waypoint x="362.0" y="70.0"></omgdi:waypoint>
         <omgdi:waypoint x="424.0" y="46.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow31" id="BPMNEdge_flow31">
-        <omgdi:waypoint x="425.0" y="133.0"></omgdi:waypoint>
-        <omgdi:waypoint x="424.0" y="191.0"></omgdi:waypoint>
-        <omgdi:waypoint x="274.0" y="191.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow32" id="BPMNEdge_flow32">
         <omgdi:waypoint x="325.0" y="71.0"></omgdi:waypoint>
