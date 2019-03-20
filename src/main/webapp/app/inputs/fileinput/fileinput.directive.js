@@ -56,7 +56,7 @@
                 $scope.removeRow = function() {
                     if ($scope.rows.length > $scope.min) {
                         $scope.rows.pop();
-                        $scope.$parent.attachments[$scope.name+($scope.rows.length)] = undefined;
+                        delete $scope.$parent.attachments[$scope.name+($scope.rows.length)];
                     }
                 };
 
