@@ -5,6 +5,8 @@ import it.cnr.si.domain.ExternalMessage;
 import it.cnr.si.domain.enumeration.ExternalMessageStatus;
 import it.cnr.si.domain.enumeration.ExternalMessageVerb;
 import it.cnr.si.repository.ExternalMessageRepository;
+
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -76,16 +78,17 @@ public class ExternalMessageService {
         externalMessageRepository.delete(id);
     }
 
-    public void createExternalMessage(String url, ExternalMessageVerb verb, Map payload) {
+    public void createExternalMessage(String url, ExternalMessageVerb verb, Map<String, Object> payload) {
 
-        Gson gson = new Gson();
-        String payloadString = gson.toJson(payload);
+        
+        JSONObject payloadString = new JSONObject(payload);
+
 
         ExternalMessage msg = new ExternalMessage();
 
         msg.setUrl(url);
         msg.setVerb(verb);
-        msg.setPayload(payloadString);
+        msg.setPayload(payloadString.toString());
         msg.setStatus(ExternalMessageStatus.NEW);
         msg.setRetries(0);
         msg.setLastErrorMessage(null);
