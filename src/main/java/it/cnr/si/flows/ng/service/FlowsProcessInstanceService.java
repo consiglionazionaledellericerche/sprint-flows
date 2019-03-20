@@ -117,6 +117,10 @@ public class FlowsProcessInstanceService {
 		identityLinks.put("process", processLinks);
 		taskService.createTaskQuery().processInstanceId(processInstanceId).active().list().forEach(
 				task -> {
+
+					// assumo che abbiamo un solo task attivo
+					result.put("activeTask", restResponseFactory.createTaskResponse(task));
+
 					Map<String, Object> identityLink = new HashMap<>();
 					String taskDefinitionKey = task.getTaskDefinitionKey();
 					PvmActivity taskDefinition = processDefinition.findActivity(taskDefinitionKey);

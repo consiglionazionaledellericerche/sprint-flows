@@ -51,6 +51,7 @@
                         //recupero l'ultimo task (quello ancora da eseguire)
                         if (el.historyTask.endTime === null) {
                             //recupero la fase
+                        	  vm.activeTask = el.historyTask;
                             vm.data.fase = el.historyTask.name;
                             //recupero il gruppo/l'utente assegnatario del task
                             el.historyIdentityLink.forEach(function(il) {
@@ -65,6 +66,7 @@
 
                     $scope.canPublish = response.data.canPublish;
                     $scope.canUpdateAttachments = response.data.canUpdateAttachments;
+                    $scope.canSign = false;
 
                     $scope.isResponsabile = (vm.authorities.includes("ROLE_responsabile-struttura@" + vm.data.entity.variabili.idStruttura) ||
                         vm.authorities.includes("ROLE_responsabile#flussi") ||
@@ -151,5 +153,10 @@
                 }
             })
         };
+
+        $scope.addToCart = function() {
+            $scope.$rootScope.cart = $scope.$rootScope.cart || [];
+            $scope.$rootScope.cart.push()
+        }
     }
 })();
