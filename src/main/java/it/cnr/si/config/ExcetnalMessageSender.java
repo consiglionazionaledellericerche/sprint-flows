@@ -19,7 +19,7 @@ public class ExcetnalMessageSender {
     @Inject
     private RestTemplate restTemplate;
 
-    @Scheduled(fixedDelay = 10) // 10m
+    @Scheduled(fixedDelay = 600) // 10m
     public void sendMessages() {
         externalMessageService.getNewExternalMessages().forEach(this::send);
     }
