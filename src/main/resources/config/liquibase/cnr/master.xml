@@ -32,4 +32,7 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/cnr/changelog/20190125124942_added_entity_Avviso.xml"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/cnr/changelog/20190320102314_added_entity_ExternalMessage.xml"
+             relativeToChangelogFile="false"/>
+
 </databaseChangeLog>
