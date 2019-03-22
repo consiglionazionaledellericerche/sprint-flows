@@ -151,6 +151,11 @@
                     return $http.get('api/sigladynamiclist/byname/' + name);
                 },
             },
+            oil: {
+                byCategory: function(category){
+                    return $http.get('api/proxy/OIL/?proxyURL=catg/HDSiper/' + category);
+                }
+            },
             view: function(processid, version, type) {
                 return $http.get('api/views/' + processid + '/' + version + '/' + type);
             },
