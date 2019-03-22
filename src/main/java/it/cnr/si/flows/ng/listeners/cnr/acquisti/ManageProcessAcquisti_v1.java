@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import it.cnr.si.domain.enumeration.ExternalMessageVerb;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.FirmaDocumentoService;
@@ -22,6 +23,7 @@ import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.service.FlowsPdfService;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.service.ProtocolloDocumentoService;
+import it.cnr.si.service.ExternalMessageService;
 import it.cnr.si.flows.ng.listeners.cnr.acquisti.service.AcquistiService;
 
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
@@ -31,6 +33,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -66,6 +69,9 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 	private FlowsAttachmentService flowsAttachmentService;
 	@Inject
 	private AceBridgeService aceBridgeService;
+	@Inject
+	private ExternalMessageService externalMessageService;
+	
 
 	private Expression faseEsecuzione;
 
@@ -200,6 +206,25 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			throw new BpmnError("500", errorMessage+"</b><br>");
 		}
 
+	}
+	
+	public Map<String, Object> createSiglaPayload(DelegateExecution execution) {
+		Map<String, Object> metadatiAcquisto = new HashMap<String, Object>()
+		{
+		    {
+		        put("BusinessKey", execution.getProcessBusinessKey().toString());
+				DateFormat format = new SimpleDateFormat("yyyy");
+				String strDate = format.format(execution.getVariable("startDate"));  
+		        put("ESERCIZIO", strDate);
+		        put("CD_UNITA_ORGANIZZATIVA", aceBridgeService.getUoById(Integer.parseInt(execution.getVariable("idStruttura").toString())).getCdsuo());
+		        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		    	Date endDate = new Date();
+				String endStrDate = dateFormat.format(endDate);  
+		        put("DT_REGISTRAZIONE", endStrDate);
+		    }
+		};	
+
+		return metadatiAcquisto;
 	}
 	@Override
 	public void notify(DelegateExecution execution) throws Exception {
@@ -390,6 +415,10 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			controllaFilePubblicabiliTrasparenza(execution);
 			execution.setVariable(STATO_FINALE_DOMANDA, "STIPULATO");
 			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "STIPULATO");
+			//TODO implementare le url a seconda del contesto
+			String urlSigla = "www.google.it";
+			Map<String, Object> siglaPayload = createSiglaPayload(execution);
+			externalMessageService.createExternalMessage(urlSigla, ExternalMessageVerb.POST, siglaPayload);
 		};break;     
 		case "end-stipulato-end": {
 		};break;
