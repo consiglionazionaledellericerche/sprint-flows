@@ -23,7 +23,10 @@ import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.service.FlowsPdfService;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.service.ProtocolloDocumentoService;
+import it.cnr.si.flows.ng.utils.SecurityUtils;
+import it.cnr.si.service.AceService;
 import it.cnr.si.service.ExternalMessageService;
+import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
 import it.cnr.si.flows.ng.listeners.cnr.acquisti.service.AcquistiService;
 
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
@@ -31,6 +34,7 @@ import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -71,7 +75,8 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 	private AceBridgeService aceBridgeService;
 	@Inject
 	private ExternalMessageService externalMessageService;
-	
+	@Inject
+	AceService aceService;
 
 	private Expression faseEsecuzione;
 
@@ -207,25 +212,139 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 		}
 
 	}
-	
-	public Map<String, Object> createSiglaPayload(DelegateExecution execution) {
+
+	public Map<String, Object> createSiglaPayload(DelegateExecution execution) throws ParseException {
 		Map<String, Object> metadatiAcquisto = new HashMap<String, Object>()
 		{
-		    {
-		        put("BusinessKey", execution.getProcessBusinessKey().toString());
+			{
 				DateFormat format = new SimpleDateFormat("yyyy");
-				String strDate = format.format(execution.getVariable("startDate"));  
-		        put("ESERCIZIO", strDate);
-		        put("CD_UNITA_ORGANIZZATIVA", aceBridgeService.getUoById(Integer.parseInt(execution.getVariable("idStruttura").toString())).getCdsuo());
-		        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-		    	Date endDate = new Date();
+				if(execution.getVariable("startDate") != null){
+					String strDate = format.format(execution.getVariable("startDate"));  
+					put("ESERCIZIO", strDate);
+				}
+				if(execution.getVariable("idStruttura") != null){
+					put("CD_UNITA_ORGANIZZATIVA", aceBridgeService.getUoById(Integer.parseInt(execution.getVariable("idStruttura").toString())).getCdsuo());
+				}
+				DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+				Date endDate = new Date();
 				String endStrDate = dateFormat.format(endDate);  
-		        put("DT_REGISTRAZIONE", endStrDate);
-		    }
+				put("DT_REGISTRAZIONE", endStrDate);
+				if(execution.getVariable("rup") != null){
+					PersonaWebDto rupUser = aceService.getPersonaByUsername(execution.getVariable("rup").toString());
+					put("CD_TERZO_RESP", rupUser.getCodiceFiscale());
+				}
+				if(execution.getVariable("usernameFirmatarioContratto") != null){
+					PersonaWebDto firmatarioUser = aceService.getPersonaByUsername(execution.getVariable("usernameFirmatarioContratto").toString());
+					put("CD_TERZO_FIRMATARIO", firmatarioUser.getCodiceFiscale());
+				}
+				if(execution.getVariable("pIvaCodiceFiscaleDittaAggiudicataria") != null){
+					put("FIG_GIUR_EST", execution.getVariable("pIvaCodiceFiscaleDittaAggiudicataria").toString());
+				}
+				put("NATURA_CONTABILE", "P");
+				if(execution.getVariable("tipologiaAcquisizioneId") != null){
+					String tipologiaAcquisizioneId = execution.getVariable("tipologiaAcquisizioneId").toString();
+					if(tipologiaAcquisizioneId.equals("11")) {
+						put("CD_PROC_AMM", "PA55");
+					}
+					if(tipologiaAcquisizioneId.equals("12")) {
+						put("CD_PROC_AMM", "PR55");
+					}	
+					if(tipologiaAcquisizioneId.equals("13")) {
+						put("CD_PROC_AMM", "PN56");
+					}	
+					if(tipologiaAcquisizioneId.equals("14")) {
+						put("CD_PROC_AMM", "PN57");
+					}	
+					if(tipologiaAcquisizioneId.equals("15")) {
+						put("CD_PROC_AMM", "DC58");
+					}	
+					if(tipologiaAcquisizioneId.equals("23")) {
+						put("CD_PROC_AMM", "PNS");
+					}	
+					if(tipologiaAcquisizioneId.equals("22")) {
+						put("CD_PROC_AMM", "PNSS");
+					}	
+					if(tipologiaAcquisizioneId.equals("11") || tipologiaAcquisizioneId.equals("21") ) {
+						put("FL_MEPA", "Y");
+					} else {
+						put("FL_MEPA", "N");
+					}
+				}
+				if(execution.getVariable("strumentoAcquisizioneId") != null){
+					String strumentoAcquisizioneId = execution.getVariable("strumentoAcquisizioneId").toString();
+					if(strumentoAcquisizioneId.equals("12")) {
+						put("CD_PROC_AMM", "PNSS");
+					}	
+				}
+				if(execution.getVariable("descrizione") != null){
+					put("OGGETTO", execution.getVariable("descrizione").toString());
+				}
+				put("CD_PROTOCOLLO", execution.getProcessBusinessKey().toString());
+				DateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+				if(execution.getVariable("dataStipulaContratto") != null){
+					put("DT_STIPULA", dateFormat.format(inputDateFormat.parse(execution.getVariable("dataStipulaContratto").toString())));		        	
+				}
+				if(execution.getVariable("dataInizioValiditaContratto") != null){
+					put("DT_INIZIO_VALIDITA", dateFormat.format(inputDateFormat.parse(execution.getVariable("dataInizioValiditaContratto").toString())));		        	
+				}
+				if(execution.getVariable("dataFineValiditaContratto") != null){
+					put("DT_FINE_VALIDITA", dateFormat.format(inputDateFormat.parse(execution.getVariable("dataFineValiditaContratto").toString())));		        	
+				}
+				put("IM_CONTRATTO_PASSIVO", execution.getVariable("importoTotaleLordo").toString());
+				put("CD_TIPO_ATTO", "DET");
+				if(runtimeService.getVariable(execution.getProcessInstanceId(), "decisioneContrattare", FlowsAttachment.class) != null) {
+					FlowsAttachment determina = runtimeService.getVariable(execution.getProcessInstanceId(), "decisioneContrattare", FlowsAttachment.class);
+					put("DS_ATTO", determina.getLabel() + " Prot." + determina.getMetadati().get("numeroProtocollo") + " del " + dateFormat.format(inputDateFormat.parse(determina.getMetadati().get("dataProtocollo").toString())));
+				}
+
+				if(runtimeService.getVariable(execution.getProcessInstanceId(), "contratto", FlowsAttachment.class) != null) {
+					FlowsAttachment contratto = runtimeService.getVariable(execution.getProcessInstanceId(), "contratto", FlowsAttachment.class);
+					put("CD_PROTOCOLLO_GENERALE", contratto.getLabel() + " Prot." + contratto.getMetadati().get("numeroProtocollo") + " del " + dateFormat.format(inputDateFormat.parse(contratto.getMetadati().get("dataProtocollo").toString())));
+					if(contratto.isPubblicazioneTrasparenza()) {
+						put("FL_PUBBLICA_CONTRATTO", "Y");
+					} else {
+						put("FL_PUBBLICA_CONTRATTO", "N");
+					}
+				}
+				if(runtimeService.getVariable(execution.getProcessInstanceId(), "stipula", FlowsAttachment.class) != null) {
+					FlowsAttachment stipula = runtimeService.getVariable(execution.getProcessInstanceId(), "stipula", FlowsAttachment.class);
+					String cdProtocolloGenerale = stipula.getLabel();
+					if(stipula.getDataProtocollo() != null && stipula.getNumeroProtocollo() != null){
+						put("ESERCIZIO_PROTOCOLLO", format.format(inputDateFormat.parse(stipula.getDataProtocollo())));	
+						cdProtocolloGenerale = stipula.getLabel() + " Prot." + stipula.getNumeroProtocollo() + " del " + dateFormat.format(inputDateFormat.parse(stipula.getDataProtocollo()));
+					}
+					put("CD_PROTOCOLLO_GENERALE", cdProtocolloGenerale);
+					if(stipula.isPubblicazioneTrasparenza()) {
+						put("FL_PUBBLICA_CONTRATTO", "Y");
+					} else {
+						put("FL_PUBBLICA_CONTRATTO", "N");
+					}
+				}
+				put("FL_ART82", "N");
+				if(execution.getVariable("cig") != null){
+					put("CD_CIG", execution.getVariable("cig").toString());
+				}
+				if(execution.getVariable("cup") != null){
+					put("CD_CUP", execution.getVariable("cup").toString());
+				}
+				if(execution.getVariable("importoTotaleNetto") != null){
+					put("IM_CONTRATTO_PASSIVO_NETTO", execution.getVariable("importoTotaleNetto").toString());
+				}
+			}
 		};	
 
 		return metadatiAcquisto;
 	}
+	public void releaseDocumentInSigla(DelegateExecution execution) {
+		Map<String, FlowsAttachment> attachmentList = attachmentService.getAttachementsForProcessInstance(execution.getProcessInstanceId());
+		for (String key : attachmentList.keySet()) {
+			FlowsAttachment value = attachmentList.get(key);
+			LOGGER.info("Key = " + key + ", Value = " + value);
+		}	
+	}
+
+
+
 	@Override
 	public void notify(DelegateExecution execution) throws Exception {
 		//(OivPdfService oivPdfService = new OivPdfService();
@@ -250,10 +369,10 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			startAcquistiSetGroupsAndVisibility.configuraVariabiliStart(execution);
 		};break;
 		case "pre-determina-start": {
-		pubblicaTuttiFilePubblicabili(execution);
+			pubblicaTuttiFilePubblicabili(execution);
 		};break;
 		case "pre-determina-end": {
-		pubblicaTuttiFilePubblicabili(execution);
+			pubblicaTuttiFilePubblicabili(execution);
 		};break;     
 		case "end-annullato-start": {
 			execution.setVariable(STATO_FINALE_DOMANDA, "ANNULLATO");
@@ -261,9 +380,9 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 		};break;     
 		// START DECISIONE-CONTRATTARE
 		case "DECISIONE-CONTRATTARE-start": {
-            String rup = execution.getVariable("rup", String.class);
-            runtimeService.addUserIdentityLink(execution.getProcessInstanceId(), rup, PROCESS_VISUALIZER);
-            CalcolaTotaleImpegni(execution);
+			String rup = execution.getVariable("rup", String.class);
+			runtimeService.addUserIdentityLink(execution.getProcessInstanceId(), rup, PROCESS_VISUALIZER);
+			CalcolaTotaleImpegni(execution);
 		};break;  
 		case "modifica-decisione-end": {
 			CalcolaTotaleImpegni(execution);
@@ -359,6 +478,9 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 		case "firma-contratto-end": {
 			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
 				firmaDocumentoService.eseguiFirma(execution, "contratto");
+				execution.setVariable("usernameFirmatarioContratto", SecurityUtils.getCurrentUserLogin());
+				Date dataStipulaContratto = new Date();
+				execution.setVariable("dataStipulaContratto", dataStipulaContratto);	
 			}
 		};break; 
 		case "protocollo-contratto-end": {
