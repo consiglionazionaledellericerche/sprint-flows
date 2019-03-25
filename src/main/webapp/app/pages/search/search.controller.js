@@ -17,15 +17,6 @@
     vm.searchParams.page = $location.search().page || 1;
     vm.searchParams.processDefinitionKey = "all";
 
-    if ($location.search().isTaskQuery === undefined) {
-      vm.searchParams.isTaskQuery = false;
-    } else {
-      vm.searchParams.isTaskQuery =
-        $location.search().isTaskQuery === true ||
-        $location.search().isTaskQuery == "true";
-    }
-
-
     $scope.search = function() {
       //serve per evitare di ricaricare le form di ricerca associate alla Process Definition ad ogni nuova ricerca
       $scope.reload = $scope.formUrl !== oldUrl;
@@ -72,36 +63,14 @@
         });
     };
 
-
-    $scope.$watchGroup(["vm.searchParams.isTaskQuery"], function() {
-      var cleanParams = {};
-      cleanParams.active = vm.searchParams.active;
-      cleanParams.order = vm.searchParams.order;
-      cleanParams.page = 1;
-      cleanParams.isTaskQuery = vm.searchParams.isTaskQuery;
-      cleanParams.processDefinitionKey = vm.searchParams.processDefinitionKey;
-      cleanParams.numeriProtocollo = vm.searchParams.numeriProtocollo;
-
-      vm.searchParams = cleanParams;
-      $scope.search();
-    });
-
-
     $scope.$watchGroup(
-      ["vm.searchParams.processDefinitionKey", "vm.searchParams.isTaskQuery"],
+      ["vm.searchParams.processDefinitionKey"],
       function() {
         if (vm.searchParams.processDefinitionKey) {
-          if (vm.searchParams.isTaskQuery) {
-            $scope.formUrl =
-              "api/forms/" +
-              vm.searchParams.processDefinitionKey +
-              "/1/search-ti";
-          } else {
             $scope.formUrl =
               "api/forms/" +
               vm.searchParams.processDefinitionKey +
               "/1/search-pi";
-          }
         } else {
           $scope.formUrl = undefined;
         }

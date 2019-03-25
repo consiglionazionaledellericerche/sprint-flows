@@ -5,29 +5,20 @@
         .module('sprintApp')
         .controller('CartController', CartController);
 
-    CartController.$inject = ['$scope', '$state'];
+    CartController.$inject = ['$scope', '$state', '$localStorage', 'dataService'];
 
-    function CartController($scope, $state) {
+    function CartController($scope, $state, $localStorage, dataService) {
         var vm = this;
+        $scope.$localStorage = $localStorage;
 
-    }
-    
-    
-    angular.module('aprintApp').factory('cartService', cartService);
-    
-    cartService.$inject = ['$rootScope']
-    
-    function cartService($rootScope) {
-    	
-    	return {
-    		addToCart: function(taskId) {
-    			$rootScope.cart = $rootScope.cart || [];
-    			$rootScope.cart[taskId] = taskId;
-    		},
-    		clearCart: function() {
-    			$rootScope.cart = {};
-    		}
-    	}
+        $scope.removeAll = function() {
+            delete $localStorage.cart;
+            $state.go('availableTasks')
+        }
+
+        $scope.signAll = function() {
+            dataService.signMany(Object.keys($localStorage.cart));
+        }
     }
 
 })();
