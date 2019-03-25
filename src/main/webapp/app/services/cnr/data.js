@@ -271,6 +271,9 @@
                 getManuale: function(nome) {
                     return $http.get("api/manual/"+ nome, {responseType: 'arraybuffer'});
                 }
+            },
+            signMany: function(ids) {
+                return $http.post("api/tasks/signMany", {})
             }
         };
     }
