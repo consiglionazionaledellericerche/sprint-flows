@@ -112,7 +112,7 @@ public class FlowsProcessInstanceResourceTest {
     public void testGetProcessInstanceById() throws Exception {
         processInstance = util.mySetUp(acquisti);
 
-        ResponseEntity<Map<String, Object>> response = (ResponseEntity<Map<String, Object>>) flowsProcessInstanceResource.getProcessInstanceById(new MockHttpServletRequest(), processInstance.getId(), true);
+        ResponseEntity<Map<String, Object>> response = (ResponseEntity<Map<String, Object>>) flowsProcessInstanceResource.getProcessInstanceById(processInstance.getId(), true);
         assertEquals(OK, response.getStatusCode());
 
         HistoricProcessInstanceResponse entity = (HistoricProcessInstanceResponse) ((HashMap) response.getBody()).get("entity");
@@ -137,11 +137,11 @@ public class FlowsProcessInstanceResourceTest {
 
         //verifica che gli utenti con ROLE_ADMIN POSSANO accedere al servizio
         util.loginAdmin();
-        flowsProcessInstanceResource.getProcessInstanceById(new MockHttpServletRequest(), processInstance.getId(), false);
+        flowsProcessInstanceResource.getProcessInstanceById(processInstance.getId(), false);
 
         //verifica AccessDeniedException (risposta 403 Forbidden) in caso di accesso di utenti non autorizzati
         util.loginUser();
-        flowsProcessInstanceResource.getProcessInstanceById(new MockHttpServletRequest(), processInstance.getId(), false);
+        flowsProcessInstanceResource.getProcessInstanceById(processInstance.getId(), false);
     }
 
     @Test

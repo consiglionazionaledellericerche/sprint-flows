@@ -1,1 +1,32 @@
-pippo
+<div class="row">
+
+    <div class="col-md-8">
+
+        <task-list tasks="$localStorage.cart"
+                   in-firma="true"
+                   completed="false">
+        </task-list>
+
+    </div>
+
+    <div class="col-md-4">
+
+        <div class="col-md-12 text-center">
+            <h2>Azioni</h2>
+        </div>
+
+        <button class="btn btn-block btn-success" ng-click="openSignModal()">
+            <span class="glyphicon glyphicon-pencil"></span> Firma tutti
+        </button>
+
+        <hr>
+
+        <button class="btn btn-block btn-danger" ng-click="removeAll()">
+            <span class="glyphicon glyphicon-trash"></span> Svuota carrello e ritorna a 'I miei compiti'
+        </button>
+
+    </div>
+
+</div>
+
+<pre ng-if="isDevelopment">{{$localStorage.cart | json}}</pre>
