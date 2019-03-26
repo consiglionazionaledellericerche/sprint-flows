@@ -2,7 +2,9 @@ package it.cnr.si.flows.ng.service;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
@@ -39,6 +41,19 @@ public class FlowsFirmaService {
     private static final String TYPE_OTP_AUTH = "arubaRemoteSignService.typeOtpAuth";
 
     private Properties props;
+
+    public static final Map<String, String> NOME_FILE_FIRMA = new HashMap<String, String>() {{
+        put("firma-decisione", "decisioneContrattare");
+        put("firma-provvedimento-aggiudicazione", "provvedimentoAggiudicazione");
+        put("firma-revoca", "ProvvedimentoDiRevoca");
+        put("firma-contratto", "contratto");
+    }};
+
+    public static final Map<String, String> ERRORI_ARUBA = new HashMap<String, String>() {{
+        put("0001", "Formato file errato");
+        put("0003", "Credenziali errate");
+        put("0004", "PIN errato");
+    }};
     
     @Value("${cnr.firma.signcertid}")
     private String RemoteSignServiceCertId;
@@ -76,15 +91,12 @@ public class FlowsFirmaService {
         return signed;
     }
 
-    public List<byte[]> firmaMultipla(String username, String password, String otp, List<byte[]> files) throws ArubaSignServiceException {
+    public List<SignReturnV2> firmaMultipla(String username, String password, String otp, List<byte[]> files) throws ArubaSignServiceException {
 
         ArubaSignService service = getServicePort();
-
-        PdfSignApparence apparence = getApparence();
         Auth identity = getIdentity(username, password, otp);
 
         try {
-
             List<SignRequestV2> requests = files.stream()
                     .map(b -> getRequest(identity, b))
                     .collect(Collectors.toList());
@@ -92,7 +104,10 @@ public class FlowsFirmaService {
             SignReturnV2Multiple signReturnV2Multiple =
                     service.pdfsignatureV2Multiple(identity, requests, null, PdfProfile.fromValue(RemotePdfprofile));
 
-            return signReturnV2Multiple.getReturnSigns().stream().map(s -> s.getBinaryoutput()).collect(Collectors.toList());
+            if (signReturnV2Multiple.getStatus().equals("OK")) {
+                return signReturnV2Multiple.getReturnSigns();
+            } else
+                throw new ArubaSignServiceException(signReturnV2Multiple.getReturnCode());
 
 
         } catch (TypeOfTransportNotImplemented_Exception e) {
