@@ -92,29 +92,33 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
         String taskId = req.getParameter("taskId");
 
         if (taskId != null) {
-            String username = SecurityUtils.getCurrentUserLogin();
-            String assignee = taskService.createTaskQuery()
-                    .taskId(taskId)
-                    .singleResult().getAssignee();
-
-            // l'utente puo' completare il task se e' lui l'assegnatario
-            if (assignee != null) {
-                return assignee.equals(username);
-
-            } else {
-                // Se l'assegnatario non c'e', L'utente deve essere nei gruppi candidati
-                List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
-                List<String> authorities =
-                        getAuthorities(username, flowsUserDetailsService);
-
-                return identityLinks.stream()
-                        .filter(l -> l.getType().equals(IdentityLinkType.CANDIDATE))
-                        .anyMatch(l -> authorities.contains(l.getGroupId()));
-            }
+            return canCompleteTask(taskId, flowsUserDetailsService);
         } else {
             //Se non è valorizzato il taskId allora sto "avviando" un nuovo workflow e verifico di averne i permessi
             String definitionKey = req.getParameter("processDefinitionId").split(":")[0];
             return flowsProcessDefinitionResource.canStartProcesByDefinitionKey(definitionKey);
+        }
+    }
+
+    public boolean canCompleteTask(String taskId, FlowsUserDetailsService flowsUserDetailsService) {
+        String username = SecurityUtils.getCurrentUserLogin();
+        String assignee = taskService.createTaskQuery()
+                .taskId(taskId)
+                .singleResult().getAssignee();
+
+        // l'utente puo' completare il task se e' lui l'assegnatario
+        if (assignee != null) {
+            return assignee.equals(username);
+
+        } else {
+            // Se l'assegnatario non c'e', L'utente deve essere nei gruppi candidati
+            List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
+            List<String> authorities =
+                    getAuthorities(username, flowsUserDetailsService);
+
+            return identityLinks.stream()
+                    .filter(l -> l.getType().equals(IdentityLinkType.CANDIDATE))
+                    .anyMatch(l -> authorities.contains(l.getGroupId()));
         }
     }
 

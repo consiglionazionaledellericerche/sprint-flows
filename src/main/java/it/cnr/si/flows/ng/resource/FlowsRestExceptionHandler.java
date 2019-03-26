@@ -1,6 +1,7 @@
 package it.cnr.si.flows.ng.resource;
 
 import it.cnr.jada.firma.arss.ArubaSignServiceException;
+import it.cnr.si.flows.ng.exception.FlowsPermissionException;
 import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
 import it.cnr.si.flows.ng.exception.ReportException;
 import it.cnr.si.flows.ng.service.FlowsFirmaService;
@@ -112,7 +113,18 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
                 ERRORI_ARUBA.getOrDefault(e.getMessage(),"Errore sconosciuto"));
 
         return handleExceptionInternal(e, res,
-                new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+                new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+
+    }
+
+    @ExceptionHandler(FlowsPermissionException.class)
+    protected ResponseEntity<Object> handlePermissionException(FlowsPermissionException e, WebRequest request) {
+
+        long rif = Instant.now().toEpochMilli();
+        Map<String, Object> res = Utils.mapOf("message", e.getMessage());
+
+        return handleExceptionInternal(e, res,
+                new HttpHeaders(), HttpStatus.FORBIDDEN, request);
 
     }
 
