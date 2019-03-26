@@ -89,7 +89,7 @@ public class FlowsProcessInstanceResourceTest {
     }
 
     @Test
-    public void testGetMyProcesses() throws IOException {
+    public void testGetMyProcesses() throws Exception {
         processInstance = util.mySetUp(acquisti);
         String processInstanceID = verifyMyProcesses(1, 0);
 //        La sospensione non viene usata dall`applicazione
@@ -109,10 +109,10 @@ public class FlowsProcessInstanceResourceTest {
 
 
     @Test(expected = AccessDeniedException.class)
-    public void testGetProcessInstanceById() throws IOException {
+    public void testGetProcessInstanceById() throws Exception {
         processInstance = util.mySetUp(acquisti);
 
-        ResponseEntity<Map<String, Object>> response = (ResponseEntity<Map<String, Object>>) flowsProcessInstanceResource.getProcessInstanceById(new MockHttpServletRequest(), processInstance.getId(), true);
+        ResponseEntity<Map<String, Object>> response = (ResponseEntity<Map<String, Object>>) flowsProcessInstanceResource.getProcessInstanceById(processInstance.getId(), true);
         assertEquals(OK, response.getStatusCode());
 
         HistoricProcessInstanceResponse entity = (HistoricProcessInstanceResponse) ((HashMap) response.getBody()).get("entity");
@@ -137,15 +137,15 @@ public class FlowsProcessInstanceResourceTest {
 
         //verifica che gli utenti con ROLE_ADMIN POSSANO accedere al servizio
         util.loginAdmin();
-        flowsProcessInstanceResource.getProcessInstanceById(new MockHttpServletRequest(), processInstance.getId(), false);
+        flowsProcessInstanceResource.getProcessInstanceById(processInstance.getId(), false);
 
         //verifica AccessDeniedException (risposta 403 Forbidden) in caso di accesso di utenti non autorizzati
         util.loginUser();
-        flowsProcessInstanceResource.getProcessInstanceById(new MockHttpServletRequest(), processInstance.getId(), false);
+        flowsProcessInstanceResource.getProcessInstanceById(processInstance.getId(), false);
     }
 
     @Test
-    public void testGetProcessInstances() throws IOException {
+    public void testGetProcessInstances() throws Exception {
         processInstance = util.mySetUp(acquisti);
 
         //responsabileacquisti crea una seconda Process Instance di acquisti con suffisso "2" nel titolo della PI
@@ -164,7 +164,7 @@ public class FlowsProcessInstanceResourceTest {
 //        req.setParameter("impegni_json", "[{\"numero\":\"1\",\"importoNetto\":100,\"importoLordo\":120,\"descrizione\":\"descrizione impegno\",\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"gae\":\"spaclient\"}]");
         req.setParameter("impegni_json", "[{\"descrizione\":\"Impegno numero 1\",\"percentualeIva\":20,\"importoNetto\":100,\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"uo\":\"2216\",\"gae\":\"spaclient\",\"progetto\":\"Progetto impegno 1\"}]");
 
-        ResponseEntity<Object> resp = flowsTaskResource.completeTask(req);
+        ResponseEntity<ProcessInstanceResponse> resp = flowsTaskResource.completeTask(req);
         assertEquals(OK, resp.getStatusCode());
 
         //Verifico che Admin veda entrambe le Process Instances create
@@ -211,7 +211,7 @@ public class FlowsProcessInstanceResourceTest {
 
 
     @Test
-    public void testSuspend() throws IOException {
+    public void testSuspend() throws Exception {
         processInstance = util.mySetUp(acquisti);
         assertEquals(false, processInstance.isSuspended());
         //solo admin può sospendere il flow
@@ -221,7 +221,7 @@ public class FlowsProcessInstanceResourceTest {
     }
 
     @Test
-    public void testGetVariable() throws IOException {
+    public void testGetVariable() throws Exception {
         processInstance = util.mySetUp(acquisti);
 //        processInstance = util.mySetUp(iscrizioneElencoOiv);
 
@@ -233,7 +233,7 @@ public class FlowsProcessInstanceResourceTest {
 
 
     @Test
-    public void testAddAndDeleteGroupIdentityLink() throws IOException {
+    public void testAddAndDeleteGroupIdentityLink() throws Exception {
         processInstance = util.mySetUp(acquisti);
         //le funzionalità può essere acceduta solo con privileggi "ADMIN"
         util.loginAdmin();
@@ -273,7 +273,7 @@ public class FlowsProcessInstanceResourceTest {
 
 
     @Test
-    public void testAddAndDeleteUserIdentityLink() throws IOException {
+    public void testAddAndDeleteUserIdentityLink() throws Exception {
         processInstance = util.mySetUp(acquisti);
         //le funzionalità può essere acceduta solo con privileggi "ADMIN"
         util.loginAdmin();
@@ -311,7 +311,7 @@ public class FlowsProcessInstanceResourceTest {
 
 
     @Test
-    public void getProcessInstancesForTrasparenzaTest() throws IOException, ParseException {
+    public void getProcessInstancesForTrasparenzaTest() throws Exception {
         processInstance = util.mySetUp(acquisti);
 
         util.loginAdmin();

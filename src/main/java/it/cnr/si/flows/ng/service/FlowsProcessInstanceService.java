@@ -135,29 +135,30 @@ public class FlowsProcessInstanceService {
 		//History
 		ArrayList<Map<String, Object>> history = new ArrayList<>();
 		historyService.createHistoricTaskInstanceQuery()
-		.includeTaskLocalVariables()
-		.processInstanceId(processInstanceId)
-		.list()
-		.forEach(
-				task -> {
-					List<HistoricIdentityLink> links = historyService.getHistoricIdentityLinksForTask(task.getId());
-					HashMap<String, Object> entity = new HashMap<>();
-					entity.put("historyTask", restResponseFactory.createHistoricTaskInstanceResponse(task));
+				.includeTaskLocalVariables()
+				.includeProcessVariables()
+				.processInstanceId(processInstanceId)
+				.list()
+				.forEach(
+						task -> {
+							List<HistoricIdentityLink> links = historyService.getHistoricIdentityLinksForTask(task.getId());
+							HashMap<String, Object> entity = new HashMap<>();
+							entity.put("historyTask", restResponseFactory.createHistoricTaskInstanceResponse(task));
 
-					// Sostituisco l'id interno del gruppo con la dicitura estesa
-					entity.put("historyIdentityLink", Optional.ofNullable(links)
-							.map(historicIdentityLinks -> restResponseFactory.createHistoricIdentityLinkResponseList(historicIdentityLinks))
-							.filter(historicIdentityLinkResponses -> !historicIdentityLinkResponses.isEmpty())
-							.map(historicIdentityLinkResponses -> historicIdentityLinkResponses.stream())
-							.orElse(Stream.empty())
-							.map(h -> {
-								if (Optional.ofNullable(aceBridgeService).isPresent()) {
-									h.setGroupId(aceBridgeService.getExtendedGroupNome(h.getGroupId()));
-								}
-								return h;
-							}).collect(Collectors.toList()));
-					history.add(entity);
-				});
+							// Sostituisco l'id interno del gruppo con la dicitura estesa
+							entity.put("historyIdentityLink", Optional.ofNullable(links)
+									.map(historicIdentityLinks -> restResponseFactory.createHistoricIdentityLinkResponseList(historicIdentityLinks))
+									.filter(historicIdentityLinkResponses -> !historicIdentityLinkResponses.isEmpty())
+									.map(historicIdentityLinkResponses -> historicIdentityLinkResponses.stream())
+									.orElse(Stream.empty())
+									.map(h -> {
+										if (Optional.ofNullable(aceBridgeService).isPresent()) {
+											h.setGroupId(aceBridgeService.getExtendedGroupNome(h.getGroupId()));
+										}
+										return h;
+									}).collect(Collectors.toList()));
+							history.add(entity);
+						});
 		result.put("history", history);
 
 		// permessi aggiuntivi

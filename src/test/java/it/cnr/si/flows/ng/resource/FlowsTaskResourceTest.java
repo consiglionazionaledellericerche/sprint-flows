@@ -79,7 +79,7 @@ public class FlowsTaskResourceTest {
 
 
     @Test
-    public void testGetMyTasks() throws IOException {
+    public void testGetMyTasks() throws Exception {
         processInstance = util.mySetUp(acquisti);
 //       all'inizio del test SFD non ha task assegnati'
         util.loginSfd();
@@ -118,7 +118,7 @@ public class FlowsTaskResourceTest {
 
 
     @Test
-    public void testGetAvailableTasks() throws IOException {
+    public void testGetAvailableTasks() throws Exception {
         processInstance = util.mySetUp(acquisti);
         //SFD è sfd@sisinfo (quindi può vedere il task istanziato)
         util.logout();
@@ -140,7 +140,7 @@ public class FlowsTaskResourceTest {
 
 
     @Test(expected = AccessDeniedException.class)
-    public void testGetTaskInstance() throws IOException {
+    public void testGetTaskInstance() throws Exception {
         processInstance = util.mySetUp(acquisti);
         ResponseEntity<Map<String, Object>> response = flowsTaskResource.getTask(util.getFirstTaskId());
         assertEquals(OK, response.getStatusCode());
@@ -153,7 +153,7 @@ public class FlowsTaskResourceTest {
 
 
     @Test(expected = AccessDeniedException.class)
-    public void testVerifyGetTaskInstance() throws IOException {
+    public void testVerifyGetTaskInstance() throws Exception {
         processInstance = util.mySetUp(acquisti);
 
         //verifico che gli utenti che NON SONO IN GRUPPI CANDIDATE DEL TASK NE' ROLE_ADMIN
@@ -166,7 +166,7 @@ public class FlowsTaskResourceTest {
 
 
     @Test(expected = AccessDeniedException.class)
-    public void testReassignForNotResponsabili() throws IOException {
+    public void testReassignForNotResponsabili() throws Exception {
         processInstance = util.mySetUp(acquisti);
 
         util.loginResponsabileFlussoAcquistiForStruttura();
@@ -184,7 +184,7 @@ public class FlowsTaskResourceTest {
 
 
     @Test
-    public void testCompleteTask() throws IOException {
+    public void testCompleteTask() throws Exception {
         processInstance = util.mySetUp(acquisti);
         //completo il primo task
         util.loginSfd();
@@ -205,7 +205,7 @@ public class FlowsTaskResourceTest {
     }
 
     @Test
-    public void testTaskAssignedInMyGroups() throws IOException {
+    public void testTaskAssignedInMyGroups() throws Exception {
         processInstance = util.mySetUp(acquisti);
 
         //sfd NON deve vedere NESSUN Task prima dell'assegnazione del task a responsabileAcquisti2
@@ -237,7 +237,7 @@ public class FlowsTaskResourceTest {
 
     // non uso expected perche' voglio controllare *esttamente* dove viene lanciata l'eccezione
     @Test
-    public void testClaimTask() throws IOException {
+    public void testClaimTask() throws Exception {
         processInstance = util.mySetUp(acquisti);
 
 //      sfd è sfd@sisinfo quindi può prendere in carico il flusso
@@ -259,13 +259,13 @@ public class FlowsTaskResourceTest {
 
 
     @Test
-    public void testGetTasksCompletedForMe() throws ArubaSignServiceException, IOException {
+    public void testGetTasksCompletedForMe() throws Exception {
         processInstance = util.mySetUp(acquisti);
         //completo il primo task
         util.loginSfd();
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
         req.setParameter("taskId", util.getFirstTaskId());
-        ResponseEntity<Object> response = flowsTaskResource.completeTask(req);
+        ResponseEntity<ProcessInstanceResponse> response = flowsTaskResource.completeTask(req);
         assertEquals(OK, response.getStatusCode());
 
         //assegno il task a user
@@ -274,19 +274,19 @@ public class FlowsTaskResourceTest {
         taskService.setOwner(taskService.createTaskQuery().singleResult().getId(), "user");
 
         //Recupero solo il flusso completato da user e non quello assegnatogli né quello di cui è owner
-        response = flowsTaskResource.getTasksCompletedByMe(mockHttpServletRequest, ALL_PROCESS_INSTANCES, 0, 1000, ASC);
+        ResponseEntity<Object> response2 = flowsTaskResource.getTasksCompletedByMe(mockHttpServletRequest, ALL_PROCESS_INSTANCES, 0, 1000, ASC);
         assertEquals(OK, response.getStatusCode());
-        ArrayList<HistoricTaskInstanceResponse> tasks = (ArrayList<HistoricTaskInstanceResponse>) ((DataResponse) response.getBody()).getData();
+        ArrayList<HistoricTaskInstanceResponse> tasks = (ArrayList<HistoricTaskInstanceResponse>) ((DataResponse) response2.getBody()).getData();
         assertTrue(tasks.stream().anyMatch(t -> t.getId().equals(util.getFirstTaskId())));
 
 
         //Verifico che il metodo funzioni anche con ADMIN
         util.logout();
         util.loginAdmin();
-        response = flowsTaskResource.getTasksCompletedByMe(mockHttpServletRequest, ALL_PROCESS_INSTANCES, 0, 1000, ASC);
+        response2 = flowsTaskResource.getTasksCompletedByMe(mockHttpServletRequest, ALL_PROCESS_INSTANCES, 0, 1000, ASC);
         assertEquals(OK, response.getStatusCode());
         assertEquals("ADMIN non deve vedere task perchè NON NE HA COMPLETATO NESSUNO ma ha solo avviato il flusso",
-                     0, ((ArrayList<HistoricTaskInstanceResponse>) ((DataResponse) response.getBody()).getData()).size());
+                     0, ((ArrayList<HistoricTaskInstanceResponse>) ((DataResponse) response2.getBody()).getData()).size());
     }
 
 }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.Date;
+import java.util.List;
 
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Firma;
 import static it.cnr.si.flows.ng.utils.Enum.Stato.Firmato;
@@ -55,7 +56,7 @@ public class FirmaDocumentoService {
             } catch (ArubaSignServiceException e) {
                 LOGGER.error("FIRMA NON ESEGUITA", e);
                 if (e.getMessage().indexOf("error code 0001") != -1) {
-                    textMessage = "controlla il formato del file sottopsto alla firma<br>";
+                    textMessage = "controlla il formato del file sottoposto alla firma<br>";
                 } else if(e.getMessage().indexOf("error code 0003") != -1) {
                     textMessage = "CREDENZIALI ERRATE<br>";
                 } else if(e.getMessage().indexOf("error code 0004") != -1) {
@@ -65,12 +66,10 @@ public class FirmaDocumentoService {
                 }
                 throw new BpmnError("500", "<b>FIRMA NON ESEGUITA<br>" + textMessage + "</b>");
             }
-
         }
     }
 
-
-    private static String getSignedFilename(String filename) {
+    public static String getSignedFilename(String filename) {
         String result = filename.substring(0, filename.lastIndexOf('.'));
         result += ".signed";
         result += filename.substring(filename.lastIndexOf('.'));

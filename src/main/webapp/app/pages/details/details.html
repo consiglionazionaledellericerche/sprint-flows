@@ -129,12 +129,30 @@
 				</a>
 			</div>
 		</div>
+
+
+		<div class="col-md-3 col-md-offset-1">
+			<div class="btn-group btn-group-justified" role="group">
+
+				<a class="btn btn-primary" ng-if="vm.taskId && vm.activeTask.category == 'firma' && !inCart(vm.activeTask.id)"
+				   ng-click="addToCart(vm.activeTask)">
+					<span class="glyphicon glyphicon-shopping-cart"></span> Aggiungi al Carrello Firma
+				</a>
+
+				<a class="btn btn-primary" ng-if="inCart(vm.activeTask.id)"
+				   ng-click="removeFromCart(vm.activeTask)">
+					<span class="glyphicon glyphicon-shopping-cart"></span> Rimuovi dal Carrello Firma
+				</a>
+
+			</div>
+		</div>
 	</div>
+
 
 	<div class="row dev">
 		<hr>
 		<div class="col-md-12">
-			<pre ng-if="isDevelopment">{{ canPublish }}{{vm | json}}</pre>
+			<pre ng-if="isDevelopment">{{vm | json}}</pre>
 		</div>
 	</div>
 </div>
