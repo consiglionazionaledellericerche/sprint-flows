@@ -15,6 +15,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -61,7 +62,8 @@ public class FlowsAttachmentService {
     private StoreService storeService;
     @Inject
     private StorageService storageService;
-
+	@Inject
+	private Environment env;
     /**
      * Servizio che trasforma i multipart file in FlowsAttachment
      * per il successivo salvataggio sul db
@@ -371,10 +373,10 @@ public class FlowsAttachmentService {
                 .collect(Collectors.joining(NUMERI_PROTOCOLLO_SEPARATOR));
     }
 
-    // TODO public?
     public String saveOrUpdateBytes(byte[] bytes, String attachmentName, String fileName, String key) {
 
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+		Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
 
         StorageFile storageFile = new StorageFile(bais,
                 getMimetype(bais),
@@ -383,12 +385,22 @@ public class FlowsAttachmentService {
         storageFile.setTitle(fileName);
         storageFile.setDescription(fileName);
 
+		String path = "flows";
+		if (activeProfiles.contains("dev")) {
+			path = "flows-dev";
+		}
+		if (activeProfiles.contains("test")) {
+			path = "flows-test";
+		}
+		if (activeProfiles.contains("demo")) {
+			path = "flows-demo";
+		}
         StorageObject so = storeService.restoreSimpleDocument(
                 storageFile,
                 new ByteArrayInputStream(storageFile.getBytes()),
                 storageFile.getContentType(),
                 attachmentName,
-                "/Comunicazioni al CNR/flows/martin/" + key,
+				"/Comunicazioni al CNR/" + path + "/" + key,
                 true);
 
         StorageObject updatedSo = storeService.getStorageObjectBykey(

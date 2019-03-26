@@ -306,7 +306,7 @@
           </activiti:executionListener>
         </extensionElements>
       </endEvent>
-      <userTask id="firma-provvedimento-aggiudicazione" name="Firma Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoFirmaAcquisti}">
+      <userTask id="firma-provvedimento-aggiudicazione" name="Firma Provvedimento Aggiudicazione" activiti:candidateGroups="${gruppoFirmaAcquisti}" activiti:category="firma">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti_v1}">
             <activiti:field name="faseEsecuzione">
@@ -401,7 +401,7 @@
           </activiti:executionListener>
         </extensionElements>
       </endEvent>
-      <userTask id="firma-revoca" name="Firma Revoca" activiti:candidateGroups="${gruppoFirmaAcquisti}">
+      <userTask id="firma-revoca" name="Firma Revoca" activiti:candidateGroups="${gruppoFirmaAcquisti}" activiti:category="firma">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti_v1}">
             <activiti:field name="faseEsecuzione">
@@ -621,7 +621,7 @@
           </activiti:executionListener>
         </extensionElements>
       </userTask>
-      <userTask id="firma-contratto" name="Firma Contratto" activiti:candidateGroups="${gruppoFirmaAcquisti}">
+      <userTask id="firma-contratto" name="Firma Contratto" activiti:candidateGroups="${gruppoFirmaAcquisti}" activiti:category="firma">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessAcquisti_v1}">
             <activiti:field name="faseEsecuzione">

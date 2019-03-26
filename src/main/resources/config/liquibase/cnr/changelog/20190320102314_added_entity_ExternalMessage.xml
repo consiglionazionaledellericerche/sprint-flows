@@ -14,18 +14,34 @@
     <property name="floatType" value="float" dbms="mysql, oracle"/>
 
     <!--
-        Added the entity Avviso.
+        Added the entity ExternalMessage.
     -->
-    <changeSet id="20190125124942-1" author="jhipster">
-        <createTable tableName="avviso">
+    <changeSet id="20190320102314-1" author="jhipster">
+        <createTable tableName="external_message">
             <column name="id" type="bigint" autoIncrement="${autoIncrement}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="contenuto" type="varchar(255)">
+            <column name="url" type="varchar(255)">
                 <constraints nullable="false" />
             </column>
             
-            <column name="attivo" type="bit">
+            <column name="verb" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            
+            <column name="payload" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            
+            <column name="status" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            
+            <column name="retries" type="integer">
+                <constraints nullable="true" />
+            </column>
+            
+            <column name="last_error_message" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
             
