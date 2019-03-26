@@ -3,6 +3,7 @@ package it.cnr.si.flows.ng.resource;
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.jada.firma.arss.ArubaSignServiceException;
 import it.cnr.jada.firma.arss.stub.ArubaSignService;
+import it.cnr.jada.firma.arss.stub.SignReturnV2;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
 import it.cnr.si.flows.ng.service.*;
@@ -44,6 +45,10 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static it.cnr.si.flows.ng.service.FlowsFirmaService.ERRORI_ARUBA;
+import static it.cnr.si.flows.ng.service.FlowsFirmaService.NOME_FILE_FIRMA;
+import static it.cnr.si.flows.ng.utils.Enum.Azione.Firma;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.Firmato;
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
 import static it.cnr.si.flows.ng.utils.Utils.*;
 
@@ -281,33 +286,69 @@ public class FlowsTaskResource {
     }
 
     @PostMapping(value = "/signMany")
-    public ResponseEntity<Void> signMany(@RequestParam("username") String username,
-                                         @RequestParam("password") String password,
-                                         @RequestParam("otp") String otp,
-                                         @RequestParam("taskIds") List<String> taskIds) throws ArubaSignServiceException {
+    public ResponseEntity<Map<String, List<String>>> signMany(@RequestParam("username") String username,
+                                                              @RequestParam("password") String password,
+                                                              @RequestParam("otp") String otp,
+                                                              @RequestParam("taskIds") List<String> taskIds) throws ArubaSignServiceException {
 
-        List<FlowsAttachment> decisioniContrattare = taskIds.stream()
-                .map(id -> taskService.getVariable(id, "decisioneContrattare", FlowsAttachment.class))
-                .collect(Collectors.toList());
+        verificaPrecondizioniFirmaMultipla(taskIds);
 
-        List<byte[]> decisioniContrattareContent = decisioniContrattare.stream()
-                .map(att -> flowsAttachmentService.getAttachmentContentBytes(att))
-                .collect(Collectors.toList());
-
-        List<byte[]> files = flowsFirmaService.firmaMultipla(username, password, otp, decisioniContrattareContent);
+        List<Task> tasks = new ArrayList<>();
+        List<String> nomiFileDaFirmare = new ArrayList<>();
+        List<FlowsAttachment> fileDaFirmare = new ArrayList<>();
+        List<byte[]> fileContents = new ArrayList<>();
 
         for (int i = 0; i < taskIds.size(); i++) {
-            String taskId = taskIds.get(i);
-            FlowsAttachment att = decisioniContrattare.get(i);
-            String key = taskService.getVariable(taskId, "key", String.class);
-            String uid = flowsAttachmentService.saveOrUpdateBytes(files.get(i), "decisioneContrattare", "signed", key);
-            att.setUrl(uid);
-
-            Map<String, Object> data = new HashMap<String, Object>() {{put("decisioneContrattare", att);}};
-            flowsTaskService.completeTask(taskId, data);
+            String id = taskIds.get(i);
+            nomiFileDaFirmare.add(NOME_FILE_FIRMA.get(
+                    taskService.createTaskQuery().taskId(id).singleResult().getTaskDefinitionKey()));
+            fileDaFirmare.add(taskService.getVariable(id, nomiFileDaFirmare.get(i), FlowsAttachment.class));
+            fileContents.add(flowsAttachmentService.getAttachmentContentBytes(fileDaFirmare.get(i)));
         }
 
-        return ResponseEntity.ok().build();
+        List<String> succesfulTasks = new ArrayList<>();
+        List<String> failedTasks    = new ArrayList<>();
+        List<SignReturnV2> signResponses = flowsFirmaService.firmaMultipla(username, password, otp, fileContents);
+
+        for (int i = 0; i < taskIds.size(); i++) {
+            SignReturnV2 signResponse = signResponses.get(i);
+            String taskId = taskIds.get(i);
+            String nomeFile = nomiFileDaFirmare.get(i);
+            FlowsAttachment att = fileDaFirmare.get(i);
+
+            if (signResponse.getStatus().equals("OK")) {
+                String key = taskService.getVariable(taskId, "key", String.class);
+                String uid = flowsAttachmentService.saveOrUpdateBytes(signResponse.getBinaryoutput(), nomeFile, "signed", key);
+                att.setUrl(uid);
+                att.setAzione(Firma);
+                att.addStato(Firmato);
+                att.setUsername(SecurityUtils.getCurrentUserLogin());
+                att.setTime(new Date());
+
+                Map<String, Object> data = new  HashMap<String, Object>() {{
+                    put(nomeFile, att);
+                }};
+                flowsTaskService.completeTask(taskId, data);
+
+                succesfulTasks.add(taskId);
+
+            } else {
+                String taskError = ERRORI_ARUBA.getOrDefault(signResponse.getReturnCode(), "Errore sconosciuto");
+                String key = taskService.getVariable(taskId, "key", String.class);
+                failedTasks.add(taskId +":"+ key +" - "+ taskError);
+            }
+        }
+
+        return ResponseEntity.ok(
+                new HashMap<String, List<String>>() {{
+                    put("success", succesfulTasks);
+                    put("failure", failedTasks);
+                }});
+
+    }
+
+    // TODO
+    private void verificaPrecondizioniFirmaMultipla(List<String> taskIds) {
     }
 
 

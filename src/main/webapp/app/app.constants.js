@@ -4,6 +4,6 @@
     angular
         .module('sprintApp')
         .constant('VERSION', "0.2.1-SNAPSHOT")
-        .constant('DEBUG_INFO_ENABLED', true)
+        .constant('DEBUG_INFO_ENABLED', false)
 ;
 })();

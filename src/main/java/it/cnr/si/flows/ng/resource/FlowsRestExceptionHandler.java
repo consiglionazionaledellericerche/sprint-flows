@@ -1,7 +1,9 @@
 package it.cnr.si.flows.ng.resource;
 
+import it.cnr.jada.firma.arss.ArubaSignServiceException;
 import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
 import it.cnr.si.flows.ng.exception.ReportException;
+import it.cnr.si.flows.ng.service.FlowsFirmaService;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.SecurityUtils;
 import org.activiti.engine.delegate.BpmnError;
@@ -18,6 +20,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import java.time.Instant;
 import java.util.Map;
+
+import static it.cnr.si.flows.ng.service.FlowsFirmaService.ERRORI_ARUBA;
 
 /**
  * Gestore centrale delle eccezioni dell'applicazione
@@ -42,7 +46,8 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(NullPointerException.class)
     protected ResponseEntity<Object> HandleNull(RuntimeException ex, WebRequest request) {
         String bodyOfResponse = "E' stato ricevuto un null pointer per la richiesta "+ request.getContextPath();
-        LOGGER.error(bodyOfResponse);
+        LOGGER.error(bodyOfResponse, ex);
+
         return handleExceptionInternal(ex, bodyOfResponse,
                                        new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
@@ -96,6 +101,19 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
         Map<String, Object> res = Utils.mapOf("message", "Errore nella creazione del pdf. Contattare gli amminstratori specificando il numero di riferimento: " + rif);
         return handleExceptionInternal(ex, res,
                 new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+    }
+
+    @ExceptionHandler(ArubaSignServiceException.class)
+    protected ResponseEntity<Object> handleArubaSignException(ArubaSignServiceException e, WebRequest request) {
+
+        long rif = Instant.now().toEpochMilli();
+        Map<String, Object> res = Utils.mapOf(
+                "message",
+                ERRORI_ARUBA.getOrDefault(e.getMessage(),"Errore sconosciuto"));
+
+        return handleExceptionInternal(e, res,
+                new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+
     }
 
     /* --- DEFAULT EXCEPTION HANDLERS --- */
