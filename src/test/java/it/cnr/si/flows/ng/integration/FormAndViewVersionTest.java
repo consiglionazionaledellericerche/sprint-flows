@@ -71,7 +71,7 @@ public class FormAndViewVersionTest {
     }
 
     @Test
-    public void testFormAndViewVersions () throws IOException, URISyntaxException {
+    public void testFormAndViewVersions () throws Exception {
 
         setup();
 
@@ -188,7 +188,7 @@ public class FormAndViewVersionTest {
 
 
 
-    private void setup() throws IOException {
+    private void setup() throws Exception {
 
         processInstance1 = util.mySetUp(acquisti);
 

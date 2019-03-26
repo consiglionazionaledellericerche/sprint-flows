@@ -167,7 +167,7 @@ public class FlowsAttachmentResource {
                                  @PathVariable("attachmentName") String attachmentName,
                                  MultipartHttpServletRequest request) throws IOException {
 
-        Map<String, Object> data = FlowsTaskService.extractParameters(request);
+        Map<String, Object> data = FlowsTaskResource.extractParameters(request);
         String username = SecurityUtils.getCurrentUserLogin();
         String tipoModifica = request.getParameter("tipoModifica");
 
@@ -194,7 +194,7 @@ public class FlowsAttachmentResource {
                                  @PathVariable("attachmentName") String attachmentName,
                                  MultipartHttpServletRequest request) throws IOException {
 
-        Map<String, Object> data = FlowsTaskService.extractParameters(request);
+        Map<String, Object> data = FlowsTaskResource.extractParameters(request);
 
         FlowsAttachment att = runtimeService.getVariable(processInstanceId, attachmentName, FlowsAttachment.class);
         MultipartFile file = request.getFile(attachmentName + "_sostituzione_data");
@@ -221,7 +221,7 @@ public class FlowsAttachmentResource {
                                            @PathVariable("attachmentName") String attachmentName,
                                            MultipartHttpServletRequest request) throws IOException {
 
-        Map<String, Object> data = FlowsTaskService.extractParameters(request);
+        Map<String, Object> data = FlowsTaskResource.extractParameters(request);
 
         FlowsAttachment old = runtimeService.getVariable(processInstanceId, attachmentName, FlowsAttachment.class);
         FlowsAttachment att = new FlowsAttachment();
@@ -259,7 +259,7 @@ public class FlowsAttachmentResource {
     public void uploadNewAttachment(@PathVariable("processInstanceId") String processInstanceId,
                                  MultipartHttpServletRequest request) throws IOException {
 
-        Map<String, Object> data = FlowsTaskService.extractParameters(request);
+        Map<String, Object> data = FlowsTaskResource.extractParameters(request);
         String username = SecurityUtils.getCurrentUserLogin();
 
         FlowsAttachment att = new FlowsAttachment();

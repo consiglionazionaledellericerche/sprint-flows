@@ -5,12 +5,13 @@
         .module('sprintApp')
         .controller('DetailsController', DetailsController);
 
-    DetailsController.$inject = ['$scope', 'Principal', '$state', 'dataService', '$log', 'utils', '$uibModal'];
+    DetailsController.$inject = ['$scope', '$rootScope', 'Principal', '$state', '$localStorage', 'dataService', '$log', 'utils', '$uibModal'];
 
-    function DetailsController($scope, Principal, $state, dataService, $log, utils, $uibModal) {
+    function DetailsController($scope, $rootScope, Principal, $state, $localStorage, dataService, $log, utils, $uibModal) {
         var vm = this;
         vm.data = {};
         vm.taskId = $state.params.taskId;
+
         $scope.processInstanceId = $state.params.processInstanceId; // mi torna comodo per gli attachments -martin
 
         Principal.identity().then(function(account) {
@@ -51,6 +52,9 @@
                         //recupero l'ultimo task (quello ancora da eseguire)
                         if (el.historyTask.endTime === null) {
                             //recupero la fase
+                        	vm.activeTask = el.historyTask;
+                        	utils.refactoringVariables(vm.activeTask);
+
                             vm.data.fase = el.historyTask.name;
                             //recupero il gruppo/l'utente assegnatario del task
                             el.historyIdentityLink.forEach(function(il) {
@@ -65,6 +69,7 @@
 
                     $scope.canPublish = response.data.canPublish;
                     $scope.canUpdateAttachments = response.data.canUpdateAttachments;
+                    $scope.canSign = false;
 
                     $scope.isResponsabile = (vm.authorities.includes("ROLE_responsabile-struttura@" + vm.data.entity.variabili.idStruttura) ||
                         vm.authorities.includes("ROLE_responsabile#flussi") ||
@@ -151,5 +156,21 @@
                 }
             })
         };
+
+        $scope.inCart = function (id) {
+            return $localStorage.cart && $localStorage.cart.hasOwnProperty(id);
+        }
+
+        $scope.addToCart = function(task) {
+            $localStorage.cart = $localStorage.cart || {};
+            $localStorage.cart[task.id] =  task;
+        }
+
+        $scope.removeFromCart = function(task) {
+            delete $localStorage.cart[task.id];
+            if (Object.keys($localStorage.cart).length == 0) {
+                delete $localStorage.cart;
+            }
+        }
     }
 })();

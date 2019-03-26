@@ -72,7 +72,7 @@ public class CnrSummaryPdfResouceTest {
     }
 
     @Test
-    public void testSummaryPdfProcessCompleted() throws IOException {
+    public void testSummaryPdfProcessCompleted() throws Exception {
         processInstance = util.mySetUp(acquisti);
 
         Map<String, FlowsAttachment> docs = flowsAttachmentResource.getAttachementsForProcessInstance(processInstance.getId()).getBody();
@@ -114,7 +114,7 @@ public class CnrSummaryPdfResouceTest {
     }
 
     @Test
-    public void testSummaryPdfService() throws IOException, ParseException {
+    public void testSummaryPdfService() throws Exception {
         processInstance = util.mySetUp(acquisti);
 
         util.loginSfd();
@@ -131,7 +131,7 @@ public class CnrSummaryPdfResouceTest {
         util.makeFile(outputStream, "summaryCreato.pdf");
     }
 
-    private void completeTask() throws IOException {
+    private void completeTask() throws Exception {
         //completo il primo task
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
 //        req.setParameter("taskId", util.getFirstTaskId());
