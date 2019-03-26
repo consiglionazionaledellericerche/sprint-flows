@@ -5,12 +5,15 @@ import it.cnr.jada.firma.arss.ArubaSignServiceException;
 import it.cnr.jada.firma.arss.stub.ArubaSignService;
 import it.cnr.jada.firma.arss.stub.SignReturnV2;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.exception.FlowsPermissionException;
 import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
 import it.cnr.si.flows.ng.service.*;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.security.FlowsUserDetailsService;
+import it.cnr.si.security.PermissionEvaluatorImpl;
 import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
@@ -86,6 +89,10 @@ public class FlowsTaskResource {
     private FlowsFirmaService flowsFirmaService;
     @Inject
     private FlowsAttachmentService flowsAttachmentService;
+    @Inject
+    private PermissionEvaluatorImpl permissionEvaluator;
+    @Inject
+    private FlowsUserDetailsService flowsUserDetailsService;
 
 
     @PostMapping(value = "/mytasks", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -289,7 +296,8 @@ public class FlowsTaskResource {
     public ResponseEntity<Map<String, List<String>>> signMany(@RequestParam("username") String username,
                                                               @RequestParam("password") String password,
                                                               @RequestParam("otp") String otp,
-                                                              @RequestParam("taskIds") List<String> taskIds) throws ArubaSignServiceException {
+                                                              @RequestParam("taskIds") List<String> taskIds)
+            throws ArubaSignServiceException, FlowsPermissionException {
 
         verificaPrecondizioniFirmaMultipla(taskIds);
 
@@ -345,10 +353,6 @@ public class FlowsTaskResource {
                     put("failure", failedTasks);
                 }});
 
-    }
-
-    // TODO
-    private void verificaPrecondizioniFirmaMultipla(List<String> taskIds) {
     }
 
 
@@ -412,5 +416,14 @@ public class FlowsTaskResource {
                     .anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
             task.getVariables().add(isUnclaimableVariable);
         }
+    }
+
+    private void verificaPrecondizioniFirmaMultipla(List<String> taskIds) throws FlowsPermissionException {
+
+        if ( ! taskIds.stream()
+                .allMatch(id -> permissionEvaluator.canCompleteTask(id, flowsUserDetailsService)) )
+            throw new FlowsPermissionException("Nel carrello sono presenti compiti per cui l'utente non ha i permessi necessari");
+
+
     }
 }
