@@ -224,7 +224,7 @@
                             groupName: groupName,
                             userName: userName,
                             groupRole: groupRole,
-                        },
+                        }
                     });
                 },
             },
@@ -272,8 +272,17 @@
                     return $http.get("api/manual/"+ nome, {responseType: 'arraybuffer'});
                 }
             },
-            signMany: function(ids) {
-                return $http.post("api/tasks/signMany", {})
+            signMany: function(username, password, otp, ids) {
+                return $http({
+                    url: "api/tasks/signMany",
+                    method: 'POST',
+                    params: {
+                        username: username,
+                        password: password,
+                        otp: otp,
+                        taskIds: ids
+                    }
+                })
             }
         };
     }

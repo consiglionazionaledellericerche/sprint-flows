@@ -5,9 +5,9 @@
         .module('sprintApp')
         .controller('CartController', CartController);
 
-    CartController.$inject = ['$scope', '$state', '$localStorage', 'dataService'];
+    CartController.$inject = ['$scope', '$state', '$localStorage', 'dataService', '$uibModal'];
 
-    function CartController($scope, $state, $localStorage, dataService) {
+    function CartController($scope, $state, $localStorage, dataService, $uibModal) {
         var vm = this;
         $scope.$localStorage = $localStorage;
 
@@ -19,6 +19,15 @@
         $scope.signAll = function() {
             dataService.signMany(Object.keys($localStorage.cart));
         }
+
+        $scope.openSignModal = function() {
+            $uibModal.open({
+                templateUrl: 'app/pages/cart/signmany.modal.html',
+                controller: 'SignManyModalController',
+                controllerAs: 'vm',
+                size: 'md'
+            })
+        };
     }
 
 })();
