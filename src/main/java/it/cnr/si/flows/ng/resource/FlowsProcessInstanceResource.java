@@ -143,13 +143,12 @@ public class FlowsProcessInstanceResource {
     }
 
 
-
+    // TODO questo metodo restituisce ResponseEntity di due tipi diversi - HistoricProcessInstance e Map<String, Object>
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity getProcessInstanceById(
-            HttpServletRequest req,
             @RequestParam("processInstanceId") String processInstanceId,
             @RequestParam(value = "detail", required = false, defaultValue = "true") Boolean detail) {
         if (!detail) {
@@ -165,7 +164,7 @@ public class FlowsProcessInstanceResource {
     @Secured(AuthoritiesConstants.USER)
     @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
     @Timed
-    public ResponseEntity<HistoricTaskInstance> getCurrentTaskProcessInstanceById(HttpServletRequest req, @RequestParam("processInstanceId") String processInstanceId) {
+    public ResponseEntity<HistoricTaskInstance> getCurrentTaskProcessInstanceById(@RequestParam("processInstanceId") String processInstanceId) {
         HistoricTaskInstance result = flowsProcessInstanceService.getCurrentTaskOfProcessInstance(processInstanceId);
 
         return new ResponseEntity(result, HttpStatus.OK);

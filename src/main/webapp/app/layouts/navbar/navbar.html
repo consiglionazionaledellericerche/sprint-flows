@@ -103,6 +103,12 @@
                     <span class="hidden-sm">Ricerca</span>
                 </a>
             </li>
+            <li ui-sref-active="active" ng-if="vm.$localStorage.cart" has-authority="ROLE_USER">
+                <a ui-sref="cart" ng-click="vm.collapseNavbar()">
+                    <span class="glyphicon glyphicon-shopping-cart"></span>
+                    <span class="hidden-sm">Carrello Firma ({{vm.$localStorage.cart | numkeys}})</span>
+                </a>
+            </li>
             <li ui-sref-active="active" has-authority="ROLE_USER">
                 <a ui-sref="helpdesk" ng-click="vm.collapseNavbar()">
                     <span class="glyphicon glyphicon-envelope"></span>

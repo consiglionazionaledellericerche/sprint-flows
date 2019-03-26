@@ -6,7 +6,7 @@
 					<a class="pointer" ng-click="vm.searchParams.active = true; search()" data-toggle="tab">
 						<h3>
 							<i class="glyphicon glyphicon-edit"></i>
-							{{vm.searchParams.isTaskQuery ? 'Task' : 'Flussi'}} attivi
+							Flussi attivi
 						</h3>
 					</a>
 				</li>
@@ -14,7 +14,7 @@
 					<a class="pointer" ng-click="vm.searchParams.active = false; search()" data-toggle="tab">
 						<h3>
 							<i class="glyphicon glyphicon-check"></i>
-							{{vm.searchParams.isTaskQuery ? 'Task' : 'Flussi'}} terminati
+							Flussi terminati
 						</h3>
 					</a>
 				</li>
@@ -23,19 +23,7 @@
 	</div>
 	<div class="row">
 		<div class="col-md-3 padding-top">
-			<div>
-				<h4>Search type</h4>
-				<div>
-					<toggle-switch
-							ng-model="vm.searchParams.isTaskQuery"
-							on-label="Task"
-							off-label="Flussi"
-							class="switch-large">
-					</toggle-switch>
-				</div>
-			</div>
 
-			<br>
 			<div>
 				<h4>Ordinamento temporale</h4>
 				<div>
@@ -82,23 +70,14 @@
 
 
 		<div id="resultDiv" class="col-md-9" ng-cloak>
-			<h3>{{vm.searchParams.isTaskQuery ? 'Task' : 'Flussi'}} {{vm.searchParams.active ? 'attivi' :
-				'terminati'}}</h3>
+			<h3>Flussi {{vm.searchParams.active ? 'attivi' : 'terminati'}}</h3>
 			<div class="row">
 				<div ng-show="vm.loading" class="text-center col-md-12">
 					<div ng-show="vm.loading" class="sprint-loader sprint-loader-mini"></div>
 					Loading...
 				</div>
 				<div ng-hide="vm.loading" class="col-md-12">
-					<div ng-show="vm.searchParams.isTaskQuery">
-						<task-list tasks="vm.results"
-								   action-buttons="false"
-								   completed="true">
-						</task-list>
-					</div>
-					<div ng-show="!vm.searchParams.isTaskQuery">
-						<process-list processes="vm.results" paging="paging"></process-list>
-					</div>
+					<process-list processes="vm.results" paging="paging"></process-list>
 				</div>
 			</div>
 
