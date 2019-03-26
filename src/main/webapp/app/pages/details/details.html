@@ -9,19 +9,20 @@
                 </span>
 				<br><br>
 			</h4>
-			<div ng-show="isResponsabile">
-				<button class="btn btn-default btn-xs"
-						ng-click="reassign(vm.taskId, processInstanceId)"><span
-						class="glyphicon glyphicon-hand-right"></span> Riassegna Compito
-				</button>
-				<hr>
-			</div>
-			<div ng-show="isResponsabile">
-				<button class="btn btn-default btn-xs"
-						ng-click="deleteProcessInstance(processInstanceId)"><span
-						class="glyphicon glyphicon-hand-right"></span> Elimina Flusso
-				</button>
-				<hr>
+			<div ng-show="vm.data.entity.endTime == null" class="btn-toolbar">
+				<div class="btn-group" ng-show="isResponsabile">
+					<button class="btn btn-warning btn-xs"
+							ng-click="reassign(vm.taskId, processInstanceId)"><span
+							class="glyphicon glyphicon-hand-right"></span> Riassegna Compito
+					</button>
+				</div>
+				<div class="btn-group" ng-show="isResponsabile">
+					<button class="btn btn-danger btn-xs"
+							ng-click="deleteProcessInstance(processInstanceId)"><span
+							class="glyphicon glyphicon-remove-circle"></span> Elimina Flusso
+					</button>
+					<hr>
+				</div>
 			</div>
 			<div>
 				<b>Titolo: </b>{{vm.data.entity.name | get: 'titolo'}} <br>

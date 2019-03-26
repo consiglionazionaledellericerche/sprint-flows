@@ -37,8 +37,25 @@
         </createTable>
 
         <loadData encoding="UTF-8"
-                  file="config/liquibase/cnr/relationship.csv"
+                  file="config/liquibase/cnr/base-relationship.csv"
                   separator=";"
                   tableName="relationship"/>
+    </changeSet>
+
+
+    <!--Vengono sovrascritte le tuple con lo stesso id nei csv nella cartella "modified"-->
+    <!--non occorre eseguire il clear check sum ma basta un maven clean-->
+    <changeSet id="20171023125007-2" author="Paolo" runOnChange='true'>
+        <loadUpdateData encoding="UTF-8"
+                        file="config/liquibase/cnr/new/relationship.csv"
+                        primaryKey="id"
+                        schemaName="public"
+                        separator=";"
+                        tableName="relationship">
+            <column name="id" type="numeric"/>
+            <column name="group_name" type="string"/>
+            <column name="group_relationship" type="string"/>
+            <column name="group_role" type="string"/>
+        </loadUpdateData>
     </changeSet>
 </databaseChangeLog>

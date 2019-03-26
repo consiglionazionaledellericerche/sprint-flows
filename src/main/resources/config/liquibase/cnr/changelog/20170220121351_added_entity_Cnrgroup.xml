@@ -44,10 +44,26 @@
         <addPrimaryKey columnNames="cnrgroups_id, parents_id" tableName="cnrgroup_parents"/>
 
         <loadData encoding="UTF-8"
-                  file="config/liquibase/cnr/cnrgroup.csv"
+                  file="config/liquibase/cnr/base-cnrgroup.csv"
                   separator=";"
                   tableName="cnrgroup"/>
 
 
+    </changeSet>
+
+    <!--Vengono sovrascritte le tuple con lo stesso id nei csv nella cartella "modified"-->
+    <!--non occorre eseguire il clear check sum ma basta un maven clean-->
+    <changeSet id="20170220121351-2" author="Paolo" runOnChange='true'>
+        <loadUpdateData encoding="UTF-8"
+                        file="config/liquibase/cnr/new/cnrgroup.csv"
+                        primaryKey="id"
+                        schemaName="public"
+                        separator=";"
+                        tableName="cnrgroup">
+            <column name="id" type="numeric"/>
+            <column name="name" type="string"/>
+            <column name="display_name" type="string"/>
+
+        </loadUpdateData>
     </changeSet>
 </databaseChangeLog>
