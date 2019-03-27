@@ -132,6 +132,7 @@ public class Enum {
         Area(3),
         Gruppi(7),
         Dipartimento(21),
+        Sedesecondariaistituto(24),
         Ufficio(41),
         Ufficionondirigenziale(42),
         Strutturadiparticolarerilievo(43);
