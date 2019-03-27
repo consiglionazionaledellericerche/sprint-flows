@@ -43,7 +43,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-
+import java.util.TimeZone;
 
 import javax.inject.Inject;
 
@@ -259,7 +259,8 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 					put("cd_unita_organizzativa", aceBridgeService.getUoById(Integer.parseInt(execution.getVariable("idStruttura").toString())).getCdsuo().toString());
 				}
 				// DT_REGISTRAZIONE 
-				DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+				DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+				dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Vatican"));
 				Date endDate = new Date();
 				String endStrDate = dateFormat.format(endDate);  
 				put("dt_registrazione", endStrDate);
