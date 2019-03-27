@@ -264,7 +264,7 @@ public class FlowsProcessInstanceResource {
                 .startedAfter(formatoData.parse("01-01-" + startYear))
                 .startedBefore(formatoData.parse("31-12-" + endYear))
                 .includeProcessVariables();
-        if(order == DESC){
+        if (order.equals(DESC)){
             historicProcessInstances = historicProcessInstanceQuery
                     .orderByProcessInstanceStartTime().desc()
                     .listPage(firstResult, maxResults);
