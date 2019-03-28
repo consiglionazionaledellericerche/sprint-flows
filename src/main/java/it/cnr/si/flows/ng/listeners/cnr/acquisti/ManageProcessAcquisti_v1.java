@@ -221,24 +221,97 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 		Map<String, FlowsAttachment> attachmentList = attachmentService.getCurrentAttachments(execution);
 		for (String key : attachmentList.keySet()) {
 			FlowsAttachment documentoCorrente = attachmentList.get(key);
-			String aspectSiglaDecisioneContrattare = "P:sigla_contratti_aspect:doc_flusso_decisione_contrattare";
-			String aspectSiglaCommonsPubblicazione = "P:sigla_commons_aspect:flusso_pubblicazione";
 			LOGGER.info("Key = " + key + ", documentoCorrente = " + documentoCorrente.getFilename());
+			StorageObject fileKey = storeService.getStorageObjectBykey(documentoCorrente.getUrl());
+			String aspectSiglaName = "EMPTY";
+			String aspectSiglaPropertyLabel = "EMPTY";
+			//DECISIONE A CONTRATTARE
 			if(documentoCorrente.getName().equals("decisioneContrattare")){
-				StorageObject fileKey = storeService.getStorageObjectBykey(documentoCorrente.getUrl());
-				if(!storeService.hasAspect(fileKey, aspectSiglaDecisioneContrattare)) {
-					storeService.addAspect(fileKey, aspectSiglaDecisioneContrattare);					
+				aspectSiglaName = "P:sigla_contratti_aspect:doc_flusso_decisione_contrattare";
+				aspectSiglaPropertyLabel = "sigla_contratti_aspect_decisione_contrattare:label";
+			}
+			//modificheVariantiArt106			
+			if(documentoCorrente.getName().equals("modificheVariantiArt106")){
+				aspectSiglaName = "P:sigla_contratti_aspect:doc_flusso_modifiche_varianti_art106";
+				aspectSiglaPropertyLabel = "sigla_contratti_aspect_modifiche_varianti_art106:label";
+			}
+			//bandoAvvisi			
+			if(documentoCorrente.getName().equals("bandoAvvisi")){
+				aspectSiglaName = "P:sigla_contratti_aspect:doc_flusso_bando_avvisi";
+				aspectSiglaPropertyLabel = "sigla_contratti_aspect_bando_avvisi:label";
+			}
+			//letteraInvito			
+			if(documentoCorrente.getName().equals("letteraInvito")){
+				aspectSiglaName = "P:sigla_contratti_aspect:doc_flusso_lettera_invito";
+				aspectSiglaPropertyLabel = "sigla_contratti_aspect_lettera_invito:label";
+			}
+			//provvedimentoAmmessiEsclusi			
+			if(documentoCorrente.getName().equals("provvedimentoAmmessiEsclusi")){
+				aspectSiglaName = "P:sigla_contratti_aspect:doc_flusso_provvedimento_ammessi_esclusi";
+				aspectSiglaPropertyLabel = "sigla_contratti_aspect_provvedimento_ammessi_esclusi:label";
+			}
+			//provvedimentoNominaCommissione			
+			if(documentoCorrente.getName().equals("provvedimentoNominaCommissione")){
+				aspectSiglaName = "P:sigla_contratti_aspect:doc_flusso_provvedimento_nomina_commissione";
+				aspectSiglaPropertyLabel = "sigla_contratti_aspect_provvedimento_nomina_commissione:label";
+			}
+			//elencoVerbali			
+			if(documentoCorrente.getName().equals("elencoVerbali")){
+				aspectSiglaName = "P:sigla_contratti_aspect:doc_flusso_elenco_verbali";
+				aspectSiglaPropertyLabel = "sigla_contratti_aspect_elenco_verbali:label";
+			}
+			//stipula			
+			if(documentoCorrente.getName().equals("stipula")){
+				aspectSiglaName = "P:sigla_contratti_aspect:doc_flusso_stipula";
+				aspectSiglaPropertyLabel = "sigla_contratti_aspect_stipula:label";
+			}
+			//avvisoPostInformazione			
+			if(documentoCorrente.getName().equals("avvisoPostInformazione")){
+				aspectSiglaName = "P:sigla_contratti_aspect:doc_flusso_avviso_post_informazione";
+				aspectSiglaPropertyLabel = "sigla_contratti_aspect_avviso_post_informazione:label";
+			}
+			//richiestaDiAcquisto			
+			if(documentoCorrente.getName().equals("richiestaDiAcquisto")){
+				aspectSiglaName = "P:sigla_contratti_aspect:doc_flusso_richiesta_di_acquisto";
+				aspectSiglaPropertyLabel = "sigla_contratti_aspect_richiesta_di_acquisto:label";
+			}
+			//ProvvedimentoDiRevoca			
+			if(documentoCorrente.getName().equals("ProvvedimentoDiRevoca")){
+				aspectSiglaName = "P:sigla_contratti_aspect:doc_flusso_provvedimento_di_revoca";
+				aspectSiglaPropertyLabel = "sigla_contratti_aspect_provvedimento_di_revoca:label";
+			}
+			//provvedimentoAggiudicazione			
+			if(documentoCorrente.getName().equals("provvedimentoAggiudicazione")){
+				aspectSiglaName = "P:sigla_contratti_aspect:doc_flusso_provvedimento_aggiudicazione";
+				aspectSiglaPropertyLabel = "sigla_contratti_aspect_provvedimento_aggiudicazione:label";
+			}
+			//contratto			
+			if(documentoCorrente.getName().equals("contratto")){
+				aspectSiglaName = "P:sigla_contratti_aspect:doc_flusso_contratto";
+				aspectSiglaPropertyLabel = "sigla_contratti_aspect_contratto:label";
+			}
+			//allegati			
+			if(documentoCorrente.getName().startsWith("allegati")){
+				aspectSiglaName = "P:sigla_contratti_aspect:doc_flusso_allegato";
+				aspectSiglaPropertyLabel = "sigla_contratti_aspect_allegato:label";
+			}			
+			if(!aspectSiglaName.equals("EMPTY")) {
+				// INSERIMENTO ASPECT DOC
+				if(!storeService.hasAspect(fileKey, aspectSiglaName)) {
+					storeService.addAspect(fileKey, aspectSiglaName);					
 				}
+				Map<String, Object> metadataPropertiesAspectSiglaDoc = new HashMap<String, Object>();
+				metadataPropertiesAspectSiglaDoc.put(aspectSiglaPropertyLabel, documentoCorrente.getLabel());
+				storeService.updateProperties(metadataPropertiesAspectSiglaDoc  , fileKey);
+				
+				//INSERIMENTO ASPECT PUBBLICAZIONE
+				String aspectSiglaCommonsPubblicazione = "P:sigla_commons_aspect:flusso_pubblicazione";
 				if(!storeService.hasAspect(fileKey, aspectSiglaCommonsPubblicazione)) {
 					storeService.addAspect(fileKey, aspectSiglaCommonsPubblicazione);			 
 				}
-				Map<String, Object> metadataPropertiesAspectSiglaDecisioneContrattare = new HashMap<String, Object>();
-				metadataPropertiesAspectSiglaDecisioneContrattare.put("sigla_contratti_aspect_decisione_contrattare:name", documentoCorrente.getName());
-				metadataPropertiesAspectSiglaDecisioneContrattare.put("sigla_contratti_aspect_decisione_contrattare:label", documentoCorrente.getLabel());
-				metadataPropertiesAspectSiglaDecisioneContrattare.put("sigla_contratti_aspect_decisione_contrattare:filename", documentoCorrente.getFilename());
 				Map<String, Object> metadataPropertiesAspectSiglaCommonsPubblicazione = new HashMap<String, Object>();
 				metadataPropertiesAspectSiglaCommonsPubblicazione.put("sigla_commons_aspect:pubblicazione_trasparenza", documentoCorrente.isPubblicazioneTrasparenza());
-				storeService.updateProperties(metadataPropertiesAspectSiglaDecisioneContrattare  , fileKey);
+				metadataPropertiesAspectSiglaCommonsPubblicazione.put("sigla_commons_aspect:pubblicazione_urp", documentoCorrente.isPubblicazioneUrp());
 				storeService.updateProperties(metadataPropertiesAspectSiglaCommonsPubblicazione  , fileKey);
 			}
 		}
