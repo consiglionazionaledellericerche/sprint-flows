@@ -33,6 +33,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.core.env.Environment;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -82,7 +83,8 @@ public class FlowsProcessInstanceResource {
     private PermissionEvaluatorImpl permissionEvaluator;
     @Inject
     private Utils utils;
-
+    @Inject
+    private Environment env;
 
 
 
@@ -488,7 +490,7 @@ public class FlowsProcessInstanceResource {
         return instance.getProcessVariables().get(field);
     }
 
-    private static List<Map<String, Object>> getDocumentiPubblicabiliTrasparenza(HistoricProcessInstance instance) {
+    private  List<Map<String, Object>> getDocumentiPubblicabiliTrasparenza(HistoricProcessInstance instance) {
         List<Map<String, Object>> documentiPubblicabili = new ArrayList<>();
         for (Entry<String, Object> entry : instance.getProcessVariables().entrySet()) {
             String key = entry.getKey();
@@ -504,7 +506,8 @@ public class FlowsProcessInstanceResource {
                     metadatiDocumento.put("url", attachment.getUrl());
                     //TODO
                     //metadatiDocumento.put("path", attachment.getPath());
-                    //metadatiDocumento.put("url", "api/attachments/" + instance.getId() + "/" + key + "/data");
+                   
+                    metadatiDocumento.put("download", env.getProperty("repository.base.url") + "d/a/workspace/SpacesStore/" + attachment.getUrl().split(";")[0] + "/" + attachment.getName());
                     documentiPubblicabili.add(metadatiDocumento);
                 }
             }
@@ -512,7 +515,7 @@ public class FlowsProcessInstanceResource {
         return documentiPubblicabili;
     }
     
-    private static List<Map<String, Object>> getDocumentiPubblicabiliURP(HistoricProcessInstance instance) {
+    private List<Map<String, Object>> getDocumentiPubblicabiliURP(HistoricProcessInstance instance) {
         List<Map<String, Object>> documentiPubblicabili = new ArrayList<>();
         for (Entry<String, Object> entry : instance.getProcessVariables().entrySet()) {
             String key = entry.getKey();
@@ -528,7 +531,7 @@ public class FlowsProcessInstanceResource {
                     metadatiDocumento.put("url", attachment.getUrl());
                     //TODO
                     //metadatiDocumento.put("path", attachment.getPath());
-                    //metadatiDocumento.put("url", "api/attachments/" + instance.getId() + "/" + key + "/data");
+                    metadatiDocumento.put("download", env.getProperty("repository.base.url") + "d/a/workspace/SpacesStore/" + attachment.getUrl().split(";")[0] + "/" + attachment.getName());
                     documentiPubblicabili.add(metadatiDocumento);
                 }
             }
@@ -536,7 +539,7 @@ public class FlowsProcessInstanceResource {
         return documentiPubblicabili;
     }
 
-    private static Map<String, Object> trasformaVariabiliPerTrasparenza(HistoricProcessInstance instance, List<String> viewExportTrasparenza) {
+    private Map<String, Object> trasformaVariabiliPerTrasparenza(HistoricProcessInstance instance, List<String> viewExportTrasparenza) {
         Map<String, Object> mappedVariables = new HashMap<>();
 
         viewExportTrasparenza.stream().forEach(field -> {
@@ -547,7 +550,7 @@ public class FlowsProcessInstanceResource {
         return mappedVariables;
     }
     
-    private static Map<String, Object> trasformaVariabiliPerURP(HistoricProcessInstance instance, List<String> viewExportURP) {
+    private Map<String, Object> trasformaVariabiliPerURP(HistoricProcessInstance instance, List<String> viewExportURP) {
         Map<String, Object> mappedVariables = new HashMap<>();
 
         viewExportURP.stream().forEach(field -> {
