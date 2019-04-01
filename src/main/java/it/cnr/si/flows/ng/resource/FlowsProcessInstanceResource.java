@@ -48,6 +48,7 @@ import java.util.stream.Collectors;
 
 import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
 import static it.cnr.si.flows.ng.utils.Enum.Stato.PubblicatoTrasparenza;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.PubblicatoUrp;
 import static it.cnr.si.flows.ng.utils.Utils.DESC;
 import static it.cnr.si.flows.ng.utils.Utils.DESCRIZIONE;
 import static it.cnr.si.flows.ng.utils.Utils.INITIATOR;
@@ -59,7 +60,9 @@ public class FlowsProcessInstanceResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsProcessInstanceResource.class);
     public static final String EXPORT_TRASPARENZA = "export-trasparenza";
+    public static final String EXPORT_URP = "export-urp";
 	public static final String STATO_FINALE_DOMANDA = "statoFinaleDomanda";
+	
 
     @Inject
     private RestResponseFactory restResponseFactory;
@@ -247,6 +250,7 @@ public class FlowsProcessInstanceResource {
      */
     @PostMapping(value = "/getProcessInstancesForTrasparenza", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.ADMIN)
+    @PreAuthorize("hasRole('ROLE_applicazione-portalecnr@0000')")
     @Timed
     public ResponseEntity<List<Map<String, Object>>> getProcessInstancesForTrasparenza(
             @RequestParam("processDefinition") String processDefinition,
@@ -260,11 +264,12 @@ public class FlowsProcessInstanceResource {
         List<HistoricProcessInstance> historicProcessInstances;
 
         HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()
+        		.unfinished()
                 .processDefinitionKey(processDefinition)
                 .startedAfter(formatoData.parse("01-01-" + startYear))
                 .startedBefore(formatoData.parse("31-12-" + endYear))
                 .includeProcessVariables();
-        if (order.equals(DESC)){
+        if (order != null && order.equals(DESC)){
             historicProcessInstances = historicProcessInstanceQuery
                     .orderByProcessInstanceStartTime().desc()
                     .listPage(firstResult, maxResults);
@@ -285,6 +290,53 @@ public class FlowsProcessInstanceResource {
 
         List<Map<String, Object>> mappedProcessInstances = historicProcessInstances.stream()
                 .map(instance -> trasformaVariabiliPerTrasparenza(instance, exportTrasparenza))
+                .collect(Collectors.toList());
+
+        return new ResponseEntity<>(mappedProcessInstances, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/getProcessInstancesForURP", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.ADMIN)
+    @PreAuthorize("hasRole('ROLE_applicazione-portalecnr@0000')")
+    @Timed
+    public ResponseEntity<List<Map<String, Object>>> getProcessInstancesForURP(
+            @RequestParam("processDefinition") String processDefinition,
+            @RequestParam("startYear") int startYear,
+            @RequestParam("endYear") int endYear,
+            @RequestParam("firstResult") int firstResult,
+            @RequestParam("maxResults") int maxResults,
+            @RequestParam(name = "order", required = false) String order) throws ParseException {
+
+        DateFormat formatoData = new SimpleDateFormat("dd-MM-yyyy");
+        List<HistoricProcessInstance> historicProcessInstances;
+
+        HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()
+        		.unfinished()
+                .processDefinitionKey(processDefinition)
+                .startedAfter(formatoData.parse("01-01-" + startYear))
+                .startedBefore(formatoData.parse("31-12-" + endYear))
+                .includeProcessVariables();
+        if (order != null && order.equals(DESC)){
+            historicProcessInstances = historicProcessInstanceQuery
+                    .orderByProcessInstanceStartTime().desc()
+                    .listPage(firstResult, maxResults);
+        } else {
+//        	default
+            historicProcessInstances = historicProcessInstanceQuery
+                    .orderByProcessInstanceStartTime().asc()
+                    .listPage(firstResult, maxResults);
+        }
+
+        List<String> exportURP = new ArrayList<>();
+        View urp = viewRepository.getViewByProcessidType(acquisti.getValue(), EXPORT_URP);
+        String view = urp.getView();
+        JSONArray fields = new JSONArray(view);
+        for (int i = 0; i < fields.length(); i++) {
+        	exportURP.add(fields.getString(i));
+        }
+
+        List<Map<String, Object>> mappedProcessInstances = historicProcessInstances.stream()
+                .map(instance -> trasformaVariabiliPerURP(instance, exportURP))
                 .collect(Collectors.toList());
 
         return new ResponseEntity<>(mappedProcessInstances, HttpStatus.OK);
@@ -436,7 +488,7 @@ public class FlowsProcessInstanceResource {
         return instance.getProcessVariables().get(field);
     }
 
-    private static List<Map<String, Object>> getDocumentiPubblicabili(HistoricProcessInstance instance) {
+    private static List<Map<String, Object>> getDocumentiPubblicabiliTrasparenza(HistoricProcessInstance instance) {
         List<Map<String, Object>> documentiPubblicabili = new ArrayList<>();
         for (Entry<String, Object> entry : instance.getProcessVariables().entrySet()) {
             String key = entry.getKey();
@@ -449,7 +501,34 @@ public class FlowsProcessInstanceResource {
                     Map<String, Object> metadatiDocumento = new HashMap<>();
                     metadatiDocumento.put("filename", attachment.getFilename());
                     metadatiDocumento.put("name", attachment.getName());
-                    metadatiDocumento.put("url", "api/attachments/" + instance.getId() + "/" + key + "/data");
+                    metadatiDocumento.put("url", attachment.getUrl());
+                    //TODO
+                    //metadatiDocumento.put("path", attachment.getPath());
+                    //metadatiDocumento.put("url", "api/attachments/" + instance.getId() + "/" + key + "/data");
+                    documentiPubblicabili.add(metadatiDocumento);
+                }
+            }
+        }
+        return documentiPubblicabili;
+    }
+    
+    private static List<Map<String, Object>> getDocumentiPubblicabiliURP(HistoricProcessInstance instance) {
+        List<Map<String, Object>> documentiPubblicabili = new ArrayList<>();
+        for (Entry<String, Object> entry : instance.getProcessVariables().entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+
+            if (value instanceof FlowsAttachment) {
+                FlowsAttachment attachment = (FlowsAttachment) value;
+                if (attachment.getStati().contains(PubblicatoUrp)) {
+
+                    Map<String, Object> metadatiDocumento = new HashMap<>();
+                    metadatiDocumento.put("filename", attachment.getFilename());
+                    metadatiDocumento.put("name", attachment.getName());
+                    metadatiDocumento.put("url", attachment.getUrl());
+                    //TODO
+                    //metadatiDocumento.put("path", attachment.getPath());
+                    //metadatiDocumento.put("url", "api/attachments/" + instance.getId() + "/" + key + "/data");
                     documentiPubblicabili.add(metadatiDocumento);
                 }
             }
@@ -463,7 +542,18 @@ public class FlowsProcessInstanceResource {
         viewExportTrasparenza.stream().forEach(field -> {
             mappedVariables.put(field, mapVariable(instance, field));
         });
-        mappedVariables.put("documentiPubblicabili", getDocumentiPubblicabili(instance));
+        mappedVariables.put("documentiPubblicabili", getDocumentiPubblicabiliTrasparenza(instance));
+
+        return mappedVariables;
+    }
+    
+    private static Map<String, Object> trasformaVariabiliPerURP(HistoricProcessInstance instance, List<String> viewExportURP) {
+        Map<String, Object> mappedVariables = new HashMap<>();
+
+        viewExportURP.stream().forEach(field -> {
+            mappedVariables.put(field, mapVariable(instance, field));
+        });
+        mappedVariables.put("documentiPubblicabili", getDocumentiPubblicabiliURP(instance));
 
         return mappedVariables;
     }
