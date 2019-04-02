@@ -348,6 +348,7 @@ public class FlowsProcessInstanceResource {
 
     @PostMapping(value = "/getProcessInstancesForCigs", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.ADMIN)
+    @PreAuthorize("hasRole('ROLE_applicazione-portalecnr@0000')")
     @Timed
     public ResponseEntity<List<Map<String, Object>>> getProcessInstancesForCigs(
             @RequestParam("cigs") String cigs) {
@@ -394,6 +395,7 @@ public class FlowsProcessInstanceResource {
 
     @PostMapping(value = "/getProcessInstancesbyProcessInstanceIds", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.ADMIN)
+    @PreAuthorize("hasRole('ROLE_applicazione-portalecnr@0000')")
     @Timed
     public ResponseEntity<List<Map<String, Object>>> getProcessInstancesbyProcessInstanceIds(
             @RequestParam("processInstanceIds") String processInstanceIds) {
@@ -503,7 +505,8 @@ public class FlowsProcessInstanceResource {
                     Map<String, Object> metadatiDocumento = new HashMap<>();
                     metadatiDocumento.put("filename", attachment.getFilename());
                     metadatiDocumento.put("name", attachment.getName());
-                    metadatiDocumento.put("url", attachment.getUrl());
+                    metadatiDocumento.put("label", attachment.getLabel());
+                    metadatiDocumento.put("nodeRef", attachment.getUrl());
                     //TODO
                     //metadatiDocumento.put("path", attachment.getPath());
                    
@@ -528,7 +531,8 @@ public class FlowsProcessInstanceResource {
                     Map<String, Object> metadatiDocumento = new HashMap<>();
                     metadatiDocumento.put("filename", attachment.getFilename());
                     metadatiDocumento.put("name", attachment.getName());
-                    metadatiDocumento.put("url", attachment.getUrl());
+                    metadatiDocumento.put("label", attachment.getLabel());
+                    metadatiDocumento.put("nodeRef", attachment.getUrl());
                     //TODO
                     //metadatiDocumento.put("path", attachment.getPath());
                     metadatiDocumento.put("download", env.getProperty("repository.base.url") + "d/a/workspace/SpacesStore/" + attachment.getUrl().split(";")[0] + "/" + attachment.getName());
