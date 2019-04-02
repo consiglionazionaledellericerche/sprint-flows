@@ -1,9 +1,6 @@
 package it.cnr.si.flows.ng.config;
 
-import it.cnr.si.flows.ng.listeners.MailNotificationListener;
-import it.cnr.si.flows.ng.listeners.SaveSummaryAtProcessCompletion;
-import it.cnr.si.flows.ng.listeners.SetStato;
-import it.cnr.si.flows.ng.listeners.VisibilitySetter;
+import it.cnr.si.flows.ng.listeners.*;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.repository.DeploymentBuilder;
@@ -77,29 +74,35 @@ public class FlowsListenersConfiguration {
 		}
 	}
 
+	/**
+	 * ATTENZIONE: L'ordine dei listener e' importante
+	 */
 	private void addGlobalListeners() {
 		LOGGER.info("Adding Flows Listeners");
 
 		SaveSummaryAtProcessCompletion processEndListener = (SaveSummaryAtProcessCompletion)
 				appContext.getAutowireCapableBeanFactory().createBean(SaveSummaryAtProcessCompletion.class,
 																	  AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
-		runtimeService.addEventListener(processEndListener, PROCESS_COMPLETED);
-
 		SetStato beanSetStato = (SetStato) appContext.getAutowireCapableBeanFactory()
 				.createBean(SetStato.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
-		//quando viene "iniziato un task" e quando viene svolta una qualsiasi attività (serve per la "fine della Process Instance)
-		runtimeService.addEventListener(beanSetStato,
-										TASK_CREATED, HISTORIC_ACTIVITY_INSTANCE_ENDED);
-
 		MailNotificationListener mailSender = (MailNotificationListener)
 				appContext.getAutowireCapableBeanFactory().createBean(MailNotificationListener.class,
 																	  AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
-		runtimeService.addEventListener(mailSender);
-
 		VisibilitySetter visibilitySetter = (VisibilitySetter)
 				appContext.getAutowireCapableBeanFactory().createBean(VisibilitySetter.class,
 																	  AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
+
+		AddFlowsAttachmentsListener addAttachments = (AddFlowsAttachmentsListener)
+				appContext.getAutowireCapableBeanFactory().createBean(AddFlowsAttachmentsListener.class,
+						AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
+
+		//quando viene "iniziato un task" e quando viene svolta una qualsiasi attività (serve per la "fine della Process Instance)
+		runtimeService.addEventListener(mailSender);
 		runtimeService.addEventListener(visibilitySetter);
+		runtimeService.addEventListener(addAttachments, PROCESS_STARTED, TASK_COMPLETED);
+		runtimeService.addEventListener(processEndListener, PROCESS_COMPLETED);
+		runtimeService.addEventListener(beanSetStato, TASK_CREATED, HISTORIC_ACTIVITY_INSTANCE_ENDED);
+
 
 
 	}

@@ -41,9 +41,10 @@ public class FlowsAttachmentService {
     public static final String STATO_SUFFIX = "_stato";
     public static final String FILENAME_SUFFIX = "_filename";
     public static final String MIMETYPE_SUFFIX = "_mimetype";
-    public static final String ARRAY_SUFFIX_REGEX = "\\[\\d+\\]";
     public static final String NUMERI_PROTOCOLLO = "numeriProtocollo";
     public static final String NUMERI_PROTOCOLLO_SEPARATOR = "::";
+    @Deprecated
+    public static final String ARRAY_SUFFIX_REGEX = "\\[\\d+\\]";
 
 
     public static final String[] SUFFIXES = new String[] {USER_SUFFIX, STATO_SUFFIX, FILENAME_SUFFIX, MIMETYPE_SUFFIX};
@@ -64,70 +65,38 @@ public class FlowsAttachmentService {
     private StorageService storageService;
 	@Inject
 	private Environment env;
-    /**
-     * Servizio che trasforma i multipart file in FlowsAttachment
-     * per il successivo salvataggio sul db
-     *
-     */
-    public void extractAttachmentVariables(MultipartHttpServletRequest req, Map<String, Object> data, String key) throws IOException {
-        Map<String, FlowsAttachment> attachments = new HashMap<>();
-        String taskId, taskName;
 
-        if (req.getParameter("taskId") != null) {
-            taskId = (String) req.getParameter("taskId");
-            taskName = taskService.createTaskQuery().taskId(taskId).singleResult().getName();
-        } else {
-            taskId = "start";
-            taskName = "Avvio del flusso";
-        }
-
-        List<String> nomiFileDaInserire = Collections.list(req.getParameterNames()).stream()
-                .filter(name -> name.endsWith("_aggiorna"))
-                .filter(name -> "true".equals(req.getParameter(name)) )
-                .map(name -> name.replace("_aggiorna", ""))
-                .collect(Collectors.toList());
-
-        for (String fileName : nomiFileDaInserire ) {
-            FlowsAttachment att = extractSingleAttachment(req, taskId, taskName, fileName, data, key);
-            if (att != null)
-                attachments.put(fileName, att);
-        }
-
-        data.putAll(attachments);
-
-        String protocolliUniti = mergeProtocolli(attachments, taskId);
-        data.put(NUMERI_PROTOCOLLO, protocolliUniti);
-    }
-
-    public FlowsAttachment extractSingleAttachment(MultipartHttpServletRequest req, String taskId, String taskName, String fileName, Map<String, Object> data, String key) throws IOException {
-
+    public FlowsAttachment extractSingleAttachment(Map<String, Object> data, String taskId, String taskName, String key, String fileName, String path) throws IOException {
         LOGGER.info("inserisco come variabile il file {}", fileName);
+
         boolean nuovo = taskId.equals("start") || taskService.getVariable(taskId, fileName) == null;
         String username = SecurityUtils.getCurrentUserLogin();
         FlowsAttachment att = null;
+        byte[] filebytes = (byte[]) data.get(fileName + "_data");
+        String originalFilename  = (String) data.get(fileName + "_filename");
 
         if (nuovo) {
-            MultipartFile file = req.getFile(fileName + "_data");
-            if (file != null) {
+            if (filebytes != null) {
                 att = new FlowsAttachment();
 
                 setAttachmentProperties(att, taskId, taskName, fileName, data, nuovo, username);
 
-                att.setFilename(file.getOriginalFilename());
-                att.setMimetype(getMimetype(file));
-                att.setUrl(saveOrUpdateBytes(file.getBytes(), fileName, file.getOriginalFilename(), key));
+                att.setFilename(originalFilename);
+                att.setMimetype(getMimetype(filebytes));
+                att.setUrl(saveOrUpdateBytes(filebytes, fileName, originalFilename, key, path));
+                att.setPath(path);
             }
 
         } else {
             att = taskService.getVariable(taskId, fileName, FlowsAttachment.class);
-            MultipartFile file = req.getFile(fileName + "_data");
 
-                setAttachmentProperties(att, taskId, taskName, fileName, data, nuovo, username);
-                if (file != null) {
+            setAttachmentProperties(att, taskId, taskName, fileName, data, nuovo, username);
+            if (filebytes != null) {
 
-                att.setFilename(file.getOriginalFilename());
-                att.setMimetype(getMimetype(file));
-                att.setUrl(saveOrUpdateBytes(file.getBytes(), fileName, file.getOriginalFilename(), key));
+                att.setFilename(originalFilename);
+                att.setMimetype(getMimetype(filebytes));
+                att.setUrl(saveOrUpdateBytes(filebytes, fileName, originalFilename, key, path));
+                att.setPath(path);
             }
         }
 
@@ -140,11 +109,11 @@ public class FlowsAttachmentService {
         if (file != null) {
             att.setFilename(file.getOriginalFilename());
             att.setMimetype(getMimetype(file));
-            att.setUrl(saveOrUpdateBytes(file.getBytes(), fileName, file.getOriginalFilename(), key));
+            att.setUrl(saveOrUpdateBytes(file.getBytes(), fileName, file.getOriginalFilename(), key, att.getPath()));
         }
     }
 
-    public void setAttachmentProperties(FlowsAttachment att, String taskId, String taskName, String fileName, Map<String, Object> data, boolean nuovo, String username) throws IOException {
+    public void setAttachmentProperties(FlowsAttachment att, String taskId, String taskName, String fileName, Map<String, Object> data, boolean nuovo, String username) {
 
         att.setName(fileName);
         att.setTime(new Date());
@@ -152,14 +121,14 @@ public class FlowsAttachmentService {
         att.setTaskName(taskName);
         att.setUsername(username);
 
-        att.setLabel(                  String.valueOf(data.remove(fileName+"_label")));
-        att.setPubblicazioneUrp(		"true".equals(data.remove(fileName+"_pubblicazioneUrp")));
-        att.setPubblicazioneTrasparenza("true".equals(data.remove(fileName+"_pubblicazioneTrasparenza")));
-        att.setProtocollo(				"true".equals(data.remove(fileName+"_protocollo")));
+        att.setLabel(                  String.valueOf(data.get(fileName+"_label")));
+        att.setPubblicazioneUrp(		"true".equals(data.get(fileName+"_pubblicazioneUrp")));
+        att.setPubblicazioneTrasparenza("true".equals(data.get(fileName+"_pubblicazioneTrasparenza")));
+        att.setProtocollo(				"true".equals(data.get(fileName+"_protocollo")));
 
         if (att.isProtocollo()) {
-            att.setDataProtocollo(  String.valueOf(data.remove(fileName+"_dataProtocollo")));
-            att.setNumeroProtocollo(String.valueOf(data.remove(fileName+"_numeroProtocollo")));
+            att.setDataProtocollo(      String.valueOf(data.get(fileName+"_dataProtocollo")));
+            att.setNumeroProtocollo(    String.valueOf(data.get(fileName+"_numeroProtocollo")));
         } else {
             att.setDataProtocollo(null);
             att.setNumeroProtocollo(null);
@@ -190,10 +159,9 @@ public class FlowsAttachmentService {
 
         if (content != null) {
             String key = execution.getVariable("key", String.class);
-            att.setUrl(saveOrUpdateBytes(content, variableName, att.getFilename(), key));
+            att.setUrl(saveOrUpdateBytes(content, variableName, att.getFilename(), key, att.getPath()));
         }
 
-//        execution.setVariable(variableName, att);
         runtimeService.setVariable(execution.getId(), variableName, att);
     }
 
@@ -217,7 +185,7 @@ public class FlowsAttachmentService {
 
         if (content != null) {
             String key = runtimeService.getVariable(task.getExecutionId(), "key", String.class);
-            att.setUrl(saveOrUpdateBytes(content, variableName, att.getFilename(), key));
+            att.setUrl(saveOrUpdateBytes(content, variableName, att.getFilename(), key, att.getPath()));
         }
 
         runtimeService.setVariable(task.getExecutionId(), variableName, att);
@@ -231,7 +199,7 @@ public class FlowsAttachmentService {
 
         if (content != null) {
             String key = runtimeService.getVariable(executionId, "key", String.class);
-            att.setUrl(saveOrUpdateBytes(content, variableName, att.getFilename(), key));
+            att.setUrl(saveOrUpdateBytes(content, variableName, att.getFilename(), key, att.getPath()));
         }
 
         runtimeService.setVariable(executionId, variableName, att);
@@ -373,7 +341,7 @@ public class FlowsAttachmentService {
                 .collect(Collectors.joining(NUMERI_PROTOCOLLO_SEPARATOR));
     }
 
-    public String saveOrUpdateBytes(byte[] bytes, String attachmentName, String fileName, String key) {
+    public String saveOrUpdateBytes(byte[] bytes, String attachmentName, String fileName, String key, String path) {
 
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
 		Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
@@ -385,22 +353,12 @@ public class FlowsAttachmentService {
         storageFile.setTitle(fileName);
         storageFile.setDescription(fileName);
 
-		String path = "flows";
-		if (activeProfiles.contains("dev")) {
-			path = "flows-dev";
-		}
-		if (activeProfiles.contains("test")) {
-			path = "flows-test";
-		}
-		if (activeProfiles.contains("demo")) {
-			path = "flows-demo";
-		}
         StorageObject so = storeService.restoreSimpleDocument(
                 storageFile,
                 new ByteArrayInputStream(storageFile.getBytes()),
                 storageFile.getContentType(),
                 attachmentName,
-				"/Comunicazioni al CNR/" + path + "/" + key,
+				path + "/" + key,
                 true);
 
         StorageObject updatedSo = storeService.getStorageObjectBykey(

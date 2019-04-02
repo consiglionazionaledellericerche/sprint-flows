@@ -40,4 +40,8 @@ public class MimetypeUtils {
         return bais;
     }
 
+    public static String getMimetype(byte[] bytes) {
+        return new Tika().detect(bytes);
+    }
+
 }
