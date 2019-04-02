@@ -64,7 +64,6 @@ public class SetStato implements ActivitiEventListener {
 
 	@Override
 	public boolean isFailOnException() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 }

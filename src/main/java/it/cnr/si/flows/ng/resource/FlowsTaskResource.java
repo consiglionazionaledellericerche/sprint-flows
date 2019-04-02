@@ -40,6 +40,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.inject.Inject;
@@ -252,7 +253,6 @@ public class FlowsTaskResource {
             String key = counterId + "-" + counterService.getNext(counterId);
 
             Map<String, Object> data = extractParameters(req);
-            attachmentService.extractAttachmentVariables(req, data, key);
 
             ProcessInstance instance = flowsTaskService.startProcessInstance(data, definitionId, key);
 
@@ -263,7 +263,6 @@ public class FlowsTaskResource {
             try {
                 String key = taskService.getVariable(taskId, "key", String.class);
                 Map<String, Object> data = extractParameters(req);
-                attachmentService.extractAttachmentVariables(req, data, key);
 
                 flowsTaskService.completeTask(taskId, data);
 
@@ -326,7 +325,8 @@ public class FlowsTaskResource {
 
             if (signResponse.getStatus().equals("OK")) {
                 String key = taskService.getVariable(taskId, "key", String.class);
-                String uid = flowsAttachmentService.saveOrUpdateBytes(signResponse.getBinaryoutput(), nomeFile, "signed", key);
+                String path = taskService.getVariable(taskId, "path", String.class);
+                String uid = flowsAttachmentService.saveOrUpdateBytes(signResponse.getBinaryoutput(), nomeFile, "signed", key, path);
                 att.setUrl(uid);
                 att.setAzione(Firma);
                 att.addStato(Firmato);
@@ -398,11 +398,28 @@ public class FlowsTaskResource {
 
         Map<String, Object> data = new HashMap<>();
         List<String> parameterNames = Collections.list(req.getParameterNames());
-        parameterNames.stream().forEach(paramName -> {
-            // se ho un json non aggiungo i suoi singoli campi (Ed escludo il parametro "cacheBuster")
-            if ((!parameterNames.contains(paramName.split("\\[")[0] + "_json")) && (!paramName.equals("cacheBuster")))
-                data.put(paramName, req.getParameter(paramName));
-        });
+        parameterNames.stream()
+                .filter(paramName -> !parameterNames.contains(paramName.split("\\[")[0] + "_json"))
+                .filter(paramName -> !paramName.equals("cacheBuster"))
+                .forEach(paramName -> data.put(paramName, req.getParameter(paramName)));
+
+        // aggiungo anche i files
+        parameterNames.stream()
+                .filter( paramName -> paramName.endsWith("_aggiorna") )
+                .filter( paramName -> "true".equals(req.getParameter(paramName)) )
+                .map( paramName -> paramName.replace("_aggiorna", ""))
+                .forEach( paramName -> {
+                    try {
+                        MultipartFile file = req.getFile(paramName + "_data");
+                        if ( file != null ){
+                            data.put(paramName + "_data", file.getBytes());
+                            data.put(paramName + "_filename", file.getOriginalFilename());
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException("Errore nella lettura del file", e);
+                    }
+                });
+
         return data;
     }
 

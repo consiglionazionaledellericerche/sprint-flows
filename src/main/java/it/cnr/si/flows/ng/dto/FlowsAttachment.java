@@ -29,6 +29,7 @@ public class FlowsAttachment implements Serializable {
     private String taskName;
     private String userName;
     private String mimetype;
+    private String path;
     private String url;
     private byte[] bytes;
     private Map<String, Object> metadati;
@@ -58,6 +59,16 @@ public class FlowsAttachment implements Serializable {
     public void setUrl(String url) {
         this.url = url;
     }
+
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
     public String getMimetype() {
         return mimetype;
     }
