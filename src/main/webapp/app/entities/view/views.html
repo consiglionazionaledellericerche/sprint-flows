@@ -15,47 +15,53 @@
     </div>
     <br/>
     <div class="table-responsive">
+        <div class="bg-info">
+            <label>(paginazione DISABILITATA)</label><br>
+            <label>Search Any: <input ng-model="search.$"></label><br>
+            <label>Search processId: <input ng-model="search.processId"></label><br>
+            <label>Search type: <input ng-model="search.type"></label>
+        </div>
         <table class="jh-table table table-striped">
             <thead>
-                <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.transition()">
-                    <th jh-sort-by="id"><span translate="global.field.id">ID</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th jh-sort-by="processId"><span translate="sprintApp.view.processId">Process Id</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th jh-sort-by="type"><span translate="sprintApp.view.type">Type</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th jh-sort-by="view"><span translate="sprintApp.view.view">View</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th jh-sort-by="version"><span translate="sprintApp.view.version">Version</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th></th>
-                </tr>
+            <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.transition()">
+                <th jh-sort-by="id"><span translate="global.field.id">ID</span> <span class="glyphicon glyphicon-sort"></span></th>
+                <th jh-sort-by="processId"><span translate="sprintApp.view.processId">Process Id</span> <span class="glyphicon glyphicon-sort"></span></th>
+                <th jh-sort-by="type"><span translate="sprintApp.view.type">Type</span> <span class="glyphicon glyphicon-sort"></span></th>
+                <th jh-sort-by="view"><span translate="sprintApp.view.view">View</span> <span class="glyphicon glyphicon-sort"></span></th>
+                <th jh-sort-by="version"><span translate="sprintApp.view.version">Version</span> <span class="glyphicon glyphicon-sort"></span></th>
+                <th></th>
+            </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="view in vm.views track by view.id">
-                    <td><a ui-sref="view-detail({id:view.id})">{{view.id}}</a></td>
-                    <td>{{view.processId}}</td>
-                    <td>{{view.type}}</td>
-                    <td>{{view.view}}</td>
-                    <td>{{view.version}}</td>
-                    <td class="text-right">
-                        <div class="btn-group flex-btn-group-container">
-                            <button type="submit"
-                                    ui-sref="view-detail({id:view.id})"
-                                    class="btn btn-info btn-sm">
-                                <span class="glyphicon glyphicon-eye-open"></span>
-                                <span class="hidden-xs hidden-sm" translate="entity.action.view"></span>
-                            </button>
-                            <button type="submit"
-                                    ui-sref="view.edit({id:view.id})"
-                                    class="btn btn-primary btn-sm">
-                                <span class="glyphicon glyphicon-pencil"></span>
-                                <span class="hidden-xs hidden-sm" translate="entity.action.edit"></span>
-                            </button>
-                            <button type="submit"
-                                    ui-sref="view.delete({id:view.id})"
-                                    class="btn btn-danger btn-sm">
-                                <span class="glyphicon glyphicon-remove-circle"></span>
-                                <span class="hidden-xs hidden-sm" translate="entity.action.delete"></span>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
+            <tr ng-repeat="view in vm.views | filter:search:strict | orderBy:id">
+                <td><a ui-sref="view-detail({id:view.id})">{{view.id}}</a></td>
+                <td>{{view.processId}}</td>
+                <td>{{view.type}}</td>
+                <td>{{view.view}}</td>
+                <td>{{view.version}}</td>
+                <td class="text-right">
+                    <div class="btn-group flex-btn-group-container">
+                        <button type="submit"
+                                ui-sref="view-detail({id:view.id})"
+                                class="btn btn-info btn-sm">
+                            <span class="glyphicon glyphicon-eye-open"></span>
+                            <span class="hidden-xs hidden-sm" translate="entity.action.view"></span>
+                        </button>
+                        <button type="submit"
+                                ui-sref="view.edit({id:view.id})"
+                                class="btn btn-primary btn-sm">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                            <span class="hidden-xs hidden-sm" translate="entity.action.edit"></span>
+                        </button>
+                        <button type="submit"
+                                ui-sref="view.delete({id:view.id})"
+                                class="btn btn-danger btn-sm">
+                            <span class="glyphicon glyphicon-remove-circle"></span>
+                            <span class="hidden-xs hidden-sm" translate="entity.action.delete"></span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
             </tbody>
         </table>
     </div>
