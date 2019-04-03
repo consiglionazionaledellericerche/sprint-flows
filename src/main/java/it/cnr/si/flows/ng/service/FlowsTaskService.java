@@ -44,7 +44,6 @@ import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
 import static it.cnr.si.flows.ng.utils.Utils.*;
@@ -263,12 +262,16 @@ public class FlowsTaskService {
 		return response;
 	}
 
-	public ProcessInstance startProcessInstance(Map<String, Object> data, String definitionId, String key) throws IOException {
+	public ProcessInstance startProcessInstance(String definitionId, Map<String, Object> data) {
+
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitionId).singleResult();
+        String counterId = processDefinition.getName() + "-" + Calendar.getInstance().get(Calendar.YEAR);
+        String key = counterId + "-" + counterService.getNext(counterId);
+		data.put("key", key);
 
 		String username = SecurityUtils.getCurrentUserLogin();
 		data.put(initiator.name(), username);
 		data.put(startDate.name(), new Date());
-		data.put("key", key);
 
 		ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
 		runtimeService.setVariable(instance.getId(), "processInstanceId", instance.getId());
@@ -299,9 +302,14 @@ public class FlowsTaskService {
         String username = SecurityUtils.getCurrentUserLogin();
 
         // aggiungo l'identityLink che indica l'utente che esegue il task
-		taskService.addUserIdentityLink(taskId, username, TASK_EXECUTOR);
 		taskService.setVariablesLocal(taskId, data);
-		taskService.complete(taskId, data);
+		taskService.addUserIdentityLink(taskId, username, TASK_EXECUTOR);
+		try {
+            taskService.complete(taskId, data);
+        } catch (Exception e) {
+            taskService.deleteUserIdentityLink(taskId, username, TASK_EXECUTOR);
+            throw e;
+        }
 	}
 
 	public DataResponse getTasksCompletedByMe(HttpServletRequest req, @RequestParam("processDefinition") String processDefinition, @RequestParam("firstResult") int firstResult, @RequestParam("maxResults") int maxResults, @RequestParam("order") String order) {
