@@ -14,13 +14,15 @@
         vm.predicate = pagingParams.predicate;
         vm.reverse = pagingParams.ascending;
         vm.transition = transition;
-        vm.itemsPerPage = paginationConstants.itemsPerPage;
+//        todo: la paginazione non funziona con la ricerca JS(la lascio commentata per riprenderla eventualmente)
+//        vm.itemsPerPage = paginationConstants.itemsPerPage;
+        vm.itemsPerPage = 1000;
 
         loadAll();
 
         function loadAll () {
             View.query({
-                page: pagingParams.page - 1,
+//                page: pagingParams.page - 1,
                 size: vm.itemsPerPage,
                 sort: sort()
             }, onSuccess, onError);
@@ -36,7 +38,7 @@
                 vm.totalItems = headers('X-Total-Count');
                 vm.queryCount = vm.totalItems;
                 vm.views = data;
-                vm.page = pagingParams.page;
+//                vm.page = pagingParams.page;
             }
             function onError(error) {
                 AlertService.error(error.data.message);
