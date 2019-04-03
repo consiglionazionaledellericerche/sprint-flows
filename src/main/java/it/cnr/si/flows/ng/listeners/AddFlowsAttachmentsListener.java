@@ -70,27 +70,23 @@ public class AddFlowsAttachmentsListener implements ActivitiEventListener {
             throw new BpmnError("400", "Questo listener (AddFlowsAttachmentsListener) supporta solo eventi di tipo PROCESS_STARTED e TASK_COMPLETED");
         }
 
-        List<String> fileNames = processVariables.keySet().stream()
+        processVariables.keySet().stream()
                 .filter(name -> name.endsWith("_aggiorna"))
                 .filter(name -> "true".equals(processVariables.get(name)))
                 .map(name -> name.replace("_aggiorna", ""))
-                .collect(Collectors.toList());
+                .forEach(fileName -> {
 
-        try {
-            for (String fileName : fileNames) {
+                    FlowsAttachment att = (FlowsAttachment) processVariables.get(fileName); // att puo' essere null, nel qual caso verra' creato un nuovo att
+                    att = flowsAttachmentService.extractSingleAttachment(att, processVariables, taskId, taskName, key, fileName, path);
+                    if (att != null)
+                        attachments.put(fileName, att);
 
-                FlowsAttachment att = flowsAttachmentService.extractSingleAttachment(processVariables, taskId, taskName, key, fileName, path);
-                if (att != null)
-                    attachments.put(fileName, att);
-                processVariables.keySet().stream()
-                        .filter(variableName -> variableName.startsWith(fileName+"_"))
-                        .forEach(variableName -> runtimeService.removeVariable(event.getExecutionId(), variableName));
+                    processVariables.keySet().stream()
+                            .filter(variableName -> variableName.startsWith(fileName+"_"))
+                            .forEach(variableName -> runtimeService.removeVariable(event.getExecutionId(), variableName));
 
-                runtimeService.setVariable(event.getExecutionId(), fileName, att);
-            }
-        } catch (IOException e) {
-            throw new BpmnError("500", "Errore nel processamento dei files");
-        }
+                    runtimeService.setVariable(event.getExecutionId(), fileName, att);
+                });
 
         String protocolliUniti = flowsAttachmentService.mergeProtocolli(attachments, taskId);
         runtimeService.setVariable(event.getExecutionId(), NUMERI_PROTOCOLLO, protocolliUniti);

@@ -2,13 +2,11 @@ package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.jada.firma.arss.ArubaSignServiceException;
-import it.cnr.jada.firma.arss.stub.ArubaSignService;
 import it.cnr.jada.firma.arss.stub.SignReturnV2;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.exception.FlowsPermissionException;
 import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
 import it.cnr.si.flows.ng.service.*;
-import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
@@ -18,8 +16,6 @@ import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
-import org.activiti.engine.delegate.BpmnError;
-import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.IdentityLinkType;
 import org.activiti.engine.task.Task;
@@ -38,7 +34,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -47,13 +42,11 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static it.cnr.si.flows.ng.service.FlowsFirmaService.ERRORI_ARUBA;
 import static it.cnr.si.flows.ng.service.FlowsFirmaService.NOME_FILE_FIRMA;
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Firma;
 import static it.cnr.si.flows.ng.utils.Enum.Stato.Firmato;
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
 import static it.cnr.si.flows.ng.utils.Utils.*;
 
 /**
@@ -82,8 +75,6 @@ public class FlowsTaskResource {
     private RuntimeService runtimeService;
     @Inject
     private RelationshipService relationshipService;
-    @Inject
-    private CounterService counterService;
     @Inject
     private FlowsAttachmentService attachmentService;
     @Inject
@@ -235,43 +226,21 @@ public class FlowsTaskResource {
     @PostMapping(value = "complete",consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canCompleteTaskOrStartProcessInstance(#req, @flowsUserDetailsService)")
     @Timed
-    public ResponseEntity<ProcessInstanceResponse> completeTask(MultipartHttpServletRequest req) throws Exception {
+    public ResponseEntity<ProcessInstanceResponse> completeTask(MultipartHttpServletRequest req) {
 
-        String username = SecurityUtils.getCurrentUserLogin();
-
-        String taskId = (String) req.getParameter("taskId");
-        String definitionId = (String) req.getParameter("processDefinitionId");
-
+        Map<String, Object> data = extractParameters(req);
+        String taskId       = (String) data.get("taskId");
+        String definitionId = (String) data.get("processDefinitionId");
         if (isEmpty(taskId) && isEmpty(definitionId))
             throw new ProcessDefinitionAndTaskIdEmptyException();
 
         if (isEmpty(taskId)) {
+            ProcessInstance instance = flowsTaskService.startProcessInstance(definitionId, data);
 
-            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitionId).singleResult();
-
-            String counterId = processDefinition.getName() + "-" + Calendar.getInstance().get(Calendar.YEAR);
-            String key = counterId + "-" + counterService.getNext(counterId);
-
-            Map<String, Object> data = extractParameters(req);
-
-            ProcessInstance instance = flowsTaskService.startProcessInstance(data, definitionId, key);
-
-            ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-
+            return ResponseEntity.ok(restResponseFactory.createProcessInstanceResponse(instance));
         } else {
-            try {
-                String key = taskService.getVariable(taskId, "key", String.class);
-                Map<String, Object> data = extractParameters(req);
-
-                flowsTaskService.completeTask(taskId, data);
-
-                return new ResponseEntity<>(HttpStatus.OK);
-
-            } catch (Exception e) {
-                taskService.deleteUserIdentityLink(taskId, username, TASK_EXECUTOR);
-                throw e;
-            }
+            flowsTaskService.completeTask(taskId, data);
+            return new ResponseEntity<>(HttpStatus.OK);
         }
     }
 
@@ -409,15 +378,16 @@ public class FlowsTaskResource {
                 .filter( paramName -> "true".equals(req.getParameter(paramName)) )
                 .map( paramName -> paramName.replace("_aggiorna", ""))
                 .forEach( paramName -> {
-                    try {
-                        MultipartFile file = req.getFile(paramName + "_data");
-                        if ( file != null ){
-                            data.put(paramName + "_data", file.getBytes());
-                            data.put(paramName + "_filename", file.getOriginalFilename());
-                        }
-                    } catch (IOException e) {
-                        throw new RuntimeException("Errore nella lettura del file", e);
-                    }
+
+                    Optional.ofNullable(req.getFile(paramName + "_data"))
+                            .ifPresent(file -> {
+                                try {
+                                    data.put(paramName + "_data", file.getBytes());
+                                    data.put(paramName + "_filename", file.getOriginalFilename());
+                                } catch (IOException e) {
+                                    throw new RuntimeException("Errore nella lettura del file", e);
+                                }
+                            });
                 });
 
         return data;
