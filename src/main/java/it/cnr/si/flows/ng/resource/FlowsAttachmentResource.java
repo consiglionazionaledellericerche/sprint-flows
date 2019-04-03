@@ -165,17 +165,40 @@ public class FlowsAttachmentResource {
     @Timed
     public void updateAttachment(@PathVariable("processInstanceId") String processInstanceId,
                                  @PathVariable("attachmentName") String attachmentName,
-                                 MultipartHttpServletRequest request) throws IOException {
+                                 MultipartHttpServletRequest request) {
 
         Map<String, Object> data = FlowsTaskResource.extractParameters(request);
-        String username = SecurityUtils.getCurrentUserLogin();
-        String tipoModifica = request.getParameter("tipoModifica");
 
         FlowsAttachment att = runtimeService.getVariable(processInstanceId, attachmentName, FlowsAttachment.class);
         String key = runtimeService.getVariable(processInstanceId, "key", String.class);
-        MultipartFile file = request.getFile(attachmentName + "_data");
 
-        attachmentService.setAttachmentPropertiesAndBytes(att, null, "Fuori Task", attachmentName, data, key, false, username, file);
+        att = attachmentService.extractSingleAttachment(att, data, null, "Fuori Task", key, attachmentName, att.getPath());
+        flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, attachmentName, att, null);
+
+        if(att.isProtocollo()) {
+            String vecchiProtocolli = runtimeService.getVariable(processInstanceId, flowsAttachmentService.NUMERI_PROTOCOLLO, String.class);
+            flowsAttachmentService.addProtocollo(vecchiProtocolli, att.getNumeroProtocollo());
+        }
+    }
+
+
+    @RequestMapping(value = "{processInstanceId}/data/new", method = RequestMethod.POST)
+    @ResponseBody
+    @Secured(AuthoritiesConstants.USER)
+    @PreAuthorize("@permissionEvaluator.canUpdateAttachment(#processInstanceId, @flowsUserDetailsService)")
+    @Timed
+    public void uploadNewAttachment(@PathVariable("processInstanceId") String processInstanceId,
+                                    MultipartHttpServletRequest request) throws IOException {
+
+        Map<String, Object> data = FlowsTaskResource.extractParameters(request);
+
+        String processKey = runtimeService.getVariable(processInstanceId, "processKey", String.class);
+        String path = runtimeService.getVariable(processInstanceId, "pathFascicoloDocumenti", String.class);
+        String attachmentName = "allegati"+ attachmentService.getNextIndexByProcessInstanceId(processInstanceId, "allegati");
+
+        FlowsAttachment att = attachmentService.extractSingleAttachment(null, data, null, "Fuori Task", processKey, "newfile", path);
+
+        att.setName(attachmentName);
         flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, attachmentName, att, null);
 
         if(att.isProtocollo()) {
@@ -251,31 +274,6 @@ public class FlowsAttachmentResource {
         }
     }
 
-    @RequestMapping(value = "{processInstanceId}/data/new", method = RequestMethod.POST)
-    @ResponseBody
-    @Secured(AuthoritiesConstants.USER)
-    @PreAuthorize("@permissionEvaluator.canUpdateAttachment(#processInstanceId, @flowsUserDetailsService)")
-    @Timed
-    public void uploadNewAttachment(@PathVariable("processInstanceId") String processInstanceId,
-                                 MultipartHttpServletRequest request) throws IOException {
-
-        Map<String, Object> data = FlowsTaskResource.extractParameters(request);
-        String username = SecurityUtils.getCurrentUserLogin();
-
-        FlowsAttachment att = new FlowsAttachment();
-        MultipartFile file = request.getFile("newfile_data");
-        String key = runtimeService.getVariable(processInstanceId, "key", String.class);
-        String attachmentName = "allegati"+ attachmentService.getNextIndexByProcessInstanceId(processInstanceId, "allegati");
-
-        attachmentService.setAttachmentPropertiesAndBytes(att, null, "Fuori Task", "newfile", data, key, true, username, file);
-        att.setName(attachmentName);
-        flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, attachmentName, att, null);
-
-        if(att.isProtocollo()) {
-            String vecchiProtocolli = runtimeService.getVariable(processInstanceId, flowsAttachmentService.NUMERI_PROTOCOLLO, String.class);
-            flowsAttachmentService.addProtocollo(vecchiProtocolli, att.getNumeroProtocollo());
-        }
-    }
 
     @RequestMapping(value = "{variableId}/data", method = RequestMethod.GET)
     @ResponseBody
