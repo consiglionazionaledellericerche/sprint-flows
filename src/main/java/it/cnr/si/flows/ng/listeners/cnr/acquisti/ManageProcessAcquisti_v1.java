@@ -500,7 +500,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			startAcquistiSetGroupsAndVisibility.configuraVariabiliStart(execution);
 		};break;
 		case "pre-determina-start": {
-			pubblicaTuttiFilePubblicabili(execution);
+			pubblicaFilePubblicabiliURP(execution);
 		};break;
 		case "pre-determina-end": {
 			pubblicaTuttiFilePubblicabili(execution);
