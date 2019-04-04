@@ -4,20 +4,18 @@
     angular.module('sprintApp')
         .directive('taskList', taskListDirective);
 
-    taskListDirective.$inject = ['dataService', '$log', 'AlertService'];
+    taskListDirective.$inject = ['dataService', '$localStorage', '$state', '$log', 'AlertService'];
 
-    function taskListDirective(dataService, $log, AlertService) {
+    function taskListDirective(dataService, $localStorage, $state, $log, AlertService) {
 
         return {
             restrict: 'E',
             scope: {
-                tasks: '='
+                tasks: '=',
+                inFirma: '='
             },
             templateUrl: 'app/components/task-list/task-list.html',
             link: function (scope, element, attrs) {
-                scope.actionButtons = attrs.actionButtons;
-
-                scope.completed = (attrs.completed == 'true');
 
                 scope.pooled = [];
 
@@ -32,6 +30,24 @@
                         AlertService.error("Richiesta non riuscita<br>" + err.data.message);
                     });
                 };
+
+                scope.inCart = function (id) {
+                    return $localStorage.cart && $localStorage.cart.hasOwnProperty(id);
+                }
+
+                scope.addToCart = function(task) {
+                    $localStorage.cart = $localStorage.cart || {};
+                    $localStorage.cart[task.id] = task;
+                }
+
+                scope.removeFromCart = function(task) {
+                    delete $localStorage.cart[task.id];
+                    if (Object.keys($localStorage.cart).length == 0) {
+                        delete $localStorage.cart;
+                        $state.go('availableTasks')
+                    }
+                }
+
             }
         };
     }

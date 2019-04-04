@@ -1,0 +1,52 @@
+{
+    "fluentMethods": true,
+    "relationships": [],
+    "fields": [
+        {
+            "fieldName": "url",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "verb",
+            "fieldType": "ExternalMessageVerb",
+            "fieldValues": "POST,GET,PUT,PATCH,DELETE",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "payload",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "status",
+            "fieldType": "ExternalMessageStatus",
+            "fieldValues": "NEW,SENT,DELETED,ERROR",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "retries",
+            "fieldType": "Integer",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "lastErrorMessage",
+            "fieldType": "String"
+        }
+    ],
+    "changelogDate": "20190320102314",
+    "dto": "no",
+    "service": "serviceClass",
+    "entityTableName": "external_message",
+    "pagination": "pagination"
+}

@@ -30,6 +30,10 @@ public final class Utils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
 
+    public static final String INITIATOR = "initiator";
+    public static final String TITOLO = "titolo";
+    public static final String DESCRIZIONE = "descrizione";
+
     public static final String TASK_EXECUTOR = "esecutore";
     public static final String PROCESS_VISUALIZER = "visualizzatore";
 
@@ -45,8 +49,8 @@ public final class Utils {
     private static final String TEXT_EQUAL = "textEqual";
     private static final String BOOLEAN = "boolean";
     private static final String ROLE = "ROLE_";
-    private DateFormat formatoData = new SimpleDateFormat("yyyy-MM-dd");
-    private DateFormat formatoDataOra = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);
+    private static DateFormat formatoData = new SimpleDateFormat("yyyy-MM-dd");
+    private static DateFormat formatoDataOra = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);
 
     @Inject
     private Environment env;
@@ -125,7 +129,7 @@ public final class Utils {
         return formatoData.format(in);
     }
 
-    public Date parsaData(String in) throws ParseException {
+    public static Date parsaData(String in) throws ParseException {
         return formatoData.parse(in);
     }
 
@@ -133,7 +137,7 @@ public final class Utils {
         formatoDataOra.setTimeZone(TimeZone.getTimeZone("Europe/Rome"));
     }
 
-    public TaskInfoQuery orderTasks(String order, TaskInfoQuery query) {
+    public static TaskInfoQuery orderTasks(String order, TaskInfoQuery query) {
         if (order.equals(ASC))
             query.orderByTaskCreateTime().asc();
         else if (order.equals(DESC))
@@ -150,7 +154,7 @@ public final class Utils {
         return historicProcessQuery;
     }
 
-    public TaskInfoQuery searchParamsForTasks(HttpServletRequest req, TaskInfoQuery query) {
+    public static TaskInfoQuery searchParamsForTasks(HttpServletRequest req, TaskInfoQuery query) {
         try {
             JSONObject json = new JSONObject(IOUtils.toString(req.getReader()));
 
@@ -200,7 +204,7 @@ public final class Utils {
         return processQuery;
     }
 
-    public TaskInfoQuery extractProcessSearchParams(TaskInfoQuery taskQuery, JSONArray params) {
+    public static TaskInfoQuery extractProcessSearchParams(TaskInfoQuery taskQuery, JSONArray params) {
 
         for (int i = 0; i < params.length(); i++) {
             JSONObject appo = params.optJSONObject(i);
@@ -246,7 +250,7 @@ public final class Utils {
         return Arrays.asList(env.getActiveProfiles()).contains(profile);
     }
 
-    private TaskInfoQuery extractTaskSearchParams(TaskInfoQuery taskQuery, JSONArray taskParams) {
+    private static TaskInfoQuery extractTaskSearchParams(TaskInfoQuery taskQuery, JSONArray taskParams) {
 
         for (int i = 0; i < taskParams.length(); i++) {
             JSONObject appo = taskParams.optJSONObject(i);
@@ -297,7 +301,7 @@ public final class Utils {
     }
 
 
-    private TaskInfoQuery historicTaskDate(TaskInfoQuery taskQuery, String key, String value) {
+    private static TaskInfoQuery historicTaskDate(TaskInfoQuery taskQuery, String key, String value) {
         try {
             Date date = parsaData(value);
 

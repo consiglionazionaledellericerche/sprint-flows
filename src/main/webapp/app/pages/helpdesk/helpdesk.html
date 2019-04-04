@@ -5,7 +5,7 @@
                 <p class="lead" translate="helpdesk.title">HELPDESK</p>
             </div>
             <div class="alert alert-info alert-dismissible" role="alert">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"></button>
                 <div translate="helpdesk.form.avviso"></div>
             </div>
         </div>
@@ -13,41 +13,23 @@
 
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
-            <form id="helpdesk">
-                <!--4)vm.categorie: {{vm.categorie}}-->
-
-              <div class="form-group" ng-hide="idHelpdesk">
-                <!--<label for="categoria" translate="helpdesk.form.categoria">Categoria</label>-->
-                <!--<select class="form-control" id="categoria" ng-model="helpdeskModel.categoria" ng-options="categoria.id as categoria.descrizione for categoria in categorie"></select>-->
-
-                    <!-- <cnr-tree list-name="vm.categorie" label="Categorie" ng-model="vm.categoria" ng-modelid="vm.categoriaId" required></cnr-tree> -->
-                    
-                    <!-- <div js-tree="vm.jsTree" ng-model="vm.categoria" tree="treeInstance" should-apply="ignoreModelChanges()" tree-events="ready:readyCB;select_node:select_node"></div> -->
-
-                    <div id="categorieTree" required="true"></div>
-              </div>
-              <div class="form-group" ng-hide="idHelpdesk">
-                <label for="emailObject" translate="helpdesk.form.oggetto">Object</label>
-                <input type="text" class="form-control" id="emailObject" ng-required="true" ng-model="helpdeskModel.titolo" placeholder="{{'helpdesk.form.oggetto' | translate}}" />
-              </div>
-              <div class="form-group" ng-hide="idHelpdesk">
-                <label for="emailMessage" translate="helpdesk.form.messaggio">Message</label>
-                <textarea class="form-control" id="emailMessage" ng-model="helpdeskModel.descrizione" placeholder="{{'helpdesk.form.messaggio' | translate}}" rows="5" ng-required="true" ></textarea>
-              </div>
-
-              <!-- <div class="form-group">
-                <span class="btn btn-success fileinput-button">
-                    <i class="glyphicon glyphicon-plus"></i>
-                    <span>Aggiunti Allegato</span>
-                    <input id="fileupload" type="file" name="file" multiple>
-                </span>
+            <form novalidate class="flows-form" name="helpdeskForm" ng-submit="submitHelpdesk()">
+                <cnr-tree string-list="categorie"
+                          label="Tipologia Segnalazione Helpdesk"
+                          ng-model="$parent.vm.hdDataModel"
+                          ng-modelid="id"
+                          required autofill>
+                </cnr-tree>
+                <div class="form-group" ng-hide="idHelpdesk">
+                    <label for="emailObject" translate="helpdesk.form.oggetto">Object</label>
+                    <input type="text" class="form-control" id="emailObject" ng-required="true" ng-model="helpdeskModel.titolo" placeholder="{{'helpdesk.form.oggetto' | translate}}" />
+                </div>
+                <div class="form-group" ng-hide="idHelpdesk">
+                    <label for="emailMessage" translate="helpdesk.form.messaggio">Message</label>
+                    <textarea class="form-control" id="emailMessage" ng-model="helpdeskModel.descrizione" placeholder="{{'helpdesk.form.messaggio' | translate}}" rows="5" ng-required="true" ></textarea>
+                </div>
                 <br>
-                <div id="files" class="files"></div>
-              </div> -->
-              <br>
-              <button type="button" class="btn btn-primary" name="sendMail" ng-disabled="vm.sendMailButtonDisable()" translate="helpdesk.form.invia">Send</button>
-              <!-- <button type="button" class="btn btn-primary" name="sendMail" ng-disabled="sendMailButtonDisable()" translate="helpdesk.form.invia">Send</button> -->
-              <!-- <button ng-click="send()" type="button" class="btn btn-primary" name="sendMail" ng-disabled="sendMailButtonDisable()" translate="helpdesk.form.invia">Send</button> -->
+                <button type="submit" class="btn btn-primary" name="sendMail" translate="helpdesk.form.invia">Send</button>
             </form>
         </div>
     </div>

@@ -45,6 +45,14 @@
                         method: take ? 'PUT' : 'DELETE',
                     });
                 },
+                reassign: function(taskId, processInstanceId, assignee) {
+                    return $http({
+                        url: 'api/tasks/reassign/' + assignee + '?' +
+                         (taskId ? 'taskId='+ taskId + '&' : '') +
+                         (processInstanceId ? 'processInstanceId='+ processInstanceId : '') ,
+                        method: 'PUT',
+                    });
+                },
                 getTask: function(id) {
                     return $http.get('api/tasks/' + id);
                 },
@@ -76,8 +84,12 @@
                         '?processInstanceId=' + processInstanceId +
                         '&detail=' + ((detail !== undefined) ? true : false));
                 },
-                myProcessInstances: function(searchParams) {
-                    return $http.post('api/processInstances/myProcessInstances', searchParams);
+                myProcessInstances: function(processDefinitionKey, active, firstResult, maxResults, order, params) {
+                    return $http.post('api/processInstances/myProcessInstances?active=' + active +
+                        '&processDefinitionKey=' + (processDefinitionKey ? processDefinitionKey : 'all') +
+                        '&order=' + order +
+                        '&firstResult=' + firstResult +
+                        '&maxResults=' + maxResults, params);
                 },
                 getProcessInstances: function(processDefinition, active, firstResult, maxResults, order, params) {
                     return $http.post('api/processInstances/getProcessInstances?active=' + active +
@@ -97,6 +109,9 @@
                 },
                 exportSummary: function(processInstaceId) {
                     return $http.get('api/summaryPdf?processInstanceId=' + processInstaceId);
+                },
+                deleteProcessInstance: function(processInstaceId, deleteReason) {
+                    return $http.delete('api/processInstances/deleteProcessInstance?processInstanceId=' + processInstaceId + '&deleteReason=' + deleteReason);
                 },
                 setVariable: function(processInstanceId, variableName, value) {
                     return $http.post('api/processInstances/variable' +
@@ -135,6 +150,11 @@
                 byName: function(name) {
                     return $http.get('api/sigladynamiclist/byname/' + name);
                 },
+            },
+            oil: {
+                byCategory: function(category){
+                    return $http.get('api/proxy/OIL/?proxyURL=catg/HDSiper/' + category);
+                }
             },
             view: function(processid, version, type) {
                 return $http.get('api/views/' + processid + '/' + version + '/' + type);
@@ -209,7 +229,7 @@
                             groupName: groupName,
                             userName: userName,
                             groupRole: groupRole,
-                        },
+                        }
                     });
                 },
             },
@@ -248,6 +268,26 @@
                 sendWithoutAttachment: function(hdDataModel){
                     return $http.post("api/helpdesk/sendWithoutAttachment", hdDataModel)
                 }
+            },
+            manuali: {
+                getElenco: function() {
+                    return $http.get("api/manual/");
+                },
+                getManuale: function(nome) {
+                    return $http.get("api/manual/"+ nome, {responseType: 'arraybuffer'});
+                }
+            },
+            signMany: function(username, password, otp, ids) {
+                return $http({
+                    url: "api/tasks/signMany",
+                    method: 'POST',
+                    params: {
+                        username: username,
+                        password: password,
+                        otp: otp,
+                        taskIds: ids
+                    }
+                })
             }
         };
     }

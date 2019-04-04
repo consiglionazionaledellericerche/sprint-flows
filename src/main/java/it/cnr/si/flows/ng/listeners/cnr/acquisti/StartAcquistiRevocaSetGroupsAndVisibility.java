@@ -84,8 +84,6 @@ public class StartAcquistiRevocaSetGroupsAndVisibility implements ExecutionListe
             execution.setVariable("gruppoStaffAmministrativo", gruppoStaffAmministrativo);
             execution.setVariable("gruppoSFD", gruppoSFD);
             execution.setVariable("sigla", applicazioneSigla);
-            
-
         }
 
     }

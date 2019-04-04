@@ -1,0 +1,18 @@
+<div class="modal-header">
+  <h4>Cancellazione Flusso</h4>
+  <div class="form-group">
+    <label for="user">Commento per cancellazione Flusso:</label>
+    <input
+      ng-model="vm.deleteReason"
+      id="deleteReason"
+      class="form-control"
+      aria-invalid="true"
+      ng-required="true"
+      type="text">
+    </input>
+  </div>
+
+  <button class="btn btn-warning" ng-click="deleteProcess(vm.deleteReason)">
+    <span class="glyphicon glyphicon-hand-right"></span> Cancella Flusso
+  </button>
+</div>

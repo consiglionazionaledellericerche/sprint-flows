@@ -42,23 +42,35 @@
 
     <div class="col-xs-4 pull-right">
         <div class="btn-group-vertical btn-block" role="group">
-            <!--uso il campo completati impropriamente per non far apparire il bottone con le azioni della pagina dei dettagli-->
-            <a ng-show="{{!completed}}" class="btn btn-primary" ng-class="{'btn-xs': !advanced}"
+
+            <a class="btn btn-primary" ng-class="{'btn-xs': !advanced}"
                ui-sref="details({processInstanceId: task.processInstanceId, taskId: task.id})">
                 <span class="glyphicon glyphicon-th-list"></span> Dettagli Flusso
             </a>
             <a class="btn btn-default" ng-class="{'btn-xs': !advanced}"
-               ng-if="actionButtons && task.assignee !== null && task.variabili.isReleasable"
+               ng-if="!inFirma && task.assignee === null"
+               ng-click="claimTask(task.id, true)">
+                <span class="glyphicon glyphicon-hand-up" aria-hidden="true"></span> Prendi in carico
+            </a>
+            <a class="btn btn-default" ng-class="{'btn-xs': !advanced}"
+               ng-if="!inFirma && task.assignee !== null && task.variabili.isReleasable"
                ng-click="claimTask(task.id, false)">
                 <span class="glyphicon glyphicon-hand-down" aria-hidden="true"></span> Restituisci al gruppo
             </a>
-            <a class="btn btn-default" ng-class="{'btn-xs': !advanced}" ng-if="actionButtons && task.assignee === null"
-               ng-click="claimTask(task.id, true)">
-                <span class="glyphicon glyphicon-hand-up" aria-hidden="true"></span> Prendi in carico
+            <a class="btn btn-default" ng-class="{'btn-xs': !advanced}"
+               ng-if="task.category == 'firma' && !inCart(task.id)"
+               ng-click="addToCart(task)">
+                <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Aggiungi al Carrello Firma
+            </a>
+            <a class="btn btn-default" ng-class="{'btn-xs': !advanced}"
+               ng-if="inCart(task.id)"
+               ng-click="removeFromCart(task)">
+                <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Rimuovi dal Carrello
             </a>
         </div>
     </div>
 </div>
+
 <div class="loading-spiner-holder" style="text-align: center" data-loading>
     <div class="loading-spiner spinner-loader"></div>
 </div>

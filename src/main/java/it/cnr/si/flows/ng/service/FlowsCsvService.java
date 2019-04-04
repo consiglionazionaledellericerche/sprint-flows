@@ -4,6 +4,7 @@ import com.opencsv.CSVWriter;
 import it.cnr.si.domain.View;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
+import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.json.JSONArray;
@@ -22,7 +23,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
-import static it.cnr.si.flows.ng.utils.Utils.parseInt;
 
 @Service
 public class FlowsCsvService {
@@ -51,14 +51,14 @@ public class FlowsCsvService {
 		Integer firstResult = -1;
 		Integer maxResults = -1;
 
-		Map<String, Object>  flussi = flowsProcessInstanceService.search(req, processDefinitionKey, activeFlag, order, firstResult, maxResults);
+		DataResponse flussi = flowsProcessInstanceService.search(req, processDefinitionKey, activeFlag, order, firstResult, maxResults, false);
 
 		//VALORIZZAZIONE PARAMETRI STATISTICHE
-		Integer domandeAttive = parseInt(flussi.get("totalItems").toString());
+		Integer domandeAttive = (int) flussi.getTotal();
 
 		LOGGER.debug("nr. domande: {} con activeFlag: {}", domandeAttive, activeFlag);
 		// GESTIONE VARIABILI SINGOLE ISTANZE FLUSSI ATTIVI
-		return (List<HistoricProcessInstanceResponse>) flussi.get("processInstances");
+		return (List<HistoricProcessInstanceResponse>) flussi.getData();
 	}
 
 
