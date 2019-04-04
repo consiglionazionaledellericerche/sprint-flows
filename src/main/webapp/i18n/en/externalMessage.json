@@ -1,0 +1,27 @@
+{
+    "sprintApp": {
+        "externalMessage" : {
+            "home": {
+                "title": "External Messages",
+                "createLabel": "Create a new External Message",
+                "createOrEditLabel": "Create or edit a External Message",
+                "search": "Search for External Message"
+            },
+            "created": "A new External Message is created with identifier {{ param }}",
+            "updated": "A External Message is updated with identifier {{ param }}",
+            "deleted": "A External Message is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Are you sure you want to delete External Message {{ id }}?"
+            },
+            "detail": {
+                "title": "External Message"
+            },
+            "url": "Url",
+            "verb": "Verb",
+            "payload": "Payload",
+            "status": "Status",
+            "retries": "Retries",
+            "lastErrorMessage": "Last Error Message"
+        }
+    }
+}

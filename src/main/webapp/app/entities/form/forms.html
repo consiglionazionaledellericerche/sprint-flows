@@ -15,6 +15,12 @@
     </div>
     <br/>
     <div class="table-responsive">
+        <div class="bg-info">
+            <label>(paginazione DISABILITATA)</label><br>
+            <label>Search Any: <input ng-model="search.$"></label><br>
+            <label>Search TaskId: <input ng-model="search.taskId"></label><br>
+            <label>Search processDefinitionKey: <input ng-model="search.processDefinitionKey"></label>
+        </div>
         <table class="jh-table table table-striped">
             <thead>
                 <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.transition()">
@@ -27,7 +33,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="form in vm.forms track by form.id">
+                <tr ng-repeat="form in vm.forms | filter:search:strict | orderBy:id">
                     <td><a ui-sref="form-detail({id:form.id})">{{form.id}}</a></td>
                     <td>{{form.processDefinitionKey}}</td>
                     <td>{{form.version}}</td>
@@ -59,8 +65,8 @@
             </tbody>
         </table>
     </div>
-    <div class="text-center">
-        <jhi-item-count page="vm.page" total="vm.queryCount" items-per-page="vm.itemsPerPage"></jhi-item-count>
-        <uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.page" ng-change="vm.transition()"></uib-pagination>
-    </div>
+<!--    <div class="text-center">-->
+<!--        <jhi-item-count page="vm.page" total="vm.queryCount" items-per-page="vm.itemsPerPage"></jhi-item-count>-->
+<!--        <uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.page" ng-change="vm.transition()"></uib-pagination>-->
+<!--    </div>-->
 </div>

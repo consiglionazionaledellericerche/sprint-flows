@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="accordi-internazionali-domande" name="Accordi Internazionali Domande" isExecutable="true">
+    <extensionElements>
+      <activiti:executionListener event="start" delegateExpression="${manageProcessAccordiInternazionaliDomande_v1}">
+        <activiti:field name="faseEsecuzione">
+          <activiti:string><![CDATA[process-start]]></activiti:string>
+        </activiti:field>
+      </activiti:executionListener>
+      <activiti:executionListener event="end" delegateExpression="${manageProcessAccordiInternazionaliDomande_v1}">
+        <activiti:field name="faseEsecuzione">
+          <activiti:string><![CDATA[process-end]]></activiti:string>
+        </activiti:field>
+      </activiti:executionListener>
+    </extensionElements>
+    <startEvent id="startevent1" name="Start"></startEvent>
+    <userTask id="validazione" name="VALIDAZIONE" activiti:candidateGroups="${gruppoValidatoriAccordiInternazionali}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAccordiInternazionaliDomande_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[validazione-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAccordiInternazionaliDomande_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[validazione-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="valutazione-scientifica" name="VALUTAZIONE SCIENTIFICA" activiti:candidateGroups="${gruppoValutatoreScientificoDipartimento}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAccordiInternazionaliDomande_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[valutazione-scientifica-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAccordiInternazionaliDomande_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[valutazione-scientifica-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow1" name="START" sourceRef="startevent1" targetRef="validazione"></sequenceFlow>
+    <userTask id="autorizzazione-finanziamento" name="AUTORIZZAZIONE FINANZIAMENTO" activiti:candidateGroups="${gruppoValidatoriAccordiInternazionali}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAccordiInternazionaliDomande_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[autorizzazione-finanziamento-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAccordiInternazionaliDomande_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[autorizzazione-finanziamento-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway" default="flow7"></exclusiveGateway>
+    <sequenceFlow id="flow2" sourceRef="validazione" targetRef="exclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="flow7" sourceRef="exclusivegateway1" targetRef="valutazione-dirigente"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway3" name="Exclusive Gateway" default="flow9"></exclusiveGateway>
+    <sequenceFlow id="flow8" sourceRef="valutazione-scientifica" targetRef="exclusivegateway3"></sequenceFlow>
+    <endEvent id="endevent2" name="End">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAccordiInternazionaliDomande_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[endevent-non-finanziata-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="flow9" sourceRef="exclusivegateway3" targetRef="valutazione-domande-bando"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway4" name="Exclusive Gateway" default="flow11"></exclusiveGateway>
+    <sequenceFlow id="flow10" sourceRef="autorizzazione-finanziamento" targetRef="exclusivegateway4"></sequenceFlow>
+    <sequenceFlow id="flow11" sourceRef="exclusivegateway4" targetRef="endevent3"></sequenceFlow>
+    <sequenceFlow id="flow12" name="NON FINANZIATA" sourceRef="exclusivegateway4" targetRef="endevent2">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Respingi'}]]></conditionExpression>
+    </sequenceFlow>
+    <endEvent id="endevent3" name="End">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAccordiInternazionaliDomande_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[endevent-approvata-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
+    <endEvent id="endevent4" name="End">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAccordiInternazionaliDomande_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[endevent-negativa-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="flow18" name="NEGATIVA" sourceRef="exclusivegateway3" targetRef="endevent4">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Respingi'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow23" sourceRef="exclusivegateway3" targetRef="valutazione-scientifica">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'CambiaDipartimento'}]]></conditionExpression>
+    </sequenceFlow>
+    <endEvent id="endevent5" name="End"></endEvent>
+    <sequenceFlow id="flow24" name="RESPINTA" sourceRef="exclusivegateway1" targetRef="endevent5">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Respingi'}]]></conditionExpression>
+    </sequenceFlow>
+    <userTask id="valutazione-dirigente" name="VALUTAZIONE DIRIGENTE" activiti:candidateGroups="${gruppoDirigenteRichiedente}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAccordiInternazionaliDomande_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[valutazione-dirigente-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAccordiInternazionaliDomande_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[valutazione-dirigente-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="exclusivegateway7" name="Exclusive Gateway" default="flow27"></exclusiveGateway>
+    <sequenceFlow id="flow25" sourceRef="valutazione-dirigente" targetRef="exclusivegateway7"></sequenceFlow>
+    <endEvent id="endevent6" name="End"></endEvent>
+    <sequenceFlow id="flow26" name="NON AUTORIZZATA" sourceRef="exclusivegateway7" targetRef="endevent6">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Respingi'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow27" sourceRef="exclusivegateway7" targetRef="valutazione-scientifica"></sequenceFlow>
+    <boundaryEvent id="boundarytimer2" name="Timer2" attachedToRef="valutazione-dirigente" cancelActivity="false">
+      <extensionElements>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAccordiInternazionaliDomande_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[timer2-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+      <timerEventDefinition>
+        <timeCycle>R3/PT1M</timeCycle>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <boundaryEvent id="boundarytimer3" name="Timer3" attachedToRef="valutazione-dirigente" cancelActivity="true">
+      <timerEventDefinition>
+        <timeDuration>P4D</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="flow30" sourceRef="boundarytimer3" targetRef="endevent6"></sequenceFlow>
+    <scriptTask id="notificatask" name="notifica mail" scriptFormat="javascript" activiti:autoStoreVariables="false">
+      <script>execution.setVariable('notifica', true);</script>
+    </scriptTask>
+    <sequenceFlow id="flow32" sourceRef="boundarytimer2" targetRef="notificatask"></sequenceFlow>
+    <scriptTask id="valutazione-domande-bando" name="VALUTAZIONE DOMANDE BANDO" scriptFormat="javascript" activiti:autoStoreVariables="false">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAccordiInternazionaliDomande_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[valutazione-domande-bando-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAccordiInternazionaliDomande_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[valutazione-domande-bando-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+      <script>execution.setVariable('valutazioneDomandeBando', true);</script>
+    </scriptTask>
+    <sequenceFlow id="flow33" sourceRef="valutazione-domande-bando" targetRef="autorizzazione-finanziamento"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_accordi-internazionali-domande">
+    <bpmndi:BPMNPlane bpmnElement="accordi-internazionali-domande" id="BPMNPlane_accordi-internazionali-domande">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="2.0" y="156.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="validazione" id="BPMNShape_validazione">
+        <omgdc:Bounds height="61.0" width="105.0" x="70.0" y="144.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="valutazione-scientifica" id="BPMNShape_valutazione-scientifica">
+        <omgdc:Bounds height="61.0" width="105.0" x="478.0" y="144.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="autorizzazione-finanziamento" id="BPMNShape_autorizzazione-finanziamento">
+        <omgdc:Bounds height="61.0" width="105.0" x="239.0" y="294.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="203.0" y="153.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway3" id="BPMNShape_exclusivegateway3">
+        <omgdc:Bounds height="40.0" width="40.0" x="510.0" y="221.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent2" id="BPMNShape_endevent2">
+        <omgdc:Bounds height="35.0" width="35.0" x="375.0" y="364.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway4" id="BPMNShape_exclusivegateway4">
+        <omgdc:Bounds height="40.0" width="40.0" x="372.0" y="304.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent3" id="BPMNShape_endevent3">
+        <omgdc:Bounds height="35.0" width="35.0" x="449.0" y="307.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent4" id="BPMNShape_endevent4">
+        <omgdc:Bounds height="35.0" width="35.0" x="513.0" y="307.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent5" id="BPMNShape_endevent5">
+        <omgdc:Bounds height="35.0" width="35.0" x="205.0" y="72.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="valutazione-dirigente" id="BPMNShape_valutazione-dirigente">
+        <omgdc:Bounds height="61.0" width="105.0" x="274.0" y="144.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="boundarytimer2" id="BPMNShape_boundarytimer2">
+        <omgdc:Bounds height="30.0" width="30.0" x="311.0" y="132.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="boundarytimer3" id="BPMNShape_boundarytimer3">
+        <omgdc:Bounds height="30.0" width="30.0" x="358.0" y="132.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway7" id="BPMNShape_exclusivegateway7">
+        <omgdc:Bounds height="40.0" width="40.0" x="406.0" y="154.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent6" id="BPMNShape_endevent6">
+        <omgdc:Bounds height="35.0" width="35.0" x="408.0" y="72.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="notificatask" id="BPMNShape_notificatask">
+        <omgdc:Bounds height="55.0" width="105.0" x="273.0" y="62.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="valutazione-domande-bando" id="BPMNShape_valutazione-domande-bando">
+        <omgdc:Bounds height="58.0" width="105.0" x="70.0" y="296.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="37.0" y="173.0"></omgdi:waypoint>
+        <omgdi:waypoint x="70.0" y="174.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="34.0" x="6.0" y="131.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="175.0" y="174.0"></omgdi:waypoint>
+        <omgdi:waypoint x="203.0" y="173.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="243.0" y="173.0"></omgdi:waypoint>
+        <omgdi:waypoint x="274.0" y="174.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="530.0" y="205.0"></omgdi:waypoint>
+        <omgdi:waypoint x="530.0" y="221.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="510.0" y="241.0"></omgdi:waypoint>
+        <omgdi:waypoint x="121.0" y="242.0"></omgdi:waypoint>
+        <omgdi:waypoint x="122.0" y="296.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="344.0" y="324.0"></omgdi:waypoint>
+        <omgdi:waypoint x="372.0" y="324.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
+        <omgdi:waypoint x="412.0" y="324.0"></omgdi:waypoint>
+        <omgdi:waypoint x="449.0" y="324.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow12" id="BPMNEdge_flow12">
+        <omgdi:waypoint x="392.0" y="344.0"></omgdi:waypoint>
+        <omgdi:waypoint x="392.0" y="364.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="86.0" x="418.0" y="374.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow18" id="BPMNEdge_flow18">
+        <omgdi:waypoint x="530.0" y="261.0"></omgdi:waypoint>
+        <omgdi:waypoint x="530.0" y="307.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="53.0" x="570.0" y="281.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow23" id="BPMNEdge_flow23">
+        <omgdi:waypoint x="550.0" y="241.0"></omgdi:waypoint>
+        <omgdi:waypoint x="614.0" y="240.0"></omgdi:waypoint>
+        <omgdi:waypoint x="614.0" y="173.0"></omgdi:waypoint>
+        <omgdi:waypoint x="583.0" y="174.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow24" id="BPMNEdge_flow24">
+        <omgdi:waypoint x="223.0" y="153.0"></omgdi:waypoint>
+        <omgdi:waypoint x="222.0" y="107.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="49.0" x="154.0" y="84.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow25" id="BPMNEdge_flow25">
+        <omgdi:waypoint x="379.0" y="174.0"></omgdi:waypoint>
+        <omgdi:waypoint x="406.0" y="174.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow26" id="BPMNEdge_flow26">
+        <omgdi:waypoint x="426.0" y="154.0"></omgdi:waypoint>
+        <omgdi:waypoint x="425.0" y="107.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="99.0" x="449.0" y="84.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow27" id="BPMNEdge_flow27">
+        <omgdi:waypoint x="446.0" y="174.0"></omgdi:waypoint>
+        <omgdi:waypoint x="478.0" y="174.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow30" id="BPMNEdge_flow30">
+        <omgdi:waypoint x="373.0" y="132.0"></omgdi:waypoint>
+        <omgdi:waypoint x="425.0" y="107.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow32" id="BPMNEdge_flow32">
+        <omgdi:waypoint x="326.0" y="132.0"></omgdi:waypoint>
+        <omgdi:waypoint x="325.0" y="117.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow33" id="BPMNEdge_flow33">
+        <omgdi:waypoint x="175.0" y="325.0"></omgdi:waypoint>
+        <omgdi:waypoint x="239.0" y="324.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -91,7 +91,7 @@ public class ManageProcessAccordiInternazionali_v1 implements ExecutionListener 
 		};break; 
 		case "protocollo-verbale-end": {
 			if(sceltaUtente != null && sceltaUtente.equals("Protocolla")) {
-				protocolloDocumentoService.protocolla(execution, "verbale");
+				//protocolloDocumentoService.protocolla(execution, "verbale");
 			}
 		};break;  	
 		case "endevent-annullata-start": {

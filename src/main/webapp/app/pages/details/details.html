@@ -3,12 +3,27 @@
 	<div class="row">
 		<div class="col-md-8">
 			<h4>{{vm.data.entity.businessKey}}
-				<span ng-class="{'label-warning': vm.data.entity.endTime != null , 'label-success': vm.data.entity.endTime == null}"
+				<span ng-class="{'label-info': vm.data.entity.endTime != null , 'label-primary': vm.data.entity.endTime == null}"
 					  class="label">
                   {{vm.data.entity.endTime == null ? 'attivo' : 'completato'}}
                 </span>
 				<br><br>
 			</h4>
+			<div ng-show="vm.data.entity.endTime == null" class="btn-toolbar">
+				<div class="btn-group" ng-show="isResponsabile">
+					<button class="btn btn-warning btn-xs"
+							ng-click="reassign(vm.taskId, processInstanceId)"><span
+							class="glyphicon glyphicon-hand-right"></span> Riassegna Compito
+					</button>
+				</div>
+				<div class="btn-group" ng-show="isResponsabile">
+					<button class="btn btn-danger btn-xs"
+							ng-click="deleteProcessInstance(processInstanceId)"><span
+							class="glyphicon glyphicon-remove-circle"></span> Elimina Flusso
+					</button>
+					<hr>
+				</div>
+			</div>
 			<div>
 				<b>Titolo: </b>{{vm.data.entity.name | get: 'titolo'}} <br>
 			</div>
@@ -26,6 +41,9 @@
 			</div>
 			<div ng-show="vm.data.entity.endTime != null">
 				<b>Stato Finale: </b>{{vm.data.entity.name | get: 'stato'}} <br>
+			</div>
+			<div ng-show="vm.data.entity.deleteReason != null">
+				<b>Motivazione Eliminazione: </b>{{vm.data.entity.deleteReason}} <br>
 			</div>
 			<!--gruppo/utente assegnatario del task in esecuzione-->
 			<div ng-show="vm.data.groupCandidate">
@@ -111,12 +129,30 @@
 				</a>
 			</div>
 		</div>
+
+
+		<div class="col-md-3 col-md-offset-1">
+			<div class="btn-group btn-group-justified" role="group">
+
+				<a class="btn btn-primary" ng-if="vm.taskId && vm.activeTask.category == 'firma' && !inCart(vm.activeTask.id)"
+				   ng-click="addToCart(vm.activeTask)">
+					<span class="glyphicon glyphicon-shopping-cart"></span> Aggiungi al Carrello Firma
+				</a>
+
+				<a class="btn btn-primary" ng-if="inCart(vm.activeTask.id)"
+				   ng-click="removeFromCart(vm.activeTask)">
+					<span class="glyphicon glyphicon-shopping-cart"></span> Rimuovi dal Carrello Firma
+				</a>
+
+			</div>
+		</div>
 	</div>
+
 
 	<div class="row dev">
 		<hr>
 		<div class="col-md-12">
-			<pre ng-if="isDevelopment">{{ canPublish }}{{vm | json}}</pre>
+			<pre ng-if="isDevelopment">{{vm | json}}</pre>
 		</div>
 	</div>
 </div>

@@ -3,6 +3,7 @@ package it.cnr.si.flows.ng.listeners.cnr.acquisti;
 import it.cnr.si.flows.ng.listeners.oiv.service.OivSetGroupsAndVisibility;
 import it.cnr.si.flows.ng.listeners.oiv.service.OperazioniTimer;
 import it.cnr.si.flows.ng.service.AceBridgeService;
+import it.cnr.si.flows.ng.service.CounterService;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
@@ -23,6 +24,7 @@ import javax.inject.Inject;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,7 +44,9 @@ public class StartAcquistiSetGroupsAndVisibility {
     private AceBridgeService aceBridgeService;
     @Inject
     private RuntimeService runtimeService;
-
+    @Inject
+    private CounterService counterService;
+    
 	public void configuraVariabiliStart(DelegateExecution execution)  throws IOException, ParseException  {
 
 
@@ -71,7 +75,6 @@ public class StartAcquistiSetGroupsAndVisibility {
             String gruppoFirmaAcquisti = "responsabileFirmaAcquisti@"+ struttura;
             String gruppoStaffAmministrativo = "staffAmministrativo@"+ struttura;
             String gruppoSFD = "sfd@"+ struttura;
-            String rup = execution.getVariable("rup", String.class);
             String applicazioneSigla = "app.sigla";
 
             LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoRT, gruppoSFD, gruppoStaffAmministrativo, gruppoFirmaAcquisti);
@@ -89,7 +92,6 @@ public class StartAcquistiSetGroupsAndVisibility {
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoFirmaAcquisti, PROCESS_VISUALIZER);
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoStaffAmministrativo, PROCESS_VISUALIZER);
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoSFD, PROCESS_VISUALIZER);
-            runtimeService.addUserIdentityLink(execution.getProcessInstanceId(), rup, PROCESS_VISUALIZER);
             runtimeService.addUserIdentityLink(execution.getProcessInstanceId(), applicazioneSigla, PROCESS_VISUALIZER);
 //            runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), "segreteria@" + struttura, PROCESS_VISUALIZER);
 
@@ -98,7 +100,15 @@ public class StartAcquistiSetGroupsAndVisibility {
             execution.setVariable(Enum.VariableEnum.gruppoStaffAmministrativo.name(), gruppoStaffAmministrativo);
             execution.setVariable("gruppoSFD", gruppoSFD);
             execution.setVariable("sigla", applicazioneSigla);
-
+            //SET VARIABILI Direzione flusso
+			execution.setVariable("statoImpegni", "provvisori"); 
+			if (execution.getVariable("tipologiaAffidamentoDiretto") == null) {
+				execution.setVariable("tipologiaAffidamentoDiretto", "normale"); 
+			}
+            //SET CONTATORE ACQUISTO STRUTTURA		
+			String counterId = aceBridgeService.getUoById(Integer.parseInt(struttura)).getCdsuo() + "-ACQ-" + Calendar.getInstance().get(Calendar.YEAR);
+			String key = counterId + "-" + counterService.getNext(counterId);
+			execution.setVariable("codiceAcquistoStruttura", key); 
         }
 
     }

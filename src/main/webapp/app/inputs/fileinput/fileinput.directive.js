@@ -27,6 +27,8 @@
                 nota: '@?',                         // TODO non ancora implementato
                 accept: '@?',                       // tipi di file da prendere come allegati
                 multiple: '=?',                     // se ci saranno piu' file
+                min: '@?',
+                max: '@?',
                 cnrRequired: '=?',                  // tendenzialmente true
                 metadatiPubblicazione: '=?',        // se visualizzare gli slider per Urp e Trasparenza
                 metadatiPubblicazioneUrp: '=?',
@@ -43,6 +45,20 @@
                 mostraModifica: '=?'                // visualizzare la versione breve (espandibile) in modifica?
             },
             link: function ($scope, element, attrs) {
+
+                $scope.addRow = function() {
+                    if ($scope.rows.length < $scope.max)
+                        $scope.rows.push({});
+                    $scope.$parent.attachments[$scope.name+($scope.rows.length-1)] = {};
+                    $scope.$parent.attachments[$scope.name+($scope.rows.length-1)].aggiorna = true;
+                    return false;
+                };
+                $scope.removeRow = function() {
+                    if ($scope.rows.length > $scope.min) {
+                        $scope.rows.pop();
+                        delete $scope.$parent.attachments[$scope.name+($scope.rows.length)];
+                    }
+                };
 
                 function init() {
                     $scope.attrs = attrs;
@@ -61,6 +77,11 @@
                             if (el.startsWith($scope.name))
                                 $scope.rows.push({});
                         }
+                        $scope.min = $scope.min || $scope.rows.length || 0;
+                        $scope.max = $scope.max || 999;
+                        while ($scope.rows.length < $scope.min)
+                            $scope.addRow();
+
                     } else {
                         $scope.rows = [{}];
                         if (!$scope.$parent.attachments[$scope.name]) {
@@ -72,26 +93,9 @@
                     if ($scope.mostraModifica === undefined)
                         $scope.mostraModifica = true;
 
-                    $scope.min = $scope.min || $scope.rows.length || 0;
-                    $scope.max = $scope.max || 999;
-
                 }
 
                 init();
-
-                $scope.addRow = function() {
-                    if ($scope.rows.length < $scope.max)
-                        $scope.rows.push({});
-                    $scope.$parent.attachments[$scope.name+($scope.rows.length-1)] = {};
-                    $scope.$parent.attachments[$scope.name+($scope.rows.length-1)].aggiorna = true;
-                    return false;
-                };
-                $scope.removeRow = function() {
-                    if ($scope.rows.length > $scope.min) {
-                        $scope.rows.pop();
-                        $scope.$parent.attachments[$scope.name+($scope.rows.length)] = undefined;
-                    }
-                };
 
                 $scope.downloadFile = function(url, filename, mimetype) {
                     utils.downloadFile(url, filename, mimetype);

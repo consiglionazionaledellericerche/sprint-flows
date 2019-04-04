@@ -1,0 +1,11 @@
+{
+    "sprintApp": {
+        "ExternalMessageStatus" : {
+            "null": "",
+            "NEW": "NEW",
+            "SENT": "SENT",
+            "DELETED": "DELETED",
+            "ERROR": "ERROR"
+        }
+    }
+}
