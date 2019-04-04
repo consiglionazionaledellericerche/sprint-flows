@@ -16,6 +16,7 @@ import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.impl.persistence.entity.VariableInstance;
 import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.activiti.engine.impl.variable.SerializableType;
+import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricIdentityLinkResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
@@ -47,13 +48,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.List;
 
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Aggiornamento;
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Caricamento;
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
-import static it.cnr.si.flows.ng.utils.Utils.parseInt;
 import static org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA_BOLD;
 
 @Service
@@ -214,13 +216,13 @@ public class FlowsPdfService {
 
 	//Sotituisco il mapping direttamente con il json delle variabili sttuali
 	private JSONObject mappingVariables(JSONObject variables, String processInstanceId) {
-		
+
 		Map<String, Object> map = flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId);
 
 		HistoricProcessInstanceResponse processInstance = (HistoricProcessInstanceResponse) map.get("entity");
 		variables.put("businessKey", processInstance.getBusinessKey());
 
-		 
+
 		//refactoring della stringona contenete le esperienze in un jsonArray
 		if (variables.has(VALUTAZIONE_ESPERIENZE_JSON)) {
 			JSONArray esperienze = new JSONArray(variables.getString(VALUTAZIONE_ESPERIENZE_JSON));
@@ -231,17 +233,17 @@ public class FlowsPdfService {
 			JSONArray esperienze = new JSONArray(variables.getString(IMPEGNI_JSON));
 			variables.put(IMPEGNI_JSON, esperienze);
 		}
-		
+
 		if (variables.has(DITTEINVITATEJSON)) {
 			JSONArray esperienze = new JSONArray(variables.getString(DITTEINVITATEJSON));
 			variables.put(DITTEINVITATEJSON, esperienze);
 		}
-		
+
 		if (variables.has(DITTECANDIDATEJSON)) {
 			JSONArray esperienze = new JSONArray(variables.getString(DITTECANDIDATEJSON));
 			variables.put(DITTECANDIDATEJSON, esperienze);
 		}
-		
+
 		if (variables.has(DITTERTIJSON)) {
 			JSONArray esperienze = new JSONArray(variables.getString(DITTERTIJSON));
 			variables.put(DITTERTIJSON, esperienze);
@@ -271,8 +273,16 @@ public class FlowsPdfService {
 				VariableInstance value = entry.getValue();
 				//le variabili di tipo serializable (file) non vanno inseriti nel json delle variabili che verranno inseriti nel pdf
 				//(ho testato valutazioni esperienze_Json fino a 11000 caratteri ed a questo livello appare come longString)
-				if(!(((VariableInstanceEntity) value).getType() instanceof SerializableType))
-					variableInstanceJson.put(key, value.getValue());
+				if(!(((VariableInstanceEntity) value).getType() instanceof SerializableType)) {
+					if(key.toString().equals("startDate")) {
+						Date startDate = (Date)value.getValue();
+						SimpleDateFormat sdf = new  SimpleDateFormat("dd/MM/yyyy HH:mm");
+						sdf.setTimeZone(TimeZone.getTimeZone("Europe/Rome"));
+						variableInstanceJson.put(key, sdf.format(startDate));
+					} else {
+						variableInstanceJson.put(key, value.getValue());
+					}
+				}	
 			}
 			LOGGER.info("variableInstanceJson: {}", variableInstanceJson);
 		}
@@ -287,20 +297,20 @@ public class FlowsPdfService {
 			utenteRichiedente = processVariables.getString("nomeRichiedente");
 			fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
 		} 
-		
+
 		return Pair.of(fileName, makePdf(Enum.PdfType.valueOf(tipologiaDoc), processVariables, fileName, utenteRichiedente, processInstanceId));
 	}
 
 	public byte[] makePdf(Enum.PdfType pdfType, JSONObject processvariables, String fileName, String utenteRichiedente, String processInstanceId) {
-        Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
+		Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
 
 		String dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-cnr");
-        if(activeProfiles.contains("oiv")) {
-	        dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-oiv");
-        }
-        else if(activeProfiles.contains("cnr")) {
-            dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-cnr");
-        }
+		if(activeProfiles.contains("oiv")) {
+			dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-oiv");
+		}
+		else if(activeProfiles.contains("cnr")) {
+			dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-cnr");
+		}
 		byte[] pdfByteArray = null;
 		HashMap<String, Object> parameters = new HashMap();
 		InputStream jasperFile = null;
@@ -314,12 +324,12 @@ public class FlowsPdfService {
 					"net.sf.jasperreports.view.viewer", Locale.ITALIAN);
 
 			//carico un'immagine nel pdf "dinamicamente" (sostituisco una variabile nel file jsper con lo stream dell'immagine)
-	        if(activeProfiles.contains("oiv")) {
-		        parameters.put("ANN_IMAGE", this.getClass().getResourceAsStream(dir.substring(dir.indexOf("/print")) + "logo_OIV.JPG"));
-	        }
-	        else if(activeProfiles.contains("cnr")) {
-		        parameters.put("ANN_IMAGE", this.getClass().getResourceAsStream(dir.substring(dir.indexOf("/print")) + "logo_CNR.JPG"));
-	        }
+			if(activeProfiles.contains("oiv")) {
+				parameters.put("ANN_IMAGE", this.getClass().getResourceAsStream(dir.substring(dir.indexOf("/print")) + "logo_OIV.JPG"));
+			}
+			else if(activeProfiles.contains("cnr")) {
+				parameters.put("ANN_IMAGE", this.getClass().getResourceAsStream(dir.substring(dir.indexOf("/print")) + "logo_CNR.JPG"));
+			}
 			parameters.put(JRParameter.REPORT_LOCALE, Locale.ITALIAN);
 			parameters.put(JRParameter.REPORT_RESOURCE_BUNDLE, resourceBundle);
 			parameters.put(JRParameter.REPORT_DATA_SOURCE, datasource);
@@ -347,12 +357,10 @@ public class FlowsPdfService {
 			attachment.setFilename(fileName);
 			attachment.setName(pdfType.name());
 			attachment.setAzione(Aggiornamento);
-			attachment.setBytes(pdfByteArray);
 			attachment.setUsername(utenteRichiedente);
 		} else {
 			//salvo il pdf nel flusso
 			attachment = new FlowsAttachment();
-			attachment.setBytes(pdfByteArray);
 			attachment.setAzione(Caricamento);
 			attachment.setTaskId(null);
 			attachment.setTaskName(null);
@@ -363,7 +371,7 @@ public class FlowsPdfService {
 			attachment.setUsername(utenteRichiedente);
 		}
 		String taskId = taskService.createTaskQuery().processInstanceId(processInstanceId).active().singleResult().getId();
-		flowsAttachmentService.saveAttachment(pdfType.name(), attachment, taskId);
+		flowsAttachmentService.saveAttachment(taskId, pdfType.name(), attachment, pdfByteArray);
 
 		return pdfByteArray;
 	}
@@ -373,14 +381,14 @@ public class FlowsPdfService {
 		byte[] pdfByteArray = null;
 		HashMap<String, Object> parameters = new HashMap();
 		InputStream jasperFile = null;
-        Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
+		Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
 		String dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-cnr");
-        if(activeProfiles.contains("oiv")) {
-	        dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-oiv");
-        }
-        else if(activeProfiles.contains("cnr")) {
-            dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-cnr");
-        }
+		if(activeProfiles.contains("oiv")) {
+			dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-oiv");
+		}
+		else if(activeProfiles.contains("cnr")) {
+			dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-cnr");
+		}
 		try {
 			//carico le variabili della process instance
 			LOGGER.debug("Json con i dati da inserire nel pdf: {}", processvariables.toString());
@@ -423,25 +431,23 @@ public class FlowsPdfService {
 		String order = "ASC";
 		Integer firstResult = -1;
 		Integer maxResults = -1;
-		Boolean active = true;
-		Boolean finished = false;
 
 		resetStatisticvariables();
 
-		Map<String, Object>  flussiAttivi = flowsProcessInstanceService.search(req, processDefinitionKey, active, order, firstResult, maxResults);
-		Map<String, Object>  flussiTerminati = flowsProcessInstanceService.search(req, processDefinitionKey, finished, order, firstResult, maxResults);
-		Map<String, Integer> mapStatiFlussiAttivi = new HashMap<String, Integer>();
-		Map<String, Integer> mapStatiFlussiTerminati = new HashMap<String, Integer>();
+		DataResponse flussiAttivi = flowsProcessInstanceService.search(req, processDefinitionKey, true, order, firstResult, maxResults, false);
+		DataResponse flussiTerminati = flowsProcessInstanceService.search(req, processDefinitionKey, false, order, firstResult, maxResults, false);
+		Map<String, Integer> mapStatiFlussiAttivi = new HashMap();
+		Map<String, Integer> mapStatiFlussiTerminati = new HashMap();
 
 		//VALORIZZAZIONE PARAMETRI STATISTICHE
-		nrFlussiAttivi = parseInt(flussiAttivi.get("totalItems").toString());
-		nrFlussiTerminati  = parseInt(flussiTerminati.get("totalItems").toString());
+		nrFlussiAttivi = (int) flussiAttivi.getTotal();
+		nrFlussiTerminati  = (int) flussiTerminati.getTotal();
 		nrFlussiTotali = nrFlussiAttivi + nrFlussiTerminati ;
 
 		LOGGER.debug("nr. nrFlussiAttivi: {} - nr. nrFlussiTerminati: {} - nr. nrFlussiTotali: {}", nrFlussiAttivi, nrFlussiTerminati, nrFlussiTotali);
 
 		// GESTIONE VARIABILI SINGOLE ISTANZE FLUSSI ATTIVI
-		List<HistoricProcessInstanceResponse> activeProcessInstances = (List<HistoricProcessInstanceResponse>) flussiAttivi.get("processInstances");
+		List<HistoricProcessInstanceResponse> activeProcessInstances = (List<HistoricProcessInstanceResponse>) flussiAttivi.getData();
 		for (HistoricProcessInstanceResponse pi : activeProcessInstances) {
 			LOGGER.debug(" getId = {}", pi.getId());
 			LOGGER.debug(" getDurationInMillis = {}", pi.getDurationInMillis());
@@ -460,7 +466,7 @@ public class FlowsPdfService {
 		}
 
 		// GESTIONE VARIABILI SINGOLE ISTANZE FLUSSI TERMINATI
-		List<HistoricProcessInstanceResponse> terminatedProcessInstances = (List<HistoricProcessInstanceResponse>) flussiTerminati.get("processInstances");
+		List<HistoricProcessInstanceResponse> terminatedProcessInstances = (List<HistoricProcessInstanceResponse>) flussiTerminati.getData();
 		for (HistoricProcessInstanceResponse pi : terminatedProcessInstances) {
 			LOGGER.debug(" getId = {}", pi.getId());
 			LOGGER.debug(" getDurationInMillis = {}", pi.getDurationInMillis());

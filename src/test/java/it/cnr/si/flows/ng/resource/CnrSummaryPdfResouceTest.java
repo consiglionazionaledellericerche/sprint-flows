@@ -4,6 +4,7 @@ import com.google.common.net.MediaType;
 import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.TestServices;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
@@ -51,6 +52,8 @@ public class CnrSummaryPdfResouceTest {
     @Inject
     private FlowsAttachmentResource flowsAttachmentResource;
     @Inject
+    private FlowsAttachmentService attachmentService;
+    @Inject
     private RuntimeService runtimeService;
     @Inject
     private TaskService taskService;
@@ -69,7 +72,7 @@ public class CnrSummaryPdfResouceTest {
     }
 
     @Test
-    public void testSummaryPdfProcessCompleted() throws IOException {
+    public void testSummaryPdfProcessCompleted() throws Exception {
         processInstance = util.mySetUp(acquisti);
 
         Map<String, FlowsAttachment> docs = flowsAttachmentResource.getAttachementsForProcessInstance(processInstance.getId()).getBody();
@@ -107,11 +110,11 @@ public class CnrSummaryPdfResouceTest {
         assertEquals(summary.getFilename(), titoloPdf);
         assertEquals(summary.getName(), titoloPdf);
         assertEquals(summary.getMimetype(), MediaType.PDF.toString());
-        assertTrue(summary.getBytes().length > 0);
+        assertTrue(attachmentService.getAttachmentContentBytes(summary).length > 0);
     }
 
     @Test
-    public void testSummaryPdfService() throws IOException, ParseException {
+    public void testSummaryPdfService() throws Exception {
         processInstance = util.mySetUp(acquisti);
 
         util.loginSfd();
@@ -128,7 +131,7 @@ public class CnrSummaryPdfResouceTest {
         util.makeFile(outputStream, "summaryCreato.pdf");
     }
 
-    private void completeTask() throws IOException {
+    private void completeTask() throws Exception {
         //completo il primo task
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
 //        req.setParameter("taskId", util.getFirstTaskId());

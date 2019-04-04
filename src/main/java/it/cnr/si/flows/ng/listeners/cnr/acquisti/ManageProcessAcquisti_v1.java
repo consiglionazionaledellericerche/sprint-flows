@@ -7,23 +7,43 @@ import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
-
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import it.cnr.si.domain.enumeration.ExternalMessageVerb;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.FirmaDocumentoService;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.service.FlowsPdfService;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.service.ProtocolloDocumentoService;
+import it.cnr.si.flows.ng.utils.SecurityUtils;
+import it.cnr.si.service.AceService;
+import it.cnr.si.service.ExternalMessageService;
+import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
+import it.cnr.si.spring.storage.StorageObject;
+import it.cnr.si.spring.storage.StoreService;
 import it.cnr.si.flows.ng.listeners.cnr.acquisti.service.AcquistiService;
 
+import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 
+import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
-
+import java.util.TimeZone;
 
 import javax.inject.Inject;
 
@@ -54,6 +74,14 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 	private RuntimeService runtimeService;
 	@Inject
 	private FlowsAttachmentService flowsAttachmentService;
+	@Inject
+	private AceBridgeService aceBridgeService;
+	@Inject
+	private ExternalMessageService externalMessageService;
+	@Inject
+	AceService aceService;
+	@Inject
+	private StoreService storeService;
 
 	private Expression faseEsecuzione;
 
@@ -129,6 +157,37 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			}
 		}
 	}
+	public void CalcolaTotaleImpegni(DelegateExecution execution) {
+		double importoTotaleNetto = 0.0;
+		double importoTotaleLordo = 0.0;
+
+		String impegniString = (String) execution.getVariable("impegni_json");
+		JSONArray impegni = new JSONArray(impegniString);
+
+		for ( int i = 0; i < impegni.length(); i++) {
+
+			JSONObject impegno = impegni.getJSONObject(i);
+
+			try {
+				importoTotaleNetto += impegno.getDouble("importoNetto");
+			} catch (JSONException e) {
+				LOGGER.error("Formato Impegno Non Valido {} nel flusso {} - {}", impegno.getString("importoNetto"), execution.getId(), execution.getVariable("title"));
+				throw new BpmnError("400", "Formato Impegno Non Valido: " + impegno.getString("importoNetto"));
+			}
+			impegno.put("importoLordo", (double) Math.round(100*((impegno.getDouble("importoNetto")) * (1+(impegno.getDouble("percentualeIva"))/100)))/100);
+			try {
+				importoTotaleLordo += impegno.getDouble("importoLordo");
+			} catch (JSONException e) {
+				LOGGER.error("Formato Impegno Non Valido {} nel flusso {} - {}", impegno.getString("importoLordo"), execution.getId(), execution.getVariable("title"));
+				throw new BpmnError("400", "Formato Impegno Non Valido: " + impegno.getString("importoLordo"));
+			}			
+			impegno.put("uo_label", aceBridgeService.getUoById(Integer.parseInt(impegno.get("uo").toString())).getDenominazione());
+		}
+
+		execution.setVariable("impegni_json", impegni.toString());
+		execution.setVariable("importoTotaleNetto", importoTotaleNetto);
+		execution.setVariable("importoTotaleLordo", importoTotaleLordo);
+	}
 	// FUNZIONE CHE CONTROLLA LA LISTA DEI SOCUMENTI CHE DEVONO ESSERE PUBBLICATI IN TRASPARENZA (SE PRESENTI DEVONO ESSERE PUBBLICATI ALTRIMENTI IL FLUSSO SI BLOCCA)
 	public void controllaFilePubblicabiliTrasparenza(DelegateExecution execution) {
 		Map<String, FlowsAttachment> attachmentList = attachmentService.getCurrentAttachments(execution);
@@ -156,8 +215,267 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 		if (nrFilesMancanti>0) {
 			throw new BpmnError("500", errorMessage+"</b><br>");
 		}
-
 	}
+	// FUNZIONE CHE CONTROLLA LA LISTA DEI SOCUMENTI CHE DEVONO ESSERE PUBBLICATI IN TRASPARENZA (SE PRESENTI DEVONO ESSERE PUBBLICATI ALTRIMENTI IL FLUSSO SI BLOCCA)
+	public void prepareFilesToSigla(DelegateExecution execution) {
+		Map<String, FlowsAttachment> attachmentList = attachmentService.getCurrentAttachments(execution);
+		for (String key : attachmentList.keySet()) {
+			FlowsAttachment documentoCorrente = attachmentList.get(key);
+			LOGGER.info("Key = " + key + ", documentoCorrente = " + documentoCorrente.getFilename());
+			StorageObject fileKey = storeService.getStorageObjectBykey(documentoCorrente.getUrl());
+			String aspectSiglaName = "EMPTY";
+			String aspectSiglaPropertyLabel = "EMPTY";
+			//DECISIONE A CONTRATTARE
+			if(documentoCorrente.getName().equals("decisioneContrattare")){
+				aspectSiglaName = "P:sigla_contratti_aspect:doc_flusso_decisione_contrattare";
+				aspectSiglaPropertyLabel = "sigla_contratti_aspect_decisione_contrattare:label";
+			}
+			//modificheVariantiArt106			
+			if(documentoCorrente.getName().equals("modificheVariantiArt106")){
+				aspectSiglaName = "P:sigla_contratti_aspect:doc_flusso_modifiche_varianti_art106";
+				aspectSiglaPropertyLabel = "sigla_contratti_aspect_modifiche_varianti_art106:label";
+			}
+			//bandoAvvisi			
+			if(documentoCorrente.getName().equals("bandoAvvisi")){
+				aspectSiglaName = "P:sigla_contratti_aspect:doc_flusso_bando_avvisi";
+				aspectSiglaPropertyLabel = "sigla_contratti_aspect_bando_avvisi:label";
+			}
+			//letteraInvito			
+			if(documentoCorrente.getName().equals("letteraInvito")){
+				aspectSiglaName = "P:sigla_contratti_aspect:doc_flusso_lettera_invito";
+				aspectSiglaPropertyLabel = "sigla_contratti_aspect_lettera_invito:label";
+			}
+			//provvedimentoAmmessiEsclusi			
+			if(documentoCorrente.getName().equals("provvedimentoAmmessiEsclusi")){
+				aspectSiglaName = "P:sigla_contratti_aspect:doc_flusso_provvedimento_ammessi_esclusi";
+				aspectSiglaPropertyLabel = "sigla_contratti_aspect_provvedimento_ammessi_esclusi:label";
+			}
+			//provvedimentoNominaCommissione			
+			if(documentoCorrente.getName().equals("provvedimentoNominaCommissione")){
+				aspectSiglaName = "P:sigla_contratti_aspect:doc_flusso_provvedimento_nomina_commissione";
+				aspectSiglaPropertyLabel = "sigla_contratti_aspect_provvedimento_nomina_commissione:label";
+			}
+			//elencoVerbali			
+			if(documentoCorrente.getName().equals("elencoVerbali")){
+				aspectSiglaName = "P:sigla_contratti_aspect:doc_flusso_elenco_verbali";
+				aspectSiglaPropertyLabel = "sigla_contratti_aspect_elenco_verbali:label";
+			}
+			//stipula			
+			if(documentoCorrente.getName().equals("stipula")){
+				aspectSiglaName = "P:sigla_contratti_aspect:doc_flusso_stipula";
+				aspectSiglaPropertyLabel = "sigla_contratti_aspect_stipula:label";
+			}
+			//avvisoPostInformazione			
+			if(documentoCorrente.getName().equals("avvisoPostInformazione")){
+				aspectSiglaName = "P:sigla_contratti_aspect:doc_flusso_avviso_post_informazione";
+				aspectSiglaPropertyLabel = "sigla_contratti_aspect_avviso_post_informazione:label";
+			}
+			//richiestaDiAcquisto			
+			if(documentoCorrente.getName().equals("richiestaDiAcquisto")){
+				aspectSiglaName = "P:sigla_contratti_aspect:doc_flusso_richiesta_di_acquisto";
+				aspectSiglaPropertyLabel = "sigla_contratti_aspect_richiesta_di_acquisto:label";
+			}
+			//ProvvedimentoDiRevoca			
+			if(documentoCorrente.getName().equals("ProvvedimentoDiRevoca")){
+				aspectSiglaName = "P:sigla_contratti_aspect:doc_flusso_provvedimento_di_revoca";
+				aspectSiglaPropertyLabel = "sigla_contratti_aspect_provvedimento_di_revoca:label";
+			}
+			//provvedimentoAggiudicazione			
+			if(documentoCorrente.getName().equals("provvedimentoAggiudicazione")){
+				aspectSiglaName = "P:sigla_contratti_aspect:doc_flusso_provvedimento_aggiudicazione";
+				aspectSiglaPropertyLabel = "sigla_contratti_aspect_provvedimento_aggiudicazione:label";
+			}
+			//contratto			
+			if(documentoCorrente.getName().equals("contratto")){
+				aspectSiglaName = "P:sigla_contratti_aspect:doc_flusso_contratto";
+				aspectSiglaPropertyLabel = "sigla_contratti_aspect_contratto:label";
+			}
+			//allegati			
+			if(documentoCorrente.getName().startsWith("allegati")){
+				aspectSiglaName = "P:sigla_contratti_aspect:doc_flusso_allegato";
+				aspectSiglaPropertyLabel = "sigla_contratti_aspect_allegato:label";
+			}			
+			if(!aspectSiglaName.equals("EMPTY")) {
+				// INSERIMENTO ASPECT DOC
+				if(!storeService.hasAspect(fileKey, aspectSiglaName)) {
+					storeService.addAspect(fileKey, aspectSiglaName);					
+				}
+				Map<String, Object> metadataPropertiesAspectSiglaDoc = new HashMap<String, Object>();
+				metadataPropertiesAspectSiglaDoc.put(aspectSiglaPropertyLabel, documentoCorrente.getLabel());
+				storeService.updateProperties(metadataPropertiesAspectSiglaDoc  , fileKey);
+				
+				//INSERIMENTO ASPECT PUBBLICAZIONE
+				String aspectSiglaCommonsPubblicazione = "P:sigla_commons_aspect:flusso_pubblicazione";
+				if(!storeService.hasAspect(fileKey, aspectSiglaCommonsPubblicazione)) {
+					storeService.addAspect(fileKey, aspectSiglaCommonsPubblicazione);			 
+				}
+				Map<String, Object> metadataPropertiesAspectSiglaCommonsPubblicazione = new HashMap<String, Object>();
+				metadataPropertiesAspectSiglaCommonsPubblicazione.put("sigla_commons_aspect:pubblicazione_trasparenza", documentoCorrente.isPubblicazioneTrasparenza());
+				metadataPropertiesAspectSiglaCommonsPubblicazione.put("sigla_commons_aspect:pubblicazione_urp", documentoCorrente.isPubblicazioneUrp());
+				storeService.updateProperties(metadataPropertiesAspectSiglaCommonsPubblicazione  , fileKey);
+			}
+		}
+	}
+
+	public Map<String, Object> createSiglaPayload(DelegateExecution execution) throws ParseException {
+		Map<String, Object> metadatiAcquisto = new HashMap<String, Object>()
+		{
+			{
+				DateFormat format = new SimpleDateFormat("yyyy");
+				// ESERCIZIO 
+				if(execution.getVariable("startDate") != null){
+					String strDate = format.format(execution.getVariable("startDate"));  
+					put("esercizio", Integer.parseInt(strDate));
+				}
+				// CD_UNITA_ORGANIZZATIVA 
+				if(execution.getVariable("idStruttura") != null){
+					put("cd_unita_organizzativa", aceBridgeService.getUoById(Integer.parseInt(execution.getVariable("idStruttura").toString())).getCdsuo().toString());
+				}
+				// DT_REGISTRAZIONE 
+				DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+				dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Vatican"));
+				Date endDate = new Date();
+				String endStrDate = dateFormat.format(endDate);  
+				put("dt_registrazione", endStrDate);
+				// CD_TERZO_RESP 
+				if(execution.getVariable("rup") != null){
+					PersonaWebDto rupUser = aceService.getPersonaByUsername(execution.getVariable("rup").toString());
+					put("cd_terzo_resp", rupUser.getCodiceFiscale());
+				}
+				// CD_TERZO_FIRMATARIO 
+				if(execution.getVariable("usernameFirmatarioContratto") != null){
+					PersonaWebDto firmatarioUser = aceService.getPersonaByUsername(execution.getVariable("usernameFirmatarioContratto").toString());
+					put("cd_terzo_firmatario", firmatarioUser.getCodiceFiscale());
+				}
+				// FIG_GIUR_EST 
+				if(execution.getVariable("pIvaCodiceFiscaleDittaAggiudicataria") != null){
+					put("fig_giur_est", execution.getVariable("pIvaCodiceFiscaleDittaAggiudicataria").toString());
+				}
+				// NATURA_CONTABILE 
+				put("natura_contabile", "P");
+				if(execution.getVariable("tipologiaAcquisizioneId") != null){
+					String tipologiaAcquisizioneId = execution.getVariable("tipologiaAcquisizioneId").toString();
+					// CD_PROC_AMM 
+					if(tipologiaAcquisizioneId.equals("11")) {
+						put("cd_proc_amm", "PA55");
+					}
+					if(tipologiaAcquisizioneId.equals("12")) {
+						put("cd_proc_amm", "PR55");
+					}	
+					if(tipologiaAcquisizioneId.equals("13")) {
+						put("cd_proc_amm", "PN56");
+					}	
+					if(tipologiaAcquisizioneId.equals("14")) {
+						put("cd_proc_amm", "PN57");
+					}	
+					if(tipologiaAcquisizioneId.equals("15")) {
+						put("cd_proc_amm", "DC58");
+					}	
+					if(tipologiaAcquisizioneId.equals("23")) {
+						put("cd_proc_amm", "PNS");
+					}	
+					if(tipologiaAcquisizioneId.equals("22")) {
+						put("cd_proc_amm", "PNSS");
+					}	
+					// FL_MEPA 
+					if(tipologiaAcquisizioneId.equals("11") || tipologiaAcquisizioneId.equals("21") ) {
+						put("fl_mepa", "Y");
+					} else {
+						put("fl_mepa", "N");
+					}
+				}
+				// CD_PROC_AMM 
+				if(execution.getVariable("strumentoAcquisizioneId") != null){
+					String strumentoAcquisizioneId = execution.getVariable("strumentoAcquisizioneId").toString();
+					if(strumentoAcquisizioneId.equals("12")) {
+						put("cd_proc_amm", "PNSS");
+					}	
+				}
+				// OGGETTO 
+				if(execution.getVariable("descrizione") != null){
+					put("oggetto", execution.getVariable("descrizione").toString());
+				}
+				// CD_PROTOCOLLO 				
+				put("cd_protocollo", execution.getProcessBusinessKey().toString());
+				DateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+				// DT_STIPULA 
+				if(execution.getVariable("dataStipulaContratto") != null){
+					put("dt_stipula", dateFormat.format(inputDateFormat.parse(execution.getVariable("dataStipulaContratto").toString())));		        	
+				}
+				// DT_INIZIO_VALIDITA 
+				if(execution.getVariable("dataInizioValiditaContratto") != null){
+					put("dt_inizio_validita", dateFormat.format(inputDateFormat.parse(execution.getVariable("dataInizioValiditaContratto").toString())));		        	
+				}
+				// DT_FINE_VALIDITA 
+				if(execution.getVariable("dataFineValiditaContratto") != null){
+					put("dt_fine_validita", dateFormat.format(inputDateFormat.parse(execution.getVariable("dataFineValiditaContratto").toString())));		        	
+				}
+				// IM_CONTRATTO_PASSIVO 
+				put("im_contratto_passivo", new BigDecimal(execution.getVariable("importoTotaleLordo").toString()));
+				// CD_TIPO_ATTO 
+				put("cd_tipo_atto", "DET");
+				if(runtimeService.getVariable(execution.getProcessInstanceId(), "decisioneContrattare", FlowsAttachment.class) != null) {
+					FlowsAttachment determina = runtimeService.getVariable(execution.getProcessInstanceId(), "decisioneContrattare", FlowsAttachment.class);
+					// DS_ATTO 
+					put("ds_atto", determina.getLabel() + " Prot." + determina.getMetadati().get("numeroProtocollo") + " del " + dateFormat.format(inputDateFormat.parse(determina.getMetadati().get("dataProtocollo").toString())));
+				}
+				// CD_PROTOCOLLO_GENERALE 
+				if(runtimeService.getVariable(execution.getProcessInstanceId(), "contratto", FlowsAttachment.class) != null) {
+					FlowsAttachment contratto = runtimeService.getVariable(execution.getProcessInstanceId(), "contratto", FlowsAttachment.class);
+					put("cd_protocollo_generale", contratto.getLabel() + " Prot." + contratto.getMetadati().get("numeroProtocollo") + " del " + dateFormat.format(inputDateFormat.parse(contratto.getMetadati().get("dataProtocollo").toString())));
+					// FL_PUBBLICA_CONTRATTO 
+					if(contratto.isPubblicazioneTrasparenza()) {
+						put("fl_pubblica_contratto", Boolean.valueOf("true"));
+					} else {
+						put("fl_pubblica_contratto", Boolean.valueOf("false"));
+					}
+				}
+				if(runtimeService.getVariable(execution.getProcessInstanceId(), "stipula", FlowsAttachment.class) != null) {
+					FlowsAttachment stipula = runtimeService.getVariable(execution.getProcessInstanceId(), "stipula", FlowsAttachment.class);
+					// CD_PROTOCOLLO_GENERALE 
+					String cdProtocolloGenerale = stipula.getLabel();
+					// ESERCIZIO_PROTOCOLLO 
+					if(stipula.getDataProtocollo() != null && stipula.getNumeroProtocollo() != null){
+						put("esercizio_protocollo", Integer.parseInt(format.format(inputDateFormat.parse(stipula.getDataProtocollo()))));	
+						cdProtocolloGenerale = stipula.getLabel() + " Prot." + stipula.getNumeroProtocollo() + " del " + dateFormat.format(inputDateFormat.parse(stipula.getDataProtocollo()));
+					}
+					put("cd_protocollo_generale", cdProtocolloGenerale);
+					// FL_PUBBLICA_CONTRATTO 
+					if(stipula.isPubblicazioneTrasparenza()) {
+						put("fl_pubblica_contratto", Boolean.valueOf("true"));
+					} else {
+						put("fl_pubblica_contratto", Boolean.valueOf("false"));
+					}
+				}
+				// FL_ART82 
+				put("fl_art82", "N");
+				// CD_CIG 
+				if(execution.getVariable("cig") != null){
+					put("cd_cig", execution.getVariable("cig").toString());
+				}
+				// CD_CUP 
+				if(execution.getVariable("cup") != null){
+					put("cd_cup", execution.getVariable("cup").toString());
+				}
+				// IM_CONTRATTO_PASSIVO_NETTO 
+				if(execution.getVariable("importoTotaleNetto") != null){
+					put("im_contratto_passivo_netto", new BigDecimal(execution.getVariable("importoTotaleNetto").toString()));
+				}
+			}
+		};	
+
+		return metadatiAcquisto;
+	}
+	public void releaseDocumentInSigla(DelegateExecution execution) {
+		Map<String, FlowsAttachment> attachmentList = attachmentService.getAttachementsForProcessInstance(execution.getProcessInstanceId());
+		for (String key : attachmentList.keySet()) {
+			FlowsAttachment value = attachmentList.get(key);
+			LOGGER.info("Key = " + key + ", Value = " + value);
+		}	
+	}
+
+
+
 	@Override
 	public void notify(DelegateExecution execution) throws Exception {
 		//(OivPdfService oivPdfService = new OivPdfService();
@@ -180,8 +498,26 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 		// START
 		case "process-start": {
 			startAcquistiSetGroupsAndVisibility.configuraVariabiliStart(execution);
-		};break;    
+		};break;
+		case "pre-determina-start": {
+			pubblicaTuttiFilePubblicabili(execution);
+		};break;
+		case "pre-determina-end": {
+			pubblicaTuttiFilePubblicabili(execution);
+		};break;     
+		case "end-annullato-start": {
+			execution.setVariable(STATO_FINALE_DOMANDA, "ANNULLATO");
+			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "ANNULLATO");
+		};break;     
 		// START DECISIONE-CONTRATTARE
+		case "DECISIONE-CONTRATTARE-start": {
+			String rup = execution.getVariable("rup", String.class);
+			runtimeService.addUserIdentityLink(execution.getProcessInstanceId(), rup, PROCESS_VISUALIZER);
+			CalcolaTotaleImpegni(execution);
+		};break;  
+		case "modifica-decisione-end": {
+			CalcolaTotaleImpegni(execution);
+		};break;		
 		case "verifica-decisione-start": {
 			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
 		};break;  
@@ -195,10 +531,10 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				protocolloDocumentoService.protocolla(execution, "decisioneContrattare");
 			}
 		};break;  
-		case "endevent-decisione-contrattare-revoca-start": {
+		case "endevent-decisione-contrattare-annulla-start": {
 		};break;     
-		case "endevent-decisione-contrattare-revoca-end": {
-			execution.setVariable("direzioneFlusso", "RevocaSemplice");
+		case "endevent-decisione-contrattare-annulla-end": {
+			execution.setVariable("direzioneFlusso", "Annulla");
 		};break;   
 		case "endevent-decisione-contrattare-protocollo-end": {
 			execution.setVariable("direzioneFlusso", "Stipula");
@@ -206,19 +542,40 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 		// END DECISIONE-CONTRATTARE 
 
 		case "espletamento-procedura-end": {	
-			if (execution.getVariable("strumentoAcquisizioneId") != null && execution.getVariable("strumentoAcquisizioneId").equals("23")) {
+			if (execution.getVariable("strumentoAcquisizioneId") != null && (execution.getVariable("strumentoAcquisizioneId").equals("21") || execution.getVariable("strumentoAcquisizioneId").equals("23"))) {
 				acquistiService.OrdinaElencoDitteCandidate(execution);
 			}
+			if (execution.getVariable("tipologiaAffidamentoDiretto") != null && (execution.getVariable("tipologiaAffidamentoDiretto").toString().equals("semplificata"))) {
+				execution.setVariable("statoImpegni", "definitivi"); 	
+			} else {
+				execution.setVariable("tipologiaAffidamentoDiretto", "normale"); 
+			}
+			if(sceltaUtente != null && !sceltaUtente.equals("Revoca") && !execution.getVariable("tempiCompletamentoProceduraFine").equals("null")) {
+				DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+				Date dateStart = format.parse(execution.getVariable("tempiCompletamentoProceduraInizio").toString());
+				Date dateEnd = format.parse(execution.getVariable("tempiCompletamentoProceduraFine").toString());
+				if(dateStart.after(dateEnd)) {
+					throw new BpmnError("500", "<b>Data Completamento Procedura Inizio posteriore alla data di Fine<br></b>");
+				}
+			}
+
 			pubblicaTuttiFilePubblicabili(execution);
 		};break;
 		// START PROVVEDIMENTO-AGGIUDICAZIONE  
 		case "predisposizione-provvedimento-aggiudicazione-start": {
-			if (execution.getVariable("nrElencoDitteInit") != null) {
-				//				acquistiService.SostituisciDocumento(execution, "provvedimentoAggiudicazione");
-				acquistiService.ScorriElencoDitteCandidate(execution);	
+			if (execution.getVariable("strumentoAcquisizioneId") != null && (execution.getVariable("strumentoAcquisizioneId").equals("21") || execution.getVariable("strumentoAcquisizioneId").equals("23"))) {
+
+				if (execution.getVariable("nrElencoDitteInit") != null) {
+					//				acquistiService.SostituisciDocumento(execution, "provvedimentoAggiudicazione");
+					acquistiService.ScorriElencoDitteCandidate(execution);	
+				}
+				dittaCandidata.evidenzia(execution);
 			}
-			dittaCandidata.evidenzia(execution);
 		};break;
+		case "predisposizione-provvedimento-aggiudicazione-end": {
+			execution.setVariable("statoImpegni", "definitivi"); 
+			CalcolaTotaleImpegni(execution);
+		};break; 
 		case "firma-provvedimento-aggiudicazione-end": {
 			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
 				firmaDocumentoService.eseguiFirma(execution, "provvedimentoAggiudicazione");
@@ -238,7 +595,9 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 		case "endevent-provvedimento-aggiudicazione-altro-candidato-end": {
 			execution.setVariable("direzioneFlusso", "SelezionaAltroCandidato");
 		};break;
-
+		case "modifica-provvedimento-aggiudicazione-end": {
+			CalcolaTotaleImpegni(execution);
+		};break;  
 		// END PROVVEDIMENTO-AGGIUDICAZIONE
 
 		// START CONTRATTO FUORI MEPA  
@@ -250,6 +609,9 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 		case "firma-contratto-end": {
 			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
 				firmaDocumentoService.eseguiFirma(execution, "contratto");
+				execution.setVariable("usernameFirmatarioContratto", SecurityUtils.getCurrentUserLogin());
+				Date dataStipulaContratto = new Date();
+				execution.setVariable("dataStipulaContratto", dataStipulaContratto);	
 			}
 		};break; 
 		case "protocollo-contratto-end": {
@@ -277,7 +639,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
 			documentoGenerato.setLabel(labelFile);
 			documentoGenerato.setPubblicazioneTrasparenza(true);
-			flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato);
+			flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
 
 		};break;
 		case "consuntivo-end": {
@@ -297,7 +659,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				}
 			}
 			if(sceltaUtente != null && sceltaUtente.equals("RevocaConProvvedimento")) {
-					attachmentService.setPubblicabileTrasparenza(execution, "ProvvedimentoDiRevoca", true);
+				attachmentService.setPubblicabileTrasparenza(execution, "ProvvedimentoDiRevoca", true);
 			}
 
 		};break; 
@@ -305,6 +667,12 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			pubblicaTuttiFilePubblicabili(execution);
 			controllaFilePubblicabiliTrasparenza(execution);
 			execution.setVariable(STATO_FINALE_DOMANDA, "STIPULATO");
+			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "STIPULATO");
+			//TODO implementare le url a seconda del contesto
+			String urlSigla = "www.google.it";
+			Map<String, Object> siglaPayload = createSiglaPayload(execution);
+			externalMessageService.createExternalMessage(urlSigla, ExternalMessageVerb.POST, siglaPayload);
+			prepareFilesToSigla(execution);
 		};break;     
 		case "end-stipulato-end": {
 		};break;
@@ -344,6 +712,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 
 		case "end-revocato-start": {
 			execution.setVariable(STATO_FINALE_DOMANDA, "REVOCATO");
+			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "REVOCATO");
 		};break;
 
 		// FINE FLUSSO  

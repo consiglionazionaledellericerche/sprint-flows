@@ -3,7 +3,6 @@ package it.cnr.si.flows.ng.service;
 import com.opencsv.CSVWriter;
 import it.cnr.si.domain.View;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
 import it.cnr.si.flows.ng.resource.FlowsAttachmentResource;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
@@ -13,7 +12,6 @@ import it.cnr.si.security.PermissionEvaluatorImpl;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.*;
-import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
@@ -26,20 +24,18 @@ import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
-import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.task.TaskResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -57,18 +53,15 @@ import static it.cnr.si.flows.ng.utils.Utils.*;
 public class FlowsTaskService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FlowsTaskService.class);
-	private static final String ERROR_MESSAGE = "message";
 	public static final int LENGTH_TITOLO = 65;
 	public static final int LENGTH_DESCTIZIONE = 75;
 	public static final int LENGTH_INITIATOR = 45;
 	public static final int LENGTH_FASE = 45;
-	@Autowired
-	@Qualifier("processEngine")
+
+	@Autowired @Qualifier("processEngine")
 	protected ProcessEngine engine;
 	@Inject
 	private HistoryService historyService;
-	@Inject
-	private RestResponseFactory restResponseFactory;
 	@Inject
 	private TaskService taskService;
 	@Autowired(required = false)
@@ -93,51 +86,12 @@ public class FlowsTaskService {
 	private ViewRepository viewRepository;
 	@Inject
 	private Utils utils;
+	@Inject
+	private RestResponseFactory restResponseFactory;
+	@Inject
+	private Environment env;
 
-
-	// TODO magari un giorno avremo degli array, ma per adesso ce lo facciamo andare bene cosi'
-	public static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
-
-		Map<String, Object> data = new HashMap<>();
-		List<String> parameterNames = Collections.list(req.getParameterNames());
-		parameterNames.stream().forEach(paramName -> {
-			// se ho un json non aggiungo i suoi singoli campi (Ed escludo il parametro "cacheBuster")
-			if ((!parameterNames.contains(paramName.split("\\[")[0] + "_json")) && (!paramName.equals("cacheBuster")))
-				data.put(paramName, req.getParameter(paramName));
-		});
-		return data;
-	}
-
-	public DataResponse getMyTask(HttpServletRequest req, String processDefinition, int firstResult, int maxResults, String order) {
-		String username = SecurityUtils.getCurrentUserLogin();
-
-		TaskQuery taskQuery = taskService.createTaskQuery()
-				.taskAssignee(username)
-				.includeProcessVariables();
-
-		if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
-			taskQuery.processDefinitionKey(processDefinition);
-
-		taskQuery = (TaskQuery) utils.searchParamsForTasks(req, taskQuery);
-
-		utils.orderTasks(order, taskQuery);
-
-		List<TaskResponse> tasksList = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
-
-		//aggiungo ad ogni singola TaskResponse la variabile che indica se il task è restituibile ad un gruppo (true)
-		// o se è stato assegnato ad un utente specifico "dal sistema" (false)
-		addIsReleasableVariables(tasksList);
-
-		DataResponse response = new DataResponse();
-		response.setStart(firstResult);
-		response.setSize(tasksList.size());
-		response.setTotal(taskQuery.count());
-		response.setData(tasksList);
-		return response;
-	}
-
-	public Map<String, Object> search(Map<String, String> params, String processInstanceId, boolean active, String order, int firstResult, int maxResults) {
-		Map<String, Object> result = new HashMap<>();
+	public DataResponse search(Map<String, String> params, String processInstanceId, boolean active, String order, int firstResult, int maxResults) {
 		HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery();
 
 		if (!processInstanceId.equals(ALL_PROCESS_INSTANCES))
@@ -152,13 +106,16 @@ public class FlowsTaskService {
 
 		taskQuery = (HistoricTaskInstanceQuery) utils.orderTasks(order, taskQuery);
 
-		long totalItems = taskQuery.count();
-		result.put("totalItems", totalItems);
-
 		List<HistoricTaskInstance> taskRaw = taskQuery.includeProcessVariables().listPage(firstResult, maxResults);
-		List<HistoricTaskInstanceResponse> tasks = restResponseFactory.createHistoricTaskInstanceResponseList(taskRaw);
-		result.put("tasks", tasks);
-		return result;
+
+		// TODO
+		DataResponse response = new DataResponse();
+		response.setStart(firstResult);
+		response.setSize(taskRaw.size());// numero di task restituiti
+		response.setTotal(taskQuery.count()); //numero totale di task avviati da me
+		response.setData(restResponseFactory.createHistoricTaskInstanceResponseList(taskRaw));
+
+		return response;
 	}
 
 	// TODO questo metodo e' duplicato di uno in utils (controllare)
@@ -178,7 +135,10 @@ public class FlowsTaskService {
 					taskQuery.processVariableValueLikeIgnoreCase(key, "%" + value + "%");
 				else if (key.contains("Fase"))
 					taskQuery.taskNameLikeIgnoreCase("%" + value + "%");
-				else {
+                else if (key.contains("titolo"))
+                    taskQuery.processVariableValueLike("titolo", "%" + value + "%");
+
+                else {
 					//wildcard ("%") di default ma non a TUTTI i campi
 					switch (type) {
 						case "textEqual":
@@ -251,12 +211,6 @@ public class FlowsTaskService {
 
         List<String> userAuthorities = SecurityUtils.getCurrentUserAuthorities();
 
-//        String authorithiesList = userAuthorities.stream().map(s -> "'"+s+"'").collect(Collectors.joining(","));
-
-//        NativeTaskQuery nativeTaskQuery = taskService.createNativeTaskQuery().sql(
-//				"SELECT task.* FROM ACT_RU_TASK task, ACT_RU_IDENTITYLINK link " +
-//						" WHERE task.ID_ = link.TASK_ID_ AND link.GROUP_ID_ IN("+ authorithiesList +")");
-
 		TaskQuery taskQuery = (TaskQuery) utils.searchParamsForTasks(req, taskService.createTaskQuery().includeProcessVariables());
 
 		if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
@@ -300,107 +254,62 @@ public class FlowsTaskService {
 		TaskResponse task = restResponseFactory.createTaskResponse(taskRaw);
 		response.put("task", task);
 
-		// attachments
+		// attachments TODO
 		ResponseEntity<Map<String, FlowsAttachment>> attachementsEntity = attachmentResource.getAttachementsForTask(taskId);
 		Map<String, FlowsAttachment> attachments = attachementsEntity.getBody();
-		attachments.values().stream().forEach(e -> e.setBytes(null)); // il contenuto dei file non mi serve, e rallenta l'UI
+
 		response.put("attachments", attachments);
 		return response;
 	}
 
-	public ResponseEntity<Object> completeTask(MultipartHttpServletRequest req) throws IOException {
+	public ProcessInstance startProcessInstance(String definitionId, Map<String, Object> data) {
+
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitionId).singleResult();
+        String counterId = processDefinition.getName() + "-" + Calendar.getInstance().get(Calendar.YEAR);
+        String key = counterId + "-" + counterService.getNext(counterId);
+		data.put("key", key);
+
 		String username = SecurityUtils.getCurrentUserLogin();
+		data.put(initiator.name(), username);
+		data.put(startDate.name(), new Date());
 
-		String taskId = (String) req.getParameter("taskId");
-		String definitionId = (String) req.getParameter("processDefinitionId");
-		if (isEmpty(taskId) && isEmpty(definitionId))
-			throw new ProcessDefinitionAndTaskIdEmptyException();
+		ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
+		runtimeService.setVariable(instance.getId(), "processInstanceId", instance.getId());
 
-		Map<String, Object> data = extractParameters(req);
-		attachmentService.extractAttachmentVariables(req, data);
+		// metadati da visualizzare in ricerca, li metto nel Name per comodita' in ricerca
+		org.json.JSONObject name = new org.json.JSONObject();
 
-		if (isEmpty(taskId)) {
+		String titolo = (String) data.get(Enum.VariableEnum.titolo.name());
+		name.put(Enum.VariableEnum.titolo.name(), ellipsis(titolo, LENGTH_TITOLO) );
+		String descrizione = (String) data.get(Enum.VariableEnum.descrizione.name());
+		name.put(Enum.VariableEnum.descrizione.name(), ellipsis(descrizione, LENGTH_DESCTIZIONE) );
+		String initiator = (String) data.get(Enum.VariableEnum.initiator.name());
+		name.put(Enum.VariableEnum.initiator.name(), initiator);
+		String taskName = taskService.createTaskQuery()
+				.processInstanceId(instance.getProcessInstanceId())
+				.singleResult().getName();
+		name.put(stato.name(), ellipsis(taskName, LENGTH_FASE) );
 
-			ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitionId).singleResult();
-			try {
-				String counterId = processDefinition.getName() + "-" + Calendar.getInstance().get(Calendar.YEAR);
-				String key = counterId + "-" + counterService.getNext(counterId);
+		runtimeService.setProcessInstanceName(instance.getId(), name.toString());
 
-				//recupero l'idStruttura dell'utente che sta avviando il flusso
-				List<GrantedAuthority> authorities = relationshipService.getAllGroupsForUser(username);
-				List<String> groups = authorities.stream()
-						.map(GrantedAuthority::<String>getAuthority)
-						.map(Utils::removeLeadingRole)
-						.filter(g -> g.startsWith("abilitati#"+ processDefinition.getKey() +"@"))
-						.collect(Collectors.toList());
+		LOGGER.info("Avviata istanza di processo {}, id: {}", key, instance.getId());
+		return instance;
+	}
 
-				if (groups.isEmpty()) {
-					throw new BpmnError("403", "L'utente non e' abilitato ad avviare questo flusso");
-				} else {
-					// TODO la struttura va inserita nei listener specifico del flusso e non allo start
-					//                    String gruppoAbilitati = groups.get(0);
-					//                    String idStrutturaString = gruppoAbilitati.substring(gruppoAbilitati.lastIndexOf('@') + 1);
 
-					data.put(initiator.name(), username);
-					data.put(startDate.name(), new Date());
-					data.put("key", key);
+	public void completeTask(String taskId, Map<String, Object> data) {
 
-					ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
-					runtimeService.setVariable(instance.getId(), "processInstanceId", instance.getId());
-					
-					org.json.JSONObject name = new org.json.JSONObject();
-					//                    name.put(idStruttura.name(), idStrutturaString);
+        String username = SecurityUtils.getCurrentUserLogin();
 
-					String titolo = (String) data.get(Enum.VariableEnum.titolo.name());
-					name.put(Enum.VariableEnum.titolo.name(),
-							 titolo.length() < LENGTH_TITOLO ? titolo: titolo.substring(0, LENGTH_TITOLO - 3) + "...");
-					String descrizione = (String) data.get(Enum.VariableEnum.descrizione.name());
-					name.put(Enum.VariableEnum.descrizione.name(),
-							 descrizione.length() < LENGTH_DESCTIZIONE ? descrizione : descrizione.substring(0, LENGTH_DESCTIZIONE - 3) + "...");
-					String initiator = (String) data.get(Enum.VariableEnum.initiator.name());
-					name.put(Enum.VariableEnum.initiator.name(),
-							 initiator.length() < LENGTH_INITIATOR ? initiator : initiator.substring(0, LENGTH_INITIATOR - 3) + "...");
-					String taskName = taskService.createTaskQuery()
-							.processInstanceId(instance.getProcessInstanceId())
-							.singleResult().getName();
-					name.put(stato.name(),
-							 taskName.length() < LENGTH_FASE ? taskName : taskName.substring(0, LENGTH_FASE - 3) + "...");
-
-					runtimeService.setProcessInstanceName(instance.getId(), name.toString());
-
-					LOGGER.info("Avviata istanza di processo {}, id: {}", key, instance.getId());
-
-					ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(instance);
-					return new ResponseEntity<>(response, HttpStatus.OK);
-				}
-			} catch (Exception e) {
-				String errorMessage = String.format("Errore nell'avvio della Process Instances di tipo %s con eccezione:", processDefinition);
-				LOGGER.error(errorMessage, e);
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mapOf(ERROR_MESSAGE, errorMessage));
-			}
-		} else {
-			try {
-				// aggiungo l'identityLink che indica l'utente che esegue il task
-				taskService.addUserIdentityLink(taskId, username, TASK_EXECUTOR);
-				taskService.setVariablesLocal(taskId, data);
-				taskService.complete(taskId, data);
-
-				return new ResponseEntity<>(HttpStatus.OK);
-			} catch (Exception e) {
-				//Se non riesco a completare il task rimuovo l'identityLink che indica "l'esecutore" del task e restituisco un INTERNAL_SERVER_ERROR
-				//l'alternativa sarebbe aggiungere l'identityLink dopo avwer completato il task ma posso creare identityLink SOLO di task attivi
-				if(((BpmnError) e).getErrorCode() == "412"){
-					String errorMessage = String.format("%s", e.getMessage());
-					LOGGER.warn(errorMessage);
-					taskService.deleteUserIdentityLink(taskId, username, TASK_EXECUTOR);
-					return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(mapOf(ERROR_MESSAGE, errorMessage));
-				} else {
-					String errorMessage = String.format("%s<br>Errore durante il tentativo di completamento del task %s da parte dell'utente %s", e.getMessage(), taskId, username);
-					LOGGER.error(errorMessage);
-					taskService.deleteUserIdentityLink(taskId, username, TASK_EXECUTOR);
-					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mapOf(ERROR_MESSAGE, errorMessage));}
-			}
-		}
+        // aggiungo l'identityLink che indica l'utente che esegue il task
+		taskService.setVariablesLocal(taskId, data);
+		taskService.addUserIdentityLink(taskId, username, TASK_EXECUTOR);
+		try {
+            taskService.complete(taskId, data);
+        } catch (Exception e) {
+            taskService.deleteUserIdentityLink(taskId, username, TASK_EXECUTOR);
+            throw e;
+        }
 	}
 
 	public DataResponse getTasksCompletedByMe(HttpServletRequest req, @RequestParam("processDefinition") String processDefinition, @RequestParam("firstResult") int firstResult, @RequestParam("maxResults") int maxResults, @RequestParam("order") String order) {
@@ -433,18 +342,6 @@ public class FlowsTaskService {
 		response.setTotal(taskList.size()); //numero totale di task avviati da me
 		response.setData(resultList);
 		return response;
-	}
-
-	private void addIsReleasableVariables(List<TaskResponse> tasks) {
-		for (TaskResponse task : tasks) {
-			RestVariable isUnclaimableVariable = new RestVariable();
-			isUnclaimableVariable.setName("isReleasable");
-			// if has candidate groups or users -> can release
-			isUnclaimableVariable.setValue(taskService.getIdentityLinksForTask(task.getId())
-												   .stream()
-												   .anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
-			task.getVariables().add(isUnclaimableVariable);
-		}
 	}
 
 
@@ -490,5 +387,9 @@ public class FlowsTaskService {
 		}
 		writer.writeAll(entriesIterable);
 		writer.close();
+	}
+
+	private static String ellipsis(String in, int length) {
+		return in.length() < length ? in: in.substring(0, length - 3) + "...";
 	}
 }

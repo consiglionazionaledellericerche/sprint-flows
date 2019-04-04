@@ -1,0 +1,93 @@
+
+<form name="editForm" role="form" novalidate ng-submit="vm.save()" show-validation>
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+                ng-click="vm.clear()">&times;</button>
+        <h4 class="modal-title" id="myExternalMessageLabel" translate="sprintApp.externalMessage.home.createOrEditLabel">Create or edit a External Message</h4>
+    </div>
+    <div class="modal-body">
+        <jhi-alert-error></jhi-alert-error>
+        <div class="form-group" ng-show="vm.externalMessage.id">
+            <label for="id" translate="global.field.id">ID</label>
+            <input type="text" class="form-control" id="id" name="id"
+                    ng-model="vm.externalMessage.id" readonly />
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="sprintApp.externalMessage.url" for="field_url">Url</label>
+            <input type="text" class="form-control" name="url" id="field_url"
+                    ng-model="vm.externalMessage.url"
+                    required />
+            <div ng-show="editForm.url.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.url.$error.required" translate="entity.validation.required">
+                    This field is required.
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="sprintApp.externalMessage.verb" for="field_verb">Verb</label>
+            <select class="form-control" name="verb" ng-model="vm.externalMessage.verb" id="field_verb" required>
+                <option value="POST" translate="sprintApp.ExternalMessageVerb.POST">POST</option>
+                <option value="GET" translate="sprintApp.ExternalMessageVerb.GET">GET</option>
+                <option value="PUT" translate="sprintApp.ExternalMessageVerb.PUT">PUT</option>
+                <option value="PATCH" translate="sprintApp.ExternalMessageVerb.PATCH">PATCH</option>
+                <option value="DELETE" translate="sprintApp.ExternalMessageVerb.DELETE">DELETE</option>
+            </select>
+            <div ng-show="editForm.verb.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.verb.$error.required" translate="entity.validation.required">
+                    This field is required.
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="sprintApp.externalMessage.payload" for="field_payload">Payload</label>
+            <input type="text" class="form-control" name="payload" id="field_payload"
+                    ng-model="vm.externalMessage.payload"
+                    required />
+            <div ng-show="editForm.payload.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.payload.$error.required" translate="entity.validation.required">
+                    This field is required.
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="sprintApp.externalMessage.status" for="field_status">Status</label>
+            <select class="form-control" name="status" ng-model="vm.externalMessage.status" id="field_status" required>
+                <option value="NEW" translate="sprintApp.ExternalMessageStatus.NEW">NEW</option>
+                <option value="SENT" translate="sprintApp.ExternalMessageStatus.SENT">SENT</option>
+                <option value="DELETED" translate="sprintApp.ExternalMessageStatus.DELETED">DELETED</option>
+                <option value="ERROR" translate="sprintApp.ExternalMessageStatus.ERROR">ERROR</option>
+            </select>
+            <div ng-show="editForm.status.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.status.$error.required" translate="entity.validation.required">
+                    This field is required.
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="sprintApp.externalMessage.retries" for="field_retries">Retries</label>
+            <input type="number" class="form-control" name="retries" id="field_retries"
+                    ng-model="vm.externalMessage.retries"
+                     />
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="sprintApp.externalMessage.lastErrorMessage" for="field_lastErrorMessage">Last Error Message</label>
+            <input type="text" class="form-control" name="lastErrorMessage" id="field_lastErrorMessage"
+                    ng-model="vm.externalMessage.lastErrorMessage"
+                     />
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="vm.clear()">
+            <span class="glyphicon glyphicon-ban-circle"></span>&nbsp;<span translate="entity.action.cancel">Cancel</span>
+        </button>
+        <button type="submit" ng-disabled="editForm.$invalid || vm.isSaving" class="btn btn-primary">
+            <span class="glyphicon glyphicon-save"></span>&nbsp;<span translate="entity.action.save">Save</span>
+        </button>
+    </div>
+</form>

@@ -5,7 +5,12 @@
         <h3>Manualistica</h3>
 
         <ul>
-            <li><a href="https://doc-cnr.si.cnr.it/rest/content?nodeRef=e6765d0c-eca5-4503-93ca-b5dde27ea68a">Manuale utente Flusso Acquisti</a></li>
+            <!--<li><a href="https://doc-cnr.si.cnr.it/rest/content?nodeRef=e6765d0c-eca5-4503-93ca-b5dde27ea68a">Manuale utente Flusso Acquisti</a></li>-->
+            <li ng-repeat="manuale in vm.manuali">
+                <a ng-click="downloadManuale(manuale)">
+                    {{manuale}}
+                </a>
+            </li>
         </ul>
 
     </div>
