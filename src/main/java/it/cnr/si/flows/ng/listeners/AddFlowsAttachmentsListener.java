@@ -103,36 +103,42 @@ public class AddFlowsAttachmentsListener implements ActivitiEventListener {
      */
     private String getDefaultPathFascicoloDocumenti(String processInstanceId) {
 
-        String processDefinitionId = runtimeService.getVariable(processInstanceId, "processDefinitionId", String.class).split(":")[0];
-        String key = runtimeService.getVariable(processInstanceId, "key", String.class);
+        String path = runtimeService.getVariable(processInstanceId, "processDefinitionId", String.class);
+        if ( path != null ) {
+            return path;
+        } else {
 
-        Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
+            String processDefinitionId = runtimeService.getVariable(processInstanceId, "processDefinitionId", String.class).split(":")[0];
+            String key = runtimeService.getVariable(processInstanceId, "key", String.class);
 
-        String profile = "flows";
-        if (activeProfiles.contains("dev")) {
-            profile = "flows-dev";
+            Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
+
+            String profile = "flows";
+            if (activeProfiles.contains("dev")) {
+                profile = "flows-dev";
+            }
+            if (activeProfiles.contains("test")) {
+                profile = "flows-test";
+            }
+            if (activeProfiles.contains("demo")) {
+                profile = "flows-demo";
+            }
+
+            String idStruttura = runtimeService.getVariable(processInstanceId, "idStruttura", String.class);
+            String cdsuo = Optional.ofNullable(idStruttura)
+                    .map(id -> aceBridgeService.getUoById(Integer.parseInt(id)).getCdsuo())
+                    .orElse(null);
+
+            String anno = key.split("-")[1];
+
+            path = Stream.of("/Comunicazioni al CNR", profile, processDefinitionId, cdsuo, anno, key)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.joining("/"));
+
+            LOGGER.debug("Path calcolato per il flusso " + key + ": " + path);
+
+            return path;
         }
-        if (activeProfiles.contains("test")) {
-            profile = "flows-test";
-        }
-        if (activeProfiles.contains("demo")) {
-            profile = "flows-demo";
-        }
-
-        String idStruttura = runtimeService.getVariable(processInstanceId, "idStruttura", String.class);
-        String cdsuo = Optional.ofNullable(idStruttura)
-                .map(id -> aceBridgeService.getUoById(Integer.parseInt(id)).getCdsuo())
-                .orElse(null);
-
-        String anno = key.split("-")[1];
-
-        String path = Stream.of("/Comunicazioni al CNR", profile, processDefinitionId, cdsuo, anno, key)
-                .filter(Objects::nonNull)
-                .collect(Collectors.joining("/"));
-
-        LOGGER.debug("Path calcolato per il flusso "+ key +": "+ path);
-
-        return path;
 
     }
     /**
