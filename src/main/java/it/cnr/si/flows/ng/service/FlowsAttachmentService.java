@@ -355,7 +355,7 @@ public class FlowsAttachmentService {
                 new ByteArrayInputStream(storageFile.getBytes()),
                 storageFile.getContentType(),
                 attachmentName,
-				path + "/" + processKey,
+				path,
                 true);
 
         StorageObject updatedSo = storeService.getStorageObjectBykey(
