@@ -9,10 +9,12 @@ import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
+import org.activiti.engine.delegate.event.ActivitiEntityWithVariablesEvent;
 import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
 import org.activiti.engine.delegate.event.ActivitiEventType;
 import org.activiti.engine.delegate.event.impl.ActivitiEntityWithVariablesEventImpl;
+import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
@@ -60,10 +62,12 @@ public class AddFlowsAttachmentsListener implements ActivitiEventListener {
             key = runtimeService.getVariable(event.getExecutionId(), "key", String.class);
 
         } else if (event.getType() == ActivitiEventType.TASK_COMPLETED) {
+            // task = get task from event
+            ActivitiEntityWithVariablesEvent entityEvent = (ActivitiEntityWithVariablesEvent) event;
+            TaskEntity task = (TaskEntity) entityEvent.getEntity();
             path = runtimeService.getVariable(event.getExecutionId(), "pathFascicoloDocumenti", String.class);
-            // taskId = get taskId from event
-            taskId = (runtimeService.getVariable(event.getExecutionId(), "taskId", String.class));
-            taskName = taskService.createTaskQuery().taskId(taskId).singleResult().getName();
+            taskId = task.getId();
+            taskName = task.getName();
             key = runtimeService.getVariable(event.getExecutionId(), "key", String.class);
 
         } else {
