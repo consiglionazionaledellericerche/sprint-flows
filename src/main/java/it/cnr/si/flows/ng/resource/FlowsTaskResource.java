@@ -294,15 +294,18 @@ public class FlowsTaskResource {
 
             if (signResponse.getStatus().equals("OK")) {
                 String key = taskService.getVariable(taskId, "key", String.class);
-                String path = taskService.getVariable(taskId, "path", String.class);
-                String uid = flowsAttachmentService.saveOrUpdateBytes(signResponse.getBinaryoutput(), nomeFile, "signed", key, path);
+                String path = att.getPath();
+                String signedFileName = FirmaDocumentoService.getSignedFilename(att.getFilename());
+                String uid = flowsAttachmentService.saveOrUpdateBytes(signResponse.getBinaryoutput(), nomeFile, signedFileName, key, path);
+
                 att.setUrl(uid);
+                att.setFilename(signedFileName);
                 att.setAzione(Firma);
                 att.addStato(Firmato);
                 att.setUsername(SecurityUtils.getCurrentUserLogin());
                 att.setTime(new Date());
 
-                Map<String, Object> data = new  HashMap<String, Object>() {{
+                Map<String, Object> data = new HashMap<String, Object>() {{
                     put(nomeFile, att);
                 }};
                 flowsTaskService.completeTask(taskId, data);
