@@ -162,7 +162,7 @@ public class FlowsPdfService {
 				variable = variables.stream()
 						.filter(a -> (a.getName()).equals(getPropertyName(metadatum, "rows")))
 						.findFirst();
-				if (variable.isPresent()) {
+				if (variable.isPresent() && variable.get().getValue() != null) {
 					paragraphField.addText(label + ":\n", FONT_SIZE, HELVETICA_BOLD);
 					JSONArray impegni = new JSONArray((String) variable.get().getValue());
 					for (int i = 0; i < impegni.length(); i++) {
@@ -362,6 +362,7 @@ public class FlowsPdfService {
 			//salvo il pdf nel flusso
 			attachment = new FlowsAttachment();
 			attachment.setAzione(Caricamento);
+			attachment.setPath(runtimeService.getVariable(processInstanceId, "pathFascicoloDocumenti", String.class));;
 			attachment.setTaskId(null);
 			attachment.setTaskName(null);
 			attachment.setTime(new Date());
