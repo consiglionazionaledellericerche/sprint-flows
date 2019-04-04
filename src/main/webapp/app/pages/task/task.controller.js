@@ -56,7 +56,6 @@
  		if ($state.params.taskId) {
  			dataService.tasks.getTask($state.params.taskId).then(
  				function(response) {
- 					dataPromise.resolve();
  					$scope.data.taskId = $state.params.taskId;
  					//visualizzazione dei metadati del task in esecuzione
  					var processDefinition = response.data.task.processDefinitionId.split(":");
@@ -69,6 +68,7 @@
 
  					vm.diagramUrl = '/rest/diagram/taskInstance/' + $scope.data.taskId + "?" + new Date().getTime();
  					vm.formUrl = 'api/forms/task/' + $scope.data.taskId;
+ 					dataPromise.resolve();
  				});
  		} else {
  			dataPromise.reject("");

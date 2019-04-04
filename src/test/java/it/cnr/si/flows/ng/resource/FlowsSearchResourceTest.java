@@ -69,7 +69,7 @@ public class FlowsSearchResourceTest {
 
 
     @Test
-    public void testProcessInstanceSearch() throws IOException, JSONException {
+    public void testProcessInstanceSearch() throws Exception {
         processInstance = util.mySetUp(acquisti);
         util.loginAdmin();
 
@@ -322,7 +322,7 @@ public class FlowsSearchResourceTest {
 
     /* ----- TASKS ----- */
     @Test
-    public void testTaskSearch() throws IOException {
+    public void testTaskSearch() throws Exception {
         processInstance = util.mySetUp(acquisti);
 
         util.logout();

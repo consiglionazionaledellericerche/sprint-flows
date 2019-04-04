@@ -88,16 +88,25 @@
             </li>-->
 
 
-            <li ui-sref-active="active" has-authority="ROLE_USER">
-                <a ui-sref="myProcessInstances" ng-click="vm.collapseNavbar()">
-                    <span class="glyphicon glyphicon-pushpin"></span>
-                    <span class="hidden-sm">Flussi avviati da me</span>
-                </a>
-            </li>
+            <!--NASCONDIAMO LA PAGINA "Flussi avviati da me" E SE LA DOVESSERO RICHIEDERE LA RIMETTIAMO (FUNZIONA)-->
+            <!--<li ui-sref-active="active" has-authority="ROLE_USER">-->
+                <!--<a ui-sref="myProcessInstances" ng-click="vm.collapseNavbar()">-->
+                    <!--<span class="glyphicon glyphicon-pushpin"></span>-->
+                    <!--<span class="hidden-sm">Flussi avviati da me</span>-->
+                <!--</a>-->
+            <!--</li>-->
+
+
             <li ui-sref-active="active" has-authority="ROLE_USER">
                 <a ui-sref="search" ng-click="vm.collapseNavbar()">
                     <span class="glyphicon glyphicon-search"></span>
                     <span class="hidden-sm">Ricerca</span>
+                </a>
+            </li>
+            <li ui-sref-active="active" ng-if="vm.$localStorage.cart" has-authority="ROLE_USER">
+                <a ui-sref="cart" ng-click="vm.collapseNavbar()">
+                    <span class="glyphicon glyphicon-shopping-cart"></span>
+                    <span class="hidden-sm">Carrello Firma ({{vm.$localStorage.cart | numkeys}})</span>
                 </a>
             </li>
             <li ui-sref-active="active" has-authority="ROLE_USER">
@@ -182,6 +191,12 @@
                             <a ui-sref="avviso" ng-click="vm.collapseNavbar()">
                                 <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
                                 <span translate="global.menu.entities.avviso">Avviso</span>
+                            </a>
+                        </li>
+                    <li ui-sref-active="active" >
+                            <a ui-sref="external-message" ng-click="vm.collapseNavbar()">
+                                <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
+                                <span translate="global.menu.entities.externalMessage">External Message</span>
                             </a>
                         </li>
                     <!-- jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here -->

@@ -1,5 +1,15 @@
 <strong>{{label}}</strong>
 <span class="glyphicon glyphicon-question-sign" ng-show="item.placeholder" data-toggle="tooltip" data-placement="top" title="{{item.placeholder}}"></span>
 <div class="jstree-bootstrap">
-    <div js-tree="treeConfig" ng-model="jsonlist" tree="treeInstance" should-apply="ignoreModelChanges()" tree-events="ready:readyCB;select_node:select_node"></div>
+    <div ng-show="searchId">
+        <div>
+            <label>Search:
+                <input type="text" id="js-tree_q" value="" class="input">
+            </label>
+        </div>
+        <div id="js-tree" js-tree="treeConfig" ng-model="jsonlist" tree="treeInstance" should-apply="ignoreModelChanges()" tree-events="ready:readyCB;select_node:select_node"></div>
+    </div>
+    <div ng-show="!searchId">
+        <div js-tree="treeConfig" ng-model="jsonlist" tree="treeInstance" should-apply="ignoreModelChanges()" tree-events="ready:readyCB;select_node:select_node"></div>
+    </div>
 </div>

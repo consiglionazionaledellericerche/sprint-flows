@@ -184,7 +184,9 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
                         Optional.ofNullable(execution.getVariable(ManageProcessIscrizioneElencoOiv.ID_DOMANDA))
                                 .filter(String.class::isInstance)
                                 .map(String.class::cast)
-                                .orElse(null), fileRecuperato.getName(), fileRecuperato.getBytes());
+                                .orElse(null),
+                        fileRecuperato.getName(),
+                        attachmentService.getAttachmentContentBytes(fileRecuperato));
             }
             ;
             break;
@@ -233,7 +235,10 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
                             Optional.ofNullable(execution.getVariable(ID_DOMANDA))
                                     .filter(String.class::isInstance)
                                     .map(String.class::cast)
-                                    .orElse(null), flowsAttachment.get().getName(), flowsAttachment.get().getBytes(), rigetto.name());
+                                    .orElse(null),
+                            flowsAttachment.get().getName(),
+                            attachmentService.getAttachmentContentBytes(flowsAttachment.get()),
+                            rigetto.name());
                 }
             }
             break;
