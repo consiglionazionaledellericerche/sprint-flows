@@ -61,5 +61,10 @@
             });
     };
   })
+  .filter('numkeys', function() {
+    return function(object) {
+      return Object.keys(object).length;
+    }
+  });
 
 })();

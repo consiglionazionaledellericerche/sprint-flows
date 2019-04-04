@@ -5,13 +5,14 @@
 	.module('sprintApp')
 	.controller('NavbarController', NavbarController);
 
-	NavbarController.$inject = ['$rootScope', '$scope', '$state', 'Auth', 'Principal', 'ProfileService', 'LoginService', 'SwitchUserService', 'dataService', '$log'];
+	NavbarController.$inject = ['$rootScope', '$localStorage', '$scope', '$state', 'Auth', 'Principal', 'ProfileService', 'LoginService', 'SwitchUserService', 'dataService', '$log'];
 
-	function NavbarController($rootScope, $scope, $state, Auth, Principal, ProfileService, LoginService, SwitchUserService, dataService, $log) {
+	function NavbarController($rootScope, $localStorage, $scope, $state, Auth, Principal, ProfileService, LoginService, SwitchUserService, dataService, $log) {
 		var vm = this;
 
 		vm.isNavbarCollapsed = true;
 		vm.isAuthenticated = Principal.isAuthenticated;
+		vm.$localStorage = $localStorage;
 
 		vm.login = login;
 		vm.logout = logout;
@@ -55,9 +56,6 @@
 			collapseNavbar();
 			Auth.logout();
 			$state.go('home');
-			$rootScope.wfDefsBootable = []; // TODO la logica e' che gli oggetti non vanno svuotati qui
-			$rootScope.wfDefsStatistics = []; // TODO la logica e' che gli oggetti non vanno svuotati qui
-			$rootScope.wfDefsAll = []; // TODO la logica e' che gli oggetti non vanno svuotati qui
 		}
 
 		function toggleNavbar() {

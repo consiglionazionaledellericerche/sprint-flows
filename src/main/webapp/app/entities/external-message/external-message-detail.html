@@ -1,0 +1,43 @@
+
+<div>
+    <h2><span translate="sprintApp.externalMessage.detail.title">External Message</span> {{vm.externalMessage.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span translate="sprintApp.externalMessage.url">Url</span></dt>
+        <dd>
+            <span>{{vm.externalMessage.url}}</span>
+        </dd>
+        <dt><span translate="sprintApp.externalMessage.verb">Verb</span></dt>
+        <dd>
+            <span translate="{{'sprintApp.ExternalMessageVerb.' + vm.externalMessage.verb}}">{{vm.externalMessage.verb}}</span>
+        </dd>
+        <dt><span translate="sprintApp.externalMessage.payload">Payload</span></dt>
+        <dd>
+            <span>{{vm.externalMessage.payload}}</span>
+        </dd>
+        <dt><span translate="sprintApp.externalMessage.status">Status</span></dt>
+        <dd>
+            <span translate="{{'sprintApp.ExternalMessageStatus.' + vm.externalMessage.status}}">{{vm.externalMessage.status}}</span>
+        </dd>
+        <dt><span translate="sprintApp.externalMessage.retries">Retries</span></dt>
+        <dd>
+            <span>{{vm.externalMessage.retries}}</span>
+        </dd>
+        <dt><span translate="sprintApp.externalMessage.lastErrorMessage">Last Error Message</span></dt>
+        <dd>
+            <span>{{vm.externalMessage.lastErrorMessage}}</span>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            ui-sref="{{ vm.previousState }}"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span translate="entity.action.back"> Back</span>
+    </button>
+
+    <button type="button" ui-sref="external-message-detail.edit({id:vm.externalMessage.id})" class="btn btn-primary">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="hidden-xs hidden-sm" translate="entity.action.edit"> Edit</span>
+    </button>
+</div>

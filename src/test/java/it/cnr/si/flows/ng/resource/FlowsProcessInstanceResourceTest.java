@@ -21,7 +21,6 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ActiveProfiles;
@@ -34,6 +33,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.ParseException;
+import java.time.Year;
 import java.util.*;
 
 import static it.cnr.si.flows.ng.TestServices.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
@@ -42,7 +42,6 @@ import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
 import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
 import static it.cnr.si.flows.ng.utils.Utils.ASC;
 import static org.junit.Assert.*;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 
@@ -90,30 +89,30 @@ public class FlowsProcessInstanceResourceTest {
     }
 
     @Test
-    public void testGetMyProcesses() throws IOException {
+    public void testGetMyProcesses() throws Exception {
         processInstance = util.mySetUp(acquisti);
         String processInstanceID = verifyMyProcesses(1, 0);
-        // testo che, anche se una Process Instance viene sospesa, la vedo ugualmente
+//        La sospensione non viene usata dall`applicazione
+//        // testo che, anche se una Process Instance viene sospesa, la vedo ugualmente
+//        util.loginAdmin();
+//        flowsProcessInstanceResource.suspend(new MockHttpServletRequest(), processInstanceID);
+//
+//        util.loginResponsabileAcquisti();
+//        processInstanceID = verifyMyProcesses(1, 0);
+        //testo che cancellandola una Process Instances NON la vedo tra i processi avviati da me
         util.loginAdmin();
-        flowsProcessInstanceResource.suspend(new MockHttpServletRequest(), processInstanceID);
-
-        util.loginResponsabileAcquisti();
-        processInstanceID = verifyMyProcesses(1, 0);
-        //testo che sospendendo una Process Instances NON la vedo tra i processi avviati da me
-        util.loginAdmin();
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        flowsProcessInstanceResource.delete(response, processInstanceID, "TEST");
-        assertEquals(NO_CONTENT.value(), response.getStatus());
+        ResponseEntity response = flowsProcessInstanceResource.delete(processInstanceID, "TEST");
+        assertEquals(OK, response.getStatusCode());
         util.loginResponsabileAcquisti();
         verifyMyProcesses(0, 0);
     }
 
 
     @Test(expected = AccessDeniedException.class)
-    public void testGetProcessInstanceById() throws IOException {
+    public void testGetProcessInstanceById() throws Exception {
         processInstance = util.mySetUp(acquisti);
 
-        ResponseEntity<Map<String, Object>> response = (ResponseEntity<Map<String, Object>>) flowsProcessInstanceResource.getProcessInstanceById(new MockHttpServletRequest(), processInstance.getId(), true);
+        ResponseEntity<Map<String, Object>> response = (ResponseEntity<Map<String, Object>>) flowsProcessInstanceResource.getProcessInstanceById(processInstance.getId(), true);
         assertEquals(OK, response.getStatusCode());
 
         HistoricProcessInstanceResponse entity = (HistoricProcessInstanceResponse) ((HashMap) response.getBody()).get("entity");
@@ -138,15 +137,15 @@ public class FlowsProcessInstanceResourceTest {
 
         //verifica che gli utenti con ROLE_ADMIN POSSANO accedere al servizio
         util.loginAdmin();
-        flowsProcessInstanceResource.getProcessInstanceById(new MockHttpServletRequest(), processInstance.getId(), false);
+        flowsProcessInstanceResource.getProcessInstanceById(processInstance.getId(), false);
 
         //verifica AccessDeniedException (risposta 403 Forbidden) in caso di accesso di utenti non autorizzati
         util.loginUser();
-        flowsProcessInstanceResource.getProcessInstanceById(new MockHttpServletRequest(), processInstance.getId(), false);
+        flowsProcessInstanceResource.getProcessInstanceById(processInstance.getId(), false);
     }
 
     @Test
-    public void testGetProcessInstances() throws IOException {
+    public void testGetProcessInstances() throws Exception {
         processInstance = util.mySetUp(acquisti);
 
         //responsabileacquisti crea una seconda Process Instance di acquisti con suffisso "2" nel titolo della PI
@@ -162,9 +161,10 @@ public class FlowsProcessInstanceResourceTest {
         req.setParameter("strumentoAcquisizioneId", "11");
         req.setParameter("priorita", "Alta");
         req.setParameter("rup", "spaclient");
-        req.setParameter("impegni_json", "[{\"numero\":\"1\",\"importoNetto\":100,\"importoLordo\":120,\"descrizione\":\"descrizione impegno\",\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"gae\":\"spaclient\"}]");
+//        req.setParameter("impegni_json", "[{\"numero\":\"1\",\"importoNetto\":100,\"importoLordo\":120,\"descrizione\":\"descrizione impegno\",\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"gae\":\"spaclient\"}]");
+        req.setParameter("impegni_json", "[{\"descrizione\":\"Impegno numero 1\",\"percentualeIva\":20,\"importoNetto\":100,\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"uo\":\"2216\",\"gae\":\"spaclient\",\"progetto\":\"Progetto impegno 1\"}]");
 
-        ResponseEntity<Object> resp = flowsTaskResource.completeTask(req);
+        ResponseEntity<ProcessInstanceResponse> resp = flowsTaskResource.completeTask(req);
         assertEquals(OK, resp.getStatusCode());
 
         //Verifico che Admin veda entrambe le Process Instances create
@@ -185,11 +185,10 @@ public class FlowsProcessInstanceResourceTest {
         assertEquals(acquistiTrasparenzaId, entities.get(1).getProcessDefinitionId());
 
         //cancello un processo
-        MockHttpServletResponse response = new MockHttpServletResponse();
         String activeId = entities.get(0).getId();
         String notActiveId = entities.get(1).getId();
-        flowsProcessInstanceResource.delete(response, notActiveId, "test");
-        assertEquals(response.getStatus(), NO_CONTENT.value());
+        ResponseEntity response = flowsProcessInstanceResource.delete(notActiveId, "test");
+        assertEquals(response.getStatusCode(), OK);
 
         // verifico che RA veda UN processo terminato/cancellato in più (quello appena concellato + quelli cancellati nel tearDown dei test precedenti)
         util.loginResponsabileAcquisti();
@@ -212,7 +211,7 @@ public class FlowsProcessInstanceResourceTest {
 
 
     @Test
-    public void testSuspend() throws IOException {
+    public void testSuspend() throws Exception {
         processInstance = util.mySetUp(acquisti);
         assertEquals(false, processInstance.isSuspended());
         //solo admin può sospendere il flow
@@ -222,7 +221,7 @@ public class FlowsProcessInstanceResourceTest {
     }
 
     @Test
-    public void testGetVariable() throws IOException {
+    public void testGetVariable() throws Exception {
         processInstance = util.mySetUp(acquisti);
 //        processInstance = util.mySetUp(iscrizioneElencoOiv);
 
@@ -234,7 +233,7 @@ public class FlowsProcessInstanceResourceTest {
 
 
     @Test
-    public void testAddAndDeleteGroupIdentityLink() throws IOException {
+    public void testAddAndDeleteGroupIdentityLink() throws Exception {
         processInstance = util.mySetUp(acquisti);
         //le funzionalità può essere acceduta solo con privileggi "ADMIN"
         util.loginAdmin();
@@ -274,7 +273,7 @@ public class FlowsProcessInstanceResourceTest {
 
 
     @Test
-    public void testAddAndDeleteUserIdentityLink() throws IOException {
+    public void testAddAndDeleteUserIdentityLink() throws Exception {
         processInstance = util.mySetUp(acquisti);
         //le funzionalità può essere acceduta solo con privileggi "ADMIN"
         util.loginAdmin();
@@ -312,12 +311,12 @@ public class FlowsProcessInstanceResourceTest {
 
 
     @Test
-    public void getProcessInstancesForTrasparenzaTest() throws IOException, ParseException {
+    public void getProcessInstancesForTrasparenzaTest() throws Exception {
         processInstance = util.mySetUp(acquisti);
 
         util.loginAdmin();
         ResponseEntity<List<Map<String, Object>>> res = flowsProcessInstanceResource
-                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, 2018, 0, 10, ASC);
+                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, Year.now().getValue(), 0, 10, ASC);
 
         assertEquals(OK, res.getStatusCode());
         //prendo anche le Pi create negli altri test
@@ -325,7 +324,7 @@ public class FlowsProcessInstanceResourceTest {
 
         //prova recupero 10 elementi dopo il quinto (result = 3 perchè ho 8 Process Instance in totale - anche quelle generate negli altri test)
         res = flowsProcessInstanceResource
-                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, 2018, 5, 10, ASC);
+                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, Year.now().getValue(), 5, 10, ASC);
 
         //prendo anche le Pi create negli altri test
         assertEquals(OK, res.getStatusCode());
@@ -334,7 +333,7 @@ public class FlowsProcessInstanceResourceTest {
 
         //prova senza ordinamento (recupera le 8 process instances - anche quelle generate negli altri test)
         res = flowsProcessInstanceResource
-                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, 2018, 0, 10, null);
+                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, Year.now().getValue(), 0, 10, null);
 
         assertEquals(OK, res.getStatusCode());
         //prendo anche le Pi create negli altri test
@@ -343,7 +342,7 @@ public class FlowsProcessInstanceResourceTest {
 
         //prova anni sbagliati
         res = flowsProcessInstanceResource
-                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2016, 2016, 0, 10, ASC);
+                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2016, Year.now().getValue() - 1, 0, 10, ASC);
 
         assertEquals(OK, res.getStatusCode());
         assertEquals(0, res.getBody().size());
@@ -354,25 +353,22 @@ public class FlowsProcessInstanceResourceTest {
         String proceeeInstanceID = null;
         // Admin vede la Process Instance che ha avviato
         Map<String, String> searchParams = new HashMap<>();
-        searchParams.put("active", "true");
-        searchParams.put("page", "1");
-        searchParams.put("processDefinitionKey", ALL_PROCESS_INSTANCES);
-        searchParams.put("order", ASC);
 
-        ResponseEntity<Map<String, Object>> response = flowsProcessInstanceResource.getMyProcessInstances(searchParams);
+        ResponseEntity<Map<String, Object>> response = flowsProcessInstanceResource.getMyProcessInstances(0, 10, ASC, true, ALL_PROCESS_INSTANCES, searchParams);
         assertEquals(OK, response.getStatusCode());
-        ArrayList<HistoricProcessInstanceResponse> processInstances = (ArrayList<HistoricProcessInstanceResponse>)response.getBody().get("processInstances");
+
+        ArrayList processInstances = (ArrayList) ((DataResponse)response.getBody()).getData();
         assertEquals(startedByRA, processInstances.size());
         if (processInstances.size() > 0)
-            proceeeInstanceID = processInstances.get(0).getId() ;
-//
+            proceeeInstanceID = ((HistoricProcessInstanceResponse)processInstances.get(0)).getId() ;
+
         // User NON vede la Process Instance avviata da Admin
         util.loginUser();
-        response = flowsProcessInstanceResource.getMyProcessInstances(searchParams);
+
+        response = flowsProcessInstanceResource.getMyProcessInstances(0, 10, ASC, true, ALL_PROCESS_INSTANCES, searchParams);
         assertEquals(OK, response.getStatusCode());
-        assertEquals(startedBySpaclient, ((ArrayList<HistoricProcessInstanceResponse>)response.getBody().get("processInstances")).size());
+        assertEquals(startedBySpaclient, ((ArrayList) ((DataResponse)response.getBody()).getData()).size());
         util.loginResponsabileAcquisti();
         return proceeeInstanceID;
     }
-
 }

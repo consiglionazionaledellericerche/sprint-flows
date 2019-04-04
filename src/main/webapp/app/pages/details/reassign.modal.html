@@ -1,0 +1,17 @@
+<div class="modal-header">
+  <h4>Riassegnazione del Compito</h4>
+  <div class="form-group">
+    <label for="user">Selezionare l'utente a cui assegnare il compito:</label>
+    <typeaheadinput
+      type="users"
+      id="rup"
+      ng-model="vm.user"
+      label-model="vm.user_label"
+      ng-required="true"
+    ></typeaheadinput>
+  </div>
+
+  <button class="btn btn-warning" ng-click="reassignTask(vm.user)">
+    <span class="glyphicon glyphicon-hand-right"></span> Assegna Compito
+  </button>
+</div>
