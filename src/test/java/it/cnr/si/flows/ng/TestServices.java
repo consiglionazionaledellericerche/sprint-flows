@@ -53,6 +53,7 @@ public class TestServices {
     //    private static final String RA = "responsabileacquisti";
     private static final String DIRETTORE = "maurizio.lancia";
     private static final String RA = "anna.penna";
+    private static final String RFAS = "marcinireneusz.trycz";
     private static final String RA2 = "silvia.rossi";
     private static final String APP = "utente1";
     private static final String ISTRUTTORE = "utente5" ;
@@ -113,6 +114,11 @@ public class TestServices {
         login(TestServices.RA, "");
     }
 
+    public void loginResponsabileFlussoAcquistiForStruttura() {
+        logout();
+        login(TestServices.RFAS, "");
+    }
+
     public void loginResponsabileAcquisti2() {
         logout();
         login(TestServices.RA2, "");
@@ -163,7 +169,7 @@ public class TestServices {
         return firstTaskId;
     }
 
-    public ProcessInstanceResponse mySetUp(Enum.ProcessDefinitionEnum processDefinitionKey) throws IOException {
+    public ProcessInstanceResponse mySetUp(Enum.ProcessDefinitionEnum processDefinitionKey) throws Exception {
         ProcessInstanceResponse processInstanceResponse = null;
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
 
@@ -184,10 +190,12 @@ public class TestServices {
                 req.setParameter("tipologiaAcquisizioneId", "11");
                 req.setParameter("strumentoAcquisizione", "AFFIDAMENTO DIRETTO - MEPA o CONSIP\n");
                 req.setParameter("strumentoAcquisizioneId", "11");
-                req.setParameter("priorita", "Alta");
                 req.setParameter("rup", "marco.spasiano");
                 req.setParameter("rup_label", "MARCO SPASIANO (marco.spasiano)");
-                req.setParameter("impegni_json", "[{\"numero\":\"1\",\"importoNetto\":100,\"importoLordo\":120,\"descrizione\":\"descrizione impegno\",\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"gae\":\"spaclient\"}]");
+                req.setParameter("impegni_json", "[{\"descrizione\":\"Impegno numero 1\",\"percentualeIva\":20,\"importoNetto\":100,\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"uo\":\"2216\",\"gae\":\"spaclient\",\"progetto\":\"Progetto impegno 1\"}]");
+                req.setParameter("richiestaDiAcquisto_label", "Richiesta di Acquisto");
+                req.setParameter("tipologiaAffidamentoDiretto", "semplificata");
+
                 break;
             case iscrizioneElencoOiv:
                 loginAbilitatiIscrizioneElencoOiv();
@@ -214,10 +222,10 @@ public class TestServices {
                 break;
         }
         //Recupero la ProcessInstance
-        ResponseEntity<Object> response = flowsTaskResource.completeTask(req);
+        ResponseEntity<ProcessInstanceResponse> response = flowsTaskResource.completeTask(req);
         assertEquals(OK, response.getStatusCode());
 
-        ProcessInstanceResponse body = (ProcessInstanceResponse) response.getBody();
+        ProcessInstanceResponse body = response.getBody();
 
 
         // Recupero il TaskId del primo task del flusso

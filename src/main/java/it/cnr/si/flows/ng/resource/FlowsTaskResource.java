@@ -1,16 +1,32 @@
 package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
-import it.cnr.si.flows.ng.service.CoolFlowsBridgeService;
-import it.cnr.si.flows.ng.service.FlowsTaskService;
+import it.cnr.jada.firma.arss.ArubaSignServiceException;
+import it.cnr.jada.firma.arss.stub.SignReturnV2;
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.exception.FlowsPermissionException;
+import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
+import it.cnr.si.flows.ng.service.*;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
+import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
-
+import it.cnr.si.security.FlowsUserDetailsService;
+import it.cnr.si.security.PermissionEvaluatorImpl;
+import it.cnr.si.service.RelationshipService;
+import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.IdentityLinkType;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.activiti.rest.common.api.DataResponse;
+import org.activiti.rest.service.api.RestResponseFactory;
+import org.activiti.rest.service.api.engine.variable.RestVariable;
+import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
+import org.activiti.rest.service.api.runtime.task.TaskResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
@@ -19,17 +35,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-
-import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
-
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static it.cnr.si.flows.ng.service.FlowsFirmaService.ERRORI_ARUBA;
+import static it.cnr.si.flows.ng.service.FlowsFirmaService.NOME_FILE_FIRMA;
+import static it.cnr.si.flows.ng.utils.Enum.Azione.Firma;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.Firmato;
+import static it.cnr.si.flows.ng.utils.Utils.*;
 
 /**
  * @author mtrycz
@@ -39,18 +57,37 @@ import java.util.Map;
 @RequestMapping("api/tasks")
 public class FlowsTaskResource {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlowsTaskResource.class);
+
     @Inject
     private TaskService taskService;
     @Inject
     private FlowsTaskService flowsTaskService;
+    @Inject
+    private RestResponseFactory restResponseFactory;
+    @Inject
+    private RepositoryService repositoryService;
 
     @Autowired(required = false) @Deprecated
     private CoolFlowsBridgeService coolBridgeService;
 
     @Inject
     private RuntimeService runtimeService;
+    @Inject
+    private RelationshipService relationshipService;
+    @Inject
+    private FlowsAttachmentService attachmentService;
+    @Inject
+    private FlowsFirmaService flowsFirmaService;
+    @Inject
+    private FlowsAttachmentService flowsAttachmentService;
+    @Inject
+    private PermissionEvaluatorImpl permissionEvaluator;
+    @Inject
+    private FlowsUserDetailsService flowsUserDetailsService;
 
-    @RequestMapping(value = "/mytasks", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+
+    @PostMapping(value = "/mytasks", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<DataResponse> getMyTasks(
@@ -60,13 +97,37 @@ public class FlowsTaskResource {
             @RequestParam("maxResults") int maxResults,
             @RequestParam("order") String order) {
 
-        DataResponse response = flowsTaskService.getMyTask(req, processDefinition, firstResult, maxResults, order);
+        String username = SecurityUtils.getCurrentUserLogin();
+
+        TaskQuery taskQuery = taskService.createTaskQuery()
+                .taskAssignee(username)
+                .includeProcessVariables();
+
+        if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
+            taskQuery.processDefinitionKey(processDefinition);
+
+        taskQuery = (TaskQuery) Utils.searchParamsForTasks(req, taskQuery);
+
+        Utils.orderTasks(order, taskQuery);
+
+        List<TaskResponse> tasksList = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
+
+        //aggiungo ad ogni singola TaskResponse la variabile che indica se il task è restituibile ad un gruppo (true)
+        // o se è stato assegnato ad un utente specifico "dal sistema" (false)
+        addIsReleasableVariables(tasksList);
+
+        DataResponse response = new DataResponse();
+        response.setStart(firstResult);
+        response.setSize(tasksList.size());
+        response.setTotal(taskQuery.count());
+        response.setData(tasksList);
 
         return ResponseEntity.ok(response);
     }
 
 
-    @RequestMapping(value = "/availabletasks", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+
+    @PostMapping(value = "/availabletasks", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<DataResponse> getAvailableTasks(
@@ -82,7 +143,8 @@ public class FlowsTaskResource {
     }
 
 
-    @RequestMapping(value = "/taskAssignedInMyGroups", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+
+    @PostMapping(value = "/taskAssignedInMyGroups", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<DataResponse> taskAssignedInMyGroups(
@@ -98,7 +160,8 @@ public class FlowsTaskResource {
     }
 
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Map<String, Object>> getTask(@PathVariable("id") String taskId) {
@@ -110,8 +173,8 @@ public class FlowsTaskResource {
 
 
 
-    @RequestMapping(value = "/claim/{taskId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-//    @PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.canAssignTask(#taskId, @flowsUserDetailsService)")
+    @PutMapping(value = "/claim/{taskId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.canClaimTask(#taskId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Map<String, Object>> claimTask(@PathVariable("taskId") String taskId) {
 
@@ -122,8 +185,36 @@ public class FlowsTaskResource {
     }
 
 
-    @RequestMapping(value = "/claim/{taskId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canAssignTask(#taskId, @flowsUserDetailsService)")
+
+    @PutMapping(value = "/reassign/{assignee:.*}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.isResponsabile(#taskId, #processInstanceId, @flowsUserDetailsService)")
+    @Timed
+    public ResponseEntity<Map<String, Object>> reassignTask(
+            @RequestParam(name = "processInstanceId", required=false) String processInstanceId,
+            @RequestParam(name = "taskId", required=false) String taskId,
+            @PathVariable(value = "assignee") String assignee) {
+
+        if(taskId == null) {
+            // se vengo da pagine in cui ho solo il processInstanceId (tipo ricerca) trovo il taskId
+            Task task = taskService.createTaskQuery()
+                    .processInstanceId(processInstanceId)
+                    .includeProcessVariables()
+                    .singleResult();
+            taskId = task.getId();
+        }
+        taskService.setAssignee(taskId, assignee);
+
+        // Aggiungo l`identityLink per la visualizzazione
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        runtimeService.addUserIdentityLink(task.getProcessInstanceId(), taskId, PROCESS_VISUALIZER);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+
+    @DeleteMapping(value = "/claim/{taskId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canClaimTask(#taskId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Map<String, Object>> unclaimTask(@PathVariable("taskId") String taskId) {
         taskService.unclaim(taskId);
@@ -131,32 +222,30 @@ public class FlowsTaskResource {
     }
 
 
-    @RequestMapping(value = "/{id}/{user:.*}", method = RequestMethod.PUT)
-    @Timed
-    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canAssignTask(#id, #user)")
-    public ResponseEntity<Map<String, Object>> assignTask(
-            HttpServletRequest req,
-            @PathVariable("id") String id,
-            @PathVariable("user") String user) {
 
-        //    todo: non è ancora usata nell'interfaccia, fare i test
-        taskService.setAssignee(id, user);
-        Task task = taskService.createTaskQuery().taskId(id).singleResult();
-        runtimeService.addUserIdentityLink(task.getProcessInstanceId(), user, PROCESS_VISUALIZER);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-
-    @RequestMapping(value = "complete", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "complete",consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canCompleteTaskOrStartProcessInstance(#req, @flowsUserDetailsService)")
     @Timed
-    public ResponseEntity<Object> completeTask(MultipartHttpServletRequest req) throws IOException {
+    public ResponseEntity<ProcessInstanceResponse> completeTask(MultipartHttpServletRequest req) {
 
-        return flowsTaskService.completeTask(req);
+        Map<String, Object> data = extractParameters(req);
+        String taskId       = (String) data.get("taskId");
+        String definitionId = (String) data.get("processDefinitionId");
+        if (isEmpty(taskId) && isEmpty(definitionId))
+            throw new ProcessDefinitionAndTaskIdEmptyException();
+
+        if (isEmpty(taskId)) {
+            ProcessInstance instance = flowsTaskService.startProcessInstance(definitionId, data);
+
+            return ResponseEntity.ok(restResponseFactory.createProcessInstanceResponse(instance));
+        } else {
+            flowsTaskService.completeTask(taskId, data);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
     }
 
 
-    @RequestMapping(value = "/taskCompletedByMe", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/taskCompletedByMe", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<Object> getTasksCompletedByMe(
@@ -171,9 +260,74 @@ public class FlowsTaskResource {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping(value = "/signMany")
+    public ResponseEntity<Map<String, List<String>>> signMany(@RequestParam("username") String username,
+                                                              @RequestParam("password") String password,
+                                                              @RequestParam("otp") String otp,
+                                                              @RequestParam("taskIds") List<String> taskIds)
+            throws ArubaSignServiceException, FlowsPermissionException {
+
+        verificaPrecondizioniFirmaMultipla(taskIds);
+
+        List<Task> tasks = new ArrayList<>();
+        List<String> nomiFileDaFirmare = new ArrayList<>();
+        List<FlowsAttachment> fileDaFirmare = new ArrayList<>();
+        List<byte[]> fileContents = new ArrayList<>();
+
+        for (int i = 0; i < taskIds.size(); i++) {
+            String id = taskIds.get(i);
+            nomiFileDaFirmare.add(NOME_FILE_FIRMA.get(
+                    taskService.createTaskQuery().taskId(id).singleResult().getTaskDefinitionKey()));
+            fileDaFirmare.add(taskService.getVariable(id, nomiFileDaFirmare.get(i), FlowsAttachment.class));
+            fileContents.add(flowsAttachmentService.getAttachmentContentBytes(fileDaFirmare.get(i)));
+        }
+
+        List<String> succesfulTasks = new ArrayList<>();
+        List<String> failedTasks    = new ArrayList<>();
+        List<SignReturnV2> signResponses = flowsFirmaService.firmaMultipla(username, password, otp, fileContents);
+
+        for (int i = 0; i < taskIds.size(); i++) {
+            SignReturnV2 signResponse = signResponses.get(i);
+            String taskId = taskIds.get(i);
+            String nomeFile = nomiFileDaFirmare.get(i);
+            FlowsAttachment att = fileDaFirmare.get(i);
+
+            if (signResponse.getStatus().equals("OK")) {
+                String key = taskService.getVariable(taskId, "key", String.class);
+                String path = taskService.getVariable(taskId, "path", String.class);
+                String uid = flowsAttachmentService.saveOrUpdateBytes(signResponse.getBinaryoutput(), nomeFile, "signed", key, path);
+                att.setUrl(uid);
+                att.setAzione(Firma);
+                att.addStato(Firmato);
+                att.setUsername(SecurityUtils.getCurrentUserLogin());
+                att.setTime(new Date());
+
+                Map<String, Object> data = new  HashMap<String, Object>() {{
+                    put(nomeFile, att);
+                }};
+                flowsTaskService.completeTask(taskId, data);
+
+                succesfulTasks.add(taskId);
+
+            } else {
+                String taskError = ERRORI_ARUBA.getOrDefault(signResponse.getReturnCode(), "Errore sconosciuto");
+                String key = taskService.getVariable(taskId, "key", String.class);
+                failedTasks.add(taskId +":"+ key +" - "+ taskError);
+            }
+        }
+
+        return ResponseEntity.ok(
+                new HashMap<String, List<String>>() {{
+                    put("success", succesfulTasks);
+                    put("failure", failedTasks);
+                }});
+
+    }
+
+
     @Profile("cnr")
     @Deprecated
-    @RequestMapping(value = "/coolAvailableTasks", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/coolAvailableTasks", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<Map<String, Long>> getCoolAvailableTasks() {
@@ -205,8 +359,58 @@ public class FlowsTaskResource {
             result.compute(procDefId, (k,v) -> v+1);
         });
 
-
         return ResponseEntity.ok(result);
     }
 
+    // TODO magari un giorno avremo degli array, ma per adesso ce lo facciamo andare bene cosi'
+    public static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
+
+        Map<String, Object> data = new HashMap<>();
+        List<String> parameterNames = Collections.list(req.getParameterNames());
+        parameterNames.stream()
+                .filter(paramName -> !parameterNames.contains(paramName.split("\\[")[0] + "_json"))
+                .filter(paramName -> !paramName.equals("cacheBuster"))
+                .forEach(paramName -> data.put(paramName, req.getParameter(paramName)));
+
+        // aggiungo anche i files
+        parameterNames.stream()
+                .filter( paramName -> paramName.endsWith("_aggiorna") )
+                .filter( paramName -> "true".equals(req.getParameter(paramName)) )
+                .map( paramName -> paramName.replace("_aggiorna", ""))
+                .forEach( paramName -> {
+
+                    Optional.ofNullable(req.getFile(paramName + "_data"))
+                            .ifPresent(file -> {
+                                try {
+                                    data.put(paramName + "_data", file.getBytes());
+                                    data.put(paramName + "_filename", file.getOriginalFilename());
+                                } catch (IOException e) {
+                                    throw new RuntimeException("Errore nella lettura del file", e);
+                                }
+                            });
+                });
+
+        return data;
+    }
+
+    private void addIsReleasableVariables(List<TaskResponse> tasks) {
+        for (TaskResponse task : tasks) {
+            RestVariable isUnclaimableVariable = new RestVariable();
+            isUnclaimableVariable.setName("isReleasable");
+            // if has candidate groups or users -> can release
+            isUnclaimableVariable.setValue(taskService.getIdentityLinksForTask(task.getId())
+                    .stream()
+                    .anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
+            task.getVariables().add(isUnclaimableVariable);
+        }
+    }
+
+    private void verificaPrecondizioniFirmaMultipla(List<String> taskIds) throws FlowsPermissionException {
+
+        if ( ! taskIds.stream()
+                .allMatch(id -> permissionEvaluator.canCompleteTask(id, flowsUserDetailsService)) )
+            throw new FlowsPermissionException("Nel carrello sono presenti compiti per cui l'utente non ha i permessi necessari");
+
+
+    }
 }

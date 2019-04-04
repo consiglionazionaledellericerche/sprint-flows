@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -73,7 +74,7 @@ public class AceBridgeService {
 
 	public List<EntitaOrganizzativaWebDto> getUoLike(String uoName) {
 
-		return aceService.entitaOrganizzativaFind(uoName)
+		return aceService.entitaOrganizzativaFind(null, null, uoName, LocalDate.now(), null)
 				.getItems()
 				.stream()
 				.filter(e -> Enum.TipiEOPerAutocomplete.contains(e.getTipo().getId()))

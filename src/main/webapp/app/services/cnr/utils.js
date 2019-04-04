@@ -21,7 +21,13 @@
         function swap(entity) {
             entity.variabili = {};
             entity.variables.forEach(function(el) {
-                entity.variabili[el.name] = el.valueUrl ? el.valueUrl : el.value;
+
+                if (el.valueUrl)
+                    entity.variabili[el.name] = el.valueUrl
+                else {
+                    var date = moment(el.value, 'YYYY-MM-DDTHH:mm:ss.SSSZ', true);
+                    entity.variabili[el.name] = date.isValid() ? date.toDate() : el.value;
+                }
             });
             return entity;
         }

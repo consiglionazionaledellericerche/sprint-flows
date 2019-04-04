@@ -43,7 +43,7 @@ public class SostituisciDocumentoListener implements ExecutionListener {
         LOGGER.debug("Ricarico il file {} originale, ma con gli stati puliti", nomeVariabileFile);
         originale.clearStato();
         originale.setAzione(Sostituzione);
-        attachmentService.saveAttachment(execution, nomeVariabileFile, originale);
+        attachmentService.saveAttachment(execution, nomeVariabileFile, originale, null);
 
         LOGGER.debug("Salvo una copia per futuro riferimento");
         copia.setAzione(Sostituzione);
