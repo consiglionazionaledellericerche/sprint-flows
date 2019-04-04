@@ -506,11 +506,9 @@ public class FlowsProcessInstanceResource {
                     metadatiDocumento.put("filename", attachment.getFilename());
                     metadatiDocumento.put("name", attachment.getName());
                     metadatiDocumento.put("label", attachment.getLabel());
-                    metadatiDocumento.put("nodeRef", attachment.getUrl());
-                    //TODO
-                    //metadatiDocumento.put("path", attachment.getPath());
-                   
-                    metadatiDocumento.put("download", env.getProperty("repository.base.url") + "d/a/workspace/SpacesStore/" + attachment.getUrl().split(";")[0] + "/" + attachment.getName());
+                    metadatiDocumento.put("key", attachment.getUrl());
+                    metadatiDocumento.put("path", attachment.getPath());
+                   metadatiDocumento.put("download", env.getProperty("repository.base.url") + "d/a/workspace/SpacesStore/" + attachment.getUrl().split(";")[0] + "/" + attachment.getName());
                     documentiPubblicabili.add(metadatiDocumento);
                 }
             }
@@ -532,9 +530,8 @@ public class FlowsProcessInstanceResource {
                     metadatiDocumento.put("filename", attachment.getFilename());
                     metadatiDocumento.put("name", attachment.getName());
                     metadatiDocumento.put("label", attachment.getLabel());
-                    metadatiDocumento.put("nodeRef", attachment.getUrl());
-                    //TODO
-                    //metadatiDocumento.put("path", attachment.getPath());
+                    metadatiDocumento.put("key", attachment.getUrl());
+                    metadatiDocumento.put("path", attachment.getPath());
                     metadatiDocumento.put("download", env.getProperty("repository.base.url") + "d/a/workspace/SpacesStore/" + attachment.getUrl().split(";")[0] + "/" + attachment.getName());
                     documentiPubblicabili.add(metadatiDocumento);
                 }

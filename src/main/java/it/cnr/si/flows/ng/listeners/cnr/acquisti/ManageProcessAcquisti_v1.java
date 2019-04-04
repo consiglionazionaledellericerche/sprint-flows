@@ -514,7 +514,6 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			String rup = execution.getVariable("rup", String.class);
 			runtimeService.addUserIdentityLink(execution.getProcessInstanceId(), rup, PROCESS_VISUALIZER);
 			CalcolaTotaleImpegni(execution);
-			prepareFilesToSigla(execution);
 		};break;  
 		case "modifica-decisione-end": {
 			CalcolaTotaleImpegni(execution);
