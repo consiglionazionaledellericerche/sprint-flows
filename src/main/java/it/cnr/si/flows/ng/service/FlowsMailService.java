@@ -2,6 +2,7 @@ package it.cnr.si.flows.ng.service;
 
 import it.cnr.si.flows.ng.config.MailConfguration;
 import it.cnr.si.security.FlowsUserDetailsService;
+import it.cnr.si.service.AceService;
 import it.cnr.si.service.CnrgroupService;
 import it.cnr.si.service.FlowsUserService;
 import it.cnr.si.service.MailService;
@@ -38,7 +39,9 @@ public class FlowsMailService extends MailService {
     @Inject
     private CnrgroupService cnrgroupService;
     @Autowired(required = false)
-    private AceBridgeService aceService;
+    private AceBridgeService aceBridgeService;
+    @Inject
+    private AceService aceService;
     @Inject
     private FlowsUserService flowsUserService;
     @Autowired
@@ -54,9 +57,9 @@ public class FlowsMailService extends MailService {
                 ctx.setVariable("profile", "oiv");
                 ctx.setVariable("groupname", cnrgroupService.findDisplayName(groupName));
             } else {
-                ctx.setVariable("groupname", Optional.ofNullable(aceService)
+                ctx.setVariable("groupname", Optional.ofNullable(aceBridgeService)
                         .flatMap(aceBridgeService -> Optional.ofNullable(groupName))
-                        .map(s -> aceService.getExtendedGroupNome(s))
+                        .map(s -> aceBridgeService.getExtendedGroupNome(s))
                         .orElse(groupName));
             }
         }
@@ -68,7 +71,7 @@ public class FlowsMailService extends MailService {
         }
 
         String htmlContent = templateEngine.process(notificationType, ctx);
-        String mailUtente = flowsUserDetailsService.getEmailByUsername(username);
+        String mailUtente = aceService.getUtente(username).getEmail();
 
         LOGGER.info("Invio della mail all'utente "+ username +" con indirizzo "+ mailUtente);
 
