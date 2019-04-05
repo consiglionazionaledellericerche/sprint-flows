@@ -1,29 +1,16 @@
 package it.cnr.si.flows.ng.service;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import feign.Feign;
-import feign.form.FormEncoder;
-import feign.gson.GsonDecoder;
-import feign.gson.GsonEncoder;
-import it.cnr.si.flows.ng.utils.AceJwt;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.letture.RuoloUtenteWebDto;
-import net.dongliu.gson.GsonJava8TypeAdapterFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 import static it.cnr.si.security.PermissionEvaluatorImpl.CNR_CODE;
 
@@ -47,7 +34,7 @@ public class AceBridgeService {
 					}
 				})
 				.collect(Collectors.toList());
-	} 	
+	}
 
 	public List<String> getUsersInAceGroup(String groupName) {
 
