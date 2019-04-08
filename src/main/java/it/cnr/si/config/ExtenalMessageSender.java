@@ -33,7 +33,7 @@ public class ExtenalMessageSender {
         restTemplate = new RestTemplate();
     }
 
-    @Scheduled(fixedDelay = 60000, initialDelay = 10000) // 10m
+    @Scheduled(fixedDelay = 600000, initialDelay = 10000) // 10m
     public void sendMessages() {
         log.debug("Processo le rest ExternalMessage");
         externalMessageService.getNewExternalMessages().forEach(this::send);
