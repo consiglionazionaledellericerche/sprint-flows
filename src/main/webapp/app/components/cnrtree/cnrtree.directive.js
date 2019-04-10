@@ -31,26 +31,13 @@
           plugins: ["search"]
         };
 
-        var idTree = "js-tree-" + $scope.searchId;
-        var idTreeSearch = "js-tree_q-" + $scope.searchId;
-        //modifica id Tree e campo text ricerca
-        $("#js-tree").attr("id", idTree);
-        $("#js-tree_q").attr("id", idTreeSearch);
-
-        //Ricerca
-        var to = false;
-        // $("#jstree").jstree({ plugins: ["search"] });
-        $("#" + idTreeSearch).keyup(function () {
-          if (to) {
-            clearTimeout(to);
-          }
-          to = setTimeout(function () {
-            var v = $("#js-tree_q-" + $scope.searchId).val();
-            $("#" + idTree)
-              .jstree(true)
-              .search(v, false, true);
-          }, 250);
-        });
+        $scope.$watch("filter", function(newVal, oldVal, scope) {
+            if (newVal === '') {
+                $scope.treeInstance.jstree(true).clear_search ();
+                $scope.treeInstance.jstree(true).close_all();
+            } else
+                $scope.treeInstance.jstree(true).search(newVal, true, true);
+        })
 
         $scope.jsonlist = [];
         $scope.ignoreModelChanges = function () {
