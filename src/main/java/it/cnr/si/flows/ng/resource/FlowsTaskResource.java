@@ -309,6 +309,7 @@ public class FlowsTaskResource {
 
                 Map<String, Object> data = new HashMap<String, Object>() {{
                     put(nomeFile, att);
+                    put("sceltaUtente", "Firma Multipla");
                 }};
                 flowsTaskService.completeTask(taskId, data);
 
