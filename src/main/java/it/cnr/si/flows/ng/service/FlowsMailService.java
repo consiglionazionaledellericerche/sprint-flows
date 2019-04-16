@@ -6,6 +6,7 @@ import it.cnr.si.service.AceService;
 import it.cnr.si.service.CnrgroupService;
 import it.cnr.si.service.FlowsUserService;
 import it.cnr.si.service.MailService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,12 +81,13 @@ public class FlowsMailService extends MailService {
             mailConfig.getMailRecipients().stream()
                     .filter(s -> !s.isEmpty())
                     .forEach(s -> {
-                        LOGGER.info("Invio mail a {} con titolo Notifica relativa al flusso {} del tipo {} nello stato {} e con contenuto {}",
+                        LOGGER.debug("Invio mail a {} con titolo Notifica relativa al flusso {} del tipo {} nello stato {} e con contenuto {}",
                                 s,
                                 variables.get("businessKey"),
                                 notificationType,
                                 variables.get("stato"),
-                                htmlContent);
+                                StringUtils.abbreviate(htmlContent, 30));
+                        LOGGER.trace("Corpo email per intero: {}", htmlContent);
                         sendEmail(s, "Notifica relativa al flusso " + variables.get("businessKey"), htmlContent, false, true);
                     });
         } else {
