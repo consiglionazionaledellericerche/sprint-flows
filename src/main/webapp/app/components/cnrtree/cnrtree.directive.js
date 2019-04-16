@@ -32,11 +32,14 @@
         };
 
         $scope.$watch("filter", function(newVal, oldVal, scope) {
-            if (newVal === '') {
-                $scope.treeInstance.jstree(true).clear_search ();
-                $scope.treeInstance.jstree(true).close_all();
-            } else
-                $scope.treeInstance.jstree(true).search(newVal, true, true);
+            if ($scope.treeInstance) {
+                if (newVal === '') {
+                    $scope.treeInstance.jstree(true).clear_search ();
+                    $scope.treeInstance.jstree(true).close_all();
+                } else {
+                    $scope.treeInstance.jstree(true).search(newVal, true, true);
+                }
+            }
         })
 
         $scope.jsonlist = [];
