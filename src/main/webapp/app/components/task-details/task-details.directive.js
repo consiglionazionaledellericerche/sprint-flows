@@ -27,7 +27,7 @@
 						resolve: {
 							variables: function() {
 								//escludo le variabili di tipo "_json"
-								return variables.filter(variable => !variable.name.includes("_json"));
+								return variables.filter(function(variable) { return !variable.name.includes("_json");});
 							},
 							title: function() {
 								return title;
