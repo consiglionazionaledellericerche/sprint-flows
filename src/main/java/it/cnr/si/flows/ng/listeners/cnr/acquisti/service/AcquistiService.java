@@ -47,6 +47,9 @@ public class AcquistiService {
 			if (ditteInvitate.getJSONObject(i).get("offertaPresentataDittaInvitata").toString().equals("SI")) {
 				jsonValues.add(ditteInvitate.getJSONObject(i));
 			}
+			if (!ditteInvitate.getJSONObject(i).has("pIvaCodiceFiscaleDittaInvitata")) {
+				ditteInvitate.getJSONObject(i).put("pIvaCodiceFiscaleDittaInvitata", "non presente");
+			}
 		}
 		JSONArray ditteAppo = new JSONArray(jsonValues.toString());
 		Collections.sort( jsonValues, new Comparator<JSONObject>() {

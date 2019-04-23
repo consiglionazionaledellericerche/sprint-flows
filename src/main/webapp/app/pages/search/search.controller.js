@@ -1,5 +1,5 @@
 (function() {
-  "use strict";
+  'use strict';
 
   angular.module("sprintApp").controller("SearchController", SearchController);
 
@@ -32,9 +32,10 @@
       $location.search(vm.searchParams);
 
       //ripulisco i valori con null(tipo quando annullo la data selezionata)
-      Object.keys(vm.searchParams).forEach(
-        key => vm.searchParams[key] == null && delete vm.searchParams[key]
-      );
+      Object.keys(vm.searchParams).forEach(function(key) {
+          if(vm.searchParams[key] == null)
+            delete vm.searchParams[key];
+      });
       dataService.processInstances.search(vm.searchParams).then(
         function(response) {
           vm.results = utils.refactoringVariables(response.data.data);
