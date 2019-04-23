@@ -276,8 +276,8 @@ public class FlowsTaskResource {
 
         for (int i = 0; i < taskIds.size(); i++) {
             String id = taskIds.get(i);
-            nomiFileDaFirmare.add(NOME_FILE_FIRMA.get(
-                    taskService.createTaskQuery().taskId(id).singleResult().getTaskDefinitionKey()));
+            tasks.add(taskService.createTaskQuery().taskId(id).singleResult());
+            nomiFileDaFirmare.add(NOME_FILE_FIRMA.get(tasks.get(i).getTaskDefinitionKey()));
             fileDaFirmare.add(taskService.getVariable(id, nomiFileDaFirmare.get(i), FlowsAttachment.class));
             fileContents.add(flowsAttachmentService.getAttachmentContentBytes(fileDaFirmare.get(i)));
         }
@@ -304,9 +304,12 @@ public class FlowsTaskResource {
                 att.addStato(Firmato);
                 att.setUsername(SecurityUtils.getCurrentUserLogin());
                 att.setTime(new Date());
+                att.setTaskId(taskId);
+                att.setTaskName(tasks.get(i).getName());
 
                 Map<String, Object> data = new HashMap<String, Object>() {{
                     put(nomeFile, att);
+                    put("sceltaUtente", "Firma Multipla");
                 }};
                 flowsTaskService.completeTask(taskId, data);
 

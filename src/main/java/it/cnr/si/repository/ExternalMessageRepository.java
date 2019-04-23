@@ -12,10 +12,15 @@ import java.util.List;
 @SuppressWarnings("unused")
 public interface ExternalMessageRepository extends JpaRepository<ExternalMessage,Long> {
 
-    @Query("select externalmessage from ExternalMessage externalmessage")
+    @Query("select externalmessage from ExternalMessage externalmessage " +
+            " where " +
+            " (externalmessage.status = 'NEW' or externalmessage.status = 'ERROR') " +
+            " and externalmessage.retries < 6")
     public List<ExternalMessage> getNewExternalMessages();
 
-    @Query("select externalmessage from ExternalMessage externalmessage")
+    @Query("select externalmessage from ExternalMessage externalmessage" +
+            " where externalmessage.status = 'NEW' or externalmessage.status = 'ERROR' " +
+            " and externalmessage.retries >= 6 and externalmessage.retries < 15")
     public List<ExternalMessage> getFailedExternalMessages();
 
 }

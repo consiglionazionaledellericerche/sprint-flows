@@ -620,3 +620,8 @@ select.ng-touched.ng-invalid {
     min-width: 100px;
     border-radius: 5px;
 }
+
+/* fix per JsTree: i risultati della ricerca appaiono in verde */
+.jstree-default .jstree-search {
+    color: #0d6500;
+}

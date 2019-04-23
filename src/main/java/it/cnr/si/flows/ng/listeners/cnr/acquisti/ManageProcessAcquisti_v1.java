@@ -544,6 +544,10 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 		case "espletamento-procedura-end": {	
 			if (execution.getVariable("strumentoAcquisizioneId") != null && (execution.getVariable("strumentoAcquisizioneId").equals("21") || execution.getVariable("strumentoAcquisizioneId").equals("23"))) {
 				acquistiService.OrdinaElencoDitteCandidate(execution);
+			} else {
+				if (execution.getVariable("pIvaCodiceFiscaleDittaAggiudicataria") == null) {
+					execution.setVariable("pIvaCodiceFiscaleDittaAggiudicataria", "non presente");
+				}
 			}
 			if (execution.getVariable("tipologiaAffidamentoDiretto") != null && (execution.getVariable("tipologiaAffidamentoDiretto").toString().equals("semplificata"))) {
 				execution.setVariable("statoImpegni", "definitivi"); 	
