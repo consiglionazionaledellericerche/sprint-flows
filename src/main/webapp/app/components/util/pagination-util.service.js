@@ -30,7 +30,7 @@
             return parseInt(page);
         }
 
-        // sort can be in the format `id,asc` or `id`
+        // sort can be in the format 'id,asc' or 'id'
         function parsePredicate (sort) {
             var sortArray = sort.split(',');
             if (sortArray.length > 1){

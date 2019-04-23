@@ -35,6 +35,9 @@ public class DittaCandidata {
 		}
 		int nrElencoDitteCorrente = (int) execution.getVariable("nrElencoDitteCorrente");
 		JSONObject dittaCorrente = ditteCandidate.getJSONObject(nrElencoDitteCorrente);
+		if (dittaCorrente.get("pIvaCodiceFiscaleDittaInvitata") == null) {
+			execution.setVariable("pIvaCodiceFiscaleDittaCandidata", "non presente");
+		}
 		execution.setVariable("pIvaCodiceFiscaleDittaCandidata", dittaCorrente.get("pIvaCodiceFiscaleDittaInvitata"));
 		execution.setVariable("ragioneSocialeDittaCandidata", dittaCorrente.get("ragioneSocialeDittaInvitata"));
 		execution.setVariable("gestioneRTIDittaCandidata", dittaCorrente.get("gestioneRTIDittaInvitata"));
