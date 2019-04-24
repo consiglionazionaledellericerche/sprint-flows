@@ -1,4 +1,4 @@
-package it.cnr.si.flows.ng.listeners.cnr.accordiInternazionali;
+package it.cnr.si.flows.ng.listeners.cnr.accordiInternazionaliDomande;
 
 
 import it.cnr.si.flows.ng.utils.Enum;
@@ -22,8 +22,8 @@ import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 @Profile("!oiv")
 
 @Service
-public class StartAccordiInternazionaliSetGroupsAndVisibility {
-	private static final Logger LOGGER = LoggerFactory.getLogger(StartAccordiInternazionaliSetGroupsAndVisibility.class);
+public class StartAccordiInternazionaliDomandeSetGroupsAndVisibility {
+	private static final Logger LOGGER = LoggerFactory.getLogger(StartAccordiInternazionaliDomandeSetGroupsAndVisibility.class);
 
 	@Inject
 	private RuntimeService runtimeService;
@@ -41,6 +41,7 @@ public class StartAccordiInternazionaliSetGroupsAndVisibility {
 		//DA CAMBIARE - ricavando il direttore della persona che afferisce alla sua struttura
 		String gruppoDirigenteRichiedente = "responsabileFirmaAcquisti@2216";
 		String applicazioneAccordiInternazionali = "app.abil";
+		String applicazioneScrivaniaDigitale = "app.scrivaniadigitale";
 
 		LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}",  gruppoValidatoriAccordiInternazionali, gruppoResponsabileAccordiInternazionali, gruppoUfficioProtocollo);
 
@@ -57,5 +58,6 @@ public class StartAccordiInternazionaliSetGroupsAndVisibility {
 		execution.setVariable("applicazioneAccordiInternazionali", applicazioneAccordiInternazionali);
 		execution.setVariable("gruppoDirigenteRichiedente", gruppoDirigenteRichiedente);
 		execution.setVariable("gruppoValutatoreScientificoDipartimento", gruppoValutatoreScientificoDipartimento);
+		execution.setVariable("applicazioneScrivaniaDigitale", applicazioneScrivaniaDigitale);
 	}
 }

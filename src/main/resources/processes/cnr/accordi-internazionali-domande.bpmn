@@ -74,7 +74,7 @@
     <sequenceFlow id="flow9" sourceRef="exclusivegateway3" targetRef="valutazione-domande-bando"></sequenceFlow>
     <exclusiveGateway id="exclusivegateway4" name="Exclusive Gateway" default="flow11"></exclusiveGateway>
     <sequenceFlow id="flow10" sourceRef="autorizzazione-finanziamento" targetRef="exclusivegateway4"></sequenceFlow>
-    <sequenceFlow id="flow11" sourceRef="exclusivegateway4" targetRef="endevent3"></sequenceFlow>
+    <sequenceFlow id="flow11" name="APPROVATA" sourceRef="exclusivegateway4" targetRef="endevent3"></sequenceFlow>
     <sequenceFlow id="flow12" name="NON FINANZIATA" sourceRef="exclusivegateway4" targetRef="endevent2">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Respingi'}]]></conditionExpression>
     </sequenceFlow>
@@ -102,7 +102,15 @@
     <sequenceFlow id="flow23" sourceRef="exclusivegateway3" targetRef="valutazione-scientifica">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'CambiaDipartimento'}]]></conditionExpression>
     </sequenceFlow>
-    <endEvent id="endevent5" name="End"></endEvent>
+    <endEvent id="endevent5" name="End">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAccordiInternazionaliDomande_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[endevent-respinta-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
     <sequenceFlow id="flow24" name="RESPINTA" sourceRef="exclusivegateway1" targetRef="endevent5">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Respingi'}]]></conditionExpression>
     </sequenceFlow>
@@ -122,7 +130,15 @@
     </userTask>
     <exclusiveGateway id="exclusivegateway7" name="Exclusive Gateway" default="flow27"></exclusiveGateway>
     <sequenceFlow id="flow25" sourceRef="valutazione-dirigente" targetRef="exclusivegateway7"></sequenceFlow>
-    <endEvent id="endevent6" name="End"></endEvent>
+    <endEvent id="endevent6" name="End">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAccordiInternazionaliDomande_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[endevent-non-autorizzata-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
     <sequenceFlow id="flow26" name="NON AUTORIZZATA" sourceRef="exclusivegateway7" targetRef="endevent6">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Respingi'}]]></conditionExpression>
     </sequenceFlow>
@@ -149,7 +165,8 @@
       <script>execution.setVariable('notifica', true);</script>
     </scriptTask>
     <sequenceFlow id="flow32" sourceRef="boundarytimer2" targetRef="notificatask"></sequenceFlow>
-    <scriptTask id="valutazione-domande-bando" name="VALUTAZIONE DOMANDE BANDO" scriptFormat="javascript" activiti:autoStoreVariables="false">
+    <sequenceFlow id="flow33" sourceRef="valutazione-domande-bando" targetRef="autorizzazione-finanziamento"></sequenceFlow>
+    <userTask id="valutazione-domande-bando" name="VALUTAZIONE DOMANDE BANDO" activiti:assignee="${applicazioneScrivaniaDigitale}">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessAccordiInternazionaliDomande_v1}">
           <activiti:field name="faseEsecuzione">
@@ -162,9 +179,7 @@
           </activiti:field>
         </activiti:executionListener>
       </extensionElements>
-      <script>execution.setVariable('valutazioneDomandeBando', true);</script>
-    </scriptTask>
-    <sequenceFlow id="flow33" sourceRef="valutazione-domande-bando" targetRef="autorizzazione-finanziamento"></sequenceFlow>
+    </userTask>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_accordi-internazionali-domande">
     <bpmndi:BPMNPlane bpmnElement="accordi-internazionali-domande" id="BPMNPlane_accordi-internazionali-domande">
@@ -253,6 +268,9 @@
       <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
         <omgdi:waypoint x="412.0" y="324.0"></omgdi:waypoint>
         <omgdi:waypoint x="449.0" y="324.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="429.0" y="282.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow12" id="BPMNEdge_flow12">
         <omgdi:waypoint x="392.0" y="344.0"></omgdi:waypoint>
@@ -265,7 +283,7 @@
         <omgdi:waypoint x="530.0" y="261.0"></omgdi:waypoint>
         <omgdi:waypoint x="530.0" y="307.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="53.0" x="570.0" y="281.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="53.0" x="560.0" y="317.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow23" id="BPMNEdge_flow23">
