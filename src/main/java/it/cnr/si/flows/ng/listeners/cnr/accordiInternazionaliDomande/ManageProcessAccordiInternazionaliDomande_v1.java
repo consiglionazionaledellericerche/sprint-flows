@@ -1,4 +1,4 @@
-package it.cnr.si.flows.ng.listeners.cnr.accordiInternazionali;
+package it.cnr.si.flows.ng.listeners.cnr.accordiInternazionaliDomande;
 
 
 
@@ -27,9 +27,9 @@ import javax.inject.Inject;
 
 @Component
 @Profile("cnr")
-public class ManageProcessAccordiInternazionali_v1 implements ExecutionListener {
+public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionListener {
 	private static final long serialVersionUID = 686169707042367215L;
-	private static final Logger LOGGER = LoggerFactory.getLogger(ManageProcessAccordiInternazionali_v1.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ManageProcessAccordiInternazionaliDomande_v1.class);
 	public static final String STATO_FINALE_DOMANDA = "statoFinaleDomanda";
 
 	@Inject
@@ -39,7 +39,7 @@ public class ManageProcessAccordiInternazionali_v1 implements ExecutionListener 
 	@Inject
 	private FlowsProcessInstanceService flowsProcessInstanceService;
 	@Inject
-	private StartAccordiInternazionaliSetGroupsAndVisibility startAccordiInternazionaliSetGroupsAndVisibility;
+	private StartAccordiInternazionaliDomandeSetGroupsAndVisibility startAccordiInternazionaliSetGroupsAndVisibility;
 	@Inject
 	private RuntimeService runtimeService;
 
@@ -72,8 +72,8 @@ public class ManageProcessAccordiInternazionali_v1 implements ExecutionListener 
 			startAccordiInternazionaliSetGroupsAndVisibility.configuraVariabiliStart(execution);
 		};break;    
 		// START
-		case "validazione-start": {
-			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
+		case "valutazione-scientifica-end": {
+			LOGGER.info("-- valutazione-scientifica: valutazione-scientifica");
 		};break;  
 		case "validazione-end": {
 			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
@@ -83,17 +83,16 @@ public class ManageProcessAccordiInternazionali_v1 implements ExecutionListener 
 			execution.setVariable("gruppoValutatoreScientificoDipartimento", gruppoValutatoreScientificoDipartimento);
 			LOGGER.debug("Imposto i gruppi dipartimento : {} - del flusso {}", idDipartimento, gruppoValutatoreScientificoDipartimento);
 		};break;  			
-
-		case "firma-verbale-end": {
-			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
-				firmaDocumentoService.eseguiFirma(execution, "verbale");
-			}
-		};break; 
-		case "protocollo-verbale-end": {
-			if(sceltaUtente != null && sceltaUtente.equals("Protocolla")) {
-				//protocolloDocumentoService.protocolla(execution, "verbale");
-			}
-		};break;  	
+		// START
+		case "validazione-start": {
+			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
+		};break;  
+		case "endevent-respinta-start": {
+			execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA RESPINTA");
+		};break;    	
+		case "endevent-non-autorizzata-start": {
+			execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA NON AUTORIZZATA");
+		};break;  
 		case "endevent-annullata-start": {
 			execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA ANNULLATA");
 		};break;  	
