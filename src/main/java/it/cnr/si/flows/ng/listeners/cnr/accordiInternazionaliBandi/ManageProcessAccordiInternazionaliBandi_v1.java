@@ -3,10 +3,13 @@ package it.cnr.si.flows.ng.listeners.cnr.accordiInternazionaliBandi;
 
 
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
-
+import org.activiti.engine.impl.TaskServiceImpl;
+import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -17,10 +20,13 @@ import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.service.ProtocolloDocumentoService;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.exception.TaskFailedException;
 import it.cnr.si.flows.ng.listeners.cnr.acquisti.service.AcquistiService;
 
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -42,7 +48,8 @@ public class ManageProcessAccordiInternazionaliBandi_v1 implements ExecutionList
 	private StartAccordiInternazionaliBandiSetGroupsAndVisibility startAccordiInternazionaliSetGroupsAndVisibility;
 	@Inject
 	private RuntimeService runtimeService;
-
+	@Inject
+	private TaskService taskService;
 
 
 	private Expression faseEsecuzione;
@@ -90,11 +97,51 @@ public class ManageProcessAccordiInternazionaliBandi_v1 implements ExecutionList
 			execution.setVariable(STATO_FINALE_VERBALE, "VERBALE APPROVATO");
 		};break;    	
 
-
+		case "process-end": {
+			sbloccaDomandeBando(execution);
+		};break; 
 		// DEFAULT  
 		default:  {
 		};break;    
 
 		} 
+	}
+
+
+	private void sbloccaDomandeBando(DelegateExecution execution) {
+
+		String executionId = execution.getId();
+		String idBando = runtimeService.getVariable(executionId, "idBando", String.class);
+
+		try {
+			List<Task> taskIstances = taskService
+					.createTaskQuery()
+					//.taskDefinitionKey("valutazione-domande-bando")
+					.processDefinitionKey("accordi-internazionali-domande")
+					.taskDefinitionKey("valutazione-domande-bando")
+					.processVariableValueEquals("idBando", idBando)
+					.active()
+					.list();
+
+			LOGGER.info("nr istanze trovate:" + taskIstances.size());
+
+			taskIstances.forEach(taskIstance -> {
+				String taskId = taskIstance.getId(); 
+				LOGGER.debug(" key: "+ taskIstance.getProcessVariables().get("key") + " titolo: "+ taskIstance.getProcessVariables().get("titolo") + " ProcessInstanceId(): "+ taskIstance.getProcessInstanceId() + " taskid: "+ taskId + " getTaskDefinitionKey: " + taskIstance.getTaskDefinitionKey()  + " [" + taskIstance.getName() + "]");
+				LOGGER.debug("Sblocco la Domanda per il task: "+ taskId + " della Domanda: " + taskService.getVariable(taskId, "idDomanda") + " del Bando nr: " + taskService.getVariable(taskId, "idBando"));
+
+				Map<String, Object> variabili = new HashMap<>();
+				variabili.put("sceltaUtente", "graduatoria da verbale");
+				taskService.complete(taskId, variabili);
+			});
+			//throw new RuntimeException("Errore per provare la transazione atomica dello sblocco delle domande");
+
+			// LOGGER.info("Domande sbloccate correttamente");
+
+		} catch ( RuntimeException  e) {
+			LOGGER.error("Errore nel completamento dei task relativi al flusso " + executionId, e);
+			throw e;
+		}
+
 	}
 }
