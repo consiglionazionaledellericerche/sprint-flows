@@ -99,28 +99,7 @@ public class FlowsTaskResource {
 
         String username = SecurityUtils.getCurrentUserLogin();
 
-        TaskQuery taskQuery = taskService.createTaskQuery()
-                .taskAssignee(username)
-                .includeProcessVariables();
-
-        if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
-            taskQuery.processDefinitionKey(processDefinition);
-
-        taskQuery = (TaskQuery) Utils.searchParamsForTasks(req, taskQuery);
-
-        Utils.orderTasks(order, taskQuery);
-
-        List<TaskResponse> tasksList = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
-
-        //aggiungo ad ogni singola TaskResponse la variabile che indica se il task è restituibile ad un gruppo (true)
-        // o se è stato assegnato ad un utente specifico "dal sistema" (false)
-        addIsReleasableVariables(tasksList);
-
-        DataResponse response = new DataResponse();
-        response.setStart(firstResult);
-        response.setSize(tasksList.size());
-        response.setTotal(taskQuery.count());
-        response.setData(tasksList);
+        DataResponse response = flowsTaskService.getMyTasks(req, processDefinition, firstResult, maxResults, order, username);
 
         return ResponseEntity.ok(response);
     }
@@ -399,17 +378,6 @@ public class FlowsTaskResource {
         return data;
     }
 
-    private void addIsReleasableVariables(List<TaskResponse> tasks) {
-        for (TaskResponse task : tasks) {
-            RestVariable isUnclaimableVariable = new RestVariable();
-            isUnclaimableVariable.setName("isReleasable");
-            // if has candidate groups or users -> can release
-            isUnclaimableVariable.setValue(taskService.getIdentityLinksForTask(task.getId())
-                    .stream()
-                    .anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
-            task.getVariables().add(isUnclaimableVariable);
-        }
-    }
 
     private void verificaPrecondizioniFirmaMultipla(List<String> taskIds) throws FlowsPermissionException {
 
