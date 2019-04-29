@@ -246,7 +246,35 @@ public class FlowsTaskService {
 		return response;
 	}
 
-	public Map<String, Object> getTask(@PathVariable("id") String taskId) {
+
+    public DataResponse getMyTasks(HttpServletRequest req, String processDefinition, int firstResult, int maxResults, String order, String username) {
+        TaskQuery taskQuery = taskService.createTaskQuery()
+                .taskAssignee(username)
+                .includeProcessVariables();
+
+        if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
+            taskQuery.processDefinitionKey(processDefinition);
+
+        taskQuery = (TaskQuery) Utils.searchParamsForTasks(req, taskQuery);
+
+        Utils.orderTasks(order, taskQuery);
+
+        List<TaskResponse> tasksList = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
+
+        //aggiungo ad ogni singola TaskResponse la variabile che indica se il task è restituibile ad un gruppo (true)
+        // o se è stato assegnato ad un utente specifico "dal sistema" (false)
+        addIsReleasableVariables(tasksList);
+
+        DataResponse response = new DataResponse();
+        response.setStart(firstResult);
+        response.setSize(tasksList.size());
+        response.setTotal(taskQuery.count());
+        response.setData(tasksList);
+        return response;
+    }
+
+
+    public Map<String, Object> getTask(@PathVariable("id") String taskId) {
 		Map<String, Object> response = new HashMap<>();
 		Task taskRaw = taskService.createTaskQuery().taskId(taskId).includeProcessVariables().singleResult();
 
@@ -388,6 +416,20 @@ public class FlowsTaskService {
 		writer.writeAll(entriesIterable);
 		writer.close();
 	}
+
+
+	private void addIsReleasableVariables(List<TaskResponse> tasks) {
+		for (TaskResponse task : tasks) {
+			RestVariable isUnclaimableVariable = new RestVariable();
+			isUnclaimableVariable.setName("isReleasable");
+			// if has candidate groups or users -> can release
+			isUnclaimableVariable.setValue(taskService.getIdentityLinksForTask(task.getId())
+												   .stream()
+												   .anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
+			task.getVariables().add(isUnclaimableVariable);
+		}
+	}
+
 
 	private static String ellipsis(String in, int length) {
 		return in.length() < length ? in: in.substring(0, length - 3) + "...";
