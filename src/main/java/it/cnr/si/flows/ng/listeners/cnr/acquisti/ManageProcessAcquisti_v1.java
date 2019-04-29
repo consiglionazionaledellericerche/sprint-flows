@@ -503,7 +503,6 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 		};break;
 		case "pre-determina-start": {
 			pubblicaFilePubblicabiliURP(execution);
-			createSiglaPayload(execution);
 		};break;
 		case "pre-determina-end": {
 			pubblicaTuttiFilePubblicabili(execution);
