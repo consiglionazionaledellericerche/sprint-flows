@@ -332,8 +332,10 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 					put("cd_unita_organizzativa", aceBridgeService.getUoById(Integer.parseInt(execution.getVariable("idStruttura").toString())).getCdsuo().toString());
 				}
 				// DT_REGISTRAZIONE 
-				DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+				DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy'T'HH:mm:ss.SSSZ");
+				DateFormat onlyDateFormat = new SimpleDateFormat("dd-MM-yyyy");
 				dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Vatican"));
+				onlyDateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Vatican"));
 				Date endDate = new Date();
 				String endStrDate = dateFormat.format(endDate);  
 				put("dt_registrazione", endStrDate);
@@ -417,12 +419,12 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				if(runtimeService.getVariable(execution.getProcessInstanceId(), "decisioneContrattare", FlowsAttachment.class) != null) {
 					FlowsAttachment determina = runtimeService.getVariable(execution.getProcessInstanceId(), "decisioneContrattare", FlowsAttachment.class);
 					// DS_ATTO 
-					put("ds_atto", determina.getLabel() + " Prot." + determina.getMetadati().get("numeroProtocollo") + " del " + dateFormat.format(inputDateFormat.parse(determina.getMetadati().get("dataProtocollo").toString())));
+					put("ds_atto", determina.getLabel() + " Prot." + determina.getMetadati().get("numeroProtocollo") + " del " + onlyDateFormat.format(inputDateFormat.parse(determina.getMetadati().get("dataProtocollo").toString())));
 				}
 				// CD_PROTOCOLLO_GENERALE 
 				if(runtimeService.getVariable(execution.getProcessInstanceId(), "contratto", FlowsAttachment.class) != null) {
 					FlowsAttachment contratto = runtimeService.getVariable(execution.getProcessInstanceId(), "contratto", FlowsAttachment.class);
-					put("cd_protocollo_generale", contratto.getLabel() + " Prot." + contratto.getMetadati().get("numeroProtocollo") + " del " + dateFormat.format(inputDateFormat.parse(contratto.getMetadati().get("dataProtocollo").toString())));
+					put("cd_protocollo_generale", contratto.getLabel() + " Prot." + contratto.getMetadati().get("numeroProtocollo") + " del " + onlyDateFormat.format(inputDateFormat.parse(contratto.getMetadati().get("dataProtocollo").toString())));
 					// FL_PUBBLICA_CONTRATTO 
 					if(contratto.isPubblicazioneTrasparenza()) {
 						put("fl_pubblica_contratto", Boolean.valueOf("true"));
@@ -437,7 +439,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 					// ESERCIZIO_PROTOCOLLO 
 					if(stipula.getDataProtocollo() != null && stipula.getNumeroProtocollo() != null){
 						put("esercizio_protocollo", Integer.parseInt(format.format(inputDateFormat.parse(stipula.getDataProtocollo()))));	
-						cdProtocolloGenerale = stipula.getLabel() + " Prot." + stipula.getNumeroProtocollo() + " del " + dateFormat.format(inputDateFormat.parse(stipula.getDataProtocollo()));
+						cdProtocolloGenerale = stipula.getLabel() + " Prot." + stipula.getNumeroProtocollo() + " del " + onlyDateFormat.format(inputDateFormat.parse(stipula.getDataProtocollo()));
 					}
 					put("cd_protocollo_generale", cdProtocolloGenerale);
 					// FL_PUBBLICA_CONTRATTO 
@@ -501,6 +503,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 		};break;
 		case "pre-determina-start": {
 			pubblicaFilePubblicabiliURP(execution);
+			createSiglaPayload(execution);
 		};break;
 		case "pre-determina-end": {
 			pubblicaTuttiFilePubblicabili(execution);

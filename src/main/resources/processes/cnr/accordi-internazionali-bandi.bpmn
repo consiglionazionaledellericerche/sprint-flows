@@ -47,7 +47,7 @@
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessAccordiInternazionaliBandi_v1}">
           <activiti:field name="faseEsecuzione">
-            <activiti:string><![CDATA[endevent-approvata-start]]></activiti:string>
+            <activiti:string><![CDATA[endevent-bando-start]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
       </extensionElements>
@@ -114,7 +114,7 @@
         <omgdi:waypoint x="608.0" y="70.0"></omgdi:waypoint>
         <omgdi:waypoint x="626.0" y="70.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="625.0" y="28.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="20.0" x="625.0" y="28.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow21" id="BPMNEdge_flow21">
