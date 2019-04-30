@@ -127,7 +127,7 @@ public class ManageProcessAccordiInternazionaliBandi_v1 implements ExecutionList
 
 			taskIstances.forEach(taskIstance -> {
 				String taskId = taskIstance.getId(); 
-				LOGGER.debug(" key: "+ taskIstance.getProcessVariables().get("key") + " titolo: "+ taskIstance.getProcessVariables().get("titolo") + " ProcessInstanceId(): "+ taskIstance.getProcessInstanceId() + " taskid: "+ taskId + " getTaskDefinitionKey: " + taskIstance.getTaskDefinitionKey()  + " [" + taskIstance.getName() + "]");
+				LOGGER.debug(" key: " + runtimeService.getVariable(taskIstance.getProcessInstanceId(), "key", String.class) + " titolo: "+ runtimeService.getVariable(taskIstance.getProcessInstanceId(), "titolo", String.class) + " ProcessInstanceId: "+ taskIstance.getProcessInstanceId() + " taskid: "+ taskId + " getTaskDefinitionKey: " + taskIstance.getTaskDefinitionKey()  + " [" + taskIstance.getName() + "]");
 				LOGGER.debug("Sblocco la Domanda per il task: "+ taskId + " della Domanda: " + taskService.getVariable(taskId, "idDomanda") + " del Bando nr: " + taskService.getVariable(taskId, "idBando"));
 
 				Map<String, Object> variabili = new HashMap<>();
