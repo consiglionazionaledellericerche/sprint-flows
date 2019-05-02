@@ -367,8 +367,7 @@ public class FlowsSearchResourceTest {
                 "{\"key\":\"" + initiator + "\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
                 "\"taskParams\":" +
                 "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
-        request.setContent(content.getBytes());
-        response = flowsTaskResource.getMyTasks(request, ALL_PROCESS_INSTANCES, 0, 100, ASC);
+        response = flowsTaskResource.getMyTasks(ALL_PROCESS_INSTANCES, 0, 100, ASC, content);
         assertEquals(0, response.getBody().getSize());
         assertEquals(0, ((ArrayList) response.getBody().getData()).size());
         //initiator sbaliato
@@ -378,7 +377,7 @@ public class FlowsSearchResourceTest {
                 "\"taskParams\":" +
                 "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
         request.setContent(content.getBytes());
-        response = flowsTaskResource.getMyTasks(request, ALL_PROCESS_INSTANCES, 0, 100, ASC);
+        response = flowsTaskResource.getMyTasks(ALL_PROCESS_INSTANCES, 0, 100, ASC, content);
         assertEquals(0, response.getBody().getSize());
         assertEquals(0, ((ArrayList) response.getBody().getData()).size());
         //Fase sbaliata
@@ -388,7 +387,7 @@ public class FlowsSearchResourceTest {
                 "\"taskParams\":" +
                 "[{\"key\":\"Fase\",\"value\":\"Verifica DecisioneEEEEE\",\"type\":null}]}";
         request.setContent(content.getBytes());
-        response = flowsTaskResource.getMyTasks(request, ALL_PROCESS_INSTANCES, 0, 100, ASC);
+        response = flowsTaskResource.getMyTasks(ALL_PROCESS_INSTANCES, 0, 100, ASC, content);
         assertEquals(0, response.getBody().getSize());
         assertEquals(0, ((ArrayList) response.getBody().getData()).size());
     }
