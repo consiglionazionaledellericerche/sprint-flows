@@ -137,6 +137,7 @@ public final class Utils {
         formatoDataOra.setTimeZone(TimeZone.getTimeZone("Europe/Rome"));
     }
 
+
     public static TaskInfoQuery orderTasks(String order, TaskInfoQuery query) {
         if (order.equals(ASC))
             query.orderByTaskCreateTime().asc();
@@ -146,6 +147,7 @@ public final class Utils {
         return query;
     }
 
+
     public HistoricProcessInstanceQuery orderProcess(String order, HistoricProcessInstanceQuery historicProcessQuery) {
         if (order.equals(ASC))
             historicProcessQuery.orderByProcessInstanceStartTime().asc();
@@ -154,10 +156,9 @@ public final class Utils {
         return historicProcessQuery;
     }
 
-    public static TaskInfoQuery searchParamsForTasks(HttpServletRequest req, TaskInfoQuery query) {
-        try {
-            JSONObject json = new JSONObject(IOUtils.toString(req.getReader()));
 
+    public static TaskInfoQuery searchParamsForTasks(JSONObject json, TaskInfoQuery query) {
+        try {
             if (json.has(PROCESS_PARAMS))
                 query = extractProcessSearchParams(query, json.getJSONArray(PROCESS_PARAMS));
             if (json.has(TASK_PARAMS))
@@ -168,8 +169,10 @@ public final class Utils {
         return query;
     }
 
+
     public Query searchParamsForProcess(HttpServletRequest req, HistoricProcessInstanceQuery processQuery) {
         try {
+//            todo: fare lo stesso lavoro fatto per searchParamsForTasks
             JSONArray processParams = new JSONObject(IOUtils.toString(req.getReader())).getJSONArray(PROCESS_PARAMS);
 
             for (int i = 0; i < processParams.length(); i++) {
