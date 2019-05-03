@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import it.cnr.si.flows.ng.service.FirmaDocumentoService;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
+import it.cnr.si.flows.ng.service.FlowsPdfService;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.service.ProtocolloDocumentoService;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
@@ -42,8 +43,11 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 	private StartAccordiInternazionaliDomandeSetGroupsAndVisibility startAccordiInternazionaliSetGroupsAndVisibility;
 	@Inject
 	private RuntimeService runtimeService;
-
-
+	@Inject
+	private FlowsPdfService flowsPdfService;
+	@Inject
+	private FlowsAttachmentService flowsAttachmentService;
+	
 
 	private Expression faseEsecuzione;
 
@@ -74,6 +78,15 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 		// START
 		case "valutazione-scientifica-end": {
 			LOGGER.info("-- valutazione-scientifica: valutazione-scientifica");
+			String nomeFile="valutazioneProgettoAccordiBilaterali";
+			String labelFile="Scheda Valutazione Domanda";
+			execution.setVariable("punteggio_totale", (Integer.parseInt(execution.getVariable("punteggio_pianoDiLavoro").toString()) + Integer.parseInt(execution.getVariable("punteggio_qualitaProgetto").toString())+ Integer.parseInt(execution.getVariable("punteggio_valoreAggiunto").toString())+ Integer.parseInt(execution.getVariable("punteggio_qualitaGruppoDiRicerca").toString())));
+			flowsPdfService.makePdf(nomeFile, processInstanceId);
+			FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
+			documentoGenerato.setLabel(labelFile);
+			documentoGenerato.setPubblicazioneTrasparenza(true);
+			flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
+			
 		};break;  
 		case "validazione-end": {
 			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
