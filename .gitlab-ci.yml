@@ -1,2 +1,4 @@
 job_dummy:
-  script: "mvn clean install"
+  script:
+    - "echo ciao"
+    - "echo mondo"
