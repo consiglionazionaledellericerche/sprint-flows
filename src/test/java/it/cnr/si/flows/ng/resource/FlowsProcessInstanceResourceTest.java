@@ -31,8 +31,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.text.ParseException;
 import java.time.Year;
 import java.util.*;
 
@@ -170,12 +168,11 @@ public class FlowsProcessInstanceResourceTest {
         //Verifico che Admin veda entrambe le Process Instances create
         util.loginAdmin();
         MockHttpServletRequest request = new MockHttpServletRequest();
-        String content = "{\"processParams\":" +
+        String searchParams = "{\"processParams\":" +
                 "[{\"key\":" + titolo.name() + ",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
                 "{\"key\":" + startDate + "Great,\"value\":\"" + utils.formattaData(new Date()) + "\",\"type\":\"date\"}]}";
-        request.setContent(content.getBytes());
 
-        ResponseEntity<DataResponse> ret = flowsProcessInstanceResource.getProcessInstances(request, true, ALL_PROCESS_INSTANCES, 0, 1000, ASC);
+        ResponseEntity<DataResponse> ret = flowsProcessInstanceResource.getProcessInstances(true, ALL_PROCESS_INSTANCES, 0, 1000, ASC, searchParams);
         assertEquals(HttpStatus.OK, ret.getStatusCode());
         ArrayList<HistoricProcessInstanceResponse> entities = (ArrayList<HistoricProcessInstanceResponse>) ret.getBody().getData();
 
@@ -192,14 +189,13 @@ public class FlowsProcessInstanceResourceTest {
 
         // verifico che RA veda UN processo terminato/cancellato in più (quello appena concellato + quelli cancellati nel tearDown dei test precedenti)
         util.loginResponsabileAcquisti();
-        MockHttpServletRequest voidRequest = new MockHttpServletRequest();
-        voidRequest.setContent("{\"processParams\": []}".getBytes());
-        ret = flowsProcessInstanceResource.getProcessInstances(voidRequest, false, ALL_PROCESS_INSTANCES, 0, 1000, ASC);
+
+        ret = flowsProcessInstanceResource.getProcessInstances(false, ALL_PROCESS_INSTANCES, 0, 1000, ASC, "{\"processParams\": []}");
         entities = (ArrayList<HistoricProcessInstanceResponse>) ret.getBody().getData();
         assertEquals(processDeleted + 2, entities.size());
 
         // .. e 1 processo ancora attivo VERIFICANDO CHE GLI ID COINCIDANO
-        ret = flowsProcessInstanceResource.getProcessInstances(voidRequest, true, ALL_PROCESS_INSTANCES, 0, 1000, ASC);
+        ret = flowsProcessInstanceResource.getProcessInstances(true, ALL_PROCESS_INSTANCES, 0, 1000, ASC, "{\"processParams\": []}");
         entities = (ArrayList<HistoricProcessInstanceResponse>) ret.getBody().getData();
         assertEquals(1, entities.size());
         assertEquals(activeId, entities.get(0).getId());
