@@ -1,4 +1,3 @@
 job_dummy:
   script:
-    - "echo ciao"
-    - "echo mondo"
+    - "curl 'http://build.si.cnr.it/view/SPRINT_FLOWS/job/sprint-flows-dev/build?token=cambiala'"
