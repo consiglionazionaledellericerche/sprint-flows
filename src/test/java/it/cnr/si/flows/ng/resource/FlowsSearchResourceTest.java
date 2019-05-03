@@ -23,7 +23,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.*;
 
 import static it.cnr.si.flows.ng.TestServices.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
@@ -98,7 +97,6 @@ public class FlowsSearchResourceTest {
         verifySearchResponse(response, 1, 1);
 
         //verifico che le Process Instance completate (active = false) siano quelle cancellate nel tearDown di questa classe (processDeleted)
-        // + 3 (quelle cancellate nei test precedenti) + 1 (quella cancellata in testGetMyProcesses (NON quella creata con titolo diverso in testGetProcessInstances) )
         requestParams.put("active", "false");
         requestParams.put("order", DESC);
         response = flowsSearchResource.search(requestParams);
@@ -253,10 +251,10 @@ public class FlowsSearchResourceTest {
 
     private void verifySearchResponse(ResponseEntity<Object> response, int expectedTotalItems, int expectedResponseItems) throws JSONException {
         assertEquals(OK, response.getStatusCode());
-        HashMap body = (HashMap) response.getBody();
-        ArrayList responseList = (ArrayList) body.get("processInstances");
+        DataResponse dataResponse = (DataResponse) response.getBody();
+        ArrayList responseList = (ArrayList) dataResponse.getData();
         assertEquals("Lunghezza della lista NON corrispondente alle attese", expectedResponseItems, responseList.size());
-        assertEquals("TotalItems NON corrispondente alle attese", expectedTotalItems, (int) ((Long) body.get("totalItems")).longValue());
+        assertEquals("TotalItems NON corrispondente alle attese", expectedTotalItems, (int) (dataResponse.getTotal()));
 
         if (responseList.size() > 0) {
             for (int i = 0; i < (expectedTotalItems > expectedResponseItems ? expectedResponseItems : expectedTotalItems); i++) {
@@ -275,45 +273,41 @@ public class FlowsSearchResourceTest {
         ResponseEntity<DataResponse> response;
 
         //prendo solo quello avviato da RA
-        String content = "{\"processParams\":" +
+        String searchParams = "{\"processParams\":" +
                 "[{\"key\":\"" + titolo + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
                 "{\"key\":\"initiator\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}," +
                 "{\"key\":\"" + startDate + "Great\",\"value\":\"" + utils.formattaData(new Date()) + "\",\"type\":\"date\"}]}";
-        request.setContent(content.getBytes());
-        response = flowsProcessInstanceResource.getProcessInstances(request, true, ALL_PROCESS_INSTANCES, 0, 100, ASC);
+        response = flowsProcessInstanceResource.getProcessInstances(true, ALL_PROCESS_INSTANCES, 0, 100, ASC, searchParams);
         ArrayList<HistoricProcessInstanceResponse> entities = (ArrayList<HistoricProcessInstanceResponse>) response.getBody().getData();
         assertEquals(1, entities.size());
         assertEquals(1, ((ArrayList) response.getBody().getData()).size());
 
         //titolo flusso sbagliato
-        content = "{\"processParams\":" +
+        searchParams = "{\"processParams\":" +
                 "[{\"key\":" + titolo + ",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "AAAAAAAAA" + "\",\"type\":\"text\"}," +
                 "{\"key\":" + initiator + ",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}," +
                 "{\"key\":" + startDate + "Great,\"value\":\"" + utils.formattaData(new Date()) + "\",\"type\":\"date\"}]}";
-        request.setContent(content.getBytes());
-        response = flowsProcessInstanceResource.getProcessInstances(request, true, ALL_PROCESS_INSTANCES, 0, 100, ASC);
+        response = flowsProcessInstanceResource.getProcessInstances(true, ALL_PROCESS_INSTANCES, 0, 100, ASC, searchParams);
         entities = (ArrayList<HistoricProcessInstanceResponse>) response.getBody().getData();
         assertEquals(0, entities.size());
         assertEquals(0, ((ArrayList) response.getBody().getData()).size());
 
         //initiator sbaliato
-        content = "{\"processParams\":" +
+        searchParams = "{\"processParams\":" +
                 "[{\"key\":" + titolo + ",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
                 "{\"key\":" + initiator + ",\"value\":\"" + TestServices.getRA() + "AAA" + "\",\"type\":\"textEqual\"}," +
                 "{\"key\":" + startDate + "Great,\"value\":\"" + utils.formattaData(new Date()) + "\",\"type\":\"date\"}]}";
-        request.setContent(content.getBytes());
-        response = flowsProcessInstanceResource.getProcessInstances(request, true, ALL_PROCESS_INSTANCES, 0, 100, ASC);
+        response = flowsProcessInstanceResource.getProcessInstances(true, ALL_PROCESS_INSTANCES, 0, 100, ASC, searchParams);
         entities = (ArrayList<HistoricProcessInstanceResponse>) response.getBody().getData();
         assertEquals(0, entities.size());
         assertEquals(0, ((ArrayList) response.getBody().getData()).size());
 
         //STARTDATE sbaliata
-        content = "{\"processParams\":" +
+        searchParams = "{\"processParams\":" +
                 "[{\"key\":\"" + titolo + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
                 "{\"key\":" + initiator + ",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}," +
                 "{\"key\":" + startDate + "Great,\"value\":\"" + new DateTime().plusDays(1).toString("yyyy-MM-dd") + "\",\"type\":\"date\"}]}";
-        request.setContent(content.getBytes());
-        response = flowsProcessInstanceResource.getProcessInstances(request, true, ALL_PROCESS_INSTANCES, 0, 100, ASC);
+        response = flowsProcessInstanceResource.getProcessInstances(true, ALL_PROCESS_INSTANCES, 0, 100, ASC, searchParams);
         entities = (ArrayList<HistoricProcessInstanceResponse>) response.getBody().getData();
         assertEquals(0, entities.size());
         assertEquals(0, ((ArrayList) response.getBody().getData()).size());
@@ -328,13 +322,11 @@ public class FlowsSearchResourceTest {
         util.logout();
         util.loginSfd();
         //verifico che la ricerca recuperi il primo task della process instance appena avviata
-        MockHttpServletRequest request = new MockHttpServletRequest();
         String content = "{\"processParams\":" +
                 "[{\"key\":\"" + titolo + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
                 "{\"key\":\"" + initiator + "\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
                 "\"taskParams\":" +
                 "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
-        request.setContent(content.getBytes());
 
         Map<String, String> requestParams = new HashMap<>();
 
@@ -355,10 +347,10 @@ public class FlowsSearchResourceTest {
 //        assertEquals(util.getFirstTaskId(), ((HistoricTaskInstanceResponse) tasks.get(0)).getId());
 
         //verifico che con parametri di ricerca sbagliati non abbia task nel searchResult
-        verifyBadTaskSearchParams(request);
+        verifyBadTaskSearchParams();
     }
 
-    private void verifyBadTaskSearchParams(MockHttpServletRequest request) {
+    private void verifyBadTaskSearchParams() {
         String content;
         ResponseEntity<DataResponse> response;//verifico che non prenda nessun elemento (SEARCH PARAMS SBAGLIATI)
         //titolo flusso sbagliato
@@ -376,7 +368,6 @@ public class FlowsSearchResourceTest {
                 "{\"key\":\"" + initiator + "\",\"value\":\"admi\",\"type\":\"textEqual\"}]," +
                 "\"taskParams\":" +
                 "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
-        request.setContent(content.getBytes());
         response = flowsTaskResource.getMyTasks(ALL_PROCESS_INSTANCES, 0, 100, ASC, content);
         assertEquals(0, response.getBody().getSize());
         assertEquals(0, ((ArrayList) response.getBody().getData()).size());
@@ -386,7 +377,6 @@ public class FlowsSearchResourceTest {
                 "{\"key\":\"" + initiator + "\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
                 "\"taskParams\":" +
                 "[{\"key\":\"Fase\",\"value\":\"Verifica DecisioneEEEEE\",\"type\":null}]}";
-        request.setContent(content.getBytes());
         response = flowsTaskResource.getMyTasks(ALL_PROCESS_INSTANCES, 0, 100, ASC, content);
         assertEquals(0, response.getBody().getSize());
         assertEquals(0, ((ArrayList) response.getBody().getData()).size());
