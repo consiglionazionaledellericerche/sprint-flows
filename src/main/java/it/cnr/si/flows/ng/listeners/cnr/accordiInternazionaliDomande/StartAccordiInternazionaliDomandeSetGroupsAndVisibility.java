@@ -35,9 +35,10 @@ public class StartAccordiInternazionaliDomandeSetGroupsAndVisibility {
 	public void configuraVariabiliStart(DelegateExecution execution)  throws IOException, ParseException  {
 
 		String initiator = (String) execution.getVariable(Enum.VariableEnum.initiator.name());
+		String richiedente = execution.getVariable("userNameRichiedente", String.class);
 		// LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable(Enum.VariableEnum.title.name()));
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
-		List<String> gruppiUtente = aceBridgeService.getAceGroupsForUser(execution.getVariable("userNameRichiedente").toString());
+		List<String> gruppiUtente = aceBridgeService.getAceGroupsForUser(richiedente.toString());
 		gruppiUtente.forEach(gruppoUtente -> {
 			execution.setVariable("strutturaAppartenenzaUtente", gruppoUtente.toString());
 		});
@@ -50,6 +51,7 @@ public class StartAccordiInternazionaliDomandeSetGroupsAndVisibility {
 		String gruppoDirigenteRichiedente = "responsabileFirmaAcquisti@2216";
 		String applicazioneAccordiInternazionali = "app.abil";
 		String applicazioneScrivaniaDigitale = "app.scrivaniadigitale";
+		String cdsuoRichiedente = aceBridgeService.getAfferenzaUtente(richiedente);
 
 		LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}",  gruppoValidatoriAccordiInternazionali, gruppoResponsabileAccordiInternazionali, gruppoUfficioProtocollo);
 
@@ -68,5 +70,6 @@ public class StartAccordiInternazionaliDomandeSetGroupsAndVisibility {
 		execution.setVariable("gruppoDirigenteRichiedente", gruppoDirigenteRichiedente);
 		execution.setVariable("gruppoValutatoreScientificoDipartimento", gruppoValutatoreScientificoDipartimento);
 		execution.setVariable("applicazioneScrivaniaDigitale", applicazioneScrivaniaDigitale);
+		execution.setVariable("cdsuoRichiedente", cdsuoRichiedente);
 	}
 }
