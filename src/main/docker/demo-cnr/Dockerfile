@@ -1,4 +1,4 @@
-FROM openjdk:8-jdk-alpine
+FROM scolagreco/alpine-jdk-springboot
 LABEL maintainer="cironepa@gmail.com"
 
 RUN apk update
