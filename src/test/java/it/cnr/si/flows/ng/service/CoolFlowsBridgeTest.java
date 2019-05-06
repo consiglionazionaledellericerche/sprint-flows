@@ -10,6 +10,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.util.Assert;
@@ -25,6 +26,7 @@ import java.util.Map;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableTransactionManagement
+@ActiveProfiles("test,cnr")
 public class CoolFlowsBridgeTest {
 
     @Inject

@@ -121,6 +121,7 @@ public class Enum {
         preavvisoRigetto,
         soccorsoIstruttorio,
         preavvisoRigettoDef10Giorni,
+        valutazioneProgettoAccordiBilaterali,
         preavvisoRigettoCambioFascia;
 
         PdfType() {
