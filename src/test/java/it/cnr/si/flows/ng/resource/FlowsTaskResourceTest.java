@@ -83,7 +83,7 @@ public class FlowsTaskResourceTest {
         processInstance = util.mySetUp(acquisti);
 //       all'inizio del test SFD non ha task assegnati'
         util.loginSfd();
-        ResponseEntity<DataResponse> response = flowsTaskResource.getMyTasks(mockHttpServletRequest, ALL_PROCESS_INSTANCES, 0, 100, ASC);
+        ResponseEntity<DataResponse> response = flowsTaskResource.getMyTasks(ALL_PROCESS_INSTANCES, 0, 100, ASC, null);
         assertEquals(OK, response.getStatusCode());
         assertEquals(0, response.getBody().getSize());
         ArrayList myTasks = (ArrayList) response.getBody().getData();
@@ -97,8 +97,8 @@ public class FlowsTaskResourceTest {
                 "{\"key\":\"" + initiator + "\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
                 "\"taskParams\":" +
                 "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
-        request.setContent(content.getBytes());
-        response = flowsTaskResource.getMyTasks(request, ALL_PROCESS_INSTANCES, 0, 100, ASC);
+//        request.setContent(content.getBytes());
+        response = flowsTaskResource.getMyTasks(ALL_PROCESS_INSTANCES, 0, 100, ASC, content);
         myTasks = (ArrayList) response.getBody().getData();
         assertEquals(1, response.getBody().getSize());
         assertEquals(1, myTasks.size());
@@ -109,7 +109,7 @@ public class FlowsTaskResourceTest {
 //        verifico che non prenda nessun risultato ( DOPO CHE IL TASK VIENE DISASSEGNATO)
         flowsTaskResource.unclaimTask(util.getFirstTaskId());
 
-        response = flowsTaskResource.getMyTasks(request, ALL_PROCESS_INSTANCES, 0, 100, ASC);
+        response = flowsTaskResource.getMyTasks(ALL_PROCESS_INSTANCES, 0, 100, ASC, content);
         assertEquals(OK, response.getStatusCode());
         assertEquals(0, response.getBody().getSize());
         myTasks = (ArrayList) response.getBody().getData();
@@ -123,7 +123,7 @@ public class FlowsTaskResourceTest {
         //SFD è sfd@sisinfo (quindi può vedere il task istanziato)
         util.logout();
         util.loginSfd();
-        ResponseEntity<DataResponse> response = flowsTaskResource.getAvailableTasks(mockHttpServletRequest, ALL_PROCESS_INSTANCES, 0, 1000, ASC);
+        ResponseEntity<DataResponse> response = flowsTaskResource.getAvailableTasks( ALL_PROCESS_INSTANCES, 0, 1000, ASC, null);
         assertEquals(OK, response.getStatusCode());
         assertEquals(1, response.getBody().getSize());
         assertEquals(1, ((ArrayList) response.getBody().getData()).size());
@@ -131,7 +131,7 @@ public class FlowsTaskResourceTest {
 
         //USER NON è sfd@sisinfo (quindi NON può vedere il task istanziato)
         util.loginUser();
-        response = flowsTaskResource.getAvailableTasks(mockHttpServletRequest, ALL_PROCESS_INSTANCES, 0, 1000, ASC);
+        response = flowsTaskResource.getAvailableTasks( ALL_PROCESS_INSTANCES, 0, 1000, ASC, null);
         assertEquals(OK, response.getStatusCode());
         assertEquals(0, response.getBody().getSize());
         assertEquals(0, ((ArrayList) response.getBody().getData()).size());
@@ -173,7 +173,7 @@ public class FlowsTaskResourceTest {
         flowsTaskResource.reassignTask("", util.getFirstTaskId(),  "anna.penna");
 //        verifico che il tasck sia stato assegnato ad anna.penna
         util.loginResponsabileAcquisti();
-        ResponseEntity<DataResponse> res = flowsTaskResource.getMyTasks(mockHttpServletRequest, ALL_PROCESS_INSTANCES, 0, 100, ASC);
+        ResponseEntity<DataResponse> res = flowsTaskResource.getMyTasks(ALL_PROCESS_INSTANCES, 0, 100, ASC, null);
         assertEquals(OK, res.getStatusCode());
         assertEquals(util.getFirstTaskId(), ((ArrayList<TaskResponse>) res.getBody().getData()).get(0).getId());
 
@@ -210,7 +210,7 @@ public class FlowsTaskResourceTest {
 
         //sfd NON deve vedere NESSUN Task prima dell'assegnazione del task a responsabileAcquisti2
         util.loginSfd();
-        ResponseEntity<DataResponse> response = flowsTaskResource.taskAssignedInMyGroups(mockHttpServletRequest, ALL_PROCESS_INSTANCES, 0, 100, ASC);
+        ResponseEntity<DataResponse> response = flowsTaskResource.taskAssignedInMyGroups(ALL_PROCESS_INSTANCES, 0, 100, ASC, null);
         assertEquals(OK, response.getStatusCode());
         assertEquals(0, (new ArrayList((Collection) response.getBody().getData())).size());
 
@@ -218,19 +218,19 @@ public class FlowsTaskResourceTest {
         util.loginResponsabileAcquisti2();
         ResponseEntity<Map<String, Object>> resp = flowsTaskResource.claimTask(util.getFirstTaskId());
         assertEquals(OK, resp.getStatusCode());
-        response = flowsTaskResource.taskAssignedInMyGroups(mockHttpServletRequest, ALL_PROCESS_INSTANCES, 0, 100, ASC);
+        response = flowsTaskResource.taskAssignedInMyGroups(ALL_PROCESS_INSTANCES, 0, 100, ASC, null);
         assertEquals(OK, response.getStatusCode());
         assertEquals(0, (new ArrayList((Collection) response.getBody().getData())).size());
 
         //verifico che responsabileAcquisti veda il task assegnato ad responsabileaquisti2 PERCHÈ FANNO PARTE DELLO STESSO GRUPPO (RA)
         util.loginResponsabileAcquisti();
-        response = flowsTaskResource.taskAssignedInMyGroups(mockHttpServletRequest, ALL_PROCESS_INSTANCES, 0, 100, ASC);
+        response = flowsTaskResource.taskAssignedInMyGroups(ALL_PROCESS_INSTANCES, 0, 100, ASC, null);
         assertEquals(OK, response.getStatusCode());
         assertEquals(1, (new ArrayList((Collection) response.getBody().getData())).size());
 
         //sfd NON deve vedere il Task assegnato a responsabileAcquisti2 perchè NON hanno NESSUN gruppo in comune
         util.loginSfd();
-        response = flowsTaskResource.taskAssignedInMyGroups(mockHttpServletRequest, ALL_PROCESS_INSTANCES, 0, 100, ASC);
+        response = flowsTaskResource.taskAssignedInMyGroups(ALL_PROCESS_INSTANCES, 0, 100, ASC, null);
         assertEquals(OK, response.getStatusCode());
         assertEquals(0, (new ArrayList((Collection) response.getBody().getData())).size());
     }
@@ -274,7 +274,7 @@ public class FlowsTaskResourceTest {
         taskService.setOwner(taskService.createTaskQuery().singleResult().getId(), "user");
 
         //Recupero solo il flusso completato da user e non quello assegnatogli né quello di cui è owner
-        ResponseEntity<Object> response2 = flowsTaskResource.getTasksCompletedByMe(mockHttpServletRequest, ALL_PROCESS_INSTANCES, 0, 1000, ASC);
+        ResponseEntity<Object> response2 = flowsTaskResource.getTasksCompletedByMe(ALL_PROCESS_INSTANCES, 0, 1000, ASC, null);
         assertEquals(OK, response.getStatusCode());
         ArrayList<HistoricTaskInstanceResponse> tasks = (ArrayList<HistoricTaskInstanceResponse>) ((DataResponse) response2.getBody()).getData();
         assertTrue(tasks.stream().anyMatch(t -> t.getId().equals(util.getFirstTaskId())));
@@ -283,7 +283,7 @@ public class FlowsTaskResourceTest {
         //Verifico che il metodo funzioni anche con ADMIN
         util.logout();
         util.loginAdmin();
-        response2 = flowsTaskResource.getTasksCompletedByMe(mockHttpServletRequest, ALL_PROCESS_INSTANCES, 0, 1000, ASC);
+        response2 = flowsTaskResource.getTasksCompletedByMe(ALL_PROCESS_INSTANCES, 0, 1000, ASC, null);
         assertEquals(OK, response.getStatusCode());
         assertEquals("ADMIN non deve vedere task perchè NON NE HA COMPLETATO NESSUNO ma ha solo avviato il flusso",
                      0, ((ArrayList<HistoricTaskInstanceResponse>) ((DataResponse) response2.getBody()).getData()).size());

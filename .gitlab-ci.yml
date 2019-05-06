@@ -1,0 +1,4 @@
+job_dummy:
+  script:
+    - apk update; apk add curl;
+    - curl "http://build.si.cnr.it/view/SPRINT_FLOWS/job/sprint-flows-dev/build?token=cambiala"
