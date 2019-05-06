@@ -248,7 +248,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
             if (isInCandidates) {
                 result = true;
             } else {
-                log.error("L'utente {} ha tentato di prendere in carico il  task {} SENZA averne i permassi", username, taskId);
+                log.error("L'utente {} ha tentato di prendere in carico il  task {} SENZA averne i permessi", username, taskId);
             }
         }
         return result;

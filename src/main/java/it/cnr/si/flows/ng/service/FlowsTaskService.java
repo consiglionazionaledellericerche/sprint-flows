@@ -5,11 +5,11 @@ import it.cnr.si.domain.View;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.resource.FlowsAttachmentResource;
 import it.cnr.si.flows.ng.utils.Enum;
+import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
 import it.cnr.si.security.FlowsUserDetailsService;
 import it.cnr.si.security.PermissionEvaluatorImpl;
-import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricIdentityLink;
@@ -19,7 +19,9 @@ import org.activiti.engine.impl.util.json.JSONArray;
 import org.activiti.engine.impl.util.json.JSONObject;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.*;
+import org.activiti.engine.task.IdentityLinkType;
+import org.activiti.engine.task.Task;
+import org.activiti.engine.task.TaskQuery;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
@@ -38,7 +40,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParseException;
@@ -176,7 +177,7 @@ public class FlowsTaskService {
 		return taskQuery;
 	}
 
-	public DataResponse getAvailableTask(HttpServletRequest req, String processDefinition, int firstResult, int maxResults, String order) {
+	public DataResponse getAvailableTask(JSONObject searchParams, String processDefinition, int firstResult, int maxResults, String order) {
 		String username = SecurityUtils.getCurrentUserLogin();
 		List<String> authorities =
 				SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
@@ -189,7 +190,7 @@ public class FlowsTaskService {
 				.taskCandidateGroupIn(authorities)
 				.includeProcessVariables();
 
-		taskQuery = (TaskQuery) utils.searchParamsForTasks(req, taskQuery);
+		taskQuery = (TaskQuery) utils.searchParamsForTasks(searchParams, taskQuery);
 
 		if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
 			taskQuery.processDefinitionKey(processDefinition);
@@ -206,12 +207,12 @@ public class FlowsTaskService {
 		return response;
 	}
 
-	public DataResponse taskAssignedInMyGroups(HttpServletRequest req, String processDefinition, int firstResult, int maxResults, String order) {
+	public DataResponse taskAssignedInMyGroups(JSONObject searchParams, String processDefinition, int firstResult, int maxResults, String order) {
 		String username = SecurityUtils.getCurrentUserLogin();
 
         List<String> userAuthorities = SecurityUtils.getCurrentUserAuthorities();
 
-		TaskQuery taskQuery = (TaskQuery) utils.searchParamsForTasks(req, taskService.createTaskQuery().includeProcessVariables());
+		TaskQuery taskQuery = (TaskQuery) utils.searchParamsForTasks(searchParams, taskService.createTaskQuery().includeProcessVariables());
 
 		if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
 			taskQuery.processDefinitionKey(processDefinition);
@@ -246,7 +247,34 @@ public class FlowsTaskService {
 		return response;
 	}
 
-	public Map<String, Object> getTask(@PathVariable("id") String taskId) {
+
+    public DataResponse getMyTasks(JSONObject searchParams, String processDefinition, int firstResult, int maxResults, String order) {
+		TaskQuery taskQuery = (TaskQuery) Utils.searchParamsForTasks(searchParams, taskService.createTaskQuery());
+		taskQuery.taskAssignee(SecurityUtils.getCurrentUserLogin())
+                .includeProcessVariables();
+
+		if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
+			taskQuery.processDefinitionKey(processDefinition);
+
+
+        Utils.orderTasks(order, taskQuery);
+
+        List<TaskResponse> tasksList = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
+
+        //aggiungo ad ogni singola TaskResponse la variabile che indica se il task è restituibile ad un gruppo (true)
+        // o se è stato assegnato ad un utente specifico "dal sistema" (false)
+        addIsReleasableVariables(tasksList);
+
+        DataResponse response = new DataResponse();
+        response.setStart(firstResult);
+        response.setSize(tasksList.size());
+        response.setTotal(taskQuery.count());
+        response.setData(tasksList);
+        return response;
+    }
+
+
+    public Map<String, Object> getTask(@PathVariable("id") String taskId) {
 		Map<String, Object> response = new HashMap<>();
 		Task taskRaw = taskService.createTaskQuery().taskId(taskId).includeProcessVariables().singleResult();
 
@@ -312,13 +340,13 @@ public class FlowsTaskService {
         }
 	}
 
-	public DataResponse getTasksCompletedByMe(HttpServletRequest req, @RequestParam("processDefinition") String processDefinition, @RequestParam("firstResult") int firstResult, @RequestParam("maxResults") int maxResults, @RequestParam("order") String order) {
+	public DataResponse getTasksCompletedByMe(JSONObject searchParams, @RequestParam("processDefinition") String processDefinition, @RequestParam("firstResult") int firstResult, @RequestParam("maxResults") int maxResults, @RequestParam("order") String order) {
 		String username = SecurityUtils.getCurrentUserLogin();
 
 		HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery().taskInvolvedUser(username)
 				.includeProcessVariables().includeTaskLocalVariables();
 
-		query = (HistoricTaskInstanceQuery) utils.searchParamsForTasks(req, query);
+		query = (HistoricTaskInstanceQuery) utils.searchParamsForTasks(searchParams, query);
 
 		if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
 			query.processDefinitionKey(processDefinition);
@@ -388,6 +416,20 @@ public class FlowsTaskService {
 		writer.writeAll(entriesIterable);
 		writer.close();
 	}
+
+
+	private void addIsReleasableVariables(List<TaskResponse> tasks) {
+		for (TaskResponse task : tasks) {
+			RestVariable isUnclaimableVariable = new RestVariable();
+			isUnclaimableVariable.setName("isReleasable");
+			// if has candidate groups or users -> can release
+			isUnclaimableVariable.setValue(taskService.getIdentityLinksForTask(task.getId())
+												   .stream()
+												   .anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
+			task.getVariables().add(isUnclaimableVariable);
+		}
+	}
+
 
 	private static String ellipsis(String in, int length) {
 		return in.length() < length ? in: in.substring(0, length - 3) + "...";

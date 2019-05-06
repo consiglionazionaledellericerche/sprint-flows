@@ -7,7 +7,6 @@ import org.activiti.engine.impl.util.json.JSONObject;
 import org.activiti.engine.query.Query;
 import org.activiti.engine.task.TaskInfoQuery;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
@@ -17,7 +16,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -38,7 +36,7 @@ public final class Utils {
     public static final String PROCESS_VISUALIZER = "visualizzatore";
 
     private static final String TASK_PARAMS = "taskParams";
-    private static final String PROCESS_PARAMS = "processParams";
+    public static final String PROCESS_PARAMS = "processParams";
     private static final String ERRORE_NELLA_LETTURE_DELLO_STREAM_DELLA_REQUEST = "Errore nella letture dello stream della request";
     public static final String ASC = "ASC";
     public static final String DESC = "DESC";
@@ -137,6 +135,7 @@ public final class Utils {
         formatoDataOra.setTimeZone(TimeZone.getTimeZone("Europe/Rome"));
     }
 
+
     public static TaskInfoQuery orderTasks(String order, TaskInfoQuery query) {
         if (order.equals(ASC))
             query.orderByTaskCreateTime().asc();
@@ -146,6 +145,7 @@ public final class Utils {
         return query;
     }
 
+
     public HistoricProcessInstanceQuery orderProcess(String order, HistoricProcessInstanceQuery historicProcessQuery) {
         if (order.equals(ASC))
             historicProcessQuery.orderByProcessInstanceStartTime().asc();
@@ -154,10 +154,9 @@ public final class Utils {
         return historicProcessQuery;
     }
 
-    public static TaskInfoQuery searchParamsForTasks(HttpServletRequest req, TaskInfoQuery query) {
-        try {
-            JSONObject json = new JSONObject(IOUtils.toString(req.getReader()));
 
+    public static TaskInfoQuery searchParamsForTasks(JSONObject json, TaskInfoQuery query) {
+        try {
             if (json.has(PROCESS_PARAMS))
                 query = extractProcessSearchParams(query, json.getJSONArray(PROCESS_PARAMS));
             if (json.has(TASK_PARAMS))
@@ -168,9 +167,10 @@ public final class Utils {
         return query;
     }
 
-    public Query searchParamsForProcess(HttpServletRequest req, HistoricProcessInstanceQuery processQuery) {
+
+    public Query searchParamsForProcess(JSONArray processParams, HistoricProcessInstanceQuery processQuery) {
         try {
-            JSONArray processParams = new JSONObject(IOUtils.toString(req.getReader())).getJSONArray(PROCESS_PARAMS);
+//            todo: controllare
 
             for (int i = 0; i < processParams.length(); i++) {
                 JSONObject appo = processParams.optJSONObject(i);

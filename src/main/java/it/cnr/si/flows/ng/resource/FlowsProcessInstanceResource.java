@@ -12,7 +12,6 @@ import it.cnr.si.security.PermissionEvaluatorImpl;
 import it.cnr.si.security.SecurityUtils;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
-import org.activiti.engine.delegate.event.impl.ActivitiProcessCancelledEventImpl;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.history.HistoricTaskInstance;
@@ -23,9 +22,9 @@ import org.activiti.rest.service.api.runtime.process.ProcessInstanceResource;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,11 +32,9 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.core.env.Environment;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.websocket.server.PathParam;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -51,9 +48,7 @@ import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
 import static it.cnr.si.flows.ng.utils.Enum.Stato.PubblicatoTrasparenza;
 import static it.cnr.si.flows.ng.utils.Enum.Stato.PubblicatoUrp;
 import static it.cnr.si.flows.ng.utils.Utils.DESC;
-import static it.cnr.si.flows.ng.utils.Utils.DESCRIZIONE;
-import static it.cnr.si.flows.ng.utils.Utils.INITIATOR;
-import static it.cnr.si.flows.ng.utils.Utils.TITOLO;
+import static it.cnr.si.flows.ng.utils.Utils.PROCESS_PARAMS;
 
 @Controller
 @RequestMapping("api/processInstances")
@@ -98,13 +93,16 @@ public class FlowsProcessInstanceResource {
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity getProcessInstances(
-            HttpServletRequest req,
             @RequestParam("active") boolean active,
             @RequestParam("processDefinition") String processDefinition,
             @RequestParam("firstResult") int firstResult,
             @RequestParam("maxResults") int maxResults,
-            @RequestParam("order") String order) {
-        HistoricProcessInstanceQuery historicProcessQuery = flowsProcessInstanceService.getProcessInstances(req, active, processDefinition, order);
+            @RequestParam("order") String order,
+            @RequestBody(required = false) String body) {
+
+        org.activiti.engine.impl.util.json.JSONArray searchParams = new org.activiti.engine.impl.util.json.JSONObject(body).getJSONArray(PROCESS_PARAMS);
+
+        HistoricProcessInstanceQuery historicProcessQuery = flowsProcessInstanceService.getProcessInstances(searchParams, active, processDefinition, order);
 
         List<HistoricProcessInstance> historicProcessInstances = historicProcessQuery.listPage(firstResult, maxResults);
 

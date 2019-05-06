@@ -1,8 +1,12 @@
 package it.cnr.si.flows.ng.service;
 
+import it.cnr.si.flows.ng.exception.UnexpectedResultException;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.service.AceService;
+import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
 import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
+import it.cnr.si.service.dto.anagrafica.letture.PersonaEntitaOrganizzativaWebDto;
+import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
 import it.cnr.si.service.dto.anagrafica.letture.RuoloUtenteWebDto;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -11,6 +15,7 @@ import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import static it.cnr.si.security.PermissionEvaluatorImpl.CNR_CODE;
 
@@ -110,4 +115,20 @@ public class AceBridgeService {
 		}
 	}
 
+
+	public String getAfferenzaUtente(String username) {
+
+		PersonaWebDto persona = aceService.getPersonaByUsername(username);
+		List<PersonaEntitaOrganizzativaWebDto> personaEntitaOrganizzativaWebDtos = aceService.personaEntitaOrganizzativaFind(null, null, null, persona.getId(), TipoAppartenenza.AFFERENZA_UO, null, null, null, null);
+		List<PersonaEntitaOrganizzativaWebDto> afferenze = personaEntitaOrganizzativaWebDtos.stream()
+				.filter(p -> Objects.isNull(p.getFineValidita()))
+				.collect(Collectors.toList());
+
+		if (afferenze.size() == 0)
+			throw new UnexpectedResultException("Nessuna afferenza corrente per l'utente: "+ username);
+		if (afferenze.size() > 1)
+			throw new UnexpectedResultException("L'utente risulta avere piu' di una afferenza: "+ username);
+
+		return afferenze.get(0).getEntitaOrganizzativa().getCdsuo();
+	}
 }
