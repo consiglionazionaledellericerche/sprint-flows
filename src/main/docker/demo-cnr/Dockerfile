@@ -3,7 +3,6 @@ LABEL maintainer="marcinireneusz.trycz@cnr.it"
 
 # questi package servono per la generazione dei diagrammi
 RUN apk update
-RUN apk add libgcc
 RUN apk add ttf-dejavu
 
 
