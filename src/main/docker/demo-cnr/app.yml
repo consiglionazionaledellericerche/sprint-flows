@@ -1,0 +1,16 @@
+version: '2'
+services:
+  abil-app:
+    image: docker.si.cnr.it/sprint-flows-test
+    environment:
+      # - _JAVA_OPTIONS=-Xmx512m -Xms256m
+      - SPRING_PROFILES_ACTIVE=dev,cnr
+    ports:
+      - 1180:8080
+#        logging:
+#          driver: "gelf"
+#          options:
+#            gelf-address: "udp://log.cedrc.cnr.it:3514"
+#            tag: "abil"
+#            gelf-compression-type: "gzip"
+#            gelf-compression-level: "3"
