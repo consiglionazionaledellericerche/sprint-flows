@@ -25,9 +25,9 @@
  	 *
  	 * @author mtrycz
  	 */
- 	HomeController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log', '$http', '$q', 'Upload', 'utils'];
+ 	HomeController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log', '$http', '$q', 'Upload', 'utils', '$localStorage'];
 
- 	function HomeController($scope, Principal, LoginService, $state, dataService, AlertService, $log, $http, $q, Upload, utils) {
+ 	function HomeController($scope, Principal, LoginService, $state, dataService, AlertService, $log, $http, $q, Upload, utils, $localStorage) {
  		var vm = this;
  		$scope.data = {};
  		vm.taskId = $state.params.taskId;
@@ -102,6 +102,7 @@
 
  					$log.info(response);
  					AlertService.success("Richiesta completata con successo");
+                    removeFromCart($state.params.taskId)
  					$state.go('availableTasks');
 
  				}, function(err) {
@@ -118,5 +119,14 @@
  		$scope.downloadFile = function(url, filename, mimetype) {
  			utils.downloadFile(url, filename, mimetype);
  		}
+
+        function removeFromCart(taskId) {
+            if (taskId && $localStorage.cart) {
+                delete $localStorage.cart[taskId];
+                if (Object.keys($localStorage.cart).length == 0) {
+                    delete $localStorage.cart;
+                }
+            }
+        }
  	}
  })();
