@@ -1,5 +1,6 @@
 package it.cnr.si.flows.ng.utils;
 
+import com.google.common.base.Strings;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.impl.util.json.JSONArray;
@@ -120,7 +121,10 @@ public final class Utils {
     }
 
     public String formattaDataOra(Date in) {
-        return formatoDataOra.format(in);
+        if (in != null)
+            return formatoDataOra.format(in);
+        else
+            return "";
     }
 
     public String formattaData(Date in) {
