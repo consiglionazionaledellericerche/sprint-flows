@@ -107,9 +107,11 @@
 
  				}, function(err) {
  					$log.error(err);
-					if (err.status == 412){
+					if (err.status == 412) {
 						AlertService.warning("AVVISO<br>" + err.data.message);
-					}else{
+					} else if (err.status == -1) {
+						AlertService.error("Richiesta non riuscita<br>" + "E' possibile che la richiesta superi il limite massimo di grandezza (50MB)");
+					} else {
 						AlertService.error("Richiesta non riuscita<br>" + err.data.message);
 					}
 				});
