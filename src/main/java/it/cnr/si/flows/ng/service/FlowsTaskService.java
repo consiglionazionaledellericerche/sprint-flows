@@ -1,5 +1,8 @@
 package it.cnr.si.flows.ng.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import com.opencsv.CSVWriter;
 import it.cnr.si.domain.View;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
@@ -25,6 +28,7 @@ import org.activiti.engine.task.TaskQuery;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
+import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
 import org.activiti.rest.service.api.runtime.task.TaskResponse;
 import org.slf4j.Logger;
@@ -374,7 +378,7 @@ public class FlowsTaskService {
 
 
 	//    todo: testare il funzionamento
-	public void buildCsv(List<HistoricTaskInstanceResponse> taskInstance, PrintWriter printWriter, String processDefinitionKey) throws IOException {
+	public void buildCsv(List<HistoricProcessInstanceResponse> processInstances, PrintWriter printWriter, String processDefinitionKey) throws IOException {
 		// vista (campi e variabili) da inserire nel csv in base alla tipologia di flusso selezionato
 		View view = null;
 		if (!processDefinitionKey.equals(ALL_PROCESS_INSTANCES)) {
@@ -384,16 +388,30 @@ public class FlowsTaskService {
 		ArrayList<String[]> entriesIterable = new ArrayList<>();
 		boolean hasHeaders = false;
 		ArrayList<String> headers = new ArrayList<>();
-		headers.add("Business Key");
-		headers.add("Start Date");
-		for (HistoricTaskInstanceResponse task : taskInstance) {
-			//            todo: riscrivere perchè adatto alle process instances
-			List<RestVariable> variables = task.getVariables();
+		headers.add("Identificativo Flusso");
+		headers.add("Titolo");
+		headers.add("Descrizione");
+		headers.add("Utente che ha avviato il flusso");
+		headers.add("Stato");
+		headers.add("Data Inizio");
+		headers.add("Data Fine");
+
+		for (HistoricProcessInstanceResponse processInstance : processInstances) {
+			List<RestVariable> variables = processInstance.getVariables();
 			ArrayList<String> tupla = new ArrayList<>();
-			//field comuni a tutte le Task Instances (name , Start date)
-			//            tupla.add(task.getBusinessKey());
-			tupla.add(task.getName());
-			tupla.add(utils.formattaDataOra(task.getStartTime()));
+			//field comuni a tutte le Process Instances (name , Start date)
+			tupla.add(processInstance.getBusinessKey());
+
+			// inizio spacchettamento fields
+			Map<String, String> name = new ObjectMapper().readValue(processInstance.getName(), new TypeReference<Map<String, String>>() {});
+			tupla.add(name.get("titolo"));
+			tupla.add(name.get("descrizione"));
+			tupla.add(name.get("initiator"));
+			tupla.add(name.get("stato"));
+            //fine spacchettamento fields
+
+			tupla.add(utils.formattaDataOra(processInstance.getStartTime()));
+			tupla.add(utils.formattaDataOra(processInstance.getEndTime()));
 
 			//field specifici per ogni procesDefinition
 			if (view != null) {
