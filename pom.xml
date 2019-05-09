@@ -27,6 +27,7 @@
     </scm>
 
     <properties>
+        <ace-client.version>2.3.3</ace-client.version>
         <activiti.version>5.22.0</activiti.version>
         <assertj-core.version>3.5.2</assertj-core.version>
         <feign.version>9.7.0</feign.version>
@@ -51,7 +52,6 @@
         <spring.security.version>4.1.1.RELEASE</spring.security.version>
         <spring.version>4.3.2.RELEASE</spring.version>
         <sprint.version>2.0.1</sprint.version>
-        <ace-client.version>2.2.10</ace-client.version>
         <start-class>it.cnr.si.FlowsApp</start-class>
         <storage-cloud-cmis.version>0.0.6</storage-cloud-cmis.version>
     </properties>
@@ -192,6 +192,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>it.cnr.commons</groupId>
+            <artifactId>firmadigitale</artifactId>
+            <version>${firmadigitale.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>it.cnr.si</groupId>
@@ -208,11 +213,6 @@
             <groupId>it.cnr.si</groupId>
             <artifactId>storage-cloud-commons</artifactId>
             <version>${storage-cloud-cmis.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>it.cnr.commons</groupId>
-            <artifactId>firmadigitale</artifactId>
-            <version>${firmadigitale.version}</version>
         </dependency>
         <dependency>
             <groupId>it.cnr.si.sprint</groupId>
@@ -781,7 +781,7 @@
                                     <goal>install-node-and-npm</goal>
                                 </goals>
                                 <configuration>
-                                    <nodeVersion>v4.4.7</nodeVersion>
+                                    <nodeVersion>v6.17.1</nodeVersion>
                                     <npmVersion>3.10.5</npmVersion>
                                 </configuration>
                             </execution>

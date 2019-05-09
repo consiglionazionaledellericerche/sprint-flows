@@ -25,9 +25,9 @@
  	 *
  	 * @author mtrycz
  	 */
- 	HomeController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log', '$http', '$q', 'Upload', 'utils'];
+ 	HomeController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log', '$http', '$q', 'Upload', 'utils', '$localStorage'];
 
- 	function HomeController($scope, Principal, LoginService, $state, dataService, AlertService, $log, $http, $q, Upload, utils) {
+ 	function HomeController($scope, Principal, LoginService, $state, dataService, AlertService, $log, $http, $q, Upload, utils, $localStorage) {
  		var vm = this;
  		$scope.data = {};
  		vm.taskId = $state.params.taskId;
@@ -102,13 +102,16 @@
 
  					$log.info(response);
  					AlertService.success("Richiesta completata con successo");
+                    removeFromCart($state.params.taskId)
  					$state.go('availableTasks');
 
  				}, function(err) {
  					$log.error(err);
-					if (err.status == 412){
+					if (err.status == 412) {
 						AlertService.warning("AVVISO<br>" + err.data.message);
-					}else{
+					} else if (err.status == -1) {
+						AlertService.error("Richiesta non riuscita<br>" + "E' possibile che la richiesta superi il limite massimo di grandezza (50MB)");
+					} else {
 						AlertService.error("Richiesta non riuscita<br>" + err.data.message);
 					}
 				});
@@ -118,5 +121,14 @@
  		$scope.downloadFile = function(url, filename, mimetype) {
  			utils.downloadFile(url, filename, mimetype);
  		}
+
+        function removeFromCart(taskId) {
+            if (taskId && $localStorage.cart) {
+                delete $localStorage.cart[taskId];
+                if (Object.keys($localStorage.cart).length == 0) {
+                    delete $localStorage.cart;
+                }
+            }
+        }
  	}
  })();
