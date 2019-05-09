@@ -17,6 +17,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.time.Instant;
@@ -125,6 +126,26 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
 
         return handleExceptionInternal(e, res,
                 new HttpHeaders(), HttpStatus.FORBIDDEN, request);
+
+    }
+
+    @ExceptionHandler(MultipartException.class)
+    protected ResponseEntity<Object> handleMultipartException(MultipartException ex, WebRequest request) {
+
+        if (ex.getMessage().contains("SizeLimitExceededException")) {
+
+            Map<String, Object> res = Utils.mapOf("message", "I file allegati superano il limite massimo di grandezza (50MB)");
+//            return handleExceptionInternal(ex, res,
+//                    new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
+        }
+
+        long rif = Instant.now().toEpochMilli();
+        LOGGER.error("(Riferimento " + rif + ") Errore non gestito con messaggio " + ex.getMessage(), ex);
+
+        Map<String, Object> res = Utils.mapOf("message", "Errore non gestito. Contattare gli amminstratori specificando il numero di riferimento: " + rif);
+        return handleExceptionInternal(ex, res,
+                new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
 
     }
 
