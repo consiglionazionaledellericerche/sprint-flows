@@ -8,7 +8,6 @@ import it.cnr.si.flows.ng.exception.FlowsPermissionException;
 import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
 import it.cnr.si.flows.ng.service.*;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
-import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.FlowsUserDetailsService;
 import it.cnr.si.security.PermissionEvaluatorImpl;
@@ -16,15 +15,12 @@ import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.impl.util.json.JSONObject;
 import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.IdentityLinkType;
 import org.activiti.engine.task.Task;
-import org.activiti.engine.task.TaskQuery;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
-import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
-import org.activiti.rest.service.api.runtime.task.TaskResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,11 +31,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.*;
 
@@ -47,7 +41,8 @@ import static it.cnr.si.flows.ng.service.FlowsFirmaService.ERRORI_ARUBA;
 import static it.cnr.si.flows.ng.service.FlowsFirmaService.NOME_FILE_FIRMA;
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Firma;
 import static it.cnr.si.flows.ng.utils.Enum.Stato.Firmato;
-import static it.cnr.si.flows.ng.utils.Utils.*;
+import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
+import static it.cnr.si.flows.ng.utils.Utils.isEmpty;
 
 /**
  * @author mtrycz
@@ -91,53 +86,36 @@ public class FlowsTaskResource {
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<DataResponse> getMyTasks(
-            HttpServletRequest req,
             @RequestParam("processDefinition") String processDefinition,
             @RequestParam("firstResult") int firstResult,
             @RequestParam("maxResults") int maxResults,
-            @RequestParam("order") String order) {
+            @RequestParam("order") String order,
+            @RequestBody(required = false) String body){
 
-        String username = SecurityUtils.getCurrentUserLogin();
-
-        TaskQuery taskQuery = taskService.createTaskQuery()
-                .taskAssignee(username)
-                .includeProcessVariables();
-
-        if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
-            taskQuery.processDefinitionKey(processDefinition);
-
-        taskQuery = (TaskQuery) Utils.searchParamsForTasks(req, taskQuery);
-
-        Utils.orderTasks(order, taskQuery);
-
-        List<TaskResponse> tasksList = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
-
-        //aggiungo ad ogni singola TaskResponse la variabile che indica se il task è restituibile ad un gruppo (true)
-        // o se è stato assegnato ad un utente specifico "dal sistema" (false)
-        addIsReleasableVariables(tasksList);
-
-        DataResponse response = new DataResponse();
-        response.setStart(firstResult);
-        response.setSize(tasksList.size());
-        response.setTotal(taskQuery.count());
-        response.setData(tasksList);
-
+        DataResponse response = flowsTaskService.getMyTasks(body!=null ? new JSONObject(body) : new JSONObject(),
+                                                            processDefinition,
+                                                            firstResult,
+                                                            maxResults,
+                                                            order);
         return ResponseEntity.ok(response);
     }
-
 
 
     @PostMapping(value = "/availabletasks", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<DataResponse> getAvailableTasks(
-            HttpServletRequest req,
             @RequestParam("processDefinition") String processDefinition,
             @RequestParam("firstResult") int firstResult,
             @RequestParam("maxResults") int maxResults,
-            @RequestParam("order") String order) {
+            @RequestParam("order") String order,
+            @RequestBody(required = false) String body) {
 
-        DataResponse response = flowsTaskService.getAvailableTask(req, processDefinition, firstResult, maxResults, order);
+        DataResponse response = flowsTaskService.getAvailableTask(body!=null ? new JSONObject(body) : new JSONObject(),
+                                                                  processDefinition,
+                                                                  firstResult,
+                                                                  maxResults,
+                                                                  order);
 
         return ResponseEntity.ok(response);
     }
@@ -148,14 +126,17 @@ public class FlowsTaskResource {
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<DataResponse> taskAssignedInMyGroups(
-            HttpServletRequest req,
             @RequestParam("processDefinition") String processDefinition,
             @RequestParam("firstResult") int firstResult,
             @RequestParam("maxResults") int maxResults,
-            @RequestParam("order") String order) {
+            @RequestParam("order") String order,
+            @RequestBody(required = false) String body) {
 
-        DataResponse response = flowsTaskService.taskAssignedInMyGroups(req, processDefinition, firstResult, maxResults, order);
-
+        DataResponse response = flowsTaskService.taskAssignedInMyGroups(body!=null ? new JSONObject(body) : new JSONObject(),
+                                                                        processDefinition,
+                                                                        firstResult,
+                                                                        maxResults,
+                                                                        order);
         return ResponseEntity.ok(response);
     }
 
@@ -249,14 +230,17 @@ public class FlowsTaskResource {
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<Object> getTasksCompletedByMe(
-            HttpServletRequest req,
             @RequestParam("processDefinition") String processDefinition,
             @RequestParam("firstResult") int firstResult,
             @RequestParam("maxResults") int maxResults,
-            @RequestParam("order") String order) {
+            @RequestParam("order") String order,
+            @RequestBody(required = false) String body) {
 
-        DataResponse response = flowsTaskService.getTasksCompletedByMe(req, processDefinition, firstResult, maxResults, order);
-
+        DataResponse response = flowsTaskService.getTasksCompletedByMe(body!=null ? new JSONObject(body) : new JSONObject(),
+                                                                       processDefinition,
+                                                                       firstResult,
+                                                                       maxResults,
+                                                                       order);
         return ResponseEntity.ok(response);
     }
 
@@ -399,17 +383,6 @@ public class FlowsTaskResource {
         return data;
     }
 
-    private void addIsReleasableVariables(List<TaskResponse> tasks) {
-        for (TaskResponse task : tasks) {
-            RestVariable isUnclaimableVariable = new RestVariable();
-            isUnclaimableVariable.setName("isReleasable");
-            // if has candidate groups or users -> can release
-            isUnclaimableVariable.setValue(taskService.getIdentityLinksForTask(task.getId())
-                    .stream()
-                    .anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
-            task.getVariables().add(isUnclaimableVariable);
-        }
-    }
 
     private void verificaPrecondizioniFirmaMultipla(List<String> taskIds) throws FlowsPermissionException {
 
