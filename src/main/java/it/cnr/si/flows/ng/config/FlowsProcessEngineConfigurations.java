@@ -80,7 +80,7 @@ public class FlowsProcessEngineConfigurations {
         // migliorano un poco le prestazioni della search  (0,5 secondi)
         conf.setAsyncExecutorEnabled(true);
 //        il default è 10
-        conf.setAsyncExecutorMaxPoolSize(30);
+        conf.setAsyncExecutorMaxPoolSize(20);
 
         // FULL serve per la storia dei documenti
         conf.setHistoryLevel(HistoryLevel.FULL);
