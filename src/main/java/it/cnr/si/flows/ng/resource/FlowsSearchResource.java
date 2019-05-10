@@ -6,6 +6,7 @@ import it.cnr.si.flows.ng.service.FlowsTaskService;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
 import org.activiti.rest.common.api.DataResponse;
+import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -89,10 +90,10 @@ public class FlowsSearchResource {
         if (isTaskQuery)
             result = flowsTaskService.search(params, processDefinitionKey, active, order, firstResult, maxResults);
         else
-            result = flowsProcessInstanceService.search(params, processDefinitionKey, active, order, firstResult, maxResults, false);
+            result = flowsProcessInstanceService.search(params, processDefinitionKey, active, order, firstResult, maxResults, true);
 
         flowsTaskService.buildCsv(
-                (List<HistoricTaskInstanceResponse>) result.getData(),
+                (List<HistoricProcessInstanceResponse>) result.getData(),
                 res.getWriter(), processDefinitionKey);
     }
 }
