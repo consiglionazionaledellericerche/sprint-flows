@@ -260,7 +260,6 @@ public class FlowsTaskService {
 		if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
 			taskQuery.processDefinitionKey(processDefinition);
 
-
         Utils.orderTasks(order, taskQuery);
 
         List<TaskResponse> tasksList = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));

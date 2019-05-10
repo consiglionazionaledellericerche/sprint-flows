@@ -1,14 +1,14 @@
-FROM scolagreco/alpine-jdk-springboot
-LABEL maintainer="marcinireneusz.trycz@cnr.it"
+FROM scolagreco/alpine-openjdk:v3.9.2
 
-# questi package servono per la generazione dei diagrammi
-RUN apk update
-RUN apk add ttf-dejavu
+VOLUME /tmp
 
+ARG JAR_FILE=./app.war
+ADD ${JAR_FILE} /opt/app.war
+RUN apk add --update --no-cache ttf-dejavu
 
-EXPOSE 8080 5701/udp
+EXPOSE 8080
 
-ADD app.war /app/app.war
-WORKDIR /app
+WORKDIR /opt/
 
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-Dspring.profiles.active=dev,cnr","-jar", "app.war"]
+# https://spring.io/guides/gs/spring-boot-docker/#_containerize_it
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom", "-jar","/opt/app.war"]
