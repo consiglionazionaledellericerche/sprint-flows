@@ -116,7 +116,6 @@ public class FlowsTaskResource {
                                                                   firstResult,
                                                                   maxResults,
                                                                   order);
-
         return ResponseEntity.ok(response);
     }
 

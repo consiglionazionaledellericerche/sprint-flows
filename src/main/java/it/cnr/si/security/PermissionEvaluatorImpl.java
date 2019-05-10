@@ -238,13 +238,19 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
         } else {
             /*        claim         */
             log.info("Do in carico il task {} a {}", taskId, username);
-            List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
-            List<String> authorities = getAuthorities(username, flowsUserDetailsService);
+            boolean isInCandidates = false;
+            try {
+                List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
 
-            boolean isInCandidates = identityLinks.stream()
-                    .filter(l -> l.getType().equals(IdentityLinkType.CANDIDATE))
-                    .anyMatch(l -> authorities.contains(l.getGroupId()));
+                List<String> authorities = getAuthorities(username, flowsUserDetailsService);
 
+                isInCandidates = identityLinks.stream()
+                        .filter(l -> l.getType().equals(IdentityLinkType.CANDIDATE))
+                        .anyMatch(l -> authorities.contains(l.getGroupId()));
+
+            } catch (Exception e){
+                log.error("Errore nel recupero degli identity links della Task Id {} ", taskId);
+            }
             if (isInCandidates) {
                 result = true;
             } else {
