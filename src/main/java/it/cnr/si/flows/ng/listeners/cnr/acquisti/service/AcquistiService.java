@@ -33,9 +33,18 @@ public class AcquistiService {
 	private FlowsAttachmentService attachmentService;
 
 	public void OrdinaElencoDitteCandidate(DelegateExecution execution) {
-		String ditteInvitateString = (String) execution.getVariable("ditteInvitate_json");
-		LOGGER.info("ditteInvitate_json: " + ditteInvitateString);
 
+		String ditteInvitateString = null;
+		if(execution.getVariable("ditteInvitate_json") != null && !execution.getVariable("tipologiaAcquisizione").toString().equalsIgnoreCase("Procedura aperta")) {
+			ditteInvitateString = (String) execution.getVariable("ditteInvitate_json");
+			LOGGER.info("ditteInvitate_json: " + ditteInvitateString);
+		} else {
+			//Se si tratta di procedura aperta
+			if(execution.getVariable("ditteCandidateInput_json") != null && execution.getVariable("tipologiaAcquisizione").toString().equalsIgnoreCase("Procedura aperta")) {
+				ditteInvitateString = (String) execution.getVariable("ditteCandidateInput_json");
+				LOGGER.info("ditteCandidateInput_json: " + ditteInvitateString);
+			}
+		}
 		JSONArray ditteInvitate = new JSONArray(ditteInvitateString);
 		int nrTotaleDitte = ditteInvitateString.length();
 		LOGGER.info("nrTotaleDitte: " + nrTotaleDitte);
@@ -44,7 +53,12 @@ public class AcquistiService {
 
 		List<JSONObject> jsonValues = new ArrayList<JSONObject>();
 		for (int i = 0; i < ditteInvitate.length(); i++) {
-			if (ditteInvitate.getJSONObject(i).get("offertaPresentataDittaInvitata").toString().equals("SI")) {
+			//Se si tratta di procedura aperta
+			if(execution.getVariable("ditteInvitate_json") != null && !execution.getVariable("tipologiaAcquisizione").toString().equalsIgnoreCase("Procedura aperta")) {
+				if (ditteInvitate.getJSONObject(i).get("offertaPresentataDittaInvitata").toString().equals("SI")) {
+					jsonValues.add(ditteInvitate.getJSONObject(i));
+				}
+			} else {
 				jsonValues.add(ditteInvitate.getJSONObject(i));
 			}
 			if (!ditteInvitate.getJSONObject(i).has("pIvaCodiceFiscaleDittaInvitata")) {
