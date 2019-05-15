@@ -505,7 +505,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			pubblicaFilePubblicabiliURP(execution);
 		};break;
 		case "pre-determina-end": {
-			pubblicaTuttiFilePubblicabili(execution);
+			pubblicaFilePubblicabiliURP(execution);
 		};break;     
 		case "end-annullato-start": {
 			execution.setVariable(STATO_FINALE_DOMANDA, "ANNULLATO");
