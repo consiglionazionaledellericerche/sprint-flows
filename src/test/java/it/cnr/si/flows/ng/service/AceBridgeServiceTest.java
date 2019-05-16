@@ -23,7 +23,7 @@ public class AceBridgeServiceTest {
     @Test
     public void testAfferenza() {
 
-        String afferenzaUtente = aceBridgeService.getAfferenzaUtente("marcinireneusz.trycz");
+        String afferenzaUtente = aceBridgeService.getAfferenzaUtente("marcinireneusz.trycz").getCdsuo();
         Assert.assertEquals("000411", afferenzaUtente);
 
     }
