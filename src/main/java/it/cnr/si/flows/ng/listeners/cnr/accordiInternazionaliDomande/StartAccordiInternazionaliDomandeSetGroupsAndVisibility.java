@@ -38,20 +38,15 @@ public class StartAccordiInternazionaliDomandeSetGroupsAndVisibility {
 		String richiedente = execution.getVariable("userNameRichiedente", String.class);
 		// LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable(Enum.VariableEnum.title.name()));
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
-		List<String> gruppiUtente = aceBridgeService.getAceGroupsForUser(richiedente.toString());
-		gruppiUtente.forEach(gruppoUtente -> {
-			execution.setVariable("strutturaAppartenenzaUtente", gruppoUtente.toString());
-		});
-		
+		Integer strutturaAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(richiedente.toString()).getId();
 		String gruppoValidatoriAccordiInternazionali = "validatoriAccordiInternazionali@0000";
 		String gruppoUfficioProtocollo = "ufficioProtocolloAccordiInternazionali@0000";
 		String gruppoValutatoreScientificoDipartimento = "valutatoreScientificoDipartimento@0000";
 		String gruppoResponsabileAccordiInternazionali = "responsabileAccordiInternazionali@0000";
 		//DA CAMBIARE - ricavando il direttore della persona che afferisce alla sua struttura
-		String gruppoDirigenteRichiedente = "responsabileFirmaAcquisti@2216";
+		String gruppoDirigenteRichiedente = "responsabile-struttura@" + strutturaAppartenenzaUtente;
 		String applicazioneAccordiInternazionali = "app.abil";
 		String applicazioneScrivaniaDigitale = "app.scrivaniadigitale";
-		String cdsuoRichiedente = aceBridgeService.getAfferenzaUtente(richiedente);
 
 		LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}",  gruppoValidatoriAccordiInternazionali, gruppoResponsabileAccordiInternazionali, gruppoUfficioProtocollo);
 
@@ -63,6 +58,7 @@ public class StartAccordiInternazionaliDomandeSetGroupsAndVisibility {
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValutatoreScientificoDipartimento, PROCESS_VISUALIZER);
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneScrivaniaDigitale, PROCESS_VISUALIZER);
 
+		execution.setVariable("strutturaValutazioneDirigente", aceBridgeService.getAfferenzaUtente(richiedente.toString()).getId() + "-" + aceBridgeService.getAfferenzaUtente(richiedente.toString()).getDenominazione());
 		execution.setVariable("gruppoValidatoriAccordiInternazionali", gruppoValidatoriAccordiInternazionali);
 		execution.setVariable("gruppoResponsabileAccordiInternazionali", gruppoResponsabileAccordiInternazionali);
 		execution.setVariable("gruppoUfficioProtocollo", gruppoUfficioProtocollo);
@@ -70,6 +66,6 @@ public class StartAccordiInternazionaliDomandeSetGroupsAndVisibility {
 		execution.setVariable("gruppoDirigenteRichiedente", gruppoDirigenteRichiedente);
 		execution.setVariable("gruppoValutatoreScientificoDipartimento", gruppoValutatoreScientificoDipartimento);
 		execution.setVariable("applicazioneScrivaniaDigitale", applicazioneScrivaniaDigitale);
-		execution.setVariable("cdsuoRichiedente", cdsuoRichiedente);
+		execution.setVariable("cdsuoRichiedente", aceBridgeService.getAfferenzaUtente(richiedente.toString()).getCdsuo());
 	}
 }
