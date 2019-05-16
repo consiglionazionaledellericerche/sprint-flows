@@ -116,7 +116,7 @@ public class AceBridgeService {
 	}
 
 
-	public String getAfferenzaUtente(String username) {
+	public EntitaOrganizzativaWebDto getAfferenzaUtente(String username) {
 
 		PersonaWebDto persona = aceService.getPersonaByUsername(username);
 		List<PersonaEntitaOrganizzativaWebDto> personaEntitaOrganizzativaWebDtos = aceService.personaEntitaOrganizzativaFind(null, null, null, persona.getId(), TipoAppartenenza.AFFERENZA_UO, null, null, null, null);
@@ -129,6 +129,6 @@ public class AceBridgeService {
 		if (afferenze.size() > 1)
 			throw new UnexpectedResultException("L'utente risulta avere piu' di una afferenza: "+ username);
 
-		return afferenze.get(0).getEntitaOrganizzativa().getCdsuo();
+		return afferenze.get(0).getEntitaOrganizzativa();
 	}
 }
