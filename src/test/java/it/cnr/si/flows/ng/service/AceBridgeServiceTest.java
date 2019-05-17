@@ -32,7 +32,7 @@ public class AceBridgeServiceTest {
     @Test
     public void testEntitaOrganizzativaUtente() {
 
-        Integer idEo = aceBridgeService.getIdEntitaOrganizzativaDellUtente("marcinireneusz.trycz").getId();
+        Integer idEo = aceBridgeService.getEntitaOrganizzativaDellUtente("marcinireneusz.trycz").getId();
         Assert.assertEquals(Integer.valueOf(2216), idEo);
 
     }
