@@ -200,7 +200,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 					|| documentoCorrente.getName().equals("modificheVariantiArt106")
 					|| documentoCorrente.getName().equals("bandoAvvisi")
 					|| documentoCorrente.getName().equals("letteraInvito")
-					|| documentoCorrente.getName().equals("provvedimentoAmmessiEsclusi")
+				//  || documentoCorrente.getName().equals("provvedimentoAmmessiEsclusi")
 					|| documentoCorrente.getName().equals("provvedimentoNominaCommissione")
 					|| documentoCorrente.getName().equals("provvedimentoAggiudicazione")
 					|| documentoCorrente.getName().equals("elencoVerbali")
