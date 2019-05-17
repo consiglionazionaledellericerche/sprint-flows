@@ -12,6 +12,7 @@ import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.FlowsUserDetailsService;
 import it.cnr.si.security.PermissionEvaluatorImpl;
 import it.cnr.si.service.RelationshipService;
+import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -170,8 +171,15 @@ public class FlowsTaskResource {
     public ResponseEntity<Map<String, Object>> claimTask(@PathVariable("taskId") String taskId) {
 
         String username = SecurityUtils.getCurrentUserLogin();
-        taskService.claim(taskId, username);
-
+        try {
+            taskService.claim(taskId, username);
+        } catch(ActivitiObjectNotFoundException notFoundException){
+            LOGGER.error("Errore nella presa in carico del task {} da parte dell`utente {}: TASK NON TROVATO", taskId, username);
+            notFoundException.printStackTrace();
+        }catch (Exception e){
+            LOGGER.error("Errore nella presa in carico del task {} da parte dell`utente {}", taskId, username);
+            e.printStackTrace();
+        }
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

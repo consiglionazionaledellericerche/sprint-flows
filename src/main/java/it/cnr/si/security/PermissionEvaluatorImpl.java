@@ -109,7 +109,6 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
         // l'utente puo' completare il task se e' lui l'assegnatario
         if (assignee != null) {
             return assignee.equals(username);
-
         } else {
             // Se l'assegnatario non c'e', L'utente deve essere nei gruppi candidati
             List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
