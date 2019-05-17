@@ -134,7 +134,7 @@ public class AceBridgeService {
 	}
 
 
-    public EntitaOrganizzativaWebDto getIdEntitaOrganizzativaDellUtente(String username) {
+    public EntitaOrganizzativaWebDto getEntitaOrganizzativaDellUtente(String username) {
 
         String cdsuo = getAfferenzaUtente(username).getCdsuo();
 
