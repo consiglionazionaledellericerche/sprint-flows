@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.opencsv.CSVWriter;
 import it.cnr.si.domain.View;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.exception.UnexpectedResultException;
 import it.cnr.si.flows.ng.resource.FlowsAttachmentResource;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
@@ -121,6 +122,17 @@ public class FlowsTaskService {
 		response.setData(restResponseFactory.createHistoricTaskInstanceResponseList(taskRaw));
 
 		return response;
+	}
+
+	public Task getActiveTaskForProcessInstance(String processInstanceId) {
+		List<Task> tasks = taskService.createTaskQuery().active().processInstanceId(processInstanceId).list();
+
+		if (tasks.size() == 0)
+			throw new UnexpectedResultException("Nessun task attivo per il processo: "+ processInstanceId);
+		if (tasks.size() > 1)
+			throw new UnexpectedResultException("Risulta piu' di un task attivo per il processo: "+ processInstanceId);
+
+		return tasks.get(0);
 	}
 
 	// TODO questo metodo e' duplicato di uno in utils (controllare)
