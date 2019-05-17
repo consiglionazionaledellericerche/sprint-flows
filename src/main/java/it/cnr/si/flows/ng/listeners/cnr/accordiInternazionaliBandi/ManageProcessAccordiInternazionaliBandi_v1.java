@@ -132,6 +132,7 @@ public class ManageProcessAccordiInternazionaliBandi_v1 implements ExecutionList
 
 				Map<String, Object> variabili = new HashMap<>();
 				variabili.put("sceltaUtente", "graduatoria da verbale");
+				variabili.put("linkToOtherWorkflows", execution.getProcessInstanceId());			
 				taskService.complete(taskId, variabili);
 			});
 			//throw new RuntimeException("Errore per provare la transazione atomica dello sblocco delle domande");
