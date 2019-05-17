@@ -350,6 +350,9 @@ public class FlowsTaskService {
 		try {
             taskService.complete(taskId, data);
         } catch (Exception e) {
+			if (e instanceof ActivitiObjectNotFoundException)
+				LOGGER.error("Task {} NON trovato", taskId);
+
             taskService.deleteUserIdentityLink(taskId, username, TASK_EXECUTOR);
             throw e;
         }
