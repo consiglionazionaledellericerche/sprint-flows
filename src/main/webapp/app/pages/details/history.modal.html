@@ -4,9 +4,9 @@
     <div class="task-history" id="startEvent">
         <div ng-repeat="variable in vm.startTask | orderBy:'-name'">
             <div ng-switch="variable.name">
-                <div ng-switch-when="title">
+                <div ng-switch-when="titolo">
                     <h5>
-                        <task-details variables="start" title="variable.value"></task-details>
+                        <task-details variables="vm.startTask" title="variable.value"></task-details>
                         <b>Flusso {{variable.value}}</b><br><br>
                     </h5>
                 </div>
@@ -42,10 +42,8 @@
         </div>
         <!--scelta utente-->
         <div ng-repeat="variable in task.historyTask.variables">
-            <div ng-switch="variable.name">
-                <div ng-switch-when="sceltaUtente">
-                    <span ng-show="variable.value !== null"> <b>Con Scelta Utente:</b> {{variable.value}} </span><br>
-                </div>
+            <div ng-if="variable.scope == 'local' && variable.name == 'sceltaUtente'">
+                <span ng-show="variable.value !== null"> <b>Con Scelta Utente:</b> {{variable.value}} </span><br>
             </div>
         </div>
     </div>
