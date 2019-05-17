@@ -15,6 +15,7 @@
         $scope.processInstanceId = $state.params.processInstanceId; // mi torna comodo per gli attachments -martin
 
         Principal.identity().then(function(account) {
+            vm.username    = account.login;
             vm.authorities = account.authorities;
         });
 

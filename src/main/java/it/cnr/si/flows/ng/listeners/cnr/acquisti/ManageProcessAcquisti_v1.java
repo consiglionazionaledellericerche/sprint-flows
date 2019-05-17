@@ -200,7 +200,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 					|| documentoCorrente.getName().equals("modificheVariantiArt106")
 					|| documentoCorrente.getName().equals("bandoAvvisi")
 					|| documentoCorrente.getName().equals("letteraInvito")
-					|| documentoCorrente.getName().equals("provvedimentoAmmessiEsclusi")
+				//  || documentoCorrente.getName().equals("provvedimentoAmmessiEsclusi")
 					|| documentoCorrente.getName().equals("provvedimentoNominaCommissione")
 					|| documentoCorrente.getName().equals("provvedimentoAggiudicazione")
 					|| documentoCorrente.getName().equals("elencoVerbali")
@@ -505,7 +505,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			pubblicaFilePubblicabiliURP(execution);
 		};break;
 		case "pre-determina-end": {
-			pubblicaTuttiFilePubblicabili(execution);
+			pubblicaFilePubblicabiliURP(execution);
 		};break;     
 		case "end-annullato-start": {
 			execution.setVariable(STATO_FINALE_DOMANDA, "ANNULLATO");
