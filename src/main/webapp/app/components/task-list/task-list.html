@@ -33,6 +33,11 @@
                 </div>
             </li>
             <li>
+                <div ng-show="task.assignee">
+                    <strong>In carico a:</strong> {{task.assignee}} <br>
+                </div>
+            </li>
+            <li>
                 <div ng-show="advanced">
                     <ng-include src="task.searchView"/>
                 </div>
