@@ -23,8 +23,17 @@ public class AceBridgeServiceTest {
     @Test
     public void testAfferenza() {
 
-        String afferenzaUtente = aceBridgeService.getAfferenzaUtente("marcinireneusz.trycz");
+        String afferenzaUtente = aceBridgeService.getAfferenzaUtente("marcinireneusz.trycz").getCdsuo();
         Assert.assertEquals("000411", afferenzaUtente);
+
+    }
+
+
+    @Test
+    public void testEntitaOrganizzativaUtente() {
+
+        Integer idEo = aceBridgeService.getEntitaOrganizzativaDellUtente("marcinireneusz.trycz").getId();
+        Assert.assertEquals(Integer.valueOf(2216), idEo);
 
     }
 }

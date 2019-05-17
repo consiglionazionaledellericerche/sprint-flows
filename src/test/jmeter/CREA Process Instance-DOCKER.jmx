@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.1.1 r1855137">
+<jmeterTestPlan version="1.2" properties="3.2" jmeter="3.3 r1808647">
   <hashTree>
     <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan" enabled="true">
       <stringProp name="TestPlan.comments"></stringProp>
@@ -15,7 +15,7 @@
         <collectionProp name="Arguments.arguments">
           <elementProp name="server" elementType="Argument">
             <stringProp name="Argument.name">server</stringProp>
-            <stringProp name="Argument.value">172.23.0.3</stringProp>
+            <stringProp name="Argument.value">localhost</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="accessToken" elementType="Argument">
@@ -25,7 +25,7 @@
           </elementProp>
           <elementProp name="PROCESS_DEFINITION_ID" elementType="Argument">
             <stringProp name="Argument.name">PROCESS_DEFINITION_ID</stringProp>
-            <stringProp name="Argument.value">acquisti:1:8</stringProp>
+            <stringProp name="Argument.value">acquisti:1:20</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
@@ -42,6 +42,8 @@
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
         <stringProp name="ThreadGroup.duration"></stringProp>
         <stringProp name="ThreadGroup.delay"></stringProp>
+        <longProp name="ThreadGroup.start_time">1557480401000</longProp>
+        <longProp name="ThreadGroup.end_time">1557480401000</longProp>
       </ThreadGroup>
       <hashTree>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="login ADMIN" enabled="true">
@@ -211,13 +213,13 @@
         </hashTree>
       </hashTree>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Create PI" enabled="true">
-        <stringProp name="ThreadGroup.on_sample_error">stopthread</stringProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <intProp name="LoopController.loops">-1</intProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">40</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">200</stringProp>
+        <stringProp name="ThreadGroup.num_threads">20</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">45</stringProp>
         <longProp name="ThreadGroup.start_time">1510847619000</longProp>
         <longProp name="ThreadGroup.end_time">1510847619000</longProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
@@ -524,6 +526,10 @@
             <stringProp name="Scope.variable">accessToken</stringProp>
           </JSONPostProcessor>
           <hashTree/>
+          <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Constant Timer" enabled="true">
+            <stringProp name="ConstantTimer.delay">4000</stringProp>
+          </ConstantTimer>
+          <hashTree/>
         </hashTree>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="RECUPERO TASK ID" enabled="true">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
@@ -544,7 +550,7 @@
               </elementProp>
               <elementProp name="maxResults" elementType="HTTPArgument">
                 <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                <stringProp name="Argument.value">20</stringProp>
+                <stringProp name="Argument.value">9999</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
                 <boolProp name="HTTPArgument.use_equals">true</boolProp>
                 <stringProp name="Argument.name">maxResults</stringProp>
@@ -635,6 +641,10 @@
             <stringProp name="Scope.variable">accessToken</stringProp>
           </JSONPostProcessor>
           <hashTree/>
+          <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Constant Timer" enabled="true">
+            <stringProp name="ConstantTimer.delay">4000</stringProp>
+          </ConstantTimer>
+          <hashTree/>
         </hashTree>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="PRESA IN CARICO" enabled="true">
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
@@ -709,6 +719,10 @@
               </elementProp>
             </collectionProp>
           </HeaderManager>
+          <hashTree/>
+          <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Constant Timer" enabled="true">
+            <stringProp name="ConstantTimer.delay">4000</stringProp>
+          </ConstantTimer>
           <hashTree/>
         </hashTree>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="APPROVA" enabled="true">
@@ -829,12 +843,12 @@
         </IfController>
         <hashTree/>
         <GaussianRandomTimer guiclass="GaussianRandomTimerGui" testclass="GaussianRandomTimer" testname="Gaussian Random Timer" enabled="true">
-          <stringProp name="ConstantTimer.delay">2000</stringProp>
+          <stringProp name="ConstantTimer.delay">1000</stringProp>
           <stringProp name="RandomTimer.range">250.0</stringProp>
         </GaussianRandomTimer>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Admin Search" enabled="false">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Admin Search" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -1197,7 +1211,7 @@
         </GaussianRandomTimer>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="paoloenricocirone" enabled="false">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="paoloenricocirone" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">startnextloop</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
@@ -1208,6 +1222,8 @@
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
         <stringProp name="ThreadGroup.duration"></stringProp>
         <stringProp name="ThreadGroup.delay"></stringProp>
+        <longProp name="ThreadGroup.start_time">1557480401000</longProp>
+        <longProp name="ThreadGroup.end_time">1557480401000</longProp>
       </ThreadGroup>
       <hashTree>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="login Paolo Enrico Cirone" enabled="true">
@@ -1868,5 +1884,9 @@
       </ResultCollector>
       <hashTree/>
     </hashTree>
+    <WorkBench guiclass="WorkBenchGui" testclass="WorkBench" testname="WorkBench" enabled="true">
+      <boolProp name="WorkBench.save">true</boolProp>
+    </WorkBench>
+    <hashTree/>
   </hashTree>
 </jmeterTestPlan>

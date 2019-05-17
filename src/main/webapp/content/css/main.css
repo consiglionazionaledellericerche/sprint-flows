@@ -384,7 +384,18 @@ select.ng-touched.ng-invalid {
   background-color: #5bc0de!important;
 }
 
+
+.nav-pills > li.mine.active > a, .nav-pills > li.mine.active > a:hover, .nav-pills > li.mine.active > a:focus {
+    color: #fff;
+    background-color: #449d44;
+}
+
 .nav-pills > li.available.active > a, .nav-pills > li.available.active > a:hover, .nav-pills > li.available.active > a:focus {
+    color: #fff;
+    background-color: #286090;
+}
+
+.nav-pills > li.others.active > a, .nav-pills > li.others.active > a:hover, .nav-pills > li.others.active > a:focus {
     color: #fff;
     background-color: #5bc0de;
 }
