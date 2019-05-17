@@ -2,7 +2,6 @@ package it.cnr.si.security;
 
 import it.cnr.si.flows.ng.resource.FlowsProcessDefinitionResource;
 import it.cnr.si.flows.ng.service.AceBridgeService;
-import it.cnr.si.flows.ng.service.FlowsTaskService;
 import it.cnr.si.flows.ng.utils.Utils;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
@@ -48,17 +47,15 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
     private final Logger log = LoggerFactory.getLogger(PermissionEvaluatorImpl.class);
 
     @Inject
-    private TaskService taskService;
-    @Inject
-    private FlowsTaskService flowsTaskService;
+    TaskService taskService;
     @Inject
     private FlowsProcessDefinitionResource flowsProcessDefinitionResource;
     @Inject
-    private RuntimeService runtimeService;
+    RuntimeService runtimeService;
     @Inject
-    private HistoryService historyService;
+    HistoryService historyService;
     @Inject
-    private RestResponseFactory restResponseFactory;
+    RestResponseFactory restResponseFactory;
     @Inject
     private AceBridgeService aceBridgeService;
 
@@ -269,9 +266,12 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
         String user = SecurityUtils.getCurrentUserLogin();
         List<String> groups = aceBridgeService.getAceGroupsForUser(user);
         Task task;
-        if(!processInstanceId.isEmpty()) {
-            task = flowsTaskService.getActiveTaskForProcessInstance(processInstanceId);
-        } else {
+        if(!processInstanceId.isEmpty()){
+            task = taskService.createTaskQuery()
+                    .processInstanceId(processInstanceId)
+                    .includeProcessVariables()
+                    .singleResult();
+        } else{
             task = taskService.createTaskQuery()
                     .taskId(taskId)
                     .includeProcessVariables()

@@ -21,7 +21,6 @@ import org.activiti.engine.task.Task;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
-import org.activiti.rest.service.api.runtime.task.TaskResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -153,16 +152,6 @@ public class FlowsTaskResource {
     }
 
 
-    @GetMapping(value = "/activeByProcessInstanceId/{processInstanceId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
-    @Timed
-    public ResponseEntity<TaskResponse> getActiveTaskByProcessInstanceId(@PathVariable("processInstanceId") String processInstanceId) {
-
-        Task task = flowsTaskService.getActiveTaskForProcessInstance(processInstanceId);
-        TaskResponse taskResponse = restResponseFactory.createTaskResponse(task);
-
-        return ResponseEntity.ok(taskResponse);
-    }
 
     @PutMapping(value = "/claim/{taskId}")
     @PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.canClaimTask(#taskId, @flowsUserDetailsService)")
@@ -187,7 +176,11 @@ public class FlowsTaskResource {
 
         if(taskId == null) {
             // se vengo da pagine in cui ho solo il processInstanceId (tipo ricerca) trovo il taskId
-            taskId = flowsTaskService.getActiveTaskForProcessInstance(processInstanceId).getId();
+            Task task = taskService.createTaskQuery()
+                    .processInstanceId(processInstanceId)
+                    .includeProcessVariables()
+                    .singleResult();
+            taskId = task.getId();
         }
         taskService.setAssignee(taskId, assignee);
 

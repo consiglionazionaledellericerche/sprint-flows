@@ -78,8 +78,6 @@ public class FlowsPdfService {
 	@Inject
 	private FlowsAttachmentService flowsAttachmentService;
 	@Inject
-	private FlowsTaskService flowsTaskService;
-	@Inject
 	private ViewRepository viewRepository;
 	@Inject
 	private Utils utils;
@@ -373,7 +371,7 @@ public class FlowsPdfService {
 			attachment.setMimetype(com.google.common.net.MediaType.PDF.toString());
 			attachment.setUsername(utenteRichiedente);
 		}
-		String taskId = flowsTaskService.getActiveTaskForProcessInstance(processInstanceId).getId();
+		String taskId = taskService.createTaskQuery().processInstanceId(processInstanceId).active().singleResult().getId();
 		flowsAttachmentService.saveAttachment(taskId, pdfType.name(), attachment, pdfByteArray);
 
 		return pdfByteArray;
@@ -458,7 +456,7 @@ public class FlowsPdfService {
 			String processInstanceId = pi.getId();
 
 			// Calcolo gli stati nei flussi attivi)
-			String currentTaskName = flowsTaskService.getActiveTaskForProcessInstance(processInstanceId).getName();
+			String currentTaskName = taskService.createTaskQuery().processInstanceId(processInstanceId).active().singleResult().getName();
 			LOGGER.debug("--##  currentTaskName : {} ", currentTaskName);
 			//calcolo nr istanze per Stato
 			if(mapStatiFlussiAttivi.containsKey(currentTaskName)) {
