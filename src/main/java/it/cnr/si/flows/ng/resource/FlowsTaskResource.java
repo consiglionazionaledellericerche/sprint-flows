@@ -12,6 +12,7 @@ import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.FlowsUserDetailsService;
 import it.cnr.si.security.PermissionEvaluatorImpl;
 import it.cnr.si.service.RelationshipService;
+import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -21,6 +22,7 @@ import org.activiti.engine.task.Task;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
+import org.activiti.rest.service.api.runtime.task.TaskResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -152,6 +154,16 @@ public class FlowsTaskResource {
     }
 
 
+    @GetMapping(value = "/activeByProcessInstanceId/{processInstanceId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
+    @Timed
+    public ResponseEntity<TaskResponse> getActiveTaskByProcessInstanceId(@PathVariable("processInstanceId") String processInstanceId) {
+
+        Task task = flowsTaskService.getActiveTaskForProcessInstance(processInstanceId);
+        TaskResponse taskResponse = restResponseFactory.createTaskResponse(task);
+
+        return ResponseEntity.ok(taskResponse);
+    }
 
     @PutMapping(value = "/claim/{taskId}")
     @PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.canClaimTask(#taskId, @flowsUserDetailsService)")
@@ -159,8 +171,15 @@ public class FlowsTaskResource {
     public ResponseEntity<Map<String, Object>> claimTask(@PathVariable("taskId") String taskId) {
 
         String username = SecurityUtils.getCurrentUserLogin();
-        taskService.claim(taskId, username);
-
+        try {
+            taskService.claim(taskId, username);
+        } catch(ActivitiObjectNotFoundException notFoundException){
+            LOGGER.error("Errore nella presa in carico del task {} da parte dell`utente {}: TASK NON TROVATO", taskId, username);
+            notFoundException.printStackTrace();
+        }catch (Exception e){
+            LOGGER.error("Errore nella presa in carico del task {} da parte dell`utente {}", taskId, username);
+            e.printStackTrace();
+        }
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
