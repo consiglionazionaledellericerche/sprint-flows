@@ -2,7 +2,7 @@
     <div class="row form-group">
         <div class="col-md-12">
             <uib-tabset active="1" justified="true" type="pills">
-                <uib-tab index="0" select="setActiveContent('myTasks')">
+                <uib-tab index="0" classes="mine" select="setActiveContent('myTasks')">
                     <uib-tab-heading>
                         <h3>
                             <i class="glyphicon glyphicon-inbox"></i>
@@ -19,7 +19,7 @@
                     </uib-tab-heading>
                 </uib-tab>
                 </uib-tab>
-                <uib-tab index="2" classes="available" select="setActiveContent('taskAssignedInMyGroups')">
+                <uib-tab index="2" classes="others" select="setActiveContent('taskAssignedInMyGroups')">
                     <uib-tab-heading>
                         <h3>
                             <i class="glyphicon glyphicon-tasks"></i>
@@ -34,15 +34,21 @@
     <div class="row">
         <div class="col-md-12">
             <div class="progress">
-                <uib-progress animate="false">
+                <uib-progress animate="true">
                     <uib-bar class="progress-bar-striped"
-                             value="100* vm.myTasks.total/(vm.availableTasks.total+ vm.myTasks.total)" type="primary">
+                             value="100* vm.myTasks.total/(vm.availableTasks.total+ vm.myTasks.total + vm.taskAssignedInMyGroups.total)"
+                             type="success">
                         <span>{{vm.myTasks.total}}</span>
                     </uib-bar>
                     <uib-bar class="progress-bar-striped"
-                             value="100* vm.availableTasks.total/(vm.availableTasks.total+ vm.myTasks.total)"
-                             type="info">
+                             value="100* vm.availableTasks.total/(vm.availableTasks.total+ vm.myTasks.total + vm.taskAssignedInMyGroups.total)"
+                             type="primary">
                         <span>{{vm.availableTasks.total}}</span>
+                    </uib-bar>
+                    <uib-bar class="progress-bar-striped"
+                             value="100* vm.taskAssignedInMyGroups.total/(vm.availableTasks.total+ vm.myTasks.total + vm.taskAssignedInMyGroups.total)"
+                             type="info">
+                        <span>{{vm.taskAssignedInMyGroups.total}}</span>
                     </uib-bar>
                 </uib-progress>
             </div>
@@ -89,7 +95,7 @@
         <div class="col-sm-9">
             <div ng-show="vm.activeContent == 'myTasks'">
                 <h3>
-              <span class="label label-primary" class="assegnatiAMe">
+              <span class="label label-success" class="assegnatiAMe">
                 <i class="glyphicon glyphicon-inbox"></i>
                 Lista dei compiti assegnati a me
               </span>
@@ -110,7 +116,7 @@
 
             <div ng-show="vm.activeContent == 'availables'">
                 <h3>
-              <span class="label label-info" ng-class="label-info">
+              <span class="label label-primary" ng-class="label-info">
                 <i class="glyphicon glyphicon-user"></i>
                 Lista dei compiti di gruppo da prendere in carico
               </span>

@@ -108,9 +108,6 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 		};break;  
 		case "endevent-annullata-start": {
 			execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA ANNULLATA");
-		};break;  	
-		case "endevent-negativa-start": {
-			execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA NEGATIVA");
 		};break;  
 		case "endevent-non-finanziata-start": {
 			execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA NON FINANZIATA");
