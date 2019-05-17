@@ -3,6 +3,7 @@ package it.cnr.si.flows.ng.service;
 import it.cnr.si.flows.ng.exception.UnexpectedResultException;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.service.AceService;
+import it.cnr.si.service.dto.anagrafica.base.PageDto;
 import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
 import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.letture.PersonaEntitaOrganizzativaWebDto;
@@ -130,5 +131,23 @@ public class AceBridgeService {
 			throw new UnexpectedResultException("L'utente risulta avere piu' di una afferenza: "+ username);
 
 		return afferenze.get(0).getEntitaOrganizzativa();
+	}
+
+	public EntitaOrganizzativaWebDto getIdEntitaOrganizzativaDellUtente(String username) {
+
+		String cdsuo = getAfferenzaUtente(username).getCdsuo();
+
+		PageDto<EntitaOrganizzativaWebDto> entitaOrganizzativaWebDtoPageDto = aceService.entitaOrganizzativaFind(null, null, cdsuo, LocalDate.now(), null);
+
+		List<EntitaOrganizzativaWebDto> eos = entitaOrganizzativaWebDtoPageDto.getItems().stream()
+				.filter(eo -> Objects.isNull(eo.getIndirizzoPrincipale()))
+				.collect(Collectors.toList());
+
+		if (eos.size() == 0)
+			throw new UnexpectedResultException("Nessuna entita' organizzativa per il cdsuo: "+ cdsuo);
+		if (eos.size() > 1)
+			throw new UnexpectedResultException("Il Cdsuo risulta avere piu' entita' organizzative: "+ username);
+
+		return eos.get(0);
 	}
 }
