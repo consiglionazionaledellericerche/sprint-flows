@@ -30,18 +30,16 @@ public class FirmaServiceTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FirmaServiceTest.class);
 
+    private String username = "utentefr";
+    private String password = "utentefr123";
+    private String otp = "6629961578";
+
     @Autowired
     private FlowsFirmaService firmaService;
     
     @Ignore // TODO non e' chiaro se lasciare le credenziali di test su git
     @Test
     public void testFirma() throws IOException {
-
-
-        String username = "";
-        String password = "";
-        String otp = "";
-        String textMessage = "";
 
         byte[] bytes = Files.readAllBytes(Paths.get("./src/test/resources/pdf-test/summaryCreato.pdf"));
         
@@ -51,6 +49,7 @@ public class FirmaServiceTest {
             
         } catch (ArubaSignServiceException e) {
             LOGGER.error("firma non riuscita", e);
+            String textMessage = "";
             if (e.getMessage().indexOf("error code 0001") != -1) {
                 textMessage = "controlla il formato del file sottopsto alla firma";
             } else if(e.getMessage().indexOf("error code 0003") != -1) {
@@ -67,12 +66,37 @@ public class FirmaServiceTest {
     }
 
     @Test
+    public void testFirmaGrafica() throws IOException {
+
+        byte[] bytes = Files.readAllBytes(Paths.get("./src/test/resources/pdf-test/allegato.pdf"));
+
+        try {
+            byte[] bytesfirmati = firmaService.firmaGraficamente(username, password, otp, bytes);
+            Files.write(Paths.get("./src/test/resources/pdf-test/summaryFirmato.pdf"), bytesfirmati);
+
+        } catch (ArubaSignServiceException e) {
+            LOGGER.error("firma non riuscita", e);
+            String textMessage = "";
+            if (e.getMessage().indexOf("error code 0001") != -1) {
+                textMessage = "controlla il formato del file sottopsto alla firma";
+            } else if(e.getMessage().indexOf("error code 0003") != -1) {
+                textMessage = "Errore in fase di verifica delle credenziali";
+            } else if(e.getMessage().indexOf("error code 0004") != -1) {
+                textMessage = "Errore nel PIN";
+            } else {
+                textMessage = "errore generico";
+            }
+            LOGGER.error("500 firma non riuscita - " + textMessage);
+            fail();
+        }
+
+    }
+
+    @Test
     @Ignore
     public void testSignMany() {
 
-        String username = "";
-        String password = "";
-        String otp = "";
+
         try {
 
             for (int i = 1; i < 1001; i = i+100) {

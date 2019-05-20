@@ -2,10 +2,7 @@ package it.cnr.si.flows.ng.service;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -20,13 +17,13 @@ import it.cnr.jada.firma.arss.ArubaSignServiceClient;
 import it.cnr.jada.firma.arss.ArubaSignServiceException;
 
 /**
- * 
+ *
  * Firma Service
- * 
+ *
  * Utilizza codice da {@code ArubaSignServiceClient} in firmadigitale-1.11.jar
- * 
+ *
  * Il codice e' duplicato ed esteso.
- * 
+ *
  * @author mtrycz
  *
  */
@@ -54,7 +51,7 @@ public class FlowsFirmaService {
         put("0003", "Credenziali errate");
         put("0004", "PIN errato");
     }};
-    
+
     @Value("${cnr.firma.signcertid}")
     private String RemoteSignServiceCertId;
     @Value("${cnr.firma.typeotpauth}")
@@ -76,13 +73,39 @@ public class FlowsFirmaService {
     }
 
     public byte[] firma(String username, String password, String otp, byte[] bytes) throws ArubaSignServiceException {
-        
+
         // TODO verificare se poter usare un singolo client, e non ricrearlo ogni volta
         ArubaSignServiceClient client = new ArubaSignServiceClient();
 
         client.setProps(props);
 
         PdfSignApparence apparence = getApparence();
+        Auth identity = getIdentity(username, password, otp);
+
+        byte[] signed = pdfsignatureV2(identity, bytes, apparence);
+//        byte[] out = client.verify(signed);
+
+        return signed;
+    }
+
+    public byte[] firmaGraficamente(String username, String password, String otp, byte[] bytes) throws ArubaSignServiceException {
+
+        // TODO verificare se poter usare un singolo client, e non ricrearlo ogni volta
+        ArubaSignServiceClient client = new ArubaSignServiceClient();
+
+        client.setProps(props);
+
+        PdfSignApparence apparence = new PdfSignApparence();
+        apparence.setLeftx(30);
+        apparence.setLefty(10);
+        apparence.setRightx(340);
+        apparence.setRighty(50);
+//        apparence.setTesto("Testo");
+//        apparence.setReason("reason");
+        apparence.setPage(1);
+        apparence.setLocation("Rome");
+
+        apparence.setTesto("Firmato digitalmente da "+ username +" in data "+ new Date());
         Auth identity = getIdentity(username, password, otp);
 
         byte[] signed = pdfsignatureV2(identity, bytes, apparence);
@@ -114,10 +137,10 @@ public class FlowsFirmaService {
             throw new ArubaSignServiceException("error while invoking pdfsignatureV2", e);
         }
     }
-    
+
     /**
      * TODO Convenire su un formato adeguato per la firma grafica, se la si vuole
-     * 
+     *
      * @return
      */
     private PdfSignApparence getApparence() {
@@ -138,8 +161,8 @@ public class FlowsFirmaService {
      *  Questo e' il metodo personalizzato da firmadigitale-1.11.jar 
      */
     private byte[] pdfsignatureV2(Auth identity, byte[] bytes,
-            PdfSignApparence apparence) throws ArubaSignServiceException {
-        
+                                  PdfSignApparence apparence) throws ArubaSignServiceException {
+
         ArubaSignService service = getServicePort();
         LOGGER.debug("version " + service.getVersion());
 
@@ -164,7 +187,7 @@ public class FlowsFirmaService {
                     "error while invoking pdfsignatureV2", e);
         }
     }
-    
+
     /**
      * Questo metodo di utilita' e' ricopiato dalla libreria perche' e' privato
      */
@@ -181,7 +204,7 @@ public class FlowsFirmaService {
         return new ArubaSignServiceService(url, qname)
                 .getArubaSignServicePort();
     }
-    
+
     /**
      * Questo metodo di utilita' e' ricopiato dalla libreria perche' e' privato
      */
@@ -194,12 +217,12 @@ public class FlowsFirmaService {
 
         return request;
     }
-    
+
     /**
      * Questo metodo di utilita' e' ricopiato dalla libreria perche' e' privato
      */
     private Auth getIdentity(String username, String password, String otp) {
-        
+
         Auth identity = new Auth();
         identity.setUser(username);
         identity.setUserPWD(password);

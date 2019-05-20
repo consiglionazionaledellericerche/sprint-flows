@@ -38,7 +38,7 @@ cnr:
     firma:
          signcertid: AS0
          typeotpauth: firma
-         url: http://arss.demo.si.cnr.it:8980/ArubaSignService/ArubaSignService?wsdl
+         url: http://arss.cedrc.cnr.it:8080/ArubaSignService/ArubaSignService?wsdl
          pdfprofile: PADESBES
     sigla:
          usr: app.scrivaniadigitale
