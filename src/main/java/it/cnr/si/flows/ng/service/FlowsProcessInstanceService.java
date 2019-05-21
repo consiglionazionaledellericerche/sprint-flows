@@ -9,10 +9,7 @@ import it.cnr.si.repository.ViewRepository;
 import it.cnr.si.security.FlowsUserDetailsService;
 import it.cnr.si.security.PermissionEvaluatorImpl;
 import org.activiti.engine.*;
-import org.activiti.engine.history.HistoricIdentityLink;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.history.HistoricProcessInstanceQuery;
-import org.activiti.engine.history.HistoricTaskInstance;
+import org.activiti.engine.history.*;
 import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.pvm.PvmActivity;
 import org.activiti.engine.impl.pvm.ReadOnlyProcessDefinition;
@@ -98,9 +95,49 @@ public class FlowsProcessInstanceService {
 				.processInstanceId(processInstanceId)
 				.includeProcessVariables()
 				.singleResult();
+
 		//Durante la fase di creazione di una Process Instance viene richiamato questo metodo ma la query sarà vuota perchè la Pi effettivamente non è stata ancora creata
-		if(processInstance != null)
-			result.put("entity", restResponseFactory.createHistoricProcessInstanceResponse(processInstance));
+		if(processInstance != null) {
+			HistoricProcessInstanceResponse entity = restResponseFactory.createHistoricProcessInstanceResponse(processInstance);
+			result.put("entity", entity);
+
+			HistoricVariableInstance links = historyService
+					.createHistoricVariableInstanceQuery()
+					.processInstanceId(processInstanceId)
+					.variableName("linkToOtherWorkflows")
+					.singleResult();
+
+
+			if (links != null) {
+
+				List<Map<String, Object>> linkedFlows = new ArrayList<>();
+				String value = (String) links.getValue();
+				String[] values = value.split(",");
+
+				for (String linkedProcessId : values) {
+
+					HistoricProcessInstance linkedProcessInstance = historyService
+							.createHistoricProcessInstanceQuery()
+							.processInstanceId(linkedProcessId)
+							.includeProcessVariables()
+							.singleResult();
+
+					if (linkedProcessInstance != null) {
+						String key = linkedProcessInstance.getBusinessKey();
+
+						Map<String, Object> linkedObject = new HashMap<>();
+						linkedObject.put("id", linkedProcessId);
+						linkedObject.put("key", key);
+						linkedObject.put("titolo", linkedProcessInstance.getProcessVariables().get("titolo"));
+
+						linkedFlows.add(linkedObject);
+					}
+				}
+
+				if (linkedFlows.size() > 0)
+				    result.put("linkedProcesses", linkedFlows);
+			}
+		}
 
 		// ProcessDefinition (static) metadata
 		ReadOnlyProcessDefinition processDefinition = ((RepositoryServiceImpl) repositoryService).getDeployedProcessDefinition(processInstance.getProcessDefinitionId());
