@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -398,5 +399,24 @@ public class FlowsProcessInstanceService {
 			processQuery.startedBefore(calendar.getTime());
 		else if (key.contains("Great"))
 			processQuery.startedAfter(calendar.getTime());
+	}
+
+
+
+	public HistoricProcessInstanceQuery getProcessInstances(org.activiti.engine.impl.util.json.JSONArray processParams, @RequestParam("active") boolean active, @RequestParam("processDefinition") String processDefinition, @RequestParam("order") String order) {
+		HistoricProcessInstanceQuery historicProcessQuery = historyService.createHistoricProcessInstanceQuery().includeProcessVariables();
+
+		historicProcessQuery = utils.orderProcess(order, historicProcessQuery);
+
+		historicProcessQuery = (HistoricProcessInstanceQuery) utils.searchParamsForProcess(processParams, historicProcessQuery);
+		if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
+			historicProcessQuery.processDefinitionKey(processDefinition);
+
+		if (active) {
+			historicProcessQuery.unfinished();
+		} else {
+			historicProcessQuery.finished().or().deleted();
+		}
+		return historicProcessQuery;
 	}
 }
