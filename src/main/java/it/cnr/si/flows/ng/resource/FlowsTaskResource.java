@@ -16,7 +16,7 @@ import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
-import org.activiti.engine.impl.util.json.JSONObject;
+import org.activiti.engine.impl.util.json.JSONArray;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.activiti.rest.common.api.DataResponse;
@@ -94,7 +94,7 @@ public class FlowsTaskResource {
             @RequestParam("order") String order,
             @RequestBody(required = false) String body){
 
-        DataResponse response = flowsTaskService.getMyTasks(body!=null ? new JSONObject(body) : new JSONObject(),
+        DataResponse response = flowsTaskService.getMyTasks(body!=null ? new JSONArray(body) : new JSONArray(),
                                                             processDefinition,
                                                             firstResult,
                                                             maxResults,
@@ -113,7 +113,7 @@ public class FlowsTaskResource {
             @RequestParam("order") String order,
             @RequestBody(required = false) String body) {
 
-        DataResponse response = flowsTaskService.getAvailableTask(body!=null ? new JSONObject(body) : new JSONObject(),
+        DataResponse response = flowsTaskService.getAvailableTask(body!=null ? new JSONArray(body) : new JSONArray(),
                                                                   processDefinition,
                                                                   firstResult,
                                                                   maxResults,
@@ -133,7 +133,7 @@ public class FlowsTaskResource {
             @RequestParam("order") String order,
             @RequestBody(required = false) String body) {
 
-        DataResponse response = flowsTaskService.taskAssignedInMyGroups(body!=null ? new JSONObject(body) : new JSONObject(),
+        DataResponse response = flowsTaskService.taskAssignedInMyGroups(body!=null ? new JSONArray(body) : new JSONArray(),
                                                                         processDefinition,
                                                                         firstResult,
                                                                         maxResults,
@@ -254,7 +254,7 @@ public class FlowsTaskResource {
             @RequestParam("order") String order,
             @RequestBody(required = false) String body) {
 
-        DataResponse response = flowsTaskService.getTasksCompletedByMe(body!=null ? new JSONObject(body) : new JSONObject(),
+        DataResponse response = flowsTaskService.getTasksCompletedByMe(body!=null ? new JSONArray(body) : new JSONArray(),
                                                                        processDefinition,
                                                                        firstResult,
                                                                        maxResults,
