@@ -104,8 +104,6 @@ public class FlowsTaskResourceTest {
         assertEquals(1, myTasks.size());
         assertEquals(util.getFirstTaskId(), ((TaskResponse) myTasks.get(0)).getId());
 
-//        verifyBadSearchParams(request);
-
 //        verifico che non prenda nessun risultato ( DOPO CHE IL TASK VIENE DISASSEGNATO)
         flowsTaskResource.unclaimTask(util.getFirstTaskId());
 
@@ -199,9 +197,9 @@ public class FlowsTaskResourceTest {
         searchParam.put("isTaskQuery", "true");
         searchParam.put("page", "1");
 
-        ResponseEntity<Object> response = flowsSearchResource.search(searchParam);
+        ResponseEntity<DataResponse> response = flowsSearchResource.search(searchParam);
         assertEquals(OK, response.getStatusCode());
-        assertEquals(SECOND_TASK_NAME, ((ArrayList<HistoricTaskInstanceResponse>) ((HashMap) response.getBody()).get("tasks")).get(0).getName());
+        assertEquals(SECOND_TASK_NAME, ((ArrayList<HistoricTaskInstanceResponse>) (response.getBody()).getData()).get(0).getName());
     }
 
     @Test

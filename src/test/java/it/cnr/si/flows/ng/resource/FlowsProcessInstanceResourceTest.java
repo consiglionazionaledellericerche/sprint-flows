@@ -142,69 +142,6 @@ public class FlowsProcessInstanceResourceTest {
         flowsProcessInstanceResource.getProcessInstanceById(processInstance.getId(), false);
     }
 
-    @Test
-    public void testGetProcessInstances() throws Exception {
-        processInstance = util.mySetUp(acquisti);
-
-        //responsabileacquisti crea una seconda Process Instance di acquisti con suffisso "2" nel titolo della PI
-        util.loginResponsabileAcquisti();
-        String acquistiTrasparenzaId = repositoryService.createProcessDefinitionQuery().processDefinitionKey(acquisti.getValue()).latestVersion().singleResult().getId();
-        MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
-        req.setParameter("processDefinitionId", acquistiTrasparenzaId);
-        req.setParameter(titolo.name(), TITOLO_DELL_ISTANZA_DEL_FLUSSO + "2");
-        req.setParameter(descrizione.name(), "descrizione" + "2");
-        req.setParameter("tipologiaAcquisizione", "procedura aperta");
-        req.setParameter("tipologiaAcquisizioneId", "11");
-        req.setParameter("strumentoAcquisizione", "AFFIDAMENTO DIRETTO - MEPA o CONSIP\n");
-        req.setParameter("strumentoAcquisizioneId", "11");
-        req.setParameter("priorita", "Alta");
-        req.setParameter("rup", "spaclient");
-//        req.setParameter("impegni_json", "[{\"numero\":\"1\",\"importoNetto\":100,\"importoLordo\":120,\"descrizione\":\"descrizione impegno\",\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"gae\":\"spaclient\"}]");
-        req.setParameter("impegni_json", "[{\"descrizione\":\"Impegno numero 1\",\"percentualeIva\":20,\"importoNetto\":100,\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"uo\":\"2216\",\"gae\":\"spaclient\",\"progetto\":\"Progetto impegno 1\"}]");
-
-        ResponseEntity<ProcessInstanceResponse> resp = flowsTaskResource.completeTask(req);
-        assertEquals(OK, resp.getStatusCode());
-
-        //Verifico che Admin veda entrambe le Process Instances create
-        util.loginAdmin();
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        String searchParams = "{\"processParams\":" +
-                "[{\"key\":" + titolo.name() + ",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
-                "{\"key\":" + startDate + "Great,\"value\":\"" + utils.formattaData(new Date()) + "\",\"type\":\"date\"}]}";
-
-        ResponseEntity<DataResponse> ret = flowsProcessInstanceResource.getProcessInstances(true, ALL_PROCESS_INSTANCES, 0, 1000, ASC, searchParams);
-        assertEquals(HttpStatus.OK, ret.getStatusCode());
-        ArrayList<HistoricProcessInstanceResponse> entities = (ArrayList<HistoricProcessInstanceResponse>) ret.getBody().getData();
-
-        //vedo sia la Process Instance avviata da admin che quella avviata da responsabileacquisti
-        assertEquals(2, entities.size());
-        assertEquals(util.getProcessDefinition(), entities.get(0).getProcessDefinitionId());
-        assertEquals(acquistiTrasparenzaId, entities.get(1).getProcessDefinitionId());
-
-        //cancello un processo
-        String activeId = entities.get(0).getId();
-        String notActiveId = entities.get(1).getId();
-        ResponseEntity response = flowsProcessInstanceResource.delete(notActiveId, "test");
-        assertEquals(response.getStatusCode(), OK);
-
-        // verifico che RA veda UN processo terminato/cancellato in più (quello appena concellato + quelli cancellati nel tearDown dei test precedenti)
-        util.loginResponsabileAcquisti();
-
-        ret = flowsProcessInstanceResource.getProcessInstances(false, ALL_PROCESS_INSTANCES, 0, 1000, ASC, "{\"processParams\": []}");
-        entities = (ArrayList<HistoricProcessInstanceResponse>) ret.getBody().getData();
-        assertEquals(processDeleted + 2, entities.size());
-
-        // .. e 1 processo ancora attivo VERIFICANDO CHE GLI ID COINCIDANO
-        ret = flowsProcessInstanceResource.getProcessInstances(true, ALL_PROCESS_INSTANCES, 0, 1000, ASC, "{\"processParams\": []}");
-        entities = (ArrayList<HistoricProcessInstanceResponse>) ret.getBody().getData();
-        assertEquals(1, entities.size());
-        assertEquals(activeId, entities.get(0).getId());
-
-        //VERIFICO FUNZIONI LA RICERCA
-//        verifyBadSearchParams(request);
-        // TODO rifattorizzare anche il test
-    }
-
 
     @Test
     public void testSuspend() throws Exception {
@@ -216,16 +153,13 @@ public class FlowsProcessInstanceResourceTest {
         assertEquals(true, response.isSuspended());
     }
 
+
     @Test
     public void testGetVariable() throws Exception {
         processInstance = util.mySetUp(acquisti);
 //        processInstance = util.mySetUp(iscrizioneElencoOiv);
 
-
-
     }
-
-
 
 
     @Test
@@ -264,8 +198,6 @@ public class FlowsProcessInstanceResourceTest {
                                     a.getProcessInstanceId().equals(processInstance.getId())  &&
                                     a.getType() == Utils.PROCESS_VISUALIZER));
     }
-
-
 
 
     @Test
