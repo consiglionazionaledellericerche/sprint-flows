@@ -329,29 +329,31 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				}
 				// CD_UNITA_ORGANIZZATIVA 
 				if(execution.getVariable("idStruttura") != null){
-					put("cd_unita_organizzativa", aceBridgeService.getUoById(Integer.parseInt(execution.getVariable("idStruttura").toString())).getCdsuo().toString());
+					Map<String, String> unita_organizzativa = new HashMap<>();
+					unita_organizzativa.put("cd_unita_organizzativa",aceBridgeService.getUoById(Integer.parseInt(execution.getVariable("idStruttura").toString())).getCdsuo().toString());
+					put("unita_organizzativa", unita_organizzativa);
 				}
 				// DT_REGISTRAZIONE 
-				DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy'T'HH:mm:ss.SSSZ");
+				DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 				DateFormat onlyDateFormat = new SimpleDateFormat("dd-MM-yyyy");
 				dateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Vatican"));
 				onlyDateFormat.setTimeZone(TimeZone.getTimeZone("Europe/Vatican"));
 				Date endDate = new Date();
 				String endStrDate = dateFormat.format(endDate);  
 				put("dt_registrazione", endStrDate);
-				// CD_TERZO_RESP 
+				// codfisPivaRupExt CD_TERZO_RESP 
 				if(execution.getVariable("rup") != null){
 					PersonaWebDto rupUser = aceService.getPersonaByUsername(execution.getVariable("rup").toString());
-					put("cd_terzo_resp", rupUser.getCodiceFiscale());
+					put("codfisPivaRupExt", rupUser.getCodiceFiscale());
 				}
-				// CD_TERZO_FIRMATARIO 
+				// CD_TERZO_FIRMATARIO - codfisPivaFirmatarioExt
 				if(execution.getVariable("usernameFirmatarioContratto") != null){
 					PersonaWebDto firmatarioUser = aceService.getPersonaByUsername(execution.getVariable("usernameFirmatarioContratto").toString());
-					put("cd_terzo_firmatario", firmatarioUser.getCodiceFiscale());
+					put("codfisPivaFirmatarioExt", firmatarioUser.getCodiceFiscale());
 				}
-				// FIG_GIUR_EST 
+				// FIG_GIUR_EST  - codfisPivaAggiudicatarioExt
 				if(execution.getVariable("pIvaCodiceFiscaleDittaAggiudicataria") != null){
-					put("fig_giur_est", execution.getVariable("pIvaCodiceFiscaleDittaAggiudicataria").toString());
+					put("codfisPivaAggiudicatarioExt", execution.getVariable("pIvaCodiceFiscaleDittaAggiudicataria").toString());
 				}
 				// NATURA_CONTABILE 
 				put("natura_contabile", "P");
@@ -381,16 +383,16 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 					}	
 					// FL_MEPA 
 					if(tipologiaAcquisizioneId.equals("11") || tipologiaAcquisizioneId.equals("21") ) {
-						put("fl_mepa", "Y");
+						put("fl_mepa", Boolean.valueOf("true"));
 					} else {
-						put("fl_mepa", "N");
+						put("fl_mepa", Boolean.valueOf("false"));
 					}
 				}
 				// CD_PROC_AMM 
 				if(execution.getVariable("strumentoAcquisizioneId") != null){
 					String strumentoAcquisizioneId = execution.getVariable("strumentoAcquisizioneId").toString();
 					if(strumentoAcquisizioneId.equals("12")) {
-						put("cd_proc_amm", "PNSS");
+						put("cd_proc_amm", "ADAC");
 					}	
 				}
 				// OGGETTO 
@@ -415,7 +417,9 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				// IM_CONTRATTO_PASSIVO 
 				put("im_contratto_passivo", new BigDecimal(execution.getVariable("importoTotaleLordo").toString()));
 				// CD_TIPO_ATTO 
-				put("cd_tipo_atto", "DET");
+				Map<String, String> atto = new HashMap<>();
+				atto.put("cd_tipo_atto","DET");
+				put("atto", atto);
 				if(runtimeService.getVariable(execution.getProcessInstanceId(), "decisioneContrattare", FlowsAttachment.class) != null) {
 					FlowsAttachment determina = runtimeService.getVariable(execution.getProcessInstanceId(), "decisioneContrattare", FlowsAttachment.class);
 					// DS_ATTO 
@@ -424,6 +428,8 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				// CD_PROTOCOLLO_GENERALE 
 				if(runtimeService.getVariable(execution.getProcessInstanceId(), "contratto", FlowsAttachment.class) != null) {
 					FlowsAttachment contratto = runtimeService.getVariable(execution.getProcessInstanceId(), "contratto", FlowsAttachment.class);
+					// ESERCIZIO_PROTOCOLLO 
+					put("esercizio_protocollo", Integer.parseInt(format.format(inputDateFormat.parse(contratto.getMetadati().get("dataProtocollo").toString()))));	
 					put("cd_protocollo_generale", contratto.getLabel() + " Prot." + contratto.getMetadati().get("numeroProtocollo") + " del " + onlyDateFormat.format(inputDateFormat.parse(contratto.getMetadati().get("dataProtocollo").toString())));
 					// FL_PUBBLICA_CONTRATTO 
 					if(contratto.isPubblicazioneTrasparenza()) {
@@ -450,19 +456,23 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 					}
 				}
 				// FL_ART82 
-				put("fl_art82", "N");
-				// CD_CIG 
+				put("fl_art82", Boolean.valueOf("false"));
+				// cdCigExt CD_CIG 
 				if(execution.getVariable("cig") != null){
-					put("cd_cig", execution.getVariable("cig").toString());
+					put("cdCigExt", execution.getVariable("cig").toString());
 				}
-				// CD_CUP 
+				// cdCupExt CD_CUP 
 				if(execution.getVariable("cup") != null){
-					put("cd_cup", execution.getVariable("cup").toString());
+					put("cdCupExt", execution.getVariable("cup").toString());
 				}
 				// IM_CONTRATTO_PASSIVO_NETTO 
 				if(execution.getVariable("importoTotaleNetto") != null){
 					put("im_contratto_passivo_netto", new BigDecimal(execution.getVariable("importoTotaleNetto").toString()));
 				}
+				// codiceFlussoAcquisti 
+				if(execution.getVariable("key") != null){
+					put("codiceFlussoAcquisti", execution.getVariable("key").toString());
+				}				
 			}
 		};	
 
