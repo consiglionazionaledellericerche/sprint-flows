@@ -2,13 +2,12 @@
 
 	<div class="row">
 		<div class="col-md-8">
-			<h4>{{vm.data.entity.businessKey}}
+			<h3>{{vm.data.entity.businessKey}}
 				<span ng-class="{'label-info': vm.data.entity.endTime != null , 'label-primary': vm.data.entity.endTime == null}"
 					  class="label">
                   {{vm.data.entity.endTime == null ? 'attivo' : 'completato'}}
                 </span>
-				<br><br>
-			</h4>
+			</h3>
 			<div ng-show="vm.data.entity.endTime == null" class="btn-toolbar">
 				<div class="btn-group" ng-show="isResponsabile">
 					<button class="btn btn-warning btn-xs"
@@ -24,42 +23,49 @@
 					<hr>
 				</div>
 			</div>
+			<div ng-show="vm.data.linkedProcesses">
+				<b>Flussi collegati: </b>
+				<span ng-repeat="linkedProcess in vm.data.linkedProcesses">
+					<b><a ng-href="#/details?processInstanceId={{linkedProcess.id}}">{{linkedProcess.key}} ({{linkedProcess.titolo}})</a></b>
+				</span>
+			</div>
+			<hr>
 			<div>
-				<b>Titolo: </b>{{vm.data.entity.name | get: 'titolo'}} <br>
+				<h5><b>Titolo: </b>{{vm.data.entity.name | get: 'titolo'}}</h5>
 			</div>
 			<div>
-				<b>Descrizione: </b>{{vm.data.entity.name | get: 'descrizione'}} <br>
+				<b>Descrizione: </b>{{vm.data.entity.name | get: 'descrizione'}} 
 			</div>
 			<div>
-				<b>Avviato da: </b>{{vm.data.entity.variabili.initiator}} il {{vm.data.entity.variabili.startDate | data}} <br>
+				<b>Avviato da: </b>{{vm.data.entity.variabili.initiator}} il {{vm.data.entity.variabili.startDate | data}} 
 			</div>
 			<div ng-hide="!vm.data.entity.variabili.completed">
-				<b>completato il:</b>{{vm.data.entity.variabili.endDate | data}}<br>
+				<b>completato il:</b>{{vm.data.entity.variabili.endDate | data}}
 			</div>
 			<div ng-show="vm.data.entity.endTime == null">
-				<b>Stato: </b>{{vm.data.entity.name | get: 'stato'}} <br>
+				<b>Stato: </b>{{vm.data.entity.name | get: 'stato'}} 
 			</div>
 			<div ng-show="vm.data.entity.endTime != null">
-				<b>Stato Finale: </b>{{vm.data.entity.name | get: 'stato'}} <br>
+				<b>Stato Finale: </b>{{vm.data.entity.name | get: 'stato'}} 
 			</div>
 			<div ng-show="vm.data.entity.deleteReason != null">
-				<b>Motivazione Eliminazione: </b>{{vm.data.entity.deleteReason}} <br>
+				<b>Motivazione Eliminazione: </b>{{vm.data.entity.deleteReason}} 
 			</div>
 			<!--gruppo/utente assegnatario del task in esecuzione-->
 			<div ng-show="vm.data.groupCandidate">
-				<b>Gruppo Assegnatario: </b>{{vm.data.groupCandidate}} <br>
+				<b>Gruppo Assegnatario: </b>{{vm.data.groupCandidate}} 
 			</div>
 			<div ng-show="vm.activeTask.assignee">
-				<b>Utente Assegnatario: </b>{{vm.activeTask.assignee}} <br>
+				<b>Utente Assegnatario: </b>{{vm.activeTask.assignee}} 
 			</div>
 
 			<ul class="list-unstyled">
 				<ng-include src="vm.detailsView"/>
 			</ul>
-			<!--link ad altre Process Instances-->
-			<links links="vm.links"></links>
 
-			<h4>Documenti</h4>
+			<hr>
+
+			<h3>Documenti</h3>
 			<attachments process-instance-id="{{processInstanceId}}"
 						 attachments="{{vm.data.attachments}}"
 						 can-publish="canPublish"
@@ -81,13 +87,12 @@
 				<h4>Identity Links</h4>
 				<span ng-repeat="(taskId, link) in vm.data.identityLinks">
                     <div ng-show="link.assignee || link.candidateUsers || link.candidateGroup">
-                        TaskId - <strong>{{ taskId }}:</strong> <br>
-                        (Assignee: {{link.assignee || null}}, Candidate Users: {{link.candidateUsers}}, Candidate Groups: {{link.candidateGroups}})<br>
+                        TaskId - <strong>{{ taskId }}:</strong> 
+                        (Assignee: {{link.assignee || null}}, Candidate Users: {{link.candidateUsers}}, Candidate Groups: {{link.candidateGroups}})
                     </div>
                     <span ng-repeat="actualLink in link.links">
                       <strong>{{ actualLink.type }}:</strong>
-                      {{ actualLink.user || actualLink.group || actualLink.groupId || actualLink.userId}}
-                      <br>
+                      {{ actualLink.user || actualLink.group || actualLink.groupId || actualLink.userId}} <br>
                     </span>
                 </span>
 			</div>
@@ -107,10 +112,10 @@
 							ng-click="history(vm.data.history, vm.data.startEvent)"><span
 							class="glyphicon glyphicon-time"></span> Visualizza Cronologia
 					</button>
-					<br>
-					<br>
-					<button ng-click="exportSummary('/api/summaryPdf?processInstanceId=' + processInstanceId, 'Summary_' + vm.data.entity.variabili.titolo + '.pdf')"
-							class="btn btn-primary">Export Summary
+
+					<button class="btn btn-primary btn-block"
+							ng-click="exportSummary('/api/summaryPdf?processInstanceId=' + processInstanceId, 'Summary_' + vm.data.entity.variabili.titolo + '.pdf')">
+							Export Summary
 					</button>
 				</div>
 			</div>
