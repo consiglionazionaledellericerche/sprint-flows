@@ -298,8 +298,6 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
                 .processInstanceId(processInstanceId)
                 .includeProcessVariables()
                 .singleResult();
-        boolean isActive = instance.getEndTime() == null;
-
         String processDefinitionKey = instance.getProcessDefinitionKey();
         String idStruttura = String.valueOf(instance.getProcessVariables().get("idStruttura"));
 
@@ -324,7 +322,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
             isRuoloFlusso = username.equals(rup) || authorities.contains(nomeGruppoFirma);
         }
 
-        return (isResponsabile || isRuoloFlusso) && isActive;
+        return isResponsabile || isRuoloFlusso;
     }
 
     public boolean canPublishAttachment(String processInstanceId) {
