@@ -44,6 +44,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
 
     public static final String CNR_CODE = "0000";
+    public static final String ID_STRUTTURA = "idStruttura";
     private final Logger log = LoggerFactory.getLogger(PermissionEvaluatorImpl.class);
 
     @Inject
@@ -139,7 +140,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
                 .processInstanceId(processInstanceId)
                 .singleResult();
 
-        return canVisualize((String) historicProcessInstance.getProcessVariables().get("idStruttura"),
+        return canVisualize((String) historicProcessInstance.getProcessVariables().get(ID_STRUTTURA),
                             historicProcessInstance.getProcessDefinitionKey(),
                             processInstanceId, authorities, userName);
     }
@@ -277,7 +278,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
                     .singleResult();
         }
 
-        String idStruttura = (String) ((HashMap) task.getProcessVariables()).get("idStruttura");
+        String idStruttura = (String) ((HashMap) task.getProcessVariables()).get(ID_STRUTTURA);
 
         String tipoFlusso = (String) task.getProcessDefinitionId().split(":")[0];
 
@@ -301,7 +302,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
         boolean isActive = instance.getEndTime() == null;
 
         String processDefinitionKey = instance.getProcessDefinitionKey();
-        String idStruttura = String.valueOf(instance.getProcessVariables().get("idStruttura"));
+        String idStruttura = String.valueOf(instance.getProcessVariables().get(ID_STRUTTURA));
 
         String username = SecurityUtils.getCurrentUserLogin();
         List<String> authorities = getAuthorities(username, flowsUserDetailsService);
@@ -345,7 +346,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
                 return true;
 
             List<String> authorities = it.cnr.si.flows.ng.utils.SecurityUtils.getCurrentUserAuthorities();
-            String idStruttura = String.valueOf(instance.getProcessVariables().get("idStruttura"));
+            String idStruttura = String.valueOf(instance.getProcessVariables().get(ID_STRUTTURA));
             String nomeGruppoFirma = "responsabileFirmaAcquisti@" + idStruttura;
 
             if (authorities.contains(nomeGruppoFirma))
