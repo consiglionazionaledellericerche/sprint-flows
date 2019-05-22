@@ -148,7 +148,6 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
     //controllo che l'utente abbia un authorities di tipo "supervisore" o "responsabile" della struttura o del tipo di flusso
     private boolean verifyAuthorities(String idStruttura, String processDefinitionKey, List<String> authorities) {
-        Boolean canVisualize = false;
         return authorities.stream()
                 .anyMatch(
                         a -> a.contains(supervisore + "@" + CNR_CODE) ||
@@ -280,7 +279,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
         String idStruttura = (String) ((HashMap) task.getProcessVariables()).get(ID_STRUTTURA);
 
-        String tipoFlusso = (String) task.getProcessDefinitionId().split(":")[0];
+        String tipoFlusso = task.getProcessDefinitionId().split(":")[0];
 
         return (groups.contains("responsabile-struttura@" + idStruttura) ||
                 groups.contains("responsabile#flussi") ||
