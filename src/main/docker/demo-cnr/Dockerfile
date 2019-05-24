@@ -6,9 +6,9 @@ ARG JAR_FILE=./app.war
 ADD ${JAR_FILE} /opt/app.war
 RUN apk add --update --no-cache ttf-dejavu
 
-EXPOSE 8080
+EXPOSE 8080 8899
 
 WORKDIR /opt/
 
 # https://spring.io/guides/gs/spring-boot-docker/#_containerize_it
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom", "-jar","/opt/app.war"]
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8899", "-jar","/opt/app.war"]

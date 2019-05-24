@@ -88,7 +88,7 @@ public class FlowsSearchResourceTest {
         requestParams.put("page", "1");
 
         //verifico la richiesta normale
-        ResponseEntity<Object> response = flowsSearchResource.search(requestParams);
+        ResponseEntity<DataResponse> response = flowsSearchResource.search(requestParams);
         verifySearchResponse(response, 1, 1);
 
         //verifico la richiesta su tutte le Process Definition
@@ -249,7 +249,7 @@ public class FlowsSearchResourceTest {
 //    }
 
 
-    private void verifySearchResponse(ResponseEntity<Object> response, int expectedTotalItems, int expectedResponseItems) throws JSONException {
+    private void verifySearchResponse(ResponseEntity<DataResponse> response, int expectedTotalItems, int expectedResponseItems) throws JSONException {
         assertEquals(OK, response.getStatusCode());
         DataResponse dataResponse = (DataResponse) response.getBody();
         ArrayList responseList = (ArrayList) dataResponse.getData();
@@ -266,51 +266,6 @@ public class FlowsSearchResourceTest {
                 assertEquals(TestServices.getRA(), json.getString(initiator.name()));
             }
         }
-    }
-
-    //verifico che non prenda nessun elemento (SEARCH PARAMS SBAGLIATI)
-    private void verifyBadSearchParams(MockHttpServletRequest request) {
-        ResponseEntity<DataResponse> response;
-
-        //prendo solo quello avviato da RA
-        String searchParams = "{\"processParams\":" +
-                "[{\"key\":\"" + titolo + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
-                "{\"key\":\"initiator\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}," +
-                "{\"key\":\"" + startDate + "Great\",\"value\":\"" + utils.formattaData(new Date()) + "\",\"type\":\"date\"}]}";
-        response = flowsProcessInstanceResource.getProcessInstances(true, ALL_PROCESS_INSTANCES, 0, 100, ASC, searchParams);
-        ArrayList<HistoricProcessInstanceResponse> entities = (ArrayList<HistoricProcessInstanceResponse>) response.getBody().getData();
-        assertEquals(1, entities.size());
-        assertEquals(1, ((ArrayList) response.getBody().getData()).size());
-
-        //titolo flusso sbagliato
-        searchParams = "{\"processParams\":" +
-                "[{\"key\":" + titolo + ",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "AAAAAAAAA" + "\",\"type\":\"text\"}," +
-                "{\"key\":" + initiator + ",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}," +
-                "{\"key\":" + startDate + "Great,\"value\":\"" + utils.formattaData(new Date()) + "\",\"type\":\"date\"}]}";
-        response = flowsProcessInstanceResource.getProcessInstances(true, ALL_PROCESS_INSTANCES, 0, 100, ASC, searchParams);
-        entities = (ArrayList<HistoricProcessInstanceResponse>) response.getBody().getData();
-        assertEquals(0, entities.size());
-        assertEquals(0, ((ArrayList) response.getBody().getData()).size());
-
-        //initiator sbaliato
-        searchParams = "{\"processParams\":" +
-                "[{\"key\":" + titolo + ",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
-                "{\"key\":" + initiator + ",\"value\":\"" + TestServices.getRA() + "AAA" + "\",\"type\":\"textEqual\"}," +
-                "{\"key\":" + startDate + "Great,\"value\":\"" + utils.formattaData(new Date()) + "\",\"type\":\"date\"}]}";
-        response = flowsProcessInstanceResource.getProcessInstances(true, ALL_PROCESS_INSTANCES, 0, 100, ASC, searchParams);
-        entities = (ArrayList<HistoricProcessInstanceResponse>) response.getBody().getData();
-        assertEquals(0, entities.size());
-        assertEquals(0, ((ArrayList) response.getBody().getData()).size());
-
-        //STARTDATE sbaliata
-        searchParams = "{\"processParams\":" +
-                "[{\"key\":\"" + titolo + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
-                "{\"key\":" + initiator + ",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}," +
-                "{\"key\":" + startDate + "Great,\"value\":\"" + new DateTime().plusDays(1).toString("yyyy-MM-dd") + "\",\"type\":\"date\"}]}";
-        response = flowsProcessInstanceResource.getProcessInstances(true, ALL_PROCESS_INSTANCES, 0, 100, ASC, searchParams);
-        entities = (ArrayList<HistoricProcessInstanceResponse>) response.getBody().getData();
-        assertEquals(0, entities.size());
-        assertEquals(0, ((ArrayList) response.getBody().getData()).size());
     }
 
 
