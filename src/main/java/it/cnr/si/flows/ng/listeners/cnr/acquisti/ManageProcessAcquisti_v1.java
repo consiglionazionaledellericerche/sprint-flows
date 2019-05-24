@@ -364,13 +364,25 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 					}	
 					if(tipologiaAcquisizioneId.equals("15")) {
 						put("cd_proc_amm", "DC58");
-					}	
-					if(tipologiaAcquisizioneId.equals("23")) {
+					}		
+					if(tipologiaAcquisizioneId.equals("16")) {
+						put("cd_proc_amm", "PN56");
+					}		
+					if(tipologiaAcquisizioneId.equals("17")) {
+						put("cd_proc_amm", "PSCE");
+					}		
+					if(tipologiaAcquisizioneId.equals("18")) {
+						put("cd_proc_amm", "ADCC");
+					}		
+					if(tipologiaAcquisizioneId.equals("21")) {
 						put("cd_proc_amm", "PNS");
 					}	
 					if(tipologiaAcquisizioneId.equals("22")) {
 						put("cd_proc_amm", "PNSS");
-					}	
+					}		
+					if(tipologiaAcquisizioneId.equals("23")) {
+						put("cd_proc_amm", "PNS");
+					}
 					// FL_MEPA 
 					if(tipologiaAcquisizioneId.equals("11") || tipologiaAcquisizioneId.equals("21") ) {
 						put("fl_mepa", Boolean.valueOf("true"));
