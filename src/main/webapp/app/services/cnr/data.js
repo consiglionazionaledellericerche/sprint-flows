@@ -91,13 +91,6 @@
                         '&firstResult=' + firstResult +
                         '&maxResults=' + maxResults, params);
                 },
-                getProcessInstances: function(processDefinition, active, firstResult, maxResults, order, params) {
-                    return $http.post('api/processInstances/getProcessInstances?active=' + active +
-                        '&processDefinition=' + (processDefinition ? processDefinition.key : 'all') +
-                        '&order=' + order +
-                        '&firstResult=' + firstResult +
-                        '&maxResults=' + maxResults, params);
-                },
                 getAttachments: function(processInstanceId) {
                     return $http.get('api/attachments/' + processInstanceId);
                 },
