@@ -23,24 +23,13 @@
             dataService.processInstances.byProcessInstanceId($state.params.processInstanceId, true).then(
                 function(response) {
                     vm.data.entity = utils.refactoringVariables([response.data.entity])[0];
+                    vm.data.linkedProcesses = response.data.linkedProcesses;
                     vm.data.history = response.data.history;
                     //in response.data.entity.variables ci sono anche le properties della Process Instance (initiator, startdate, ecc.)
                     vm.data.startEvent = response.data.entity.variables;
                     vm.data.attachments = utils.parseAttachments(response.data.attachments);
                     vm.data.identityLinks = response.data.identityLinks;
                     vm.diagramUrl = '/rest/diagram/processInstance/' + vm.data.entity.id + "?" + new Date().getTime();
-
-                    if (response.data.entity.variabili.hasOwnProperty('linkToOtherWorkflows')) {
-                        vm.links = [];
-                        response.data.entity.variabili.linkToOtherWorkflows.split(',').forEach(function(processInstanceId) {
-                            dataService.processInstances.getVariable(processInstanceId, 'titolo').success(function(titolo) {
-                                vm.links.push({
-                                    titolo: titolo.value,
-                                    processInstanceId: processInstanceId
-                                });
-                            });
-                        });
-                    }
 
                     var processDefinition = response.data.entity.processDefinitionId.split(":");
                     vm.detailsView = 'api/views/' + processDefinition[0] + '/' + processDefinition[1] + '/detail';

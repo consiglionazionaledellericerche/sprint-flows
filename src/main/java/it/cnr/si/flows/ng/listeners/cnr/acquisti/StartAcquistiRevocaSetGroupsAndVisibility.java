@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
+import static it.cnr.si.security.PermissionEvaluatorImpl.ID_STRUTTURA;
 
 @Component
 @Profile("!oiv")
@@ -53,7 +54,7 @@ public class StartAcquistiRevocaSetGroupsAndVisibility implements ExecutionListe
             String gruppoRT = groups.get(0);
             String struttura = gruppoRT.substring(gruppoRT.lastIndexOf('@') +1);
             // idStruttura variabile che indica che il flusso è diviso per strutture (implica la visibilità distinta tra strutture)
-            execution.setVariable("idStruttura", struttura);
+            execution.setVariable(ID_STRUTTURA, struttura);
             String gruppoFirmaAcquisti = "responsabileFirmaAcquisti@"+ struttura;
             String gruppoStaffAmministrativo = "staffAmministrativo@"+ struttura;
             String gruppoSFD = "sfd@"+ struttura;

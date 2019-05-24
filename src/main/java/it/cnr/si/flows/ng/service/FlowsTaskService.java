@@ -2,7 +2,6 @@ package it.cnr.si.flows.ng.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import com.opencsv.CSVWriter;
 import it.cnr.si.domain.View;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
@@ -193,10 +192,9 @@ public class FlowsTaskService {
 		return taskQuery;
 	}
 
-	public DataResponse getAvailableTask(JSONObject searchParams, String processDefinition, int firstResult, int maxResults, String order) {
+	public DataResponse getAvailableTask(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
 		String username = SecurityUtils.getCurrentUserLogin();
-		List<String> authorities =
-				SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+		List<String> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
 						.map(GrantedAuthority::getAuthority)
 						.map(Utils::removeLeadingRole)
 						.collect(Collectors.toList());
@@ -206,7 +204,7 @@ public class FlowsTaskService {
 				.taskCandidateGroupIn(authorities)
 				.includeProcessVariables();
 
-		taskQuery = (TaskQuery) utils.searchParamsForTasks(searchParams, taskQuery);
+		taskQuery = (TaskQuery) utils.searchParams(searchParams, taskQuery);
 
 		if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
 			taskQuery.processDefinitionKey(processDefinition);
@@ -223,12 +221,12 @@ public class FlowsTaskService {
 		return response;
 	}
 
-	public DataResponse taskAssignedInMyGroups(JSONObject searchParams, String processDefinition, int firstResult, int maxResults, String order) {
+	public DataResponse taskAssignedInMyGroups(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
 		String username = SecurityUtils.getCurrentUserLogin();
 
         List<String> userAuthorities = SecurityUtils.getCurrentUserAuthorities();
 
-		TaskQuery taskQuery = (TaskQuery) utils.searchParamsForTasks(searchParams, taskService.createTaskQuery().includeProcessVariables());
+		TaskQuery taskQuery = (TaskQuery) utils.searchParams(searchParams, taskService.createTaskQuery().includeProcessVariables());
 
 		if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
 			taskQuery.processDefinitionKey(processDefinition);
@@ -264,15 +262,15 @@ public class FlowsTaskService {
 	}
 
 
-    public DataResponse getMyTasks(JSONObject searchParams, String processDefinition, int firstResult, int maxResults, String order) {
-		TaskQuery taskQuery = (TaskQuery) Utils.searchParamsForTasks(searchParams, taskService.createTaskQuery());
+    public DataResponse getMyTasks(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
+		TaskQuery taskQuery = (TaskQuery) utils.searchParams(searchParams, taskService.createTaskQuery());
 		taskQuery.taskAssignee(SecurityUtils.getCurrentUserLogin())
                 .includeProcessVariables();
 
 		if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
 			taskQuery.processDefinitionKey(processDefinition);
 
-        Utils.orderTasks(order, taskQuery);
+        utils.orderTasks(order, taskQuery);
 
         List<TaskResponse> tasksList = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
 
@@ -358,13 +356,13 @@ public class FlowsTaskService {
         }
 	}
 
-	public DataResponse getTasksCompletedByMe(JSONObject searchParams, @RequestParam("processDefinition") String processDefinition, @RequestParam("firstResult") int firstResult, @RequestParam("maxResults") int maxResults, @RequestParam("order") String order) {
+	public DataResponse getTasksCompletedByMe(JSONArray searchParams, @RequestParam("processDefinition") String processDefinition, @RequestParam("firstResult") int firstResult, @RequestParam("maxResults") int maxResults, @RequestParam("order") String order) {
 		String username = SecurityUtils.getCurrentUserLogin();
 
 		HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery().taskInvolvedUser(username)
 				.includeProcessVariables().includeTaskLocalVariables();
 
-		query = (HistoricTaskInstanceQuery) utils.searchParamsForTasks(searchParams, query);
+		query = (HistoricTaskInstanceQuery) utils.searchParams(searchParams, query);
 
 		if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
 			query.processDefinitionKey(processDefinition);
