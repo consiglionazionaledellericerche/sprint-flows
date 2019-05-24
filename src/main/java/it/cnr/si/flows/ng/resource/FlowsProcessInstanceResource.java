@@ -84,40 +84,6 @@ public class FlowsProcessInstanceResource {
 
 
     /**
-     * Restituisce le Process Instances attive o terminate.
-     *
-     * @param active boolean active
-     * @return le process Instance attive o terminate
-     */
-    @PostMapping(value = "/getProcessInstances", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured(AuthoritiesConstants.USER)
-    @Timed
-    public ResponseEntity getProcessInstances(
-            @RequestParam("active") boolean active,
-            @RequestParam("processDefinition") String processDefinition,
-            @RequestParam("firstResult") int firstResult,
-            @RequestParam("maxResults") int maxResults,
-            @RequestParam("order") String order,
-            @RequestBody(required = false) String body) {
-
-        org.activiti.engine.impl.util.json.JSONArray searchParams = new org.activiti.engine.impl.util.json.JSONObject(body).getJSONArray(PROCESS_PARAMS);
-
-        HistoricProcessInstanceQuery historicProcessQuery = flowsProcessInstanceService.getProcessInstances(searchParams, active, processDefinition, order);
-
-        List<HistoricProcessInstance> historicProcessInstances = historicProcessQuery.listPage(firstResult, maxResults);
-
-        DataResponse response = new DataResponse();
-        response.setStart(firstResult);
-        response.setSize(historicProcessInstances.size());// numero di task restituiti
-        response.setTotal(historicProcessQuery.count()); //numero totale di task avviati da me
-        response.setData(restResponseFactory.createHistoricProcessInstanceResponseList(historicProcessInstances));
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-
-
-    /**
      * Restituisce le Processs Instances avviate dall'utente loggato
      *
      * @param firstResult          il primo elemento da restituire

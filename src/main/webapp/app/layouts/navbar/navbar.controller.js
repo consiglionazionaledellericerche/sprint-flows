@@ -77,11 +77,6 @@
 				});
 				//lista di TUTTE le Process Definition
 				$rootScope.wfDefsAll = response.data.all;
-				$rootScope.wfDefsAll.push({
-					key: "all",
-					name: "ALL"
-				});
-
 
 				//popolo l'array delle process Definitions di cui l'utente loggato può vedere le statistiche
 				$rootScope.wfDefsStatistics = $rootScope.wfDefsAll.filter(function(processDefinition){

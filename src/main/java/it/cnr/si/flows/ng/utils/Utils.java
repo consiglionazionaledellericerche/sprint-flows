@@ -1,11 +1,9 @@
 package it.cnr.si.flows.ng.utils;
 
-import com.google.common.base.Strings;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.impl.util.json.JSONArray;
 import org.activiti.engine.impl.util.json.JSONObject;
-import org.activiti.engine.query.Query;
 import org.activiti.engine.task.TaskInfoQuery;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.slf4j.Logger;
@@ -140,7 +138,7 @@ public final class Utils {
     }
 
 
-    public static TaskInfoQuery orderTasks(String order, TaskInfoQuery query) {
+    public TaskInfoQuery orderTasks(String order, TaskInfoQuery query) {
         if (order.equals(ASC))
             query.orderByTaskCreateTime().asc();
         else if (order.equals(DESC))
@@ -159,102 +157,18 @@ public final class Utils {
     }
 
 
-    public static TaskInfoQuery searchParamsForTasks(JSONObject json, TaskInfoQuery query) {
-        try {
-            if (json.has(PROCESS_PARAMS))
-                query = extractProcessSearchParams(query, json.getJSONArray(PROCESS_PARAMS));
-            if (json.has(TASK_PARAMS))
-                query = extractTaskSearchParams(query, json.getJSONArray(TASK_PARAMS));
-        } catch (Exception e) {
-            LOGGER.error(ERRORE_NELLA_LETTURE_DELLO_STREAM_DELLA_REQUEST, e);
-        }
-        return query;
-    }
-
-
-    public Query searchParamsForProcess(JSONArray processParams, HistoricProcessInstanceQuery processQuery) {
-        try {
-//            todo: controllare
-
-            for (int i = 0; i < processParams.length(); i++) {
-                JSONObject appo = processParams.optJSONObject(i);
-                String key = appo.getString("key");
-                String value = appo.getString("value");
-                String type = appo.getString("type");
-                //wildcard ("%") di default ma non a TUTTI i campi
-                switch (type) {
-                    case TEXT_EQUAL:
-                    case BOOLEAN:
-                        // gestione variabili booleane e dei valori testuali "perfettamente uguali"
-                        processQuery.variableValueEquals(key, value);
-                        break;
-                    case "date":
-                        Date date = formatoData.parse(value);
-
-                        if (key.contains(LESS)) {
-                            processQuery.variableValueLessThanOrEqual(key.replace(LESS, ""), date);
-                        } else if (key.contains(GREAT))
-                            processQuery.variableValueGreaterThanOrEqual(key.replace(GREAT, ""), date);
-                        break;
-                    default:
-                        //variabili con la wildcard  (%value%)
-                        processQuery.variableValueLike(key, "%" + value + "%");
-                        break;
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.error(ERRORE_NELLA_LETTURE_DELLO_STREAM_DELLA_REQUEST, e);
-        }
-        return processQuery;
-    }
-
-    public static TaskInfoQuery extractProcessSearchParams(TaskInfoQuery taskQuery, JSONArray params) {
-
-        for (int i = 0; i < params.length(); i++) {
-            JSONObject appo = params.optJSONObject(i);
-            String key = appo.getString("key");
-            String value = appo.getString("value");
-            String type = appo.getString("type");
-            //wildcard ("%") di default ma non a TUTTI i campi
-            switch (type) {
-                case TEXT_EQUAL:
-                    taskQuery.processVariableValueEquals(key, value);
-                    break;
-                case BOOLEAN:
-                    // gestione variabili booleane
-                    taskQuery.processVariableValueEquals(key, Boolean.valueOf(value));
-                    break;
-                case "date":
-                    try {
-                        Date date = formatoData.parse(value);
-                        if (key.contains(LESS)) {
-                            taskQuery.processVariableValueLessThanOrEqual(key.replace(LESS, ""), date);
-                        } else if (key.contains(GREAT))
-                            taskQuery.processVariableValueGreaterThanOrEqual(key.replace(GREAT, ""), date);
-                    } catch (ParseException e) {
-                        LOGGER.error(ERRORE_NEL_PARSING_DELLA_DATA, value, e);
-                    }
-                    break;
-                default:
-                    //variabili con la wildcard  (%value%)
-                    taskQuery.processVariableValueLikeIgnoreCase(key, "%" + value + "%");
-                    break;
-            }
-        }
-        return taskQuery;
-    }
-
     public String[] getArray(List<String> tupla) {
         String[] entries = new String[tupla.size()];
         entries = tupla.toArray(entries);
         return entries;
     }
 
+
     public boolean isProfileActive(String profile) {
         return Arrays.asList(env.getActiveProfiles()).contains(profile);
     }
 
-    private static TaskInfoQuery extractTaskSearchParams(TaskInfoQuery taskQuery, JSONArray taskParams) {
+    public TaskInfoQuery searchParams(JSONArray taskParams, TaskInfoQuery taskQuery) {
 
         for (int i = 0; i < taskParams.length(); i++) {
             JSONObject appo = taskParams.optJSONObject(i);
@@ -285,18 +199,24 @@ public final class Utils {
                 //wildcard ("%") di default ma non a TUTTI i campi
                 switch (type) {
                     case TEXT_EQUAL:
-                        taskQuery.taskVariableValueEquals(key, value);
+                        taskQuery.or()
+                                .taskVariableValueEquals(key, value)
+                                .processVariableValueEquals(key, value).endOr();
                         break;
                     case BOOLEAN:
                         // gestione variabili booleane
-                        taskQuery.taskVariableValueEquals(key, Boolean.valueOf(value));
+                        taskQuery.or()
+                                .taskVariableValueEquals(key, Boolean.valueOf(value))
+                                .processVariableValueEquals(key, Boolean.valueOf(value)).endOr();
                         break;
                     case "date":
                         taskQuery = historicTaskDate(taskQuery, key, value);
                         break;
                     default:
                         //variabili con la wildcard  (%value%)
-                        taskQuery.taskVariableValueLikeIgnoreCase(key, "%" + value + "%");
+                        taskQuery.or()
+                                .taskVariableValueLikeIgnoreCase(key, "%" + value + "%")
+                                .processVariableValueLikeIgnoreCase(key, "%" + value + "%").endOr();
                         break;
                 }
             }
@@ -310,23 +230,28 @@ public final class Utils {
             Date date = parsaData(value);
 
             if (key.contains(LESS)) {
-                taskQuery.taskVariableValueLessThanOrEqual(key.replace(LESS, ""), date);
+                taskQuery.or()
+                        .taskVariableValueLessThanOrEqual(key.replace(LESS, ""), date)
+                        .processVariableValueLessThanOrEqual(key.replace(LESS, ""), date).endOr();
             } else if (key.contains(GREAT))
-                taskQuery.taskVariableValueGreaterThanOrEqual(key.replace(GREAT, ""), date);
+                taskQuery.or()
+                        .taskVariableValueGreaterThanOrEqual(key.replace(GREAT, ""), date)
+                        .processVariableValueLessThanOrEqual(key.replace(GREAT, ""), date).endOr();
         } catch (ParseException e) {
             LOGGER.error(ERRORE_NEL_PARSING_DELLA_DATA, value, e);
         }
         return taskQuery;
     }
 
-	public static class SearchResult {
-		String value;
+
+    public static class SearchResult {
+        String value;
         String label;
 
         public SearchResult(String v, String l) {
-			value = v;
-			label = l;
-		}
+            value = v;
+            label = l;
+        }
 
         public String getValue() {
             return value;
@@ -335,10 +260,10 @@ public final class Utils {
         public String getLabel() {
             return label;
         }
-	}
+    }
 
 
-	public String getString(Map<String, String> params, String paramName, String defaultValue) {
+    public String getString(Map<String, String> params, String paramName, String defaultValue) {
         String value = params.get(paramName);
         return value != null ? value : defaultValue;
     }

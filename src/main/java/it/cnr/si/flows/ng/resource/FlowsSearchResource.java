@@ -43,7 +43,7 @@ public class FlowsSearchResource {
     @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
-    public ResponseEntity<Object> search(@RequestBody Map<String, String> params) {
+    public ResponseEntity<DataResponse> search(@RequestBody Map<String, String> params) {
 
         String processDefinitionKey = util.getString(params, "processDefinitionKey", "all");
         String order = util.getString(params, "order", "ASC");
