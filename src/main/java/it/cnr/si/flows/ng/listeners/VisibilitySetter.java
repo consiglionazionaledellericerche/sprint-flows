@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import static it.cnr.si.security.PermissionEvaluatorImpl.CNR_CODE;
+import static it.cnr.si.security.PermissionEvaluatorImpl.ID_STRUTTURA;
 
 import it.cnr.si.flows.ng.utils.Utils;
 
@@ -66,7 +67,7 @@ public class VisibilitySetter implements ActivitiEventListener {
 
 			}
 
-			String idStruttura = (String) variables.get("idStruttura");
+			String idStruttura = (String) variables.get(ID_STRUTTURA);
 			if (idStruttura!= null) {
 				// TODO inserire if se è un flusso organizzato per strutture
 
