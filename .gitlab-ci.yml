@@ -28,11 +28,11 @@ test:
     - mvn -q test -DskipTests -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 
 
-nexus_dev:
+nexus_test:
   stage: nexus
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   only:
-    - dev
+    - test
   script: mvn -q install -DskipTests -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 
 container_test:
