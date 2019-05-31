@@ -598,26 +598,26 @@
             <!-- jhipster-needle-maven-add-plugin -->
 
             <!--prova-->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <executable>./node_modules/bower/bin/bower</executable>
-                    <arguments>
-                        <argument>install</argument>
-                    </arguments>
-                    <!--<workingDirectory>${basedir}/src/main/webapp</workingDirectory>-->
-                    <workingDirectory>${basedir}</workingDirectory>
-                </configuration>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.codehaus.mojo</groupId>-->
+<!--                <artifactId>exec-maven-plugin</artifactId>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <phase>generate-sources</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>exec</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--                <configuration>-->
+<!--                    <executable>bower</executable>-->
+<!--                    <arguments>-->
+<!--                        <argument>install</argument>-->
+<!--                    </arguments>-->
+<!--                    &lt;!&ndash;<workingDirectory>${basedir}/src/main/webapp</workingDirectory>&ndash;&gt;-->
+<!--                    <workingDirectory>${basedir}</workingDirectory>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
