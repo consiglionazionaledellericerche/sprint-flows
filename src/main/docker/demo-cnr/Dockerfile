@@ -3,7 +3,7 @@ FROM scolagreco/alpine-openjdk:v3.9.2
 VOLUME /tmp
 
 RUN apk add --update --no-cache ttf-dejavu
-ARG JAR_FILE=./app.war
+ARG JAR_FILE=./target/app.war
 ADD ${JAR_FILE} /opt/app.war
 
 EXPOSE 8080 8899
