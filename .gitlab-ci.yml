@@ -35,5 +35,13 @@ nexus_dev:
     - dev
   script: mvn -q install -DskipTests -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 
+container_test:
+  stage: container
+  only:
+    - test
+  script:
+    - echo "Running build image and push image"
+    - docker build --file src/main/docker/demo-cnr/Dockerfile -t docker.si.cnr.it/sprint-flows-test .
+    - docker push docker.si.cnr.it/sprint-flows-test
 
 
