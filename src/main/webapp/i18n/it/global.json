@@ -39,7 +39,6 @@
                 "audits": "Cambiamenti",
                 "apidocs": "API",
                 "database": "Database",
-                "activeFlows": "Flussi Attivi",
                 "jhipster-needle-menu-add-admin-element": "JHipster will add additional menu entries here (do not translate!)"
             },
             "language": "Lingua"

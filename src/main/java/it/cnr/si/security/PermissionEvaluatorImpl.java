@@ -44,6 +44,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
 
     public static final String CNR_CODE = "0000";
+    public static final String ID_STRUTTURA = "idStruttura";
     private final Logger log = LoggerFactory.getLogger(PermissionEvaluatorImpl.class);
 
     @Inject
@@ -139,7 +140,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
                 .processInstanceId(processInstanceId)
                 .singleResult();
 
-        return canVisualize((String) historicProcessInstance.getProcessVariables().get("idStruttura"),
+        return canVisualize((String) historicProcessInstance.getProcessVariables().get(ID_STRUTTURA),
                             historicProcessInstance.getProcessDefinitionKey(),
                             processInstanceId, authorities, userName);
     }
@@ -147,7 +148,6 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
     //controllo che l'utente abbia un authorities di tipo "supervisore" o "responsabile" della struttura o del tipo di flusso
     private boolean verifyAuthorities(String idStruttura, String processDefinitionKey, List<String> authorities) {
-        Boolean canVisualize = false;
         return authorities.stream()
                 .anyMatch(
                         a -> a.contains(supervisore + "@" + CNR_CODE) ||
@@ -277,9 +277,9 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
                     .singleResult();
         }
 
-        String idStruttura = (String) ((HashMap) task.getProcessVariables()).get("idStruttura");
+        String idStruttura = (String) ((HashMap) task.getProcessVariables()).get(ID_STRUTTURA);
 
-        String tipoFlusso = (String) task.getProcessDefinitionId().split(":")[0];
+        String tipoFlusso = task.getProcessDefinitionId().split(":")[0];
 
         return (groups.contains("responsabile-struttura@" + idStruttura) ||
                 groups.contains("responsabile#flussi") ||
@@ -298,8 +298,10 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
                 .processInstanceId(processInstanceId)
                 .includeProcessVariables()
                 .singleResult();
+        boolean isActive = instance.getEndTime() == null;
+
         String processDefinitionKey = instance.getProcessDefinitionKey();
-        String idStruttura = String.valueOf(instance.getProcessVariables().get("idStruttura"));
+        String idStruttura = String.valueOf(instance.getProcessVariables().get(ID_STRUTTURA));
 
         String username = SecurityUtils.getCurrentUserLogin();
         List<String> authorities = getAuthorities(username, flowsUserDetailsService);
@@ -322,7 +324,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
             isRuoloFlusso = username.equals(rup) || authorities.contains(nomeGruppoFirma);
         }
 
-        return isResponsabile || isRuoloFlusso;
+        return (isResponsabile || isRuoloFlusso) && isActive;
     }
 
     public boolean canPublishAttachment(String processInstanceId) {
@@ -343,7 +345,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
                 return true;
 
             List<String> authorities = it.cnr.si.flows.ng.utils.SecurityUtils.getCurrentUserAuthorities();
-            String idStruttura = String.valueOf(instance.getProcessVariables().get("idStruttura"));
+            String idStruttura = String.valueOf(instance.getProcessVariables().get(ID_STRUTTURA));
             String nomeGruppoFirma = "responsabileFirmaAcquisti@" + idStruttura;
 
             if (authorities.contains(nomeGruppoFirma))
