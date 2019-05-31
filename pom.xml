@@ -610,7 +610,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <executable>bower</executable>
+                    <executable>./node_modules/bower/bin/bower</executable>
                     <arguments>
                         <argument>install</argument>
                     </arguments>
