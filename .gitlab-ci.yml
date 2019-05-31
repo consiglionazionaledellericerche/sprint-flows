@@ -19,7 +19,7 @@ build_dev:
   only:
     - dev
   script:
-    - mvn compile -DskipTests -Pdev -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+    - mvn compile package -DskipTests -Pdev -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
     - cp target/*.war target/app.war
 
 build:
