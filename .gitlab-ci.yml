@@ -20,13 +20,21 @@ build_dev:
     - dev
   script:
     - mvn compile -DskipTests -Pdev -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+    - cp target/*.war target/app.war
+
+build:
+  stage: build
+  image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
+  except:
+    - dev
+  script:
+    - mvn compile -DskipTests -Pprod -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 
 test:
   stage: test
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   script:
     - mvn -q test -DskipTests -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-
 
 nexus_test:
   stage: nexus
@@ -44,4 +52,14 @@ container_test:
     - docker build --file src/main/docker/demo-cnr/Dockerfile -t docker.si.cnr.it/sprint-flows-test .
     - docker push docker.si.cnr.it/sprint-flows-test
 
+container_demo:
+  stage: container
+  tags:
+    - shared
+  only:
+    - demo
+  script:
+    - echo "Running build image and push image"
+    - docker build --file src/main/docker/demo-cnr/Dockerfile -t docker.si.cnr.it/sprint-flows-demo .
+    - docker push docker.si.cnr.it/sprint-flows-demo
 
