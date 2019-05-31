@@ -6,22 +6,35 @@ variables:
   CNR_MAVEN_VERSION: 3.4.0
 
 stages:
-  - build_test
+  - build
+  - test
   - nexus
   - release
+  - container
+  - deploy
 
 build_dev:
-  stage: build_test
+  stage: build
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   only:
     - dev
   script:
     - apt install nodejs -y
-    - mvn compile test -Pdev
+    - mvn compile -DskipTests -Pdev
+
+test:
+  stage: test
+  image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
+  script:
+    - mvn test
+
 
 nexus_dev:
   stage: nexus
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   only:
     - dev
-  script: mvn install -Pdev
+  script: mvn install
+
+
+
