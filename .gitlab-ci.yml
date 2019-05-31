@@ -20,13 +20,13 @@ build_dev:
     - dev
   script:
     - apt install nodejs -y
-    - mvn compile -DskipTests -Pdev
+    - mvn -q compile -DskipTests -Pdev
 
 test:
   stage: test
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   script:
-    - mvn test -DskipTests
+    - mvn -q test -DskipTests
 
 
 nexus_dev:
@@ -34,7 +34,7 @@ nexus_dev:
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   only:
     - dev
-  script: mvn install -DskipTests
+  script: mvn -q install -DskipTests
 
 
 
