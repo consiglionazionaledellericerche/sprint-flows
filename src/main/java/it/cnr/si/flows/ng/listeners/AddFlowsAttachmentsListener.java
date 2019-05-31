@@ -3,17 +3,13 @@ package it.cnr.si.flows.ng.listeners;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
-import org.activiti.bpmn.converter.export.BPMNDIExport;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.BpmnError;
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.event.ActivitiEntityWithVariablesEvent;
 import org.activiti.engine.delegate.event.ActivitiEvent;
 import org.activiti.engine.delegate.event.ActivitiEventListener;
 import org.activiti.engine.delegate.event.ActivitiEventType;
-import org.activiti.engine.delegate.event.impl.ActivitiEntityWithVariablesEventImpl;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,12 +17,12 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static it.cnr.si.flows.ng.service.FlowsAttachmentService.NUMERI_PROTOCOLLO;
+import static it.cnr.si.security.PermissionEvaluatorImpl.ID_STRUTTURA;
 
 @Component
 public class AddFlowsAttachmentsListener implements ActivitiEventListener {
@@ -128,7 +124,7 @@ public class AddFlowsAttachmentsListener implements ActivitiEventListener {
                 profile = "flows-demo";
             }
 
-            String idStruttura = runtimeService.getVariable(processInstanceId, "idStruttura", String.class);
+            String idStruttura = runtimeService.getVariable(processInstanceId, ID_STRUTTURA, String.class);
             String cdsuo = Optional.ofNullable(idStruttura)
                     .map(id -> aceBridgeService.getUoById(Integer.parseInt(id)).getCdsuo())
                     .orElse(null);
