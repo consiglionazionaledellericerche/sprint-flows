@@ -16,7 +16,7 @@ build_dev:
   only:
     - dev
   script:
-    - apt install node -y
+    - apt install nodejs -y
     - mvn compile test -Pdev
 
 nexus_dev:
