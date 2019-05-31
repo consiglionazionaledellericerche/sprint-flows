@@ -13,11 +13,13 @@ stages:
 build_dev:
   stage: build_test
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
-  only: dev
+  only:
+    - dev
   script: mvn build test -Pdev
 
 nexus_dev:
   stage: nexus
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
-  only: dev
+  only:
+    - dev
   script: mvn install -Pdev
