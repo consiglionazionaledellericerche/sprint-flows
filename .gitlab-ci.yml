@@ -15,7 +15,7 @@ build_dev:
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   only:
     - dev
-  script: mvn build test -Pdev
+  script: mvn compile test -Pdev
 
 nexus_dev:
   stage: nexus
