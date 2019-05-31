@@ -1,7 +1,16 @@
 package it.cnr.si.flows.ng.listeners.cnr.acquisti;
 
 
-
+import it.cnr.si.domain.enumeration.ExternalMessageVerb;
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.listeners.cnr.acquisti.service.AcquistiService;
+import it.cnr.si.flows.ng.service.*;
+import it.cnr.si.flows.ng.utils.SecurityUtils;
+import it.cnr.si.service.AceService;
+import it.cnr.si.service.ExternalMessageService;
+import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
+import it.cnr.si.spring.storage.StorageObject;
+import it.cnr.si.spring.storage.StoreService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
@@ -15,37 +24,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import it.cnr.si.domain.enumeration.ExternalMessageVerb;
-import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.service.AceBridgeService;
-import it.cnr.si.flows.ng.service.FirmaDocumentoService;
-import it.cnr.si.flows.ng.service.FlowsAttachmentService;
-import it.cnr.si.flows.ng.service.FlowsPdfService;
-import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
-import it.cnr.si.flows.ng.service.ProtocolloDocumentoService;
-import it.cnr.si.flows.ng.utils.SecurityUtils;
-import it.cnr.si.service.AceService;
-import it.cnr.si.service.ExternalMessageService;
-import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
-import it.cnr.si.spring.storage.StorageObject;
-import it.cnr.si.spring.storage.StoreService;
-import it.cnr.si.flows.ng.listeners.cnr.acquisti.service.AcquistiService;
-
-import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
-
+import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
-import javax.inject.Inject;
+import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
+import static it.cnr.si.security.PermissionEvaluatorImpl.ID_STRUTTURA;
 
 @Component
 @Profile("cnr")
@@ -328,9 +318,9 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 					put("esercizio", Integer.parseInt(strDate));
 				}
 				// CD_UNITA_ORGANIZZATIVA 
-				if(execution.getVariable("idStruttura") != null){
+				if(execution.getVariable(ID_STRUTTURA) != null){
 					Map<String, String> unita_organizzativa = new HashMap<>();
-					unita_organizzativa.put("cd_unita_organizzativa",aceBridgeService.getUoById(Integer.parseInt(execution.getVariable("idStruttura").toString())).getCdsuo().toString());
+					unita_organizzativa.put("cd_unita_organizzativa",aceBridgeService.getUoById(Integer.parseInt(execution.getVariable(ID_STRUTTURA).toString())).getCdsuo().toString());
 					put("unita_organizzativa", unita_organizzativa);
 				}
 				// DT_REGISTRAZIONE 
@@ -374,13 +364,25 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 					}	
 					if(tipologiaAcquisizioneId.equals("15")) {
 						put("cd_proc_amm", "DC58");
-					}	
-					if(tipologiaAcquisizioneId.equals("23")) {
+					}		
+					if(tipologiaAcquisizioneId.equals("16")) {
+						put("cd_proc_amm", "PN56");
+					}		
+					if(tipologiaAcquisizioneId.equals("17")) {
+						put("cd_proc_amm", "PSCE");
+					}		
+					if(tipologiaAcquisizioneId.equals("18")) {
+						put("cd_proc_amm", "ADCC");
+					}		
+					if(tipologiaAcquisizioneId.equals("21")) {
 						put("cd_proc_amm", "PNS");
 					}	
 					if(tipologiaAcquisizioneId.equals("22")) {
 						put("cd_proc_amm", "PNSS");
-					}	
+					}		
+					if(tipologiaAcquisizioneId.equals("23")) {
+						put("cd_proc_amm", "PNS");
+					}
 					// FL_MEPA 
 					if(tipologiaAcquisizioneId.equals("11") || tipologiaAcquisizioneId.equals("21") ) {
 						put("fl_mepa", Boolean.valueOf("true"));
