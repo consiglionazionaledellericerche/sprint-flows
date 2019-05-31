@@ -1,4 +1,23 @@
-job_dummy:
-  script:
-    - apk update; apk add curl;
-    - curl "http://build.si.cnr.it/view/SPRINT_FLOWS/job/sprint-flows-dev/build?token=cambiala"
+image: docker:stable
+
+variables:
+  DOCKER_DRIVER: overlay2
+  MAVEN_OPTS: -Dmaven.repo.local=.m2
+  CNR_MAVEN_VERSION: 3.4.0
+
+stages:
+  - build_test
+  - nexus
+  - release
+
+build_dev:
+  stage: build_test
+  image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
+  only: dev
+  script: mvn build test -Pdev
+
+nexus_dev:
+  stage: nexus
+  image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
+  only: dev
+  script: mvn install -Pdev
