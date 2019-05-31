@@ -26,7 +26,7 @@ test:
   stage: test
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   script:
-    - mvn test
+    - mvn test -DskipTests
 
 
 nexus_dev:
