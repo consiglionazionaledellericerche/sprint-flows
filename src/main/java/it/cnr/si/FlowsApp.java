@@ -86,7 +86,6 @@ public class FlowsApp {
             log.error("Selezionare esattamente un profilo tra 'cnr' e 'oiv'");
             System.exit(1);
         }
-
     }
 
     /**
@@ -109,6 +108,4 @@ public class FlowsApp {
                 env.getProperty("server.port"));
 
     }
-
 }
-
