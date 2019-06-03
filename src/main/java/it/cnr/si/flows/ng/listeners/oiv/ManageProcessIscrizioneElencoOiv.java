@@ -165,11 +165,12 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 		case VALUTAZIONE_START:
 			break;
 		case VALUTAZIONE_END: {
-			LOGGER.info("VALUTAZIONE_END_PIPPO");
+			LOGGER.info("VALUTAZIONE_END");
+			LOGGER.info("PER CANCELLAZIONE");
 			String valSceltaUtente = execution.getVariable("sceltaUtente").toString();
-			if((valSceltaUtente.equals("genera_PDF_preavviso_di_rigetto") || valSceltaUtente.equals("calcola_punteggio") || valSceltaUtente.equals("aggiorna_PDF_preavviso_di_rigetto"))) {
-				calcolaPunteggioFascia.calcolaAggiornaGiudizioFinale(execution, nonAggiornaGiudizioFinale);
-			}
+			//if((valSceltaUtente.equals("genera_PDF_preavviso_di_rigetto") || valSceltaUtente.equals("calcola_punteggio") || valSceltaUtente.equals("aggiorna_PDF_preavviso_di_rigetto"))) {
+			//	calcolaPunteggioFascia.calcolaAggiornaGiudizioFinale(execution, nonAggiornaGiudizioFinale);
+			//}
 		}
 		;
 		break;
