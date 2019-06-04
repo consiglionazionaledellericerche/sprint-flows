@@ -23,6 +23,8 @@ build_dev:
     - dev
   script:
     - mvn compile package -DskipTests -Pdev -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+    - cp target/*.war src/main/docker/demo-cnr/app.war
+
 
 build:
   stage: build
@@ -51,7 +53,6 @@ container_test:
     - test
   script:
     - echo "Running build image and push image"
-    - cp target/*.war target/app.war
     - docker build --file src/main/docker/demo-cnr/Dockerfile -t docker.si.cnr.it/sprint-flows-test .
     - docker push docker.si.cnr.it/sprint-flows-test
 
@@ -63,7 +64,6 @@ container_demo:
     - demo
   script:
     - echo "Running build image and push image"
-    - cp target/*.war target/app.war
     - docker build --file src/main/docker/demo-cnr/Dockerfile -t docker.si.cnr.it/sprint-flows-demo .
     - docker push docker.si.cnr.it/sprint-flows-demo
 
