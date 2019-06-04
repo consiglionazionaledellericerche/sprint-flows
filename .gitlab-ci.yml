@@ -5,6 +5,9 @@ variables:
   MAVEN_OPTS: -Dmaven.repo.local=.m2
   CNR_MAVEN_VERSION: 3.4.0
 
+services:
+  - docker:dind
+
 stages:
   - build
   - test
