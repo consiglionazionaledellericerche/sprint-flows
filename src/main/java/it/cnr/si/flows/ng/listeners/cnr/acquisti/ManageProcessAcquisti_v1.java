@@ -347,56 +347,59 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				}
 				// NATURA_CONTABILE 
 				put("natura_contabile", "P");
+				Map<String, String> proceduraAmministrativa = new HashMap<>();
 				if(execution.getVariable("tipologiaAcquisizioneId") != null){
 					String tipologiaAcquisizioneId = execution.getVariable("tipologiaAcquisizioneId").toString();
 					// CD_PROC_AMM 
 					if(tipologiaAcquisizioneId.equals("11")) {
-						put("cd_proc_amm", "PA55");
+						proceduraAmministrativa.put("cd_proc_amm", "PA55");
 					}
 					if(tipologiaAcquisizioneId.equals("12")) {
-						put("cd_proc_amm", "PR55");
+						proceduraAmministrativa.put("cd_proc_amm", "PR55");
 					}	
 					if(tipologiaAcquisizioneId.equals("13")) {
-						put("cd_proc_amm", "PN56");
+						proceduraAmministrativa.put("cd_proc_amm", "PN56");
 					}	
 					if(tipologiaAcquisizioneId.equals("14")) {
-						put("cd_proc_amm", "PN57");
+						proceduraAmministrativa.put("cd_proc_amm", "PN57");
 					}	
 					if(tipologiaAcquisizioneId.equals("15")) {
-						put("cd_proc_amm", "DC58");
+						proceduraAmministrativa.put("cd_proc_amm", "DC58");
 					}		
 					if(tipologiaAcquisizioneId.equals("16")) {
-						put("cd_proc_amm", "PN56");
+						proceduraAmministrativa.put("cd_proc_amm", "PN56");
 					}		
 					if(tipologiaAcquisizioneId.equals("17")) {
-						put("cd_proc_amm", "PSCE");
+						proceduraAmministrativa.put("cd_proc_amm", "PSCE");
 					}		
 					if(tipologiaAcquisizioneId.equals("18")) {
-						put("cd_proc_amm", "ADCC");
+						proceduraAmministrativa.put("cd_proc_amm", "ADCC");
 					}		
 					if(tipologiaAcquisizioneId.equals("21")) {
-						put("cd_proc_amm", "PNS");
+						proceduraAmministrativa.put("cd_proc_amm", "PNS");
 					}	
 					if(tipologiaAcquisizioneId.equals("22")) {
-						put("cd_proc_amm", "PNSS");
+						proceduraAmministrativa.put("cd_proc_amm", "PNSS");
 					}		
 					if(tipologiaAcquisizioneId.equals("23")) {
-						put("cd_proc_amm", "PNS");
-					}
-					// FL_MEPA 
-					if(tipologiaAcquisizioneId.equals("11") || tipologiaAcquisizioneId.equals("21") ) {
-						put("fl_mepa", Boolean.valueOf("true"));
-					} else {
-						put("fl_mepa", Boolean.valueOf("false"));
+						proceduraAmministrativa.put("cd_proc_amm", "PNS");
 					}
 				}
 				// CD_PROC_AMM 
 				if(execution.getVariable("strumentoAcquisizioneId") != null){
 					String strumentoAcquisizioneId = execution.getVariable("strumentoAcquisizioneId").toString();
 					if(strumentoAcquisizioneId.equals("12")) {
-						put("cd_proc_amm", "ADAC");
+						proceduraAmministrativa.put("cd_proc_amm", "ADAC");
 					}	
+					// FL_MEPA 
+					if(strumentoAcquisizioneId.equals("11") || strumentoAcquisizioneId.equals("21") ) {
+						put("fl_mepa", Boolean.valueOf("true"));
+					} else {
+						put("fl_mepa", Boolean.valueOf("false"));
+					}
 				}
+				put("procedura_amministrativa", proceduraAmministrativa);
+
 				// OGGETTO 
 				if(execution.getVariable("descrizione") != null){
 					put("oggetto", execution.getVariable("descrizione").toString());
@@ -474,7 +477,15 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				// codiceFlussoAcquisti 
 				if(execution.getVariable("key") != null){
 					put("codiceFlussoAcquisti", execution.getVariable("key").toString());
-				}				
+				}
+				// DITTE INVITATE ditteInvitate_json 
+				if(execution.getVariable("ditteInvitate_json") != null){
+					put("listaDitteInvitateExt", execution.getVariable("ditteInvitate_json").toString());
+				}
+				// IMPEGNI impegni_json 
+				if(execution.getVariable("impegni_json") != null){
+					put("listaUoAbilitateExt", execution.getVariable("impegni_json").toString());
+				}
 			}
 		};	
 
@@ -576,7 +587,6 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 					throw new BpmnError("500", "<b>Data Completamento Procedura Inizio posteriore alla data di Fine<br></b>");
 				}
 			}
-
 			pubblicaTuttiFilePubblicabili(execution);
 		};break;
 		// START PROVVEDIMENTO-AGGIUDICAZIONE  
@@ -592,7 +602,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 		};break;
 		case "predisposizione-provvedimento-aggiudicazione-end": {
 			execution.setVariable("statoImpegni", "definitivi"); 
-			CalcolaTotaleImpegni(execution);
+			CalcolaTotaleImpegni(execution);			
 		};break; 
 		case "firma-provvedimento-aggiudicazione-end": {
 			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
