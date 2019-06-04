@@ -1,4 +1,69 @@
-job_dummy:
+image: docker:stable
+
+variables:
+  DOCKER_DRIVER: overlay2
+  MAVEN_OPTS: -Dmaven.repo.local=.m2
+  CNR_MAVEN_VERSION: 3.4.0
+
+services:
+  - docker:dind
+
+stages:
+  - build
+  - test
+  - nexus
+  - release
+  - container
+  - deploy
+
+build_dev:
+  stage: build
+  image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
+  only:
+    - dev
   script:
-    - apk update; apk add curl;
-    - curl "http://build.si.cnr.it/view/SPRINT_FLOWS/job/sprint-flows-dev/build?token=cambiala"
+    - mvn compile package -DskipTests -Pdev -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+
+build:
+  stage: build
+  image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
+  except:
+    - dev
+  script:
+    - mvn compile -DskipTests -Pprod -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+
+test:
+  stage: test
+  image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
+  script:
+    - mvn -q test -DskipTests -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+
+nexus_test:
+  stage: nexus
+  image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
+  only:
+    - test
+  script: mvn -q install -DskipTests -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+
+container_test:
+  stage: container
+  only:
+    - test
+  script:
+    - echo "Running build image and push image"
+    - cp target/*.war target/app.war
+    - docker build --file src/main/docker/demo-cnr/Dockerfile -t docker.si.cnr.it/sprint-flows-test .
+    - docker push docker.si.cnr.it/sprint-flows-test
+
+container_demo:
+  stage: container
+  tags:
+    - shared
+  only:
+    - demo
+  script:
+    - echo "Running build image and push image"
+    - cp target/*.war target/app.war
+    - docker build --file src/main/docker/demo-cnr/Dockerfile -t docker.si.cnr.it/sprint-flows-demo .
+    - docker push docker.si.cnr.it/sprint-flows-demo
+
