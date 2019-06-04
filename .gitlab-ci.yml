@@ -48,7 +48,6 @@ test:
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   script:
     - mvn -q test -DskipTests -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-    - cp ./target/app.war ./target/app2.war
 
 nexus_test:
   stage: nexus
