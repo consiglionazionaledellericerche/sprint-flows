@@ -22,8 +22,12 @@ build_dev:
   only:
     - dev
   script:
-    - mvn compile package -DskipTests -Pdev -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+    - mvn clean compile package -DskipTests -Pdev -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
     - cp target/*.war ./src/main/docker/demo-cnr/app.war
+  artifacts:
+    paths:
+      - ./target/app.war
+    expire_in: 1 day
 
 build:
   stage: build
