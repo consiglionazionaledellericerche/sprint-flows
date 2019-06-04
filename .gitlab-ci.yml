@@ -77,3 +77,7 @@ container_demo:
     - docker build --file src/main/docker/demo-cnr/Dockerfile -t docker.si.cnr.it/sprint-flows-demo .
     - docker push docker.si.cnr.it/sprint-flows-demo
 
+release_war:
+  stage: release
+  script:
+    - mvn --batch-mode -Dresume=false release:perform -Pprod -DskipTests -DpushChanges=false -DlocalCheckout=true
