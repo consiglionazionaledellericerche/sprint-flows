@@ -81,4 +81,4 @@ release_war:
   stage: release
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   script:
-    - mvn --batch-mode -Dresume=false release:perepare release:perform -Pprod -DskipTests -DpushChanges=false -DlocalCheckout=true -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+    - mvn --batch-mode -Dresume=false release:prepare release:perform -Pprod -DskipTests -DpushChanges=false -DlocalCheckout=true -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
