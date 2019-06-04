@@ -48,6 +48,7 @@
     <logger name="sun.rmi" level="WARN"/>
     <logger name="liquibase" level="WARN"/>
     <logger name="sun.rmi.transport" level="WARN"/>
+    <logger name="sun.net" level="INFO"/>
     <!-- commentare (o impostare a DEBUG) per avere dettagli del db di activiti -->
     <logger name="org.activiti.engine" level="INFO"/>
     <logger name="org.activiti.spring" level="INFO"/>
