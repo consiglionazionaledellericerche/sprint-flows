@@ -1,6 +1,6 @@
 version: '2'
 services:
-    sprint-flows-demo_cnr:
+    sprint-flows-cnr:
         image: docker.si.cnr.it/sprint-flows
         environment:
             - SPRING_PROFILES_ACTIVE=prod,cnr,swagger
