@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="missioni-ordine" name="Missioni-Ordine" isExecutable="true">
+    <startEvent id="startevent1" name="Start"></startEvent>
+    <userTask id="firma-uo" name="Firma UO" activiti:candidateGroups="ROLE_USER">
+      <extensionElements>
+        <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="firma-spesa" name="Firma Spesa" activiti:candidateGroups="ROLE_USER">
+      <extensionElements>
+        <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="respinto-uo" name="Respinto UO" activiti:candidateGroups="ROLE_USER">
+      <extensionElements>
+        <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="respinto-spesa" name="Respinto Spesa" activiti:candidateGroups="ROLE_USER">
+      <extensionElements>
+        <activiti:executionListener event="start" class="it.cnr.si.flows.ng.listeners.TaskGeneric"></activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway" default="flow9"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway" default="flow3"></exclusiveGateway>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="firma-uo"></sequenceFlow>
+    <sequenceFlow id="flow2" name="Firma" sourceRef="exclusivegateway2" targetRef="endevent1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Firma'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow3" name="Respingi" sourceRef="exclusivegateway2" targetRef="respinto-spesa"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="firma-spesa" targetRef="exclusivegateway2"></sequenceFlow>
+    <sequenceFlow id="flow5" name="Firma" sourceRef="exclusivegateway1" targetRef="firma-spesa">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Firma' && wfvarValidazioneSpesa == true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow6" sourceRef="respinto-spesa" targetRef="firma-spesa"></sequenceFlow>
+    <sequenceFlow id="flow7" sourceRef="respinto-uo" targetRef="firma-uo"></sequenceFlow>
+    <sequenceFlow id="flow8" sourceRef="firma-uo" targetRef="exclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="flow9" name="Respingi" sourceRef="exclusivegateway1" targetRef="respinto-uo"></sequenceFlow>
+    <sequenceFlow id="flow10" sourceRef="exclusivegateway1" targetRef="endevent1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Firma' && wfvarValidazioneSpesa == false}]]></conditionExpression>
+    </sequenceFlow>
+    <dataObject id="sceltaUtente" name="sceltaUtente" itemSubjectRef="xsd:string">
+      <extensionElements>
+        <activiti:value></activiti:value>
+      </extensionElements>
+    </dataObject>
+    <dataObject id="valore" name="valore" itemSubjectRef="xsd:int">
+      <extensionElements>
+        <activiti:value>2</activiti:value>
+      </extensionElements>
+    </dataObject>
+    <dataObject id="wfvarValidazioneSpesa" name="wfvarValidazioneSpesa" itemSubjectRef="xsd:boolean">
+      <extensionElements>
+        <activiti:value>true</activiti:value>
+      </extensionElements>
+    </dataObject>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_missioni-ordine">
+    <bpmndi:BPMNPlane bpmnElement="missioni-ordine" id="BPMNPlane_missioni-ordine">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="20.0" y="50.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="firma-uo" id="BPMNShape_firma-uo">
+        <omgdc:Bounds height="55.0" width="105.0" x="80.0" y="40.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="firma-spesa" id="BPMNShape_firma-spesa">
+        <omgdc:Bounds height="55.0" width="105.0" x="303.0" y="40.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="respinto-uo" id="BPMNShape_respinto-uo">
+        <omgdc:Bounds height="55.0" width="105.0" x="80.0" y="120.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="respinto-spesa" id="BPMNShape_respinto-spesa">
+        <omgdc:Bounds height="55.0" width="105.0" x="303.0" y="120.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="218.0" y="47.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway2" id="BPMNShape_exclusivegateway2">
+        <omgdc:Bounds height="40.0" width="40.0" x="430.0" y="47.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="500.0" y="50.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="55.0" y="67.0"></omgdi:waypoint>
+        <omgdi:waypoint x="80.0" y="67.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="470.0" y="67.0"></omgdi:waypoint>
+        <omgdi:waypoint x="500.0" y="67.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="467.0" y="40.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="450.0" y="87.0"></omgdi:waypoint>
+        <omgdi:waypoint x="449.0" y="148.0"></omgdi:waypoint>
+        <omgdi:waypoint x="408.0" y="147.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="461.0" y="87.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="408.0" y="67.0"></omgdi:waypoint>
+        <omgdi:waypoint x="430.0" y="67.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="258.0" y="67.0"></omgdi:waypoint>
+        <omgdi:waypoint x="303.0" y="67.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="257.0" y="40.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="355.0" y="120.0"></omgdi:waypoint>
+        <omgdi:waypoint x="355.0" y="95.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="132.0" y="120.0"></omgdi:waypoint>
+        <omgdi:waypoint x="132.0" y="95.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="185.0" y="67.0"></omgdi:waypoint>
+        <omgdi:waypoint x="218.0" y="67.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="238.0" y="87.0"></omgdi:waypoint>
+        <omgdi:waypoint x="237.0" y="148.0"></omgdi:waypoint>
+        <omgdi:waypoint x="185.0" y="147.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="251.0" y="87.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="238.0" y="47.0"></omgdi:waypoint>
+        <omgdi:waypoint x="238.0" y="8.0"></omgdi:waypoint>
+        <omgdi:waypoint x="517.0" y="8.0"></omgdi:waypoint>
+        <omgdi:waypoint x="517.0" y="50.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

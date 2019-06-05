@@ -1,54 +1,42 @@
 (function() {
-    'use strict';
+	'use strict';
 
-    angular
-        .module('sprintApp')
-        .controller('SettingsController', SettingsController);
+	angular
+		.module('sprintApp')
+		.controller('SettingsController', SettingsController);
 
-    SettingsController.$inject = ['Principal', 'Auth', 'JhiLanguageService', '$translate'];
+	SettingsController.$inject = ['User', 'Principal', 'Auth', 'JhiLanguageService', /* 'User',/* "entity",*/ '$translate'];
 
-    function SettingsController (Principal, Auth, JhiLanguageService, $translate) {
-        var vm = this;
+	function SettingsController(User, Principal, Auth, JhiLanguageService, /* User,entity,*/ $translate) {
+		var vm = this;
 
-        vm.error = null;
-        vm.save = save;
-        vm.settingsAccount = null;
-        vm.success = null;
+		vm.error = null;
+		vm.save = save;
+		//        vm.settingsAccount = entity;
+		vm.settingsAccount = null;
+		vm.success = null;
+		vm.gender = ["F", "M"];
 
-        /**
-         * Store the "settings account" in a separate variable, and not in the shared "account" variable.
-         */
-        var copyAccount = function (account) {
-            return {
-                activated: account.activated,
-                email: account.email,
-                firstName: account.firstName,
-                langKey: account.langKey,
-                lastName: account.lastName,
-                login: account.login
-            };
-        };
+		//precaricamento informazioni utente
+		Principal.identity().then(function(account) {
+			User.get({
+				login: account.login
+			}, function(result) {
+				vm.settingsAccount = result;
+			});
+		});
 
-        Principal.identity().then(function(account) {
-            vm.settingsAccount = copyAccount(account);
-        });
 
-        function save () {
-            Auth.updateAccount(vm.settingsAccount).then(function() {
-                vm.error = null;
-                vm.success = 'OK';
-                Principal.identity(true).then(function(account) {
-                    vm.settingsAccount = copyAccount(account);
-                });
-                JhiLanguageService.getCurrent().then(function(current) {
-                    if (vm.settingsAccount.langKey !== current) {
-                        $translate.use(vm.settingsAccount.langKey);
-                    }
-                });
-            }).catch(function() {
-                vm.success = null;
-                vm.error = 'ERROR';
-            });
-        }
-    }
+		function save() {
+			User.update(vm.settingsAccount,
+				function onSaveSuccess() {
+					vm.error = null;
+					vm.success = 'OK';
+				},
+				function onSaveError() {
+					vm.success = null;
+					vm.error = 'ERROR';
+				});
+		}
+	}
 })();

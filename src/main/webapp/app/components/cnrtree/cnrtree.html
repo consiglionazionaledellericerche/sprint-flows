@@ -1,0 +1,22 @@
+<strong>{{label}}</strong>
+<span class="glyphicon glyphicon-question-sign" ng-show="item.placeholder" data-toggle="tooltip" data-placement="top" title="{{item.placeholder}}"></span>
+<div class="jstree-bootstrap">
+    <div>
+        <div ng-show="searchId" style="padding: 10px;">
+            <form class="form-inline">
+                <label>Filtra:</label>
+                <input class="form-control"
+                       type="text"
+                       placeholder="Codice"
+                       ng-model="filter"
+                       ng-model-options="{debounce: 250, allowInvalid: false}">
+            </form>
+        </div>
+        <div js-tree="treeConfig"
+             ng-model="jsonlist"
+             tree="treeInstance"
+             should-apply="ignoreModelChanges()"
+             tree-events="ready:readyCB;select_node:select_node">
+        </div>
+    </div>
+</div>

@@ -1,0 +1,21 @@
+<div ng-repeat="variable in variables">
+    <div>
+        <div ng-switch on="variable.name">
+            <div ng-switch-when="title">
+                <strong>Titolo:</strong> {{variable.value}}
+            </div>
+            <div ng-switch-when="startDate">
+                <strong>Avviato il </strong> {{variable.value | data}}
+            </div>
+            <div ng-switch-when="initiator">
+                <strong>Aviato da </strong> {{variable.value}}
+            </div>
+            <div ng-switch-when="taskId">
+                <strong>Id del compito: </strong> {{variable.value}}
+            </div>
+            <div ng-switch-default>
+                <strong>{{variable.name}}:</strong> {{variable.value}}
+            </div>
+        </div>
+    </div>
+</div>

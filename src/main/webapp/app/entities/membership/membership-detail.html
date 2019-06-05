@@ -1,0 +1,46 @@
+
+<div>
+    <h2><span translate="sprintApp.membership.detail.title">Membership</span> {{membership.id}}</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th translate="entity.detail.field">Field</th>
+                <th translate="entity.detail.value">Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>
+                    <span translate="sprintApp.membership.grouprole">Grouprole</span>
+                </td>
+                <td>
+                    <span class="form-control-static">{{membership.grouprole}}</span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span translate="sprintApp.membership.cnrgroup">cnrgroup</span>
+                </td>
+                <td>
+                    {{membership.cnrgroup.displayName}}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span translate="sprintApp.membership.user">user</span>
+                </td>
+                <td>
+                    {{membership.user.login}}
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <button type="submit"
+            onclick="window.history.back()"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span translate="entity.action.back"> Back</span>
+    </button>
+</div>

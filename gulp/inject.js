@@ -1,6 +1,7 @@
 'use strict';
 
 var gulp = require('gulp'),
+    debug = require('gulp-debug'),
     plumber = require('gulp-plumber'),
     inject = require('gulp-inject'),
     es = require('event-stream'),
@@ -21,7 +22,9 @@ module.exports = {
 
 function app() {
     return gulp.src(config.app + 'index.html')
+        .pipe(plumber({errorHandler: handleErrors}))
         .pipe(inject(gulp.src(config.app + 'app/**/*.js')
+            .pipe(debug())
             .pipe(naturalSort())
             .pipe(angularFilesort()), {relative: true}))
         .pipe(gulp.dest(config.app));
@@ -30,9 +33,10 @@ function app() {
 function vendor() {
     var stream = gulp.src(config.app + 'index.html')
         .pipe(plumber({errorHandler: handleErrors}))
-        .pipe(inject(gulp.src(bowerFiles(), {read: false}), {
-            name: 'bower',
-            relative: true
+        .pipe(inject(gulp.src(bowerFiles(), {read: false})
+                    .pipe(debug()), {
+                        name: 'bower',
+                        relative: true
         }))
         .pipe(gulp.dest(config.app));
 

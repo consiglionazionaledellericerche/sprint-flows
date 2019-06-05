@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="ScrivoLeggo" name="Scrivo &amp; Leggo" isExecutable="true">
+    <callActivity id="callactivityScrivo1" name="Call activity Scrivo1" calledElement="flussoScrivo1">
+      <extensionElements>
+        <activiti:in source="valore" target="valore1"></activiti:in>
+        <activiti:out source="valore1" target="valore"></activiti:out>
+      </extensionElements>
+    </callActivity>
+    <startEvent id="startevent1" name="Start"></startEvent>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="exclusivegateway1"></sequenceFlow>
+    <callActivity id="callactivityLeggo" name="Call activity Leggo" calledElement="flussoLeggo">
+      <extensionElements>
+        <activiti:in source="valore" target="valore3"></activiti:in>
+        <activiti:out source="valore3" target="valore"></activiti:out>
+      </extensionElements>
+    </callActivity>
+    <sequenceFlow id="flow2" sourceRef="callactivityScrivo1" targetRef="callactivityLeggo"></sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow3" sourceRef="callactivityLeggo" targetRef="endevent1"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway" default="flow5"></exclusiveGateway>
+    <callActivity id="callactivityScrivo2" name="Call activity Scrivo2" calledElement="flussoScrivo2">
+      <extensionElements>
+        <activiti:in source="valore" target="valore2"></activiti:in>
+        <activiti:out source="valore1" target="valore"></activiti:out>
+      </extensionElements>
+    </callActivity>
+    <sequenceFlow id="flow4" sourceRef="exclusivegateway1" targetRef="callactivityScrivo2">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${scelta == 'scrivo2'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow5" sourceRef="exclusivegateway1" targetRef="callactivityScrivo1"></sequenceFlow>
+    <sequenceFlow id="flow6" sourceRef="callactivityScrivo2" targetRef="callactivityLeggo"></sequenceFlow>
+    <dataObject id="valore" name="valore" itemSubjectRef="xsd:int">
+      <extensionElements>
+        <activiti:value>1</activiti:value>
+      </extensionElements>
+    </dataObject>
+    <dataObject id="scelta" name="scelta" itemSubjectRef="xsd:string">
+      <extensionElements>
+        <activiti:value>scrivo2</activiti:value>
+      </extensionElements>
+    </dataObject>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_ScrivoLeggo">
+    <bpmndi:BPMNPlane bpmnElement="ScrivoLeggo" id="BPMNPlane_ScrivoLeggo">
+      <bpmndi:BPMNShape bpmnElement="callactivityScrivo1" id="BPMNShape_callactivityScrivo1">
+        <omgdc:Bounds height="71.0" width="105.0" x="213.0" y="300.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="51.0" y="250.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="callactivityLeggo" id="BPMNShape_callactivityLeggo">
+        <omgdc:Bounds height="81.0" width="105.0" x="350.0" y="227.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="530.0" y="250.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="140.0" y="247.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="callactivityScrivo2" id="BPMNShape_callactivityScrivo2">
+        <omgdc:Bounds height="76.0" width="105.0" x="213.0" y="160.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="86.0" y="267.0"></omgdi:waypoint>
+        <omgdi:waypoint x="140.0" y="267.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="318.0" y="335.0"></omgdi:waypoint>
+        <omgdi:waypoint x="402.0" y="335.0"></omgdi:waypoint>
+        <omgdi:waypoint x="402.0" y="308.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="455.0" y="267.0"></omgdi:waypoint>
+        <omgdi:waypoint x="530.0" y="267.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="160.0" y="247.0"></omgdi:waypoint>
+        <omgdi:waypoint x="160.0" y="198.0"></omgdi:waypoint>
+        <omgdi:waypoint x="213.0" y="198.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="160.0" y="287.0"></omgdi:waypoint>
+        <omgdi:waypoint x="160.0" y="336.0"></omgdi:waypoint>
+        <omgdi:waypoint x="213.0" y="335.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="318.0" y="198.0"></omgdi:waypoint>
+        <omgdi:waypoint x="403.0" y="198.0"></omgdi:waypoint>
+        <omgdi:waypoint x="402.0" y="227.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

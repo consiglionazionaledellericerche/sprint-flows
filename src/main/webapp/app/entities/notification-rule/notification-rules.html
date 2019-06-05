@@ -1,0 +1,72 @@
+<div>
+    <h2 translate="sprintApp.notificationRule.home.title">Notification Rules</h2>
+    <jhi-alert></jhi-alert>
+    <div class="alert alert-info text-center">
+      <p>Gli eventi attualmente gestiti sono: TASK_CREATED, TASK_ASSIGNED, TASK_COMPLETED, SEQUENCEFLOW_TAKEN, PROCESS_STARTED, PROCESS_COMPLETED, PROCESS_CANCELLED
+      <p>Per i tipi TASK_* indicare anche il nome del task (per gli altri mettere 'none')
+    </div>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-4 no-padding-left">
+                <button class="btn btn-primary" ui-sref="notification-rule.new" >
+                    <span class="glyphicon glyphicon-plus"></span>
+                    <span  translate="sprintApp.notificationRule.home.createLabel">
+                        Create new Notification Rule
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <div class="table-responsive">
+        <table class="jh-table table table-striped">
+            <thead>
+                <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.transition()">
+                    <th jh-sort-by="id"><span translate="global.field.id">ID</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="processId"><span translate="sprintApp.notificationRule.processId">Process Id</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="taskName"><span translate="sprintApp.notificationRule.taskName">Task Name</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="recipients"><span translate="sprintApp.notificationRule.recipients">Recipients</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="eventType"><span translate="sprintApp.notificationRule.eventType">Event Type</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="persona"><span translate="sprintApp.notificationRule.persona">Persona</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="notificationRule in vm.notificationRules track by notificationRule.id">
+                    <td><a ui-sref="notification-rule-detail({id:notificationRule.id})">{{notificationRule.id}}</a></td>
+                    <td>{{notificationRule.processId}}</td>
+                    <td>{{notificationRule.taskName}}</td>
+                    <td>{{notificationRule.recipients}}</td>
+                    <td>{{notificationRule.eventType}}</td>
+                    <td>{{notificationRule.persona}}</td>
+                    <td class="text-right">
+                        <div class="btn-group flex-btn-group-container">
+                            <button type="submit"
+                                    ui-sref="notification-rule-detail({id:notificationRule.id})"
+                                    class="btn btn-info btn-sm">
+                                <span class="glyphicon glyphicon-eye-open"></span>
+                                <span class="hidden-xs hidden-sm" translate="entity.action.view"></span>
+                            </button>
+                            <button type="submit"
+                                    ui-sref="notification-rule.edit({id:notificationRule.id})"
+                                    class="btn btn-primary btn-sm">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                                <span class="hidden-xs hidden-sm" translate="entity.action.edit"></span>
+                            </button>
+                            <button type="submit"
+                                    ui-sref="notification-rule.delete({id:notificationRule.id})"
+                                    class="btn btn-danger btn-sm">
+                                <span class="glyphicon glyphicon-remove-circle"></span>
+                                <span class="hidden-xs hidden-sm" translate="entity.action.delete"></span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="text-center">
+        <jhi-item-count page="vm.page" total="vm.queryCount" items-per-page="vm.itemsPerPage"></jhi-item-count>
+        <uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.page" ng-change="vm.transition()"></uib-pagination>
+    </div>
+</div>

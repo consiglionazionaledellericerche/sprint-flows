@@ -1,0 +1,22 @@
+version: '2'
+services:
+    sprint-flows-demo:
+        image: docker.si.cnr.it/sprint-flows-demo
+        links:
+            - sprint-flows-demo-pg:postgresql
+        environment:
+            - SPRING_PROFILES_ACTIVE=swagger,cnr
+            - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/activiti
+            - SPRING_DATASOURCE_USERNAME=activiti
+            - SPRING_DATASOURCE_PASSWORD=activitipw
+            - JHIPSTER_SLEEP=10 # gives time for the database to boot before the application
+        command: java -Djava.security.egd=file:/dev/./urandom -jar /app.war
+        ports:
+            - 9200:8080
+    sprint-flows-demo-pg:
+        image: postgres:9.6.1
+        environment:
+            - POSTGRES_USER=activiti
+            - POSTGRES_PASSWORD=activitipw
+        ports:
+            - 8485:5432

@@ -1,0 +1,38 @@
+<div class="modal-header">
+    <h4>Firma Multipla</h4>
+</div>
+
+<div class="modal-body">
+
+    <div class="row">
+        <div class="col-md-12">
+            <form novalidate name="signManyForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" ng-model="vm.username" id="username" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="text" ng-model="vm.password" id="password" ng-attr-type="{{ showPassword ? 'text' : 'password' }}" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="otp">OTP</label>
+                    <input type="text" ng-model="vm.otp" id="otp" ng-attr-type="{{ showPassword ? 'text' : 'password' }} " class="form-control" required>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="alert" ng-class="vm.messageClass" ng-show="vm.message">
+                            <span ng-bind-html="vm.message"></span>
+                            <button type="button" class="close" ng-click="vm.message = undefined">×</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" ng-click="vm.signMany()" ng-disabled="signManyForm.$invalid || vm.submitDisabled">
+                    <span class="glyphicon glyphicon-pencil"></span> Firma
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

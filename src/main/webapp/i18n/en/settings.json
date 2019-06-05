@@ -6,6 +6,12 @@
             "firstname.placeholder": "Your first name",
             "lastname": "Last Name",
             "lastname.placeholder": "Your last name",
+            "email": "Email",
+            "email.placeholder": "Your email",           
+            "phone": "Telephone",
+            "phone.placeholder": "Your phone",
+            "gender": "gender",
+            "gender.placeholder": "M/F",
             "language": "Language",
             "button": "Save"
         },

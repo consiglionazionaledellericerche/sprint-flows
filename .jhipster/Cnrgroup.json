@@ -1,0 +1,36 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipName": "parents",
+            "otherEntityName": "cnrgroup",
+            "relationshipType": "many-to-many",
+            "otherEntityField": "name",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "memberGroups"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "name",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required",
+                "pattern"
+            ],
+            "fieldValidateRulesPattern": "^[a-zA-Z0-9_-@#]*$"
+        },
+        {
+            "fieldName": "displayName",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        }
+    ],
+    "changelogDate": "20170220121351",
+    "dto": "no",
+    "service": "serviceClass",
+    "entityTableName": "cnrgroup",
+    "pagination": "pagination"
+}

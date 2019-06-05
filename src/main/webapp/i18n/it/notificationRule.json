@@ -1,0 +1,26 @@
+{
+    "sprintApp": {
+        "notificationRule" : {
+            "home": {
+                "title": "NotificationRules",
+                "createLabel": "Genera un nuovo Notification Rule",
+                "createOrEditLabel": "Genera o modifica un Notification Rule",
+                "search": "Cerca Notification Rule"
+            },
+            "created": "&Egrave; stato generato un nuovo Notification Rule con identificatore { param }}",
+            "updated": "&Egrave; stato aggiornato Notification Rule identificato da {{ param }}",
+            "deleted": "&Egrave; stato eliminato Notification Rule con identificatore {{ param }}",
+            "delete": {
+                "question": "Sei sicuro di volere eliminare Notification Rule {{ id }}?"
+            },
+            "detail": {
+                "title": "Notification Rule"
+            },
+            "processId": "Process Id",
+            "taskName": "Task Name",
+            "recipients": "Recipients",
+            "eventType": "Event Type",
+            "persona": "Persona"
+        }
+    }
+}

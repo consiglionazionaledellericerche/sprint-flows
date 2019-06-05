@@ -1,30 +1,66 @@
 <div ng-cloak>
+  <!-- intestazione -->
+  <div class="row text-center" ng-if="vm.taskId">
+    <h3>{{vm.definition.name}}</h3>
+    <p class="text-muted">{{vm.definition.description}}</p>
 
-  <div class="row text-center">
+    <div class="col-xs-8">
+      <ul class="list-unstyled">
+        <li><h3><strong>{{vm.taskVariables.key}} [{{data.entity.name}}]</strong></h3></li>
+        <li class="text-left" >Titolo: <strong>{{vm.taskVariables.titolo}}</strong></li>
+        <li class="text-left" >Descrizione: <strong>{{vm.taskVariables.descrizione}}</strong></li>
+        <li class="text-left" >Avviato il <strong>{{vm.taskVariables.startDate | data}}</strong> da <strong>{{vm.taskVariables.initiator}}</strong></li>
+      </ul>
+    </div>
+
+    <div class="col-xs-4">
+      DIAGRAMMA<br>
+      <a ng-click="openDiagramModal(vm.diagramUrl)">
+        <img class="img-bordered" ng-src="{{vm.diagramUrl}}" title="{{vm.definition.name}}" style="max-width: 100%; max-height: 100px;"/>
+      </a>
+    </div>
+  </div>
+
+  <div class="row text-center" ng-if="!vm.taskId">
     <!-- intestazione -->
     <h3>{{vm.definition.name}}</h3>
     <p class="text-muted">{{vm.definition.description}}</p>
-    <img class="img-bordered" ng-src='/rest/diagram/{{vm.definition.id}}' title="{{vm.definition.name}}" style="max-width: 100%" />
+    <img class="img-bordered" ng-src='{{vm.diagramUrl}}' title="{{vm.definition.name}}" style="max-width: 100%" />
   </div>
-
-  <!-- /rest/processinstances/start/{processName} or start-hire-process -->
-  <form class="flows-form" name="taskForm">
-    <div class="row">
-      <div class="col-md-6 col-md-offset-3">
-        <ng-include src="vm.formUrl" ng-model="vm.data"/>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-2 col-md-offset-4">
-        <button class="btn btn-primary btn-block" type="reset">Reimposta</button>
-      </div>
-      <div class="col-md-2">
-        <button class="btn btn-primary btn-block" type="submit" ng-click="submitTask()">Avvia Flusso</button>
-      </div>
-    </div>
-  </form>
-
   <hr>
-  <pre>{{scope | json}}</pre>
-  <pre>{{vm | json}}</pre>
+
+  <div class="row">
+    <div class="col-md-6 col-md-offset-3">
+      <form novalidate class="flows-form" name="taskForm" ng-submit="submitTask(picFile)">
+        <input type="hidden" name="taskId" value="{{vm.data.taskId}}" />
+        <input type="hidden" name="processDefinitionId" value="{{data.processDefinitionId}}" />
+
+        <ng-include src="vm.formUrl" onload="autofill()" ></ng-include>
+
+        <hr>
+
+        <div class="row">
+          <div class="col-md-12">
+            <div class="btn-group btn-group-justified" role="group">
+              <div class="btn-group" role="group">
+                <button class="btn btn-primary" type="button" back><span class="glyphicon glyphicon-arrow-left"></span> Ritorna</button>
+              </div>
+              <!--               <div class="btn-group" role="group"> -->
+              <!--                 <button class="btn btn-primary" type="reset"><span class="glyphicon glyphicon-refresh"> Reimposta</button> -->
+              <!--               </div> -->
+              <div class="btn-group" role="group">
+                <button class="btn btn-primary" type="submit" ng-class="{'btn-warning': taskForm.$invalid}">{{ vm.taskId ? "Invia" : "Avvia Flusso"}} <span class="glyphicon glyphicon-arrow-right"></span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <hr>
+  <!--   <pre ng-if="!isDevelopment">{{taskForm | json}}</pre> -->
+  <pre ng-if="isDevelopment">{{attachments | json}}</pre>
+  <pre ng-if="isDevelopment">{{data | json}}</pre>
+  <pre ng-if="isDevelopment">{{vm | json}}</pre>
+  <pre ng-if="isDevelopment">{{taskForm | json}}</pre>
 </div>

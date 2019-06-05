@@ -1,0 +1,96 @@
+<div ng-cloak>
+	<div class="row form-group">
+		<div class="col-md-12">
+			<ul class="nav nav-pills nav-justified">
+				<li role="presentation" ng-class="{'active': vm.searchParams.active}">
+					<a class="pointer" ng-click="vm.searchParams.active = true; search()" data-toggle="tab">
+						<h3>
+							<i class="glyphicon glyphicon-edit"></i>
+							Flussi attivi
+						</h3>
+					</a>
+				</li>
+				<li role="presentation" ng-class="{'active-info': !vm.searchParams.active}">
+					<a class="pointer" ng-click="vm.searchParams.active = false; search()" data-toggle="tab">
+						<h3>
+							<i class="glyphicon glyphicon-check"></i>
+							Flussi terminati
+						</h3>
+					</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-3 padding-top">
+
+			<div>
+				<h4>Ordinamento temporale</h4>
+				<div>
+					<button class="btn btn-default btn-block margin-top-20"
+							ng-click="vm.searchParams.order ===  'ASC' ?  vm.searchParams.order  = 'DESC' : vm.searchParams.order  = 'ASC'; search()">
+						<span class="glyphicon glyphicon-sort"></span>
+						{{vm.searchParams.order === 'ASC' ? 'Crescente' : 'Descrescente'}}
+					</button>
+				</div>
+			</div>
+
+			<br>
+			<h4>Tipologie</h4>
+			<div id="tipologieDiv">
+				<div>
+					<div class="dropdown md-menu-origin">
+						<ui-select ng-model="vm.searchParams.processDefinitionKey" title="Tipologie"
+								   on-select="search()">
+							<ui-select-match placeholder="Seleziona la tipologia di flusso" allow-clear="true">
+								{{$select.selected.name}}
+							</ui-select-match>
+							<ui-select-choices repeat="processDefinition.key as processDefinition in wfDefsAll">
+								<span ng-bind-html="processDefinition.name"></span>
+							</ui-select-choices>
+						</ui-select>
+					</div>
+					<br>
+					<div>
+						<ng-include id="searchFields" src="formUrl" onload="reload"></ng-include>
+					</div>
+				</div>
+			</div>
+			<br>
+			<br>
+			<button ng-click="vm.searchParams.page = 1; search()" class="btn btn-primary">
+				<span class="glyphicon glyphicon-filter"></span>
+				Filtra
+			</button>
+			<button ng-click="exportCsv()" class="btn btn-info">
+				<span class="glyphicon glyphicon-export"></span>
+				Esporta Csv
+			</button>
+		</div>
+
+
+		<div id="resultDiv" class="col-md-9" ng-cloak>
+			<h3>Flussi {{vm.searchParams.active ? 'attivi' : 'terminati'}}</h3>
+			<div class="row">
+				<div ng-show="vm.loading" class="text-center col-md-12">
+					<div ng-show="vm.loading" class="sprint-loader sprint-loader-mini"></div>
+					Loading...
+				</div>
+				<div ng-hide="vm.loading" class="col-md-12">
+					<process-list processes="vm.results" paging="paging"></process-list>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="text-center col-md-12">
+					<jhi-item-count page="vm.searchParams.page" total="vm.totalItems"
+									items-per-page="20"></jhi-item-count>
+					<uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.searchParams.page"
+									ng-change="search()"></uib-pagination>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<pre ng-if="isDevelopment">	{{vm | json}} </pre>

@@ -1,0 +1,32 @@
+{
+    "relationships": [
+        {
+            "relationshipId": 1,
+            "relationshipName": "cnrgroup",
+            "otherEntityName": "cnrgroup",
+            "relationshipType": "many-to-one",
+            "otherEntityField": "display_name"
+        },
+        {
+            "relationshipId": 2,
+            "relationshipName": "user",
+            "otherEntityName": "jhi_user",
+            "relationshipType": "many-to-one",
+            "otherEntityField": "login"
+        }
+    ],
+    "fields": [
+        {
+            "fieldId": 1,
+            "fieldName": "grouprole",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        }
+    ],
+    "changelogDate": "20180410115515",
+    "dto": "no",
+    "service": "serviceClass",
+    "pagination": "pager"
+}
