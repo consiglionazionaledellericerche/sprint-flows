@@ -98,9 +98,6 @@ deploydockprod:
     - sed -i "s/SPRING_DATASOURCE_PASSWORD_SED/$POSTGRESS_PASSWORD/g" ./src/main/docker/app-prod.yml
     - sed -i "s/SPRING_LDAP_MANAGERPASSWORD_SED/$LDAP_PASSWORD/g" ./src/main/docker/app-prod.yml
     - sed -i "s/ACE_PASSWORD_SED/$ACE_PASSWORD/g" ./src/main/docker/app-prod.yml
-    - echo "listing running services"
-    - sshremote $SSH_CONNECT_DOCPROD01 "docker ps"
-    - sshremote $SSH_CONNECT_DOCPROD02 "docker ps"
     - echo "stopping services"
     - sshremote $SSH_CONNECT_DOCPROD01 "if [ -f  ''/sites/docker-flows/app.yml'' ]; then docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml down; fi && rm -rf /sites/docker-flows/ && mkdir -p /sites/docker-flows/"
     - sshremote $SSH_CONNECT_DOCPROD02 "if [ -f  ''/sites/docker-flows/app.yml'' ]; then docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml down; fi && rm -rf /sites/docker-flows/ && mkdir -p /sites/docker-flows/"
@@ -112,4 +109,4 @@ deploydockprod:
     - sshremote $SSH_CONNECT_DOCPROD02 "docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml pull && docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml up -d"
   environment:
     name: dockprod01
-    url: http://dockprod01.cedrc.cnr.it:1380
+    url: http://dockprod01.cedrc.cnr.it:1480
