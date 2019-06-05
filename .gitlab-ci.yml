@@ -8,6 +8,12 @@ variables:
 services:
   - docker:dind
 
+cache:
+  key: $CI_COMMIT_SHORT_SHA
+  paths:
+    - .m2/repository/
+    - target/app.war
+
 stages:
   - build
   - test
@@ -22,7 +28,12 @@ build_dev:
   only:
     - dev
   script:
-    - mvn compile package -DskipTests -Pdev -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+    - mvn clean compile package -DskipTests -Pdev -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+    - cp ./target/*.war ./target/app.war
+  artifacts:
+    paths:
+      - ./target/app.war
+    expire_in: 1 day
 
 build:
   stage: build
@@ -31,6 +42,7 @@ build:
     - dev
   script:
     - mvn compile -DskipTests -Pprod -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+    - cp ./target/*.war ./target/app.war
 
 test:
   stage: test
@@ -51,7 +63,6 @@ container_test:
     - test
   script:
     - echo "Running build image and push image"
-    - cp target/*.war target/app.war
     - docker build --file src/main/docker/demo-cnr/Dockerfile -t docker.si.cnr.it/sprint-flows-test .
     - docker push docker.si.cnr.it/sprint-flows-test
 
@@ -63,7 +74,39 @@ container_demo:
     - demo
   script:
     - echo "Running build image and push image"
-    - cp target/*.war target/app.war
     - docker build --file src/main/docker/demo-cnr/Dockerfile -t docker.si.cnr.it/sprint-flows-demo .
     - docker push docker.si.cnr.it/sprint-flows-demo
 
+release_war:
+  stage: release
+  image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
+  script:
+    - mvn --batch-mode -Dresume=false release:prepare release:perform -Pprod -DskipTests -Darguments=-DskipTests -DpushChanges=false -DlocalCheckout=true -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+
+deploydockprod:
+  stage: deploy
+  image: scolagreco/alpine-ssh:latest
+  only:
+    - master
+  tags:
+    - shared
+  when: manual
+  script:
+    - echo "Deploy to dockprod01 & dockprod02"
+    - echo "setting secrets"
+    - sed -i "s/docker.si.cnr.it\/sprint-flows/docker.si.cnr.it\/sprint-flows:${CI_COMMIT_TAG}/g" ./src/main/docker/app-prod.yml
+    - sed -i "s/SPRING_DATASOURCE_PASSWORD_SED/$POSTGRESS_PASSWORD/g" ./src/main/docker/app-prod.yml
+    - sed -i "s/SPRING_LDAP_MANAGERPASSWORD_SED/$LDAP_PASSWORD/g" ./src/main/docker/app-prod.yml
+    - sed -i "s/ACE_PASSWORD_SED/$ACE_PASSWORD/g" ./src/main/docker/app-prod.yml
+    - echo "stopping services"
+    - sshremote $SSH_CONNECT_DOCPROD01 "if [ -f  ''/sites/docker-flows/app.yml'' ]; then docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml down; fi && rm -rf /sites/docker-flows/ && mkdir -p /sites/docker-flows/"
+    - sshremote $SSH_CONNECT_DOCPROD02 "if [ -f  ''/sites/docker-flows/app.yml'' ]; then docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml down; fi && rm -rf /sites/docker-flows/ && mkdir -p /sites/docker-flows/"
+    - echo "copying docker-copose file"
+    - scpremote ./src/main/docker/app-prod.yml $SSH_CONNECT_DOCPROD01:/sites/docker-flows/app.yml
+    - scpremote ./src/main/docker/demo-cnr/app-prod.yml $SSH_CONNECT_DOCPROD02:/sites/docker-flows/app.yml
+    - echo "starting services"
+    - sshremote $SSH_CONNECT_DOCPROD01 "docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml pull && docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml up -d"
+    - sshremote $SSH_CONNECT_DOCPROD02 "docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml pull && docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml up -d"
+  environment:
+    name: dockprod01
+    url: http://dockprod01.cedrc.cnr.it:1380
