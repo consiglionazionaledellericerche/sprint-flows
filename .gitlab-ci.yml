@@ -41,7 +41,7 @@ build:
   except:
     - dev
   script:
-    - mvn clean compile -DskipTests -Pprod -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+    - mvn clean compile package -DskipTests -Pprod -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
     - cp ./target/*.war ./target/app.war
 
 test:
@@ -99,8 +99,8 @@ deploydockprod:
     - sed -i "s/SPRING_LDAP_MANAGERPASSWORD_SED/$LDAP_PASSWORD/g" ./src/main/docker/app-prod.yml
     - sed -i "s/ACE_PASSWORD_SED/$ACE_PASSWORD/g" ./src/main/docker/app-prod.yml
     - echo "stopping services"
-    - sshremote $SSH_CONNECT_DOCPROD01 "if [ -f  ''/sites/docker-flows/app.yml'' ]; then docker-compose -p $CI_PROJECT_NAME down; fi && rm -rf /sites/docker-flows/ && mkdir -p /sites/docker-flows/"
-    - sshremote $SSH_CONNECT_DOCPROD02 "if [ -f  ''/sites/docker-flows/app.yml'' ]; then docker-compose -p $CI_PROJECT_NAME down; fi && rm -rf /sites/docker-flows/ && mkdir -p /sites/docker-flows/"
+    - sshremote $SSH_CONNECT_DOCPROD01 "if [ -f  ''/sites/docker-flows/app.yml'' ]; then docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml down; fi && rm -rf /sites/docker-flows/ && mkdir -p /sites/docker-flows/"
+    - sshremote $SSH_CONNECT_DOCPROD02 "if [ -f  ''/sites/docker-flows/app.yml'' ]; then docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml down; fi && rm -rf /sites/docker-flows/ && mkdir -p /sites/docker-flows/"
     - echo "copying docker-compose file"
     - scpremote ./src/main/docker/app-prod.yml $SSH_CONNECT_DOCPROD01:/sites/docker-flows/app.yml
     - scpremote ./src/main/docker/app-prod.yml $SSH_CONNECT_DOCPROD02:/sites/docker-flows/app.yml
