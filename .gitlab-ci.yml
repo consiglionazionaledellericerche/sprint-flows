@@ -101,7 +101,7 @@ deploydockprod01:
     url: http://dockprod01.cedrc.cnr.it:1380
 
 deploydockprod02:
-  stage: deploy_prod_container
+  stage: deploy
   image: scolagreco/alpine-ssh:latest
   tags:
     - shared
