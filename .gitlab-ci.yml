@@ -41,7 +41,7 @@ build:
   except:
     - dev
   script:
-    - mvn compile -DskipTests -Pprod -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+    - mvn clean compile -DskipTests -Pprod -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
     - cp ./target/*.war ./target/app.war
 
 test:
@@ -92,7 +92,7 @@ deploydockprod:
     - shared
   when: manual
   script:
-    - echo "Deploy sprint-flows:${CI_COMMIT_TAG} to dockprod01 & dockprod02"
+    - echo "Deploy sprint-flows to dockprod01 & dockprod02"
     - echo "setting secrets"
 #    - sed -i "s/docker.si.cnr.it\/sprint-flows/docker.si.cnr.it\/sprint-flows:LATEST/g" ./src/main/docker/app-prod.yml
     - sed -i "s/SPRING_DATASOURCE_PASSWORD_SED/$POSTGRESS_PASSWORD/g" ./src/main/docker/app-prod.yml
@@ -101,6 +101,8 @@ deploydockprod:
     - echo "stopping services"
     - sshremote $SSH_CONNECT_DOCPROD01 "if [ -f  ''/sites/docker-flows/app.yml'' ]; then docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml down; fi && rm -rf /sites/docker-flows/ && mkdir -p /sites/docker-flows/"
     - sshremote $SSH_CONNECT_DOCPROD02 "if [ -f  ''/sites/docker-flows/app.yml'' ]; then docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml down; fi && rm -rf /sites/docker-flows/ && mkdir -p /sites/docker-flows/"
+    - echo "looking good?"
+    - sshremote $SSH_CONNECT_DOCPROD01 cat /sites/docker-flows/app.yml
     - echo "copying docker-copose file"
     - scpremote ./src/main/docker/app-prod.yml $SSH_CONNECT_DOCPROD01:/sites/docker-flows/app.yml
     - scpremote ./src/main/docker/app-prod.yml $SSH_CONNECT_DOCPROD02:/sites/docker-flows/app.yml
