@@ -1,0 +1,53 @@
+<div>
+    <h2 translate="sprintApp.userMembership.home.title">User Memberships</h2>
+    <jhi-alert></jhi-alert>
+    <br/>
+    <div class="table-responsive">
+        <table class="jh-table table table-striped">
+            <thead>
+            <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.transition()">
+                <th jh-sort-by="gFroupname">
+                    <span translate="sprintApp.membership.groupname">Username</span>
+                    <span class="glyphicon glyphicon-sort"></span></th>
+                <th jh-sort-by="grouprole">
+                    <span translate="sprintApp.membership.grouprole">Grouprole</span>
+                    <span class="glyphicon glyphicon-sort"></span></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="membership in vm.memberships">
+                <td>{{membership.cnrgroup.displayName}}</td>
+                <td>{{membership.grouprole}}</td>
+                <td class="text-right">
+
+
+                    <div class="btn-group flex-btn-group-container">
+                        <!--IMPORTANTE: Se ho l'id allora la membership è nella tabella del Db e posso fare le CRUD (altrimenti è "derivata" dalle relationship-->
+                        <button type="submit"
+                                ui-sref="group-memberships({groupname:membership.cnrgroup.name, displayName:membership.cnrgroup.displayName})"
+                                class="btn btn-info btn-sm">
+                            <span class="glyphicon glyphicon-eye-open"></span>
+                            <span class="hidden-xs hidden-sm" translate="entity.action.view"></span>
+                        </button>
+                        <div ng-if="membership.grouprole == 'coordinator'">
+                            <button type="submit"
+                                    ui-sref="group-memberships-edit({groupname:membership.cnrgroup.name, displayName:membership.cnrgroup.displayName})"
+                                    class="btn btn-primary btn-sm">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                                <span class="hidden-xs hidden-sm" translate="entity.action.edit"></span>
+                            </button>
+                        </div>
+
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="text-center">
+        <jhi-item-count page="vm.page" total="vm.queryCount" items-per-page="vm.itemsPerPage"></jhi-item-count>
+        <uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.page"
+                        ng-change="vm.transition()"></uib-pagination>
+    </div>
+</div>

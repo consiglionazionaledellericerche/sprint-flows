@@ -1,0 +1,44 @@
+<div ng-cloak>
+	<div class="row">
+		<div class="col-md-3">
+
+			<label>Statistiche dal</label>
+			<div class="form-group">
+				<input type="date" ng-model="vm.exportParams.startDateGreat"
+					class="ng-pristine ng-untouched ng-valid ng-empty"
+					aria-invalid="false">
+			</div>
+
+			<label> al </label>
+			<div class="form-group">
+				<input type="date" ng-model="vm.exportParams.startDateLess"
+					class="ng-pristine ng-untouched ng-valid ng-empty"
+					aria-invalid="false">
+			</div>
+
+			<div class="form-group">
+				<label>Struttura</label> <select
+					ng-model="vm.exportParams.struttura">
+
+					<option ng-repeat="struttura in strutture" value="{{struttura.value}}">{{struttura.label}}</option>
+
+				</select>
+			</div>
+
+			<button
+				ng-click="exportFile(true, vm.processDefinition.key, vm.exportParams.startDateGreat, vm.exportParams.startDateLess, 'statistiche_' + vm.processDefinition.key + '.pdf')"
+				class="btn btn-primary" translate="statistics.home.exportPdfLabel">
+			</button>
+			<button
+				ng-click="exportFile(false, vm.processDefinition.key, vm.exportParams.startDateGreat, vm.exportParams.startDateLess, 'statistiche_' + vm.processDefinition.key + '.csv')"
+				class="btn btn-primary" translate="statistics.home.exportCsvLabel">
+			</button>
+		</div>
+
+		<div class="col-md-9">
+			<h2 translate="statistics.home.title"></h2>
+			<h2>{{vm.processDefinition}}</h2>
+			<pre ng-if="isDevelopment">{{vm | json	}}</pre>
+		</div>
+	</div>
+</div>

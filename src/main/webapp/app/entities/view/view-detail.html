@@ -1,0 +1,35 @@
+
+<div>
+    <h2><span translate="sprintApp.view.detail.title">View</span> {{vm.view.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span translate="sprintApp.view.processId">Process Id</span></dt>
+        <dd>
+            <span>{{vm.view.processId}}</span>
+        </dd>
+        <dt><span translate="sprintApp.view.type">Type</span></dt>
+        <dd>
+            <span>{{vm.view.type}}</span>
+        </dd>
+        <dt><span translate="sprintApp.view.view">View</span></dt>
+        <dd>
+            <span>{{vm.view.view}}</span>
+        </dd>
+        <dt><span translate="sprintApp.view.version">Version</span></dt>
+        <dd>
+            <span>{{vm.view.version}}</span>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            ui-sref="{{ vm.previousState }}"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span translate="entity.action.back"> Back</span>
+    </button>
+
+    <button type="button" ui-sref="view-detail.edit({id:vm.view.id})" class="btn btn-primary">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="hidden-xs hidden-sm" translate="entity.action.edit"> Edit</span>
+    </button>
+</div>

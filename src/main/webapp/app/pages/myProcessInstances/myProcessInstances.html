@@ -1,0 +1,116 @@
+<div ng-cloak>
+    <div class="row form-group">
+        <div class="col-md-12">
+            <uib-tabset active="0" justified="true" type="pills">
+                <uib-tab index="0" select="setActiveContent('active')">
+                    <uib-tab-heading>
+                        <h3>
+                            <i class="glyphicon glyphicon-edit"></i>
+                            Flussi attivi: {{vm.myProcessInstancesActive.length}}
+                        </h3>
+                    </uib-tab-heading>
+                </uib-tab>
+                <uib-tab classes="available" index="1" select="setActiveContent('terminated')">
+                    <uib-tab-heading>
+                        <h3>
+                            <i class="glyphicon glyphicon-check"></i>
+                            Flussi terminati: {{vm.myProcessInstancesTerminated.length}}
+                        </h3>
+                    </uib-tab-heading>
+                </uib-tab>
+            </uib-tabset>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="progress">
+                <uib-progress animate="false">
+                    <uib-bar class="progress-bar-striped"
+                             value="100* vm.myProcessInstancesActive.length/(vm.myProcessInstancesTerminated.length+ vm.myProcessInstancesActive.length)"
+                             type="primary">
+                        <span>{{vm.myProcessInstancesActive.length}}</span>
+                    </uib-bar>
+                    <uib-bar class="progress-bar-striped"
+                             value="100* vm.myProcessInstancesTerminated.length/(vm.myProcessInstancesTerminated.length + vm.myProcessInstancesActive.length)"
+                             type="info">
+                        <span>{{vm.myProcessInstancesTerminated.length}} </span>
+                    </uib-bar>
+                </uib-progress>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div>
+                <h4>Ordinamento temporale</h4>
+                <div>
+                    <button class="btn btn-default btn-block margin-top-20"
+                            ng-click="vm.searchParams.order ===  'ASC' ?  vm.searchParams.order='DESC' : vm.searchParams.order = 'ASC'">
+                        <span class="glyphicon glyphicon-sort"></span>
+                        {{vm.order === 'ASC' ? 'Crescente' : 'Descrescente'}}
+                    </button>
+                </div>
+            </div>
+            <h4>Tipologie</h4>
+            <div id="tipologieDiv">
+                <div>
+                    <div class="dropdown md-menu-origin">
+                        <ui-select ng-model="vm.processDefinitionKey" title="Tipologie"
+                                   on-select="loadMyProcessInstances()">
+                            <ui-select-match placeholder="Seleziona la tipologia di flusso" allow-clear="true">
+                                {{$select.selected.name}}
+                            </ui-select-match>
+                            <ui-select-choices repeat="processDefinition.key as processDefinition in wfDefsBootable">
+                                <span ng-bind-html="processDefinition.name"></span>
+                            </ui-select-choices>
+                        </ui-select>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div>
+                <ng-include id="searchFields" src="formUrl" onload="removeUserDiv()"></ng-include>
+            </div>
+            <button ng-click="loadMyProcessInstances()" class="btn btn-primary">
+                <span class="glyphicon glyphicon-filter"></span>
+                Filtra
+            </button>
+        </div>
+
+        <div class="col-md-9" ng-show="activeContent == 'active'">
+            <h3>
+                <span class="label label-primary">
+                    <i class="glyphicon-inbox"></i>
+                    Flussi avviati da me ed ancora ATTIVI
+                </span>
+            </h3>
+            <process-list processes="vm.myProcessInstancesActive"  paging="paging"></process-list>
+            <!--paginazione Flussi Attivi-->
+            <div class="text-center">
+                <jhi-item-count page="vm.pageActive" total="vm.queryCountActive"
+                                items-per-page="vm.itemsPerPage"></jhi-item-count>
+                <uib-pagination class="pagination-sm" total-items="vm.totalItemsActive" ng-model="vm.pageActive"
+                                ng-change="vm.transition()"></uib-pagination>
+            </div>
+        </div>
+        <div class="col-md-9" ng-show="activeContent == 'terminated'">
+            <h3>
+                <span class="label label-info" ng-class="label - info">
+                    <i class="glyphicon glyphicon-user"></i>
+                    Flussi avviati da me e TERMINATI
+                </span>
+            </h3>
+            <process-list processes="vm.myProcessInstancesTerminated" paging="paging"></process-list>
+            <!--paginazione Flussi Terminati-->
+            <div class="text-center">
+                <jhi-item-count page="vm.pageTerminated" total="vm.queryCountTerminated"
+                                items-per-page="vm.itemsPerPage"></jhi-item-count>
+                <uib-pagination class="pagination-sm" total-items="vm.totalItemsTerminated" ng-model="vm.pageTerminated"
+                                ng-change="vm.transition()"></uib-pagination>
+            </div>
+        </div>
+
+    </div>
+    <pre ng-if="isDevelopment">{{tasks | json}}</pre>
+    <pre ng-if="isDevelopment">{{vm | json}}</pre>
+</div>

@@ -1,0 +1,25 @@
+{
+    "sprintApp": {
+        "membership" : {
+            "home": {
+                "title": "Memberships",
+                "createLabel": "Create a new Membership",
+                "createOrEditLabel": "Create or edit a Membership",
+                "search": "Search for Membership"
+            },
+            "created": "A new Membership is created with identifier {{ param }}",
+            "updated": "A Membership is updated with identifier {{ param }}",
+            "deleted": "A Membership is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Are you sure you want to delete the user <b>{{ user }}</b> from group <b>{{displayName}}</b> like <i>{{grouprole}}?"
+            },
+            "detail": {
+                "title": "Membership"
+            },
+            "grouprole": "Grouprole",
+            "cnrgroup": "Cnrgroup",
+            "user": "User",
+            "groupname": "Group Name"
+        }
+    }
+}

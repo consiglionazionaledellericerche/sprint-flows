@@ -1,0 +1,66 @@
+version: '2'
+services:
+  sprint-flows-demo_cnr:
+    image: c8fd2f81b1f0
+    #        image: sprint-flows-demo_cnr
+    links:
+      - sprint-flows-demo_cnr-pg:postgresql
+    environment:
+      - SPRING_PROFILES_ACTIVE=demo,cnr
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/flows
+      - SPRING_DATASOURCE_USERNAME=activiti
+      - SPRING_DATASOURCE_PASSWORD=activitipw
+      - JHIPSTER_SLEEP=10 # gives time for the database to boot before the application
+
+  lb:
+    image: dockercloud/haproxy
+    links:
+      - sprint-flows-demo_cnr
+    ports:
+      - '80:80'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  #    sprint-flows-demo_cnr2:
+  #        image: c8fd2f81b1f0
+  #        #        image: sprint-flows-demo_cnr
+  #        links:
+  #            - sprint-flows-demo_cnr-pg:postgresql
+  #        environment:
+  #            - SPRING_PROFILES_ACTIVE=demo,cnr
+  #            - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/flows
+  #            - SPRING_DATASOURCE_USERNAME=activiti
+  #            - SPRING_DATASOURCE_PASSWORD=activitipw
+  #            - JHIPSTER_SLEEP=20 # gives time for the database to boot before the application
+  #        ports:
+  #            - 9201:8080
+  #            - 5702:5709
+
+  sprint-flows-demo_cnr-pg:
+    image: postgres:9.6.9-alpine
+    environment:
+      - POSTGRES_USER=activiti
+      - POSTGRES_PASSWORD=activitipw
+      - POSTGRES_DB=flows-cnr #"-cnr" viene aggiunto a runtime a seconda del profilo con cui l'app viene avviata
+    volumes:
+      - spring-flows-demo-cnr-pg-data:/var/lib/postgresql/data
+    ports:
+      - 8485:5432
+
+
+  #management center
+  management-center:
+    image: hazelcast/management-center:3.6.1
+    # persisting mancenter users db folder to local disk
+    volumes:
+      - ~/mancenter3.6.1:/mancenter-3.6.1
+    environment:
+      - MANCENTER_DATA=/mancenter-3.6.1
+      # enable REST interface on management center
+      # http://docs.hazelcast.org/docs/latest-development/manual/html/Management/Clustered_REST_via_Management_Center.html
+      - JAVA_OPTS=-Dhazelcast.mc.rest.enabled=true
+    ports:
+      - 9999:8080
+
+volumes:
+  spring-flows-demo-cnr-pg-data:

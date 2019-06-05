@@ -1,0 +1,24 @@
+<div class="modal-header">
+  <h4 class="modal-title">
+    Modifica Variabile {{vm.variableName}} (id flusso {{vm.processInstanceId}})
+  </h4>
+  <p>Da grandi poteri derivano grandi responsabilita'
+</div>
+<div class="modal-body">
+  <div class="msg msg-danger" ng-if="vm.error">Si e' verificato un errore</div>
+  <div class="form-group">
+    <label for="valoreVariabile">{{vm.variableName}}</label>
+    <input
+      ng-model="vm.currentValue"
+      id="valoreVariabile"
+      class="form-control"
+      aria-invalid="true"
+      type="text">
+  </div>
+
+  <button class="btn btn-danger" type="button" ng-click="vm.setVariable()">Modifica</button>
+
+</div>
+<div class="modal-footer">
+  <button class="btn btn-primary" type="button" ng-click="$dismiss()">Chiudi</button>
+</div>

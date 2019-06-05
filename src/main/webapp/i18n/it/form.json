@@ -1,0 +1,25 @@
+{
+    "sprintApp": {
+        "form" : {
+            "home": {
+                "title": "Forms",
+                "createLabel": "Genera un nuovo Form",
+                "createOrEditLabel": "Genera o modifica un Form",
+                "search": "Cerca Form"
+            },
+            "created": "&Egrave; stato generato un nuovo Form con identificatore { param }}",
+            "updated": "&Egrave; stato aggiornato Form identificato da {{ param }}",
+            "deleted": "&Egrave; stato eliminato Form con identificatore {{ param }}",
+            "delete": {
+                "question": "Sei sicuro di volere eliminare Form {{ id }}?"
+            },
+            "detail": {
+                "title": "Form"
+            },
+            "processDefinitionKey": "Process Definition Key",
+            "version": "Version",
+            "taskId": "Task Id",
+            "form": "Form"
+        }
+    }
+}

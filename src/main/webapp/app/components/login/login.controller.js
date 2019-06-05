@@ -20,6 +20,7 @@
         vm.requestResetPassword = requestResetPassword;
         vm.username = null;
 
+//todo: serve per fare l'effetto "focus" sul nome dell'utente loggato che ora non c'è più?
         $timeout(function (){angular.element('#username').focus();});
 
         function cancel () {
@@ -35,7 +36,7 @@
         function login (event) {
             event.preventDefault();
             Auth.login({
-                username: vm.username,
+                username: vm.username.toLowerCase(),
                 password: vm.password,
                 rememberMe: vm.rememberMe
             }).then(function () {
@@ -45,6 +46,9 @@
                     $state.current.name === 'finishReset' || $state.current.name === 'requestReset') {
                     $state.go('home');
                 }
+
+                if ($state.current.name === 'home')
+                    $state.go('home');
 
                 $rootScope.$broadcast('authenticationSuccess');
 

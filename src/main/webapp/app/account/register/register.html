@@ -72,6 +72,17 @@
                         </p>
                     </div>
                 </div>
+                
+                <div class="form-group">
+                    <label for="phone" translate="global.form.phone">Phone</label>
+                    <input id="phone" name="phone" class="form-control" ng-model="vm.settingsAccount.phone" placeholder="{{'global.form.phone.placeholder' | translate}}"
+                           ng-model="vm.settingsAccount.phone" ></input>
+                </div>
+                <div class="form-group">
+                    <label for="gender" translate="global.form.gender">Gender</label>
+                    <input id="gender" name="gender" class="form-control" ng-model="vm.settingsAccount.gender" placeholder="{{'global.form.gender.placeholder' | translate}}"
+                           ng-model="vm.settingsAccount.gender" ></input>
+                </div>                     
                 <div class="form-group">
                     <label class="control-label" for="password" translate="global.form.newpassword">New password</label>
                     <input type="password" class="form-control" id="password" name="password" placeholder="{{'global.form.newpassword.placeholder' | translate}}"

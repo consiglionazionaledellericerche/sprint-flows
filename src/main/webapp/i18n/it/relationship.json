@@ -1,0 +1,24 @@
+{
+  "sprintApp": {
+    "relationship": {
+      "home": {
+        "title": "Relationships",
+        "createLabel": "Genera un nuovo Relationship",
+        "createOrEditLabel": "Genera o modifica un Relationship",
+        "search": "Cerca Relationship"
+      },
+      "created": "&Egrave; stato generato un nuovo Relationship con identificatore { param }}",
+      "updated": "&Egrave; stato aggiornato Relationship identificato da {{ param }}",
+      "deleted": "&Egrave; stato eliminato Relationship con identificatore {{ param }}",
+      "delete": {
+        "question": "Sei sicuro di volere eliminare Relationship {{ id }}?"
+      },
+      "detail": {
+        "title": "Relationship"
+      },
+      "groupName": "Group Name",
+      "groupRelationship": "Group Relationship",
+      "groupRole": "Group Role"
+    }
+  }
+}

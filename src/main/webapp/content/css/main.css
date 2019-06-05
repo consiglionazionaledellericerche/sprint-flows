@@ -1,7 +1,21 @@
 body {
-    background: #fafafa;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    color: #333;
+    background: #ddd;
+    font-family: "Helvetica Neue", Helvetica, "Open Sans", "Droid Sans", "Roboto", "Segoe", "Arial", sans-serif;
+    color: #222;
+}
+
+.container {
+	background-color: #fff;
+	box-shadow: inset 0 1px 0 rgba(255,255,255,.55),0 1px 15px rgba(0,0,0,.25);
+}
+
+.maincontent {
+  margin: 15px;
+}
+
+.footer {
+  color: #777;
+  text-align: center;
 }
 
 /* ==========================================================================
@@ -47,6 +61,10 @@ Developement Ribbon
     pointer-events: none;
 }
 
+.navbar {
+  padding-left: 15px;
+  padding-right: 15px;
+}
 /* ==========================================================================
 Version number in navbar
 ========================================================================== */
@@ -227,14 +245,15 @@ Custom alerts for notification
 .alerts .toast {
     position: fixed;
     width: 100%;
+    z-index: 999;
 }
 
 .alerts .toast.left {
-    left: 5px;
+    left: 10px;
 }
 
 .alerts .toast.right {
-    right: 5px;
+    right: 10px;
 }
 
 .alerts .toast.top {
@@ -247,7 +266,7 @@ Custom alerts for notification
 
 @media screen and (min-width: 480px) {
     .alerts .toast {
-        width: 50%;
+        width: 500px;
     }
 }
 
@@ -337,6 +356,283 @@ ui bootstrap tweaks
   box-shadow: 4px 4px 13px 2px rgba(0, 0, 0, 0.5)
 }
 
-input.ng-dirty.ng-invalid {
+input.ng-touched.ng-invalid,
+button.ng-touched.ng-invalid,
+textarea.ng-touched.ng-invalid,
+div.ng-touched.ng-invalid,
+cnr-tree.ng-touched.ng-invalid > .jstree-bootstrap,
+select.ng-touched.ng-invalid {
   border: solid 1px red;
+}
+
+.tasks .row {
+    border-bottom: 1px solid #f8f8f8;
+    box-shadow: 0 10px 35px -23px rgba(0, 0, 0, 0.35);
+    padding-bottom: 20px;
+    padding-top: 20px;
+}
+
+.task-history {
+  border-top: 2px solid #EEE;
+  padding-bottom: 10px;
+}
+
+.nav-pills > li.active-info > a,
+.nav-pills > li.active-info > a:hover,
+.nav-pills > li.active-info > a:focus {
+  color: #fff;
+  background-color: #5bc0de!important;
+}
+
+
+.nav-pills > li.mine.active > a, .nav-pills > li.mine.active > a:hover, .nav-pills > li.mine.active > a:focus {
+    color: #fff;
+    background-color: #449d44;
+}
+
+.nav-pills > li.available.active > a, .nav-pills > li.available.active > a:hover, .nav-pills > li.available.active > a:focus {
+    color: #fff;
+    background-color: #286090;
+}
+
+.nav-pills > li.others.active > a, .nav-pills > li.others.active > a:hover, .nav-pills > li.others.active > a:focus {
+    color: #fff;
+    background-color: #5bc0de;
+}
+
+.nav-pills{
+    display: flex;
+}
+.nav-pills li {
+    display: flex;
+    flex: 1;
+}
+
+.nav-pills li  a {
+    flex: 1;
+}
+
+.banner {
+  height: 250px;
+}
+
+.cnr-banner {
+    background: url("../images/cnr-flows-banner.png") center no-repeat;
+    background-size: contain;
+}
+
+.oiv-banner {
+    background: url("../images/oiv-flows-banner.png") center no-repeat;
+    background-size: contain;
+}
+
+/* CSS per editor ACE */
+.ace_editor {
+  height: 200px;
+}
+
+/* big fat modal */
+.modal-xl {
+    width: 1150px;
+}
+
+.cnr-descrizione-task {
+    border: 1px solid lightblue;
+    padding: 15px;
+    margin: 10px;
+}
+
+.cnr-descrizione-file {
+     border: 1px solid gold;
+     padding: 15px;
+     margin: 10px;
+ }
+
+
+.alerts .alert {
+  box-shadow: 4px 4px 10px -3px rgba(0,0,0,0.75);
+}
+
+.alert-success {
+  border-color: #b5c8a5;
+}
+.alert-danger {
+  border-color: #d3b4b9;
+}
+
+
+
+.jstree-bootstrap{
+  overflow: scroll;
+  max-height: 334px;
+  box-shadow: 0px 0px 5px #ccc;
+}
+
+.label-Pubblicato {
+  background-color: #5cb85c;
+}
+
+.label-PubblicatoTrasparenza {
+  background-color: #5cb85c;
+}
+
+.label-PubblicatoUrp {
+  background-color: #ff8000;
+}
+/* START SPINNER */
+@-moz-keyframes sprint-loader {
+  0% {
+    -moz-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -moz-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@-webkit-keyframes sprint-loader {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@keyframes sprint-loader {
+  0% {
+    -moz-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -moz-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+/* :not(:required) hides this rule from IE9 and below */
+.sprint-loader:not(:required) {
+  -moz-animation: sprint-loader 1500ms infinite linear;
+  -webkit-animation: sprint-loader 1500ms infinite linear;
+  animation: sprint-loader 1500ms infinite linear;
+  -moz-border-radius: 0.5em;
+  -webkit-border-radius: 0.5em;
+  border-radius: 0.5em;
+  -moz-box-shadow: rgba(0, 0, 51, 0.3) 1.5em 0 0 0, rgba(0, 0, 51, 0.3) 1.1em 1.1em 0 0, rgba(0, 0, 51, 0.3) 0 1.5em 0 0, rgba(0, 0, 51, 0.3) -1.1em 1.1em 0 0, rgba(0, 0, 51, 0.3) -1.5em 0 0 0, rgba(0, 0, 51, 0.3) -1.1em -1.1em 0 0, rgba(0, 0, 51, 0.3) 0 -1.5em 0 0, rgba(0, 0, 51, 0.3) 1.1em -1.1em 0 0;
+  -webkit-box-shadow: rgba(0, 0, 51, 0.3) 1.5em 0 0 0, rgba(0, 0, 51, 0.3) 1.1em 1.1em 0 0, rgba(0, 0, 51, 0.3) 0 1.5em 0 0, rgba(0, 0, 51, 0.3) -1.1em 1.1em 0 0, rgba(0, 0, 51, 0.3) -1.5em 0 0 0, rgba(0, 0, 51, 0.3) -1.1em -1.1em 0 0, rgba(0, 0, 51, 0.3) 0 -1.5em 0 0, rgba(0, 0, 51, 0.3) 1.1em -1.1em 0 0;
+  box-shadow: rgba(0, 0, 51, 0.3) 1.5em 0 0 0, rgba(0, 0, 51, 0.3) 1.1em 1.1em 0 0, rgba(0, 0, 51, 0.3) 0 1.5em 0 0, rgba(0, 0, 51, 0.3) -1.1em 1.1em 0 0, rgba(0, 0, 51, 0.3) -1.5em 0 0 0, rgba(0, 0, 51, 0.3) -1.1em -1.1em 0 0, rgba(0, 0, 51, 0.3) 0 -1.5em 0 0, rgba(0, 0, 51, 0.3) 1.1em -1.1em 0 0;
+  display: inline-block;
+  font-size: 10px;
+  width: 1em;
+  height: 1em;
+  margin: 1.5em;
+  overflow: hidden;
+  text-indent: 100%;
+}
+.sprint-loader-mini {
+  font-size: 5px!important;
+}
+/* END SPINNER */
+
+
+/* START workflow */
+.workflow-definition {
+  width: 100%;
+  height: 50px;
+  display: inline-block;
+  margin: 10px;
+  font-weight: bold;
+  color: white;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.workflow-definition-description {
+  height:250px;
+  padding: 10px;
+}
+
+.workflow-definition-action {
+  height:50px;
+  background:rgba(0,0,0,0.5);
+  padding: 15px;
+}
+
+.workflow-definition-action a {
+  color: rgba(255,255,255,.7);
+  margin: 0 10px;
+}
+
+.workflow-definition-action a:hover {
+  text-decoration: none;
+  color: white;
+}
+
+.workflow-definition-0 {
+  background-color: #651FFF;
+  background-image: url('../images/icons/asterisk2.png');
+}
+
+.workflow-definition-1 {
+  background-color: #00BCD4;
+  background-image: url('../images/icons/bull1.png');
+}
+
+.workflow-definition-2 {
+  background-color: #43A047;
+  background-image: url('../images/icons/code11.png');
+}
+
+.workflow-definition-3 {
+  background-color: #F9A825;
+  background-image: url('../images/icons/comment32.png');
+}
+
+.workflow-definition-4 {
+  background-color: #E53935;
+  background-image: url('../images/icons/bell13.png');
+}
+
+.workflow-definition-5 {
+  background-color: #7B1FA2;
+  background-image: url('../images/icons/bullseye.png');
+}
+
+.workflow-definition-6 {
+  background-color: #2196F3;
+  background-image: url('../images/icons/cogs3.png');
+}
+
+.workflow-definition-7 {
+  background-color: #8BC34A;
+  background-image: url('../images/icons/lightning14.png');
+}
+.font-bold {
+  font-weight: bold;
+}
+.font-italic {
+  font-style: italic;
+}
+
+/* END workflow */
+
+
+.toggle-switch {
+    border: 1px solid lightgray;
+    cursor: pointer;
+    display: inline-block;
+    text-align: left;
+    overflow: hidden;
+    line-height: 8px;
+    min-width: 100px;
+    border-radius: 5px;
+}
+
+/* fix per JsTree: i risultati della ricerca appaiono in verde */
+.jstree-default .jstree-search {
+    color: #0d6500;
 }

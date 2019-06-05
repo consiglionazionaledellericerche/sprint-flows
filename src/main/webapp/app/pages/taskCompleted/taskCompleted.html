@@ -1,0 +1,66 @@
+<div ng-cloak>
+    <div class="row">
+        <div class="col-md-3">
+            <div>
+                <h4>Ordinamento temporale</h4>
+                <div>
+                    <button class="btn btn-default btn-block margin-top-20"
+                            ng-click="vm.order ===  'ASC' ?  vm.order='DESC' : vm.order = 'ASC'">
+                        <span class="glyphicon glyphicon-sort"></span>
+                        {{vm.order === 'ASC' ? 'Crescente' : 'Descrescente'}}
+                    </button>
+                </div>
+            </div>
+            <h4>Tipologie</h4>
+            <div id="tipologieDiv">
+                <div>
+                    <div class="dropdown md-menu-origin">
+                        <ui-select ng-model="vm.processDefinitionKey" title="Tipologie"
+                                   on-select="loadTaskCompleted()">
+                            <ui-select-match placeholder="Seleziona la tipologia di flusso" allow-clear="true">
+                                {{$select.selected.name}}
+                            </ui-select-match>
+                            <ui-select-choices repeat="processDefinition.key as processDefinition in wfDefsAll">
+                                <span ng-bind-html="processDefinition.name"></span>
+                            </ui-select-choices>
+                        </ui-select>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div>
+                <ng-include id="searchFields" src="formUrl"></ng-include>
+            </div>
+            <br>
+            <div>
+                <button ng-click="loadTaskCompleted()" class="btn btn-primary">Filtra</button>
+            </div>
+
+        </div>
+
+        <div class="col-md-9">
+            <h4>Attivita completate</h4>
+            <div ng-repeat="availableFilter in availableFilters">
+                <div class="btn-group btn-group-justified" role="group">
+                    <div class="btn-group" role="group" ng-repeat="option in availableFilter.values">
+                        <button class="btn btn-default btn-sm"
+                                ng-class="{active: completedFilterSelected === option.key}"
+                                ng-click="filter(option.key)">
+                            <span class="glyphicon glyphicon-calendar"></span> {{option.label}}
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <task-list tasks="vm.taskCompletedForMe" completed="true"></task-list>
+
+            <!--paginazione-->
+            <div class="text-center">
+                <jhi-item-count page="vm.page" total="vm.queryCount" items-per-page="vm.itemsPerPage"></jhi-item-count>
+                <uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.page"
+                                ng-change="vm.transition(current)"></uib-pagination>
+            </div>
+
+            <pre ng-if="isDevelopment">{{vm.taskCompletedForMe | json}}</pre>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,350 @@
+{
+	"info": {
+		"name": "FLOWS TEST - OIV - Soccorso Istruttorio",
+		"_postman_id": "1c09aa97-9dd6-3aed-0650-bc73a1577bcd",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Richiesta token FLOWS",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"postman.setGlobalVariable(\"ACCESS_TOKEN\", data.access_token);",
+							"postman.setGlobalVariable(\"REFRESH_TOKEN\", data.refresh_token);"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic c3ByaW50YXBwOm15LXNlY3JldC10b2tlbi10by1jaGFuZ2UtaW4tcHJvZHVjdGlvbg=="
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "admin",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "read write",
+							"description": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/oauth/token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"oauth",
+						"token"
+					]
+				},
+				"description": "Ottiene il token (impostare una passoword)."
+			},
+			"response": []
+		},
+		{
+			"name": "IMPERSONATE USER",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/impersonate/start?impersonate_username=utente1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"impersonate",
+						"start"
+					],
+					"query": [
+						{
+							"key": "impersonate_username",
+							"value": "utente1",
+							"equals": true
+						}
+					]
+				},
+				"description": "IMPERSONATE USER"
+			},
+			"response": []
+		},
+		{
+			"name": "SPRINT_FLOWS - OIV - Get Task (SOCCORSO ISTRUTTORIO)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9697b43a-4164-433f-a57b-a2c0a09f2703",
+						"type": "text/javascript",
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"    console.log(data.history.length);",
+							"    for (var i = 0; i < data.history.length;i++ ) {",
+							"    console.log(i + \") ID: \" + data.history[i].historyTask.id + \" NAME: \" + data.history[i].historyTask.name);",
+							"    if(data.history[i].historyTask.name === \"SOCCORSO ISTRUTTORIO\"){",
+							"        postman.setGlobalVariable(\"TASK_ID\", data.history[i].historyTask.id);",
+							"    }",
+							"}",
+							"    console.log(\"-- ID recuperato è: \" + postman.getGlobalVariable(\"TASK_ID\"));",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "cacheBuster",
+						"value": "150399103591"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "processInstanceId",
+							"value": "5",
+							"type": "text",
+							"description": ""
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/processInstances?processInstanceId=2501",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"processInstances"
+					],
+					"query": [
+						{
+							"key": "processInstanceId",
+							"value": "2501",
+							"equals": true
+						}
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "SPRINT_FLOWS - OIV - Soccorso Istruttorio",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "8f7743ad-0fd0-4030-acc3-1f3309b68014",
+						"type": "text/javascript",
+						"exec": [
+							"//postman.setGlobalVariable(\"TASK_ID\", \"5335\");",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "cacheBuster",
+						"value": "150399103591"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "processDefinitionId",
+							"value": "iscrizione-elenco-oiv:1:4",
+							"type": "text",
+							"description": ""
+						},
+						{
+							"key": "taskId",
+							"value": "{{TASK_ID}}",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "sceltaUtente",
+							"value": "invia_a_istruttoria",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "dataComunicazioneSoccorsoIstruttorio",
+							"value": "2018-02-05T23:00:00.000Z",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "dataInvioSoccorsoIstruttorio",
+							"value": "2018-02-07T23:00:00.000Z",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "punteggioEsperienzeProposto",
+							"value": "1212",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "fasciaAppartenenzaProposta",
+							"value": "2",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "commento",
+							"value": "bah",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "valutazioneEsperienze_json",
+							"value": "[{\"numeroEsperienza\":1,\"dataInizio\":\"2017-12-31T23:00:00.000Z\",\"dataFine\":\"2018-02-10T23:00:00.000Z\",\"tipologiaEsperienza\":\"esperienza 1\",\"ambitoEsperienza\":\"agraria\",\"attivitaSvolta\":\"dirigente\",\"annotazioniValutatore\":\"8556\",\"oggettoDiSoccorso\":\"SI\",\"motivazioneSoccorso\":\"5745\",\"giudizioFinale\":\"OK\"},{\"numeroEsperienza\":2,\"dataInizio\":\"2018-01-28T23:00:00.000Z\",\"dataFine\":\"2018-02-15T23:00:00.000Z\",\"tipologiaEsperienza\":\"esperienza 2 versione2\",\"ambitoEsperienza\":\"pubblico  versione2\",\"attivitaSvolta\":\"impiegato versione2\",\"annotazioniValutatore\":\"566i\",\"giudizioFinale\":\"OK\",\"oggettoDiSoccorso\":\"SI\",\"motivazioneSoccorso\":\"67\"},{\"numeroEsperienza\":3,\"dataInizio\":\"2018-02-04T23:00:00.000Z\",\"dataFine\":\"2018-02-08T23:00:00.000Z\",\"tipologiaEsperienza\":\"esperienza 3 versione2\",\"ambitoEsperienza\":\"settore privato versione2\",\"attivitaSvolta\":\"direttore versione2\",\"annotazioniValutatore\":\"758\",\"oggettoDiSoccorso\":\"SI\",\"motivazioneSoccorso\":\"ytr\",\"giudizioFinale\":\"KO\"},{\"numeroEsperienza\":4,\"dataInizio\":\"2011-02-15T23:00:00.000Z\",\"dataFine\":\"2016-02-22T23:00:00.000Z\",\"tipologiaEsperienza\":\"nuova esperienza post soccorso\",\"ambitoEsperienza\":\"professionale\",\"attivitaSvolta\":\"dirigente\"}]",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "osservazioniSoccorsoRichiedente",
+							"value": "Le osservazioni riguardano i punri 4b e 2a",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "allegati-soccorso-istruttorio[0]",
+							"value": "",
+							"description": "",
+							"type": "file"
+						},
+						{
+							"key": "allegati-soccorso-istruttorio[1]",
+							"value": "",
+							"description": "",
+							"type": "file"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/tasks/complete?",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"tasks",
+						"complete"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "4de5989d-b2bb-4757-b48d-0831b35ecaae",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "4c55e236-8604-4491-acf4-4d737ae9461a",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

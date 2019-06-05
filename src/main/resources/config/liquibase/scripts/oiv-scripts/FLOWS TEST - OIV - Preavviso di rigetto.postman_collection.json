@@ -1,0 +1,324 @@
+{
+	"info": {
+		"name": "FLOWS TEST - OIV - Preavviso di rigetto",
+		"_postman_id": "17c41b34-035c-62ae-482b-30bf021d0db8",
+		"description": "FLOWS TEST - OIV - Preavviso di rigetto",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Richiesta token FLOWS",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"postman.setGlobalVariable(\"ACCESS_TOKEN\", data.access_token);",
+							"postman.setGlobalVariable(\"REFRESH_TOKEN\", data.refresh_token);"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic c3ByaW50YXBwOm15LXNlY3JldC10b2tlbi10by1jaGFuZ2UtaW4tcHJvZHVjdGlvbg=="
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "admin",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "read write",
+							"description": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/oauth/token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"oauth",
+						"token"
+					]
+				},
+				"description": "Ottiene il token (impostare una passoword)."
+			},
+			"response": []
+		},
+		{
+			"name": "IMPERSONATE USER",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/impersonate/start?impersonate_username=utente1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"impersonate",
+						"start"
+					],
+					"query": [
+						{
+							"key": "impersonate_username",
+							"value": "utente1",
+							"equals": true
+						}
+					]
+				},
+				"description": "IMPERSONATE USER"
+			},
+			"response": []
+		},
+		{
+			"name": "SPRINT_FLOWS - OIV - Get Task (PREAVVISO RIGETTO)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "247f7b3a-a833-48f9-bc38-2bfb6bf988d4",
+						"type": "text/javascript",
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"    console.log(data.history.length);",
+							"    for (var i = 0; i < data.history.length;i++ ) {",
+							"    console.log(i + \") ID: \" + data.history[i].historyTask.id + \" NAME: \" + data.history[i].historyTask.name);",
+							"    if(data.history[i].historyTask.name === \"PREAVVISO RIGETTO\"){",
+							"        postman.setGlobalVariable(\"TASK_ID\", data.history[i].historyTask.id);",
+							"    }",
+							"}",
+							"    console.log(\"-- ID recuperato è: \" + postman.getGlobalVariable(\"TASK_ID\"));",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "cacheBuster",
+						"value": "150399103591"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "processInstanceId",
+							"value": "5",
+							"type": "text",
+							"description": ""
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/processInstances?processInstanceId=2501",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"processInstances"
+					],
+					"query": [
+						{
+							"key": "processInstanceId",
+							"value": "2501",
+							"equals": true
+						}
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "SPRINT_FLOWS - OIV - Preavviso di Rigetto",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "61524458-6586-43f2-87fd-80a2273e709c",
+						"type": "text/javascript",
+						"exec": [
+							"//postman.setGlobalVariable(\"TASK_ID\", \"51068\");",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "cacheBuster",
+						"value": "150399103591"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "processDefinitionId",
+							"value": "iscrizione-elenco-oiv:1:4",
+							"type": "text",
+							"description": ""
+						},
+						{
+							"key": "taskId",
+							"value": "{{TASK_ID}}",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "sceltaUtente",
+							"value": "invia_istruttoria",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "dataInvioNuovaDomanda",
+							"value": "2018-03-07T23:00:00.000Z",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "osservazioniRichiedente",
+							"value": "Le mie osservazioni sono in merito al punto 1 e 4 E BASTAAAAA.",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "commento",
+							"value": "bah",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "allegati-riscontro-preavviso[0]",
+							"description": "",
+							"type": "file"
+						},
+						{
+							"key": "allegati-riscontro-preavviso[1]",
+							"description": "",
+							"type": "file"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/tasks/complete?",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"tasks",
+						"complete"
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "4de5989d-b2bb-4757-b48d-0831b35ecaae",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "4c55e236-8604-4491-acf4-4d737ae9461a",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

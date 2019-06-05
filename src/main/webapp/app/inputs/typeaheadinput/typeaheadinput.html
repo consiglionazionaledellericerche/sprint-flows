@@ -1,0 +1,41 @@
+<style>
+  .custom-popup-wrapper {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    display: none;
+    background-color: #fff;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+  }
+
+  .custom-popup-wrapper > .message {
+    padding: 10px 20px;
+    border-bottom: 1px solid #ddd;
+    color: darkorange;
+  }
+
+  .custom-popup-wrapper > .dropdown-menu {
+    position: static;
+    float: none;
+    display: block;
+    min-width: 160px;
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+</style>
+
+<input type="text"
+    ng-model="localModel"
+    ng-required="ngRequired"
+    placeholder="Inizia a digitare per avviare la ricerca"
+    uib-typeahead="record as record.label for record in loadRecords($viewValue)"
+    typeahead-wait-ms=250
+    typeahead-loading="loadingLocations"
+    typeahead-no-results="noResults"
+    typeahead-editable=false
+    typeahead-min-length=3
+    typeahead-popup-template-url="app/inputs/typeaheadinput/typeaheadinput.popup.html"
+    class="form-control">

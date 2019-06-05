@@ -1,0 +1,83 @@
+<div class="row vertical-align-center well" ng-class="{'row-slim': !advanced}" ng-repeat="task in tasks">
+    <div class="col-xs-8">
+        <ul class="list-unstyled">
+            <li>
+                <small class="label"
+                       ng-class="{'label-info' : process.endTime, 'label-primary' : !process.endTime}">
+                    {{task.variabili.key}}
+                </small>
+            </li>
+            <li>
+                <strong>{{task.variabili.titolo}}</strong> <br>
+            </li>
+            <li>
+                <strong>Flusso avviato da</strong> <em>{{task.variabili.initiator}}</em>
+                <strong>il</strong> <em>{{task.variabili.startDate | data}}</em>
+            </li>
+            <li>
+                <span ng-bind-html="task.priority | priority"></span>
+            </li>
+            <li>
+                <div ng-show="task.variabili.titolo">
+                    <strong>Titolo:</strong> {{task.variabili.titolo}} <br>
+                </div>
+            </li>
+            <li>
+                <div ng-show="task.name">
+                    <strong>Stato:</strong> {{task.name}}</span> <br>
+                </div>
+            </li>
+            <li>
+                <div ng-show="task.variabili.sceltaUtente">
+                    <strong>Scelta utente:</strong> {{task.variabili.sceltaUtente}} <br>
+                </div>
+            </li>
+            <li>
+                <div ng-show="task.assignee">
+                    <strong>In carico a:</strong> {{task.assignee}} <br>
+                </div>
+            </li>
+            <li>
+                <div ng-show="advanced">
+                    <ng-include src="task.searchView"/>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <div class="col-xs-4 pull-right">
+        <div class="btn-group-vertical btn-block" role="group">
+
+            <a class="btn btn-primary" ng-class="{'btn-xs': !advanced}"
+               ui-sref="details({processInstanceId: task.processInstanceId, taskId: task.id})">
+                <span class="glyphicon glyphicon-th-list"></span> Dettagli Flusso
+            </a>
+            <a class="btn btn-default" ng-class="{'btn-xs': !advanced}"
+               ng-if="!inFirma && task.assignee === null"
+               ng-click="claimTask(task.id, true)">
+                <span class="glyphicon glyphicon-hand-up" aria-hidden="true"></span> Prendi in carico
+            </a>
+            <a class="btn btn-default" ng-class="{'btn-xs': !advanced}"
+               ng-if="!inFirma && task.assignee !== null && task.variabili.isReleasable"
+               ng-click="claimTask(task.id, false)">
+                <span class="glyphicon glyphicon-hand-down" aria-hidden="true"></span> Restituisci al gruppo
+            </a>
+            <a class="btn btn-default" ng-class="{'btn-xs': !advanced}"
+               ng-if="task.category == 'firma' && !inCart(task.id)"
+               ng-click="addToCart(task)">
+                <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Aggiungi al Carrello Firma
+            </a>
+            <a class="btn btn-default" ng-class="{'btn-xs': !advanced}"
+               ng-if="inCart(task.id)"
+               ng-click="removeFromCart(task)">
+                <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Rimuovi dal Carrello
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="loading-spiner-holder" style="text-align: center" data-loading>
+    <div class="loading-spiner spinner-loader"></div>
+</div>
+
+<span ng-show="tasks.length == 0">Nessun Compito</span>
