@@ -20,7 +20,7 @@
             var toast = this.toast,
                 alertId = 0, // unique id for each alert. Starts from 0.
                 alerts = [],
-                timeout = 5000; // default timeout
+                timeout = 15000; // default timeout
 
             return {
                 factory: factory,
@@ -64,7 +64,7 @@
                     type: 'danger',
                     msg: msg,
                     params: params,
-                    timeout: timeout,
+                    timeout: 0,
                     toast: toast,
                     position: position
                 });

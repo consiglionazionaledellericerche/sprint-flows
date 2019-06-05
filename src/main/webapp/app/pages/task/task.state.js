@@ -10,7 +10,7 @@
     function stateConfig($stateProvider) {
         $stateProvider.state('task', {
             parent: 'app',
-            url: '/task?processDefinition&taskName',
+            url: '/task?processDefinitionId&taskName&taskId',
             data: {
                 authorities: ['ROLE_USER']
             },

@@ -1,0 +1,39 @@
+
+<div>
+    <h2><span translate="sprintApp.notificationRule.detail.title">Notification Rule</span> {{vm.notificationRule.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span translate="sprintApp.notificationRule.processId">Process Id</span></dt>
+        <dd>
+            <span>{{vm.notificationRule.processId}}</span>
+        </dd>
+        <dt><span translate="sprintApp.notificationRule.taskName">Task Name</span></dt>
+        <dd>
+            <span>{{vm.notificationRule.taskName}}</span>
+        </dd>
+        <dt><span translate="sprintApp.notificationRule.recipients">Recipients</span></dt>
+        <dd>
+            <span>{{vm.notificationRule.recipients}}</span>
+        </dd>
+        <dt><span translate="sprintApp.notificationRule.eventType">Event Type</span></dt>
+        <dd>
+            <span>{{vm.notificationRule.eventType}}</span>
+        </dd>
+        <dt><span translate="sprintApp.notificationRule.persona">Persona</span></dt>
+        <dd>
+            <span>{{vm.notificationRule.persona}}</span>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            ui-sref="{{ vm.previousState }}"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span translate="entity.action.back"> Back</span>
+    </button>
+
+    <button type="button" ui-sref="notification-rule-detail.edit({id:vm.notificationRule.id})" class="btn btn-primary">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="hidden-xs hidden-sm" translate="entity.action.edit"> Edit</span>
+    </button>
+</div>

@@ -1,0 +1,23 @@
+{
+    "sprintApp": {
+        "dynamiclist" : {
+            "home": {
+                "title": "Dynamiclists",
+                "createLabel": "Create a new Dynamiclist",
+                "createOrEditLabel": "Create or edit a Dynamiclist",
+                "search": "Search for Dynamiclist"
+            },
+            "created": "A new Dynamiclist is created with identifier {{ param }}",
+            "updated": "A Dynamiclist is updated with identifier {{ param }}",
+            "deleted": "A Dynamiclist is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Are you sure you want to delete Dynamiclist {{ id }}?"
+            },
+            "detail": {
+                "title": "Dynamiclist"
+            },
+            "name": "Name",
+            "listjson": "Listjson"
+        }
+    }
+}

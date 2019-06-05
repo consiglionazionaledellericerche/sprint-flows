@@ -1,0 +1,50 @@
+<div class="modal-header">
+    <h4>Cronologia</h4>
+    <!--startTask non rientra tra i task "normali"-->
+    <div class="task-history" id="startEvent">
+        <div ng-repeat="variable in vm.startTask | orderBy:'-name'">
+            <div ng-switch="variable.name">
+                <div ng-switch-when="titolo">
+                    <h5>
+                        <task-details variables="vm.startTask" title="variable.value"></task-details>
+                        <b>Flusso {{variable.value}}</b><br><br>
+                    </h5>
+                </div>
+                <div ng-switch-when="startDate">
+                    <b>Avviato il </b> {{variable.value | dataora}} <br>
+                </div>
+                <div ng-switch-when="initiator">
+                    <b>Dall'utente </b> {{variable.value}} <br>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="task-history" ng-repeat="task in vm.tasks | orderBy:'historyTask.startTime'">
+        <h5>
+            <task-details variables="task.historyTask.variables" title="task.historyTask.name"></task-details>
+            <b>{{task.historyTask.name}} </b>
+        </h5>
+        <!--identitylink (gruppo/utente assegnatario, esecutore del task-->
+        <div ng-repeat="identityLink in task.historyIdentityLink">
+            <div ng-switch="identityLink.type">
+                <div ng-switch-when="candidate">
+                    <span ng-show="identityLink.userId !== null"> <b>Utente Assegnatario:</b> {{identityLink.userId}} </span><br>
+                    <span ng-show="identityLink.groupId !== null"> <b>Gruppo Assegnatario:</b> {{identityLink.groupId}} </span><br>
+                </div>
+                <div ng-switch-when="esecutore">
+                    <span ng-show="identityLink.userId !== null"> <b>Eseguito dall'Utente:</b> {{identityLink.userId}} </span><br>
+                </div>
+            </div>
+        </div>
+        <b>Data di assegnazione:</b> {{task.historyTask.startTime | dataora}} <br>
+        <div ng-hide="task.historyTask.endTime === null">
+            <b>Con data di completamento:</b> {{task.historyTask.endTime | dataora}}
+        </div>
+        <!--scelta utente-->
+        <div ng-repeat="variable in task.historyTask.variables">
+            <div ng-if="variable.scope == 'local' && variable.name == 'sceltaUtente'">
+                <span ng-show="variable.value !== null"> <b>Con Scelta Utente:</b> {{variable.value}} </span><br>
+            </div>
+        </div>
+    </div>
+</div>

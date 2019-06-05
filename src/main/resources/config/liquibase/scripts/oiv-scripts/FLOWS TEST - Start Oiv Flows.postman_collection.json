@@ -1,0 +1,268 @@
+{
+	"info": {
+		"_postman_id": "2c375092-3d9f-3752-32df-5df169cc6a3a",
+		"name": "FLOWS TEST - Start Oiv Flows",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Richiesta token FLOWS",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"postman.setGlobalVariable(\"ACCESS_TOKEN\", data.access_token);",
+							"postman.setGlobalVariable(\"REFRESH_TOKEN\", data.refresh_token);"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic c3ByaW50YXBwOm15LXNlY3JldC10b2tlbi10by1jaGFuZ2UtaW4tcHJvZHVjdGlvbg=="
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "admin",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "read write",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/oauth/token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"oauth",
+						"token"
+					]
+				},
+				"description": "Ottiene il token (impostare una passoword)."
+			},
+			"response": []
+		},
+		{
+			"name": "IMPERSONATE USER",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/impersonate/start?impersonate_username=utente1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"impersonate",
+						"start"
+					],
+					"query": [
+						{
+							"key": "impersonate_username",
+							"value": "utente1"
+						}
+					]
+				},
+				"description": "IMPERSONATE USER"
+			},
+			"response": []
+		},
+		{
+			"name": "SPRINT_FLOWS Start OIV Workflow",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "cacheBuster",
+						"value": "150399103591"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "processDefinitionId",
+							"value": "iscrizione-elenco-oiv:1:4",
+							"type": "text"
+						},
+						{
+							"key": "titolo",
+							"value": "Domanda 2",
+							"type": "text"
+						},
+						{
+							"key": "descrizione",
+							"value": "Domanda 2",
+							"type": "text"
+						},
+						{
+							"key": "nomeRichiedente",
+							"value": "laila Setta",
+							"type": "text"
+						},
+						{
+							"key": "dataNascitaRichiedente",
+							"value": "1962-01-19T00:00:00.000Z",
+							"type": "text"
+						},
+						{
+							"key": "sessoRichiedente",
+							"value": "F",
+							"type": "text"
+						},
+						{
+							"key": "tipologiaRichiesta",
+							"value": "iscrizione",
+							"type": "text"
+						},
+						{
+							"key": "dataIscrizioneElenco",
+							"value": "2012-01-09T23:00:00.000Z",
+							"type": "text"
+						},
+						{
+							"key": "codiceIscrizioneElenco",
+							"value": "USY-34",
+							"type": "text"
+						},
+						{
+							"key": "dataInvioDomanda",
+							"value": "2108-02-19T00:00:00.000Z",
+							"type": "text"
+						},
+						{
+							"key": "valutazioneEsperienze_json",
+							"value": "[{  \"idEsperienza\": \"a79bae55-0f60-460c-8341-c1430df9feca;1.1\",  \"numeroEsperienza\": 1,  \"dataInizio\": \"22/12/2001\",  \"dataFine\": \"22/12/2003\",  \"tipologiaEsperienza\": \"esperienza 1\",  \"ambitoEsperienza\": \"agraria\",  \"attivitaSvolta\": \"dirigente\",  \"nrDipendenti\": \"maggioreUguale250\",  \"annotazioniValutatore\": \"8556\",  \"oggettoDiSoccorso\": \"SI\",  \"motivazioneSoccorso\": \"5745\",  \"giudizioFinale\": \"OK\"   }, {  \"idEsperienza\": \"bbbbbbbb-0f60-460c-8341-c1430df9feca;1.1\",  \"numeroEsperienza\": 2,  \"dataInizio\": \"02/04/2003\",  \"dataFine\": \"13/12/2007\",  \"tipologiaEsperienza\": \"esperienza 2 versione2\",  \"ambitoEsperienza\": \"pubblico  versione2\",  \"attivitaSvolta\": \"impiegato versione2\",  \"nrDipendenti\": \"maggioreUguale250\",  \"annotazioniValutatore\": \"566i\",  \"oggettoDiSoccorso\": \"SI\",  \"motivazioneSoccorso\": \"67\",  \"giudizioFinale\": \"OK\"   }, {  \"idEsperienza\": \"cccccccccccc-0f60-460c-8341-c1430df9feca;1.1\",  \"numeroEsperienza\": 3,  \"dataInizio\": \"09/11/2007\",  \"dataFine\": \"14/03/2011\",  \"tipologiaEsperienza\": \"esperienza 3 versione2\",  \"ambitoEsperienza\": \"settore privato versione2\",  \"attivitaSvolta\": \"direttore versione2\",  \"nrDipendenti\": \"minoreDi250\",  \"annotazioniValutatore\": \"758\",  \"oggettoDiSoccorso\": \"SI\",  \"motivazioneSoccorso\": \"ytr\",  \"giudizioFinale\": \"KO\"   } ]",
+							"type": "text"
+						},
+						{
+							"key": "punteggioEsperienzeProposto",
+							"value": "123",
+							"type": "text"
+						},
+						{
+							"key": "fasciaAppartenenzaProposta",
+							"value": "2",
+							"type": "text"
+						},
+						{
+							"key": "domanda",
+							"value": "",
+							"type": "file"
+						},
+						{
+							"key": "cv",
+							"value": "",
+							"type": "file"
+						},
+						{
+							"key": "codiceFiscaleRichiedente",
+							"value": "HSSDIE324L83901",
+							"type": "text"
+						},
+						{
+							"key": "idDomanda",
+							"value": "12381209",
+							"description": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/tasks/complete?",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"tasks",
+						"complete"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "4de5989d-b2bb-4757-b48d-0831b35ecaae",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "4c55e236-8604-4491-acf4-4d737ae9461a",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

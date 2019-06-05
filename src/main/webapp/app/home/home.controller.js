@@ -5,9 +5,9 @@
         .module('sprintApp')
         .controller('HomeController', HomeController);
 
-    HomeController.$inject = ['$scope', 'Principal', 'LoginService', '$state'];
+    HomeController.$inject = ['$scope', 'Principal', 'LoginService', 'ProfileService', '$q', '$state', 'dataService'];
 
-    function HomeController ($scope, Principal, LoginService, $state) {
+    function HomeController ($scope, Principal, LoginService, ProfileService, $q, $state, dataService) {
         var vm = this;
 
         vm.account = null;
@@ -20,10 +20,28 @@
 
         getAccount();
 
+        dataService.avvisi.getAttivi().then(function(response) {
+            vm.avvisi = response.data;
+        })
+
+        /* --- */
+
+        function getTasksCount() {
+            dataService.tasks.coolAvailableTasks().then(function(response) {
+                vm.coolTasks = response.data;
+            });
+        }
+
         function getAccount() {
-            Principal.identity().then(function(account) {
-                vm.account = account;
+            var principalPromise = Principal.identity()
+            var profilePromise   = ProfileService.getProfileInfo();
+
+            $q.all([principalPromise, profilePromise]).then(function(data) {
+                vm.account = data[0];
+                vm.profiles = data[1].activeProfiles;
                 vm.isAuthenticated = Principal.isAuthenticated;
+                if ( vm.isAuthenticated && vm.profiles.includes('cnr') )
+                    getTasksCount();
             });
         }
         function register () {

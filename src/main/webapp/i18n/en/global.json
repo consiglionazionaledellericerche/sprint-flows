@@ -1,12 +1,22 @@
 {
     "global": {
-        "title": "Sprint",
+        "title": "Digital Desktop",
         "browsehappy": "You are using an <strong>outdated</strong> browser. Please <a href=\"http://browsehappy.com/?locale=en\">upgrade your browser</a> to improve your experience.",
         "menu": {
             "home": "Home",
             "jhipster-needle-menu-add-element": "JHipster will add additional menu entries here (do not translate!)",
             "entities": {
                 "main": "Entities",
+                "cnrauthority": "Cnrauthority",
+                "form": "Form",
+                "cnrgroup": "Cnrgroup",
+              "relationship": "Relationship",
+                "dynamiclist": "Dynamiclist",
+                "view": "View",
+                "notificationRule": "Notification Rule",
+                "membership": "Membership",
+                "avviso": "Avviso",
+                "externalMessage": "External Message",
                 "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
             },
             "account": {
@@ -41,7 +51,11 @@
             "confirmpassword": "New password confirmation",
             "confirmpassword.placeholder": "Confirm the new password",
             "email": "E-mail",
-            "email.placeholder": "Your e-mail"
+            "email.placeholder": "Your e-mail",
+            "phone": "Phone",
+            "phone.placeholder": "Your phone",
+            "gender": "Gender",
+            "gender.placeholder": "Your gender"
         },
         "messages": {
             "info": {

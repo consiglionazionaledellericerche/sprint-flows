@@ -18,10 +18,13 @@ module.exports = {
     fonts: fonts,
     common: common,
     swagger: swagger,
-    images: images
+    images: images,
+    jstree: jstree,
+    ace: ace,
+    customjs: customjs
 }
 
-var yorc = require('../.yo-rc.json')['generator-jhipster'];
+//var yorc = require('../.yo-rc.json')['generator-jhipster'];
 
 function i18n() {
     return gulp.src(config.app + 'i18n/**')
@@ -31,9 +34,10 @@ function i18n() {
 }
 
 function languages() {
-    var locales = yorc.languages.map(function (locale) {
-        return config.bower + 'angular-i18n/angular-locale_' + locale + '.js';
-    });
+//    var locales = yorc.languages.map(function (locale) {
+//        return config.bower + 'angular-i18n/angular-locale_' + locale + '.js';
+//    });
+    var locales = [config.bower + 'angular-i18n/angular-locale_' + 'it_IT' + '.js'];
     return gulp.src(locales)
         .pipe(plumber({errorHandler: handleErrors}))
         .pipe(changed(config.app + 'i18n/'))
@@ -63,6 +67,24 @@ function fonts() {
         }))
         .pipe(gulp.dest(config.dist))
     );
+}
+
+function jstree() {
+    return gulp.src(config.bower + 'bootstrap-jstree-theme/dist/themes/bootstrap/*.{png,gif}')
+        .pipe(plumber({errorHandler: handleErrors}))
+        .pipe(gulp.dest(config.dist + 'content/css/'));
+}
+
+function ace() {
+    return gulp.src(config.app + 'content/js/ace/*.js')
+        .pipe(plumber({errorHandler: handleErrors}))
+        .pipe(gulp.dest(config.dist + 'content/js/ace/'));
+}
+
+function customjs() {
+    return gulp.src(config.app + 'content/js/*.js')
+        .pipe(plumber({errorHandler: handleErrors}))
+        .pipe(gulp.dest(config.dist + 'content/js/'));
 }
 
 function common() {
