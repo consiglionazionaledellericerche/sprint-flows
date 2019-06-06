@@ -128,8 +128,8 @@ public class FlowsPdfResource {
 	 * @param processDefinitionKey the process definition key
 	 * @param startDateGreat       the start date great
 	 * @param startDateLess        the start date less
+	 * @param idStruttura          idStruttura
 	 * @return the response entity
-	 * @throws ParseException the parse exception
 	 */
 //    todo:  TEST
 	@RequestMapping(value = "/makeStatisticPdf", method = RequestMethod.GET, produces = "application/pdf")
