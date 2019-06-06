@@ -2,7 +2,7 @@ image: docker:stable
 
 variables:
   DOCKER_DRIVER: overlay2
-  MAVEN_OPTS: -Dmaven.repo.local=.m2
+  MAVEN_OPTS: -Dmaven.repo.local=.m2 -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
   CNR_MAVEN_VERSION: 3.4.0
 
 services:
