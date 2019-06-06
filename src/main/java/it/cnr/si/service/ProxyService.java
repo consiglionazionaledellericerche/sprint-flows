@@ -26,12 +26,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Service for proxy to other application.
- * <p/>
- * <p>
- * </p>
- */
 @Service
 public class ProxyService implements EnvironmentAware{
     private final Logger log = LoggerFactory.getLogger(ProxyService.class);
@@ -62,7 +56,9 @@ public class ProxyService implements EnvironmentAware{
         HttpEntity<String> requestEntity = new HttpEntity<String>(body, headers);
         log.info("Url: "+proxyURL);
         log.info("Header: "+headers);
-        log.info("Body: "+body);
+        log.info("Body: "+body);    /**
+     * The filename to be associated with the {@link MimeMessage} in the form data.
+     */
         try {
             ResponseEntity<String> result = getRestTemplate(app).
                     exchange(proxyURL, httpMethod, requestEntity, String.class);
