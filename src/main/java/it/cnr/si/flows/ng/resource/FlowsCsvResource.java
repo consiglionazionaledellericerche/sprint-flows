@@ -38,6 +38,7 @@ public class FlowsCsvResource {
 	 * @param res                  the res
 	 * @param processDefinitionKey La process definition key della ricerca (oppurer "all")
 	 * @param startDateGreat       the start date great
+	 * @param idStruttura          idStruttura
 	 * @param startDateLess        the start date less
 	 * @throws IOException the io exception
 	 */

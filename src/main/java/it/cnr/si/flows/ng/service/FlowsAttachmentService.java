@@ -73,13 +73,13 @@ public class FlowsAttachmentService {
      *
      * Se passo un att nullo, verra' creato un att nuovo
      *
-     * @param att
-     * @param data
-     * @param taskId
-     * @param taskName
-     * @param processKey
-     * @param fileName
-     * @param path
+     * @param att           att
+     * @param data          att
+     * @param taskId        att
+     * @param taskName      att
+     * @param processKey    att
+     * @param fileName      att
+     * @param path          att
      * @return att nuovo o aggiornato
      */
     public FlowsAttachment extractSingleAttachment(FlowsAttachment att, Map<String, Object> data, String taskId, String taskName, String processKey, String fileName, String path) {
@@ -87,6 +87,7 @@ public class FlowsAttachmentService {
         LOGGER.info("inserisco come variabile il file {}", fileName);
         byte[] filebytes = (byte[]) data.get(fileName + "_data");
         String originalFilename  = (String) data.get(fileName + "_filename");
+        String nodeRef  = (String) data.get(fileName + "_nodeRef");
 
         if (att == null) {
             if (filebytes != null) {
@@ -99,6 +100,17 @@ public class FlowsAttachmentService {
                 att.setMimetype(getMimetype(filebytes));
                 att.setUrl(saveOrUpdateBytes(filebytes, fileName, originalFilename, processKey, path));
                 att.setPath(path);
+
+            } else if (nodeRef != null) {
+                att = new FlowsAttachment();
+
+                setAttachmentProperties(att, taskId, taskName, fileName, data);
+                att.setAzione(linkDaAltraApplicazione);
+
+                att.setFilename(originalFilename);
+                att.setUrl(nodeRef);
+                att.setMimetype( (String) data.get(fileName + "_mimetype") );
+                att.setPath( (String) data.get(fileName + "_path") );
             }
         } else {
             setAttachmentProperties(att, taskId, taskName, fileName, data);
@@ -220,6 +232,10 @@ public class FlowsAttachmentService {
      * (per poter aggiornare gli allegati gia' presenti (es. allegato[0] e allegato[1]) e caricarne di nuovi (es. allegato[2])
      * Per cui, se sto aggiornando un file, vado dritto col nomefile (es. allegato[1])
      * invece se ne sto caricando uno nuovo, ho bisogno di sapere l'ultimo indice non ancora utilizzato
+     *
+     * @param fileName          nome File
+     * @param processInstanceId id
+     * @return next calculated index
      */
     public int getNextIndexByProcessInstanceId(String processInstanceId, String fileName) {
         int index = 0;
