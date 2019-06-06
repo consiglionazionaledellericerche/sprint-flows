@@ -20,8 +20,8 @@
     </prerequisites>
 
     <scm>
-        <connection>scm:git:ssh://git@git.si.cnr.it:documentale/sprint-flows.git</connection>
-        <developerConnection>scm:git:ssh://git@git.si.cnr.it:documentale/sprint-flows.git</developerConnection>
+        <connection>scm:git:ssh://git@git.si.cnr.it/documentale/sprint-flows.git</connection>
+        <developerConnection>scm:git:ssh://git@git.si.cnr.it/documentale/sprint-flows.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
