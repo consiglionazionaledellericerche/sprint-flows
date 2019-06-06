@@ -17,11 +17,14 @@ import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.service.FlowsPdfService;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.service.ProtocolloDocumentoService;
+import it.cnr.si.service.ExternalMessageService;
+import it.cnr.si.domain.enumeration.ExternalMessageVerb;
+import it.cnr.si.flows.ng.utils.Enum;
+import it.cnr.si.flows.ng.utils.Enum.StatoDomandeAccordiInternazionaliEnum;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.listeners.cnr.acquisti.service.AcquistiService;
-
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -47,9 +50,33 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 	private FlowsPdfService flowsPdfService;
 	@Inject
 	private FlowsAttachmentService flowsAttachmentService;
-	
+	@Inject
+	private ExternalMessageService externalMessageService;	
 
 	private Expression faseEsecuzione;
+	
+	
+
+	public void restToApplicazioneAccordiBilaterali(DelegateExecution execution, StatoDomandeAccordiInternazionaliEnum statoDomanda) {
+
+		String urlAccordiBilaterali = "www.google.it";
+		// @Value("${cnr.accordi-bilaterali.url}")
+		// private String urlAccordiBilaterali;
+		// @Value("${cnr.accordi-bilaterali.usr}")
+		// private String usrAccordiBilaterali;	
+		// @Value("${cnr.accordi-bilaterali.psw}")
+		// private String pswAccordiBilaterali;
+		Double idDomanda = Double.parseDouble(execution.getVariable("idDomanda").toString());
+		Map<String, Object> abilPayload = new HashMap<String, Object>()
+		{
+			{
+				put("idDomanda", idDomanda);
+				put("stato", statoDomanda.name().toString());
+			}	
+		};	
+		externalMessageService.createExternalMessage(urlAccordiBilaterali, ExternalMessageVerb.POST, abilPayload);
+
+	}
 
 
 	@Override
@@ -84,13 +111,12 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 			flowsPdfService.makePdf(nomeFile, processInstanceId);
 			FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
 			documentoGenerato.setLabel(labelFile);
-			documentoGenerato.setPubblicazioneTrasparenza(true);
 			flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
 			
 		};break;  
 		case "validazione-end": {
 			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
-			String idDipartimento = execution.getVariable("codiceDipartimento").toString();
+			String idDipartimento = execution.getVariable("dipartimentoId").toString();
 			String gruppoValutatoreScientificoDipartimento = "valutatoreScientificoDipartimento@" + idDipartimento;
 			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValutatoreScientificoDipartimento, PROCESS_VISUALIZER);
 			execution.setVariable("gruppoValutatoreScientificoDipartimento", gruppoValutatoreScientificoDipartimento);
@@ -100,20 +126,28 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 		case "validazione-start": {
 			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
 		};break;  
+		case "valutazione-domande-bando-start": {
+			restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.VALUTATA_SCIENTIFICAMENTE);
+		};break;    
 		case "endevent-respinta-start": {
 			execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA RESPINTA");
+			restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA);
 		};break;    	
 		case "endevent-non-autorizzata-start": {
 			execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA NON AUTORIZZATA");
+			restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA);
 		};break;  
 		case "endevent-annullata-start": {
 			execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA ANNULLATA");
+			restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA);
 		};break;  
 		case "endevent-non-finanziata-start": {
 			execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA NON FINANZIATA");
+			restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA);
 		};break;  	
 		case "endevent-approvata-start": {
 			execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA APPROVATA");
+			restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.ACCETATA);
 		};break;  
 		//TIMERS
 		case "timer2-end": {
