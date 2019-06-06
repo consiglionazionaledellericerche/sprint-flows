@@ -30,7 +30,6 @@ deploy_nexus_snapshot:
     - dev
   script:
     - mvn -B clean compile package deploy -DskipTests -Pdev
-    - cp ./target/*.war ./target/app.war
 
 
 # branch TEST & DEMO
@@ -43,6 +42,7 @@ buildtestcontainer:
     - test
     - demo
   script:
+    - mvn -B clean compile package deploy -DskipTests -Pprod
     - echo "Running build image and push image"
     - docker build --file src/main/docker/Dockerfile -t docker.si.cnr.it/sprint-flows-$CI_COMMIT_REF_NAME .
     - docker push docker.si.cnr.it/sprint-flows-$CI_COMMIT_REF_NAME
