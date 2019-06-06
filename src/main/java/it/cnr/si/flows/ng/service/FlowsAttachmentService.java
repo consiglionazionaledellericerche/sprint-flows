@@ -87,6 +87,7 @@ public class FlowsAttachmentService {
         LOGGER.info("inserisco come variabile il file {}", fileName);
         byte[] filebytes = (byte[]) data.get(fileName + "_data");
         String originalFilename  = (String) data.get(fileName + "_filename");
+        String nodeRef  = (String) data.get(fileName + "_nodeRef");
 
         if (att == null) {
             if (filebytes != null) {
@@ -99,6 +100,17 @@ public class FlowsAttachmentService {
                 att.setMimetype(getMimetype(filebytes));
                 att.setUrl(saveOrUpdateBytes(filebytes, fileName, originalFilename, processKey, path));
                 att.setPath(path);
+
+            } else if (nodeRef != null) {
+                att = new FlowsAttachment();
+
+                setAttachmentProperties(att, taskId, taskName, fileName, data);
+                att.setAzione(linkDaAltraApplicazione);
+
+                att.setFilename(originalFilename);
+                att.setUrl(nodeRef);
+                att.setMimetype( getMimetype(getAttachmentContentBytes(nodeRef)) );
+                att.setPath((String) data.get(fileName + "_path"));
             }
         } else {
             setAttachmentProperties(att, taskId, taskName, fileName, data);
