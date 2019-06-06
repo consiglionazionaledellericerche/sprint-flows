@@ -132,22 +132,27 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 		case "endevent-respinta-start": {
 			execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA RESPINTA");
 			restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA);
+			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "RESPINTA");
 		};break;    	
 		case "endevent-non-autorizzata-start": {
 			execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA NON AUTORIZZATA");
 			restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA);
+			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "NON AUTORIZZATA");
 		};break;  
 		case "endevent-annullata-start": {
 			execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA ANNULLATA");
 			restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA);
+			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "ANNULLATA");
 		};break;  
 		case "endevent-non-finanziata-start": {
 			execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA NON FINANZIATA");
 			restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA);
+			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "NON FINANZIATA");
 		};break;  	
 		case "endevent-approvata-start": {
 			execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA APPROVATA");
-			restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.ACCETATA);
+			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA.toString());
+			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "APPROVATA");
 		};break;  
 		//TIMERS
 		case "timer2-end": {
