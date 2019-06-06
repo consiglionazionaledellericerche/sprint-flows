@@ -109,8 +109,8 @@ public class FlowsAttachmentService {
 
                 att.setFilename(originalFilename);
                 att.setUrl(nodeRef);
-                att.setMimetype( getMimetype(getAttachmentContentBytes(nodeRef)) );
-                att.setPath((String) data.get(fileName + "_path"));
+                att.setMimetype( (String) data.get(fileName + "_mimetype") );
+                att.setPath( (String) data.get(fileName + "_path") );
             }
         } else {
             setAttachmentProperties(att, taskId, taskName, fileName, data);
