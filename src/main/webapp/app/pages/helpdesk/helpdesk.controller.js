@@ -56,9 +56,5 @@
         $state.go("home");
       };
     };
-
-    $scope.fatto = function() {
-      $state.go('home');
-    }
   }
 })();

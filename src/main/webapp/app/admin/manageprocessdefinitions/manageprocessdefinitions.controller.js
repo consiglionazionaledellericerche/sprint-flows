@@ -9,8 +9,6 @@
 
     function ManageProcessDefinitionsController($scope, paginationConstants, dataService, utils, $log, Upload, AlertService) {
         var vm = this;
-        $scope.data = {};
-        $scope.attachments = [];
 
         $scope.data = {};
         $scope.attachments = {};
