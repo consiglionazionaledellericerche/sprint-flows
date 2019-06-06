@@ -171,6 +171,8 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
      * @param idStruttura          the id struttura
      * @param authorities          le authorities dell'utente loggato
      * @param currentUserLogin             userName loggato
+     * @param processDefinitionKey      key
+     * @param processInstanceId         id
      * @return the boolean
      */
 
