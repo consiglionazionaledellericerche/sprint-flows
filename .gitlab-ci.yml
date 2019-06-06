@@ -128,7 +128,7 @@ buildprodcontainer:
 
 
 deploydockprod01:
-  stage: deploy
+  stage: deploy_prod_container
   image: scolagreco/alpine-ssh:latest
   only:
     - /^(\d+\.)?(\d+\.)?(\*|\d+)$/
@@ -155,7 +155,7 @@ deploydockprod01:
     url: http://dockprod01.cedrc.cnr.it:1480
 
 deploydockprod02:
-  stage: deploy
+  stage: deploy_prod_container
   image: scolagreco/alpine-ssh:latest
   only:
     - /^(\d+\.)?(\d+\.)?(\*|\d+)$/
