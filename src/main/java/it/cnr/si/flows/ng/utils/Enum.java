@@ -72,7 +72,8 @@ public class Enum {
         RimozioneDaPubblicazioneTrasparenza,
         RimozioneDaPubblicazioneUrp,
         SostituzioneProtocollo,
-        RettificaProtocollo
+        RettificaProtocollo,
+        linkDaAltraApplicazione
     }
 
 
