@@ -8,10 +8,10 @@
         <version>1.0.3</version>
     </parent>
 
-  <groupId>it.cnr.si.flows</groupId>
-  <artifactId>sprint-flows</artifactId>
-  <version>0.2.9-SNAPSHOT</version>
-  <packaging>war</packaging>
+    <groupId>it.cnr.si.flows</groupId>
+    <artifactId>sprint-flows</artifactId>
+    <version>0.9.1-SNAPSHOT</version>
+    <packaging>war</packaging>
 
     <name>sprint-flows</name>
 
@@ -20,8 +20,8 @@
     </prerequisites>
 
     <scm>
-        <connection>scm:git:ssh://git@git.si.cnr.it:documentale/sprint-flows.git</connection>
-        <developerConnection>scm:git:ssh://git@git.si.cnr.it:documentale/sprint-flows.git</developerConnection>
+        <connection>scm:git:ssh://git@git.si.cnr.it/documentale/sprint-flows.git</connection>
+        <developerConnection>scm:git:ssh://git@git.si.cnr.it/documentale/sprint-flows.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
