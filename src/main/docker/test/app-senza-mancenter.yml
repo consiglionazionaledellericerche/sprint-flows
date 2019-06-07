@@ -1,0 +1,12 @@
+version: '2'
+services:
+  sprint-flows-demo_cnr:
+    image: docker.si.cnr.it/sprint-flows-test
+    environment:
+      - SPRING_PROFILES_ACTIVE=test,cnr,swagger
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://dockerwebtest01.si.cnr.it:1482/flows
+      - SPRING_DATASOURCE_USERNAME=activiti
+      - SPRING_DATASOURCE_PASSWORD=activitipw
+      - JHIPSTER_SLEEP=10 # gives time for the database to boot before the application
+    ports:
+      - 1481:8080
