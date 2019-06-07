@@ -72,7 +72,7 @@ deploydockertest01:
     - sed -i "s/DOCKER_IMAGE_SED/spring-flows-test/g" ./src/main/docker/app.yml
     - sed -i "s/SPRING_PROFILES_ACTIVE_SED/cnr,swagger,test/g" ./src/main/docker/app.yml
     - sed -i "s/PORT_SED/1480/g" ./src/main/docker/app.yml
-    - sshremote $SSH_CONNECT_DOCKERTEST01 "if [ -f  ''/sites/sprint-flows-test/app.yml'' ]; then docker-compose -p sprint-flows-test -f /sites/sprint-flows-test/app.yml down; fi && rm -rf /sites/sprint-flows-test && mkdir -p /sites/sprint-flows-test || echo ''dir didn't exist''"
+    - sshremote $SSH_CONNECT_DOCKERTEST01 "if [ -f  ''/sites/sprint-flows-test/app.yml'' ]; then docker-compose -p sprint-flows-test -f /sites/sprint-flows-test/app.yml down; fi && rm -rf /sites/sprint-flows-test && mkdir -p /sites/sprint-flows-test || echo NODIR"
     - scpremote ./src/main/docker/app.yml $SSH_CONNECT_DOCKERTEST01:/sites/sprint-flows-test/app.yml
     - sshremote $SSH_CONNECT_DOCKERTEST01 "cd /sites/sprint-flows-test && docker-compose -p sprint-flows-test -f app.yml pull && docker-compose -p sprint-flows-test -f app.yml up -d"
   environment:
@@ -91,7 +91,7 @@ deploydockertest02:
     - sed -i "s/DOCKER_IMAGE_SED/spring-flows-test/g" ./src/main/docker/app.yml
     - sed -i "s/SPRING_PROFILES_ACTIVE_SED/cnr,swagger,test/g" ./src/main/docker/app.yml
     - sed -i "s/PORT_SED/1480/g" ./src/main/docker/app.yml
-    - sshremote $SSH_CONNECT_DOCKERTEST02 "if [ -f  ''/sites/sprint-flows-test/app.yml'' ]; then docker-compose -p sprint-flows-test -f /sites/sprint-flows-test/app.yml down; fi && rm -rf /sites/sprint-flows-test && mkdir -p /sites/sprint-flows-test || echo ''dir didn't exist''"
+    - sshremote $SSH_CONNECT_DOCKERTEST02 "if [ -f  ''/sites/sprint-flows-test/app.yml'' ]; then docker-compose -p sprint-flows-test -f /sites/sprint-flows-test/app.yml down; fi && rm -rf /sites/sprint-flows-test && mkdir -p /sites/sprint-flows-test || echo NODIR"
     - scpremote ./src/main/docker/app.yml $SSH_CONNECT_DOCKERTEST02:/sites/sprint-flows-test/app.yml
     - sshremote $SSH_CONNECT_DOCKERTEST02 "cd /sites/sprint-flows-test && docker-compose -p sprint-flows-test -f app.yml pull && docker-compose -p sprint-flows-test -f app.yml up -d"
   environment:
