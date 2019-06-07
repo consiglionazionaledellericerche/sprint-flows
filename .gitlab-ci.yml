@@ -23,7 +23,7 @@ stages:
   - deploy_prod_container
 
 
-deploy_nexus_snapshot:
+deploy_dev_snapshot:
   stage: deploy_snapshot
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   only:
@@ -34,17 +34,23 @@ deploy_nexus_snapshot:
 
 # branch TEST & DEMO
 
-buildtestcontainer:
-  stage: build_test_container
-  image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
-  tags:
-    - shared
+deploy_snapshot:
+  stage: deploy_snapshot
   only:
     - test
     - demo
   script:
     - mvn -B clean compile package deploy -DskipTests -Pprod
     - cp ./target/*.war ./target/app.war
+
+buildtestcontainer:
+  stage: build_test_container
+  tags:
+    - shared
+  only:
+    - test
+    - demo
+  script:
     - echo "Running build image and push image"
     - docker build --file src/main/docker/Dockerfile -t docker.si.cnr.it/sprint-flows-$CI_COMMIT_REF_NAME .
     - docker push docker.si.cnr.it/sprint-flows-$CI_COMMIT_REF_NAME
