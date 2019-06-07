@@ -118,6 +118,7 @@ public class ManageProcessAccordiInternazionaliBandi_v1 implements ExecutionList
 		};break;  	
 		case "endevent-bando-start": {
 			execution.setVariable(STATO_FINALE_VERBALE, "VERBALE APPROVATO");
+			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "APPROVATO");
 		};break;    	
 
 		case "process-end": {
