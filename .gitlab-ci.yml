@@ -2,7 +2,7 @@ image: docker:stable
 
 variables:
   DOCKER_DRIVER: overlay2
-  MAVEN_OPTS: -Dmaven.repo.local=.m2 -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+  MAVEN_OPTS: -Dmaven.repo.local=./.m2 -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
   CNR_MAVEN_VERSION: 3.4.0
 
 services:
@@ -46,6 +46,10 @@ deploy_snapshot:
   only:
     - test
     - demo
+  cache:
+    key: $CI_COMMIT_SHORT_SHA
+    paths:
+      - target/app.war
   script:
     - mvn -B clean compile package deploy -DskipTests -Pprod
     - cp ./target/*.war ./target/app.war
