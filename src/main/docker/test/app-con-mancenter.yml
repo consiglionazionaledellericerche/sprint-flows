@@ -16,9 +16,11 @@ services:
     links:
       - sprint-flows-demo_cnr
     environment:
-      - ADDITIONAL_BACKEND_DOCKERWEBTEST02=server dockerwebtest02.si.cnr.it:1480
+      - ADDITIONAL_BACKEND_DOCKERWEBTEST02="server dockerwebtest02.si.cnr.it:1480"
+      - STATS_PORT=1484
     ports:
       - 1480:80
+      - 1484:1484
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
