@@ -15,6 +15,7 @@ cache:
     - node/
     - node/modules/
     - src/main/webapp/bower_components
+    - target/app.war
 
 stages:
   - deploy_snapshot
@@ -30,10 +31,6 @@ deploy_dev_snapshot:
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   only:
     - dev
-  cache:
-    key: $CI_COMMIT_SHORT_SHA
-    paths:
-      - target/app.war
   script:
     - mvn -B clean compile package deploy -DskipTests -Pdev
 
@@ -46,10 +43,6 @@ deploy_snapshot:
   only:
     - test
     - demo
-  cache:
-    key: $CI_COMMIT_SHORT_SHA
-    paths:
-      - target/app.war
   script:
     - mvn -B clean compile package deploy -DskipTests -Pprod
     - cp ./target/*.war ./target/app.war
