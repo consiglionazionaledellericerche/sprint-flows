@@ -51,6 +51,7 @@ deploy_snapshot:
 
 buildtestcontainer:
   stage: build_test_container
+  image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   tags:
     - shared
   only:
