@@ -17,8 +17,7 @@ services:
     links:
       - sprint-flows-demo_cnr
     environment:
-      - ADDITIONAL_BACKEND_WEBTEST=server dockerwebtest02 dockerwebtest02.si.cnr.it:1481 check inter 2000 rise 2 fall 3,server dockerwebtest01 dockerwebtest01.si.cnr.it:1481 check inter 2000 rise 2 fall 3
-      - EXTRA_FRONTEND_SETTINGS_1480=balance roundrobin, default_backend WEBTEST
+      - ADDITIONAL_BACKEND_default_service=server dockerwebtest02 dockerwebtest02.si.cnr.it:1481 check inter 2000 rise 2 fall 3,server dockerwebtest01 dockerwebtest01.si.cnr.it:1481 check inter 2000 rise 2 fall 3
       - STATS_PORT=1484
     ports:
       - 1480:1480
