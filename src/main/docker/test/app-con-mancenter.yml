@@ -10,16 +10,18 @@ services:
       - JHIPSTER_SLEEP=10 # gives time for the database to boot before the application
     ports:
       - 1481:8080
+      - 1489:5701
 
   lb:
     image: dockercloud/haproxy
     links:
       - sprint-flows-demo_cnr
     environment:
-      - ADDITIONAL_BACKEND_DOCKERWEBTEST02="server dockerwebtest02.si.cnr.it:1480"
+      - ADDITIONAL_BACKEND_WEBTEST=server dockerwebtest02 dockerwebtest02.si.cnr.it:1481 check inter 2000 rise 2 fall 3,server dockerwebtest01 dockerwebtest01.si.cnr.it:1481 check inter 2000 rise 2 fall 3
+      - EXTRA_FRONTEND_SETTINGS_1480=balance roundrobin, default_backend WEBTEST
       - STATS_PORT=1484
     ports:
-      - 1480:80
+      - 1480:1480
       - 1484:1484
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
