@@ -68,7 +68,7 @@ public class CacheConfiguration {
         String hazelcastInstanceName = env.getProperty("cache.hazelcast.name", String.class, "sprint");
         Integer hazelcastPort = env.getProperty("cache.hazelcast.port", Integer.class, 5701);
         Integer hazelcastMulticastPort = env.getProperty("cache.hazelcast.multicastPort", Integer.class, 54327);
-        Integer hazelcastOutboundPort = env.getProperty("cache.hazelcast.outboundPort", Integer.class);
+        Integer hazelcastOutboundPort = env.getProperty("cache.hazelcast.outboundPort", Integer.class, 1488);
         String members = env.getProperty("cache.hazelcast.members");
 
         config.setInstanceName(hazelcastInstanceName);
