@@ -78,8 +78,10 @@ public class CacheConfiguration {
         config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
         config.getNetworkConfig().getJoin().getAwsConfig().setEnabled(false);
 
-        if (hazelcastOutboundPort != null)
+        if (hazelcastOutboundPort != null) {
+            log.info("hazelcastOutboundPort: " + hazelcastOutboundPort);
             config.getNetworkConfig().addOutboundPort(hazelcastOutboundPort);
+        }
 
         config.setGroupConfig(new GroupConfig());
         config.getGroupConfig().setName("sprint-flows");
