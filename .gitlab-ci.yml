@@ -97,7 +97,7 @@ release_artifact:
     - git checkout -B "$CI_BUILD_REF_NAME"
     # mi metto in condizione del push per l'utente con la deploy key
     - echo $CI_PROJECT_PATH
-    - git remote set-url --push origin git@git.si.cnr.it:$CI_PROJECT_PATH.git
+    - git remote set-url --push origin git@git.si.cnr.it:documentale/sprint-flows.git
     - mvn -Dresume=false release:prepare release:perform -Pprod -DpushChanges=false -DlocalCheckout=true -DskipTests -Darguments="-Dmaven.test.skip=true -DskipTests"
     - git push --tags
     - git commit --amend -m "[ci skip] prepare for next development iteration"
