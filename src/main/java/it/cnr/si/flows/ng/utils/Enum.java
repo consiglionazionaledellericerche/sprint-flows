@@ -72,13 +72,26 @@ public class Enum {
         RimozioneDaPubblicazioneTrasparenza,
         RimozioneDaPubblicazioneUrp,
         SostituzioneProtocollo,
-        RettificaProtocollo
+        RettificaProtocollo,
+        linkDaAltraApplicazione,
+        GenerazioneDaSistema
     }
 
+    public enum StatoDomandeAccordiInternazionaliEnum {
+    	APERTA,
+    	CHIUSA,
+    	INVIATA,
+    	RESPINTA,
+    	VALUTATA_SCIENTIFICAMENTE,
+    	ACCETATA,
+    	CANCELLATA;
+    }
 
     public enum ProcessDefinitionEnum {
         acquisti("acquisti"),
         permessiFerie("permessi-ferie"),
+        accordiInternazionaliBandi("accordi-internazionali-bandi"),
+        accordiInternazionaliDomande("accordi-internazionali-domande"),
         iscrizioneElencoOiv("iscrizione-elenco-oiv");
 
         private String value;
