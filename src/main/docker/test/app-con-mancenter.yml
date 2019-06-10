@@ -13,14 +13,12 @@ services:
       - 1489:5701
 
   lb:
-    image: dockercloud/haproxy
-    links:
-      - sprint-flows-demo_cnr
+    image: eeacms/haproxy
     environment:
-      - ADDITIONAL_BACKEND_default_service=server dockerwebtest02 dockerwebtest02.si.cnr.it:1481 check inter 2000 rise 2 fall 3,server dockerwebtest01 dockerwebtest01.si.cnr.it:1481 check inter 2000 rise 2 fall 3
+      - BACKENDS=dockerwebtest01.si.cnr.it:1481 dockerwebtest02.si.cnr.it:1481
       - STATS_PORT=1484
     ports:
-      - 1480:1480
+      - 1480:5000
       - 1484:1484
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
