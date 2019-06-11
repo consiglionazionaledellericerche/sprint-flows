@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
 import static it.cnr.si.security.PermissionEvaluatorImpl.CNR_CODE;
 
 @Service
@@ -68,6 +69,18 @@ public class AceBridgeService {
 	public List<EntitaOrganizzativaWebDto> getUoLike(String uoName) {
 
 		return aceService.entitaOrganizzativaFind(null, null, uoName, LocalDate.now(), null)
+				.getItems()
+				.stream()
+				.filter(e -> Enum.TipiEOPerAutocomplete.contains(e.getTipo().getId()))
+				//                .map(e -> Pair.of(e.getId(), e.getCdsuo() +" - "+ e.getDenominazione()))
+				.collect(Collectors.toList());
+	}
+
+
+//	todo: in futuro rendere cacheable?
+	public List<EntitaOrganizzativaWebDto> getUoByTipo(int tipo) {
+
+		return aceService.entitaOrganizzativaFind(null, null, null, LocalDate.now(), tipo)
 				.getItems()
 				.stream()
 				.filter(e -> Enum.TipiEOPerAutocomplete.contains(e.getTipo().getId()))
