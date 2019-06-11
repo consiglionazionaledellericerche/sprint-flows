@@ -5,3 +5,4 @@ ID;GROUP_NAME;GROUP_RELATIONSHIP;GROUP_ROLE
 4;direttore@99999;delegatofirma@99999;coordinator
 5;direttore@STRUTTURA;responsabile-struttura@STRUTTURA;member
 6;responsabile-sede@STRUTTURA;responsabile-struttura@STRUTTURA;member
+7;direttoreFF@STRUTTURA;responsabile-struttura@STRUTTURA;member
