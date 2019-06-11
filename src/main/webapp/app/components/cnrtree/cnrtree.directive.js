@@ -12,6 +12,7 @@
         siglaList: "@",
         listName: "@",
         stringList: "@",
+        dipartimentiList: "@",
         cdsuo: "@?",
         label: "@",
         ngModel: "=",
@@ -31,15 +32,15 @@
           plugins: ["search"]
         };
 
-        $scope.$watch("filter", function(newVal, oldVal, scope) {
-            if ($scope.treeInstance) {
-                if (newVal === '') {
-                    $scope.treeInstance.jstree(true).clear_search ();
-                    $scope.treeInstance.jstree(true).close_all();
-                } else {
-                    $scope.treeInstance.jstree(true).search(newVal, true, true);
-                }
+        $scope.$watch("filter", function (newVal, oldVal, scope) {
+          if ($scope.treeInstance) {
+            if (newVal === '') {
+              $scope.treeInstance.jstree(true).clear_search();
+              $scope.treeInstance.jstree(true).close_all();
+            } else {
+              $scope.treeInstance.jstree(true).search(newVal, true, true);
             }
+          }
         })
 
         $scope.jsonlist = [];
@@ -99,20 +100,38 @@
               }
             );
           } else {
-            dataService.dynamiclist.byName($scope.listName).then(
-              function (response) {
-                var lists = JSON.parse(response.data.listjson);
-                var type =
-                  $scope.cdsuo !== undefined && $scope.cdsuo !== ""
-                    ? $scope.cdsuo
-                    : "default";
-                $scope.jsonlist = lists[type];
-                $scope.treeConfig.version++;
-              },
-              function (response) {
-                $log.error(response);
-              }
-            );
+            if ($scope.dipartimentiList) {
+              dataService.search.dipartimentiList(21).then(
+                function (response) {
+                  $scope.jsonlist = response.data.results.map(function (el) {
+                    return {
+                      id: el.value,
+                      text: el.label,
+                      icon: "glyphicon glyphicon-file"
+                    };
+                  });
+                  $scope.treeConfig.version++;
+                },
+                function (response) {
+                  $log.error(response);
+                }
+              );
+            } else {
+              dataService.dynamiclist.byName($scope.listName).then(
+                function (response) {
+                  var lists = JSON.parse(response.data.listjson);
+                  var type =
+                    $scope.cdsuo !== undefined && $scope.cdsuo !== ""
+                      ? $scope.cdsuo
+                      : "default";
+                  $scope.jsonlist = lists[type];
+                  $scope.treeConfig.version++;
+                },
+                function (response) {
+                  $log.error(response);
+                }
+              );
+            }
           }
         }
 
