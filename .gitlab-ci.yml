@@ -12,6 +12,7 @@ cache:
   key: $CI_COMMIT_REF_NAME
   paths:
     - .m2/repository/
+    - ~/.npm
     - node/
     - node/modules/
     - src/main/webapp/bower_components
