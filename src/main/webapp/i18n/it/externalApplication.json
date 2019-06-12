@@ -1,0 +1,13 @@
+{
+    "sprintApp": {
+        "ExternalApplication" : {
+            "null": "",
+            "ABIL": "ABIL",
+            "SIGLA": "SIGLA",
+            "ACE": "ACE",
+            "MISSIONI": "MISSIONI",
+            "ATTESTATI": "ATTESTATI",
+            "GENERIC": "GENERIC"
+        }
+    }
+}
