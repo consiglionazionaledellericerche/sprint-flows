@@ -1,7 +1,7 @@
 package it.cnr.si.service;
 
-import com.google.gson.Gson;
 import it.cnr.si.domain.ExternalMessage;
+import it.cnr.si.domain.enumeration.ExternalApplication;
 import it.cnr.si.domain.enumeration.ExternalMessageStatus;
 import it.cnr.si.domain.enumeration.ExternalMessageVerb;
 import it.cnr.si.repository.ExternalMessageRepository;
@@ -78,13 +78,15 @@ public class ExternalMessageService {
         externalMessageRepository.delete(id);
     }
 
-    public void createExternalMessage(String url, ExternalMessageVerb verb, Map<String, Object> payload) {
+    public void createExternalMessage(String url, ExternalMessageVerb verb, Map<String, Object> payload, ExternalApplication app) {
 
-        
         JSONObject payloadString = new JSONObject(payload);
-
-
         ExternalMessage msg = new ExternalMessage();
+
+        if (app != null)
+            msg.setApplication(app);
+        else
+            msg.setApplication(ExternalApplication.GENERIC);
 
         msg.setUrl(url);
         msg.setVerb(verb);
