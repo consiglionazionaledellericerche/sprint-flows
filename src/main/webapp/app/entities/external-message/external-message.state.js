@@ -48,6 +48,7 @@
                     $translatePartialLoader.addPart('externalMessage');
                     $translatePartialLoader.addPart('externalMessageVerb');
                     $translatePartialLoader.addPart('externalMessageStatus');
+                    $translatePartialLoader.addPart('externalApplication');
                     $translatePartialLoader.addPart('global');
                     return $translate.refresh();
                 }]
@@ -72,6 +73,7 @@
                     $translatePartialLoader.addPart('externalMessage');
                     $translatePartialLoader.addPart('externalMessageVerb');
                     $translatePartialLoader.addPart('externalMessageStatus');
+                    $translatePartialLoader.addPart('externalApplication');
                     return $translate.refresh();
                 }],
                 entity: ['$stateParams', 'ExternalMessage', function($stateParams, ExternalMessage) {
@@ -134,6 +136,7 @@
                                 status: null,
                                 retries: null,
                                 lastErrorMessage: null,
+                                application: null,
                                 id: null
                             };
                         }
