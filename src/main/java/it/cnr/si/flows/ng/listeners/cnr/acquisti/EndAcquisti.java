@@ -15,7 +15,7 @@ public class EndAcquisti {
 
     public void onEvent(ActivitiEvent event) {
         if (event.getType() == ActivitiEventType.PROCESS_COMPLETED) {
-            externalMessageService.createExternalMessage("url", ExternalMessageVerb.POST, new HashMap(), null);
+            //externalMessageService.createExternalMessage("url", ExternalMessageVerb.POST, new HashMap(), null);
         }
     }
 }
