@@ -24,6 +24,7 @@ import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Enum.StatoDomandeAccordiInternazionaliEnum;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
+import it.cnr.si.domain.enumeration.ExternalApplication;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -77,8 +78,7 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 				put("stato", statoDomanda.name().toString());
 			}	
 		};	
-		externalMessageService.createExternalMessage(urlAccordiBilaterali, ExternalMessageVerb.POST, abilPayload, null);
-
+		externalMessageService.createExternalMessage(urlAccordiBilaterali, ExternalMessageVerb.POST, abilPayload, ExternalApplication.ABIL);
 	}
 
 

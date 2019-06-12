@@ -1,6 +1,7 @@
 package it.cnr.si.flows.ng.listeners.cnr.acquisti;
 
 
+import it.cnr.si.domain.enumeration.ExternalApplication;
 import it.cnr.si.domain.enumeration.ExternalMessageVerb;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.listeners.cnr.acquisti.service.AcquistiService;
@@ -699,7 +700,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			//TODO implementare le url a seconda del contesto
 			String urlSigla = "www.google.it";
 			Map<String, Object> siglaPayload = createSiglaPayload(execution);
-			externalMessageService.createExternalMessage(urlSigla, ExternalMessageVerb.POST, siglaPayload, null);
+			externalMessageService.createExternalMessage(urlSigla, ExternalMessageVerb.POST, siglaPayload, ExternalApplication.SIGLA);
 			prepareFilesToSigla(execution);
 		};break;     
 		case "end-stipulato-end": {
