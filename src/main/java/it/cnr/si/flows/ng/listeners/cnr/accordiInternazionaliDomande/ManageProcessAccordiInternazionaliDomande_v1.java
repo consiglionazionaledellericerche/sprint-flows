@@ -17,7 +17,6 @@ import it.cnr.si.flows.ng.service.FirmaDocumentoService;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.service.FlowsPdfService;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
-import it.cnr.si.flows.ng.service.FlowsTaskService;
 import it.cnr.si.flows.ng.service.ProtocolloDocumentoService;
 import it.cnr.si.service.ExternalMessageService;
 import it.cnr.si.domain.enumeration.ExternalMessageVerb;
@@ -78,7 +77,7 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 				put("stato", statoDomanda.name().toString());
 			}	
 		};	
-		externalMessageService.createExternalMessage(urlAccordiBilaterali, ExternalMessageVerb.POST, abilPayload);
+		externalMessageService.createExternalMessage(urlAccordiBilaterali, ExternalMessageVerb.POST, abilPayload, null);
 
 	}
 

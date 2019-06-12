@@ -2,9 +2,9 @@ package it.cnr.si.web.rest;
 
 import it.cnr.si.SprintApp;
 import it.cnr.si.domain.ExternalMessage;
+import it.cnr.si.flows.ng.TestUtil;
 import it.cnr.si.repository.ExternalMessageRepository;
 import it.cnr.si.service.ExternalMessageService;
-import it.cnr.si.flows.ng.TestUtil;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import it.cnr.si.domain.enumeration.ExternalMessageVerb;
 import it.cnr.si.domain.enumeration.ExternalMessageStatus;
+import it.cnr.si.domain.enumeration.ExternalApplication;
 /**
  * Test class for the ExternalMessageResource REST controller.
  *
@@ -55,6 +56,9 @@ public class ExternalMessageResourceIntTest {
     private static final Integer UPDATED_RETRIES = 2;
     private static final String DEFAULT_LAST_ERROR_MESSAGE = "AAAAA";
     private static final String UPDATED_LAST_ERROR_MESSAGE = "BBBBB";
+
+    private static final ExternalApplication DEFAULT_APPLICATION = ExternalApplication.ABIL;
+    private static final ExternalApplication UPDATED_APPLICATION = ExternalApplication.SIGLA;
 
     @Inject
     private ExternalMessageRepository externalMessageRepository;
@@ -99,7 +103,8 @@ public class ExternalMessageResourceIntTest {
                 .payload(DEFAULT_PAYLOAD)
                 .status(DEFAULT_STATUS)
                 .retries(DEFAULT_RETRIES)
-                .lastErrorMessage(DEFAULT_LAST_ERROR_MESSAGE);
+                .lastErrorMessage(DEFAULT_LAST_ERROR_MESSAGE)
+                .application(DEFAULT_APPLICATION);
         return externalMessage;
     }
 
@@ -130,6 +135,7 @@ public class ExternalMessageResourceIntTest {
         assertThat(testExternalMessage.getStatus()).isEqualTo(DEFAULT_STATUS);
         assertThat(testExternalMessage.getRetries()).isEqualTo(DEFAULT_RETRIES);
         assertThat(testExternalMessage.getLastErrorMessage()).isEqualTo(DEFAULT_LAST_ERROR_MESSAGE);
+        assertThat(testExternalMessage.getApplication()).isEqualTo(DEFAULT_APPLICATION);
     }
 
     @Test
@@ -206,6 +212,42 @@ public class ExternalMessageResourceIntTest {
 
     @Test
     @Transactional
+    public void checkRetriesIsRequired() throws Exception {
+        int databaseSizeBeforeTest = externalMessageRepository.findAll().size();
+        // set the field null
+        externalMessage.setRetries(null);
+
+        // Create the ExternalMessage, which fails.
+
+        restExternalMessageMockMvc.perform(post("/api/external-messages")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(externalMessage)))
+                .andExpect(status().isBadRequest());
+
+        List<ExternalMessage> externalMessages = externalMessageRepository.findAll();
+        assertThat(externalMessages).hasSize(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    public void checkApplicationIsRequired() throws Exception {
+        int databaseSizeBeforeTest = externalMessageRepository.findAll().size();
+        // set the field null
+        externalMessage.setApplication(null);
+
+        // Create the ExternalMessage, which fails.
+
+        restExternalMessageMockMvc.perform(post("/api/external-messages")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(externalMessage)))
+                .andExpect(status().isBadRequest());
+
+        List<ExternalMessage> externalMessages = externalMessageRepository.findAll();
+        assertThat(externalMessages).hasSize(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
     public void getAllExternalMessages() throws Exception {
         // Initialize the database
         externalMessageRepository.saveAndFlush(externalMessage);
@@ -220,7 +262,8 @@ public class ExternalMessageResourceIntTest {
                 .andExpect(jsonPath("$.[*].payload").value(hasItem(DEFAULT_PAYLOAD.toString())))
                 .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS.toString())))
                 .andExpect(jsonPath("$.[*].retries").value(hasItem(DEFAULT_RETRIES)))
-                .andExpect(jsonPath("$.[*].lastErrorMessage").value(hasItem(DEFAULT_LAST_ERROR_MESSAGE.toString())));
+                .andExpect(jsonPath("$.[*].lastErrorMessage").value(hasItem(DEFAULT_LAST_ERROR_MESSAGE.toString())))
+                .andExpect(jsonPath("$.[*].application").value(hasItem(DEFAULT_APPLICATION.toString())));
     }
 
     @Test
@@ -239,7 +282,8 @@ public class ExternalMessageResourceIntTest {
             .andExpect(jsonPath("$.payload").value(DEFAULT_PAYLOAD.toString()))
             .andExpect(jsonPath("$.status").value(DEFAULT_STATUS.toString()))
             .andExpect(jsonPath("$.retries").value(DEFAULT_RETRIES))
-            .andExpect(jsonPath("$.lastErrorMessage").value(DEFAULT_LAST_ERROR_MESSAGE.toString()));
+            .andExpect(jsonPath("$.lastErrorMessage").value(DEFAULT_LAST_ERROR_MESSAGE.toString()))
+            .andExpect(jsonPath("$.application").value(DEFAULT_APPLICATION.toString()));
     }
 
     @Test
@@ -266,7 +310,8 @@ public class ExternalMessageResourceIntTest {
                 .payload(UPDATED_PAYLOAD)
                 .status(UPDATED_STATUS)
                 .retries(UPDATED_RETRIES)
-                .lastErrorMessage(UPDATED_LAST_ERROR_MESSAGE);
+                .lastErrorMessage(UPDATED_LAST_ERROR_MESSAGE)
+                .application(UPDATED_APPLICATION);
 
         restExternalMessageMockMvc.perform(put("/api/external-messages")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -283,6 +328,7 @@ public class ExternalMessageResourceIntTest {
         assertThat(testExternalMessage.getStatus()).isEqualTo(UPDATED_STATUS);
         assertThat(testExternalMessage.getRetries()).isEqualTo(UPDATED_RETRIES);
         assertThat(testExternalMessage.getLastErrorMessage()).isEqualTo(UPDATED_LAST_ERROR_MESSAGE);
+        assertThat(testExternalMessage.getApplication()).isEqualTo(UPDATED_APPLICATION);
     }
 
     @Test
