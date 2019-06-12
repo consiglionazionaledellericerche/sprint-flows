@@ -80,7 +80,7 @@ class ExternalMessageGatlingTest extends Simulation {
             .exec(http("Create new externalMessage")
             .post("/api/external-messages")
             .headers(headers_http_authenticated)
-            .body(StringBody("""{"id":null, "url":"SAMPLE_TEXT", "verb":null, "payload":"SAMPLE_TEXT", "status":null, "retries":"0", "lastErrorMessage":"SAMPLE_TEXT"}""")).asJSON
+            .body(StringBody("""{"id":null, "url":"SAMPLE_TEXT", "verb":null, "payload":"SAMPLE_TEXT", "status":null, "retries":"0", "lastErrorMessage":"SAMPLE_TEXT", "application":null}""")).asJSON
             .check(status.is(201))
             .check(headerRegex("Location", "(.*)").saveAs("new_externalMessage_url"))).exitHereIfFailed
             .pause(10)

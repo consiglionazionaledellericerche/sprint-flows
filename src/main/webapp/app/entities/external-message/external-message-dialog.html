@@ -72,13 +72,40 @@
             <label class="control-label" translate="sprintApp.externalMessage.retries" for="field_retries">Retries</label>
             <input type="number" class="form-control" name="retries" id="field_retries"
                     ng-model="vm.externalMessage.retries"
-                     />
+                    required />
+            <div ng-show="editForm.retries.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.retries.$error.required" translate="entity.validation.required">
+                    This field is required.
+                </p>
+                <p class="help-block"
+                    ng-show="editForm.retries.$error.number" translate="entity.validation.number">
+                    This field should be a number.
+                </p>
+            </div>
         </div>
         <div class="form-group">
             <label class="control-label" translate="sprintApp.externalMessage.lastErrorMessage" for="field_lastErrorMessage">Last Error Message</label>
             <input type="text" class="form-control" name="lastErrorMessage" id="field_lastErrorMessage"
                     ng-model="vm.externalMessage.lastErrorMessage"
                      />
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="sprintApp.externalMessage.application" for="field_application">Application</label>
+            <select class="form-control" name="application" ng-model="vm.externalMessage.application" id="field_application" required>
+                <option value="ABIL" translate="sprintApp.ExternalApplication.ABIL">ABIL</option>
+                <option value="SIGLA" translate="sprintApp.ExternalApplication.SIGLA">SIGLA</option>
+                <option value="ACE" translate="sprintApp.ExternalApplication.ACE">ACE</option>
+                <option value="MISSIONI" translate="sprintApp.ExternalApplication.MISSIONI">MISSIONI</option>
+                <option value="ATTESTATI" translate="sprintApp.ExternalApplication.ATTESTATI">ATTESTATI</option>
+                <option value="GENERIC" translate="sprintApp.ExternalApplication.GENERIC">GENERIC</option>
+            </select>
+            <div ng-show="editForm.application.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.application.$error.required" translate="entity.validation.required">
+                    This field is required.
+                </p>
+            </div>
         </div>
 
     </div>
