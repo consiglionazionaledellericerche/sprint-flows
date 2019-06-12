@@ -42,6 +42,14 @@
         {
             "fieldName": "lastErrorMessage",
             "fieldType": "String"
+        },
+        {
+            "fieldName": "application",
+            "fieldType": "ExternalApplication",
+            "fieldValues": "ABIL,SIGLA,ACE,MISSIONI,ATTESTATI,GENERIC",
+            "fieldValidateRules": [
+                "required"
+            ]
         }
     ],
     "changelogDate": "20190320102314",
