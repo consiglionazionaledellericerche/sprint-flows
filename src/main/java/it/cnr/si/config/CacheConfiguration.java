@@ -16,6 +16,10 @@ import org.springframework.core.env.Environment;
 
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @Configuration
@@ -68,7 +72,7 @@ public class CacheConfiguration {
         String hazelcastInstanceName = env.getProperty("cache.hazelcast.name", String.class, "sprint");
         Integer hazelcastPort = env.getProperty("cache.hazelcast.port", Integer.class, 5701);
         Integer hazelcastMulticastPort = env.getProperty("cache.hazelcast.multicastPort", Integer.class, null);
-        Integer hazelcastOutboundPort = env.getProperty("cache.hazelcast.outboundPort", Integer.class, 1488);
+        String hazelcastOutboundPort = env.getProperty("cache.hazelcast.outboundPort", String.class, null);
         String members = env.getProperty("cache.hazelcast.members");
 
         config.setInstanceName(hazelcastInstanceName);
@@ -77,6 +81,14 @@ public class CacheConfiguration {
 
         config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
         config.getNetworkConfig().getJoin().getAwsConfig().setEnabled(false);
+
+        if (hazelcastOutboundPort != null) {
+            log.info("hazelcastOutboundPort: " + hazelcastOutboundPort);
+
+            List<String> outboundPorts = new ArrayList<>();
+            outboundPorts.add(hazelcastOutboundPort);
+            config.getNetworkConfig().setOutboundPortDefinitions(outboundPorts);
+        }
 
         config.setGroupConfig(new GroupConfig());
         config.getGroupConfig().setName("sprint-flows");
@@ -91,10 +103,6 @@ public class CacheConfiguration {
             config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(true);
             config.getNetworkConfig().getJoin().getMulticastConfig().setMulticastPort(hazelcastMulticastPort);
             config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(false);
-        } else if (hazelcastOutboundPort != null) {
-            log.info("hazelcastOutboundPort: " + hazelcastOutboundPort);
-            config.getNetworkConfig().addOutboundPort(hazelcastOutboundPort);
-            config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(true);
         } else {
             config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(false);
         }
