@@ -67,7 +67,7 @@ public class CacheConfiguration {
 
         String hazelcastInstanceName = env.getProperty("cache.hazelcast.name", String.class, "sprint");
         Integer hazelcastPort = env.getProperty("cache.hazelcast.port", Integer.class, 5701);
-        Integer hazelcastMulticastPort = env.getProperty("cache.hazelcast.multicastPort", Integer.class, 54327);
+        Integer hazelcastMulticastPort = env.getProperty("cache.hazelcast.multicastPort", Integer.class, null);
         Integer hazelcastOutboundPort = env.getProperty("cache.hazelcast.outboundPort", Integer.class, 1488);
         String members = env.getProperty("cache.hazelcast.members");
 
@@ -77,11 +77,6 @@ public class CacheConfiguration {
 
         config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
         config.getNetworkConfig().getJoin().getAwsConfig().setEnabled(false);
-
-        if (hazelcastOutboundPort != null) {
-            log.info("hazelcastOutboundPort: " + hazelcastOutboundPort);
-            config.getNetworkConfig().addOutboundPort(hazelcastOutboundPort);
-        }
 
         config.setGroupConfig(new GroupConfig());
         config.getGroupConfig().setName("sprint-flows");
@@ -96,6 +91,10 @@ public class CacheConfiguration {
             config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(true);
             config.getNetworkConfig().getJoin().getMulticastConfig().setMulticastPort(hazelcastMulticastPort);
             config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(false);
+        } else if (hazelcastOutboundPort != null) {
+            log.info("hazelcastOutboundPort: " + hazelcastOutboundPort);
+            config.getNetworkConfig().addOutboundPort(hazelcastOutboundPort);
+            config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(true);
         } else {
             config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(false);
         }
