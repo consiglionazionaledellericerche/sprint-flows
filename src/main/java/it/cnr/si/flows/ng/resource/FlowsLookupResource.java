@@ -1,5 +1,6 @@
 package it.cnr.si.flows.ng.resource;
 
+import it.cnr.si.config.ExtenalMessageSender;
 import it.cnr.si.flows.ng.ldap.LdapPersonToSearchResultMapper;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.utils.Utils;
@@ -45,6 +46,9 @@ public class FlowsLookupResource {
     @Inject
     private RestResponseFactory restResponseFactory;
 
+    @Inject
+    private ExtenalMessageSender extenalMessageSender;
+
     @RequestMapping(value = "/ace/user/{username:.+}", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.ADMIN)
     public List<String> getAce(@PathVariable String username) {
@@ -83,6 +87,15 @@ public class FlowsLookupResource {
         List<Utils.SearchResult> result = ldapTemplate.search( criteria, new LdapPersonToSearchResultMapper());
 
         return ResponseEntity.ok(result.get(0));
+    }
+
+    @RequestMapping(value = "/runcron", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
+    public ResponseEntity<Void> runCron(@PathVariable String username) {
+
+        extenalMessageSender.sendMessages();
+        extenalMessageSender.sendErrorMessages();
+        return ResponseEntity.ok().build();
     }
 
 }
