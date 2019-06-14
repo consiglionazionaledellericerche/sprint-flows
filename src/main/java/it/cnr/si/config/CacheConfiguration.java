@@ -16,6 +16,7 @@ import org.springframework.core.env.Environment;
 
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -102,7 +103,7 @@ public class CacheConfiguration {
         if (members != null) {
             log.info("TCP members: " + members);
             config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(true);
-            config.getNetworkConfig().getJoin().getTcpIpConfig().addMember(members);
+            config.getNetworkConfig().getJoin().getTcpIpConfig().setMembers(Arrays.asList(members.split(",")));
         } else if (hazelcastMulticastPort != null) {
             log.info("multicast on port " + hazelcastMulticastPort);
             config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(true);
