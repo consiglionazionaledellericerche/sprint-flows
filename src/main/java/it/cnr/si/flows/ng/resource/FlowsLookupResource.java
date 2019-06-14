@@ -2,6 +2,7 @@ package it.cnr.si.flows.ng.resource;
 
 import it.cnr.si.flows.ng.ldap.LdapPersonToSearchResultMapper;
 import it.cnr.si.flows.ng.service.AceBridgeService;
+import it.cnr.si.flows.ng.service.SiperService;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.FlowsLdapAccountService;
@@ -44,6 +45,8 @@ public class FlowsLookupResource {
     private RestResponseFactory restResponseFactory;
     @Inject
     private FlowsLdapAccountService flowsLdapAccountService;
+    @Inject
+    private SiperService siperService;
 
     @RequestMapping(value = "/ace/user/{username:.+}", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.ADMIN)
@@ -96,4 +99,10 @@ public class FlowsLookupResource {
         return ResponseEntity.ok(result.get(0));
     }
 
+    @RequestMapping(value = "/siper/responsabilesede/{cdsuo:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.ADMIN)
+    public ResponseEntity<List<Map<String, Object>>> getResponsabileSede(@PathVariable String cdsuo) {
+
+        return ResponseEntity.ok(siperService.getResponsabileCDSUO(cdsuo));
+    }
 }
