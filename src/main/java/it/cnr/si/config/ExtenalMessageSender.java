@@ -138,7 +138,8 @@ public class ExtenalMessageSender {
         @Override
         public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 
-            request.getHeaders().add("Authorization", "Bearer "+ id_token);
+            request.getHeaders().set("Authorization", "Bearer "+ id_token);
+            request.getHeaders().set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
             ClientHttpResponse response = execution.execute(request, body);
 
             if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
@@ -148,6 +149,7 @@ public class ExtenalMessageSender {
                 auth.put("password", env.getProperty("cnr.abil.password"));
                 MultiValueMap<String, String> headers = new HttpHeaders();
                 headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+
                 RequestEntity entity = new RequestEntity(
                         auth,
                         headers,
@@ -158,7 +160,8 @@ public class ExtenalMessageSender {
 
                 this.id_token = (String) resp.getBody().get("id_token");
 
-                request.getHeaders().add("Authorization", "Bearer "+ id_token);
+                request.getHeaders().set("Authorization", "Bearer "+ id_token);
+                request.getHeaders().set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
                 response = execution.execute(request, body);
             }
 
