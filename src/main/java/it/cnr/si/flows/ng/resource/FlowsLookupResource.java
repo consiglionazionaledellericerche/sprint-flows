@@ -1,5 +1,6 @@
 package it.cnr.si.flows.ng.resource;
 
+import it.cnr.si.config.ExtenalMessageSender;
 import it.cnr.si.flows.ng.ldap.LdapPersonToSearchResultMapper;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.SiperService;
@@ -9,7 +10,8 @@ import it.cnr.si.service.FlowsLdapAccountService;
 import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
 import org.activiti.engine.ManagementService;
 import org.activiti.rest.service.api.RestResponseFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +37,8 @@ import java.util.Map;
 @Profile("cnr")
 public class FlowsLookupResource {
 
+    private final Logger log = LoggerFactory.getLogger(FlowsLookupResource.class);
+
     @Inject
     private LdapTemplate ldapTemplate;
     @Inject
@@ -47,6 +51,8 @@ public class FlowsLookupResource {
     private FlowsLdapAccountService flowsLdapAccountService;
     @Inject
     private SiperService siperService;
+    @Inject
+    private ExtenalMessageSender extenalMessageSender;
 
     @RequestMapping(value = "/ace/user/{username:.+}", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.ADMIN)
@@ -105,4 +111,15 @@ public class FlowsLookupResource {
 
         return ResponseEntity.ok(siperService.getResponsabileCDSUO(cdsuo));
     }
+
+    @RequestMapping(value = "/runcron", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
+    public ResponseEntity<Void> runCron() {
+
+        log.info("Running crons");
+        extenalMessageSender.sendMessagesDo();
+        extenalMessageSender.sendErrorMessagesDo();
+        return ResponseEntity.ok().build();
+    }
+
 }
