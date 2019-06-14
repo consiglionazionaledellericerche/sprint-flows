@@ -75,14 +75,12 @@ public class CacheConfiguration {
         String publicIp = env.getProperty("cache.hazelcast.publicIp");
         String localIp = System.getProperty("local.ip");
 
-        //
-//        config.setProperty("hazelcast.local.localAddress", localIp);
         NetworkConfig networkConfig = config.getNetworkConfig();
         InterfacesConfig networkInterface = networkConfig.getInterfaces();
-        networkInterface.setEnabled(true).addInterface(localIp);
-        networkConfig.setPublicAddress(publicIp);
-
-        //
+        if(localIp != null)
+            networkInterface.setEnabled(true).addInterface(localIp);
+        if(publicIp != null)
+            networkConfig.setPublicAddress(publicIp);
 
         config.setInstanceName(hazelcastInstanceName);
         config.getNetworkConfig().setPort(hazelcastPort);
