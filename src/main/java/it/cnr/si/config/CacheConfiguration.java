@@ -74,6 +74,17 @@ public class CacheConfiguration {
         Integer hazelcastMulticastPort = env.getProperty("cache.hazelcast.multicastPort", Integer.class, null);
         String hazelcastOutboundPort = env.getProperty("cache.hazelcast.outboundPort", String.class, null);
         String members = env.getProperty("cache.hazelcast.members");
+        String publicIp = env.getProperty("cache.hazelcast.publicIp");
+        String localIp = System.getProperty("local.ip");
+
+        //
+        config.setProperty("hazelcast.local.localAddress", localIp);
+        NetworkConfig networkConfig = config.getNetworkConfig();
+        InterfacesConfig networkInterface = networkConfig.getInterfaces();
+        networkInterface.setEnabled(true).addInterface(localIp);
+        networkConfig.setPublicAddress(publicIp);
+
+        //
 
         config.setInstanceName(hazelcastInstanceName);
         config.getNetworkConfig().setPort(hazelcastPort);

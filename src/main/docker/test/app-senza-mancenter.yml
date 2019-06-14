@@ -8,6 +8,12 @@ services:
       - SPRING_DATASOURCE_USERNAME=activiti
       - SPRING_DATASOURCE_PASSWORD=activitipw
       - JHIPSTER_SLEEP=10 # gives time for the database to boot before the application
+      - CACHE_HAZELCAST_PUBLICIP=150.146.206.152
+      - CACHE_HAZELCAST_MEMBERS=dockerwebtest01.si.cnr.it:1485,dockerwebtest02.si.cnr.it:1485
     ports:
       - 1481:8080
-      - 1485-1489
+      - 1485:1485
+      - 1486:1486
+      - 1487:1487
+      - 1488:1488
+      - 1489:1489
