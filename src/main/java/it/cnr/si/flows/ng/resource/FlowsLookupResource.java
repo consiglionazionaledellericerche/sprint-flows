@@ -91,10 +91,10 @@ public class FlowsLookupResource {
 
     @RequestMapping(value = "/runcron", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
-    public ResponseEntity<Void> runCron(@PathVariable String username) {
+    public ResponseEntity<Void> runCron() {
 
-        extenalMessageSender.sendMessages();
-        extenalMessageSender.sendErrorMessages();
+        extenalMessageSender.sendMessagesDo();
+        extenalMessageSender.sendErrorMessagesDo();
         return ResponseEntity.ok().build();
     }
 

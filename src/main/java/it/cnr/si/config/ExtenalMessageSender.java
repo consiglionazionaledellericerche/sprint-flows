@@ -69,12 +69,20 @@ public class ExtenalMessageSender {
 
     @Scheduled(fixedDelay = 600000, initialDelay = 10000) // 10m
     public void sendMessages() {
+        sendMessagesDo();
+    }
+
+    public void sendMessagesDo() {
         log.debug("Processo le rest ExternalMessage");
         externalMessageService.getNewExternalMessages().forEach(this::send);
     }
 
     @Scheduled(fixedDelay = 21600000, initialDelay = 60000) // 6h
     public void sendErrorMessages() {
+        sendErrorMessagesDo();
+    }
+
+    public void sendErrorMessagesDo() {
         log.debug("Processo le rest ExternalMessage in errore");
         externalMessageService.getFailedExternalMessages().forEach(this::send);
     }
