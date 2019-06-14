@@ -16,6 +16,8 @@ import org.springframework.core.env.Environment;
 
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -50,7 +52,7 @@ public class CacheConfiguration {
     }
 
     @Bean
-    public HazelcastInstance hazelcastInstance(JHipsterProperties jHipsterProperties) {
+    public HazelcastInstance hazelcastInstance(JHipsterProperties jHipsterProperties) throws UnknownHostException {
         log.debug("Configuring Hazelcast");
         Config config = new Config();
 
@@ -73,12 +75,10 @@ public class CacheConfiguration {
         String members = env.getProperty("cache.hazelcast.members");
 
         String publicIp = env.getProperty("cache.hazelcast.publicIp");
-        String localIp = System.getProperty("local.ip");
 
         NetworkConfig networkConfig = config.getNetworkConfig();
         InterfacesConfig networkInterface = networkConfig.getInterfaces();
-        if(localIp != null)
-            networkInterface.setEnabled(true).addInterface(localIp);
+        networkInterface.setEnabled(true).addInterface(InetAddress.getLocalHost().getHostAddress());
         if(publicIp != null)
             networkConfig.setPublicAddress(publicIp);
 
