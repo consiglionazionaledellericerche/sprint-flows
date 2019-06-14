@@ -78,7 +78,9 @@ public class CacheConfiguration {
 
         NetworkConfig networkConfig = config.getNetworkConfig();
         InterfacesConfig networkInterface = networkConfig.getInterfaces();
-        networkInterface.setEnabled(true).addInterface(InetAddress.getLocalHost().getHostAddress());
+        String hostAddress = InetAddress.getLocalHost().getHostAddress();
+        log.info("Local IP: "+ hostAddress);
+        networkInterface.setEnabled(true).addInterface(hostAddress);
         if(publicIp != null)
             networkConfig.setPublicAddress(publicIp);
 
