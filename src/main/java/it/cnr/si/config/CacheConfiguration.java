@@ -78,11 +78,11 @@ public class CacheConfiguration {
         String localIp = System.getProperty("local.ip");
 
         //
-        config.setProperty("hazelcast.local.localAddress", localIp);
-        NetworkConfig networkConfig = config.getNetworkConfig();
-        InterfacesConfig networkInterface = networkConfig.getInterfaces();
-        networkInterface.setEnabled(true).addInterface(localIp);
-        networkConfig.setPublicAddress(publicIp);
+//        config.setProperty("hazelcast.local.localAddress", localIp);
+//        NetworkConfig networkConfig = config.getNetworkConfig();
+//        InterfacesConfig networkInterface = networkConfig.getInterfaces();
+//        networkInterface.setEnabled(true).addInterface(localIp);
+//        networkConfig.setPublicAddress(publicIp);
 
         //
 
