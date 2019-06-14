@@ -660,7 +660,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 
 		// START CONSUNTIVO  
 		case "consuntivo-start": {
-			String nomeFile="avvisoPostInformazione";
+			String nomeFile="avvisoPostInformazione" + " - " + processInstanceId;
 			String labelFile="Avviso di Post-Informazione";
 			acquistiService.ProponiDittaAggiudicataria(execution);
 			flowsPdfService.makePdf(nomeFile, processInstanceId);
