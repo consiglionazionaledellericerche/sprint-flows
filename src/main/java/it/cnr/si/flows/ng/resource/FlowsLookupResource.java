@@ -8,11 +8,11 @@ import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
 import org.activiti.engine.ManagementService;
 import org.activiti.rest.service.api.RestResponseFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.query.ContainerCriteria;
 import org.springframework.ldap.query.LdapQueryBuilder;
@@ -23,8 +23,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
-import javax.naming.NamingException;
-import javax.naming.directory.Attributes;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,18 +32,16 @@ import java.util.Map;
 @Profile("cnr")
 public class FlowsLookupResource {
 
-    @Autowired
-    private LdapTemplate ldapTemplate;
+    private final Logger log = LoggerFactory.getLogger(FlowsLookupResource.class);
 
+    @Inject
+    private LdapTemplate ldapTemplate;
     @Inject
     private AceBridgeService aceService;
-
     @Inject
     private ManagementService managementService;
-
     @Inject
     private RestResponseFactory restResponseFactory;
-
     @Inject
     private ExtenalMessageSender extenalMessageSender;
 
@@ -93,6 +89,7 @@ public class FlowsLookupResource {
     @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Void> runCron() {
 
+        log.info("Running crons");
         extenalMessageSender.sendMessagesDo();
         extenalMessageSender.sendErrorMessagesDo();
         return ResponseEntity.ok().build();
