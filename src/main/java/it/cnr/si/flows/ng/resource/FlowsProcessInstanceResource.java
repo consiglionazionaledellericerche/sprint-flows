@@ -15,6 +15,7 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.history.HistoricTaskInstance;
+import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceActionRequest;
@@ -193,11 +194,14 @@ public class FlowsProcessInstanceResource {
     @GetMapping(value = "/variable", produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity getVariable(
+    public ResponseEntity<HistoricVariableInstance> getVariable(
             @RequestParam("processInstanceId") String processInstanceId,
             @RequestParam("variableName") String variableName) {
 
-        return new ResponseEntity<>(runtimeService.getVariableInstance(processInstanceId, variableName), HttpStatus.OK);
+        return new ResponseEntity<>(historyService.createHistoricVariableInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .variableName(variableName)
+                .singleResult(), HttpStatus.OK);
     }
 
 
