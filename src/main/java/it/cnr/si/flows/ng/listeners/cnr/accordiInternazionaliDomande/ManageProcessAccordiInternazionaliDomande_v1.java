@@ -10,6 +10,7 @@ import org.activiti.engine.delegate.Expression;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -38,6 +39,12 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 	private static final Logger LOGGER = LoggerFactory.getLogger(ManageProcessAccordiInternazionaliDomande_v1.class);
 	public static final String STATO_FINALE_DOMANDA = "statoFinaleDomanda";
 
+
+	@Value("${cnr.abil.url}")
+	private String urlAccordiBilaterali;
+	@Value("${cnr.abil.domandePath}")
+	private String pathDomandeAccordiBilaterali;
+
 	@Inject
 	private FirmaDocumentoService firmaDocumentoService;
 	@Inject
@@ -59,11 +66,8 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 
 	private Expression faseEsecuzione;
 
-
-
 	public void restToApplicazioneAccordiBilaterali(DelegateExecution execution, StatoDomandeAccordiInternazionaliEnum statoDomanda) {
 
-		String urlAccordiBilaterali = "www.google.it";
 		// @Value("${cnr.accordi-bilaterali.url}")
 		// private String urlAccordiBilaterali;
 		// @Value("${cnr.accordi-bilaterali.usr}")
@@ -77,8 +81,10 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 				put("idDomanda", idDomanda);
 				put("stato", statoDomanda.name().toString());
 			}	
-		};	
-		externalMessageService.createExternalMessage(urlAccordiBilaterali, ExternalMessageVerb.POST, abilPayload, ExternalApplication.ABIL);
+		};
+
+		String url = urlAccordiBilaterali + pathDomandeAccordiBilaterali;
+		externalMessageService.createExternalMessage(url, ExternalMessageVerb.POST, abilPayload, ExternalApplication.ABIL);
 	}
 
 
