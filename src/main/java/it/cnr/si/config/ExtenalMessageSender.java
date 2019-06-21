@@ -7,6 +7,7 @@ import it.cnr.si.service.ExternalMessageService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.http.*;
@@ -32,10 +33,19 @@ public class ExtenalMessageSender {
 
     private final Logger log = LoggerFactory.getLogger(ExtenalMessageSender.class);
 
+    @Value("${cnr.abil.url}")
+    private String abilUrl;
+    @Value("${cnr.abil.username}")
+    private String abilUsername;
+    @Value("${cnr.abil.password}")
+    private String abilPassword;
+    @Value("${cnr.abil.loginPath}")
+    private String abilLoginPath;
+
+
     @Inject
     private ExternalMessageService externalMessageService;
-    @Inject
-    private Environment env;
+
 
     @PostConstruct
     public void init() {
@@ -46,18 +56,6 @@ public class ExtenalMessageSender {
         List<ClientHttpRequestInterceptor> interceptors = abilTemplate.getInterceptors();
         interceptors.add(new AbilRequestInterceptor());
         abilTemplate.setInterceptors(interceptors);
-
-//        ResourceOwnerPasswordResourceDetails resource = new ResourceOwnerPasswordResourceDetails();
-//        resource.setUsername(env.getProperty("cnr.abil.username", String.class));
-//        resource.setPassword(env.getProperty("cnr.abil.password", String.class));
-//
-//        resource.setScope(Arrays.asList("read", "write"));
-//        resource.setAccessTokenUri(env.getProperty("cnr.abil.accessTokenUri", String.class));
-////        resource.setClientId("cnr.abil.clientId");
-////        resource.setClientSecret(env.getProperty("cnr.abil.clientSecret", String.class));
-//
-//        DefaultOAuth2ClientContext clientContext = new DefaultOAuth2ClientContext();
-//        RestTemplate abil = new OAuth2RestTemplate(resource, clientContext);
 
         ExternalApplication.ABIL.setTemplate(abilTemplate);
 
@@ -145,8 +143,8 @@ public class ExtenalMessageSender {
             if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 
                 Map<String, String> auth = new HashMap<>();
-                auth.put("username", env.getProperty("cnr.abil.username"));
-                auth.put("password", env.getProperty("cnr.abil.password"));
+                auth.put("username", abilUsername);
+                auth.put("password", abilPassword);
                 MultiValueMap<String, String> headers = new HttpHeaders();
                 headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
@@ -154,7 +152,7 @@ public class ExtenalMessageSender {
                         auth,
                         headers,
                         HttpMethod.POST,
-                        URI.create(env.getProperty("cnr.abil.loginUrl")));
+                        URI.create(abilUrl + abilLoginPath));
 
                 ResponseEntity<Map> resp = new RestTemplate().exchange(entity, Map.class);
 
@@ -164,7 +162,6 @@ public class ExtenalMessageSender {
                 request.getHeaders().set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
                 response = execution.execute(request, body);
             }
-
 
             return response;
         }
