@@ -67,7 +67,7 @@ services:
     logging: *default-logging
 
   syslog-ng-server:
-    image: mtrycz/rtail-server
+    image: docker.si.cnr.it/syslog-rtail
     environment:
       - SYSLOG_USERNAME=admin
       - SYSLOG_PASSWORD=admin
