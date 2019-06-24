@@ -63,7 +63,7 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 	private ExternalMessageService externalMessageService;	
 	@Inject
 	private TaskService taskService;
-		
+
 	private Expression faseEsecuzione;
 
 	public void restToApplicazioneAccordiBilaterali(DelegateExecution execution, StatoDomandeAccordiInternazionaliEnum statoDomanda) {
@@ -105,93 +105,95 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 		String faseEsecuzioneValue = "noValue";
 		faseEsecuzioneValue = faseEsecuzione.getValue(execution).toString();
 		LOGGER.info("-- azioneScelta: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
-
-		switch(faseEsecuzioneValue){  
-		// START
-		case "process-start": {
-			startAccordiInternazionaliSetGroupsAndVisibility.configuraVariabiliStart(execution);
-		};break;    
-		// START
-		case "valutazione-scientifica-end": {
-			LOGGER.info("-- valutazione-scientifica: valutazione-scientifica");
-			if(execution.getVariable("sceltaUtente").equals("CambiaDipartimento")) {
+		//CHECK PER ANNULLO FLUSSO 
+		if (execution.getVariableInstance("motivazioneEliminazione") == null) {
+			switch(faseEsecuzioneValue){  
+			// START
+			case "process-start": {
+				startAccordiInternazionaliSetGroupsAndVisibility.configuraVariabiliStart(execution);
+			};break;    
+			// START
+			case "valutazione-scientifica-end": {
+				LOGGER.info("-- valutazione-scientifica: valutazione-scientifica");
+				if(execution.getVariable("sceltaUtente").equals("CambiaDipartimento")) {
+					String idDipartimento = execution.getVariable("dipartimentoId").toString();
+					String gruppoValutatoreScientificoDipartimento = "valutatoreScientificoDipartimento@" + idDipartimento;
+					runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValutatoreScientificoDipartimento, PROCESS_VISUALIZER);
+					execution.setVariable("gruppoValutatoreScientificoDipartimento", gruppoValutatoreScientificoDipartimento);
+					LOGGER.debug("Imposto i gruppi dipartimento : {} - del flusso {}", idDipartimento, gruppoValutatoreScientificoDipartimento);
+				} else {
+					String nomeFile="valutazioneProgettoAccordiBilaterali";
+					String labelFile="Scheda Valutazione Domanda";
+					execution.setVariable("punteggio_totale", (Integer.parseInt(execution.getVariable("punteggio_pianoDiLavoro").toString()) + Integer.parseInt(execution.getVariable("punteggio_qualitaProgetto").toString())+ Integer.parseInt(execution.getVariable("punteggio_valoreAggiunto").toString())+ Integer.parseInt(execution.getVariable("punteggio_qualitaGruppoDiRicerca").toString())));
+					flowsPdfService.makePdf(nomeFile, processInstanceId);
+					FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
+					documentoGenerato.setLabel(labelFile);
+					flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
+				}
+			};break;  
+			case "validazione-end": {
+				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
 				String idDipartimento = execution.getVariable("dipartimentoId").toString();
 				String gruppoValutatoreScientificoDipartimento = "valutatoreScientificoDipartimento@" + idDipartimento;
 				runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValutatoreScientificoDipartimento, PROCESS_VISUALIZER);
 				execution.setVariable("gruppoValutatoreScientificoDipartimento", gruppoValutatoreScientificoDipartimento);
 				LOGGER.debug("Imposto i gruppi dipartimento : {} - del flusso {}", idDipartimento, gruppoValutatoreScientificoDipartimento);
-			} else {
-				String nomeFile="valutazioneProgettoAccordiBilaterali";
-				String labelFile="Scheda Valutazione Domanda";
-				execution.setVariable("punteggio_totale", (Integer.parseInt(execution.getVariable("punteggio_pianoDiLavoro").toString()) + Integer.parseInt(execution.getVariable("punteggio_qualitaProgetto").toString())+ Integer.parseInt(execution.getVariable("punteggio_valoreAggiunto").toString())+ Integer.parseInt(execution.getVariable("punteggio_qualitaGruppoDiRicerca").toString())));
-				flowsPdfService.makePdf(nomeFile, processInstanceId);
-				FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
-				documentoGenerato.setLabel(labelFile);
-				flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
-			}
-		};break;  
-	case "validazione-end": {
-		flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
-		String idDipartimento = execution.getVariable("dipartimentoId").toString();
-		String gruppoValutatoreScientificoDipartimento = "valutatoreScientificoDipartimento@" + idDipartimento;
-		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValutatoreScientificoDipartimento, PROCESS_VISUALIZER);
-		execution.setVariable("gruppoValutatoreScientificoDipartimento", gruppoValutatoreScientificoDipartimento);
-		LOGGER.debug("Imposto i gruppi dipartimento : {} - del flusso {}", idDipartimento, gruppoValutatoreScientificoDipartimento);
-	};break;  			
-	// START
-	case "validazione-start": {
-		flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
-	};break;  
-	case "valutazione-domande-bando-start": {
-		restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.VALUTATA_SCIENTIFICAMENTE);
-	};break;    
-	case "endevent-respinta-start": {
-		execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA RESPINTA");
-		restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA);
-		flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "RESPINTA");
-	};break;    	
-	case "endevent-non-autorizzata-start": {
-		execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA NON AUTORIZZATA");
-		restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA);
-		flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "NON AUTORIZZATA");
-	};break;  
-	case "endevent-annullata-start": {
-		execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA ANNULLATA");
-		restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA);
-		flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "ANNULLATA");
-	};break;  
-	case "endevent-non-finanziata-start": {
-		execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA NON FINANZIATA");
-		restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA);
-		flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "NON FINANZIATA");
-	};break;  	
-	case "endevent-approvata-start": {
-		execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA APPROVATA");
-		flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA.toString());
-		flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "APPROVATA");
-	};break;  
-	//TIMERS
-	case "timer2-end": {
-		int nrNotifiche = 1;
-		if(execution.getVariable("numeroNotificheTimer2") != null) {
-			nrNotifiche = (Integer.parseInt(execution.getVariable("numeroNotificheTimer2").toString()) + 1);
-		} 
-		execution.setVariable("numeroNotificheTimer2", nrNotifiche);
-		LOGGER.debug("Timer2 nrNotifiche: {}", nrNotifiche);
-	};break;  
-	case "timer2-end-script": {
-		int nrNotifiche = 1;
-		if(execution.getVariable("numeroNotificheTimer2") != null) {
-			nrNotifiche = (Integer.parseInt(execution.getVariable("numeroNotificheTimer2").toString()) + 1);
-		} 
-		execution.setVariable("numeroNotificheTimer2", nrNotifiche);
-		LOGGER.debug("Timer2 nrNotifiche: {}", nrNotifiche);
-	};break;  
+			};break;  			
+			// START
+			case "validazione-start": {
+				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
+			};break;  
+			case "valutazione-domande-bando-start": {
+				restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.VALUTATA_SCIENTIFICAMENTE);
+			};break;    
+			case "endevent-respinta-start": {
+				execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA RESPINTA");
+				restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA);
+				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "RESPINTA");
+			};break;    	
+			case "endevent-non-autorizzata-start": {
+				execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA NON AUTORIZZATA");
+				restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA);
+				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "NON AUTORIZZATA");
+			};break;  
+			case "endevent-annullata-start": {
+				execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA ANNULLATA");
+				restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA);
+				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "ANNULLATA");
+			};break;  
+			case "endevent-non-finanziata-start": {
+				execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA NON FINANZIATA");
+				restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA);
+				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "NON FINANZIATA");
+			};break;  	
+			case "endevent-approvata-start": {
+				execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA APPROVATA");
+				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA.toString());
+				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "APPROVATA");
+			};break;  
+			//TIMERS
+			case "timer2-end": {
+				int nrNotifiche = 1;
+				if(execution.getVariable("numeroNotificheTimer2") != null) {
+					nrNotifiche = (Integer.parseInt(execution.getVariable("numeroNotificheTimer2").toString()) + 1);
+				} 
+				execution.setVariable("numeroNotificheTimer2", nrNotifiche);
+				LOGGER.debug("Timer2 nrNotifiche: {}", nrNotifiche);
+			};break;  
+			case "timer2-end-script": {
+				int nrNotifiche = 1;
+				if(execution.getVariable("numeroNotificheTimer2") != null) {
+					nrNotifiche = (Integer.parseInt(execution.getVariable("numeroNotificheTimer2").toString()) + 1);
+				} 
+				execution.setVariable("numeroNotificheTimer2", nrNotifiche);
+				LOGGER.debug("Timer2 nrNotifiche: {}", nrNotifiche);
+			};break;  
 
-	// DEFAULT  
-	default:  {
-	};break;    
+			// DEFAULT  
+			default:  {
+			};break;    
 
-	} 
-}
+			} 
+		}
+	}
 }

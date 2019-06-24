@@ -1,4 +1,16 @@
 version: '2'
+
+extra_hosts:
+  - "dockerwebtest01:dockerwebtest01.si.cnr.it"
+  - "dockerwebtest02:dockerwebtest02.si.cnr.it"
+
+x-logging:
+  &default-logging
+  driver: syslog
+  options:
+    syslog-address: "udp://dockerwebtest01:1489"
+#    syslog-format: rfc5424
+
 services:
   sprint-flows-demo_cnr:
     image: docker.si.cnr.it/sprint-flows-test
@@ -15,8 +27,7 @@ services:
       - 1485:1485
       - 1486:1486
       - 1487:1487
-      - 1488:1488
-      - 1489:1489
+    logging: *default-logging
 
   lb:
     image: eeacms/haproxy
@@ -28,6 +39,8 @@ services:
       - 1484:1484
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    logging: *default-logging
+
 
   sprint-flows-demo_cnr-pg:
     image: postgres:9.6.9-alpine
@@ -39,6 +52,7 @@ services:
       - spring-flows-demo-cnr-pg-data:/var/lib/postgresql/data
     ports:
       - 1482:5432
+    logging: *default-logging
 
 
   #management center
@@ -54,6 +68,16 @@ services:
       - JAVA_OPTS=-Dhazelcast.mc.rest.enabled=true
     ports:
       - 1483:8080
+    logging: *default-logging
+
+  syslog-ng-server:
+    image: mtrycz/rtail-server
+    environment:
+      - SYSLOG_USERNAME=admin
+      - SYSLOG_PASSWORD=admin
+    ports:
+      - 1488:8181
+      - 1489:514/udp
 
 volumes:
   spring-flows-demo-cnr-pg-data:
