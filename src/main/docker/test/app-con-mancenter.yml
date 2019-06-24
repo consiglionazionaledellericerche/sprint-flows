@@ -1,14 +1,10 @@
 version: '2'
 
-extra_hosts:
-  - "dockerwebtest01:dockerwebtest01.si.cnr.it"
-  - "dockerwebtest02:dockerwebtest02.si.cnr.it"
-
 x-logging:
   &default-logging
   driver: syslog
   options:
-    syslog-address: "udp://dockerwebtest01:1489"
+    syslog-address: "udp://dockerwebtest01.si.cnr.it:1489"
 #    syslog-format: rfc5424
 
 services:
