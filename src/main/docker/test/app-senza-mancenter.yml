@@ -5,7 +5,6 @@ x-logging:
   driver: syslog
   options:
     syslog-address: "udp://dockerwebtest01.si.cnr.it:1489"
-    syslog-format: rfc5424
 
 services:
   sprint-flows-demo_cnr:
