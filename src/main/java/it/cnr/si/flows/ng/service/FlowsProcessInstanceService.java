@@ -103,7 +103,7 @@ public class FlowsProcessInstanceService {
 
 			Map<String, RestVariable> variabili = new HashMap<>();
 			entity.getVariables().forEach(v -> variabili.put(v.getName(), v));
-			result.put("variabili", variabili);
+			result.put("variabili", variabili); // Modifica per vedere piu' comodamente le variabili
 
 			HistoricVariableInstance links = historyService
 					.createHistoricVariableInstanceQuery()
