@@ -38,14 +38,15 @@ public class StartAccordiInternazionaliDomandeSetGroupsAndVisibility {
 		String richiedente = execution.getVariable("userNameRichiedente", String.class);
 		// LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable(Enum.VariableEnum.title.name()));
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
-//		Integer strutturaAppartenenzaUtente2 = aceBridgeService.getEntitaOrganizzativaDellUtente(richiedente.toString()).getId();
-		Integer strutturaAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(richiedente.toString()).getId();
+		Integer strutturaAppartenenzaUtente = aceBridgeService.getEntitaOrganizzativaDellUtente(richiedente.toString()).getId();
+//		Integer strutturaAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(richiedente.toString()).getId();
 		String gruppoValidatoriAccordiInternazionali = "validatoriAccordiInternazionali@0000";
 		String gruppoUfficioProtocollo = "ufficioProtocolloAccordiInternazionali@0000";
 		String gruppoValutatoreScientificoDipartimento = "valutatoreScientificoDipartimento@0000";
 		String gruppoResponsabileAccordiInternazionali = "responsabileAccordiInternazionali@0000";
 		//DA CAMBIARE - ricavando il direttore della persona che afferisce alla sua struttura
 		String gruppoDirigenteRichiedente = "responsabile-struttura@" + strutturaAppartenenzaUtente;
+		
 		String applicazioneAccordiInternazionali = "app.abil";
 		String applicazioneScrivaniaDigitale = "app.scrivaniadigitale";
 
