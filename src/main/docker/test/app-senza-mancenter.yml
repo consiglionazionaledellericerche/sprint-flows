@@ -1,4 +1,16 @@
 version: '2'
+
+extra_hosts:
+  - "dockerwebtest01:dockerwebtest01.si.cnr.it"
+  - "dockerwebtest02:dockerwebtest02.si.cnr.it"
+
+x-logging:
+  &default-logging
+  driver: syslog
+  options:
+    syslog-address: "udp://dockerwebtest01:1489"
+    syslog-format: rfc5424
+
 services:
   sprint-flows-demo_cnr:
     image: docker.si.cnr.it/sprint-flows-test
@@ -15,5 +27,4 @@ services:
       - 1485:1485
       - 1486:1486
       - 1487:1487
-      - 1488:1488
-      - 1489:1489
+    logging: *default-logging
