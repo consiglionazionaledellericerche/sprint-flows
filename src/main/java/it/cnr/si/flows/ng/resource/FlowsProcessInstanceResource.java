@@ -51,7 +51,7 @@ import static it.cnr.si.flows.ng.utils.Enum.Stato.PubblicatoUrp;
 import static it.cnr.si.flows.ng.utils.Utils.DESC;
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_PARAMS;
 
-@Controller
+@RestController
 @RequestMapping("api/processInstances")
 public class FlowsProcessInstanceResource {
 

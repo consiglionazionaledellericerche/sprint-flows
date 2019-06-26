@@ -76,11 +76,11 @@ public class FlowsProcessEngineConfigurations {
         }
 
         // async migliora le prestazioni, in particolare con tanti utenti
-        conf.setAsyncExecutorActivate(true);
+        // conf.setAsyncExecutorActivate(true);
         // migliorano un poco le prestazioni della search  (0,5 secondi)
-        conf.setAsyncExecutorEnabled(true);
+        // conf.setAsyncExecutorEnabled(true);
 //        il default è 10
-        conf.setAsyncExecutorMaxPoolSize(20);
+        // conf.setAsyncExecutorMaxPoolSize(200);
 
         // FULL serve per la storia dei documenti
         conf.setHistoryLevel(HistoryLevel.FULL);

@@ -2,12 +2,13 @@ package it.cnr.si.flows.ng.listeners.cnr.accordiInternazionaliDomande;
 
 
 
+import org.activiti.engine.ManagementService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
-
+import org.activiti.engine.runtime.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import it.cnr.si.flows.ng.service.FirmaDocumentoService;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
+import it.cnr.si.flows.ng.service.FlowsMailService;
 import it.cnr.si.flows.ng.service.FlowsPdfService;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.service.ProtocolloDocumentoService;
@@ -28,6 +30,7 @@ import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 import it.cnr.si.domain.enumeration.ExternalApplication;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -63,6 +66,9 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 	private ExternalMessageService externalMessageService;	
 	@Inject
 	private TaskService taskService;
+	@Inject
+	private ManagementService managementService;
+	
 
 	private Expression faseEsecuzione;
 
@@ -194,6 +200,14 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 			};break;    
 
 			} 
+		} else {
+			List<Job> timerAttivi = managementService.createJobQuery().timers().processInstanceId(processInstanceId).list();
+			timerAttivi.forEach(singoloTimer -> {
+				if (singoloTimer.getId() != null) {
+					LOGGER.debug("cancello il timer: {}", singoloTimer.getId());
+					managementService.deleteJob(singoloTimer.getId());
+				}
+			});
 		}
 	}
 }
