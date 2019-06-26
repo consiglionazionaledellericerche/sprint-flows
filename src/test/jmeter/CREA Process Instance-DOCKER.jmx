@@ -282,7 +282,7 @@
               </elementProp>
               <elementProp name="titolo" elementType="HTTPArgument">
                 <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                <stringProp name="Argument.value">titolo jmeter</stringProp>
+                <stringProp name="Argument.value">titolo jmeter ${__RandomString(6,qwertyuiopasdfghjklzxcvbnm)}</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
                 <boolProp name="HTTPArgument.use_equals">true</boolProp>
                 <stringProp name="Argument.name">titolo</stringProp>
@@ -1342,13 +1342,13 @@
           </HeaderManager>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="SEARCH (numeriProtocollo)" enabled="true">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="SEARCH admin (Titolo random-2)" enabled="true">
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments">
               <elementProp name="" elementType="HTTPArgument">
                 <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                <stringProp name="Argument.value">{&quot;active&quot;:true,&quot;order&quot;:&quot;ASC&quot;,&quot;page&quot;:1,&quot;processDefinitionKey&quot;:&quot;acquisti&quot;,&quot;numeriProtocollo&quot;:&quot;text=444&quot;}&#xd;
+                <stringProp name="Argument.value">{&quot;active&quot;:true,&quot;order&quot;:&quot;ASC&quot;,&quot;page&quot;:1,&quot;processDefinitionKey&quot;:&quot;acquisti&quot;,&quot;titolo&quot;:&quot;text=${__RandomString(2,qwertyuiopasdfghjklzxcvbnm)}&quot;}&#xd;
 </stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
@@ -1901,13 +1901,13 @@
           </HeaderManager>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="search (numeriProtocollo)" enabled="true">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="search  Paolo  (Titolo random-2)" enabled="true">
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments">
               <elementProp name="" elementType="HTTPArgument">
                 <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                <stringProp name="Argument.value">{&quot;active&quot;:true,&quot;order&quot;:&quot;ASC&quot;,&quot;page&quot;:1,&quot;processDefinitionKey&quot;:&quot;acquisti&quot;,&quot;numeriProtocollo&quot;:&quot;&quot;}&#xd;
+                <stringProp name="Argument.value">{&quot;active&quot;:true,&quot;order&quot;:&quot;ASC&quot;,&quot;page&quot;:1,&quot;processDefinitionKey&quot;:&quot;acquisti&quot;,&quot;titolo&quot;:&quot;text=${__RandomString(2,qwertyuiopasdfghjklzxcvbnm)}&quot;}&#xd;
 </stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
@@ -1994,7 +1994,7 @@
       </hashTree>
       <ConfigTestElement guiclass="PropertyControlGui" testclass="ConfigTestElement" testname="Property Display" enabled="true"/>
       <hashTree/>
-      <ResultCollector guiclass="StatGraphVisualizer" testclass="ResultCollector" testname="Aggregate Graph" enabled="false">
+      <ResultCollector guiclass="StatGraphVisualizer" testclass="ResultCollector" testname="Aggregate Graph" enabled="true">
         <boolProp name="ResultCollector.error_logging">false</boolProp>
         <objProp>
           <name>saveConfig</name>
@@ -2097,6 +2097,42 @@
             <bytes>true</bytes>
             <sentBytes>true</sentBytes>
             <url>true</url>
+            <threadCounts>true</threadCounts>
+            <idleTime>true</idleTime>
+            <connectTime>true</connectTime>
+          </value>
+        </objProp>
+        <stringProp name="filename"></stringProp>
+      </ResultCollector>
+      <hashTree/>
+      <ResultCollector guiclass="GraphVisualizer" testclass="ResultCollector" testname="Graph Results" enabled="true">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>true</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>true</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>true</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+            <sentBytes>true</sentBytes>
             <threadCounts>true</threadCounts>
             <idleTime>true</idleTime>
             <connectTime>true</connectTime>

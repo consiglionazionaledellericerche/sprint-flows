@@ -1,6 +1,6 @@
 package it.cnr.si.flows.ng.resource;
 
-import it.cnr.si.config.ExtenalMessageSender;
+import it.cnr.si.config.ExternalMessageSender;
 import it.cnr.si.flows.ng.ldap.LdapPersonToSearchResultMapper;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.SiperService;
@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.query.ContainerCriteria;
 import org.springframework.ldap.query.LdapQueryBuilder;
@@ -26,8 +25,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
-import javax.naming.NamingException;
-import javax.naming.directory.Attributes;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +49,7 @@ public class FlowsLookupResource {
     @Inject
     private SiperService siperService;
     @Inject
-    private ExtenalMessageSender extenalMessageSender;
+    private ExternalMessageSender extenalMessageSender;
 
     @RequestMapping(value = "/ace/user/{username:.+}", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.ADMIN)
