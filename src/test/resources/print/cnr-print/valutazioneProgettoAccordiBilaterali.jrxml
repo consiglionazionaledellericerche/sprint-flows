@@ -522,7 +522,7 @@
 					<textElement>
 						<font size="12" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$F{scadenzaPresentazioneDomande} !=null ? $F{scadenzaPresentazioneDomande}.substring(0,10) : "N/A"]]></textFieldExpression>
+					<textFieldExpression><![CDATA[!$F{scadenzaPresentazioneDomande}.equals("null") ? $F{scadenzaPresentazioneDomande}.substring(0,10) : "N/A"]]></textFieldExpression>
 				</textField>
 				<textField>
 					<reportElement x="0" y="38" width="200" height="20" uuid="5d6522a2-b6b0-4961-9e77-9969e6dd9281"/>
