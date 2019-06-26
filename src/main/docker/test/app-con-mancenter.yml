@@ -4,15 +4,17 @@ x-logging:
   &default-logging
   driver: syslog
   options:
-    syslog-address: "udp://dockerwebtest01.si.cnr.it:1489"
+    syslog-address: "udp://localhost:1489"
 #    syslog-format: rfc5424
 
 services:
-  sprint-flows-demo_cnr:
+  sprint-flows-test-cnr:
     image: docker.si.cnr.it/sprint-flows-test
+    links:
+      - sprint-flows-test-cnr-pg:postgresql
     environment:
       - SPRING_PROFILES_ACTIVE=test,cnr,swagger
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://dockerwebtest01.si.cnr.it:1482/flows
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/flows
       - SPRING_DATASOURCE_USERNAME=activiti
       - SPRING_DATASOURCE_PASSWORD=activitipw
       - JHIPSTER_SLEEP=10 # gives time for the database to boot before the application
@@ -38,7 +40,7 @@ services:
     logging: *default-logging
 
 
-  sprint-flows-demo_cnr-pg:
+  sprint-flows-test-cnr-pg:
     image: postgres:9.6.9-alpine
     environment:
       - POSTGRES_USER=activiti
@@ -66,7 +68,7 @@ services:
       - 1483:8080
     logging: *default-logging
 
-  syslog-ng-server:
+  syslog-rtail:
     image: docker.si.cnr.it/syslog-rtail
     environment:
       - SYSLOG_USERNAME=admin

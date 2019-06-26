@@ -7,7 +7,7 @@ x-logging:
     syslog-address: "udp://dockerwebtest01.si.cnr.it:1489"
 
 services:
-  sprint-flows-demo_cnr:
+  sprint-flows-test-cnr:
     image: docker.si.cnr.it/sprint-flows-test
     environment:
       - SPRING_PROFILES_ACTIVE=test,cnr,swagger
