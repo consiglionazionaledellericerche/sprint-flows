@@ -176,6 +176,7 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 				execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA APPROVATA");
 				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA.toString());
 				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "APPROVATA");
+				restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.ACCETATA);
 			};break;  
 			//TIMERS
 			case "timer2-end": {
