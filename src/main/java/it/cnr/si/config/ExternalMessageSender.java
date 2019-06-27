@@ -68,7 +68,7 @@ public class ExternalMessageSender {
 
     }
 
-    @Scheduled(fixedDelay = 10000, initialDelay = 10000) // 10m
+    @Scheduled(fixedDelay = 600000, initialDelay = 10000) // 10m
     public void sendMessages() {
 
         // Soltanto un nodo dovrebbe effettuare l'invio degli ExternalMessage
