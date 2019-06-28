@@ -1,20 +1,10 @@
 package it.cnr.si;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.Collection;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
-import org.activiti.spring.boot.AbstractProcessEngineAutoConfiguration;
-import org.activiti.spring.boot.DataSourceProcessEngineAutoConfiguration;
-import org.activiti.spring.boot.EndpointAutoConfiguration;
-import org.activiti.spring.boot.JpaProcessEngineAutoConfiguration;
+import it.cnr.si.config.Constants;
+import it.cnr.si.config.DefaultProfileUtil;
+import it.cnr.si.config.JHipsterProperties;
+import org.activiti.spring.boot.*;
 import org.activiti.spring.boot.JpaProcessEngineAutoConfiguration.JpaConfiguration;
-import org.activiti.spring.boot.RestApiAutoConfiguration;
-import org.activiti.spring.boot.SecurityAutoConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -27,11 +17,13 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.core.env.Environment;
-import org.springframework.scheduling.annotation.EnableAsync;
 
-import it.cnr.si.config.Constants;
-import it.cnr.si.config.DefaultProfileUtil;
-import it.cnr.si.config.JHipsterProperties;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.Collection;
 
 @ComponentScan
 @SpringBootApplication
