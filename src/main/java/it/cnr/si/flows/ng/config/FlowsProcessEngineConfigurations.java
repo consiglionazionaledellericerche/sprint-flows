@@ -18,6 +18,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.naming.ConfigurationException;
@@ -28,6 +32,7 @@ import java.util.Set;
 import static org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl.DEFAULT_GENERIC_MAX_LENGTH_STRING;
 
 @Configuration
+@Order(Ordered.LOWEST_PRECEDENCE)
 public class FlowsProcessEngineConfigurations {
 
     private static final String ACTIVITI_VERSION = "5.22.0";
@@ -112,7 +117,7 @@ public class FlowsProcessEngineConfigurations {
     public ProcessEngine getProcessEngine(
             SpringProcessEngineConfiguration conf) throws Exception {
         //modifica per il flusso test-timer
-        conf.setJobExecutorActivate(true);
+        conf.setJobExecutorActivate(false);
         conf.setMaxLengthStringVariableType(10000000);
 
         //IMPORTANTE: aggiungo un nuovo tipo di dato specifico SOLO SE è NON VERRA' MODIFICATO (per non creare problemi al DB)
@@ -191,5 +196,16 @@ public class FlowsProcessEngineConfigurations {
     @Bean
     public ProcessDiagramGenerator getProcessDiagramGenerator(ProcessEngine processEingine) {
         return processEingine.getProcessEngineConfiguration().getProcessDiagramGenerator();
+    }
+
+    /**
+     * Voglio che il JobExecutor parta soltanto dopo l'avvio di tutto l'ambaradam
+     * @param event
+     */
+    @EventListener
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+
+        System.out.println("Increment counter "+ event);
+        ProcessEngines.getDefaultProcessEngine().getProcessEngineConfiguration().getJobExecutor().start();
     }
 }
