@@ -55,7 +55,7 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 	@Inject
 	private FlowsProcessInstanceService flowsProcessInstanceService;
 	@Inject
-	private StartAccordiInternazionaliDomandeSetGroupsAndVisibility startAccordiInternazionaliSetGroupsAndVisibility;
+	private StartAccordiInternazionaliDomandeSetGroupsAndVisibility startAccordiInternazionaliDomandeSetGroupsAndVisibility;
 	@Inject
 	private RuntimeService runtimeService;
 	@Inject
@@ -116,7 +116,7 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 			switch(faseEsecuzioneValue){  
 			// START
 			case "process-start": {
-				startAccordiInternazionaliSetGroupsAndVisibility.configuraVariabiliStart(execution);
+				startAccordiInternazionaliDomandeSetGroupsAndVisibility.configuraVariabiliStart(execution);
 			};break;    
 			// START
 			case "valutazione-scientifica-end": {
