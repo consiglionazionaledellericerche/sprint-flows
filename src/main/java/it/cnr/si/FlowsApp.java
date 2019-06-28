@@ -14,6 +14,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.core.env.Environment;
@@ -81,7 +82,7 @@ public class FlowsApp {
     }
 
     /**
-     * Main method, used to run the application.
+     * Main method, used to run the application.Refreshed
      *
      * @param args the command line arguments
      * @throws UnknownHostException if the local host name could not be resolved into an address
@@ -89,7 +90,10 @@ public class FlowsApp {
     public static void main(String[] args) throws UnknownHostException {
         SpringApplication app = new SpringApplication(FlowsApp.class);
         DefaultProfileUtil.addDefaultProfile(app);
-        Environment env = app.run(args).getEnvironment();
+        ConfigurableApplicationContext appContext = app.run(args);
+        appContext.start();
+
+        Environment env = appContext.getEnvironment();
         log.info("\n----------------------------------------------------------\n\t" +
                 "Application '{}' is running! Access URLs:\n\t" +
                 "Local: \t\thttp://127.0.0.1:{}\n\t" +
