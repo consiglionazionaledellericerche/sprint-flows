@@ -5,8 +5,10 @@ import it.cnr.si.flows.ng.listeners.oiv.service.OperazioniTimer;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.CounterService;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
+import it.cnr.si.flows.ng.service.SiperService;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
+import it.cnr.si.service.AceService;
 import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.BpmnError;
@@ -46,7 +48,11 @@ public class StartAcquistiSetGroupsAndVisibility {
     private RuntimeService runtimeService;
     @Inject
     private CounterService counterService;
-    
+	@Inject
+	private AceService aceService;
+	@Inject
+	private SiperService siperService;
+	
 	public void configuraVariabiliStart(DelegateExecution execution)  throws IOException, ParseException  {
 
 
@@ -64,13 +70,17 @@ public class StartAcquistiSetGroupsAndVisibility {
 
         if (groups.isEmpty())
             throw new BpmnError("403", "L'utente non e' abilitato ad avviare questo flusso");
-        else if ( groups.size() > 1 )
-            throw new BpmnError("500", "L'utente appartiene a piu' di un gruppo Staff Amministrativo");
         else {
 
             String gruppoRT = groups.get(0);
-            String struttura = gruppoRT.substring(gruppoRT.lastIndexOf('@') +1);
+            //String struttura = gruppoRT.substring(gruppoRT.lastIndexOf('@') +1);
             // idStruttura variabile che indica che il flusso è diviso per strutture (implica la visibilità distinta tra strutture)
+            
+            // NUOVA PROCEDURA PER PRENDERE L'ENTITA' ORGANIZZATIVA DI RIFERIMENTO 
+    		String cdsuoAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(initiator).getCdsuo();
+    		Object insdipResponsabileUo = siperService.getResponsabileCDSUO(cdsuoAppartenenzaUtente).get(0).get("codice_sede");
+    		String struttura = aceService.entitaOrganizzativaFindByTerm(insdipResponsabileUo.toString()).get(0).getId().toString();
+    	                       
             execution.setVariable(idStruttura.name(), struttura);
             String gruppoFirmaAcquisti = "responsabileFirmaAcquisti@"+ struttura;
             String gruppoStaffAmministrativo = "staffAmministrativo@"+ struttura;
