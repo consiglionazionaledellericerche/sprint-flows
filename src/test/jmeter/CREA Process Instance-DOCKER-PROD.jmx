@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="3.2" jmeter="3.3 r1808647">
+  <hashTree>
+    <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+      <collectionProp name="Arguments.arguments">
+        <elementProp name="server" elementType="Argument">
+          <stringProp name="Argument.name">server</stringProp>
+          <stringProp name="Argument.value">nuovascrivaniadigitale.cnr.it</stringProp>
+          <stringProp name="Argument.metadata">=</stringProp>
+        </elementProp>
+        <elementProp name="accessToken" elementType="Argument">
+          <stringProp name="Argument.name">accessToken</stringProp>
+          <stringProp name="Argument.value"></stringProp>
+          <stringProp name="Argument.metadata">=</stringProp>
+        </elementProp>
+        <elementProp name="PROCESS_DEFINITION_ID" elementType="Argument">
+          <stringProp name="Argument.name">PROCESS_DEFINITION_ID</stringProp>
+          <stringProp name="Argument.value">acquisti:1:998</stringProp>
+          <stringProp name="Argument.metadata">=</stringProp>
+        </elementProp>
+        <elementProp name="Delay" elementType="Argument">
+          <stringProp name="Argument.name">Delay</stringProp>
+          <stringProp name="Argument.value">0</stringProp>
+          <stringProp name="Argument.metadata">=</stringProp>
+        </elementProp>
+        <elementProp name="port" elementType="Argument">
+          <stringProp name="Argument.name">port</stringProp>
+          <stringProp name="Argument.value">443</stringProp>
+          <stringProp name="Argument.metadata">=</stringProp>
+        </elementProp>
+        <elementProp name="user" elementType="Argument">
+          <stringProp name="Argument.name">user</stringProp>
+          <stringProp name="Argument.value">paoloenricocirone</stringProp>
+          <stringProp name="Argument.metadata">=</stringProp>
+        </elementProp>
+        <elementProp name="path_richiesta_di_acquisto" elementType="Argument">
+          <stringProp name="Argument.name">path_richiesta_di_acquisto</stringProp>
+          <stringProp name="Argument.value">${__BeanShell(import org.apache.jmeter.services.FileServer; FileServer.getFileServer().getBaseDir();)}${__BeanShell(File.separator,)}summaryFirmato.pdf</stringProp>
+          <stringProp name="Argument.metadata">=</stringProp>
+        </elementProp>
+        <elementProp name="path_decisione_a_contrattare" elementType="Argument">
+          <stringProp name="Argument.name">path_decisione_a_contrattare</stringProp>
+          <stringProp name="Argument.value">${__BeanShell(import org.apache.jmeter.services.FileServer; FileServer.getFileServer().getBaseDir();)}${__BeanShell(File.separator,)}summaryFirmato.pdf</stringProp>
+          <stringProp name="Argument.metadata">=</stringProp>
+        </elementProp>
+        <elementProp name="protocol" elementType="Argument">
+          <stringProp name="Argument.name">protocol</stringProp>
+          <stringProp name="Argument.value">https</stringProp>
+          <stringProp name="Argument.metadata">=</stringProp>
+        </elementProp>
+      </collectionProp>
+    </Arguments>
+    <hashTree/>
+  </hashTree>
+</jmeterTestPlan>

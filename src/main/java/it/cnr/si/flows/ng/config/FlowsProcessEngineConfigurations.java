@@ -57,6 +57,9 @@ public class FlowsProcessEngineConfigurations {
         conf.setApplicationContext(appContext);
 
         // il DataSource configurato da JHipster/Sprint
+        int oldPoolSize = dataSource.getMaximumPoolSize();
+        dataSource.setMaximumPoolSize(50);
+        LOGGER.info("Imposto il dataSource con massimo numero di connessioni: "+ dataSource.getMaximumPoolSize() + "(era: "+ oldPoolSize +")");
         conf.setDataSource(dataSource);
         conf.setTransactionManager(transactionManager);
         conf.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
