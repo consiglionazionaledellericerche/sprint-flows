@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.ContextStartedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.naming.ConfigurationException;
@@ -55,6 +57,9 @@ public class FlowsProcessEngineConfigurations {
         conf.setApplicationContext(appContext);
 
         // il DataSource configurato da JHipster/Sprint
+        int oldPoolSize = dataSource.getMaximumPoolSize();
+        dataSource.setMaximumPoolSize(50);
+        LOGGER.info("Imposto il dataSource con massimo numero di connessioni: "+ dataSource.getMaximumPoolSize() + "(era: "+ oldPoolSize +")");
         conf.setDataSource(dataSource);
         conf.setTransactionManager(transactionManager);
         conf.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
@@ -76,11 +81,11 @@ public class FlowsProcessEngineConfigurations {
         }
 
         // async migliora le prestazioni, in particolare con tanti utenti
-        conf.setAsyncExecutorActivate(true);
+        // conf.setAsyncExecutorActivate(true);
         // migliorano un poco le prestazioni della search  (0,5 secondi)
-        conf.setAsyncExecutorEnabled(true);
+        // conf.setAsyncExecutorEnabled(true);
 //        il default è 10
-        conf.setAsyncExecutorMaxPoolSize(20);
+        // conf.setAsyncExecutorMaxPoolSize(200);
 
         // FULL serve per la storia dei documenti
         conf.setHistoryLevel(HistoryLevel.FULL);
@@ -112,7 +117,7 @@ public class FlowsProcessEngineConfigurations {
     public ProcessEngine getProcessEngine(
             SpringProcessEngineConfiguration conf) throws Exception {
         //modifica per il flusso test-timer
-        conf.setJobExecutorActivate(true);
+        conf.setJobExecutorActivate(false);
         conf.setMaxLengthStringVariableType(10000000);
 
         //IMPORTANTE: aggiungo un nuovo tipo di dato specifico SOLO SE è NON VERRA' MODIFICATO (per non creare problemi al DB)
@@ -191,5 +196,16 @@ public class FlowsProcessEngineConfigurations {
     @Bean
     public ProcessDiagramGenerator getProcessDiagramGenerator(ProcessEngine processEingine) {
         return processEingine.getProcessEngineConfiguration().getProcessDiagramGenerator();
+    }
+
+    /**
+     * Voglio che il JobExecutor parta soltanto dopo l'avvio di tutto l'ambaradam
+     * @param event
+     */
+    @EventListener
+    public void onApplicationEvent(ContextStartedEvent event) {
+
+        System.out.println("Increment counter "+ event);
+        ProcessEngines.getDefaultProcessEngine().getProcessEngineConfiguration().getJobExecutor().start();
     }
 }

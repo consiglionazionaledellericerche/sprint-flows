@@ -1,6 +1,7 @@
 package it.cnr.si.flows.ng.listeners.cnr.acquisti;
 
 
+import it.cnr.si.domain.enumeration.ExternalApplication;
 import it.cnr.si.domain.enumeration.ExternalMessageVerb;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.listeners.cnr.acquisti.service.AcquistiService;
@@ -190,7 +191,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 					|| documentoCorrente.getName().equals("modificheVariantiArt106")
 					|| documentoCorrente.getName().equals("bandoAvvisi")
 					|| documentoCorrente.getName().equals("letteraInvito")
-				//  || documentoCorrente.getName().equals("provvedimentoAmmessiEsclusi")
+					//  || documentoCorrente.getName().equals("provvedimentoAmmessiEsclusi")
 					|| documentoCorrente.getName().equals("provvedimentoNominaCommissione")
 					|| documentoCorrente.getName().equals("provvedimentoAggiudicazione")
 					|| documentoCorrente.getName().equals("elencoVerbali")
@@ -293,7 +294,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				Map<String, Object> metadataPropertiesAspectSiglaDoc = new HashMap<String, Object>();
 				metadataPropertiesAspectSiglaDoc.put(aspectSiglaPropertyLabel, documentoCorrente.getLabel());
 				storeService.updateProperties(metadataPropertiesAspectSiglaDoc  , fileKey);
-				
+
 				//INSERIMENTO ASPECT PUBBLICAZIONE
 				String aspectSiglaCommonsPubblicazione = "P:sigla_commons_aspect:flusso_pubblicazione";
 				if(!storeService.hasAspect(fileKey, aspectSiglaCommonsPubblicazione)) {
@@ -518,343 +519,345 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 		String faseEsecuzioneValue = "noValue";
 		faseEsecuzioneValue = faseEsecuzione.getValue(execution).toString();
 		LOGGER.info("-- azioneScelta: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
-
-		switch(faseEsecuzioneValue){  
-		// START
-		case "process-start": {
-			startAcquistiSetGroupsAndVisibility.configuraVariabiliStart(execution);
-		};break;
-		case "pre-determina-start": {
-			pubblicaFilePubblicabiliURP(execution);
-		};break;
-		case "pre-determina-end": {
-			pubblicaFilePubblicabiliURP(execution);
-		};break;     
-		case "end-annullato-start": {
-			execution.setVariable(STATO_FINALE_DOMANDA, "ANNULLATO");
-			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "ANNULLATO");
-		};break;     
-		// START DECISIONE-CONTRATTARE
-		case "DECISIONE-CONTRATTARE-start": {
-			String rup = execution.getVariable("rup", String.class);
-			runtimeService.addUserIdentityLink(execution.getProcessInstanceId(), rup, PROCESS_VISUALIZER);
-			CalcolaTotaleImpegni(execution);
-		};break;  
-		case "modifica-decisione-end": {
-			CalcolaTotaleImpegni(execution);
-		};break;		
-		case "verifica-decisione-start": {
-			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
-		};break;  
-		case "firma-decisione-end": {
-			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
-				firmaDocumentoService.eseguiFirma(execution, "decisioneContrattare");
-			}
-		};break; 
-		case "protocollo-decisione-end": {
-			if(sceltaUtente != null && sceltaUtente.equals("Protocolla")) {
-				protocolloDocumentoService.protocolla(execution, "decisioneContrattare");
-			}
-		};break;  
-		case "endevent-decisione-contrattare-annulla-start": {
-		};break;     
-		case "endevent-decisione-contrattare-annulla-end": {
-			execution.setVariable("direzioneFlusso", "Annulla");
-		};break;   
-		case "endevent-decisione-contrattare-protocollo-end": {
-			execution.setVariable("direzioneFlusso", "Stipula");
-		};break;
-		// END DECISIONE-CONTRATTARE 
-
-		case "espletamento-procedura-end": {	
-			if (execution.getVariable("strumentoAcquisizioneId") != null && (execution.getVariable("strumentoAcquisizioneId").equals("21") || execution.getVariable("strumentoAcquisizioneId").equals("23"))) {
-				acquistiService.OrdinaElencoDitteCandidate(execution);
-			} else {
-				if (execution.getVariable("pIvaCodiceFiscaleDittaAggiudicataria") == null) {
-					execution.setVariable("pIvaCodiceFiscaleDittaAggiudicataria", "non presente");
+		//CHECK PER ANNULLO FLUSSO 
+		if (execution.getVariableInstance("motivazioneEliminazione") == null) {
+			switch(faseEsecuzioneValue){  
+			// START
+			case "process-start": {
+				startAcquistiSetGroupsAndVisibility.configuraVariabiliStart(execution);
+			};break;
+			case "pre-determina-start": {
+				pubblicaFilePubblicabiliURP(execution);
+			};break;
+			case "pre-determina-end": {
+				pubblicaFilePubblicabiliURP(execution);
+			};break;     
+			case "end-annullato-start": {
+				execution.setVariable(STATO_FINALE_DOMANDA, "ANNULLATO");
+				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "ANNULLATO");
+			};break;     
+			// START DECISIONE-CONTRATTARE
+			case "DECISIONE-CONTRATTARE-start": {
+				String rup = execution.getVariable("rup", String.class);
+				runtimeService.addUserIdentityLink(execution.getProcessInstanceId(), rup, PROCESS_VISUALIZER);
+				CalcolaTotaleImpegni(execution);
+			};break;  
+			case "modifica-decisione-end": {
+				CalcolaTotaleImpegni(execution);
+			};break;		
+			case "verifica-decisione-start": {
+				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
+			};break;  
+			case "firma-decisione-end": {
+				if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
+					firmaDocumentoService.eseguiFirma(execution, "decisioneContrattare");
 				}
-			}
-			if (execution.getVariable("tipologiaAffidamentoDiretto") != null && (execution.getVariable("tipologiaAffidamentoDiretto").toString().equals("semplificata"))) {
-				execution.setVariable("statoImpegni", "definitivi"); 	
-			} else {
-				execution.setVariable("tipologiaAffidamentoDiretto", "normale"); 
-			}
-			if(sceltaUtente != null && !sceltaUtente.equals("Revoca") && !execution.getVariable("tempiCompletamentoProceduraFine").equals("null")) {
-				DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-				Date dateStart = format.parse(execution.getVariable("tempiCompletamentoProceduraInizio").toString());
-				Date dateEnd = format.parse(execution.getVariable("tempiCompletamentoProceduraFine").toString());
-				if(dateStart.after(dateEnd)) {
-					throw new BpmnError("500", "<b>Data Completamento Procedura Inizio posteriore alla data di Fine<br></b>");
+			};break; 
+			case "protocollo-decisione-end": {
+				if(sceltaUtente != null && sceltaUtente.equals("Protocolla")) {
+					protocolloDocumentoService.protocolla(execution, "decisioneContrattare");
 				}
-			}
-			pubblicaTuttiFilePubblicabili(execution);
-		};break;
-		// START PROVVEDIMENTO-AGGIUDICAZIONE  
-		case "predisposizione-provvedimento-aggiudicazione-start": {
-			if (execution.getVariable("strumentoAcquisizioneId") != null && (execution.getVariable("strumentoAcquisizioneId").equals("21") || execution.getVariable("strumentoAcquisizioneId").equals("23"))) {
+			};break;  
+			case "endevent-decisione-contrattare-annulla-start": {
+			};break;     
+			case "endevent-decisione-contrattare-annulla-end": {
+				execution.setVariable("direzioneFlusso", "Annulla");
+			};break;   
+			case "endevent-decisione-contrattare-protocollo-end": {
+				execution.setVariable("direzioneFlusso", "Stipula");
+			};break;
+			// END DECISIONE-CONTRATTARE 
 
-				if (execution.getVariable("nrElencoDitteInit") != null) {
-					//				acquistiService.SostituisciDocumento(execution, "provvedimentoAggiudicazione");
-					acquistiService.ScorriElencoDitteCandidate(execution);	
+			case "espletamento-procedura-end": {	
+				if (execution.getVariable("strumentoAcquisizioneId") != null && (execution.getVariable("strumentoAcquisizioneId").equals("21") || execution.getVariable("strumentoAcquisizioneId").equals("23"))) {
+					acquistiService.OrdinaElencoDitteCandidate(execution);
+				} else {
+					if (execution.getVariable("pIvaCodiceFiscaleDittaAggiudicataria") == null) {
+						execution.setVariable("pIvaCodiceFiscaleDittaAggiudicataria", "non presente");
+					}
 				}
-				dittaCandidata.evidenzia(execution);
-			}
-		};break;
-		case "predisposizione-provvedimento-aggiudicazione-end": {
-			execution.setVariable("statoImpegni", "definitivi"); 
-			CalcolaTotaleImpegni(execution);			
-		};break; 
-		case "firma-provvedimento-aggiudicazione-end": {
-			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
-				firmaDocumentoService.eseguiFirma(execution, "provvedimentoAggiudicazione");
-			}
-		};break;  
-		case "protocollo-provvedimento-aggiudicazione-end": {
-			if(sceltaUtente != null && sceltaUtente.equals("Protocolla")) {
-				protocolloDocumentoService.protocolla(execution, "provvedimentoAggiudicazione");
-			}
-		};break;
-		case "endevent-provvedimento-aggiudicazione-revoca-end": {
-			execution.setVariable("direzioneFlusso", "RevocaConProvvedimento");
-		};break;    
-		case "endevent-provvedimento-aggiudicazione-protocollo-end": {
-			execution.setVariable("direzioneFlusso", "Stipula");
-		};break;     
-		case "endevent-provvedimento-aggiudicazione-altro-candidato-end": {
-			execution.setVariable("direzioneFlusso", "SelezionaAltroCandidato");
-		};break;
-		case "modifica-provvedimento-aggiudicazione-end": {
-			CalcolaTotaleImpegni(execution);
-		};break;  
-		// END PROVVEDIMENTO-AGGIUDICAZIONE
-
-		// START CONTRATTO FUORI MEPA  
-		case "predisposizione-contratto-start": {
-			if ((execution.getVariable("gestioneRTIDittaAggiudicataria") != null) && (execution.getVariable("gestioneRTIDittaAggiudicataria").toString().equals("SI"))) {
-				//dittaCandidata.aggiornaDittaRTIInvitata(execution);
-			}
-		};break;
-		case "firma-contratto-end": {
-			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
-				firmaDocumentoService.eseguiFirma(execution, "contratto");
-				execution.setVariable("usernameFirmatarioContratto", SecurityUtils.getCurrentUserLogin());
-				Date dataStipulaContratto = new Date();
-				execution.setVariable("dataStipulaContratto", dataStipulaContratto);	
-			}
-		};break; 
-		case "protocollo-contratto-end": {
-			if(sceltaUtente != null && sceltaUtente.equals("Protocolla")) {
-				protocolloDocumentoService.protocolla(execution, "contratto");
-			}
-		};break;  
-		case "endevent-contratto-fuori-mepa-revoca-end": {
-			execution.setVariable("direzioneFlusso", "RevocaConProvvedimento");
-		};break; 
-		case "endevent-contratto-fuori-mepa-protocollo-end": {
-			execution.setVariable("direzioneFlusso", "Stipula");
-		};break;     
-		case "endevent-contratto-fuori-mepa-altro-candidato-end": {
-			execution.setVariable("direzioneFlusso", "SelezionaAltroCandidato");
-		};break;
-		// END CONTRATTO FUORI MEPA
-
-		// START CONSUNTIVO  
-		case "consuntivo-start": {
-			String nomeFile="avvisoPostInformazione";
-			String labelFile="Avviso di Post-Informazione";
-			acquistiService.ProponiDittaAggiudicataria(execution);
-			flowsPdfService.makePdf(nomeFile, processInstanceId);
-			FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
-			documentoGenerato.setLabel(labelFile);
-			documentoGenerato.setPubblicazioneTrasparenza(true);
-			flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
-
-		};break;
-		case "consuntivo-end": {
-			if(sceltaUtente != null && !sceltaUtente.equals("RevocaConProvvedimento")) {
+				if (execution.getVariable("tipologiaAffidamentoDiretto") != null && (execution.getVariable("tipologiaAffidamentoDiretto").toString().equals("semplificata"))) {
+					execution.setVariable("statoImpegni", "definitivi"); 	
+				} else {
+					execution.setVariable("tipologiaAffidamentoDiretto", "normale"); 
+				}
+				if(sceltaUtente != null && !sceltaUtente.equals("Revoca") && !execution.getVariable("tempiCompletamentoProceduraFine").equals("null")) {
+					DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+					Date dateStart = format.parse(execution.getVariable("tempiCompletamentoProceduraInizio").toString());
+					Date dateEnd = format.parse(execution.getVariable("tempiCompletamentoProceduraFine").toString());
+					if(dateStart.after(dateEnd)) {
+						throw new BpmnError("500", "<b>Data Completamento Procedura Inizio posteriore alla data di Fine<br></b>");
+					}
+				}
 				pubblicaTuttiFilePubblicabili(execution);
+			};break;
+			// START PROVVEDIMENTO-AGGIUDICAZIONE  
+			case "predisposizione-provvedimento-aggiudicazione-start": {
+				if (execution.getVariable("strumentoAcquisizioneId") != null && (execution.getVariable("strumentoAcquisizioneId").equals("21") || execution.getVariable("strumentoAcquisizioneId").equals("23"))) {
+
+					if (execution.getVariable("nrElencoDitteInit") != null) {
+						//				acquistiService.SostituisciDocumento(execution, "provvedimentoAggiudicazione");
+						acquistiService.ScorriElencoDitteCandidate(execution);	
+					}
+					dittaCandidata.evidenzia(execution);
+				}
+			};break;
+			case "predisposizione-provvedimento-aggiudicazione-end": {
+				execution.setVariable("statoImpegni", "definitivi"); 
+				CalcolaTotaleImpegni(execution);			
+			};break; 
+			case "firma-provvedimento-aggiudicazione-end": {
+				if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
+					firmaDocumentoService.eseguiFirma(execution, "provvedimentoAggiudicazione");
+				}
+			};break;  
+			case "protocollo-provvedimento-aggiudicazione-end": {
+				if(sceltaUtente != null && sceltaUtente.equals("Protocolla")) {
+					protocolloDocumentoService.protocolla(execution, "provvedimentoAggiudicazione");
+				}
+			};break;
+			case "endevent-provvedimento-aggiudicazione-revoca-end": {
+				execution.setVariable("direzioneFlusso", "RevocaConProvvedimento");
+			};break;    
+			case "endevent-provvedimento-aggiudicazione-protocollo-end": {
+				execution.setVariable("direzioneFlusso", "Stipula");
+			};break;     
+			case "endevent-provvedimento-aggiudicazione-altro-candidato-end": {
+				execution.setVariable("direzioneFlusso", "SelezionaAltroCandidato");
+			};break;
+			case "modifica-provvedimento-aggiudicazione-end": {
+				CalcolaTotaleImpegni(execution);
+			};break;  
+			// END PROVVEDIMENTO-AGGIUDICAZIONE
+
+			// START CONTRATTO FUORI MEPA  
+			case "predisposizione-contratto-start": {
+				if ((execution.getVariable("gestioneRTIDittaAggiudicataria") != null) && (execution.getVariable("gestioneRTIDittaAggiudicataria").toString().equals("SI"))) {
+					//dittaCandidata.aggiornaDittaRTIInvitata(execution);
+				}
+			};break;
+			case "firma-contratto-end": {
+				if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
+					firmaDocumentoService.eseguiFirma(execution, "contratto");
+					execution.setVariable("usernameFirmatarioContratto", SecurityUtils.getCurrentUserLogin());
+					Date dataStipulaContratto = new Date();
+					execution.setVariable("dataStipulaContratto", dataStipulaContratto);	
+				}
+			};break; 
+			case "protocollo-contratto-end": {
+				if(sceltaUtente != null && sceltaUtente.equals("Protocolla")) {
+					protocolloDocumentoService.protocolla(execution, "contratto");
+				}
+			};break;  
+			case "endevent-contratto-fuori-mepa-revoca-end": {
+				execution.setVariable("direzioneFlusso", "RevocaConProvvedimento");
+			};break; 
+			case "endevent-contratto-fuori-mepa-protocollo-end": {
+				execution.setVariable("direzioneFlusso", "Stipula");
+			};break;     
+			case "endevent-contratto-fuori-mepa-altro-candidato-end": {
+				execution.setVariable("direzioneFlusso", "SelezionaAltroCandidato");
+			};break;
+			// END CONTRATTO FUORI MEPA
+
+			// START CONSUNTIVO  
+			case "consuntivo-start": {
+				String nomeFile="avvisoPostInformazione";
+				String labelFile="Avviso di Post-Informazione";
+				acquistiService.ProponiDittaAggiudicataria(execution);
+				flowsPdfService.makePdf(nomeFile, processInstanceId);
+				FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
+				documentoGenerato.setLabel(labelFile);
+				documentoGenerato.setPubblicazioneTrasparenza(true);
+				flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
+
+			};break;
+			case "consuntivo-end": {
+				if(sceltaUtente != null && !sceltaUtente.equals("RevocaConProvvedimento")) {
+					pubblicaTuttiFilePubblicabili(execution);
+					attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);
+					//attachmentService.setPubblicabileTrasparenza(execution.getId(), "avvisoPostInformazione", true);
+					//attachmentService.setPubblicabileTrasparenza(execution.getId(), "modificheVariantiArt106", true);
+					if ( execution.getVariable("importoTotaleNetto") != null && Double.compare(Double.parseDouble(execution.getVariable("importoTotaleNetto").toString()), 1000000) > 0) {
+						attachmentService.setPubblicabileTrasparenza(execution, "stipula", true);
+					}
+					if(execution.getVariable("numeroProtocollo_stipula") != null) {
+						protocolloDocumentoService.protocollaDocumento(execution, "stipula", execution.getVariable("numeroProtocollo_stipula").toString(), execution.getVariable("dataProtocollo_stipula").toString());
+					}
+					if(execution.getVariable("numeroProtocollo_contratto") != null) {
+						protocolloDocumentoService.protocollaDocumento(execution, "contratto", execution.getVariable("numeroProtocollo_contratto").toString(), execution.getVariable("dataProtocollo_contratto").toString());
+					}
+				}
+				if(sceltaUtente != null && sceltaUtente.equals("RevocaConProvvedimento")) {
+					attachmentService.setPubblicabileTrasparenza(execution, "ProvvedimentoDiRevoca", true);
+				}
+
+			};break; 
+			case "end-stipulato-start": {
+				pubblicaTuttiFilePubblicabili(execution);
+				controllaFilePubblicabiliTrasparenza(execution);
+				execution.setVariable(STATO_FINALE_DOMANDA, "STIPULATO");
+				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "STIPULATO");
+				//TODO implementare le url a seconda del contesto
+				String urlSigla = "www.google.it";
+				Map<String, Object> siglaPayload = createSiglaPayload(execution);
+				externalMessageService.createExternalMessage(urlSigla, ExternalMessageVerb.POST, siglaPayload, ExternalApplication.SIGLA);
+				prepareFilesToSigla(execution);
+			};break;     
+			case "end-stipulato-end": {
+			};break;
+			// END CONSUNTIVO  
+
+			// START STIPULA MEPA  
+			//		case "stipula-mepa-consip-start": {
+			//			if (execution.getVariable("strumentoAcquisizioneId").toString().equals("21")) {
+			//				dittaCandidata.evidenzia(execution);
+			//			} else {
+			//				if ((execution.getVariable("gestioneRTIDittaAggiudicataria") != null) && (execution.getVariable("gestioneRTIDittaAggiudicataria").toString().equals("SI"))) {
+			//					dittaCandidata.aggiornaDittaRTIInvitata(execution);
+			//				}
+			//			}			
+			//		};break; 
+			case "endevent-stipula-mepa-consip-revoca-end": {
+				execution.setVariable("direzioneFlusso", "RevocaConProvvedimento");
+			};break;
+			case "endevent-stipula-mepa-consip-protocollo-end": {
+				execution.setVariable("direzioneFlusso", "Stipula");
+			};break; 
+			// END STIPULA MEPA  
+
+			// START REVOCA
+
+			case "firma-revoca-end": {
+				firmaDocumentoService.eseguiFirma(execution, "ProvvedimentoDiRevoca");
+			};break; 
+			case "protocollo-revoca-end": {
+				if(sceltaUtente != null && sceltaUtente.equals("Protocolla")) {
+					protocolloDocumentoService.protocolla(execution, "ProvvedimentoDiRevoca");
+				}
+			};break;  
+			// END REVOCA  
+
+			// FINE ACQUISTI  
+
+			case "end-revocato-start": {
+				execution.setVariable(STATO_FINALE_DOMANDA, "REVOCATO");
+				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "REVOCATO");
+			};break;
+
+			// FINE FLUSSO  
+			case "process-end": {
+				//			if(execution.getVariable(STATO_FINALE_DOMANDA).toString().equals("STIPULATO")){
+				//				pubblicaTuttiFilePubblicabili(execution);
+				//			}
+			};break;  
+
+			//SUBFLUSSI
+			case "DECISIONE-CONTRATTARE-end": {
 				attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);
-				//attachmentService.setPubblicabileTrasparenza(execution.getId(), "avvisoPostInformazione", true);
-				//attachmentService.setPubblicabileTrasparenza(execution.getId(), "modificheVariantiArt106", true);
-				if ( execution.getVariable("importoTotaleNetto") != null && Double.compare(Double.parseDouble(execution.getVariable("importoTotaleNetto").toString()), 1000000) > 0) {
-					attachmentService.setPubblicabileTrasparenza(execution, "stipula", true);
+				if(sceltaUtente != null && sceltaUtente.equals("RevocaSemplice")) {
+					for (String key : attachmentList.keySet()) {
+						FlowsAttachment value = attachmentList.get(key);
+						LOGGER.info("Key = " + key + ", Value = " + value);
+						attachmentService.setPubblicabileTrasparenza(execution, value.getName(), false);					
+					}
+				} else {					
+					//attachmentService.setPubblicabileTrasparenza(execution.getId(), "decisioneContrattare", true);
+					pubblicaTuttiFilePubblicabili(execution);
 				}
-				if(execution.getVariable("numeroProtocollo_stipula") != null) {
-					protocolloDocumentoService.protocollaDocumento(execution, "stipula", execution.getVariable("numeroProtocollo_stipula").toString(), execution.getVariable("dataProtocollo_stipula").toString());
+			};break;
+
+			case "PROVVEDIMENTO-AGGIUDICAZIONE-start": {
+				//			attachmentService.setPubblicabileTrasparenza(execution.getId(), "giustificazioniAnomalie", true);
+				//			attachmentService.setPubblicabileTrasparenza(execution.getId(), "provvedimentoNominaCommissione", true);
+				//			attachmentService.setPubblicabileTrasparenza(execution.getId(), "provvedimentoAmmessiEsclusi", true);
+				//			attachmentService.setPubblicabileTrasparenza(execution.getId(), "esitoValutazioneAnomalie", true);
+				//			attachmentService.setPubblicabileTrasparenza(execution.getId(), "elencoDitteInvitate", true);
+				//			attachmentService.setPubblicabileTrasparenza(execution.getId(), "elencoVerbali", true);
+				//			attachmentService.setPubblicabileTrasparenza(execution.getId(), "bandoAvvisi", true);
+				//			attachmentService.setPubblicabileTrasparenza(execution.getId(), "letteraInvito", true);
+				pubblicaTuttiFilePubblicabili(execution);
+			};break;	
+
+			case "PROVVEDIMENTO-AGGIUDICAZIONE-end": {
+				attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);
+				if(sceltaUtente != null && sceltaUtente.equals("RevocaConProvvedimento")) {
+					for (String key : attachmentList.keySet()) {
+						FlowsAttachment value = attachmentList.get(key);
+						LOGGER.info("Key = " + key + ", Value = " + value);
+						//attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
+					}
+				} else {					
+					pubblicaTuttiFilePubblicabili(execution);
 				}
-				if(execution.getVariable("numeroProtocollo_contratto") != null) {
-					protocolloDocumentoService.protocollaDocumento(execution, "contratto", execution.getVariable("numeroProtocollo_contratto").toString(), execution.getVariable("dataProtocollo_contratto").toString());
+			};break;	
+
+
+			case "CONTRATTO-FUORI-MEPA-start": {
+				//			attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);		
+				//			pubblicaFileMultipliPubblicabili(execution, "bandoAvvisi", true);
+				//			pubblicaFileMultipliPubblicabili(execution, "letteraInvito", true);
+				pubblicaTuttiFilePubblicabili(execution);
+
+			};break;	
+
+
+			case "CONTRATTO-FUORI-MEPA-end": {
+				attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);
+				if(sceltaUtente != null && sceltaUtente.equals("RevocaConProvvedimento")) {
+					for (String key : attachmentList.keySet()) {
+						FlowsAttachment value = attachmentList.get(key);
+						LOGGER.info("Key = " + key + ", Value = " + value);
+						//attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
+					}
+				} else {	
+					if ( execution.getVariable("importoTotaleNetto") != null && Double.parseDouble(execution.getVariable("importoTotaleNetto").toString()) > 1000000) {
+						attachmentService.setPubblicabileTrasparenza(execution, "contratto", true);
+					}
+					pubblicaTuttiFilePubblicabili(execution);
 				}
-			}
-			if(sceltaUtente != null && sceltaUtente.equals("RevocaConProvvedimento")) {
+			};break;
+
+
+
+			case "STIPULA-MEPA-start": {
+				//			attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);		
+				//			pubblicaFileMultipliPubblicabili(execution, "bandoAvvisi", true);
+				//			pubblicaFileMultipliPubblicabili(execution, "letteraInvito", true);
+				pubblicaTuttiFilePubblicabili(execution);
+
+			};break;	
+
+			case "STIPULA-MEPA-end": {
+				attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);
+				if(sceltaUtente != null && sceltaUtente.equals("RevocaConProvvedimento")) {
+					for (String key : attachmentList.keySet()) {
+						FlowsAttachment value = attachmentList.get(key);
+						LOGGER.info("Key = " + key + ", Value = " + value);
+						//attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
+					}
+				} else {					
+					pubblicaTuttiFilePubblicabili(execution);
+				}
+			};break;		
+			case "REVOCA-end": {
+				attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);
+				for (String key : attachmentList.keySet()) {
+					FlowsAttachment value = attachmentList.get(key);
+					LOGGER.info("Key = " + key + ", Value = " + value);
+					//attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
+				}
 				attachmentService.setPubblicabileTrasparenza(execution, "ProvvedimentoDiRevoca", true);
-			}
-
-		};break; 
-		case "end-stipulato-start": {
-			pubblicaTuttiFilePubblicabili(execution);
-			controllaFilePubblicabiliTrasparenza(execution);
-			execution.setVariable(STATO_FINALE_DOMANDA, "STIPULATO");
-			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "STIPULATO");
-			//TODO implementare le url a seconda del contesto
-			String urlSigla = "www.google.it";
-			Map<String, Object> siglaPayload = createSiglaPayload(execution);
-			externalMessageService.createExternalMessage(urlSigla, ExternalMessageVerb.POST, siglaPayload);
-			prepareFilesToSigla(execution);
-		};break;     
-		case "end-stipulato-end": {
-		};break;
-		// END CONSUNTIVO  
-
-		// START STIPULA MEPA  
-		//		case "stipula-mepa-consip-start": {
-		//			if (execution.getVariable("strumentoAcquisizioneId").toString().equals("21")) {
-		//				dittaCandidata.evidenzia(execution);
-		//			} else {
-		//				if ((execution.getVariable("gestioneRTIDittaAggiudicataria") != null) && (execution.getVariable("gestioneRTIDittaAggiudicataria").toString().equals("SI"))) {
-		//					dittaCandidata.aggiornaDittaRTIInvitata(execution);
-		//				}
-		//			}			
-		//		};break; 
-		case "endevent-stipula-mepa-consip-revoca-end": {
-			execution.setVariable("direzioneFlusso", "RevocaConProvvedimento");
-		};break;
-		case "endevent-stipula-mepa-consip-protocollo-end": {
-			execution.setVariable("direzioneFlusso", "Stipula");
-		};break; 
-		// END STIPULA MEPA  
-
-		// START REVOCA
-
-		case "firma-revoca-end": {
-			firmaDocumentoService.eseguiFirma(execution, "ProvvedimentoDiRevoca");
-		};break; 
-		case "protocollo-revoca-end": {
-			if(sceltaUtente != null && sceltaUtente.equals("Protocolla")) {
-				protocolloDocumentoService.protocolla(execution, "ProvvedimentoDiRevoca");
-			}
-		};break;  
-		// END REVOCA  
-
-		// FINE ACQUISTI  
-
-		case "end-revocato-start": {
-			execution.setVariable(STATO_FINALE_DOMANDA, "REVOCATO");
-			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "REVOCATO");
-		};break;
-
-		// FINE FLUSSO  
-		case "process-end": {
-			//			if(execution.getVariable(STATO_FINALE_DOMANDA).toString().equals("STIPULATO")){
-			//				pubblicaTuttiFilePubblicabili(execution);
-			//			}
-		};break;  
-
-		//SUBFLUSSI
-		case "DECISIONE-CONTRATTARE-end": {
-			attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);
-			if(sceltaUtente != null && sceltaUtente.equals("RevocaSemplice")) {
-				for (String key : attachmentList.keySet()) {
-					FlowsAttachment value = attachmentList.get(key);
-					LOGGER.info("Key = " + key + ", Value = " + value);
-					attachmentService.setPubblicabileTrasparenza(execution, value.getName(), false);					
-				}
-			} else {					
-				//attachmentService.setPubblicabileTrasparenza(execution.getId(), "decisioneContrattare", true);
 				pubblicaTuttiFilePubblicabili(execution);
-			}
-		};break;
+			};break;	
+			case "end-revocato": {
+			};break;
 
-		case "PROVVEDIMENTO-AGGIUDICAZIONE-start": {
-			//			attachmentService.setPubblicabileTrasparenza(execution.getId(), "giustificazioniAnomalie", true);
-			//			attachmentService.setPubblicabileTrasparenza(execution.getId(), "provvedimentoNominaCommissione", true);
-			//			attachmentService.setPubblicabileTrasparenza(execution.getId(), "provvedimentoAmmessiEsclusi", true);
-			//			attachmentService.setPubblicabileTrasparenza(execution.getId(), "esitoValutazioneAnomalie", true);
-			//			attachmentService.setPubblicabileTrasparenza(execution.getId(), "elencoDitteInvitate", true);
-			//			attachmentService.setPubblicabileTrasparenza(execution.getId(), "elencoVerbali", true);
-			//			attachmentService.setPubblicabileTrasparenza(execution.getId(), "bandoAvvisi", true);
-			//			attachmentService.setPubblicabileTrasparenza(execution.getId(), "letteraInvito", true);
-			pubblicaTuttiFilePubblicabili(execution);
-		};break;	
+			// DEFAULT  
+			default:  {
+			};break;    
 
-		case "PROVVEDIMENTO-AGGIUDICAZIONE-end": {
-			attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);
-			if(sceltaUtente != null && sceltaUtente.equals("RevocaConProvvedimento")) {
-				for (String key : attachmentList.keySet()) {
-					FlowsAttachment value = attachmentList.get(key);
-					LOGGER.info("Key = " + key + ", Value = " + value);
-					//attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
-				}
-			} else {					
-				pubblicaTuttiFilePubblicabili(execution);
-			}
-		};break;	
-
-
-		case "CONTRATTO-FUORI-MEPA-start": {
-			//			attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);		
-			//			pubblicaFileMultipliPubblicabili(execution, "bandoAvvisi", true);
-			//			pubblicaFileMultipliPubblicabili(execution, "letteraInvito", true);
-			pubblicaTuttiFilePubblicabili(execution);
-
-		};break;	
-
-
-		case "CONTRATTO-FUORI-MEPA-end": {
-			attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);
-			if(sceltaUtente != null && sceltaUtente.equals("RevocaConProvvedimento")) {
-				for (String key : attachmentList.keySet()) {
-					FlowsAttachment value = attachmentList.get(key);
-					LOGGER.info("Key = " + key + ", Value = " + value);
-					//attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
-				}
-			} else {	
-				if ( execution.getVariable("importoTotaleNetto") != null && Double.parseDouble(execution.getVariable("importoTotaleNetto").toString()) > 1000000) {
-					attachmentService.setPubblicabileTrasparenza(execution, "contratto", true);
-				}
-				pubblicaTuttiFilePubblicabili(execution);
-			}
-		};break;
-
-
-
-		case "STIPULA-MEPA-start": {
-			//			attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);		
-			//			pubblicaFileMultipliPubblicabili(execution, "bandoAvvisi", true);
-			//			pubblicaFileMultipliPubblicabili(execution, "letteraInvito", true);
-			pubblicaTuttiFilePubblicabili(execution);
-
-		};break;	
-
-		case "STIPULA-MEPA-end": {
-			attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);
-			if(sceltaUtente != null && sceltaUtente.equals("RevocaConProvvedimento")) {
-				for (String key : attachmentList.keySet()) {
-					FlowsAttachment value = attachmentList.get(key);
-					LOGGER.info("Key = " + key + ", Value = " + value);
-					//attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
-				}
-			} else {					
-				pubblicaTuttiFilePubblicabili(execution);
-			}
-		};break;		
-		case "REVOCA-end": {
-			attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);
-			for (String key : attachmentList.keySet()) {
-				FlowsAttachment value = attachmentList.get(key);
-				LOGGER.info("Key = " + key + ", Value = " + value);
-				//attachmentService.setPubblicabile(execution.getId(), value.getName(), false);					
-			}
-			attachmentService.setPubblicabileTrasparenza(execution, "ProvvedimentoDiRevoca", true);
-			pubblicaTuttiFilePubblicabili(execution);
-		};break;	
-		case "end-revocato": {
-		};break;
-
-		// DEFAULT  
-		default:  {
-		};break;    
-
+			} 
 		} 
 	}
 }

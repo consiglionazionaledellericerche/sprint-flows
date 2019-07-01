@@ -12,6 +12,8 @@ import it.cnr.si.domain.enumeration.ExternalMessageVerb;
 
 import it.cnr.si.domain.enumeration.ExternalMessageStatus;
 
+import it.cnr.si.domain.enumeration.ExternalApplication;
+
 /**
  * A ExternalMessage.
  */
@@ -44,11 +46,17 @@ public class ExternalMessage implements Serializable {
     @Column(name = "status", nullable = false)
     private ExternalMessageStatus status;
 
-    @Column(name = "retries")
+    @NotNull
+    @Column(name = "retries", nullable = false)
     private Integer retries;
 
     @Column(name = "last_error_message")
     private String lastErrorMessage;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "application", nullable = false)
+    private ExternalApplication application;
 
     public Long getId() {
         return id;
@@ -136,6 +144,19 @@ public class ExternalMessage implements Serializable {
         this.lastErrorMessage = lastErrorMessage;
     }
 
+    public ExternalApplication getApplication() {
+        return application;
+    }
+
+    public ExternalMessage application(ExternalApplication application) {
+        this.application = application;
+        return this;
+    }
+
+    public void setApplication(ExternalApplication application) {
+        this.application = application;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -166,6 +187,7 @@ public class ExternalMessage implements Serializable {
             ", status='" + status + "'" +
             ", retries='" + retries + "'" +
             ", lastErrorMessage='" + lastErrorMessage + "'" +
+            ", application='" + application + "'" +
             '}';
     }
 }
