@@ -38,12 +38,14 @@
       <h4>Aggiorna Documento</h4>
       <form novalidate class="flows-form" name="aggiornaDocumentoForm" ng-submit="submitAggiornaDocumento(picFile)">
 
-        <fileinput
+        <div>
+          <fileinput
                 name="{{vm.attachment.name}}"
                 multiple=false
                 metadati-protocollo="true"
                 mostra-modifica="false"
                 cnr-required=true />
+        </div>
         <button class="btn btn-primary" type="submit" ng-disabled="aggiornaDocumentoForm.$invalid">
           invia
           <span class="glyphicon glyphicon-arrow-right"></span>
@@ -68,7 +70,8 @@
         <div class="row" ng-if="data.tipoModifica == 'sostituzione'">
           <div class="col-md-12">
             <form novalidate class="flows-form" name="aggiornaSostituzioneForm" ng-submit="submitAggiornaDocumento(picFile)">
-              <fileinput
+              <div>
+                <fileinput
                       name="{{vm.attachment.name}}_sostituzione"
                       label="{{vm.attachment.label}}"
                       multiple="false"
@@ -81,6 +84,7 @@
                       pubblicazione-disabilitato="true"
                       slider-protocollo-disabilitato="true"
               />
+              </div>
 
               <div class="form-group">
                 <label for="motivoSostituzione">Motivo sostituzione</label>
@@ -98,7 +102,8 @@
       <div class="row" ng-if="data.tipoModifica == 'rettifica'">
         <div class="col-md-12">
           <form novalidate class="flows-form" name="rettificaForm" ng-submit="submitAggiornaDocumento(picFile)">
-            <fileinput
+            <div>
+              <fileinput
                     name="{{vm.attachment.name}}_rettifica"
                     label="Rettifica {{vm.attachment.label}}"
                     multiple="false"
@@ -111,6 +116,7 @@
                     pubblicazione-disabilitato="true"
                     slider-protocollo-disabilitato="true"
             />
+            </div>
 
             <button class="btn btn-primary" type="submit" ng-disabled="rettificaForm.$invalid">
               invia

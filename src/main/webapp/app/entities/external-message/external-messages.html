@@ -25,6 +25,7 @@
                     <th jh-sort-by="status"><span translate="sprintApp.externalMessage.status">Status</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="retries"><span translate="sprintApp.externalMessage.retries">Retries</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="lastErrorMessage"><span translate="sprintApp.externalMessage.lastErrorMessage">Last Error Message</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="application"><span translate="sprintApp.externalMessage.application">Application</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th></th>
                 </tr>
             </thead>
@@ -37,6 +38,7 @@
                     <td translate="{{'sprintApp.ExternalMessageStatus.' + externalMessage.status}}">{{externalMessage.status}}</td>
                     <td>{{externalMessage.retries}}</td>
                     <td>{{externalMessage.lastErrorMessage}}</td>
+                    <td translate="{{'sprintApp.ExternalApplication.' + externalMessage.application}}">{{externalMessage.application}}</td>
                     <td class="text-right">
                         <div class="btn-group flex-btn-group-container">
                             <button type="submit"

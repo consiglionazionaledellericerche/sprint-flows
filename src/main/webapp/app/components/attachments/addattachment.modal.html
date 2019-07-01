@@ -9,13 +9,15 @@
 
             <form novalidate class="flows-form" name="aggiornaDocumentoForm" ng-submit="submitDocumento(picFile)">
 
-                <fileinput name="newfile"
-                           multiple=false
-                           cnr-required=true
-                           metadati-pubblicazione-urp="true"
-                           metadati-pubblicazione-trasparenza="true"
-                           metadati-protocollo="true"
-                />
+                <div>
+                    <fileinput name="newfile"
+                               multiple=false
+                               cnr-required=true
+                               metadati-pubblicazione-urp="true"
+                               metadati-pubblicazione-trasparenza="true"
+                               metadati-protocollo="true"
+                    />
+                </div>
                 <button class="btn btn-primary" type="submit" ng-disabled="aggiornaDocumentoForm.$invalid">
                     Invia
                     <span class="glyphicon glyphicon-arrow-right"></span>

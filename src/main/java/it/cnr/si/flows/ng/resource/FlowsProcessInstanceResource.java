@@ -15,6 +15,7 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.history.HistoricTaskInstance;
+import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceActionRequest;
@@ -50,7 +51,7 @@ import static it.cnr.si.flows.ng.utils.Enum.Stato.PubblicatoUrp;
 import static it.cnr.si.flows.ng.utils.Utils.DESC;
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_PARAMS;
 
-@Controller
+@RestController
 @RequestMapping("api/processInstances")
 public class FlowsProcessInstanceResource {
 
@@ -193,13 +194,20 @@ public class FlowsProcessInstanceResource {
     @GetMapping(value = "/variable", produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     @Secured(AuthoritiesConstants.ADMIN)
-    public ResponseEntity getVariable(
+    public ResponseEntity<HistoricVariableInstance> getVariable(
             @RequestParam("processInstanceId") String processInstanceId,
             @RequestParam("variableName") String variableName) {
 
-        return new ResponseEntity<>(runtimeService.getVariableInstance(processInstanceId, variableName), HttpStatus.OK);
+        return new ResponseEntity<HistoricVariableInstance>(
+                historyService.createHistoricVariableInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .variableName(variableName)
+                .list()
+                .stream()
+                .sorted((a, b) -> b.getLastUpdatedTime().compareTo(a.getLastUpdatedTime()) )
+                .findFirst().orElse(null),
+                HttpStatus.OK);
     }
-
 
 
     /**

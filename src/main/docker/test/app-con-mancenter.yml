@@ -1,17 +1,31 @@
 version: '2'
+
+x-logging:
+  &default-logging
+  driver: syslog
+  options:
+    syslog-address: "udp://localhost:1489"
+#    syslog-format: rfc5424
+
 services:
-  sprint-flows-demo_cnr:
+  sprint-flows-test-cnr:
     image: docker.si.cnr.it/sprint-flows-test
+    links:
+      - sprint-flows-test-cnr-pg:postgresql
     environment:
       - SPRING_PROFILES_ACTIVE=test,cnr,swagger
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://dockerwebtest01.si.cnr.it:1482/flows
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/flows
       - SPRING_DATASOURCE_USERNAME=activiti
       - SPRING_DATASOURCE_PASSWORD=activitipw
       - JHIPSTER_SLEEP=10 # gives time for the database to boot before the application
+      - CACHE_HAZELCAST_PUBLICIP=150.146.206.150
+      - CACHE_HAZELCAST_MEMBERS=150.146.206.150:1485,150.146.206.152:1485
     ports:
       - 1481:8080
-      - 1488:1488
-      - 1489:5701
+      - 1485:1485
+      - 1486:1486
+      - 1487:1487
+    logging: *default-logging
 
   lb:
     image: eeacms/haproxy
@@ -23,8 +37,10 @@ services:
       - 1484:1484
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    logging: *default-logging
 
-  sprint-flows-demo_cnr-pg:
+
+  sprint-flows-test-cnr-pg:
     image: postgres:9.6.9-alpine
     environment:
       - POSTGRES_USER=activiti
@@ -34,6 +50,7 @@ services:
       - spring-flows-demo-cnr-pg-data:/var/lib/postgresql/data
     ports:
       - 1482:5432
+    logging: *default-logging
 
 
   #management center
@@ -49,6 +66,16 @@ services:
       - JAVA_OPTS=-Dhazelcast.mc.rest.enabled=true
     ports:
       - 1483:8080
+    logging: *default-logging
+
+  syslog-rtail:
+    image: docker.si.cnr.it/syslog-rtail
+    environment:
+      - SYSLOG_USERNAME=admin
+      - SYSLOG_PASSWORD=admin
+    ports:
+      - 1488:8181
+      - 1489:514/udp
 
 volumes:
   spring-flows-demo-cnr-pg-data:
