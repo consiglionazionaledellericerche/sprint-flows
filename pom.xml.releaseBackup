@@ -10,8 +10,9 @@
 
     <groupId>it.cnr.si.flows</groupId>
     <artifactId>sprint-flows</artifactId>
-    <version>0.9.10-SNAPSHOT</version>
+    <version>0.3.0-SNAPSHOT</version>
     <packaging>war</packaging>
+    <!--<packaging>jar</packaging>-->
 
     <name>sprint-flows</name>
 
@@ -20,13 +21,13 @@
     </prerequisites>
 
     <scm>
-        <connection>scm:git:ssh://git@git.si.cnr.it/documentale/sprint-flows.git</connection>
-        <developerConnection>scm:git:ssh://git@git.si.cnr.it/documentale/sprint-flows.git</developerConnection>
+        <connection>scm:git:ssh://git@git.si.cnr.it/dev/sprint-flows.git</connection>
+        <developerConnection>scm:git:ssh://git@git.si.cnr.it/dev/sprint-flows.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
     <properties>
-        <ace-client.version>2.3.6</ace-client.version>
+        <ace-client.version>2.3.3</ace-client.version>
         <activiti.version>5.22.0</activiti.version>
         <assertj-core.version>3.5.2</assertj-core.version>
         <feign.version>9.7.0</feign.version>

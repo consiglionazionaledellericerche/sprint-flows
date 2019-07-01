@@ -101,6 +101,10 @@ public class FlowsProcessInstanceService {
 			HistoricProcessInstanceResponse entity = restResponseFactory.createHistoricProcessInstanceResponse(processInstance);
 			result.put("entity", entity);
 
+			Map<String, RestVariable> variabili = new HashMap<>();
+			entity.getVariables().forEach(v -> variabili.put(v.getName(), v));
+			result.put("variabili", variabili); // Modifica per vedere piu' comodamente le variabili
+
 			HistoricVariableInstance links = historyService
 					.createHistoricVariableInstanceQuery()
 					.processInstanceId(processInstanceId)

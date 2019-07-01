@@ -16,6 +16,9 @@ import org.springframework.core.env.Environment;
 
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -49,7 +52,7 @@ public class CacheConfiguration {
     }
 
     @Bean
-    public HazelcastInstance hazelcastInstance(JHipsterProperties jHipsterProperties) {
+    public HazelcastInstance hazelcastInstance(JHipsterProperties jHipsterProperties) throws UnknownHostException {
         log.debug("Configuring Hazelcast");
         Config config = new Config();
 
@@ -68,8 +71,18 @@ public class CacheConfiguration {
         String hazelcastInstanceName = env.getProperty("cache.hazelcast.name", String.class, "sprint");
         Integer hazelcastPort = env.getProperty("cache.hazelcast.port", Integer.class, 5701);
         Integer hazelcastMulticastPort = env.getProperty("cache.hazelcast.multicastPort", Integer.class, 54327);
-        Integer hazelcastOutboundPort = env.getProperty("cache.hazelcast.outboundPort", Integer.class);
+        Integer hazelcastOutboundPort = env.getProperty("cache.hazelcast.outboundPort", Integer.class, 1488);
         String members = env.getProperty("cache.hazelcast.members");
+
+        String publicIp = env.getProperty("cache.hazelcast.publicIp");
+
+        NetworkConfig networkConfig = config.getNetworkConfig();
+        InterfacesConfig networkInterface = networkConfig.getInterfaces();
+        String hostAddress = InetAddress.getLocalHost().getHostAddress();
+        log.info("Local IP: "+ hostAddress);
+        networkInterface.setEnabled(true).addInterface(hostAddress);
+        if(publicIp != null)
+            networkConfig.setPublicAddress(publicIp);
 
         config.setInstanceName(hazelcastInstanceName);
         config.getNetworkConfig().setPort(hazelcastPort);
@@ -90,7 +103,7 @@ public class CacheConfiguration {
         if (members != null) {
             log.info("TCP members: " + members);
             config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(true);
-            config.getNetworkConfig().getJoin().getTcpIpConfig().addMember(members);
+            config.getNetworkConfig().getJoin().getTcpIpConfig().setMembers(Arrays.asList(members.split(",")));
         } else if (hazelcastMulticastPort != null) {
             log.info("multicast on port " + hazelcastMulticastPort);
             config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(true);
