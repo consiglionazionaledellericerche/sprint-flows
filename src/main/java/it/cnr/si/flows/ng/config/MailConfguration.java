@@ -25,12 +25,15 @@ public class MailConfguration {
     public static final String MAIL_CONFIG = "mailConfig";
     public static final String MAIL_ACTIVATED = "mailActivated";
     public static final String MAIL_RECIPIENTS = "mailRecipients";
+    public static final String MAIL_URL = "mailUrl";
 
 
     @Value("${spring.mail.recipients:}")
     private List<String> initMailRecipients;
     @Value("${spring.mail.activated:false}")
     private boolean initMailActivated;
+    @Value("${spring.mail.url}")
+    private String url;
 
     @Inject
     private HazelcastInstance hazelcastInstance;
@@ -50,6 +53,7 @@ public class MailConfguration {
 
             mailConfig.put(MAIL_ACTIVATED, initMailActivated);
             mailConfig.put(MAIL_RECIPIENTS, initMailRecipients);
+            mailConfig.put(MAIL_URL, url);
 
         } else {
             log.info("MailConfig gia' settato, leggo le impostazioni predefiniti: {} {}", mailConfig.get(MAIL_ACTIVATED), MAIL_RECIPIENTS);
@@ -70,6 +74,9 @@ public class MailConfguration {
         hazelcastInstance.getReplicatedMap(MAIL_CONFIG).put(MAIL_ACTIVATED, mailActivated);
     }
 
+    public String getMailUrl() {
+        return String.valueOf(hazelcastInstance.getReplicatedMap(MAIL_CONFIG).get(MAIL_URL));
+    }
     // --- //
 
     private ITemplateResolver htmlTemplateResolver() {
