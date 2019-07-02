@@ -1,6 +1,7 @@
 package it.cnr.si.flows.ng.listeners;
 
 import it.cnr.si.domain.NotificationRule;
+import it.cnr.si.flows.ng.config.MailConfguration;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.FlowsMailService;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
@@ -23,8 +24,6 @@ import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Stream;
-
-import static org.activiti.engine.delegate.event.ActivitiEventType.PROCESS_STARTED;
 
 @Component
 public class MailNotificationListener  implements ActivitiEventListener {
@@ -53,7 +52,8 @@ public class MailNotificationListener  implements ActivitiEventListener {
 	private MembershipService membershipService;
 	@Inject
 	private FlowsProcessInstanceService flowsProcessInstanceService;
-
+	@Inject
+	private MailConfguration mailConfguration;
 
 
 	@Override
@@ -80,6 +80,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
 			case TASK_ASSIGNED:
 			case TASK_CREATED:
 				variables.put("stato", ((TaskEntity)((ActivitiEntityEvent)event).getEntity()).getName());
+				variables.put("nextTaskId", ((TaskEntity)((ActivitiEntityEvent)event).getEntity()).getId());
 				break;
 			case PROCESS_CANCELLED:
 				variables.put("stato", ((ActivitiEventType)event.getType()).name()  + " - con causa: " + ((ActivitiProcessCancelledEventImpl) event).getCause());				
@@ -88,10 +89,11 @@ public class MailNotificationListener  implements ActivitiEventListener {
 				variables.put("stato", ((ExecutionEntity)((ActivitiEntityEventImpl) event).getEntity()).getActivity().getProperty("name"));
 				break;
 		}
-		variables.put("descrizione", ((String) variables.get("descrizione")));
-		variables.put("titolo", ((String) variables.get("titolo")));
-		variables.put("initiator", ((String) variables.get("initiator")));
-		variables.put("businessKey", ((String) variables.get("processDefinitionId")).split(":")[0]);
+		variables.put("descrizione", ((String) variables.get("descrizione")) );
+		variables.put("titolo", ((String) variables.get("titolo")) );
+		variables.put("initiator", ((String) variables.get("initiator")) );
+//		variables.put("businessKey", ((String) variables.get("businessKey")) );
+		variables.put("serverUrl", mailConfguration.getMailUrl());
 
 		return variables;
 	}
