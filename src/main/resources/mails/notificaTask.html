@@ -14,15 +14,16 @@
             <span th:if="${groupname}">
                 Riceve questa notifica in quanto parte del gruppo <bold th:text="${groupname}">NOME GRUPPO</bold></span>
         <p>
-            Si notifica che il flusso in oggetto ha raggiunto la fase "<bold th:text="${fase}">FASE</bold>"
+            Si notifica che il flusso in oggetto ha raggiunto la fase "<bold th:text="${taskName}">FASE</bold>"
         <p th:if="${commento!=null and commento!= ''}">
             Il compito presenta la seguente nota di commento:
             <pre th:text="${commento}">Commento</pre>
         <hr>
 
-        <p th:if="${scadenza}"> Data di Scadenza <strong th:text="${scadenza}">SCADENZA FLUSSO</strong></p>
-        <p th:if="${priorita}"> Priorita <strong th:text="${priorita}">CODICE VERDE</strong></p>
-
+		<a th:href="${processLink}">
+            Link per accedere direttamente al dettali del flusso
+        </a>
+        
         <hr>
         <footer th:if="${profile == 'oiv'}" style="color: dark-gray; font-size: 0.8em;">
           <p>Si prega di non rispondere alla presente mail generata automaticamente dal sistema.
