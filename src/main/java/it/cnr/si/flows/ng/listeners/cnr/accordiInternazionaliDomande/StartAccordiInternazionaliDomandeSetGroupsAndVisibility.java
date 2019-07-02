@@ -46,7 +46,7 @@ public class StartAccordiInternazionaliDomandeSetGroupsAndVisibility {
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
 		//Integer cdsuoAppartenenzaUtente = aceBridgeService.getEntitaOrganizzativaDellUtente(richiedente.toString()).getId();
 		String cdsuoAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(richiedente.toString()).getCdsuo();
-		Object insdipResponsabileUo = siperService.getResponsabileCDSUO(cdsuoAppartenenzaUtente).get(0).get("codice_sede");
+		Object insdipResponsabileUo = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("codice_sede");
 		Integer idEntitaorganizzativaResponsabileUtente = aceService.entitaOrganizzativaFindByTerm(insdipResponsabileUo.toString()).get(0).getId();
 		String gruppoValidatoriAccordiInternazionali = "validatoriAccordiInternazionali@0000";
 		String gruppoUfficioProtocollo = "ufficioProtocolloAccordiInternazionali@0000";
