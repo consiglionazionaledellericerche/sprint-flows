@@ -35,7 +35,7 @@ exec:
   script:
     - sshremote $SSH_CONNECT_DOCPROD02 "docker ps -a"
     - sshremote $SSH_CONNECT_DOCPROD02 "docker ps"
-    - sshremote $SSH_CONNECT_DOCPROD01 "docker stop docker-flows_sprint-flows-cnr_1_7e482add33c7"
+    - sshremote $SSH_CONNECT_DOCPROD01 "docker stop 0f708828434f 320dae3aabb9"
     - sshremote $SSH_CONNECT_DOCPROD01 "docker ps -a"
 
 deploy_dev_snapshot:
