@@ -68,7 +68,7 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 	private TaskService taskService;
 	@Inject
 	private ManagementService managementService;
-	
+
 
 	private Expression faseEsecuzione;
 
@@ -130,7 +130,7 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 				} else {
 					String nomeFile="valutazioneProgettoAccordiBilaterali";
 					String labelFile="Scheda Valutazione Domanda";
-					execution.setVariable("punteggio_totale", (Integer.parseInt(execution.getVariable("punteggio_pianoDiLavoro").toString()) + Integer.parseInt(execution.getVariable("punteggio_qualitaProgetto").toString())+ Integer.parseInt(execution.getVariable("punteggio_valoreAggiunto").toString())+ Integer.parseInt(execution.getVariable("punteggio_qualitaGruppoDiRicerca").toString())));
+					execution.setVariable("punteggio_totale", (Double.parseDouble(execution.getVariable("punteggio_pianoDiLavoro").toString().replaceAll(",", ".")) + Double.parseDouble(execution.getVariable("punteggio_qualitaProgetto").toString().replaceAll(",", "."))+ Double.parseDouble(execution.getVariable("punteggio_valoreAggiunto").toString().replaceAll(",", "."))+ Double.parseDouble(execution.getVariable("punteggio_qualitaGruppoDiRicerca").toString().replaceAll(",", "."))));
 					flowsPdfService.makePdf(nomeFile, processInstanceId);
 					FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
 					documentoGenerato.setLabel(labelFile);
@@ -144,6 +144,13 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 				runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValutatoreScientificoDipartimento, PROCESS_VISUALIZER);
 				execution.setVariable("gruppoValutatoreScientificoDipartimento", gruppoValutatoreScientificoDipartimento);
 				LOGGER.debug("Imposto i gruppi dipartimento : {} - del flusso {}", idDipartimento, gruppoValutatoreScientificoDipartimento);
+				// GENERO LA DOMANDA
+				String nomeFile="domandaAccordiBilaterali";
+				String labelFile="Domanda";
+				flowsPdfService.makePdf(nomeFile, processInstanceId);
+				FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
+				documentoGenerato.setLabel(labelFile);
+				flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
 			};break;  			
 			// START
 			case "validazione-start": {
