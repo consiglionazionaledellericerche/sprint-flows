@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -189,10 +188,12 @@ public class RelationshipService {
                 .collect(Collectors.toSet());
     }
 
+    @Timed
     public List<String> getUsersInMyGroups(String username) {
 
         List<String> usersInMyGroups = new ArrayList<>();
-        List<String> myGroups = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+        List<String> myGroups = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                .parallelStream()
                 .map(GrantedAuthority::getAuthority)
                 .map(Utils::removeLeadingRole)
                 .filter(group -> group.indexOf("afferenza") <= -1)
