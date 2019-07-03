@@ -53,6 +53,12 @@ public class FlowsMailService extends MailService {
         Context ctx = new Context();
         ctx.setVariables(variables);
         ctx.setVariable("username", username);
+
+        ctx.setVariable("taskLink", variables.get("serverUrl") + "/#/details?processInstanceId="+ variables.get("processInstanceId") +"&taskId="+ variables.get("nextTaskId"));
+        ctx.setVariable("processLink", variables.get("serverUrl") + "/#/details?processInstanceId="+ variables.get("processInstanceId"));
+
+        // ${serverUrl}/#/details?processInstanceId=${processInstanceId}&amp;taskId=${nextTaskId}}
+
         if (groupName != null) {
             if (Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
                 ctx.setVariable("profile", "oiv");
@@ -83,18 +89,18 @@ public class FlowsMailService extends MailService {
                     .forEach(s -> {
                         LOGGER.debug("Invio mail a {} con titolo Notifica relativa al flusso {} del tipo {} nello stato {} e con contenuto {}",
                                 s,
-                                variables.get("businessKey"),
+                                variables.get("key"),
                                 notificationType,
                                 variables.get("stato"),
                                 StringUtils.abbreviate(htmlContent, 30));
                         LOGGER.trace("Corpo email per intero: {}", htmlContent);
-                        sendEmail(s, "Notifica relativa al flusso " + variables.get("businessKey"), htmlContent, false, true);
+                        sendEmail(s, "Notifica relativa al flusso " + variables.get("key"), htmlContent, false, true);
                     });
         } else {
             // In produzione mando le email ai veri destinatari
             if(mailUtente != null)
                 sendEmail(mailUtente,
-                        "Notifica relativa al flusso " + variables.get("businessKey"),
+                        "Notifica relativa al flusso " + variables.get("key"),
                         htmlContent,
                         false,
                         true);

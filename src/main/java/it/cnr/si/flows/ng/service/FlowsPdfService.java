@@ -263,7 +263,7 @@ public class FlowsPdfService {
 				.singleResult();
 
 		// Verifico se il workflow sia terminato
-		if(historicProcessInstance.getEndTime() != null){
+		if((historicProcessInstance != null) && (historicProcessInstance.getEndTime() != null)){
 			//carico le processVariables e rimappo in formato json il campo stringa "valutazioneEsperienze_json"
 			variableInstanceJson = new JSONObject(historicProcessInstance.getProcessVariables());
 		} else {
