@@ -19,6 +19,7 @@ public class SiperService {
     private RestTemplate siperRestTemplate;
     private String url;
     private String pathResponsabile = "/siper/json/sedi?titCa={cdsuo}&userinfo=true&ruolo=resp";
+    private String pathDirettore = "/siper/json/sedi?titCa={cdsuo}&userinfo=true&ruolo=dircds";
 
     @Inject
     private Environment env;
@@ -42,6 +43,16 @@ public class SiperService {
 
         ResponseEntity<? extends List> forEntity = siperRestTemplate.getForEntity(
                 this.url + pathResponsabile,
+                List.class,
+                cdsuo);
+
+        return (List<Map<String, Object>>) forEntity.getBody();
+    }
+    
+    public List<Map<String, Object>> getDirettoreCDSUO(String cdsuo) {
+
+        ResponseEntity<? extends List> forEntity = siperRestTemplate.getForEntity(
+                this.url + pathDirettore,
                 List.class,
                 cdsuo);
 
