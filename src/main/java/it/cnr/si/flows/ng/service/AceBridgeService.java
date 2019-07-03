@@ -9,6 +9,7 @@ import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.letture.PersonaEntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
 import it.cnr.si.service.dto.anagrafica.letture.RuoloUtenteWebDto;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -88,13 +89,13 @@ public class AceBridgeService {
 				.collect(Collectors.toList());
 	}
 
-	//    @Cacheable("idRuoloBySigla")
+	@Cacheable("idRuoloBySigla")
 	public int getIdRuoloBySigla(String sigla) {
 
 		return aceService.getRuoloBySigla(sigla).getId();
 	}
 
-	//    @Cacheable("nuomeRuoloBySigla")
+	@Cacheable("nuomeRuoloBySigla")
 	public String getNomeRuoloBySigla(String sigla) {
 
 		return aceService.getRuoloBySigla(sigla).getDescr();
