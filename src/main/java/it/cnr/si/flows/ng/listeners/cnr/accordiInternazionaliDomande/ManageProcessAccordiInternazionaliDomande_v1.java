@@ -209,6 +209,7 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 
 			} 
 		} else {
+			restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.CANCELLATA);
 			List<Job> timerAttivi = managementService.createJobQuery().timers().processInstanceId(processInstanceId).list();
 			timerAttivi.forEach(singoloTimer -> {
 				if (singoloTimer.getId() != null) {
