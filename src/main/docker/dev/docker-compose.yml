@@ -1,0 +1,103 @@
+version: '2'
+
+x-logging:
+  &default-logging
+  driver: syslog
+  options:
+    syslog-address: "udp://localhost:1489"
+#    syslog-format: rfc5424
+
+services:
+  sprint-flows-test-cnr:
+    image: sprint-flows-dev
+    links:
+      - sprint-flows-test-cnr-pg:postgresql
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev,cnr,swagger
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/flows
+      - SPRING_DATASOURCE_USERNAME=activiti
+      - SPRING_DATASOURCE_PASSWORD=activitipw
+      - JHIPSTER_SLEEP=10 # gives time for the database to boot before the application
+      - CACHE_HAZELCAST_PORT=1485
+      - CACHE_HAZELCAST_OUTBOUNDPORT=1486
+      - CACHE_HAZELCAST_MEMBERS=150.146.40.97:1485,150.146.40.97:1585
+      - CACHE_HAZELCAST_MANCENTER=http://150.146.40.97:1483/mancenter
+    ports:
+      - 1481:8080
+      - 1485:1485
+      - 1486:1486
+      - 1487:1487
+    logging: *default-logging
+
+  sprint-flows-test-cnr-2:
+    image: sprint-flows-dev
+    links:
+      - sprint-flows-test-cnr-pg:postgresql
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev,cnr,swagger
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/flows
+      - SPRING_DATASOURCE_USERNAME=activiti
+      - SPRING_DATASOURCE_PASSWORD=activitipw
+      - JHIPSTER_SLEEP=15 # gives time for the database to boot before the application
+      - CACHE_HAZELCAST_PORT=1585
+      - CACHE_HAZELCAST_OUTBOUNDPORT=1586
+      - CACHE_HAZELCAST_MEMBERS=150.146.40.97:1485,150.146.40.97:1585
+    ports:
+      - 1581:8080
+      - 1585:1585
+      - 1586:1586
+      - 1587:1587
+    logging: *default-logging
+
+  lb:
+    image: eeacms/haproxy
+    environment:
+      - BACKENDS=150.146.40.97:1481 150.146.40.97:1581
+      - STATS_PORT=1484
+    ports:
+      - 1480:5000
+      - 1484:1484
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    logging: *default-logging
+
+
+  sprint-flows-test-cnr-pg:
+    image: postgres:9.6.9-alpine
+    environment:
+      - POSTGRES_USER=activiti
+      - POSTGRES_PASSWORD=activitipw
+      - POSTGRES_DB=flows-cnr #"-cnr" viene aggiunto a runtime a seconda del profilo con cui l'app viene avviata
+    volumes:
+      - spring-flows-demo-cnr-pg-data:/var/lib/postgresql/data
+    ports:
+      - 1482:5432
+    logging: *default-logging
+
+
+  #management center
+  management-center:
+    image: hazelcast/management-center:3.6.1
+    # persisting mancenter users db folder to local disk
+    volumes:
+      - ~/mancenter3.6.1:/mancenter-3.6.1
+    environment:
+      - MANCENTER_DATA=/mancenter-3.6.1
+      # enable REST interface on management center
+      # http://docs.hazelcast.org/docs/latest-development/manual/html/Management/Clustered_REST_via_Management_Center.html
+      - JAVA_OPTS=-Dhazelcast.mc.rest.enabled=true
+    ports:
+      - 1483:8080
+    logging: *default-logging
+
+  syslog-rtail:
+    image: docker.si.cnr.it/syslog-rtail
+    environment:
+      - SYSLOG_USERNAME=admin
+      - SYSLOG_PASSWORD=admin
+    ports:
+      - 1488:8181
+      - 1489:514/udp
+
+volumes:
+  spring-flows-demo-cnr-pg-data:
