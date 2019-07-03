@@ -10,7 +10,7 @@
 
     <groupId>it.cnr.si.flows</groupId>
     <artifactId>sprint-flows</artifactId>
-    <version>0.9.12-SNAPSHOT</version>
+    <version>0.9.12</version>
     <packaging>war</packaging>
 
     <name>sprint-flows</name>
@@ -22,7 +22,7 @@
     <scm>
         <connection>scm:git:ssh://git@git.si.cnr.it/documentale/sprint-flows.git</connection>
         <developerConnection>scm:git:ssh://git@git.si.cnr.it/documentale/sprint-flows.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>0.9.12</tag>
     </scm>
 
     <properties>
