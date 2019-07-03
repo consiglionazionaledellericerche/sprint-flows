@@ -19,6 +19,7 @@ cache:
     - target/app.war
 
 stages:
+  - execute_prod_cmd
   - deploy_snapshot
   - build_test_container
   - deploy_test_container
@@ -26,6 +27,13 @@ stages:
   - build_prod_container
   - deploy_prod_container
 
+exec:
+  stage: execute_prod_cmd
+  image: scolagreco/alpine-ssh:latest
+  only: 
+    - CI
+  script:
+    - sshremote $SSH_CONNECT_DOCPROD01 "docker ps -a"
 
 deploy_dev_snapshot:
   stage: deploy_snapshot
