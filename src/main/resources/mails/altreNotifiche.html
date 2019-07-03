@@ -22,9 +22,11 @@
             <pre th:text="${commento}">Commento</pre>
         <hr>
 
-        <p> Data di Scadenza <bold th:text="${scadenza}">SCADENZA FLUSSO</bold></p>
-        <p> Priorita <bold th:text="${priorita}">CODICE VERDE</bold></p>
-
+        <a th:href="${processLink}">
+            Link per accedere direttamente al dettali del flusso
+        </a>
+        
+        
         <hr>
         <footer th:if="${profile == 'oiv'}">
           <p>Si prega di non rispondere alla presente mail generata automaticamente dal sistema.
