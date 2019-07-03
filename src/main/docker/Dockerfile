@@ -2,7 +2,7 @@ FROM scolagreco/alpine-openjdk:v3.9.2
 
 VOLUME /tmp
 
-RUN apk add --update --no-cache ttf-dejavu
+RUN apk add --update --no-cache ttf-dejavu curl
 
 EXPOSE 8080
 WORKDIR /opt/
