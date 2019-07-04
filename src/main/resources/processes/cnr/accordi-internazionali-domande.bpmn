@@ -150,6 +150,18 @@
     </boundaryEvent>
     <sequenceFlow id="flow30" sourceRef="boundarytimer3" targetRef="endevent6"></sequenceFlow>
     <scriptTask id="notificatask" name="notifica mail" scriptFormat="javascript" activiti:autoStoreVariables="false">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAccordiInternazionaliDomande_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[notificatask-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAccordiInternazionaliDomande_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[notificatask-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
       <script>execution.setVariable('notifica', true);</script>
     </scriptTask>
     <sequenceFlow id="flow32" sourceRef="boundarytimer2" targetRef="notificatask"></sequenceFlow>
