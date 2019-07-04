@@ -76,7 +76,7 @@ public class VerificaDomandeAccordiBilaterali {
 	private final Map<String, String> errors = new HashMap<>();
 
 	//@Test questa riga non va mai messa su git
-	//@Test
+	//S@Test
 	public void runBatch() throws IOException {
 		Map<String, String> persone = getPersoneDaFile();
 
@@ -104,10 +104,10 @@ public class VerificaDomandeAccordiBilaterali {
 
 			Object insdipResponsabileUo = new Object();
 			if (!siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).isEmpty()) {
-				log.info("getDirettoreCDSUO  FUNZIONA ");
 				insdipResponsabileUo = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("codice_sede");
-				log.info("getResponsabileCDSUO  FUNZIONA ");
-				insdipResponsabileUo = siperService.getResponsabileCDSUO(cdsuoAppartenenzaUtente).get(0).get("codice_sede");
+				log.info("getDirettoreCDSUO  FUNZIONA ");
+				//Object insdipResponsabileUoForTest = siperService.getResponsabileCDSUO(cdsuoAppartenenzaUtente).get(0).get("codice_sede");
+				//log.info("getResponsabileCDSUO  FUNZIONA ");
 
 			} else {
 				log.info("getDirettoreCDSUO  NON HA FUNZIONATO!!!!!!!!!!!!!!!!!!!! ");
@@ -118,7 +118,6 @@ public class VerificaDomandeAccordiBilaterali {
 			}
 
 
-			//Object insdipResponsabileUo = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("codice_sede");
 			String usernameDirettore = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("uid").toString();
 			Integer idEntitaorganizzativaResponsabileUtente = aceService.entitaOrganizzativaFindByTerm(insdipResponsabileUo.toString()).get(0).getId();
 			String siglaEntitaorganizzativaResponsabileUtente = aceService.entitaOrganizzativaFindByTerm(insdipResponsabileUo.toString()).get(0).getSigla().toString();
