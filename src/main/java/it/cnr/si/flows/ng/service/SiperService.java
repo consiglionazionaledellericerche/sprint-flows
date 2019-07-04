@@ -1,11 +1,15 @@
 package it.cnr.si.flows.ng.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.support.BasicAuthorizationInterceptor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import it.cnr.si.flows.ng.listeners.cnr.accordiInternazionaliDomande.StartAccordiInternazionaliDomandeSetGroupsAndVisibility;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -15,6 +19,7 @@ import java.util.Map;
 
 @Service
 public class SiperService {
+	private static final Logger LOGGER = LoggerFactory.getLogger(StartAccordiInternazionaliDomandeSetGroupsAndVisibility.class);
 
     private RestTemplate siperRestTemplate;
     private String url;
@@ -55,6 +60,9 @@ public class SiperService {
                 this.url + pathDirettore,
                 List.class,
                 cdsuo);
+
+		
+        LOGGER.debug("****** UTENTE {} ******", forEntity.getBody());
 
         return (List<Map<String, Object>>) forEntity.getBody();
     }
