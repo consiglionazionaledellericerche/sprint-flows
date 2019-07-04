@@ -68,7 +68,7 @@ public class PopolazioneProfiliAcquistiBatch {
 	private AceService aceService;
 	@Inject
 	private AceBridgeService aceBridgeService;
-	private final Map<String, RuntimeException> errors = new HashMap<>();
+	private final Map<String, String> errors = new HashMap<>();
 
 	//@Test questa riga non va mai messa su git
 	public void runBatch() throws IOException {
@@ -78,8 +78,8 @@ public class PopolazioneProfiliAcquistiBatch {
 			inserisciRuolo(username, siglaRuolo);
 		});
 
-		errors.forEach( (tripla, e) -> {
-			log.error(tripla +": "+ e.getMessage());
+		errors.forEach( (tripla, risultato) -> {
+			log.error(tripla +": "+ risultato);
 		});
 	}
 
@@ -101,11 +101,15 @@ public class PopolazioneProfiliAcquistiBatch {
 			try {
 				aceService.associaRuoloPersona(idRuolo, idPersona, idEo);
 				log.info("Associato ruolo {} persona {} eo {}", idRuolo, idPersona, idEo);
+				errors.put(username + " "+ siglaRuolo + " "+ eo.getSigla() + "("+ eo.getId() +")", "OK");
 			} catch (RuntimeException e) {
-				log.error("Errore nella richiesta", e);
-				errors.put(username + " "+ siglaRuolo + " "+ eo.getSigla() + "("+ eo.getId() +")", e);
+				if (e.getMessage().contains("Il Ruolo specificato e' gia' presente")) {
+					errors.put(username + " "+ siglaRuolo + " "+ eo.getSigla() + "("+ eo.getId() +")", "PRESENTE");
+				} else {
+					log.error("Errore nella richiesta", e);
+					errors.put(username + " "+ siglaRuolo + " "+ eo.getSigla() + "("+ eo.getId() +")", e.getMessage());	
+				}
 			}
-
 		});
 
 

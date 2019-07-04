@@ -8,6 +8,7 @@ import it.cnr.si.service.AceService;
 
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.DelegateExecution;
+import org.h2.util.New;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -37,7 +38,7 @@ public class StartAccordiInternazionaliDomandeSetGroupsAndVisibility {
 	private AceService aceService;
 	@Inject
 	private SiperService siperService;
-	
+
 	public void configuraVariabiliStart(DelegateExecution execution)  throws IOException, ParseException  {
 
 		String initiator = (String) execution.getVariable(Enum.VariableEnum.initiator.name());
@@ -46,7 +47,17 @@ public class StartAccordiInternazionaliDomandeSetGroupsAndVisibility {
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
 		//Integer cdsuoAppartenenzaUtente = aceBridgeService.getEntitaOrganizzativaDellUtente(richiedente.toString()).getId();
 		String cdsuoAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(richiedente.toString()).getCdsuo();
-		Object insdipResponsabileUo = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("codice_sede");
+		Object insdipResponsabileUo = new Object();
+		try {
+			siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("codice_sede");
+			LOGGER.debug("getDirettoreCDSUO  FUNZIONA ");
+			insdipResponsabileUo = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("codice_sede");
+
+		} catch (RuntimeException e) {
+			e.printStackTrace();
+			insdipResponsabileUo = siperService.getResponsabileCDSUO(cdsuoAppartenenzaUtente).get(0).get("codice_sede");
+
+		}
 		Integer idEntitaorganizzativaResponsabileUtente = aceService.entitaOrganizzativaFindByTerm(insdipResponsabileUo.toString()).get(0).getId();
 		String gruppoValidatoriAccordiInternazionali = "validatoriAccordiInternazionali@0000";
 		String gruppoUfficioProtocollo = "ufficioProtocolloAccordiInternazionali@0000";
@@ -54,10 +65,10 @@ public class StartAccordiInternazionaliDomandeSetGroupsAndVisibility {
 		String gruppoResponsabileAccordiInternazionali = "responsabileAccordiInternazionali@0000";
 		//DA CAMBIARE - ricavando il direttore della persona che afferisce alla sua struttura
 		String gruppoDirigenteRichiedente = "responsabile-struttura@" + idEntitaorganizzativaResponsabileUtente;
-		
+
 		String applicazioneAccordiInternazionali = "app.abil";
 		String applicazioneScrivaniaDigitale = "app.scrivaniadigitale";
-		
+
 		LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}",  gruppoValidatoriAccordiInternazionali, gruppoResponsabileAccordiInternazionali, gruppoUfficioProtocollo);
 
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValidatoriAccordiInternazionali, PROCESS_VISUALIZER);
