@@ -22,6 +22,7 @@
         if ($state.params.processInstanceId) {
             dataService.processInstances.byProcessInstanceId($state.params.processInstanceId, true).then(
                 function(response) {
+//                todo: questo lavoro viene fatto in parte nel service getProcessInstanceWithDetails
                     vm.data.entity = utils.refactoringVariables([response.data.entity])[0];
                     vm.data.linkedProcesses = response.data.linkedProcesses;
                     vm.data.history = response.data.history;

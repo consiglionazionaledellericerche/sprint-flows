@@ -151,10 +151,10 @@ public class FlowsTaskService {
 					taskQuery.processVariableValueLikeIgnoreCase(key, "%" + value + "%");
 				else if (key.contains("Fase"))
 					taskQuery.taskNameLikeIgnoreCase("%" + value + "%");
-                else if (key.contains("titolo"))
-                    taskQuery.processVariableValueLike("titolo", "%" + value + "%");
+				else if (key.contains("titolo"))
+					taskQuery.processVariableValueLike("titolo", "%" + value + "%");
 
-                else {
+				else {
 					//wildcard ("%") di default ma non a TUTTI i campi
 					switch (type) {
 						case "textEqual":
@@ -195,9 +195,9 @@ public class FlowsTaskService {
 	public DataResponse getAvailableTask(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
 		String username = SecurityUtils.getCurrentUserLogin();
 		List<String> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-						.map(GrantedAuthority::getAuthority)
-						.map(Utils::removeLeadingRole)
-						.collect(Collectors.toList());
+				.map(GrantedAuthority::getAuthority)
+				.map(Utils::removeLeadingRole)
+				.collect(Collectors.toList());
 
 		TaskQuery taskQuery = taskService.createTaskQuery()
 				.taskCandidateUser(username)
@@ -224,7 +224,7 @@ public class FlowsTaskService {
 	public DataResponse taskAssignedInMyGroups(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
 		String username = SecurityUtils.getCurrentUserLogin();
 
-        List<String> userAuthorities = SecurityUtils.getCurrentUserAuthorities();
+		List<String> userAuthorities = SecurityUtils.getCurrentUserAuthorities();
 
 		TaskQuery taskQuery = (TaskQuery) utils.searchParams(searchParams, taskService.createTaskQuery().includeProcessVariables());
 
@@ -233,11 +233,12 @@ public class FlowsTaskService {
 
 		utils.orderTasks(order, taskQuery);
 
-		////		TODO: da analizzare se le prestazioni sono migliori rispetto a farsi dare la lista di task attivi e ciclare per quali il member è l'assignee (codice di Martin sottostante)
 		List<TaskResponse> result = new ArrayList<>();
 
 		List<String> usersInMyGroups = relationshipService.getUsersInMyGroups(username);
 
+		//risulta avere prestazioni leggermente migliori questo approccio rispetto a quello commentato
+        // (test effettuati con 300 Pi e 30 Task assegnati ad altri utenti nei miei gruppi
 		//      prendo i task assegnati agli utenti trovati
 		for (String user : usersInMyGroups) {
             List<Task> tasks = taskQuery.taskAssignee(user).list()
@@ -249,7 +250,9 @@ public class FlowsTaskService {
 
             result.addAll(restResponseFactory.createTaskResponseList(tasks));
         }
-
+//		result = restResponseFactory.createTaskResponseList(taskQuery.list().stream()
+//																	.filter(t -> usersInMyGroups.contains(t.getAssignee()) || taskService.getIdentityLinksForTask(t.getId()).stream().anyMatch(il -> il.getType().equals(IdentityLinkType.CANDIDATE) && userAuthorities.contains(il.getGroupId())))
+//																	.collect(Collectors.toList()));
 
 		List<TaskResponse> responseList = result.subList(firstResult <= result.size() ? firstResult : result.size(),
 														 maxResults <= result.size() ? maxResults : result.size());
@@ -262,32 +265,32 @@ public class FlowsTaskService {
 	}
 
 
-    public DataResponse getMyTasks(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
+	public DataResponse getMyTasks(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
 		TaskQuery taskQuery = (TaskQuery) utils.searchParams(searchParams, taskService.createTaskQuery());
 		taskQuery.taskAssignee(SecurityUtils.getCurrentUserLogin())
-                .includeProcessVariables();
+				.includeProcessVariables();
 
 		if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
 			taskQuery.processDefinitionKey(processDefinition);
 
-        utils.orderTasks(order, taskQuery);
+		utils.orderTasks(order, taskQuery);
 
-        List<TaskResponse> tasksList = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
+		List<TaskResponse> tasksList = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
 
-        //aggiungo ad ogni singola TaskResponse la variabile che indica se il task è restituibile ad un gruppo (true)
-        // o se è stato assegnato ad un utente specifico "dal sistema" (false)
-        addIsReleasableVariables(tasksList);
+		//aggiungo ad ogni singola TaskResponse la variabile che indica se il task è restituibile ad un gruppo (true)
+		// o se è stato assegnato ad un utente specifico "dal sistema" (false)
+		addIsReleasableVariables(tasksList);
 
-        DataResponse response = new DataResponse();
-        response.setStart(firstResult);
-        response.setSize(tasksList.size());
-        response.setTotal(taskQuery.count());
-        response.setData(tasksList);
-        return response;
-    }
+		DataResponse response = new DataResponse();
+		response.setStart(firstResult);
+		response.setSize(tasksList.size());
+		response.setTotal(taskQuery.count());
+		response.setData(tasksList);
+		return response;
+	}
 
 
-    public Map<String, Object> getTask(@PathVariable("id") String taskId) {
+	public Map<String, Object> getTask(@PathVariable("id") String taskId) {
 		Map<String, Object> response = new HashMap<>();
 		Task taskRaw = taskService.createTaskQuery().taskId(taskId).includeProcessVariables().singleResult();
 
@@ -305,9 +308,9 @@ public class FlowsTaskService {
 
 	public ProcessInstance startProcessInstance(String definitionId, Map<String, Object> data) {
 
-        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitionId).singleResult();
-        String counterId = processDefinition.getName() + "-" + Calendar.getInstance().get(Calendar.YEAR);
-        String key = counterId + "-" + counterService.getNext(counterId);
+		ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitionId).singleResult();
+		String counterId = processDefinition.getName() + "-" + Calendar.getInstance().get(Calendar.YEAR);
+		String key = counterId + "-" + counterService.getNext(counterId);
 		data.put("key", key);
 
 		String username = SecurityUtils.getCurrentUserLogin();
@@ -340,20 +343,20 @@ public class FlowsTaskService {
 
 	public void completeTask(String taskId, Map<String, Object> data) {
 
-        String username = SecurityUtils.getCurrentUserLogin();
+		String username = SecurityUtils.getCurrentUserLogin();
 
-        // aggiungo l'identityLink che indica l'utente che esegue il task
+		// aggiungo l'identityLink che indica l'utente che esegue il task
 		taskService.setVariablesLocal(taskId, data);
 		taskService.addUserIdentityLink(taskId, username, TASK_EXECUTOR);
 		try {
-            taskService.complete(taskId, data);
-        } catch (Exception e) {
+			taskService.complete(taskId, data);
+		} catch (Exception e) {
 			if (e instanceof ActivitiObjectNotFoundException)
 				LOGGER.error("Task {} NON trovato", taskId);
 
-            taskService.deleteUserIdentityLink(taskId, username, TASK_EXECUTOR);
-            throw e;
-        }
+			taskService.deleteUserIdentityLink(taskId, username, TASK_EXECUTOR);
+			throw e;
+		}
 	}
 
 	public DataResponse getTasksCompletedByMe(JSONArray searchParams, @RequestParam("processDefinition") String processDefinition, @RequestParam("firstResult") int firstResult, @RequestParam("maxResults") int maxResults, @RequestParam("order") String order) {
@@ -420,7 +423,7 @@ public class FlowsTaskService {
 			tupla.add(name.get("descrizione"));
 			tupla.add(name.get("initiator"));
 			tupla.add(name.get("stato"));
-            //fine spacchettamento fields
+			//fine spacchettamento fields
 
 			tupla.add(utils.formattaDataOra(processInstance.getStartTime()));
 			tupla.add(utils.formattaDataOra(processInstance.getEndTime()));
