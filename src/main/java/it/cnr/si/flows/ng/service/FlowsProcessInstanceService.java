@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -138,8 +137,8 @@ public class FlowsProcessInstanceService {
 					}
 				}
 
-				if (linkedFlows.size() > 0)
-				    result.put("linkedProcesses", linkedFlows);
+				if (!linkedFlows.isEmpty())
+					result.put("linkedProcesses", linkedFlows);
 			}
 		}
 
@@ -155,30 +154,17 @@ public class FlowsProcessInstanceService {
 		Map<String, Object> processLinks = new HashMap<>();
 		processLinks.put("links", restResponseFactory.createHistoricIdentityLinkResponseList(historyService.getHistoricIdentityLinksForProcessInstance(processInstanceId)));
 		identityLinks.put("process", processLinks);
-		taskService.createTaskQuery().processInstanceId(processInstanceId).active().list().forEach(
-				task -> {
-					Map<String, Object> identityLink = new HashMap<>();
-					String taskDefinitionKey = task.getTaskDefinitionKey();
-					PvmActivity taskDefinition = processDefinition.findActivity(taskDefinitionKey);
-					TaskDefinition taskDef = (TaskDefinition) taskDefinition.getProperty("taskDefinition");
-					List<IdentityLink> links = taskService.getIdentityLinksForTask(task.getId());
 
-					identityLink.put("links", restResponseFactory.createRestIdentityLinks(links));
-					identityLink.put("assignee", taskDef.getAssigneeExpression());
-					identityLink.put("candidateGroups", taskDef.getCandidateGroupIdExpressions());
-					identityLink.put("candidateUsers", taskDef.getCandidateUserIdExpressions());
-
-					identityLinks.put(task.getId(), identityLink);
-				});
-		result.put("identityLinks", identityLinks);
-
-		//History
-		ArrayList<Map<String, Object>> history = new ArrayList<>();
-		historyService.createHistoricTaskInstanceQuery()
+		List<HistoricTaskInstance> taskList = historyService.createHistoricTaskInstanceQuery()
 				.includeTaskLocalVariables()
 				.includeProcessVariables()
 				.processInstanceId(processInstanceId)
-				.list()
+				.list();
+
+		//History
+		ArrayList<Map<String, Object>> history = new ArrayList<>();
+
+		taskList
 				.forEach(
 						task -> {
 							List<HistoricIdentityLink> links = historyService.getHistoricIdentityLinksForTask(task.getId());
@@ -198,7 +184,26 @@ public class FlowsProcessInstanceService {
 										return h;
 									}).collect(Collectors.toList()));
 							history.add(entity);
+
+							// se il task è quello attivo prendo anche i gruppi o gli utenti assegnee/candidate
+							if(task.getEndTime() == null) {
+								Map<String, Object> identityLink = new HashMap<>();
+								String taskDefinitionKey = task.getTaskDefinitionKey();
+								PvmActivity taskDefinition = processDefinition.findActivity(taskDefinitionKey);
+								TaskDefinition taskDef = (TaskDefinition) taskDefinition.getProperty("taskDefinition");
+								List<IdentityLink> taskLinks = taskService.getIdentityLinksForTask(task.getId());
+
+								identityLink.put("links", restResponseFactory.createRestIdentityLinks(taskLinks));
+								identityLink.put("assignee", taskDef.getAssigneeExpression());
+								identityLink.put("candidateGroups", taskDef.getCandidateGroupIdExpressions());
+								identityLink.put("candidateUsers", taskDef.getCandidateUserIdExpressions());
+
+								identityLinks.put(task.getId(), identityLink);
+							}
 						});
+
+		result.put("identityLinks", identityLinks);
+
 		result.put("history", history);
 
 		// permessi aggiuntivi
