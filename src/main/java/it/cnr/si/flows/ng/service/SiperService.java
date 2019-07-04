@@ -26,7 +26,8 @@ public class SiperService {
     private String url;
     private String pathResponsabile = "/siper/json/sedi?titCa={cdsuo}&userinfo=true&ruolo=resp";
     private String pathDirettore = "/siper/json/sedi?titCa={cdsuo}&userinfo=true&ruolo=dircds";
-
+    private String pathCDSUOAfferenzaUtente = "/siper/json/userinfo/{userName}";
+    
     @Inject
     private Environment env;
 
@@ -68,6 +69,21 @@ public class SiperService {
         Type type = new TypeToken<List<Map<String, Object>>>() {}.getType();
         BufferedReader reader = new BufferedReader(new StringReader(((String)responseString.getBody())));
         List<Map<String, Object>> response = gson.fromJson(reader, type);
+
+        return response;
+    }
+    
+
+    public Map<String, Object> getCDSUOAfferenzaUtente(String userName) {
+
+        //request
+        ResponseEntity responseString = siperRestTemplate.exchange(this.url + pathCDSUOAfferenzaUtente, HttpMethod.GET,
+                                                                   new HttpEntity<>("body"), String.class, userName);
+        // mapping della response in una List<Map<String, Object>>
+        Gson gson = new Gson();
+        Type type = new TypeToken<Map<String, Object>>() {}.getType();
+        BufferedReader reader = new BufferedReader(new StringReader(((String)responseString.getBody())));
+        Map<String, Object> response = gson.fromJson(reader, type);
 
         return response;
     }
