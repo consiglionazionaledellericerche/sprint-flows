@@ -3,7 +3,9 @@ package it.cnr.si.flows.ng.service;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.springframework.core.env.Environment;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.support.BasicAuthorizationInterceptor;
 import org.springframework.stereotype.Service;
@@ -14,7 +16,6 @@ import javax.inject.Inject;
 import java.io.BufferedReader;
 import java.io.StringReader;
 import java.lang.reflect.Type;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -61,7 +62,7 @@ public class SiperService {
 
         //request
         ResponseEntity responseString = siperRestTemplate.exchange(this.url + pathDirettore, HttpMethod.GET,
-                                                             new HttpEntity<>("body"), String.class, cdsuo);
+                                                                   new HttpEntity<>("body"), String.class, cdsuo);
         // mapping della response in una List<Map<String, Object>>
         Gson gson = new Gson();
         Type type = new TypeToken<List<Map<String, Object>>>() {}.getType();
