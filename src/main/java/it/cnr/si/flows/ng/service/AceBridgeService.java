@@ -44,6 +44,11 @@ public class AceBridgeService {
 				.collect(Collectors.toList());
 	}
 
+	/**
+	 * ATTENZIONE! Usare getUsersInLocalGroups() per prendere tutti gli utenti, compresi col ruolo-nel-ruolo
+	 * Usare questo solo per prendere solo i gruppi di uno specifico gruppo Ace
+	 */
+	@Deprecated
 	public List<String> getUsersInAceGroup(String groupName) {
 
 		if (!groupName.contains("@"))
