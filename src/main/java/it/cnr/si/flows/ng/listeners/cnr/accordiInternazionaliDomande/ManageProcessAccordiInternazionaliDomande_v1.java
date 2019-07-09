@@ -184,6 +184,9 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA.toString());
 				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "APPROVATA");
 				restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.ACCETATA);
+			};break;   	
+			case "notificatask-start": {
+				LOGGER.debug("**** notificatask-start");
 			};break;  
 			//TIMERS
 			case "timer2-end": {
@@ -209,6 +212,7 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 
 			} 
 		} else {
+			restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.CANCELLATA);
 			List<Job> timerAttivi = managementService.createJobQuery().timers().processInstanceId(processInstanceId).list();
 			timerAttivi.forEach(singoloTimer -> {
 				if (singoloTimer.getId() != null) {
