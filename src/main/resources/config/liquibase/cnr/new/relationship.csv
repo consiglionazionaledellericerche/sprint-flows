@@ -17,6 +17,7 @@ ID;GROUP_NAME;GROUP_RELATIONSHIP;GROUP_ROLE
 19;direttoreGeneraleFF@STRUTTURA;responsabileFirmaAcquisti@STRUTTURA;member
 20;dirigente@STRUTTURA;responsabileFirmaAcquisti@STRUTTURA;member
 21;dirigenteAI@STRUTTURA;responsabileFirmaAcquisti@STRUTTURA;member
-30;delegato@34403;responsabileAccordiInternazionali@0000;member
+30;delegato@34409;responsabileAccordiInternazionali@0000;member
+31;responsabile-struttura@34403;responsabileAccordiInternazionali@0000;member
 
 
