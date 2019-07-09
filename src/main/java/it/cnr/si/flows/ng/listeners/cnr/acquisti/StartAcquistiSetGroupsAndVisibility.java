@@ -1,10 +1,7 @@
 package it.cnr.si.flows.ng.listeners.cnr.acquisti;
 
-import it.cnr.si.flows.ng.listeners.oiv.service.OivSetGroupsAndVisibility;
-import it.cnr.si.flows.ng.listeners.oiv.service.OperazioniTimer;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.CounterService;
-import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.service.SiperService;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
@@ -13,7 +10,6 @@ import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.ExecutionListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +56,7 @@ public class StartAcquistiSetGroupsAndVisibility {
        // LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable(Enum.VariableEnum.title.name()));
         LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
 
-        List<GrantedAuthority> authorities = relationshipService.getAllGroupsForUser(initiator);
+        List<GrantedAuthority> authorities = relationshipService.getAllGroupsForUserOLD(initiator);
 
         List<String> groups = authorities.stream()
                 .map(GrantedAuthority::getAuthority)

@@ -3,7 +3,6 @@ package it.cnr.si.flows.ng.ldap;
 import it.cnr.si.service.RelationshipService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.ldap.core.DirContextOperations;
@@ -32,7 +31,6 @@ public class FlowsAuthoritiesPopulator implements LdapAuthoritiesPopulator {
     @Inject
     private Environment env;
 
-    @CacheEvict(value = "allGroups", key = "#username")
     @Override
     public Collection<GrantedAuthority> getGrantedAuthorities(DirContextOperations userData, String username) {
 
@@ -49,7 +47,7 @@ public class FlowsAuthoritiesPopulator implements LdapAuthoritiesPopulator {
             log.debug("no attribute {} defined for user {}", DEPARTMENT_NUMBER, username);
         }
 
-        List<GrantedAuthority> fullGrantedAuthorities = relationshipService.getAllGroupsForUser(username);
+        List<GrantedAuthority> fullGrantedAuthorities = relationshipService.getAllGroupsForUserOLD(username);
         list.addAll(fullGrantedAuthorities);
 
         log.info("Full Groups for {}, including from local relationship {}", username, fullGrantedAuthorities);

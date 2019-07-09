@@ -32,6 +32,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -81,7 +82,7 @@ public class FlowsTaskResource {
     @Inject
     private PermissionEvaluatorImpl permissionEvaluator;
     @Inject
-    private FlowsUserDetailsService flowsUserDetailsService;
+    private UserDetailsService flowsUserDetailsService;
 
 
     @PostMapping(value = "/mytasks", produces = MediaType.APPLICATION_JSON_VALUE)

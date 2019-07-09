@@ -26,6 +26,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -198,7 +199,7 @@ public class MembershipResource {
 
         List<Membership> members = membershipService.getMembershipByGroupName(groupName);
 
-        List<Relationship> relationships = relationshipService.getRelationshipsForGroupRelationship(groupName);
+        Set<Relationship> relationships = relationshipService.getRelationshipsForGroupRelationship(groupName);
 
         for (Relationship relationship : relationships) {
             List<Membership> membershipForRelationship = membershipService.getMembershipByGroupName(relationship.getGroupName());

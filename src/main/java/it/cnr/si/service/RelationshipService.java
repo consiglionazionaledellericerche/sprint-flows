@@ -1,6 +1,7 @@
 package it.cnr.si.service;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Sets;
 import it.cnr.si.domain.Relationship;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.utils.Utils;
@@ -9,7 +10,6 @@ import it.cnr.si.repository.RelationshipRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,7 +38,7 @@ public class RelationshipService {
     @Inject
     private RelationshipRepository relationshipRepository;
     @Autowired(required = false)
-    private AceBridgeService aceService;
+    private AceBridgeService aceBridgeService;
     @Inject
     private CnrgroupRepository cnrgroupRepository;
     @Inject
@@ -53,7 +53,6 @@ public class RelationshipService {
      * @param relationship the entity to save
      * @return the persisted entity
      */
-    @CacheEvict(value = {"allGroups", "user"}, allEntries = true)
     public Relationship save(Relationship relationship) {
         log.debug("Request to save Relationship : {}", relationship);
         return relationshipRepository.save(relationship);
@@ -88,35 +87,35 @@ public class RelationshipService {
      *
      * @param id the id of the entity
      */
-    @CacheEvict(value = {"allGroups", "user"}, allEntries = true)
     public void delete(Long id) {
         log.debug("Request to delete Relationship : {}", id);
         relationshipRepository.delete(id);
     }
 
-//    @Cacheable(value = "allGroups", key = "#username")
-    @Timed
-    public List<GrantedAuthority> getAllGroupsForUser(String username) {
+    public Set<Relationship> getAllRelationshipForGroup(String group) {
+        return relationshipRepository.findRelationshipGroup(group);
+    }
 
-        List<String> merged;
+    @Timed
+    public List<GrantedAuthority> getAllGroupsForUserOLD(String username) {
+
+        Set<String> merged;
         if (!Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
 
             //A) recupero la lista dei gruppi a cui appartiene direttamente l'utente
-            Set<String> aceGroup = getACEGroupsForUser(username);
+            Set<String> aceGroup = getAceGroupsForUser(username);
             //B) recupero i children dei gruppi "supervisori" e "responsabili"
+            // TODO ?????
             Set<String> aceGroupWithChildren = getACEChildren(aceGroup);
 
             //C) recupero i gruppi "associati" nel nostro db (getAllRelationship) e mergio
             merged = Stream.concat(aceGroupWithChildren.stream(), getAllRelationship(aceGroupWithChildren).stream())
                     .distinct()
                     .map(Utils::addLeadingRole)
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toSet());
         } else {
             // A) Se sono su OIV, carico le Membership
-            merged = membershipService.getGroupNamesForUser(username).stream()
-                    .distinct()
-                    .map(Utils::addLeadingRole)
-                    .collect(Collectors.toList());
+            merged = getLocalGroupsForUser(username);
         }
 
         return merged.stream()
@@ -124,6 +123,15 @@ public class RelationshipService {
                 .collect(Collectors.toList());
     }
 
+    public Set<String> getLocalGroupsForUser(String username) {
+        return membershipService.getGroupNamesForUser(username).stream()
+                .distinct()
+                .map(Utils::addLeadingRole)
+                .collect(Collectors.toSet());
+    }
+
+    // TODO ??????
+    @Deprecated
     private Set<String> getACEChildren(Set<String> aceGroup) {
         //Filtro solo i gruppi di tipo "responsabili" o "supervisori"
         Set<String> groupToSearchChildren = aceGroup.stream()
@@ -143,8 +151,7 @@ public class RelationshipService {
                 .collect(Collectors.toSet());
     }
 
-
-    public Set<String> getAllRelationship(Set<String> aceGropupWithParents) {
+    private Set<String> getAllRelationship(Set<String> aceGropupWithParents) {
         Set<String> result = new HashSet<>();
         for (String group : aceGropupWithParents) {
             //match esatto (ad es.: ra@2216 -> supervisore#acquistitrasparenza@STRUTTURA)
@@ -172,16 +179,11 @@ public class RelationshipService {
         }
         //mapping in modo da recuperare il distinct
         return result.stream()
-                .distinct()
                 .collect(Collectors.toSet());
     }
 
-    public Set<Relationship> getAllRelationshipForGroup(String group) {
-        return relationshipRepository.findRelationshipGroup(group);
-    }
-
-    public Set<String> getACEGroupsForUser(String username) {
-        return Optional.ofNullable(aceService)
+    public Set<String> getAceGroupsForUser(String username) {
+        return Optional.ofNullable(aceBridgeService)
                 .map(aceBridgeService -> aceBridgeService.getAceGroupsForUser(username))
                 .map(strings -> strings.stream())
                 .orElse(Stream.empty())
@@ -204,9 +206,7 @@ public class RelationshipService {
 
         if (!Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
             //filtro in ACE gli utenti che appartengono agli stessi gruppi dell'utente loggato
-            for (String myGroup : myGroups) {
-                usersInMyGroups.addAll(aceService.getUsersInAceGroup(myGroup));
-            }
+            usersInMyGroups.addAll(getUsersInGroups(myGroups));
         } else {
             //filtro in Membership gli utenti che appartengono agli stessi gruppi dell'utente loggato            
             for (String myGroup : myGroups) {
@@ -225,7 +225,109 @@ public class RelationshipService {
         return usersInMyGroups;
     }
 
-    public List<Relationship> getRelationshipsForGroupRelationship(String groupRelationship) {
+    public Set<String> getUsersInGroups(Collection<String> myGroups) {
+        Set<String> result = new HashSet<>();
+        for (String myGroup : myGroups) {
+            result.addAll(aceBridgeService.getUsersInAceGroup(myGroup));
+        }
+        return result;
+    }
+
+    public Set<Relationship> getRelationshipsForGroupRelationship(String groupRelationship) {
         return relationshipRepository.getRelationshipsForGroupRelationship(groupRelationship);
+    }
+
+    public Set<String> getUsersInAllRelatedGroups(String groupName) {
+        Set<String> allRelatedGroups = getAllRelatedGroups(groupName);
+        Set<String> members = getUsersInGroups(allRelatedGroups);
+        return members;
+    }
+
+
+    /* --------------------------------------------- */
+
+    /**
+     *
+     * Questo metodo recupera tutti i gruppi dell'utente,
+     * sia quelli locali
+     * che quelli di Ace
+     * che quelli definiti nelle relazioni gruppo-nel-gruppo
+     *
+     * @param username
+     * @return
+     */
+    public Set<String> getAllGroupsForUser(String username) {
+
+        Set<String> groups = new HashSet<>();
+        groups.addAll(getAceGroupsForUser(username));
+        groups.addAll(getLocalGroupsForUser(username));
+
+        Set<String> allGroupsRecursively = getAllGroupsRecursively(groups, groups);
+
+        return allGroupsRecursively;
+    }
+
+    private Set<String> getAllGroupsRecursively(Set<String> resultSoFar, Set<String> visited) {
+
+        log.debug("resultsSoFar {}, visited {}", resultSoFar, visited);
+
+        for (String group : resultSoFar) {
+
+            Set<Relationship> children = relationshipRepository.findRelationshipGroup(group);
+            for (Relationship child : children) {
+                if (!visited.contains(child.getGroupRelationship())) {
+                    visited.add(child.getGroupRelationship());
+                    resultSoFar.add(child.getGroupRelationship());
+                    getAllGroupsRecursively(resultSoFar, visited);
+                }
+            }
+
+            if (group.contains("@")) {
+                String role = group.substring(0, group.indexOf('@'));
+                children = relationshipRepository.findRelationshipForStructure(role);
+
+                for (Relationship child : children) {
+                    if (!visited.contains(child.getGroupRelationship())) {
+                        visited.add(child.getGroupRelationship());
+                        resultSoFar.add(Utils.replaceStruttura(child.getGroupRelationship(), group.substring(group.indexOf('@'))));
+                        getAllGroupsRecursively(resultSoFar, visited);
+                    }
+                }
+            }
+
+
+            Set<Relationship> parents = relationshipRepository.getRelationshipsForGroupRelationship(group);
+            for (Relationship parent : parents) {
+                if (!visited.contains(parent.getGroupName())) {
+                    visited.add(parent.getGroupName());
+                    resultSoFar.add(parent.getGroupName());
+                    getAllGroupsRecursively(resultSoFar, visited);
+                }
+            }
+
+            if (group.contains("@")) {
+                String role = group.substring(0, group.indexOf('@'));
+                parents = relationshipRepository.findRelationshipForStructureByGroupRelationship(role);
+
+                for (Relationship parent : parents) {
+                    if (!visited.contains(parent.getGroupName())) {
+                        visited.add(parent.getGroupName());
+                        resultSoFar.add(Utils.replaceStruttura(parent.getGroupRelationship(), group.substring(group.indexOf('@'))));
+                        getAllGroupsRecursively(resultSoFar, visited);
+                    }
+                }
+            }
+
+        }
+
+        return resultSoFar;
+    }
+
+    public Set<String> getAllUsersInGroups(Collection<String> groups) {
+        return null;
+    }
+
+    public Set<String> getAllRelatedGroups(String groupName) {
+        return getAllRelationship(Sets.newHashSet(groupName));
     }
 }
