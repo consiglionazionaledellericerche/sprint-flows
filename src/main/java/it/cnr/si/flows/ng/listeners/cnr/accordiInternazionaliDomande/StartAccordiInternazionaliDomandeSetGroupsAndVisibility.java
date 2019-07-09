@@ -6,6 +6,7 @@ import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.SiperService;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.service.AceService;
+import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
 
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.DelegateExecution;
@@ -58,7 +59,15 @@ public class StartAccordiInternazionaliDomandeSetGroupsAndVisibility {
 		finally {
 			LOGGER.debug("getDirettoreCDSUO  FUNZIONA ");
 			Object insdipResponsabileUo = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("codice_sede");
-			Integer idEntitaorganizzativaResponsabileUtente = aceService.entitaOrganizzativaFindByTerm(insdipResponsabileUo.toString()).get(0).getId();
+			String usernameDirettore = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("uid").toString();
+			EntitaOrganizzativaWebDto entitaOrganizzativaDirUo = aceService.entitaOrganizzativaFindByTerm(insdipResponsabileUo.toString()).get(0);
+			Integer idEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getId();
+			String siglaEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getSigla().toString();
+			String denominazioneEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getDenominazione().toString();
+			String cdsuoEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getCdsuo().toString();
+			String idnsipEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getIdnsip().toString();			
+			LOGGER.info("L'utente {} ha come direttore {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", richiedente.toString(), usernameDirettore, denominazioneEntitaorganizzativaResponsabileUtente, siglaEntitaorganizzativaResponsabileUtente, idEntitaorganizzativaResponsabileUtente, cdsuoEntitaorganizzativaResponsabileUtente, idnsipEntitaorganizzativaResponsabileUtente);
+			
 			String gruppoValidatoriAccordiInternazionali = "validatoriAccordiInternazionali@0000";
 			String gruppoUfficioProtocollo = "ufficioProtocolloAccordiInternazionali@0000";
 			String gruppoValutatoreScientificoDipartimento = "valutatoreScientificoDipartimento@0000";
@@ -69,6 +78,7 @@ public class StartAccordiInternazionaliDomandeSetGroupsAndVisibility {
 			String applicazioneAccordiInternazionali = "app.abil";
 			String applicazioneScrivaniaDigitale = "app.scrivaniadigitale";
 
+			LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}",  gruppoValidatoriAccordiInternazionali, gruppoResponsabileAccordiInternazionali, gruppoUfficioProtocollo);
 			LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}",  gruppoValidatoriAccordiInternazionali, gruppoResponsabileAccordiInternazionali, gruppoUfficioProtocollo);
 
 			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValidatoriAccordiInternazionali, PROCESS_VISUALIZER);
