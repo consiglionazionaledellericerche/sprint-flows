@@ -1,7 +1,6 @@
 package it.cnr.si.service;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.Sets;
 import it.cnr.si.domain.Relationship;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.utils.Utils;
@@ -237,48 +236,39 @@ public class RelationshipService {
         return relationshipRepository.getRelationshipsForGroupRelationship(groupRelationship);
     }
 
-    public Set<String> getUsersInAllRelatedGroups(String groupName) {
-        Set<String> allRelatedGroups = getAllRelatedGroups(groupName);
-        Set<String> members = getUsersInGroups(allRelatedGroups);
-        return members;
-    }
-
-
-    /* --------------------------------------------- */
-
-    /**
-     *
-     * Questo metodo recupera tutti i gruppi dell'utente,
-     * sia quelli locali
-     * che quelli di Ace
-     * che quelli definiti nelle relazioni gruppo-nel-gruppo
-     *
-     * @param username
-     * @return
-     */
     public Set<String> getAllGroupsForUser(String username) {
 
         Set<String> groups = new HashSet<>();
-        groups.addAll(getAceGroupsForUser(username));
-        groups.addAll(getLocalGroupsForUser(username));
+        groups.addAll( getAceGroupsForUser(username) );
+        groups.addAll( getLocalGroupsForUser(username) );
 
-        Set<String> allGroupsRecursively = getAllGroupsRecursively(groups, groups);
+        groups.addAll( getAllChildGroupsRecursively(groups, new HashSet<>()) );
 
-        return allGroupsRecursively;
+        return groups;
     }
 
-    private Set<String> getAllGroupsRecursively(Set<String> resultSoFar, Set<String> visited) {
+    public Set<String> getAllUsersInGroup(String groupName) {
+
+        Set<String> groups = new HashSet<>();
+        groups.add(groupName);
+
+        groups = getAllParentGroupsRecursively(groups, new HashSet<>());
+
+        return getUsersInGroups(groups);
+    }
+
+
+    private Set<String> getAllChildGroupsRecursively(Set<String> resultSoFar, Set<String> visited) {
 
         log.debug("resultsSoFar {}, visited {}", resultSoFar, visited);
+        Set<String> buffer = new HashSet<>();
 
         for (String group : resultSoFar) {
 
             Set<Relationship> children = relationshipRepository.findRelationshipGroup(group);
             for (Relationship child : children) {
                 if (!visited.contains(child.getGroupRelationship())) {
-                    visited.add(child.getGroupRelationship());
-                    resultSoFar.add(child.getGroupRelationship());
-                    getAllGroupsRecursively(resultSoFar, visited);
+                    buffer.add(child.getGroupRelationship());
                 }
             }
 
@@ -288,20 +278,31 @@ public class RelationshipService {
 
                 for (Relationship child : children) {
                     if (!visited.contains(child.getGroupRelationship())) {
-                        visited.add(child.getGroupRelationship());
-                        resultSoFar.add(Utils.replaceStruttura(child.getGroupRelationship(), group.substring(group.indexOf('@'))));
-                        getAllGroupsRecursively(resultSoFar, visited);
+                        visited.add(group);
+                        buffer.add(Utils.replaceStruttura(child.getGroupRelationship(), group.substring(group.indexOf('@'))));
                     }
                 }
             }
+        }
 
+        if (!buffer.isEmpty())
+            getAllChildGroupsRecursively(buffer, visited);
+
+        return buffer;
+
+    }
+
+    private Set<String> getAllParentGroupsRecursively(Set<String> resultSoFar, Set<String> visited) {
+
+        log.debug("resultsSoFar {}, visited {}", resultSoFar, visited);
+        Set<String> buffer = new HashSet<>();
+
+        for (String group : resultSoFar) {
 
             Set<Relationship> parents = relationshipRepository.getRelationshipsForGroupRelationship(group);
             for (Relationship parent : parents) {
                 if (!visited.contains(parent.getGroupName())) {
-                    visited.add(parent.getGroupName());
-                    resultSoFar.add(parent.getGroupName());
-                    getAllGroupsRecursively(resultSoFar, visited);
+                    buffer.add(parent.getGroupName());
                 }
             }
 
@@ -311,23 +312,18 @@ public class RelationshipService {
 
                 for (Relationship parent : parents) {
                     if (!visited.contains(parent.getGroupName())) {
-                        visited.add(parent.getGroupName());
-                        resultSoFar.add(Utils.replaceStruttura(parent.getGroupRelationship(), group.substring(group.indexOf('@'))));
-                        getAllGroupsRecursively(resultSoFar, visited);
+                        visited.add(group);
+                        buffer.add(Utils.replaceStruttura(parent.getGroupName(), group.substring(group.indexOf('@'))));
                     }
                 }
             }
-
         }
 
-        return resultSoFar;
+        if (!buffer.isEmpty())
+            getAllParentGroupsRecursively(buffer, visited);
+
+        return buffer;
+
     }
 
-    public Set<String> getAllUsersInGroups(Collection<String> groups) {
-        return null;
-    }
-
-    public Set<String> getAllRelatedGroups(String groupName) {
-        return getAllRelationship(Sets.newHashSet(groupName));
-    }
 }
