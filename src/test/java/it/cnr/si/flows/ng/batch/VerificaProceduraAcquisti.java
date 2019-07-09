@@ -62,11 +62,12 @@ import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
 
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+//@ActiveProfiles(profiles = "dev,cnr")
 @ActiveProfiles(profiles = "dev,cnr")
 @RunWith(SpringJUnit4ClassRunner.class)
-public class VerificaDomandeAccordiBilaterali {
+public class VerificaProceduraAcquisti {
 
-	private static final Logger log = LoggerFactory.getLogger(VerificaDomandeAccordiBilaterali.class);
+	private static final Logger log = LoggerFactory.getLogger(VerificaProceduraAcquisti.class);
 
 	@Inject
 	private AceService aceService;
@@ -75,7 +76,7 @@ public class VerificaDomandeAccordiBilaterali {
 	@Inject
 	private SiperService siperService;
 	private final Map<String, String> errors = new HashMap<>();
-	int personNr = 1;
+	int personNr = 0;
 
 	//@Test questa riga non va mai messa su git
 	//@Test
@@ -83,7 +84,7 @@ public class VerificaDomandeAccordiBilaterali {
 		Map<String, String> persone = getPersoneDaFile();
 
 		persone.forEach( (username, siglaRuolo) -> {
-			log.info("****** VERIFICA DIRETTORE PER UTENTE {}  nr.{} di:{} totali ******", username, personNr, persone.size());
+			log.info("****** VERIFICA RESPONSABILE PER UTENTE {}  nr.{} di:{} totali ******", username, personNr, persone.size());
 			personNr = personNr + 1;
 			verificaDirettore(username, siglaRuolo);
 		});
@@ -102,32 +103,42 @@ public class VerificaDomandeAccordiBilaterali {
 			cdsuoAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(username).getCdsuo();
 		} catch(UnexpectedResultException | FeignException | HttpClientErrorException error1) {
 			log.info("L'UTENTE {} NON esiste in anagrafica ACE !!!!!!!!!!!!!!! ", username);
-			cdsuoAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(username).get("codice_uo").toString();
+			try {
+				cdsuoAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(username).get("codice_uo").toString();
+			} catch(UnexpectedResultException | FeignException | HttpClientErrorException error2) {
+				log.info("L'UTENTE {} NON esiste in anagrafica SIPER !!!!!!!!!!!!!!! ", username);
+			}
+			finally {
+				log.info("------------------------------ ");
+			}
 		}
 		finally {
-			Object insdipResponsabileUo = new Object();
-			String usernameDirettore = null;
-			EntitaOrganizzativaWebDto entitaOrganizzativaDirUo = null;
-			try {
-				insdipResponsabileUo = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("codice_sede");
-				log.info("getDirettoreCDSUO  FUNZIONA ");
-				usernameDirettore = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("uid").toString();
-			} catch(UnexpectedResultException | FeignException | HttpClientErrorException error2) {
-				log.info("-------------- getDirettoreCDSUO  NON HA FUNZIONATO!!!!!!!!!!!!!!! l'utente {} non ha DIRETTORE per la CDSUO {}", username, cdsuoAppartenenzaUtente);
+			if (cdsuoAppartenenzaUtente == null) {
+				log.info("L'UTENTE {} NON esiste in anagrafica ACE e SIPER !!!!!!!!!!!!!!! ", username);
+			} else {
+				Map<String, Object> responsabileUo;
+				try {
+					responsabileUo = siperService.getResponsabileCDSUO(cdsuoAppartenenzaUtente).get(0);
+					String idnsipResponsabileUo = responsabileUo.get("codice_sede").toString();
+					log.info("-------------- getResponsabileCDSUO  FUNZIONA per CDSUO {} con IDNSIP {}", cdsuoAppartenenzaUtente, idnsipResponsabileUo);
+					String usernameResponsabile = responsabileUo.get("uid").toString();
+					EntitaOrganizzativaWebDto entitaOrganizzativaRespUo = null;
+					try {
+						entitaOrganizzativaRespUo = aceService.entitaOrganizzativaFindByTerm(idnsipResponsabileUo.toString()).get(0);
+					} catch(UnexpectedResultException | FeignException | HttpClientErrorException error4) {
+						log.info("-------------- entitaOrganizzativaRespUo  NON RIESCO A TROVARE L'ENTITA' ORGANIZZATIVA per la IDNSIP {}", idnsipResponsabileUo);
+					}
+			
+					Integer idEntitaorganizzativaResponsabileUtente = entitaOrganizzativaRespUo.getId();
+					String siglaEntitaorganizzativaResponsabileUtente = entitaOrganizzativaRespUo.getSigla().toString();
+					String denominazioneEntitaorganizzativaResponsabileUtente = entitaOrganizzativaRespUo.getDenominazione().toString();
+					String cdsuoEntitaorganizzativaResponsabileUtente = entitaOrganizzativaRespUo.getCdsuo().toString();
+					String idnsipEntitaorganizzativaResponsabileUtente = entitaOrganizzativaRespUo.getIdnsip().toString();
+					log.info("L'utente {} ha come Responsabile {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", username, usernameResponsabile, denominazioneEntitaorganizzativaResponsabileUtente, siglaEntitaorganizzativaResponsabileUtente, idEntitaorganizzativaResponsabileUtente, cdsuoEntitaorganizzativaResponsabileUtente, idnsipEntitaorganizzativaResponsabileUtente);
+				} catch(UnexpectedResultException | FeignException | HttpClientErrorException error3) {
+					log.info("-------------- getResponsabileCDSUO  NON HA FUNZIONATO!!!!!!!!!!!!!!! l'utente {} non ha Responsabile per la CDSUO {}", username, cdsuoAppartenenzaUtente);
+				}
 			}
-
-			try {
-				entitaOrganizzativaDirUo = aceService.entitaOrganizzativaFindByTerm(insdipResponsabileUo.toString()).get(0);
-			} catch(UnexpectedResultException | FeignException | HttpClientErrorException error3) {
-				log.info("-------------- entitaOrganizzativaDirUo  NON RIESCO A TROVARE L'ENTITA' ORGANIZZATIVA per la CDSUO {}", cdsuoAppartenenzaUtente);
-			}
-			Integer idEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getId();
-			String siglaEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getSigla().toString();
-			String denominazioneEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getDenominazione().toString();
-			String cdsuoEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getCdsuo().toString();
-			String idnsipEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getIdnsip().toString();
-			log.info("L'utente {} ha come direttore {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", username, usernameDirettore, denominazioneEntitaorganizzativaResponsabileUtente, siglaEntitaorganizzativaResponsabileUtente, idEntitaorganizzativaResponsabileUtente, cdsuoEntitaorganizzativaResponsabileUtente, idnsipEntitaorganizzativaResponsabileUtente);
-
 		}
 	}
 
@@ -135,7 +146,7 @@ public class VerificaDomandeAccordiBilaterali {
 
 		CSVParser parser = new CSVParser(',');
 
-		Stream<String> lines = Files.lines(Paths.get("./src/test/resources/batch/utentiDomandeAccordiBilaterali.csv"));
+		Stream<String> lines = Files.lines(Paths.get("./src/test/resources/batch/utentiProceduraAcquisti.csv"));
 
 		Map<String, String> associazioni = new HashMap<>();
 
