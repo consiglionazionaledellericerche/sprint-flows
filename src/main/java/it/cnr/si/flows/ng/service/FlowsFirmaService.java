@@ -47,6 +47,7 @@ public class FlowsFirmaService {
         put("firma-provvedimento-aggiudicazione", "provvedimentoAggiudicazione");
         put("firma-revoca", "ProvvedimentoDiRevoca");
         put("firma-contratto", "contratto");
+        put("firma-verbale", "verbale");
     }};
 
     public static final Map<String, String> ERRORI_ARUBA = new HashMap<String, String>() {{
