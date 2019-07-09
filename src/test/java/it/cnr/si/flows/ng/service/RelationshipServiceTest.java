@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.inject.Inject;
@@ -20,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test,cnr")
 public class RelationshipServiceTest {
 
     private static final String GROUP_RELATIONSHIP = "aaaaaa";
@@ -64,5 +66,12 @@ public class RelationshipServiceTest {
     public void testGetAllGroups() {
         Set<String> allGroups = relationshipService.getAllGroupsForUser("maurizio.lancia");
         System.out.println(allGroups);
+    }
+
+    @Test
+    public void testGetLanciaByResponsabileStrutture() {
+
+        Set<String> allUsersInGroup = relationshipService.getAllUsersInGroup("responsabile-struttura@34408");
+        System.out.println(allUsersInGroup);
     }
 }
