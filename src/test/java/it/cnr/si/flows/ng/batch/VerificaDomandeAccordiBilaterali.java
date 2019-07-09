@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
@@ -53,10 +54,14 @@ import it.cnr.si.SprintApp;
 import it.cnr.si.config.Constants;
 import it.cnr.si.config.DefaultProfileUtil;
 import it.cnr.si.config.JHipsterProperties;
+import it.cnr.si.domain.Relationship;
 import it.cnr.si.flows.ng.exception.UnexpectedResultException;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.SiperService;
 import it.cnr.si.service.AceService;
+import it.cnr.si.service.CnrgroupService;
+import it.cnr.si.service.MembershipService;
+import it.cnr.si.service.RelationshipService;
 import it.cnr.si.service.dto.anagrafica.base.PageDto;
 import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
@@ -74,6 +79,12 @@ public class VerificaDomandeAccordiBilaterali {
 	private AceBridgeService aceBridgeService;
 	@Inject
 	private SiperService siperService;
+	@Inject
+	private MembershipService membershipService;
+	@Inject
+	private RelationshipService relationshipService;
+	
+	
 	private final Map<String, String> errors = new HashMap<>();
 	int personNr = 1;
 
@@ -127,7 +138,20 @@ public class VerificaDomandeAccordiBilaterali {
 			String cdsuoEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getCdsuo().toString();
 			String idnsipEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getIdnsip().toString();
 			log.info("L'utente {} ha come direttore {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", username, usernameDirettore, denominazioneEntitaorganizzativaResponsabileUtente, siglaEntitaorganizzativaResponsabileUtente, idEntitaorganizzativaResponsabileUtente, cdsuoEntitaorganizzativaResponsabileUtente, idnsipEntitaorganizzativaResponsabileUtente);
-
+			String gruppoDirigenteRichiedente = "responsabile-struttura@" + idEntitaorganizzativaResponsabileUtente;
+			
+			 Set<String> members = relationshipService.getAllUsersInGroup(gruppoDirigenteRichiedente);
+			//List<String> members = membershipService.findMembersInGroup(gruppoDirigenteRichiedente);
+			 if (members.size() == 0) {
+				 log.info("Il gruppo RESPONSABILE STRUTTURA: {} NON HA NESSUNO", gruppoDirigenteRichiedente);
+			 } 
+			 if (members.size() > 1) {
+				 log.info("Il gruppo RESPONSABILE STRUTTURA: {} HA PIU' MEMBRI", gruppoDirigenteRichiedente);
+			 } 
+			members.forEach(member -> {
+				log.info("L'utente {} fa parte del gruppo {} ", member.toString(), gruppoDirigenteRichiedente);
+			});
+			
 		}
 	}
 
