@@ -11,7 +11,6 @@ import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
-import it.cnr.si.security.FlowsUserDetailsService;
 import it.cnr.si.security.PermissionEvaluatorImpl;
 import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.*;
@@ -39,6 +38,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -82,7 +82,7 @@ public class FlowsTaskService {
 	@Inject
 	private RepositoryService repositoryService;
 	@Inject
-	private FlowsUserDetailsService flowsUserDetailsService;
+	private UserDetailsService flowsUserDetailsService;
 	@Inject
 	private PermissionEvaluatorImpl permissionEvaluator;
 	@Inject
