@@ -38,8 +38,6 @@ public class StartAccordiInternazionaliBandiSetGroupsAndVisibility {
 		String gruppoUfficioProtocollo = "ufficioProtocolloAccordiInternazionali@0000";
 		String gruppoValutatoreScientificoDipartimento = "valutatoreScientificoDipartimento@0000";
 		String gruppoResponsabileAccordiInternazionali = "responsabileAccordiInternazionali@0000";
-		//DA CAMBIARE - ricavando il direttore della persona che afferisce alla sua struttura
-		String gruppoDirigenteRichiedente = "responsabileFirmaAcquisti@2216";
 		String applicazioneAccordiInternazionali = "app.abil";
 
 		LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}",  gruppoValidatoriAccordiInternazionali, gruppoResponsabileAccordiInternazionali, gruppoUfficioProtocollo);
@@ -48,14 +46,12 @@ public class StartAccordiInternazionaliBandiSetGroupsAndVisibility {
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileAccordiInternazionali, PROCESS_VISUALIZER);
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneAccordiInternazionali, PROCESS_VISUALIZER);
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoUfficioProtocollo, PROCESS_VISUALIZER);
-		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoDirigenteRichiedente, PROCESS_VISUALIZER);
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValutatoreScientificoDipartimento, PROCESS_VISUALIZER);
 
 		execution.setVariable("gruppoValidatoriAccordiInternazionali", gruppoValidatoriAccordiInternazionali);
 		execution.setVariable("gruppoResponsabileAccordiInternazionali", gruppoResponsabileAccordiInternazionali);
 		execution.setVariable("gruppoUfficioProtocollo", gruppoUfficioProtocollo);
 		execution.setVariable("applicazioneAccordiInternazionali", applicazioneAccordiInternazionali);
-		execution.setVariable("gruppoDirigenteRichiedente", gruppoDirigenteRichiedente);
 		execution.setVariable("gruppoValutatoreScientificoDipartimento", gruppoValutatoreScientificoDipartimento);
 	}
 }
