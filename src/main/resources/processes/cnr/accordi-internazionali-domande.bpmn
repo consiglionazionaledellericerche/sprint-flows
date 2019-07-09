@@ -140,12 +140,12 @@
         </activiti:executionListener>
       </extensionElements>
       <timerEventDefinition>
-        <timeCycle>R3/PT1M</timeCycle>
+        <timeCycle>R5/P1D</timeCycle>
       </timerEventDefinition>
     </boundaryEvent>
     <boundaryEvent id="boundarytimer3" name="Timer3" attachedToRef="valutazione-dirigente" cancelActivity="true">
       <timerEventDefinition>
-        <timeDuration>P4D</timeDuration>
+        <timeDuration>P6D</timeDuration>
       </timerEventDefinition>
     </boundaryEvent>
     <sequenceFlow id="flow30" sourceRef="boundarytimer3" targetRef="endevent6"></sequenceFlow>
