@@ -126,7 +126,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
 			if (Optional.ofNullable(aceBridgeService).isPresent()) {
 				candidates.forEach(c -> {
 					if (c.getGroupId() != null) {
-						List<String> members = aceBridgeService.getUsersInAceGroup(c.getGroupId());
+						Set<String> members = relationshipService.getAllUsersInGroup(c.getGroupId());
 						members.forEach(m -> {
 							mailService.sendFlowEventNotification(FlowsMailService.TASK_ASSEGNATO_AL_GRUPPO_HTML, integratedVariables, task.getName(), m, c.getGroupId());
 						});
@@ -231,7 +231,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
 											LOGGER.debug("variables.get(groupVariableName): {}", variables.get(groupVariableName));
 											String groupName = (String) variables.get(groupVariableName);
 
-											Set<String> members = relationshipService.getUsersInAllRelatedGroups(groupName);
+											Set<String> members = relationshipService.getAllUsersInGroup(groupName);
 
 											LOGGER.debug("Invio la mail {} al gruppo {} con utenti {}", nt, groupName, members);
 											members.forEach(member -> {
