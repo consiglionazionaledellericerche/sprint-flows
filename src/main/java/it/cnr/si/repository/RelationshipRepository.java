@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -21,5 +20,8 @@ public interface RelationshipRepository extends JpaRepository<Relationship, Long
     public Set<Relationship> findRelationshipForStructure(@Param("groupName") String groupName);
 
     @Query("select relationship from Relationship relationship where relationship.groupRelationship =:groupRelationship")
-    List<Relationship> getRelationshipsForGroupRelationship(@Param("groupRelationship") String groupRelationship);
+    public Set<Relationship> getRelationshipsForGroupRelationship(@Param("groupRelationship") String groupRelationship);
+
+    @Query("select relationship from Relationship relationship where relationship.groupRelationship = CONCAT(:groupRelationship, '@STRUTTURA')")
+    public Set<Relationship> findRelationshipForStructureByGroupRelationship(@Param("groupRelationship") String groupRelationship);
 }

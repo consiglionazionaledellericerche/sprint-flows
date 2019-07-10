@@ -28,12 +28,24 @@ public class AuditingAspect {
     @Pointcut("execution(* it.cnr.si.flows.ng.service.FlowsMailService.sendFlowEventNotification(..))")
     private void inFlowsMailService() {}
 
+    @Before("inFlowsMailService() && args(notificationType, variables, taskName, username, groupName)")
+    public void auditMailSendAttempt(JoinPoint joinPoint, String notificationType, Map<String, Object> variables, String taskName, String username, String groupName) {
+        Object[] args = joinPoint.getArgs();
+
+        log.info("Tentativo di inviare la mail {} a {} del gruppo {}, task {}", notificationType, username, taskName, groupName);
+
+        AuditEvent event = new AuditEvent(username, "EMAIL_SEND_ATTEMPT", "username="+ username, "groupName="+ groupName, "title="+ variables.get("title"), "notificationType="+ notificationType);
+        repo.add(event);
+    }
+
     @AfterReturning("inFlowsMailService() && args(notificationType, variables, taskName, username, groupName)")
     public void auditMailsendSuccess(JoinPoint joinPoint, String notificationType, Map<String, Object> variables, String taskName, String username, String groupName) {
 
         Object[] args = joinPoint.getArgs();
 
-        AuditEvent event = new AuditEvent(username, "EMAIL_SEND_SUCCESS", "groupName="+ groupName, "title="+ variables.get("title"), "notificationType="+ notificationType);
+        log.info("Tentativo di inviare la mail riuscito {} a {} del gruppo {}, task {}", notificationType, username, taskName, groupName);
+
+        AuditEvent event = new AuditEvent(username, "EMAIL_SEND_SUCCESS", "username="+ username, "groupName="+ groupName, "title="+ variables.get("title"), "notificationType="+ notificationType);
         repo.add(event);
 
     }
@@ -43,7 +55,9 @@ public class AuditingAspect {
 
         Object[] args = joinPoint.getArgs();
 
-        AuditEvent event = new AuditEvent(username, "EMAIL_SEND_FAILURE", "groupName=" + groupName, TITLE + "=" + variables.get(TITLE), "notificationType=" + notificationType);
+        log.info("Tentativo di inviare la mail fallito {} a {} del gruppo {}, task {}", notificationType, username, taskName, groupName);
+
+        AuditEvent event = new AuditEvent(username, "EMAIL_SEND_FAILURE", "username="+ username, "groupName=" + groupName, TITLE + "=" + variables.get(TITLE), "notificationType=" + notificationType);
         repo.add(event);
     }
 

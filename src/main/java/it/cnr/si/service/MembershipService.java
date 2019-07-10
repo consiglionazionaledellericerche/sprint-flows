@@ -96,6 +96,7 @@ public class MembershipService {
                 .collect(Collectors.toSet());
     }
 
+    @Deprecated
     public List<String> findMembersInGroup(String groupName) {
         List<String> result = membershipRepository.findMembersInGroup(groupName);
         Optional.ofNullable(aceService)

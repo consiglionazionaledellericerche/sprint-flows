@@ -70,7 +70,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
      *                               una dipendenza ciclica visto che anche le classi che lo richiamano potrebbero averlo iniettato
      * @return risultato della verifica dei permessi (booleano)
      */
-    public boolean canVisualizeTask(String taskId, FlowsUserDetailsService flowsUserDetailsService) {
+    public boolean canVisualizeTask(String taskId, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
         Optional<String> username = Optional.of(SecurityUtils.getCurrentUserLogin());
         List<String> authorities = getAuthorities(username.orElse(""), flowsUserDetailsService);
 
@@ -89,7 +89,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
      *                               una dipendenza ciclica visto che anche le classi che lo richiamano potrebbero averlo iniettato
      * @return risultato della verifica dei permessi (booleano)
      */
-    public boolean canCompleteTaskOrStartProcessInstance(MultipartHttpServletRequest req, FlowsUserDetailsService flowsUserDetailsService) {
+    public boolean canCompleteTaskOrStartProcessInstance(MultipartHttpServletRequest req, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
         String taskId = req.getParameter("taskId");
 
         if (taskId != null) {
@@ -101,7 +101,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
         }
     }
 
-    public boolean canCompleteTask(String taskId, FlowsUserDetailsService flowsUserDetailsService) {
+    public boolean canCompleteTask(String taskId, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
         String username = SecurityUtils.getCurrentUserLogin();
         String assignee = taskService.createTaskQuery()
                 .taskId(taskId)
@@ -131,7 +131,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
      *                               ciclica visto che anche le classi che richiamano questo metodo potrebbero averlo iniettato
      * @return risultato della verifica dei permessi (booleano)
      */
-    public boolean canVisualize(String processInstanceId, FlowsUserDetailsService flowsUserDetailsService) {
+    public boolean canVisualize(String processInstanceId, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
         String userName = SecurityUtils.getCurrentUserLogin();
         List<String> authorities = getAuthorities(userName, flowsUserDetailsService);
 
@@ -216,7 +216,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
      *                               una dipendenza ciclica visto che anche le classi che lo richiamano potrebbero averlo iniettato
      * @return risultato della verifica dei permessi (booleano)
      */
-    public boolean canClaimTask(String taskId, FlowsUserDetailsService flowsUserDetailsService) {
+    public boolean canClaimTask(String taskId, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
         boolean result = false;
         String username = SecurityUtils.getCurrentUserLogin();
         Task task = taskService.createTaskQuery()
@@ -263,7 +263,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
 
 
-    public boolean isResponsabile(String taskId, String processInstanceId, FlowsUserDetailsService flowsUserDetailsService) {
+    public boolean isResponsabile(String taskId, String processInstanceId, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
         String user = SecurityUtils.getCurrentUserLogin();
         List<String> groups = aceBridgeService.getAceGroupsForUser(user);
         Task task;
@@ -291,7 +291,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
 
 
-    public boolean canUpdateAttachment(String processInstanceId, FlowsUserDetailsService flowsUserDetailsService) {
+    public boolean canUpdateAttachment(String processInstanceId, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
 
         if(SecurityUtils.isCurrentUserInRole("ROLE_ADMIN"))
             return true;
@@ -369,7 +369,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
     }
 
 
-    private List<String> getAuthorities(String username, FlowsUserDetailsService flowsUserDetailsService) {
+    private List<String> getAuthorities(String username, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
         return flowsUserDetailsService.loadUserByUsername(username).getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .map(Utils::removeLeadingRole)

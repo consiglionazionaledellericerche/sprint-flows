@@ -4,17 +4,17 @@ import feign.RequestInterceptor;
 import feign.RequestTemplate;
 
 /**
- * TokenRequestInterceptor. Aggiunge l'access token del token jwt come header di ogni richiesta
+ * FlowsTokenRequestInterceptor. Aggiunge l'access token del token jwt come header di ogni richiesta
  * fatta.
  *
  * @author daniele
  * @since 11/06/18
  */
-public class TokenRequestInterceptor implements RequestInterceptor {
+public class FlowsTokenRequestInterceptor implements RequestInterceptor {
 
   private final String accessToken;
 
-  public TokenRequestInterceptor(String accessToken) {
+  public FlowsTokenRequestInterceptor(String accessToken) {
     this.accessToken = accessToken;
   }
 
