@@ -17,6 +17,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
 import org.springframework.security.ldap.search.LdapUserSearch;
+import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsManager;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsService;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
@@ -54,11 +55,11 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
         return new LdapUserDetailsManager(ctx);
     }
     @Profile(value = {"!oiv"})
-    @Bean public LdapUserDetailsService getLdapUserDetailsService(LdapUserSearch search, FlowsAuthoritiesPopulator fap) {
+    @Bean public LdapUserDetailsService getLdapUserDetailsService(LdapUserSearch search, LdapAuthoritiesPopulator fap) {
         return new LdapUserDetailsService(search, fap);
     }
     @Profile(value = {"!oiv"})
-    @Bean public FlowsAuthoritiesPopulator getFlowsAuthoritiesPopulator(ApplicationContext appContext) {
+    @Bean public LdapAuthoritiesPopulator getFlowsAuthoritiesPopulator(ApplicationContext appContext) {
         FlowsAuthoritiesPopulator cap = new FlowsAuthoritiesPopulator();
         appContext.getAutowireCapableBeanFactory().autowireBean(cap);
         return cap;

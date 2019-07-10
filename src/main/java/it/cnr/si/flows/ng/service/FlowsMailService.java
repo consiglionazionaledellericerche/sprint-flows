@@ -1,7 +1,6 @@
 package it.cnr.si.flows.ng.service;
 
 import it.cnr.si.flows.ng.config.MailConfguration;
-import it.cnr.si.security.FlowsUserDetailsService;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.CnrgroupService;
 import it.cnr.si.service.FlowsUserService;
@@ -13,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -46,7 +46,7 @@ public class FlowsMailService extends MailService {
     @Inject
     private FlowsUserService flowsUserService;
     @Autowired
-    private FlowsUserDetailsService flowsUserDetailsService;
+    private UserDetailsService flowsUserDetailsService;
 
     @Async
     public void sendFlowEventNotification(String notificationType, Map<String, Object> variables, String taskName, String username, final String groupName) {

@@ -31,6 +31,8 @@ spring:
             url: http://helpwildfly.si.cnr.it:8080/rest/
             newProblem: pest
             instance: /HDSiper
+    mail:
+        url: http://dockerwebtest01.si.cnr.it:1480
 
 cnr:
     activiti:
