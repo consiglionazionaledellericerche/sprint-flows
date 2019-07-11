@@ -195,7 +195,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
 	 */
 	private void send(Map<String, Object> variables, List<NotificationRule> notificationRules, String nt, String tn) {
 
-
+		LOGGER.debug("Sto inviando secondo le notification rule :{} ({}, {})", notificationRules, nt, tn);
 		notificationRules.stream()
 				.forEach(rule -> {
 					LOGGER.debug("rule.getRecipients(): {}", rule.getRecipients());
