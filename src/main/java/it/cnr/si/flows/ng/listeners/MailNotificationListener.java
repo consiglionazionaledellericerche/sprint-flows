@@ -127,6 +127,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
 				candidates.forEach(c -> {
 					if (c.getGroupId() != null) {
 						Set<String> members = relationshipService.getAllUsersInGroup(c.getGroupId());
+						LOGGER.info("Sto inviando mail standard a {} del gruppo {} per il task", members, c.getGroupId(), task.getName());
 						members.forEach(m -> {
 							mailService.sendFlowEventNotification(FlowsMailService.TASK_ASSEGNATO_AL_GRUPPO_HTML, integratedVariables, task.getName(), m, c.getGroupId());
 						});
@@ -195,7 +196,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
 	 */
 	private void send(Map<String, Object> variables, List<NotificationRule> notificationRules, String nt, String tn) {
 
-		LOGGER.debug("Sto inviando secondo le notification rule :{} ({}, {})", notificationRules, nt, tn);
+		LOGGER.info("Sto inviando secondo le notification rule :{} ({}, {})", notificationRules, nt, tn);
 		notificationRules.stream()
 				.forEach(rule -> {
 					LOGGER.debug("rule.getRecipients(): {}", rule.getRecipients());
