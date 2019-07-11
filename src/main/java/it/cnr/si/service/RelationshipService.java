@@ -95,7 +95,12 @@ public class RelationshipService {
         return relationshipRepository.findRelationshipGroup(group);
     }
 
+    public Set<Relationship> getRelationshipsForGroupRelationship(String groupRelationship) {
+        return relationshipRepository.getRelationshipsForGroupRelationship(groupRelationship);
+    }
+
     @Timed
+    @Deprecated // questo metodo non e' ricorsivo, quindi se abbiamo gruppi nei gruppi nei gruppi non puo' funzionare
     public List<GrantedAuthority> getAllGroupsForUserOLD(String username) {
 
         Set<String> merged;
@@ -122,11 +127,9 @@ public class RelationshipService {
                 .collect(Collectors.toList());
     }
 
-    public Set<String> getLocalGroupsForUser(String username) {
-        return membershipService.getGroupNamesForUser(username).stream()
-                .distinct()
-                .map(Utils::addLeadingRole)
-                .collect(Collectors.toSet());
+    // TODO attenzione: questo metodo, a differenza di getAceGroupsForUser aggiunge i ROLE_
+    private Set<String> getLocalGroupsForUser(String username) {
+        return membershipService.getGroupNamesForUser(username);
     }
 
     // TODO ??????
@@ -193,6 +196,9 @@ public class RelationshipService {
     public List<String> getUsersInMyGroups(String username) {
 
         List<String> usersInMyGroups = new ArrayList<>();
+
+        Set<String> newGroups = getAllGroupsForUser(username);
+
         List<String> myGroups = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
                 .parallelStream()
                 .map(GrantedAuthority::getAuthority)
@@ -227,14 +233,16 @@ public class RelationshipService {
     public Set<String> getUsersInGroups(Collection<String> myGroups) {
         Set<String> result = new HashSet<>();
         for (String myGroup : myGroups) {
-            result.addAll(aceBridgeService.getUsersInAceGroup(myGroup));
+            try {
+                result.addAll(aceBridgeService.getUsersInAceGroup(myGroup));
+            } catch (RuntimeException e) {
+                log.warn("Il ruolo {} non esiste in ACE", myGroup);
+            }
         }
         return result;
     }
 
-    public Set<Relationship> getRelationshipsForGroupRelationship(String groupRelationship) {
-        return relationshipRepository.getRelationshipsForGroupRelationship(groupRelationship);
-    }
+
 
     public Set<String> getAllGroupsForUser(String username) {
 
@@ -252,7 +260,7 @@ public class RelationshipService {
         Set<String> groups = new HashSet<>();
         groups.add(groupName);
 
-        groups = getAllParentGroupsRecursively(groups, new HashSet<>());
+        groups.addAll( getAllParentGroupsRecursively(groups, new HashSet<>()) );
 
         return getUsersInGroups(groups);
     }
@@ -260,7 +268,7 @@ public class RelationshipService {
 
     private Set<String> getAllChildGroupsRecursively(Set<String> resultSoFar, Set<String> visited) {
 
-        log.debug("resultsSoFar {}, visited {}", resultSoFar, visited);
+        log.trace("resultsSoFar {}, visited {}", resultSoFar, visited);
         Set<String> buffer = new HashSet<>();
 
         for (String group : resultSoFar) {
@@ -286,7 +294,7 @@ public class RelationshipService {
         }
 
         if (!buffer.isEmpty())
-            getAllChildGroupsRecursively(buffer, visited);
+            resultSoFar.addAll(getAllChildGroupsRecursively(buffer, visited));
 
         return buffer;
 
@@ -294,7 +302,7 @@ public class RelationshipService {
 
     private Set<String> getAllParentGroupsRecursively(Set<String> resultSoFar, Set<String> visited) {
 
-        log.debug("resultsSoFar {}, visited {}", resultSoFar, visited);
+        log.trace("resultsSoFar {}, visited {}", resultSoFar, visited);
         Set<String> buffer = new HashSet<>();
 
         for (String group : resultSoFar) {

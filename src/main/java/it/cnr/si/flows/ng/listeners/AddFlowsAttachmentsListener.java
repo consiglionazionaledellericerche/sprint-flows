@@ -27,7 +27,7 @@ import static it.cnr.si.security.PermissionEvaluatorImpl.ID_STRUTTURA;
 @Component
 public class AddFlowsAttachmentsListener implements ActivitiEventListener {
 
-    private final Logger LOGGER = LoggerFactory.getLogger(VisibilitySetter.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(AddFlowsAttachmentsListener.class);
 
     @Inject
     private RuntimeService runtimeService;
@@ -42,7 +42,7 @@ public class AddFlowsAttachmentsListener implements ActivitiEventListener {
 
     @Override
     public void onEvent(ActivitiEvent event) {
-        LOGGER.info("Sono in AddFlowsAttachmentsListener con evento "+ event.getType() + event);
+        LOGGER.info("Sono in AddFlowsAttachmentsListener con evento "+ event.getType() + event.getExecutionId());
 
         String path, taskId, taskName, key;
 
