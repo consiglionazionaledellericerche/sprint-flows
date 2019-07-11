@@ -32,14 +32,14 @@ public class AuditingAspect {
     public void auditMailSendAttempt(JoinPoint joinPoint, String notificationType, Map<String, Object> variables, String taskName, String username, String groupName) {
         Object[] args = joinPoint.getArgs();
 
-        log.info("Tentativo di inviare la mail {} a {} del gruppo {}, task {}", notificationType, username, taskName, groupName);
+        log.info("Tentativo di inviare la mail {} a {} del gruppo {}, task {}", notificationType, username, groupName, taskName );
 
         AuditEvent event = new AuditEvent(username, "EMAIL_SEND_ATTEMPT", "username="+ username, "groupName="+ groupName, "title="+ variables.get("title"), "notificationType="+ notificationType);
         repo.add(event);
     }
 
     @AfterReturning("inFlowsMailService() && args(notificationType, variables, taskName, username, groupName)")
-    public void auditMailsendSuccess(JoinPoint joinPoint, String notificationType, Map<String, Object> variables, String taskName, String username, String groupName) {
+    public void auditMailSendSuccess(JoinPoint joinPoint, String notificationType, Map<String, Object> variables, String taskName, String username, String groupName) {
 
         Object[] args = joinPoint.getArgs();
 
