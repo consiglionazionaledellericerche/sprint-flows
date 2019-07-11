@@ -89,7 +89,7 @@ public class StartAccordiInternazionaliDomandeSetGroupsAndVisibility {
 			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValutatoreScientificoDipartimento, PROCESS_VISUALIZER);
 			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneScrivaniaDigitale, PROCESS_VISUALIZER);
 
-			execution.setVariable("strutturaValutazioneDirigente", aceBridgeService.getAfferenzaUtente(richiedente.toString()).getId() + "-" + aceBridgeService.getAfferenzaUtente(richiedente.toString()).getDenominazione());
+			execution.setVariable("strutturaValutazioneDirigente", idEntitaorganizzativaResponsabileUtente + "-" + denominazioneEntitaorganizzativaResponsabileUtente);
 			execution.setVariable("gruppoValidatoriAccordiInternazionali", gruppoValidatoriAccordiInternazionali);
 			execution.setVariable("gruppoResponsabileAccordiInternazionali", gruppoResponsabileAccordiInternazionali);
 			execution.setVariable("gruppoUfficioProtocollo", gruppoUfficioProtocollo);
@@ -97,7 +97,7 @@ public class StartAccordiInternazionaliDomandeSetGroupsAndVisibility {
 			execution.setVariable("gruppoDirigenteRichiedente", gruppoDirigenteRichiedente);
 			execution.setVariable("gruppoValutatoreScientificoDipartimento", gruppoValutatoreScientificoDipartimento);
 			execution.setVariable("applicazioneScrivaniaDigitale", applicazioneScrivaniaDigitale);
-			execution.setVariable("cdsuoRichiedente", aceBridgeService.getAfferenzaUtente(richiedente.toString()).getCdsuo());
+			execution.setVariable("cdsuoRichiedente", cdsuoAppartenenzaUtente);
 		}
 	}
 }
