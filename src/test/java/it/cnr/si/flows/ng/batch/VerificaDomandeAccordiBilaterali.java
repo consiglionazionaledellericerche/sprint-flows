@@ -83,8 +83,8 @@ public class VerificaDomandeAccordiBilaterali {
 	private MembershipService membershipService;
 	@Inject
 	private RelationshipService relationshipService;
-	
-	
+
+
 	private final Map<String, String> errors = new HashMap<>();
 	int personNr = 1;
 
@@ -123,35 +123,47 @@ public class VerificaDomandeAccordiBilaterali {
 				insdipResponsabileUo = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("codice_sede");
 				log.info("getDirettoreCDSUO  FUNZIONA ");
 				usernameDirettore = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("uid").toString();
+				try {
+					entitaOrganizzativaDirUo = aceService.entitaOrganizzativaFindByTerm(insdipResponsabileUo.toString()).get(0);
+				} catch(UnexpectedResultException | FeignException | HttpClientErrorException error3) {
+					log.info("-------------- entitaOrganizzativaDirUo  NON RIESCO A TROVARE L'ENTITA' ORGANIZZATIVA per la CDSUO {}", cdsuoAppartenenzaUtente);
+					try {
+						entitaOrganizzativaDirUo = aceService.entitaOrganizzativaFindByTerm(insdipResponsabileUo.toString()).get(0);
+					} catch(UnexpectedResultException | FeignException | HttpClientErrorException error4) {
+						log.info("-------------- entitaOrganizzativaDirUo  2o TENTATIVO NON RIESCO A TROVARE L'ENTITA' ORGANIZZATIVA per la CDSUO {}", cdsuoAppartenenzaUtente);
+					}
+				}
+				finally {
+
+					Integer idEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getId();
+					String siglaEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getSigla().toString();
+					String denominazioneEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getDenominazione().toString();
+					String cdsuoEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getCdsuo().toString();
+					String idnsipEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getIdnsip().toString();
+					log.info("L'utente {} ha come direttore {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", username, usernameDirettore, denominazioneEntitaorganizzativaResponsabileUtente, siglaEntitaorganizzativaResponsabileUtente, idEntitaorganizzativaResponsabileUtente, cdsuoEntitaorganizzativaResponsabileUtente, idnsipEntitaorganizzativaResponsabileUtente);
+					String gruppoDirigenteRichiedente = "responsabile-struttura@" + idEntitaorganizzativaResponsabileUtente;
+
+					Set<String> members = relationshipService.getAllUsersInGroup(gruppoDirigenteRichiedente);
+					//List<String> members = membershipService.findMembersInGroup(gruppoDirigenteRichiedente);
+					if (members.size() == 0) {
+						log.info("Il gruppo RESPONSABILE STRUTTURA: {} NON HA NESSUNO", gruppoDirigenteRichiedente);
+					} 
+					if (members.size() > 1) {
+						log.info("Il gruppo RESPONSABILE STRUTTURA: {} HA PIU' MEMBRI", gruppoDirigenteRichiedente);
+					} 
+					members.forEach(member -> {
+						log.info("L'utente {} fa parte del gruppo {} ", member.toString(), gruppoDirigenteRichiedente);
+					});
+
+				}	
 			} catch(UnexpectedResultException | FeignException | HttpClientErrorException error2) {
 				log.info("-------------- getDirettoreCDSUO  NON HA FUNZIONATO!!!!!!!!!!!!!!! l'utente {} non ha DIRETTORE per la CDSUO {}", username, cdsuoAppartenenzaUtente);
 			}
+			finally {
+				log.info("-------------- NEXT");
 
-			try {
-				entitaOrganizzativaDirUo = aceService.entitaOrganizzativaFindByTerm(insdipResponsabileUo.toString()).get(0);
-			} catch(UnexpectedResultException | FeignException | HttpClientErrorException error3) {
-				log.info("-------------- entitaOrganizzativaDirUo  NON RIESCO A TROVARE L'ENTITA' ORGANIZZATIVA per la CDSUO {}", cdsuoAppartenenzaUtente);
+
 			}
-			Integer idEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getId();
-			String siglaEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getSigla().toString();
-			String denominazioneEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getDenominazione().toString();
-			String cdsuoEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getCdsuo().toString();
-			String idnsipEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getIdnsip().toString();
-			log.info("L'utente {} ha come direttore {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", username, usernameDirettore, denominazioneEntitaorganizzativaResponsabileUtente, siglaEntitaorganizzativaResponsabileUtente, idEntitaorganizzativaResponsabileUtente, cdsuoEntitaorganizzativaResponsabileUtente, idnsipEntitaorganizzativaResponsabileUtente);
-			String gruppoDirigenteRichiedente = "responsabile-struttura@" + idEntitaorganizzativaResponsabileUtente;
-			
-			 Set<String> members = relationshipService.getAllUsersInGroup(gruppoDirigenteRichiedente);
-			//List<String> members = membershipService.findMembersInGroup(gruppoDirigenteRichiedente);
-			 if (members.size() == 0) {
-				 log.info("Il gruppo RESPONSABILE STRUTTURA: {} NON HA NESSUNO", gruppoDirigenteRichiedente);
-			 } 
-			 if (members.size() > 1) {
-				 log.info("Il gruppo RESPONSABILE STRUTTURA: {} HA PIU' MEMBRI", gruppoDirigenteRichiedente);
-			 } 
-			members.forEach(member -> {
-				log.info("L'utente {} fa parte del gruppo {} ", member.toString(), gruppoDirigenteRichiedente);
-			});
-			
 		}
 	}
 
@@ -159,7 +171,7 @@ public class VerificaDomandeAccordiBilaterali {
 
 		CSVParser parser = new CSVParser(',');
 
-		Stream<String> lines = Files.lines(Paths.get("./src/test/resources/batch/utentiDomandeAccordiBilaterali.csv"));
+		Stream<String> lines = Files.lines(Paths.get("./src/test/resources/batch/utentiDomandeAccordiBilaterali4.csv"));
 
 		Map<String, String> associazioni = new HashMap<>();
 

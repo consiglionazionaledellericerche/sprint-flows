@@ -1,5 +1,6 @@
 package it.cnr.si.flows.ng.ldap;
 
+import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.service.RelationshipService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Modified my mtrycz on 26/05/17.
@@ -47,7 +49,12 @@ public class FlowsAuthoritiesPopulator implements LdapAuthoritiesPopulator {
             log.debug("no attribute {} defined for user {}", DEPARTMENT_NUMBER, username);
         }
 
-        List<GrantedAuthority> fullGrantedAuthorities = relationshipService.getAllGroupsForUserOLD(username);
+        List<GrantedAuthority> fullGrantedAuthorities = relationshipService.getAllGroupsForUser(username)
+                .stream()
+                .map(Utils::addLeadingRole)
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+
         list.addAll(fullGrantedAuthorities);
 
         log.info("Full Groups for {}, including from local relationship {}", username, fullGrantedAuthorities);
