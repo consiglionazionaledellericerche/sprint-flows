@@ -5,6 +5,7 @@ VOLUME /tmp
 RUN apk add --update --no-cache ttf-dejavu curl
 
 EXPOSE 8080
+
 WORKDIR /opt/
 
 # https://spring.io/guides/gs/spring-boot-docker/#_containerize_it

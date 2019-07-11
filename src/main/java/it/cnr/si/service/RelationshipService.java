@@ -9,8 +9,6 @@ import it.cnr.si.repository.RelationshipRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,7 +37,7 @@ public class RelationshipService {
     @Inject
     private RelationshipRepository relationshipRepository;
     @Autowired(required = false)
-    private AceBridgeService aceService;
+    private AceBridgeService aceBridgeService;
     @Inject
     private CnrgroupRepository cnrgroupRepository;
     @Inject
@@ -54,7 +52,6 @@ public class RelationshipService {
      * @param relationship the entity to save
      * @return the persisted entity
      */
-    @CacheEvict(value = {"allGroups", "user"}, allEntries = true)
     public Relationship save(Relationship relationship) {
         log.debug("Request to save Relationship : {}", relationship);
         return relationshipRepository.save(relationship);
@@ -89,35 +86,40 @@ public class RelationshipService {
      *
      * @param id the id of the entity
      */
-    @CacheEvict(value = {"allGroups", "user"}, allEntries = true)
     public void delete(Long id) {
         log.debug("Request to delete Relationship : {}", id);
         relationshipRepository.delete(id);
     }
 
-//    @Cacheable(value = "allGroups", key = "#username")
-    @Timed
-    public List<GrantedAuthority> getAllGroupsForUser(String username) {
+    public Set<Relationship> getAllRelationshipForGroup(String group) {
+        return relationshipRepository.findRelationshipGroup(group);
+    }
 
-        List<String> merged;
+    public Set<Relationship> getRelationshipsForGroupRelationship(String groupRelationship) {
+        return relationshipRepository.getRelationshipsForGroupRelationship(groupRelationship);
+    }
+
+    @Timed
+    @Deprecated // questo metodo non e' ricorsivo, quindi se abbiamo gruppi nei gruppi nei gruppi non puo' funzionare
+    public List<GrantedAuthority> getAllGroupsForUserOLD(String username) {
+
+        Set<String> merged;
         if (!Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
 
             //A) recupero la lista dei gruppi a cui appartiene direttamente l'utente
-            Set<String> aceGroup = getACEGroupsForUser(username);
+            Set<String> aceGroup = getAceGroupsForUser(username);
             //B) recupero i children dei gruppi "supervisori" e "responsabili"
+            // TODO ?????
             Set<String> aceGroupWithChildren = getACEChildren(aceGroup);
 
             //C) recupero i gruppi "associati" nel nostro db (getAllRelationship) e mergio
             merged = Stream.concat(aceGroupWithChildren.stream(), getAllRelationship(aceGroupWithChildren).stream())
                     .distinct()
                     .map(Utils::addLeadingRole)
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toSet());
         } else {
             // A) Se sono su OIV, carico le Membership
-            merged = membershipService.getGroupNamesForUser(username).stream()
-                    .distinct()
-                    .map(Utils::addLeadingRole)
-                    .collect(Collectors.toList());
+            merged = getLocalGroupsForUser(username);
         }
 
         return merged.stream()
@@ -125,6 +127,13 @@ public class RelationshipService {
                 .collect(Collectors.toList());
     }
 
+    // TODO attenzione: questo metodo, a differenza di getAceGroupsForUser aggiunge i ROLE_
+    private Set<String> getLocalGroupsForUser(String username) {
+        return membershipService.getGroupNamesForUser(username);
+    }
+
+    // TODO ??????
+    @Deprecated
     private Set<String> getACEChildren(Set<String> aceGroup) {
         //Filtro solo i gruppi di tipo "responsabili" o "supervisori"
         Set<String> groupToSearchChildren = aceGroup.stream()
@@ -144,8 +153,7 @@ public class RelationshipService {
                 .collect(Collectors.toSet());
     }
 
-
-    public Set<String> getAllRelationship(Set<String> aceGropupWithParents) {
+    private Set<String> getAllRelationship(Set<String> aceGropupWithParents) {
         Set<String> result = new HashSet<>();
         for (String group : aceGropupWithParents) {
             //match esatto (ad es.: ra@2216 -> supervisore#acquistitrasparenza@STRUTTURA)
@@ -173,26 +181,26 @@ public class RelationshipService {
         }
         //mapping in modo da recuperare il distinct
         return result.stream()
-                .distinct()
                 .collect(Collectors.toSet());
     }
 
-    public Set<Relationship> getAllRelationshipForGroup(String group) {
-        return relationshipRepository.findRelationshipGroup(group);
-    }
-
-    public Set<String> getACEGroupsForUser(String username) {
-        return Optional.ofNullable(aceService)
+    public Set<String> getAceGroupsForUser(String username) {
+        return Optional.ofNullable(aceBridgeService)
                 .map(aceBridgeService -> aceBridgeService.getAceGroupsForUser(username))
                 .map(strings -> strings.stream())
                 .orElse(Stream.empty())
                 .collect(Collectors.toSet());
     }
 
+    @Timed
     public List<String> getUsersInMyGroups(String username) {
 
         List<String> usersInMyGroups = new ArrayList<>();
-        List<String> myGroups = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+
+        Set<String> newGroups = getAllGroupsForUser(username);
+
+        List<String> myGroups = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+                .parallelStream()
                 .map(GrantedAuthority::getAuthority)
                 .map(Utils::removeLeadingRole)
                 .filter(group -> group.indexOf("afferenza") <= -1)
@@ -203,9 +211,7 @@ public class RelationshipService {
 
         if (!Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
             //filtro in ACE gli utenti che appartengono agli stessi gruppi dell'utente loggato
-            for (String myGroup : myGroups) {
-                usersInMyGroups.addAll(aceService.getUsersInAceGroup(myGroup));
-            }
+            usersInMyGroups.addAll(getUsersInGroups(myGroups));
         } else {
             //filtro in Membership gli utenti che appartengono agli stessi gruppi dell'utente loggato            
             for (String myGroup : myGroups) {
@@ -224,7 +230,108 @@ public class RelationshipService {
         return usersInMyGroups;
     }
 
-    public List<Relationship> getRelationshipsForGroupRelationship(String groupRelationship) {
-        return relationshipRepository.getRelationshipsForGroupRelationship(groupRelationship);
+    public Set<String> getUsersInGroups(Collection<String> myGroups) {
+        Set<String> result = new HashSet<>();
+        for (String myGroup : myGroups) {
+            try {
+                result.addAll(aceBridgeService.getUsersInAceGroup(myGroup));
+            } catch (RuntimeException e) {
+                log.warn("Il ruolo {} non esiste in ACE", myGroup);
+            }
+        }
+        return result;
     }
+
+
+
+    public Set<String> getAllGroupsForUser(String username) {
+
+        Set<String> groups = new HashSet<>();
+        groups.addAll( getAceGroupsForUser(username) );
+        groups.addAll( getLocalGroupsForUser(username) );
+
+        groups.addAll( getAllChildGroupsRecursively(groups, new HashSet<>()) );
+
+        return groups;
+    }
+
+    public Set<String> getAllUsersInGroup(String groupName) {
+
+        Set<String> groups = new HashSet<>();
+        groups.add(groupName);
+
+        groups.addAll( getAllParentGroupsRecursively(groups, new HashSet<>()) );
+
+        return getUsersInGroups(groups);
+    }
+
+
+    private Set<String> getAllChildGroupsRecursively(Set<String> resultSoFar, Set<String> visited) {
+
+        log.trace("resultsSoFar {}, visited {}", resultSoFar, visited);
+        Set<String> buffer = new HashSet<>();
+
+        for (String group : resultSoFar) {
+
+            Set<Relationship> children = relationshipRepository.findRelationshipGroup(group);
+            for (Relationship child : children) {
+                if (!visited.contains(child.getGroupRelationship())) {
+                    buffer.add(child.getGroupRelationship());
+                }
+            }
+
+            if (group.contains("@")) {
+                String role = group.substring(0, group.indexOf('@'));
+                children = relationshipRepository.findRelationshipForStructure(role);
+
+                for (Relationship child : children) {
+                    if (!visited.contains(child.getGroupRelationship())) {
+                        visited.add(group);
+                        buffer.add(Utils.replaceStruttura(child.getGroupRelationship(), group.substring(group.indexOf('@'))));
+                    }
+                }
+            }
+        }
+
+        if (!buffer.isEmpty())
+            resultSoFar.addAll(getAllChildGroupsRecursively(buffer, visited));
+
+        return buffer;
+
+    }
+
+    private Set<String> getAllParentGroupsRecursively(Set<String> resultSoFar, Set<String> visited) {
+
+        log.trace("resultsSoFar {}, visited {}", resultSoFar, visited);
+        Set<String> buffer = new HashSet<>();
+
+        for (String group : resultSoFar) {
+
+            Set<Relationship> parents = relationshipRepository.getRelationshipsForGroupRelationship(group);
+            for (Relationship parent : parents) {
+                if (!visited.contains(parent.getGroupName())) {
+                    buffer.add(parent.getGroupName());
+                }
+            }
+
+            if (group.contains("@")) {
+                String role = group.substring(0, group.indexOf('@'));
+                parents = relationshipRepository.findRelationshipForStructureByGroupRelationship(role);
+
+                for (Relationship parent : parents) {
+                    if (!visited.contains(parent.getGroupName())) {
+                        visited.add(group);
+                        buffer.add(Utils.replaceStruttura(parent.getGroupName(), group.substring(group.indexOf('@'))));
+                    }
+                }
+            }
+        }
+
+        if (!buffer.isEmpty())
+            getAllParentGroupsRecursively(buffer, visited);
+
+        return buffer;
+
+    }
+
 }

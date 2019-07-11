@@ -3,11 +3,8 @@ package it.cnr.si.flows.ng.resource;
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
-import it.cnr.si.flows.ng.service.FlowsTaskService;
 import it.cnr.si.flows.ng.utils.Enum;
-import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.security.FlowsUserDetailsService;
 import it.cnr.si.security.PermissionEvaluatorImpl;
 import it.cnr.si.spring.storage.StoreService;
 import org.activiti.engine.HistoryService;
@@ -22,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -53,7 +51,7 @@ public class FlowsAttachmentResource {
     @Inject
     private FlowsAttachmentService flowsAttachmentService;
     @Inject
-    private FlowsUserDetailsService flowsUserDetailsService;
+    private UserDetailsService flowsUserDetailsService;
     @Inject
     private PermissionEvaluatorImpl permissionEvaluator;
     @Inject
