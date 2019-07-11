@@ -4,7 +4,6 @@ import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.CounterService;
 import it.cnr.si.flows.ng.service.SiperService;
 import it.cnr.si.flows.ng.utils.Enum;
-import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.RuntimeService;
@@ -14,12 +13,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Calendar;
@@ -56,11 +53,7 @@ public class StartAcquistiSetGroupsAndVisibility {
        // LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable(Enum.VariableEnum.title.name()));
         LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
 
-        List<GrantedAuthority> authorities = relationshipService.getAllGroupsForUserOLD(initiator);
-
-        List<String> groups = authorities.stream()
-                .map(GrantedAuthority::getAuthority)
-                .map(Utils::removeLeadingRole)
+        List<String> groups = relationshipService.getAllGroupsForUser(initiator).stream()
                 .filter(g -> g.startsWith("staffAmministrativo@"))
                 .collect(Collectors.toList());
 
