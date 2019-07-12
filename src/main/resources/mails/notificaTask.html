@@ -13,7 +13,7 @@
             Gentile <span th:text="${username}">nome.cognome</span><br>
             <span th:if="${groupname}">
                 Riceve questa notifica in quanto parte del gruppo <bold th:text="${groupname}">NOME GRUPPO</bold></span>
-        <p>
+        <p th:if="${taskName!=null and taskName!= ''}">
             Si notifica che il flusso in oggetto ha raggiunto la fase "<bold th:text="${taskName}">FASE</bold>"
         <p th:if="${commento!=null and commento!= ''}">
             Il compito presenta la seguente nota di commento:

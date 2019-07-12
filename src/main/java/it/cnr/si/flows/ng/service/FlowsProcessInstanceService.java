@@ -6,7 +6,6 @@ import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
-import it.cnr.si.security.FlowsUserDetailsService;
 import it.cnr.si.security.PermissionEvaluatorImpl;
 import org.activiti.engine.*;
 import org.activiti.engine.history.*;
@@ -119,25 +118,25 @@ public class FlowsProcessInstanceService {
 				String[] values = value.split(",");
 
 				for (String linkedProcessId : values) {
+					if(permissionEvaluator.canVisualize(linkedProcessId, flowsUserDetailsService)) {
+						HistoricProcessInstance linkedProcessInstance = historyService
+								.createHistoricProcessInstanceQuery()
+								.processInstanceId(linkedProcessId)
+								.includeProcessVariables()
+								.singleResult();
 
-					HistoricProcessInstance linkedProcessInstance = historyService
-							.createHistoricProcessInstanceQuery()
-							.processInstanceId(linkedProcessId)
-							.includeProcessVariables()
-							.singleResult();
+						if (linkedProcessInstance != null) {
+							String key = linkedProcessInstance.getBusinessKey();
 
-					if (linkedProcessInstance != null) {
-						String key = linkedProcessInstance.getBusinessKey();
+							Map<String, Object> linkedObject = new HashMap<>();
+							linkedObject.put("id", linkedProcessId);
+							linkedObject.put("key", key);
+							linkedObject.put("titolo", linkedProcessInstance.getProcessVariables().get("titolo"));
 
-						Map<String, Object> linkedObject = new HashMap<>();
-						linkedObject.put("id", linkedProcessId);
-						linkedObject.put("key", key);
-						linkedObject.put("titolo", linkedProcessInstance.getProcessVariables().get("titolo"));
-
-						linkedFlows.add(linkedObject);
+							linkedFlows.add(linkedObject);
+						}
 					}
 				}
-
 				if (!linkedFlows.isEmpty())
 					result.put("linkedProcesses", linkedFlows);
 			}
