@@ -57,7 +57,7 @@ buildtestcontainer:
     - demo
   script:
     - echo "Running build image and push image"
-    - docker build --file src/main/docker/Dockerfile -t docker.si.cnr.it/sprint-flows-$CI_COMMIT_REF_NAME .
+    - docker build --file src/main/docker/test/Dockerfile -t docker.si.cnr.it/sprint-flows-$CI_COMMIT_REF_NAME .
     - docker push docker.si.cnr.it/sprint-flows-$CI_COMMIT_REF_NAME
 
 
