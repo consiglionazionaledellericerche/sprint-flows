@@ -84,6 +84,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
 			case TASK_CREATED:
 				variables.put("stato", ((TaskEntity)((ActivitiEntityEvent)event).getEntity()).getName());
 				variables.put("nextTaskId", ((TaskEntity)((ActivitiEntityEvent)event).getEntity()).getId());
+				variables.put("processInstanceId", ((TaskEntity)((ActivitiEntityEvent)event).getEntity()).getProcessInstanceId());
 				break;
 			case PROCESS_CANCELLED:
 				variables.put("stato", ((ActivitiEventType)event.getType()).name()  + " - con causa: " + ((ActivitiProcessCancelledEventImpl) event).getCause());				
@@ -92,10 +93,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
 				variables.put("stato", ((ExecutionEntity)((ActivitiEntityEventImpl) event).getEntity()).getActivity().getProperty("name"));
 				break;
 		}
-		variables.put("descrizione", ((String) variables.get("descrizione")) );
-		variables.put("titolo", ((String) variables.get("titolo")) );
-		variables.put("initiator", ((String) variables.get("initiator")) );
-//		variables.put("businessKey", ((String) variables.get("businessKey")) );
+
 		variables.put("serverUrl", mailConfguration.getMailUrl());
 
 		return variables;
