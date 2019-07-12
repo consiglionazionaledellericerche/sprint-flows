@@ -78,6 +78,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
 				break;
 			case SEQUENCEFLOW_TAKEN:
 				variables.put("stato", ((ActivitiSequenceFlowTakenEventImpl)event).getTargetActivityName());
+				variables.put("processInstanceId", ((ActivitiSequenceFlowTakenEventImpl)event).getProcessInstanceId());
 				break;
 			case TASK_COMPLETED:
 			case TASK_ASSIGNED:
