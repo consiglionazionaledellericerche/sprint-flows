@@ -13,6 +13,7 @@ services:
         ports:
             - 1480:8080
             - 1481:1481
+            - 1482:1482
         logging:
             driver: "gelf"
             options:
