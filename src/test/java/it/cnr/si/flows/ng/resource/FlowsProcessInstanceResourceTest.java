@@ -275,6 +275,44 @@ public class FlowsProcessInstanceResourceTest {
     }
 
 
+
+    @Test
+    public void getProcessInstancesForURPTest() throws Exception {
+        processInstance = util.mySetUp(acquisti);
+
+        util.loginPortaleCnr();
+        ResponseEntity<List<Map<String, Object>>> res = flowsProcessInstanceResource
+                .getProcessInstancesForURP(acquisti.getValue(), 2018, Year.now().getValue(), 0, 10, ASC);
+
+        assertEquals(OK, res.getStatusCode());
+        assertEquals(1, res.getBody().size());
+
+        //prova recupero 5 elementi dopo il sevondo (result = 0 perchè ho 1 Process Instance in totale)
+        res = flowsProcessInstanceResource
+                .getProcessInstancesForURP(acquisti.getValue(), 2018, Year.now().getValue(), 2, 10, ASC);
+
+        assertEquals(OK, res.getStatusCode());
+        assertEquals(0, res.getBody().size());
+
+
+        //prova senza ordinamento
+        res = flowsProcessInstanceResource
+                .getProcessInstancesForURP(acquisti.getValue(), 2018, Year.now().getValue(), 0, 10, null);
+
+        assertEquals(OK, res.getStatusCode());
+        //prendo anche le Pi create negli altri test
+        assertEquals(1, res.getBody().size());
+
+
+        //prova anni sbagliati (Result set vuoto)
+        res = flowsProcessInstanceResource
+                .getProcessInstancesForURP(acquisti.getValue(), 2016, Year.now().getValue() - 1, 0, 10, ASC);
+
+        assertEquals(OK, res.getStatusCode());
+        assertEquals(0, res.getBody().size());
+    }
+
+
     private String verifyMyProcesses(int startedByRA, int startedBySpaclient) {
         String proceeeInstanceID = null;
         // Admin vede la Process Instance che ha avviato
