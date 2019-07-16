@@ -402,7 +402,7 @@ public class FlowsProcessInstanceService {
 		writer.close();
 	}
 
-	public List<HistoricProcessInstance> getProcessinstancesForTrasparenza( String processDefinition, Date startDate, Date endDate, int firstResult, int maxResults, String order) {
+	public List<HistoricProcessInstance> getPIForExternalServices(String processDefinition, Date startDate, Date endDate, int firstResult, int maxResults, String order) {
 		List<HistoricProcessInstance> historicProcessInstances;
 
 		HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()

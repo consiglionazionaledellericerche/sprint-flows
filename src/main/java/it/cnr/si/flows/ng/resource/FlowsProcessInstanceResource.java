@@ -12,7 +12,6 @@ import it.cnr.si.security.SecurityUtils;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.rest.common.api.DataResponse;
@@ -47,7 +46,6 @@ import java.util.stream.Collectors;
 import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
 import static it.cnr.si.flows.ng.utils.Enum.Stato.PubblicatoTrasparenza;
 import static it.cnr.si.flows.ng.utils.Enum.Stato.PubblicatoUrp;
-import static it.cnr.si.flows.ng.utils.Utils.DESC;
 
 @RestController
 @RequestMapping("api/processInstances")
@@ -233,18 +231,17 @@ public class FlowsProcessInstanceResource {
             @RequestParam(name = "order", required = false) String order) throws ParseException {
 
         DateFormat formatoData = new SimpleDateFormat("dd-MM-yyyy");
-
-        List<HistoricProcessInstance> historicProcessInstances = flowsProcessInstanceService.getProcessinstancesForTrasparenza(processDefinition,
-                                                                                                                               formatoData.parse("01-01-" + startYear),
-                                                                                                                               formatoData.parse("31-12-" + endYear),
-                                                                                                                               firstResult, maxResults, order);
+        List<HistoricProcessInstance> historicProcessInstances =
+                flowsProcessInstanceService.getPIForExternalServices(processDefinition,
+                                                                     formatoData.parse("01-01-" + startYear),
+                                                                     formatoData.parse("31-12-" + endYear),
+                                                                     firstResult, maxResults, order);
         List<String> exportTrasparenza = new ArrayList<>();
         View trasparenza = viewRepository.getViewByProcessidType(processDefinition, EXPORT_TRASPARENZA);
         String view = trasparenza.getView();
         JSONArray fields = new JSONArray(view);
-        for (int i = 0; i < fields.length(); i++) {
+        for (int i = 0; i < fields.length(); i++)
             exportTrasparenza.add(fields.getString(i));
-        }
 
         List<Map<String, Object>> mappedProcessInstances = historicProcessInstances.stream()
                 .map(instance -> trasformaVariabiliPerTrasparenza(instance, exportTrasparenza))
@@ -268,32 +265,17 @@ public class FlowsProcessInstanceResource {
             @RequestParam(name = "order", required = false) String order) throws ParseException {
 
         DateFormat formatoData = new SimpleDateFormat("dd-MM-yyyy");
-        List<HistoricProcessInstance> historicProcessInstances;
-
-        HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()
-                .unfinished()
-                .processDefinitionKey(processDefinition)
-                .startedAfter(formatoData.parse("01-01-" + startYear))
-                .startedBefore(formatoData.parse("31-12-" + endYear))
-                .includeProcessVariables();
-        if (order != null && order.equals(DESC)){
-            historicProcessInstances = historicProcessInstanceQuery
-                    .orderByProcessInstanceStartTime().desc()
-                    .listPage(firstResult, maxResults);
-        } else {
-//        	default
-            historicProcessInstances = historicProcessInstanceQuery
-                    .orderByProcessInstanceStartTime().asc()
-                    .listPage(firstResult, maxResults);
-        }
-
+        List<HistoricProcessInstance> historicProcessInstances =
+                flowsProcessInstanceService.getPIForExternalServices(processDefinition,
+                                                                     formatoData.parse("01-01-" + startYear),
+                                                                     formatoData.parse("31-12-" + endYear),
+                                                                     firstResult, maxResults, order);
         List<String> exportURP = new ArrayList<>();
         View urp = viewRepository.getViewByProcessidType(acquisti.getValue(), EXPORT_URP);
         String view = urp.getView();
         JSONArray fields = new JSONArray(view);
-        for (int i = 0; i < fields.length(); i++) {
+        for (int i = 0; i < fields.length(); i++)
             exportURP.add(fields.getString(i));
-        }
 
         List<Map<String, Object>> mappedProcessInstances = historicProcessInstances.stream()
                 .map(instance -> trasformaVariabiliPerURP(instance, exportURP))
