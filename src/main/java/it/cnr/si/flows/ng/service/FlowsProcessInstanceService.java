@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -35,6 +36,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static it.cnr.si.flows.ng.resource.FlowsProcessInstanceResource.EXPORT_TRASPARENZA;
 import static it.cnr.si.flows.ng.utils.Utils.*;
 
 
@@ -398,6 +400,28 @@ public class FlowsProcessInstanceService {
 		}
 		writer.writeAll(entriesIterable);
 		writer.close();
+	}
+
+	public List<HistoricProcessInstance> getPIForExternalServices(String processDefinition, Date startDate, Date endDate, int firstResult, int maxResults, String order) {
+		List<HistoricProcessInstance> historicProcessInstances;
+
+		HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()
+				.unfinished()
+				.processDefinitionKey(processDefinition)
+				.startedAfter(startDate)
+				.startedBefore(endDate)
+				.includeProcessVariables();
+		if (order != null && order.equals(DESC)){
+			historicProcessInstances = historicProcessInstanceQuery
+					.orderByProcessInstanceStartTime().desc()
+					.listPage(firstResult, maxResults);
+		} else {
+//        	default
+			historicProcessInstances = historicProcessInstanceQuery
+					.orderByProcessInstanceStartTime().asc()
+					.listPage(firstResult, maxResults);
+		}
+		return historicProcessInstances;
 	}
 
 
