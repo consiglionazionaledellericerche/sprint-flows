@@ -6,6 +6,8 @@ import it.cnr.si.service.AceService;
 import it.cnr.si.service.dto.anagrafica.base.PageDto;
 import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
 import it.cnr.si.service.dto.anagrafica.letture.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -23,10 +25,14 @@ import static it.cnr.si.security.PermissionEvaluatorImpl.CNR_CODE;
 @Profile("!oiv")
 public class AceBridgeService {
 
+	private final Logger log = LoggerFactory.getLogger(AceBridgeService.class);
+
 	@Inject
 	private AceService aceService;
 
 	public List<String> getAceGroupsForUser(String loginUsername) {
+
+		log.debug("Recupero i ruoli per l'utente {}", loginUsername);
 
 		ArrayList<RuoloUtenteWebDto> ruoliUtente = aceService.ruoloUtente(loginUsername);
 
