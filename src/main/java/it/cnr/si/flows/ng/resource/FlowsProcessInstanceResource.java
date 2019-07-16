@@ -236,20 +236,8 @@ public class FlowsProcessInstanceResource {
                                                                      formatoData.parse("01-01-" + startYear),
                                                                      formatoData.parse("31-12-" + endYear),
                                                                      firstResult, maxResults, order);
-        List<String> exportTrasparenza = new ArrayList<>();
-        View trasparenza = viewRepository.getViewByProcessidType(processDefinition, EXPORT_TRASPARENZA);
-        String view = trasparenza.getView();
-        JSONArray fields = new JSONArray(view);
-        for (int i = 0; i < fields.length(); i++)
-            exportTrasparenza.add(fields.getString(i));
-
-        List<Map<String, Object>> mappedProcessInstances = historicProcessInstances.stream()
-                .map(instance -> trasformaVariabiliPerTrasparenza(instance, exportTrasparenza))
-                .collect(Collectors.toList());
-
-        return new ResponseEntity<>(mappedProcessInstances, HttpStatus.OK);
+        return new ResponseEntity<>(getMappedPI(processDefinition, historicProcessInstances, EXPORT_TRASPARENZA), HttpStatus.OK);
     }
-
 
 
     @PostMapping(value = "/getProcessInstancesForURP", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -270,18 +258,7 @@ public class FlowsProcessInstanceResource {
                                                                      formatoData.parse("01-01-" + startYear),
                                                                      formatoData.parse("31-12-" + endYear),
                                                                      firstResult, maxResults, order);
-        List<String> exportURP = new ArrayList<>();
-        View urp = viewRepository.getViewByProcessidType(acquisti.getValue(), EXPORT_URP);
-        String view = urp.getView();
-        JSONArray fields = new JSONArray(view);
-        for (int i = 0; i < fields.length(); i++)
-            exportURP.add(fields.getString(i));
-
-        List<Map<String, Object>> mappedProcessInstances = historicProcessInstances.stream()
-                .map(instance -> trasformaVariabiliPerURP(instance, exportURP))
-                .collect(Collectors.toList());
-
-        return new ResponseEntity<>(mappedProcessInstances, HttpStatus.OK);
+        return new ResponseEntity<>(getMappedPI(processDefinition, historicProcessInstances, EXPORT_URP), HttpStatus.OK);
     }
 
 
@@ -414,7 +391,6 @@ public class FlowsProcessInstanceResource {
     }
 
 
-
     private static Object mapVariable(HistoricProcessInstance instance, String field) {
         if (instance.getProcessVariables().get(field) == null)
             return null;
@@ -431,6 +407,7 @@ public class FlowsProcessInstanceResource {
         }
         return instance.getProcessVariables().get(field);
     }
+
 
     private  List<Map<String, Object>> getDocumentiPubblicabiliTrasparenza(HistoricProcessInstance instance) {
         List<Map<String, Object>> documentiPubblicabili = new ArrayList<>();
@@ -456,6 +433,7 @@ public class FlowsProcessInstanceResource {
         return documentiPubblicabili;
     }
 
+
     private List<Map<String, Object>> getDocumentiPubblicabiliURP(HistoricProcessInstance instance) {
         List<Map<String, Object>> documentiPubblicabili = new ArrayList<>();
         for (Entry<String, Object> entry : instance.getProcessVariables().entrySet()) {
@@ -480,6 +458,7 @@ public class FlowsProcessInstanceResource {
         return documentiPubblicabili;
     }
 
+
     private Map<String, Object> trasformaVariabiliPerTrasparenza(HistoricProcessInstance instance, List<String> viewExportTrasparenza) {
         Map<String, Object> mappedVariables = new HashMap<>();
 
@@ -491,6 +470,7 @@ public class FlowsProcessInstanceResource {
         return mappedVariables;
     }
 
+
     private Map<String, Object> trasformaVariabiliPerURP(HistoricProcessInstance instance, List<String> viewExportURP) {
         Map<String, Object> mappedVariables = new HashMap<>();
 
@@ -500,5 +480,18 @@ public class FlowsProcessInstanceResource {
         mappedVariables.put("documentiPubblicabili", getDocumentiPubblicabiliURP(instance));
 
         return mappedVariables;
+    }
+
+
+    private List<Map<String, Object>> getMappedPI(@RequestParam("processDefinition") String processDefinition, List<HistoricProcessInstance> historicProcessInstances, String typeView) {
+        String viewTrasparenza = viewRepository.getViewByProcessidType(processDefinition, typeView).getView();
+        JSONArray fieldsTrasparenza = new JSONArray(viewTrasparenza);
+        List<String> exportTrasparenza = new ArrayList<>();
+        for (int i = 0; i < fieldsTrasparenza.length(); i++)
+            exportTrasparenza.add(fieldsTrasparenza.getString(i));
+
+        return historicProcessInstances.stream()
+                .map(instance -> trasformaVariabiliPerTrasparenza(instance, exportTrasparenza))
+                .collect(Collectors.toList());
     }
 }
