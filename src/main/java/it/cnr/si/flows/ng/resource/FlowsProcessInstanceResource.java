@@ -239,7 +239,7 @@ public class FlowsProcessInstanceResource {
                                                                                                                                formatoData.parse("31-12-" + endYear),
                                                                                                                                firstResult, maxResults, order);
         List<String> exportTrasparenza = new ArrayList<>();
-        View trasparenza = viewRepository.getViewByProcessidType(acquisti.getValue(), EXPORT_TRASPARENZA);
+        View trasparenza = viewRepository.getViewByProcessidType(processDefinition, EXPORT_TRASPARENZA);
         String view = trasparenza.getView();
         JSONArray fields = new JSONArray(view);
         for (int i = 0; i < fields.length(); i++) {
