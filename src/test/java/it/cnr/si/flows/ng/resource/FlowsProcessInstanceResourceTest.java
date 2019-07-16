@@ -242,33 +242,31 @@ public class FlowsProcessInstanceResourceTest {
     public void getProcessInstancesForTrasparenzaTest() throws Exception {
         processInstance = util.mySetUp(acquisti);
 
-        util.loginAdmin();
+        util.loginPortaleCnr();
         ResponseEntity<List<Map<String, Object>>> res = flowsProcessInstanceResource
                 .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, Year.now().getValue(), 0, 10, ASC);
 
         assertEquals(OK, res.getStatusCode());
-        //prendo anche le Pi create negli altri test
-        assertEquals(8, res.getBody().size());
+        assertEquals(1, res.getBody().size());
 
-        //prova recupero 10 elementi dopo il quinto (result = 3 perchè ho 8 Process Instance in totale - anche quelle generate negli altri test)
+        //prova recupero 5 elementi dopo il sevondo (result = 0 perchè ho 1 Process Instance in totale)
         res = flowsProcessInstanceResource
-                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, Year.now().getValue(), 5, 10, ASC);
+                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, Year.now().getValue(), 2, 10, ASC);
 
-        //prendo anche le Pi create negli altri test
         assertEquals(OK, res.getStatusCode());
-        assertEquals(3, res.getBody().size());
+        assertEquals(0, res.getBody().size());
 
 
-        //prova senza ordinamento (recupera le 8 process instances - anche quelle generate negli altri test)
+        //prova senza ordinamento
         res = flowsProcessInstanceResource
                 .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, Year.now().getValue(), 0, 10, null);
 
         assertEquals(OK, res.getStatusCode());
         //prendo anche le Pi create negli altri test
-        assertEquals(8, res.getBody().size());
+        assertEquals(1, res.getBody().size());
 
 
-        //prova anni sbagliati
+        //prova anni sbagliati (Result set vuoto)
         res = flowsProcessInstanceResource
                 .getProcessInstancesForTrasparenza(acquisti.getValue(), 2016, Year.now().getValue() - 1, 0, 10, ASC);
 

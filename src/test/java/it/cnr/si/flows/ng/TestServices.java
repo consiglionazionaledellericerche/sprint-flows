@@ -56,6 +56,7 @@ public class TestServices {
     private static final String RA2 = "silvia.rossi";
     private static final String APP = "utente1";
     private static final String ISTRUTTORE = "utente5" ;
+    private static final String PORTALE_CNR = "app.portalecnr";
 
 
     @Inject
@@ -86,6 +87,11 @@ public class TestServices {
     public void loginAdmin() {
         logout();
         login("admin", "admin");
+    }
+
+    public void loginPortaleCnr() {
+        logout();
+        login(TestServices.PORTALE_CNR, "");
     }
 
     public void loginSpaclient() {
