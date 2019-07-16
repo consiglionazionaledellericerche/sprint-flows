@@ -56,8 +56,8 @@ public class FlowsProcessInstanceResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsProcessInstanceResource.class);
     public static final String EXPORT_TRASPARENZA = "export-trasparenza";
     public static final String EXPORT_URP = "export-urp";
-	public static final String STATO_FINALE_DOMANDA = "statoFinaleDomanda";
-	
+    public static final String STATO_FINALE_DOMANDA = "statoFinaleDomanda";
+
 
     @Inject
     private RestResponseFactory restResponseFactory;
@@ -149,9 +149,9 @@ public class FlowsProcessInstanceResource {
 
         runtimeService.setVariable(processInstanceId, STATO_FINALE_DOMANDA, "ELIMINATO");
         runtimeService.setVariable(processInstanceId, "motivazioneEliminazione", deleteReason);
-		flowsProcessInstanceService.updateSearchTerms(flowsProcessInstanceService.getCurrentTaskOfProcessInstance(processInstanceId).getExecutionId(), processInstanceId, "ELIMINATO");
+        flowsProcessInstanceService.updateSearchTerms(flowsProcessInstanceService.getCurrentTaskOfProcessInstance(processInstanceId).getExecutionId(), processInstanceId, "ELIMINATO");
 
-		runtimeService.deleteProcessInstance(processInstanceId, deleteReason);
+        runtimeService.deleteProcessInstance(processInstanceId, deleteReason);
         return new ResponseEntity(HttpStatus.OK);
     }
 
@@ -198,12 +198,12 @@ public class FlowsProcessInstanceResource {
 
         return new ResponseEntity<HistoricVariableInstance>(
                 historyService.createHistoricVariableInstanceQuery()
-                .processInstanceId(processInstanceId)
-                .variableName(variableName)
-                .list()
-                .stream()
-                .sorted((a, b) -> b.getLastUpdatedTime().compareTo(a.getLastUpdatedTime()) )
-                .findFirst().orElse(null),
+                        .processInstanceId(processInstanceId)
+                        .variableName(variableName)
+                        .list()
+                        .stream()
+                        .sorted((a, b) -> b.getLastUpdatedTime().compareTo(a.getLastUpdatedTime()) )
+                        .findFirst().orElse(null),
                 HttpStatus.OK);
     }
 
@@ -233,25 +233,11 @@ public class FlowsProcessInstanceResource {
             @RequestParam(name = "order", required = false) String order) throws ParseException {
 
         DateFormat formatoData = new SimpleDateFormat("dd-MM-yyyy");
-        List<HistoricProcessInstance> historicProcessInstances;
 
-        HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()
-        		.unfinished()
-                .processDefinitionKey(processDefinition)
-                .startedAfter(formatoData.parse("01-01-" + startYear))
-                .startedBefore(formatoData.parse("31-12-" + endYear))
-                .includeProcessVariables();
-        if (order != null && order.equals(DESC)){
-            historicProcessInstances = historicProcessInstanceQuery
-                    .orderByProcessInstanceStartTime().desc()
-                    .listPage(firstResult, maxResults);
-        } else {
-//        	default
-            historicProcessInstances = historicProcessInstanceQuery
-                    .orderByProcessInstanceStartTime().asc()
-                    .listPage(firstResult, maxResults);
-        }
-
+        List<HistoricProcessInstance> historicProcessInstances = flowsProcessInstanceService.getProcessinstancesForTrasparenza(processDefinition,
+                                                                                                                               formatoData.parse("01-01-" + startYear),
+                                                                                                                               formatoData.parse("31-12-" + endYear),
+                                                                                                                               firstResult, maxResults, order);
         List<String> exportTrasparenza = new ArrayList<>();
         View trasparenza = viewRepository.getViewByProcessidType(acquisti.getValue(), EXPORT_TRASPARENZA);
         String view = trasparenza.getView();
@@ -266,6 +252,8 @@ public class FlowsProcessInstanceResource {
 
         return new ResponseEntity<>(mappedProcessInstances, HttpStatus.OK);
     }
+
+
 
     @PostMapping(value = "/getProcessInstancesForURP", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.ADMIN)
@@ -283,7 +271,7 @@ public class FlowsProcessInstanceResource {
         List<HistoricProcessInstance> historicProcessInstances;
 
         HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()
-        		.unfinished()
+                .unfinished()
                 .processDefinitionKey(processDefinition)
                 .startedAfter(formatoData.parse("01-01-" + startYear))
                 .startedBefore(formatoData.parse("31-12-" + endYear))
@@ -304,7 +292,7 @@ public class FlowsProcessInstanceResource {
         String view = urp.getView();
         JSONArray fields = new JSONArray(view);
         for (int i = 0; i < fields.length(); i++) {
-        	exportURP.add(fields.getString(i));
+            exportURP.add(fields.getString(i));
         }
 
         List<Map<String, Object>> mappedProcessInstances = historicProcessInstances.stream()
@@ -478,14 +466,14 @@ public class FlowsProcessInstanceResource {
                     metadatiDocumento.put("label", attachment.getLabel());
                     metadatiDocumento.put("key", attachment.getUrl());
                     metadatiDocumento.put("path", attachment.getPath());
-                   metadatiDocumento.put("download", env.getProperty("repository.base.url") + "d/a/workspace/SpacesStore/" + attachment.getUrl().split(";")[0] + "/" + attachment.getName());
+                    metadatiDocumento.put("download", env.getProperty("repository.base.url") + "d/a/workspace/SpacesStore/" + attachment.getUrl().split(";")[0] + "/" + attachment.getName());
                     documentiPubblicabili.add(metadatiDocumento);
                 }
             }
         }
         return documentiPubblicabili;
     }
-    
+
     private List<Map<String, Object>> getDocumentiPubblicabiliURP(HistoricProcessInstance instance) {
         List<Map<String, Object>> documentiPubblicabili = new ArrayList<>();
         for (Entry<String, Object> entry : instance.getProcessVariables().entrySet()) {
@@ -520,7 +508,7 @@ public class FlowsProcessInstanceResource {
 
         return mappedVariables;
     }
-    
+
     private Map<String, Object> trasformaVariabiliPerURP(HistoricProcessInstance instance, List<String> viewExportURP) {
         Map<String, Object> mappedVariables = new HashMap<>();
 
