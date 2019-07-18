@@ -49,8 +49,6 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> HandleNull(RuntimeException ex, WebRequest request) {
         String bodyOfResponse = "E' stato ricevuto un null pointer per la richiesta "+ request.getContextPath();
         LOGGER.error(bodyOfResponse, ex);
-        LOGGER.error("--- REST-PDF request getParameterMap {}", request.getParameterMap());
-        LOGGER.error("--- REST-PDF request getHeaderNames {}", request.getHeaderNames());
 
         return handleExceptionInternal(ex, bodyOfResponse,
                                        new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
