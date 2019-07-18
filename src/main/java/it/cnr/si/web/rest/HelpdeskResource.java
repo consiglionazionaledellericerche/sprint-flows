@@ -1,9 +1,8 @@
 package it.cnr.si.web.rest;
 
-import javax.annotation.security.RolesAllowed;
-import javax.servlet.http.HttpServletRequest;
 import it.cnr.si.domain.ExternalProblem;
 import it.cnr.si.flows.ng.utils.JSONResponseEntity;
+import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.HelpdeskService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import it.cnr.si.security.AuthoritiesConstants;
 
+import javax.annotation.security.RolesAllowed;
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 
 @RolesAllowed({AuthoritiesConstants.USER})
@@ -29,9 +29,10 @@ public class HelpdeskResource {
 
 
 	@PostMapping(value = "/helpdesk/sendWithAttachment", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity sendWithAttachment(HttpServletRequest req, @RequestParam("file") MultipartFile uploadedMultipartFile) {
-//		todo: riscrivere perchè hd viene inizializzato nel service
-	    log.info("Invio mail helpdesk con allegato");
+	public ResponseEntity sendWithAttachment(HttpServletRequest req, @RequestParam("allegato_data") MultipartFile allegato) {
+		HashMap response = new HashMap();
+
+		log.info("Invio mail helpdesk con allegato");
 		ExternalProblem hd = new ExternalProblem();
 
 		hd.setTitolo(PREFISSO_TITOLO + req.getParameter("titolo"));
@@ -43,9 +44,10 @@ public class HelpdeskResource {
 		hd.setCategoria(new Integer(req.getParameter("categoria")));
 		hd.setCategoriaDescrizione(req.getParameter("categoriaDescrizione"));
 		Long id = helpdeskService.newProblem(hd);
-		helpdeskService.addAttachments(id, uploadedMultipartFile);
-		
-		return JSONResponseEntity.ok();
+		helpdeskService.addAttachments(id, allegato);
+
+		response.put("segnalazioneId", id);
+		return JSONResponseEntity.ok(response);
 	}
 
 
@@ -54,7 +56,7 @@ public class HelpdeskResource {
 		log.info("InvHashmaio mail helpdesk senza allegato");
 		HashMap response = new HashMap();
 		hdDataModel.setTitolo(PREFISSO_TITOLO + hdDataModel.getTitolo());
-		response.put("segnalazioneId" ,helpdeskService.newProblem(hdDataModel));
+		response.put("segnalazioneId", helpdeskService.newProblem(hdDataModel));
 
 		return JSONResponseEntity.ok(response);
 	}
