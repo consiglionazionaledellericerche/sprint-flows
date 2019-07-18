@@ -284,11 +284,10 @@ public class FlowsPdfService {
 					} else {
 						String valueEscaped = "";
 						if(((VariableInstanceEntity) value).getType() instanceof LongStringType){
-							valueEscaped = StringEscapeUtils.escapeHtml(runtimeService.getVariable(processInstanceId,value.getName()).toString());
+							valueEscaped = Jsoup.parse(StringEscapeUtils.escapeHtml(runtimeService.getVariable(processInstanceId,value.getName()).toString().replaceAll("\t", "  "))).text();
 
 						} else {
-							valueEscaped = StringEscapeUtils.escapeHtml(value.getValue().toString());
-
+							valueEscaped = Jsoup.parse(StringEscapeUtils.escapeHtml(value.getValue().toString().replaceAll("\t", "  "))).text();
 						}
 						variableInstanceJson.put(key, valueEscaped);
 					}
