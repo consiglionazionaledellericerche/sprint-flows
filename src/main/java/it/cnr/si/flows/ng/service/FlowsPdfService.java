@@ -282,8 +282,14 @@ public class FlowsPdfService {
 						sdf.setTimeZone(TimeZone.getTimeZone("Europe/Rome"));
 						variableInstanceJson.put(key, sdf.format(startDate));
 					} else {
-						// ...
-						String valueEscaped = StringEscapeUtils.escapeHtml(value.getValue().toString());
+						String valueEscaped = "";
+						if(((VariableInstanceEntity) value).getType() instanceof LongStringType){
+							valueEscaped = StringEscapeUtils.escapeHtml(runtimeService.getVariable(processInstanceId,value.getName()).toString());
+
+						} else {
+							valueEscaped = StringEscapeUtils.escapeHtml(value.getValue().toString());
+
+						}
 						variableInstanceJson.put(key, valueEscaped);
 					}
 				}	
