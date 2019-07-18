@@ -28,8 +28,14 @@
                     <label for="emailMessage" translate="helpdesk.form.messaggio">Message</label>
                     <textarea class="form-control" id="emailMessage" ng-model="helpdeskModel.descrizione" placeholder="{{'helpdesk.form.messaggio' | translate}}" rows="5" ng-required="true" ></textarea>
                 </div>
-                <br>
-                <button type="submit" class="btn btn-primary" name="sendMail" translate="helpdesk.form.invia">Send</button>
+                <div class="form-group" ng-hide="idHelpdesk">
+                    <form novalidate class="flows-form" name="fileForm" ng-submit="submitHelpdesk()">
+                        <div>
+                            <fileinput name="allegato" label="Allegato Segnalazione" multiple=false cnr-required=false />
+                        </div>
+                        <button class="btn btn-primary" type="submit" translate="helpdesk.form.invia"> Send<span class="glyphicon glyphicon-arrow-right"></span></button>
+                    </form>
+                </div>
             </form>
         </div>
     </div>
