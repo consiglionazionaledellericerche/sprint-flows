@@ -15,12 +15,14 @@ import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.impl.persistence.entity.VariableInstance;
 import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.activiti.engine.impl.variable.LongStringType;
 import org.activiti.engine.impl.variable.SerializableType;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricIdentityLinkResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -273,14 +275,18 @@ public class FlowsPdfService {
 				VariableInstance value = entry.getValue();
 				//le variabili di tipo serializable (file) non vanno inseriti nel json delle variabili che verranno inseriti nel pdf
 				//(ho testato valutazioni esperienze_Json fino a 11000 caratteri ed a questo livello appare come longString)
-				if(!(((VariableInstanceEntity) value).getType() instanceof SerializableType)) {
+				if((!(((VariableInstanceEntity) value).getType() instanceof SerializableType)) || (((VariableInstanceEntity) value).getType() instanceof LongStringType)){
 					if(key.toString().equals("startDate")) {
 						Date startDate = (Date)value.getValue();
 						SimpleDateFormat sdf = new  SimpleDateFormat("dd/MM/yyyy HH:mm");
 						sdf.setTimeZone(TimeZone.getTimeZone("Europe/Rome"));
 						variableInstanceJson.put(key, sdf.format(startDate));
 					} else {
-						variableInstanceJson.put(key, value.getValue());
+						String valueEscaped = "campo erroneamente compilato";
+						if (runtimeService.getVariable(processInstanceId,value.getName()) != null) {
+							valueEscaped = Jsoup.parse(StringEscapeUtils.escapeHtml(runtimeService.getVariable(processInstanceId,value.getName()).toString().replaceAll("\t", "  "))).text();
+							variableInstanceJson.put(key, valueEscaped);
+						}
 					}
 				}	
 			}
