@@ -282,14 +282,11 @@ public class FlowsPdfService {
 						sdf.setTimeZone(TimeZone.getTimeZone("Europe/Rome"));
 						variableInstanceJson.put(key, sdf.format(startDate));
 					} else {
-						String valueEscaped = "";
-						if(((VariableInstanceEntity) value).getType() instanceof LongStringType){
+						String valueEscaped = "campo erroneamente compilato";
+						if (runtimeService.getVariable(processInstanceId,value.getName()) != null) {
 							valueEscaped = Jsoup.parse(StringEscapeUtils.escapeHtml(runtimeService.getVariable(processInstanceId,value.getName()).toString().replaceAll("\t", "  "))).text();
-
-						} else {
-							valueEscaped = Jsoup.parse(StringEscapeUtils.escapeHtml(value.getValue().toString().replaceAll("\t", "  "))).text();
+							variableInstanceJson.put(key, valueEscaped);
 						}
-						variableInstanceJson.put(key, valueEscaped);
 					}
 				}	
 			}
