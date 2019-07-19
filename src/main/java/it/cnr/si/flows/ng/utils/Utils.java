@@ -263,6 +263,38 @@ public final class Utils {
     }
 
 
+    public static class associazioneRuoloPersonaCDSUO {
+        String ruolo;
+        String persona;
+        String cdsuo;
+
+
+
+        public String getRuolo() {
+            return ruolo;
+        }
+
+        public String getPersona() {
+            return persona;
+        }
+        
+        public String getCdsuo() {
+            return cdsuo;
+        }
+
+        public void setRuolo(String ruolo) {
+            this.ruolo = ruolo;
+        }
+
+        public void setCdsuo(String cdsuo) {
+            this.cdsuo = cdsuo;
+        }
+        
+        public void setPersona(String persona) {
+            this.persona = persona;
+        }
+    }
+
     public String getString(Map<String, String> params, String paramName, String defaultValue) {
         String value = params.get(paramName);
         return value != null ? value : defaultValue;
