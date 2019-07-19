@@ -57,6 +57,7 @@ import it.cnr.si.config.JHipsterProperties;
 import it.cnr.si.flows.ng.exception.UnexpectedResultException;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.SiperService;
+import it.cnr.si.flows.ng.utils.Utils.associazioneRuoloPersonaCDSUO;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.RelationshipService;
@@ -88,11 +89,19 @@ public class PopolazioneProfiliPerCDSUOAcquistiBatch {
 	//@Test questa riga non va mai messa su git
 	//@Test
 	public void runBatch() throws IOException {
-		String[][] persone = getPersoneDaFile();
+		//String[][] persone = getPersoneDaFile();
+		
+		Map<Integer, associazioneRuoloPersonaCDSUO> persone = new HashMap<Integer, associazioneRuoloPersonaCDSUO>();
+		persone = getPersoneDaFile();
+		
+		
+		for (int i = 0; i < persone.size(); i++) {
+			inserisciRuolo(persone.get(i).getPersona(), persone.get(i).getRuolo(), persone.get(i).getCdsuo());
+		    // fruit is an element of the `fruits` array.
+		}
+		
 
-		for (int k = 0; k < persone.length; k++) {
-			inserisciRuolo(persone[k][0], persone[k][1], persone[k][2]);
-		};
+
 
 		errors.forEach( (tripla, risultato) -> {
 			log.error(tripla +": "+ risultato);
@@ -197,33 +206,32 @@ public class PopolazioneProfiliPerCDSUOAcquistiBatch {
 
 	}
 
-	private String[][] getPersoneDaFile() throws IOException {
+	private Map<Integer, associazioneRuoloPersonaCDSUO> getPersoneDaFile() throws IOException {
 
 		CSVParser parser = new CSVParser(',');
 
 		Stream<String> lines = Files.lines(Paths.get("./src/test/resources/batch/singoloGruppoUtentiProceduraAcquisti.csv"));
 
-//		Map<String, String> associazioni = new HashMap<>();
-		int id = 10;
-		int value = 10;
 		i = 0;
-		String[][] associazioni = new String [id][value];
 		
+		Map<Integer, associazioneRuoloPersonaCDSUO> associazioni = new HashMap<Integer, associazioneRuoloPersonaCDSUO>();
 
 		lines
 				.skip(1).
 				forEach(l -> {
 					try {
+
 						String[] values = parser.parseLine(l);
-						log.info(values[0] + " " + values[1]+ " " + values[2]);
-						associazioni[i][0] = values[0];
-						associazioni[i][1] = values[1];
-						associazioni[i][2] = values[2];
-						i++;
+						log.info(values[0] + " " + values[1]);
+						associazioneRuoloPersonaCDSUO asso = new associazioneRuoloPersonaCDSUO();
+						asso.setPersona(values[0]);
+						asso.setRuolo(values[1]);
+						asso.setCdsuo(values[2]);
+						associazioni.putIfAbsent(i, asso) ;
+						i=i+1;
 
 					} catch (IOException e) {e.printStackTrace();}
 				});
-
 
 		return associazioni;
 	}
