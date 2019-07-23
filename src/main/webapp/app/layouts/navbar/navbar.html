@@ -124,7 +124,7 @@
             <li ng-if="app == 'cnr'" ui-sref-active="active" has-authority="ROLE_USER">
                 <a ui-sref="manualistica" ng-click="vm.collapseNavbar()">
                     <span class="glyphicon glyphicon-book"></span>
-                    <span class="hidden-sm">Manualistica</span>
+                    <span class="hidden-sm">Manualistica&Faq</span>
                 </a>
             </li>
             <!-- jhipster-needle-add-element-to-menu - JHipster will add new menu items here -->
@@ -197,6 +197,12 @@
                             <a ui-sref="external-message" ng-click="vm.collapseNavbar()">
                                 <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
                                 <span translate="global.menu.entities.externalMessage">External Message</span>
+                            </a>
+                        </li>
+                    <li ui-sref-active="active" >
+                            <a ui-sref="faq" ng-click="vm.collapseNavbar()">
+                                <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
+                                <span translate="global.menu.entities.faq">Faq</span>
                             </a>
                         </li>
                     <!-- jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here -->
