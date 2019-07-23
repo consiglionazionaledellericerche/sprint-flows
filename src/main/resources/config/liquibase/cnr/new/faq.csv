@@ -1,0 +1,4 @@
+id;testo;is_readable
+1;Prova FAQ 1;TRUE
+2;Prova FAQ 2;TRUE
+3;Prova FAQ non leggibile;FALSE
