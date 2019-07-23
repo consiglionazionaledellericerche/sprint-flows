@@ -17,6 +17,7 @@
                 "membership": "Membership",
                 "avviso": "Avviso",
                 "externalMessage": "External Message",
+                "faq": "Faq",
                 "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
             },
             "account": {

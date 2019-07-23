@@ -273,6 +273,11 @@
                     return $http.get("api/manual/" + nome, { responseType: 'arraybuffer' });
                 }
             },
+            faq: {
+                getReadable: function () {
+                    return $http.get("api/faqs/readable");
+                }
+            },
             signMany: function (username, password, otp, ids) {
                 return $http({
                     url: "api/tasks/signMany",
