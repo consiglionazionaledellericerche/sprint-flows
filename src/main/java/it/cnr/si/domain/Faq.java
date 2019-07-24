@@ -4,7 +4,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -23,8 +23,12 @@ public class Faq implements Serializable {
     private Long id;
 
     @NotNull
-    @Column(name = "testo", nullable = false)
-    private String testo;
+    @Column(name = "domanda", nullable = false)
+    private String domanda;
+
+    @NotNull
+    @Column(name = "risposta", nullable = false)
+    private String risposta;
 
     @NotNull
     @Column(name = "is_readable", nullable = false)
@@ -38,17 +42,30 @@ public class Faq implements Serializable {
         this.id = id;
     }
 
-    public String getTesto() {
-        return testo;
+    public String getDomanda() {
+        return domanda;
     }
 
-    public Faq testo(String testo) {
-        this.testo = testo;
+    public Faq domanda(String domanda) {
+        this.domanda = domanda;
         return this;
     }
 
-    public void setTesto(String testo) {
-        this.testo = testo;
+    public void setDomanda(String domanda) {
+        this.domanda = domanda;
+    }
+
+    public String getRisposta() {
+        return risposta;
+    }
+
+    public Faq risposta(String risposta) {
+        this.risposta = risposta;
+        return this;
+    }
+
+    public void setRisposta(String risposta) {
+        this.risposta = risposta;
     }
 
     public Boolean isIsReadable() {
@@ -88,7 +105,8 @@ public class Faq implements Serializable {
     public String toString() {
         return "Faq{" +
             "id=" + id +
-            ", testo='" + testo + "'" +
+            ", domanda='" + domanda + "'" +
+            ", risposta='" + risposta + "'" +
             ", isReadable='" + isReadable + "'" +
             '}';
     }

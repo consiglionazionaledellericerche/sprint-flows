@@ -37,8 +37,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = SprintApp.class)
 public class FaqResourceIntTest {
-    private static final String DEFAULT_TESTO = "AAAAA";
-    private static final String UPDATED_TESTO = "BBBBB";
+    private static final String DEFAULT_DOMANDA = "AAAAA";
+    private static final String UPDATED_DOMANDA = "BBBBB";
+    private static final String DEFAULT_RISPOSTA = "AAAAA";
+    private static final String UPDATED_RISPOSTA = "BBBBB";
 
     private static final Boolean DEFAULT_IS_READABLE = false;
     private static final Boolean UPDATED_IS_READABLE = true;
@@ -78,7 +80,8 @@ public class FaqResourceIntTest {
     public static Faq createEntity(EntityManager em) {
         Faq faq = new Faq();
         faq = new Faq()
-                .testo(DEFAULT_TESTO)
+                .domanda(DEFAULT_DOMANDA)
+                .risposta(DEFAULT_RISPOSTA)
                 .isReadable(DEFAULT_IS_READABLE);
         return faq;
     }
@@ -104,16 +107,35 @@ public class FaqResourceIntTest {
         List<Faq> faqs = faqRepository.findAll();
         assertThat(faqs).hasSize(databaseSizeBeforeCreate + 1);
         Faq testFaq = faqs.get(faqs.size() - 1);
-        assertThat(testFaq.getTesto()).isEqualTo(DEFAULT_TESTO);
+        assertThat(testFaq.getDomanda()).isEqualTo(DEFAULT_DOMANDA);
+        assertThat(testFaq.getRisposta()).isEqualTo(DEFAULT_RISPOSTA);
         assertThat(testFaq.isIsReadable()).isEqualTo(DEFAULT_IS_READABLE);
     }
 
     @Test
     @Transactional
-    public void checkTestoIsRequired() throws Exception {
+    public void checkDomandaIsRequired() throws Exception {
         int databaseSizeBeforeTest = faqRepository.findAll().size();
         // set the field null
-        faq.setTesto(null);
+        faq.setDomanda(null);
+
+        // Create the Faq, which fails.
+
+        restFaqMockMvc.perform(post("/api/faqs")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(faq)))
+                .andExpect(status().isBadRequest());
+
+        List<Faq> faqs = faqRepository.findAll();
+        assertThat(faqs).hasSize(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    public void checkRispostaIsRequired() throws Exception {
+        int databaseSizeBeforeTest = faqRepository.findAll().size();
+        // set the field null
+        faq.setRisposta(null);
 
         // Create the Faq, which fails.
 
@@ -155,7 +177,8 @@ public class FaqResourceIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(faq.getId().intValue())))
-                .andExpect(jsonPath("$.[*].testo").value(hasItem(DEFAULT_TESTO.toString())))
+                .andExpect(jsonPath("$.[*].domanda").value(hasItem(DEFAULT_DOMANDA.toString())))
+                .andExpect(jsonPath("$.[*].risposta").value(hasItem(DEFAULT_RISPOSTA.toString())))
                 .andExpect(jsonPath("$.[*].isReadable").value(hasItem(DEFAULT_IS_READABLE.booleanValue())));
     }
 
@@ -170,7 +193,8 @@ public class FaqResourceIntTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(faq.getId().intValue()))
-            .andExpect(jsonPath("$.testo").value(DEFAULT_TESTO.toString()))
+            .andExpect(jsonPath("$.domanda").value(DEFAULT_DOMANDA.toString()))
+            .andExpect(jsonPath("$.risposta").value(DEFAULT_RISPOSTA.toString()))
             .andExpect(jsonPath("$.isReadable").value(DEFAULT_IS_READABLE.booleanValue()));
     }
 
@@ -192,7 +216,8 @@ public class FaqResourceIntTest {
         // Update the faq
         Faq updatedFaq = faqRepository.findOne(faq.getId());
         updatedFaq
-                .testo(UPDATED_TESTO)
+                .domanda(UPDATED_DOMANDA)
+                .risposta(UPDATED_RISPOSTA)
                 .isReadable(UPDATED_IS_READABLE);
 
         restFaqMockMvc.perform(put("/api/faqs")
@@ -204,7 +229,8 @@ public class FaqResourceIntTest {
         List<Faq> faqs = faqRepository.findAll();
         assertThat(faqs).hasSize(databaseSizeBeforeUpdate);
         Faq testFaq = faqs.get(faqs.size() - 1);
-        assertThat(testFaq.getTesto()).isEqualTo(UPDATED_TESTO);
+        assertThat(testFaq.getDomanda()).isEqualTo(UPDATED_DOMANDA);
+        assertThat(testFaq.getRisposta()).isEqualTo(UPDATED_RISPOSTA);
         assertThat(testFaq.isIsReadable()).isEqualTo(UPDATED_IS_READABLE);
     }
 
