@@ -21,7 +21,10 @@
             <column name="id" type="bigint" autoIncrement="${autoIncrement}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="testo" type="varchar(255)">
+            <column name="domanda" type="varchar()">
+                <constraints nullable="false" />
+            </column>
+            <column name="risposta" type="varchar()">
                 <constraints nullable="false" />
             </column>
             

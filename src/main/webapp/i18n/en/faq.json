@@ -1,0 +1,24 @@
+{
+    "sprintApp": {
+        "faq" : {
+            "home": {
+                "title": "Faqs",
+                "createLabel": "Create a new Faq",
+                "createOrEditLabel": "Create or edit a Faq",
+                "search": "Search for Faq"
+            },
+            "created": "A new Faq is created with identifier {{ param }}",
+            "updated": "A Faq is updated with identifier {{ param }}",
+            "deleted": "A Faq is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Are you sure you want to delete Faq {{ id }}?"
+            },
+            "detail": {
+                "title": "Faq"
+            },
+            "domanda": "Domanda",
+            "risposta": "Risposta",
+            "isReadable": "Is Readable"
+        }
+    }
+}
