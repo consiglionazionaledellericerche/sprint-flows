@@ -1,4 +1,2 @@
 id;domanda;risposta;is_readable
-1;Domanda 1?;Risposta 1;TRUE
-2;Domanda 2?;Risposta 2;TRUE
-3;Domanda 3?;Risposta 3;FALSE
+1;Perché mi arriva una mail di notifica e non trovo compiti assegnati?;Alcune notifiche sono solo per segnalare la presenza di un flusso di interesse per l'utente;TRUE
