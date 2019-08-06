@@ -5,9 +5,9 @@
         .factory('dataService', Data);
 
 
-    Data.$inject = ['$http'];
+    Data.$inject = ['$http', 'Upload'];
 
-    function Data($http) {
+    function Data($http, Upload) {
         return {
 
             avvisi: {
@@ -254,13 +254,13 @@
                 }
             },
             helpdesk: {
-                // sendWithAttachment: function(hd, attachment){
-                //     return $http({
-                //         url: 'api/helpdesk/sendWithAttachment',
-                //         method: 'Post',
-                //         params: {}
-                //     });
-                // },
+                sendWithAttachment: function (data) {
+                    return Upload.upload({
+                        url: 'api/helpdesk/sendWithAttachment',
+                        method: 'Post',
+                        data: data,
+                    });
+                },
                 sendWithoutAttachment: function (hdDataModel) {
                     return $http.post("api/helpdesk/sendWithoutAttachment", hdDataModel)
                 }
@@ -271,6 +271,11 @@
                 },
                 getManuale: function (nome) {
                     return $http.get("api/manual/" + nome, { responseType: 'arraybuffer' });
+                }
+            },
+            faq: {
+                getReadable: function () {
+                    return $http.get("api/faqs/readable");
                 }
             },
             signMany: function (username, password, otp, ids) {
