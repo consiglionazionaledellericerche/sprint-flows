@@ -1,0 +1,4 @@
+id;domanda;risposta;is_readable
+1;Domanda 1?;Risposta 1;TRUE
+2;Domanda 2?;Risposta 2;TRUE
+3;Domanda 3?;Risposta 3;FALSE
