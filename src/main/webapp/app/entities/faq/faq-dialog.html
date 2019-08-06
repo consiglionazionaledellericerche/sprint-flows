@@ -1,0 +1,62 @@
+
+<form name="editForm" role="form" novalidate ng-submit="vm.save()" show-validation>
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+                ng-click="vm.clear()">&times;</button>
+        <h4 class="modal-title" id="myFaqLabel" translate="sprintApp.faq.home.createOrEditLabel">Create or edit a Faq</h4>
+    </div>
+    <div class="modal-body">
+        <jhi-alert-error></jhi-alert-error>
+        <div class="form-group" ng-show="vm.faq.id">
+            <label for="id" translate="global.field.id">ID</label>
+            <input type="text" class="form-control" id="id" name="id"
+                    ng-model="vm.faq.id" readonly />
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="sprintApp.faq.domanda" for="field_domanda">Domanda</label>
+            <input type="text" class="form-control" name="domanda" id="field_domanda"
+                    ng-model="vm.faq.domanda"
+                    required />
+            <div ng-show="editForm.domanda.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.domanda.$error.required" translate="entity.validation.required">
+                    This field is required.
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="sprintApp.faq.risposta" for="field_risposta">Risposta</label>
+            <input type="text" class="form-control" name="risposta" id="field_risposta"
+                    ng-model="vm.faq.risposta"
+                    required />
+            <div ng-show="editForm.risposta.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.risposta.$error.required" translate="entity.validation.required">
+                    This field is required.
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="sprintApp.faq.isReadable" for="field_isReadable">Is Readable</label>
+            <input type="checkbox" class="form-control" name="isReadable" id="field_isReadable"
+                    ng-model="vm.faq.isReadable"
+                     />
+            <div ng-show="editForm.isReadable.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.isReadable.$error.required" translate="entity.validation.required">
+                    This field is required.
+                </p>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="vm.clear()">
+            <span class="glyphicon glyphicon-ban-circle"></span>&nbsp;<span translate="entity.action.cancel">Cancel</span>
+        </button>
+        <button type="submit" ng-disabled="editForm.$invalid || vm.isSaving" class="btn btn-primary">
+            <span class="glyphicon glyphicon-save"></span>&nbsp;<span translate="entity.action.save">Save</span>
+        </button>
+    </div>
+</form>
