@@ -88,15 +88,22 @@ public class Enum {
     }
 
     public enum ProcessDefinitionEnum {
-        acquisti("acquisti"),
-        permessiFerie("permessi-ferie"),
-        accordiInternazionaliBandi("accordi-internazionali-bandi"),
-        accordiInternazionaliDomande("accordi-internazionali-domande"),
-        iscrizioneElencoOiv("iscrizione-elenco-oiv");
+        acquisti("acquisti","acquisti"),
+        permessiFerie("permessi-ferie", "permessi-ferie"),
+        accordiInternazionaliBandi("accordi-internazionali-bandi", "accordi-internazionali-bandi"),
+        accordiInternazionaliDomande("accordi-internazionali-domande", "accordi-internazionali-domande"),
+        iscrizioneElencoOiv("iscrizione-elenco-oiv", "iscrizione-elenco-oiv"),
+        testAcquistiAvvisi("testAcquistiAvvisi", "acquisti");
+
 
         private String value;
 
-        ProcessDefinitionEnum(String value) {
+        private String processDefinition;
+
+        public String getProcessDefinition() { return processDefinition;  }
+
+        ProcessDefinitionEnum(String value, String processDefinition) {
+            this.processDefinition = processDefinition;
             this.value = value;
         }
 
