@@ -18,10 +18,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -31,12 +29,13 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import java.time.Year;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
-import static it.cnr.si.flows.ng.TestServices.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
 import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
+import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.testAcquistiAvvisi;
 import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
 import static it.cnr.si.flows.ng.utils.Utils.ASC;
 import static org.junit.Assert.*;
@@ -237,79 +236,99 @@ public class FlowsProcessInstanceResourceTest {
                                     a.getType() == Utils.PROCESS_VISUALIZER));
     }
 
-
-    @Test
-    public void getProcessInstancesForTrasparenzaTest() throws Exception {
-        processInstance = util.mySetUp(acquisti);
-
-        util.loginPortaleCnr();
-        ResponseEntity<List<Map<String, Object>>> res = flowsProcessInstanceResource
-                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, Year.now().getValue(), 0, 10, ASC);
-
-        assertEquals(OK, res.getStatusCode());
-        assertEquals(1, res.getBody().size());
-
-        //prova recupero 5 elementi dopo il sevondo (result = 0 perchè ho 1 Process Instance in totale)
-        res = flowsProcessInstanceResource
-                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, Year.now().getValue(), 2, 10, ASC);
-
-        assertEquals(OK, res.getStatusCode());
-        assertEquals(0, res.getBody().size());
-
-
-        //prova senza ordinamento
-        res = flowsProcessInstanceResource
-                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, Year.now().getValue(), 0, 10, null);
-
-        assertEquals(OK, res.getStatusCode());
-        //prendo anche le Pi create negli altri test
-        assertEquals(1, res.getBody().size());
-
-
-        //prova anni sbagliati (Result set vuoto)
-        res = flowsProcessInstanceResource
-                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2016, Year.now().getValue() - 1, 0, 10, ASC);
-
-        assertEquals(OK, res.getStatusCode());
-        assertEquals(0, res.getBody().size());
-    }
+//
+//    @Test
+//    public void getProcessInstancesForTrasparenzaTest() throws Exception {
+//        processInstance = util.mySetUp(acquisti);
+//
+//        util.loginPortaleCnr();
+//        ResponseEntity<List<Map<String, Object>>> res = flowsProcessInstanceResource
+//                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, Year.now().getValue(), 0, 10, ASC);
+//
+//        assertEquals(OK, res.getStatusCode());
+//        assertEquals(1, res.getBody().size());
+//
+//        //prova recupero 5 elementi dopo il sevondo (result = 0 perchè ho 1 Process Instance in totale)
+//        res = flowsProcessInstanceResource
+//                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, Year.now().getValue(), 2, 10, ASC);
+//
+//        assertEquals(OK, res.getStatusCode());
+//        assertEquals(0, res.getBody().size());
+//
+//
+//        //prova senza ordinamento
+//        res = flowsProcessInstanceResource
+//                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, Year.now().getValue(), 0, 10, null);
+//
+//        assertEquals(OK, res.getStatusCode());
+//        //prendo anche le Pi create negli altri test
+//        assertEquals(1, res.getBody().size());
+//
+//
+//        //prova anni sbagliati (Result set vuoto)
+//        res = flowsProcessInstanceResource
+//                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2016, Year.now().getValue() - 1, 0, 10, ASC);
+//
+//        assertEquals(OK, res.getStatusCode());
+//        assertEquals(0, res.getBody().size());
+//    }
 
 
 
     @Test
     public void getProcessInstancesForURPTest() throws Exception {
-        processInstance = util.mySetUp(acquisti);
+
+        processInstance = util.mySetUp(testAcquistiAvvisi);
+        LocalDate dataScadenzaAvvisoPreDetermina = LocalDate.of(2019, Month.JUNE, 4);
 
         util.loginPortaleCnr();
+
+        // terminiRicorso > (oggi - startFlusso) ==> resultSet = 1
         ResponseEntity<List<Map<String, Object>>> res = flowsProcessInstanceResource
-                .getProcessInstancesForURP(acquisti.getValue(), 2018, Year.now().getValue(), 0, 10, ASC);
-
+                .getProcessInstancesForURP(acquisti.getValue(), (int) (dataScadenzaAvvisoPreDetermina.until(LocalDate.now(), ChronoUnit.DAYS) + 1), true, null, 0, 10, ASC);
         assertEquals(OK, res.getStatusCode());
         assertEquals(1, res.getBody().size());
 
-        //prova recupero 5 elementi dopo il sevondo (result = 0 perchè ho 1 Process Instance in totale)
+        // terminiRicorso < (oggi - startFlusso) ==> resultSet = 0
         res = flowsProcessInstanceResource
-                .getProcessInstancesForURP(acquisti.getValue(), 2018, Year.now().getValue(), 2, 10, ASC);
+                .getProcessInstancesForURP(acquisti.getValue(), (int) (dataScadenzaAvvisoPreDetermina.until(LocalDate.now(), ChronoUnit.DAYS) - 1), true, null, 0, 10, ASC);
 
         assertEquals(OK, res.getStatusCode());
         assertEquals(0, res.getBody().size());
 
-
-        //prova senza ordinamento
-        res = flowsProcessInstanceResource
-                .getProcessInstancesForURP(acquisti.getValue(), 2018, Year.now().getValue(), 0, 10, null);
-
-        assertEquals(OK, res.getStatusCode());
-        //prendo anche le Pi create negli altri test
-        assertEquals(1, res.getBody().size());
-
-
-        //prova anni sbagliati (Result set vuoto)
-        res = flowsProcessInstanceResource
-                .getProcessInstancesForURP(acquisti.getValue(), 2016, Year.now().getValue() - 1, 0, 10, ASC);
-
-        assertEquals(OK, res.getStatusCode());
-        assertEquals(0, res.getBody().size());
+//        todo: DA SCOMMENTARE SOLO SE SI DECIDE DI FARE LA QUERY CON LO STATO DEL FLUSSO (ANDREA)
+//        // vado avanti col flusso
+//        MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
+//
+//        String processDefinition = repositoryService.createProcessDefinitionQuery()
+//                .processDefinitionKey(acquisti.getProcessDefinition())
+//                .latestVersion()
+//                .singleResult()
+//                .getId();
+//        req.setParameter("processDefinitionId", processDefinition);
+//        req.setParameter("taskId", util.getFirstTaskId());
+//        req.setParameter("commento", "commento determina JUNIT ");
+//        req.setParameter("dataScadenzaAvvisoPreDetermina", "2019-06-04T22:00:00.000Z");
+//        req.setParameter("sceltaUtente", "PredisponiDetermina");
+//        req.setParameter("tipologiaAcquisizione", "Procedura ristretta");
+//        req.setParameter("tipologiaAcquisizioneId", "12");
+//        req.setParameter("strumentoAcquisizione", "PROCEDURA SELETTIVA - MEPA");
+//        req.setParameter("strumentoAcquisizioneId", "21");
+//        req.setParameter("tipologiaProceduraSelettiva", "economicamenteVantaggiosa");
+//        req.setParameter("rup", "marco.spasiano");
+//        req.setParameter("rup_label", "MARCO SPASIANO");
+//        req.setParameter("impegni_json", "[{\"descrizione\":\"Impegno numero 1\",\"percentualeIva\":20,\"importoNetto\":100,\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"uo\":\"2216\",\"gae\":\"spaclient\",\"progetto\":\"Progetto impegno 1\"}]");
+//
+//        util.loginResponsabileAcquisti();
+//        ResponseEntity<ProcessInstanceResponse> response = flowsTaskResource.completeTask(req);
+//        assertEquals(OK, response.getStatusCode());
+//
+//        // il flusso non è più nella fase "Pre-determina"
+//        util.loginPortaleCnr();
+//        res = flowsProcessInstanceResource
+//                .getProcessInstancesForURP(acquisti.getValue(), (int) (dataScadenzaAvvisoPreDetermina.until(LocalDate.now(), ChronoUnit.DAYS) + 1), true, null, 0, 10, ASC);
+//        assertEquals(OK, res.getStatusCode());
+//        assertEquals(0, res.getBody().size());
     }
 
 

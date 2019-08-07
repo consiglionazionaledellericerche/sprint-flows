@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -36,7 +35,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static it.cnr.si.flows.ng.resource.FlowsProcessInstanceResource.EXPORT_TRASPARENZA;
 import static it.cnr.si.flows.ng.utils.Utils.*;
 
 
@@ -71,6 +69,7 @@ public class FlowsProcessInstanceService {
 	private UserDetailsService flowsUserDetailsService;
 	@Inject
 	private Utils utils;
+
 
 	public HistoricTaskInstance getCurrentTaskOfProcessInstance(String processInstanceId) {
 		return historyService.createHistoricTaskInstanceQuery()
@@ -422,6 +421,55 @@ public class FlowsProcessInstanceService {
 					.listPage(firstResult, maxResults);
 		}
 		return historicProcessInstances;
+	}
+
+
+	public List<HistoricTaskInstance> getTIForExternalServices(String processDefinition, int terminiRicorso, Boolean avvisiScaduti, Boolean gareScadute, int firstResult, int maxResults, String order) {
+
+		HistoricTaskInstanceQuery historicTaskInstanceQuery = historyService.createHistoricTaskInstanceQuery()
+				.unfinished()
+				.includeProcessVariables()
+				.processDefinitionKey(processDefinition);
+
+		String now = utils.formattaData(new Date());
+		if(gareScadute != null){
+			historicTaskInstanceQuery
+                    .processVariableValueLike("strumentoAcquisizione", "PROCEDURA SELETTIVA%");
+//TODO: dovrebbe prendere tutti i task successivi a "Espletamento Procedura" ma le variabili valorizzate mi assicurano che il task è stato superato
+//			.taskName("Espletamento Procedura")
+			if(gareScadute){
+				// GARE SCADUTE IN ATTESA DI ESITO: data scadenza presentazione offerta < NOW
+				historicTaskInstanceQuery
+						.processVariableValueLessThan("dataScadenzaBando", now);
+			} else {
+				// GARE IN CORSO data scadenza presentbvmnvbnmvmvgazione offerta >= NOW
+				historicTaskInstanceQuery
+						.processVariableValueGreaterThanOrEqual("dataScadenzaBando", now);
+            }
+		}
+
+		if(avvisiScaduti != null){
+//TODO: dovrebbe prendere tutti i task successivi a "Pre determina" ma le variabili valorizzate mi assicurano che il task è stato superato
+//            historicTaskInstanceQuery
+//					.taskName("Pre determina");
+		    if(avvisiScaduti){
+				// AVVISI SCADUTI: data scadenza presentazione offerta  < NOW && data scadenza presentazione offerta + terminiRicorso >= NOW
+				Calendar appo = Calendar.getInstance();
+				appo.setTime(new Date());
+				appo.add(Calendar.DAY_OF_MONTH, -terminiRicorso);
+
+				historicTaskInstanceQuery
+                        .processVariableValueLessThan("dataScadenzaAvvisoPreDetermina", now)
+                        .processVariableValueGreaterThanOrEqual("dataScadenzaAvvisoPreDetermina", utils.formattaData(appo.getTime()));
+		    }else{
+				// AVVISI IN CORSO: data scadenza presentazione offerta >= NOW
+				historicTaskInstanceQuery
+						.processVariableValueGreaterThanOrEqual("dataScadenzaAvvisoPreDetermina", now);
+            }
+		}
+		utils.orderTasks(order, historicTaskInstanceQuery);
+
+        return historicTaskInstanceQuery.listPage(firstResult, maxResults);
 	}
 
 
