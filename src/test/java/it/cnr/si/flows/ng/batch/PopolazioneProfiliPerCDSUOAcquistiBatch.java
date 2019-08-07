@@ -79,8 +79,6 @@ public class PopolazioneProfiliPerCDSUOAcquistiBatch {
 	@Inject
 	private SiperService siperService;
 	@Inject
-	private MembershipService membershipService;
-	@Inject
 	private RelationshipService relationshipService;
 	private final Map<String, String> errors = new HashMap<>();
 
@@ -210,7 +208,9 @@ public class PopolazioneProfiliPerCDSUOAcquistiBatch {
 
 		CSVParser parser = new CSVParser(',');
 
-		Stream<String> lines = Files.lines(Paths.get("./src/test/resources/batch/singoloGruppoUtentiProceduraAcquisti.csv"));
+//		INSERIMENTO FILE CON NOMINATIVI		
+//		Stream<String> lines = Files.lines(Paths.get("./src/test/resources/batch/singoloGruppoUtentiProceduraAcquisti.csv"));
+		Stream<String> lines = Files.lines(Paths.get("./src/test/resources/batch/ProceduraAcquisti-Utenti-ICCOM.csv"));
 
 		i = 0;
 		
