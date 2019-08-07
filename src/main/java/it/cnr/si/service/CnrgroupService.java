@@ -4,7 +4,6 @@ import it.cnr.si.domain.Cnrgroup;
 import it.cnr.si.repository.CnrgroupRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -30,7 +29,6 @@ public class CnrgroupService {
      * @param cnrgroup the entity to save
      * @return the persisted entity
      */
-    @CacheEvict(value = {"allGroups", "user"}, allEntries = true)
     public Cnrgroup save(Cnrgroup cnrgroup) {
         log.debug("Request to save Cnrgroup : {}", cnrgroup);
         return cnrgroupRepository.save(cnrgroup);

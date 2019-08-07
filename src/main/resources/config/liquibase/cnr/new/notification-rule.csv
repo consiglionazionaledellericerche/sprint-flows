@@ -1,0 +1,3 @@
+ID;PROCESS_ID;TASK_NAME;RECIPIENTS;EVENT_TYPE;PERSONA
+1088;accordi-internazionali-domande;validazione;gruppoDirigenteRichiedente;TASK_CREATED;FALSE
+1091;accordi-internazionali-domande;flow32;gruppoDirigenteRichiedente;SEQUENCEFLOW_TAKEN;FALSE

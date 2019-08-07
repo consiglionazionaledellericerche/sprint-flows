@@ -2,11 +2,9 @@ package it.cnr.si.flows.ng;
 
 import it.cnr.si.flows.ng.resource.FlowsTaskResource;
 import it.cnr.si.flows.ng.utils.Enum;
-import it.cnr.si.security.FlowsUserDetailsService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
-import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResource;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
@@ -19,6 +17,7 @@ import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -57,6 +56,7 @@ public class TestServices {
     private static final String RA2 = "silvia.rossi";
     private static final String APP = "utente1";
     private static final String ISTRUTTORE = "utente5" ;
+    private static final String PORTALE_CNR = "app.portalecnr";
 
 
     @Inject
@@ -71,7 +71,7 @@ public class TestServices {
     @Inject
     private ProcessInstanceResource processInstanceResource;
     @Inject
-    FlowsUserDetailsService flowsUserDetailsService;
+    private UserDetailsService flowsUserDetailsService;
     private String processDefinition;
     private String firstTaskId;
 
@@ -87,6 +87,11 @@ public class TestServices {
     public void loginAdmin() {
         logout();
         login("admin", "admin");
+    }
+
+    public void loginPortaleCnr() {
+        logout();
+        login(TestServices.PORTALE_CNR, "");
     }
 
     public void loginSpaclient() {
@@ -174,7 +179,7 @@ public class TestServices {
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
 
         processDefinition = repositoryService.createProcessDefinitionQuery()
-                .processDefinitionKey(processDefinitionKey.getValue())
+                .processDefinitionKey(processDefinitionKey.getProcessDefinition())
                 .latestVersion()
                 .singleResult()
                 .getId();
@@ -195,6 +200,16 @@ public class TestServices {
                 req.setParameter("impegni_json", "[{\"descrizione\":\"Impegno numero 1\",\"percentualeIva\":20,\"importoNetto\":100,\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"uo\":\"2216\",\"gae\":\"spaclient\",\"progetto\":\"Progetto impegno 1\"}]");
                 req.setParameter("richiestaDiAcquisto_label", "Richiesta di Acquisto");
                 req.setParameter("tipologiaAffidamentoDiretto", "semplificata");
+
+                break;
+            case testAcquistiAvvisi:
+                loginResponsabileAcquisti();
+
+                req.setParameter("sceltaUtente", "GestionePreDetermina");
+                req.setParameter("commento", "commento prova Pre-Determina(Junit)");
+                req.setParameter(titolo.name(), "prova Pre-Determina(Junit)");
+                req.setParameter("descrizione", "descrizione prova Pre-Determina(Junit)");
+                req.setParameter("dataScadenzaAvvisoPreDetermina", "2019-06-04T22:00:00.000Z");
 
                 break;
             case iscrizioneElencoOiv:

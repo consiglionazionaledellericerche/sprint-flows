@@ -72,18 +72,38 @@ public class Enum {
         RimozioneDaPubblicazioneTrasparenza,
         RimozioneDaPubblicazioneUrp,
         SostituzioneProtocollo,
-        RettificaProtocollo
+        RettificaProtocollo,
+        linkDaAltraApplicazione,
+        GenerazioneDaSistema
     }
 
+    public enum StatoDomandeAccordiInternazionaliEnum {
+    	APERTA,
+    	CHIUSA,
+    	INVIATA,
+    	RESPINTA,
+    	VALUTATA_SCIENTIFICAMENTE,
+    	ACCETATA,
+    	CANCELLATA;
+    }
 
     public enum ProcessDefinitionEnum {
-        acquisti("acquisti"),
-        permessiFerie("permessi-ferie"),
-        iscrizioneElencoOiv("iscrizione-elenco-oiv");
+        acquisti("acquisti","acquisti"),
+        permessiFerie("permessi-ferie", "permessi-ferie"),
+        accordiInternazionaliBandi("accordi-internazionali-bandi", "accordi-internazionali-bandi"),
+        accordiInternazionaliDomande("accordi-internazionali-domande", "accordi-internazionali-domande"),
+        iscrizioneElencoOiv("iscrizione-elenco-oiv", "iscrizione-elenco-oiv"),
+        testAcquistiAvvisi("testAcquistiAvvisi", "acquisti");
+
 
         private String value;
 
-        ProcessDefinitionEnum(String value) {
+        private String processDefinition;
+
+        public String getProcessDefinition() { return processDefinition;  }
+
+        ProcessDefinitionEnum(String value, String processDefinition) {
+            this.processDefinition = processDefinition;
             this.value = value;
         }
 
@@ -122,6 +142,7 @@ public class Enum {
         soccorsoIstruttorio,
         preavvisoRigettoDef10Giorni,
         valutazioneProgettoAccordiBilaterali,
+        domandaAccordiBilaterali,
         preavvisoRigettoCambioFascia;
 
         PdfType() {

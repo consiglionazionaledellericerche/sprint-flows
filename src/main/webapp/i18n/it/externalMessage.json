@@ -21,7 +21,8 @@
             "payload": "Payload",
             "status": "Status",
             "retries": "Retries",
-            "lastErrorMessage": "Last Error Message"
+            "lastErrorMessage": "Last Error Message",
+            "application": "Application"
         }
     }
 }

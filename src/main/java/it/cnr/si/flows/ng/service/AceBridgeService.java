@@ -5,10 +5,10 @@ import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.dto.anagrafica.base.PageDto;
 import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
-import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
-import it.cnr.si.service.dto.anagrafica.letture.PersonaEntitaOrganizzativaWebDto;
-import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
-import it.cnr.si.service.dto.anagrafica.letture.RuoloUtenteWebDto;
+import it.cnr.si.service.dto.anagrafica.letture.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -18,16 +18,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
 import static it.cnr.si.security.PermissionEvaluatorImpl.CNR_CODE;
 
 @Service
 @Profile("!oiv")
 public class AceBridgeService {
 
+	private final Logger log = LoggerFactory.getLogger(AceBridgeService.class);
+
 	@Inject
 	private AceService aceService;
 
 	public List<String> getAceGroupsForUser(String loginUsername) {
+
+		log.debug("Recupero i ruoli per l'utente {}", loginUsername);
 
 		ArrayList<RuoloUtenteWebDto> ruoliUtente = aceService.ruoloUtente(loginUsername);
 
@@ -42,6 +47,11 @@ public class AceBridgeService {
 				.collect(Collectors.toList());
 	}
 
+	/**
+	 * ATTENZIONE! Usare ???() per prendere tutti gli utenti, compresi col ruolo-nel-ruolo
+	 * Usare questo solo per prendere solo i gruppi di uno specifico gruppo Ace
+	 */
+	@Deprecated
 	public List<String> getUsersInAceGroup(String groupName) {
 
 		if (!groupName.contains("@"))
@@ -53,11 +63,17 @@ public class AceBridgeService {
 
 		int idRuolo = getIdRuoloBySigla(sigla);
 
-		return aceService.getUtentiInRuoloEo(idRuolo, idEo)
-				.stream()
-				.map(p -> p.getUsername())
-				.collect(Collectors.toList());
-
+		if (idEo != 0 )
+			return aceService.getUtentiInRuoloEo(idRuolo, idEo)
+					.stream()
+					.map(p -> p.getUsername())
+					.collect(Collectors.toList());
+		else
+			return aceService.getUtentiInRuoloCnr(idRuolo)
+					.stream()
+					.map(RuoloUtenteWebDto::getUtente)
+					.map(UtenteWebDto::getUsername)
+					.collect(Collectors.toList());
 	}
 
 	public EntitaOrganizzativaWebDto getUoById(int id) {
@@ -75,13 +91,25 @@ public class AceBridgeService {
 				.collect(Collectors.toList());
 	}
 
-	//    @Cacheable("idRuoloBySigla")
+
+//	todo: in futuro rendere cacheable?
+	public List<EntitaOrganizzativaWebDto> getUoByTipo(int tipo) {
+
+		return aceService.entitaOrganizzativaFind(null, null, null, LocalDate.now(), tipo)
+				.getItems()
+				.stream()
+				.filter(e -> Enum.TipiEOPerAutocomplete.contains(e.getTipo().getId()))
+				//                .map(e -> Pair.of(e.getId(), e.getCdsuo() +" - "+ e.getDenominazione()))
+				.collect(Collectors.toList());
+	}
+
+	@Cacheable("idRuoloBySigla")
 	public int getIdRuoloBySigla(String sigla) {
 
 		return aceService.getRuoloBySigla(sigla).getId();
 	}
 
-	//    @Cacheable("nuomeRuoloBySigla")
+	@Cacheable("nuomeRuoloBySigla")
 	public String getNomeRuoloBySigla(String sigla) {
 
 		return aceService.getRuoloBySigla(sigla).getDescr();

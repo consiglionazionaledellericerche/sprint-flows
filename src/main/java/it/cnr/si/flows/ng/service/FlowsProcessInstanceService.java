@@ -6,7 +6,6 @@ import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
-import it.cnr.si.security.FlowsUserDetailsService;
 import it.cnr.si.security.PermissionEvaluatorImpl;
 import org.activiti.engine.*;
 import org.activiti.engine.history.*;
@@ -26,8 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -67,9 +66,10 @@ public class FlowsProcessInstanceService {
 	@Inject
 	PermissionEvaluatorImpl permissionEvaluator;
 	@Inject
-	private FlowsUserDetailsService flowsUserDetailsService;
+	private UserDetailsService flowsUserDetailsService;
 	@Inject
 	private Utils utils;
+
 
 	public HistoricTaskInstance getCurrentTaskOfProcessInstance(String processInstanceId) {
 		return historyService.createHistoricTaskInstanceQuery()
@@ -101,6 +101,10 @@ public class FlowsProcessInstanceService {
 			HistoricProcessInstanceResponse entity = restResponseFactory.createHistoricProcessInstanceResponse(processInstance);
 			result.put("entity", entity);
 
+			Map<String, RestVariable> variabili = new HashMap<>();
+			entity.getVariables().forEach(v -> variabili.put(v.getName(), v));
+			result.put("variabili", variabili); // Modifica per vedere piu' comodamente le variabili
+
 			HistoricVariableInstance links = historyService
 					.createHistoricVariableInstanceQuery()
 					.processInstanceId(processInstanceId)
@@ -115,27 +119,27 @@ public class FlowsProcessInstanceService {
 				String[] values = value.split(",");
 
 				for (String linkedProcessId : values) {
+					if(permissionEvaluator.canVisualize(linkedProcessId, flowsUserDetailsService)) {
+						HistoricProcessInstance linkedProcessInstance = historyService
+								.createHistoricProcessInstanceQuery()
+								.processInstanceId(linkedProcessId)
+								.includeProcessVariables()
+								.singleResult();
 
-					HistoricProcessInstance linkedProcessInstance = historyService
-							.createHistoricProcessInstanceQuery()
-							.processInstanceId(linkedProcessId)
-							.includeProcessVariables()
-							.singleResult();
+						if (linkedProcessInstance != null) {
+							String key = linkedProcessInstance.getBusinessKey();
 
-					if (linkedProcessInstance != null) {
-						String key = linkedProcessInstance.getBusinessKey();
+							Map<String, Object> linkedObject = new HashMap<>();
+							linkedObject.put("id", linkedProcessId);
+							linkedObject.put("key", key);
+							linkedObject.put("titolo", linkedProcessInstance.getProcessVariables().get("titolo"));
 
-						Map<String, Object> linkedObject = new HashMap<>();
-						linkedObject.put("id", linkedProcessId);
-						linkedObject.put("key", key);
-						linkedObject.put("titolo", linkedProcessInstance.getProcessVariables().get("titolo"));
-
-						linkedFlows.add(linkedObject);
+							linkedFlows.add(linkedObject);
+						}
 					}
 				}
-
-				if (linkedFlows.size() > 0)
-				    result.put("linkedProcesses", linkedFlows);
+				if (!linkedFlows.isEmpty())
+					result.put("linkedProcesses", linkedFlows);
 			}
 		}
 
@@ -151,30 +155,17 @@ public class FlowsProcessInstanceService {
 		Map<String, Object> processLinks = new HashMap<>();
 		processLinks.put("links", restResponseFactory.createHistoricIdentityLinkResponseList(historyService.getHistoricIdentityLinksForProcessInstance(processInstanceId)));
 		identityLinks.put("process", processLinks);
-		taskService.createTaskQuery().processInstanceId(processInstanceId).active().list().forEach(
-				task -> {
-					Map<String, Object> identityLink = new HashMap<>();
-					String taskDefinitionKey = task.getTaskDefinitionKey();
-					PvmActivity taskDefinition = processDefinition.findActivity(taskDefinitionKey);
-					TaskDefinition taskDef = (TaskDefinition) taskDefinition.getProperty("taskDefinition");
-					List<IdentityLink> links = taskService.getIdentityLinksForTask(task.getId());
 
-					identityLink.put("links", restResponseFactory.createRestIdentityLinks(links));
-					identityLink.put("assignee", taskDef.getAssigneeExpression());
-					identityLink.put("candidateGroups", taskDef.getCandidateGroupIdExpressions());
-					identityLink.put("candidateUsers", taskDef.getCandidateUserIdExpressions());
-
-					identityLinks.put(task.getId(), identityLink);
-				});
-		result.put("identityLinks", identityLinks);
-
-		//History
-		ArrayList<Map<String, Object>> history = new ArrayList<>();
-		historyService.createHistoricTaskInstanceQuery()
+		List<HistoricTaskInstance> taskList = historyService.createHistoricTaskInstanceQuery()
 				.includeTaskLocalVariables()
 				.includeProcessVariables()
 				.processInstanceId(processInstanceId)
-				.list()
+				.list();
+
+		//History
+		ArrayList<Map<String, Object>> history = new ArrayList<>();
+
+		taskList
 				.forEach(
 						task -> {
 							List<HistoricIdentityLink> links = historyService.getHistoricIdentityLinksForTask(task.getId());
@@ -194,7 +185,26 @@ public class FlowsProcessInstanceService {
 										return h;
 									}).collect(Collectors.toList()));
 							history.add(entity);
+
+							// se il task è quello attivo prendo anche i gruppi o gli utenti assegnee/candidate
+							if(task.getEndTime() == null) {
+								Map<String, Object> identityLink = new HashMap<>();
+								String taskDefinitionKey = task.getTaskDefinitionKey();
+								PvmActivity taskDefinition = processDefinition.findActivity(taskDefinitionKey);
+								TaskDefinition taskDef = (TaskDefinition) taskDefinition.getProperty("taskDefinition");
+								List<IdentityLink> taskLinks = taskService.getIdentityLinksForTask(task.getId());
+
+								identityLink.put("links", restResponseFactory.createRestIdentityLinks(taskLinks));
+								identityLink.put("assignee", taskDef.getAssigneeExpression());
+								identityLink.put("candidateGroups", taskDef.getCandidateGroupIdExpressions());
+								identityLink.put("candidateUsers", taskDef.getCandidateUserIdExpressions());
+
+								identityLinks.put(task.getId(), identityLink);
+							}
 						});
+
+		result.put("identityLinks", identityLinks);
+
 		result.put("history", history);
 
 		// permessi aggiuntivi
@@ -389,6 +399,77 @@ public class FlowsProcessInstanceService {
 		}
 		writer.writeAll(entriesIterable);
 		writer.close();
+	}
+
+	public List<HistoricProcessInstance> getPIForExternalServices(String processDefinition, Date startDate, Date endDate, int firstResult, int maxResults, String order) {
+		List<HistoricProcessInstance> historicProcessInstances;
+
+		HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()
+				.unfinished()
+				.processDefinitionKey(processDefinition)
+				.startedAfter(startDate)
+				.startedBefore(endDate)
+				.includeProcessVariables();
+		if (order != null && order.equals(DESC)){
+			historicProcessInstances = historicProcessInstanceQuery
+					.orderByProcessInstanceStartTime().desc()
+					.listPage(firstResult, maxResults);
+		} else {
+//        	default
+			historicProcessInstances = historicProcessInstanceQuery
+					.orderByProcessInstanceStartTime().asc()
+					.listPage(firstResult, maxResults);
+		}
+		return historicProcessInstances;
+	}
+
+
+	public List<HistoricTaskInstance> getTIForExternalServices(String processDefinition, int terminiRicorso, Boolean avvisiScaduti, Boolean gareScadute, int firstResult, int maxResults, String order) {
+
+		HistoricTaskInstanceQuery historicTaskInstanceQuery = historyService.createHistoricTaskInstanceQuery()
+				.unfinished()
+				.includeProcessVariables()
+				.processDefinitionKey(processDefinition);
+
+		String now = utils.formattaData(new Date());
+		if(gareScadute != null){
+			historicTaskInstanceQuery
+                    .processVariableValueLike("strumentoAcquisizione", "PROCEDURA SELETTIVA%");
+//TODO: dovrebbe prendere tutti i task successivi a "Espletamento Procedura" ma le variabili valorizzate mi assicurano che il task è stato superato
+//			.taskName("Espletamento Procedura")
+			if(gareScadute){
+				// GARE SCADUTE IN ATTESA DI ESITO: data scadenza presentazione offerta < NOW
+				historicTaskInstanceQuery
+						.processVariableValueLessThan("dataScadenzaBando", now);
+			} else {
+				// GARE IN CORSO data scadenza presentbvmnvbnmvmvgazione offerta >= NOW
+				historicTaskInstanceQuery
+						.processVariableValueGreaterThanOrEqual("dataScadenzaBando", now);
+            }
+		}
+
+		if(avvisiScaduti != null){
+//TODO: dovrebbe prendere tutti i task successivi a "Pre determina" ma le variabili valorizzate mi assicurano che il task è stato superato
+//            historicTaskInstanceQuery
+//					.taskName("Pre determina");
+		    if(avvisiScaduti){
+				// AVVISI SCADUTI: data scadenza presentazione offerta  < NOW && data scadenza presentazione offerta + terminiRicorso >= NOW
+				Calendar appo = Calendar.getInstance();
+				appo.setTime(new Date());
+				appo.add(Calendar.DAY_OF_MONTH, -terminiRicorso);
+
+				historicTaskInstanceQuery
+                        .processVariableValueLessThan("dataScadenzaAvvisoPreDetermina", now)
+                        .processVariableValueGreaterThanOrEqual("dataScadenzaAvvisoPreDetermina", utils.formattaData(appo.getTime()));
+		    }else{
+				// AVVISI IN CORSO: data scadenza presentazione offerta >= NOW
+				historicTaskInstanceQuery
+						.processVariableValueGreaterThanOrEqual("dataScadenzaAvvisoPreDetermina", now);
+            }
+		}
+		utils.orderTasks(order, historicTaskInstanceQuery);
+
+        return historicTaskInstanceQuery.listPage(firstResult, maxResults);
 	}
 
 

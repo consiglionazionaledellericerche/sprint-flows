@@ -32,6 +32,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -81,7 +82,7 @@ public class FlowsTaskResource {
     @Inject
     private PermissionEvaluatorImpl permissionEvaluator;
     @Inject
-    private FlowsUserDetailsService flowsUserDetailsService;
+    private UserDetailsService flowsUserDetailsService;
 
 
     @PostMapping(value = "/mytasks", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -211,7 +212,59 @@ public class FlowsTaskResource {
     }
 
 
+    @PutMapping(value = "/addCandidateGroup/{group:.*}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Timed
+    public ResponseEntity<Map<String, Object>> addCandidateGroup(
+            @RequestParam(name = "processInstanceId", required=false) String processInstanceId,
+            @RequestParam(name = "taskId", required=false) String taskId,
+            @PathVariable(value = "group") String group) {
 
+        if(taskId == null) {
+            // se vengo da pagine in cui ho solo il processInstanceId (tipo ricerca) trovo il taskId
+            Task task = taskService.createTaskQuery()
+                    .processInstanceId(processInstanceId)
+                    .includeProcessVariables()
+                    .singleResult();
+            taskId = task.getId();
+        }
+        taskService.addCandidateGroup(taskId, group);
+
+        // Aggiungo l`identityLink per la visualizzazione
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        runtimeService.addGroupIdentityLink(task.getProcessInstanceId(), group, PROCESS_VISUALIZER);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    
+    
+
+    @DeleteMapping(value = "/removeCandidateGroup/{group:.*}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Timed
+    public ResponseEntity<Map<String, Object>> removeCandidateGroup(
+            @RequestParam(name = "processInstanceId", required=false) String processInstanceId,
+            @RequestParam(name = "taskId", required=false) String taskId,
+            @PathVariable(value = "group") String group) {
+
+        if(taskId == null) {
+            // se vengo da pagine in cui ho solo il processInstanceId (tipo ricerca) trovo il taskId
+            Task task = taskService.createTaskQuery()
+                    .processInstanceId(processInstanceId)
+                    .includeProcessVariables()
+                    .singleResult();
+            taskId = task.getId();
+        }
+        taskService.deleteCandidateGroup(taskId, group);
+
+        // Aggiungo l`identityLink per la visualizzazione
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        runtimeService.deleteGroupIdentityLink(task.getProcessInstanceId(), group, PROCESS_VISUALIZER);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    
+    
     @DeleteMapping(value = "/claim/{taskId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canClaimTask(#taskId, @flowsUserDetailsService)")
     @Timed

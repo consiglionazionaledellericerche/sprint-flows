@@ -9,9 +9,13 @@
 
     function ManualisticaController($scope, $state, dataService, utils) {
         var vm = this;
-
+        //Recupero i Manuali
         dataService.manuali.getElenco().then(function(response) {
             vm.manuali = response.data;
+        });
+        //Recupero le Faq readable
+        dataService.faq.getReadable().then(function(faqs) {
+            vm.faqs = faqs.data;
         });
 
         $scope.downloadManuale = function(manuale) {

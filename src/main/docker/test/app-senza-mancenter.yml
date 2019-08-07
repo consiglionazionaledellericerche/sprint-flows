@@ -1,0 +1,25 @@
+version: '2'
+
+x-logging:
+  &default-logging
+  driver: syslog
+  options:
+    syslog-address: "udp://dockerwebtest01.si.cnr.it:1489"
+
+services:
+  sprint-flows-test-cnr:
+    image: docker.si.cnr.it/sprint-flows-test
+    environment:
+      - SPRING_PROFILES_ACTIVE=test,cnr,swagger
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://dockerwebtest01.si.cnr.it:1482/flows
+      - SPRING_DATASOURCE_USERNAME=activiti
+      - SPRING_DATASOURCE_PASSWORD=activitipw
+      - JHIPSTER_SLEEP=10 # gives time for the database to boot before the application
+      - CACHE_HAZELCAST_PUBLICIP=150.146.206.152
+      - CACHE_HAZELCAST_MEMBERS=150.146.206.150:1485,150.146.206.152:1485
+    ports:
+      - 1481:8080
+      - 1485:1485
+      - 1486:1486
+      - 1487:1487
+    logging: *default-logging

@@ -10,26 +10,41 @@ import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.impl.TaskServiceImpl;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
+import org.activiti.rest.common.api.DataResponse;
+import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import com.google.common.net.MediaType;
+
 import it.cnr.si.flows.ng.service.FirmaDocumentoService;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
+import it.cnr.si.flows.ng.service.FlowsCsvService;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
+import it.cnr.si.flows.ng.service.FlowsTaskService;
 import it.cnr.si.flows.ng.service.ProtocolloDocumentoService;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.exception.TaskFailedException;
 import it.cnr.si.flows.ng.listeners.cnr.acquisti.service.AcquistiService;
 
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
+import static it.cnr.si.flows.ng.utils.Enum.Azione.GenerazioneDaSistema;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.FileAttributeView;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 
 @Component
 @Profile("cnr")
@@ -50,6 +65,12 @@ public class ManageProcessAccordiInternazionaliBandi_v1 implements ExecutionList
 	private RuntimeService runtimeService;
 	@Inject
 	private TaskService taskService;
+	@Inject
+	private FlowsCsvService flowsCsvService;
+	@Inject
+	private FlowsAttachmentService flowsAttachmentService;
+	@Inject
+	private FlowsTaskService flowsTaskService;
 
 
 	private Expression faseEsecuzione;
@@ -80,10 +101,12 @@ public class ManageProcessAccordiInternazionaliBandi_v1 implements ExecutionList
 		};break;    
 		// START
 		case "caricamento-verbale-start": {
+			creaExportCsvDomandePerBando(execution, (execution.getVariable("idBando").toString()));
 			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
 		};break;  
 
 		case "firma-verbale-end": {
+
 			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
 				firmaDocumentoService.eseguiFirma(execution, "verbale");
 			}
@@ -95,6 +118,7 @@ public class ManageProcessAccordiInternazionaliBandi_v1 implements ExecutionList
 		};break;  	
 		case "endevent-bando-start": {
 			execution.setVariable(STATO_FINALE_VERBALE, "VERBALE APPROVATO");
+			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "APPROVATO");
 		};break;    	
 
 		case "process-end": {
@@ -132,7 +156,12 @@ public class ManageProcessAccordiInternazionaliBandi_v1 implements ExecutionList
 
 				Map<String, Object> variabili = new HashMap<>();
 				variabili.put("sceltaUtente", "graduatoria da verbale");
-				variabili.put("linkToOtherWorkflows", execution.getProcessInstanceId());			
+				variabili.put("linkToOtherWorkflows", execution.getProcessInstanceId());	
+				if (execution.getVariable("linkToOtherWorkflows") != null) {
+					execution.setVariable("linkToOtherWorkflows", execution.getVariable("linkToOtherWorkflows").toString() + "," + taskIstance.getProcessInstanceId());
+				} else {
+					execution.setVariable("linkToOtherWorkflows", taskIstance.getProcessInstanceId());
+				}
 				taskService.complete(taskId, variabili);
 			});
 			//throw new RuntimeException("Errore per provare la transazione atomica dello sblocco delle domande");
@@ -144,5 +173,39 @@ public class ManageProcessAccordiInternazionaliBandi_v1 implements ExecutionList
 			throw e;
 		}
 
+	}
+
+
+	private void creaExportCsvDomandePerBando(DelegateExecution execution, String idBando) throws IOException {
+		String processInstanceId = execution.getProcessInstanceId();
+		Map<String, String> req = new HashMap<>();
+		if (idBando != null) {
+			req.put("idBando", "text="+idBando);
+		}
+		//req.put(processDefinitionKey, processDefinitionKey);
+		String order = "ASC";
+		Integer firstResult = -1;
+		Integer maxResults = -1;
+		String processDefinitionKey = "accordi-internazionali-domande";
+		Boolean activeFlag = true;
+
+		DataResponse flussiAttivaPerBando = flowsProcessInstanceService.search(req, processDefinitionKey, activeFlag, order, firstResult, maxResults, true);
+		File tempFile = File.createTempFile("prefix-", "-suffix");
+		//File tempFile = File.createTempFile("MyAppName-", ".tmp");
+		PrintWriter writer = new PrintWriter(tempFile);
+		//creo il csv corrispondente
+		String fileName = "ExportCsvDomandeBando" + idBando + ".csv";
+		//String downloadName = "ExportCsvDomandeBando" + idBando;
+		String labelFile = "Export Csv Domande Bando";
+		flowsTaskService.buildCsv((List<HistoricProcessInstanceResponse>) flussiAttivaPerBando.getData(), writer, processDefinitionKey);
+		byte[] contents = FileUtils.readFileToByteArray(tempFile);
+		FlowsAttachment documentoGenerato = new FlowsAttachment();
+		documentoGenerato.setFilename(fileName);
+		documentoGenerato.setName(fileName);
+		documentoGenerato.setLabel(labelFile);
+		documentoGenerato.setAzione(GenerazioneDaSistema);
+		documentoGenerato.setMimetype(MediaType.MICROSOFT_EXCEL.toString());
+		documentoGenerato.setPath(runtimeService.getVariable(processInstanceId, "pathFascicoloDocumenti", String.class));
+		flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, fileName, documentoGenerato, contents);
 	}
 }
