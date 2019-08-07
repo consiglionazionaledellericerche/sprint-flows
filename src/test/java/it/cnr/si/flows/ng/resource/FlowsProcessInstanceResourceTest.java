@@ -20,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -281,8 +282,8 @@ public class FlowsProcessInstanceResourceTest {
         processInstance = util.mySetUp(testAcquistiAvvisi);
         LocalDate dataScadenzaAvvisoPreDetermina = LocalDate.of(2019, Month.JUNE, 4);
 
+        //AVVISI SCADUTI
         util.loginPortaleCnr();
-
         // terminiRicorso > (oggi - startFlusso) ==> resultSet = 1
         ResponseEntity<List<Map<String, Object>>> res = flowsProcessInstanceResource
                 .getProcessInstancesForURP(acquisti.getValue(), (int) (dataScadenzaAvvisoPreDetermina.until(LocalDate.now(), ChronoUnit.DAYS) + 1), true, null, 0, 10, ASC);
@@ -296,39 +297,51 @@ public class FlowsProcessInstanceResourceTest {
         assertEquals(OK, res.getStatusCode());
         assertEquals(0, res.getBody().size());
 
+        // vado avanti col flusso (Pre-determina -> Verifica))
+        MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
+
+        String processDefinition = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionKey(acquisti.getProcessDefinition())
+                .latestVersion()
+                .singleResult()
+                .getId();
+        req.setParameter("processDefinitionId", processDefinition);
+        req.setParameter("taskId", util.getFirstTaskId());
+        req.setParameter("commento", "commento determina JUNIT ");
+        req.setParameter("dataScadenzaAvvisoPreDetermina", "2019-06-04T22:00:00.000Z");
+        req.setParameter("sceltaUtente", "PredisponiDetermina");
+        req.setParameter("tipologiaAcquisizione", "Procedura ristretta");
+        req.setParameter("tipologiaAcquisizioneId", "12");
+        req.setParameter("strumentoAcquisizione", "PROCEDURA SELETTIVA - MEPA");
+        req.setParameter("strumentoAcquisizioneId", "21");
+        req.setParameter("tipologiaProceduraSelettiva", "economicamenteVantaggiosa");
+        req.setParameter("rup", "marco.spasiano");
+        req.setParameter("rup_label", "MARCO SPASIANO");
+        req.setParameter("impegni_json", "[{\"descrizione\":\"Impegno numero 1\",\"percentualeIva\":20,\"importoNetto\":100,\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"uo\":\"2216\",\"gae\":\"spaclient\",\"progetto\":\"Progetto impegno 1\"}]");
+
+        util.loginResponsabileAcquisti();
+        ResponseEntity<ProcessInstanceResponse> response = flowsTaskResource.completeTask(req);
+        assertEquals(OK, response.getStatusCode());
+
 //        todo: DA SCOMMENTARE SOLO SE SI DECIDE DI FARE LA QUERY CON LO STATO DEL FLUSSO (ANDREA)
-//        // vado avanti col flusso
-//        MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
-//
-//        String processDefinition = repositoryService.createProcessDefinitionQuery()
-//                .processDefinitionKey(acquisti.getProcessDefinition())
-//                .latestVersion()
-//                .singleResult()
-//                .getId();
-//        req.setParameter("processDefinitionId", processDefinition);
-//        req.setParameter("taskId", util.getFirstTaskId());
-//        req.setParameter("commento", "commento determina JUNIT ");
-//        req.setParameter("dataScadenzaAvvisoPreDetermina", "2019-06-04T22:00:00.000Z");
-//        req.setParameter("sceltaUtente", "PredisponiDetermina");
-//        req.setParameter("tipologiaAcquisizione", "Procedura ristretta");
-//        req.setParameter("tipologiaAcquisizioneId", "12");
-//        req.setParameter("strumentoAcquisizione", "PROCEDURA SELETTIVA - MEPA");
-//        req.setParameter("strumentoAcquisizioneId", "21");
-//        req.setParameter("tipologiaProceduraSelettiva", "economicamenteVantaggiosa");
-//        req.setParameter("rup", "marco.spasiano");
-//        req.setParameter("rup_label", "MARCO SPASIANO");
-//        req.setParameter("impegni_json", "[{\"descrizione\":\"Impegno numero 1\",\"percentualeIva\":20,\"importoNetto\":100,\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"uo\":\"2216\",\"gae\":\"spaclient\",\"progetto\":\"Progetto impegno 1\"}]");
-//
-//        util.loginResponsabileAcquisti();
-//        ResponseEntity<ProcessInstanceResponse> response = flowsTaskResource.completeTask(req);
-//        assertEquals(OK, response.getStatusCode());
-//
 //        // il flusso non è più nella fase "Pre-determina"
 //        util.loginPortaleCnr();
 //        res = flowsProcessInstanceResource
 //                .getProcessInstancesForURP(acquisti.getValue(), (int) (dataScadenzaAvvisoPreDetermina.until(LocalDate.now(), ChronoUnit.DAYS) + 1), true, null, 0, 10, ASC);
 //        assertEquals(OK, res.getStatusCode());
 //        assertEquals(0, res.getBody().size());
+
+//        processInstance = util.mySetUp(testAcquistiAvvisi);
+//        LocalDate dataScadenzaAvvisoPreDetermina = LocalDate.of(2019, Month.JUNE, 4);
+//
+//        util.loginPortaleCnr();
+
+        // GARE SCADUTE:non recupero nessuna Pi perche non sono ancora nella fase "Espletamento Procedura"
+        util.loginPortaleCnr();
+         res = flowsProcessInstanceResource
+                .getProcessInstancesForURP(acquisti.getValue(),0, null, true, 0, 10, ASC);
+        assertEquals(OK, res.getStatusCode());
+        assertEquals(0, res.getBody().size());
     }
 
 
