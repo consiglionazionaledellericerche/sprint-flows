@@ -1,9 +1,5 @@
 package it.cnr.si.config;
 
-import java.util.Arrays;
-
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +11,11 @@ import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 
-import it.cnr.si.flows.ng.ldap.FlowsAuthoritiesPopulator;
+import javax.inject.Inject;
+import java.util.Arrays;
 
 /**
  * Created by francesco on 30/03/15.
@@ -39,7 +37,7 @@ public class SecurityConfigurationLDAP extends WebSecurityConfigurerAdapter {
     @Inject
     private UserDetailsContextMapper userDetailsContextMapper;
     @Autowired(required = false)
-    private FlowsAuthoritiesPopulator authPopulator;
+    private LdapAuthoritiesPopulator authPopulator;
 
     @Inject
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {

@@ -1,7 +1,6 @@
 package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
-import it.cnr.si.flows.ng.ldap.LdapPersonToSearchResultMapper;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
@@ -16,13 +15,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -69,6 +67,25 @@ public class FlowsUserResourceAce {
         Map<String, Object> response = new HashMap<>();
 
         List<Utils.SearchResult> collect = aceBridgeService.getUoLike(struttura)
+                .stream()
+                .map(p -> new Utils.SearchResult(p.getId().toString(), p.getCdsuo() +" - "+ p.getDenominazione()))
+                .collect(Collectors.toList());
+
+        response.put("more", collect.size() > 10);
+        response.put("results", collect.stream().limit(10).collect(Collectors.toList()));
+
+        return ResponseEntity.ok(response);
+    }
+
+
+    @GetMapping(value = "/dipartimenti/{tipo:.+}/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
+    @Timed
+    public ResponseEntity<Map<String, Object>> getDipartimerntiList(@PathVariable int tipo) {
+
+        Map<String, Object> response = new HashMap<>();
+
+        List<Utils.SearchResult> collect = aceBridgeService.getUoByTipo(tipo)
                 .stream()
                 .map(p -> new Utils.SearchResult(p.getId().toString(), p.getCdsuo() +" - "+ p.getDenominazione()))
                 .collect(Collectors.toList());

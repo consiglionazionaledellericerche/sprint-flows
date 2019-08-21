@@ -346,12 +346,12 @@ public class FlowsProcessDiagramGenerator extends DefaultProcessDiagramGenerator
     /**
      * This method makes coordinates of connection flow better.
      *
-     * @param processDiagramCanvas
-     * @param bpmnModel
-     * @param sourceElement
-     * @param targetElement
-     * @param graphicInfoList
-     * @return
+     * @param processDiagramCanvas  desc
+     * @param bpmnModel             desc
+     * @param sourceElement         desc
+     * @param targetElement         desc
+     * @param graphicInfoList       desc
+     * @return la lista dei graphic info
      */
     protected static List<GraphicInfo> connectionPerfectionizer(DefaultProcessDiagramCanvas processDiagramCanvas, BpmnModel bpmnModel, BaseElement sourceElement, BaseElement targetElement, List<GraphicInfo> graphicInfoList) {
         GraphicInfo sourceGraphicInfo = bpmnModel.getGraphicInfo(sourceElement.getId());
@@ -367,7 +367,7 @@ public class FlowsProcessDiagramGenerator extends DefaultProcessDiagramGenerator
      * This method returns shape type of base element.<br>
      * Each element can be presented as rectangle, rhombus, or ellipse.
      *
-     * @param baseElement
+     * @param baseElement   desc
      * @return DefaultProcessDiagramCanvas.SHAPE_TYPE
      */
     protected static DefaultProcessDiagramCanvas.SHAPE_TYPE getShapeType(BaseElement baseElement) {

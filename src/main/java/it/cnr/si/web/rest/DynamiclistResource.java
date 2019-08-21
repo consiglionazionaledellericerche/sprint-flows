@@ -177,10 +177,10 @@ public class DynamiclistResource {
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     @Secured(AuthoritiesConstants.USER)
-    public ResponseEntity<Void> deleteDynamiclist(@PathVariable Long name) {
-        log.debug("REST request to delete Dynamiclist : {}", name);
-        dynamiclistRepository.delete(name);
-        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("dynamiclist", name.toString())).build();
+    public ResponseEntity<Void> deleteDynamiclist(@PathVariable Long id) {
+        log.debug("REST request to delete Dynamiclist : {}", id);
+        dynamiclistRepository.delete(id);
+        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("dynamiclist", id.toString())).build();
     }
 
 

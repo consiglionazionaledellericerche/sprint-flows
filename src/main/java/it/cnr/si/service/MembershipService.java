@@ -34,29 +34,18 @@ public class MembershipService {
     @Autowired(required = false)
     private AceBridgeService aceService;
 
-    /**
-     * Save a membership.
-     * @return the persisted entity
-     */
     public Membership save(Membership membership) {
         log.debug("Request to save Membership : {}", membership);
         return membershipRepository.save(membership);
     }
 
-    /**
-     *  get all the memberships.
-     *  @return the list of entities
-     */
+
     @Transactional(readOnly = true) 
     public Page<Membership> findAll(Pageable pageable) {
         log.debug("Request to get all Memberships");
         return membershipRepository.findAll(pageable);
     }
 
-    /**
-     *  get one membership by id.
-     *  @return the entity
-     */
     @Transactional(readOnly = true) 
     public Membership findOne(Long id) {
         log.debug("Request to get Membership : {}", id);
@@ -107,6 +96,7 @@ public class MembershipService {
                 .collect(Collectors.toSet());
     }
 
+    @Deprecated
     public List<String> findMembersInGroup(String groupName) {
         List<String> result = membershipRepository.findMembersInGroup(groupName);
         Optional.ofNullable(aceService)
