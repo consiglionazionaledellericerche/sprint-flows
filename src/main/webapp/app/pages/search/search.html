@@ -23,7 +23,7 @@
 	</div>
 	<div class="row">
 		<div class="col-md-3 padding-top">
-			<div>
+			<div ng-show="false">
 				<h4>Search type</h4>
 				<div>
 					<toggle-switch
@@ -49,11 +49,13 @@
 			</div>
 
 			<br>
-			<h4>Tipologie</h4>
-			<div id="tipologieDiv">
+			<div id="tipologieDiv" ng-show="false">
+				<h4>Tipologie</h4>
 				<div>
 					<div class="dropdown md-menu-origin">
-						<ui-select ng-model="vm.searchParams.processDefinitionKey" title="Tipologie"
+						<ui-select ng-model="vm.searchParams.processDefinitionKey"
+								   ng-init="iscrizione-elenco-oiv"
+								   title="Tipologie"
 								   on-select="search()">
 							<ui-select-match placeholder="Seleziona la tipologia di flusso" allow-clear="true">
 								{{$select.selected.name}}
