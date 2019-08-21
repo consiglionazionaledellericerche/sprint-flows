@@ -49,14 +49,15 @@
 			</div>
 
 			<br>
-			<div id="tipologieDiv" ng-show="false">
-				<h4>Tipologie</h4>
+			<div id="tipologieDiv">
+				<h4 ng-show="false">Tipologie</h4>
 				<div>
 					<div class="dropdown md-menu-origin">
 						<ui-select ng-model="vm.searchParams.processDefinitionKey"
-								   ng-init="iscrizione-elenco-oiv"
+								   ng-init="vm.searchParams.processDefinitionKey = 'iscrizione-elenco-oiv'"
 								   title="Tipologie"
-								   on-select="search()">
+								   on-select="search()"
+						           ng-show="false">
 							<ui-select-match placeholder="Seleziona la tipologia di flusso" allow-clear="true">
 								{{$select.selected.name}}
 							</ui-select-match>
