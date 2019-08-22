@@ -371,15 +371,15 @@ public class FlowsTaskService {
 			} catch (Exception e) {
 				//Se non riesco a completare il task rimuovo l'identityLink che indica "l'esecutore" del task e restituisco un INTERNAL_SERVER_ERROR
 				//l'alternativa sarebbe aggiungere l'identityLink dopo avwer completato il task ma posso creare identityLink SOLO di task attivi
-				if(((BpmnError) e).getErrorCode() == "412"){
+				taskService.deleteUserIdentityLink(taskId, username, TASK_EXECUTOR);
+
+				if( e instanceof BpmnError && ((BpmnError) e).getErrorCode() == "412"){
 					String errorMessage = String.format("%s", e.getMessage());
 					LOGGER.warn(errorMessage);
-					taskService.deleteUserIdentityLink(taskId, username, TASK_EXECUTOR);
 					return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(mapOf(ERROR_MESSAGE, errorMessage));
 				} else {
 					String errorMessage = String.format("Errore durante il tentativo di completamento del task %s da parte dell'utente %s: %s", taskId, username, e.getMessage());
 					LOGGER.error(errorMessage);
-					taskService.deleteUserIdentityLink(taskId, username, TASK_EXECUTOR);
 					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mapOf(ERROR_MESSAGE, errorMessage));}
 			}
 		}
