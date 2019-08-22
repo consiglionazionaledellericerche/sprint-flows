@@ -171,6 +171,8 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 			//if((valSceltaUtente.equals("genera_PDF_preavviso_di_rigetto") || valSceltaUtente.equals("calcola_punteggio") || valSceltaUtente.equals("aggiorna_PDF_preavviso_di_rigetto"))) {
 			//	calcolaPunteggioFascia.calcolaAggiornaGiudizioFinale(execution, nonAggiornaGiudizioFinale);
 			//}
+			// TODO rest per calcolo fascia 
+			//application-fp/applications-ricalcola-fascia?applicationId={nodeRef}
 		}
 		;
 		break;

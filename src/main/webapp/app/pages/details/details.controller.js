@@ -5,13 +5,18 @@
         .module('sprintApp')
         .controller('DetailsController', DetailsController);
 
-    DetailsController.$inject = ['$scope', '$state', 'dataService', '$log', 'utils', '$uibModal', '$window'];
+    DetailsController.$inject = ['$scope', '$state', 'dataService', '$log', 'utils', '$uibModal', '$window', 'Principal'];
 
-    function DetailsController($scope, $state, dataService, $log, utils, $uibModal, $window) {
+    function DetailsController($scope, $state, dataService, $log, utils, $uibModal, $window, Principal) {
         var vm = this;
         vm.data = {};
         vm.taskId = $state.params.taskId;
         $scope.processInstanceId = $state.params.processInstanceId; // mi torna comodo per gli attachments -martin
+
+        Principal.identity().then(function(account) {
+            vm.username    = account.login;
+            vm.authorities = account.authorities;
+        });
 
         if ($state.params.processInstanceId) {
             dataService.processInstances.byProcessInstanceId($state.params.processInstanceId, true).then(
@@ -43,6 +48,9 @@
                         //recupero l'ultimo task (quello ancora da eseguire)
                         if (el.historyTask.endTime === null) {
                             //recupero la fase
+                        	vm.activeTask = el.historyTask;
+                        	utils.refactoringVariables(vm.activeTask);
+
                             vm.data.fase = el.historyTask.name;
                             //recupero il gruppo/l'utente assegnatario del task
                             el.historyIdentityLink.forEach(function(il) {

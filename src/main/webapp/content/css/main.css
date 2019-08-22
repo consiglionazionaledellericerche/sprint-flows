@@ -18,6 +18,12 @@ body {
   text-align: center;
 }
 
+.oiv-banner {
+  margin: 10px auto;
+}
+
+.cnr-banner {}
+
 /* ==========================================================================
 Hide ng-cloak on page load, https://docs.angularjs.org/api/ng/directive/ngCloak
 ========================================================================== */

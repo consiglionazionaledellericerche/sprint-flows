@@ -90,5 +90,8 @@
 			} else
 				$scope.formUrl = undefined;
 		});
+
+        // eseguo una ricerca gia' all'accesso della pagina
+		$scope.search();
 	}
 })();
