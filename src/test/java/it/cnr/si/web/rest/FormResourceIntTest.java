@@ -1,7 +1,6 @@
 package it.cnr.si.web.rest;
 
 import it.cnr.si.FlowsApp;
-import it.cnr.si.FlowsTest;
 import it.cnr.si.domain.Form;
 import it.cnr.si.flows.ng.TestUtil;
 import it.cnr.si.repository.FormRepository;
@@ -15,7 +14,6 @@ import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
