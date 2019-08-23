@@ -61,6 +61,7 @@
  					var processDefinitionKey = response.data.task.processDefinitionId.split(":")[0];
  					vm.detailsView = 'api/views/' + processDefinitionKey + '/detail';
  					vm.data.entity = utils.refactoringVariables([response.data.task])[0];
+ 					vm.processInstanceId = response.data.task.processInstanceId;
 
  					vm.taskVariables = vm.data.entity.variabili;
  					vm.attachments = utils.parseAttachments(response.data.attachments);
