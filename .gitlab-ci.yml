@@ -36,6 +36,7 @@ test:
   allow_failure: true
 
 code_quality:
+  stage: code_quality
   image: docker:stable
   variables:
     DOCKER_DRIVER: overlay2
