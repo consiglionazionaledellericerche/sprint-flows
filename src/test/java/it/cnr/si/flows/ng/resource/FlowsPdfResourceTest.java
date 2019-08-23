@@ -5,17 +5,16 @@ import it.cnr.si.flows.ng.TestServices;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -30,10 +29,11 @@ import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.iscrizioneElen
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "test,oiv")
-@Ignore //TODO: i pdf generati e le tipologie dei pdf stanno cambiando quindi conviene scrivere i test quando saranno stabili
+@SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles(profiles = "test,cnr")
+@EnableTransactionManagement
+@RunWith(SpringRunner.class)
+//@Ignore //TODO: i pdf generati e le tipologie dei pdf stanno cambiando quindi conviene scrivere i test quando saranno stabili
 public class FlowsPdfResourceTest {
 
     @Inject

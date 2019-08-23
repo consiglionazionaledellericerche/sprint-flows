@@ -1,6 +1,7 @@
 package it.cnr.si.web.rest;
 
-import it.cnr.si.SprintApp;
+import it.cnr.si.FlowsApp;
+import it.cnr.si.FlowsTest;
 import it.cnr.si.domain.NotificationRule;
 import it.cnr.si.flows.ng.TestUtil;
 import it.cnr.si.repository.NotificationRuleRepository;
@@ -14,10 +15,12 @@ import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
@@ -36,9 +39,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see NotificationRuleResource
  */
 @Ignore
+@SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles(profiles = "test,cnr")
+@EnableTransactionManagement
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = SprintApp.class)
-@ActiveProfiles(profiles = "cnr")
 public class NotificationRuleResourceIntTest {
     private static final String DEFAULT_PROCESS_ID = "AAAAA";
     private static final String UPDATED_PROCESS_ID = "BBBBB";

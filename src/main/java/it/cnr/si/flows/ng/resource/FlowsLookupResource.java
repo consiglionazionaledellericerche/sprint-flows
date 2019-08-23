@@ -114,8 +114,8 @@ public class FlowsLookupResource {
     public ResponseEntity<Void> runCron() {
 
         log.info("Running crons");
-        extenalMessageSender.sendMessagesDo();
-        extenalMessageSender.sendErrorMessagesDo();
+        extenalMessageSender.sendMessages();
+        extenalMessageSender.sendErrorMessages();
         return ResponseEntity.ok().build();
     }
 

@@ -19,6 +19,7 @@ cache:
     - target/app.war
 
 stages:
+  - test
   - deploy_snapshot
   - build_test_container
   - deploy_test_container
@@ -26,6 +27,12 @@ stages:
   - build_prod_container
   - deploy_prod_container
 
+test:
+  stage: test
+  image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
+  script:
+    - mvn -B clean compile package test -fae
+  allow_failure: true
 
 deploy_dev_snapshot:
   stage: deploy_snapshot
@@ -33,7 +40,7 @@ deploy_dev_snapshot:
   only:
     - dev
   script:
-    - mvn -B clean compile package deploy -DskipTests -Pdev
+    - mvn -B deploy -DskipTests -Pdev
 
 
 # branch TEST & DEMO

@@ -1,0 +1,7 @@
+ajp:
+  port: 8098
+
+cache:
+  hazelcast:
+    name: sprint-oiv
+    port: 5707

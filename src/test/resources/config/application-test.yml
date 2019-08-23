@@ -93,6 +93,10 @@ ace:
     url: "http://acebuntudock.si.cnr.it:5555/api"
     username: app.scrivaniadigitale
     password: bubbazza
+user:
+    admin:
+        username: admin
+        password: admin
+
 cache.hazelcast.port: 5709
 cache.hazelcast.packages: it.cnr.si
-
