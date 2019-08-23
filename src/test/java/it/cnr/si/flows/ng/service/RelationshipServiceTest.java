@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -23,9 +24,10 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.assertEquals;
 
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test,cnr")
+@ActiveProfiles(profiles = "test,cnr")
+@EnableTransactionManagement
+@RunWith(SpringRunner.class)
 public class RelationshipServiceTest {
 
     private final Logger log = LoggerFactory.getLogger(RelationshipServiceTest.class);

@@ -1,25 +1,24 @@
 package it.cnr.si.flows.ng.service;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.stream.IntStream;
-
+import it.cnr.si.FlowsApp;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import it.cnr.si.FlowsApp;
-import it.cnr.si.SprintApp;
+import java.util.stream.IntStream;
+
+import static org.junit.Assert.assertEquals;
 
 @Ignore // Questo test non ha senso eseguirlo con H2, ma solo in locale con un postgres
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles(profiles = "test,cnr")
 @EnableTransactionManagement
+@RunWith(SpringRunner.class)
 public class CounterServiceTest {
 
     @Autowired

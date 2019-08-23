@@ -6,6 +6,7 @@ import it.cnr.si.web.rest.dto.CNRUserDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.query.ContainerCriteria;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @Primary
+@Profile("!oiv")
 public class FlowsLdapAccountService extends LdapAccountService {
 
     private final static Logger log = LoggerFactory.getLogger(LdapAccountService.class);
