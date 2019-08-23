@@ -219,26 +219,44 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 		case FIRMA_DG_RIGETTO_START:
 			break;
 		case FIRMA_DG_RIGETTO_END: {
-			final Optional<FlowsAttachment> flowsAttachment = Optional.ofNullable(attachmentService.getAttachementsForProcessInstance(processInstanceId))
-					.map(stringFlowsAttachmentMap -> stringFlowsAttachmentMap.entrySet().stream())
-					.filter(entryStream -> {
-						return entryStream.anyMatch(stringFlowsAttachmentEntry -> {
-							return stringFlowsAttachmentEntry.getKey().equals(rigetto.name()) ||
-									stringFlowsAttachmentEntry.getKey().equals(rigettoMotivato.name()) ||
-									stringFlowsAttachmentEntry.getKey().equals(rigettoDopoPreavviso.name()) ||
-									stringFlowsAttachmentEntry.getKey().equals(rigettoDopo10Giorni.name()) ||
-									stringFlowsAttachmentEntry.getKey().equals(RigettoDef10Giorni.name());
-						});
-					})
-					.map(entryStream -> entryStream.findAny())
-					.map(stringFlowsAttachmentEntry -> stringFlowsAttachmentEntry.get().getValue());
-			if (flowsAttachment.isPresent()) {
-				comunicazioni(
-						Optional.ofNullable(execution.getVariable(ID_DOMANDA))
-						.filter(String.class::isInstance)
-						.map(String.class::cast)
-						.orElse(null), flowsAttachment.get().getName(), flowsAttachment.get().getBytes(), rigetto.name());
+			
+			Map<String, FlowsAttachment> attachments = attachmentService.getAttachementsForProcessInstance(processInstanceId);
+			FlowsAttachment att = null;
+			if ( attachments.containsKey(rigetto.name()) )
+				att = attachments.get(rigetto.name());
+			else if ( attachments.containsKey(rigettoMotivato.name()) )
+				att = attachments.get(rigettoMotivato.name());
+			else if ( attachments.containsKey(rigettoDopoPreavviso.name()) )
+				att = attachments.get(rigettoDopoPreavviso.name());
+			else if ( attachments.containsKey(rigettoDopo10Giorni.name()) )
+				att = attachments.get(rigettoDopo10Giorni.name());
+			else if ( attachments.containsKey(RigettoDef10Giorni.name()) )
+				att = attachments.get(RigettoDef10Giorni.name());
+					
+			if (att != null) {
+				FlowsAttachment fileRecuperato = (FlowsAttachment) execution.getVariable(att.getName());
+				comunicazioni(execution.getVariable(ID_DOMANDA, String.class), att.getName(), fileRecuperato.getBytes(), rigetto.name());
 			}
+//			final Optional<FlowsAttachment> flowsAttachment = Optional.ofNullable(attachmentService.getAttachementsForProcessInstance(processInstanceId))
+//					.map(stringFlowsAttachmentMap -> stringFlowsAttachmentMap.entrySet().stream())
+//					.filter(entryStream -> {
+//						return entryStream.anyMatch(stringFlowsAttachmentEntry -> {
+//							return stringFlowsAttachmentEntry.getKey().equals(rigetto.name()) ||
+//									stringFlowsAttachmentEntry.getKey().equals(rigettoMotivato.name()) ||
+//									stringFlowsAttachmentEntry.getKey().equals(rigettoDopoPreavviso.name()) ||
+//									stringFlowsAttachmentEntry.getKey().equals(rigettoDopo10Giorni.name()) ||
+//									stringFlowsAttachmentEntry.getKey().equals(RigettoDef10Giorni.name());
+//						});
+//					})
+//					.map(entryStream -> entryStream.findAny())
+//					.map(stringFlowsAttachmentEntry -> stringFlowsAttachmentEntry.get().getValue());
+//			if (flowsAttachment.isPresent()) {
+//				comunicazioni(
+//						Optional.ofNullable(execution.getVariable(ID_DOMANDA))
+//						.filter(String.class::isInstance)
+//						.map(String.class::cast)
+//						.orElse(null), flowsAttachment.get().getName(), flowsAttachment.get().getBytes(), rigetto.name());
+//			}
 		}
 		break;
 		case END_IMPROCEDIBILE: {
