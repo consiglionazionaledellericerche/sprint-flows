@@ -31,7 +31,7 @@ test:
   stage: test
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   script:
-    - mvn -B clean compile package test -fae
+    - mvn -B clean compile package test -Dmaven.test.failure.ignore=true
   allow_failure: true
 
 deploy_dev_snapshot:
