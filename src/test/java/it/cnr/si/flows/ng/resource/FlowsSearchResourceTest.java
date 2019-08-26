@@ -5,7 +5,6 @@ import it.cnr.si.flows.ng.TestServices;
 import it.cnr.si.flows.ng.utils.Utils;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
-import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.json.JSONException;
 import org.junit.After;
