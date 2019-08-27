@@ -244,72 +244,12 @@
 		<groupHeader>
 			<band height="87" splitType="Stretch">
 				<textField isStretchWithOverflow="true">
-					<reportElement style="Detail" x="35" y="6" width="505" height="77" uuid="7ac903fa-55d2-4e21-a610-fa7dda8d3df3"/>
+					<reportElement style="Detail" x="35" y="5" width="505" height="77" uuid="7ac903fa-55d2-4e21-a610-fa7dda8d3df3"/>
 					<textElement textAlignment="Justified">
 						<font fontName="SansSerif" size="11" isBold="false"/>
 						<paragraph lineSpacing="1_1_2"/>
 					</textElement>
-					<textFieldExpression><![CDATA["\tCon riferimento alla nuova versione della sua domanda di iscrizione nell’Elenco nazionale dei componenti degli Organismi indipendenti di valutazione inviata in data "+$F{dataInvioNuovaDomanda}.substring( 8, 10 )+"/"+$F{dataInvioNuovaDomanda}.substring( 5, 7 )+"/"+$F{dataInvioNuovaDomanda}.substring( 0, 4 )+" a seguito del preavviso di rigetto identificato al numero "+$F{protocolloPreavviso}+" trasmesso il "+$F{dataPreavviso}.substring( 8, 10 )+"/"+$F{dataPreavviso}.substring( 5, 7 )+"/"+$F{dataPreavviso}.substring( 0, 4 )+", si rappresenta quanto segue.\r\n\tAl riguardo, si precisa che, sulla base delle dichiarazioni fornite nella richiesta di iscrizione, "+( $F{numeroValutazioniNegative}.equals( "1" )  ? ("l’esperienza riportata nel punto: ") : ("le esperienze riportate nei punti: ") ) +" "+$F{elencoValutazioniNegative} +" della domanda, " +( $F{motivazioneStandard}.equals( "no" )  ? ($F{testoMotivazioneSpecifica}) : ("non "+( $F{numeroValutazioniNegative}.equals( "1" )  ? ("è riconducibile ") : ("sono riconducibili ") ) +"all’ambito indicato."))]]></textFieldExpression>
-				</textField>
-			</band>
-			<band height="80" splitType="Stretch">
-				<textField isStretchWithOverflow="true">
-					<reportElement x="37" y="5" width="505" height="73" uuid="637f807b-c116-4153-ae82-a5a70ac9adf0"/>
-					<textElement textAlignment="Justified" markup="styled">
-						<font size="11"/>
-						<paragraph lineSpacing="1_1_2"/>
-					</textElement>
-					<textFieldExpression><![CDATA["\tLa ratio della nuova disciplina, infatti, è quella di valorizzare l’elemento, sostanziale, della qualificazione professionale derivante da specifiche esperienze maturate, con carattere di continuità e prevalenza, nello svolgimento di attività in almeno uno degli ambiti individuati dal decreto.\r\n\tTali ambiti vanno intesi in maniera coerente con le finalità e l’area di applicazione del decreto stesso.\r\n\tNe consegue che, nel caso specifico " +( $F{numeroAmbitiKo}.equals( "1" )  ? ("dell'ambito ") : ("degli ambiti ") ) + $F{elencoAmbitiKo} +" cui la S.V. riconduce prevalentemente le esperienze professionali maturate, le attività positivamente valutabili devono essere riferibili, rispettivamente:"]]></textFieldExpression>
-				</textField>
-			</band>
-			<band height="60" splitType="Stretch">
-				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-					<reportElement positionType="Float" x="34" y="4" width="505" height="56" isRemoveLineWhenBlank="true" uuid="217a73b7-12c4-46db-9f98-dcc4ab6fa73a"/>
-					<textElement textAlignment="Justified" markup="styled">
-						<font size="11"/>
-						<paragraph lineSpacing="1_1_2"/>
-					</textElement>
-					<textFieldExpression><![CDATA[( $F{numeroAmbitoControlloGestioneKo}.equals( "0" )  ?  ("") : ("<li>all’utilizzo di strumenti e metodologie volti a verificare l’efficacia, l’efficienza e l’economicità dell’azione di un’organizzazione, svolte al fine di ottimizzare, anche mediante tempestivi interventi di correzione, il rapporto fra costi e risultati.\r\n\tNel caso specifico delle pubbliche amministrazioni, ci si riferisce, ad esempio, al complesso di attività che le stesse pongono in essere ai sensi dell’art. 4 del decreto legislativo n. 286/1999.</li>"))]]></textFieldExpression>
-				</textField>
-			</band>
-			<band height="60" splitType="Stretch">
-				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-					<reportElement positionType="Float" x="34" y="4" width="505" height="56" isRemoveLineWhenBlank="true" uuid="d1bb2e86-50a3-4984-b2a7-f7f02c43dea7"/>
-					<textElement textAlignment="Justified" markup="styled">
-						<font size="11"/>
-						<paragraph lineSpacing="1_1_2"/>
-					</textElement>
-					<textFieldExpression><![CDATA[( $F{numeroAmbitoPianificazioneKo}.equals( "0" )  ?  ("") : ("<li>alla pianificazione strategica e operativa da intendersi come il processo con cui, in un’organizzazione, partendo dall’analisi del contesto interno ed esterno, si definiscono obiettivi, rispettivamente, di medio/lungo periodo o breve periodo, e si indicano piani di attività, tempi di realizzazione, risorse dedicate, modalità di monitoraggio e verifica dei risultati.</li>"))]]></textFieldExpression>
-				</textField>
-			</band>
-			<band height="60" splitType="Stretch">
-				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-					<reportElement positionType="Float" x="34" y="4" width="505" height="56" isRemoveLineWhenBlank="true" uuid="b32f0ce4-628c-465f-92b5-1190a0b4dbf4"/>
-					<textElement textAlignment="Justified" markup="styled">
-						<font size="11"/>
-						<paragraph lineSpacing="1_1_2"/>
-					</textElement>
-					<textFieldExpression><![CDATA[( $F{numeroAmbitoMisurazionePerformanceKo}.equals( "0" )  ?  ("") : ("<li>allo sviluppo e gestione di sistemi multidimensionali di misurazione della performance aziendale finalizzati al monitoraggio ed alla rendicontazione, interna ed esterna, dei risultati raggiunti dall’organizzazione e dai suoi dipendenti.\r\n\tNel caso specifico delle pubbliche amministrazioni, il riferimento è alle funzioni di misurazione e valutazione della performance, in entrambe le dimensioni organizzativa e individuale, cosi come definite dal decreto legislativo n. 150/2009 (artt. 8 e 9).</li>"))]]></textFieldExpression>
-				</textField>
-			</band>
-			<band height="60" splitType="Stretch">
-				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-					<reportElement positionType="Float" x="34" y="4" width="505" height="56" isRemoveLineWhenBlank="true" uuid="32602fa2-fb10-488e-aaa7-ac335be9ebd5"/>
-					<textElement textAlignment="Justified" markup="styled">
-						<font size="11"/>
-						<paragraph lineSpacing="1_1_2"/>
-					</textElement>
-					<textFieldExpression><![CDATA[( $F{numeroAmbitoProgrammazioneFinanziariaKo}.equals( "0" )  ?  ("") : ("<li>a tutte quelle tipicamente connesse con la gestione dell'intero ciclo del bilancio nel settore pubblico (predisposizione del bilancio di previsione, definizione del budget, variazioni ed assestamento di bilancio, predisposizione del rendiconto).</li>"))]]></textFieldExpression>
-				</textField>
-			</band>
-			<band height="60" splitType="Stretch">
-				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-					<reportElement positionType="Float" x="34" y="4" width="505" height="56" isRemoveLineWhenBlank="true" uuid="e546ac5c-2012-4ad8-9928-664d6bfc4ecf"/>
-					<textElement textAlignment="Justified" markup="styled">
-						<font size="11"/>
-						<paragraph lineSpacing="1_1_2"/>
-					</textElement>
-					<textFieldExpression><![CDATA[( $F{numeroAmbitoRiskManagmentKo}.equals( "0" )  ?  ("") : ("<li>a tutte le fasi del processo di gestione del rischio, ovvero l’identificazione dei fattori di rischio (incluso il rischio corruttivo), l’analisi del rischio con conseguente determinazione della probabilità di accadimento e della “magnitudo” degli effetti e, infine, la risposta al rischio con la definizione di tutte le misure di prevenzione e/o protezione nonchè dei sistemi di monitoraggio e controllo.</li>") )]]></textFieldExpression>
+					<textFieldExpression><![CDATA["\tCon riferimento alla sua comunicazione del  "+$F{dataInvioNuovaDomanda}.substring( 8, 10 )+"/"+$F{dataInvioNuovaDomanda}.substring( 5, 7 )+"/"+$F{dataInvioNuovaDomanda}.substring( 0, 4 )+", con la quale ha inoltrato documentazione relativa all’esperienza professionale, si comunica che le informazioni fornite non consentono di ritenere sussistenti i requisiti richiesti in quanto non è stato possibile acquisire elementi relativi a esperienze concrete, maturate nel periodo indicato, utili per l’iscrizione nell’Elenco nazionale degli OIV."]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupHeader>
@@ -337,13 +277,6 @@
 				</textElement>
 				<textFieldExpression><![CDATA[( $F{sessoRichiedente}.equalsIgnoreCase( "M" )  ? ("Al dott.: ") : ("Alla dott.ssa: ") )]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
-				<reportElement style="Detail" x="310" y="162" width="69" height="17" uuid="e2a46fcd-e936-4956-a327-61d08f44f5bd"/>
-				<textElement>
-					<font fontName="SansSerif" size="11" isBold="false"/>
-				</textElement>
-				<textFieldExpression><![CDATA["E-mail :"]]></textFieldExpression>
-			</textField>
 			<image>
 				<reportElement x="1" y="2" width="329" height="130" uuid="6beae08d-439c-499c-9fc8-d7d0aa6d351e"/>
 				<imageExpression><![CDATA[$P{ANN_IMAGE}]]></imageExpression>
@@ -356,19 +289,12 @@
 				<textFieldExpression><![CDATA[$F{nomeRichiedente}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="Detail" x="392" y="162" width="160" height="17" uuid="461b7621-7cc4-4b3f-918d-756b70d532d8"/>
-				<textElement>
-					<font fontName="SansSerif" size="11" isBold="false"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{emailRichiedente}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true">
 				<reportElement x="107" y="193" width="433" height="33" uuid="e9825bfd-c98f-4489-83b3-1ceb9783f873"/>
 				<textElement textAlignment="Justified">
 					<font size="11" isBold="true"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<textFieldExpression><![CDATA["rigetto della domanda di iscrizione nell’Elenco nazionale dei componenti degli Organismi indipendenti di valutazione ai sensi del D.M 2 dicembre 2016."]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Elenco nazionale dei componenti degli Organismi indipendenti di valutazione ai sensi del D.M 2 dicembre 2016. Rigetto dell’istanza presentata il " + $F{dataInvioDomanda} + "."]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
 				<reportElement style="Detail" x="37" y="193" width="53" height="17" uuid="dd416054-cc8d-42ad-b73f-7b2d1262a798"/>
@@ -393,17 +319,17 @@
 					<font size="11"/>
 					<paragraph lineSpacing="1_1_2"/>
 				</textElement>
-				<textFieldExpression><![CDATA["\tPertanto, il Dipartimento procede al rigetto dell’istanza."]]></textFieldExpression>
+				<textFieldExpression><![CDATA["\tPertanto, il Dipartimento procede al rigetto dell’istanza confermando quanto già esplicitato nel preavviso con nota del " + $F{dataPreavviso}.substring( 8, 10 )+"/"+$F{dataPreavviso}.substring( 5, 7 )+"/"+$F{dataPreavviso}.substring( 0, 4 )+ "  - nr. protocollo:  " +$F{protocolloPreavviso} +  "."]]></textFieldExpression>
 			</textField>
 		</band>
-		<band height="93">
+		<band height="122">
 			<textField isStretchWithOverflow="true">
 				<reportElement style="Detail" x="247" y="41" width="305" height="51" uuid="2d49c6fc-7ded-4f0d-94fb-e4cc1e708646"/>
 				<textElement textAlignment="Center">
 					<font fontName="SansSerif" size="11" isBold="false"/>
 					<paragraph lineSpacing="1_1_2"/>
 				</textElement>
-				<textFieldExpression><![CDATA["per il Direttore dell’Ufficio\r\ndott.ssa Alessandra Barberi\r\n(Dirigente del Servizio per la valutazione indipendente)"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["cons. Marco De Giorgi"]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
