@@ -28,6 +28,7 @@ import javax.inject.Inject;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -118,6 +119,12 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 			break;
 		case SMISTAMENTO_END: {
 			operazioniTimer.determinaTimerScadenzaTermini(execution, BOUNDARYTIMER_3);
+			String dataInvioDomanda = execution.getVariable("startDate").toString();
+			SimpleDateFormat inFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
+			Date dtIn = inFormat.parse(dataInvioDomanda); 
+			SimpleDateFormat stringDateFormat = new SimpleDateFormat("dd-MM-yyyy");  
+			String strDate = stringDateFormat.format(dtIn);  
+			execution.setVariable("dataInvioDomanda", strDate);
 		}
 		;
 		break;
@@ -163,6 +170,13 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 		case CAMBIO_ISTRUTTORE_END:
 			break;
 		case VALUTAZIONE_START:
+			operazioniTimer.determinaTimerScadenzaTermini(execution, BOUNDARYTIMER_3);
+			String dataInvioDomanda = execution.getVariable("startDate").toString();
+			SimpleDateFormat inFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
+			Date dtIn = inFormat.parse(dataInvioDomanda); 
+			SimpleDateFormat stringDateFormat = new SimpleDateFormat("dd-MM-yyyy");  
+			String strDate = stringDateFormat.format(dtIn);  
+			execution.setVariable("dataInvioDomanda", strDate);
 			break;
 		case VALUTAZIONE_END: {
 			LOGGER.info("VALUTAZIONE_END");

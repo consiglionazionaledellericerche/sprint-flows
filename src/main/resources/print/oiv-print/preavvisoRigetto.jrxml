@@ -183,6 +183,10 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="startDate"/>
 		<fieldDescription><![CDATA[startDate]]></fieldDescription>
 	</field>
+	<field name="dataInvioDomanda" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="dataInvioDomanda"/>
+		<fieldDescription><![CDATA[dataInvioDomanda]]></fieldDescription>
+	</field>
 	<field name="nomeRichiedente" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="nomeRichiedente"/>
 		<fieldDescription><![CDATA[nomeRichiedente]]></fieldDescription>
@@ -444,7 +448,7 @@
 				<textElement>
 					<font isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Elenco nazionale dei componenti degli Organismi indipendenti di valutazione ai sensi del D.M 2 dicembre 2016. Preavviso di rigetto dell’istanza presentata il " +$F{startDate} + "."]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Elenco nazionale dei componenti degli Organismi indipendenti di valutazione ai sensi del D.M 2 dicembre 2016. Preavviso di rigetto dell’istanza presentata il " +$F{dataInvioDomanda}+"."]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
