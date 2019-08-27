@@ -120,7 +120,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 		case SMISTAMENTO_END: {
 			operazioniTimer.determinaTimerScadenzaTermini(execution, BOUNDARYTIMER_3);
 			String dataInvioDomanda = execution.getVariable("startDate").toString();
-			SimpleDateFormat inFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
+			SimpleDateFormat inFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);;
 			Date dtIn = inFormat.parse(dataInvioDomanda); 
 			SimpleDateFormat stringDateFormat = new SimpleDateFormat("dd-MM-yyyy");  
 			String strDate = stringDateFormat.format(dtIn);  
@@ -172,7 +172,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 		case VALUTAZIONE_START:
 			operazioniTimer.determinaTimerScadenzaTermini(execution, BOUNDARYTIMER_3);
 			String dataInvioDomanda = execution.getVariable("startDate").toString();
-			SimpleDateFormat inFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
+			SimpleDateFormat inFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);;
 			Date dtIn = inFormat.parse(dataInvioDomanda); 
 			SimpleDateFormat stringDateFormat = new SimpleDateFormat("dd-MM-yyyy");  
 			String strDate = stringDateFormat.format(dtIn);  
