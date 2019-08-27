@@ -67,7 +67,7 @@ public class CalcolaPunteggioFascia {
                     elencoValutazioniNegative = elencoValutazioniNegative.concat(obj.getString("numeroEsperienza"));
                     numeroValutazioniNegative = numeroValutazioniNegative + 1;
                     switch (obj.getString("ambitoEsperienza")) {
-                        case "CONTROLLO DI GESTIONE": {
+                        case "Controllo di gestione": {
                             numeroAmbitoControlloGestioneKo = numeroAmbitoControlloGestioneKo + 1;
                             LOGGER.info("-- ambitoEsperienza: " + obj.getString("ambitoEsperienza") + " nr KO: " + numeroAmbitoControlloGestioneKo);
                             if (numeroAmbitoControlloGestioneKo == 1) {
@@ -77,7 +77,7 @@ public class CalcolaPunteggioFascia {
                         }
                         ;
                         break;
-                        case "PIANIFICAZIONE": {
+                        case "Pianificazione": {
                             numeroAmbitoPianificazioneKo = numeroAmbitoPianificazioneKo + 1;
                             LOGGER.info("-- ambitoEsperienza: " + obj.getString("ambitoEsperienza") + " nr KO: " + numeroAmbitoPianificazioneKo);
                             if (numeroAmbitoPianificazioneKo == 1) {
@@ -87,7 +87,7 @@ public class CalcolaPunteggioFascia {
                         }
                         ;
                         break;
-                        case "MISURAZIONE E VALUTAZIONE DELLA PERFORMANCE ORGANIZZATIVA E INDIVIDUALE": {
+                        case "Misurazione e valutazione della performance organizzativa e individuale": {
                             numeroAmbitoMisurazionePerformanceKo = numeroAmbitoMisurazionePerformanceKo + 1;
                             LOGGER.info("-- ambitoEsperienza: " + obj.getString("ambitoEsperienza") + " nr KO: " + numeroAmbitoMisurazionePerformanceKo);
                             if (numeroAmbitoMisurazionePerformanceKo == 1) {
@@ -97,7 +97,7 @@ public class CalcolaPunteggioFascia {
                         }
                         ;
                         break;
-                        case "PROGRAMMAZIONE FINANZIARIA E DI BILANCIO": {
+                        case "Programmazione finanziaria e di bilancio": {
                             numeroAmbitoProgrammazioneFinanziariaKo = numeroAmbitoProgrammazioneFinanziariaKo + 1;
                             LOGGER.info("-- ambitoEsperienza: " + obj.getString("ambitoEsperienza") + " nr KO: " + numeroAmbitoProgrammazioneFinanziariaKo);
                             if (numeroAmbitoProgrammazioneFinanziariaKo == 1) {
@@ -107,7 +107,7 @@ public class CalcolaPunteggioFascia {
                         }
                         ;
                         break;
-                        case "RISK MANAGEMENT": {
+                        case "Risk management": {
                             numeroAmbitoRiskManagmentKo = numeroAmbitoRiskManagmentKo + 1;
                             LOGGER.info("-- ambitoEsperienza: " + obj.getString("ambitoEsperienza") + " nr KO: " + numeroAmbitoRiskManagmentKo);
                             if (numeroAmbitoRiskManagmentKo == 1) {
