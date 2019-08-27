@@ -182,7 +182,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 			LOGGER.info("VALUTAZIONE_END");
 			LOGGER.info("PER CANCELLAZIONE");
 			String valSceltaUtente = execution.getVariable("sceltaUtente").toString();
-			if((valSceltaUtente.equals("genera_PDF_preavviso_di_rigetto") || valSceltaUtente.equals("calcola_punteggio") || valSceltaUtente.equals("aggiorna_PDF_preavviso_di_rigetto"))) {
+			if((valSceltaUtente.equals("genera_PDF_preavviso_di_rigetto") || valSceltaUtente.equals("calcola_punteggio") || valSceltaUtente.equals("approva"))) {
 				calcolaPunteggioFascia.calcolaAggiornaGiudizioFinale(execution, nonAggiornaGiudizioFinale);
 			}
 			// TODO rest per calcolo fascia 
