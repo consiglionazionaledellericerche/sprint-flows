@@ -72,6 +72,7 @@ public class TestServices {
     private ProcessInstanceResource processInstanceResource;
     @Inject
     private UserDetailsService flowsUserDetailsService;
+    public static int allProcessDeleted = 0;
     private String processDefinition;
     private String firstTaskId;
 
@@ -153,16 +154,18 @@ public class TestServices {
 
 
     public int myTearDown() {
-        int processDeleted = 0;
+
         //cancello le Process Instance creata all'inizio del test'
         List<ProcessInstance> list = runtimeService.createProcessInstanceQuery().list();
         HttpServletResponse res = new MockHttpServletResponse();
+        int processDeleted = 0;
         for (ProcessInstance pi : list) {
             processInstanceResource.deleteProcessInstance(pi.getProcessInstanceId(), "TEST", res);
             assertEquals(NO_CONTENT.value(), res.getStatus());
             processDeleted++;
         }
         logout();
+        allProcessDeleted = allProcessDeleted + processDeleted;
         return processDeleted;
     }
 
@@ -207,7 +210,7 @@ public class TestServices {
 
                 req.setParameter("sceltaUtente", "GestionePreDetermina");
                 req.setParameter("commento", "commento prova Pre-Determina(Junit)");
-                req.setParameter(titolo.name(), "prova Pre-Determina(Junit)");
+                req.setParameter(titolo.name(), TITOLO_DELL_ISTANZA_DEL_FLUSSO);
                 req.setParameter("descrizione", "descrizione prova Pre-Determina(Junit)");
                 req.setParameter("dataScadenzaAvvisoPreDetermina", "2019-06-04T22:00:00.000Z");
 
