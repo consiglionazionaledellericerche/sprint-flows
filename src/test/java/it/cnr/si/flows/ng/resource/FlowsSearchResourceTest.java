@@ -41,9 +41,7 @@ import static org.springframework.http.HttpStatus.OK;
 public class FlowsSearchResourceTest {
 
     @Inject
-    private TestServices util;
-    @Inject
-    private Utils utils;
+    private TestServices testServices;
     @Inject
     private FlowsProcessInstanceResource flowsProcessInstanceResource;
     @Inject
@@ -64,14 +62,14 @@ public class FlowsSearchResourceTest {
 
     @After
     public void tearDown() {
-        util.myTearDown();
+        testServices.myTearDown();
     }
 
 
     @Test
     public void testProcessInstanceSearch() throws Exception {
-        processInstance = util.mySetUp(acquisti);
-        util.loginAdmin();
+        processInstance = testServices.mySetUp(acquisti);
+        testServices.loginAdmin();
 
         final Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, +1);
@@ -82,7 +80,7 @@ public class FlowsSearchResourceTest {
         Map<String, String> requestParams = new HashMap<>();
         requestParams.put(titolo.name(), "text=" + TITOLO_DELL_ISTANZA_DEL_FLUSSO);
         requestParams.put(initiator.name(), "text="+ TestServices.getRA());
-        requestParams.put("processDefinitionKey", util.getProcessDefinition().split(":")[0]);
+        requestParams.put("processDefinitionKey", testServices.getProcessDefinition().split(":")[0]);
         requestParams.put("order", ASC);
         requestParams.put("active", "true");
         requestParams.put("isTaskQuery", "false");
@@ -97,11 +95,11 @@ public class FlowsSearchResourceTest {
         response = flowsSearchResource.search(requestParams);
         verifySearchResponse(response, 1, 1);
 
-        //verifico che le Process Instance completate (active = false) siano quelle cancellate nel tearDown di questa classe (processDeleted)
+        //verifico che le Process Instance completate (active = false) siano quelle cancellate nei vari tearDown eseguiti finora
         requestParams.put("active", "false");
         requestParams.put("order", DESC);
         response = flowsSearchResource.search(requestParams);
-        verifySearchResponse(response, 1, 1);
+        verifySearchResponse(response, TestServices.allProcessDeleted + 1, TestServices.allProcessDeleted + 1);
 
         /*
          * VERIFICA GESTIONE DELLE AUTHORITIES TODO
@@ -260,7 +258,7 @@ public class FlowsSearchResourceTest {
         if (responseList.size() > 0) {
             for (int i = 0; i < (expectedTotalItems > expectedResponseItems ? expectedResponseItems : expectedTotalItems); i++) {
                 HistoricProcessInstanceResponse taskresponse = ((HistoricProcessInstanceResponse) responseList.get(i));
-                assertTrue(taskresponse.getProcessDefinitionId().contains(util.getProcessDefinition()));
+                assertTrue(taskresponse.getProcessDefinitionId().contains(testServices.getProcessDefinition()));
                 //verifico che le Process Instance restituite dalla search rispettino i parametri della ricerca
                 org.json.JSONObject json = new org.json.JSONObject(taskresponse.getName());
                 assertEquals(TITOLO_DELL_ISTANZA_DEL_FLUSSO, json.getString(titolo.name()));
@@ -273,10 +271,10 @@ public class FlowsSearchResourceTest {
     /* ----- TASKS ----- */
     @Test
     public void testTaskSearch() throws Exception {
-        processInstance = util.mySetUp(acquisti);
+        processInstance = testServices.mySetUp(acquisti);
 
-        util.logout();
-        util.loginSfd();
+        testServices.logout();
+        testServices.loginSfd();
         //verifico che la ricerca recuperi il primo task della process instance appena avviata
         Map<String, String> requestParams = new HashMap<>();
 
