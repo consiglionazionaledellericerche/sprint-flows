@@ -70,7 +70,9 @@ public class FlowsProcessInstanceService {
 	PermissionEvaluatorImpl permissionEvaluator;
 	@Inject
 	private FlowsUserDetailsService flowsUserDetailsService;
-	@Inject
+    @Inject
+    private FlowsProcessInstanceService flowsProcessInstanceService;
+    @Inject
 	private Utils utils;
 
 	public HistoricTaskInstance getCurrentTaskOfProcessInstance(String processInstanceId) {
@@ -272,7 +274,10 @@ public class FlowsProcessInstanceService {
 		headers.add("Business Key");
 		headers.add("Start Date");
 		for (HistoricProcessInstanceResponse pi : processInstances) {
-			List<RestVariable> variables = pi.getVariables();
+			Map<String, Object> map = flowsProcessInstanceService.getProcessInstanceWithDetails(pi.getId());
+	        HistoricProcessInstanceResponse processInstance = (HistoricProcessInstanceResponse) map.get("entity");
+	        List<RestVariable> variables = processInstance.getVariables();
+			//List<RestVariable> variables = pi.getVariables();
 			ArrayList<String> tupla = new ArrayList<>();
 			//field comuni a tutte le Process Instances (Business Key, Start date)
 			tupla.add(pi.getBusinessKey());
