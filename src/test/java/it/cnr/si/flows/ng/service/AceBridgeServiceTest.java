@@ -1,5 +1,6 @@
 package it.cnr.si.flows.ng.service;
 
+import feign.FeignException;
 import it.cnr.si.FlowsApp;
 import org.junit.Assert;
 import org.junit.Test;
@@ -43,7 +44,7 @@ public class AceBridgeServiceTest {
 
     }
 
-    @Test
+    @Test(expected = FeignException.class)
     public void testGetRuoliUtente() {
 
         List<String> aceGroupsForUser = aceBridgeService.getAceGroupsForUser("marcinireneusz.trycz");
