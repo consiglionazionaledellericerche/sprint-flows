@@ -56,6 +56,7 @@ public class SaveSummaryAtProcessCompletion implements ActivitiEventListener {
             pdfToDB.setName(fileName);
             pdfToDB.setFilename(fileName);
             pdfToDB.setMimetype(MediaType.PDF.toString());
+            pdfToDB.setPath((String) runtimeService.getVariable(event.getExecutionId(), "pathFascicoloDocumenti"));
 
             attachmentService.saveAttachmentFuoriTask( event.getExecutionId(), fileName, pdfToDB, outputStream.toByteArray());
         }
