@@ -29,8 +29,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.Map;
 
 import static it.cnr.si.flows.ng.TestServices.JUNIT_TEST;
-import static it.cnr.si.flows.ng.utils.Enum.Actions.revoca;
-import static it.cnr.si.flows.ng.utils.Enum.Actions.revocaSemplice;
+import static it.cnr.si.flows.ng.utils.Enum.Actions.*;
 import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
 import static org.junit.Assert.*;
 import static org.springframework.http.HttpStatus.OK;
@@ -85,7 +84,7 @@ public class CnrSummaryPdfResouceTest {
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
         req.setParameter("taskId", taskService.createTaskQuery().singleResult().getId());
         req.setParameter("processDefinitionId", processInstance.getProcessDefinitionId());
-        req.setParameter("sceltaUtente", revoca.getValue());
+        req.setParameter("sceltaUtente", annulla.getValue());
         req.setParameter("commentoRevoca", "commento di revoca" + JUNIT_TEST);
         assertEquals(OK, flowsTaskResource.completeTask(req).getStatusCode());
         //acceddo come ra e confermo la revoca semplice
@@ -119,8 +118,7 @@ public class CnrSummaryPdfResouceTest {
         completeTask();
 
         ResponseEntity<byte[]> resp = flowsPdfResource.makeSummaryPdf(processInstance.getId(), new MockHttpServletRequest());
-
-        assertEquals(resp.getStatusCode(), HttpStatus.OK);
+        assertEquals(HttpStatus.OK, resp.getStatusCode());
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(resp.getBody().length);
         outputStream.write(resp.getBody(), 0, resp.getBody().length);
@@ -133,7 +131,8 @@ public class CnrSummaryPdfResouceTest {
         //completo il primo task
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
 //        req.setParameter("taskId", util.getFirstTaskId());
-        req.setParameter("taskId", taskService.createTaskQuery().singleResult().getId());
+//        req.setParameter("taskId", taskService.createTaskQuery().singleResult().getId());
+        req.setParameter("taskId", taskService.createTaskQuery().orderByTaskCreateTime().desc().list().get(0).getId());
         req.setParameter("processDefinitionId", processInstance.getProcessDefinitionId());
         req.setParameter("sceltaUtente", "Approva");
         req.setParameter("commento", "commento approvazione" + JUNIT_TEST);

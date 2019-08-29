@@ -6,6 +6,7 @@ public class Enum {
     public enum Actions {
 
         revoca("Revoca"),
+        annulla("Annulla"),
         revocaSemplice("RevocaSemplice"),
         RevocaConProvvedimento("RevocaConProvvedimento");
 
