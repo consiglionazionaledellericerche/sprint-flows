@@ -92,8 +92,7 @@ public class SwitchUserTest {
         assertThat(impersonatedAccount).containsEntry("login", "marcinireneusz.trycz");
         assertThat(impersonatedAccount.get("authorities")).asList()
         .contains("ROLE_PREVIOUS_ADMINISTRATOR")
-        .contains("DEPARTMENT_603240")
-                .contains("ROLE_responsabile#acquisti@2216");
+        .contains("DEPARTMENT_603240");
 
         Map<String, Object> exitAccount = getAccount(token);
         assertThat(exitAccount).containsEntry("login", "admin");
