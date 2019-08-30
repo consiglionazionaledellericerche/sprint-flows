@@ -98,7 +98,7 @@ public class FlowsSearchResourceTest {
         requestParams.put("active", "false");
         requestParams.put("order", DESC);
         response = flowsSearchResource.search(requestParams);
-        verifySearchResponse(response, TestServices.allProcessDeleted + 1, TestServices.allProcessDeleted + 1);
+        verifySearchResponse(response, TestServices.allProcessDeleted, TestServices.allProcessDeleted);
 
         /*
          * VERIFICA GESTIONE DELLE AUTHORITIES TODO
