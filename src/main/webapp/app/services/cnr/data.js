@@ -188,6 +188,9 @@
                 },
                 users: function (username) {
                     return $http.get('api/lookup/ldap/user/' + username);
+                },
+                mycdsuos: function () {
+                    return $http.get('api/lookup/ace/user/cdsuoabilitate');
                 }
             },
             mail: {

@@ -121,8 +121,12 @@ public class AceBridgeService {
 		if (id == 0) {
 			return "CNR";
 		} else {
-			return aceService.entitaOrganizzativaById(id).getDenominazione();
+			return getStrutturaById(id).getDenominazione();
 		}
+	}
+
+	public EntitaOrganizzativaWebDto getStrutturaById(Integer id) {
+		return aceService.entitaOrganizzativaById(id);
 	}
 
 	//    @Cacheable("nomiEstesiGruppiRuoloStruttura")
