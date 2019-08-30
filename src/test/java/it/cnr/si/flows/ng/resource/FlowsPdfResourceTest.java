@@ -30,7 +30,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "test,cnr")
+@ActiveProfiles(profiles = "test,oiv")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
 //@Ignore //TODO: i pdf generati e le tipologie dei pdf stanno cambiando quindi conviene scrivere i test quando saranno stabili
