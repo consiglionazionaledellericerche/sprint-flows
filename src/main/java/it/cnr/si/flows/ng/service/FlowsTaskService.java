@@ -12,6 +12,7 @@ import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
 import it.cnr.si.security.PermissionEvaluatorImpl;
+import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricIdentityLink;
@@ -87,6 +88,8 @@ public class FlowsTaskService {
 	private PermissionEvaluatorImpl permissionEvaluator;
 	@Inject
 	private RelationshipService relationshipService;
+	@Inject
+	private MembershipService membershipService;
 	@Inject
 	private ViewRepository viewRepository;
 	@Inject
@@ -235,7 +238,7 @@ public class FlowsTaskService {
 
 		List<TaskResponse> result = new ArrayList<>();
 
-		List<String> usersInMyGroups = relationshipService.membershipService.getUsersInMyGroups(username, relationshipService);
+		List<String> usersInMyGroups = membershipService.getUsersInMyGroups(username);
 
 		//risulta avere prestazioni leggermente migliori questo approccio rispetto a quello commentato
         // (test effettuati con 300 Pi e 30 Task assegnati ad altri utenti nei miei gruppi
