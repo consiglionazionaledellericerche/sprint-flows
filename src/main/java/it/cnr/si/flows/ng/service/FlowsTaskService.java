@@ -235,7 +235,7 @@ public class FlowsTaskService {
 
 		List<TaskResponse> result = new ArrayList<>();
 
-		List<String> usersInMyGroups = relationshipService.getUsersInMyGroups(username);
+		List<String> usersInMyGroups = relationshipService.membershipService.getUsersInMyGroups(username, relationshipService);
 
 		//risulta avere prestazioni leggermente migliori questo approccio rispetto a quello commentato
         // (test effettuati con 300 Pi e 30 Task assegnati ad altri utenti nei miei gruppi
