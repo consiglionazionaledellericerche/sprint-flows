@@ -173,7 +173,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				throw new BpmnError("400", "Formato Impegno Non Valido: " + impegno.getString("importoLordo"));
 			}			
 			impegno.put("uo_label", aceBridgeService.getUoById(Integer.parseInt(impegno.get("uo").toString())).getDenominazione());
-			impegno.put("uo", aceBridgeService.getUoById(Integer.parseInt(impegno.get("uo").toString())).getCdsuo());
+			impegno.put("cdsuo", aceBridgeService.getUoById(Integer.parseInt(impegno.get("uo").toString())).getCdsuo());
 		}
 
 		execution.setVariable("impegni_json", impegni.toString());
@@ -482,11 +482,21 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				}
 				// DITTE INVITATE ditteInvitate_json 
 				if(execution.getVariable("ditteInvitate_json") != null){
-					put("listaDitteInvitateExt", execution.getVariable("ditteInvitate_json").toString());
+					String ditteInvitateString = execution.getVariable("ditteInvitate_json").toString();
+					JSONArray ditteInvitate = new JSONArray(ditteInvitateString);
+					put("listaDitteInvitateExt", ditteInvitate);
 				}
 				// IMPEGNI impegni_json 
 				if(execution.getVariable("impegni_json") != null){
-					put("listaUoAbilitateExt", execution.getVariable("impegni_json").toString());
+					String impegniString = execution.getVariable("impegni_json").toString();
+					JSONArray impegni = new JSONArray(impegniString);
+					for ( int i = 0; i < impegni.length(); i++) {
+						JSONObject impegno = impegni.getJSONObject(i);
+						impegno.put("uo_label", aceBridgeService.getUoById(Integer.parseInt(impegno.get("uo").toString())).getDenominazione());
+						impegno.put("cdsuo", aceBridgeService.getUoById(Integer.parseInt(impegno.get("uo").toString())).getCdsuo());
+					}
+					execution.setVariable("impegni_json", impegni.toString());
+					put("listaUoAbilitateExt", impegni);
 				}
 			}
 		};	
@@ -590,6 +600,8 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 						throw new BpmnError("500", "<b>Data Completamento Procedura Inizio posteriore alla data di Fine<br></b>");
 					}
 				}
+				//REMOVE
+				Map<String, Object> siglaPayload = createSiglaPayload(execution);
 				pubblicaTuttiFilePubblicabili(execution);
 			};break;
 			// START PROVVEDIMENTO-AGGIUDICAZIONE  
