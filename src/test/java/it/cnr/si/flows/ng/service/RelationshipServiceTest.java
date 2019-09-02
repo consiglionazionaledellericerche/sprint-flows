@@ -39,8 +39,8 @@ public class RelationshipServiceTest {
     @Test
     public void testGetAllGroupsForUser() throws Exception {
         //in questo modo testo anche il metodo getAllRelationship che viene richiamato in getAllGroupsForUserOLD
-        Set<String> groupsForRa = relationshipService.getAllGroupsForUser(TestServices.getRA());
-        Set<String> groupsForRa2 = relationshipService.getAllGroupsForUser(TestServices.getRA2());
+        Set<String> groupsForRa = relationshipService.membershipService.getAllGroupsForUser(TestServices.getRA(), relationshipService);
+        Set<String> groupsForRa2 = relationshipService.membershipService.getAllGroupsForUser(TestServices.getRA2(), relationshipService);
 
         assertEquals("Due utenti che appartengono allo stesso gruppo hanno RELAZIONI DIVERSE", groupsForRa, groupsForRa2);
 
@@ -53,8 +53,8 @@ public class RelationshipServiceTest {
         relationship = relationshipService.save(relationship);
 
         //verifico che getAllGroupsForUserOLD prenda la modifica per entrambi gli utenti
-        Set<String> newGroupsForRa = relationshipService.getAllGroupsForUser(TestServices.getRA());
-        Set<String> newGroupsForRa2 = relationshipService.getAllGroupsForUser(TestServices.getRA2());
+        Set<String> newGroupsForRa = relationshipService.membershipService.getAllGroupsForUser(TestServices.getRA(), relationshipService);
+        Set<String> newGroupsForRa2 = relationshipService.membershipService.getAllGroupsForUser(TestServices.getRA2(), relationshipService);
         assertEquals("Due utenti che appartengono allo stesso gruppo hanno RELAZIONI DIVERSE", newGroupsForRa, newGroupsForRa2);
 
 
@@ -63,15 +63,15 @@ public class RelationshipServiceTest {
 
         //elimino la relazione e verifico che tutto funzioni come prima
         relationshipService.delete(relationship.getId());
-        groupsForRa = relationshipService.getAllGroupsForUser(TestServices.getRA());
-        groupsForRa2 = relationshipService.getAllGroupsForUser(TestServices.getRA2());
+        groupsForRa = relationshipService.membershipService.getAllGroupsForUser(TestServices.getRA(), relationshipService);
+        groupsForRa2 = relationshipService.membershipService.getAllGroupsForUser(TestServices.getRA2(), relationshipService);
 
         assertEquals("Due utenti che appartengono allo stesso gruppo hanno RELAZIONI DIVERSE dopo la cancellazione della relationship", groupsForRa, groupsForRa2);
     }
 
     @Test
     public void testGetAllGroups() {
-        Set<String> allGroups = relationshipService.getAllGroupsForUser("maurizio.lancia");
+        Set<String> allGroups = relationshipService.membershipService.getAllGroupsForUser("maurizio.lancia", relationshipService);
         System.out.println(allGroups);
         List<String> allGroupsOLD = relationshipService.getAllGroupsForUserOLD("maurizio.lancia").stream().map(GrantedAuthority::getAuthority).map(Utils::removeLeadingRole).collect(Collectors.toList());
         System.out.println(allGroupsOLD);
@@ -85,7 +85,7 @@ public class RelationshipServiceTest {
     @Test
     public void testGetLanciaByResponsabileStrutture() {
 
-        Set<String> allUsersInGroup = relationshipService.getAllUsersInGroup("responsabile-struttura@34408");
+        Set<String> allUsersInGroup = relationshipService.membershipService.getAllUsersInGroup("responsabile-struttura@34408", relationshipService);
         System.out.println(allUsersInGroup);
     }
 }
