@@ -5,6 +5,7 @@ import it.cnr.si.flows.ng.service.CounterService;
 import it.cnr.si.flows.ng.service.SiperService;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.service.AceService;
+import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.BpmnError;
@@ -45,6 +46,8 @@ public class StartAcquistiSetGroupsAndVisibility {
 	private AceService aceService;
 	@Inject
 	private SiperService siperService;
+	@Inject
+	private MembershipService membershipService;
 
 	public void configuraVariabiliStart(DelegateExecution execution)  throws IOException, ParseException  {
 
@@ -53,7 +56,7 @@ public class StartAcquistiSetGroupsAndVisibility {
 		// LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable(Enum.VariableEnum.title.name()));
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
 
-		List<String> groups = relationshipService.membershipService.getAllGroupsForUser(initiator, relationshipService).stream()
+		List<String> groups = membershipService.getAllGroupsForUser(initiator).stream()
 				.filter(g -> g.startsWith("staffAmministrativo@"))
 				.collect(Collectors.toList());
 
