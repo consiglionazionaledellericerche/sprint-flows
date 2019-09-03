@@ -238,7 +238,7 @@ public class FlowsTaskService {
 
 		List<TaskResponse> result = new ArrayList<>();
 
-		List<String> usersInMyGroups = membershipService.getUsersInMyGroups(username);
+		Set<String> usersInMyGroups = membershipService.getUsersInMyGroups(username);
 
 		//risulta avere prestazioni leggermente migliori questo approccio rispetto a quello commentato
         // (test effettuati con 300 Pi e 30 Task assegnati ad altri utenti nei miei gruppi
