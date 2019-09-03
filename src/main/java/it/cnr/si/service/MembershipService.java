@@ -12,8 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -145,14 +143,12 @@ public class MembershipService {
                 .collect(Collectors.toSet());
     }
 
-    // TODO fix Optional vs NPE
-    // TODO questo metodo va a beccare solo ACE e non Membership
-    public Set<String> getUsersInACEGroups(Collection<String> myGroups) {
-        Set<String> result = new HashSet<>();
-        for (String myGroup : myGroups)
-            result.addAll(getUsersInAceGroup(myGroup));
-        return result;
-    }
+//    private Set<String> getUsersInACEGroups(Collection<String> myGroups) {
+//        Set<String> result = new HashSet<>();
+//        for (String myGroup : myGroups)
+//            result.addAll(getUsersInAceGroup(myGroup));
+//        return result;
+//    }
 
 
     public Set<String> getAllUsersInGroup(String groupName) {
@@ -161,47 +157,25 @@ public class MembershipService {
         groups.add(groupName);
         groups.addAll( getAllParentGroupsRecursively(groups, new HashSet<>()) );
 
-        return getUsersInACEGroups(groups);
+        Set<String> result = new HashSet<>();
+
+        return groups.stream()
+                .map(this::getUsersInAceGroup)
+                .flatMap(list -> list.stream())
+                .collect(Collectors.toSet());
     }
 
 
 
     @Timed
-    public List<String> getUsersInMyGroups(String username) {
+    public Set<String> getUsersInMyGroups(String username) {
 
-        List<String> usersInMyGroups = new ArrayList<>();
+        return getAllGroupsForUser(username).stream()     // recupero tutti i gruppi per l'utente richiesto
+                .map(myGroup -> getAllUsersInGroup(myGroup)) // per ogni gruppo recupero i suoi membri
+                .flatMap(list -> list.stream())           // ho uno stream di liste di stringhe che trasformo in uno stream di stringhe
+                .filter(user -> !user.equals(username))   // non mi interessa includere l'utente con cui ho chiamato
+                .collect(Collectors.toSet());
 
-        Set<String> newGroups = getAllGroupsForUser(username);
-
-        List<String> myGroups = SecurityContextHolder.getContext().getAuthentication().getAuthorities()
-                .parallelStream()
-                .map(GrantedAuthority::getAuthority)
-                .map(Utils::removeLeadingRole)
-                .filter(group -> group.indexOf("afferenza") <= -1)
-                .filter(group -> group.indexOf("USER") <= -1)
-                .filter(group -> group.indexOf("DEPARTMENT") <= -1)
-                .filter(group -> group.indexOf("PREVIOUS") <= -1)
-                .collect(Collectors.toList());
-
-        if (!Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
-            //filtro in ACE gli utenti che appartengono agli stessi gruppi dell'utente loggato
-            usersInMyGroups.addAll(getUsersInACEGroups(myGroups));
-        } else {
-            //filtro in Membership gli utenti che appartengono agli stessi gruppi dell'utente loggato
-            for (String myGroup : myGroups) {
-                // se qui dovesse throware null,
-                // reipostare usersInMyGroups.addAll(membershipService.findMembersInGroup(myGroup) != null ? membershipService.findMembersInGroup(myGroup) : new ArrayList<>());
-                // Martin
-                usersInMyGroups.addAll(getUsersInGroup(myGroup));
-            }
-        }
-
-        usersInMyGroups = usersInMyGroups.stream()
-                .distinct()
-                .filter(user -> !user.equals(username))
-                .collect(Collectors.toList());
-
-        return usersInMyGroups;
     }
 
     private Set<String> getAllChildGroupsRecursively(Set<String> resultSoFar, Set<String> visited) {

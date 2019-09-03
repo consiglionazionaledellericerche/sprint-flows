@@ -1,12 +1,9 @@
 package it.cnr.si.service;
 
 import it.cnr.si.domain.Relationship;
-import it.cnr.si.flows.ng.service.AceBridgeService;
-import it.cnr.si.repository.CnrgroupRepository;
 import it.cnr.si.repository.RelationshipRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
@@ -24,12 +21,6 @@ public class RelationshipService {
 
     @Inject
     private RelationshipRepository relationshipRepository;
-    @Autowired(required = false)
-    private AceBridgeService aceBridgeService;
-    @Inject
-    private CnrgroupRepository cnrgroupRepository;
-    @Inject
-    public MembershipService membershipService;
 
     /**
      * Save a relationship.
