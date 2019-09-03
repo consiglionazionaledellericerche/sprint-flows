@@ -2,6 +2,7 @@ package it.cnr.si.flows.ng.resource;
 
 import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.TestServices;
+import org.activiti.engine.HistoryService;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
@@ -47,6 +48,8 @@ public class FlowsSearchResourceTest {
     private FlowsTaskResource flowsTaskResource;
     @Inject
     private FlowsSearchResource flowsSearchResource;
+    @Inject
+    private HistoryService historyService;
 
     private ProcessInstanceResponse processInstance;
 
@@ -95,10 +98,17 @@ public class FlowsSearchResourceTest {
         verifySearchResponse(response, 1, 1);
 
         //verifico che le Process Instance completate (active = false) siano quelle cancellate nei vari tearDown eseguiti finora
+        requestParams.put("maxResult", "50");
         requestParams.put("active", "false");
         requestParams.put("order", DESC);
         response = flowsSearchResource.search(requestParams);
-        verifySearchResponse(response, TestServices.allProcessDeleted, TestServices.allProcessDeleted);
+        int allProcessDeleted = (int) historyService.createHistoricProcessInstanceQuery().finished().count();
+        verifySearchResponse(response, allProcessDeleted, allProcessDeleted);
+
+        // verifico che  il parametro maxResult funzioni correttamente
+        requestParams.put("maxResult", "5");
+        response = flowsSearchResource.search(requestParams);
+        verifySearchResponse(response, allProcessDeleted, 5);
 
         /*
          * VERIFICA GESTIONE DELLE AUTHORITIES TODO
@@ -107,12 +117,10 @@ public class FlowsSearchResourceTest {
 
 
         //parametri sbagliati (strumentoAcquisizioneId 12 invece di 11, initiator = admin invece dell'RA) ==> 0 risultati
-        requestParams.put("titolo", "textEqual=12");
+        requestParams.put("strumentoAcquisizioneId", "textEqual=12");
         requestParams.put("initiator", "text=admin");
         requestParams.put("order", ASC);
         requestParams.put("active", "true");
-        requestParams.put("firstResult", "0");
-        requestParams.put("maxResults", "20");
 
         response = flowsSearchResource.search(requestParams);
         verifySearchResponse(response, 0, 0);

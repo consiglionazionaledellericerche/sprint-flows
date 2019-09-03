@@ -91,6 +91,7 @@ jasper-report:
 
 ace:
     url: "http://acebuntudock.si.cnr.it:5555/api"
+#    url: "https://api.ace.cnr.it/api/"
     username: app.scrivaniadigitale
     password: bubbazza
 user:
