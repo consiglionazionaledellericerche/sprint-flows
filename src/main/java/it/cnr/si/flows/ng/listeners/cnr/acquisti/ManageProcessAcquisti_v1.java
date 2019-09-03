@@ -600,8 +600,6 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 						throw new BpmnError("500", "<b>Data Completamento Procedura Inizio posteriore alla data di Fine<br></b>");
 					}
 				}
-				//REMOVE
-				Map<String, Object> siglaPayload = createSiglaPayload(execution);
 				pubblicaTuttiFilePubblicabili(execution);
 			};break;
 			// START PROVVEDIMENTO-AGGIUDICAZIONE  
