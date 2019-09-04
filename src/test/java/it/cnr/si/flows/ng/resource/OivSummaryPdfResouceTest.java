@@ -30,7 +30,6 @@ import static org.junit.Assert.assertTrue;
 import static org.springframework.http.HttpStatus.OK;
 
 
-//todo: va in errore con l'interazione con http://cool-jconon-funzione-pubblica.test.si.cnr.it (forse non trova la priocess instance avviata sul bd in memoria durante il test)
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(profiles = "test,oiv")
 @EnableTransactionManagement
@@ -64,9 +63,6 @@ public class OivSummaryPdfResouceTest {
     }
 
 
-//    @DirtiesContext
-//    @Test
-//    public void clearContext() {}
 
     @Test
     public void testSummaryPdfProcessCompleted() throws Exception {
