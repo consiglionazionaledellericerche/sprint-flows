@@ -2,36 +2,26 @@ package it.cnr.si.flows.batch;
 
 
 import com.opencsv.CSVParser;
-import feign.FeignException;
 import it.cnr.si.FlowsApp;
-import it.cnr.si.flows.ng.exception.UnexpectedResultException;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.SiperService;
-import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils.associazioneRuoloPersonaCDSUO;
 import it.cnr.si.service.AceService;
-import it.cnr.si.service.RelationshipService;
+import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
-
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.web.client.HttpClientErrorException;
 
 import javax.inject.Inject;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -49,7 +39,7 @@ public class RimozioneProfiliPerCDSUOAcquistiBatch {
 	@Inject
 	private SiperService siperService;
 	@Inject
-	private RelationshipService relationshipService;
+	private MembershipService membershipService;
 	private final Map<String, String> errors = new HashMap<>();
 
 	int i = 0;
@@ -105,14 +95,14 @@ public class RimozioneProfiliPerCDSUOAcquistiBatch {
 		ListaIdCDSUO.forEach(idCDSUO -> {
 			log.info("La Struttura {} [{} ] fa parte del gruppo CDSUO: {} ", idCDSUO.getDenominazione(), idCDSUO.getId(), cdsuo);
 			String gruppoRuolo = siglaRuolo + "@" + idCDSUO.getId();
-			Set<String> members = relationshipService.getAllUsersInGroup(gruppoRuolo);
+			Set<String> members = membershipService.getAllUsersInGroup(gruppoRuolo);
 			//List<String> members = membershipService.findMembersInGroup(gruppoRuolo);
 			if (members.size() == 0) {
 				log.info(" INFO: Il gruppo {} NON HA NESSUNO", gruppoRuolo);
-			} 
+			}
 			if (members.size() > 1) {
 				log.info(" INFO: Il gruppo {} HA PIU' MEMBRI", gruppoRuolo);
-			} 
+			}
 			members.forEach(member -> {
 				log.info("L'utente {} fa parte del gruppo {} ", member.toString(), gruppoRuolo);
 				results.add("L'utente " + member.toString()  +" a parte del gruppo "+ gruppoRuolo + " [" + idCDSUO.getDenominazioneBreve() + " / " + idCDSUO.getSigla() + " / " + idCDSUO.getIdnsip() + "]");
@@ -154,21 +144,21 @@ public class RimozioneProfiliPerCDSUOAcquistiBatch {
 		Map<Integer, associazioneRuoloPersonaCDSUO> associazioni = new HashMap<Integer, associazioneRuoloPersonaCDSUO>();
 
 		lines
-		.skip(1).
-		forEach(l -> {
-			try {
+				.skip(1).
+				forEach(l -> {
+					try {
 
-				String[] values = parser.parseLine(l);
-				log.info(values[0] + " " + values[1]);
-				associazioneRuoloPersonaCDSUO asso = new associazioneRuoloPersonaCDSUO();
-				asso.setPersona(values[0]);
-				asso.setRuolo(values[1]);
-				asso.setCdsuo(values[2]);
-				associazioni.putIfAbsent(i, asso) ;
-				i=i+1;
+						String[] values = parser.parseLine(l);
+						log.info(values[0] + " " + values[1]);
+						associazioneRuoloPersonaCDSUO asso = new associazioneRuoloPersonaCDSUO();
+						asso.setPersona(values[0]);
+						asso.setRuolo(values[1]);
+						asso.setCdsuo(values[2]);
+						associazioni.putIfAbsent(i, asso) ;
+						i=i+1;
 
-			} catch (IOException e) {e.printStackTrace();}
-		});
+					} catch (IOException e) {e.printStackTrace();}
+				});
 
 		return associazioni;
 	}
