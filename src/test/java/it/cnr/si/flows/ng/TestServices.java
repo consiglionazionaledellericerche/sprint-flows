@@ -212,6 +212,7 @@ public class TestServices {
                 req.setParameter(titolo.name(), TITOLO_DELL_ISTANZA_DEL_FLUSSO);
                 req.setParameter("descrizione", "descrizione prova Pre-Determina(Junit)");
                 req.setParameter("dataScadenzaAvvisoPreDetermina", "2019-06-04T22:00:00.000Z");
+                req.setParameter("idStruttura", "2216");
 
                 break;
             case iscrizioneElencoOiv:
