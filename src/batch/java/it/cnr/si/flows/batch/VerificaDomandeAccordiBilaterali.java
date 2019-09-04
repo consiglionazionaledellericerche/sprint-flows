@@ -104,18 +104,18 @@ public class VerificaDomandeAccordiBilaterali {
 					log.info("OK: L'utente {} ha come direttore {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", username, usernameDirettore, denominazioneEntitaorganizzativaResponsabileUtente, siglaEntitaorganizzativaResponsabileUtente, idEntitaorganizzativaResponsabileUtente, cdsuoEntitaorganizzativaResponsabileUtente, idnsipEntitaorganizzativaResponsabileUtente);
 					String gruppoDirigenteRichiedente = "responsabile-struttura@" + idEntitaorganizzativaResponsabileUtente;
 
-					Set<String> members = relationshipService.getAllUsersInGroup(gruppoDirigenteRichiedente);
+					Set<String> members = membershipService.getAllUsersInGroup(gruppoDirigenteRichiedente);
 					//List<String> members = membershipService.findMembersInGroup(gruppoDirigenteRichiedente);
 					if (members.size() == 0) {
 						log.info(" ERROR: Il gruppo RESPONSABILE STRUTTURA: {} NON HA NESSUNO", gruppoDirigenteRichiedente);
-					} 
+					}
 					if (members.size() > 1) {
 						log.info(" ERROR: Il gruppo RESPONSABILE STRUTTURA: {} HA PIU' MEMBRI", gruppoDirigenteRichiedente);
-					} 
+					}
 					members.forEach(member -> {
 						log.info("L'utente {} fa parte del gruppo {} ", member.toString(), gruppoDirigenteRichiedente);
 					});
-				}	
+				}
 			} catch(UnexpectedResultException | FeignException | HttpClientErrorException error2) {
 				log.info("-------------- ERROR: getDirettoreCDSUO  NON HA FUNZIONATO!!!!!!!!!!!!!!! l'utente {} non ha DIRETTORE per la CDSUO {}", username, cdsuoAppartenenzaUtente);
 			}
@@ -136,16 +136,16 @@ public class VerificaDomandeAccordiBilaterali {
 		Map<String, String> associazioni = new HashMap<>();
 
 		lines
-		.skip(1).
-		forEach(l -> {
-			try {
+				.skip(1).
+				forEach(l -> {
+					try {
 
-				String[] values = parser.parseLine(l);
-				log.info(values[0] + " " + values[1]);
-				associazioni.put(values[0], values[1]);
+						String[] values = parser.parseLine(l);
+						log.info(values[0] + " " + values[1]);
+						associazioni.put(values[0], values[1]);
 
-			} catch (IOException e) {e.printStackTrace();}
-		});
+					} catch (IOException e) {e.printStackTrace();}
+				});
 
 
 		return associazioni;
