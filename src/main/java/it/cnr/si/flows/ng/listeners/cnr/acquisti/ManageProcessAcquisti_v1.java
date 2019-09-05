@@ -44,6 +44,8 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 	private static final long serialVersionUID = 686169707042367215L;
 	private static final Logger LOGGER = LoggerFactory.getLogger(ManageProcessAcquisti_v1.class);
 	public static final String STATO_FINALE_DOMANDA = "statoFinaleDomanda";
+	public static final String FLAG_ISTRASPARENZA = "false";
+	
 
 	@Inject
 	private FirmaDocumentoService firmaDocumentoService;
@@ -536,6 +538,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			// START
 			case "process-start": {
 				startAcquistiSetGroupsAndVisibility.configuraVariabiliStart(execution);
+				execution.setVariable(STATO_FINALE_DOMANDA, "IN CORSO");
 			};break;
 			case "pre-determina-start": {
 				pubblicaFilePubblicabiliURP(execution);
@@ -765,6 +768,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 
 			//SUBFLUSSI
 			case "DECISIONE-CONTRATTARE-end": {
+				execution.setVariable(FLAG_ISTRASPARENZA, "true");
 				attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);
 				if(sceltaUtente != null && sceltaUtente.equals("RevocaSemplice")) {
 					for (String key : attachmentList.keySet()) {
