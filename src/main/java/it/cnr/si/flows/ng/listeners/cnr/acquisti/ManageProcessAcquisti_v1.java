@@ -44,7 +44,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 	private static final long serialVersionUID = 686169707042367215L;
 	private static final Logger LOGGER = LoggerFactory.getLogger(ManageProcessAcquisti_v1.class);
 	public static final String STATO_FINALE_DOMANDA = "statoFinaleDomanda";
-	public static final String FLAG_ISTRASPARENZA = "false";
+	public static final String FLAG_ISTRASPARENZA = "flagIsTrasparenza";
 	
 
 	@Inject
@@ -539,6 +539,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			case "process-start": {
 				startAcquistiSetGroupsAndVisibility.configuraVariabiliStart(execution);
 				execution.setVariable(STATO_FINALE_DOMANDA, "IN CORSO");
+				execution.setVariable(FLAG_ISTRASPARENZA, "false");
 			};break;
 			case "pre-determina-start": {
 				pubblicaFilePubblicabiliURP(execution);
