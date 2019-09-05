@@ -72,7 +72,6 @@ public class TestServices {
     private ProcessInstanceResource processInstanceResource;
     @Inject
     private UserDetailsService flowsUserDetailsService;
-    public static int allProcessDeleted = 0;
     private String processDefinition;
     private String firstTaskId;
 
@@ -165,7 +164,6 @@ public class TestServices {
             processDeleted++;
         }
         logout();
-        allProcessDeleted = allProcessDeleted + processDeleted;
         return processDeleted;
     }
 
@@ -203,6 +201,7 @@ public class TestServices {
                 req.setParameter("impegni_json", "[{\"descrizione\":\"Impegno numero 1\",\"percentualeIva\":20,\"importoNetto\":100,\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"uo\":\"2216\",\"gae\":\"spaclient\",\"progetto\":\"Progetto impegno 1\"}]");
                 req.setParameter("richiestaDiAcquisto_label", "Richiesta di Acquisto");
                 req.setParameter("tipologiaAffidamentoDiretto", "semplificata");
+                req.setParameter("idStruttura", "2216");
 
                 break;
             case testAcquistiAvvisi:
@@ -213,6 +212,7 @@ public class TestServices {
                 req.setParameter(titolo.name(), TITOLO_DELL_ISTANZA_DEL_FLUSSO);
                 req.setParameter("descrizione", "descrizione prova Pre-Determina(Junit)");
                 req.setParameter("dataScadenzaAvvisoPreDetermina", "2019-06-04T22:00:00.000Z");
+                req.setParameter("idStruttura", "2216");
 
                 break;
             case iscrizioneElencoOiv:

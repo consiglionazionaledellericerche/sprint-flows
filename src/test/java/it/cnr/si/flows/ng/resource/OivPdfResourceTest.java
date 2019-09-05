@@ -33,8 +33,7 @@ import static org.junit.Assert.assertTrue;
 @ActiveProfiles(profiles = "test,oiv")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
-//@Ignore //TODO: i pdf generati e le tipologie dei pdf stanno cambiando quindi conviene scrivere i test quando saranno stabili
-public class FlowsPdfResourceTest {
+public class OivPdfResourceTest {
 
     @Inject
     private FlowsPdfResource flowsPdfResource;
