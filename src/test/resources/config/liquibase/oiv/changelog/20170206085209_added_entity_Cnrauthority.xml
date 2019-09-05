@@ -14,35 +14,35 @@
     <property name="floatType" value="float" dbms="mysql, oracle"/>
 
     <!--
-        Added the entity View.
+        Added the entity Cnrauthority.
     -->
-    <changeSet id="20170504083856-1" author="jhipster">
-        <createTable tableName="view">
+    <changeSet id="20170206085209-1" author="jhipster">
+        <createTable tableName="cnrauthority">
             <column name="id" type="bigint" autoIncrement="${autoIncrement}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="process_id" type="varchar(255)">
-                <constraints nullable="false"/>
+            <column name="display_name" type="varchar(255)">
+                <constraints nullable="true"/>
             </column>
 
-            <column name="type" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="version" type="varchar(255)">
-                <constraints nullable="true" />
-            </column>
-
-            <column name="view" type="varchar">
-                <constraints nullable="false"/>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="true"/>
             </column>
 
             <!-- jhipster-needle-liquibase-add-column - Jhipster will add columns here, do not remove-->
         </createTable>
 
-        <loadData encoding="UTF-8"
-                  file="config/liquibase/oiv/view.csv"
-                  separator=";"
-                  tableName="view"/>
+        <createTable tableName="cnrauthority_cnrauthorityparent">
+            <column name="cnrauthorityparents_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cnrauthorities_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="cnrauthorities_id, cnrauthorityparents_id"
+                       tableName="cnrauthority_cnrauthorityparent"/>
+
     </changeSet>
 </databaseChangeLog>

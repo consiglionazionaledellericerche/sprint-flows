@@ -220,6 +220,9 @@ public class FlowsProcessInstanceService {
 
 		FlowsHistoricProcessInstanceQuery processQuery = new FlowsHistoricProcessInstanceQuery(managementService);
 
+		processQuery.setFirstResult(firstResult);
+		processQuery.setMaxResults(maxResults);
+
 		setSearchTerms(searchParams, processQuery);
 
 		List<String> authorities = Utils.getCurrentUserAuthorities();

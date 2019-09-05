@@ -51,7 +51,7 @@ public class FlowsSearchResource {
         boolean isTaskQuery = util.getBoolean(params, "isTaskQuery", false);
         int page = util.getInteger(params, "page", 1);
 
-        Integer maxResults = 20;
+        Integer maxResults = util.getInteger(params, "maxResult", 20);
         Integer firstResult = maxResults * (page-1) ;
 
         DataResponse result;

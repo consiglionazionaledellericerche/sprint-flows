@@ -14,35 +14,31 @@
     <property name="floatType" value="float" dbms="mysql, oracle"/>
 
     <!--
-        Added the entity View.
+        Added the entity Relationship.
     -->
-    <changeSet id="20170504083856-1" author="jhipster">
-        <createTable tableName="view">
+    <changeSet id="20171023125007-1" author="jhipster">
+        <createTable tableName="relationship">
             <column name="id" type="bigint" autoIncrement="${autoIncrement}">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="process_id" type="varchar(255)">
+            <column name="group_name" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
 
-            <column name="type" type="varchar(255)">
+            <column name="group_relationship" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
 
-            <column name="version" type="varchar(255)">
-                <constraints nullable="true" />
-            </column>
-
-            <column name="view" type="varchar">
-                <constraints nullable="false"/>
+            <column name="group_role" type="varchar(255)">
+                <constraints nullable="true"/>
             </column>
 
             <!-- jhipster-needle-liquibase-add-column - Jhipster will add columns here, do not remove-->
         </createTable>
 
         <loadData encoding="UTF-8"
-                  file="config/liquibase/oiv/view.csv"
+                  file="config/liquibase/oiv/relationship.csv"
                   separator=";"
-                  tableName="view"/>
+                  tableName="relationship"/>
     </changeSet>
 </databaseChangeLog>

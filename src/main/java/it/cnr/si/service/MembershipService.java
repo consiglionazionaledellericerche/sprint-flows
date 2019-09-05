@@ -1,16 +1,17 @@
 package it.cnr.si.service;
 
+import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.domain.Membership;
+import it.cnr.si.domain.Relationship;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.MembershipRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +33,12 @@ public class MembershipService {
     private MembershipRepository membershipRepository;
 
     @Autowired(required = false)
-    private AceBridgeService aceService;
+    private AceBridgeService aceBridgeService;
+    @Inject
+    private RelationshipService relationshipService;
+    @Inject
+    private Environment env;
+
 
     public Membership save(Membership membership) {
         log.debug("Request to save Membership : {}", membership);
@@ -60,7 +66,6 @@ public class MembershipService {
         membershipRepository.delete(id);
     }
 
-
     /**
      * Get one membership by username and groupname.
      *
@@ -75,38 +80,6 @@ public class MembershipService {
     }
 
 
-    public Set<String> getGroupNamesForUser(String username) {
-        return membershipRepository.findGroupNamesForUser(username);
-    }
-
-
-    public List<GrantedAuthority> getAllAdditionalAuthoritiesForUser(String username) {
-        return Stream.concat(getGroupNamesForUser(username).stream(), getACEGroupsForUser(username).stream())
-                .distinct()
-                .map(Utils::addLeadingRole)
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
-    }
-
-    private Set<String> getACEGroupsForUser(String username) {
-        return Optional.ofNullable(aceService)
-                .map(aceBridgeService -> aceBridgeService.getAceGroupsForUser(username))
-                .map(strings -> strings.stream())
-                .orElse(Stream.empty())
-                .collect(Collectors.toSet());
-    }
-
-    @Deprecated
-    public List<String> findMembersInGroup(String groupName) {
-        List<String> result = membershipRepository.findMembersInGroup(groupName);
-        Optional.ofNullable(aceService)
-                .map(aceBridgeService -> aceService.getUsersInAceGroup(groupName))
-                .filter(strings -> !strings.isEmpty())
-                .ifPresent(strings -> result.addAll(strings));
-        return result;
-    }
-
-
     public Page<Membership> getGroupsWithRole(Pageable pageable, String user, String role) {
         return membershipRepository.getGroupsWithRole(role, user, pageable);
     }
@@ -116,8 +89,162 @@ public class MembershipService {
         return membershipRepository.getMembershipByGroupName(groupName);
     }
 
+    /* --- */
 
-    public List<Membership> getGroupForUser(String userName) {
-        return membershipRepository.getGroupForUser(userName);
+    // TODO attenzione: questo metodo, a differenza di getAceGroupsForUser aggiunge i ROLE_
+    public Set<String> getLocalGroupsForUser(String username) {
+        return membershipRepository.findGroupNamesForUser(username);
     }
+
+
+    public Set<String> getAceGroupsForUser(String username) {
+        return Optional.ofNullable(aceBridgeService)
+                .map(aceBridgeService -> aceBridgeService.getAceGroupsForUser(username))
+                .map(strings -> strings.stream())
+                .orElse(Stream.empty())
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * Dato uno username restituisce tutti suoi gruppi, sia di ACE che di Membership,
+     * compresi quelli ereditati
+     *
+     * @param username
+     * @return
+     */
+    public Set<String> getAllGroupsForUser(String username) {
+
+        Set<String> groups = new HashSet<>();
+        groups.addAll( getAceGroupsForUser(username) );
+        groups.addAll( getLocalGroupsForUser(username) );
+
+        groups.addAll( getAllChildGroupsRecursively(groups, new HashSet<>()) );
+
+        return groups;
+    }
+
+    /* --- */
+
+    @Deprecated
+    public List<String> getUsersInGroup(String groupName) {
+        List<String> result = membershipRepository.findMembersInGroup(groupName);
+        Set<String> users = getUsersInAceGroup(groupName);
+        result.addAll(users);
+        return result;
+    }
+
+    @SuppressWarnings("deprecation") // Questo e' il modo giusto di usare il metodo aceBridgeService.getUsersInAceGroup
+    public Set<String> getUsersInAceGroup(String groupName) {
+        return Optional.ofNullable(aceBridgeService)
+                .map(aceBridgeService -> aceBridgeService.getUsersInAceGroup(groupName))
+                .filter(strings -> !strings.isEmpty())
+                .map(strings -> strings.stream())
+                .orElse(Stream.empty())
+                .collect(Collectors.toSet());
+    }
+
+//    private Set<String> getUsersInACEGroups(Collection<String> myGroups) {
+//        Set<String> result = new HashSet<>();
+//        for (String myGroup : myGroups)
+//            result.addAll(getUsersInAceGroup(myGroup));
+//        return result;
+//    }
+
+
+    public Set<String> getAllUsersInGroup(String groupName) {
+
+        Set<String> groups = new HashSet<>();
+        groups.add(groupName);
+        groups.addAll( getAllParentGroupsRecursively(groups, new HashSet<>()) );
+
+        Set<String> result = new HashSet<>();
+
+        return groups.stream()
+                .map(this::getUsersInAceGroup)
+                .flatMap(list -> list.stream())
+                .collect(Collectors.toSet());
+    }
+
+
+
+    @Timed
+    public Set<String> getUsersInMyGroups(String username) {
+
+        return getAllGroupsForUser(username).stream()     // recupero tutti i gruppi per l'utente richiesto
+                .map(myGroup -> getAllUsersInGroup(myGroup)) // per ogni gruppo recupero i suoi membri
+                .flatMap(list -> list.stream())           // ho uno stream di liste di stringhe che trasformo in uno stream di stringhe
+                .filter(user -> !user.equals(username))   // non mi interessa includere l'utente con cui ho chiamato
+                .collect(Collectors.toSet());
+
+    }
+
+    private Set<String> getAllChildGroupsRecursively(Set<String> resultSoFar, Set<String> visited) {
+
+        log.trace("resultsSoFar {}, visited {}", resultSoFar, visited);
+        Set<String> buffer = new HashSet<>();
+
+        for (String group : resultSoFar) {
+
+            Set<Relationship> children = relationshipService.getAllRelationshipForGroup(group);
+            for (Relationship child : children) {
+                if (!visited.contains(child.getGroupRelationship())) {
+                    buffer.add(child.getGroupRelationship());
+                }
+            }
+
+            if (group.contains("@")) {
+                String role = group.substring(0, group.indexOf('@'));
+                children = relationshipService.findRelationshipForStructure(role);
+
+                for (Relationship child : children) {
+                    if (!visited.contains(child.getGroupRelationship())) {
+                        visited.add(group);
+                        buffer.add(Utils.replaceStruttura(child.getGroupRelationship(), group.substring(group.indexOf('@'))));
+                    }
+                }
+            }
+        }
+
+        if (!buffer.isEmpty())
+            resultSoFar.addAll(getAllChildGroupsRecursively(buffer, visited));
+
+        return buffer;
+
+    }
+
+
+    private Set<String> getAllParentGroupsRecursively(Set<String> resultSoFar, Set<String> visited) {
+
+        log.trace("resultsSoFar {}, visited {}", resultSoFar, visited);
+        Set<String> buffer = new HashSet<>();
+
+        for (String group : resultSoFar) {
+
+            Set<Relationship> parents = relationshipService.getRelationshipsForGroupRelationship(group);
+            for (Relationship parent : parents) {
+                if (!visited.contains(parent.getGroupName())) {
+                    buffer.add(parent.getGroupName());
+                }
+            }
+
+            if (group.contains("@")) {
+                String role = group.substring(0, group.indexOf('@'));
+                parents = relationshipService.findRelationshipForStructureByGroupRelationship(role);
+
+                for (Relationship parent : parents) {
+                    if (!visited.contains(parent.getGroupName())) {
+                        visited.add(group);
+                        buffer.add(Utils.replaceStruttura(parent.getGroupName(), group.substring(group.indexOf('@'))));
+                    }
+                }
+            }
+        }
+
+        if (!buffer.isEmpty())
+            getAllParentGroupsRecursively(buffer, visited);
+
+        return buffer;
+
+    }
+
 }

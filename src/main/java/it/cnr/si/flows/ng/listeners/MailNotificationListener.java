@@ -114,7 +114,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
 		if (Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
 			candidates.forEach(c -> {
 				if (c.getGroupId() != null) {
-					List<String> members = membershipService.findMembersInGroup(c.getGroupId());
+					List<String> members = membershipService.getUsersInGroup(c.getGroupId());
 					members.forEach(m -> {
 						mailService.sendFlowEventNotification(FlowsMailService.TASK_ASSEGNATO_AL_GRUPPO_HTML, integratedVariables, task.getName(), m, c.getGroupId());
 					});
@@ -125,7 +125,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
 			if (Optional.ofNullable(aceBridgeService).isPresent()) {
 				candidates.forEach(c -> {
 					if (c.getGroupId() != null) {
-						Set<String> members = relationshipService.getAllUsersInGroup(c.getGroupId());
+						Set<String> members = membershipService.getAllUsersInGroup(c.getGroupId());
 						LOGGER.info("Sto inviando mail standard a {} del gruppo {} per il task", members, c.getGroupId(), task.getName());
 						members.forEach(m -> {
 							mailService.sendFlowEventNotification(FlowsMailService.TASK_ASSEGNATO_AL_GRUPPO_HTML, integratedVariables, task.getName(), m, c.getGroupId());
@@ -216,7 +216,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
 									.forEach(groupVariableName -> {
 										LOGGER.debug("groupVariableName: {}", groupVariableName);
 										String groupName = (String) groupVariableName;
-										List<String> members = membershipService.findMembersInGroup(groupName);
+										List<String> members = membershipService.getUsersInGroup(groupName);
 										LOGGER.debug("Invio la mail {} al gruppo {} con utenti {}", nt, groupName, members);
 										members.forEach(member -> {
 											mailService.sendFlowEventNotification(nt, variables, tn, member, groupName);
@@ -231,7 +231,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
 											LOGGER.debug("variables.get(groupVariableName): {}", variables.get(groupVariableName));
 											String groupName = (String) variables.get(groupVariableName);
 
-											Set<String> members = relationshipService.getAllUsersInGroup(groupName);
+											Set<String> members = membershipService.getAllUsersInGroup(groupName);
 
 											LOGGER.debug("Invio la mail {} al gruppo {} con utenti {}", nt, groupName, members);
 											members.forEach(member -> {
