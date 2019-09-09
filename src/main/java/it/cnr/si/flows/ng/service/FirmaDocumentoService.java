@@ -11,10 +11,9 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.Date;
-import java.util.List;
 
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Firma;
-import static it.cnr.si.flows.ng.utils.Enum.Stato.Firmato;
+import static it.cnr.si.flows.ng.utils.Enum.StatoAcquisti.Firmato;
 
 
 @Service

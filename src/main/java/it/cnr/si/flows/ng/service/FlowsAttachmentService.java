@@ -17,8 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.inject.Inject;
 import java.io.ByteArrayInputStream;
@@ -30,8 +28,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static it.cnr.si.flows.ng.utils.Enum.Azione.*;
-import static it.cnr.si.flows.ng.utils.Enum.Stato.PubblicatoTrasparenza;
-import static it.cnr.si.flows.ng.utils.Enum.Stato.PubblicatoUrp;
+import static it.cnr.si.flows.ng.utils.Enum.StatoAcquisti.PubblicatoTrasparenza;
+import static it.cnr.si.flows.ng.utils.Enum.StatoAcquisti.PubblicatoUrp;
 import static it.cnr.si.flows.ng.utils.MimetypeUtils.getMimetype;
 
 @Service

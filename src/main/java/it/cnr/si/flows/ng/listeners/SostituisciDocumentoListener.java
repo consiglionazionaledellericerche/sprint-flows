@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Sostituzione;
-import static it.cnr.si.flows.ng.utils.Enum.Stato.Sostituito;
+import static it.cnr.si.flows.ng.utils.Enum.StatoAcquisti.Sostituito;
 
 
 @Component

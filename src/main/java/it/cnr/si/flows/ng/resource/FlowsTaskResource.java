@@ -9,7 +9,6 @@ import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
 import it.cnr.si.flows.ng.service.*;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.security.FlowsUserDetailsService;
 import it.cnr.si.security.PermissionEvaluatorImpl;
 import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.ActivitiObjectNotFoundException;
@@ -43,7 +42,7 @@ import java.util.*;
 import static it.cnr.si.flows.ng.service.FlowsFirmaService.ERRORI_ARUBA;
 import static it.cnr.si.flows.ng.service.FlowsFirmaService.NOME_FILE_FIRMA;
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Firma;
-import static it.cnr.si.flows.ng.utils.Enum.Stato.Firmato;
+import static it.cnr.si.flows.ng.utils.Enum.StatoAcquisti.Firmato;
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 import static it.cnr.si.flows.ng.utils.Utils.isEmpty;
 

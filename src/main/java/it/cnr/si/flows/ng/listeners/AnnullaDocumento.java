@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Annullo;
-import static it.cnr.si.flows.ng.utils.Enum.Stato.Annullato;
+import static it.cnr.si.flows.ng.utils.Enum.StatoAcquisti.Annullato;
 
 @Component
 public class AnnullaDocumento implements ExecutionListener {

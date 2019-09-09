@@ -2,7 +2,6 @@ package it.cnr.si.flows.ng.service;
 
 
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 
 import org.activiti.engine.delegate.DelegateExecution;
 
@@ -11,14 +10,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Protocollo;
-import static it.cnr.si.flows.ng.utils.Enum.Stato.Protocollato;
+import static it.cnr.si.flows.ng.utils.Enum.StatoAcquisti.Protocollato;
 
 import java.io.IOException;
 import java.text.ParseException;
 
 import javax.inject.Inject;
-
-import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 
 @Service
 public class ProtocolloDocumentoService {
