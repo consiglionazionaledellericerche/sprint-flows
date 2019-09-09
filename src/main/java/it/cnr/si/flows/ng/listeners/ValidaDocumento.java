@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Validazione;
-import static it.cnr.si.flows.ng.utils.Enum.Stato.Validato;
+import static it.cnr.si.flows.ng.utils.Enum.StatoAcquisti.Validato;
 
 @Component
 public class ValidaDocumento implements ExecutionListener {

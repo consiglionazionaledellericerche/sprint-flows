@@ -1,7 +1,7 @@
 package it.cnr.si.flows.ng.listeners.cnr.acquisti.service;
 
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Sostituzione;
-import static it.cnr.si.flows.ng.utils.Enum.Stato.Sostituito;
+import static it.cnr.si.flows.ng.utils.Enum.StatoAcquisti.Sostituito;
 
 import java.util.ArrayList;
 import java.util.Collections;

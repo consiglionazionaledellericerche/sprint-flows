@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
+import static it.cnr.si.flows.ng.utils.Enum.StatoAcquisti.Revocato;
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 import static it.cnr.si.security.PermissionEvaluatorImpl.ID_STRUTTURA;
 
@@ -756,8 +757,8 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			// FINE ACQUISTI  
 
 			case "end-revocato-start": {
-				execution.setVariable(STATO_FINALE_DOMANDA, "REVOCATO");
-				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "REVOCATO");
+				execution.setVariable(STATO_FINALE_DOMANDA, Revocato);
+				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Revocato.name());
 			};break;
 
 			// FINE FLUSSO  

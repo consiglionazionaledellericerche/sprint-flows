@@ -117,35 +117,35 @@ public class FlowsAttachment implements Serializable {
     }
 
     @SuppressWarnings("unchecked")
-    public void addStato(Enum.Stato s) {
+    public void addStato(Enum.StatoAcquisti s) {
         getStati().add(s);
     }
 
     @SuppressWarnings("unchecked")
-    public Set<Enum.Stato> getStati() {
-        getMetadati().putIfAbsent("stati",new HashSet<Enum.Stato>());
-        return (Set<Enum.Stato>) this.getMetadati().get("stati");
+    public Set<Enum.StatoAcquisti> getStati() {
+        getMetadati().putIfAbsent("stati",new HashSet<Enum.StatoAcquisti>());
+        return (Set<Enum.StatoAcquisti>) this.getMetadati().get("stati");
     }
 
-    public void setStati(Set<Enum.Stato> stati) {
+    public void setStati(Set<Enum.StatoAcquisti> stati) {
         getMetadati().put("stati", stati);
     }
 
     @SuppressWarnings("unchecked")
-    public void removeStato(Enum.Stato s) {
-        Set<Enum.Stato> stati = getStati();
+    public void removeStato(Enum.StatoAcquisti s) {
+        Set<Enum.StatoAcquisti> stati = getStati();
         stati.remove(s);
     }
     @SuppressWarnings("unchecked")
     public void removeAzione(Enum.Azione a) {
         if (this.getMetadati().get("azioni") == null)
-            this.getMetadati().put("azioni", new ArrayList<Enum.Stato>());
-        List<Enum.Stato> azione = (List<Enum.Stato>) this.getMetadati().get("azioni");
+            this.getMetadati().put("azioni", new ArrayList<Enum.StatoAcquisti>());
+        List<Enum.StatoAcquisti> azione = (List<Enum.StatoAcquisti>) this.getMetadati().get("azioni");
         azione.remove(a);
     }
 
     public void clearStato() {
-        this.getMetadati().put("stati", new HashSet<Enum.Stato>());
+        this.getMetadati().put("stati", new HashSet<Enum.StatoAcquisti>());
     }
 
     public void setAzione(Enum.Azione a) {
