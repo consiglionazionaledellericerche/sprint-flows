@@ -80,13 +80,13 @@ public class Enum {
     }
 
     public enum StatoDomandeAccordiInternazionaliEnum {
-    	APERTA,
-    	CHIUSA,
-    	INVIATA,
-    	RESPINTA,
-    	VALUTATA_SCIENTIFICAMENTE,
-    	ACCETATA,
-    	CANCELLATA;
+        APERTA,
+        CHIUSA,
+        INVIATA,
+        RESPINTA,
+        VALUTATA_SCIENTIFICAMENTE,
+        ACCETATA,
+        CANCELLATA;
     }
 
     public enum ProcessDefinitionEnum {
@@ -128,7 +128,9 @@ public class Enum {
         startDate,
         endDate,
         gruppoRA,
-    	gruppoStaffAmministrativo;
+        gruppoStaffAmministrativo,
+        dataScadenzaAvvisoPreDetermina,
+        flagIsTrasparenza;
     }
 
 

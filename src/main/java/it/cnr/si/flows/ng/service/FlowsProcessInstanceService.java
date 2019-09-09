@@ -35,6 +35,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static it.cnr.si.flows.ng.listeners.cnr.acquisti.ManageProcessAcquisti_v1.STATO_FINALE_DOMANDA;
+import static it.cnr.si.flows.ng.utils.Enum.StatoAcquisti.Annullato;
+import static it.cnr.si.flows.ng.utils.Enum.StatoAcquisti.Revocato;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.dataScadenzaAvvisoPreDetermina;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.flagIsTrasparenza;
 import static it.cnr.si.flows.ng.utils.Utils.*;
 
 
@@ -69,6 +74,9 @@ public class FlowsProcessInstanceService {
 	private UserDetailsService flowsUserDetailsService;
 	@Inject
 	private Utils utils;
+	@Inject
+	private FlowsAttachmentService attachmentService;
+
 
 
 	public HistoricTaskInstance getCurrentTaskOfProcessInstance(String processInstanceId) {
@@ -389,8 +397,7 @@ public class FlowsProcessInstanceService {
 							headers.add(field.getString("label"));
 					}
 				} catch (JSONException e) {
-					LOGGER.error("Errore nel processamento del JSON", e);
-					throw new IOException(e);
+					LOGGER.error("Errore nel processamento del JSON", new IOException(e));
 				}
 			}
 			if (!hasHeaders) {
@@ -404,76 +411,71 @@ public class FlowsProcessInstanceService {
 		writer.close();
 	}
 
-	public List<HistoricProcessInstance> getPIForExternalServices(String processDefinition, Date startDate, Date endDate, int firstResult, int maxResults, String order) {
-		List<HistoricProcessInstance> historicProcessInstances;
+
+	public List<HistoricProcessInstance> getProcessInstancesForURP( int terminiRicorso, Boolean avvisiScaduti, Boolean gareScadute, int firstResult, int maxResults, String order) {
 
 		HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()
-				.unfinished()
-				.processDefinitionKey(processDefinition)
-				.startedAfter(startDate)
-				.startedBefore(endDate)
-				.includeProcessVariables();
-		if (order != null && order.equals(DESC)){
-			historicProcessInstances = historicProcessInstanceQuery
-					.orderByProcessInstanceStartTime().desc()
-					.listPage(firstResult, maxResults);
-		} else {
-//        	default
-			historicProcessInstances = historicProcessInstanceQuery
-					.orderByProcessInstanceStartTime().asc()
-					.listPage(firstResult, maxResults);
-		}
-		return historicProcessInstances;
-	}
-
-
-	public List<HistoricTaskInstance> getTIForExternalServices(String processDefinition, int terminiRicorso, Boolean avvisiScaduti, Boolean gareScadute, int firstResult, int maxResults, String order) {
-
-		HistoricTaskInstanceQuery historicTaskInstanceQuery = historyService.createHistoricTaskInstanceQuery()
-				.unfinished()
 				.includeProcessVariables()
-				.processDefinitionKey(processDefinition);
+				.processDefinitionKey("acquisti")
+				.or()
+				.variableValueNotEquals(STATO_FINALE_DOMANDA, Annullato.name())
+				.variableValueNotEquals(STATO_FINALE_DOMANDA, Revocato.name())
+				.endOr();
+		Calendar appo = Calendar.getInstance();
 
 		String now = utils.formattaData(new Date());
 		if(gareScadute != null){
-			historicTaskInstanceQuery
-                    .processVariableValueLike("strumentoAcquisizione", "PROCEDURA SELETTIVA%");
-//TODO: dovrebbe prendere tutti i task successivi a "Espletamento Procedura" ma le variabili valorizzate mi assicurano che il task è stato superato
-//			.taskName("Espletamento Procedura")
+			historicProcessInstanceQuery
+					.variableValueLike("strumentoAcquisizione", "PROCEDURA SELETTIVA%");
 			if(gareScadute){
-				// GARE SCADUTE IN ATTESA DI ESITO: data scadenza presentazione offerta < NOW
-				historicTaskInstanceQuery
-						.processVariableValueLessThan("dataScadenzaBando", now);
-			} else {
-				// GARE IN CORSO data scadenza presentbvmnvbnmvmvgazione offerta >= NOW
-				historicTaskInstanceQuery
-						.processVariableValueGreaterThanOrEqual("dataScadenzaBando", now);
-            }
-		}
-
-		if(avvisiScaduti != null){
-//TODO: dovrebbe prendere tutti i task successivi a "Pre determina" ma le variabili valorizzate mi assicurano che il task è stato superato
-//            historicTaskInstanceQuery
-//					.taskName("Pre determina");
-		    if(avvisiScaduti){
-				// AVVISI SCADUTI: data scadenza presentazione offerta  < NOW && data scadenza presentazione offerta + terminiRicorso >= NOW
-				Calendar appo = Calendar.getInstance();
+				// GARE SCADUTE IN ATTESA DI ESITO: data scadenza presentazione offerta < NOW - terminiRicorso
 				appo.setTime(new Date());
 				appo.add(Calendar.DAY_OF_MONTH, -terminiRicorso);
 
-				historicTaskInstanceQuery
-                        .processVariableValueLessThan("dataScadenzaAvvisoPreDetermina", now)
-                        .processVariableValueGreaterThanOrEqual("dataScadenzaAvvisoPreDetermina", utils.formattaData(appo.getTime()));
-		    }else{
-				// AVVISI IN CORSO: data scadenza presentazione offerta >= NOW
-				historicTaskInstanceQuery
-						.processVariableValueGreaterThanOrEqual("dataScadenzaAvvisoPreDetermina", now);
-            }
+				historicProcessInstanceQuery
+						.variableValueLessThan("dataScadenzaBando", appo);
+			} else {
+				// GARE IN CORSO data scadenza presentbvmnvbnmvmvgazione offerta >= NOW
+				historicProcessInstanceQuery
+						.variableValueGreaterThanOrEqual("dataScadenzaBando", now);
+			}
 		}
-		utils.orderTasks(order, historicTaskInstanceQuery);
 
-        return historicTaskInstanceQuery.listPage(firstResult, maxResults);
+		if(avvisiScaduti != null){
+			if(avvisiScaduti){
+				// AVVISI SCADUTI: data scadenza presentazione offerta  < NOW && data scadenza presentazione offerta + terminiRicorso >= NOW
+				appo.setTime(new Date());
+				appo.add(Calendar.DAY_OF_MONTH, -terminiRicorso);
+
+				historicProcessInstanceQuery
+						.variableValueLessThan(dataScadenzaAvvisoPreDetermina.name(), now)
+						.variableValueGreaterThanOrEqual(dataScadenzaAvvisoPreDetermina.name(), utils.formattaData(appo.getTime()));
+			}else{
+				// AVVISI IN CORSO: data scadenza presentazione offerta >= NOW
+				historicProcessInstanceQuery
+						.variableValueGreaterThanOrEqual(dataScadenzaAvvisoPreDetermina.name(), now);
+			}
+		}
+		utils.orderProcess(order, historicProcessInstanceQuery);
+
+		return historicProcessInstanceQuery.listPage(firstResult, maxResults);
 	}
+
+
+
+	public List<HistoricProcessInstance> getProcessInstancesForTrasparenza(int firstResult, int maxResults, String order) {
+
+		HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()
+				.includeProcessVariables()
+				.processDefinitionKey("acquisti")
+				.unfinished()
+				.variableValueEquals(flagIsTrasparenza.name(), "true");
+
+		utils.orderProcess(order, historicProcessInstanceQuery);
+
+		return historicProcessInstanceQuery.listPage(firstResult, maxResults);
+	}
+
 
 
 	private void processDate(HistoricProcessInstanceQuery processQuery, String key, String value) {

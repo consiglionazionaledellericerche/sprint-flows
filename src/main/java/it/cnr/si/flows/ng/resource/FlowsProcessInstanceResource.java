@@ -10,9 +10,9 @@ import it.cnr.si.security.PermissionEvaluatorImpl;
 import it.cnr.si.security.SecurityUtils;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricVariableInstance;
-import org.activiti.engine.task.TaskInfo;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceActionRequest;
@@ -20,6 +20,7 @@ import org.activiti.rest.service.api.runtime.process.ProcessInstanceResource;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
@@ -43,8 +44,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import static it.cnr.si.flows.ng.utils.Enum.Stato.PubblicatoTrasparenza;
-import static it.cnr.si.flows.ng.utils.Enum.Stato.PubblicatoUrp;
+import static it.cnr.si.flows.ng.utils.Enum.StatoAcquisti.PubblicatoTrasparenza;
+import static it.cnr.si.flows.ng.utils.Enum.StatoAcquisti.PubblicatoUrp;
 
 @RestController
 @RequestMapping("api/processInstances")
@@ -205,38 +206,28 @@ public class FlowsProcessInstanceResource {
     }
 
 
-//    /**
-//     * Gets process instances for trasparenza.
-//     *
-//     * @param processDefinition la process definition (es; "acquisti")
-//     * @param startYear         anno di inizio dell`intervallo temporale
-//     * @param endYear           anno di fine dell`intervallo temporale
-//     * @param firstResult       il primo risultato che si vuole recuperare
-//     * @param maxResults        il numero (massimo) di risultati che si vuole recuperare
-//     * @param order             l`ordine (ASC o DESC) in base alla data di start del flusso (non richiesto, può anche essere nullo)
-//     * @return le process instances da esportare in trasparenza
-//     * @throws ParseException the parse exception
-//     */
-//    @PostMapping(value = "/getProcessInstancesForTrasparenza", produces = MediaType.APPLICATION_JSON_VALUE)
-//    @Secured(AuthoritiesConstants.ADMIN)
-//    @PreAuthorize("hasRole('ROLE_applicazione-portalecnr@0000')")
-//    @Timed
-//    public ResponseEntity<List<Map<String, Object>>> getProcessInstancesForTrasparenza(
-//            @RequestParam("processDefinition") String processDefinition,
-//            @RequestParam("startYear") int startYear,
-//            @RequestParam("endYear") int endYear,
-//            @RequestParam("firstResult") int firstResult,
-//            @RequestParam("maxResults") int maxResults,
-//            @RequestParam(name = "order", required = false) String order) throws ParseException {
-//
-//        DateFormat formatoData = new SimpleDateFormat("dd-MM-yyyy");
-//        List<HistoricProcessInstance> historicProcessInstances =
-//                flowsProcessInstanceService.getPIForExternalServices(processDefinition,
-//                                                                     formatoData.parse("01-01-" + startYear),
-//                                                                     formatoData.parse("31-12-" + endYear),
-//                                                                     firstResult, maxResults, order);
-//        return new ResponseEntity<>(getMappedPI(processDefinition, historicProcessInstances, EXPORT_TRASPARENZA), HttpStatus.OK);
-//    }
+    /**
+     * Gets process instances for trasparenza.
+     *
+     * @param firstResult       il primo risultato che si vuole recuperare
+     * @param maxResults        il numero (massimo) di risultati che si vuole recuperare
+     * @param order             l`ordine (ASC o DESC) in base alla data di start del flusso (non richiesto, può anche essere nullo)
+     * @return le process instances da esportare in trasparenza
+     */
+    @PostMapping(value = "/getProcessInstancesForTrasparenza", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.ADMIN)
+    @PreAuthorize("hasRole('ROLE_applicazione-portalecnr@0000')")
+    @Timed
+    public ResponseEntity<List<Map<String, Object>>> getProcessInstancesForTrasparenza(
+            @RequestParam("firstResult") int firstResult,
+            @RequestParam("maxResults") int maxResults,
+            @RequestParam(name = "order", required = false) String order) throws ParseException {
+
+        List<HistoricProcessInstance> historicProcessInstances =
+                flowsProcessInstanceService.getProcessInstancesForTrasparenza(firstResult, maxResults, order);
+
+        return new ResponseEntity<>(getMappedPI("acquisti", historicProcessInstances, EXPORT_TRASPARENZA), HttpStatus.OK);
+    }
 
 
     @PostMapping(value = "/getProcessInstancesForURP", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -244,18 +235,17 @@ public class FlowsProcessInstanceResource {
     @PreAuthorize("hasRole('ROLE_applicazione-portalecnr@0000')")
     @Timed
     public ResponseEntity<List<Map<String, Object>>> getProcessInstancesForURP(
-            @RequestParam("processDefinition") String processDefinition,
             @RequestParam("terminiRicorso") int terminiRicorso,
             @RequestParam(name = "avvisiScaduti", required = false) Boolean avvisiScaduti,
             @RequestParam(name = "gareScadute", required = false) Boolean gareScadute,
             @RequestParam("firstResult") int firstResult,
             @RequestParam("maxResults") int maxResults,
-            @RequestParam(name = "order", required = false) String order) throws ParseException {
+            @RequestParam(name = "order", required = false) String order) {
 
-        List<HistoricTaskInstance> historicTaskInstances =
-                flowsProcessInstanceService.getTIForExternalServices(processDefinition, terminiRicorso, avvisiScaduti, gareScadute, firstResult, maxResults, order);
+        List<HistoricProcessInstance> historicProcessInstances =
+                flowsProcessInstanceService.getProcessInstancesForURP(terminiRicorso, avvisiScaduti, gareScadute, firstResult, maxResults, order);
 
-        return new ResponseEntity<>(getMappedPI(processDefinition, historicTaskInstances, EXPORT_URP), HttpStatus.OK);
+        return new ResponseEntity<>(getMappedPI("acquisti", historicProcessInstances, EXPORT_URP), HttpStatus.OK);
     }
 
 
@@ -307,42 +297,6 @@ public class FlowsProcessInstanceResource {
 
 
 
-//    @PostMapping(value = "/getProcessInstancesbyProcessInstanceIds", produces = MediaType.APPLICATION_JSON_VALUE)
-//    @Secured(AuthoritiesConstants.ADMIN)
-//    @PreAuthorize("hasRole('ROLE_applicazione-portalecnr@0000')")
-//    @Timed
-//    public ResponseEntity<List<Map<String, Object>>> getProcessInstancesbyProcessInstanceIds(
-//            @RequestParam("processInstanceIds") String processInstanceIds) {
-//
-//        Set<String> processInstanceIdsList = new HashSet(Arrays.asList(processInstanceIds.split(",")));
-//
-//        List<String> exportTrasparenza = new ArrayList<>();
-//
-//        List<HistoricProcessInstance> historicProcessInstances = null;
-//        List<Map<String, Object>> mappedProcessInstances = null;
-//
-//        historicProcessInstances = historyService.createHistoricProcessInstanceQuery()
-//                .processInstanceIds(processInstanceIdsList)
-//                .includeProcessVariables()
-//                .list();
-//
-//
-//        View trasparenza = viewRepository.getViewByProcessidType(acquisti.getValue(), EXPORT_TRASPARENZA);
-//        String view = trasparenza.getView();
-//        JSONArray fields = new JSONArray(view);
-//        for (int j = 0; j < fields.length(); j++) {
-//            exportTrasparenza.add(fields.getString(j));
-//        }
-//
-//        mappedProcessInstances = historicProcessInstances.stream()
-//                .map(instance -> trasformaVariabiliPerTrasparenza(instance, exportTrasparenza))
-//                .collect(Collectors.toList());
-//
-//        return new ResponseEntity<>(mappedProcessInstances, HttpStatus.OK);
-//    }
-
-
-
     @PostMapping(value = "/identityLinks", produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     @Secured(AuthoritiesConstants.ADMIN)
@@ -388,30 +342,61 @@ public class FlowsProcessInstanceResource {
     }
 
 
-//    private static Object mapVariable(HistoricProcessInstance instance, String field) {
-    private static Object mapVariable(TaskInfo instance, String field) {
-        if (instance.getProcessVariables().get(field) == null)
-            return null;
-        //        todo: metodo di Martin da scrivere meglio(doppio return e catch vuoti)?
-        if (field.endsWith("_json")) {
-            try {
-                return new ObjectMapper().readValue((String) instance.getProcessVariables().get(field), List.class);
-            } catch (IOException e) {
-            }
-            try {
-                return new ObjectMapper().readValue((String) instance.getProcessVariables().get(field), Map.class);
-            } catch (IOException e) {
-            }
+    private List<Map<String, Object>> getMappedPI(String processDefinition, List<HistoricProcessInstance> historicProcessInstances, String typeView) {
+        String view = viewRepository.getViewByProcessidType(processDefinition, typeView).getView();
+        JSONArray jsonFieldsToExport = new JSONArray(view);
+
+        List<Map<String, Object>> response = null;
+
+        if(typeView != null && typeView.equals(EXPORT_URP)){
+            response =historicProcessInstances.stream()
+                    .map(instance -> trasformaVariabili(instance, jsonFieldsToExport, false))
+                    .collect(Collectors.toList());
+        } else if(typeView != null && typeView.equals(EXPORT_TRASPARENZA)){
+            response = historicProcessInstances.stream()
+                    .map(instance -> trasformaVariabili(instance, jsonFieldsToExport, true))
+                    .collect(Collectors.toList());
         }
-        return instance.getProcessVariables().get(field);
+        return response;
     }
 
 
-//    private  List<Map<String, Object>> getDocumentiPubblicabiliTrasparenza(HistoricProcessInstance instance) {
-    private  List<Map<String, Object>> getDocumentiPubblicabiliTrasparenza(TaskInfo instance) {
+    private Object mapVariable(HistoricProcessInstance instance, String field) {
+        Object ret = null;
+        switch (field) {
+            case "stato":
+                ret = new JSONObject(instance.getName()).getString("stato");
+                break;
+            case "terminata":
+                if (instance.getEndTime() != null)
+                    ret = true;
+                else
+                    ret = false;
+                break;
+            case "impegni_json":
+                try {
+                    if (instance.getProcessVariables().get(field) != null)
+                        ret = new ObjectMapper().readValue((String) instance.getProcessVariables().get(field), List.class);
+                    else
+                        ret = "";
+                } catch (IOException e) {
+                    LOGGER.error("Errore nel mapping delle variabili di tipo \"impegni_json\"", e);
+                }
+                break;
+            default:
+                if (instance.getProcessVariables().get(field) != null)
+                    ret = instance.getProcessVariables().get(field);
+                break;
+
+
+        }
+        return ret;
+    }
+
+
+    private  List<Map<String, Object>> getDocumentiPubblicabiliTrasparenza(HistoricProcessInstance instance) {
         List<Map<String, Object>> documentiPubblicabili = new ArrayList<>();
         for (Entry<String, Object> entry : instance.getProcessVariables().entrySet()) {
-            String key = entry.getKey();
             Object value = entry.getValue();
 
             if (value instanceof FlowsAttachment) {
@@ -433,11 +418,9 @@ public class FlowsProcessInstanceResource {
     }
 
 
-//    private List<Map<String, Object>> getDocumentiPubblicabiliURP(HistoricProcessInstance instance) {
-    private List<Map<String, Object>> getDocumentiPubblicabiliURP(HistoricTaskInstance instance) {
+    private List<Map<String, Object>> getDocumentiPubblicabiliURP(HistoricProcessInstance instance) {
         List<Map<String, Object>> documentiPubblicabili = new ArrayList<>();
         for (Entry<String, Object> entry : instance.getProcessVariables().entrySet()) {
-            String key = entry.getKey();
             Object value = entry.getValue();
 
             if (value instanceof FlowsAttachment) {
@@ -459,39 +442,20 @@ public class FlowsProcessInstanceResource {
     }
 
 
-    private Map<String, Object> trasformaVariabiliPerTrasparenza(HistoricTaskInstance instance, List<String> viewExportTrasparenza) {
+    private Map<String, Object> trasformaVariabili(HistoricProcessInstance instance, JSONArray viewExport, boolean isTrasparenza) {
         Map<String, Object> mappedVariables = new HashMap<>();
-
-        viewExportTrasparenza.stream().forEach(field -> {
-            mappedVariables.put(field, mapVariable(instance, field));
+        viewExport.forEach(field -> {
+            Object value = mapVariable(instance, field.toString());
+            if(value != null){
+                mappedVariables.put(field.toString(), value.toString());
+            }
         });
-        mappedVariables.put("documentiPubblicabili", getDocumentiPubblicabiliTrasparenza(instance));
+
+        if(isTrasparenza)
+            mappedVariables.put("documentiPubblicabiliInTrasparenza", getDocumentiPubblicabiliTrasparenza(instance));
+        else
+            mappedVariables.put("documentiPubblicabiliInURP", getDocumentiPubblicabiliURP(instance));
 
         return mappedVariables;
-    }
-
-
-    private Map<String, Object> trasformaVariabiliPerURP(HistoricTaskInstance instance, List<String> viewExportURP) {
-        Map<String, Object> mappedVariables = new HashMap<>();
-
-        viewExportURP.stream().forEach(field -> {
-            mappedVariables.put(field, mapVariable(instance, field));
-        });
-        mappedVariables.put("documentiPubblicabili", getDocumentiPubblicabiliURP(instance));
-
-        return mappedVariables;
-    }
-
-
-    private List<Map<String, Object>> getMappedPI(String processDefinition, List<HistoricTaskInstance> historicProcessInstances, String typeView) {
-        String viewTrasparenza = viewRepository.getViewByProcessidType(processDefinition, typeView).getView();
-        JSONArray fieldsTrasparenza = new JSONArray(viewTrasparenza);
-        List<String> exportTrasparenza = new ArrayList<>();
-        for (int i = 0; i < fieldsTrasparenza.length(); i++)
-            exportTrasparenza.add(fieldsTrasparenza.getString(i));
-
-        return historicProcessInstances.stream()
-                .map(instance -> trasformaVariabiliPerTrasparenza(instance, exportTrasparenza))
-                .collect(Collectors.toList());
     }
 }
