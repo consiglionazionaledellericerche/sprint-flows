@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import static it.cnr.si.flows.ng.utils.Enum.StatoAcquisti.Revocato;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.statoFinaleDomanda;
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 import static it.cnr.si.security.PermissionEvaluatorImpl.ID_STRUTTURA;
 
@@ -44,7 +45,6 @@ import static it.cnr.si.security.PermissionEvaluatorImpl.ID_STRUTTURA;
 public class ManageProcessAcquisti_v1 implements ExecutionListener {
 	private static final long serialVersionUID = 686169707042367215L;
 	private static final Logger LOGGER = LoggerFactory.getLogger(ManageProcessAcquisti_v1.class);
-	public static final String STATO_FINALE_DOMANDA = "statoFinaleDomanda";
 	public static final String FLAG_ISTRASPARENZA = "flagIsTrasparenza";
 	
 
@@ -539,7 +539,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			// START
 			case "process-start": {
 				startAcquistiSetGroupsAndVisibility.configuraVariabiliStart(execution);
-				execution.setVariable(STATO_FINALE_DOMANDA, "IN CORSO");
+				execution.setVariable(statoFinaleDomanda.name(), "IN CORSO");
 				execution.setVariable(FLAG_ISTRASPARENZA, "false");
 			};break;
 			case "pre-determina-start": {
@@ -549,7 +549,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				pubblicaFilePubblicabiliURP(execution);
 			};break;     
 			case "end-annullato-start": {
-				execution.setVariable(STATO_FINALE_DOMANDA, "ANNULLATO");
+				execution.setVariable(statoFinaleDomanda.name(), "ANNULLATO");
 				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "ANNULLATO");
 			};break;     
 			// START DECISIONE-CONTRATTARE
@@ -712,7 +712,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			case "end-stipulato-start": {
 				pubblicaTuttiFilePubblicabili(execution);
 				controllaFilePubblicabiliTrasparenza(execution);
-				execution.setVariable(STATO_FINALE_DOMANDA, "STIPULATO");
+				execution.setVariable(statoFinaleDomanda.name(), "STIPULATO");
 				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "STIPULATO");
 				//TODO implementare le url a seconda del contesto
 				String urlSigla = "www.google.it";
@@ -757,13 +757,13 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			// FINE ACQUISTI  
 
 			case "end-revocato-start": {
-				execution.setVariable(STATO_FINALE_DOMANDA, Revocato);
+				execution.setVariable(statoFinaleDomanda.name(), Revocato);
 				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Revocato.name());
 			};break;
 
 			// FINE FLUSSO  
 			case "process-end": {
-				//			if(execution.getVariable(STATO_FINALE_DOMANDA).toString().equals("STIPULATO")){
+				//			if(execution.getVariable(statoFinaleDomanda.name()).toString().equals("STIPULATO")){
 				//				pubblicaTuttiFilePubblicabili(execution);
 				//			}
 			};break;  
