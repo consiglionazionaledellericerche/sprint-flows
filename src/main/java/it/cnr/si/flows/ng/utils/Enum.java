@@ -130,7 +130,9 @@ public class Enum {
         gruppoRA,
         gruppoStaffAmministrativo,
         dataScadenzaAvvisoPreDetermina,
-        flagIsTrasparenza;
+        dataScadenzaBando,
+        flagIsTrasparenza,
+        statoFinaleDomanda;
     }
 
 

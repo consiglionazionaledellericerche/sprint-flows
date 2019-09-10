@@ -46,6 +46,7 @@ import java.util.stream.Collectors;
 
 import static it.cnr.si.flows.ng.utils.Enum.StatoAcquisti.PubblicatoTrasparenza;
 import static it.cnr.si.flows.ng.utils.Enum.StatoAcquisti.PubblicatoUrp;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.statoFinaleDomanda;
 
 @RestController
 @RequestMapping("api/processInstances")
@@ -54,7 +55,6 @@ public class FlowsProcessInstanceResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsProcessInstanceResource.class);
     public static final String EXPORT_TRASPARENZA = "export-trasparenza";
     public static final String EXPORT_URP = "export-urp";
-    public static final String STATO_FINALE_DOMANDA = "statoFinaleDomanda";
 
 
     @Inject
@@ -145,7 +145,7 @@ public class FlowsProcessInstanceResource {
             @RequestParam(value = "processInstanceId", required = true) String processInstanceId,
             @RequestParam(value = "deleteReason", required = true) String deleteReason) {
 
-        runtimeService.setVariable(processInstanceId, STATO_FINALE_DOMANDA, "ELIMINATO");
+        runtimeService.setVariable(processInstanceId, statoFinaleDomanda.name(), "ELIMINATO");
         runtimeService.setVariable(processInstanceId, "motivazioneEliminazione", deleteReason);
         flowsProcessInstanceService.updateSearchTerms(flowsProcessInstanceService.getCurrentTaskOfProcessInstance(processInstanceId).getExecutionId(), processInstanceId, "ELIMINATO");
 

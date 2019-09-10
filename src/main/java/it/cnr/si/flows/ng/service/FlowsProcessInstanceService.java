@@ -35,11 +35,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static it.cnr.si.flows.ng.listeners.cnr.acquisti.ManageProcessAcquisti_v1.STATO_FINALE_DOMANDA;
 import static it.cnr.si.flows.ng.utils.Enum.StatoAcquisti.Annullato;
 import static it.cnr.si.flows.ng.utils.Enum.StatoAcquisti.Revocato;
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.dataScadenzaAvvisoPreDetermina;
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.flagIsTrasparenza;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
 import static it.cnr.si.flows.ng.utils.Utils.*;
 
 
@@ -412,14 +410,14 @@ public class FlowsProcessInstanceService {
 	}
 
 
-	public List<HistoricProcessInstance> getProcessInstancesForURP( int terminiRicorso, Boolean avvisiScaduti, Boolean gareScadute, int firstResult, int maxResults, String order) {
+	public List<HistoricProcessInstance> getProcessInstancesForURP(int terminiRicorso, Boolean avvisiScaduti, Boolean gareScadute, int firstResult, int maxResults, String order) {
 
 		HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()
 				.includeProcessVariables()
 				.processDefinitionKey("acquisti")
 				.or()
-				.variableValueNotEquals(STATO_FINALE_DOMANDA, Annullato.name())
-				.variableValueNotEquals(STATO_FINALE_DOMANDA, Revocato.name())
+				.variableValueNotEquals(statoFinaleDomanda.name(), Annullato.name())
+				.variableValueNotEquals(statoFinaleDomanda.name(), Revocato.name())
 				.endOr();
 		Calendar appo = Calendar.getInstance();
 
@@ -430,14 +428,15 @@ public class FlowsProcessInstanceService {
 			if(gareScadute){
 				// GARE SCADUTE IN ATTESA DI ESITO: data scadenza presentazione offerta < NOW - terminiRicorso
 				appo.setTime(new Date());
-				appo.add(Calendar.DAY_OF_MONTH, -terminiRicorso);
+				if(terminiRicorso != 0)
+					appo.add(Calendar.DAY_OF_MONTH, -terminiRicorso);
 
 				historicProcessInstanceQuery
-						.variableValueLessThan("dataScadenzaBando", appo);
+						.variableValueLessThan(dataScadenzaBando.name(), appo);
 			} else {
 				// GARE IN CORSO data scadenza presentbvmnvbnmvmvgazione offerta >= NOW
 				historicProcessInstanceQuery
-						.variableValueGreaterThanOrEqual("dataScadenzaBando", now);
+						.variableValueGreaterThanOrEqual(dataScadenzaBando.name(), now);
 			}
 		}
 
