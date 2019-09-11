@@ -2,7 +2,7 @@ package it.cnr.si.flows.ng.service;
 
 import feign.FeignException;
 import it.cnr.si.FlowsApp;
-import it.cnr.si.service.dto.anagrafica.scritture.EntitaOrganizzativaDto;
+import it.cnr.si.service.dto.anagrafica.letture.GerarchiaWebDto;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(profiles = "test,cnr")
@@ -63,8 +64,10 @@ public class AceBridgeServiceTest {
     @Test
     public void testGetParent() {
 
-        EntitaOrganizzativaDto eo = aceBridgeService.getParentEo(34421);
-        Assert.assertEquals(Integer.valueOf(2216), eo.getId());
+        List<GerarchiaWebDto> parents = aceBridgeService.getParents(34421);
+        parents = parents.stream().filter(p -> p.getTipo().getId() == 2).collect(Collectors.toList());
+
+        Assert.assertEquals(Integer.valueOf(2216), parents.get(0).getPadre().getId());
 
     }
 }
