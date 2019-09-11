@@ -28,8 +28,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static it.cnr.si.flows.ng.utils.Enum.Azione.*;
-import static it.cnr.si.flows.ng.utils.Enum.StatoAcquisti.PubblicatoTrasparenza;
-import static it.cnr.si.flows.ng.utils.Enum.StatoAcquisti.PubblicatoUrp;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.PubblicatoTrasparenza;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.PubblicatoUrp;
 import static it.cnr.si.flows.ng.utils.MimetypeUtils.getMimetype;
 
 @Service
