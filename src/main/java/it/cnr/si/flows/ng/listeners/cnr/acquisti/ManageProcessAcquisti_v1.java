@@ -35,7 +35,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
-import static it.cnr.si.flows.ng.utils.Enum.StatoAcquisti.Revocato;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.Revocato;
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.statoFinaleDomanda;
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 import static it.cnr.si.security.PermissionEvaluatorImpl.ID_STRUTTURA;

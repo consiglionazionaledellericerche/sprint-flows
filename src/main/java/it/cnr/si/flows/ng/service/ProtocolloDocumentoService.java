@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Protocollo;
-import static it.cnr.si.flows.ng.utils.Enum.StatoAcquisti.Protocollato;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.Protocollato;
 
 import java.io.IOException;
 import java.text.ParseException;
