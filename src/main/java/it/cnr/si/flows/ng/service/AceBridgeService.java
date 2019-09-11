@@ -6,7 +6,6 @@ import it.cnr.si.service.AceService;
 import it.cnr.si.service.dto.anagrafica.base.PageDto;
 import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
 import it.cnr.si.service.dto.anagrafica.letture.*;
-import it.cnr.si.service.dto.anagrafica.scritture.EntitaOrganizzativaDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
@@ -187,7 +186,7 @@ public class AceBridgeService {
         return eos.get(0);
     }
 
-    public EntitaOrganizzativaDto getParentEo(long id) {
-		return aceService.getParent(id);
+    public List<GerarchiaWebDto> getParents(long id) {
+		return aceService.getParentsForEo(id);
 	}
 }
