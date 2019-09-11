@@ -2,6 +2,7 @@ package it.cnr.si.flows.ng.service;
 
 import feign.FeignException;
 import it.cnr.si.FlowsApp;
+import it.cnr.si.service.dto.anagrafica.scritture.EntitaOrganizzativaDto;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,5 +58,13 @@ public class AceBridgeServiceTest {
         log.info("{}", aceGroupsForUser);
         aceGroupsForUser = aceBridgeService.getAceGroupsForUser("");
         log.info("{}", aceGroupsForUser);
+    }
+
+    @Test
+    public void testGetParent() {
+
+        EntitaOrganizzativaDto eo = aceBridgeService.getParentEo(34421);
+        Assert.assertEquals(Integer.valueOf(2216), eo.getId());
+
     }
 }
