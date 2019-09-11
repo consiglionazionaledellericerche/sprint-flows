@@ -13,7 +13,7 @@ import javax.inject.Inject;
 import java.util.Date;
 
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Firma;
-import static it.cnr.si.flows.ng.utils.Enum.StatoAcquisti.Firmato;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.Firmato;
 
 
 @Service
