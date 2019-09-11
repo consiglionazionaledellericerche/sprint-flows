@@ -35,8 +35,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static it.cnr.si.flows.ng.utils.Enum.StatoAcquisti.Annullato;
-import static it.cnr.si.flows.ng.utils.Enum.StatoAcquisti.Revocato;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.Annullato;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.Revocato;
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
 import static it.cnr.si.flows.ng.utils.Utils.*;
 
@@ -420,6 +420,7 @@ public class FlowsProcessInstanceService {
 				.variableValueNotEquals(statoFinaleDomanda.name(), Revocato.name())
 				.endOr();
 		Calendar appo = Calendar.getInstance();
+		appo.setTime(new Date());
 
 		String now = utils.formattaData(new Date());
 		if(gareScadute != null){
@@ -427,12 +428,11 @@ public class FlowsProcessInstanceService {
 					.variableValueLike("strumentoAcquisizione", "PROCEDURA SELETTIVA%");
 			if(gareScadute){
 				// GARE SCADUTE IN ATTESA DI ESITO: data scadenza presentazione offerta < NOW - terminiRicorso
-				appo.setTime(new Date());
 				if(terminiRicorso != 0)
 					appo.add(Calendar.DAY_OF_MONTH, -terminiRicorso);
 
 				historicProcessInstanceQuery
-						.variableValueLessThan(dataScadenzaBando.name(), appo);
+						.variableValueLessThan(dataScadenzaBando.name(), utils.formattaData(appo.getTime()));
 			} else {
 				// GARE IN CORSO data scadenza presentbvmnvbnmvmvgazione offerta >= NOW
 				historicProcessInstanceQuery
@@ -443,7 +443,6 @@ public class FlowsProcessInstanceService {
 		if(avvisiScaduti != null){
 			if(avvisiScaduti){
 				// AVVISI SCADUTI: data scadenza presentazione offerta  < NOW && data scadenza presentazione offerta + terminiRicorso >= NOW
-				appo.setTime(new Date());
 				appo.add(Calendar.DAY_OF_MONTH, -terminiRicorso);
 
 				historicProcessInstanceQuery

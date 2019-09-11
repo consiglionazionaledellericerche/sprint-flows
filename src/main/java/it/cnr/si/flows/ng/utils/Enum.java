@@ -47,7 +47,7 @@ public class Enum {
     }
 
 
-    public enum StatoAcquisti {
+    public enum Stato {
         Validato,
         Protocollato,
         Firmato,
