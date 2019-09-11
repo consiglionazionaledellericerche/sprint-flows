@@ -6,6 +6,7 @@ import it.cnr.si.service.AceService;
 import it.cnr.si.service.dto.anagrafica.base.PageDto;
 import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
 import it.cnr.si.service.dto.anagrafica.letture.*;
+import it.cnr.si.service.dto.anagrafica.scritture.EntitaOrganizzativaDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
@@ -50,6 +51,8 @@ public class AceBridgeService {
 	/**
 	 * ATTENZIONE! Usare ???() per prendere tutti gli utenti, compresi col ruolo-nel-ruolo
 	 * Usare questo solo per prendere solo i gruppi di uno specifico gruppo Ace
+	 *
+	 * L'unico utilizzo giustificato di questo service e' in MembershipService
 	 */
 	@Deprecated
 	public List<String> getUsersInAceGroup(String groupName) {
@@ -183,4 +186,8 @@ public class AceBridgeService {
 
         return eos.get(0);
     }
+
+    public EntitaOrganizzativaDto getParentEo(long id) {
+		return aceService.getParent(id);
+	}
 }
