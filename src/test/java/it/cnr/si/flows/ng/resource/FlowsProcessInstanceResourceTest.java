@@ -2,6 +2,7 @@ package it.cnr.si.flows.ng.resource;
 
 import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.TestServices;
+import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
@@ -318,7 +319,17 @@ public class FlowsProcessInstanceResourceTest {
         assertEquals(OK, res.getStatusCode());
         assertEquals(0, res.getBody().size());
 
+
         //visto che devo firmare la Decisione non posso superare questa fase nei test
+        //(a meno che nn setti direttamente la variabile settata alla fine della macro-fase "DECISIONE A CONTRATTARE")
+        util.loginAdmin();
+        flowsProcessInstanceResource.setVariable(processInstance.getId(), Enum.VariableEnum.flagIsTrasparenza.name(), "true");
+
+        util.loginPortaleCnr();
+        res = flowsProcessInstanceResource
+                .getProcessInstancesForTrasparenza(0, 10, ASC);
+        assertEquals(OK, res.getStatusCode());
+        assertEquals(1, res.getBody().size());
     }
 
 
