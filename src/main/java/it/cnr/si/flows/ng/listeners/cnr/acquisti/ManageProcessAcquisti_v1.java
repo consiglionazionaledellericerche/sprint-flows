@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import static it.cnr.si.flows.ng.utils.Enum.Stato.Revocato;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.flagIsTrasparenza;
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.statoFinaleDomanda;
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 import static it.cnr.si.security.PermissionEvaluatorImpl.ID_STRUTTURA;
@@ -45,8 +46,6 @@ import static it.cnr.si.security.PermissionEvaluatorImpl.ID_STRUTTURA;
 public class ManageProcessAcquisti_v1 implements ExecutionListener {
 	private static final long serialVersionUID = 686169707042367215L;
 	private static final Logger LOGGER = LoggerFactory.getLogger(ManageProcessAcquisti_v1.class);
-	public static final String FLAG_ISTRASPARENZA = "flagIsTrasparenza";
-	
 
 	@Inject
 	private FirmaDocumentoService firmaDocumentoService;
@@ -540,7 +539,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			case "process-start": {
 				startAcquistiSetGroupsAndVisibility.configuraVariabiliStart(execution);
 				execution.setVariable(statoFinaleDomanda.name(), "IN CORSO");
-				execution.setVariable(FLAG_ISTRASPARENZA, "false");
+				execution.setVariable(flagIsTrasparenza.name(), "false");
 			};break;
 			case "pre-determina-start": {
 				pubblicaFilePubblicabiliURP(execution);
@@ -770,7 +769,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 
 			//SUBFLUSSI
 			case "DECISIONE-CONTRATTARE-end": {
-				execution.setVariable(FLAG_ISTRASPARENZA, "true");
+				execution.setVariable(flagIsTrasparenza.name(), "true");
 				attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);
 				if(sceltaUtente != null && sceltaUtente.equals("RevocaSemplice")) {
 					for (String key : attachmentList.keySet()) {
