@@ -6,6 +6,7 @@ import it.cnr.si.flows.ng.utils.Utils;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
@@ -30,15 +31,20 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.Callable;
 
 import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
 import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.testAcquistiAvvisi;
 import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
 import static it.cnr.si.flows.ng.utils.Utils.ASC;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.with;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.*;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -66,6 +72,8 @@ public class FlowsProcessInstanceResourceTest {
     private FlowsProcessDefinitionResource flowsProcessDefinitionResource;
     @Inject
     private RepositoryService repositoryService;
+    @Inject
+    private TaskService taskService;
 
     private StopWatch stopWatch = new StopWatch();
     private ProcessInstanceResponse processInstance;
@@ -238,50 +246,13 @@ public class FlowsProcessInstanceResourceTest {
                                     a.getType() == Utils.PROCESS_VISUALIZER));
     }
 
-//
-//    @Test
-//    public void getProcessInstancesForTrasparenzaTest() throws Exception {
-//        processInstance = util.mySetUp(acquisti);
-//
-//        util.loginPortaleCnr();
-//        ResponseEntity<List<Map<String, Object>>> res = flowsProcessInstanceResource
-//                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, Year.now().getValue(), 0, 10, ASC);
-//
-//        assertEquals(OK, res.getStatusCode());
-//        assertEquals(1, res.getBody().size());
-//
-//        //prova recupero 5 elementi dopo il sevondo (result = 0 perchè ho 1 Process Instance in totale)
-//        res = flowsProcessInstanceResource
-//                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, Year.now().getValue(), 2, 10, ASC);
-//
-//        assertEquals(OK, res.getStatusCode());
-//        assertEquals(0, res.getBody().size());
-//
-//
-//        //prova senza ordinamento
-//        res = flowsProcessInstanceResource
-//                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, Year.now().getValue(), 0, 10, null);
-//
-//        assertEquals(OK, res.getStatusCode());
-//        //prendo anche le Pi create negli altri test
-//        assertEquals(1, res.getBody().size());
-//
-//
-//        //prova anni sbagliati (Result set vuoto)
-//        res = flowsProcessInstanceResource
-//                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2016, Year.now().getValue() - 1, 0, 10, ASC);
-//
-//        assertEquals(OK, res.getStatusCode());
-//        assertEquals(0, res.getBody().size());
-//    }
 
 
-
-    @Test
+    @Test()
     public void getProcessInstancesForURPTest() throws Exception {
 
         processInstance = util.mySetUp(testAcquistiAvvisi);
-        LocalDate dataScadenzaAvvisoPreDetermina = LocalDate.of(2019, Month.JUNE, 4);
+        LocalDate dataScadenzaAvvisoPreDetermina = LocalDate.of(2019, Month.SEPTEMBER, 4);
 
         //AVVISI SCADUTI
         util.loginPortaleCnr();
@@ -300,7 +271,6 @@ public class FlowsProcessInstanceResourceTest {
 
         // vado avanti col flusso (Pre-determina -> Verifica))
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
-
         String processDefinition = repositoryService.createProcessDefinitionQuery()
                 .processDefinitionKey(acquisti.getProcessDefinition())
                 .latestVersion()
@@ -309,7 +279,7 @@ public class FlowsProcessInstanceResourceTest {
         req.setParameter("processDefinitionId", processDefinition);
         req.setParameter("taskId", util.getFirstTaskId());
         req.setParameter("commento", "commento determina JUNIT ");
-        req.setParameter("dataScadenzaAvvisoPreDetermina", "2019-06-04T22:00:00.000Z");
+        req.setParameter("dataScadenzaAvvisoPreDetermina", "2019-09-04T00:00:00.000Z");
         req.setParameter("sceltaUtente", "PredisponiDetermina");
         req.setParameter("tipologiaAcquisizione", "Procedura ristretta");
         req.setParameter("tipologiaAcquisizioneId", "12");
@@ -324,26 +294,78 @@ public class FlowsProcessInstanceResourceTest {
         ResponseEntity<ProcessInstanceResponse> response = flowsTaskResource.completeTask(req);
         assertEquals(OK, response.getStatusCode());
 
-//        todo: DA SCOMMENTARE SOLO SE SI DECIDE DI FARE LA QUERY CON LO STATO DEL FLUSSO (ANDREA)
-//        // il flusso non è più nella fase "Pre-determina"
-//        util.loginPortaleCnr();
-//        res = flowsProcessInstanceResource
-//                .getProcessInstancesForURP(acquisti.getValue(), (int) (dataScadenzaAvvisoPreDetermina.until(LocalDate.now(), ChronoUnit.DAYS) + 1), true, null, 0, 10, ASC);
-//        assertEquals(OK, res.getStatusCode());
-//        assertEquals(0, res.getBody().size());
+        // GARE SCADUTE
+        util.loginPortaleCnr();
+        // terminiRicorso > (oggi - startFlusso) ==> resultSet = 0 (LA LOGICA TEMPORALE DELLE GARE È "OPPOSTA" RISPETTO A QUELLA DEGLI AVVISI)
+        res = flowsProcessInstanceResource
+                .getProcessInstancesForURP((int)(dataScadenzaAvvisoPreDetermina.until(LocalDate.now(), ChronoUnit.DAYS) + 1), null, false, 0, 10, ASC);
+        assertEquals(OK, res.getStatusCode());
+        assertEquals(0, res.getBody().size());
+        // terminiRicorso < (oggi - startFlusso) ==> resultSet = 1 (LA LOGICA TEMPORALE DELLE GARE È "OPPOSTA" RISPETTO A QUELLA DEGLI AVVISI)
+        res = flowsProcessInstanceResource
+                .getProcessInstancesForURP((int)(dataScadenzaAvvisoPreDetermina.until(LocalDate.now(), ChronoUnit.DAYS) - 1), null, true, 0, 10, ASC);
+        assertEquals(OK, res.getStatusCode());
+        assertEquals(1, res.getBody().size());
+    }
 
-//        processInstance = util.mySetUp(testAcquistiAvvisi);
-//        LocalDate dataScadenzaAvvisoPreDetermina = LocalDate.of(2019, Month.JUNE, 4);
-//
-//        util.loginPortaleCnr();
 
-//        todo: da fixare
-//        // GARE SCADUTE:non recupero nessuna Pi perche non sono ancora nella fase "Espletamento Procedura"
-//        util.loginPortaleCnr();
-//         res = flowsProcessInstanceResource
-//                .getProcessInstancesForURP(0, null, true, 0, 10, ASC);
-//        assertEquals(OK, res.getStatusCode());
-//        assertEquals(0, res.getBody().size());
+    //il task "Firma Decisione" firma i File che NON vengono caricati dal test in precedenza ==> NullPointerException
+    @Test(expected = NullPointerException.class)
+    public void getProcessInstancesForTrasparenzaTest() throws Exception {
+        MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
+        processInstance = util.mySetUp(acquisti);
+        // Finchè non esco dalla macro-fase "DECISIONE A CONTRATTARE" il flagIsTrasparenza è false quindi la Pi nn appare nella ricerca
+        util.loginPortaleCnr();
+        ResponseEntity<List<Map<String, Object>>> res = flowsProcessInstanceResource
+                .getProcessInstancesForTrasparenza(0, 10, ASC);
+        assertEquals(OK, res.getStatusCode());
+        assertEquals(0, res.getBody().size());
+
+        //Supero fase "Verifica Decisione"
+        util.loginSfd();
+        req.setParameter("processDefinitionId", util.getProcessDefinition());
+        req.setParameter("taskId", getTaskId());
+        req.setParameter("strumentoAcquisizione", "PROCEDURA SELETTIVA - MEPA");
+        req.setParameter("tipologiaProceduraSelettiva", "prezzoPiuBasso");
+        req.setParameter("sceltaUtente", "Approva");
+        req.setParameter("commento", "commento approvazione di TEST");
+        ResponseEntity<ProcessInstanceResponse> response = flowsTaskResource.completeTask(req);
+        assertEquals(OK, response.getStatusCode());
+
+        //Supero fase "Firma Decisione"
+        util.loginDirettore();
+        req.setParameter("processDefinitionId", util.getProcessDefinition());
+        req.setParameter("taskId", getTaskId());
+        req.setParameter("strumentoAcquisizione", "PROCEDURA SELETTIVA - MEPA");
+        req.setParameter("tipologiaProceduraSelettiva", "prezzoPiuBasso");
+        req.setParameter("sceltaUtente", "Firma");
+        req.setParameter("commento", "commento di TEST");
+        req.setParameter("username", "utentefr");
+        req.setParameter("otp", "629961578");
+        req.setParameter("password", "utentefr123");
+        req.setParameter("notaDecisioneContrattare", "nota di TEST");
+        response = flowsTaskResource.completeTask(req);
+        assertEquals(OK, response.getStatusCode());
+
+        util.loginPortaleCnr();
+        //Aspetto che il Listner setti il flag "flagIsTrasparenza" a true in modo che la Pi sia restituita da getProcessInstancesForTrasparenza
+        with().timeout(30, SECONDS).pollDelay(20, SECONDS)
+                .await().until(getPIForTrasparenzaSize(), equalTo(1) );
+    }
+
+
+    private Callable<Integer> getPIForTrasparenzaSize() throws ParseException {
+        util.loginPortaleCnr();
+        ResponseEntity<List<Map<String, Object>>> res1 = flowsProcessInstanceResource
+                .getProcessInstancesForTrasparenza(0, 10, ASC);
+
+        assertEquals(OK, res1.getStatusCode());
+        return () -> res1.getBody().size();
+    }
+
+
+    private String getTaskId() {
+        return taskService.createTaskQuery().singleResult().getId();
     }
 
 

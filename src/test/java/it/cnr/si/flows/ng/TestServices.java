@@ -31,8 +31,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static it.cnr.si.flows.ng.utils.Enum.SiglaList.TIPOLOGIA_ACQUISIZIONE;
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.descrizione;
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.titolo;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -206,13 +205,14 @@ public class TestServices {
                 break;
             case testAcquistiAvvisi:
                 loginResponsabileAcquisti();
-
                 req.setParameter("sceltaUtente", "GestionePreDetermina");
                 req.setParameter("commento", "commento prova Pre-Determina(Junit)");
                 req.setParameter(titolo.name(), TITOLO_DELL_ISTANZA_DEL_FLUSSO);
-                req.setParameter("descrizione", "descrizione prova Pre-Determina(Junit)");
-                req.setParameter("dataScadenzaAvvisoPreDetermina", "2019-06-04T22:00:00.000Z");
+                req.setParameter(descrizione.name(), "descrizione prova Pre-Determina(Junit)");
+                req.setParameter(dataScadenzaAvvisoPreDetermina.name(), "2019-09-04T00:00:00.000Z");
+                req.setParameter(dataScadenzaBando.name(), "2019-09-04T00:00:00.000Z");
                 req.setParameter("idStruttura", "2216");
+                req.setParameter("strumentoAcquisizione", "PROCEDURA SELETTIVA");
 
                 break;
             case iscrizioneElencoOiv:
