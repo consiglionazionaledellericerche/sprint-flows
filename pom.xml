@@ -58,12 +58,6 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.awaitility</groupId>
-                <artifactId>awaitility</artifactId>
-                <version>4.0.1</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
                 <groupId>com.github.ralfstuckert.pdfbox-layout</groupId>
                 <artifactId>pdfbox1-layout</artifactId>
                 <version>0.8.1</version>
@@ -152,12 +146,6 @@
     </dependencyManagement>
 
     <dependencies>
-        <dependency>
-            <groupId>org.awaitility</groupId>
-            <artifactId>awaitility</artifactId>
-            <version>4.0.1</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>com.github.ralfstuckert.pdfbox-layout</groupId>
             <artifactId>pdfbox1-layout</artifactId>
