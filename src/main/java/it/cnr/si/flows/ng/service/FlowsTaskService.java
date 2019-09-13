@@ -406,6 +406,7 @@ public class FlowsTaskService {
 		ArrayList<String[]> entriesIterable = new ArrayList<>();
 		boolean hasHeaders = false;
 		ArrayList<String> headers = new ArrayList<>();
+		headers.add("processInstanceId");
 		headers.add("Identificativo Flusso");
 		headers.add("Titolo");
 		headers.add("Descrizione");
@@ -418,6 +419,7 @@ public class FlowsTaskService {
 			List<RestVariable> variables = processInstance.getVariables();
 			ArrayList<String> tupla = new ArrayList<>();
 			//field comuni a tutte le Process Instances (name , Start date)
+			tupla.add(processInstance.getId());
 			tupla.add(processInstance.getBusinessKey());
 
 			// inizio spacchettamento fields
