@@ -3,6 +3,7 @@ package it.cnr.si.flows.ng.resource;
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
+import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
 import it.cnr.si.security.AuthoritiesConstants;
@@ -13,6 +14,7 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricVariableInstance;
+import org.activiti.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceActionRequest;
@@ -37,10 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.websocket.server.PathParam;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
@@ -377,8 +376,6 @@ public class FlowsProcessInstanceResource {
                 try {
                     if (instance.getProcessVariables().get(field) != null)
                         ret = new ObjectMapper().readValue((String) instance.getProcessVariables().get(field), List.class);
-                    else
-                        ret = "";
                 } catch (IOException e) {
                     LOGGER.error("Errore nel mapping delle variabili di tipo \"impegni_json\"", e);
                 }
@@ -387,8 +384,6 @@ public class FlowsProcessInstanceResource {
                 if (instance.getProcessVariables().get(field) != null)
                     ret = instance.getProcessVariables().get(field);
                 break;
-
-
         }
         return ret;
     }
@@ -434,6 +429,24 @@ public class FlowsProcessInstanceResource {
                     metadatiDocumento.put("key", attachment.getUrl());
                     metadatiDocumento.put("path", attachment.getPath());
                     metadatiDocumento.put("download", env.getProperty("repository.base.url") + "d/a/workspace/SpacesStore/" + attachment.getUrl().split(";")[0] + "/" + attachment.getName());
+                    // recupero la data di pubblicvazione in URP
+                    Optional<HistoricDetailVariableInstanceUpdateEntity> dataPubblicazione = historyService.createHistoricDetailQuery()
+                            .processInstanceId(instance.getId())
+                            .variableUpdates()
+                            .orderByVariableRevision()
+                            .excludeTaskDetails()
+                            .asc()
+                            .list()
+                            .stream()
+                            .map(h -> (HistoricDetailVariableInstanceUpdateEntity) h)
+                            .filter(h -> h.getName().equals(attachment.getName()) &&
+                                    ((FlowsAttachment) h.getValue()).getMetadati().containsKey("azione") &&
+                                    ((Enum.Azione)((FlowsAttachment) h.getValue()).getMetadati().get("azione")).name() == (Enum.Azione.PubblicazioneUrp.name()))
+                            .findAny();
+
+                    if(dataPubblicazione.isPresent())
+                        metadatiDocumento.put("dataPubblicazione", dataPubblicazione.get().getTime());
+
                     documentiPubblicabili.add(metadatiDocumento);
                 }
             }
