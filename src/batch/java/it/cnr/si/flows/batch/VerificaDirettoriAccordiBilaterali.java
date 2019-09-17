@@ -55,15 +55,17 @@ public class VerificaDirettoriAccordiBilaterali {
 	private RelationshipService relationshipService;
 	@Value("${ace.url}")
 	private String aceURL;
-	
+
 	private final Map<String, String> errors = new HashMap<>();
 	int personNr = 1;
 	List <String> results = new ArrayList<>();
+	EntitaOrganizzativaWebDto entitaOrganizzativaResponsabileStruttura = null;
 
 	//@Test questa riga non va mai messa su git
 	//@Test
 	public void runBatch() throws IOException {
 		Map<String, String> persone = getPersoneDaFile();
+		
 		results.add("---------- LISTA RISULTATI -----------------");
 
 		persone.forEach( (username, siglaRuolo) -> {
@@ -75,7 +77,7 @@ public class VerificaDirettoriAccordiBilaterali {
 		errors.forEach( (tripla, risultato) -> {
 			log.error(tripla +": "+ risultato);
 		});
-		
+
 		//RPINT RISULTATI
 		results.forEach(result -> {
 			log.info(result);
@@ -94,28 +96,31 @@ public class VerificaDirettoriAccordiBilaterali {
 			cdsuoAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(username).get("codice_uo").toString();
 		}
 		finally {
-			Object insdipResponsabileUo = new Object();
+			Object insdipAppartenenzaUtente = new Object();
+			insdipAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(username).getIdnsip();
 			String usernameDirettore = null;
-			EntitaOrganizzativaWebDto entitaOrganizzativaDirUo = null;
+			EntitaOrganizzativaWebDto entitaOrganizzativaUtente = null;
 			try {
-				insdipResponsabileUo = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("codice_sede");
-				log.info("getDirettoreCDSUO  FUNZIONA ");
-				usernameDirettore = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("uid").toString();
+				entitaOrganizzativaUtente = aceService.entitaOrganizzativaFindByTerm(insdipAppartenenzaUtente.toString()).get(0);
+			} catch(UnexpectedResultException | FeignException | HttpClientErrorException error3) {
+				log.info("-------------- WARNING: entitaOrganizzativaUtente  NON RIESCO A TROVARE L'ENTITA' ORGANIZZATIVA per la IDNSIP {}", insdipAppartenenzaUtente);
 				try {
-					entitaOrganizzativaDirUo = aceService.entitaOrganizzativaFindByTerm(insdipResponsabileUo.toString()).get(0);
-				} catch(UnexpectedResultException | FeignException | HttpClientErrorException error3) {
-					log.info("-------------- WARNING: entitaOrganizzativaDirUo  NON RIESCO A TROVARE L'ENTITA' ORGANIZZATIVA per la CDSUO {}", cdsuoAppartenenzaUtente);
-					try {
-						entitaOrganizzativaDirUo = aceService.entitaOrganizzativaFindByTerm(insdipResponsabileUo.toString()).get(0);
-					} catch(UnexpectedResultException | FeignException | HttpClientErrorException error4) {
-						log.info("-------------- ERROR: entitaOrganizzativaDirUo  2o TENTATIVO NON RIESCO A TROVARE L'ENTITA' ORGANIZZATIVA per la CDSUO {}", cdsuoAppartenenzaUtente);
-					}
+					entitaOrganizzativaUtente = aceService.entitaOrganizzativaFindByTerm(insdipAppartenenzaUtente.toString()).get(0);
+				} catch(UnexpectedResultException | FeignException | HttpClientErrorException error4) {
+					log.info("-------------- ERROR: entitaOrganizzativaUtente  2o TENTATIVO NON RIESCO A TROVARE L'ENTITA' ORGANIZZATIVA per la IDNSIP {}", insdipAppartenenzaUtente);
+				}
+			}
+			finally {
+				try {
+					usernameDirettore = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("uid").toString();
+				} catch(UnexpectedResultException | FeignException | HttpClientErrorException error4) {
+					log.info("-------------- ERROR: usernameDirettore  NON RIESCO A TROVARE il direttore per la CDSUO {}", cdsuoAppartenenzaUtente);
 				}
 				finally {
 
 					//	NEW
-					List<GerarchiaWebDto> listaGerarchia = aceBridgeService.getParents(entitaOrganizzativaDirUo.getId());
-					EntitaOrganizzativaWebDto entitaOrganizzativaResponsabileStruttura = null;
+					List<GerarchiaWebDto> listaGerarchia = aceBridgeService.getParents(entitaOrganizzativaUtente.getId());
+					log.info("-------------- listaGerarchia size {}", listaGerarchia.size());
 					List<GerarchiaWebDto> gerarchiaResults = listaGerarchia.stream()
 							.filter(gerarchiaSingola -> gerarchiaSingola.getTipo().getId() == 2 || gerarchiaSingola.getTipo().getId() == 1)
 							.collect(Collectors.toList());
@@ -126,7 +131,7 @@ public class VerificaDirettoriAccordiBilaterali {
 					if (gerarchia.getTipo().getId() == 1) {
 						entitaOrganizzativaResponsabileStruttura = gerarchia.getPadre();
 					} else {
-						entitaOrganizzativaResponsabileStruttura = entitaOrganizzativaDirUo;
+						entitaOrganizzativaResponsabileStruttura = entitaOrganizzativaUtente;
 					}
 
 
@@ -137,27 +142,28 @@ public class VerificaDirettoriAccordiBilaterali {
 					String gruppoResponsabileStrutturaPadre = "responsabile-struttura@" + entitaOrganizzativaResponsabileStruttura.getId();
 
 					Set<String> membriResponsabileStrutturaPadre = membershipService.getAllUsersInGroup(gruppoResponsabileStrutturaPadre);
+					log.info("nr membriResponsabileStrutturaPadre  {} per struttura {} ", membriResponsabileStrutturaPadre.size(), entitaOrganizzativaResponsabileStruttura.getId());
 					if (membriResponsabileStrutturaPadre.size() == 0){
 						log.info("il direttore del padre {} NON ESISTE ");
 					}
 					membriResponsabileStrutturaPadre.forEach(responsabile -> {
 						if(responsabile.toString().equals(nomeDirettoreSiper)) {
-							log.info("il direttore del padre {} CORRISPONDE al direttore SIPER {} ", responsabile.toString(), nomeDirettoreSiper);
-							results.add("OK -- il direttore del padre [" + responsabile.toString()  +"] CORRISPONDE al direttore SIPER "+ nomeDirettoreSiper + " --");
+							log.info("il direttore della struttura {} [{}] è {} CORRISPONDE al direttore SIPER {} ", entitaOrganizzativaResponsabileStruttura.getId(), entitaOrganizzativaResponsabileStruttura.getDenominazione(), responsabile.toString(), nomeDirettoreSiper);
+							results.add("OK -- il direttore della struttura padre [" + entitaOrganizzativaResponsabileStruttura.getId() + " - " + entitaOrganizzativaResponsabileStruttura.getDenominazione() +"  [" + responsabile.toString()  +"] CORRISPONDE al direttore SIPER "+ nomeDirettoreSiper + " --");
 
 						} else {
-							log.info("il direttore del padre {} NON CORRISPONDE al direttore SIPER {} ", responsabile.toString(), nomeDirettoreSiper);
-							results.add("NO -- il direttore del padre [" + responsabile.toString()  +"] NON CORRISPONDE al direttore SIPER "+ nomeDirettoreSiper + " --");
+							log.info("il direttore della struttura padre {} [{}] è {} NON CORRISPONDE al direttore SIPER {} ", entitaOrganizzativaResponsabileStruttura.getId(), entitaOrganizzativaResponsabileStruttura.getDenominazione(), responsabile.toString(), nomeDirettoreSiper);
+							results.add("NO -- il direttore della struttura padre [" + entitaOrganizzativaResponsabileStruttura.getId() + " - " + entitaOrganizzativaResponsabileStruttura.getDenominazione() +"  [" + responsabile.toString()  +"] NON CORRISPONDE al direttore SIPER "+ nomeDirettoreSiper + " --");
 						}
 					});				
 
 					//FINE - NEW
 
-					Integer idEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getId();
-					String siglaEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getSigla().toString();
-					String denominazioneEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getDenominazione().toString();
-					String cdsuoEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getCdsuo().toString();
-					String idnsipEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getIdnsip().toString();
+					Integer idEntitaorganizzativaResponsabileUtente = entitaOrganizzativaUtente.getId();
+					String siglaEntitaorganizzativaResponsabileUtente = entitaOrganizzativaUtente.getSigla().toString();
+					String denominazioneEntitaorganizzativaResponsabileUtente = entitaOrganizzativaUtente.getDenominazione().toString();
+					String cdsuoEntitaorganizzativaResponsabileUtente = entitaOrganizzativaUtente.getCdsuo().toString();
+					String idnsipEntitaorganizzativaResponsabileUtente = entitaOrganizzativaUtente.getIdnsip().toString();
 					log.info("OK: L'utente {} ha come direttore {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", username, usernameDirettore, denominazioneEntitaorganizzativaResponsabileUtente, siglaEntitaorganizzativaResponsabileUtente, idEntitaorganizzativaResponsabileUtente, cdsuoEntitaorganizzativaResponsabileUtente, idnsipEntitaorganizzativaResponsabileUtente);
 					String gruppoDirigenteRichiedente = "responsabile-struttura@" + idEntitaorganizzativaResponsabileUtente;
 
@@ -165,21 +171,17 @@ public class VerificaDirettoriAccordiBilaterali {
 					//List<String> members = membershipService.findMembersInGroup(gruppoDirigenteRichiedente);
 					if (members.size() == 0) {
 						log.info(" ERROR: Il gruppo RESPONSABILE STRUTTURA: {} NON HA NESSUNO", gruppoDirigenteRichiedente);
+						results.add("NO -- Il gruppo RESPONSABILE STRUTTURA: " + gruppoDirigenteRichiedente + " NON HA NESSUNO");
 					}
 					if (members.size() > 1) {
 						log.info(" ERROR: Il gruppo RESPONSABILE STRUTTURA: {} HA PIU' MEMBRI", gruppoDirigenteRichiedente);
+						results.add("NO -- Il gruppo RESPONSABILE STRUTTURA: " + gruppoDirigenteRichiedente +  " HA PIU' MEMBRI");
 					}
 					members.forEach(member -> {
 						log.info("L'utente {} fa parte del gruppo {} ", member.toString(), gruppoDirigenteRichiedente);
+
 					});
 				}
-			} catch(UnexpectedResultException | FeignException | HttpClientErrorException error2) {
-				log.info("-------------- ERROR: getDirettoreCDSUO  NON HA FUNZIONATO!!!!!!!!!!!!!!! l'utente {} non ha DIRETTORE per la CDSUO {}", username, cdsuoAppartenenzaUtente);
-			}
-			finally {
-				log.info("-------------- NEXT");
-
-
 			}
 		}
 	}
