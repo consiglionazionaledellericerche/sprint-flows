@@ -215,7 +215,7 @@ public class FlowsProcessInstanceResource {
      */
     @PostMapping(value = "/getProcessInstancesForTrasparenza", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.ADMIN)
-    @PreAuthorize("hasRole('ROLE_applicazione-portalecnr@0000')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR hasRole('ROLE_applicazione-portalecnr@0000')")
     @Timed
     public ResponseEntity<List<Map<String, Object>>> getProcessInstancesForTrasparenza(
             @RequestParam("firstResult") int firstResult,
@@ -231,7 +231,7 @@ public class FlowsProcessInstanceResource {
 
     @PostMapping(value = "/getProcessInstancesForURP", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.ADMIN)
-    @PreAuthorize("hasRole('ROLE_applicazione-portalecnr@0000')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR hasRole('ROLE_applicazione-portalecnr@0000')")
     @Timed
     public ResponseEntity<List<Map<String, Object>>> getProcessInstancesForURP(
             @RequestParam("terminiRicorso") int terminiRicorso,
