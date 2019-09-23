@@ -89,6 +89,21 @@ public class Enum {
         CANCELLATA;
     }
 
+    public enum StatoDomandeSTMEnum {
+        APERTA,
+        CHIUSA,
+        INVIATA,
+        VALIDATA,
+        NON_VALIDATA,
+        IN_MODIFICA,
+        RESPINTA,
+        VALUTATA_SCIENTIFICAMENTE,
+        AUTORIZZATA,
+        ANNULLATA,
+        ACCETTATA,
+        CANCELLATA;
+    }
+    
     public enum ProcessDefinitionEnum {
         acquisti("acquisti","acquisti"),
         permessiFerie("permessi-ferie", "permessi-ferie"),

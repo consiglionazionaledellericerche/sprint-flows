@@ -6,6 +6,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -31,9 +32,13 @@ public class TimerSettings implements Serializable {
     private String timerId;
 
     @NotNull
+    @Column(name = "newDate", nullable = false)
+    private Date newDate;
+    
+    @NotNull
     @Column(name = "yearAddValue", nullable = false)
     private int yearAddValue;
-
+    
     @NotNull
     @Column(name = "monthAddValue", nullable = false)
     private int monthAddValue;
@@ -82,6 +87,21 @@ public class TimerSettings implements Serializable {
 
     public void setTimerId(String timerId) {
         this.timerId = timerId;
+    }
+    
+    
+    public Date getNewDate() {
+        return newDate;
+    }
+    
+    public TimerSettings newDate(Date newDate) {
+        this.newDate = newDate;
+        return this;
+    }
+    
+    public void setNewDate(Date newDate) {
+        this.newDate = newDate;
+
     }
 
     public int getYearAddValue() {
@@ -166,4 +186,5 @@ public class TimerSettings implements Serializable {
             ", minuteAddValue='" + minuteAddValue + "'" +
             '}';
     }
+
 }

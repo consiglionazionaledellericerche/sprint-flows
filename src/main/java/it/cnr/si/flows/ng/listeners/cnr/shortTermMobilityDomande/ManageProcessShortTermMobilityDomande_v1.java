@@ -1,0 +1,256 @@
+package it.cnr.si.flows.ng.listeners.cnr.shortTermMobilityDomande;
+
+
+import it.cnr.si.domain.enumeration.ExternalApplication;
+import it.cnr.si.domain.enumeration.ExternalMessageVerb;
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.service.*;
+import it.cnr.si.flows.ng.utils.Enum;
+import it.cnr.si.flows.ng.utils.Enum.StatoDomandeSTMEnum;
+import it.cnr.si.flows.ng.utils.Enum.StatoDomandeSTMEnum;
+import it.cnr.si.service.ExternalMessageService;
+import org.activiti.engine.ManagementService;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
+import org.activiti.engine.delegate.DelegateExecution;
+import org.activiti.engine.delegate.ExecutionListener;
+import org.activiti.engine.delegate.Expression;
+import org.activiti.engine.runtime.Job;
+import org.activiti.engine.runtime.ProcessInstance;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
+
+import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.statoFinaleDomanda;
+import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
+
+@Component
+@Profile("cnr")
+public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListener {
+	private static final long serialVersionUID = 686169707042367215L;
+	private static final Logger LOGGER = LoggerFactory.getLogger(ManageProcessShortTermMobilityDomande_v1.class);
+
+
+	@Value("${cnr.abil.url}")
+	private String urlShortTermMobility;
+	@Value("${cnr.abil.domandePath}")
+	private String pathDomandeShortTermMobility;
+
+	@Inject
+	private FirmaDocumentoService firmaDocumentoService;
+	@Inject
+	private ProtocolloDocumentoService protocolloDocumentoService;
+	@Inject
+	private FlowsProcessInstanceService flowsProcessInstanceService;
+	@Inject
+	private StartShortTermMobilityDomandeSetGroupsAndVisibility startAccordiInternazionaliDomandeSetGroupsAndVisibility;
+	@Inject
+	private RuntimeService runtimeService;
+	@Inject
+	private FlowsPdfService flowsPdfService;
+	@Inject
+	private FlowsAttachmentService flowsAttachmentService;
+	@Inject
+	private ExternalMessageService externalMessageService;	
+	@Inject
+	private TaskService taskService;
+	@Inject
+	private ManagementService managementService;
+
+
+	private Expression faseEsecuzione;
+
+	public void restToApplicazioneSTM(DelegateExecution execution, StatoDomandeSTMEnum statoDomanda) {
+
+		// @Value("${cnr.accordi-bilaterali.url}")
+		// private String urlShortTermMobility;
+		// @Value("${cnr.accordi-bilaterali.usr}")
+		// private String usrAccordiBilaterali;	
+		// @Value("${cnr.accordi-bilaterali.psw}")
+		// private String pswAccordiBilaterali;
+		Double idDomanda = Double.parseDouble(execution.getVariable("idDomanda").toString());
+		Map<String, Object> abilPayload = new HashMap<String, Object>()
+		{
+			{
+				put("idDomanda", idDomanda);
+				put("stato", statoDomanda.name().toString());
+			}	
+		};
+
+		String url = urlShortTermMobility + pathDomandeShortTermMobility;
+		externalMessageService.createExternalMessage(url, ExternalMessageVerb.POST, abilPayload, ExternalApplication.ABIL);
+	}
+
+
+	@Override
+	public void notify(DelegateExecution execution) throws Exception {
+
+		Map<String, FlowsAttachment> attachmentList;
+		String processInstanceId =  execution.getProcessInstanceId();
+		String executionId =  execution.getId();
+		String stato =  execution.getCurrentActivityName();
+		String sceltaUtente = "start";
+		if(execution.getVariable("sceltaUtente") != null) {
+			sceltaUtente =  (String) execution.getVariable("sceltaUtente");	
+		}
+		LOGGER.info("ProcessInstanceId: " + processInstanceId);
+		String faseEsecuzioneValue = "noValue";
+		faseEsecuzioneValue = faseEsecuzione.getValue(execution).toString();
+		LOGGER.info("-- azioneScelta: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
+		//CHECK PER ANNULLO FLUSSO 
+		if (execution.getVariableInstance("motivazioneEliminazione") == null) {
+			switch(faseEsecuzioneValue){  
+			// START
+			case "process-start": {
+				startAccordiInternazionaliDomandeSetGroupsAndVisibility.configuraVariabiliStart(execution);
+			};break;    	
+			// START
+			case "validazione-start": {
+				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
+			};break;  
+			case "validazione-end": {
+				//flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
+				String idDipartimento = execution.getVariable("dipartimentoId").toString();
+				String gruppogruppoValutatoreScientificoSTMDipartimento = "gruppoValutatoreScientificoSTMDipartimento@" + idDipartimento;
+				runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppogruppoValutatoreScientificoSTMDipartimento, PROCESS_VISUALIZER);
+				execution.setVariable("gruppogruppoValutatoreScientificoSTMDipartimento", gruppogruppoValutatoreScientificoSTMDipartimento);
+				LOGGER.debug("Imposto i gruppi dipartimento : {} - del flusso {}", idDipartimento, gruppogruppoValutatoreScientificoSTMDipartimento);
+				// INPUT DEVE PREVEDERE LA DOMANDA PDF - NON GENERO LA DOMANDA
+				//				String nomeFile="domandaShortTermMobility";
+				//				String labelFile="Domanda";
+				//				flowsPdfService.makePdf(nomeFile, processInstanceId);
+				//				FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
+				//				documentoGenerato.setLabel(labelFile);
+				//				flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
+			};break;  	 
+			case "modifica-start": {
+				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.IN_MODIFICA);
+			};break;
+			case "endevent-non-validata-start": {
+				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.RESPINTA);
+				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.RESPINTA);
+				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.RESPINTA.toString());
+			};break;    	
+			case "endevent.validata-start": {
+				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.VALIDATA);
+				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.VALIDATA);
+				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.VALIDATA.toString());
+			};break;  
+			case "endevent-annullata-start": {
+				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.ANNULLATA);
+				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.ANNULLATA);
+				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.ANNULLATA.toString());
+			};break;
+			// SUBFLUSSO VALIDAZIONE DIRIGENTE
+			case "validazioneDirigente-end": {
+				LOGGER.debug("**** validazioneDirigente-end");
+			};break; 			
+			case "endevent-respinta-start": {
+				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.RESPINTA);
+				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.RESPINTA);
+				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.RESPINTA.toString());
+			};break;					
+			case "endevent-autorizzata-start": {
+				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.AUTORIZZATA);
+				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.AUTORIZZATA);
+				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.AUTORIZZATA.toString());
+			};break;						
+			case "accettazione-start": {
+				LOGGER.debug("**** accettazione-start");
+			};break; 			
+			case "accettazione-end": {
+				LOGGER.debug("**** accettazione-end");
+				if(!sceltaUtente.equals("Respingi")) {
+					execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.ACCETTATA);
+					restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.ACCETTATA);
+					flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.ACCETTATA.toString());
+				}
+				// VERIFICA TUTTE LE DOMANDE DI FLUSSI ATTIVI PER QUEL BANDO
+				List<ProcessInstance> processinstancesListaPerBando = runtimeService.createProcessInstanceQuery()
+						.variableValueEquals("idBando", execution.getVariable("idBando"))
+						.list();
+				List<ProcessInstance> processinstancesListaDomandeAccettatePerBando = runtimeService.createProcessInstanceQuery()
+						.variableValueEquals(statoFinaleDomanda.name(), execution.getVariable(Enum.StatoDomandeSTMEnum.ACCETTATA.toString()))
+						.variableValueEquals("idBando", execution.getVariable("idBando"))
+						.list();
+				
+				if (processinstancesListaPerBando.size() == processinstancesListaDomandeAccettatePerBando.size()) {
+					processinstancesListaDomandeAccettatePerBando.forEach(( processInstance) -> {
+						runtimeService.signal(processInstance.getId());
+						LOGGER.info("-- sblocco la processInstance: " + processInstance.getName() + " (" + processInstance.getId() + ") ");
+					});
+				}
+
+			};break;  
+			case "valutazione-scientifica-start": {
+				LOGGER.debug("**** valutazione-scientifica-start");
+			};break; 			
+
+			case "valutazione-scientifica-end": {
+				LOGGER.info("-- valutazione-scientifica: valutazione-scientifica");
+				if(execution.getVariable("sceltaUtente").equals("CambiaDipartimento")) {
+					String idDipartimento = execution.getVariable("dipartimentoId").toString();
+					String gruppogruppoValutatoreScientificoSTMDipartimento = "gruppoValutatoreScientificoSTMDipartimento@" + idDipartimento;
+					runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppogruppoValutatoreScientificoSTMDipartimento, PROCESS_VISUALIZER);
+					execution.setVariable("gruppogruppoValutatoreScientificoSTMDipartimento", gruppogruppoValutatoreScientificoSTMDipartimento);
+					LOGGER.debug("Imposto i gruppi dipartimento : {} - del flusso {}", idDipartimento, gruppogruppoValutatoreScientificoSTMDipartimento);
+				} else {
+					execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE);
+					restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE);
+					flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE.toString());
+					//CREAZIONE PDF VALUTAZIONE
+					String nomeFile="valutazioneShortTermMobility";
+					String labelFile="Scheda Valutazione Domanda";
+					//execution.setVariable("punteggio_totale", (Double.parseDouble(execution.getVariable("punteggio_pianoDiLavoro").toString().replaceAll(",", ".")) + Double.parseDouble(execution.getVariable("punteggio_qualitaProgetto").toString().replaceAll(",", "."))+ Double.parseDouble(execution.getVariable("punteggio_valoreAggiunto").toString().replaceAll(",", "."))+ Double.parseDouble(execution.getVariable("punteggio_qualitaGruppoDiRicerca").toString().replaceAll(",", "."))));
+					flowsPdfService.makePdf(nomeFile, processInstanceId);
+					FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
+					documentoGenerato.setLabel(labelFile);
+					flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
+					// VERIFICA TUTTE LE DOMANDE DI FLUSSI ATTIVI PER QUEL BANDO
+					List<ProcessInstance> processinstancesListaPerBando = runtimeService.createProcessInstanceQuery()
+							.variableValueEquals("idBando", execution.getVariable("idBando"))
+							.list();
+					List<ProcessInstance> processinstancesListaDomandeValutatePerBando = runtimeService.createProcessInstanceQuery()
+							.variableValueEquals(statoFinaleDomanda.name(), execution.getVariable(Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE.toString()))
+							.variableValueEquals("idBando", execution.getVariable("idBando"))
+							.list();
+					
+					if (processinstancesListaPerBando.size() == processinstancesListaDomandeValutatePerBando.size()) {
+						//START FLUSSO BANDI
+					}
+				}
+			};break;	
+			//TIMERS
+			case "timer-chiusura-bando-end": {
+				int nrNotifiche = 1;
+				if(execution.getVariable("numeroNotificheTimer2") != null) {
+					nrNotifiche = (Integer.parseInt(execution.getVariable("numeroNotificheTimer2").toString()) + 1);
+				} 
+				execution.setVariable("numeroNotificheTimer2", nrNotifiche);
+				LOGGER.debug("Timer2 nrNotifiche: {}", nrNotifiche);
+			};break;  
+
+			// DEFAULT  
+			default:  {
+			};break;    
+
+			} 
+		} else {
+			restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.CANCELLATA);
+			List<Job> timerAttivi = managementService.createJobQuery().timers().processInstanceId(processInstanceId).list();
+			timerAttivi.forEach(singoloTimer -> {
+				if (singoloTimer.getId() != null) {
+					LOGGER.debug("cancello il timer: {}", singoloTimer.getId());
+					managementService.deleteJob(singoloTimer.getId());
+				}
+			});
+		}
+	}
+}
