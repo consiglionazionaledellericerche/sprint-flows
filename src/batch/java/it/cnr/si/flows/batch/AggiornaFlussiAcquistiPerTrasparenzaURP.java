@@ -66,6 +66,7 @@ public class AggiornaFlussiAcquistiPerTrasparenzaURP {
 
 	private final Map<String, String> errors = new HashMap<>();
 	int personNr = 1;
+	int cnt = 0;
 	List <String> results = new ArrayList<>();
 	EntitaOrganizzativaWebDto entitaOrganizzativaResponsabileStruttura = null;
 
@@ -75,6 +76,7 @@ public class AggiornaFlussiAcquistiPerTrasparenzaURP {
 
 		results.add("---------- LISTA RISULTATI -----------------");
 
+
 		HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()
 				.includeProcessVariables()
 				.processDefinitionKey("acquisti")
@@ -82,12 +84,13 @@ public class AggiornaFlussiAcquistiPerTrasparenzaURP {
 		//.processInstanceNameLike("%Pre Determina%")
 		//.variableValueEquals("flagIsTrasparenza", "true");
 		historicProcessInstanceQuery.list().forEach(processInstance -> {
+			cnt++;
 			setFlagIsTrasparenza(processInstance);
 			setDataScadenzaBando(processInstance);
-			log.info("il processo: {}, id = {} del flusso {}", processInstance.getId(), processInstance.getName(), processInstance.getProcessDefinitionKey());
+			setStatoFinaleDomanda(processInstance);
+			log.info("{}) il processo: {}, id = {} del flusso {}", cnt, processInstance.getId(), processInstance.getName(), processInstance.getProcessDefinitionKey());
 			if(processInstance.getProcessVariables().get("strumentoAcquisizione") != null) {
 				log.info(" strumentoAcquisizione: {} ", processInstance.getProcessVariables().get("strumentoAcquisizione").toString());
-				log.info(" strumentoAcquisizione index: {}", processInstance.getProcessVariables().get("strumentoAcquisizione").toString().indexOf("PROCEDURA SELETTIVA"));
 			}
 		});
 
@@ -109,8 +112,9 @@ public class AggiornaFlussiAcquistiPerTrasparenzaURP {
 				)
 		{
 			if (processInstance.getProcessVariables().get("flagIsTrasparenza") != null) {
-				results.add(" *** " + processInstance.getName() + " flagIsTrasparenza: " + processInstance.getProcessVariables().get("flagIsTrasparenza").toString());
+				log.info(" ***  il processo: " + processInstance.getId() + " -- " + processInstance.getName() + " flagIsTrasparenza: " + processInstance.getProcessVariables().get("flagIsTrasparenza").toString());
 			} else {
+				results.add(" *** AGGIUNGO flagIsTrasparenza true al processo: " + processInstance.getId() + " -- " + processInstance.getName() );
 				runtimeService.setVariable(processInstance.getId(), "flagIsTrasparenza", "true");
 			}
 		}
@@ -128,13 +132,25 @@ public class AggiornaFlussiAcquistiPerTrasparenzaURP {
 				)
 		{
 			if (processInstance.getProcessVariables().get("dataScadenzaBando") != null) {
-				results.add(" ---- " + processInstance.getName() + " dataScadenzaBando: " + processInstance.getProcessVariables().get("dataScadenzaBando").toString());
+				log.info(" ---- " + processInstance.getId() + " -- "  + processInstance.getName() + " dataScadenzaBando: " + processInstance.getProcessVariables().get("dataScadenzaBando").toString());
 			} else {
-				//runtimeService.setVariable(processInstance.getId(), "dataScadenzaBando", "2019-09-12T22:00:00.000Z");
+				results.add(" ---- AGGIUNGO dataScadenzaBando 2019-09-12T22:00:00.000Z al" + processInstance.getId() + " -- "  + processInstance.getName() );
+				runtimeService.setVariable(processInstance.getId(), "dataScadenzaBando", "2019-09-12T22:00:00.000Z");
 			}
 		}
 	}
+
+	private void setStatoFinaleDomanda(HistoricProcessInstance processInstance) {
+
+		if (processInstance.getProcessVariables().get("statoFinaleDomanda") != null) {
+			log.info(" *** il processo: " + processInstance.getId() + " -- " + processInstance.getName() + " statoFinaleDomanda: " + processInstance.getProcessVariables().get("statoFinaleDomanda").toString());
+		} else {
+			results.add(" *** AGGIUNGO statoFinaleDomanda IN CORSO al processo: " + processInstance.getId() + " -- " + processInstance.getName() );
+			runtimeService.setVariable(processInstance.getId(), "statoFinaleDomanda", "IN CORSO");
+		}
+	}
 }
+
 
 
 
