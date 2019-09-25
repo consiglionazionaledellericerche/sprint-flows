@@ -85,13 +85,13 @@ public class AggiornaFlussiAcquistiPerTrasparenzaURP {
 		//.variableValueEquals("flagIsTrasparenza", "true");
 		historicProcessInstanceQuery.list().forEach(processInstance -> {
 			cnt++;
-			setFlagIsTrasparenza(processInstance);
-			setDataScadenzaBando(processInstance);
-			setStatoFinaleDomanda(processInstance);
 			log.info("{}) il processo: {}, id = {} del flusso {}", cnt, processInstance.getId(), processInstance.getName(), processInstance.getProcessDefinitionKey());
 			if(processInstance.getProcessVariables().get("strumentoAcquisizione") != null) {
 				log.info(" strumentoAcquisizione: {} ", processInstance.getProcessVariables().get("strumentoAcquisizione").toString());
 			}
+			setFlagIsTrasparenza(processInstance);
+			setDataScadenzaBando(processInstance);
+			setStatoFinaleDomanda(processInstance);
 		});
 
 		//RPINT RISULTATI
@@ -99,7 +99,6 @@ public class AggiornaFlussiAcquistiPerTrasparenzaURP {
 			log.info(result);
 		});
 	}
-
 
 	private void setFlagIsTrasparenza(HistoricProcessInstance processInstance) {
 
@@ -134,7 +133,7 @@ public class AggiornaFlussiAcquistiPerTrasparenzaURP {
 			if (processInstance.getProcessVariables().get("dataScadenzaBando") != null) {
 				log.info(" ---- " + processInstance.getId() + " -- "  + processInstance.getName() + " dataScadenzaBando: " + processInstance.getProcessVariables().get("dataScadenzaBando").toString());
 			} else {
-				results.add(" ---- AGGIUNGO dataScadenzaBando 2019-09-12T22:00:00.000Z al" + processInstance.getId() + " -- "  + processInstance.getName() );
+				results.add(" ---- AGGIUNGO dataScadenzaBando 2019-09-12T22:00:00.000Z al processo: " + processInstance.getId() + " -- "  + processInstance.getName() );
 				runtimeService.setVariable(processInstance.getId(), "dataScadenzaBando", "2019-09-12T22:00:00.000Z");
 			}
 		}
