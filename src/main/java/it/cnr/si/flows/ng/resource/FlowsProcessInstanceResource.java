@@ -348,7 +348,7 @@ public class FlowsProcessInstanceResource {
         List<Map<String, Object>> response = null;
 
         if(typeView != null && typeView.equals(EXPORT_URP)){
-            response =historicProcessInstances.stream()
+            response = historicProcessInstances.stream()
                     .map(instance -> trasformaVariabili(instance, jsonFieldsToExport, false))
                     .collect(Collectors.toList());
         } else if(typeView != null && typeView.equals(EXPORT_TRASPARENZA)){
@@ -363,6 +363,9 @@ public class FlowsProcessInstanceResource {
     private Object mapVariable(HistoricProcessInstance instance, String field) {
         Object ret = null;
         switch (field) {
+            case "businessKey":
+                ret = instance.getBusinessKey();
+                break;
             case "stato":
                 ret = new JSONObject(instance.getName()).getString("stato");
                 break;
