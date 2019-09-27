@@ -434,7 +434,7 @@ public class FlowsProcessInstanceService {
 				historicProcessInstanceQuery
 						.variableValueLessThan(dataScadenzaBando.name(), utils.formattaData(appo.getTime()));
 			} else {
-				// GARE IN CORSO data scadenza presentbvmnvbnmvmvgazione offerta >= NOW
+				// GARE IN CORSO data scadenza presentazione offerta >= NOW
 				historicProcessInstanceQuery
 						.variableValueGreaterThanOrEqual(dataScadenzaBando.name(), now);
 			}
