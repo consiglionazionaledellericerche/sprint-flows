@@ -133,21 +133,41 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 			case "modifica-start": {
 				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.IN_MODIFICA);
 			};break;
-			case "endevent-non-validata-start": {
-				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.RESPINTA);
-				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.RESPINTA);
-				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.RESPINTA.toString());
-			};break;    	
-			case "endevent.validata-start": {
-				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.VALIDATA);
-				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.VALIDATA);
-				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.VALIDATA.toString());
-			};break;  
-			case "endevent-annullata-start": {
-				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.ANNULLATA);
-				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.ANNULLATA);
-				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.ANNULLATA.toString());
-			};break;
+
+			case "pre-accettazione-start": {
+				if(sceltaUtente.equals("Respingi")) {
+					execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.RESPINTA);
+					restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.RESPINTA);
+					flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.RESPINTA.toString());
+				} else {
+					if(sceltaUtente.equals("Annulla")) {
+						execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.ANNULLATA);
+						restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.ANNULLATA);
+						flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.ANNULLATA.toString());
+					}
+					else{
+						execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.VALIDATA);
+						restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.VALIDATA);
+						flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.VALIDATA.toString());
+					}
+				}
+			};break; 			
+
+//			case "endevent-non-validata-start": {
+//				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.RESPINTA);
+//				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.RESPINTA);
+//				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.RESPINTA.toString());
+//			};break;    	
+//			case "endevent-validata-start": {
+//				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.VALIDATA);
+//				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.VALIDATA);
+//				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.VALIDATA.toString());
+//			};break;  
+//			case "endevent-annullata-start": {
+//				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.ANNULLATA);
+//				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.ANNULLATA);
+//				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.ANNULLATA.toString());
+//			};break;
 			// SUBFLUSSO VALIDAZIONE DIRIGENTE
 			case "validazioneDirigente-end": {
 				LOGGER.debug("**** validazioneDirigente-end");
@@ -180,7 +200,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 						.variableValueEquals(statoFinaleDomanda.name(), execution.getVariable(Enum.StatoDomandeSTMEnum.ACCETTATA.toString()))
 						.variableValueEquals("idBando", execution.getVariable("idBando"))
 						.list();
-				
+
 				if (processinstancesListaPerBando.size() == processinstancesListaDomandeAccettatePerBando.size()) {
 					processinstancesListaDomandeAccettatePerBando.forEach(( processInstance) -> {
 						runtimeService.signal(processInstance.getId());
@@ -221,7 +241,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 							.variableValueEquals(statoFinaleDomanda.name(), execution.getVariable(Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE.toString()))
 							.variableValueEquals("idBando", execution.getVariable("idBando"))
 							.list();
-					
+
 					if (processinstancesListaPerBando.size() == processinstancesListaDomandeValutatePerBando.size()) {
 						//START FLUSSO BANDI
 					}
