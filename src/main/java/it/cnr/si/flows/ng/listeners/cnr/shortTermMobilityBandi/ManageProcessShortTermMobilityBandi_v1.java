@@ -101,7 +101,18 @@ public class ManageProcessShortTermMobilityBandi_v1 implements ExecutionListener
 		// START
 		case "process-start": {
 			startShortTermMobilityBandiSetGroupsAndVisibility.configuraVariabiliStart(execution);
+			execution.setVariable("tutteDomandeAccettateFlag", "false");
 		};break;    
+
+		case "elenco-domande-start": {
+			// VERIFICA TUTTE LE DOMANDE DI FLUSSI ATTIVI PER QUEL BANDO
+//			List<ProcessInstance> processinstancesListaPerBando = runtimeService.createProcessInstanceQuery()
+//					.processDefinitionKey("short-term-mobility-domande")
+//					.variableValueEquals("idBando", execution.getVariable("idBando"))
+//					.list();
+
+		};break;  
+
 		// START
 		case "caricamento-verbale-start": {
 			creaExportCsvDomandePerBando(execution, (execution.getVariable("idBando").toString()));

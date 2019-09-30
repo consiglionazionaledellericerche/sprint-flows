@@ -230,7 +230,6 @@ public class FlowsProcessInstanceResource {
 
 
     @PostMapping(value = "/getProcessInstancesForURP", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured(AuthoritiesConstants.ADMIN)
     @PreAuthorize("hasRole('ROLE_ADMIN') OR hasRole('ROLE_applicazione-portalecnr@0000')")
     @Timed
     public ResponseEntity<List<Map<String, Object>>> getProcessInstancesForURP(
