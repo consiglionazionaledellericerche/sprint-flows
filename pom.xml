@@ -53,6 +53,8 @@
         <sprint.version>2.0.1</sprint.version>
         <start-class>it.cnr.si.FlowsApp</start-class>
         <storage-cloud-cmis.version>0.0.6</storage-cloud-cmis.version>
+        <janino.version>3.0.6</janino.version>
+        <gelf.version>1.12.0</gelf.version>
     </properties>
 
     <dependencyManagement>
@@ -349,6 +351,18 @@
             <artifactId>thymeleaf-spring4</artifactId>
             <version>3.0.6.RELEASE</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.janino</groupId>
+            <artifactId>janino</artifactId>
+            <version>${janino.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>biz.paluch.logging</groupId>
+            <artifactId>logstash-gelf</artifactId>
+            <version>${gelf.version}</version>
+        </dependency>
+
     </dependencies>
 
     <build>
