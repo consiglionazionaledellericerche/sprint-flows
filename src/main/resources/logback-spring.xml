@@ -62,4 +62,45 @@
         <appender-ref ref="CONSOLE"/>
     </root>
 
+    <springProperty scope="context" name="graylog.host" source="graylog.host"/>
+    <springProperty scope="context" name="graylog.port" source="graylog.port"/>
+    <springProperty scope="context" name="graylog.loglevel" source="graylog.loglevel"/>
+
+    <if condition='isDefined("graylog.host")'>
+        <then>
+            <appender name="gelf" class="biz.paluch.logging.gelf.logback.GelfLogbackAppender">
+                <host>udp:${graylog.host}</host>
+                <port>${graylog.port}</port>
+                <!--<originHost>ace.cnr.it</originHost>-->
+                <version>1.1</version>
+                <facility>ace-prova</facility>
+                <extractStackTrace>true</extractStackTrace>
+                <filterStackTrace>true</filterStackTrace>
+                <mdcProfiling>true</mdcProfiling>
+                <timestampPattern>yyyy-MM-dd HH:mm:ss,SSSS</timestampPattern>
+                <maximumMessageSize>8192</maximumMessageSize>
+
+                <!-- This are static fields -->
+                <additionalFields>
+                    environment=dev,
+                    tag=sprint-flows
+                </additionalFields>
+                <!--&lt;!&ndash; Optional: Specify field types &ndash;&gt;-->
+                <additionalFieldTypes>environment=String,tag=String</additionalFieldTypes>
+
+                <!-- This are fields using MDC -->
+                <mdcFields>mdcField1,mdcField2</mdcFields>
+                <dynamicMdcFields>mdc.*,(mdc|MDC)fields</dynamicMdcFields>
+                <includeFullMdc>true</includeFullMdc>
+                <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                    <level>${graylog.loglevel}</level>
+                </filter>
+            </appender>
+
+            <root level="INFO">
+                <appender-ref ref="gelf"/>
+            </root>
+        </then>
+    </if>
+
 </configuration>
