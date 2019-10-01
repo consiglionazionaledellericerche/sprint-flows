@@ -154,8 +154,7 @@ public class FlowsProcessInstanceResource {
 			flowsProcessInstanceService.updateSearchTerms(flowsProcessInstanceService.getCurrentTaskOfProcessInstance(processInstanceId).getExecutionId(), processInstanceId, "ELIMINATO");
 		} catch(RuntimeException  error1) {
 		}		finally {
-
-
+			flowsProcessInstanceService.updateSearchTerms(processInstanceId, processInstanceId, "ELIMINATO");
 			runtimeService.deleteProcessInstance(processInstanceId, deleteReason);
 			return new ResponseEntity(HttpStatus.OK);
 		}

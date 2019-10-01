@@ -331,10 +331,20 @@ public class FlowsProcessInstanceService {
 
 
 	public void updateSearchTerms(String executionId, String processInstanceId, String stato) {
-
-		String initiator =   runtimeService.getVariable(executionId , INITIATOR).toString();
-		String titolo =  runtimeService.getVariable(executionId , TITOLO).toString();
-		String descrizione =  runtimeService.getVariable(executionId , DESCRIZIONE).toString();
+		
+		String initiator = "";
+		String titolo = "";
+		String descrizione = "";
+		
+		if (runtimeService.getVariable(executionId , INITIATOR) != null) {
+			initiator =   runtimeService.getVariable(executionId , INITIATOR).toString();
+		}		
+		if (runtimeService.getVariable(executionId , TITOLO) != null) {
+			titolo =   runtimeService.getVariable(executionId , TITOLO).toString();
+		}		
+		if (runtimeService.getVariable(executionId , DESCRIZIONE) != null) {
+			descrizione =   runtimeService.getVariable(executionId , DESCRIZIONE).toString();
+		}
 
 		JSONObject name = new JSONObject();
 
