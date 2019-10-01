@@ -1,10 +1,7 @@
 package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
-
-import feign.FeignException;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.exception.UnexpectedResultException;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
@@ -36,13 +33,11 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.websocket.server.PathParam;
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -153,12 +148,11 @@ public class FlowsProcessInstanceResource {
 		try {
 			flowsProcessInstanceService.updateSearchTerms(flowsProcessInstanceService.getCurrentTaskOfProcessInstance(processInstanceId).getExecutionId(), processInstanceId, "ELIMINATO");
 		} catch(RuntimeException  error1) {
-		}		finally {
-
-
+			return new ResponseEntity("Errore nell`aggiornamento di stato, DESCRIZIONE, TITOLO, INITIATOR nel \"name\" della PI", HttpStatus.INTERNAL_SERVER_ERROR);
+		}finally {
 			runtimeService.deleteProcessInstance(processInstanceId, deleteReason);
-			return new ResponseEntity(HttpStatus.OK);
 		}
+		return new ResponseEntity(HttpStatus.OK);
 	}
 
 	// TODO ???
@@ -204,12 +198,12 @@ public class FlowsProcessInstanceResource {
 
 		return new ResponseEntity<HistoricVariableInstance>(
 				historyService.createHistoricVariableInstanceQuery()
-				.processInstanceId(processInstanceId)
-				.variableName(variableName)
-				.list()
-				.stream()
-				.sorted((a, b) -> b.getLastUpdatedTime().compareTo(a.getLastUpdatedTime()) )
-				.findFirst().orElse(null),
+						.processInstanceId(processInstanceId)
+						.variableName(variableName)
+						.list()
+						.stream()
+						.sorted((a, b) -> b.getLastUpdatedTime().compareTo(a.getLastUpdatedTime()) )
+						.findFirst().orElse(null),
 				HttpStatus.OK);
 	}
 
@@ -233,7 +227,7 @@ public class FlowsProcessInstanceResource {
 		List<HistoricProcessInstance> historicProcessInstances =
 				flowsProcessInstanceService.getProcessInstancesForTrasparenza(firstResult, maxResults, order);
 
-		return new ResponseEntity<>(getMappedPI("acquisti", historicProcessInstances, EXPORT_TRASPARENZA), HttpStatus.OK);
+		return new ResponseEntity<>(mappingPI("acquisti", historicProcessInstances, EXPORT_TRASPARENZA), HttpStatus.OK);
 	}
 
 
@@ -251,7 +245,7 @@ public class FlowsProcessInstanceResource {
 		List<HistoricProcessInstance> historicProcessInstances =
 				flowsProcessInstanceService.getProcessInstancesForURP(terminiRicorso, avvisiScaduti, gareScadute, firstResult, maxResults, order);
 
-		return new ResponseEntity<>(getMappedPI("acquisti", historicProcessInstances, EXPORT_URP), HttpStatus.OK);
+		return new ResponseEntity<>(mappingPI("acquisti", historicProcessInstances, EXPORT_URP), HttpStatus.OK);
 	}
 
 
@@ -348,54 +342,62 @@ public class FlowsProcessInstanceResource {
 	}
 
 
-	private List<Map<String, Object>> getMappedPI(String processDefinition, List<HistoricProcessInstance> historicProcessInstances, String typeView) {
+	private List<Map<String, Object>> mappingPI(String processDefinition, List<HistoricProcessInstance> historicProcessInstances, String typeView) {
 		String view = viewRepository.getViewByProcessidType(processDefinition, typeView).getView();
 		JSONArray jsonFieldsToExport = new JSONArray(view);
 
 		List<Map<String, Object>> response = null;
 
-		if(typeView != null && typeView.equals(EXPORT_URP)){
-			response = historicProcessInstances.stream()
-					.map(instance -> trasformaVariabili(instance, jsonFieldsToExport, false))
-					.collect(Collectors.toList());
-		} else if(typeView != null && typeView.equals(EXPORT_TRASPARENZA)){
-			response = historicProcessInstances.stream()
-					.map(instance -> trasformaVariabili(instance, jsonFieldsToExport, true))
-					.collect(Collectors.toList());
+		if(typeView != null) {
+			if (typeView.equals(EXPORT_URP)) {
+				response = historicProcessInstances.stream()
+						.map(instance -> trasformaVariabili(instance, jsonFieldsToExport, false))
+						.collect(Collectors.toList());
+			} else if (typeView.equals(EXPORT_TRASPARENZA)) {
+				response = historicProcessInstances.stream()
+						.map(instance -> trasformaVariabili(instance, jsonFieldsToExport, true))
+						.collect(Collectors.toList());
+			}
 		}
 		return response;
 	}
 
 
-	private Object mapVariable(HistoricProcessInstance instance, String field) {
-		Object ret = null;
-		switch (field) {
-		case "businessKey":
-			ret = instance.getBusinessKey();
-			break;
-		case "stato":
-			ret = new JSONObject(instance.getName()).getString("stato");
-			break;
-		case "terminata":
-			if (instance.getEndTime() != null)
-				ret = true;
-			else
-				ret = false;
-			break;
-		case "impegni_json":
-			try {
-				if (instance.getProcessVariables().get(field) != null)
-					ret = new ObjectMapper().readValue((String) instance.getProcessVariables().get(field), List.class);
-			} catch (IOException e) {
-				LOGGER.error("Errore nel mapping delle variabili di tipo \"impegni_json\"", e);
-			}
-			break;
-		default:
-			if (instance.getProcessVariables().get(field) != null)
-				ret = instance.getProcessVariables().get(field);
-			break;
+	private Map<String, Object> trasformaVariabili(HistoricProcessInstance instance, JSONArray viewExport, boolean isTrasparenza) {
+		HashMap<String, Object> mappedVariables = new HashMap<>();
+
+		if (isTrasparenza) {
+			mappedVariables.put("documentiPubblicabiliInTrasparenza", getDocumentiPubblicabiliTrasparenza(instance));
+		} else {
+			mappedVariables.put("documentiPubblicabiliInURP", getDocumentiPubblicabiliURP(instance));
 		}
-		return ret;
+
+		viewExport.forEach(field -> {
+			Object variable = instance.getProcessVariables().get(field);
+			switch (field.toString()) {
+				case "businessKey":
+					mappedVariables.put(field.toString(), instance.getBusinessKey());
+					break;
+				case "stato":
+					mappedVariables.put(field.toString(), new JSONObject(instance.getName()).getString("stato"));
+					break;
+				case "terminata":
+					mappedVariables.put(field.toString(), instance.getEndTime() != null ? true : false);
+					break;
+				case "impegni_json":
+					try {
+						mappedVariables.put(field.toString(), new ObjectMapper().readValue(variable != null ? (String) variable : "", List.class));
+					} catch (IOException e) {
+						LOGGER.error("Errore nel mapping delle variabili di tipo \"impegni_json\"", e);
+					}
+					break;
+				default:
+					mappedVariables.put(field.toString(), variable != null ? variable.toString():"");
+					break;
+			}
+		});
+
+		return mappedVariables;
 	}
 
 
@@ -451,7 +453,7 @@ public class FlowsProcessInstanceResource {
 							.map(h -> (HistoricDetailVariableInstanceUpdateEntity) h)
 							.filter(h -> h.getName().equals(attachment.getName()) &&
 									((FlowsAttachment) h.getValue()).getMetadati().containsKey("azione") &&
-									((Enum.Azione)((FlowsAttachment) h.getValue()).getMetadati().get("azione")).name() == (Enum.Azione.PubblicazioneUrp.name()))
+									((Enum.Azione)((FlowsAttachment) h.getValue()).getMetadati().get("azione")).name().equals(Enum.Azione.PubblicazioneUrp.name()))
 							.findAny();
 
 					if(dataPubblicazione.isPresent())
@@ -462,23 +464,5 @@ public class FlowsProcessInstanceResource {
 			}
 		}
 		return documentiPubblicabili;
-	}
-
-
-	private Map<String, Object> trasformaVariabili(HistoricProcessInstance instance, JSONArray viewExport, boolean isTrasparenza) {
-		Map<String, Object> mappedVariables = new HashMap<>();
-		viewExport.forEach(field -> {
-			Object value = mapVariable(instance, field.toString());
-			if(value != null){
-				mappedVariables.put(field.toString(), value.toString());
-			}
-		});
-
-		if(isTrasparenza)
-			mappedVariables.put("documentiPubblicabiliInTrasparenza", getDocumentiPubblicabiliTrasparenza(instance));
-		else
-			mappedVariables.put("documentiPubblicabiliInURP", getDocumentiPubblicabiliURP(instance));
-
-		return mappedVariables;
 	}
 }
