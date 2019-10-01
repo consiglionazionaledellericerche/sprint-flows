@@ -91,13 +91,13 @@ public class MembershipService {
 
     /* --- */
 
-    // TODO attenzione: questo metodo, a differenza di getAceGroupsForUser aggiunge i ROLE_
-    public Set<String> getLocalGroupsForUser(String username) {
+    // Se a qualcuno dovesse servire puo' rendere questo metodo public, ma non credo - martin 4/9/19
+    private Set<String> getLocalGroupsForUser(String username) {
         return membershipRepository.findGroupNamesForUser(username);
     }
 
-
-    public Set<String> getAceGroupsForUser(String username) {
+    // Se a qualcuno dovesse servire puo' rendere questo metodo public, ma non credo - martin 4/9/19
+    private Set<String> getAceGroupsForUser(String username) {
         return Optional.ofNullable(aceBridgeService)
                 .map(aceBridgeService -> aceBridgeService.getAceGroupsForUser(username))
                 .map(strings -> strings.stream())
@@ -108,6 +108,8 @@ public class MembershipService {
     /**
      * Dato uno username restituisce tutti suoi gruppi, sia di ACE che di Membership,
      * compresi quelli ereditati
+     *
+     * I nomi dei gruppi NON hanno il ROLE_
      *
      * @param username
      * @return
@@ -125,6 +127,11 @@ public class MembershipService {
 
     /* --- */
 
+    /**
+     * DEPRACATED : questo metodo va a scalare solo un livello di relationship tra gruppi
+     * @param groupName
+     * @return
+     */
     @Deprecated
     public List<String> getUsersInGroup(String groupName) {
         List<String> result = membershipRepository.findMembersInGroup(groupName);
@@ -133,8 +140,9 @@ public class MembershipService {
         return result;
     }
 
-    @SuppressWarnings("deprecation") // Questo e' il modo giusto di usare il metodo aceBridgeService.getUsersInAceGroup
-    public Set<String> getUsersInAceGroup(String groupName) {
+    // Se a qualcuno dovesse servire puo' rendere questo metodo public, ma non credo - martin 4/9/19
+    @SuppressWarnings("deprecation") // Questo e' l'unico modo giusto di usare il metodo aceBridgeService.getUsersInAceGroup
+    private Set<String> getUsersInAceGroup(String groupName) {
         return Optional.ofNullable(aceBridgeService)
                 .map(aceBridgeService -> aceBridgeService.getUsersInAceGroup(groupName))
                 .filter(strings -> !strings.isEmpty())
@@ -142,13 +150,6 @@ public class MembershipService {
                 .orElse(Stream.empty())
                 .collect(Collectors.toSet());
     }
-
-//    private Set<String> getUsersInACEGroups(Collection<String> myGroups) {
-//        Set<String> result = new HashSet<>();
-//        for (String myGroup : myGroups)
-//            result.addAll(getUsersInAceGroup(myGroup));
-//        return result;
-//    }
 
 
     public Set<String> getAllUsersInGroup(String groupName) {
@@ -164,7 +165,6 @@ public class MembershipService {
                 .flatMap(list -> list.stream())
                 .collect(Collectors.toSet());
     }
-
 
 
     @Timed
