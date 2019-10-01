@@ -251,12 +251,12 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 					restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE);
 					flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE.toString());
 					//CREAZIONE PDF VALUTAZIONE
-//					String nomeFile="valutazioneShortTermMobility";
-//					String labelFile="Scheda Valutazione Domanda";
-//					flowsPdfService.makePdf(nomeFile, processInstanceId);
-//					FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
-//					documentoGenerato.setLabel(labelFile);
-//					flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
+					String nomeFile="valutazioneShortTermMobility";
+					String labelFile="Scheda Valutazione Domanda";
+					flowsPdfService.makePdf(nomeFile, processInstanceId);
+					FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
+					documentoGenerato.setLabel(labelFile);
+					flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
 					// VERIFICA TUTTE LE DOMANDE DI FLUSSI ATTIVI PER QUEL BANDO
 					List<ProcessInstance> processinstancesListaPerBando = runtimeService.createProcessInstanceQuery()
 							.processDefinitionKey("short-term-mobility-domande")
