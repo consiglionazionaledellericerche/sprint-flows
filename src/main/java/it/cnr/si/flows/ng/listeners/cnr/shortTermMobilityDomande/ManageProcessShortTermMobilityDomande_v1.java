@@ -238,6 +238,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 
 			case "valutazione-scientifica-end": {
 				LOGGER.info("-- valutazione-scientifica: valutazione-scientifica");
+				execution.setVariable("domandaCorrenteValutataFlag", "false");
 				if(execution.getVariable("sceltaUtente").equals("CambiaDipartimento")) {
 					String idDipartimento = execution.getVariable("dipartimentoId").toString();
 					String gruppogruppoValutatoreScientificoSTMDipartimento = "gruppoValutatoreScientificoSTMDipartimento@" + idDipartimento;
@@ -245,17 +246,17 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 					execution.setVariable("gruppogruppoValutatoreScientificoSTMDipartimento", gruppogruppoValutatoreScientificoSTMDipartimento);
 					LOGGER.debug("Imposto i gruppi dipartimento : {} - del flusso {}", idDipartimento, gruppogruppoValutatoreScientificoSTMDipartimento);
 				} else {
+					execution.setVariable("domandaCorrenteValutataFlag", "true");
 					execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE.toString());
 					restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE);
 					flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE.toString());
 					//CREAZIONE PDF VALUTAZIONE
-					String nomeFile="valutazioneShortTermMobility";
-					String labelFile="Scheda Valutazione Domanda";
-					//execution.setVariable("punteggio_totale", (Double.parseDouble(execution.getVariable("punteggio_pianoDiLavoro").toString().replaceAll(",", ".")) + Double.parseDouble(execution.getVariable("punteggio_qualitaProgetto").toString().replaceAll(",", "."))+ Double.parseDouble(execution.getVariable("punteggio_valoreAggiunto").toString().replaceAll(",", "."))+ Double.parseDouble(execution.getVariable("punteggio_qualitaGruppoDiRicerca").toString().replaceAll(",", "."))));
-					flowsPdfService.makePdf(nomeFile, processInstanceId);
-					FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
-					documentoGenerato.setLabel(labelFile);
-					flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
+//					String nomeFile="valutazioneShortTermMobility";
+//					String labelFile="Scheda Valutazione Domanda";
+//					flowsPdfService.makePdf(nomeFile, processInstanceId);
+//					FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
+//					documentoGenerato.setLabel(labelFile);
+//					flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
 					// VERIFICA TUTTE LE DOMANDE DI FLUSSI ATTIVI PER QUEL BANDO
 					List<ProcessInstance> processinstancesListaPerBando = runtimeService.createProcessInstanceQuery()
 							.processDefinitionKey("short-term-mobility-domande")
@@ -264,10 +265,10 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 					List<ProcessInstance> processinstancesListaDomandeValutatePerBando = runtimeService.createProcessInstanceQuery()
 							.processDefinitionKey("short-term-mobility-domande")
 							.variableValueEquals("idBando", execution.getVariable("idBando"))
-							.variableValueEquals(statoFinaleDomanda.name(), execution.getVariable(Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE.toString()))
+							.variableValueEquals(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE.toString())
 							.list();
 
-					if (processinstancesListaPerBando.size() == processinstancesListaDomandeValutatePerBando.size()) {
+					if ((processinstancesListaPerBando.size() == processinstancesListaDomandeValutatePerBando.size() + 1) &&  (execution.getVariable("domandaCorrenteValutataFlag").toString().equals("true"))) {
 						//START FLUSSO BANDI
 						// Creazione flusso bando se non presente la presenza del flusso bando 
 

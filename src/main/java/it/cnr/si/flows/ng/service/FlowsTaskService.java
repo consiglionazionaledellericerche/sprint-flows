@@ -160,21 +160,21 @@ public class FlowsTaskService {
 				else {
 					//wildcard ("%") di default ma non a TUTTI i campi
 					switch (type) {
-						case "textEqual":
-							taskQuery.taskVariableValueEquals(key, value);
-							break;
-						case "boolean":
-							// gestione variabili booleane
-							taskQuery.taskVariableValueEquals(key, Boolean.valueOf(value));
-							break;
-						case "date":
-							processDate(taskQuery, key, value);
-							break;
-						default:
-							//variabili con la wildcard  (%value%)
-							if (!value.isEmpty())
-								taskQuery.taskVariableValueLikeIgnoreCase(key, "%" + value + "%");
-							break;
+					case "textEqual":
+						taskQuery.taskVariableValueEquals(key, value);
+						break;
+					case "boolean":
+						// gestione variabili booleane
+						taskQuery.taskVariableValueEquals(key, Boolean.valueOf(value));
+						break;
+					case "date":
+						processDate(taskQuery, key, value);
+						break;
+					default:
+						//variabili con la wildcard  (%value%)
+						if (!value.isEmpty())
+							taskQuery.taskVariableValueLikeIgnoreCase(key, "%" + value + "%");
+						break;
 					}
 				}
 			}
@@ -241,24 +241,24 @@ public class FlowsTaskService {
 		Set<String> usersInMyGroups = membershipService.getUsersInMyGroups(username);
 
 		//risulta avere prestazioni leggermente migliori questo approccio rispetto a quello commentato
-        // (test effettuati con 300 Pi e 30 Task assegnati ad altri utenti nei miei gruppi
+		// (test effettuati con 300 Pi e 30 Task assegnati ad altri utenti nei miei gruppi
 		//      prendo i task assegnati agli utenti trovati
 		for (String user : usersInMyGroups) {
-            List<Task> tasks = taskQuery.taskAssignee(user).list()
-                    .stream()
-                    .filter(t ->
-                            taskService.getIdentityLinksForTask(t.getId()).stream().anyMatch(il ->
-                                    il.getType().equals(IdentityLinkType.CANDIDATE) && userAuthorities.contains(il.getGroupId()) )
-                    ).collect(Collectors.toList());
+			List<Task> tasks = taskQuery.taskAssignee(user).list()
+					.stream()
+					.filter(t ->
+					taskService.getIdentityLinksForTask(t.getId()).stream().anyMatch(il ->
+					il.getType().equals(IdentityLinkType.CANDIDATE) && userAuthorities.contains(il.getGroupId()) )
+							).collect(Collectors.toList());
 
-            result.addAll(restResponseFactory.createTaskResponseList(tasks));
-        }
-//		result = restResponseFactory.createTaskResponseList(taskQuery.list().stream()
-//																	.filter(t -> usersInMyGroups.contains(t.getAssignee()) || taskService.getIdentityLinksForTask(t.getId()).stream().anyMatch(il -> il.getType().equals(IdentityLinkType.CANDIDATE) && userAuthorities.contains(il.getGroupId())))
-//																	.collect(Collectors.toList()));
+			result.addAll(restResponseFactory.createTaskResponseList(tasks));
+		}
+		//		result = restResponseFactory.createTaskResponseList(taskQuery.list().stream()
+		//																	.filter(t -> usersInMyGroups.contains(t.getAssignee()) || taskService.getIdentityLinksForTask(t.getId()).stream().anyMatch(il -> il.getType().equals(IdentityLinkType.CANDIDATE) && userAuthorities.contains(il.getGroupId())))
+		//																	.collect(Collectors.toList()));
 
 		List<TaskResponse> responseList = result.subList(firstResult <= result.size() ? firstResult : result.size(),
-														 maxResults <= result.size() ? maxResults : result.size());
+				maxResults <= result.size() ? maxResults : result.size());
 		DataResponse response = new DataResponse();
 		response.setStart(firstResult);
 		response.setSize(responseList.size());
@@ -271,7 +271,7 @@ public class FlowsTaskService {
 	public DataResponse getMyTasks(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
 		TaskQuery taskQuery = (TaskQuery) utils.searchParams(searchParams, taskService.createTaskQuery());
 		taskQuery.taskAssignee(SecurityUtils.getCurrentUserLogin())
-				.includeProcessVariables();
+		.includeProcessVariables();
 
 		if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
 			taskQuery.processDefinitionKey(processDefinition);
@@ -332,11 +332,15 @@ public class FlowsTaskService {
 		name.put(Enum.VariableEnum.descrizione.name(), ellipsis(descrizione, LENGTH_DESCTIZIONE) );
 		String initiator = (String) data.get(Enum.VariableEnum.initiator.name());
 		name.put(Enum.VariableEnum.initiator.name(), initiator);
-		String taskName = taskService.createTaskQuery()
-				.processInstanceId(instance.getProcessInstanceId())
-				.singleResult().getName();
-		name.put(stato.name(), ellipsis(taskName, LENGTH_FASE) );
+		if (taskService.createTaskQuery().processInstanceId(instance.getProcessInstanceId()).count() == 0) {
+			name.put(stato.name(),ellipsis("START", LENGTH_FASE) );
 
+		} else {
+			String taskName = taskService.createTaskQuery()
+					.processInstanceId(instance.getProcessInstanceId())
+					.singleResult().getName();
+			name.put(stato.name(), ellipsis(taskName, LENGTH_FASE) );
+		}
 		runtimeService.setProcessInstanceName(instance.getId(), name.toString());
 
 		LOGGER.info("Avviata istanza di processo {}, id: {}", key, instance.getId());
@@ -462,8 +466,8 @@ public class FlowsTaskService {
 			isUnclaimableVariable.setName("isReleasable");
 			// if has candidate groups or users -> can release
 			isUnclaimableVariable.setValue(taskService.getIdentityLinksForTask(task.getId())
-												   .stream()
-												   .anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
+					.stream()
+					.anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
 			task.getVariables().add(isUnclaimableVariable);
 		}
 	}

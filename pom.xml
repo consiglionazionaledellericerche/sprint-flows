@@ -32,8 +32,10 @@
         <feign.version>9.7.0</feign.version>
         <firmadigitale.version>1.11</firmadigitale.version>
         <gatling-maven-plugin.version>2.1.7</gatling-maven-plugin.version>
+        <gelf.version>1.12.0</gelf.version>
         <jacoco-maven-plugin.version>0.7.7.201606060606</jacoco-maven-plugin.version>
         <jada.version>2.9</jada.version>
+        <janino.version>3.0.6</janino.version>
         <jasperreports.version>6.6.0</jasperreports.version>
         <json-path.version>2.2.0</json-path.version>
         <liquibase-hibernate4.version>3.5</liquibase-hibernate4.version>
@@ -146,6 +148,11 @@
     </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>biz.paluch.logging</groupId>
+            <artifactId>logstash-gelf</artifactId>
+            <version>${gelf.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.github.ralfstuckert.pdfbox-layout</groupId>
             <artifactId>pdfbox1-layout</artifactId>
@@ -317,6 +324,12 @@
             <version>2.4.3</version>
             <scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.janino</groupId>
+            <artifactId>janino</artifactId>
+            <version>${janino.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
@@ -349,6 +362,7 @@
             <artifactId>thymeleaf-spring4</artifactId>
             <version>3.0.6.RELEASE</version>
         </dependency>
+
     </dependencies>
 
     <build>

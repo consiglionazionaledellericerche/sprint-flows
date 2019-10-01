@@ -140,16 +140,18 @@ public class ManageProcessShortTermMobilityBandi_v1 implements ExecutionListener
 
 			// VERIFICA TUTTE LE DOMANDE DI FLUSSI ATTIVI PER QUEL BANDO
 			List<ProcessInstance> processinstancesListaPerBando = runtimeService.createProcessInstanceQuery()
+					.processDefinitionKey("short-term-mobility-domande")
 					.variableValueEquals("idBando", execution.getVariable("idBando"))
+					.variableValueEquals(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE.toString())
 					.list();
 
 			//AGGIUNGE IL LINK AL BANDO
-			processinstancesListaPerBando.forEach(( processInstance) -> {
-				String linkToOtherWorkflows = runtimeService.getVariable(processInstance.getId(), "linkToOtherWorkflows").toString();
-				if (linkToOtherWorkflows != null) {
-					runtimeService.setVariable(processInstance.getId(), "linkToOtherWorkflows", linkToOtherWorkflows + "," + execution.getProcessInstanceId());
+			processinstancesListaPerBando.forEach((processInstance) -> {
+				if (runtimeService.getVariable(processInstance.getProcessInstanceId(), "linkToOtherWorkflows") != null) {
+					String linkToOtherWorkflows = runtimeService.getVariable(processInstance.getProcessInstanceId(), "linkToOtherWorkflows").toString();
+					runtimeService.setVariable(processInstance.getProcessInstanceId(), "linkToOtherWorkflows", linkToOtherWorkflows + "," + execution.getProcessInstanceId());
 				} else {
-					runtimeService.setVariable(processInstance.getId(),  "linkToOtherWorkflows", execution.getProcessInstanceId());
+					runtimeService.setVariable(processInstance.getProcessInstanceId(),  "linkToOtherWorkflows", execution.getProcessInstanceId());
 				}				
 				//SBLOCCA TUTTE LE DOMANDE ATTIVE DI QUEL BANDO
 				runtimeService.signal(processInstance.getId());
