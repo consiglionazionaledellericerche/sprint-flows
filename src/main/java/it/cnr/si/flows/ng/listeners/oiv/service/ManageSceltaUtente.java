@@ -64,7 +64,7 @@ public class ManageSceltaUtente {
         if (sceltaUtente != null) {
             switch (faseEsecuzione) {
                 case SMISTAMENTO_END: {
-                    if (sceltaUtente.equals(SceltaUtenteEnum.PRENDO_IN_CARICO_LA_DOMANDA))
+                    if (sceltaUtente.equals(SceltaUtenteEnum.ESEUGUO_ISTRUTTORIA_DOMANDA))
                         determinaAttore.determinaIstruttore(execution);
                     if (sceltaUtente.equals(SceltaUtenteEnum.RICHIESTA_SOCCORSO_ISTRUTTORIO))
                         manageControlli.verificaPuntiSoccorso(execution);
