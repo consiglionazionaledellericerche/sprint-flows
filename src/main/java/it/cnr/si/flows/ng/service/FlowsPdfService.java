@@ -304,6 +304,12 @@ public class FlowsPdfService {
 			fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
 		} 
 
+		if(processVariables.has("userNameRichiedente")) {
+			utenteRichiedente = processVariables.getString("userNameRichiedente");
+			fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
+		} 
+		
+		
 		return Pair.of(fileName, makePdf(Enum.PdfType.valueOf(tipologiaDoc), processVariables, fileName, utenteRichiedente, processInstanceId));
 	}
 

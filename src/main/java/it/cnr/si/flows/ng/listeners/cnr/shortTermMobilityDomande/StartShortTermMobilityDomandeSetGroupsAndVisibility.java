@@ -64,7 +64,7 @@ public class StartShortTermMobilityDomandeSetGroupsAndVisibility {
 		//SET TIMER
 		LOGGER.debug("scadenzaPresentazioneDomande {}",  execution.getVariable("scadenzaPresentazioneDomande").toString());
 		String scadenzaPresentazioneDomande = execution.getVariable("scadenzaPresentazioneDomande", String.class);
-		execution.setVariable("statoFinaleDomanda",  Enum.StatoDomandeSTMEnum.APERTA);
+		execution.setVariable("statoFinaleDomanda",  Enum.StatoDomandeSTMEnum.APERTA.toString());
 		
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");

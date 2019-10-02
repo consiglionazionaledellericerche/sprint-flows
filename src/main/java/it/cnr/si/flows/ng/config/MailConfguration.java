@@ -40,7 +40,7 @@ public class MailConfguration {
 
     @Scheduled(fixedDelay = 3000, initialDelay = 10000) // 10m
     public void logStatus() {
-        log.debug("MailConfig: {} {}", isMailActivated(), getMailRecipients());
+        //log.debug("MailConfig: {} {}", isMailActivated(), getMailRecipients());
     }
 
 
