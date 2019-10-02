@@ -78,7 +78,7 @@
               <activiti:string><![CDATA[pre-accettazione-start]]></activiti:string>
             </activiti:field>
           </activiti:executionListener>
-          <activiti:executionListener event="start" delegateExpression="${manageProcessShortTermMobilityDomande_v1}">
+          <activiti:executionListener event="end" delegateExpression="${manageProcessShortTermMobilityDomande_v1}">
             <activiti:field name="faseEsecuzione">
               <activiti:string><![CDATA[pre-accettazione-end]]></activiti:string>
             </activiti:field>
@@ -100,7 +100,20 @@
         <timeDate>${scadenzaPresentazioneDomande}</timeDate>
       </timerEventDefinition>
     </boundaryEvent>
-    <userTask id="autorizzazione" name="AUTORIZZAZIONE" activiti:candidateGroups="${gruppoValidatoriShortTermMobility}"></userTask>
+    <userTask id="autorizzazione" name="AUTORIZZAZIONE" activiti:candidateGroups="${gruppoValidatoriShortTermMobility}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessShortTermMobilityDomande_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[autorizzazione-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessShortTermMobilityDomande_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[autorizzazione-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
     <endEvent id="endevent-respinta" name="End Respinta">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessShortTermMobilityDomande_v1}">
@@ -166,14 +179,43 @@
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow70" sourceRef="pre-valutazione" targetRef="valutazione-scientifica"></sequenceFlow>
-    <receiveTask id="pre-valutazione" name="PRE VALUTAZIONE"></receiveTask>
-    <receiveTask id="graduatoria" name="GRADUATORIA"></receiveTask>
+    <receiveTask id="pre-valutazione" name="PRE VALUTAZIONE">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessShortTermMobilityDomande_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[pre-valutazione-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessShortTermMobilityDomande_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[pre-valutazione-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </receiveTask>
+    <receiveTask id="graduatoria" name="GRADUATORIA">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessShortTermMobilityDomande_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[graduatoria-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessShortTermMobilityDomande_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[graduatoria-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </receiveTask>
     <sequenceFlow id="flow75" sourceRef="valutazione-scientifica" targetRef="exclusivegateway16"></sequenceFlow>
     <sequenceFlow id="flow76" sourceRef="graduatoria" targetRef="autorizzazione"></sequenceFlow>
     <exclusiveGateway id="exclusivegateway16" name="Exclusive Gateway" default="flow77"></exclusiveGateway>
     <sequenceFlow id="flow77" sourceRef="exclusivegateway16" targetRef="graduatoria"></sequenceFlow>
     <sequenceFlow id="flow78" sourceRef="exclusivegateway16" targetRef="valutazione-scientifica">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'CambiaDipartimento'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow79" sourceRef="exclusivegateway15" targetRef="valutazione-scientifica">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente != 'Respingi' &&  tutteDomandeAccettateFlag == 'true'}]]></conditionExpression>
     </sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_short-term-mobility-domande">
@@ -352,6 +394,12 @@
         <omgdi:waypoint x="566.0" y="211.0"></omgdi:waypoint>
         <omgdi:waypoint x="566.0" y="283.0"></omgdi:waypoint>
         <omgdi:waypoint x="545.0" y="282.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow79" id="BPMNEdge_flow79">
+        <omgdi:waypoint x="270.0" y="261.0"></omgdi:waypoint>
+        <omgdi:waypoint x="270.0" y="240.0"></omgdi:waypoint>
+        <omgdi:waypoint x="449.0" y="240.0"></omgdi:waypoint>
+        <omgdi:waypoint x="492.0" y="250.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

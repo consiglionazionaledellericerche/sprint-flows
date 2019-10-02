@@ -1,5 +1,6 @@
 package it.cnr.si.flows.batch;
 
+
 import com.opencsv.CSVParser;
 import feign.FeignException;
 import it.cnr.si.FlowsApp;
@@ -8,8 +9,10 @@ import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.SiperService;
 import it.cnr.si.flows.ng.utils.Utils.associazioneRuoloPersonaCDSUO;
 import it.cnr.si.service.AceService;
-import it.cnr.si.service.MembershipService;
+import it.cnr.si.service.RelationshipService;
 import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
+
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +44,7 @@ public class PopolazioneProfiliPerCDSUOAcquistiBatch {
 	@Inject
 	private SiperService siperService;
 	@Inject
-	private MembershipService membershipService;
+	private RelationshipService relationshipService;
 	private final Map<String, String> errors = new HashMap<>();
 
 	int i = 0;
@@ -50,16 +53,16 @@ public class PopolazioneProfiliPerCDSUOAcquistiBatch {
 	//@Test
 	public void runBatch() throws IOException {
 		//String[][] persone = getPersoneDaFile();
-
+		
 		Map<Integer, associazioneRuoloPersonaCDSUO> persone = new HashMap<Integer, associazioneRuoloPersonaCDSUO>();
 		persone = getPersoneDaFile();
-
-
+		
+		
 		for (int i = 0; i < persone.size(); i++) {
 			inserisciRuolo(persone.get(i).getPersona(), persone.get(i).getRuolo(), persone.get(i).getCdsuo());
-			// fruit is an element of the `fruits` array.
+		    // fruit is an element of the `fruits` array.
 		}
-
+		
 
 
 
@@ -72,7 +75,7 @@ public class PopolazioneProfiliPerCDSUOAcquistiBatch {
 
 		//EntitaOrganizzativaWebDto afferenzaUtente = aceBridgeService.getAfferenzaUtente(username);
 		//String cdsuo = afferenzaUtente.getCdsuo();
-
+		
 		log.info("****** UTENTE {} ******", username);
 
 		String cdsuoAppartenenzaUtente = null;
@@ -116,18 +119,18 @@ public class PopolazioneProfiliPerCDSUOAcquistiBatch {
 					log.info("OK: L'utente {} ha come responsabile {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", username, usernameResponsabileUO, denominazioneEntitaorganizzativaResponsabileUtente, siglaEntitaorganizzativaResponsabileUtente, idEntitaorganizzativaResponsabileUtente, cdsuoEntitaorganizzativaResponsabileUtente, idnsipEntitaorganizzativaResponsabileUtente);
 					String gruppoDirigenteRichiedente = "responsabileFirmaAcquisti@" + idEntitaorganizzativaResponsabileUtente;
 
-					Set<String> members = membershipService.getAllUsersInGroup(gruppoDirigenteRichiedente);
+					Set<String> members = relationshipService.getAllUsersInGroup(gruppoDirigenteRichiedente);
 					//List<String> members = membershipService.findMembersInGroup(gruppoDirigenteRichiedente);
 					if (members.size() == 0) {
 						log.info(" ERROR: Il gruppo RESPONSABILE STRUTTURA: {} NON HA NESSUNO", gruppoDirigenteRichiedente);
-					}
+					} 
 					if (members.size() > 1) {
 						log.info(" ERROR: Il gruppo RESPONSABILE STRUTTURA: {} HA PIU' MEMBRI", gruppoDirigenteRichiedente);
-					}
+					} 
 					members.forEach(member -> {
 						log.info("L'utente {} fa parte del gruppo {} ", member.toString(), gruppoDirigenteRichiedente);
 					});
-
+					
 					Integer idRuolo = aceService.getRuoloBySigla(siglaRuolo).getId();
 					Integer idPersona = aceService.getPersonaByUsername(username).getId();
 
@@ -140,11 +143,11 @@ public class PopolazioneProfiliPerCDSUOAcquistiBatch {
 							errors.put(username + " "+ siglaRuolo + " "+ siglaEntitaorganizzativaResponsabileUtente + "("+ idEntitaorganizzativaResponsabileUtente +")", "PRESENTE");
 						} else {
 							log.error("Errore nella richiesta", e);
-							errors.put(username + " "+ siglaRuolo + " "+ siglaEntitaorganizzativaResponsabileUtente + "("+ idEntitaorganizzativaResponsabileUtente +")", e.getMessage());
+							errors.put(username + " "+ siglaRuolo + " "+ siglaEntitaorganizzativaResponsabileUtente + "("+ idEntitaorganizzativaResponsabileUtente +")", e.getMessage());	
 						}
 					}
-
-				}
+					
+				}	
 			} catch(UnexpectedResultException | FeignException | HttpClientErrorException error2) {
 				log.info("-------------- ERROR: getResponsabileCDSUO  NON HA FUNZIONATO!!!!!!!!!!!!!!! l'utente {} non ha RESPONSABILE UO per la CDSUO {}", username, cdsuoAppartenenzaUtente);
 			}
@@ -172,10 +175,13 @@ public class PopolazioneProfiliPerCDSUOAcquistiBatch {
 
 //		INSERIMENTO FILE CON NOMINATIVI		
 //		Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/singoloGruppoUtentiProceduraAcquisti.csv"));
-		Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/ProceduraAcquisti-Utenti-ICCOM.csv"));
+//		Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/ProceduraAcquisti-Utenti-ICCOM.csv"));
+//		Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/ProceduraAcquisti-Utenti-SISINFO.csv"));
+		Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/ProceduraAcquisti-Utenti-IFN.csv"));
+		
 
 		i = 0;
-
+		
 		Map<Integer, associazioneRuoloPersonaCDSUO> associazioni = new HashMap<Integer, associazioneRuoloPersonaCDSUO>();
 
 		lines
@@ -198,24 +204,3 @@ public class PopolazioneProfiliPerCDSUOAcquistiBatch {
 		return associazioni;
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

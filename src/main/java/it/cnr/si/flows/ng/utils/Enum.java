@@ -101,6 +101,7 @@ public class Enum {
         AUTORIZZATA,
         ANNULLATA,
         ACCETTATA,
+        ACCETTAZIONE,
         CANCELLATA;
     }
     
@@ -164,6 +165,7 @@ public class Enum {
         preavvisoRigettoDef10Giorni,
         valutazioneProgettoAccordiBilaterali,
         domandaAccordiBilaterali,
+        valutazioneShortTermMobility,
         preavvisoRigettoCambioFascia;
 
         PdfType() {
