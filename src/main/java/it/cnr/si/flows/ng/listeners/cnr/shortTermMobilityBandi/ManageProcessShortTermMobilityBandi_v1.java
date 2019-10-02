@@ -218,7 +218,7 @@ public class ManageProcessShortTermMobilityBandi_v1 implements ExecutionListener
 		String processInstanceId = execution.getProcessInstanceId();
 		Map<String, String> req = new HashMap<>();
 		if (idBando != null) {
-			req.put("idBando", "text="+idBando);
+			req.put("idBando", "integer="+idBando);
 		}
 		//req.put(processDefinitionKey, processDefinitionKey);
 		String order = "ASC";
