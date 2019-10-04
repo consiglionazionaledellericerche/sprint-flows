@@ -451,7 +451,7 @@ public class FlowsProcessInstanceService {
 				// GARE IN CORSO data scadenza presentazione offerta >= NOW
 				historicProcessInstanceQuery
 						.variableValueGreaterThanOrEqual(dataScadenzaBando.name(), now);
-				LOGGER.info("GARE IN CORSO nr flussi {}", historicProcessInstanceQuery.count());
+				LOGGER.info("GARE IN CORSO nei flussi {}", historicProcessInstanceQuery.count());
 
 			}
 		}
