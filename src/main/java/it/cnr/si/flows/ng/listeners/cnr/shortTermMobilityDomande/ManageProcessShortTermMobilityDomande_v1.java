@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.initiator;
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.statoFinaleDomanda;
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 
@@ -253,6 +254,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 					//CREAZIONE PDF VALUTAZIONE
 					String nomeFile="valutazioneShortTermMobility";
 					String labelFile="Scheda Valutazione Domanda";
+					execution.setVariable("punteggio_totale", (Double.parseDouble(execution.getVariable("punteggio_curriculum").toString().replaceAll(",", ".")) + Double.parseDouble(execution.getVariable("punteggio_patnerIstituzioneStraniera").toString().replaceAll(",", "."))+ Double.parseDouble(execution.getVariable("punteggio_programmaDiRicerca").toString().replaceAll(",", "."))));
 					flowsPdfService.makePdf(nomeFile, processInstanceId);
 					FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
 					documentoGenerato.setLabel(labelFile);
@@ -286,6 +288,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 							data.put(Enum.VariableEnum.initiator.name(), "app.scrivaniadigitale");
 							data.put("idBando", execution.getVariable("idBando"));
 							data.put("processDefinitionId", processDefinitionId);
+							data.put(initiator.name(), "app.scrivaniadigitale");
 
 							LOGGER.info("-- EFFETTUO START FLUSSO short-term-mobility-bandi CON titolo: " + data.get("titolo") + " descrizione" + data.get("descrizione")  + " initiator " + data.get("initiator")  + " idBando" + data.get("idBando") );
 

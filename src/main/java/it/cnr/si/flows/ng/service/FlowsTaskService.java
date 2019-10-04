@@ -317,7 +317,9 @@ public class FlowsTaskService {
 		data.put("key", key);
 
 		String username = SecurityUtils.getCurrentUserLogin();
-		data.put(initiator.name(), username);
+		if (data.get(initiator.name()) == null) {
+			data.put(initiator.name(), username);
+		}
 		data.put(startDate.name(), new Date());
 
 		ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
