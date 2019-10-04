@@ -172,42 +172,42 @@ public class FlowsProcessInstanceService {
 		ArrayList<Map<String, Object>> history = new ArrayList<>();
 
 		taskList
-				.forEach(
-						task -> {
-							List<HistoricIdentityLink> links = historyService.getHistoricIdentityLinksForTask(task.getId());
-							HashMap<String, Object> entity = new HashMap<>();
-							entity.put("historyTask", restResponseFactory.createHistoricTaskInstanceResponse(task));
+		.forEach(
+				task -> {
+					List<HistoricIdentityLink> links = historyService.getHistoricIdentityLinksForTask(task.getId());
+					HashMap<String, Object> entity = new HashMap<>();
+					entity.put("historyTask", restResponseFactory.createHistoricTaskInstanceResponse(task));
 
-							// Sostituisco l'id interno del gruppo con la dicitura estesa
-							entity.put("historyIdentityLink", Optional.ofNullable(links)
-									.map(historicIdentityLinks -> restResponseFactory.createHistoricIdentityLinkResponseList(historicIdentityLinks))
-									.filter(historicIdentityLinkResponses -> !historicIdentityLinkResponses.isEmpty())
-									.map(historicIdentityLinkResponses -> historicIdentityLinkResponses.stream())
-									.orElse(Stream.empty())
-									.map(h -> {
-										if (Optional.ofNullable(aceBridgeService).isPresent()) {
-											h.setGroupId(aceBridgeService.getExtendedGroupNome(h.getGroupId()));
-										}
-										return h;
-									}).collect(Collectors.toList()));
-							history.add(entity);
+					// Sostituisco l'id interno del gruppo con la dicitura estesa
+					entity.put("historyIdentityLink", Optional.ofNullable(links)
+							.map(historicIdentityLinks -> restResponseFactory.createHistoricIdentityLinkResponseList(historicIdentityLinks))
+							.filter(historicIdentityLinkResponses -> !historicIdentityLinkResponses.isEmpty())
+							.map(historicIdentityLinkResponses -> historicIdentityLinkResponses.stream())
+							.orElse(Stream.empty())
+							.map(h -> {
+								if (Optional.ofNullable(aceBridgeService).isPresent()) {
+									h.setGroupId(aceBridgeService.getExtendedGroupNome(h.getGroupId()));
+								}
+								return h;
+							}).collect(Collectors.toList()));
+					history.add(entity);
 
-							// se il task è quello attivo prendo anche i gruppi o gli utenti assegnee/candidate
-							if(task.getEndTime() == null) {
-								Map<String, Object> identityLink = new HashMap<>();
-								String taskDefinitionKey = task.getTaskDefinitionKey();
-								PvmActivity taskDefinition = processDefinition.findActivity(taskDefinitionKey);
-								TaskDefinition taskDef = (TaskDefinition) taskDefinition.getProperty("taskDefinition");
-								List<IdentityLink> taskLinks = taskService.getIdentityLinksForTask(task.getId());
+					// se il task è quello attivo prendo anche i gruppi o gli utenti assegnee/candidate
+					if(task.getEndTime() == null) {
+						Map<String, Object> identityLink = new HashMap<>();
+						String taskDefinitionKey = task.getTaskDefinitionKey();
+						PvmActivity taskDefinition = processDefinition.findActivity(taskDefinitionKey);
+						TaskDefinition taskDef = (TaskDefinition) taskDefinition.getProperty("taskDefinition");
+						List<IdentityLink> taskLinks = taskService.getIdentityLinksForTask(task.getId());
 
-								identityLink.put("links", restResponseFactory.createRestIdentityLinks(taskLinks));
-								identityLink.put("assignee", taskDef.getAssigneeExpression());
-								identityLink.put("candidateGroups", taskDef.getCandidateGroupIdExpressions());
-								identityLink.put("candidateUsers", taskDef.getCandidateUserIdExpressions());
+						identityLink.put("links", restResponseFactory.createRestIdentityLinks(taskLinks));
+						identityLink.put("assignee", taskDef.getAssigneeExpression());
+						identityLink.put("candidateGroups", taskDef.getCandidateGroupIdExpressions());
+						identityLink.put("candidateUsers", taskDef.getCandidateUserIdExpressions());
 
-								identityLinks.put(task.getId(), identityLink);
-							}
-						});
+						identityLinks.put(task.getId(), identityLink);
+					}
+				});
 
 		result.put("identityLinks", identityLinks);
 
@@ -226,9 +226,10 @@ public class FlowsProcessInstanceService {
 
 		FlowsHistoricProcessInstanceQuery processQuery = new FlowsHistoricProcessInstanceQuery(managementService);
 
-		processQuery.setFirstResult(firstResult);
-		processQuery.setMaxResults(maxResults);
-
+		if (firstResult != -1 && maxResults != -1) {
+			processQuery.setFirstResult(firstResult);
+			processQuery.setMaxResults(maxResults);
+		}
 		setSearchTerms(searchParams, processQuery);
 
 		List<String> authorities = Utils.getCurrentUserAuthorities();
@@ -306,17 +307,17 @@ public class FlowsProcessInstanceService {
 						processQuery.processInstanceBusinessKey(value);
 					} else {
 						switch (type) {
-							case "textEqual":
-								processQuery.variableValueEquals(key, value);
-								break;
-							case "boolean":
-								// gestione variabili booleane
-								processQuery.variableValueEquals(key, Boolean.valueOf(value));
-								break;
-							default:
-								//variabili con la wildcard  (%value%)
-								processQuery.variableValueLikeIgnoreCase(key, "%" + value + "%");
-								break;
+						case "textEqual":
+							processQuery.variableValueEquals(key, value);
+							break;
+						case "boolean":
+							// gestione variabili booleane
+							processQuery.variableValueEquals(key, Boolean.valueOf(value));
+							break;
+						default:
+							//variabili con la wildcard  (%value%)
+							processQuery.variableValueLikeIgnoreCase(key, "%" + value + "%");
+							break;
 						}
 					}
 				}
@@ -331,11 +332,11 @@ public class FlowsProcessInstanceService {
 
 
 	public void updateSearchTerms(String executionId, String processInstanceId, String stato) {
-		
+
 		String initiator = "";
 		String titolo = "";
 		String descrizione = "";
-		
+
 		if (runtimeService.getVariable(executionId , INITIATOR) != null) {
 			initiator =   runtimeService.getVariable(executionId , INITIATOR).toString();
 		}		
