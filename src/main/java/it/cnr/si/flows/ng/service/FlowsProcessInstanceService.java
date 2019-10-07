@@ -430,27 +430,28 @@ public class FlowsProcessInstanceService {
 				.variableValueNotEquals(statoFinaleDomanda.name(), Annullato.name())
 				.variableValueNotEquals(statoFinaleDomanda.name(), Revocato.name())
 				.endOr();
-		Calendar appo = Calendar.getInstance();
-		appo.setTime(new Date());
+		Calendar dataTerminiRicorso = Calendar.getInstance();
+		dataTerminiRicorso.setTime(new Date());
 
 		String now = utils.formattaData(new Date());
 		if(gareScadute != null){
 			historicProcessInstanceQuery
-			.variableValueLike("strumentoAcquisizione", "PROCEDURA SELETTIVA%");
+					.variableValueLike("strumentoAcquisizione", "PROCEDURA SELETTIVA%");
 			if(gareScadute){
-				// GARE SCADUTE IN ATTESA DI ESITO: data scadenza presentazione offerta < NOW - terminiRicorso
+				// GARE SCADUTE IN ATTESA DI ESITO: data scadenza presentazione offerta < NOW  && data scadenza presentazione offerta - termini di ricorso >= NOW
 				if(terminiRicorso != 0)
-					appo.add(Calendar.DAY_OF_MONTH, -terminiRicorso);
+					dataTerminiRicorso.add(Calendar.DAY_OF_MONTH, -terminiRicorso);
 
 				historicProcessInstanceQuery
-				.variableValueLessThan(dataScadenzaBando.name(), utils.formattaData(appo.getTime()));
+						.variableValueLessThan(dataScadenzaBando.name(), now)
+						.variableValueGreaterThanOrEqual(dataScadenzaBando.name(), utils.formattaData(dataTerminiRicorso.getTime()));
 				LOGGER.info("SCADUTE IN ATTESA DI ESITO nr flussi {}", historicProcessInstanceQuery.count());
 
 			} else {
 				// GARE IN CORSO data scadenza presentazione offerta >= NOW
 				historicProcessInstanceQuery
-				.variableValueGreaterThanOrEqual(dataScadenzaBando.name(), now);
-				LOGGER.info("GARE IN CORSO nr flussi {}", historicProcessInstanceQuery.count());
+						.variableValueGreaterThanOrEqual(dataScadenzaBando.name(), now);
+				LOGGER.info("GARE IN CORSO nei flussi {}", historicProcessInstanceQuery.count());
 
 			}
 		}
@@ -458,15 +459,15 @@ public class FlowsProcessInstanceService {
 		if(avvisiScaduti != null){
 			if(avvisiScaduti){
 				// AVVISI SCADUTI: data scadenza presentazione offerta  < NOW && data scadenza presentazione offerta + terminiRicorso >= NOW
-				appo.add(Calendar.DAY_OF_MONTH, -terminiRicorso);
+				dataTerminiRicorso.add(Calendar.DAY_OF_MONTH, -terminiRicorso);
 
 				historicProcessInstanceQuery
-				.variableValueLessThan(dataScadenzaAvvisoPreDetermina.name(), now)
-				.variableValueGreaterThanOrEqual(dataScadenzaAvvisoPreDetermina.name(), utils.formattaData(appo.getTime()));
+						.variableValueLessThan(dataScadenzaAvvisoPreDetermina.name(), now)
+						.variableValueGreaterThanOrEqual(dataScadenzaAvvisoPreDetermina.name(), utils.formattaData(dataTerminiRicorso.getTime()));
 			}else{
 				// AVVISI IN CORSO: data scadenza presentazione offerta >= NOW
 				historicProcessInstanceQuery
-				.variableValueGreaterThanOrEqual(dataScadenzaAvvisoPreDetermina.name(), now);
+						.variableValueGreaterThanOrEqual(dataScadenzaAvvisoPreDetermina.name(), now);
 			}
 		}
 		utils.orderProcess(order, historicProcessInstanceQuery);
