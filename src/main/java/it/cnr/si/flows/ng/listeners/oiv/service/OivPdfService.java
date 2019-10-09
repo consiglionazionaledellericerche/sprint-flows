@@ -136,7 +136,7 @@ public class OivPdfService {
 					for (int i = 0; i < impegni.length(); i++) {
 						JSONObject impegno = impegni.getJSONObject(i);
 
-						addLine(paragraphField, "Impegno numero " + (i + 1), "", true, false);
+						addLine(paragraphField, "numero " + (i + 1), "", true, false);
 						JSONArray keys = impegno.names();
 						for (int j = 0; j < keys.length(); j++) {
 							String key = keys.getString(j);
