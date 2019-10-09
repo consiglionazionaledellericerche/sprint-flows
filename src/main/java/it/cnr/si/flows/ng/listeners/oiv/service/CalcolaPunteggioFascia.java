@@ -60,7 +60,9 @@ public class CalcolaPunteggioFascia {
                     numeroValutazioniPositive = numeroValutazioniPositive + 1;
                 } else {
                     LOGGER.info("PIPPO");
-                    comunicaEsperienzaNonCoerente(obj.getString("idEsperienza"), obj.getString("annotazioniIstruttore"));
+                    if(obj.has("annotazioniIstruttore")) {
+                        comunicaEsperienzaNonCoerente(obj.getString("idEsperienza"), obj.getString("annotazioniIstruttore"));
+                    }
                     if (numeroValutazioniNegative >= 1) {
                         elencoValutazioniNegative = elencoValutazioniNegative.concat("; ");
                     }
