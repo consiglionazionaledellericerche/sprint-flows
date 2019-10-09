@@ -251,13 +251,17 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="sceltaUtente"/>
 		<fieldDescription><![CDATA[sceltaUtente]]></fieldDescription>
 	</field>
-	<field name="nomeCognomeRichiedente" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="nomeCognomeRichiedente"/>
-		<fieldDescription><![CDATA[nomeCognomeRichiedente]]></fieldDescription>
+	<field name="nomeCognomeProponente" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="nomeCognomeProponente"/>
+		<fieldDescription><![CDATA[nomeCognomeProponente]]></fieldDescription>
 	</field>
 	<field name="strutturaValutazioneDirigente" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="strutturaValutazioneDirigente"/>
 		<fieldDescription><![CDATA[strutturaValutazioneDirigente]]></fieldDescription>
+	</field>
+	<field name="profiloProponente" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="profiloProponente"/>
+		<fieldDescription><![CDATA[profiloProponente]]></fieldDescription>
 	</field>
 	<field name="initiator" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="initiator"/>
@@ -410,14 +414,14 @@
 					<textElement textAlignment="Left">
 						<font size="12" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA["Nome richiedente : "]]></textFieldExpression>
+					<textFieldExpression><![CDATA["Nome proponente : "]]></textFieldExpression>
 				</textField>
 				<textField>
 					<reportElement x="204" y="124" width="351" height="20" uuid="126fd6fc-1a28-4bcc-98da-bd2779998024"/>
 					<textElement>
 						<font size="12" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$F{nomeCognomeRichiedente}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{nomeCognomeProponente}]]></textFieldExpression>
 				</textField>
 				<textField>
 					<reportElement x="0" y="0" width="549" height="34" uuid="410d787a-4aca-46a3-b201-85c7d3f714b7"/>
@@ -453,6 +457,20 @@
 						<font size="12" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{idDomanda}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="1" y="144" width="200" height="20" uuid="9036bf5c-662d-46fe-8c97-08e29ac964bf"/>
+					<textElement textAlignment="Left">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Profilo proponente : "]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="205" y="144" width="351" height="20" uuid="208da3bb-c030-48f3-a72e-245f59e470fa"/>
+					<textElement>
+						<font size="12" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{profiloProponente}]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupHeader>
