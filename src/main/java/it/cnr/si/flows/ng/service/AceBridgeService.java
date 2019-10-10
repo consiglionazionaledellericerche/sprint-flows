@@ -167,6 +167,23 @@ public class AceBridgeService {
 		return afferenze.get(0).getEntitaOrganizzativa();
 	}
 
+	
+	public EntitaOrganizzativaWebDto getAfferenzaUtenteTipoSede(String username) {
+
+		PersonaWebDto persona = aceService.getPersonaByUsername(username);
+		List<PersonaEntitaOrganizzativaWebDto> personaEntitaOrganizzativaWebDtos = aceService.personaEntitaOrganizzativaFind(null, null, null, persona.getId(), TipoAppartenenza.SEDE, null, null, null, null);
+		List<PersonaEntitaOrganizzativaWebDto> afferenze = personaEntitaOrganizzativaWebDtos.stream()
+				.filter(p -> Objects.isNull(p.getFineValidita()))
+				.collect(Collectors.toList());
+
+		if (afferenze.size() == 0)
+			throw new UnexpectedResultException("Nessuna afferenza corrente per l'utente: "+ username);
+		if (afferenze.size() > 1)
+			throw new UnexpectedResultException("L'utente risulta avere piu' di una afferenza: "+ username);
+
+		return afferenze.get(0).getEntitaOrganizzativa();
+	}
+	
 
     public EntitaOrganizzativaWebDto getEntitaOrganizzativaDellUtente(String username) {
 

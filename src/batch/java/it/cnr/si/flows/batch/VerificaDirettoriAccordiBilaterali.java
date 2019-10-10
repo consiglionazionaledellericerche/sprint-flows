@@ -90,7 +90,8 @@ public class VerificaDirettoriAccordiBilaterali {
 
 		String cdsuoAppartenenzaUtente = null;
 		try {
-			cdsuoAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(username).getCdsuo();
+			//cdsuoAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(username).getCdsuo();
+			cdsuoAppartenenzaUtente = aceBridgeService.getAfferenzaUtenteTipoSede(username).getCdsuo();
 		} catch(UnexpectedResultException | FeignException | HttpClientErrorException error1) {
 			log.info("WARNING: L'UTENTE {} NON esiste in anagrafica ACE !!!!!!!!!!!!!!! ", username);
 			//cdsuoAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(username).get("codice_uo").toString();
@@ -99,7 +100,11 @@ public class VerificaDirettoriAccordiBilaterali {
 		finally {
 			if(cdsuoAppartenenzaUtente != null) {
 				Object insdipAppartenenzaUtente = new Object();
-				insdipAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(username).getIdnsip();
+				//insdipAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(username).getIdnsip();
+				log.info("-------------- getAfferenzaUtente {}", aceBridgeService.getAfferenzaUtente(username).getIdnsip());
+				log.info("-------------- getSede {}", aceBridgeService.getAfferenzaUtenteTipoSede(username).getIdnsip());
+
+				insdipAppartenenzaUtente = aceBridgeService.getAfferenzaUtenteTipoSede(username).getIdnsip();
 				String usernameDirettore = null;
 				EntitaOrganizzativaWebDto entitaOrganizzativaUtente = null;
 				try {
@@ -184,8 +189,8 @@ public class VerificaDirettoriAccordiBilaterali {
 
 		CSVParser parser = new CSVParser(',');
 
-		Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/utentiGenericiTest.csv"));
-
+		//Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/utentiGenericiTest.csv"));
+		Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/utentiDomandeAccordiBilaterali1.csv"));
 		Map<String, String> associazioni = new HashMap<>();
 
 		lines
