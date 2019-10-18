@@ -162,6 +162,12 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 			operazioniTimer.riprendiTimerTempiProceduramentali(execution, BOUNDARYTIMER_3, BOUNDARYTIMER_6);
 			execution.setVariable(DATA_FINE_SOCCORSO_ISTRUTTORIO, simpleDataNow);
 			execution.setVariable(GIORNI_DURATA_SOCCORSO_ISTRUTTORIO, operazioniTimer.calcolaGiorniTraDateString(execution.getVariable(DATA_INIZIO_SOCCORSO_ISTRUTTORIO).toString(), execution.getVariable(DATA_FINE_SOCCORSO_ISTRUTTORIO).toString()));
+			LOGGER.debug("--- GIORNI_DURATA_SOCCORSO_ISTRUTTORIO: {}", execution.getVariable(GIORNI_DURATA_SOCCORSO_ISTRUTTORIO));
+			int numeroGGSoccorsoIstruttorio = Integer.parseInt(execution.getVariable(GIORNI_DURATA_SOCCORSO_ISTRUTTORIO).toString());
+			if (numeroGGSoccorsoIstruttorio > 29) {
+				execution.setVariable("tempiSoccorsoIstruttorio", "SCADUTI");
+			}
+			LOGGER.debug("--- tempiSoccorsoIstruttorio: {}", execution.getVariable("tempiSoccorsoIstruttorio"));
 		}
 		;
 		break;

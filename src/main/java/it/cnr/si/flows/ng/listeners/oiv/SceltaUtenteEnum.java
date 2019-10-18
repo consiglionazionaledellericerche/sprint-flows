@@ -6,7 +6,6 @@ public enum SceltaUtenteEnum {
     START("start"),
     PRENDO_IN_CARICO_LA_DOMANDA("prendo_in_carico_la_domanda"),
     ESEUGUO_ISTRUTTORIA_DOMANDA("eseguo_istruttoria_domanda"),
-    ICHIESTA_SOCCORSO_ISTRUTTORIO("richiesta_soccorso_istruttorio"),
     INVIO_VALUTAZIONE("invio_valutazione"),
     RICHIESTA_SOCCORSO_ISTRUTTORIO("richiesta_soccorso_istruttorio"),
     GENERA_PDF_PREAVVISO_DI_RIGETTO("genera_PDF_preavviso_di_rigetto"),
