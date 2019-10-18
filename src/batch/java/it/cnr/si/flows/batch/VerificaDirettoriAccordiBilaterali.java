@@ -111,11 +111,6 @@ public class VerificaDirettoriAccordiBilaterali {
 					entitaOrganizzativaUtente = aceService.entitaOrganizzativaFindByTerm(insdipAppartenenzaUtente.toString()).get(0);
 				} catch(UnexpectedResultException | FeignException | HttpClientErrorException error3) {
 					log.info("-------------- WARNING: entitaOrganizzativaUtente  NON RIESCO A TROVARE L'ENTITA' ORGANIZZATIVA per la IDNSIP {}", insdipAppartenenzaUtente);
-					try {
-						entitaOrganizzativaUtente = aceService.entitaOrganizzativaFindByTerm(insdipAppartenenzaUtente.toString()).get(0);
-					} catch(UnexpectedResultException | FeignException | HttpClientErrorException error4) {
-						log.info("-------------- ERROR: entitaOrganizzativaUtente  2o TENTATIVO NON RIESCO A TROVARE L'ENTITA' ORGANIZZATIVA per la IDNSIP {}", insdipAppartenenzaUtente);
-					}
 				}
 				finally {
 					try {
@@ -123,7 +118,6 @@ public class VerificaDirettoriAccordiBilaterali {
 					} catch(UnexpectedResultException | FeignException | HttpClientErrorException error6) {
 						log.info("-------------- ERROR: usernameDirettore  NON RIESCO A TROVARE il direttore per la CDSUO {}", cdsuoAppartenenzaUtente);
 						results.add("ERROR: " + username + " --usernameDirettore  NON RIESCO A TROVARE il direttore per la CDSUO " + cdsuoAppartenenzaUtente);
-
 					}
 					finally {
 						if (usernameDirettore != null) {
@@ -189,8 +183,8 @@ public class VerificaDirettoriAccordiBilaterali {
 
 		CSVParser parser = new CSVParser(',');
 
-		//Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/utentiGenericiTest.csv"));
-		Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/utentiDomandeAccordiBilaterali1.csv"));
+		Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/utentiGenericiTest.csv"));
+		//Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/utentiDomandeAccordiBilaterali1.csv"));
 		Map<String, String> associazioni = new HashMap<>();
 
 		lines
