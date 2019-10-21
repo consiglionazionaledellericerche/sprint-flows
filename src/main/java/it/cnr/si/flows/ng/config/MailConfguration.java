@@ -40,7 +40,7 @@ public class MailConfguration {
 
     @Scheduled(fixedDelay = 3000, initialDelay = 10000) // 10m
     public void logStatus() {
-        //log.debug("MailConfig: {} {}", isMailActivated(), getMailRecipients());
+        log.debug("MailConfig: {} {}", isMailActivated(), getMailRecipients());
     }
 
 
@@ -58,6 +58,8 @@ public class MailConfguration {
         } else {
             log.info("MailConfig gia' settato, leggo le impostazioni predefiniti: {} {}", mailConfig.get(MAIL_ACTIVATED), MAIL_RECIPIENTS);
         }
+
+        logStatus();
     }
 
     public List<String> getMailRecipients() {
@@ -65,6 +67,7 @@ public class MailConfguration {
     }
     public void setMailRecipients(List<String> mailRecipients) {
         hazelcastInstance.getReplicatedMap(MAIL_CONFIG).put(MAIL_RECIPIENTS, mailRecipients);
+        logStatus();
     }
 
     public boolean isMailActivated() {
@@ -72,6 +75,7 @@ public class MailConfguration {
     }
     public void setMailActivated(boolean mailActivated) {
         hazelcastInstance.getReplicatedMap(MAIL_CONFIG).put(MAIL_ACTIVATED, mailActivated);
+        logStatus();
     }
 
     public String getMailUrl() {
