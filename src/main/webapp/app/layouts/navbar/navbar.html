@@ -28,7 +28,7 @@
                     <span class="hidden-sm" translate="global.menu.home">Home</span>
                 </a>
             </li>
-            <li ui-sref-active="active" has-authority="ROLE_ADMIN" >
+            <li ui-sref-active="active" has-authority="ROLE_USER">
                 <a ui-sref="availabletasks" ng-click="vm.collapseNavbar()">
                     <span class="glyphicon glyphicon-inbox"></span>
                     <span class="hidden-sm">I miei compiti</span>
@@ -86,7 +86,7 @@
                     <span class="hidden-sm">Compiti Completati</span>
                 </a>
             </li>
-            <li ui-sref-active="active" has-authority="ROLE_USER">
+            <li ui-sref-active="active" has-authority="ROLE_ADMIN">
                 <a ui-sref="my-process-instances" ng-click="vm.collapseNavbar()">
                     <span class="glyphicon glyphicon-pushpin"></span>
                     <span class="hidden-sm">Flussi avviati da me</span>
