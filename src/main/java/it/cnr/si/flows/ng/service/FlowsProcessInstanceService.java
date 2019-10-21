@@ -20,7 +20,6 @@ import org.activiti.engine.impl.task.TaskDefinition;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
-import org.activiti.rest.service.api.history.HistoricIdentityLinkResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -107,8 +106,18 @@ public class FlowsProcessInstanceService {
 		// Attachments
 		Map<String, FlowsAttachment> attachements = flowsAttachmentService.getAttachementsForProcessInstance(processInstanceId);
 		// in visualizzazione dettagli non mi servono i dati binari degli allegati
-		attachements.values().stream().forEach(a -> a.setBytes(null));
-		result.put("attachments", attachements);
+		LinkedHashMap<String, FlowsAttachment> sortedAttachements = new LinkedHashMap(); // LinkedHashMap mantiene l'ordine
+		attachements.values()
+				.stream()
+				.sorted(new Comparator<FlowsAttachment>() {
+					@Override
+					public int compare(FlowsAttachment f1, FlowsAttachment f2) {
+						return f1.getTime().compareTo(f2.getTime()); // ordine crescente per data ultimo aggiornamento
+					}
+				})
+				.peek(a -> a.setBytes(null)) // rimuovo i dati binari in visualizzazione dettagli
+				.forEach(a -> sortedAttachements.put(a.getName(), a));
+		result.put("attachments", sortedAttachements);
 
 		final Map<String, Object> identityLinks = new LinkedHashMap<>();
 		Map<String, Object> processLinks = new HashMap<>();
