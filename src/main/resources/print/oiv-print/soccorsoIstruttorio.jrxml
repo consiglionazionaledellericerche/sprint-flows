@@ -4,7 +4,7 @@
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="oivPreavvisoRigetto"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="oivSoccorsoIstruttorio"/>
 	<style name="Title" fontName="Times New Roman" fontSize="50" isBold="true" pdfFontName="Times-Bold"/>
 	<style name="SubTitle" forecolor="#736343" fontName="Arial" fontSize="18"/>
 	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
@@ -156,30 +156,60 @@
 		</box>
 	</style>
 	<subDataset name="Esperienze" uuid="43718d59-fac1-44c4-8e31-33ea348b2df2">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="oivSoccorsoIstruttorio"/>
+		<queryString language="json">
+			<![CDATA[valutazioneEsperienze_json]]>
+		</queryString>
+		<field name="numeroEsperienza" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="numeroEsperienza"/>
+			<fieldDescription><![CDATA[numeroEsperienza]]></fieldDescription>
+		</field>
+		<field name="dataInizio" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="dataInizio"/>
+			<fieldDescription><![CDATA[dataInizio]]></fieldDescription>
+		</field>
+		<field name="dataFine" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="dataFine"/>
+			<fieldDescription><![CDATA[dataFine]]></fieldDescription>
+		</field>
+		<field name="tipologiaEsperienza" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="tipologiaEsperienza"/>
+			<fieldDescription><![CDATA[tipologiaEsperienza]]></fieldDescription>
+		</field>
+		<field name="ambitoEsperienza" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="ambitoEsperienza"/>
+			<fieldDescription><![CDATA[ambitoEsperienza]]></fieldDescription>
+		</field>
+		<field name="attivitaSvolta" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="attivitaSvolta"/>
+			<fieldDescription><![CDATA[attivitaSvolta]]></fieldDescription>
+		</field>
+		<field name="annotazioniValutatore" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="annotazioniValutatore"/>
+			<fieldDescription><![CDATA[annotazioniValutatore]]></fieldDescription>
+		</field>
+		<field name="oggettoDiSoccorso" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="oggettoDiSoccorso"/>
+			<fieldDescription><![CDATA[oggettoDiSoccorso]]></fieldDescription>
+		</field>
+		<field name="motivazioneSoccorso" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="motivazioneSoccorso"/>
+			<fieldDescription><![CDATA[motivazioneSoccorso]]></fieldDescription>
+		</field>
+		<field name="giudizioFinale" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="giudizioFinale"/>
+			<fieldDescription><![CDATA[giudizioFinale]]></fieldDescription>
+		</field>
+		<field name="annotazioniDirigente" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="annotazioniDirigente"/>
+			<fieldDescription><![CDATA[annotazioniDirigente]]></fieldDescription>
+		</field>
+	</subDataset>
+	<subDataset name="Dataset1" uuid="afba7d10-5d4b-4231-9306-e83d33efb9ea">
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="oivSoccorsoIstruttorio"/>
 		<queryString language="json">
 			<![CDATA[]]>
 		</queryString>
-		<field name="annotazioniValutatore" class="java.lang.String">
-			<fieldDescription><![CDATA[annotazioniValutatore]]></fieldDescription>
-		</field>
-		<field name="numeroEsperienza" class="java.lang.String">
-			<fieldDescription><![CDATA[numeroEsperienza]]></fieldDescription>
-		</field>
-		<field name="tipologiaEsperienza" class="java.lang.String">
-			<fieldDescription><![CDATA[tipologiaEsperienza]]></fieldDescription>
-		</field>
-		<field name="attivitaSvolta" class="java.lang.String">
-			<fieldDescription><![CDATA[attivitaSvolta]]></fieldDescription>
-		</field>
-		<field name="ambitoEsperienza" class="java.lang.String">
-			<fieldDescription><![CDATA[ambitoEsperienza]]></fieldDescription>
-		</field>
-		<field name="motivazioneSoccorso" class="java.lang.String">
-			<fieldDescription><![CDATA[motivazioneSoccorso]]></fieldDescription>
-		</field>
-		<field name="oggettoDiSoccorso" class="java.lang.String">
-			<fieldDescription><![CDATA[oggettoDiSoccorso]]></fieldDescription>
-		</field>
 	</subDataset>
 	<parameter name="ANN_IMAGE" class="java.io.InputStream"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
@@ -188,6 +218,10 @@
 	<queryString language="json">
 		<![CDATA[]]>
 	</queryString>
+	<field name="startDate" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="startDate"/>
+		<fieldDescription><![CDATA[startDate]]></fieldDescription>
+	</field>
 	<field name="dataInvioDomanda" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="dataInvioDomanda"/>
 		<fieldDescription><![CDATA[dataInvioDomanda]]></fieldDescription>
@@ -303,30 +337,22 @@
 	<group name="Group2">
 		<groupExpression><![CDATA[(int)($V{REPORT_COUNT}/5)]]></groupExpression>
 		<groupHeader>
-			<band height="219">
+			<band height="196">
 				<textField>
 					<reportElement x="37" y="13" width="505" height="40" uuid="e9825bfd-c98f-4489-83b3-1ceb9783f873"/>
 					<textElement>
 						<font size="11" isBold="true"/>
 						<paragraph lineSpacing="Single"/>
 					</textElement>
-					<textFieldExpression><![CDATA["Oggetto:\t Elenco nazionale dei componenti degli Organismi indipendenti di valutazione ai sensi del D.M 2 dicembre 2016. Soccorso istruttorio." ]]></textFieldExpression>
+					<textFieldExpression><![CDATA["Oggetto:\t Elenco nazionale dei componenti degli Organismi indipendenti di valutazione ai sensi del D.M 2 dicembre 2016. Soccorso istruttorio."]]></textFieldExpression>
 				</textField>
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-					<reportElement x="30" y="80" width="505" height="116" uuid="f268cea9-49bb-4966-bc1d-bb4675fea055"/>
+					<reportElement x="30" y="79" width="505" height="116" uuid="f268cea9-49bb-4966-bc1d-bb4675fea055"/>
 					<textElement textAlignment="Justified" markup="styled">
 						<font size="11"/>
 						<paragraph lineSpacing="1_1_2"/>
 					</textElement>
-					<textFieldExpression><![CDATA["\tGentile " + ($F{sessoRichiedente}.equals( "M" )  ? ("dott ") : ("dott.ssa ")) + $F{nomeRichiedente} + "\r\n\t a seguito della verifica effettuata sulla domanda, pervenuta in data " + $F{dataInvioDomanda}.substring( 8, 10 )+"/"+$F{dataInvioDomanda}.substring( 5, 7 )+"/"+$F{dataInvioDomanda}.substring( 0, 4 )  + ", si rappresenta  la necessità di integrare le informazioni prodotte per consentire di verificare la riconducibilità delle esperienze all&apos;" + "<style isItalic=\"true\">" + " Area di specializzazione " + "</style>" +  "indicata e ai fini degli eventuali controlli successivi che il Dipartimento effettuerà sulla veridicità delle dichiarazioni rese." + "<style isUnderline =\"true\">" + "\r\n\tNell&apos;ambito delle attività di soccorso istruttorio le viene quindi data la possibilità di procedere alle integrazioni entro 30 giorni dal ricevimento della presente comunicazione tramite l&apos;apposita funzionalità disponibile nella sua area personale del Portale della performance." + "</style>" + "."]]></textFieldExpression>
-				</textField>
-				<textField>
-					<reportElement x="30" y="196" width="505" height="20" uuid="217a73b7-12c4-46db-9f98-dcc4ab6fa73a"/>
-					<textElement textAlignment="Justified" markup="styled">
-						<font size="11"/>
-						<paragraph lineSpacing="1_1_2"/>
-					</textElement>
-					<textFieldExpression><![CDATA[( $F{numeroValutazioniNegative}.equals( "0" )  ? null : ("\r\n\tIn particolare si osserva che: ")  )]]></textFieldExpression>
+					<textFieldExpression><![CDATA["\tGentile " + ($F{sessoRichiedente}.equals( "M" )  ? ("dott ") : ("dott.ssa ")) + $F{nomeRichiedente} + "\r\n\t a seguito della verifica effettuata sulla domanda, pervenuta in data " + $F{dataInvioDomanda}.substring( 0, 2 )+"/"+$F{dataInvioDomanda}.substring( 3, 5 )+"/"+$F{dataInvioDomanda}.substring( 6, 10 )  + ", si rappresenta  la necessità di integrare le informazioni prodotte per consentire di verificare la riconducibilità delle esperienze all&apos;" + "<style isItalic=\"true\">" + " Area di specializzazione " + "</style>" +  "indicata e ai fini degli eventuali controlli successivi che il Dipartimento effettuerà sulla veridicità delle dichiarazioni rese." + "<style isUnderline =\"true\">" + "\r\n\tNell&apos;ambito delle attività di soccorso istruttorio le viene quindi data la possibilità di procedere alle integrazioni entro 30 giorni dal ricevimento della presente comunicazione tramite l&apos;apposita funzionalità disponibile nella sua area personale del Portale della performance" + "</style>" + "."]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupHeader>
@@ -342,7 +368,7 @@
 						<font size="11"/>
 						<paragraph lineSpacing="1_1_2"/>
 					</textElement>
-					<textFieldExpression><![CDATA["\tSi chiede, dunque, alla S.V. di fornire i chiarimenti richiesti, relativi alle sole esperienze in argomento, " + "<style isBold=\"true\">" + " corredate da idonea documentazione dell’ente attestante l’attività dichiarata, " + "</style>" +  "entro  il termine di 30 giorni dal ricevimento della presente comunicazione tramite l’apposita funzionalità disponibile nella sua area personale del Portale della performance."]]></textFieldExpression>
+					<textFieldExpression><![CDATA["\tSi chiede, dunque, alla S.V. di fornire i chiarimenti richiesti, relativi alle sole esperienze in argomento, " + "<style isBold=\"true\">" + " corredate da idonea documentazione dell’ente attestante l’attività dichiarata, " + "</style>" +  "entro  il termine di 30 giorni dal ricevimento della presente comunicazione tramite l’apposita funzionalità disponibile nella sua area personale del Portale della performance"]]></textFieldExpression>
 				</textField>
 			</band>
 			<band height="59">
@@ -409,25 +435,35 @@
 		<band height="19" splitType="Stretch"/>
 	</columnHeader>
 	<detail>
-		<band height="40">
+		<band height="29">
+			<textField>
+				<reportElement x="30" y="5" width="505" height="20" uuid="b653ce35-40fc-4481-a9d3-14313f88ad2a"/>
+				<textElement textAlignment="Justified" markup="styled">
+					<font size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[ ( $F{numeroValutazioniNegative}  == "1" ? ("") : ("In particolare si osserva che: ") )
+]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="33">
 			<componentElement>
-				<reportElement positionType="Float" stretchType="ContainerBottom" x="31" y="5" width="510" height="30" isRemoveLineWhenBlank="true" uuid="04333226-daf1-4ae5-b491-7b4f6a8d6855">
+				<reportElement positionType="Float" stretchType="ContainerBottom" x="31" y="2" width="510" height="27" isRemoveLineWhenBlank="true" uuid="04333226-daf1-4ae5-b491-7b4f6a8d6855">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.HorizontalRowLayout"/>
 				</reportElement>
 				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
 					<datasetRun subDataset="Esperienze" uuid="5c4bcf38-5213-4c81-bae1-c6b0b767ae80">
 						<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JsonDataSource)$P{REPORT_DATA_SOURCE}).subDataSource("valutazioneEsperienze_json")]]></dataSourceExpression>
 					</datasetRun>
-					<jr:listContents height="30" width="510">
+					<jr:listContents height="27" width="510">
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-							<reportElement x="0" y="0" width="255" height="30" uuid="c76d5669-e350-4482-9b22-f97c2fbc1c7d">
+							<reportElement x="0" y="0" width="255" height="27" uuid="c76d5669-e350-4482-9b22-f97c2fbc1c7d">
 								<printWhenExpression><![CDATA[$F{oggettoDiSoccorso}.equalsIgnoreCase( "SI" )]]></printWhenExpression>
 							</reportElement>
 							<textElement textAlignment="Center" verticalAlignment="Middle"/>
 							<textFieldExpression><![CDATA["Esperienza professionale nr." + $F{numeroEsperienza}]]></textFieldExpression>
 						</textField>
 						<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-							<reportElement x="255" y="0" width="255" height="30" uuid="414ac89b-2df8-45dd-b9ef-6e25b4d62a02">
+							<reportElement x="255" y="0" width="255" height="27" uuid="414ac89b-2df8-45dd-b9ef-6e25b4d62a02">
 								<printWhenExpression><![CDATA[$F{oggettoDiSoccorso}.equalsIgnoreCase( "SI" )]]></printWhenExpression>
 							</reportElement>
 							<textElement verticalAlignment="Middle"/>
