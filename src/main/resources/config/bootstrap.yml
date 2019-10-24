@@ -1,9 +1,12 @@
 spring:
+  application:
+    name: flows
   cloud:
     config:
       server:
         bootstrap: true
         git:
-          uri: git@git.si.cnr.it:documentale/flows-config.git
-
-
+          uri: http://git.si.cnr.it/devops/configuration-repo.git
+          searchPaths: '{application}'
+          username: flows-app
+          password: a6bowcXMN-8n4m4VgANu
