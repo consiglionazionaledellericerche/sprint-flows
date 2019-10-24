@@ -1,0 +1,9 @@
+spring:
+  cloud:
+    config:
+      server:
+        bootstrap: true
+        git:
+          uri: git@git.si.cnr.it:documentale/flows-config.git
+
+
