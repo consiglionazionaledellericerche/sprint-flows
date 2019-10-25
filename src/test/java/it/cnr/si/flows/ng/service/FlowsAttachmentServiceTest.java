@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.inject.Inject;
 
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "test,cnr")
+@ActiveProfiles(profiles = "native,unittests,cnr")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
 public class FlowsAttachmentServiceTest {

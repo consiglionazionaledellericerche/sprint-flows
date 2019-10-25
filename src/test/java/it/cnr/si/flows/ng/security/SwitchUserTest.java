@@ -24,7 +24,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "test,cnr")
+@ActiveProfiles(profiles = "native,unittests,cnr")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
 public class SwitchUserTest {
@@ -92,7 +92,7 @@ public class SwitchUserTest {
         assertThat(impersonatedAccount).containsEntry("login", "marcinireneusz.trycz");
         assertThat(impersonatedAccount.get("authorities")).asList()
         .contains("ROLE_PREVIOUS_ADMINISTRATOR")
-        .contains("DEPARTMENT_603240");
+        .contains("DEPARTMENT_641100");
 
         Map<String, Object> exitAccount = getAccount(token);
         assertThat(exitAccount).containsEntry("login", "admin");

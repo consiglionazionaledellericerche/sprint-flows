@@ -38,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @Ignore
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "test,cnr")
+@ActiveProfiles(profiles = "native,unittests,cnr")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
 public class NotificationRuleResourceIntTest {

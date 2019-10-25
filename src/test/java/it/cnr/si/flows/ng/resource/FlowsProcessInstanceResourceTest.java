@@ -48,10 +48,10 @@ import static org.springframework.http.HttpStatus.OK;
 
 
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "test,cnr")
+@ActiveProfiles(profiles = "native,unittests,cnr")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
-//@ActiveProfiles(profiles = "test,oiv")
+//@ActiveProfiles(profiles = "native,unittests,oiv")
 public class FlowsProcessInstanceResourceTest {
 
     private static final int LOAD_TEST_PROCESS_INSTANCES = 700;

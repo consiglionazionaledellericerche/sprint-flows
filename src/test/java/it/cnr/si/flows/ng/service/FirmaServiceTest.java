@@ -25,7 +25,7 @@ import java.util.Optional;
 import static org.junit.Assert.fail;
 
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "test,cnr")
+@ActiveProfiles(profiles = "native,unittests,cnr")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
 public class FirmaServiceTest {

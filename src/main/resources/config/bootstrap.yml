@@ -8,5 +8,3 @@ spring:
         git:
           uri: http://git.si.cnr.it/devops/configuration-repo.git
           searchPaths: '{application}'
-          username: flows-app
-          password: a6bowcXMN-8n4m4VgANu

@@ -30,7 +30,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "test,oiv")
+@ActiveProfiles(profiles = "native,unittests,oiv")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
 public class OivPdfResourceTest {
