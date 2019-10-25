@@ -10,7 +10,7 @@
 
     <groupId>it.cnr.si.flows</groupId>
     <artifactId>sprint-flows</artifactId>
-    <version>0.9.18-SNAPSHOT</version>
+    <version>0.9.21-SNAPSHOT</version>
     <packaging>war</packaging>
 
     <name>sprint-flows</name>
@@ -355,7 +355,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <version>${spring-boot.version}</version>
-            <!-- <scope>test</scope>-->
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.thymeleaf</groupId>
@@ -575,9 +575,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.12.4</version>
                 <configuration>
-                    <excludes>
-                        <exclude>**/batch/**</exclude>
-                    </excludes>
                     <argLine>-Djava.security.egd=file:/dev/./urandom
                         -Xmx256m
                         ${surefireArgLine}</argLine>
