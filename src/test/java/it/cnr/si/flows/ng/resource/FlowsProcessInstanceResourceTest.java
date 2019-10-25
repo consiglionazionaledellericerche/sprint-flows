@@ -2,10 +2,12 @@ package it.cnr.si.flows.ng.resource;
 
 import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.TestServices;
+import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
@@ -17,36 +19,39 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.util.StopWatch;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import java.time.Year;
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.Callable;
 
-import static it.cnr.si.flows.ng.TestServices.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
 import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
+import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.testAcquistiAvvisi;
 import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
 import static it.cnr.si.flows.ng.utils.Utils.ASC;
 import static org.junit.Assert.*;
 import static org.springframework.http.HttpStatus.OK;
 
 
-@SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles(profiles = "native,unittests,cnr")
+@EnableTransactionManagement
 @RunWith(SpringRunner.class)
-@ActiveProfiles(profiles = "test,cnr")
-//@ActiveProfiles(profiles = "test,oiv")
+//@ActiveProfiles(profiles = "native,unittests,oiv")
 public class FlowsProcessInstanceResourceTest {
 
     private static final int LOAD_TEST_PROCESS_INSTANCES = 700;
@@ -65,6 +70,8 @@ public class FlowsProcessInstanceResourceTest {
     private FlowsProcessDefinitionResource flowsProcessDefinitionResource;
     @Inject
     private RepositoryService repositoryService;
+    @Inject
+    private TaskService taskService;
 
     private StopWatch stopWatch = new StopWatch();
     private ProcessInstanceResponse processInstance;
@@ -238,42 +245,106 @@ public class FlowsProcessInstanceResourceTest {
     }
 
 
-    @Test
-    public void getProcessInstancesForTrasparenzaTest() throws Exception {
-        processInstance = util.mySetUp(acquisti);
 
-        util.loginAdmin();
+    @Test()
+    public void getProcessInstancesForURPTest() throws Exception {
+
+        processInstance = util.mySetUp(testAcquistiAvvisi);
+        LocalDate dataScadenzaAvvisoPreDetermina = LocalDate.of(2019, Month.SEPTEMBER, 4);
+
+        //AVVISI SCADUTI
+        util.loginPortaleCnr();
+        // terminiRicorso > (oggi - startFlusso) ==> resultSet = 1
         ResponseEntity<List<Map<String, Object>>> res = flowsProcessInstanceResource
-                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, Year.now().getValue(), 0, 10, ASC);
-
+                .getProcessInstancesForURP((int) (dataScadenzaAvvisoPreDetermina.until(LocalDate.now(), ChronoUnit.DAYS) + 1), true, null, 0, 10, ASC);
         assertEquals(OK, res.getStatusCode());
-        //prendo anche le Pi create negli altri test
-        assertEquals(8, res.getBody().size());
+        assertEquals(1, res.getBody().size());
 
-        //prova recupero 10 elementi dopo il quinto (result = 3 perchè ho 8 Process Instance in totale - anche quelle generate negli altri test)
+        // terminiRicorso < (oggi - startFlusso) ==> resultSet = 0
         res = flowsProcessInstanceResource
-                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, Year.now().getValue(), 5, 10, ASC);
-
-        //prendo anche le Pi create negli altri test
-        assertEquals(OK, res.getStatusCode());
-        assertEquals(3, res.getBody().size());
-
-
-        //prova senza ordinamento (recupera le 8 process instances - anche quelle generate negli altri test)
-        res = flowsProcessInstanceResource
-                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2018, Year.now().getValue(), 0, 10, null);
-
-        assertEquals(OK, res.getStatusCode());
-        //prendo anche le Pi create negli altri test
-        assertEquals(8, res.getBody().size());
-
-
-        //prova anni sbagliati
-        res = flowsProcessInstanceResource
-                .getProcessInstancesForTrasparenza(acquisti.getValue(), 2016, Year.now().getValue() - 1, 0, 10, ASC);
+                .getProcessInstancesForURP((int) (dataScadenzaAvvisoPreDetermina.until(LocalDate.now(), ChronoUnit.DAYS) - 1), true, null, 0, 10, ASC);
 
         assertEquals(OK, res.getStatusCode());
         assertEquals(0, res.getBody().size());
+
+        // vado avanti col flusso (Pre-determina -> Verifica))
+        MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
+        String processDefinition = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionKey(acquisti.getProcessDefinition())
+                .latestVersion()
+                .singleResult()
+                .getId();
+        req.setParameter("processDefinitionId", processDefinition);
+        req.setParameter("taskId", util.getFirstTaskId());
+        req.setParameter("commento", "commento determina JUNIT ");
+        req.setParameter("dataScadenzaAvvisoPreDetermina", "2019-09-04T00:00:00.000Z");
+        req.setParameter("sceltaUtente", "PredisponiDetermina");
+        req.setParameter("tipologiaAcquisizione", "Procedura ristretta");
+        req.setParameter("tipologiaAcquisizioneId", "12");
+        req.setParameter("strumentoAcquisizione", "PROCEDURA SELETTIVA - MEPA");
+        req.setParameter("strumentoAcquisizioneId", "21");
+        req.setParameter("tipologiaProceduraSelettiva", "economicamenteVantaggiosa");
+        req.setParameter("rup", "marco.spasiano");
+        req.setParameter("rup_label", "MARCO SPASIANO");
+        req.setParameter("impegni_json", "[{\"descrizione\":\"Impegno numero 1\",\"percentualeIva\":20,\"importoNetto\":100,\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"uo\":\"2216\",\"gae\":\"spaclient\",\"progetto\":\"Progetto impegno 1\"}]");
+
+        util.loginResponsabileAcquisti();
+
+        ResponseEntity<ProcessInstanceResponse> response = flowsTaskResource.completeTask(req);
+        assertEquals(OK, response.getStatusCode());
+
+        // GARE SCADUTE
+        util.loginPortaleCnr();
+        // terminiRicorso > (oggi - startFlusso) ==> resultSet = 0 (LA LOGICA TEMPORALE DELLE GARE È "OPPOSTA" RISPETTO A QUELLA DEGLI AVVISI)
+        res = flowsProcessInstanceResource
+                .getProcessInstancesForURP((int)(dataScadenzaAvvisoPreDetermina.until(LocalDate.now(), ChronoUnit.DAYS) + 1), null, false, 0, 10, ASC);
+        assertEquals(OK, res.getStatusCode());
+        assertEquals(0, res.getBody().size());
+        // terminiRicorso < (oggi - startFlusso) ==> resultSet = 1 (LA LOGICA TEMPORALE DELLE GARE È "OPPOSTA" RISPETTO A QUELLA DEGLI AVVISI)
+        res = flowsProcessInstanceResource
+                .getProcessInstancesForURP((int)(dataScadenzaAvvisoPreDetermina.until(LocalDate.now(), ChronoUnit.DAYS) - 1), null, true, 0, 10, ASC);
+        assertEquals(OK, res.getStatusCode());
+        assertEquals(1, res.getBody().size());
+    }
+
+
+    @Test
+    public void getProcessInstancesForTrasparenzaTest() throws Exception {
+        MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
+        processInstance = util.mySetUp(acquisti);
+        // Finchè non esco dalla macro-fase "DECISIONE A CONTRATTARE" il flagIsTrasparenza è false quindi la Pi nn appare nella ricerca
+        util.loginPortaleCnr();
+        ResponseEntity<List<Map<String, Object>>> res = flowsProcessInstanceResource
+                .getProcessInstancesForTrasparenza(0, 10, ASC);
+        assertEquals(OK, res.getStatusCode());
+        assertEquals(0, res.getBody().size());
+
+
+        //visto che devo firmare la Decisione non posso superare questa fase nei test
+        //(a meno che nn setti direttamente la variabile settata alla fine della macro-fase "DECISIONE A CONTRATTARE")
+        util.loginAdmin();
+        flowsProcessInstanceResource.setVariable(processInstance.getId(), Enum.VariableEnum.flagIsTrasparenza.name(), "true");
+
+        util.loginPortaleCnr();
+        res = flowsProcessInstanceResource
+                .getProcessInstancesForTrasparenza(0, 10, ASC);
+        assertEquals(OK, res.getStatusCode());
+        assertEquals(1, res.getBody().size());
+    }
+
+
+    private Callable<Integer> getPIForTrasparenzaSize() throws ParseException {
+        util.loginPortaleCnr();
+        ResponseEntity<List<Map<String, Object>>> res1 = flowsProcessInstanceResource
+                .getProcessInstancesForTrasparenza(0, 10, ASC);
+
+        assertEquals(OK, res1.getStatusCode());
+        return () -> res1.getBody().size();
+    }
+
+
+    private String getTaskId() {
+        return taskService.createTaskQuery().singleResult().getId();
     }
 
 

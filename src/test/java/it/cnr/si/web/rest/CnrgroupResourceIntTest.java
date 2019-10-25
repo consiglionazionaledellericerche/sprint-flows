@@ -1,6 +1,6 @@
 package it.cnr.si.web.rest;
 
-import it.cnr.si.SprintApp;
+import it.cnr.si.FlowsApp;
 import it.cnr.si.domain.Cnrgroup;
 import it.cnr.si.flows.ng.TestUtil;
 import it.cnr.si.repository.CnrgroupRepository;
@@ -19,6 +19,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
@@ -36,9 +37,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *
  * @see CnrgroupResource
  */
+@SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles(profiles = "native,unittests,cnr")
+@EnableTransactionManagement
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = SprintApp.class)
-@ActiveProfiles(profiles = "cnr")
 @Ignore
 public class CnrgroupResourceIntTest {
     private static final String DEFAULT_NAME = "AAAAA";

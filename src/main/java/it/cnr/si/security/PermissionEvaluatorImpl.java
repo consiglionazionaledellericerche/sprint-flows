@@ -14,6 +14,7 @@ import org.activiti.engine.task.Task;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
@@ -57,7 +58,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
     HistoryService historyService;
     @Inject
     RestResponseFactory restResponseFactory;
-    @Inject
+    @Autowired(required = false)
     private AceBridgeService aceBridgeService;
 
 
@@ -318,7 +319,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
                                 a.contains(responsabile + "#flussi@" + idStruttura));
         boolean isRuoloFlusso = false;
 
-        if (instance.getProcessDefinitionKey().equals(acquisti.getValue())) {
+        if (instance.getProcessDefinitionKey().equals(acquisti.getProcessDefinition())) {
 
             String rup = String.valueOf(instance.getProcessVariables().get("rup"));
             String nomeGruppoFirma = "responsabileFirmaAcquisti@" + idStruttura;
@@ -340,7 +341,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
                 .singleResult();
         String username = SecurityUtils.getCurrentUserLogin();
 
-        if (instance.getProcessDefinitionKey().equals(acquisti.getValue())) {
+        if (instance.getProcessDefinitionKey().equals(acquisti.getProcessDefinition())) {
 
             String rup = String.valueOf(instance.getProcessVariables().get("rup"));
             if (username.equals(rup))

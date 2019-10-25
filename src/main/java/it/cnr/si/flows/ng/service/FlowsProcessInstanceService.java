@@ -6,7 +6,6 @@ import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
-import it.cnr.si.security.FlowsUserDetailsService;
 import it.cnr.si.security.PermissionEvaluatorImpl;
 import org.activiti.engine.*;
 import org.activiti.engine.history.*;
@@ -36,6 +35,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static it.cnr.si.flows.ng.utils.Enum.Stato.Annullato;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.Revocato;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
 import static it.cnr.si.flows.ng.utils.Utils.*;
 
 
@@ -70,6 +72,10 @@ public class FlowsProcessInstanceService {
 	private UserDetailsService flowsUserDetailsService;
 	@Inject
 	private Utils utils;
+	@Inject
+	private FlowsAttachmentService attachmentService;
+
+
 
 	public HistoricTaskInstance getCurrentTaskOfProcessInstance(String processInstanceId) {
 		return historyService.createHistoricTaskInstanceQuery()
@@ -119,25 +125,25 @@ public class FlowsProcessInstanceService {
 				String[] values = value.split(",");
 
 				for (String linkedProcessId : values) {
+					if(permissionEvaluator.canVisualize(linkedProcessId, flowsUserDetailsService)) {
+						HistoricProcessInstance linkedProcessInstance = historyService
+								.createHistoricProcessInstanceQuery()
+								.processInstanceId(linkedProcessId)
+								.includeProcessVariables()
+								.singleResult();
 
-					HistoricProcessInstance linkedProcessInstance = historyService
-							.createHistoricProcessInstanceQuery()
-							.processInstanceId(linkedProcessId)
-							.includeProcessVariables()
-							.singleResult();
+						if (linkedProcessInstance != null) {
+							String key = linkedProcessInstance.getBusinessKey();
 
-					if (linkedProcessInstance != null) {
-						String key = linkedProcessInstance.getBusinessKey();
+							Map<String, Object> linkedObject = new HashMap<>();
+							linkedObject.put("id", linkedProcessId);
+							linkedObject.put("key", key);
+							linkedObject.put("titolo", linkedProcessInstance.getProcessVariables().get("titolo"));
 
-						Map<String, Object> linkedObject = new HashMap<>();
-						linkedObject.put("id", linkedProcessId);
-						linkedObject.put("key", key);
-						linkedObject.put("titolo", linkedProcessInstance.getProcessVariables().get("titolo"));
-
-						linkedFlows.add(linkedObject);
+							linkedFlows.add(linkedObject);
+						}
 					}
 				}
-
 				if (!linkedFlows.isEmpty())
 					result.put("linkedProcesses", linkedFlows);
 			}
@@ -166,42 +172,42 @@ public class FlowsProcessInstanceService {
 		ArrayList<Map<String, Object>> history = new ArrayList<>();
 
 		taskList
-				.forEach(
-						task -> {
-							List<HistoricIdentityLink> links = historyService.getHistoricIdentityLinksForTask(task.getId());
-							HashMap<String, Object> entity = new HashMap<>();
-							entity.put("historyTask", restResponseFactory.createHistoricTaskInstanceResponse(task));
+		.forEach(
+				task -> {
+					List<HistoricIdentityLink> links = historyService.getHistoricIdentityLinksForTask(task.getId());
+					HashMap<String, Object> entity = new HashMap<>();
+					entity.put("historyTask", restResponseFactory.createHistoricTaskInstanceResponse(task));
 
-							// Sostituisco l'id interno del gruppo con la dicitura estesa
-							entity.put("historyIdentityLink", Optional.ofNullable(links)
-									.map(historicIdentityLinks -> restResponseFactory.createHistoricIdentityLinkResponseList(historicIdentityLinks))
-									.filter(historicIdentityLinkResponses -> !historicIdentityLinkResponses.isEmpty())
-									.map(historicIdentityLinkResponses -> historicIdentityLinkResponses.stream())
-									.orElse(Stream.empty())
-									.map(h -> {
-										if (Optional.ofNullable(aceBridgeService).isPresent()) {
-											h.setGroupId(aceBridgeService.getExtendedGroupNome(h.getGroupId()));
-										}
-										return h;
-									}).collect(Collectors.toList()));
-							history.add(entity);
+					// Sostituisco l'id interno del gruppo con la dicitura estesa
+					entity.put("historyIdentityLink", Optional.ofNullable(links)
+							.map(historicIdentityLinks -> restResponseFactory.createHistoricIdentityLinkResponseList(historicIdentityLinks))
+							.filter(historicIdentityLinkResponses -> !historicIdentityLinkResponses.isEmpty())
+							.map(historicIdentityLinkResponses -> historicIdentityLinkResponses.stream())
+							.orElse(Stream.empty())
+							.map(h -> {
+								if (Optional.ofNullable(aceBridgeService).isPresent()) {
+									h.setGroupId(aceBridgeService.getExtendedGroupNome(h.getGroupId()));
+								}
+								return h;
+							}).collect(Collectors.toList()));
+					history.add(entity);
 
-							// se il task è quello attivo prendo anche i gruppi o gli utenti assegnee/candidate
-							if(task.getEndTime() == null) {
-								Map<String, Object> identityLink = new HashMap<>();
-								String taskDefinitionKey = task.getTaskDefinitionKey();
-								PvmActivity taskDefinition = processDefinition.findActivity(taskDefinitionKey);
-								TaskDefinition taskDef = (TaskDefinition) taskDefinition.getProperty("taskDefinition");
-								List<IdentityLink> taskLinks = taskService.getIdentityLinksForTask(task.getId());
+					// se il task è quello attivo prendo anche i gruppi o gli utenti assegnee/candidate
+					if(task.getEndTime() == null) {
+						Map<String, Object> identityLink = new HashMap<>();
+						String taskDefinitionKey = task.getTaskDefinitionKey();
+						PvmActivity taskDefinition = processDefinition.findActivity(taskDefinitionKey);
+						TaskDefinition taskDef = (TaskDefinition) taskDefinition.getProperty("taskDefinition");
+						List<IdentityLink> taskLinks = taskService.getIdentityLinksForTask(task.getId());
 
-								identityLink.put("links", restResponseFactory.createRestIdentityLinks(taskLinks));
-								identityLink.put("assignee", taskDef.getAssigneeExpression());
-								identityLink.put("candidateGroups", taskDef.getCandidateGroupIdExpressions());
-								identityLink.put("candidateUsers", taskDef.getCandidateUserIdExpressions());
+						identityLink.put("links", restResponseFactory.createRestIdentityLinks(taskLinks));
+						identityLink.put("assignee", taskDef.getAssigneeExpression());
+						identityLink.put("candidateGroups", taskDef.getCandidateGroupIdExpressions());
+						identityLink.put("candidateUsers", taskDef.getCandidateUserIdExpressions());
 
-								identityLinks.put(task.getId(), identityLink);
-							}
-						});
+						identityLinks.put(task.getId(), identityLink);
+					}
+				});
 
 		result.put("identityLinks", identityLinks);
 
@@ -220,6 +226,10 @@ public class FlowsProcessInstanceService {
 
 		FlowsHistoricProcessInstanceQuery processQuery = new FlowsHistoricProcessInstanceQuery(managementService);
 
+		if (firstResult != -1 && maxResults != -1) {
+			processQuery.setFirstResult(firstResult);
+			processQuery.setMaxResults(maxResults);
+		}
 		setSearchTerms(searchParams, processQuery);
 
 		List<String> authorities = Utils.getCurrentUserAuthorities();
@@ -297,17 +307,17 @@ public class FlowsProcessInstanceService {
 						processQuery.processInstanceBusinessKey(value);
 					} else {
 						switch (type) {
-							case "textEqual":
-								processQuery.variableValueEquals(key, value);
-								break;
-							case "boolean":
-								// gestione variabili booleane
-								processQuery.variableValueEquals(key, Boolean.valueOf(value));
-								break;
-							default:
-								//variabili con la wildcard  (%value%)
-								processQuery.variableValueLikeIgnoreCase(key, "%" + value + "%");
-								break;
+						case "textEqual":
+							processQuery.variableValueEquals(key, value);
+							break;
+						case "boolean":
+							// gestione variabili booleane
+							processQuery.variableValueEquals(key, Boolean.valueOf(value));
+							break;
+						default:
+							//variabili con la wildcard  (%value%)
+							processQuery.variableValueLikeIgnoreCase(key, "%" + value + "%");
+							break;
 						}
 					}
 				}
@@ -323,9 +333,19 @@ public class FlowsProcessInstanceService {
 
 	public void updateSearchTerms(String executionId, String processInstanceId, String stato) {
 
-		String initiator =   runtimeService.getVariable(executionId , INITIATOR).toString();
-		String titolo =  runtimeService.getVariable(executionId , TITOLO).toString();
-		String descrizione =  runtimeService.getVariable(executionId , DESCRIZIONE).toString();
+		String initiator = "";
+		String titolo = "";
+		String descrizione = "";
+
+		if (runtimeService.getVariable(executionId , INITIATOR) != null) {
+			initiator =   runtimeService.getVariable(executionId , INITIATOR).toString();
+		}		
+		if (runtimeService.getVariable(executionId , TITOLO) != null) {
+			titolo =   runtimeService.getVariable(executionId , TITOLO).toString();
+		}		
+		if (runtimeService.getVariable(executionId , DESCRIZIONE) != null) {
+			descrizione =   runtimeService.getVariable(executionId , DESCRIZIONE).toString();
+		}
 
 		JSONObject name = new JSONObject();
 
@@ -386,8 +406,7 @@ public class FlowsProcessInstanceService {
 							headers.add(field.getString("label"));
 					}
 				} catch (JSONException e) {
-					LOGGER.error("Errore nel processamento del JSON", e);
-					throw new IOException(e);
+					LOGGER.error("Errore nel processamento del JSON", new IOException(e));
 				}
 			}
 			if (!hasHeaders) {
@@ -400,6 +419,77 @@ public class FlowsProcessInstanceService {
 		writer.writeAll(entriesIterable);
 		writer.close();
 	}
+
+
+	public List<HistoricProcessInstance> getProcessInstancesForURP(int terminiRicorso, Boolean avvisiScaduti, Boolean gareScadute, int firstResult, int maxResults, String order) {
+
+		HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()
+				.includeProcessVariables()
+				.processDefinitionKey("acquisti")
+				.or()
+				.variableValueNotEquals(statoFinaleDomanda.name(), Annullato.name())
+				.variableValueNotEquals(statoFinaleDomanda.name(), Revocato.name())
+				.endOr();
+		Calendar dataTerminiRicorso = Calendar.getInstance();
+		dataTerminiRicorso.setTime(new Date());
+
+		String now = utils.formattaData(new Date());
+		if(gareScadute != null){
+			historicProcessInstanceQuery
+					.variableValueLike("strumentoAcquisizione", "PROCEDURA SELETTIVA%");
+			if(gareScadute){
+				// GARE SCADUTE IN ATTESA DI ESITO: data scadenza presentazione offerta < NOW  && data scadenza presentazione offerta - termini di ricorso >= NOW
+				if(terminiRicorso != 0)
+					dataTerminiRicorso.add(Calendar.DAY_OF_MONTH, -terminiRicorso);
+
+				historicProcessInstanceQuery
+						.variableValueLessThan(dataScadenzaBando.name(), now)
+						.variableValueGreaterThanOrEqual(dataScadenzaBando.name(), utils.formattaData(dataTerminiRicorso.getTime()));
+				LOGGER.info("SCADUTE IN ATTESA DI ESITO nr flussi {}", historicProcessInstanceQuery.count());
+
+			} else {
+				// GARE IN CORSO data scadenza presentazione offerta >= NOW
+				historicProcessInstanceQuery
+						.variableValueGreaterThanOrEqual(dataScadenzaBando.name(), now);
+				LOGGER.info("GARE IN CORSO nei flussi {}", historicProcessInstanceQuery.count());
+
+			}
+		}
+
+		if(avvisiScaduti != null){
+			if(avvisiScaduti){
+				// AVVISI SCADUTI: data scadenza presentazione offerta  < NOW && data scadenza presentazione offerta + terminiRicorso >= NOW
+				dataTerminiRicorso.add(Calendar.DAY_OF_MONTH, -terminiRicorso);
+
+				historicProcessInstanceQuery
+						.variableValueLessThan(dataScadenzaAvvisoPreDetermina.name(), now)
+						.variableValueGreaterThanOrEqual(dataScadenzaAvvisoPreDetermina.name(), utils.formattaData(dataTerminiRicorso.getTime()));
+			}else{
+				// AVVISI IN CORSO: data scadenza presentazione offerta >= NOW
+				historicProcessInstanceQuery
+						.variableValueGreaterThanOrEqual(dataScadenzaAvvisoPreDetermina.name(), now);
+			}
+		}
+		utils.orderProcess(order, historicProcessInstanceQuery);
+
+		return historicProcessInstanceQuery.listPage(firstResult, maxResults);
+	}
+
+
+
+	public List<HistoricProcessInstance> getProcessInstancesForTrasparenza(int firstResult, int maxResults, String order) {
+
+		HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()
+				.includeProcessVariables()
+				.processDefinitionKey("acquisti")
+				.unfinished()
+				.variableValueEquals(flagIsTrasparenza.name(), "true");
+
+		utils.orderProcess(order, historicProcessInstanceQuery);
+
+		return historicProcessInstanceQuery.listPage(firstResult, maxResults);
+	}
+
 
 
 	private void processDate(HistoricProcessInstanceQuery processQuery, String key, String value) {

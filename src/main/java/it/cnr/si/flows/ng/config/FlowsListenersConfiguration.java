@@ -49,7 +49,7 @@ public class FlowsListenersConfiguration {
 	private void createDeployments() throws IOException {
 
 		Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
-		if (activeProfiles.contains("dev") || activeProfiles.contains("test")) {
+		if (activeProfiles.contains("dev") || activeProfiles.contains("unittests")) {
 
 			String dir = null;
 			if (activeProfiles.contains("cnr"))

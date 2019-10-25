@@ -5,7 +5,6 @@ import it.cnr.si.domain.Form;
 import it.cnr.si.flows.ng.TestUtil;
 import it.cnr.si.repository.FormRepository;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
@@ -18,6 +17,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
@@ -35,10 +35,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *
  * @see FormResource
  */
+@SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles(profiles = "native,unittests,cnr")
+@EnableTransactionManagement
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = FlowsApp.class)
-@ActiveProfiles(profiles = "cnr")
-@Ignore
+//@Ignore
 public class FormResourceIntTest {
     private static final String DEFAULT_PROCESS_DEFINITION_KEY = "AAAAA";
     private static final String UPDATED_PROCESS_DEFINITION_KEY = "BBBBB";

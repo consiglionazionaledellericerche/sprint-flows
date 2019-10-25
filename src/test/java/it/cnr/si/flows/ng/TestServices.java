@@ -31,8 +31,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static it.cnr.si.flows.ng.utils.Enum.SiglaList.TIPOLOGIA_ACQUISIZIONE;
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.descrizione;
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.titolo;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -56,6 +55,7 @@ public class TestServices {
     private static final String RA2 = "silvia.rossi";
     private static final String APP = "utente1";
     private static final String ISTRUTTORE = "utente5" ;
+    private static final String PORTALE_CNR = "app.portalecnr";
 
 
     @Inject
@@ -86,6 +86,11 @@ public class TestServices {
     public void loginAdmin() {
         logout();
         login("admin", "admin");
+    }
+
+    public void loginPortaleCnr() {
+        logout();
+        login(TestServices.PORTALE_CNR, "");
     }
 
     public void loginSpaclient() {
@@ -147,10 +152,11 @@ public class TestServices {
 
 
     public int myTearDown() {
-        int processDeleted = 0;
+
         //cancello le Process Instance creata all'inizio del test'
         List<ProcessInstance> list = runtimeService.createProcessInstanceQuery().list();
         HttpServletResponse res = new MockHttpServletResponse();
+        int processDeleted = 0;
         for (ProcessInstance pi : list) {
             processInstanceResource.deleteProcessInstance(pi.getProcessInstanceId(), "TEST", res);
             assertEquals(NO_CONTENT.value(), res.getStatus());
@@ -173,7 +179,7 @@ public class TestServices {
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
 
         processDefinition = repositoryService.createProcessDefinitionQuery()
-                .processDefinitionKey(processDefinitionKey.getValue())
+                .processDefinitionKey(processDefinitionKey.getProcessDefinition())
                 .latestVersion()
                 .singleResult()
                 .getId();
@@ -194,6 +200,19 @@ public class TestServices {
                 req.setParameter("impegni_json", "[{\"descrizione\":\"Impegno numero 1\",\"percentualeIva\":20,\"importoNetto\":100,\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"uo\":\"2216\",\"gae\":\"spaclient\",\"progetto\":\"Progetto impegno 1\"}]");
                 req.setParameter("richiestaDiAcquisto_label", "Richiesta di Acquisto");
                 req.setParameter("tipologiaAffidamentoDiretto", "semplificata");
+                req.setParameter("idStruttura", "2216");
+
+                break;
+            case testAcquistiAvvisi:
+                loginResponsabileAcquisti();
+                req.setParameter("sceltaUtente", "GestionePreDetermina");
+                req.setParameter("commento", "commento prova Pre-Determina(Junit)");
+                req.setParameter(titolo.name(), TITOLO_DELL_ISTANZA_DEL_FLUSSO);
+                req.setParameter(descrizione.name(), "descrizione prova Pre-Determina(Junit)");
+                req.setParameter(dataScadenzaAvvisoPreDetermina.name(), "2019-09-04T00:00:00.000Z");
+                req.setParameter(dataScadenzaBando.name(), "2019-09-04T00:00:00.000Z");
+                req.setParameter("idStruttura", "2216");
+                req.setParameter("strumentoAcquisizione", "PROCEDURA SELETTIVA");
 
                 break;
             case iscrizioneElencoOiv:

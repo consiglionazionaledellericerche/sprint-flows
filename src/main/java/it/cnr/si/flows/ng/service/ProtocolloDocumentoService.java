@@ -2,7 +2,6 @@ package it.cnr.si.flows.ng.service;
 
 
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 
 import org.activiti.engine.delegate.DelegateExecution;
 
@@ -17,8 +16,6 @@ import java.io.IOException;
 import java.text.ParseException;
 
 import javax.inject.Inject;
-
-import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 
 @Service
 public class ProtocolloDocumentoService {

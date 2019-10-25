@@ -35,6 +35,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
+import static it.cnr.si.flows.ng.utils.Enum.Stato.Revocato;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.flagIsTrasparenza;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.statoFinaleDomanda;
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 import static it.cnr.si.security.PermissionEvaluatorImpl.ID_STRUTTURA;
 
@@ -43,7 +46,6 @@ import static it.cnr.si.security.PermissionEvaluatorImpl.ID_STRUTTURA;
 public class ManageProcessAcquisti_v1 implements ExecutionListener {
 	private static final long serialVersionUID = 686169707042367215L;
 	private static final Logger LOGGER = LoggerFactory.getLogger(ManageProcessAcquisti_v1.class);
-	public static final String STATO_FINALE_DOMANDA = "statoFinaleDomanda";
 
 	@Inject
 	private FirmaDocumentoService firmaDocumentoService;
@@ -173,6 +175,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				throw new BpmnError("400", "Formato Impegno Non Valido: " + impegno.getString("importoLordo"));
 			}			
 			impegno.put("uo_label", aceBridgeService.getUoById(Integer.parseInt(impegno.get("uo").toString())).getDenominazione());
+			impegno.put("cdsuo", aceBridgeService.getUoById(Integer.parseInt(impegno.get("uo").toString())).getCdsuo());
 		}
 
 		execution.setVariable("impegni_json", impegni.toString());
@@ -481,11 +484,21 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				}
 				// DITTE INVITATE ditteInvitate_json 
 				if(execution.getVariable("ditteInvitate_json") != null){
-					put("listaDitteInvitateExt", execution.getVariable("ditteInvitate_json").toString());
+					String ditteInvitateString = execution.getVariable("ditteInvitate_json").toString();
+					JSONArray ditteInvitate = new JSONArray(ditteInvitateString);
+					put("listaDitteInvitateExt", ditteInvitate);
 				}
 				// IMPEGNI impegni_json 
 				if(execution.getVariable("impegni_json") != null){
-					put("listaUoAbilitateExt", execution.getVariable("impegni_json").toString());
+					String impegniString = execution.getVariable("impegni_json").toString();
+					JSONArray impegni = new JSONArray(impegniString);
+					for ( int i = 0; i < impegni.length(); i++) {
+						JSONObject impegno = impegni.getJSONObject(i);
+						impegno.put("uo_label", aceBridgeService.getUoById(Integer.parseInt(impegno.get("uo").toString())).getDenominazione());
+						impegno.put("cdsuo", aceBridgeService.getUoById(Integer.parseInt(impegno.get("uo").toString())).getCdsuo());
+					}
+					execution.setVariable("impegni_json", impegni.toString());
+					put("listaUoAbilitateExt", impegni);
 				}
 			}
 		};	
@@ -525,6 +538,8 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			// START
 			case "process-start": {
 				startAcquistiSetGroupsAndVisibility.configuraVariabiliStart(execution);
+				execution.setVariable(statoFinaleDomanda.name(), "IN CORSO");
+				execution.setVariable(flagIsTrasparenza.name(), "false");
 			};break;
 			case "pre-determina-start": {
 				pubblicaFilePubblicabiliURP(execution);
@@ -533,7 +548,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				pubblicaFilePubblicabiliURP(execution);
 			};break;     
 			case "end-annullato-start": {
-				execution.setVariable(STATO_FINALE_DOMANDA, "ANNULLATO");
+				execution.setVariable(statoFinaleDomanda.name(), "ANNULLATO");
 				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "ANNULLATO");
 			};break;     
 			// START DECISIONE-CONTRATTARE
@@ -696,7 +711,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			case "end-stipulato-start": {
 				pubblicaTuttiFilePubblicabili(execution);
 				controllaFilePubblicabiliTrasparenza(execution);
-				execution.setVariable(STATO_FINALE_DOMANDA, "STIPULATO");
+				execution.setVariable(statoFinaleDomanda.name(), "STIPULATO");
 				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "STIPULATO");
 				//TODO implementare le url a seconda del contesto
 				String urlSigla = "www.google.it";
@@ -741,19 +756,20 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			// FINE ACQUISTI  
 
 			case "end-revocato-start": {
-				execution.setVariable(STATO_FINALE_DOMANDA, "REVOCATO");
-				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "REVOCATO");
+				execution.setVariable(statoFinaleDomanda.name(), Revocato);
+				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Revocato.name());
 			};break;
 
 			// FINE FLUSSO  
 			case "process-end": {
-				//			if(execution.getVariable(STATO_FINALE_DOMANDA).toString().equals("STIPULATO")){
+				//			if(execution.getVariable(statoFinaleDomanda.name()).toString().equals("STIPULATO")){
 				//				pubblicaTuttiFilePubblicabili(execution);
 				//			}
 			};break;  
 
 			//SUBFLUSSI
 			case "DECISIONE-CONTRATTARE-end": {
+				execution.setVariable(flagIsTrasparenza.name(), "true");
 				attachmentList = attachmentService.getAttachementsForProcessInstance(processInstanceId);
 				if(sceltaUtente != null && sceltaUtente.equals("RevocaSemplice")) {
 					for (String key : attachmentList.keySet()) {

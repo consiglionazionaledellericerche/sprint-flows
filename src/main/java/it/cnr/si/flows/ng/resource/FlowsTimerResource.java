@@ -94,4 +94,28 @@ public class FlowsTimerResource {
     }
 
     
+    @RequestMapping(value = "/timer/setTimer", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId, @flowsUserDetailsService)")
+    @Timed
+    public  ResponseEntity<TimerSettings> setTimer(
+            //HttpServletRequest req,
+            @RequestBody TimerSettings timer) {
+
+
+        DataResponse response = new DataResponse();
+        
+        try {
+			flowsTimerService.setTimer(timer.getProcessInstanceId(), timer.getTimerId(), timer.getNewDate());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+        //return ResponseEntity.ok(response);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+    
 }
