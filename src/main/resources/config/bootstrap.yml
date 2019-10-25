@@ -6,5 +6,5 @@ spring:
       server:
         bootstrap: true
         git:
-          uri: http://git.si.cnr.it/devops/configuration-repo.git
+          uri: git@git.si.cnr.it:devops/configuration-repo.git
           searchPaths: '{application}'
