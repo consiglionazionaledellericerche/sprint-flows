@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 
 @Ignore // Questo test non ha senso eseguirlo con H2, ma solo in locale con un postgres
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "test,cnr")
+@ActiveProfiles(profiles = "native,unittests,cnr")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
 public class CounterServiceTest {
@@ -31,7 +31,6 @@ public class CounterServiceTest {
         url: jdbc:postgresql://localhost:5432/formazione
         name:
         username: formazione
-        password: formazionepw
     jpa:
         database-platform: it.cnr.si.domain.util.FixedPostgreSQL82Dialect
         database: POSTGRESQL

@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
 import static org.springframework.http.HttpStatus.OK;
 
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "test,cnr")
+@ActiveProfiles(profiles = "native,unittests,cnr")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
 public class CnrSummaryPdfResouceTest {

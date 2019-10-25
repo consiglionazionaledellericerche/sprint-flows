@@ -9,10 +9,9 @@ import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.SiperService;
 import it.cnr.si.flows.ng.utils.Utils.associazioneRuoloPersonaCDSUO;
 import it.cnr.si.service.AceService;
+import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.RelationshipService;
 import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
-
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +44,8 @@ public class PopolazioneProfiliPerCDSUOAcquistiBatch {
 	private SiperService siperService;
 	@Inject
 	private RelationshipService relationshipService;
+	@Inject
+	private MembershipService membershipService;
 	private final Map<String, String> errors = new HashMap<>();
 
 	int i = 0;
@@ -119,7 +120,7 @@ public class PopolazioneProfiliPerCDSUOAcquistiBatch {
 					log.info("OK: L'utente {} ha come responsabile {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", username, usernameResponsabileUO, denominazioneEntitaorganizzativaResponsabileUtente, siglaEntitaorganizzativaResponsabileUtente, idEntitaorganizzativaResponsabileUtente, cdsuoEntitaorganizzativaResponsabileUtente, idnsipEntitaorganizzativaResponsabileUtente);
 					String gruppoDirigenteRichiedente = "responsabileFirmaAcquisti@" + idEntitaorganizzativaResponsabileUtente;
 
-					Set<String> members = relationshipService.getAllUsersInGroup(gruppoDirigenteRichiedente);
+					Set<String> members = membershipService.getAllUsersInGroup(gruppoDirigenteRichiedente);
 					//List<String> members = membershipService.findMembersInGroup(gruppoDirigenteRichiedente);
 					if (members.size() == 0) {
 						log.info(" ERROR: Il gruppo RESPONSABILE STRUTTURA: {} NON HA NESSUNO", gruppoDirigenteRichiedente);

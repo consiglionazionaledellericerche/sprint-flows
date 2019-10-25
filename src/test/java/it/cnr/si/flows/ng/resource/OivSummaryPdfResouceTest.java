@@ -31,7 +31,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "test,oiv")
+@ActiveProfiles(profiles = "native,unittests,oiv")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
 public class OivSummaryPdfResouceTest {

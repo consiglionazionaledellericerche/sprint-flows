@@ -5,7 +5,6 @@ import it.cnr.si.domain.Form;
 import it.cnr.si.flows.ng.TestUtil;
 import it.cnr.si.repository.FormRepository;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
@@ -37,10 +36,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see FormResource
  */
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "test,cnr")
+@ActiveProfiles(profiles = "native,unittests,cnr")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
-@Ignore
+//@Ignore
 public class FormResourceIntTest {
     private static final String DEFAULT_PROCESS_DEFINITION_KEY = "AAAAA";
     private static final String UPDATED_PROCESS_DEFINITION_KEY = "BBBBB";

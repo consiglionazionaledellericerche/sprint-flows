@@ -15,7 +15,7 @@ import javax.security.auth.login.LoginException;
 import java.net.URISyntaxException;
 
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "test,cnr")
+@ActiveProfiles(profiles = "native,unittests,cnr")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
 public class CoolFlowsBridgeTest {
