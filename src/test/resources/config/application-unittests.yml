@@ -29,6 +29,8 @@ spring:
 
 
 cnr:
+  activiti:
+    diagram-font: DejaVu Sans
   sigla:
     usr: app.scrivaniadigitale
     psw: bubbazza
