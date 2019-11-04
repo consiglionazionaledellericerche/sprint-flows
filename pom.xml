@@ -15,10 +15,6 @@
 
     <name>sprint-flows</name>
 
-    <prerequisites>
-        <maven>3.0.0</maven>
-    </prerequisites>
-
     <scm>
         <connection>scm:git:ssh://git@git.si.cnr.it/dev/sprint-flows.git</connection>
         <developerConnection>scm:git:ssh://git@git.si.cnr.it/dev/sprint-flows.git</developerConnection>
@@ -150,7 +146,7 @@
         <dependency>
             <groupId>com.lowagie</groupId>
             <artifactId>itext</artifactId>
-            <version>2.1.7.js2</version>
+            <version>2.1.7</version>
         </dependency>
         <!--dipendenze exportCsv-->
         <dependency>
@@ -213,8 +209,8 @@
                     <groupId>itext</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>org.olap4j</artifactId>
-                    <groupId>olap4j</groupId>
+                	<groupId>org.olap4j</groupId>
+                	<artifactId>olap4j</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -271,11 +267,6 @@
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
             <version>1.8.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.olap4j</groupId>
-            <artifactId>olap4j</artifactId>
-            <version>1.2.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -554,29 +545,6 @@
                 </configuration>
             </plugin>
             <!-- jhipster-needle-maven-add-plugin -->
-
-            <!--prova-->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.6.0</version>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <executable>bower</executable>
-                    <arguments>
-                        <argument>install</argument>
-                    </arguments>
-                    <!--<workingDirectory>${basedir}/src/main/webapp</workingDirectory>-->
-                    <workingDirectory>${basedir}</workingDirectory>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
