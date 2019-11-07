@@ -52,7 +52,7 @@
         <spring-boot.version>1.4.0.RELEASE</spring-boot.version>
         <spring.security.version>4.1.1.RELEASE</spring.security.version>
         <spring.version>4.3.2.RELEASE</spring.version>
-        <sprint.version>2.0.1</sprint.version>
+        <sprint.version>2.3.13</sprint.version>
         <start-class>it.cnr.si.FlowsApp</start-class>
         <storage-cloud-cmis.version>0.0.6</storage-cloud-cmis.version>
     </properties>

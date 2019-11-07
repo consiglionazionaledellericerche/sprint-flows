@@ -17,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -28,7 +30,7 @@ import java.util.stream.Stream;
 public class MembershipService {
 
     private final Logger log = LoggerFactory.getLogger(MembershipService.class);
-    
+
     @Inject
     private MembershipRepository membershipRepository;
 
@@ -46,13 +48,13 @@ public class MembershipService {
     }
 
 
-    @Transactional(readOnly = true) 
+    @Transactional(readOnly = true)
     public Page<Membership> findAll(Pageable pageable) {
         log.debug("Request to get all Memberships");
         return membershipRepository.findAll(pageable);
     }
 
-    @Transactional(readOnly = true) 
+    @Transactional(readOnly = true)
     public Membership findOne(Long id) {
         log.debug("Request to get Membership : {}", id);
         return membershipRepository.findOne(id);
@@ -170,12 +172,23 @@ public class MembershipService {
     @Timed
     public Set<String> getUsersInMyGroups(String username) {
 
-        return getAllGroupsForUser(username).stream()     // recupero tutti i gruppi per l'utente richiesto
-                .map(myGroup -> getAllUsersInGroup(myGroup)) // per ogni gruppo recupero i suoi membri
-                .flatMap(list -> list.stream())           // ho uno stream di liste di stringhe che trasformo in uno stream di stringhe
-                .filter(user -> !user.equals(username))   // non mi interessa includere l'utente con cui ho chiamato
-                .collect(Collectors.toSet());
+        // puo' capitare che un'utente ha *molti* gruppi
+        // cerco di velocizzare le cose con un parallelStream
 
+        ForkJoinPool forkJoinPool = new ForkJoinPool(3);
+        Set<String> otherUsers = null;
+        try {
+            otherUsers = forkJoinPool.submit(
+                    () -> getAllGroupsForUser(username).parallelStream()     // recupero tutti i gruppi per l'utente richiesto
+                        .map(myGroup -> getAllUsersInGroup(myGroup)) // per ogni gruppo recupero i suoi membri
+                        .flatMap(list -> list.stream())           // ho uno stream di liste di stringhe che trasformo in uno stream di stringhe
+                        .filter(user -> !user.equals(username))   // non mi interessa includere l'utente con cui ho chiamato
+                        .collect(Collectors.toSet())
+                    ).get();
+            return otherUsers;
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Set<String> getAllChildGroupsRecursively(Set<String> resultSoFar, Set<String> visited) {
