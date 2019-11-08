@@ -8,7 +8,7 @@
 
 # DIAGRAMMA DI FLUSSO
 
-![flusso](.\screenshot\flusso oiv con ruoli.jpg)
+![flusso](./screenshot/flusso oiv con ruoli.jpg)
 
 # VISIBILITA&#39;
 
@@ -756,13 +756,13 @@ Tabella 1 - Elenco parametri &quot;Dettagli Flusso&quot;
 
 
 
-![dettagi oiv](.\screenshot\dettagi oiv.jpg)
+![dettagi oiv](./screenshot/dettagi oiv.jpg)
 
 Figura 2 - Interfaccia di esempio del pannello &quot;Dettagli Flussi&quot; per flusso Acquisti
 
 
 
-![ricerca oiv](.\screenshot\ricerca oiv.jpg)
+![ricerca oiv](./screenshot/ricerca oiv.jpg)
 
 Figura 3 - Interfaccia di esempio del pannello &quot;Ricerca Flussi&quot; per flusso Acquisti
 
