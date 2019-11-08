@@ -37,7 +37,7 @@ Esistono 2 versioni di scrivania digitale, una versione "stand alone" ed una ver
 
 La versione "Stand Alone" di Scrivania Digitale è una versione che tende ad utilizzare quanto più possibile risorse interne rispetto ad applicazioni aggiuntive. Ad esempio non si appoggia a nessun Repository Documentale esterno per i documenti che vengono inseriti nel DB. Utilizza un sistema interno per la profilazione, l'autenticazione e la gestione delle utenze e dei ruoli assegnati. 
 
-![versione stand alone](.\screenshot\versione stand alone.JPG)
+![versione stand alone](./screenshot/versione stand alone.JPG)
 
 
 
@@ -45,7 +45,7 @@ La versione "Stand Alone" di Scrivania Digitale è una versione che tende ad uti
 
 La versione "Integrata" di Scrivania Digitale è una versione che tende ad integrare quanto più possibile risorse e applicazioni esterne sia open source e commerciali quali: un repository documentale esterno (es. Alfresco), un sistema di firma remota (es. ARSS aruba sign); Questa versione è predisposta anche per integrarsi con applicazioni realizzate internamente come l'Anagrafica Centralizzata, e altre applicazioni che possono collegarsi direttamente a flussi specifici.
 
-![versione integrata](.\screenshot\versione integrata.JPG)
+![versione integrata](./screenshot/versione integrata.JPG)
 
 
 
@@ -53,7 +53,7 @@ La versione "Integrata" di Scrivania Digitale è una versione che tende ad integ
 
 # DIAGRAMMA DI FLUSSO
 
- ![Flusso OIV](.\screenshot\Flusso OIV.jpg)
+ ![Flusso OIV](./screenshot/Flusso OIV.jpg)
 
 Figura 1 - esempio di diagramma di flusso
 
@@ -70,7 +70,7 @@ In genere un flusso può essere suddiviso in sottoflussi. Ad esempio il flusso &
 5. STIPULA MEPA
 6. REVOCA PROCEDURA
 
- ![Flusso OIV](.\screenshot\18 - Fasi del Flusso.jpg)
+ ![Flusso OIV](./screenshot/18 - Fasi del Flusso.jpg)
 Figura 18 - Fasi del Flusso
 
 
@@ -83,7 +83,7 @@ Nella presente sezione sono definiti gli elementi di base che costituiscono l'in
 
 La maschera di inserimento dati fornisce all'utente l'interfaccia per poter immettere gli input in maniera corretta e guidata. Ci sono diverse tipologie di campi di inserimento (documento, testo, area di testo, data, ecc..) ognuna specifica per un diverso tipo di dato. In Figura 2 viene riportato un esempio di maschera di inserimento dati relativa al Task &quot; Avvio Flusso .
 
- ![2-avvio flusso](.\screenshot\2-avvio flusso.jpg)
+ ![2-avvio flusso](./screenshot/2-avvio flusso.jpg)
 Figura 2- maschera di inserimento dati relativa al Task &quot; Avvio Flusso&quot;
 
 ## TIPOLOGIE DI INPUT
@@ -92,7 +92,7 @@ Figura 2- maschera di inserimento dati relativa al Task &quot; Avvio Flusso&quot
 
 Il testo è un comune campo di input a cui è associata un'etichetta.
 
- ![3-Testo](.\screenshot\3-testo.jpg)
+ ![3-Testo](./screenshot/3-testo.jpg)
 Figura 3 - Testo
 
 ### Area di Testo
@@ -101,14 +101,14 @@ Le aree di testo consentono di inserire descrizioni più lunghe, che può essere
 
 Un apposito parametro permette allo sviluppatore di definire il numero massimo di righe (default = 3 righe).
 
- ![Flusso OIV](.\screenshot\4 - Area di Testo.jpg)
+ ![Flusso OIV](./screenshot/4 - Area di Testo.jpg)
 Figura 4 - Area di Testo
 
 ### Opzioni Scelta con Bottoni
 
 Alcuni parametri possono essere selezionati tramite bottone, come nel caso delle priorità
 
- ![Flusso OIV](.\screenshot\5 - opzioni scelta con bottoni.jpg)
+ ![Flusso OIV](./screenshot/5 - opzioni scelta con bottoni.jpg)
 Figura 5 - opzioni scelta con bottoni
 
 
@@ -117,7 +117,7 @@ Figura 5 - opzioni scelta con bottoni
 
 Alcuni parametri possono essere selezionati tramite menù ad albero.
 
- ![Flusso OIV](.\screenshot\6 - opzioni scelta con menù ad albero.jpg)
+ ![Flusso OIV](./screenshot/6 - opzioni scelta con menù ad albero.jpg)
 Figura 6 - opzioni scelta con menù ad albero
 
 
@@ -126,21 +126,21 @@ Figura 6 - opzioni scelta con menù ad albero
 
 L'input di alcuni campi può essere effettuato tramite campo di testo con funzione di autocompletamento, che permette di selezionare una delle voci visualizzate automaticamente durante la digitazione. Un esempio classico è quello della scelta del nominativo di un utente (Figura 7 - Selezione tramite funzione di autocompletamento).
 
- ![Flusso OIV](.\screenshot\7 - Selezione tramite funzione di autocompletamento.jpg)
+ ![Flusso OIV](./screenshot/7 - Selezione tramite funzione di autocompletamento.jpg)
 Figura 7 - Selezione tramite funzione di autocompletamento
 
 ### Pulsante Azione
 
 I pulsanti Azione permettono di selezionare l&#39;azione desiderata e determinare così la prosecuzione del flusso.
 
- ![Flusso OIV](.\screenshot\8 – azioni scelta.jpg)
+ ![Flusso OIV](./screenshot/8 – azioni scelta.jpg)
 Figura 8 – azioni scelta
 
 ### Nota Informativa
 
 La nota informativa corrisponde al set di informazioni che viene visualizzato all'utente come aiuto nella comprensione del compito che deve svolgere.
 
- ![Flusso OIV](.\screenshot\9 – nota informativa.jpg)
+ ![Flusso OIV](./screenshot/9 – nota informativa.jpg)
 Figura 9 – nota informativa
 
 
@@ -149,21 +149,21 @@ Figura 9 – nota informativa
 
 Alcune entità associate ad un compito sono caratterizzate da un set di dati (es. l'entità &quot;impegno&quot; è caratterizzata da un identificativo, un esercizio, una GAE, etc.).  Nel caso sia necessario inserire più entità dello stesso tipo associate al medesimo compito (es. più impegni per la medesima procedura di acquisto), è possibile cliccare sul bottone verde con il segno (+) (Figura 10) per far apparire nella maschera un nuovo set di campi identico al precedente.
 
- ![Flusso OIV](.\screenshot\10 - Set Multipli di Dati.jpg)
+ ![Flusso OIV](./screenshot/10 - Set Multipli di Dati.jpg)
 Figura 10 - Set Multipli di Dati
 
 Il risultato di questo inserimento è visibile in Figura 11 – visualizzazione set multiplo di dati
 
 
 
- ![Flusso OIV](.\screenshot\11 – visualizzazione set multiplo di dati.jpg)
+ ![Flusso OIV](./screenshot/11 – visualizzazione set multiplo di dati.jpg)
 Figura 11 – visualizzazione set multiplo di dati
 
 
 
 # GESTIONE DOCUMENTI
 
-![documenti scrivania](.\screenshot\documenti scrivania.jpg)
+![documenti scrivania](./screenshot/documenti scrivania.jpg)
 
 
 
@@ -171,21 +171,21 @@ Figura 11 – visualizzazione set multiplo di dati
 
 Sono quei documenti &quot;definiti&quot; che vengono gestiti da Scrivania Digitale. Questi documenti vengono modificati, approvati, firmati e protocollati all'interno dell'applicazione. Il sistema prevede anche la gestione di default dei metadati associati (es. pubblicabile in Trasparenza / Urp)
 
- ![Flusso OIV](.\screenshot\12 – Caricamento Documenti Tipologia 1.jpg)
+ ![Flusso OIV](./screenshot/12 – Caricamento Documenti Tipologia 1.jpg)
 Figura 12 – Caricamento Documenti Tipologia 1
 
 ## Documenti tipo 2 - Documenti tipizzati caricati nel Sistema
 
 Sono documenti &quot;definiti&quot; che vengono caricati in Scrivania Digitale. Questi documenti vengono caricati all'interno dell'applicazione ma non vengono firmati e protocollati all'interno dell'applicazione. Parametri come il protocollo possono essere inseriti nell'atto del caricamento.
 
- ![Flusso OIV](.\screenshot\13 - Caricamento Documenti Tipologia 2.jpg)
+ ![Flusso OIV](./screenshot/13 - Caricamento Documenti Tipologia 2.jpg)
 Figura 13 - Caricamento Documenti Tipologia 2
 
 ## Documenti tipo 3 - Documenti Allegati
 
 Sono quei documenti &quot;non definiti&quot; che vengono caricati in Scrivania Digitale. Per questi documenti deve essere specificato il &quot;Tipo Documento&quot; e tutti i metadati gestiti nei documenti di quel determinato flusso.
 
- ![Flusso OIV](.\screenshot\14 - Caricamento Documenti Tipologia 3.jpg)
+ ![Flusso OIV](./screenshot/14 - Caricamento Documenti Tipologia 3.jpg)
 Figura 14 - Caricamento Documenti Tipologia 3
 
 Documenti di questo tipo possono essere caricati extra-flusso da utenti con ruoli speciali mediante apposita interfaccia nei dettagli del flusso.
@@ -199,14 +199,14 @@ Durante l'esecuzione dei vari Task del Flusso ciascun documento può essere etic
 
 Quando il sistema completa alcune fasi determinate allora i documenti &quot;pubblicabile in trasparenza&quot; o &quot;pubblicabile URP&quot; saranno effettivamente resi rispettivamente disponibili per la pubblicazione in trasparenza e in URP. Le rispettive etichette cambieranno in "**PubblicatoTrasparenza**" o "**PubblicatoURP**".
 
- ![Flusso OIV](.\screenshot\15 - etichette sui documenti.jpg)
+ ![Flusso OIV](./screenshot/15 - etichette sui documenti.jpg)
 Figura 15 - etichette sui documenti
 
 ## Gestione delle etichette - extra flusso
 
 Ruoli che hanno permessi particolari possono in qualsiasi momento cambiare lo stato di pubblicazione di un documento. Per modificare i documenti basta andare sui dettagli del flusso e cliccare la &quot;rotellina&quot; relativa al documento che si vuole modificare come indicato in Figura 16
 
- ![Flusso OIV](.\screenshot\16 - gestione documenti extra flusso.jpg)
+ ![Flusso OIV](./screenshot/16 - gestione documenti extra flusso.jpg)
 Figura 16 - gestione documenti extra flusso
 
 ## Gestione della pubblicazione I parametri di Protocollo (data e nr)
@@ -234,7 +234,7 @@ Sono quei documenti del tipo 1 che sono già stati firmati e protocollati all'in
      - Verranno copiati gli altri metadati dal documento principale
      - Verrà inserita la &quot;motivazione della sostituzione&quot;
 
- ![Flusso OIV](.\screenshot\17 - Documenti tipo 4.jpg)
+ ![Flusso OIV](./screenshot/17 - Documenti tipo 4.jpg)
 
 
 
@@ -246,7 +246,7 @@ Sono quei documenti del tipo 1 che sono già stati firmati e protocollati all'in
 
 A destra, nella parte superiore della PAGINA appaiono le diverse voci del menù. Ogni utente ha sempre accesso alle seguenti voci del menù: “**I miei compiti**”, “**Ricerca**”, “**HelpDesk**”, “**Manualistica**” e “**Utente**”. Inoltre, a seconda dei ruoli ricoperti dall’utente in Scrivania Digitale, possono apparire altre voci più specifiche.
 
-![menu](.\screenshot\menu.JPG)
+![menu](./screenshot/menu.JPG)
 
 
 
@@ -276,7 +276,7 @@ Nel pannello di sinistra è presente un filtro di ricerca che permette di filtra
 
 
 
-![i miei compiti](.\screenshot\i miei compiti.jpg)
+![i miei compiti](./screenshot/i miei compiti.jpg)
 
 
 
@@ -300,7 +300,7 @@ Cliccando il bottone “Invia” verranno messi in evidenza tutti i campi obblig
 
 Se tutto va a buon fine il compito è terminato facendo proseguire il flusso verso il passo successivo. Il compito non è più presente nella lista de: “I MIEI COMPITI”. 
 
-![dettagli flusso](.\screenshot\dettagli flusso.JPG)
+![dettagli flusso](./screenshot/dettagli flusso.JPG)
 
 
 
@@ -323,7 +323,7 @@ Una volta avuti i risultati della ricerca, cliccando sul bottone “dettagli” 
 
 Tramite il bottone "**Esporta Csv**" è possibile esportare i risultati della ricerca in formato ".csv". Questo tipo di export è parametrizzabile per tipologia di flussi mediante il pannello di amministratore
 
-![ricerca](.\screenshot\ricerca.jpg)
+![ricerca](./screenshot/ricerca.jpg)
 
 
 
@@ -331,7 +331,7 @@ Tramite il bottone "**Esporta Csv**" è possibile esportare i risultati della ri
 
 Nella PAGINA “Help Desk”, è possibile, compilando l’apposito form, inviare una segnalazione all'Help Desk. Le tipologie sono distinte per: problemi Amministrativi e problemi tecnici
 
-![help desk](.\screenshot\help desk.jpg)
+![help desk](./screenshot/help desk.jpg)
 
 
 
@@ -341,7 +341,7 @@ Nella PAGINA “Help Desk”, è possibile, compilando l’apposito form, inviar
 
 Nella PAGINA “Manualistica” si trovano i link alla manualistica relativa ai vari tipi di flusso 
 
-![Manualistica](.\screenshot\Manualistica.jpg)
+![Manualistica](./screenshot/Manualistica.jpg)
 
 
 
