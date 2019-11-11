@@ -475,7 +475,7 @@ public class FlowsTaskService {
 	}
 
 
-	private static String ellipsis(String in, int length) {
+	static String ellipsis(String in, int length) {
 		return in.length() < length ? in: in.substring(0, length - 3) + "...";
 	}
 }

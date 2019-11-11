@@ -4,6 +4,7 @@ import com.opencsv.CSVWriter;
 import it.cnr.si.domain.View;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery;
+import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
 import it.cnr.si.security.PermissionEvaluatorImpl;
@@ -27,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
-
 import javax.inject.Inject;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -39,6 +39,7 @@ import static it.cnr.si.flows.ng.utils.Enum.Stato.Annullato;
 import static it.cnr.si.flows.ng.utils.Enum.Stato.Revocato;
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
 import static it.cnr.si.flows.ng.utils.Utils.*;
+import static it.cnr.si.flows.ng.service.FlowsTaskService.*;
 
 
 /**
@@ -349,9 +350,11 @@ public class FlowsProcessInstanceService {
 
 		JSONObject name = new JSONObject();
 
-		name.put(DESCRIZIONE, descrizione);
-		name.put(TITOLO, titolo);
-		name.put("stato", stato);
+		
+		
+		name.put(DESCRIZIONE, ellipsis(descrizione, LENGTH_DESCTIZIONE));
+		name.put(TITOLO, ellipsis(titolo, LENGTH_TITOLO));
+		name.put("stato", ellipsis(stato, LENGTH_FASE) );
 		name.put(INITIATOR, initiator);
 
 		runtimeService.setProcessInstanceName(processInstanceId, name.toString());
