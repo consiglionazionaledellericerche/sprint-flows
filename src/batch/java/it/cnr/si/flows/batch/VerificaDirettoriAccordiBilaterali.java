@@ -183,8 +183,8 @@ public class VerificaDirettoriAccordiBilaterali {
 
 		CSVParser parser = new CSVParser(',');
 
-		Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/utentiGenericiTest.csv"));
-		//Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/utentiDomandeAccordiBilaterali1.csv"));
+		//Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/utentiGenericiTest.csv"));
+		Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/utentiDomandeAccordiBilaterali1.csv"));
 		Map<String, String> associazioni = new HashMap<>();
 
 		lines
