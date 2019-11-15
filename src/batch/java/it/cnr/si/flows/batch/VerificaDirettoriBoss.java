@@ -89,11 +89,18 @@ public class VerificaDirettoriBoss {
 
 		log.info("****** UTENTE {} ******", username);
 		BossDto direttoreACE = null;
+		BossDto responsabileSede = null;
 		String usernameDirettoreACE = "";
 		String usernameDirettoreSIPER = "";
-		Integer idEntitaOrganizzativaDirettoreBoss = 0;
-		String DenominazioneEOEntitaOrganizzativaDirettoreBoss = null;
+		String denominazioneEntitaOrganizzativaDirettoreAce = null;
+		String denominazioneEntitaOrganizzativaDirettoreSIPER = null;
+		String siglaEntitaOrganizzativaDirettoreACE = null;
+		String siglaEntitaOrganizzativaDirettoreSIPER = null;
+		String ruoloEntitaOrganizzativaDirettore = null;
 		String cdsuoAppartenenzaUtente = null;
+		Integer idEntitaOrganizzativaDirettoreACE = 0;
+
+
 		try {
 			//cdsuoAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(username).getCdsuo();
 			cdsuoAppartenenzaUtente = aceBridgeService.getAfferenzaUtenteTipoSede(username).getCdsuo();
@@ -119,9 +126,11 @@ public class VerificaDirettoriBoss {
 				finally {
 					try {
 						usernameDirettoreSIPER = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("uid").toString();
+						denominazioneEntitaOrganizzativaDirettoreSIPER = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("struttura_appartenenza").toString();
+						siglaEntitaOrganizzativaDirettoreSIPER = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("sigla_sede").toString();
 					} catch(UnexpectedResultException | FeignException | HttpClientErrorException error6) {
 						log.info("-------------- ERROR: usernameDirettoreSIPER SIPER  NON RIESCO A TROVARE il direttore per la CDSUO {}", cdsuoAppartenenzaUtente);
-						results.add("ERROR: " + username + " --usernameDirettoreSIPER SIPER NON RIESCO A TROVARE il direttore per la CDSUO " + cdsuoAppartenenzaUtente);
+						results.add("ERROR: " + username + " --usernameDirettoreSIPER SIPER NON RIESCO A TROVARE il direttore per la CDSUO " + cdsuoAppartenenzaUtente + "IDSIP (" + insdipAppartenenzaUtente + ") - CDSUO (" + entitaOrganizzativaUtente + ")");
 					}
 					finally {
 						if (usernameDirettoreSIPER != null) {
@@ -130,44 +139,54 @@ public class VerificaDirettoriBoss {
 								direttoreACE = aceService.bossDirettoreByUsername(username);
 								usernameDirettoreACE = direttoreACE.getUsername().toString();
 								results.add("BOSS --- userNameDirettore ACE " + usernameDirettoreACE + " idEntitaOrganizzativa: [" + direttoreACE.getIdEntitaOrganizzativa() + "] - denominazioneEO: " + direttoreACE.getDenominazioneEO() + " (" + direttoreACE.getSiglaEO() +")");
-								idEntitaOrganizzativaDirettoreBoss = direttoreACE.getIdEntitaOrganizzativa();
-								DenominazioneEOEntitaOrganizzativaDirettoreBoss = direttoreACE.getDenominazioneEO();
+								idEntitaOrganizzativaDirettoreACE = direttoreACE.getIdEntitaOrganizzativa();
+								denominazioneEntitaOrganizzativaDirettoreAce = direttoreACE.getDenominazioneEO();
+								siglaEntitaOrganizzativaDirettoreACE = direttoreACE.getSiglaEO();
+								ruoloEntitaOrganizzativaDirettore = direttoreACE.getDescrRuolo();
 							} catch(UnexpectedResultException | FeignException | HttpClientErrorException | IndexOutOfBoundsException error5) {
-								results.add("ERROR: " + username + " --usernameDirettore ACE NON RIESCO A TROVARE il direttore per l'utente " + username);
+								results.add("ERROR ACE: " + username + " --usernameDirettore ACE NON RIESCO A TROVARE il direttore per l'utente " + username + " - con errore: " + error5.getMessage());
 							}
 
 							finally {
 								if (direttoreACE != null) {
 									// CHECK DIRETTORE
-									String gruppoResponsabileStrutturaPadre = "responsabile-struttura@" + idEntitaOrganizzativaDirettoreBoss;
-									Set<String> membriResponsabileStrutturaPadre = membershipService.getAllUsersInGroup(gruppoResponsabileStrutturaPadre);
-									log.info("nr membriResponsabileStrutturaPadre  {} per struttura {} ", membriResponsabileStrutturaPadre.size(), idEntitaOrganizzativaDirettoreBoss);
-									if (membriResponsabileStrutturaPadre.size() == 0){
-										log.info("NO --- il direttore della struttura padre {} [{}] NON ESISTE ", idEntitaOrganizzativaDirettoreBoss, DenominazioneEOEntitaOrganizzativaDirettoreBoss);
+									String gruppoResponsabileStrutturaPadre = "responsabile-struttura@" + idEntitaOrganizzativaDirettoreACE;
+									Set<String> membriResponsabileStruttura = membershipService.getAllUsersInGroup(gruppoResponsabileStrutturaPadre);
+									log.info("nr membriResponsabileStruttura  {} per struttura {} ", membriResponsabileStruttura.size(), idEntitaOrganizzativaDirettoreACE);
+									if (membriResponsabileStruttura.size() == 0){
+										log.info("NO --- il ResponsabileStruttura della struttura ACE id:{} [{}] NON ESISTE ", idEntitaOrganizzativaDirettoreACE, denominazioneEntitaOrganizzativaDirettoreAce);
+										results.add("NO --- il ResponsabileStruttura della struttura ACE id:" + idEntitaOrganizzativaDirettoreACE +" [" + denominazioneEntitaOrganizzativaDirettoreAce + "] NON ESISTE " );
 									}
-									if (membriResponsabileStrutturaPadre.size() > 1){
-										log.info("NO --- ci sono {} direttori per la struttura padre {} [{}] ", membriResponsabileStrutturaPadre.size(), idEntitaOrganizzativaDirettoreBoss, DenominazioneEOEntitaOrganizzativaDirettoreBoss);
+									if (membriResponsabileStruttura.size() > 1){
+										results.add("NO --- ci sono " + membriResponsabileStruttura.size() + " direttori per la struttura ACE id: " + idEntitaOrganizzativaDirettoreACE +" [" + denominazioneEntitaOrganizzativaDirettoreAce + "] NON ESISTE " );
+										log.info("NO --- ci sono {} direttori per la struttura ACE id: {} [{}] ", membriResponsabileStruttura.size(), idEntitaOrganizzativaDirettoreACE, denominazioneEntitaOrganizzativaDirettoreAce);
 									}
-									String direttoreSIPER = usernameDirettoreSIPER;
-									String direttoreBossACE = usernameDirettoreACE;
-									Integer idEO = idEntitaOrganizzativaDirettoreBoss;
-									String DenominazioneEO = DenominazioneEOEntitaOrganizzativaDirettoreBoss;
-									membriResponsabileStrutturaPadre.forEach(responsabile -> {
-										if(responsabile.toString().equals(direttoreSIPER)) {
-											log.info("il direttore trovato in ACE nella struttura (padre) {} [{}] è {} CORRISPONDE al direttore trovato su SIPER {} ", idEO, DenominazioneEO, responsabile.toString(), direttoreSIPER);
-											results.add("OK --- " + username + " -- il direttore della struttura padre [" + idEO + " - " + DenominazioneEO +"  [" + responsabile.toString()  +"] CORRISPONDE al direttore SIPER "+ direttoreSIPER + " --");
+									String direttore_SIPER = usernameDirettoreSIPER;
+									String direttore_ACE = usernameDirettoreACE;
+									String DenominazioneEO_SIPER = denominazioneEntitaOrganizzativaDirettoreSIPER;
+									String DenominazioneEO_ACE = denominazioneEntitaOrganizzativaDirettoreAce;
+									String siglaEO_SIPER = siglaEntitaOrganizzativaDirettoreSIPER;
+									String siglaEO_ACE = siglaEntitaOrganizzativaDirettoreACE;
+									Integer idEO_ACE = idEntitaOrganizzativaDirettoreACE;
+									String ruoloEODirettore_ACE = ruoloEntitaOrganizzativaDirettore;
+									membriResponsabileStruttura.forEach(responsabile -> {
+										//CONFRONTO SIPER
+										if(responsabile.toString().equals(direttore_SIPER)) {
+											log.info("il direttore trovato in ACE nella struttura SIPER {} [{}] è {} CORRISPONDE al direttore trovato su SIPER {} ", siglaEO_SIPER, DenominazioneEO_SIPER, responsabile.toString(), direttore_SIPER);
+											results.add("OK --- " + username + " -- il direttore della struttura SIPER [" + siglaEO_SIPER + " - " + DenominazioneEO_SIPER +"  [" + responsabile.toString()  +"] CORRISPONDE al direttore SIPER "+ direttore_SIPER + " --");
 
 										} else {
-											log.info("il direttore trovato in ACE nella struttura padre {} [{}] è {} NON CORRISPONDE al direttore trovato su SIPER {} ", idEO, DenominazioneEO, responsabile.toString(), direttoreSIPER);
-											results.add("NO --- " + username + " -- il direttore della struttura padre [" + idEO + " - " + DenominazioneEO +"  [" + responsabile.toString()  +"] NON CORRISPONDE al direttore SIPER "+ direttoreSIPER + " --");
+											log.info("il direttore trovato in ACE nella struttura SIPER {} [{}] è {} NON CORRISPONDE al direttore trovato su SIPER {} ", siglaEO_SIPER, DenominazioneEO_SIPER, responsabile.toString(), direttore_SIPER);
+											results.add("NO --- " + username + " -- il direttore della struttura SIPER [" + siglaEO_SIPER + " - " + DenominazioneEO_SIPER +"  [" + responsabile.toString()  +"] NON CORRISPONDE al direttore SIPER "+ direttore_SIPER + " --");
 										}
-										if(responsabile.toString().equals(direttoreBossACE)) {
-											log.info("il direttore trovato in ACE nella struttura (padre) {} [{}] è {} CORRISPONDE al direttore trovato su ACE BOSS {} ", idEO, DenominazioneEO, responsabile.toString(), direttoreBossACE);
-											results.add("OK --- " + username + " -- il direttore della struttura padre [" + idEO + " - " + DenominazioneEO +"  [" + responsabile.toString()  +"] CORRISPONDE al direttore ACE "+ direttoreBossACE + " --");
+										//CONFRONTO ACE
+										if(responsabile.toString().equals(direttore_ACE)) {
+											log.info("il direttore trovato in ACE nella struttura ACE id:{} {} [{}] è {} CORRISPONDE al direttore trovato su ACE BOSS {} ", siglaEO_ACE, idEO_ACE, DenominazioneEO_ACE, responsabile.toString(), direttore_ACE);
+											results.add("OK --- " + username + " -- il direttore della struttura ACE id: " + idEO_ACE + " [" + siglaEO_ACE + " - " + DenominazioneEO_ACE +"  [" + responsabile.toString()  +"] CORRISPONDE al direttore ACE "+ direttore_ACE + " --");
 
 										} else {
-											log.info("il direttore trovato in ACE nella struttura padre {} [{}] è {} NON CORRISPONDE al direttore trovato su ACE BOSS {} ", idEO, DenominazioneEO, responsabile.toString(), direttoreBossACE);
-											results.add("NO --- " + username + " -- il direttore della struttura padre [" + idEO + " - " + DenominazioneEO +"  [" + responsabile.toString()  +"] NON CORRISPONDE al direttore ACE "+ direttoreBossACE + " --");
+											log.info("il direttore trovato in ACE nella struttura ACE id:{}  {} [{}] è {} NON CORRISPONDE al direttore trovato su ACE BOSS {} ", siglaEO_ACE, idEO_ACE, DenominazioneEO_ACE, responsabile.toString(), direttore_ACE);
+											results.add("NO --- " + username + " -- il direttore della struttura ACE id: " + idEO_ACE + " [" + siglaEO_ACE + " - " + DenominazioneEO_ACE +"  [" + responsabile.toString()  +"] NON CORRISPONDE al direttore ACE "+ direttore_ACE + " --");
 										}
 									});				
 
@@ -186,8 +205,8 @@ public class VerificaDirettoriBoss {
 
 		CSVParser parser = new CSVParser(',');
 
-		//Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/utentiGenericiTest.csv"));
-		Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/utentiDomandeAccordiBilaterali1.csv"));
+		Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/utentiGenericiTest.csv"));
+		//Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/utentiDomandeAccordiBilaterali1.csv"));
 		Map<String, String> associazioni = new HashMap<>();
 
 		lines
