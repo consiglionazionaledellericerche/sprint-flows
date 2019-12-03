@@ -88,6 +88,9 @@ public class VerificaDirettoriAccordiBilaterali {
 
 		log.info("****** UTENTE {} ******", username);
 
+		String userNameresponsabileSede = aceService.bossSedeByUsername(username).getUsername().toString();
+		results.add("BOSS --- userNameresponsabileSede " + userNameresponsabileSede);
+
 		String cdsuoAppartenenzaUtente = null;
 		try {
 			//cdsuoAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(username).getCdsuo();
@@ -159,11 +162,11 @@ public class VerificaDirettoriAccordiBilaterali {
 									}
 									membriResponsabileStrutturaPadre.forEach(responsabile -> {
 										if(responsabile.toString().equals(nomeDirettoreSiper)) {
-											log.info("il direttore trovanto in ACE nella struttura (padre) {} [{}] è {} CORRISPONDE al direttore trovato su SIPER {} ", entitaOrganizzativaResponsabileStruttura.getId(), entitaOrganizzativaResponsabileStruttura.getDenominazione(), responsabile.toString(), nomeDirettoreSiper);
+											log.info("il direttore trovato in ACE nella struttura (padre) {} [{}] è {} CORRISPONDE al direttore trovato su SIPER {} ", entitaOrganizzativaResponsabileStruttura.getId(), entitaOrganizzativaResponsabileStruttura.getDenominazione(), responsabile.toString(), nomeDirettoreSiper);
 											results.add("OK --- " + username + " -- il direttore della struttura padre [" + entitaOrganizzativaResponsabileStruttura.getId() + " - " + entitaOrganizzativaResponsabileStruttura.getDenominazione() +"  [" + responsabile.toString()  +"] CORRISPONDE al direttore SIPER "+ nomeDirettoreSiper + " --");
 
 										} else {
-											log.info("il direttore trovanto in ACE nella struttura padre {} [{}] è {} NON CORRISPONDE al direttore trovato su SIPER {} ", entitaOrganizzativaResponsabileStruttura.getId(), entitaOrganizzativaResponsabileStruttura.getDenominazione(), responsabile.toString(), nomeDirettoreSiper);
+											log.info("il direttore trovato in ACE nella struttura padre {} [{}] è {} NON CORRISPONDE al direttore trovato su SIPER {} ", entitaOrganizzativaResponsabileStruttura.getId(), entitaOrganizzativaResponsabileStruttura.getDenominazione(), responsabile.toString(), nomeDirettoreSiper);
 											results.add("NO --- " + username + " -- il direttore della struttura padre [" + entitaOrganizzativaResponsabileStruttura.getId() + " - " + entitaOrganizzativaResponsabileStruttura.getDenominazione() +"  [" + responsabile.toString()  +"] NON CORRISPONDE al direttore SIPER "+ nomeDirettoreSiper + " --");
 										}
 									});				
@@ -183,8 +186,8 @@ public class VerificaDirettoriAccordiBilaterali {
 
 		CSVParser parser = new CSVParser(',');
 
-		Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/utentiGenericiTest.csv"));
-		//Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/utentiDomandeAccordiBilaterali1.csv"));
+		//Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/utentiGenericiTest.csv"));
+		Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/utentiDomandeAccordiBilaterali1.csv"));
 		Map<String, String> associazioni = new HashMap<>();
 
 		lines

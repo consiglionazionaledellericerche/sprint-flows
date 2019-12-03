@@ -62,7 +62,7 @@ public class StartShortTermMobilityDomandeSetGroupsAndVisibility {
 
 		String initiator = (String) execution.getVariable(Enum.VariableEnum.initiator.name());		
 		//SET TIMER
-		LOGGER.debug("scadenzaPresentazioneDomande {}",  execution.getVariable("scadenzaPresentazioneDomande").toString());
+//		LOGGER.debug("scadenzaPresentazioneDomande {}",  execution.getVariable("scadenzaPresentazioneDomande").toString());
 		String scadenzaPresentazioneDomande = execution.getVariable("scadenzaPresentazioneDomande", String.class);
 		execution.setVariable("statoFinaleDomanda",  Enum.StatoDomandeSTMEnum.APERTA.toString());
 		
@@ -87,15 +87,15 @@ public class StartShortTermMobilityDomandeSetGroupsAndVisibility {
 		}
 		
 		
-		String richiedente = execution.getVariable("userNameRichiedente", String.class);
+		String proponente = execution.getVariable("userNameProponente", String.class);
 		// LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable(Enum.VariableEnum.title.name()));
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
-		//Integer cdsuoAppartenenzaUtente = aceBridgeService.getEntitaOrganizzativaDellUtente(richiedente.toString()).getId();
+		//Integer cdsuoAppartenenzaUtente = aceBridgeService.getEntitaOrganizzativaDellUtente(proponente.toString()).getId();
 		String cdsuoAppartenenzaUtente = null;
 		try {
-			cdsuoAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(richiedente.toString()).getCdsuo();
+			cdsuoAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(proponente.toString()).getCdsuo();
 		} catch(UnexpectedResultException | FeignException e) {
-			cdsuoAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(richiedente.toString()).get("codice_uo").toString();
+			cdsuoAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(proponente.toString()).get("codice_uo").toString();
 		}
 		finally {
 			LOGGER.debug("getDirettoreCDSUO  FUNZIONA ");
@@ -107,14 +107,14 @@ public class StartShortTermMobilityDomandeSetGroupsAndVisibility {
 			String denominazioneEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getDenominazione().toString();
 			String cdsuoEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getCdsuo().toString();
 			String idnsipEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getIdnsip().toString();			
-			LOGGER.info("L'utente {} ha come direttore {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", richiedente.toString(), usernameDirettore, denominazioneEntitaorganizzativaResponsabileUtente, siglaEntitaorganizzativaResponsabileUtente, idEntitaorganizzativaResponsabileUtente, cdsuoEntitaorganizzativaResponsabileUtente, idnsipEntitaorganizzativaResponsabileUtente);
+			LOGGER.info("L'utente {} ha come direttore {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", proponente.toString(), usernameDirettore, denominazioneEntitaorganizzativaResponsabileUtente, siglaEntitaorganizzativaResponsabileUtente, idEntitaorganizzativaResponsabileUtente, cdsuoEntitaorganizzativaResponsabileUtente, idnsipEntitaorganizzativaResponsabileUtente);
 			
 			String gruppoValidatoriShortTermMobility = "validatoriShortTermMobility@0000";
-			String gruppoUfficioProtocollo = "ufficioProtocolloAccordiInternazionali@0000";
+			String gruppoUfficioProtocollo = "ufficioProtocolloShortTermMobility@0000";
 			String gruppoValutatoreScientificoSTMDipartimento = "valutatoreScientificoSTMDipartimento@0000";
 			String gruppoResponsabileAccordiInternazionali = "responsabileAccordiInternazionali@0000";
 			//DA CAMBIARE - ricavando il direttore della persona che afferisce alla sua struttura
-			String gruppoDirigenteRichiedente = "responsabile-struttura@" + idEntitaorganizzativaResponsabileUtente;
+			String gruppoDirigenteProponente = "responsabile-struttura@" + idEntitaorganizzativaResponsabileUtente;
 
 			String applicazioneSTM = "app.abil";
 			String applicazioneScrivaniaDigitale = "app.scrivaniadigitale";
@@ -126,7 +126,7 @@ public class StartShortTermMobilityDomandeSetGroupsAndVisibility {
 			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileAccordiInternazionali, PROCESS_VISUALIZER);
 			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneSTM, PROCESS_VISUALIZER);
 			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoUfficioProtocollo, PROCESS_VISUALIZER);
-			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoDirigenteRichiedente, PROCESS_VISUALIZER);
+			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoDirigenteProponente, PROCESS_VISUALIZER);
 			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValutatoreScientificoSTMDipartimento, PROCESS_VISUALIZER);
 			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneScrivaniaDigitale, PROCESS_VISUALIZER);
 
@@ -135,10 +135,10 @@ public class StartShortTermMobilityDomandeSetGroupsAndVisibility {
 			execution.setVariable("gruppoResponsabileAccordiInternazionali", gruppoResponsabileAccordiInternazionali);
 			execution.setVariable("gruppoUfficioProtocollo", gruppoUfficioProtocollo);
 			execution.setVariable("applicazioneSTM", applicazioneSTM);
-			execution.setVariable("gruppoDirigenteRichiedente", gruppoDirigenteRichiedente);
+			execution.setVariable("gruppoDirigenteProponente", gruppoDirigenteProponente);
 			execution.setVariable("gruppoValutatoreScientificoSTMDipartimento", gruppoValutatoreScientificoSTMDipartimento);
 			execution.setVariable("applicazioneScrivaniaDigitale", applicazioneScrivaniaDigitale);
-			execution.setVariable("cdsuoRichiedente", cdsuoAppartenenzaUtente);
+			execution.setVariable("cdsuoProponente", cdsuoAppartenenzaUtente);
 		}
 	}
 }

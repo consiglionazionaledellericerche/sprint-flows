@@ -54,7 +54,7 @@
       <sequenceFlow id="flow46" name="ANNULLATA" sourceRef="exclusivegateway10" targetRef="pre-accettazione">
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Annulla'}]]></conditionExpression>
       </sequenceFlow>
-      <userTask id="validazione" name="VALIDAZIONE" activiti:candidateGroups="${gruppoValidatoriShortTermMobility}">
+      <userTask id="validazione" name="VALIDAZIONE" activiti:candidateGroups="${gruppoDirigenteProponente}">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessShortTermMobilityDomande_v1}">
             <activiti:field name="faseEsecuzione">
