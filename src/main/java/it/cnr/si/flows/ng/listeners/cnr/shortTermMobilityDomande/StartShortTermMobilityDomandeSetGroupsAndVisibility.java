@@ -110,7 +110,7 @@ public class StartShortTermMobilityDomandeSetGroupsAndVisibility {
 			LOGGER.info("L'utente {} ha come direttore {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", proponente.toString(), usernameDirettore, denominazioneEntitaorganizzativaResponsabileUtente, siglaEntitaorganizzativaResponsabileUtente, idEntitaorganizzativaResponsabileUtente, cdsuoEntitaorganizzativaResponsabileUtente, idnsipEntitaorganizzativaResponsabileUtente);
 			
 			String gruppoValidatoriShortTermMobility = "validatoriShortTermMobility@0000";
-			String gruppoUfficioProtocollo = "ufficioProtocolloAccordiInternazionali@0000";
+			String gruppoUfficioProtocollo = "ufficioProtocolloShortTermMobility@0000";
 			String gruppoValutatoreScientificoSTMDipartimento = "valutatoreScientificoSTMDipartimento@0000";
 			String gruppoResponsabileAccordiInternazionali = "responsabileAccordiInternazionali@0000";
 			//DA CAMBIARE - ricavando il direttore della persona che afferisce alla sua struttura

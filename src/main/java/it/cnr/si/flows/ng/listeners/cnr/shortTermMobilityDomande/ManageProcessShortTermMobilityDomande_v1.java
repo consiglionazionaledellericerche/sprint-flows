@@ -124,10 +124,10 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 			case "validazione-end": {
 				//flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
 				String idDipartimento = execution.getVariable("dipartimentoId").toString();
-				String gruppogruppoValutatoreScientificoSTMDipartimento = "gruppoValutatoreScientificoSTMDipartimento@" + idDipartimento;
-				runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppogruppoValutatoreScientificoSTMDipartimento, PROCESS_VISUALIZER);
-				execution.setVariable("gruppogruppoValutatoreScientificoSTMDipartimento", gruppogruppoValutatoreScientificoSTMDipartimento);
-				LOGGER.debug("Imposto i gruppi dipartimento : {} - del flusso {}", idDipartimento, gruppogruppoValutatoreScientificoSTMDipartimento);
+				String gruppoValutatoreScientificoSTMDipartimento = "valutatoreScientificoDipartimento@" + idDipartimento;
+				runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValutatoreScientificoSTMDipartimento, PROCESS_VISUALIZER);
+				execution.setVariable("gruppoValutatoreScientificoSTMDipartimento", gruppoValutatoreScientificoSTMDipartimento);
+				LOGGER.debug("Imposto i gruppi dipartimento : {} - del flusso {}", idDipartimento, gruppoValutatoreScientificoSTMDipartimento);
 				// INPUT DEVE PREVEDERE LA DOMANDA PDF - NON GENERO LA DOMANDA
 				//				String nomeFile="domandaShortTermMobility";
 				//				String labelFile="Domanda";
@@ -242,10 +242,10 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 				execution.setVariable("domandaCorrenteValutataFlag", "false");
 				if(execution.getVariable("sceltaUtente").equals("CambiaDipartimento")) {
 					String idDipartimento = execution.getVariable("dipartimentoId").toString();
-					String gruppogruppoValutatoreScientificoSTMDipartimento = "gruppoValutatoreScientificoSTMDipartimento@" + idDipartimento;
-					runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppogruppoValutatoreScientificoSTMDipartimento, PROCESS_VISUALIZER);
-					execution.setVariable("gruppogruppoValutatoreScientificoSTMDipartimento", gruppogruppoValutatoreScientificoSTMDipartimento);
-					LOGGER.debug("Imposto i gruppi dipartimento : {} - del flusso {}", idDipartimento, gruppogruppoValutatoreScientificoSTMDipartimento);
+					String gruppoValutatoreScientificoSTMDipartimento = "valutatoreScientificoDipartimento@" + idDipartimento;
+					runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValutatoreScientificoSTMDipartimento, PROCESS_VISUALIZER);
+					execution.setVariable("gruppoValutatoreScientificoSTMDipartimento", gruppoValutatoreScientificoSTMDipartimento);
+					LOGGER.debug("Imposto i gruppi dipartimento : {} - del flusso {}", idDipartimento, gruppoValutatoreScientificoSTMDipartimento);
 				} else {
 					execution.setVariable("domandaCorrenteValutataFlag", "true");
 					execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE.toString());

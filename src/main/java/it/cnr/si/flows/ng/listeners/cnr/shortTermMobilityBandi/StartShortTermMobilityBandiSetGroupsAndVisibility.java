@@ -47,8 +47,8 @@ public class StartShortTermMobilityBandiSetGroupsAndVisibility {
 		// LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable(Enum.VariableEnum.title.name()));
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
 
-		String gruppoValidatoriShortTermMobility = "validatoriAccordiInternazionali@0000";
-		String gruppoUfficioProtocollo = "ufficioProtocolloAccordiInternazionali@0000";
+		String gruppoValidatoriShortTermMobility = "validatoriShortTermMobility@0000";
+		String gruppoUfficioProtocollo = "ufficioProtocolloShortTermMobility@0000";
 		String gruppoValutatoreScientificoDipartimento = "valutatoreScientificoDipartimento@0000";
 		String gruppoResponsabileAccordiInternazionali = "responsabileAccordiInternazionali@0000";
 		String applicazioneShortTermMobility = "app.abil";
