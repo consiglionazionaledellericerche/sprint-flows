@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <!--
+        Added the constraints for entity Cnrauthority.
+    -->
+    <changeSet id="20170206085209-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="cnrauthorities_id"
+                                 baseTableName="cnrauthority_cnrauthorityparent"
+                                 constraintName="fk_cnrauthority_cnrauthorityparent_cnrauthorities_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="cnrauthority"/>
+        <addForeignKeyConstraint baseColumnNames="cnrauthorityparents_id"
+                                 baseTableName="cnrauthority_cnrauthorityparent"
+                                 constraintName="fk_cnrauthority_cnrauthorityparent_cnrauthorityparents_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="cnrauthority"/>
+
+    </changeSet>
+</databaseChangeLog>

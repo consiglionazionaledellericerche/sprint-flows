@@ -104,7 +104,7 @@ public class RelationshipService {
     public List<GrantedAuthority> getAllGroupsForUserOLD(String username) {
 
         Set<String> merged;
-        if (!Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
+        if (Arrays.asList(env.getActiveProfiles()).contains("cnr")) {
 
             //A) recupero la lista dei gruppi a cui appartiene direttamente l'utente
             Set<String> aceGroup = getAceGroupsForUser(username);
@@ -209,7 +209,7 @@ public class RelationshipService {
                 .filter(group -> group.indexOf("PREVIOUS") <= -1)
                 .collect(Collectors.toList());
 
-        if (!Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
+        if (Arrays.asList(env.getActiveProfiles()).contains("cnr")) {
             //filtro in ACE gli utenti che appartengono agli stessi gruppi dell'utente loggato
             usersInMyGroups.addAll(getUsersInGroups(myGroups));
         } else {
