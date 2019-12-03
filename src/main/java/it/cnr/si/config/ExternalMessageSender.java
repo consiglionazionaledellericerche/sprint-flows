@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.*;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -31,6 +32,7 @@ import java.util.Map;
 
 @EnableScheduling
 @Configuration
+@Profile("cnr")
 public class ExternalMessageSender {
 
     private final Logger log = LoggerFactory.getLogger(ExternalMessageSender.class);

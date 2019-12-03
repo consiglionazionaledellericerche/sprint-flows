@@ -25,9 +25,18 @@
 
 		//in ogni caso questa chiamata viene cachata e non viene richiamata ad ogni caricamento della navbar
 		ProfileService.getProfileInfo().then(function(response) {
+
 			$rootScope.inDevelopment = (response.activeProfiles.includes('dev') ? 'true' : 'false');
 			//verifico qual è il profilo spring con cui è stata avviata l'app per caricare il corrispondente banner
-			$rootScope.app = (response.activeProfiles.includes('oiv') ? 'oiv' : 'cnr');
+			if (response.activeProfiles.includes('cnr'))
+			    $rootScope.app = 'cnr';
+			else if (response.activeProfiles.includes('oiv'))
+			    $rootScope.app = 'oiv';
+			else if (response.activeProfiles.includes('showcase'))
+			    $rootScope.app = 'showcase';
+			else
+			    $rootScope.app = 'none';
+
 			vm.swaggerEnabled = response.swaggerEnabled;
 		});
 

@@ -62,7 +62,7 @@ public class SecurityConfigurationLDAP extends WebSecurityConfigurerAdapter {
                 log.warn("no ldap configuration found");
             }
         } else {
-            log.info("Profilo oiv, non carico LDAP");
+            log.info("Profilo non cnr, non carico LDAP");
         }
     }
 
