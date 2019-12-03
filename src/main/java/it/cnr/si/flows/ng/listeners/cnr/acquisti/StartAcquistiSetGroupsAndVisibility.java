@@ -27,7 +27,7 @@ import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.idStruttura;
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 
 @Component
-@Profile("!oiv")
+@Profile("cnr")
 
 @Service
 public class StartAcquistiSetGroupsAndVisibility {

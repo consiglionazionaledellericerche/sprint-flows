@@ -13,6 +13,7 @@ import org.activiti.engine.delegate.event.ActivitiEventType;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
@@ -33,7 +34,7 @@ public class AddFlowsAttachmentsListener implements ActivitiEventListener {
     private RuntimeService runtimeService;
     @Inject
     private TaskService taskService;
-    @Inject
+    @Autowired(required = false)
     private AceBridgeService aceBridgeService;
     @Inject
     private Environment env;
@@ -124,10 +125,13 @@ public class AddFlowsAttachmentsListener implements ActivitiEventListener {
                 profile = "flows-demo";
             }
 
-            String idStruttura = runtimeService.getVariable(processInstanceId, ID_STRUTTURA, String.class);
-            String cdsuo = Optional.ofNullable(idStruttura)
-                    .map(id -> aceBridgeService.getUoById(Integer.parseInt(id)).getCdsuo())
-                    .orElse(null);
+            String cdsuo = null;
+            if (activeProfiles.contains("cnr")) {
+                String idStruttura = runtimeService.getVariable(processInstanceId, ID_STRUTTURA, String.class);
+                cdsuo = Optional.ofNullable(idStruttura)
+                        .map(id -> aceBridgeService.getUoById(Integer.parseInt(id)).getCdsuo())
+                        .orElse(null);
+            }
 
             String anno = key.split("-")[1];
 

@@ -85,8 +85,12 @@ public class VisibilitySetter implements ActivitiEventListener {
 
 	private void setDefaultVisibilityRules(String taskId, String processInstanceId) {
 		taskService.getIdentityLinksForTask(taskId).stream()
-		.filter(l -> l.getType().equals(IdentityLinkType.CANDIDATE) && l.getGroupId() != null)
-		.forEach(l -> runtimeService.addGroupIdentityLink(processInstanceId, l.getGroupId(), Utils.PROCESS_VISUALIZER));
+				.filter(l -> l.getType().equals(IdentityLinkType.CANDIDATE) && l.getGroupId() != null)
+				.forEach(l -> runtimeService.addGroupIdentityLink(processInstanceId, l.getGroupId(), Utils.PROCESS_VISUALIZER));
+
+		taskService.getIdentityLinksForTask(taskId).stream()
+				.filter(l -> l.getType().equals(IdentityLinkType.ASSIGNEE))
+				.forEach(l -> runtimeService.addUserIdentityLink(processInstanceId, l.getUserId(), Utils.PROCESS_VISUALIZER));
 	}
 
 

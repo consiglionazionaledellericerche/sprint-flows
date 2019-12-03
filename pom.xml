@@ -52,7 +52,7 @@
         <spring.version>4.3.2.RELEASE</spring.version>
         <sprint.version>2.0.1</sprint.version>
         <start-class>it.cnr.si.FlowsApp</start-class>
-        <storage-cloud-cmis.version>0.0.6</storage-cloud-cmis.version>
+        <storage-cloud.version>1.0.6</storage-cloud.version>
     </properties>
 
     <dependencyManagement>
@@ -202,17 +202,6 @@
             <artifactId>ace-client</artifactId>
             <version>${ace-client.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>it.cnr.si</groupId>
-            <artifactId>storage-cloud-cmis</artifactId>
-            <version>${storage-cloud-cmis.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>it.cnr.si</groupId>
-            <artifactId>storage-cloud-commons</artifactId>
-            <version>${storage-cloud-cmis.version}</version>
-        </dependency>
         <dependency>
             <groupId>it.cnr.si.sprint</groupId>
             <artifactId>sprint-core</artifactId>
@@ -228,6 +217,22 @@
             <groupId>it.cnr.si.sprint</groupId>
             <artifactId>sprint-ldap</artifactId>
             <version>${sprint.version}</version>
+        </dependency>
+
+        <!--        <dependency>-->
+        <!--            <groupId>it.cnr.si</groupId>-->
+        <!--            <artifactId>storage-cloud-cmis</artifactId>-->
+        <!--            <version>${storage-cloud.version}</version>-->
+        <!--        </dependency>-->
+        <dependency>
+            <groupId>it.cnr.si.storage</groupId>
+            <artifactId>storage-cloud-commons</artifactId>
+            <version>${storage-cloud.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>it.cnr.si.storage</groupId>
+            <artifactId>storage-cloud-filesystem</artifactId>
+            <version>${storage-cloud.version}</version>
         </dependency>
         <dependency>
             <groupId>net.dongliu</groupId>

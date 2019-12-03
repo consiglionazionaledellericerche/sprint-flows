@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 import static it.cnr.si.security.PermissionEvaluatorImpl.CNR_CODE;
 
 @Service
-@Profile("!oiv")
+@Profile("cnr")
 public class AceBridgeService {
 
 	private final Logger log = LoggerFactory.getLogger(AceBridgeService.class);
