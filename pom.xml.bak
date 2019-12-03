@@ -5,14 +5,13 @@
     <parent>
         <artifactId>archetype</artifactId>
         <groupId>it.cnr.si</groupId>
-        <version>1.0.3</version>
+        <version>1.0.7</version>
     </parent>
 
     <groupId>it.cnr.si.flows</groupId>
     <artifactId>sprint-flows</artifactId>
-    <version>0.2.1-SNAPSHOT</version>
+    <version>0.9.18-SNAPSHOT</version>
     <packaging>war</packaging>
-    <!--<packaging>jar</packaging>-->
 
     <name>sprint-flows</name>
 
@@ -21,12 +20,13 @@
     </prerequisites>
 
     <scm>
-        <connection>scm:git:ssh://git@git.si.cnr.it/dev/sprint-flows.git</connection>
-        <developerConnection>scm:git:ssh://git@git.si.cnr.it/dev/sprint-flows.git</developerConnection>
+        <connection>scm:git:ssh://git@git.si.cnr.it/documentale/sprint-flows.git</connection>
+        <developerConnection>scm:git:ssh://git@git.si.cnr.it/documentale/sprint-flows.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
     <properties>
+        <ace-client.version>2.3.10</ace-client.version>
         <activiti.version>5.22.0</activiti.version>
         <assertj-core.version>3.5.2</assertj-core.version>
         <feign.version>9.7.0</feign.version>
@@ -51,9 +51,10 @@
         <spring.security.version>4.1.1.RELEASE</spring.security.version>
         <spring.version>4.3.2.RELEASE</spring.version>
         <sprint.version>2.0.1</sprint.version>
-        <ace-client.version>2.3.3</ace-client.version>
         <start-class>it.cnr.si.FlowsApp</start-class>
         <storage-cloud-cmis.version>0.0.6</storage-cloud-cmis.version>
+        <janino.version>3.0.6</janino.version>
+        <gelf.version>1.12.0</gelf.version>
     </properties>
 
     <dependencyManagement>
@@ -192,6 +193,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>it.cnr.commons</groupId>
+            <artifactId>firmadigitale</artifactId>
+            <version>${firmadigitale.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>it.cnr.si</groupId>
@@ -208,11 +214,6 @@
             <groupId>it.cnr.si</groupId>
             <artifactId>storage-cloud-commons</artifactId>
             <version>${storage-cloud-cmis.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>it.cnr.commons</groupId>
-            <artifactId>firmadigitale</artifactId>
-            <version>${firmadigitale.version}</version>
         </dependency>
         <dependency>
             <groupId>it.cnr.si.sprint</groupId>
@@ -343,13 +344,25 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <version>${spring-boot.version}</version>
-            <scope>test</scope>
+            <!-- <scope>test</scope>-->
         </dependency>
         <dependency>
             <groupId>org.thymeleaf</groupId>
             <artifactId>thymeleaf-spring4</artifactId>
             <version>3.0.6.RELEASE</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.janino</groupId>
+            <artifactId>janino</artifactId>
+            <version>${janino.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>biz.paluch.logging</groupId>
+            <artifactId>logstash-gelf</artifactId>
+            <version>${gelf.version}</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -556,6 +569,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.12.4</version>
                 <configuration>
+                    <excludes>
+                        <exclude>**/batch/**</exclude>
+                    </excludes>
                     <argLine>-Djava.security.egd=file:/dev/./urandom
                         -Xmx256m
                         ${surefireArgLine}</argLine>
@@ -597,27 +613,6 @@
             </plugin>
             <!-- jhipster-needle-maven-add-plugin -->
 
-            <!--prova-->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <executable>bower</executable>
-                    <arguments>
-                        <argument>install</argument>
-                    </arguments>
-                    <!--<workingDirectory>${basedir}/src/main/webapp</workingDirectory>-->
-                    <workingDirectory>${basedir}</workingDirectory>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -800,7 +795,7 @@
                                     <goal>bower</goal>
                                 </goals>
                                 <configuration>
-                                    <arguments>install --no-color</arguments>
+                                    <arguments>install --allow-root --no-color</arguments>
                                 </configuration>
                             </execution>
                             <execution>

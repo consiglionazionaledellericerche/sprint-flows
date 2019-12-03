@@ -3,7 +3,7 @@
 
 	angular
 		.module('sprintApp')
-		.controller('TaskController', HomeController);
+		.controller('TaskController', TaskController);
 
 	/**
 	 * Questo e' un po' il cuore di tutta l'applicazione, per questo e' un pochino piu' complicato di altri
@@ -25,9 +25,9 @@
 	 *
 	 * @author mtrycz
 	 */
-	HomeController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log', '$http', '$q', 'Upload', 'utils', '$localStorage'];
+	TaskController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log', '$http', '$q', 'Upload', 'utils', '$localStorage'];
 
-	function HomeController($scope, Principal, LoginService, $state, dataService, AlertService, $log, $http, $q, Upload, utils, $localStorage) {
+	function TaskController($scope, Principal, LoginService, $state, dataService, AlertService, $log, $http, $q, Upload, utils, $localStorage) {
 		var vm = this;
 		$scope.data = {};
 		vm.taskId = $state.params.taskId;

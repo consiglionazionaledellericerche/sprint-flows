@@ -1,7 +1,7 @@
 package it.cnr.si.flows.ng.ldap;
 
 import it.cnr.si.flows.ng.utils.Utils;
-import it.cnr.si.service.RelationshipService;
+import it.cnr.si.service.MembershipService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -29,9 +29,9 @@ public class FlowsAuthoritiesPopulator implements LdapAuthoritiesPopulator {
     private final Logger log = LoggerFactory.getLogger(FlowsAuthoritiesPopulator.class);
 
     @Inject
-    private RelationshipService relationshipService;
-    @Inject
     private Environment env;
+    @Inject
+    private MembershipService membershipService;
 
     @Override
     public Collection<GrantedAuthority> getGrantedAuthorities(DirContextOperations userData, String username) {
@@ -49,7 +49,7 @@ public class FlowsAuthoritiesPopulator implements LdapAuthoritiesPopulator {
             log.debug("no attribute {} defined for user {}", DEPARTMENT_NUMBER, username);
         }
 
-        List<GrantedAuthority> fullGrantedAuthorities = relationshipService.getAllGroupsForUser(username)
+        List<GrantedAuthority> fullGrantedAuthorities = membershipService.getAllGroupsForUser(username)
                 .stream()
                 .map(Utils::addLeadingRole)
                 .map(SimpleGrantedAuthority::new)

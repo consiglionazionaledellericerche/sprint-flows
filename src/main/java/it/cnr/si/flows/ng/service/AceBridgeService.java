@@ -50,6 +50,8 @@ public class AceBridgeService {
 	/**
 	 * ATTENZIONE! Usare ???() per prendere tutti gli utenti, compresi col ruolo-nel-ruolo
 	 * Usare questo solo per prendere solo i gruppi di uno specifico gruppo Ace
+	 *
+	 * L'unico utilizzo giustificato di questo service e' in MembershipService
 	 */
 	@Deprecated
 	public List<String> getUsersInAceGroup(String groupName) {
@@ -121,8 +123,12 @@ public class AceBridgeService {
 		if (id == 0) {
 			return "CNR";
 		} else {
-			return aceService.entitaOrganizzativaById(id).getDenominazione();
+			return getStrutturaById(id).getDenominazione();
 		}
+	}
+
+	public EntitaOrganizzativaWebDto getStrutturaById(Integer id) {
+		return aceService.entitaOrganizzativaById(id);
 	}
 
 	//    @Cacheable("nomiEstesiGruppiRuoloStruttura")
@@ -161,6 +167,23 @@ public class AceBridgeService {
 		return afferenze.get(0).getEntitaOrganizzativa();
 	}
 
+	
+	public EntitaOrganizzativaWebDto getAfferenzaUtenteTipoSede(String username) {
+
+		PersonaWebDto persona = aceService.getPersonaByUsername(username);
+		List<PersonaEntitaOrganizzativaWebDto> personaEntitaOrganizzativaWebDtos = aceService.personaEntitaOrganizzativaFind(null, null, null, persona.getId(), TipoAppartenenza.SEDE, null, null, null, null);
+		List<PersonaEntitaOrganizzativaWebDto> afferenze = personaEntitaOrganizzativaWebDtos.stream()
+				.filter(p -> Objects.isNull(p.getFineValidita()))
+				.collect(Collectors.toList());
+
+		if (afferenze.size() == 0)
+			throw new UnexpectedResultException("Nessuna afferenza corrente per l'utente: "+ username);
+		if (afferenze.size() > 1)
+			throw new UnexpectedResultException("L'utente risulta avere piu' di una afferenza: "+ username);
+
+		return afferenze.get(0).getEntitaOrganizzativa();
+	}
+	
 
     public EntitaOrganizzativaWebDto getEntitaOrganizzativaDellUtente(String username) {
 
@@ -179,4 +202,8 @@ public class AceBridgeService {
 
         return eos.get(0);
     }
+
+    public List<GerarchiaWebDto> getParents(long id) {
+		return aceService.getParentsForEo(id);
+	}
 }

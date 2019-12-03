@@ -6,6 +6,7 @@ public class Enum {
     public enum Actions {
 
         revoca("Revoca"),
+        annulla("Annulla"),
         revocaSemplice("RevocaSemplice"),
         RevocaConProvvedimento("RevocaConProvvedimento");
 
@@ -54,7 +55,8 @@ public class Enum {
         Annullato,
         PubblicatoUrp,
         PubblicatoTrasparenza,
-        Sostituito
+        Sostituito,
+        Revocato
     }
 
 
@@ -78,15 +80,31 @@ public class Enum {
     }
 
     public enum StatoDomandeAccordiInternazionaliEnum {
-    	APERTA,
-    	CHIUSA,
-    	INVIATA,
-    	RESPINTA,
-    	VALUTATA_SCIENTIFICAMENTE,
-    	ACCETATA,
-    	CANCELLATA;
+        APERTA,
+        CHIUSA,
+        INVIATA,
+        RESPINTA,
+        VALUTATA_SCIENTIFICAMENTE,
+        ACCETATA,
+        CANCELLATA;
     }
 
+    public enum StatoDomandeSTMEnum {
+        APERTA,
+        CHIUSA,
+        INVIATA,
+        VALIDATA,
+        NON_VALIDATA,
+        IN_MODIFICA,
+        RESPINTA,
+        VALUTATA_SCIENTIFICAMENTE,
+        AUTORIZZATA,
+        ANNULLATA,
+        ACCETTATA,
+        ACCETTAZIONE,
+        CANCELLATA;
+    }
+    
     public enum ProcessDefinitionEnum {
         acquisti("acquisti","acquisti"),
         permessiFerie("permessi-ferie", "permessi-ferie"),
@@ -126,7 +144,11 @@ public class Enum {
         startDate,
         endDate,
         gruppoRA,
-    	gruppoStaffAmministrativo;
+        gruppoStaffAmministrativo,
+        dataScadenzaAvvisoPreDetermina,
+        dataScadenzaBando,
+        flagIsTrasparenza,
+        statoFinaleDomanda;
     }
 
 
@@ -143,6 +165,7 @@ public class Enum {
         preavvisoRigettoDef10Giorni,
         valutazioneProgettoAccordiBilaterali,
         domandaAccordiBilaterali,
+        valutazioneShortTermMobility,
         preavvisoRigettoCambioFascia;
 
         PdfType() {

@@ -5,6 +5,7 @@ import it.cnr.si.flows.ng.service.CounterService;
 import it.cnr.si.flows.ng.service.SiperService;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.service.AceService;
+import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.BpmnError;
@@ -45,6 +46,8 @@ public class StartAcquistiSetGroupsAndVisibility {
 	private AceService aceService;
 	@Inject
 	private SiperService siperService;
+	@Inject
+	private MembershipService membershipService;
 
 	public void configuraVariabiliStart(DelegateExecution execution)  throws IOException, ParseException  {
 
@@ -53,7 +56,7 @@ public class StartAcquistiSetGroupsAndVisibility {
 		// LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable(Enum.VariableEnum.title.name()));
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
 
-		List<String> groups = relationshipService.getAllGroupsForUser(initiator).stream()
+		List<String> groups = membershipService.getAllGroupsForUser(initiator).stream()
 				.filter(g -> g.startsWith("staffAmministrativo@"))
 				.collect(Collectors.toList());
 
@@ -61,26 +64,29 @@ public class StartAcquistiSetGroupsAndVisibility {
 			throw new BpmnError("403", "L'utente non e' abilitato ad avviare questo flusso");
 		else {
 
-			String gruppostaffAmministrativo = groups.get(0);
-			String struttura = gruppostaffAmministrativo.substring(gruppostaffAmministrativo.lastIndexOf('@') +1);
-			// idStruttura variabile che indica che il flusso è diviso per strutture (implica la visibilità distinta tra strutture)
+			//String gruppoStaffAmministrativo = groups.get(0);
+//			String struttura = gruppoStaffAmministrativo.substring(gruppoStaffAmministrativo.lastIndexOf('@') +1);
+//			// idStruttura variabile che indica che il flusso è diviso per strutture (implica la visibilità distinta tra strutture)
+//
+//			// NUOVA PROCEDURA PER PRENDERE L'ENTITA' ORGANIZZATIVA DI RIFERIMENTO 
+//			String cdsuoAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(initiator).getCdsuo();
+//			Object insdipResponsabileUo = siperService.getResponsabileCDSUO(cdsuoAppartenenzaUtente).get(0).get("codice_sede");
+//			String strutturaAppartenenza = aceService.entitaOrganizzativaFindByTerm(insdipResponsabileUo.toString()).get(0).getId().toString();
+//
+//			if (!struttura.equals(strutturaAppartenenza)) {
+//				LOGGER.info("TEST l'utente {} sta avviando il flusso {} con per una struttura [{}] diversa da quella di appartenenza [{}])", initiator, execution.getId(), struttura,strutturaAppartenenza);
+//			}
+//
+//			execution.setVariable(idStruttura.name(), struttura);
 
-			// NUOVA PROCEDURA PER PRENDERE L'ENTITA' ORGANIZZATIVA DI RIFERIMENTO 
-			String cdsuoAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(initiator).getCdsuo();
-			Object insdipResponsabileUo = siperService.getResponsabileCDSUO(cdsuoAppartenenzaUtente).get(0).get("codice_sede");
-			String strutturaAppartenenza = aceService.entitaOrganizzativaFindByTerm(insdipResponsabileUo.toString()).get(0).getId().toString();
+			String struttura = execution.getVariable(idStruttura.name()).toString();
 
-			if (!struttura.equals(strutturaAppartenenza)) {
-				LOGGER.info("TEST l'utente {} sta avviando il flusso {} con per una struttura [{}] diversa da quella di appartenenza [{}])", initiator, execution.getId(), struttura,strutturaAppartenenza);
-			}
-
-			execution.setVariable(idStruttura.name(), struttura);
 			String gruppoFirmaAcquisti = "responsabileFirmaAcquisti@"+ struttura;
 			String gruppoStaffAmministrativo = "staffAmministrativo@"+ struttura;
 			String gruppoSFD = "sfd@"+ struttura;
 			String applicazioneSigla = "app.sigla";
 
-			LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppostaffAmministrativo, gruppoSFD, gruppoStaffAmministrativo, gruppoFirmaAcquisti);
+			LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoStaffAmministrativo, gruppoSFD, gruppoStaffAmministrativo, gruppoFirmaAcquisti);
 
 			//Check se il gruppo SFD ha membri
 			List<String> members = aceBridgeService.getUsersInAceGroup(gruppoSFD);
@@ -91,14 +97,14 @@ public class StartAcquistiSetGroupsAndVisibility {
 			}
 			execution.setVariable("nomeStruttura", aceBridgeService.getNomeStruturaById(Integer.parseInt(struttura)));
 
-			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppostaffAmministrativo, PROCESS_VISUALIZER);
+			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoStaffAmministrativo, PROCESS_VISUALIZER);
 			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoFirmaAcquisti, PROCESS_VISUALIZER);
 			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoStaffAmministrativo, PROCESS_VISUALIZER);
 			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoSFD, PROCESS_VISUALIZER);
 			runtimeService.addUserIdentityLink(execution.getProcessInstanceId(), applicazioneSigla, PROCESS_VISUALIZER);
 			//            runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), "segreteria@" + struttura, PROCESS_VISUALIZER);
 
-			execution.setVariable("gruppostaffAmministrativo", gruppostaffAmministrativo);
+			execution.setVariable("gruppoStaffAmministrativo", gruppoStaffAmministrativo);
 			execution.setVariable("gruppoFirmaAcquisti", gruppoFirmaAcquisti);
 			execution.setVariable(Enum.VariableEnum.gruppoStaffAmministrativo.name(), gruppoStaffAmministrativo);
 			execution.setVariable("gruppoSFD", gruppoSFD);

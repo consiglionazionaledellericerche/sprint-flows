@@ -10,10 +10,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.inject.Inject;
 
-@RunWith(SpringRunner.class)
+import static org.junit.Assert.assertEquals;
+
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles(profiles = "native,unittests,cnr")
 @EnableTransactionManagement
-@ActiveProfiles("test,cnr")
+@RunWith(SpringRunner.class)
 public class SiperServiceTest {
 
     @Inject
@@ -22,8 +24,9 @@ public class SiperServiceTest {
     @Test
     public void testGetResponsabileUo() {
 
-        System.out.println(siperService.getResponsabileCDSUO("000400").get(0).get("codice_sede"));
+        String responsabile = (String) siperService.getResponsabileCDSUO("ASR108").get(0).get("uid");
 
+        assertEquals("maurizio.lancia", responsabile);
 
     }
 }
