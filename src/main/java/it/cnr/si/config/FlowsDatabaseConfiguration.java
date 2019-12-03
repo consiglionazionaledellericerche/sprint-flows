@@ -34,6 +34,8 @@ public class FlowsDatabaseConfiguration {
             liquibase.setChangeLog("classpath:config/liquibase/oiv/master.xml");
         else if(activeProfiles.contains("cnr"))
             liquibase.setChangeLog("classpath:config/liquibase/cnr/master.xml");
+        else if(activeProfiles.contains("showcase"))
+            liquibase.setChangeLog("classpath:config/liquibase/showcase/master.xml");
 
         liquibase.setDataSource(dataSource);
         liquibase.setContexts(liquibaseProperties.getContexts());

@@ -56,6 +56,8 @@ public class FlowsListenersConfiguration {
 				dir = "cnr";
 			else if (activeProfiles.contains("oiv"))
 				dir = "oiv";
+			else if (activeProfiles.contains("showcase"))
+				dir = "showcase";
 			else
 				System.exit(1);
 
