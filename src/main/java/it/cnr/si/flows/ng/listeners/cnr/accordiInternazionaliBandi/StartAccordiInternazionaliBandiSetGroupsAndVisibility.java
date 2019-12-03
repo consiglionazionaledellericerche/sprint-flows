@@ -19,7 +19,7 @@ import java.text.ParseException;
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 
 @Component
-@Profile("!oiv")
+@Profile("cnr")
 
 @Service
 public class StartAccordiInternazionaliBandiSetGroupsAndVisibility {
