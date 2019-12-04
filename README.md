@@ -212,7 +212,7 @@ In genere un flusso può essere suddiviso in sottoflussi. Ad esempio il flusso &
 5. STIPULA MEPA
 6. REVOCA PROCEDURA
 
- ![Flusso_OIV](./docs/screenshots/18 - Fasi del Flusso.jpg)
+ ![Flusso_OIV](./docs/screenshots/18_Fasi_del_Flusso.jpg)
 Figura 18 - Fasi del Flusso
 
 
