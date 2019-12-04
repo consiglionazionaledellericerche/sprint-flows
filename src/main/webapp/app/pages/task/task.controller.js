@@ -45,6 +45,7 @@
 			formPromise.resolve(2);
 		}; // usato nell'html
 
+
 		$q.all([formPromise.promise, dataPromise.promise])
 			.then(function (value) {
 				angular.forEach(taskForm, function (el) {
@@ -60,6 +61,16 @@
 					$scope.data["tipologiaAffidamentoDiretto"] = vm.taskVariables["tipologiaAffidamentoDiretto"];
 				if ([21, 23].includes(Number(vm.taskVariables["strumentoAcquisizioneId"])))
 					$scope.data["tipologiaProceduraSelettiva"] = vm.taskVariables["tipologiaProceduraSelettiva"];
+
+				dataService.draft.getDraftByTaskId($state.params.taskId, null).then(
+                    function(response){
+                        //popolo i campi col contenuto del json
+                        var json = JSON.parse(response.data.json);
+                        for (var key of Object.keys(json)) {
+                            $scope.data["" + key] = json[key]
+                        }
+                    }
+                );
 			});
 
 		if ($state.params.taskId) {
@@ -97,11 +108,9 @@
 				AlertService.warning("Inserire tutti i valori obbligatori.");
 
 			} else {
-
 				// Serializzo gli oggetti complessi in stringhe
 				// E' necessario copiarli in un nuovo campo, senno' angular si incasina
 				// Non posso usare angular.copy() perche' ho degli oggetti File non gestiti bene
-
 				utils.prepareForSubmit($scope.data, $scope.attachments);
 
 				Upload.upload({
@@ -129,6 +138,19 @@
 
 		$scope.downloadFile = function (url, filename, mimetype) {
 			utils.downloadFile(url, filename, mimetype);
+		}
+
+		$scope.createDraft = function (taskId) {
+            //copio scope.data e tolgo i campi che non voglio salvare nel Draft
+		    var json = Object.assign({}, $scope.data);
+		    delete json.entity;
+            delete json.processDefinitionId;
+            delete json.sceltaUtente;
+            delete json.taskId;
+            delete json.dipartimentoId;
+            delete json.dipartimento;
+            //salvo il draft
+			dataService.draft.updateDraft($state.params.taskId, json, vm.username);
 		}
 
 		function removeFromCart(taskId) {
