@@ -4,7 +4,7 @@ mvn clean compile package spring-boot:run -Pprod -DskipTests -Dspring.profiles.a
 
 cp ./target/*.war ./target/app.war
 
-docker build --file src/main/docker/test/Dockerfile -t docker.si.cnr.it/sprint-flows-showcase .
+docker build --file src/main/docker/showcase/Dockerfile -t docker.si.cnr.it/sprint-flows-showcase .
 
 docker run docker.si.cnr.it/sprint-flows-showcase
 
