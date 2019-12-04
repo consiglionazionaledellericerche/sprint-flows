@@ -111,16 +111,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
 		TaskEntity task = (TaskEntity) taskEvent.getEntity();
 
 		Set<IdentityLink> candidates = ((TaskEntity)taskEvent.getEntity()).getCandidates();
-		if (Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
-			candidates.forEach(c -> {
-				if (c.getGroupId() != null) {
-					List<String> members = membershipService.findMembersInGroup(c.getGroupId());
-					members.forEach(m -> {
-						mailService.sendFlowEventNotification(FlowsMailService.TASK_ASSEGNATO_AL_GRUPPO_HTML, integratedVariables, task.getName(), m, c.getGroupId());
-					});
-				}
-			});
-		} else {
+		if (Arrays.asList(env.getActiveProfiles()).contains("cnr")) {
 
 			if (Optional.ofNullable(aceBridgeService).isPresent()) {
 				candidates.forEach(c -> {
@@ -133,6 +124,18 @@ public class MailNotificationListener  implements ActivitiEventListener {
 					}
 				});
 			}
+
+		} else {
+
+			candidates.forEach(c -> {
+				if (c.getGroupId() != null) {
+					List<String> members = membershipService.findMembersInGroup(c.getGroupId());
+					members.forEach(m -> {
+						mailService.sendFlowEventNotification(FlowsMailService.TASK_ASSEGNATO_AL_GRUPPO_HTML, integratedVariables, task.getName(), m, c.getGroupId());
+					});
+				}
+			});
+
 		}
 		return integratedVariables;
 	}
@@ -210,19 +213,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
 									mailService.sendFlowEventNotification(nt, variables, tn, person, null);
 								});
 					} else {
-						if (Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
-							Stream.of(rule.getRecipients().split(","))
-									.map(s -> s.trim())
-									.forEach(groupVariableName -> {
-										LOGGER.debug("groupVariableName: {}", groupVariableName);
-										String groupName = (String) groupVariableName;
-										List<String> members = membershipService.findMembersInGroup(groupName);
-										LOGGER.debug("Invio la mail {} al gruppo {} con utenti {}", nt, groupName, members);
-										members.forEach(member -> {
-											mailService.sendFlowEventNotification(nt, variables, tn, member, groupName);
-										});
-									});
-						} else {
+						if (Arrays.asList(env.getActiveProfiles()).contains("cnr")) {
 
 							if (Optional.ofNullable(aceBridgeService).isPresent()) {
 								Stream.of(rule.getRecipients().split(","))
@@ -239,6 +230,18 @@ public class MailNotificationListener  implements ActivitiEventListener {
 											});
 										});
 							}
+						} else {
+							Stream.of(rule.getRecipients().split(","))
+									.map(s -> s.trim())
+									.forEach(groupVariableName -> {
+										LOGGER.debug("groupVariableName: {}", groupVariableName);
+										String groupName = (String) groupVariableName;
+										List<String> members = membershipService.findMembersInGroup(groupName);
+										LOGGER.debug("Invio la mail {} al gruppo {} con utenti {}", nt, groupName, members);
+										members.forEach(member -> {
+											mailService.sendFlowEventNotification(nt, variables, tn, member, groupName);
+										});
+									});
 						}
 
 					}
