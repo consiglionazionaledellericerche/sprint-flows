@@ -14,6 +14,7 @@ import org.activiti.engine.task.Task;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
@@ -57,7 +58,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
     HistoryService historyService;
     @Inject
     RestResponseFactory restResponseFactory;
-    @Inject
+    @Autowired(required = false)
     private AceBridgeService aceBridgeService;
 
 
@@ -265,7 +266,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
     public boolean isResponsabile(String taskId, String processInstanceId, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
         String user = SecurityUtils.getCurrentUserLogin();
-        List<String> groups = aceBridgeService.getAceGroupsForUser(user);
+        List<String> groups = aceBridgeService.getAceGroupsForUser(user); // TODO
         Task task;
         if(!processInstanceId.isEmpty()){
             task = taskService.createTaskQuery()

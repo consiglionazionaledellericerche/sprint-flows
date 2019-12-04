@@ -38,7 +38,7 @@ public class MailConfguration {
     @Inject
     private HazelcastInstance hazelcastInstance;
 
-    @Scheduled(fixedDelay = 3000, initialDelay = 10000) // 10m
+    @Scheduled(fixedDelay = 60000, initialDelay = 10000) // 10m
     public void logStatus() {
         log.debug("MailConfig: {} {}", isMailActivated(), getMailRecipients());
     }
