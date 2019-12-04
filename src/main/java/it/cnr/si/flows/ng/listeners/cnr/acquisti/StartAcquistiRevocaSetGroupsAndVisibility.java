@@ -20,7 +20,7 @@ import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 import static it.cnr.si.security.PermissionEvaluatorImpl.ID_STRUTTURA;
 
 @Component
-@Profile("!oiv")
+@Profile("cnr")
 public class StartAcquistiRevocaSetGroupsAndVisibility implements ExecutionListener {
     private static final long serialVersionUID = 686169707042367215L;
     private static final Logger LOGGER = LoggerFactory.getLogger(StartAcquistiRevocaSetGroupsAndVisibility.class);

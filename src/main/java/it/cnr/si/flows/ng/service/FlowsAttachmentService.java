@@ -374,10 +374,10 @@ public class FlowsAttachmentService {
 				path,
                 true);
 
-        StorageObject updatedSo = storeService.getStorageObjectBykey(
-                so.<String>getPropertyValue("cmis:objectId").split(";")[0]);
+//        StorageObject updatedSo = storeService.getStorageObjectBykey(
+//                so.<String>getPropertyValue("cmis:objectId").split(";")[0]);
 
-        return updatedSo.getPropertyValue("cmis:objectId");
+        return so.getPropertyValue("cmis:objectId");
     }
 
     public InputStream getAttachmentContent(String key) {

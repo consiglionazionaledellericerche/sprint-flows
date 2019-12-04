@@ -34,6 +34,10 @@ spring:
     mail:
         url: http://dockerwebtest01.si.cnr.it:1480
 
+ajp:
+    port: 8099
+    timeout: 120000
+
 cnr:
     activiti:
         diagram-font: DejaVu Sans
@@ -54,6 +58,21 @@ cnr:
     coolflows:
          username: utente1
          password: HggHjhUIuhedfwUI788yasdfiuh897
+    filesystem:
+        directory: /tmp/flows-attachments
+    abil:
+        username:
+        password:
+        url:
+        loginPath:
+        domandePath:
+    siper:
+        url: https://siper.cnr.it/
+        username: siper.user
+        password: siper.password
+
+
+
 oiv:
      baseurl: http://cool-jconon-funzione-pubblica.test.si.cnr.it
      esperienza-noncoerente: ${oiv.baseurl}/rest/application-fp/esperienza-noncoerente
