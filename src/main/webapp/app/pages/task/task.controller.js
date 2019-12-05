@@ -149,8 +149,8 @@
             delete json.taskId;
             delete json.dipartimentoId;
             delete json.dipartimento;
-            //salvo il draft
-			dataService.draft.updateDraft($state.params.taskId, json, vm.username);
+            //salvo il draft con username null perchè deve essere visibile a tutti
+			dataService.draft.updateDraft($state.params.taskId, json, null);
 		}
 
 		function removeFromCart(taskId) {

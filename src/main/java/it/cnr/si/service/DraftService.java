@@ -2,8 +2,6 @@ package it.cnr.si.service;
 
 import it.cnr.si.domain.Draft;
 import it.cnr.si.repository.DraftRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,8 +14,6 @@ import java.util.List;
 @Service
 @Transactional
 public class DraftService {
-
-    private final Logger log = LoggerFactory.getLogger(DraftService.class);
 
     @Inject
     private DraftRepository draftRepository;
@@ -86,8 +82,9 @@ public class DraftService {
      * @param taskId the task id
      */
     public void deleteDraftByTaskId(Long taskId) {
-        Draft draft = draftRepository.getDraftByTaskId(taskId);
-
-        draftRepository.delete(draft.getId());
+        List<Draft> drafts = draftRepository.getAllDraftByTaskId(taskId);
+        for(Draft draft : drafts) {
+            draftRepository.delete(draft.getId());
+        }
     }
 }

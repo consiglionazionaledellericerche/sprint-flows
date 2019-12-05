@@ -31,16 +31,16 @@ public class DraftResource {
 
     /**
      * PUT  /drafts : Save or Updates an existing draft.
-     *     nel caso in cui non si specifichi l`username si recupera un Draft che può essere letto da tutti,
-     *     viceversa, se si specifica uno username, il Draft potrà essere letto solo da qurello username
+     * nel caso in cui non si specifichi l`username si recupera un Draft che può essere letto da tutti,
+     * viceversa, se si specifica uno username, il Draft potrà essere letto solo da qurello username
+     *
      * @param taskId   the draft to update
      * @param json     the json
      * @param username the username
      * @return the ResponseEntity with status 200 (OK) and with body the updated draft, or with status 400 (Bad Request) if the draft is not valid, or with status 500 (Internal Server Error) if the draft couldnt be updated
      * @throws URISyntaxException if the Location URI syntax is incorrect
      */
-    @RequestMapping(value = "/drafts/updateDraft",
-            method = RequestMethod.PUT,
+    @PutMapping(value = "/drafts/updateDraft",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<Draft> updateDraft(@RequestParam("taskId") Long taskId, @RequestParam("json") String json, @RequestParam("username") String username) throws URISyntaxException {
@@ -64,14 +64,18 @@ public class DraftResource {
      *
      * @return the ResponseEntity with status 200 (OK) and the list of drafts in body
      */
-    @RequestMapping(value = "/drafts",
-            method = RequestMethod.GET,
+    @GetMapping(value = "/drafts",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public List<Draft> getAllDrafts() {
+    public ResponseEntity<List<Draft>> getAllDrafts() {
         log.debug("REST request to get all Drafts");
         List<Draft> drafts = draftService.findAll();
-        return drafts;
+
+        return Optional.ofNullable(drafts)
+                .map(result -> new ResponseEntity<>(
+                        result,
+                        HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
 
@@ -81,11 +85,10 @@ public class DraftResource {
      * @param id the id of the draft to retrieve
      * @return the ResponseEntity with status 200 (OK) and with body the draft, or with status 404 (Not Found)
      */
-    @RequestMapping(value = "/draft/{id}",
-            method = RequestMethod.GET,
+    @GetMapping(value = "/draft/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Draft> getDraft(@PathVariable Long id) {
+    public ResponseEntity<Draft> getDraftById(@PathVariable Long id) {
         log.debug("REST request to get Draft : {}", id);
         Draft draft = draftService.findOne(id);
         return Optional.ofNullable(draft)
@@ -96,14 +99,13 @@ public class DraftResource {
     }
 
     /**
-     * GET  /drafts/:id : get the "id" draft.
+     * GET  /drafts/getDraftByTaskId : restituisce i draft associati ad un utente
      *
      * @param taskId   the id of the draft to retrieve
      * @param username the username
      * @return the ResponseEntity with status 200 (OK) and with body the draft, or with status 404 (Not Found)
      */
-    @RequestMapping(value = "/draft/getDraftByTaskId",
-            method = RequestMethod.GET,
+    @GetMapping(value = "/draft/getDraftByTaskId",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<Draft> getDraftByTaskId(@RequestParam("taskId") Long taskId, @RequestParam("username") String username) {
@@ -123,8 +125,7 @@ public class DraftResource {
      * @param id the id of the Draft to delete
      * @return the ResponseEntity with status 200 (OK)
      */
-    @RequestMapping(value = "/draft/{id}",
-            method = RequestMethod.DELETE,
+    @DeleteMapping(value = "/draft/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<Void> deleteDraft(@PathVariable Long id) {
