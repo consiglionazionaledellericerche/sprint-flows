@@ -1,7 +1,18 @@
 # SCRIVANIA DIGITALE
 
-[TOC]
+.. toctree::
 
+   ./docs/DEMO.md
+   ./docs/INTRO.md
+   ./docs/ASPETTI_TECNOLOGICI.md
+   ./docs/DIAGRAMMI_DI_FLUSSO.md
+   ./docs/MENU.md
+   ./docs/INTERFACCIA.md
+   ./docs/GESTIONE_DOCUMENTI.md
+
+   
+   
+   
 # DEMO
 
 ```$sh
