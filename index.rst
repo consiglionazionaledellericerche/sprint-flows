@@ -1,9 +1,9 @@
 .. toctree::
 
-   ./docs/DEMO.rst
-   ./docs/INTRO.rst
-   ./docs/ASPETTI_TECNOLOGICI.rst
-   ./docs/DIAGRAMMI_DI_FLUSSO.rst
-   ./docs/MENU.rst
-   ./docs/INTERFACCIA.rst
-   ./docs/GESTIONE_DOCUMENTI.rst
+   _docs/DEMO.rst
+   _docs/INTRO.rst
+   _docs/ASPETTI_TECNOLOGICI.rst
+   _docs/DIAGRAMMI_DI_FLUSSO.rst
+   _docs/MENU.rst
+   _docs/INTERFACCIA.rst
+   _docs/GESTIONE_DOCUMENTI.rst
