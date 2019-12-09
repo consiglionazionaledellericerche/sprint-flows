@@ -34,7 +34,7 @@
     </scm>
 
     <properties>
-        <ace-client.version>2.3.7</ace-client.version>
+        <ace-client.version>2.3.15</ace-client.version>
         <activiti.version>5.22.0</activiti.version>
         <assertj-core.version>3.5.2</assertj-core.version>
         <feign.version>9.7.0</feign.version>
@@ -58,7 +58,7 @@
         <spring-boot.version>1.4.0.RELEASE</spring-boot.version>
         <spring.security.version>4.1.1.RELEASE</spring.security.version>
         <spring.version>4.3.2.RELEASE</spring.version>
-        <sprint.version>2.0.1</sprint.version>
+        <sprint.version>2.3.16</sprint.version>
         <start-class>it.cnr.si.FlowsApp</start-class>
         <storage-cloud.version>1.0.6</storage-cloud.version>
     </properties>
