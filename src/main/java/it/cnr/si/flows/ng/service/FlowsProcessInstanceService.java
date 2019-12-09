@@ -426,6 +426,7 @@ public class FlowsProcessInstanceService {
 
 
 	private void processDate(HistoricProcessInstanceQuery processQuery, String key, String value) {
+		// TODO remove deprecated api javax.xml
 		Calendar calendar = javax.xml.bind.DatatypeConverter.parseDateTime(value);
 
 		if (key.contains("Less"))
