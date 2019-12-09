@@ -5,7 +5,7 @@
     <parent>
         <artifactId>archetype</artifactId>
         <groupId>it.cnr.si</groupId>
-        <version>1.0.7</version>
+        <version>1.0.15</version>
     </parent>
 
     <groupId>it.cnr.si.flows</groupId>
@@ -19,6 +19,14 @@
         <maven>3.0.0</maven>
     </prerequisites>
 
+
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
     <scm>
         <connection>scm:git:ssh://git@git.si.cnr.it/documentale/sprint-flows.git</connection>
         <developerConnection>scm:git:ssh://git@git.si.cnr.it/documentale/sprint-flows.git</developerConnection>
@@ -30,10 +38,10 @@
         <activiti.version>5.22.0</activiti.version>
         <assertj-core.version>3.5.2</assertj-core.version>
         <feign.version>9.7.0</feign.version>
-        <firmadigitale.version>1.11</firmadigitale.version>
+        <firmadigitale.version>1.15</firmadigitale.version>
         <gatling-maven-plugin.version>2.1.7</gatling-maven-plugin.version>
         <jacoco-maven-plugin.version>0.7.7.201606060606</jacoco-maven-plugin.version>
-        <jada.version>2.9</jada.version>
+
         <jasperreports.version>6.6.0</jasperreports.version>
         <json-path.version>2.2.0</json-path.version>
         <liquibase-hibernate4.version>3.5</liquibase-hibernate4.version>
@@ -57,11 +65,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>com.github.ralfstuckert.pdfbox-layout</groupId>
-                <artifactId>pdfbox1-layout</artifactId>
-                <version>0.8.1</version>
-            </dependency>
             <dependency>
                 <groupId>com.opencsv</groupId>
                 <artifactId>opencsv</artifactId>
@@ -151,11 +154,6 @@
             <artifactId>pdfbox1-layout</artifactId>
             <version>0.8.1</version>
         </dependency>
-        <dependency>
-            <groupId>com.lowagie</groupId>
-            <artifactId>itext</artifactId>
-            <version>2.1.7.js2</version>
-        </dependency>
         <!--dipendenze exportCsv-->
         <dependency>
             <groupId>com.opencsv</groupId>
@@ -181,18 +179,7 @@
         </dependency>
 
         <dependency>
-            <groupId>it.cnr</groupId>
-            <artifactId>jada-ejb3</artifactId>
-            <version>${jada.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>persistence-api</artifactId>
-                    <groupId>javax.persistence</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>it.cnr.commons</groupId>
+            <groupId>it.cnr.si</groupId>
             <artifactId>firmadigitale</artifactId>
             <version>${firmadigitale.version}</version>
         </dependency>
@@ -268,10 +255,7 @@
                     <artifactId>jdtcore</artifactId>
                     <groupId>eclipse</groupId>
                 </exclusion>
-                <exclusion>
-                    <artifactId>com.lowagie</artifactId>
-                    <groupId>itext</groupId>
-                </exclusion>
+
                 <exclusion>
                     <artifactId>org.olap4j</artifactId>
                     <groupId>olap4j</groupId>
