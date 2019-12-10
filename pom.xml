@@ -292,6 +292,11 @@
             <version>2.3.0</version>
         </dependency>
         <dependency>
+            <groupId>javax.xml.ws</groupId>
+            <artifactId>jaxws-api</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+        <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
             <version>2.3.0</version>
@@ -662,26 +667,6 @@
                         your application on port 5005 <jvmArguments>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005</jvmArguments> -->
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.6.0</version>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <executable>bower</executable>
-                    <arguments>
-                        <argument>install</argument>
-                    </arguments>
-                    <workingDirectory>${basedir}</workingDirectory>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 
@@ -752,7 +737,7 @@
                                 </goals>
                                 <configuration>
                                     <nodeVersion>v4.4.7</nodeVersion>
-                                    <npmVersion>3.10.5</npmVersion>
+                                    <npmVersion>3.10.10</npmVersion>
                                 </configuration>
                             </execution>
                             <execution>

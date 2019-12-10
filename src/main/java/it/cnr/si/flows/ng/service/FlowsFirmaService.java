@@ -101,7 +101,7 @@ public class FlowsFirmaService {
             SignRequestV2 req = getRequest(identity, bytes);
 
             SignReturnV2 response = service.pdfsignatureV2(req, apparence,
-                    PdfProfile.fromValue(RemotePdfprofile), null);
+                    PdfProfile.fromValue(RemotePdfprofile), null, null);
 
             LOGGER.debug(response.getReturnCode() + " " + response.getStatus());
 
