@@ -1,6 +1,6 @@
 package it.cnr.si.flows.ng.service;
 
-import it.cnr.jada.firma.arss.ArubaSignServiceException;
+import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.listeners.oiv.service.OivSetGroupsAndVisibility;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;

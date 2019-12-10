@@ -10,17 +10,9 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import it.cnr.jada.firma.arss.ArubaSignServiceClient;
-import it.cnr.jada.firma.arss.ArubaSignServiceException;
-import it.cnr.jada.firma.arss.stub.ArubaSignService;
-import it.cnr.jada.firma.arss.stub.ArubaSignServiceService;
-import it.cnr.jada.firma.arss.stub.Auth;
-import it.cnr.jada.firma.arss.stub.PdfProfile;
-import it.cnr.jada.firma.arss.stub.PdfSignApparence;
-import it.cnr.jada.firma.arss.stub.SignRequestV2;
-import it.cnr.jada.firma.arss.stub.SignReturnV2;
-import it.cnr.jada.firma.arss.stub.TypeOfTransportNotImplemented_Exception;
-import it.cnr.jada.firma.arss.stub.TypeTransport;
+import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceClient;
+import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
+import it.cnr.si.firmadigitale.firma.arss.stub.*;
 
 /**
  * 

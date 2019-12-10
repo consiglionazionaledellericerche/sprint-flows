@@ -5,7 +5,7 @@
     <parent>
         <artifactId>archetype</artifactId>
         <groupId>it.cnr.si</groupId>
-        <version>1.0.3</version>
+        <version>1.0.15</version>
     </parent>
 
     <groupId>it.cnr.si.flows</groupId>
@@ -21,10 +21,17 @@
         <tag>HEAD</tag>
     </scm>
 
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
     <properties>
         <activiti.version>5.22.0</activiti.version>
         <assertj-core.version>3.5.2</assertj-core.version>
-        <firmadigitale.version>1.11</firmadigitale.version>
+        <firmadigitale.version>1.15</firmadigitale.version>
         <gatling-maven-plugin.version>2.1.7</gatling-maven-plugin.version>
         <jacoco-maven-plugin.version>0.7.7.201606060606</jacoco-maven-plugin.version>
         <jasperreports.version>6.5.1</jasperreports.version>
@@ -43,7 +50,7 @@
         <spring-boot.version>1.4.0.RELEASE</spring-boot.version>
         <spring.security.version>4.1.1.RELEASE</spring.security.version>
         <spring.version>4.3.2.RELEASE</spring.version>
-        <sprint.version>2.0.1</sprint.version>
+        <sprint.version>2.3.16</sprint.version>
         <start-class>it.cnr.si.FlowsApp</start-class>
     </properties>
 
@@ -155,7 +162,7 @@
             <version>3.9</version>
         </dependency>
         <dependency>
-            <groupId>it.cnr.commons</groupId>
+            <groupId>it.cnr.si</groupId>
             <artifactId>firmadigitale</artifactId>
             <version>${firmadigitale.version}</version>
         </dependency>
