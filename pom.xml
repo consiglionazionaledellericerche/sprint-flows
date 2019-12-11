@@ -780,7 +780,7 @@
                                 </goals>
                                 <configuration>
                                     <nodeVersion>v6.17.1</nodeVersion>
-                                    <npmVersion>3.10.5</npmVersion>
+                                    <npmVersion>3.10.10</npmVersion>
                                 </configuration>
                             </execution>
                             <execution>
