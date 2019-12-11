@@ -1,0 +1,39 @@
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    # l'url del db viene modificata all'avvio dell'applicazione a seconda del profilo (cnr => flows-cnr,
+    # oiv => flows-oiv) in modo che l'applicazione punti un db diverso a seconda del profilo
+    url: jdbc:h2:file:./DB-H2/flows;DB_CLOSE_DELAY=-1
+    username: flows
+    password:
+  jpa:
+    database-platform: it.cnr.si.domain.util.FixedH2Dialect
+    database: H2
+    show-sql: false
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+      naming:
+        strategy: org.springframework.boot.orm.jpa.hibernate.SpringNamingStrategy
+    properties:
+      hibernate.cache.use_second_level_cache: true
+      hibernate.cache.use_query_cache: false
+      hibernate.generate_statistics: false
+      hibernate.cache.region.factory_class: it.cnr.si.config.hazelcast.HazelcastCacheRegionFactory
+      hibernate.cache.use_minimal_puts: true
+      hibernate.cache.hazelcast.use_lite_member: true
+
+ajp:
+  port: 8099
+  timeout: 120000
+
+cnr:
+  filesystem:
+    directory: /tmp/sprint-flows-showcase
+
+showcase:
+  mail:
+    mail.port: 587
+    mail.user:
+    mail.password:
+
