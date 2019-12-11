@@ -41,7 +41,7 @@ public class FlowsMailService extends MailService {
     private CnrgroupService cnrgroupService;
     @Autowired(required = false)
     private AceBridgeService aceBridgeService;
-    @Inject
+    @Autowired(required = false) //TODO
     private AceService aceService;
     @Inject
     private FlowsUserService flowsUserService;
