@@ -2,7 +2,7 @@ image: docker:stable
 
 variables:
   DOCKER_DRIVER: overlay2
-  MAVEN_OPTS: -Dmaven.repo.local=./.m2 -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+  MAVEN_OPTS: -Dmaven.repo.local=./.m2 -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -B
   CNR_MAVEN_VERSION: 3.4.0
 
 services:
@@ -33,7 +33,7 @@ deploy_dev_snapshot:
   only:
     - dev
   script:
-    - mvn -B clean compile package deploy -DskipTests -Pdev
+    - mvn clean compile package deploy -DskipTests -Pdev
 
 
 # branch TEST & DEMO
@@ -45,7 +45,7 @@ deploy_snapshot:
     - test
     - demo
   script:
-    - mvn -B clean compile package deploy -DskipTests -Pprod
+    - mvn clean compile package deploy -DskipTests -Pprod
     - cp ./target/*.war ./target/app.war
 
 buildtestcontainer:
