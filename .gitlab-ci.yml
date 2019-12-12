@@ -115,13 +115,18 @@ buildprodcontainer:
   except:
     - branches
   script:
-    - echo "Running build image and push image for latest release"
-    - docker build --file src/main/docker/Dockerfile -t docker.si.cnr.it/sprint-flows  .
-    - docker push docker.si.cnr.it/sprint-flows
     - echo "Running build image and push image for release tag"
     - echo $CI_COMMIT_TAG
-    - docker build --file src/main/docker/Dockerfile -t docker.si.cnr.it/sprint-flows:$CI_COMMIT_TAG .
-    - docker push docker.si.cnr.it/sprint-flows:$CI_COMMIT_TAG
+    - echo $CI_COMMIT_REF_NAME
+    - docker build --file src/main/docker/Dockerfile -t $CI_PROJECT_NAME:$CI_COMMIT_REF_NAME .
+    - docker push $CI_PROJECT_NAME:$CI_COMMIT_REF_NAME
+    - echo "Done pushing image to local docker repo. Now pushing to dockerhub."
+    - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
+    - docker tag $CI_PROJECT_NAME:$CI_COMMIT_REF_NAME $DOCKER_HUB_ORGANIZATION/$CI_PROJECT_NAME:$CI_COMMIT_REF_NAME
+    - docker tag $CI_PROJECT_NAME:$CI_COMMIT_REF_NAME $DOCKER_HUB_ORGANIZATION/$CI_PROJECT_NAME:latest
+    - docker push $DOCKER_HUB_ORGANIZATION/$CI_PROJECT_NAME:$CI_COMMIT_REF_NAME
+    - docker push $DOCKER_HUB_ORGANIZATION/$CI_PROJECT_NAME:latest
+
 
 
 deploydockprod01:
