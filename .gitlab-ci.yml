@@ -2,7 +2,7 @@ image: docker:stable
 
 variables:
   DOCKER_DRIVER: overlay2
-  MAVEN_OPTS: -Dmaven.repo.local=./.m2 -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -B
+  MAVEN_OPTS: -Dmaven.repo.local=./.m2 -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
   CNR_MAVEN_VERSION: 3.4.0
 
 services:
@@ -33,7 +33,7 @@ deploy_dev_snapshot:
   only:
     - dev
   script:
-    - mvn clean compile package deploy -DskipTests -Pdev
+    - mvn -B clean compile package deploy -DskipTests -Pdev
 
 
 # branch TEST & DEMO
@@ -45,7 +45,7 @@ deploy_snapshot:
     - test
     - demo
   script:
-    - mvn clean compile package deploy -DskipTests -Pprod
+    - mvn -B clean compile package deploy -DskipTests -Pprod
     - cp ./target/*.war ./target/app.war
 
 buildtestcontainer:
@@ -97,7 +97,7 @@ release_artifact:
     - git checkout -B "$CI_BUILD_REF_NAME"
     # mi metto in condizione del push per l'utente con la deploy key
     - git remote set-url --push origin git@git.si.cnr.it:documentale/sprint-flows.git
-    - mvn -Dresume=false release:prepare release:perform -Pprod -DpushChanges=false -DlocalCheckout=true -DskipTests -Darguments="-Dmaven.test.skip=true -DskipTests"
+    - mvn -B -Dresume=false release:prepare release:perform -Pprod -DpushChanges=false -DlocalCheckout=true -DskipTests -Darguments="-Dmaven.test.skip=true -DskipTests"
     - git remote set-url --push origin git@git.si.cnr.it:documentale/sprint-flows.git
     - git push --tags
     - git commit --amend -m "[ci skip] prepare for next development iteration"
