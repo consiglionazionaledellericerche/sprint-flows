@@ -137,10 +137,42 @@
                 <artifactId>thymeleaf-spring4</artifactId>
                 <version>3.0.6.RELEASE</version>
             </dependency>
+            <dependency>
+            	<groupId>org.hibernate</groupId>
+            	<artifactId>hibernate-core</artifactId>
+            	<version>5.2.4.Final</version>
+            </dependency>
+             <dependency>
+                 <groupId>org.hibernate</groupId>
+                 <artifactId>hibernate-entitymanager</artifactId>
+                 <version>5.2.4.Final</version>
+             </dependency>
+            <dependency>
+            	<groupId>org.hibernate</groupId>
+            	<artifactId>hibernate-validator</artifactId>
+            	<version>5.2.4.Final</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>5.2.4.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>5.2.4.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>5.2.4.Final</version>
+        </dependency>
+
         <dependency>
             <groupId>com.github.ralfstuckert.pdfbox-layout</groupId>
             <artifactId>pdfbox1-layout</artifactId>
@@ -314,11 +346,6 @@
             <artifactId>groovy</artifactId>
             <version>2.4.3</version>
             <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-entitymanager</artifactId>
-            <version>5.1.0.Final</version>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
