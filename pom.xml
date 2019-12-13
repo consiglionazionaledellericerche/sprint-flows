@@ -207,6 +207,10 @@
                     <artifactId>json</artifactId>
                     <groupId>org.apache.geronimo.bundles</groupId>
                 </exclusion>
+                <exclusion>
+                	<groupId>org.hibernate</groupId>
+                	<artifactId>hibernate-core</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
