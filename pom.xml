@@ -141,11 +141,6 @@
     </dependencyManagement>
 
     <dependencies>
-		<dependency>
-		    <groupId>org.hibernate</groupId>
-		    <artifactId>hibernate-entitymanager</artifactId>
-		    <version>5.1.0.Final</version>
-		</dependency>
         <dependency>
             <groupId>com.github.ralfstuckert.pdfbox-layout</groupId>
             <artifactId>pdfbox1-layout</artifactId>
