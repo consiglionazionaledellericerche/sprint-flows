@@ -12,6 +12,12 @@ oppure
 mvn clean install spring-boot:run -Pprod -DskipTests -Dspring.profiles.active=native,showcase,test,swagger
 ```
 
+oppure
+
+```$sh
+docker run -p 8080:8080 consiglionazionalericerche/sprint-flows
+```
+
 # INTRODUZIONE
 
 Il presente manuale è una guida all'utilizzo di &quot;Scrivania Digitale&quot; come piattaforma per flussi di lavoro informatizzati - un'applicazione con interfaccia web che permette di definire ed eseguire flussi di lavoro che comportano l'assegnazione di compiti a diversi attori e la raccolta di informazioni e documentazione relativi alle attività amministrative.
