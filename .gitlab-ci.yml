@@ -111,33 +111,29 @@ buildprodcontainer:
   tags:
     - shared
   only:
-    - /^(\d+\.)?(\d+\.)?(\*|\d+)$/
-  except:
-    - branches
+    - prod
   script:
     - echo "Running build image and push image for latest release"
     - docker build --file src/main/docker/Dockerfile -t docker.si.cnr.it/sprint-flows  .
     - docker push docker.si.cnr.it/sprint-flows
     - echo "Running build image and push image for release tag"
     - echo $CI_COMMIT_TAG
-    - docker build --file src/main/docker/Dockerfile -t docker.si.cnr.it/sprint-flows:$CI_COMMIT_TAG .
-    - docker push docker.si.cnr.it/sprint-flows:$CI_COMMIT_TAG
+    - docker build --file src/main/docker/Dockerfile -t docker.si.cnr.it/sprint-flows:1.0.8 .
+    - docker push docker.si.cnr.it/sprint-flows:1.0.8
 
 
 deploydockprod01:
   stage: deploy_prod_container
   image: scolagreco/alpine-ssh:latest
   only:
-    - /^(\d+\.)?(\d+\.)?(\*|\d+)$/
-  except:
-    - branches
+    - prod
   tags:
     - shared
   when: manual
   script:
     - echo "Deploy sprint-flows to dockprod01"
     - echo "setting secrets"
-    - sed -i "s/docker.si.cnr.it\/sprint-flows/docker.si.cnr.it\/sprint-flows:$CI_COMMIT_TAG/g" ./src/main/docker/app-prod.yml
+    - sed -i "s/docker.si.cnr.it\/sprint-flows/docker.si.cnr.it\/sprint-flows:1.0.8/g" ./src/main/docker/app-prod.yml
     - sed -i "s/SPRING_DATASOURCE_PASSWORD_SED/$POSTGRESS_PASSWORD/g" ./src/main/docker/app-prod.yml
     - sed -i "s/SPRING_LDAP_MANAGERPASSWORD_SED/$LDAP_PASSWORD/g" ./src/main/docker/app-prod.yml
     - sed -i "s/ACE_PASSWORD_SED/$ACE_PASSWORD/g" ./src/main/docker/app-prod.yml
@@ -156,9 +152,9 @@ deploydockprod02:
   stage: deploy_prod_container
   image: scolagreco/alpine-ssh:latest
   only:
-    - /^(\d+\.)?(\d+\.)?(\*|\d+)$/
-  except:
-    - branches
+    - prod
+  tags:
+    - shared
   when: manual
   script:
     - echo "Deploy sprint-flows to dockprod02"
