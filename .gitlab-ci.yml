@@ -113,6 +113,7 @@ buildprodcontainer:
   only:
     - prod
   script:
+    - mvn clean package -B -Pprod -DskipTests
     - echo "Running build image and push image for latest release"
     - docker build --file src/main/docker/Dockerfile -t docker.si.cnr.it/sprint-flows  .
     - docker push docker.si.cnr.it/sprint-flows
