@@ -61,7 +61,7 @@ public class VerificaDomandeAccordiBilaterali {
 	List <String> results = new ArrayList<>();
 
 	//@Test questa riga non va mai messa su git
-	@Test
+	//@Test
 	public void runBatch() throws IOException {
 		Map<String, String> persone = getPersoneDaFile();
 
