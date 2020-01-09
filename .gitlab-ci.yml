@@ -30,11 +30,9 @@ exec:
   script:
     - sshremote $SSH_CONNECT_DOCPROD01 "docker ps -a"
     - sshremote $SSH_CONNECT_DOCPROD02 "docker ps -a"
-#    - sshremote $SSH_CONNECT_DOCPROD01 "docker-compose -f /sites/docker-flows/app.yml ps"
-#    - sshremote $SSH_CONNECT_DOCPROD02 "docker-compose -f /sites/docker-flows/app.yml ps"
+    - sshremote $SSH_CONNECT_DOCPROD01 "docker-compose -f /sites/docker-flows/app.yml ps"
+    - sshremote $SSH_CONNECT_DOCPROD02 "docker-compose -f /sites/docker-flows/app.yml ps"
 #    - sshremote $SSH_CONNECT_DOCPROD02 "docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml down -v --remove-orphans || echo NOFILE"
-    - sshremote $SSH_CONNECT_DOCPROD01 "docker rm -f 69fb2e961f00"
-    - sshremote $SSH_CONNECT_DOCPROD01 "docker rm -f 5240ffaf1faf"    
 
 
 
