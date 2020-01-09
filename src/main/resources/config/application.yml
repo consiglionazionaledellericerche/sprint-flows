@@ -131,7 +131,7 @@ cnr:
     password: bubbazza
   abil:
     username: app.scrivaniadigitale
-    password: bubbazza
+    password: portacigliarancini2019
     url: http://dockerwebtest01.si.cnr.it:8088
     loginPath: /api/authenticate
     domandePath: /api/cambioStatoDomanda
