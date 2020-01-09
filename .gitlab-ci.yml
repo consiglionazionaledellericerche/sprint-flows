@@ -9,7 +9,7 @@ services:
   - docker:dind
 
 cache:
-  key: $CI_COMMIT_SHORT_SHA
+  key: $CI_COMMIT_REF_NAME
   paths:
     - .m2/repository/
     - ~/.npm
@@ -46,7 +46,7 @@ deploy_snapshot:
     - demo
     - prod
   script:
-    - mvn -B compile package -DskipTests -Pprod
+    - mvn -B clean compile package -DskipTests -Pprod
     - cp ./target/*.war ./target/app.war
 
 buildtestcontainer:
