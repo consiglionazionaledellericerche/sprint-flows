@@ -140,8 +140,8 @@ deploydockprod01:
     - sed -i "s/ACE_PASSWORD_SED/$ACE_PASSWORD/g" ./src/main/docker/app-prod.yml
     - sed -i "s/CMIS_PASSWORD/$CMIS_PASSWORD/g" ./src/main/docker/app-prod.yml
     - echo "stopping service"
-    - sshremote $SSH_CONNECT_DOCPROD01 "if [ -f  ''/sites/docker-flows/app.yml'' ]; then docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml down -v --remove-orphans; fi && rm -rf /sites/docker-flows/ && mkdir -p /sites/docker-flows/ || echo NODIR"
-    - echo "copying docker-compose file"
+    - sshremote $SSH_CONNECT_DOCPROD01 "docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml down -v --remove-orphans || echo NOFILE"
+    - sshremote $SSH_CONNECT_DOCPROD01 "rm -rf /sites/docker-flows/ && mkdir -p /sites/docker-flows/"    - echo "copying docker-compose file"
     - scpremote ./src/main/docker/app-prod.yml $SSH_CONNECT_DOCPROD01:/sites/docker-flows/app.yml
     - echo "starting service"
     - sshremote $SSH_CONNECT_DOCPROD01 "docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml pull && docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml up -d"
@@ -166,7 +166,8 @@ deploydockprod02:
     - sed -i "s/ACE_PASSWORD_SED/$ACE_PASSWORD/g" ./src/main/docker/app-prod.yml
     - sed -i "s/CMIS_PASSWORD/$CMIS_PASSWORD/g" ./src/main/docker/app-prod.yml
     - echo "stopping service"
-    - sshremote $SSH_CONNECT_DOCPROD02 "if [ -f  ''/sites/docker-flows/app.yml'' ]; then docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml down -v --remove-orphans; fi && rm -rf /sites/docker-flows/ && mkdir -p /sites/docker-flows/ || echo NODIR"
+    - sshremote $SSH_CONNECT_DOCPROD02 "docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml down -v --remove-orphans || echo NOFILE"
+    - sshremote $SSH_CONNECT_DOCPROD02 "rm -rf /sites/docker-flows/ && mkdir -p /sites/docker-flows/"
     - echo "copying docker-compose file"
     - scpremote ./src/main/docker/app-prod.yml $SSH_CONNECT_DOCPROD02:/sites/docker-flows/app.yml
     - echo "starting services"
