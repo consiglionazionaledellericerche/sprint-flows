@@ -27,6 +27,7 @@ exec:
   only: 
     - CI
   script:
+    - watch ls
     - sshremote $SSH_CONNECT_DOCPROD01 "docker ps -a"
     - sshremote $SSH_CONNECT_DOCPROD02 "docker ps -a"
 
