@@ -9,6 +9,7 @@ import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
 import org.hibernate.service.spi.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,11 +26,11 @@ public class HelpdeskService {
     private final static String REST_OIL_NEW_PROBLEM =  "pest/HDSiper";
     private final Logger log = LoggerFactory.getLogger(HelpdeskService.class);
     @Inject
-    ProxyService proxyService;
+    private ProxyService proxyService;
     @Inject
-    Utils utils;
-    @Inject
-    AceService aceService;
+    private Utils utils;
+    @Autowired(required = false)
+    private AceService aceService;
 
 
     public Long newProblem(ExternalProblem hd) throws ServiceException {

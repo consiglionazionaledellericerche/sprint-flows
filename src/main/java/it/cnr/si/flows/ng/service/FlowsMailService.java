@@ -41,7 +41,7 @@ public class FlowsMailService extends MailService {
     private CnrgroupService cnrgroupService;
     @Autowired(required = false)
     private AceBridgeService aceBridgeService;
-    @Inject
+    @Autowired(required = false) //TODO
     private AceService aceService;
     @Inject
     private FlowsUserService flowsUserService;
@@ -60,21 +60,23 @@ public class FlowsMailService extends MailService {
         // ${serverUrl}/#/details?processInstanceId=${processInstanceId}&amp;taskId=${nextTaskId}}
 
         if (groupName != null) {
-            if (Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
-                ctx.setVariable("profile", "oiv");
-                ctx.setVariable("groupname", cnrgroupService.findDisplayName(groupName));
-            } else {
+            if (Arrays.asList(env.getActiveProfiles()).contains("cnr")) {
                 ctx.setVariable("groupname", Optional.ofNullable(aceBridgeService)
                         .flatMap(aceBridgeService -> Optional.ofNullable(groupName))
                         .map(s -> aceBridgeService.getExtendedGroupNome(s))
                         .orElse(groupName));
+            } else {
+                ctx.setVariable("profile", "oiv");
+                ctx.setVariable("groupname", cnrgroupService.findDisplayName(groupName));
             }
         }
         ctx.setVariable("taskName", taskName);
-        if (Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
-            ctx.setVariable("profile", "oiv");
-        } else {
+        if (Arrays.asList(env.getActiveProfiles()).contains("cnr")) {
             ctx.setVariable("profile", "cnr");
+        } else if (Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
+            ctx.setVariable("profile", "oiv");
+        } else if (Arrays.asList(env.getActiveProfiles()).contains("showcase")) {
+            ctx.setVariable("profile", "showcase");
         }
 
         String htmlContent = templateEngine.process(notificationType, ctx);

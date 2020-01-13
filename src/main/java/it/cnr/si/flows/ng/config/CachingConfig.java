@@ -4,6 +4,7 @@ import it.cnr.si.config.CacheConfiguration;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -22,7 +23,7 @@ public class CachingConfig {
     private static DateFormat formatoDataOra = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ITALY);
     private final Logger log = LoggerFactory.getLogger(CachingConfig.class);
 
-    @Inject
+    @Autowired(required = false)
     private AceBridgeService aceBridgeService;
     @Inject
     private CacheConfiguration cacheConfiguration;

@@ -5,12 +5,12 @@
     <parent>
         <artifactId>archetype</artifactId>
         <groupId>it.cnr.si</groupId>
-        <version>1.0.7</version>
+        <version>1.0.15</version>
     </parent>
 
     <groupId>it.cnr.si.flows</groupId>
     <artifactId>sprint-flows</artifactId>
-    <version>1.0.8</version>
+    <version>1.0.26-SNAPSHOT</version>
     <packaging>war</packaging>
 
     <name>sprint-flows</name>
@@ -22,18 +22,18 @@
     <scm>
         <connection>scm:git:ssh://git@git.si.cnr.it/documentale/sprint-flows.git</connection>
         <developerConnection>scm:git:ssh://git@git.si.cnr.it/documentale/sprint-flows.git</developerConnection>
-        <tag>1.0.8</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
-        <ace-client.version>2.3.7</ace-client.version>
+        <ace-client.version>2.3.16</ace-client.version>
         <activiti.version>5.22.0</activiti.version>
         <assertj-core.version>3.5.2</assertj-core.version>
         <feign.version>9.7.0</feign.version>
-        <firmadigitale.version>1.11</firmadigitale.version>
+        <firmadigitale.version>1.15</firmadigitale.version>
         <gatling-maven-plugin.version>2.1.7</gatling-maven-plugin.version>
         <jacoco-maven-plugin.version>0.7.7.201606060606</jacoco-maven-plugin.version>
-        <jada.version>2.9</jada.version>
+
         <jasperreports.version>6.6.0</jasperreports.version>
         <json-path.version>2.2.0</json-path.version>
         <liquibase-hibernate4.version>3.5</liquibase-hibernate4.version>
@@ -50,18 +50,13 @@
         <spring-boot.version>1.4.0.RELEASE</spring-boot.version>
         <spring.security.version>4.1.1.RELEASE</spring.security.version>
         <spring.version>4.3.2.RELEASE</spring.version>
-        <sprint.version>2.0.1</sprint.version>
+        <sprint.version>2.3.17</sprint.version>
         <start-class>it.cnr.si.FlowsApp</start-class>
-        <storage-cloud-cmis.version>0.0.6</storage-cloud-cmis.version>
+        <storage-cloud.version>1.0.6</storage-cloud.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>com.github.ralfstuckert.pdfbox-layout</groupId>
-                <artifactId>pdfbox1-layout</artifactId>
-                <version>0.8.1</version>
-            </dependency>
             <dependency>
                 <groupId>com.opencsv</groupId>
                 <artifactId>opencsv</artifactId>
@@ -76,6 +71,21 @@
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi</artifactId>
                 <version>3.6</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-core</artifactId>
+                <version>5.2.4.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-entitymanager</artifactId>
+                <version>5.2.4.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>5.2.4.Final</version>
             </dependency>
             <dependency>
                 <groupId>org.json</groupId>
@@ -154,7 +164,7 @@
         <dependency>
             <groupId>com.lowagie</groupId>
             <artifactId>itext</artifactId>
-            <version>2.1.7.js2</version>
+            <version>2.1.7</version>
         </dependency>
         <!--dipendenze exportCsv-->
         <dependency>
@@ -181,23 +191,6 @@
         </dependency>
 
         <dependency>
-            <groupId>it.cnr</groupId>
-            <artifactId>jada-ejb3</artifactId>
-            <version>${jada.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>persistence-api</artifactId>
-                    <groupId>javax.persistence</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>it.cnr.commons</groupId>
-            <artifactId>firmadigitale</artifactId>
-            <version>${firmadigitale.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>it.cnr.si</groupId>
             <artifactId>ace-client</artifactId>
             <version>${ace-client.version}</version>
@@ -205,13 +198,8 @@
 
         <dependency>
             <groupId>it.cnr.si</groupId>
-            <artifactId>storage-cloud-cmis</artifactId>
-            <version>${storage-cloud-cmis.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>it.cnr.si</groupId>
-            <artifactId>storage-cloud-commons</artifactId>
-            <version>${storage-cloud-cmis.version}</version>
+            <artifactId>firmadigitale</artifactId>
+            <version>${firmadigitale.version}</version>
         </dependency>
         <dependency>
             <groupId>it.cnr.si.sprint</groupId>
@@ -228,6 +216,34 @@
             <groupId>it.cnr.si.sprint</groupId>
             <artifactId>sprint-ldap</artifactId>
             <version>${sprint.version}</version>
+        </dependency>
+
+        <!--        <dependency>-->
+        <!--            <groupId>it.cnr.si</groupId>-->
+        <!--            <artifactId>storage-cloud-cmis</artifactId>-->
+        <!--            <version>${storage-cloud.version}</version>-->
+        <!--        </dependency>-->
+        <dependency>
+            <groupId>it.cnr.si.storage</groupId>
+            <artifactId>storage-cloud-commons</artifactId>
+            <version>${storage-cloud.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>it.cnr.si.storage</groupId>
+            <artifactId>storage-cloud-filesystem</artifactId>
+            <version>${storage-cloud.version}</version>
+        </dependency>
+
+        <!-- EE dependencies for Java11 -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml.ws</groupId>
+            <artifactId>jaxws-api</artifactId>
+            <version>2.3.0</version>
         </dependency>
         <dependency>
             <groupId>net.dongliu</groupId>
@@ -263,10 +279,7 @@
                     <artifactId>jdtcore</artifactId>
                     <groupId>eclipse</groupId>
                 </exclusion>
-                <exclusion>
-                    <artifactId>com.lowagie</artifactId>
-                    <groupId>itext</groupId>
-                </exclusion>
+
                 <exclusion>
                     <artifactId>org.olap4j</artifactId>
                     <groupId>olap4j</groupId>
@@ -317,6 +330,22 @@
             <version>2.4.3</version>
             <scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>5.2.4.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>5.2.4.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>5.2.4.Final</version>
+        </dependency>
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
@@ -349,7 +378,19 @@
             <artifactId>thymeleaf-spring4</artifactId>
             <version>3.0.6.RELEASE</version>
         </dependency>
+
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+        <repository>
+            <id>mavencentral</id>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </repository>
+    </repositories>
 
     <build>
         <defaultGoal>spring-boot:run</defaultGoal>
@@ -509,6 +550,12 @@
                             <version>[${java.version}.0,)</version>
                         </requireJavaVersion>
                     </rules>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <source>8</source>
                 </configuration>
             </plugin>
             <plugin>
