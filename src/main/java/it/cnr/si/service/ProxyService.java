@@ -1,7 +1,6 @@
 package it.cnr.si.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.cnr.jada.ejb.session.ComponentException;
 import it.cnr.si.domain.ExternalProblem;
 import it.cnr.si.flows.ng.utils.FileMessageResource;
 import it.cnr.si.flows.ng.utils.proxy.ResultProxy;
@@ -43,7 +42,7 @@ public class ProxyService implements EnvironmentAware{
             ObjectMapper mapper = new ObjectMapper();
             body = mapper.writeValueAsString(jsonBody);
         } catch (Exception ex) {
-            throw new ComponentException("Errore nella manipolazione del file JSON per la preparazione del body della richiesta REST.", ex);
+            throw new RuntimeException("Errore nella manipolazione del file JSON per la preparazione del body della richiesta REST.", ex);
         }
         return process(httpMethod, body, app, url, queryString, authorization);
     }

@@ -218,7 +218,7 @@
                 </a>
                 <ul class="dropdown-menu" uib-dropdown-menu>
                     <li ui-sref-active="active">
-                        <a ui-sref="user-management" ng-click="vm.collapseNavbar()">
+                        <a ui-sref="user-management" ng-click="vm.collapseNavbar()" has-authority="ROLE_ADMIN" ng-hide="(app != 'showcase' || app != 'oiv')">
                             <span class="glyphicon glyphicon-user"></span>&nbsp;
                             <span translate="global.menu.admin.userManagement">User management</span>
                         </a>

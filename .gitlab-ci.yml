@@ -98,11 +98,11 @@ release_artifact:
     - git checkout -B "$CI_BUILD_REF_NAME"
     # mi metto in condizione del push per l'utente con la deploy key
     - git remote set-url --push origin git@git.si.cnr.it:documentale/sprint-flows.git
-    - mvn -Dresume=false release:prepare release:perform -Pprod -DpushChanges=false -DlocalCheckout=true -DskipTests -Darguments="-Dmaven.test.skip=true -DskipTests"
+    - mvn -B -Dresume=false release:prepare release:perform -Pprod -DpushChanges=false -DlocalCheckout=true -DskipTests -Darguments="-Dmaven.test.skip=true -DskipTests"
     - git remote set-url --push origin git@git.si.cnr.it:documentale/sprint-flows.git
     - git push --tags
     - git commit --amend -m "[ci skip] prepare for next development iteration"
-    - git push
+    - git push --set-upstream origin $CI_BUILD_REF_NAME
   when: manual
   allow_failure: false
 
@@ -114,13 +114,16 @@ buildprodcontainer:
   only:
     - prod
   script:
-    - echo "Running build image and push image for latest release"
-    - docker build --file src/main/docker/Dockerfile -t docker.si.cnr.it/sprint-flows  .
-    - docker push docker.si.cnr.it/sprint-flows
     - echo "Running build image and push image for release tag"
-    - echo $CI_COMMIT_TAG
-    - docker build --file src/main/docker/Dockerfile -t docker.si.cnr.it/sprint-flows .
-    - docker push docker.si.cnr.it/sprint-flows
+    - echo $CI_COMMIT_REF_NAME
+    - docker build --file src/main/docker/Dockerfile -t $CI_PROJECT_NAME:$CI_COMMIT_REF_NAME .
+#    - docker push $CI_PROJECT_NAME:$CI_COMMIT_REF_NAME
+    - echo "Done pushing image to local docker repo. Now pushing to dockerhub."
+    - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
+    - docker tag $CI_PROJECT_NAME:$CI_COMMIT_REF_NAME $DOCKER_HUB_ORGANIZATION/$CI_PROJECT_NAME:$CI_COMMIT_REF_NAME
+    - docker tag $CI_PROJECT_NAME:$CI_COMMIT_REF_NAME $DOCKER_HUB_ORGANIZATION/$CI_PROJECT_NAME:latest
+    - docker push $DOCKER_HUB_ORGANIZATION/$CI_PROJECT_NAME:$CI_COMMIT_REF_NAME
+    - docker push $DOCKER_HUB_ORGANIZATION/$CI_PROJECT_NAME:latest
 
 
 deploydockprod01:

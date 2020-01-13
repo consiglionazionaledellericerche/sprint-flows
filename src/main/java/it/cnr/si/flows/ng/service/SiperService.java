@@ -2,6 +2,7 @@ package it.cnr.si.flows.ng.service;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Profile("cnr")
 public class SiperService {
 
     private RestTemplate siperRestTemplate;

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="permessi-ferie" name="Permessi Ferie" isExecutable="true">
+    <startEvent id="startevent1" name="Start" activiti:async="true" activiti:initiator="initiator"></startEvent>
+    <userTask id="approvazione" name="Direttore Approva o Rifiuta" activiti:assignee="direttore"></userTask>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow2" sourceRef="approvazione" targetRef="exclusivegateway1"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="fine" sourceRef="exclusivegateway1" targetRef="endevent1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approvato == true}]]></conditionExpression>
+    </sequenceFlow>
+    <userTask id="correzione" name="L'utente corregge" activiti:assignee="${initiator}"></userTask>
+    <sequenceFlow id="flow5" sourceRef="exclusivegateway1" targetRef="correzione">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approvato == false}]]></conditionExpression>
+    </sequenceFlow>
+    <userTask id="validazione" name="Segreteria Valida" activiti:candidateGroups="segreteria"></userTask>
+    <sequenceFlow id="flow6" sourceRef="startevent1" targetRef="validazione"></sequenceFlow>
+    <sequenceFlow id="flow8" sourceRef="correzione" targetRef="validazione"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow9" sourceRef="validazione" targetRef="exclusivegateway2"></sequenceFlow>
+    <sequenceFlow id="flow10" sourceRef="exclusivegateway2" targetRef="approvazione">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${validato == true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow11" sourceRef="exclusivegateway2" targetRef="correzione"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_permessi-ferie">
+    <bpmndi:BPMNPlane bpmnElement="permessi-ferie" id="BPMNPlane_permessi-ferie">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="30.0" y="53.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="approvazione" id="BPMNShape_approvazione">
+        <omgdc:Bounds height="91.0" width="141.0" x="432.0" y="22.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="740.0" y="52.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="640.0" y="49.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="correzione" id="BPMNShape_correzione">
+        <omgdc:Bounds height="81.0" width="152.0" x="130.0" y="150.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="validazione" id="BPMNShape_validazione">
+        <omgdc:Bounds height="86.0" width="151.0" x="130.0" y="25.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway2" id="BPMNShape_exclusivegateway2">
+        <omgdc:Bounds height="40.0" width="40.0" x="340.0" y="50.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="573.0" y="67.0"></omgdi:waypoint>
+        <omgdi:waypoint x="640.0" y="69.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="fine" id="BPMNEdge_fine">
+        <omgdi:waypoint x="680.0" y="69.0"></omgdi:waypoint>
+        <omgdi:waypoint x="740.0" y="69.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="660.0" y="89.0"></omgdi:waypoint>
+        <omgdi:waypoint x="659.0" y="189.0"></omgdi:waypoint>
+        <omgdi:waypoint x="282.0" y="190.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="65.0" y="70.0"></omgdi:waypoint>
+        <omgdi:waypoint x="130.0" y="68.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="206.0" y="150.0"></omgdi:waypoint>
+        <omgdi:waypoint x="205.0" y="111.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="281.0" y="68.0"></omgdi:waypoint>
+        <omgdi:waypoint x="340.0" y="70.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="380.0" y="70.0"></omgdi:waypoint>
+        <omgdi:waypoint x="432.0" y="67.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
+        <omgdi:waypoint x="360.0" y="90.0"></omgdi:waypoint>
+        <omgdi:waypoint x="359.0" y="132.0"></omgdi:waypoint>
+        <omgdi:waypoint x="206.0" y="150.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

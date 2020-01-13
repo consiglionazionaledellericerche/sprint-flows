@@ -1,6 +1,6 @@
 package it.cnr.si.flows.ng.resource;
 
-import it.cnr.jada.firma.arss.ArubaSignServiceException;
+import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
 import it.cnr.si.flows.ng.exception.FlowsPermissionException;
 import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
 import it.cnr.si.flows.ng.exception.ReportException;

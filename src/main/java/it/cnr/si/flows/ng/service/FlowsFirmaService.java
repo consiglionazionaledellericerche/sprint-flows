@@ -11,13 +11,13 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.xml.namespace.QName;
 
-import it.cnr.jada.firma.arss.stub.*;
+import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceClient;
+import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
+import it.cnr.si.firmadigitale.firma.arss.stub.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import it.cnr.jada.firma.arss.ArubaSignServiceClient;
-import it.cnr.jada.firma.arss.ArubaSignServiceException;
 
 /**
  * 
@@ -103,7 +103,7 @@ public class FlowsFirmaService {
                     .collect(Collectors.toList());
 
             SignReturnV2Multiple signReturnV2Multiple =
-                    service.pdfsignatureV2Multiple(identity, requests, null, PdfProfile.fromValue(RemotePdfprofile));
+                    service.pdfsignatureV2Multiple(identity, requests, null, PdfProfile.fromValue(RemotePdfprofile), null);
 
             if (signReturnV2Multiple.getStatus().equals("OK")) {
                 return signReturnV2Multiple.getReturnSigns();
@@ -148,7 +148,7 @@ public class FlowsFirmaService {
             SignRequestV2 req = getRequest(identity, bytes);
 
             SignReturnV2 response = service.pdfsignatureV2(req, apparence,
-                    PdfProfile.fromValue(RemotePdfprofile), null);
+                    PdfProfile.fromValue(RemotePdfprofile), null, null);
 
             LOGGER.debug(response.getReturnCode() + " " + response.getStatus());
 
