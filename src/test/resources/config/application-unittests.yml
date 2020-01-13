@@ -17,13 +17,20 @@ spring:
     database-platform: it.cnr.si.domain.util.FixedH2Dialect
     database: H2
     show-sql: false
-    proxy:
-      OIL:
-        username: admin
-        password: ubiquitous
-        url: http://helpwildfly.si.cnr.it:8080/rest/
-        newProblem: pest
-        instance: /HDSiper
+    properties:
+      hibernate.cache.use_second_level_cache: false
+      hibernate.cache.use_query_cache: false
+      hibernate.generate_statistics: false
+      hibernate.cache.region.factory_class: it.cnr.si.config.hazelcast.HazelcastCacheRegionFactory
+      hibernate.cache.use_minimal_puts: true
+      hibernate.cache.hazelcast.use_lite_member: true
+  proxy:
+    OIL:
+      username: admin
+      password: ubiquitous
+      url: http://helpwildfly.si.cnr.it:8080/rest/
+      newProblem: pest
+      instance: /HDSiper
   mail:
     url: localhost:8080
 

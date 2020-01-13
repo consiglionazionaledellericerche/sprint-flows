@@ -12,6 +12,7 @@ import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
 import it.cnr.si.security.PermissionEvaluatorImpl;
+import it.cnr.si.service.DraftService;
 import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.*;
@@ -98,6 +99,8 @@ public class FlowsTaskService {
 	private RestResponseFactory restResponseFactory;
 	@Inject
 	private Environment env;
+	@Inject
+	private DraftService draftService;
 
 	public DataResponse search(Map<String, String> params, String processInstanceId, boolean active, String order, int firstResult, int maxResults) {
 		HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery();
@@ -359,6 +362,8 @@ public class FlowsTaskService {
 		taskService.addUserIdentityLink(taskId, username, TASK_EXECUTOR);
 		try {
 			taskService.complete(taskId, data);
+
+			draftService.deleteDraftByTaskId(Long.valueOf(taskId));
 		} catch (Exception e) {
 			if (e instanceof ActivitiObjectNotFoundException)
 				LOGGER.error("Task {} NON trovato", taskId);

@@ -7,8 +7,12 @@ import it.cnr.si.flows.ng.service.SiperService;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.MembershipService;
+import it.cnr.si.service.dto.anagrafica.enums.Carattere;
 import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.letture.GerarchiaWebDto;
+import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
+import it.cnr.si.service.dto.anagrafica.letture.RuoloWebDto;
+import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.DelegateExecution;
@@ -27,6 +31,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -60,104 +65,106 @@ public class StartAccordiInternazionaliDomandeSetGroupsAndVisibility {
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
 		//Integer cdsuoAppartenenzaUtente = aceBridgeService.getEntitaOrganizzativaDellUtente(richiedente.toString()).getId();
 		String cdsuoAppartenenzaUtente = null;
+		String idnsipAppartenenzaUtente = null;
+		String denominazioneAppartenenzaUtente = null;
+		String siglaAppartenenzaUtente = null;
+		BossDto responsabileStrutturaRichiedente = new BossDto();
+		Integer idEntitaResponsabileStrutturaRichiedente = null;
+		String userNameResponsabileStrutturaRichiedente  = null;
+		Carattere carattereEntitaOrganizzativa = null;
+		int IdEntitaOrganizzativa = 0;
+
 		try {
-			cdsuoAppartenenzaUtente = aceBridgeService.getAfferenzaUtenteTipoSede(richiedente.toString()).getCdsuo();
+			EntitaOrganizzativaWebDto entitaOrganizzativaUtente = aceBridgeService.getAfferenzaUtenteTipoSede(richiedente.toString());
+			cdsuoAppartenenzaUtente = entitaOrganizzativaUtente.getCdsuo();
+			idnsipAppartenenzaUtente = entitaOrganizzativaUtente.getIdnsip();
+			denominazioneAppartenenzaUtente = entitaOrganizzativaUtente.getDenominazione();
+			siglaAppartenenzaUtente = entitaOrganizzativaUtente.getSigla();
+			carattereEntitaOrganizzativa = entitaOrganizzativaUtente.getCarattere();
+			IdEntitaOrganizzativa = entitaOrganizzativaUtente.getId();
 		} catch(UnexpectedResultException | FeignException e) {
-			cdsuoAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(richiedente.toString()).get("codice_uo").toString();
+			Map<String, Object> afferenzaUtente = siperService.getCDSUOAfferenzaUtente(richiedente.toString());
+			cdsuoAppartenenzaUtente = afferenzaUtente.get("codice_uo").toString();
+			idnsipAppartenenzaUtente = afferenzaUtente.get("codice_sede").toString();
+			denominazioneAppartenenzaUtente = afferenzaUtente.get("struttura_appartenenza").toString();
+			siglaAppartenenzaUtente = afferenzaUtente.get("sigla_sede").toString();
+
+			List<EntitaOrganizzativaWebDto> listaEntità = aceService.entitaOrganizzativaFindByTerm(cdsuoAppartenenzaUtente);
+			if (listaEntità.size() == 1) {
+				carattereEntitaOrganizzativa = listaEntità.get(0).getCarattere();
+				IdEntitaOrganizzativa = listaEntità.get(0).getId();
+			}
 		}
 		finally {
-			LOGGER.debug("getDirettoreCDSUO  FUNZIONA ");
-			Object insdipResponsabileUo = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("codice_sede");
-			String usernameDirettore = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("uid").toString();
-			EntitaOrganizzativaWebDto entitaOrganizzativaDirUo = aceService.entitaOrganizzativaFindByTerm(insdipResponsabileUo.toString()).get(0);
 
-			//			NEW - codice per ricavare il padre della struttura
-			List<GerarchiaWebDto> listaGerarchia = null;
-			try {
-				listaGerarchia = aceBridgeService.getParents(entitaOrganizzativaDirUo.getId());
-			} catch(UnexpectedResultException | FeignException | HttpClientErrorException | IndexOutOfBoundsException error5) {
-				LOGGER.debug("ERROR: " + richiedente.toString() + " --la struttura " + entitaOrganizzativaDirUo.getId() + " -- CDSUO " +entitaOrganizzativaDirUo.getCdsuo()+ " -- IDNSIP " +entitaOrganizzativaDirUo.getIdnsip() + " NON HA PARTENT");
+			if (carattereEntitaOrganizzativa != null) {
+				if (carattereEntitaOrganizzativa.equals(it.cnr.si.service.dto.anagrafica.enums.Carattere.RICERCA)) {
+					responsabileStrutturaRichiedente = aceService.bossDirettoreByUsername(richiedente.toString());
+				} else {
+					try {
+						responsabileStrutturaRichiedente = aceService.bossSedeResponsabileByUsername(richiedente.toString());
+					} catch(UnexpectedResultException | FeignException e) {
+							responsabileStrutturaRichiedente.setIdEntitaOrganizzativa(aceBridgeService.getAfferenzaUtenteTipoSede(richiedente.toString()).getId());
+							responsabileStrutturaRichiedente.setUsername(siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("uid").toString());
+							responsabileStrutturaRichiedente.setSiglaEO(siglaAppartenenzaUtente);
+							responsabileStrutturaRichiedente.setDenominazioneEO(siglaAppartenenzaUtente);
+							Set<String> listaMembriResponsabileStruttura = membershipService.getAllUsersInGroup("responsabile-struttura@" + aceBridgeService.getAfferenzaUtenteTipoSede(richiedente.toString()).getId());
+							if (listaMembriResponsabileStruttura.size() < 1 && !listaMembriResponsabileStruttura.contains(responsabileStrutturaRichiedente.getUsername())) {
+								LOGGER.info("responsabileStrutturaRichiedente {} trovato in SIPER non trova corrispondenza con quello in ACE]", responsabileStrutturaRichiedente.getUsername());
+								throw new IllegalStateException();
+							}
+						}				
+					finally {
+						LOGGER.info("responsabileStrutturaRichiedente {} ]", responsabileStrutturaRichiedente);
+					}
+				}
 			}
-			finally {
-				if (listaGerarchia != null) {
-
-					LOGGER.info("-------------- listaGerarchia size {}", listaGerarchia.size());
-					List<GerarchiaWebDto> gerarchiaResults = listaGerarchia.stream()
-							.filter(gerarchiaSingola -> gerarchiaSingola.getTipo().getId() == 2 || gerarchiaSingola.getTipo().getId() == 1)
-							.collect(Collectors.toList());
-					if (gerarchiaResults.size() != 1) {
-						throw new IllegalStateException();
-					}
-					GerarchiaWebDto gerarchia = gerarchiaResults.get(0);
-					if (gerarchia.getTipo().getId() == 1) {
-						entitaOrganizzativaResponsabileStruttura = gerarchia.getPadre();
-					} else {
-						entitaOrganizzativaResponsabileStruttura = entitaOrganizzativaDirUo;
-					}
-					int idEentitaOrganizzativaResponsabileStruttura = entitaOrganizzativaResponsabileStruttura.getId();
-					String denominazioneEntitaOrganizzativaResponsabileStruttura = entitaOrganizzativaResponsabileStruttura.getDenominazione();
-					LOGGER.info("-------------- padre: id: {} [{}], Gerarchia tipo: {}  [{}]", entitaOrganizzativaResponsabileStruttura.getId(), denominazioneEntitaOrganizzativaResponsabileStruttura, gerarchia.getTipo().getId(), gerarchia.getTipo().getDescr());
-					// CHECK DIRETTORE
-					String nomeDirettoreSiper = usernameDirettore.toString();
-					String gruppoResponsabileStrutturaPadre = "responsabile-struttura@" + entitaOrganizzativaResponsabileStruttura.getId();
-
-					Set<String> membriResponsabileStrutturaPadre = membershipService.getAllUsersInGroup(gruppoResponsabileStrutturaPadre);
-					LOGGER.info("nr membriResponsabileStrutturaPadre  {} per struttura {} ", membriResponsabileStrutturaPadre.size(), entitaOrganizzativaResponsabileStruttura.getId());
-					if (membriResponsabileStrutturaPadre.size() == 0){
-						LOGGER.info("NO --- il direttore della struttura padre {} [{}] NON ESISTE ", entitaOrganizzativaResponsabileStruttura.getId(), denominazioneEntitaOrganizzativaResponsabileStruttura);
-					}
-					if (membriResponsabileStrutturaPadre.size() > 1){
-						LOGGER.info("NO --- ci sono {} direttori per la struttura padre {} [{}] ", membriResponsabileStrutturaPadre.size(), entitaOrganizzativaResponsabileStruttura.getId(), denominazioneEntitaOrganizzativaResponsabileStruttura);
-					}
-					membriResponsabileStrutturaPadre.forEach(responsabile -> {
-						if(responsabile.toString().equals(nomeDirettoreSiper)) {
-							LOGGER.info("OK --- " + richiedente.toString() + " -- il direttore della struttura padre [" + idEentitaOrganizzativaResponsabileStruttura + " - " + denominazioneEntitaOrganizzativaResponsabileStruttura +"  [" + responsabile.toString()  +"] CORRISPONDE al direttore SIPER "+ nomeDirettoreSiper + " --");
-
-						} else {
-							LOGGER.info("il direttore trovanto in ACE nella struttura padre {} [{}] è {} NON CORRISPONDE al direttore trovato su SIPER {} ", idEentitaOrganizzativaResponsabileStruttura, denominazioneEntitaOrganizzativaResponsabileStruttura, responsabile.toString(), nomeDirettoreSiper);
-							LOGGER.debug("NO --- " + richiedente.toString() + " -- il direttore della struttura padre [" + idEentitaOrganizzativaResponsabileStruttura + " - " + denominazioneEntitaOrganizzativaResponsabileStruttura +"  [" + responsabile.toString()  +"] NON CORRISPONDE al direttore SIPER "+ nomeDirettoreSiper + " --");
-						}
-					});				
-			//END NEW
-					
-					String siglaEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getSigla().toString();
-					String denominazioneEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getDenominazione().toString();
-					String cdsuoEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getCdsuo().toString();
-					String idnsipEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getIdnsip().toString();			
-					LOGGER.info("L'utente {} ha come direttore {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", richiedente.toString(), usernameDirettore, denominazioneEntitaorganizzativaResponsabileUtente, siglaEntitaorganizzativaResponsabileUtente, idEentitaOrganizzativaResponsabileStruttura, cdsuoEntitaorganizzativaResponsabileUtente, idnsipEntitaorganizzativaResponsabileUtente);
-
-					String gruppoValidatoriAccordiInternazionali = "validatoriAccordiInternazionali@0000";
-					String gruppoUfficioProtocollo = "ufficioProtocolloAccordiInternazionali@0000";
-					String gruppoValutatoreScientificoDipartimento = "valutatoreScientificoDipartimento@0000";
-					String gruppoResponsabileAccordiInternazionali = "responsabileAccordiInternazionali@0000";
-					//DA CAMBIARE - ricavando il direttore della persona che afferisce alla sua struttura
-					String gruppoDirigenteRichiedente = "responsabile-struttura@" + idEentitaOrganizzativaResponsabileStruttura;
-
-					String applicazioneAccordiInternazionali = "app.abil";
-					String applicazioneScrivaniaDigitale = "app.scrivaniadigitale";
-
-					LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}",  gruppoValidatoriAccordiInternazionali, gruppoResponsabileAccordiInternazionali, gruppoUfficioProtocollo);
-					LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}",  gruppoValidatoriAccordiInternazionali, gruppoResponsabileAccordiInternazionali, gruppoUfficioProtocollo);
-
-					runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValidatoriAccordiInternazionali, PROCESS_VISUALIZER);
-					runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileAccordiInternazionali, PROCESS_VISUALIZER);
-					runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneAccordiInternazionali, PROCESS_VISUALIZER);
-					runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoUfficioProtocollo, PROCESS_VISUALIZER);
-					runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoDirigenteRichiedente, PROCESS_VISUALIZER);
-					runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValutatoreScientificoDipartimento, PROCESS_VISUALIZER);
-					runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneScrivaniaDigitale, PROCESS_VISUALIZER);
-
-					execution.setVariable("strutturaValutazioneDirigente", idEentitaOrganizzativaResponsabileStruttura + "-" + denominazioneEntitaorganizzativaResponsabileUtente);
-					execution.setVariable("gruppoValidatoriAccordiInternazionali", gruppoValidatoriAccordiInternazionali);
-					execution.setVariable("gruppoResponsabileAccordiInternazionali", gruppoResponsabileAccordiInternazionali);
-					execution.setVariable("gruppoUfficioProtocollo", gruppoUfficioProtocollo);
-					execution.setVariable("applicazioneAccordiInternazionali", applicazioneAccordiInternazionali);
-					execution.setVariable("gruppoDirigenteRichiedente", gruppoDirigenteRichiedente);
-					execution.setVariable("gruppoValutatoreScientificoDipartimento", gruppoValutatoreScientificoDipartimento);
-					execution.setVariable("applicazioneScrivaniaDigitale", applicazioneScrivaniaDigitale);
-					execution.setVariable("cdsuoRichiedente", cdsuoAppartenenzaUtente);
+			if (responsabileStrutturaRichiedente != null) {
+				idEntitaResponsabileStrutturaRichiedente = responsabileStrutturaRichiedente.getIdEntitaOrganizzativa();
+				userNameResponsabileStrutturaRichiedente = responsabileStrutturaRichiedente.getUsername();
+				String usernameDirettore = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("uid").toString();
+				if (!userNameResponsabileStrutturaRichiedente.equals(usernameDirettore)) {
+					LOGGER.info("responsabileStrutturaRichiedente {} trovato in SIPER non trova corrispondenza con quello in ACE]", responsabileStrutturaRichiedente.getUsername());
+					throw new IllegalStateException();
 				}
 			}
 		}
+
+		String siglaEntitaorganizzativaResponsabileUtente = responsabileStrutturaRichiedente.getSiglaEO();
+		String denominazioneEntitaorganizzativaResponsabileUtente = responsabileStrutturaRichiedente.getDenominazioneEO();
+		String cdsuoEntitaorganizzativaResponsabileUtente = aceService.entitaOrganizzativaById(idEntitaResponsabileStrutturaRichiedente).getCdsuo();
+		String idnsipEntitaorganizzativaResponsabileUtente = aceService.entitaOrganizzativaById(idEntitaResponsabileStrutturaRichiedente).getIdnsip();			
+		LOGGER.info("L'utente {} ha come direttore {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", richiedente.toString(), responsabileStrutturaRichiedente, denominazioneEntitaorganizzativaResponsabileUtente, siglaEntitaorganizzativaResponsabileUtente, idEntitaResponsabileStrutturaRichiedente, cdsuoEntitaorganizzativaResponsabileUtente, idnsipEntitaorganizzativaResponsabileUtente);
+
+		String gruppoValidatoriAccordiInternazionali = "validatoriAccordiInternazionali@0000";
+		String gruppoUfficioProtocollo = "ufficioProtocolloAccordiInternazionali@0000";
+		String gruppoValutatoreScientificoDipartimento = "valutatoreScientificoDipartimento@0000";
+		String gruppoResponsabileAccordiInternazionali = "responsabileAccordiInternazionali@0000";
+		//DA CAMBIARE - ricavando il direttore della persona che afferisce alla sua struttura
+		String gruppoDirigenteRichiedente = "responsabile-struttura@" + idEntitaResponsabileStrutturaRichiedente;
+
+		String applicazioneAccordiInternazionali = "app.abil";
+		String applicazioneScrivaniaDigitale = "app.scrivaniadigitale";
+
+		LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}",  gruppoValidatoriAccordiInternazionali, gruppoResponsabileAccordiInternazionali, gruppoUfficioProtocollo);
+		LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}",  gruppoValidatoriAccordiInternazionali, gruppoResponsabileAccordiInternazionali, gruppoUfficioProtocollo);
+
+		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValidatoriAccordiInternazionali, PROCESS_VISUALIZER);
+		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileAccordiInternazionali, PROCESS_VISUALIZER);
+		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneAccordiInternazionali, PROCESS_VISUALIZER);
+		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoUfficioProtocollo, PROCESS_VISUALIZER);
+		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoDirigenteRichiedente, PROCESS_VISUALIZER);
+		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValutatoreScientificoDipartimento, PROCESS_VISUALIZER);
+		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneScrivaniaDigitale, PROCESS_VISUALIZER);
+
+		execution.setVariable("strutturaValutazioneDirigente", idEntitaResponsabileStrutturaRichiedente + "-" + denominazioneEntitaorganizzativaResponsabileUtente);
+		execution.setVariable("gruppoValidatoriAccordiInternazionali", gruppoValidatoriAccordiInternazionali);
+		execution.setVariable("gruppoResponsabileAccordiInternazionali", gruppoResponsabileAccordiInternazionali);
+		execution.setVariable("gruppoUfficioProtocollo", gruppoUfficioProtocollo);
+		execution.setVariable("applicazioneAccordiInternazionali", applicazioneAccordiInternazionali);
+		execution.setVariable("gruppoDirigenteRichiedente", gruppoDirigenteRichiedente);
+		execution.setVariable("gruppoValutatoreScientificoDipartimento", gruppoValutatoreScientificoDipartimento);
+		execution.setVariable("applicazioneScrivaniaDigitale", applicazioneScrivaniaDigitale);
+		execution.setVariable("cdsuoRichiedente", cdsuoAppartenenzaUtente);
 	}
 }
