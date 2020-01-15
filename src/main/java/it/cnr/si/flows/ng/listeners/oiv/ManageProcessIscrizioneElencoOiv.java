@@ -33,6 +33,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static it.cnr.si.flows.ng.utils.Enum.PdfType.*;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.statoFinaleDomanda;
 
 
 @Component
@@ -41,7 +42,6 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 
     private static final long serialVersionUID = 686169707042367215L;
     private static final Logger LOGGER = LoggerFactory.getLogger(ManageProcessIscrizioneElencoOiv.class);
-    public static final String STATO_FINALE_DOMANDA = "statoFinaleDomanda";
     public static final String TEMPI_PROCEDIMENTALI_DOMANDA = "tempiProcedimentaliDomanda";
     public static final String TEMPI_SOCCORSO_ISTRUTTORIO = "tempiSoccorsoIstruttorio";
     public static final String TEMPI_PREAVVISO_RIGETTO = "tempiPreavvisoRigetto";
@@ -243,7 +243,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
             }
             break;
             case END_IMPROCEDIBILE: {
-                execution.setVariable(STATO_FINALE_DOMANDA, "IMPROCEDIBILE");
+                execution.setVariable(statoFinaleDomanda.name(), "IMPROCEDIBILE");
                 final Pair<String, byte[]> pair = createOivPdf.creaPdfOiv(execution, improcedibile.name());
                 comunicazioni(
                         Optional.ofNullable(execution.getVariable(ID_DOMANDA))
@@ -260,12 +260,12 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
                                 .filter(String.class::isInstance)
                                 .map(String.class::cast)
                                 .orElse(null)));
-                execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA APPROVATA");
+                execution.setVariable(statoFinaleDomanda.name(), "DOMANDA APPROVATA");
             }
             ;
             break;
             case END_RESPINTA: {
-                execution.setVariable(STATO_FINALE_DOMANDA, "RESPINTA");
+                execution.setVariable(statoFinaleDomanda.name(), "RESPINTA");
             }
             ;
             break;

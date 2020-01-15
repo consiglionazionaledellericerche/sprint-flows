@@ -143,7 +143,7 @@ public class VerificaDomandeAccordiBilaterali {
 					log.info("OK: L'utente {} ha come direttore {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", username, usernameDirettore, denominazioneEntitaorganizzativaResponsabileUtente, siglaEntitaorganizzativaResponsabileUtente, idEntitaorganizzativaResponsabileUtente, cdsuoEntitaorganizzativaResponsabileUtente, idnsipEntitaorganizzativaResponsabileUtente);
 					String gruppoDirigenteRichiedente = "responsabile-struttura@" + idEntitaorganizzativaResponsabileUtente;
 
-					Set<String> members = relationshipService.getAllUsersInGroup(gruppoDirigenteRichiedente);
+					Set<String> members = membershipService.getAllUsersInGroup(gruppoDirigenteRichiedente);
 					//List<String> members = membershipService.findMembersInGroup(gruppoDirigenteRichiedente);
 					if (members.size() == 0) {
 						log.info(" ERROR: Il gruppo RESPONSABILE STRUTTURA: {} NON HA NESSUNO", gruppoDirigenteRichiedente);

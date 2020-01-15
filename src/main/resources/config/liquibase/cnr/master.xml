@@ -36,5 +36,7 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/cnr/changelog/20190723085228_added_entity_Faq.xml"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/cnr/changelog/20190723085228_added_entity_Draft.xml"
+             relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

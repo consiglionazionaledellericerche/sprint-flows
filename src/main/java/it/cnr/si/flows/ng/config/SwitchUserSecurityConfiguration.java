@@ -48,9 +48,10 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
                 .antMatchers(IMPERSONATE_START_URL).hasRole("ADMIN")
                 .antMatchers(IMPERSONATE_EXIT_URL).hasRole("PREVIOUS_ADMINISTRATOR")
                 .and()
-                .addFilterAfter(switchUserFilter(), FilterSecurityInterceptor.class);
+                .addFilterAfter(switchUserFilter(), FilterSecurityInterceptor.class)
+                .addFilterAfter(logPrologSettingFilter(), OAuthCookieSwithUserFilter.class);
     }
-    
+
     @Profile(value = {"cnr"})
     @Bean public LdapUserDetailsManager getLdapUserDetailsManager(LdapContextSource ctx) {
         return new LdapUserDetailsManager(ctx);
@@ -105,5 +106,10 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
         filter.setExitUserUrl(IMPERSONATE_EXIT_URL);
         filter.setTargetUrl("/");
         return filter;
+    }
+
+    @Bean
+    public LogPrologSettingFilter logPrologSettingFilter() {
+        return new LogPrologSettingFilter();
     }
 }

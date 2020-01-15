@@ -1,15 +1,13 @@
 package it.cnr.si.web.rest;
 
-import it.cnr.si.SprintApp;
+import it.cnr.si.FlowsApp;
 import it.cnr.si.domain.View;
 import it.cnr.si.flows.ng.TestUtil;
 import it.cnr.si.repository.ViewRepository;
-
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import static org.hamcrest.Matchers.hasItem;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
@@ -20,6 +18,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
@@ -37,9 +36,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *
  * @see ViewResource
  */
+@SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles(profiles = "native,unittests,cnr")
+@EnableTransactionManagement
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = SprintApp.class)
-@ActiveProfiles(profiles = "cnr")
 @Ignore
 public class ViewResourceIntTest {
     private static final String DEFAULT_PROCESS_ID = "AAAAA";

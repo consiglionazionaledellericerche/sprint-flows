@@ -2,7 +2,6 @@ package it.cnr.si.flows.ng.service;
 
 
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 
 import org.activiti.engine.delegate.DelegateExecution;
 
@@ -18,15 +17,13 @@ import java.text.ParseException;
 
 import javax.inject.Inject;
 
-import it.cnr.si.flows.ng.service.FlowsAttachmentService;
-
 @Service
 public class ProtocolloDocumentoService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProtocolloDocumentoService.class);
 
-    @Inject
-    private FlowsAttachmentService flowsAttachmentService;
-    
+	@Inject
+	private FlowsAttachmentService flowsAttachmentService;
+
 	public void protocolla(DelegateExecution execution, String nomeVariabileFile)  throws IOException, ParseException  {
 
 		if (nomeVariabileFile == null)
@@ -45,8 +42,8 @@ public class ProtocolloDocumentoService {
 		//execution.setVariable("numeroProtocollo_" + nomeVariabileFile, valoreNumeroProtocollo);
 		//execution.setVariable("dataProtocollo_" + nomeVariabileFile, valoreDataProtocollo);
 		att.getMetadati().put("numeroProtocollo", valoreNumeroProtocollo);
-        att.getMetadati().put("dataProtocollo", valoreDataProtocollo);
-        execution.setVariable("numeriProtocollo", flowsAttachmentService.addProtocollo(execution.getVariable("numeriProtocollo").toString(), valoreNumeroProtocollo));
+		att.getMetadati().put("dataProtocollo", valoreDataProtocollo);
+		execution.setVariable("numeriProtocollo", flowsAttachmentService.addProtocollo(execution.getVariable("numeriProtocollo").toString(), valoreNumeroProtocollo));
 	}
 
 	// se il numero e data di protocollo sono già variabili con la sintassi  <numeroProtocollo_ + nomeVariabileFile>

@@ -19,6 +19,7 @@ cache:
     - target/app.war
 
 stages:
+  - test
   - deploy_snapshot
   - build_test_container
   - deploy_test_container
@@ -26,6 +27,12 @@ stages:
   - build_prod_container
   - deploy_prod_container
 
+test:
+  stage: test
+  image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
+  script:
+    - mvn -B clean compile sonar:sonar -Dsonar.host.url=http://sonar.si.cnr.it test package -fae
+  allow_failure: true
 
 deploy_dev_snapshot:
   stage: deploy_snapshot
@@ -46,7 +53,7 @@ deploy_snapshot:
     - demo
     - prod
   script:
-    - mvn -B clean compile package -DskipTests -Pprod
+    - mvn -B clean compile package deploy -DskipTests -Pprod
     - cp ./target/*.war ./target/app.war
 
 buildtestcontainer:
@@ -71,10 +78,12 @@ deploydockertest01e02:
     - test
   script:
     - echo "Deploy to dockertest01"
+    - sed -i "s/CONFIG_REPO_TOKEN/$CONFIG_REPO_TOKEN/g" ./src/main/docker/test/app-con-mancenter.yml
     - sshremote $SSH_CONNECT_DOCKERTEST01 "if [ -f  ''/sites/sprint-flows-test/app.yml'' ]; then docker-compose -p sprint-flows-test -f /sites/sprint-flows-test/app.yml down --remove-orphans; fi && rm -rf /sites/sprint-flows-test && mkdir -p /sites/sprint-flows-test || echo NODIR"
     - scpremote ./src/main/docker/test/app-con-mancenter.yml $SSH_CONNECT_DOCKERTEST01:/sites/sprint-flows-test/app.yml
     - sshremote $SSH_CONNECT_DOCKERTEST01 "cd /sites/sprint-flows-test && docker-compose -p sprint-flows-test -f app.yml pull && docker-compose -p sprint-flows-test -f app.yml up -d"
     - echo "Deploy to dockertest02"
+    - sed -i "s/CONFIG_REPO_TOKEN/$CONFIG_REPO_TOKEN/g" ./src/main/docker/test/app-senza-mancenter.yml
     - sshremote $SSH_CONNECT_DOCKERTEST02 "if [ -f  ''/sites/sprint-flows-test/app.yml'' ]; then docker-compose -p sprint-flows-test -f /sites/sprint-flows-test/app.yml down --remove-orphans; fi && rm -rf /sites/sprint-flows-test && mkdir -p /sites/sprint-flows-test || echo NODIR"
     - scpremote ./src/main/docker/test/app-senza-mancenter.yml $SSH_CONNECT_DOCKERTEST02:/sites/sprint-flows-test/app.yml
     - sshremote $SSH_CONNECT_DOCKERTEST02 "cd /sites/sprint-flows-test && docker-compose -p sprint-flows-test -f app.yml pull && docker-compose -p sprint-flows-test -f app.yml up -d"
@@ -137,11 +146,12 @@ deploydockprod01:
   script:
     - echo "Deploy sprint-flows to dockprod01"
     - echo "setting secrets"
-    - sed -i "s/docker.si.cnr.it\/sprint-flows/docker.si.cnr.it\/sprint-flows:latest/g" ./src/main/docker/app-prod.yml
+    - sed -i "s/docker.si.cnr.it\/sprint-flows/docker.si.cnr.it\/sprint-flows:$CI_COMMIT_TAG/g" ./src/main/docker/app-prod.yml
     - sed -i "s/SPRING_DATASOURCE_PASSWORD_SED/$POSTGRESS_PASSWORD/g" ./src/main/docker/app-prod.yml
     - sed -i "s/SPRING_LDAP_MANAGERPASSWORD_SED/$LDAP_PASSWORD/g" ./src/main/docker/app-prod.yml
     - sed -i "s/ACE_PASSWORD_SED/$ACE_PASSWORD/g" ./src/main/docker/app-prod.yml
     - sed -i "s/CMIS_PASSWORD/$CMIS_PASSWORD/g" ./src/main/docker/app-prod.yml
+    - sed -i "s/CONFIG_REPO_TOKEN/$CONFIG_REPO_TOKEN/g" ./src/main/docker/app-prod.yml
     - echo "stopping service"
     - sshremote $SSH_CONNECT_DOCPROD01 "docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml down -v --remove-orphans || echo NOFILE"
     - sshremote $SSH_CONNECT_DOCPROD01 "rm -rf /sites/docker-flows/ && mkdir -p /sites/docker-flows/"    - echo "copying docker-compose file"
@@ -168,6 +178,7 @@ deploydockprod02:
     - sed -i "s/SPRING_LDAP_MANAGERPASSWORD_SED/$LDAP_PASSWORD/g" ./src/main/docker/app-prod.yml
     - sed -i "s/ACE_PASSWORD_SED/$ACE_PASSWORD/g" ./src/main/docker/app-prod.yml
     - sed -i "s/CMIS_PASSWORD/$CMIS_PASSWORD/g" ./src/main/docker/app-prod.yml
+    - sed -i "s/CONFIG_REPO_TOKEN/$CONFIG_REPO_TOKEN/g" ./src/main/docker/app-prod.yml
     - echo "stopping service"
     - sshremote $SSH_CONNECT_DOCPROD02 "docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml down -v --remove-orphans || echo NOFILE"
     - sshremote $SSH_CONNECT_DOCPROD02 "rm -rf /sites/docker-flows/ && mkdir -p /sites/docker-flows/"

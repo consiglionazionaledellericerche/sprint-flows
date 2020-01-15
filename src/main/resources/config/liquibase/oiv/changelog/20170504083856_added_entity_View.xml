@@ -24,18 +24,32 @@
             <column name="process_id" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-
             <column name="type" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
 
+            <column name="version" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
             <column name="view" type="varchar">
                 <constraints nullable="false"/>
             </column>
 
             <!-- jhipster-needle-liquibase-add-column - Jhipster will add columns here, do not remove-->
         </createTable>
-
+        
+        <loadData encoding="UTF-8"
+                  file="config/liquibase/cnr/view.csv"
+                  separator=";"
+                  tableName="view"/>
+        <loadData encoding="UTF-8"
+                  file="config/liquibase/cnr/view-acquisti-v1.csv"
+                  separator=";"
+                  tableName="view"/>
+        <loadData encoding="UTF-8"
+                  file="config/liquibase/cnr/view-accordi-internazionali-v1.csv"
+                  separator=";"
+                  tableName="view"/>
         <loadData encoding="UTF-8"
                   file="config/liquibase/oiv/view.csv"
                   separator=";"

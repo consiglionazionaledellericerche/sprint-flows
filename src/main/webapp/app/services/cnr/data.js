@@ -188,6 +188,9 @@
                 },
                 users: function (username) {
                     return $http.get('api/lookup/ldap/user/' + username);
+                },
+                mycdsuos: function () {
+                    return $http.get('api/lookup/ace/user/cdsuoabilitate');
                 }
             },
             mail: {
@@ -276,6 +279,29 @@
             faq: {
                 getReadable: function () {
                     return $http.get("api/faqs/readable");
+                }
+            },
+            draft: {
+                getDraftByTaskId: function (taskId, username) {
+                    return $http({
+                        url: 'api/draft/getDraftByTaskId',
+                        method: 'GET',
+                        params: {
+                            taskId: taskId,
+                            username: (username ? username : '')
+                        },
+                    });
+                },
+                updateDraft: function (taskId, json, username) {
+                    return $http({
+                        url: 'api/drafts/updateDraft?',
+                        method: 'PUT',
+                        params: {
+                            taskId: taskId,
+                            json: json,
+                            username: (username ? username : '')
+                        }
+                    });
                 }
             },
             signMany: function (username, password, otp, ids) {

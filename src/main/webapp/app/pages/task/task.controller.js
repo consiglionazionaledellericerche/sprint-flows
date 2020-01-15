@@ -3,7 +3,7 @@
 
 	angular
 		.module('sprintApp')
-		.controller('TaskController', HomeController);
+		.controller('TaskController', TaskController);
 
 	/**
 	 * Questo e' un po' il cuore di tutta l'applicazione, per questo e' un pochino piu' complicato di altri
@@ -25,9 +25,9 @@
 	 *
 	 * @author mtrycz
 	 */
-	HomeController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log', '$http', '$q', 'Upload', 'utils', '$localStorage'];
+	TaskController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log', '$http', '$q', 'Upload', 'utils', '$localStorage'];
 
-	function HomeController($scope, Principal, LoginService, $state, dataService, AlertService, $log, $http, $q, Upload, utils, $localStorage) {
+	function TaskController($scope, Principal, LoginService, $state, dataService, AlertService, $log, $http, $q, Upload, utils, $localStorage) {
 		var vm = this;
 		$scope.data = {};
 		vm.taskId = $state.params.taskId;
@@ -45,6 +45,7 @@
 			formPromise.resolve(2);
 		}; // usato nell'html
 
+
 		$q.all([formPromise.promise, dataPromise.promise])
 			.then(function (value) {
 				angular.forEach(taskForm, function (el) {
@@ -60,6 +61,16 @@
 					$scope.data["tipologiaAffidamentoDiretto"] = vm.taskVariables["tipologiaAffidamentoDiretto"];
 				if ([21, 23].includes(Number(vm.taskVariables["strumentoAcquisizioneId"])))
 					$scope.data["tipologiaProceduraSelettiva"] = vm.taskVariables["tipologiaProceduraSelettiva"];
+
+				dataService.draft.getDraftByTaskId($state.params.taskId, null).then(
+                    function(response){
+                        //popolo i campi col contenuto del json
+                        var json = JSON.parse(response.data.json);
+                        for (var key of Object.keys(json)) {
+                            $scope.data["" + key] = json[key]
+                        }
+                    }
+                );
 			});
 
 		if ($state.params.taskId) {
@@ -97,11 +108,9 @@
 				AlertService.warning("Inserire tutti i valori obbligatori.");
 
 			} else {
-
 				// Serializzo gli oggetti complessi in stringhe
 				// E' necessario copiarli in un nuovo campo, senno' angular si incasina
 				// Non posso usare angular.copy() perche' ho degli oggetti File non gestiti bene
-
 				utils.prepareForSubmit($scope.data, $scope.attachments);
 
 				Upload.upload({
@@ -129,6 +138,19 @@
 
 		$scope.downloadFile = function (url, filename, mimetype) {
 			utils.downloadFile(url, filename, mimetype);
+		}
+
+		$scope.createDraft = function (taskId) {
+            //copio scope.data e tolgo i campi che non voglio salvare nel Draft
+		    var json = Object.assign({}, $scope.data);
+		    delete json.entity;
+            delete json.processDefinitionId;
+            delete json.sceltaUtente;
+            delete json.taskId;
+            delete json.dipartimentoId;
+            delete json.dipartimento;
+            //salvo il draft con username null perchè deve essere visibile a tutti
+			dataService.draft.updateDraft($state.params.taskId, json, null);
 		}
 
 		function removeFromCart(taskId) {
