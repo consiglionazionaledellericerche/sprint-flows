@@ -1,0 +1,88 @@
+spring:
+  ldap:
+    userSearchBase: o=cnr, c=it
+    userSearchFilter: uid={0}
+    url: ldap://virtest1.si.cnr.it:389
+    managerDn: cn=mastercnrapp2,ou=account,o=cnr,c=it
+    managerPassword: pippa
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    # l'url del db viene modificata all'avvio dell'applicazione a seconda del profilo (cnr => flows-cnr,
+    # oiv => flows-oiv) in modo che l'applicazione punti un db diverso a seconda del profilo
+    url: jdbc:postgresql://localhost:5432/flows
+    username: activiti
+    password: activitipw
+  jpa:
+    database-platform: it.cnr.si.domain.util.FixedPostgreSQL82Dialect
+    database: POSTGRESQL
+    show-sql: false
+  proxy:
+    OIL:
+      username: admin
+      password: ubiquitous
+      url: http://helpwildfly.si.cnr.it:8080/rest/
+      newProblem: pest
+      instance: /HDSiper
+  mail:
+    url: "https://demoscrivaniadigitale-cnr.si.cnr.it"
+
+cnr:
+  firma:
+    signcertid: AS0
+    typeotpauth: firma
+    url: http://arss.cedrc.cnr.it:8080/ArubaSignService/ArubaSignService?wsdl
+    pdfprofile: PADESBES
+  sigla:
+    usr: app.scrivaniadigitale
+    psw: bubbazza
+  coolflows:
+    username: utente1
+    password: HggHjhUIuhedfwUI788yasdfiuh897
+oiv:
+  baseurl: http://cool-jconon-funzione-pubblica.test.si.cnr.it
+  esperienza-noncoerente: ${oiv.baseurl}/rest/application-fp/esperienza-noncoerente
+  ricalcola-fascia: ${oiv.baseurl}/rest/application-fp/applications-ricalcola-fascia
+  iscrivi-inelenco: ${oiv.baseurl}/rest/application-fp/iscrivi-inelenco
+  soccorso-istruttorio: ${oiv.baseurl}/rest/application-fp/soccorso-istruttorio
+  preavviso-rigetto: ${oiv.baseurl}/rest/application-fp/preavviso-rigetto
+  comunicazioni: ${oiv.baseurl}/rest/application-fp/comunicazioni
+  usr: admin
+  psw: admin
+  mail:
+    mail.host: servizi.palazzochigi.it
+    mail.protocol: smtp
+    mail.port: 587
+    mail.user: elenco.oiv
+    mail.password: elencooiv2016
+    mail.send.error.to: massimo.fraticelli@cnr.it
+    mail.from: no-reply@scrivaniadigitale
+
+
+jhipster:
+  swagger:
+    title: sprint API
+    description: sprint API documentation
+    version: 0.0.1
+    termsOfServiceUrl:
+    contactName:
+    contactUrl:
+    contactEmail:
+    license:
+    licenseUrl:
+jasper-report:
+  dir-oiv: /src/main/resources/print/oiv-print/
+  dir-cnr: /src/main/resources/print/cnr-print/
+
+
+ace:
+  url: "http://acebuntudock.si.cnr.it:5555/api"
+  username: app.scrivaniadigitale
+  password: bubbazza
+
+# TODO: da modificare
+#repository:
+#  base:
+#    url: http://as1dock.si.cnr.it:8080/alfresco/
+
+#cache.hazelcast.port: 5709
+#cache.hazelcast.packages: it.cnr.si
