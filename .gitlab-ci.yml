@@ -46,7 +46,7 @@ deploy_snapshot:
     - demo
     - prod
   script:
-    - mvn -B clean compile package -DskipTests -Pprod
+    - mvn -B clean compile package -DskipTests -Pprod -U
     - cp ./target/*.war ./target/app.war
 
 buildtestcontainer:
