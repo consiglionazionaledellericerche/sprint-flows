@@ -19,6 +19,7 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
@@ -107,6 +108,7 @@ public class ExternalMessageSender {
     }
 
     private void send(ExternalMessage msg) {
+    // TODO refactor : il metodo send dovrebbe sendare, non sendare-e-salvare
 
         log.debug("Tentativo della rest {}", msg);
 

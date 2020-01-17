@@ -189,7 +189,7 @@ public class FlowsUserService {
 
     public void deleteUser(String login) {
         jdbcTokenStore.findTokensByUserName(login).stream().forEach(token ->
-                                                                            jdbcTokenStore.removeAccessToken(token));
+                jdbcTokenStore.removeAccessToken(token));
         flowsUserRepository.findOneByLogin(login).ifPresent(u -> {
             flowsUserRepository.delete(u);
             log.debug("Deleted User: {}", u);

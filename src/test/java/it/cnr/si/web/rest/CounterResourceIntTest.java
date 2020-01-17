@@ -19,6 +19,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
@@ -36,9 +37,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *
  * @see CounterResource
  */
+@SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles(profiles = "native,unittests,cnr")
+@EnableTransactionManagement
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = FlowsApp.class)
-@ActiveProfiles(profiles = "cnr")
 @Ignore
 public class CounterResourceIntTest {
     private static final String DEFAULT_NAME = "AAAAA";
@@ -131,7 +133,7 @@ public class CounterResourceIntTest {
 
         // Get the counter
         restCounterMockMvc.perform(get("/api/counters/{id}", counter.getId()))
-            .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound());
     }
 
     @Test

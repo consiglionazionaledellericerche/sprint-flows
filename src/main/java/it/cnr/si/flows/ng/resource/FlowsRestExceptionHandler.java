@@ -51,7 +51,7 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
         LOGGER.error(bodyOfResponse, ex);
 
         return handleExceptionInternal(ex, bodyOfResponse,
-                                       new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+                new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
 
@@ -59,7 +59,7 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> HandleProcessDefinitionAndTaskIdEmpty(ProcessDefinitionAndTaskIdEmptyException ex, WebRequest request) {
         String bodyOfResponse = "Fornire almeno un taskId o un definitionId";
         return handleExceptionInternal(ex, bodyOfResponse,
-                                       new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+                new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
 
@@ -71,7 +71,7 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
 
         String bodyOfResponse = "L'utente non ha i permessi necessari per eseguire l'azione richiesta";
         return handleExceptionInternal(ex, bodyOfResponse,
-                                       new HttpHeaders(), HttpStatus.FORBIDDEN, request);
+                new HttpHeaders(), HttpStatus.FORBIDDEN, request);
     }
 
 
@@ -90,7 +90,7 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
 
         LOGGER.error("L'utente {} ha cercato di a completare il task {} / avviare il flusso {}, ma c'e' stato un errore: {}", username, taskId, definitionId, ex.getMessage());
         return handleExceptionInternal(ex, Utils.mapOf("message", ex.getMessage()),
-                                       new HttpHeaders(), Utils.getStatus(ex.getErrorCode()), request);
+                new HttpHeaders(), Utils.getStatus(ex.getErrorCode()), request);
     }
 
 
@@ -159,7 +159,7 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
 
         Map<String, Object> res = Utils.mapOf("message", "Errore non gestito. Contattare gli amminstratori specificando il numero di riferimento: " + rif);
         return handleExceptionInternal(ex, res,
-                                       new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+                new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
     @ExceptionHandler(RuntimeException.class)
@@ -170,7 +170,7 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
 
         Map<String, Object> res = Utils.mapOf("message", "Errore non gestito. Contattare gli amminstratori specificando il numero di riferimento: " + rif);
         return handleExceptionInternal(ex, res,
-                                       new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+                new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
 
     }
 

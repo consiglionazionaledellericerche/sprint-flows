@@ -17,6 +17,9 @@ services:
       - JHIPSTER_SLEEP=10 # gives time for the database to boot before the application
       - CACHE_HAZELCAST_PUBLICIP=150.146.206.152
       - CACHE_HAZELCAST_MEMBERS=150.146.206.150:1485,150.146.206.152:1485
+      - SPRING_CLOUD_CONFIG_SERVER_GIT_URI=http://git.si.cnr.it/devops/configuration-repo.git
+      - SPRING_CLOUD_CONFIG_SERVER_GIT_USERNAME=flows
+      - SPRING_CLOUD_CONFIG_SERVER_GIT_PASSWORD=CONFIG_REPO_TOKEN
     ports:
       - 1481:8080
       - 1485:1485

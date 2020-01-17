@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.Date;
-import java.util.List;
 
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Firma;
 import static it.cnr.si.flows.ng.utils.Enum.Stato.Firmato;
@@ -31,8 +30,8 @@ public class FirmaDocumentoService {
         if (nomeVariabileFile == null)
             throw new IllegalStateException("Questo Listener ha bisogno del campo 'nomeFileDaFirmare' nella process definition (nel Task Listener - Fields).");
         if (execution.getVariable("sceltaUtente") != null &&
-            !"Firma Multipla".equals(execution.getVariable("sceltaUtente")) &&
-            "Firma".equals(execution.getVariable("sceltaUtente")) ) {
+                !"Firma Multipla".equals(execution.getVariable("sceltaUtente")) &&
+                "Firma".equals(execution.getVariable("sceltaUtente")) ) {
 
             String stringaOscurante = "******";
             // TODO: validare presenza di queste tre variabili

@@ -156,7 +156,7 @@ public class PopolazioneProfiliPerCDSUOAcquistiBatch {
 					log.info("OK: L'utente {} ha come responsabile {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", username, usernameResponsabileUO, denominazioneEntitaorganizzativaResponsabileUtente, siglaEntitaorganizzativaResponsabileUtente, idEntitaorganizzativaResponsabileUtente, cdsuoEntitaorganizzativaResponsabileUtente, idnsipEntitaorganizzativaResponsabileUtente);
 					String gruppoDirigenteRichiedente = "responsabileFirmaAcquisti@" + idEntitaorganizzativaResponsabileUtente;
 
-					Set<String> members = relationshipService.getAllUsersInGroup(gruppoDirigenteRichiedente);
+					Set<String> members = membershipService.getAllUsersInGroup(gruppoDirigenteRichiedente);
 					//List<String> members = membershipService.findMembersInGroup(gruppoDirigenteRichiedente);
 					if (members.size() == 0) {
 						log.info(" ERROR: Il gruppo RESPONSABILE STRUTTURA: {} NON HA NESSUNO", gruppoDirigenteRichiedente);

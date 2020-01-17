@@ -96,10 +96,10 @@ public class FlowsTaskResource {
             @RequestBody(required = false) String body){
 
         DataResponse response = flowsTaskService.getMyTasks(body!=null ? new JSONArray(body) : new JSONArray(),
-                                                            processDefinition,
-                                                            firstResult,
-                                                            maxResults,
-                                                            order);
+                processDefinition,
+                firstResult,
+                maxResults,
+                order);
         return ResponseEntity.ok(response);
     }
 
@@ -115,10 +115,10 @@ public class FlowsTaskResource {
             @RequestBody(required = false) String body) {
 
         DataResponse response = flowsTaskService.getAvailableTask(body!=null ? new JSONArray(body) : new JSONArray(),
-                                                                  processDefinition,
-                                                                  firstResult,
-                                                                  maxResults,
-                                                                  order);
+                processDefinition,
+                firstResult,
+                maxResults,
+                order);
         return ResponseEntity.ok(response);
     }
 
@@ -135,10 +135,10 @@ public class FlowsTaskResource {
             @RequestBody(required = false) String body) {
 
         DataResponse response = flowsTaskService.taskAssignedInMyGroups(body!=null ? new JSONArray(body) : new JSONArray(),
-                                                                        processDefinition,
-                                                                        firstResult,
-                                                                        maxResults,
-                                                                        order);
+                processDefinition,
+                firstResult,
+                maxResults,
+                order);
         return ResponseEntity.ok(response);
     }
 
@@ -236,8 +236,8 @@ public class FlowsTaskResource {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
-    
-    
+
+
 
     @DeleteMapping(value = "/removeCandidateGroup/{group:.*}", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -263,8 +263,8 @@ public class FlowsTaskResource {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
-    
-    
+
+
     @DeleteMapping(value = "/claim/{taskId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canClaimTask(#taskId, @flowsUserDetailsService)")
     @Timed
@@ -308,10 +308,10 @@ public class FlowsTaskResource {
             @RequestBody(required = false) String body) {
 
         DataResponse response = flowsTaskService.getTasksCompletedByMe(body!=null ? new JSONArray(body) : new JSONArray(),
-                                                                       processDefinition,
-                                                                       firstResult,
-                                                                       maxResults,
-                                                                       order);
+                processDefinition,
+                firstResult,
+                maxResults,
+                order);
         return ResponseEntity.ok(response);
     }
 

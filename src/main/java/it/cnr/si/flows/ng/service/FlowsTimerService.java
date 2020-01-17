@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -49,6 +50,9 @@ public class FlowsTimerService {
 	@Inject
 	private RepositoryService repositoryService;
 
+	@Inject
+	private FlowsTimerService flowsTimerService;
+
 
 	public List getTimers(String processInstanceId) throws IOException, ParseException {
 
@@ -62,11 +66,31 @@ public class FlowsTimerService {
 		{
 			String timerName = ((TimerEntity) job).getJobHandlerConfiguration()
 					.split(":")[1]
-							.replace("\"", "")
-							.replace("}", "");
+					.replace("\"", "")
+					.replace("}", "");
 			LOGGER.info("getDuedate {}, getId {}, TimerDeclarationImpl {}", job.getDuedate(), job.getId(), timerName);
 		}
 		return timerJobs;
+	}
+
+
+	public void setTimer(String processInstanceId, String timerId, Date date) throws IOException, ParseException {
+
+		//      TIMER
+		LOGGER.debug("setTimer {}",  date);
+		// SimpleDateFormat formatter=new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
+		//Date newTimerDate = formatter.parse(date);
+		Date newTimerDate = date;
+
+		List<Job> jobTimer = flowsTimerService.getTimer(processInstanceId,timerId);
+		if(jobTimer.size() > 0){
+			LOGGER.info("------ DATA: {} per timer: {} " + jobTimer.get(0).getDuedate(), timerId);
+		} else {
+			LOGGER.info("------ " + timerId + ": TIMER SCADUTO: ");
+		}
+
+		managementService.executeCommand(new SetTimerDuedateCmd(jobTimer.get(0).getId(), newTimerDate));
+
 	}
 
 	public List getTimer(String processInstanceId, String timerId) throws IOException, ParseException {
@@ -82,8 +106,8 @@ public class FlowsTimerService {
 		{
 			String timerName = ((TimerEntity) job).getJobHandlerConfiguration()
 					.split(":")[1]
-							.replace("\"", "")
-							.replace("}", "");
+					.replace("\"", "")
+					.replace("}", "");
 			LOGGER.info("getDuedate {}, getId {}, TimerDeclarationImpl {}", job.getDuedate(), job.getId(), timerName);
 			if (timerName.equals(timerId)) {
 				LOGGER.info("--- DATA FINE PROCEDURA: {}, getId: {}, timerName: {}", job.getDuedate(), job.getId(), timerName);
@@ -107,17 +131,17 @@ public class FlowsTimerService {
 		{
 			String timerName = ((TimerEntity) job).getJobHandlerConfiguration()
 					.split(":")[1]
-							.replace("\"", "")
-							.replace("}", "");
+					.replace("\"", "")
+					.replace("}", "");
 			LOGGER.debug("getDuedate {}, getId {}, TimerDeclarationImpl {}", job.getDuedate(), job.getId(), timerName);
 			if (timerName.equals(timerId)) {
 				LOGGER.debug("--- CAMBIO DATA Duedate: {}, getId: {}, timerName: {}", job.getDuedate(), job.getId(), timerName);
 				//job.wait().
-				int yearAddValueInt = 0;   
-				int monthAddValueInt = 0;   
-				int hourAddValueInt = 0;   
-				int dayAddValueInt = 0;   
-				int minuteAddValueInt = 0;   
+				int yearAddValueInt = 0;
+				int monthAddValueInt = 0;
+				int hourAddValueInt = 0;
+				int dayAddValueInt = 0;
+				int minuteAddValueInt = 0;
 				if (yearAddValue != 0) {
 					try {
 						yearAddValueInt = yearAddValue;

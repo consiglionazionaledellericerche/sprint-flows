@@ -83,5 +83,29 @@
             <column name="version" type="string"/>
             <column name="view" type="string"/>
         </loadUpdateData>
+        <loadUpdateData encoding="UTF-8"
+                        file="config/liquibase/cnr/new/short-term-mobility-domande-view.csv"
+                        primaryKey="id"
+                        schemaName="public"
+                        separator=";"
+                        tableName="view">
+            <column name="id" type="numeric"/>
+            <column name="process_id" type="string"/>
+            <column name="type" type="string"/>
+            <column name="version" type="string"/>
+            <column name="view" type="string"/>
+        </loadUpdateData>
+        <loadUpdateData encoding="UTF-8"
+                        file="config/liquibase/cnr/new/short-term-mobility-bandi-view.csv"
+                        primaryKey="id"
+                        schemaName="public"
+                        separator=";"
+                        tableName="view">
+            <column name="id" type="numeric"/>
+            <column name="process_id" type="string"/>
+            <column name="type" type="string"/>
+            <column name="version" type="string"/>
+            <column name="view" type="string"/>
+        </loadUpdateData>
     </changeSet>
 </databaseChangeLog>

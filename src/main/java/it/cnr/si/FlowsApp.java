@@ -75,7 +75,7 @@ public class FlowsApp {
                 .filter(p -> p.equals("cnr") || p.equals("oiv") || p.equals("showcase"))
                 .count();
         if (profiles != 1) {
-            log.error("Selezionare esattamente un profilo tra 'cnr' e 'oiv'");
+            log.error("Selezionare esattamente un profilo tra 'cnr', 'oiv' e 'showcase'");
             System.exit(1);
         }
     }
@@ -94,9 +94,9 @@ public class FlowsApp {
 
         Environment env = appContext.getEnvironment();
         log.info("\n----------------------------------------------------------\n\t" +
-                "Application '{}' is running! Access URLs:\n\t" +
-                "Local: \t\thttp://127.0.0.1:{}\n\t" +
-                "External: \thttp://{}:{}\n----------------------------------------------------------",
+                        "Application '{}' is running! Access URLs:\n\t" +
+                        "Local: \t\thttp://127.0.0.1:{}\n\t" +
+                        "External: \thttp://{}:{}\n----------------------------------------------------------",
                 env.getProperty("spring.application.name"),
                 env.getProperty("server.port"),
                 InetAddress.getLocalHost().getHostAddress(),
