@@ -121,7 +121,7 @@ buildprodcontainer:
   tags:
     - shared
   only:
-    - prod
+    - tags
   script:
     - echo "Running build image and push image for release tag"
     - echo $CI_COMMIT_REF_NAME
