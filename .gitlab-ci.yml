@@ -124,6 +124,7 @@ buildprodcontainer:
     - tags
   script:
     - mvn -B clean compile package -DskipTests -Pprod -U
+    - cp ./target/*.war ./target/app.war
     - echo "Running build image and push image for release tag"
     - echo $CI_COMMIT_REF_NAME
     - docker build --file src/main/docker/Dockerfile -t $CI_PROJECT_NAME:$CI_COMMIT_REF_NAME .
