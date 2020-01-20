@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 
 @Ignore // Questo test non ha senso eseguirlo con H2, ma solo in locale con un postgres
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "native,unittests,cnr")
+@ActiveProfiles(profiles = "native,showcase,unittests")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
 public class CounterServiceTest {
