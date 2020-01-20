@@ -32,7 +32,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "test,oiv")
+@ActiveProfiles(profiles = "native,showcase,unittests")
 @Ignore //TODO: i pdf generati e le tipologie dei pdf stanno cambiando quindi conviene scrivere i test quando saranno stabili
 public class FlowsPdfResourceTest {
 

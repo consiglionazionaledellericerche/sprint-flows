@@ -71,8 +71,6 @@ public class FlowsTaskService {
 	private HistoryService historyService;
 	@Inject
 	private TaskService taskService;
-	@Autowired(required = false)
-	private AceBridgeService aceBridgeService;
 	@Inject
 	private FlowsAttachmentResource attachmentResource;
 	@Inject
