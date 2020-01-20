@@ -8,6 +8,7 @@ import it.cnr.si.flows.ng.service.*;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Enum.StatoDomandeSTMEnum;
 import it.cnr.si.flows.ng.utils.Enum.StatoDomandeSTMEnum;
+import it.cnr.si.service.AceService;
 import it.cnr.si.service.ExternalMessageService;
 import org.activiti.engine.ManagementService;
 import org.activiti.engine.RepositoryService;
@@ -40,9 +41,9 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 	private static final Logger LOGGER = LoggerFactory.getLogger(ManageProcessShortTermMobilityDomande_v1.class);
 
 
-	@Value("${cnr.abil.url}")
+	@Value("${cnr.stm.url}")
 	private String urlShortTermMobility;
-	@Value("${cnr.abil.domandePath}")
+	@Value("${cnr.stm.domandePath}")
 	private String pathDomandeShortTermMobility;
 
 	@Inject
@@ -69,7 +70,10 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 	private ManagementService managementService;
 	@Inject
 	private RepositoryService repositoryService;
-
+	@Inject
+	private AceBridgeService aceBridgeService;
+	@Inject
+	private AceService aceService;
 
 	private Expression faseEsecuzione;
 
@@ -82,7 +86,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 		// @Value("${cnr.accordi-bilaterali.psw}")
 		// private String pswAccordiBilaterali;
 		Double idDomanda = Double.parseDouble(execution.getVariable("idDomanda").toString());
-		Map<String, Object> abilPayload = new HashMap<String, Object>()
+		Map<String, Object> stmPayload = new HashMap<String, Object>()
 		{
 			{
 				put("idDomanda", idDomanda);
@@ -91,7 +95,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 		};
 
 		String url = urlShortTermMobility + pathDomandeShortTermMobility;
-		externalMessageService.createExternalMessage(url, ExternalMessageVerb.POST, abilPayload, ExternalApplication.ABIL);
+		externalMessageService.createExternalMessage(url, ExternalMessageVerb.POST, stmPayload, ExternalApplication.STM);
 	}
 
 
@@ -217,8 +221,10 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 				if ((processinstancesListaDomandeAttivePerBando.size()  == processinstancesListaDomandeAccettatePerBando.size() + 1) &&  (execution.getVariable("domandaCorrenteAccettataFlag").toString().equals("true"))) {
 					execution.setVariable("tutteDomandeAccettateFlag", "true");
 					processinstancesListaDomandeAccettatePerBando.forEach(( processInstance) -> {
-						runtimeService.signal(processInstance.getId());
-						LOGGER.info("-- sblocco la processInstance: " + processInstance.getName() + " (" + processInstance.getId() + ") ");
+						if (flowsProcessInstanceService.getProcessInstance(processInstance.getId()).getName().contains(Enum.StatoDomandeSTMEnum.ACCETTATA.toString())) {
+							runtimeService.signal(processInstance.getId());
+							LOGGER.info("-- sblocco la processInstance: " + processInstance.getName() + " (" + processInstance.getId() + ") ");			
+						}
 					});
 
 				}
@@ -259,34 +265,39 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 					FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
 					documentoGenerato.setLabel(labelFile);
 					flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
-					// VERIFICA TUTTE LE DOMANDE DI FLUSSI ATTIVI PER QUEL BANDO
-					List<ProcessInstance> processinstancesListaPerBando = runtimeService.createProcessInstanceQuery()
+					// VERIFICA TUTTE LE DOMANDE DI FLUSSI ATTIVI PER QUEL BANDO e PER QUEL DIPARTIMENTO
+					List<ProcessInstance> processinstancesListaPerBandoDipartimento = runtimeService.createProcessInstanceQuery()
 							.processDefinitionKey("short-term-mobility-domande")
 							.variableValueEquals("idBando", execution.getVariable("idBando"))
+							.variableValueEquals("dipartimentoId", execution.getVariable("dipartimentoId"))
 							.list();
-					List<ProcessInstance> processinstancesListaDomandeValutatePerBando = runtimeService.createProcessInstanceQuery()
+					List<ProcessInstance> processinstancesListaDomandeValutatePerBandoDipartimento = runtimeService.createProcessInstanceQuery()
 							.processDefinitionKey("short-term-mobility-domande")
 							.variableValueEquals("idBando", execution.getVariable("idBando"))
+							.variableValueEquals("dipartimentoId", execution.getVariable("dipartimentoId"))
 							.variableValueEquals(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE.toString())
 							.list();
 
-					if ((processinstancesListaPerBando.size() == processinstancesListaDomandeValutatePerBando.size() + 1) &&  (execution.getVariable("domandaCorrenteValutataFlag").toString().equals("true"))) {
+					if ((processinstancesListaPerBandoDipartimento.size() == processinstancesListaDomandeValutatePerBandoDipartimento.size() + 1) &&  (execution.getVariable("domandaCorrenteValutataFlag").toString().equals("true"))) {
 						//START FLUSSO BANDI
 						// Creazione flusso bando se non presente la presenza del flusso bando 
 
-						List<ProcessInstance> processinstancesBandiPerBando = runtimeService.createProcessInstanceQuery()
-								.processDefinitionKey("short-term-mobility-bandi")
+						List<ProcessInstance> processinstancesBandiPerBandoDipartimento = runtimeService.createProcessInstanceQuery()
+								.processDefinitionKey("short-term-mobility-bando-dipartimento")
 								.variableValueEquals("idBando", execution.getVariable("idBando"))
+								.variableValueEquals("dipartimentoId", execution.getVariable("dipartimentoId"))
 								.list();
-						if (processinstancesBandiPerBando.size() == 0)
+						if (processinstancesBandiPerBandoDipartimento.size() == 0)
 						{
-							String processDefinitionId = repositoryService.createProcessDefinitionQuery().processDefinitionKeyLike("short-term-mobility-bandi").orderByProcessDefinitionVersion().desc().list().get(0).getId();
+							String processDefinitionId = repositoryService.createProcessDefinitionQuery().processDefinitionKeyLike("short-term-mobility-bando-dipartimento").orderByProcessDefinitionVersion().desc().list().get(0).getId();
 							//START del flusso bando
+							String siglaDipartimento = aceBridgeService.getUoById(Integer.parseInt(execution.getVariable("dipartimentoId").toString())).getSigla();
 							Map<String, Object> data = new HashMap<>();
-							data.put(Enum.VariableEnum.titolo.name(), execution.getVariable("bando"));
-							data.put(Enum.VariableEnum.descrizione.name(), execution.getVariable("shortTermMobilityName"));
+							data.put(Enum.VariableEnum.titolo.name(), execution.getVariable("bando") + "-" + siglaDipartimento);
+							data.put(Enum.VariableEnum.descrizione.name(), execution.getVariable("shortTermMobilityName") + "-" + siglaDipartimento);
 							data.put(Enum.VariableEnum.initiator.name(), "app.scrivaniadigitale");
 							data.put("idBando", execution.getVariable("idBando"));
+							data.put("dipartimentoId", execution.getVariable("dipartimentoId"));
 							data.put("processDefinitionId", processDefinitionId);
 							data.put(initiator.name(), "app.scrivaniadigitale");
 
@@ -295,7 +306,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 							flowsTaskService.startProcessInstance(processDefinitionId, data);
 						} else {
 							// Aziona il receive task "elenco-domande"
-							LOGGER.info("-- Bando già avviato: " + processinstancesBandiPerBando.get(0).getBusinessKey() );
+							LOGGER.info("-- Bando già avviato: " + processinstancesBandiPerBandoDipartimento.get(0).getBusinessKey() );
 						}
 					}
 				}
