@@ -38,6 +38,7 @@ import org.activiti.spring.boot.SecurityAutoConfiguration;
 import org.activiti.spring.boot.JpaProcessEngineAutoConfiguration.JpaConfiguration;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.json.JSONObject;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -78,6 +79,7 @@ import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
 //@ActiveProfiles(profiles = "dev,cnr")
 @ActiveProfiles(profiles = "dev,cnr")
 @RunWith(SpringJUnit4ClassRunner.class)
+@Ignore
 public class GenerazioneJsonperPDF {
 
 	private static final Logger log = LoggerFactory.getLogger(GenerazioneJsonperPDF.class);

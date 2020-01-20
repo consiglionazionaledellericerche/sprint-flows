@@ -1,8 +1,8 @@
 package it.cnr.si.security;
 
 import it.cnr.si.flows.ng.resource.FlowsProcessDefinitionResource;
-import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.utils.Utils;
+import it.cnr.si.service.MembershipService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -58,9 +59,8 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
     HistoryService historyService;
     @Inject
     RestResponseFactory restResponseFactory;
-    @Autowired(required = false)
-    private AceBridgeService aceBridgeService;
-
+    @Autowired
+    private MembershipService membershipService;
 
     /**
      * Determina se un utente ha i permessi per visualizzare un Task.
@@ -266,7 +266,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
     public boolean isResponsabile(String taskId, String processInstanceId, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
         String user = SecurityUtils.getCurrentUserLogin();
-        List<String> groups = aceBridgeService.getAceGroupsForUser(user);
+        Set<String> groups = membershipService.getAllGroupsForUser(user);
         Task task;
         if(!processInstanceId.isEmpty()){
             task = taskService.createTaskQuery()

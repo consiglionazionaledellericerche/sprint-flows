@@ -4,6 +4,7 @@ import feign.FeignException;
 import it.cnr.si.FlowsApp;
 import it.cnr.si.service.dto.anagrafica.letture.GerarchiaWebDto;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 @ActiveProfiles(profiles = "native,unittests,cnr")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
+@Ignore // TODO per ora testiamo solo Showcase, funzionalita' CNR da testare separatamente
 public class AceBridgeServiceTest {
 
     private final Logger log = LoggerFactory.getLogger(AceBridgeServiceTest.class);

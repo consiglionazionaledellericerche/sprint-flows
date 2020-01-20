@@ -31,10 +31,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
+import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.permessiFerie;
 import static org.junit.Assert.assertEquals;
 
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "native,unittests,cnr")
+@ActiveProfiles(profiles = "native,showcase,unittests")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
 public class FormAndViewVersionTest {
@@ -190,22 +191,17 @@ public class FormAndViewVersionTest {
 
     private void setup() throws Exception {
 
-        processInstance1 = util.mySetUp(acquisti);
+        processInstance1 = util.mySetUp(permessiFerie);
 
-        String formStart = formResource.getFormByTrittico("acquisti", "1", "start").getBody();
+        String formStart = formResource.getFormByTrittico(permessiFerie.getValue(), "1", "start").getBody();
         forms.put("acquisti-1-start", formStart);
         forms.put("acquisti-2-start", formStart.replace("Responsabile Unico del Procedimento (RUP)", "RUP"));
         forms.put("acquisti-3-start", formStart.replace("Responsabile Unico del Procedimento (RUP)", "Responsabile procedimento Unico"));
 
-        String formVerifica = formResource.getFormByTrittico("acquisti", "1", "verifica-decisione").getBody();
+        String formVerifica = formResource.getFormByTrittico(permessiFerie.getValue(), "1", "validazione").getBody();
         forms.put("acquisti-1-verifica-decisione", formVerifica);
         forms.put("acquisti-2-verifica-decisione", formVerifica.replace("Il Supporto alle Funzioni Direzionali", "L'SFD"));
         forms.put("acquisti-3-verifica-decisione", formVerifica.replace("Il Supporto alle Funzioni Direzionali", "Il Supporto alle Funzioni Direzionali (SFD)"));
-
-//        String formModifica = formResource.getFormByTrittico("acquisti", "1", "modifica-decisione").getBody();
-//        forms.put("acquisti-1-modifica-decisione", formModifica);
-//        forms.put("acquisti-2-modifica-decisione", formModifica.replace("Titolo Acquisizione", "Titolo Acquisizione2"));
-//        forms.put("acquisti-3-modifica-decisione", formModifica.replace("Titolo Acquisizione", "Titolo Acquisizione3"));
 
     }
 

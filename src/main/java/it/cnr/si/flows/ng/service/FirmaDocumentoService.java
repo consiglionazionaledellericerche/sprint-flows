@@ -7,6 +7,7 @@ import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -20,7 +21,7 @@ import static it.cnr.si.flows.ng.utils.Enum.Stato.Firmato;
 public class FirmaDocumentoService {
     private static final Logger LOGGER = LoggerFactory.getLogger(FirmaDocumentoService.class);
 
-    @Inject
+    @Autowired(required = false)
     private FlowsFirmaService flowsFirmaService;
     @Inject
     private FlowsAttachmentService flowsAttachmentService;
