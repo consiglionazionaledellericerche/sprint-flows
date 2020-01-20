@@ -25,6 +25,7 @@ import org.activiti.spring.boot.JpaProcessEngineAutoConfiguration;
 import org.activiti.spring.boot.RestApiAutoConfiguration;
 import org.activiti.spring.boot.SecurityAutoConfiguration;
 import org.activiti.spring.boot.JpaProcessEngineAutoConfiguration.JpaConfiguration;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -60,6 +61,7 @@ import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(profiles = "dev,cnr")
 @RunWith(SpringJUnit4ClassRunner.class)
+@Ignore
 public class PopolazioneProfiliAcquistiBatch {
 
 	private static final Logger log = LoggerFactory.getLogger(PopolazioneProfiliAcquistiBatch.class);

@@ -28,6 +28,7 @@ import static org.junit.Assert.fail;
 @ActiveProfiles(profiles = "native,unittests,cnr")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
+@Ignore // TODO per ora testiamo solo Showcase, funzionalita' CNR da testare separatamente
 public class FirmaServiceTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FirmaServiceTest.class);

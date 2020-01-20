@@ -75,7 +75,7 @@ public class FlowsTaskResource {
     private RelationshipService relationshipService;
     @Inject
     private FlowsAttachmentService attachmentService;
-    @Inject
+    @Autowired(required = false)
     private FlowsFirmaService flowsFirmaService;
     @Inject
     private FlowsAttachmentService flowsAttachmentService;

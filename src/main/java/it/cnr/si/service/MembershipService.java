@@ -33,7 +33,6 @@ public class MembershipService {
 
     @Inject
     private MembershipRepository membershipRepository;
-
     @Autowired(required = false)
     private AceBridgeService aceBridgeService;
     @Inject
