@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,8 +24,10 @@ import java.nio.charset.StandardCharsets;
 
 @Service
 @Transactional
+@Profile("cnr")
 public class DynamicListService {
 
+    //TODO
     private static final String URL_STRING = "http://sigla-main-rest-missioni.test.si.cnr.it/SIGLA/";
     private static final String QUERY_STRING = "{\"activePage\" : 0, \"maxItemsPerPage\" : 1000000,\"context\" : {\"esercizio\" : 2017,\"cd_unita_organizzativa\" : \"999.000\",\"cd_cds\" : \"999\",\"cd_cdr\" : \"999.000.000\"},\"clauses\"}";
     private final Logger log = LoggerFactory.getLogger(DynamicListService.class);

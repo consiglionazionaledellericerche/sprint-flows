@@ -1,6 +1,7 @@
 package it.cnr.si.flows.ng.service;
 
 import it.cnr.si.FlowsApp;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,6 +19,7 @@ import java.net.URISyntaxException;
 @ActiveProfiles(profiles = "native,unittests,cnr")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
+@Ignore // TODO per ora testiamo solo Showcase, funzionalita' CNR da testare separatamente
 public class CoolFlowsBridgeTest {
 
     @Inject

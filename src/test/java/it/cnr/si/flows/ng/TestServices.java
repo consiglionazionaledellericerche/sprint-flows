@@ -108,6 +108,11 @@ public class TestServices {
         login(TestServices.APP, "");
     }
 
+    public void loginUtente1() {
+        logout();
+        login(TestServices.APP, "utente1");
+    }
+
     public void loginSfd() {
         logout();
         login(SFD, SFD);
@@ -236,6 +241,15 @@ public class TestServices {
                                                   this.getClass().getResourceAsStream("/pdf-test/domanda.pdf")));
                 req.addFile(new MockMultipartFile("cv", "cv.pdf", MediaType.APPLICATION_PDF.getType() + "/" + MediaType.APPLICATION_PDF.getSubtype(),
                                                   this.getClass().getResourceAsStream("/pdf-test/cv.pdf")));
+
+                break;
+            case permessiFerie:
+                loginUtente1();
+                loginAbilitatiIscrizioneElencoOiv();
+                req.setParameter("titolo", "titolo");
+                req.setParameter("descrizione", "descrizione");
+                req.addFile(new MockMultipartFile("richiestaFerie", "domanda.pdf", MediaType.APPLICATION_PDF.getType() + "/" + MediaType.APPLICATION_PDF.getSubtype(),
+                        this.getClass().getResourceAsStream("/pdf-test/domanda.pdf")));
 
                 break;
         }

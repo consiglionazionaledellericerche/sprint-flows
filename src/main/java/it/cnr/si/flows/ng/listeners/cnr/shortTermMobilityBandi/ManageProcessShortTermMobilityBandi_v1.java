@@ -1,14 +1,16 @@
 package it.cnr.si.flows.ng.listeners.cnr.shortTermMobilityBandi;
 
 
-
-
+import com.google.common.net.MediaType;
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.listeners.cnr.shortTermMobilityBandoDipartimento.StartShortTermMobilityBandoDipartimentoSetGroupsAndVisibility;
+import it.cnr.si.flows.ng.service.*;
+import it.cnr.si.flows.ng.utils.Enum;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
-import org.activiti.engine.impl.TaskServiceImpl;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.activiti.rest.common.api.DataResponse;
@@ -19,35 +21,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import com.google.common.net.MediaType;
-
-import it.cnr.si.flows.ng.service.FirmaDocumentoService;
-import it.cnr.si.flows.ng.service.FlowsAttachmentService;
-import it.cnr.si.flows.ng.service.FlowsCsvService;
-import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
-import it.cnr.si.flows.ng.service.FlowsTaskService;
-import it.cnr.si.flows.ng.service.ProtocolloDocumentoService;
-import it.cnr.si.flows.ng.utils.Enum;
-import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.exception.TaskFailedException;
-import it.cnr.si.flows.ng.listeners.cnr.acquisti.service.AcquistiService;
-
-import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
-import static it.cnr.si.flows.ng.utils.Enum.Azione.GenerazioneDaSistema;
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.statoFinaleDomanda;
-
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.attribute.FileAttribute;
-import java.nio.file.attribute.FileAttributeView;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletResponse;
+import static it.cnr.si.flows.ng.utils.Enum.Azione.GenerazioneDaSistema;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.statoFinaleDomanda;
 
 @Component
 @Profile("cnr")
@@ -63,7 +46,7 @@ public class ManageProcessShortTermMobilityBandi_v1 implements ExecutionListener
 	@Inject
 	private FlowsProcessInstanceService flowsProcessInstanceService;
 	@Inject
-	private StartShortTermMobilityBandiSetGroupsAndVisibility startShortTermMobilityBandiSetGroupsAndVisibility;
+	private StartShortTermMobilityBandoDipartimentoSetGroupsAndVisibility startShortTermMobilityBandiSetGroupsAndVisibility;
 	@Inject
 	private RuntimeService runtimeService;
 	@Inject
