@@ -1,4 +1,4 @@
-package it.cnr.si.flows.ng.listeners.cnr.shortTermMobilityBandi;
+package it.cnr.si.flows.ng.listeners.cnr.shortTermMobilityBandoDipartimento;
 
 
 
@@ -34,8 +34,8 @@ import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 @Profile("!oiv")
 
 @Service
-public class StartShortTermMobilityBandiSetGroupsAndVisibility {
-	private static final Logger LOGGER = LoggerFactory.getLogger(StartShortTermMobilityBandiSetGroupsAndVisibility.class);
+public class StartShortTermMobilityBandoDipartimentoSetGroupsAndVisibility {
+	private static final Logger LOGGER = LoggerFactory.getLogger(StartShortTermMobilityBandoDipartimentoSetGroupsAndVisibility.class);
 
 	@Inject
 	private RuntimeService runtimeService;

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="short-term-mobility-bando-dipartimento" name="Short Term Mobility Bando Dipartimento" isExecutable="true">
+    <extensionElements>
+      <activiti:executionListener event="start" delegateExpression="${manageProcessShortTermMobilityBandoDipartimento_v1}">
+        <activiti:field name="faseEsecuzione">
+          <activiti:string><![CDATA[process-start]]></activiti:string>
+        </activiti:field>
+      </activiti:executionListener>
+      <activiti:executionListener event="end" delegateExpression="${manageProcessShortTermMobilityBandoDipartimento_v1}">
+        <activiti:field name="faseEsecuzione">
+          <activiti:string><![CDATA[process-end]]></activiti:string>
+        </activiti:field>
+      </activiti:executionListener>
+    </extensionElements>
+    <startEvent id="startevent1" name="Start"></startEvent>
+    <sequenceFlow id="flow1" name="START" sourceRef="startevent1" targetRef="provvedimento-graduatoria"></sequenceFlow>
+    <userTask id="firma-graduatoria" name="FIRMA GRADUATORIA" activiti:candidateGroups="${gruppoResponsabileAccordiInternazionali}" activiti:category="firma">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessShortTermMobilityBandoDipartimento_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[firma-graduatoria-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessShortTermMobilityBandoDipartimento_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[firma-graduatoria-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="protocollo-graduatoria" name="PROTOCOLLO GRADUATORIA" activiti:candidateGroups="${gruppoUfficioProtocollo}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessShortTermMobilityBandoDipartimento_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[protocollo-graduatoria-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessShortTermMobilityBandoDipartimento_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[protocollo-graduatoria-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <endEvent id="endevent3" name="End">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessShortTermMobilityBandoDipartimento_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[endevent-bando-dipartimento-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
+    <exclusiveGateway id="exclusivegateway6" name="Exclusive Gateway" default="flow16"></exclusiveGateway>
+    <sequenceFlow id="flow15" sourceRef="firma-graduatoria" targetRef="exclusivegateway6"></sequenceFlow>
+    <sequenceFlow id="flow16" sourceRef="exclusivegateway6" targetRef="protocollo-graduatoria"></sequenceFlow>
+    <sequenceFlow id="flow17" name="END" sourceRef="protocollo-graduatoria" targetRef="endevent3"></sequenceFlow>
+    <userTask id="provvedimento-graduatoria" name="PROVVEDIMENTO GRADUATORIA" activiti:candidateGroups="${gruppoValidatoriShortTermMobility}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessShortTermMobilityBandoDipartimento_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[provvedimento-graduatoria-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessShortTermMobilityBandoDipartimento_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[provvedimento-graduatoria-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow21" sourceRef="provvedimento-graduatoria" targetRef="firma-graduatoria"></sequenceFlow>
+    <sequenceFlow id="flow22" sourceRef="exclusivegateway6" targetRef="provvedimento-graduatoria">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Modifica'}]]></conditionExpression>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_short-term-mobility-bando-dipartimento">
+    <bpmndi:BPMNPlane bpmnElement="short-term-mobility-bando-dipartimento" id="BPMNPlane_short-term-mobility-bando-dipartimento">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="30.0" y="39.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="firma-graduatoria" id="BPMNShape_firma-graduatoria">
+        <omgdc:Bounds height="61.0" width="105.0" x="229.0" y="26.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="protocollo-graduatoria" id="BPMNShape_protocollo-graduatoria">
+        <omgdc:Bounds height="61.0" width="105.0" x="409.0" y="26.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent3" id="BPMNShape_endevent3">
+        <omgdc:Bounds height="35.0" width="35.0" x="540.0" y="39.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway6" id="BPMNShape_exclusivegateway6">
+        <omgdc:Bounds height="40.0" width="40.0" x="349.0" y="36.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="provvedimento-graduatoria" id="BPMNShape_provvedimento-graduatoria">
+        <omgdc:Bounds height="61.0" width="114.0" x="90.0" y="26.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="65.0" y="56.0"></omgdi:waypoint>
+        <omgdi:waypoint x="90.0" y="56.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="34.0" x="39.0" y="13.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow15" id="BPMNEdge_flow15">
+        <omgdi:waypoint x="334.0" y="56.0"></omgdi:waypoint>
+        <omgdi:waypoint x="349.0" y="56.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow16" id="BPMNEdge_flow16">
+        <omgdi:waypoint x="389.0" y="56.0"></omgdi:waypoint>
+        <omgdi:waypoint x="409.0" y="56.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow17" id="BPMNEdge_flow17">
+        <omgdi:waypoint x="514.0" y="56.0"></omgdi:waypoint>
+        <omgdi:waypoint x="540.0" y="56.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="20.0" x="539.0" y="13.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow21" id="BPMNEdge_flow21">
+        <omgdi:waypoint x="204.0" y="56.0"></omgdi:waypoint>
+        <omgdi:waypoint x="229.0" y="56.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow22" id="BPMNEdge_flow22">
+        <omgdi:waypoint x="369.0" y="76.0"></omgdi:waypoint>
+        <omgdi:waypoint x="369.0" y="113.0"></omgdi:waypoint>
+        <omgdi:waypoint x="147.0" y="113.0"></omgdi:waypoint>
+        <omgdi:waypoint x="147.0" y="87.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
