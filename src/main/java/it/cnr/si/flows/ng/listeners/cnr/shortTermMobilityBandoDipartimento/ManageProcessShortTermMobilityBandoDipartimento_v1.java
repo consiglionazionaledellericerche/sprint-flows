@@ -122,12 +122,12 @@ public class ManageProcessShortTermMobilityBandoDipartimento_v1 implements Execu
 		case "firma-graduatoria-end": {
 
 			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
-				firmaDocumentoService.eseguiFirma(execution, "GRADUATORIA");
+				firmaDocumentoService.eseguiFirma(execution, "graduatoria");
 			}
 		};break; 
 		case "protocollo-graduatoria-end": {
 			if(sceltaUtente != null && sceltaUtente.equals("Protocolla")) {
-				protocolloDocumentoService.protocolla(execution, "GRADUATORIA");
+				protocolloDocumentoService.protocolla(execution, "graduatoria");
 			}
 		};break;  	
 		case "endevent-bando-dipartimento-start": {
@@ -146,7 +146,7 @@ public class ManageProcessShortTermMobilityBandoDipartimento_v1 implements Execu
 					.variableValueEquals(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE.toString())
 					.list();
 
-			//AGGIUNGE IL LINK AL BANDO
+			//AGGIUNGE IL LINK ALLE VARIE DOMANDA PER BANDO PER DIPARIMENTO
 			processinstancesListaPerBandoDipartimento.forEach((processInstance) -> {
 				if (runtimeService.getVariable(processInstance.getProcessInstanceId(), "linkToOtherWorkflows") != null) {
 					String linkToOtherWorkflows = runtimeService.getVariable(processInstance.getProcessInstanceId(), "linkToOtherWorkflows").toString();
@@ -154,6 +154,17 @@ public class ManageProcessShortTermMobilityBandoDipartimento_v1 implements Execu
 				} else {
 					runtimeService.setVariable(processInstance.getProcessInstanceId(),  "linkToOtherWorkflows", execution.getProcessInstanceId());
 				}				
+				
+				
+				//AGGIUNGE IL LINK AL BANDO PER DIPARIMENTO DI TUTTI I WORKFLOW
+				Map<String, Object> variabili = new HashMap<>();
+				variabili.put("linkToOtherWorkflows", execution.getProcessInstanceId());	
+				if (execution.getVariable("linkToOtherWorkflows") != null) {
+					execution.setVariable("linkToOtherWorkflows", execution.getVariable("linkToOtherWorkflows").toString() + "," + processInstance.getProcessInstanceId());
+				} else {
+					execution.setVariable("linkToOtherWorkflows", processInstance.getProcessInstanceId());
+				}
+				
 				//SBLOCCA TUTTE LE DOMANDE ATTIVE DI QUEL BANDO
 				runtimeService.signal(processInstance.getId());
 				LOGGER.info("-- sblocco la processInstance: " + processInstance.getName() + " (" + processInstance.getId() + ") ");
