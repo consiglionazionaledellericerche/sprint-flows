@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 import static it.cnr.si.security.PermissionEvaluatorImpl.CNR_CODE;
 
 @Service
-@Profile("!oiv")
+@Profile("cnr")
 public class AceBridgeService {
 
 	private final Logger log = LoggerFactory.getLogger(AceBridgeService.class);
@@ -94,7 +94,7 @@ public class AceBridgeService {
 	}
 
 
-//	todo: in futuro rendere cacheable?
+	//	todo: in futuro rendere cacheable?
 	public List<EntitaOrganizzativaWebDto> getUoByTipo(int tipo) {
 
 		return aceService.entitaOrganizzativaFind(null, null, null, LocalDate.now(), tipo)
@@ -167,7 +167,7 @@ public class AceBridgeService {
 		return afferenze.get(0).getEntitaOrganizzativa();
 	}
 
-	
+
 	public EntitaOrganizzativaWebDto getAfferenzaUtenteTipoSede(String username) {
 
 		PersonaWebDto persona = aceService.getPersonaByUsername(username);
@@ -183,25 +183,25 @@ public class AceBridgeService {
 
 		return afferenze.get(0).getEntitaOrganizzativa();
 	}
-	
 
-    public EntitaOrganizzativaWebDto getEntitaOrganizzativaDellUtente(String username) {
 
-        String cdsuo = getAfferenzaUtente(username).getCdsuo();
+	public EntitaOrganizzativaWebDto getEntitaOrganizzativaDellUtente(String username) {
 
-        PageDto<EntitaOrganizzativaWebDto> entitaOrganizzativaWebDtoPageDto = aceService.entitaOrganizzativaFind(null, null, cdsuo, LocalDate.now(), null);
+		String cdsuo = getAfferenzaUtente(username).getCdsuo();
 
-        List<EntitaOrganizzativaWebDto> eos = entitaOrganizzativaWebDtoPageDto.getItems().stream()
-                .filter(eo -> Objects.isNull(eo.getEntitaLocale()))
-                .collect(Collectors.toList());
+		PageDto<EntitaOrganizzativaWebDto> entitaOrganizzativaWebDtoPageDto = aceService.entitaOrganizzativaFind(null, null, cdsuo, LocalDate.now(), null);
 
-        if (eos.size() == 0)
-            throw new UnexpectedResultException("Nessuna entita' organizzativa per il cdsuo: "+ cdsuo);
-        if (eos.size() > 1)
-            throw new UnexpectedResultException("Il Cdsuo risulta avere piu' entita' organizzative: "+ username);
+		List<EntitaOrganizzativaWebDto> eos = entitaOrganizzativaWebDtoPageDto.getItems().stream()
+				.filter(eo -> Objects.isNull(eo.getEntitaLocale()))
+				.collect(Collectors.toList());
 
-        return eos.get(0);
-    }
+		if (eos.size() == 0)
+			throw new UnexpectedResultException("Nessuna entita' organizzativa per il cdsuo: "+ cdsuo);
+		if (eos.size() > 1)
+			throw new UnexpectedResultException("Il Cdsuo risulta avere piu' entita' organizzative: "+ username);
+
+		return eos.get(0);
+	}
 
     public List<GerarchiaWebDto> getParents(long id) {
 		return aceService.getParentsForEo(id);

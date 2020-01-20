@@ -1,8 +1,8 @@
 package it.cnr.si.flows.ng.service;
 
-import it.cnr.jada.firma.arss.ArubaSignServiceException;
-import it.cnr.jada.firma.arss.stub.SignReturnV2;
 import it.cnr.si.FlowsApp;
+import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
+import it.cnr.si.firmadigitale.firma.arss.stub.SignReturnV2;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;

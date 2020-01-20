@@ -426,6 +426,16 @@ select.ng-touched.ng-invalid {
     background-size: contain;
 }
 
+.showcase-banner {
+    background: url("../images/showcase-flows-banner.png") center no-repeat;
+    background-size: contain;
+}
+
+.none-banner {
+    background: url("../images/none-flows-banner.png") center no-repeat;
+    background-size: contain;
+}
+
 /* CSS per editor ACE */
 .ace_editor {
   height: 200px;

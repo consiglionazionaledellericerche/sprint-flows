@@ -66,7 +66,7 @@
                     function(response){
                         //popolo i campi col contenuto del json
                         var json = JSON.parse(response.data.json);
-                        for (var key of Object.keys(json)) {
+                        for (var key in Object.keys(json)) {
                             $scope.data["" + key] = json[key]
                         }
                     }

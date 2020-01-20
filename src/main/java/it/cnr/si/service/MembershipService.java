@@ -180,11 +180,11 @@ public class MembershipService {
         try {
             otherUsers = forkJoinPool.submit(
                     () -> getAllGroupsForUser(username).parallelStream()     // recupero tutti i gruppi per l'utente richiesto
-                        .map(myGroup -> getAllUsersInGroup(myGroup)) // per ogni gruppo recupero i suoi membri
-                        .flatMap(list -> list.stream())           // ho uno stream di liste di stringhe che trasformo in uno stream di stringhe
-                        .filter(user -> !user.equals(username))   // non mi interessa includere l'utente con cui ho chiamato
-                        .collect(Collectors.toSet())
-                    ).get();
+                            .map(myGroup -> getAllUsersInGroup(myGroup)) // per ogni gruppo recupero i suoi membri
+                            .flatMap(list -> list.stream())           // ho uno stream di liste di stringhe che trasformo in uno stream di stringhe
+                            .filter(user -> !user.equals(username))   // non mi interessa includere l'utente con cui ho chiamato
+                            .collect(Collectors.toSet())
+            ).get();
             return otherUsers;
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);

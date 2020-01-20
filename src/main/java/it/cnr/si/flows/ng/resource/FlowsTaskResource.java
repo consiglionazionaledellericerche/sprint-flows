@@ -1,14 +1,15 @@
 package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
-import it.cnr.jada.firma.arss.ArubaSignServiceException;
-import it.cnr.jada.firma.arss.stub.SignReturnV2;
+import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
+import it.cnr.si.firmadigitale.firma.arss.stub.SignReturnV2;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.exception.FlowsPermissionException;
 import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
 import it.cnr.si.flows.ng.service.*;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.security.FlowsUserDetailsService;
 import it.cnr.si.security.PermissionEvaluatorImpl;
 import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.ActivitiObjectNotFoundException;
@@ -95,10 +96,10 @@ public class FlowsTaskResource {
             @RequestBody(required = false) String body){
 
         DataResponse response = flowsTaskService.getMyTasks(body!=null ? new JSONArray(body) : new JSONArray(),
-                                                            processDefinition,
-                                                            firstResult,
-                                                            maxResults,
-                                                            order);
+                processDefinition,
+                firstResult,
+                maxResults,
+                order);
         return ResponseEntity.ok(response);
     }
 
@@ -114,10 +115,10 @@ public class FlowsTaskResource {
             @RequestBody(required = false) String body) {
 
         DataResponse response = flowsTaskService.getAvailableTask(body!=null ? new JSONArray(body) : new JSONArray(),
-                                                                  processDefinition,
-                                                                  firstResult,
-                                                                  maxResults,
-                                                                  order);
+                processDefinition,
+                firstResult,
+                maxResults,
+                order);
         return ResponseEntity.ok(response);
     }
 
@@ -134,10 +135,10 @@ public class FlowsTaskResource {
             @RequestBody(required = false) String body) {
 
         DataResponse response = flowsTaskService.taskAssignedInMyGroups(body!=null ? new JSONArray(body) : new JSONArray(),
-                                                                        processDefinition,
-                                                                        firstResult,
-                                                                        maxResults,
-                                                                        order);
+                processDefinition,
+                firstResult,
+                maxResults,
+                order);
         return ResponseEntity.ok(response);
     }
 
@@ -235,8 +236,8 @@ public class FlowsTaskResource {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
-    
-    
+
+
 
     @DeleteMapping(value = "/removeCandidateGroup/{group:.*}", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -262,8 +263,8 @@ public class FlowsTaskResource {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
-    
-    
+
+
     @DeleteMapping(value = "/claim/{taskId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canClaimTask(#taskId, @flowsUserDetailsService)")
     @Timed
@@ -307,10 +308,10 @@ public class FlowsTaskResource {
             @RequestBody(required = false) String body) {
 
         DataResponse response = flowsTaskService.getTasksCompletedByMe(body!=null ? new JSONArray(body) : new JSONArray(),
-                                                                       processDefinition,
-                                                                       firstResult,
-                                                                       maxResults,
-                                                                       order);
+                processDefinition,
+                firstResult,
+                maxResults,
+                order);
         return ResponseEntity.ok(response);
     }
 

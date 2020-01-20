@@ -8,20 +8,39 @@
                 <div class="alert alert-success" ng-switch-when="true" translate="home.logged.message" translate-values="{username: '{{vm.account.login}}'}">
                     You are logged in as user "{{vm.account.login}}".
                 </div>
-                <div ng-switch-when="false" ng-If="app == 'cnr'">
+                <div ng-switch-when="false" ng-if="app == 'cnr'">
                     Per autenticarsi usare il menu' "Utente" usando le credenziali Siper.
                 </div>
-                <div ng-switch-when="false" ng-If="app == 'oiv'">
+                <div ng-switch-when="false" ng-if="app !== 'cnr'">
                     Per autenticarsi usare il menu' "Utente" usando le credenziali dell'applicazione.
                 </div>
 
+                <div ng-if="app === 'showcase'">
+                    <hr>
+                    <p>Questa versione "Showcase" della Scrivania Digitale contiene un semplice flusso di Richiesta Permessi/Ferie per illustrare le funzionalità del sistema
+                    <p>Sono presenti i seguenti utenti:
+                    <ul>
+                        <li>utente1:utente1 che, come dipendente può fare una richiesta di ferie attraverso una form apposita</li>
+                        <li>utente2:utente2 e utente3:utente3 che, come segreteria, rivedono e inoltrano la richiesta al direttore</li>
+                        <li>direttore:utente4 che approva la richiesta</li>
+                        <li>admin:admin che non ha funzioni nel flusso, ma può eseguire azioni speciali nel sistema</li>
+                    </ul>
+                    <p>In particolare gli utenti del gruppo Segreteria possono entrambi eseguire il compito di inoltrare la richiesta. Se uno di loro decide di prenderlo in carico,
+                        l'altro non potrà eseguirlo, ma lo potrà visionare nella scheda "Compiti di gruppo in carico ad altri".
+                    <p>Quando la richiesta passa al direttore (o all'utente1 che ha avviato il flusso), il compito è assegnato direttamente a quell'utente
+                    <p>Nella schermata dei dettagli del flusso è possibile visionare tutti i metadati del flusso (compresi i documenti allegati) e
+                        la loro storia, ed esportarne un docuemento di sintesi in formato pdf.
+                    <p>Nella schermata della ricerca è possibile ricercare i flussi avviati e terminati, anche per chiavi di ricerca (definite per tipo di flusso).
+                    <hr>
+                    <p>In questa versione della Scrivania Digitale le notifiche email sono disabilitate.
+                </div>
 
                 <div ng-show="vm.avvisi.length > 0">
                     <h2>Avvisi</h2>
                     <div class="alert alert-warning" ng-repeat="avviso in vm.avvisi">{{avviso.contenuto}}</div>
                 </div>
 
-                <div class="row" ng-switch-when="true" ng-If="app == 'cnr'">
+                <div class="row" ng-switch-when="true" ng-if="app == 'cnr'">
                     <div class="col-md-6 well">
                         <div>
                             <a class="btn btn-primary btn-block" style="margin: 10px;" href="https://scrivaniadigitale.cnr.it">Cliccare qui per autenticarsi con la<br/>versione precedente della Scrivania Digitale</a>

@@ -28,7 +28,7 @@ import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.idStruttura;
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 
 @Component
-@Profile("!oiv")
+@Profile("cnr")
 
 @Service
 public class StartAcquistiSetGroupsAndVisibility {
@@ -68,7 +68,7 @@ public class StartAcquistiSetGroupsAndVisibility {
 //			String struttura = gruppoStaffAmministrativo.substring(gruppoStaffAmministrativo.lastIndexOf('@') +1);
 //			// idStruttura variabile che indica che il flusso è diviso per strutture (implica la visibilità distinta tra strutture)
 //
-//			// NUOVA PROCEDURA PER PRENDERE L'ENTITA' ORGANIZZATIVA DI RIFERIMENTO 
+//			// NUOVA PROCEDURA PER PRENDERE L'ENTITA' ORGANIZZATIVA DI RIFERIMENTO
 //			String cdsuoAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(initiator).getCdsuo();
 //			Object insdipResponsabileUo = siperService.getResponsabileCDSUO(cdsuoAppartenenzaUtente).get(0).get("codice_sede");
 //			String strutturaAppartenenza = aceService.entitaOrganizzativaFindByTerm(insdipResponsabileUo.toString()).get(0).getId().toString();
@@ -110,14 +110,14 @@ public class StartAcquistiSetGroupsAndVisibility {
 			execution.setVariable("gruppoSFD", gruppoSFD);
 			execution.setVariable("sigla", applicazioneSigla);
 			//SET VARIABILI Direzione flusso
-			execution.setVariable("statoImpegni", "provvisori"); 
+			execution.setVariable("statoImpegni", "provvisori");
 			if (execution.getVariable("tipologiaAffidamentoDiretto") == null) {
-				execution.setVariable("tipologiaAffidamentoDiretto", "normale"); 
+				execution.setVariable("tipologiaAffidamentoDiretto", "normale");
 			}
-			//SET CONTATORE ACQUISTO STRUTTURA		
+			//SET CONTATORE ACQUISTO STRUTTURA
 			String counterId = aceBridgeService.getUoById(Integer.parseInt(struttura)).getCdsuo() + "-ACQ-" + Calendar.getInstance().get(Calendar.YEAR);
 			String key = counterId + "-" + counterService.getNext(counterId);
-			execution.setVariable("codiceAcquistoStruttura", key); 
+			execution.setVariable("codiceAcquistoStruttura", key);
 		}
 
 	}

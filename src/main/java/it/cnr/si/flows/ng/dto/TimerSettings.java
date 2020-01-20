@@ -18,11 +18,11 @@ import java.util.Objects;
 public class TimerSettings implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    
+
     @NotNull
     @Column(name = "processInstanceId", nullable = false)
     private String processInstanceId;
@@ -34,19 +34,19 @@ public class TimerSettings implements Serializable {
     @NotNull
     @Column(name = "newDate", nullable = false)
     private Date newDate;
-    
+
     @NotNull
     @Column(name = "yearAddValue", nullable = false)
     private int yearAddValue;
-    
+
     @NotNull
     @Column(name = "monthAddValue", nullable = false)
     private int monthAddValue;
-    
+
     @NotNull
     @Column(name = "dayAddValue", nullable = false)
     private int dayAddValue;
-    
+
     @NotNull
     @Column(name = "hourAddValue", nullable = false)
     private int hourAddValue;
@@ -88,17 +88,17 @@ public class TimerSettings implements Serializable {
     public void setTimerId(String timerId) {
         this.timerId = timerId;
     }
-    
-    
+
+
     public Date getNewDate() {
         return newDate;
     }
-    
+
     public TimerSettings newDate(Date newDate) {
         this.newDate = newDate;
         return this;
     }
-    
+
     public void setNewDate(Date newDate) {
         this.newDate = newDate;
 
@@ -116,7 +116,7 @@ public class TimerSettings implements Serializable {
     public void setYearAddValue(int yearAddValue) {
         this.yearAddValue = yearAddValue;
     }
-  
+
 
     public int getMonthAddValue() {
         return yearAddValue;
@@ -174,17 +174,17 @@ public class TimerSettings implements Serializable {
     public int hashCode() {
         return Objects.hashCode(id);
     }
-    
+
     @Override
     public String toString() {
         return "timer{" +
-            ", processInstanceId='" + processInstanceId + "'" +
-            ", yearAddValue='" + yearAddValue + "'" +
-            ", monthAddValue='" + monthAddValue + "'" +
-            ", dayAddValue='" + dayAddValue + "'" +
-            ", hourAddValue='" + hourAddValue + "'" +
-            ", minuteAddValue='" + minuteAddValue + "'" +
-            '}';
+                ", processInstanceId='" + processInstanceId + "'" +
+                ", yearAddValue='" + yearAddValue + "'" +
+                ", monthAddValue='" + monthAddValue + "'" +
+                ", dayAddValue='" + dayAddValue + "'" +
+                ", hourAddValue='" + hourAddValue + "'" +
+                ", minuteAddValue='" + minuteAddValue + "'" +
+                '}';
     }
 
 }

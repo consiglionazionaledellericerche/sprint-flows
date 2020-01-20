@@ -20,7 +20,7 @@ import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 import static it.cnr.si.security.PermissionEvaluatorImpl.ID_STRUTTURA;
 
 @Component
-@Profile("!oiv")
+@Profile("cnr")
 public class StartAcquistiRevocaSetGroupsAndVisibility implements ExecutionListener {
     private static final long serialVersionUID = 686169707042367215L;
     private static final Logger LOGGER = LoggerFactory.getLogger(StartAcquistiRevocaSetGroupsAndVisibility.class);
@@ -65,7 +65,7 @@ public class StartAcquistiRevocaSetGroupsAndVisibility implements ExecutionListe
                 execution.setVariable("organizzazioneStruttura", "Complessa");
             }
             execution.setVariable("nomeStruttura", aceBridgeService.getNomeStruturaById(Integer.parseInt(struttura)));
-            
+
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoRT, PROCESS_VISUALIZER);
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoFirmaAcquisti, PROCESS_VISUALIZER);
             runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoStaffAmministrativo, PROCESS_VISUALIZER);

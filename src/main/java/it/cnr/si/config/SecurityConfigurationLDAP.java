@@ -47,7 +47,7 @@ public class SecurityConfigurationLDAP extends WebSecurityConfigurerAdapter {
             String url = propertyResolver.getProperty("url");
             if (propertyResolver != null && url != null) {
                 log.info("ldap server: " + url);
-    
+
                 auth.ldapAuthentication()
                         .userDetailsContextMapper(userDetailsContextMapper)
                         .ldapAuthoritiesPopulator(authPopulator)
@@ -62,7 +62,7 @@ public class SecurityConfigurationLDAP extends WebSecurityConfigurerAdapter {
                 log.warn("no ldap configuration found");
             }
         } else {
-            log.info("Profilo oiv, non carico LDAP");
+            log.info("Profilo non cnr, non carico LDAP");
         }
     }
 

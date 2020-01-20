@@ -198,12 +198,12 @@ public class FlowsProcessInstanceResource {
 
 		return new ResponseEntity<HistoricVariableInstance>(
 				historyService.createHistoricVariableInstanceQuery()
-				.processInstanceId(processInstanceId)
-				.variableName(variableName)
-				.list()
-				.stream()
-				.sorted((a, b) -> b.getLastUpdatedTime().compareTo(a.getLastUpdatedTime()) )
-				.findFirst().orElse(null),
+						.processInstanceId(processInstanceId)
+						.variableName(variableName)
+						.list()
+						.stream()
+						.sorted((a, b) -> b.getLastUpdatedTime().compareTo(a.getLastUpdatedTime()) )
+						.findFirst().orElse(null),
 				HttpStatus.OK);
 	}
 

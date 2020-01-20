@@ -5,6 +5,8 @@
 /.project
 /.settings/
 /.classpath
+.classpath
+.project
 /DB-H2/
 /.xml/
 /.bpmn/
