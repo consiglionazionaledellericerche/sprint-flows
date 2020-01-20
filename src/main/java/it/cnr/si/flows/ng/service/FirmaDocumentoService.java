@@ -1,6 +1,6 @@
 package it.cnr.si.flows.ng.service;
 
-import it.cnr.jada.firma.arss.ArubaSignServiceException;
+import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
 import org.activiti.engine.delegate.BpmnError;
@@ -30,8 +30,8 @@ public class FirmaDocumentoService {
         if (nomeVariabileFile == null)
             throw new IllegalStateException("Questo Listener ha bisogno del campo 'nomeFileDaFirmare' nella process definition (nel Task Listener - Fields).");
         if (execution.getVariable("sceltaUtente") != null &&
-            !"Firma Multipla".equals(execution.getVariable("sceltaUtente")) &&
-            "Firma".equals(execution.getVariable("sceltaUtente")) ) {
+                !"Firma Multipla".equals(execution.getVariable("sceltaUtente")) &&
+                "Firma".equals(execution.getVariable("sceltaUtente")) ) {
 
             String stringaOscurante = "******";
             // TODO: validare presenza di queste tre variabili

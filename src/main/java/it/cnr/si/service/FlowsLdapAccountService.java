@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @Primary
-@Profile("!oiv")
+@Profile("cnr")
 public class FlowsLdapAccountService extends LdapAccountService {
 
     private final static Logger log = LoggerFactory.getLogger(LdapAccountService.class);

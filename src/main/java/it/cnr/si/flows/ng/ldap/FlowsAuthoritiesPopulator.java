@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 /**
  * Modified my mtrycz on 26/05/17.
  */
-@Profile(value = {"!oiv"})
+@Profile(value = {"cnr"})
 public class FlowsAuthoritiesPopulator implements LdapAuthoritiesPopulator {
 
     public static final String DEPARTMENT_NUMBER = "departmentnumber";

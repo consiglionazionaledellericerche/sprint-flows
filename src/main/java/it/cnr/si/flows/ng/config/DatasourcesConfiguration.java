@@ -64,6 +64,8 @@ public class DatasourcesConfiguration {
             dbUrl = dbUrl.replace("flows", "flows-cnr");
         } else if (springActiveProfiles.contains("oiv")) {
             dbUrl = dbUrl.replace("flows", "flows-oiv");
+        } else if (springActiveProfiles.contains("showcase")) {
+            dbUrl = dbUrl.replace("flows", "flows-showcase");
         }
         return dbUrl;
     }

@@ -51,15 +51,18 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
                 .addFilterAfter(switchUserFilter(), FilterSecurityInterceptor.class)
                 .addFilterAfter(logPrologSettingFilter(), OAuthCookieSwithUserFilter.class);
     }
-    @Profile(value = {"!oiv"})
+
+    @Profile(value = {"cnr"})
     @Bean public LdapUserDetailsManager getLdapUserDetailsManager(LdapContextSource ctx) {
         return new LdapUserDetailsManager(ctx);
     }
-    @Profile(value = {"!oiv"})
+
+    @Profile(value = {"cnr"})
     @Bean public LdapUserDetailsService getLdapUserDetailsService(LdapUserSearch search, LdapAuthoritiesPopulator fap) {
         return new LdapUserDetailsService(search, fap);
     }
-    @Profile(value = {"!oiv"})
+
+    @Profile(value = {"cnr"})
     @Bean public LdapAuthoritiesPopulator getFlowsAuthoritiesPopulator(ApplicationContext appContext) {
         FlowsAuthoritiesPopulator cap = new FlowsAuthoritiesPopulator();
         appContext.getAutowireCapableBeanFactory().autowireBean(cap);
@@ -67,7 +70,7 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
     }
 
     @Bean
-    @Profile(value = {"!oiv"})
+    @Profile(value = {"cnr"})
     public LdapUserSearch getLdapUserSearch(Environment env, LdapContextSource ctx) {
         PropertyResolver p = new RelaxedPropertyResolver(env, "spring.ldap.");
         String userSearchBase = ""; //p.getProperty("userSearchBase");
@@ -77,7 +80,7 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
     }
 
     @Bean
-    @Profile(value = {"!oiv"})
+    @Profile(value = {"cnr"})
     public LdapContextSource getLdapContextSource(Environment env) {
         PropertyResolver p = new RelaxedPropertyResolver(env, "spring.ldap."); //
 
@@ -90,7 +93,7 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
     }
 
     @Bean
-    @Profile(value = {"!oiv"})
+    @Profile(value = {"cnr"})
     public LdapTemplate getLdapTemplate(LdapContextSource contextSource) {
         return new LdapTemplate(contextSource);
     }

@@ -133,7 +133,7 @@ public class CounterResourceIntTest {
 
         // Get the counter
         restCounterMockMvc.perform(get("/api/counters/{id}", counter.getId()))
-            .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound());
     }
 
     @Test

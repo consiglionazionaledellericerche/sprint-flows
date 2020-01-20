@@ -125,10 +125,13 @@ public class AddFlowsAttachmentsListener implements ActivitiEventListener {
                 profile = "flows-demo";
             }
 
-            String idStruttura = runtimeService.getVariable(processInstanceId, ID_STRUTTURA, String.class);
-            String cdsuo = Optional.ofNullable(idStruttura)
-                    .map(id -> aceBridgeService.getUoById(Integer.parseInt(id)).getCdsuo())
-                    .orElse(null);
+            String cdsuo = null;
+            if (activeProfiles.contains("cnr")) {
+                String idStruttura = runtimeService.getVariable(processInstanceId, ID_STRUTTURA, String.class);
+                cdsuo = Optional.ofNullable(idStruttura)
+                        .map(id -> aceBridgeService.getUoById(Integer.parseInt(id)).getCdsuo())
+                        .orElse(null);
+            }
 
             String anno = key.split("-")[1];
 

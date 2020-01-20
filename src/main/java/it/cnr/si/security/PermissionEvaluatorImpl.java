@@ -341,7 +341,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
                 .singleResult();
         String username = SecurityUtils.getCurrentUserLogin();
 
-        if (instance.getProcessDefinitionKey().equals(acquisti.getProcessDefinition())) {
+            if (instance.getProcessDefinitionKey().equals(acquisti.getProcessDefinition())) {
 
             String rup = String.valueOf(instance.getProcessVariables().get("rup"));
             if (username.equals(rup))

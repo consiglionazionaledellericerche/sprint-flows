@@ -288,7 +288,7 @@ public class FlowsPdfService {
 							variableInstanceJson.put(key, valueEscaped);
 						}
 					}
-				}	
+				}
 			}
 			LOGGER.info("variableInstanceJson: {}", variableInstanceJson);
 		}
@@ -297,19 +297,19 @@ public class FlowsPdfService {
 		JSONObject processVariables = mappingVariables(variableInstanceJson, processInstanceId);
 		//creo il pdf corrispondente
 		String utenteRichiedente = "sistema";
-		String fileName = tipologiaDoc + ".pdf";			
+		String fileName = tipologiaDoc + ".pdf";
 
 		if(processVariables.has("nomeRichiedente")) {
 			utenteRichiedente = processVariables.getString("nomeRichiedente");
 			fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
-		} 
+		}
 
 		if(processVariables.has("userNameRichiedente")) {
 			utenteRichiedente = processVariables.getString("userNameRichiedente");
 			fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
-		} 
-		
-		
+		}
+
+
 		return Pair.of(fileName, makePdf(Enum.PdfType.valueOf(tipologiaDoc), processVariables, fileName, utenteRichiedente, processInstanceId));
 	}
 
