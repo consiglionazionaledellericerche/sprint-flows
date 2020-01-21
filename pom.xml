@@ -235,6 +235,11 @@
             <artifactId>storage-cloud-filesystem</artifactId>
             <version>${storage-cloud.version}</version>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>it.cnr.si.storage</groupId>-->
+<!--            <artifactId>storage-cloud-cmis</artifactId>-->
+<!--            <version>${storage-cloud.version}</version>-->
+<!--        </dependency>-->
 
         <!-- EE dependencies for Java11 -->
         <dependency>
@@ -537,22 +542,6 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>com.spotify</groupId>
-                <artifactId>docker-maven-plugin</artifactId>
-                <version>0.4.10</version>
-                <configuration>
-                    <imageName>sprint</imageName>
-                    <dockerDirectory>src/main/docker</dockerDirectory>
-                    <resources>
-                        <resource>
-                            <targetPath>/</targetPath>
-                            <directory>${project.build.directory}</directory>
-                            <include>${project.build.finalName}.war</include>
-                        </resource>
-                    </resources>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>io.gatling</groupId>
                 <artifactId>gatling-maven-plugin</artifactId>
                 <version>${gatling-maven-plugin.version}</version>
@@ -791,6 +780,24 @@
                     <!-- Enable the line below to have remote debugging of
                         your application on port 5005 <jvmArguments>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005</jvmArguments> -->
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.coderplus.maven.plugins</groupId>
+                <artifactId>copy-rename-maven-plugin</artifactId>
+                <version>1.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-file</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <sourceFile>target/${project.build.finalName}.war</sourceFile>
+                            <destinationFile>target/app.war</destinationFile>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

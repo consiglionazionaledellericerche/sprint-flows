@@ -18,6 +18,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
+import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -135,9 +136,9 @@ public class AddFlowsAttachmentsListener implements ActivitiEventListener {
 
             String anno = key.split("-")[1];
 
-            path = Stream.of("/Comunicazioni al CNR", profile, processDefinitionId, cdsuo, anno, key)
+            path = Stream.of("Comunicazioni al CNR", profile, processDefinitionId, cdsuo, anno, key)
                     .filter(Objects::nonNull)
-                    .collect(Collectors.joining("/"));
+                    .collect(Collectors.joining(File.separator));
 
             LOGGER.debug("Path calcolato per il flusso " + key + ": " + path);
 

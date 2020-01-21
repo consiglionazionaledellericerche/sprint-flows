@@ -31,7 +31,7 @@ import java.util.stream.Stream;
 @RequestMapping("api/manual")
 public class FlowsManualResource {
 
-    private static final String DIR_MANUALI = "/Comunicazioni al CNR/flows/Manuali/";
+    private static final String DIR_MANUALI = "Comunicazioni al CNR/flows/Manuali/";
     private static final String TITLE = "cm:title";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsManualResource.class);
