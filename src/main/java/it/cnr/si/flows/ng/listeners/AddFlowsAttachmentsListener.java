@@ -136,9 +136,9 @@ public class AddFlowsAttachmentsListener implements ActivitiEventListener {
 
             String anno = key.split("-")[1];
 
-            path = Stream.of("Comunicazioni al CNR", profile, processDefinitionId, cdsuo, anno, key)
+            path = Stream.of("/Comunicazioni al CNR", profile, processDefinitionId, cdsuo, anno, key)
                     .filter(Objects::nonNull)
-                    .collect(Collectors.joining(File.separator, File.separator, File.separator));
+                    .collect(Collectors.joining("/"));
 
             LOGGER.debug("Path calcolato per il flusso " + key + ": " + path);
 
