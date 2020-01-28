@@ -12,6 +12,7 @@ import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
 import it.cnr.si.security.PermissionEvaluatorImpl;
+import it.cnr.si.service.DraftService;
 import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.*;
@@ -70,8 +71,6 @@ public class FlowsTaskService {
 	private HistoryService historyService;
 	@Inject
 	private TaskService taskService;
-	@Autowired(required = false)
-	private AceBridgeService aceBridgeService;
 	@Inject
 	private FlowsAttachmentResource attachmentResource;
 	@Inject
@@ -98,6 +97,8 @@ public class FlowsTaskService {
 	private RestResponseFactory restResponseFactory;
 	@Inject
 	private Environment env;
+	@Inject
+	private DraftService draftService;
 
 	public DataResponse search(Map<String, String> params, String processInstanceId, boolean active, String order, int firstResult, int maxResults) {
 		HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery();
@@ -160,21 +161,21 @@ public class FlowsTaskService {
 				else {
 					//wildcard ("%") di default ma non a TUTTI i campi
 					switch (type) {
-					case "textEqual":
-						taskQuery.taskVariableValueEquals(key, value);
-						break;
-					case "boolean":
-						// gestione variabili booleane
-						taskQuery.taskVariableValueEquals(key, Boolean.valueOf(value));
-						break;
-					case "date":
-						processDate(taskQuery, key, value);
-						break;
-					default:
-						//variabili con la wildcard  (%value%)
-						if (!value.isEmpty())
-							taskQuery.taskVariableValueLikeIgnoreCase(key, "%" + value + "%");
-						break;
+						case "textEqual":
+							taskQuery.taskVariableValueEquals(key, value);
+							break;
+						case "boolean":
+							// gestione variabili booleane
+							taskQuery.taskVariableValueEquals(key, Boolean.valueOf(value));
+							break;
+						case "date":
+							processDate(taskQuery, key, value);
+							break;
+						default:
+							//variabili con la wildcard  (%value%)
+							if (!value.isEmpty())
+								taskQuery.taskVariableValueLikeIgnoreCase(key, "%" + value + "%");
+							break;
 					}
 				}
 			}
@@ -247,9 +248,9 @@ public class FlowsTaskService {
 			List<Task> tasks = taskQuery.taskAssignee(user).list()
 					.stream()
 					.filter(t ->
-					taskService.getIdentityLinksForTask(t.getId()).stream().anyMatch(il ->
-					il.getType().equals(IdentityLinkType.CANDIDATE) && userAuthorities.contains(il.getGroupId()) )
-							).collect(Collectors.toList());
+							taskService.getIdentityLinksForTask(t.getId()).stream().anyMatch(il ->
+									il.getType().equals(IdentityLinkType.CANDIDATE) && userAuthorities.contains(il.getGroupId()) )
+					).collect(Collectors.toList());
 
 			result.addAll(restResponseFactory.createTaskResponseList(tasks));
 		}
@@ -271,7 +272,7 @@ public class FlowsTaskService {
 	public DataResponse getMyTasks(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
 		TaskQuery taskQuery = (TaskQuery) utils.searchParams(searchParams, taskService.createTaskQuery());
 		taskQuery.taskAssignee(SecurityUtils.getCurrentUserLogin())
-		.includeProcessVariables();
+				.includeProcessVariables();
 
 		if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
 			taskQuery.processDefinitionKey(processDefinition);
@@ -317,9 +318,8 @@ public class FlowsTaskService {
 		data.put("key", key);
 
 		String username = SecurityUtils.getCurrentUserLogin();
-		if (data.get(initiator.name()) == null) {
-			data.put(initiator.name(), username);
-		}
+
+		data.put(initiator.name(), username);
 		data.put(startDate.name(), new Date());
 
 		ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
@@ -359,6 +359,8 @@ public class FlowsTaskService {
 		taskService.addUserIdentityLink(taskId, username, TASK_EXECUTOR);
 		try {
 			taskService.complete(taskId, data);
+
+			draftService.deleteDraftByTaskId(Long.valueOf(taskId));
 		} catch (Exception e) {
 			if (e instanceof ActivitiObjectNotFoundException)
 				LOGGER.error("Task {} NON trovato", taskId);

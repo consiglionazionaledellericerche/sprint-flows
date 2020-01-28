@@ -98,7 +98,7 @@
             <column name="form" type="string"/>
         </loadUpdateData>
         <loadUpdateData encoding="UTF-8"
-                        file="config/liquibase/cnr/new/short-term-mobility-bandi-form.csv"
+                        file="config/liquibase/cnr/new/short-term-mobility-bando-dipartimento-form.csv"
                         primaryKey="id"
                         schemaName="public"
                         separator=";"

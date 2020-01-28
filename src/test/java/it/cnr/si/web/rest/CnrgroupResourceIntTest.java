@@ -38,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see CnrgroupResource
  */
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "native,unittests,cnr")
+@ActiveProfiles(profiles = "native,showcase,unittests")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
 @Ignore
@@ -73,8 +73,8 @@ public class CnrgroupResourceIntTest {
         CnrgroupResource cnrgroupResource = new CnrgroupResource();
         ReflectionTestUtils.setField(cnrgroupResource, "cnrgroupService", cnrgroupService);
         this.restCnrgroupMockMvc = MockMvcBuilders.standaloneSetup(cnrgroupResource)
-            .setCustomArgumentResolvers(pageableArgumentResolver)
-            .setMessageConverters(jacksonMessageConverter).build();
+                .setCustomArgumentResolvers(pageableArgumentResolver)
+                .setMessageConverters(jacksonMessageConverter).build();
     }
 
     /**
@@ -175,11 +175,11 @@ public class CnrgroupResourceIntTest {
 
         // Get the cnrgroup
         restCnrgroupMockMvc.perform(get("/api/cnrgroups/{id}", cnrgroup.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.id").value(cnrgroup.getId().intValue()))
-            .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
-            .andExpect(jsonPath("$.displayName").value(DEFAULT_DISPLAY_NAME.toString()));
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(jsonPath("$.id").value(cnrgroup.getId().intValue()))
+                .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
+                .andExpect(jsonPath("$.displayName").value(DEFAULT_DISPLAY_NAME.toString()));
     }
 
     @Test

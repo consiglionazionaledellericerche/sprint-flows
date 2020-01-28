@@ -21,7 +21,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "native,unittests,cnr")
+@ActiveProfiles(profiles = "native,showcase,unittests")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
 public class MembershipServiceTest {
@@ -72,9 +72,9 @@ public class MembershipServiceTest {
     @Test
     public void testGetUsersInMyGroups() {
 
-        Set<String> usersInMyGroups = membershipService.getUsersInMyGroups("anna.penna");
+        Set<String> usersInMyGroups = membershipService.getUsersInMyGroups("utente2");
         log.info("All groups for user "+membershipService.getAllGroupsForUser(TestServices.getRA()));
-        assertTrue(usersInMyGroups.contains("silvia.rossi"));
+        assertTrue(usersInMyGroups.contains("utente3"));
 
     }
 }

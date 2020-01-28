@@ -159,6 +159,9 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 			};break;    	
 			case "endevent-non-autorizzata-start": {
 				execution.setVariable(statoFinaleDomanda.name(), "DOMANDA NON AUTORIZZATA");
+				if(execution.getVariable("sceltaUtente") != "Respingi") {
+					execution.setVariable("notaDomandaRespinta", "Scadenza termini temporali Valutazione Dirigente");
+				}
 				restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA);
 				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "NON AUTORIZZATA");
 			};break;  

@@ -15,6 +15,7 @@ import java.util.Map;
  */
 public enum ExternalApplication {
     ABIL,
+    STM,
     SIGLA,
     ACE,
     MISSIONI,

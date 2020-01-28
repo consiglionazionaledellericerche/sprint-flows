@@ -9,6 +9,7 @@ import it.cnr.si.web.rest.util.HeaderUtil;
 import it.cnr.si.web.rest.util.PaginationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -36,7 +37,7 @@ public class DynamiclistResource {
 
     @Inject
     private DynamiclistRepository dynamiclistRepository;
-    @Inject
+    @Autowired(required = false)
     DynamicListService dynamicListService;
 
 

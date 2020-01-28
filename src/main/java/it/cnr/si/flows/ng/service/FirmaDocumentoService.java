@@ -1,12 +1,13 @@
 package it.cnr.si.flows.ng.service;
 
-import it.cnr.jada.firma.arss.ArubaSignServiceException;
+import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -20,7 +21,7 @@ import static it.cnr.si.flows.ng.utils.Enum.Stato.Firmato;
 public class FirmaDocumentoService {
     private static final Logger LOGGER = LoggerFactory.getLogger(FirmaDocumentoService.class);
 
-    @Inject
+    @Autowired(required = false)
     private FlowsFirmaService flowsFirmaService;
     @Inject
     private FlowsAttachmentService flowsAttachmentService;
@@ -30,8 +31,8 @@ public class FirmaDocumentoService {
         if (nomeVariabileFile == null)
             throw new IllegalStateException("Questo Listener ha bisogno del campo 'nomeFileDaFirmare' nella process definition (nel Task Listener - Fields).");
         if (execution.getVariable("sceltaUtente") != null &&
-            !"Firma Multipla".equals(execution.getVariable("sceltaUtente")) &&
-            "Firma".equals(execution.getVariable("sceltaUtente")) ) {
+                !"Firma Multipla".equals(execution.getVariable("sceltaUtente")) &&
+                "Firma".equals(execution.getVariable("sceltaUtente")) ) {
 
             String stringaOscurante = "******";
             // TODO: validare presenza di queste tre variabili

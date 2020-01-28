@@ -4,16 +4,10 @@ package it.cnr.si.flows.ng.resource;
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.service.FlowsPdfService;
-import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.impl.persistence.entity.VariableInstance;
-import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
-import org.activiti.engine.impl.variable.SerializableType;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,11 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;
-import java.text.ParseException;
-import java.util.Map;
-import java.util.Map.Entry;
 
 
 /**
@@ -63,7 +53,6 @@ public class FlowsPdfResource {
 	 * Crea e restituisce il summary pdf del flusso.
 	 *
 	 * @param processInstanceId : processInstanceId del workflow di cui si vuole generare il summary
-	 * @param req               the req
 	 * @return ResponseEntity restituisce il pdf generato
 	 */
 	@RequestMapping(value = "/summaryPdf", headers = "Accept=application/pdf", method = RequestMethod.GET, produces = "application/pdf")
@@ -71,8 +60,7 @@ public class FlowsPdfResource {
 	@Timed
 	@Secured(AuthoritiesConstants.USER)
 	public ResponseEntity<byte[]> makeSummaryPdf(
-			@RequestParam("processInstanceId") String processInstanceId,
-			HttpServletRequest req) {
+			@RequestParam("processInstanceId") String processInstanceId) {
 
 		try {
 			final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

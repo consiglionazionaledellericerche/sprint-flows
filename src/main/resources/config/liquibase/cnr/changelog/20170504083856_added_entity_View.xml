@@ -96,7 +96,7 @@
             <column name="view" type="string"/>
         </loadUpdateData>
         <loadUpdateData encoding="UTF-8"
-                        file="config/liquibase/cnr/new/short-term-mobility-bandi-view.csv"
+                        file="config/liquibase/cnr/new/short-term-mobility-bando-dipartimento-view.csv"
                         primaryKey="id"
                         schemaName="public"
                         separator=";"

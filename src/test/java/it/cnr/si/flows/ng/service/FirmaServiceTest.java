@@ -1,8 +1,8 @@
 package it.cnr.si.flows.ng.service;
 
-import it.cnr.jada.firma.arss.ArubaSignServiceException;
-import it.cnr.jada.firma.arss.stub.SignReturnV2;
 import it.cnr.si.FlowsApp;
+import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
+import it.cnr.si.firmadigitale.firma.arss.stub.SignReturnV2;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -28,6 +28,7 @@ import static org.junit.Assert.fail;
 @ActiveProfiles(profiles = "native,unittests,cnr")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
+@Ignore // TODO per ora testiamo solo Showcase, funzionalita' CNR da testare separatamente
 public class FirmaServiceTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FirmaServiceTest.class);

@@ -8,6 +8,7 @@ import it.cnr.si.spring.storage.StorageService;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -30,12 +31,12 @@ import java.util.stream.Stream;
 @RequestMapping("api/manual")
 public class FlowsManualResource {
 
-    private static final String DIR_MANUALI = "/Comunicazioni al CNR/flows/Manuali/";
+    private static final String DIR_MANUALI = "Comunicazioni al CNR/flows/Manuali/";
     private static final String TITLE = "cm:title";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsManualResource.class);
 
-    @Inject
+    @Autowired(required = false)
     private StorageService storageService;
 
     @RequestMapping(value = "/", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

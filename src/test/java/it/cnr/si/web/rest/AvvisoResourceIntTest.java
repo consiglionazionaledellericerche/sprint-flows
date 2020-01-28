@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @see AvvisoResource
  */
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "native,unittests,cnr")
+@ActiveProfiles(profiles = "native,showcase,unittests")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
 public class AvvisoResourceIntTest {
@@ -72,8 +72,8 @@ public class AvvisoResourceIntTest {
         AvvisoResource avvisoResource = new AvvisoResource();
         ReflectionTestUtils.setField(avvisoResource, "avvisoService", avvisoService);
         this.restAvvisoMockMvc = MockMvcBuilders.standaloneSetup(avvisoResource)
-            .setCustomArgumentResolvers(pageableArgumentResolver)
-            .setMessageConverters(jacksonMessageConverter).build();
+                .setCustomArgumentResolvers(pageableArgumentResolver)
+                .setMessageConverters(jacksonMessageConverter).build();
     }
 
     /**
@@ -156,11 +156,11 @@ public class AvvisoResourceIntTest {
 
         // Get the avviso
         restAvvisoMockMvc.perform(get("/api/avvisos/{id}", avviso.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.id").value(avviso.getId().intValue()))
-            .andExpect(jsonPath("$.contenuto").value(DEFAULT_CONTENUTO.toString()))
-            .andExpect(jsonPath("$.attivo").value(DEFAULT_ATTIVO.booleanValue()));
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(jsonPath("$.id").value(avviso.getId().intValue()))
+                .andExpect(jsonPath("$.contenuto").value(DEFAULT_CONTENUTO.toString()))
+                .andExpect(jsonPath("$.attivo").value(DEFAULT_ATTIVO.booleanValue()));
     }
 
     @Test

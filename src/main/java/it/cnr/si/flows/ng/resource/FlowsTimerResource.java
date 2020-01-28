@@ -42,7 +42,7 @@ public class FlowsTimerResource {
     private FlowsTimerService flowsTimerService;
     @Inject
     private RestResponseFactory restResponseFactory;
-    
+
     @RequestMapping(value = "/timer/{processId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId, @flowsUserDetailsService)")
     @Timed
@@ -54,12 +54,12 @@ public class FlowsTimerResource {
         response.setData(restResponseFactory.createJobResponseList(timerList));
         return ResponseEntity.ok(response);
     }
-    
+
     @RequestMapping(value = "/timer/{processId}/{timerId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<DataResponse> getProcessSingleTimer(@PathVariable("processId") String processInstanceId,
-            @PathVariable("timerId") String timerId) throws IOException, ParseException {
+                                                              @PathVariable("timerId") String timerId) throws IOException, ParseException {
 
         List<Job> timerList = flowsTimerService.getTimer(processInstanceId, timerId);
         LOGGER.info("timerList.size(): " + timerList.size());
@@ -68,7 +68,7 @@ public class FlowsTimerResource {
         response.setData(restResponseFactory.createJobResponseList(timerList));
         return ResponseEntity.ok(response);
     }
-    
+
     @RequestMapping(value = "/timer/setTimerValuesFromNow", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId, @flowsUserDetailsService)")
     @Timed
@@ -78,22 +78,22 @@ public class FlowsTimerResource {
 
 
         DataResponse response = new DataResponse();
-        
+
         try {
-			flowsTimerService.setTimerValuesFromNow(timer.getProcessInstanceId(), timer.getTimerId(), timer.getYearAddValue(), timer.getMonthAddValue(), timer.getDayAddValue(), timer.getHourAddValue(), timer.getMinuteAddValue());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            flowsTimerService.setTimerValuesFromNow(timer.getProcessInstanceId(), timer.getTimerId(), timer.getYearAddValue(), timer.getMonthAddValue(), timer.getDayAddValue(), timer.getHourAddValue(), timer.getMinuteAddValue());
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         //return ResponseEntity.ok(response);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    
+
     @RequestMapping(value = "/timer/setTimer", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId, @flowsUserDetailsService)")
     @Timed
@@ -103,19 +103,19 @@ public class FlowsTimerResource {
 
 
         DataResponse response = new DataResponse();
-        
+
         try {
-			flowsTimerService.setTimer(timer.getProcessInstanceId(), timer.getTimerId(), timer.getNewDate());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            flowsTimerService.setTimer(timer.getProcessInstanceId(), timer.getTimerId(), timer.getNewDate());
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         //return ResponseEntity.ok(response);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-    
+
 }

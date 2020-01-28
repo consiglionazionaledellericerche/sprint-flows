@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.5.1.final utlizzo versione della libreria JasperReports6.5.1  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="valutazioneProgettoAccordiBilaterali" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="NoPages" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c0187353-db16-46fc-a7a4-9ece39bc4976">
+<!-- Created with Jaspersoft Studio version 6.11.0.final utlizzo versione della libreria JasperReports6.11.0-0c4056ccaa4d25a5a8c45672d2f764ea3498bebb  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="valutazioneProgettoAccordiBilaterali" pageWidth="595" pageHeight="842" whenNoDataType="NoPages" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c0187353-db16-46fc-a7a4-9ece39bc4976">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
@@ -251,17 +251,13 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="sceltaUtente"/>
 		<fieldDescription><![CDATA[sceltaUtente]]></fieldDescription>
 	</field>
-	<field name="nomeCognomeProponente" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="nomeCognomeProponente"/>
-		<fieldDescription><![CDATA[nomeCognomeProponente]]></fieldDescription>
+	<field name="nomeCognomeRichiedente" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="nomeCognomeRichiedente"/>
+		<fieldDescription><![CDATA[nomeCognomeRichiedente]]></fieldDescription>
 	</field>
 	<field name="strutturaValutazioneDirigente" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="strutturaValutazioneDirigente"/>
 		<fieldDescription><![CDATA[strutturaValutazioneDirigente]]></fieldDescription>
-	</field>
-	<field name="profiloProponente" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="profiloProponente"/>
-		<fieldDescription><![CDATA[profiloProponente]]></fieldDescription>
 	</field>
 	<field name="initiator" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="initiator"/>
@@ -391,7 +387,7 @@
 		<groupExpression><![CDATA[(int)($V{REPORT_COUNT}/5)]]></groupExpression>
 		<groupHeader>
 			<band height="30">
-				<textField isStretchWithOverflow="true">
+				<textField textAdjust="StretchHeight">
 					<reportElement x="0" y="0" width="555" height="30" uuid="34639f49-4225-42a1-a30d-4e24330aba5e"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle" markup="styled">
 						<font size="16" isBold="true"/>
@@ -400,7 +396,7 @@
 				</textField>
 			</band>
 			<band height="36">
-				<textField isStretchWithOverflow="true">
+				<textField textAdjust="StretchHeight">
 					<reportElement x="0" y="0" width="555" height="30" uuid="4f214ac5-1b60-4da5-9c89-1cbd6db078dd"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font size="11" isBold="true" isItalic="true"/>
@@ -414,14 +410,14 @@
 					<textElement textAlignment="Left">
 						<font size="12" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA["Nome proponente : "]]></textFieldExpression>
+					<textFieldExpression><![CDATA["Nome richiedente : "]]></textFieldExpression>
 				</textField>
 				<textField>
 					<reportElement x="204" y="124" width="351" height="20" uuid="126fd6fc-1a28-4bcc-98da-bd2779998024"/>
 					<textElement>
 						<font size="12" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$F{nomeCognomeProponente}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{nomeCognomeRichiedente}]]></textFieldExpression>
 				</textField>
 				<textField>
 					<reportElement x="0" y="0" width="549" height="34" uuid="410d787a-4aca-46a3-b201-85c7d3f714b7"/>
@@ -458,20 +454,6 @@
 					</textElement>
 					<textFieldExpression><![CDATA[$F{idDomanda}]]></textFieldExpression>
 				</textField>
-				<textField>
-					<reportElement x="1" y="144" width="200" height="20" uuid="9036bf5c-662d-46fe-8c97-08e29ac964bf"/>
-					<textElement textAlignment="Left">
-						<font size="12" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA["Profilo proponente : "]]></textFieldExpression>
-				</textField>
-				<textField>
-					<reportElement x="205" y="144" width="351" height="20" uuid="208da3bb-c030-48f3-a72e-245f59e470fa"/>
-					<textElement>
-						<font size="12" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{profiloProponente}]]></textFieldExpression>
-				</textField>
 			</band>
 		</groupHeader>
 	</group>
@@ -487,7 +469,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA["SCHEDA VALUTAZIONE DEL PROGETTO "]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
+			<textField textAdjust="StretchHeight">
 				<reportElement x="0" y="42" width="555" height="21" uuid="10119319-030e-4176-a69a-e86a174f58cc"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isItalic="true"/>
@@ -504,7 +486,7 @@
 	</columnHeader>
 	<detail>
 		<band height="87">
-			<textField isStretchWithOverflow="true">
+			<textField textAdjust="StretchHeight">
 				<reportElement positionType="Float" x="0" y="7" width="556" height="17" uuid="4cfea49b-9713-48e6-82db-09b68941541c"/>
 				<textElement textAlignment="Justified" markup="styled">
 					<font fontName="SansSerif" size="11" isBold="true" isItalic="false"/>
@@ -512,7 +494,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA["Punteggio totale : "+ $F{punteggio_totale} +"\r\n"]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
+			<textField textAdjust="StretchHeight">
 				<reportElement positionType="Float" x="0" y="62" width="556" height="17" uuid="b420b75b-f40b-4349-bff9-9bba77f18bad"/>
 				<textElement textAlignment="Justified" markup="styled">
 					<font fontName="SansSerif" size="11" isBold="true" isItalic="false"/>
@@ -520,7 +502,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA["3 - Programma di ricerca\r\nPunteggio: "  +$F{punteggio_programmaDiRicerca}+ "\r\ncommento: " +$F{commento_programmaDiRicerca} +"\r\n\r\n"]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
+			<textField textAdjust="StretchHeight">
 				<reportElement positionType="Float" x="0" y="25" width="556" height="17" uuid="7ac903fa-55d2-4e21-a610-fa7dda8d3df3"/>
 				<textElement textAlignment="Justified" markup="styled">
 					<font fontName="SansSerif" size="11" isBold="true" isItalic="false"/>
@@ -528,7 +510,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA["1 - Curriculum vitae - pubblicazioni\r\nPunteggio: "  + $F{punteggio_curriculum} + "\r\ncommento: "  +$F{commento_curriculum} +"\r\n\r\n"]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
+			<textField textAdjust="StretchHeight">
 				<reportElement positionType="Float" x="0" y="43" width="556" height="17" uuid="ae569f93-4b65-45b7-8ff9-06ecb89dfdb5"/>
 				<textElement textAlignment="Justified" markup="styled">
 					<font fontName="SansSerif" size="11" isBold="true" isItalic="false"/>

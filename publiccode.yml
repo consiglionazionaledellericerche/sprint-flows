@@ -1,0 +1,137 @@
+# This repository adheres to the publiccode.yml standard by including this 
+# metadata file that makes public software easily discoverable.
+# More info at https://github.com/italia/publiccode.yml
+
+publiccodeYmlVersion: '0.2'
+applicationSuite: sprint-flows
+categories:
+  - document-management
+description:
+  it:
+    documentation: 'https://github.com/consiglionazionaledellericerche/sprint-flows'
+    features:
+      - search for flow instances
+      - list of my tasks
+      - notification roles
+      - workflow
+      - generation of pdf documents
+      - generation of summary reports
+      - generation of .csv research report
+    screenshots:
+      - ./_docs/screenshots/10_Set_Multipli_di_Dati.jpg
+      - ./_docs/screenshots/11_visualizzazione_set_multiplo_di_dati.jpg
+      - ./_docs/screenshots/12_Caricamento_Documenti_Tipologia_1.jpg
+      - ./_docs/screenshots/13_Caricamento_Documenti_Tipologia_2.jpg
+      - ./_docs/screenshots/14_Caricamento_Documenti_Tipologia_3.jpg
+      - ./_docs/screenshots/15_etichette_sui_documenti.jpg
+      - ./_docs/screenshots/16_gestione_documenti_extra_flusso.jpg
+      - ./_docs/screenshots/17_Documenti_tipo_4.jpg
+      - ./_docs/screenshots/17_Elementi_Dettagli_Flusso.jpg
+      - ./_docs/screenshots/18_Fasi_del_Flusso.jpg
+      - ./_docs/screenshots/2_avvio_flusso.jpg
+      - ./_docs/screenshots/28_scelta_utente_in_avvio_del_flusso.jpg
+      - ./_docs/screenshots/3_testo.jpg
+      - ./_docs/screenshots/4_Area_di_Testo.jpg
+      - ./_docs/screenshots/5_opzioni_scelta_con_bottoni.jpg
+      - ./_docs/screenshots/6_opzioni_scelta_con_menu_ad_albero.jpg
+      - ./_docs/screenshots/7_Selezione_tramite_funzione_di_autocompletamento.jpg
+      - ./_docs/screenshots/8_azioni_scelta.jpg
+      - ./_docs/screenshots/9_nota_informativa.jpg
+      - ./_docs/screenshots/chronology.JPG
+      - ./_docs/screenshots/completed_tasks.JPG
+      - ./_docs/screenshots/dettagli_flusso.JPG
+      - ./_docs/screenshots/dettagli_oiv.jpg
+      - ./_docs/screenshots/documenti_scrivania.JPG
+      - ./_docs/screenshots/Export_csv.JPG
+      - ./_docs/screenshots/Export_Summary_pdf.JPG
+      - ./_docs/screenshots/flusso_oiv_con_ruoli.jpg
+      - ./_docs/screenshots/Flusso_OIV.jpg
+      - ./_docs/screenshots/help_desk.jpg
+      - ./_docs/screenshots/HOME.JPG
+      - ./_docs/screenshots/i_miei_compiti.jpg
+      - ./_docs/screenshots/interazione_scrivania_digitale_con_altre_applicazioni.JPG
+      - ./_docs/screenshots/Manualistica.jpg
+      - ./_docs/screenshots/menu.JPG
+      - ./_docs/screenshots/my_tasks.JPG
+      - ./_docs/screenshots/ricerca_oiv.jpg
+      - ./_docs/screenshots/ricerca.jpg
+      - ./_docs/screenshots/search_ative_workflows.JPG
+      - ./_docs/screenshots/search_completed_workflows.JPG
+      - ./_docs/screenshots/versione_integrata.JPG
+      - ./_docs/screenshots/versione_stand_alone.JPG
+      - ./_docs/screenshots/Workflow_details.JPG
+
+    genericName: Scrivania Digitale
+    localisedName: Scrivania Digitale
+    longDescription: >2
+        
+
+      “Scrivania Digitale” platform is an application with a web interface that
+      allows you to define and execute workflows that involve assigning tasks to
+      different actors and the collection of information and documentation
+      related to administrative activities. “Scrivania Digitale” also allows the
+      management of Document flows within an institution, a company or any
+      medium and large dimension structured reality. “Scrivania Digitale” has as
+      main objective to guide the users predisposed in the management of various
+      administrative procedures. “Scrivania Digitale” can be used in its
+      “standalone version” or in  its “Integrated” version as well.The system is
+      part of the e-government project of CNR, in coherence with the
+      Administrative Digital Code and regulations concerning optimization of the
+      productivity of public work and of efficiency and transparency of public
+      administrations and their simplification and development\\*.\\*27 October
+      2009, legislative decree, n. 150, on "Implementation of the 4      March
+      2009 law, n. 15, on the matter of optimization of the productivity of
+      public work and of efficiency and transparency of public administrations"
+      and the recent 9 February 2012 legislative decree, n. 5, "Urgent measures
+      of simplification and development" (art. 8 Simplification of participation
+      in recruitment competitions and testing). 
+    shortDescription: >-
+      “Scrivania Digitale” platform is an application with a web interface that
+      allows you to define and execute workflows.
+developmentStatus: stable
+it:
+  conforme:
+    gdpr: false
+    lineeGuidaDesign: false
+    misureMinimeSicurezza: false
+    modelloInteroperabilita: false
+  countryExtensionVersion: '0.2'
+  piattaforme:
+    anpr: false
+    cie: false
+    pagopa: false
+    spid: false
+  riuso:
+    codiceIPA: cnr
+landingURL: 'https://nuovascrivaniadigitale.cnr.it'
+logo: ./_docs/screenshots/logo_Scrivania_Digitale.png
+
+legal:
+  license: AGPL-3.0-or-later
+localisation:
+  availableLanguages:
+    - it
+  localisationReady: false
+maintenance:
+  contacts:
+    - affiliation: Consiglio Nazionale delle Ricerche
+      email: marco.spasiano@cnr.it
+      name: Marco Spasiano
+    - affiliation: Consiglio Nazionale delle Ricerche
+      email: massimo.fraticelli@cnr.it
+      name: Massimo Fraticelli
+    - affiliation: Consiglio Nazionale delle Ricerche
+      email: marcinireneusz.trycz@cnr.it
+      name: Marcin Ireneusz Trycz
+    - affiliation: Consiglio Nazionale delle Ricerche
+      email: paolo.cirone@iasi.cnr.it
+      name: Paolo Enrico Cirone
+  type: internal
+name: sprint-flows
+platforms:
+  - linux
+  - web
+releaseDate: '2019-12-04'
+softwareType: standalone/web
+softwareVersion: 1.0.8
+url: 'https://github.com/consiglionazionaledellericerche/sprint-flows'

@@ -104,7 +104,7 @@ public class Enum {
         ACCETTAZIONE,
         CANCELLATA;
     }
-    
+
     public enum ProcessDefinitionEnum {
         acquisti("acquisti","acquisti"),
         permessiFerie("permessi-ferie", "permessi-ferie"),
