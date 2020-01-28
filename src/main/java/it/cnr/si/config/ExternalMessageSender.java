@@ -64,6 +64,7 @@ public class ExternalMessageSender {
         abilTemplate.setInterceptors(interceptors);
 
         ExternalApplication.ABIL.setTemplate(abilTemplate);
+        ExternalApplication.STM.setTemplate(abilTemplate);
 
         // GENERIC
 
