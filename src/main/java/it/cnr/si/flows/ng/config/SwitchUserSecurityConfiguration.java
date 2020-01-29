@@ -45,7 +45,7 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
                 .and()
                 .antMatcher("/impersonate/**")
                 .authorizeRequests()
-                .antMatchers(IMPERSONATE_START_URL).hasRole("ADMIN")
+                .antMatchers(IMPERSONATE_START_URL).hasAnyRole("ROLE_ADMIN", "ROLE_amministratori-supporto-tecnico@0000")
                 .antMatchers(IMPERSONATE_EXIT_URL).hasRole("PREVIOUS_ADMINISTRATOR")
                 .and()
                 .addFilterAfter(switchUserFilter(), FilterSecurityInterceptor.class)
