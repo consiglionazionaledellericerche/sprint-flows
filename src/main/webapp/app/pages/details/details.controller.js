@@ -23,7 +23,7 @@
             dataService.processInstances.byProcessInstanceId($state.params.processInstanceId, true).then(
                 function(response) {
                     vm.data.entity = utils.refactoringVariables([response.data.entity])[0];
-                    vm.initiator = JSON.parse(vm.data.entity.name).initiator;
+                    vm.initiator = JSON.parse(vm.data.entity.name).initiator; //serve per richiamare la "cronologia"
                     vm.data.linkedProcesses = response.data.linkedProcesses;
                     vm.data.history = response.data.history;
                     //in response.data.entity.variables ci sono anche le properties della Process Instance (initiator, startdate, ecc.)

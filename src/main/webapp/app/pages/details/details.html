@@ -37,7 +37,6 @@
 				<b>Descrizione: </b>{{vm.data.entity.name | get: 'descrizione'}} 
 			</div>
 			<div>
-<!--				<b>Avviato da: </b>{{vm.data.entity.variabili.initiator}} il {{vm.data.entity.variabili.startDate | data}} -->
 				<b>Avviato da: </b>{{vm.data.entity.name | get: 'initiator'}} il {{vm.data.entity.variabili.startDate | data}}
 			</div>
 			<div ng-hide="!vm.data.entity.variabili.completed">
