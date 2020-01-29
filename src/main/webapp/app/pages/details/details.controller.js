@@ -23,6 +23,7 @@
             dataService.processInstances.byProcessInstanceId($state.params.processInstanceId, true).then(
                 function(response) {
                     vm.data.entity = utils.refactoringVariables([response.data.entity])[0];
+                    vm.initiator = JSON.parse(vm.data.entity.name).initiator;
                     vm.data.linkedProcesses = response.data.linkedProcesses;
                     vm.data.history = response.data.history;
                     //in response.data.entity.variables ci sono anche le properties della Process Instance (initiator, startdate, ecc.)
@@ -97,7 +98,7 @@
         };
 
 
-        $scope.history = function(tasks, startTask) {
+        $scope.history = function(tasks, startTask, initiator) {
             $uibModal.open({
                 templateUrl: 'app/pages/details/history.modal.html',
                 controller: 'HistoryModalController',
@@ -106,6 +107,9 @@
                 resolve: {
                     tasks: function() {
                         return tasks;
+                    },
+                    initiator: function() {
+                        return initiator;
                     },
                     startTask: function() {
                         return startTask;

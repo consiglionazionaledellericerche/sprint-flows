@@ -13,10 +13,13 @@
                 <div ng-switch-when="startDate">
                     <b>Avviato il </b> {{variable.value | dataora}} <br>
                 </div>
-                <div ng-switch-when="initiator">
-                    <b>Dall'utente </b> {{variable.value}} <br>
-                </div>
+<!--                <div ng-switch-when="initiator">-->
+<!--                    <b>Dall'utente </b> {{variable.value}} <br>-->
+<!--                </div>-->
             </div>
+        </div>
+        <div>
+            <b>Dall'utente </b> {{vm.initiator}} <br>
         </div>
     </div>
     <div class="task-history" ng-repeat="task in vm.tasks | orderBy:'historyTask.startTime'">

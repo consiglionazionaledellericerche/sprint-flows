@@ -37,7 +37,8 @@
 				<b>Descrizione: </b>{{vm.data.entity.name | get: 'descrizione'}} 
 			</div>
 			<div>
-				<b>Avviato da: </b>{{vm.data.entity.variabili.initiator}} il {{vm.data.entity.variabili.startDate | data}} 
+<!--				<b>Avviato da: </b>{{vm.data.entity.variabili.initiator}} il {{vm.data.entity.variabili.startDate | data}} -->
+				<b>Avviato da: </b>{{vm.data.entity.name | get: 'initiator'}} il {{vm.data.entity.variabili.startDate | data}}
 			</div>
 			<div ng-hide="!vm.data.entity.variabili.completed">
 				<b>completato il:</b>{{vm.data.entity.variabili.endDate | data}}
@@ -109,7 +110,7 @@
 				</div>
 				<div class="col-sm-6 col-md-12">
 					<button class="btn btn-default btn-block"
-							ng-click="history(vm.data.history, vm.data.startEvent)"><span
+							ng-click="history(vm.data.history, vm.data.startEvent, vm.initiator)"><span
 							class="glyphicon glyphicon-time"></span> Visualizza Cronologia
 					</button>
 
