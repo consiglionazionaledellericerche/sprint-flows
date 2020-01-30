@@ -302,8 +302,9 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 							data.put(initiator.name(), "app.scrivaniadigitale");
 
 							LOGGER.info("-- EFFETTUO START FLUSSO short-term-mobility-bandi CON titolo: " + data.get("titolo") + " descrizione" + data.get("descrizione")  + " initiator " + data.get("initiator")  + " idBando" + data.get("idBando") );
-
-							flowsTaskService.startProcessInstance(processDefinitionId, data);
+							
+							//flowsTaskService.startProcessInstance(processDefinitionId, data);
+							flowsTaskService.startProcessInstanceAsApplication(processDefinitionId, data,"app.scrivaniadigitale");
 						} else {
 							// Aziona il receive task "elenco-domande"
 							LOGGER.info("-- Bando già avviato: " + processinstancesBandiPerBandoDipartimento.get(0).getBusinessKey() );

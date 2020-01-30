@@ -348,6 +348,44 @@ public class FlowsTaskService {
 		LOGGER.info("Avviata istanza di processo {}, id: {}", key, instance.getId());
 		return instance;
 	}
+	public ProcessInstance startProcessInstanceAsApplication(String definitionId, Map<String, Object> data, String applicationName) {
+
+		ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitionId).singleResult();
+		String counterId = processDefinition.getName() + "-" + Calendar.getInstance().get(Calendar.YEAR);
+		String key = counterId + "-" + counterService.getNext(counterId);
+		data.put("key", key);
+
+		String username = SecurityUtils.getCurrentUserLogin();
+
+		data.put(applicationName, username);
+		data.put(startDate.name(), new Date());
+
+		ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
+		runtimeService.setVariable(instance.getId(), "processInstanceId", instance.getId());
+
+		// metadati da visualizzare in ricerca, li metto nel Name per comodita' in ricerca
+		org.json.JSONObject name = new org.json.JSONObject();
+
+		String titolo = (String) data.get(Enum.VariableEnum.titolo.name());
+		name.put(Enum.VariableEnum.titolo.name(), ellipsis(titolo, LENGTH_TITOLO) );
+		String descrizione = (String) data.get(Enum.VariableEnum.descrizione.name());
+		name.put(Enum.VariableEnum.descrizione.name(), ellipsis(descrizione, LENGTH_DESCTIZIONE) );
+		String initiator = (String) data.get(Enum.VariableEnum.initiator.name());
+		name.put(Enum.VariableEnum.initiator.name(), initiator);
+		if (taskService.createTaskQuery().processInstanceId(instance.getProcessInstanceId()).count() == 0) {
+			name.put(stato.name(),ellipsis("START", LENGTH_FASE) );
+
+		} else {
+			String taskName = taskService.createTaskQuery()
+					.processInstanceId(instance.getProcessInstanceId())
+					.singleResult().getName();
+			name.put(stato.name(), ellipsis(taskName, LENGTH_FASE) );
+		}
+		runtimeService.setProcessInstanceName(instance.getId(), name.toString());
+
+		LOGGER.info("Avviata istanza di processo {}, id: {}", key, instance.getId());
+		return instance;
+	}
 
 
 	public void completeTask(String taskId, Map<String, Object> data) {
