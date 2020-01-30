@@ -1,28 +1,8 @@
 package it.cnr.si.flows.ng.config;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AccountExpiredException;
-import org.springframework.security.authentication.AccountStatusUserDetailsChecker;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
-import org.springframework.security.authentication.AuthenticationDetailsSource;
-import org.springframework.security.authentication.CredentialsExpiredException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.LockedException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
@@ -36,6 +16,18 @@ import org.springframework.security.web.authentication.switchuser.Authentication
 import org.springframework.security.web.authentication.switchuser.SwitchUserAuthorityChanger;
 import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
 import org.springframework.security.web.authentication.switchuser.SwitchUserGrantedAuthority;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class OAuthCookieSwithUserFilter extends SwitchUserFilter {
 
@@ -70,7 +62,7 @@ public class OAuthCookieSwithUserFilter extends SwitchUserFilter {
             // User has requested to impersonate
             if (requiresSetCookie(request)) {
                 // forbid any requests from non-admins
-                if(!request.isUserInRole("ADMIN")) {
+                if(!(request.isUserInRole("ADMIN") || request.isUserInRole("amministratori-supporto-tecnico@0000"))) {
                     clearImpersonationCookie(response);
                     response.sendError(HttpStatus.FORBIDDEN.value());
                     return;
@@ -90,7 +82,7 @@ public class OAuthCookieSwithUserFilter extends SwitchUserFilter {
             // any other normal request; check if the principal needs to be switched
             else if (requiresSwitchUser(request)) {
                 // forbid any requests from non-admins
-                if(!request.isUserInRole("ADMIN")) {
+                if(!(request.isUserInRole("ADMIN") || request.isUserInRole("amministratori-supporto-tecnico@0000"))) {
                     clearImpersonationCookie(response);
                     response.sendError(HttpStatus.FORBIDDEN.value());
                     return;

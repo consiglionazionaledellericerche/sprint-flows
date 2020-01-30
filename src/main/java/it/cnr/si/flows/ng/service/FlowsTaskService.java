@@ -316,10 +316,9 @@ public class FlowsTaskService {
 		String counterId = processDefinition.getName() + "-" + Calendar.getInstance().get(Calendar.YEAR);
 		String key = counterId + "-" + counterService.getNext(counterId);
 		data.put("key", key);
-
-		String username = SecurityUtils.getCurrentUserLogin();
-
-		data.put(initiator.name(), username);
+		//L`utenza reale (admin o ROLE_amministratori-supporto-tecnico@0000)
+		// non può avviare il flusso quindi ho bisogno dell`utenza "fittizia"/impersonata
+		data.put(initiator.name(), SecurityUtils.getCurrentUserLogin());
 		data.put(startDate.name(), new Date());
 
 		ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
@@ -332,8 +331,8 @@ public class FlowsTaskService {
 		name.put(Enum.VariableEnum.titolo.name(), ellipsis(titolo, LENGTH_TITOLO) );
 		String descrizione = (String) data.get(Enum.VariableEnum.descrizione.name());
 		name.put(Enum.VariableEnum.descrizione.name(), ellipsis(descrizione, LENGTH_DESCTIZIONE) );
-		String initiator = (String) data.get(Enum.VariableEnum.initiator.name());
-		name.put(Enum.VariableEnum.initiator.name(), initiator);
+		//metto l`utente REALE che ha avviato il flusso nel JSON nel name
+		name.put(Enum.VariableEnum.initiator.name(), SecurityUtils.getRealUserLogged());
 		if (taskService.createTaskQuery().processInstanceId(instance.getProcessInstanceId()).count() == 0) {
 			name.put(stato.name(),ellipsis("START", LENGTH_FASE) );
 
@@ -390,7 +389,7 @@ public class FlowsTaskService {
 
 	public void completeTask(String taskId, Map<String, Object> data) {
 
-		String username = SecurityUtils.getCurrentUserLogin();
+		String username = SecurityUtils.getRealUserLogged();
 
 		// aggiungo l'identityLink che indica l'utente che esegue il task
 		taskService.setVariablesLocal(taskId, data);
