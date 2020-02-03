@@ -1,3 +1,4 @@
+
 image: docker:stable
 
 variables:
@@ -42,7 +43,6 @@ deploy_snapshot:
     - master
   script:
     - mvn -B clean compile package deploy -DskipTests -Pprod -U
-
 
 buildtestcontainer:
   stage: build_test_container

@@ -4,7 +4,7 @@ import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.spring.storage.StorageObject;
-import it.cnr.si.spring.storage.StorageService;
+import it.cnr.si.spring.storage.StoreService;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,21 +31,21 @@ import java.util.stream.Stream;
 @RequestMapping("api/manual")
 public class FlowsManualResource {
 
-    private static final String DIR_MANUALI = "/Comunicazioni al CNR/flows/Manuali/";
+    private static final String DIR_MANUALI = "Comunicazioni al CNR/flows/Manuali/";
     private static final String TITLE = "cm:title";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsManualResource.class);
 
     @Autowired(required = false)
-    private StorageService storageService;
+    private StoreService storeService;
 
     @RequestMapping(value = "/", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<List<String>> getElencoManuali() {
-        StorageObject dirObject = storageService.getObjectByPath(DIR_MANUALI, true);
-        List<StorageObject> manuali = storageService.getChildren(dirObject.getKey());
+        StorageObject dirObject = storeService.getStorageObjectByPath(DIR_MANUALI, true);
+        List<StorageObject> manuali = storeService.getChildren(dirObject.getKey());
 
         List<String> paths = manuali.stream()
                 .map(m -> (String) m.getPropertyValue(TITLE) )
@@ -59,9 +59,9 @@ public class FlowsManualResource {
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<byte[]> getManuale(@PathVariable("manuale") String manuale) throws IOException {
-        StorageObject manObject = storageService.getObjectByPath(DIR_MANUALI + manuale, false);
+        StorageObject manObject = storeService.getStorageObjectByPath(DIR_MANUALI + manuale, false);
 
-        InputStream stream = storageService.getInputStream(manObject.getKey());
+        InputStream stream = storeService.getResource(manObject.getKey());
 
         return ResponseEntity.ok(IOUtils.toByteArray(stream) );
     }
