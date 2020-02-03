@@ -287,7 +287,7 @@
                         url: 'api/draft/getDraftByTaskId',
                         method: 'GET',
                         params: {
-                            taskId: taskId,
+                            taskId: taskId ? taskId : '0',
                             username: (username ? username : '')
                         },
                     });
@@ -297,10 +297,10 @@
                         url: 'api/drafts/updateDraft?',
                         method: 'PUT',
                         params: {
-                            taskId: taskId,
-                            json: json,
+                            taskId: taskId ? taskId : '0',
                             username: (username ? username : '')
-                        }
+                        },
+                        data: json
                     });
                 }
             },

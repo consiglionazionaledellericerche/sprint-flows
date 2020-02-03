@@ -31,24 +31,24 @@ public class DraftResource {
 
     /**
      * PUT  /drafts : Save or Updates an existing draft.
-     * nel caso in cui non si specifichi l`username si recupera un Draft che può essere letto da tutti,
-     * viceversa, se si specifica uno username, il Draft potrà essere letto solo da qurello username
+     * NEL CASO IN CUI NON SI SPECIFICHI L`USERNAME SI RECUPERA UN DRAFT CHE PUÒ ESSERE LETTO DA TUTTI,
+     * VICEVERSA, SE SI SPECIFICA UNO USERNAME, IL DRAFT POTRÀ ESSERE LETTO SOLO DA QURELLO USERNAME
      *
-     * @param taskId   the draft to update
-     * @param json     the json
+     * @param taskId   taskId del draft: SE È 0 ALLORA IL TASKID NON C`È, allora IL DRAFT È ASSOCIATO AD UNA PI CHE SI STA CREANDO
      * @param username the username
      * @return the ResponseEntity with status 200 (OK) and with body the updated draft, or with status 400 (Bad Request) if the draft is not valid, or with status 500 (Internal Server Error) if the draft couldnt be updated
-     * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping(value = "/drafts/updateDraft",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+                produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Draft> updateDraft(@RequestParam("taskId") Long taskId, @RequestParam("json") String json, @RequestParam("username") String username) throws URISyntaxException {
+    public ResponseEntity<Draft> updateDraft(@RequestParam("taskId") Long taskId,
+                                             @RequestBody String json,
+                                             @RequestParam("username") String username){
         Draft dbDraft = draftService.findDraft(taskId, username);
 
-        if (dbDraft == null) {
+        if (dbDraft == null)
             dbDraft = new Draft();
-        }
+
         dbDraft.setJson(json);
         dbDraft.setTaskId(taskId);
         dbDraft.setUsername(username.isEmpty() ? null : username);

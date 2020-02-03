@@ -115,8 +115,8 @@ public class ManageProcessShortTermMobilityBandoDipartimento_v1 implements Execu
 
 		// START
 		case "provvedimento-graduatoria-start": {
-			creaExportCsvDomandePerBandoDipartimento(execution, (execution.getVariable("idBando").toString()), (execution.getVariable("dipartimentoId").toString()));
 			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
+			creaExportCsvDomandePerBandoDipartimento(execution, (execution.getVariable("idBando").toString()), (execution.getVariable("dipartimentoId").toString()));
 		};break;  
 
 		case "firma-graduatoria-end": {
@@ -248,7 +248,8 @@ public class ManageProcessShortTermMobilityBandoDipartimento_v1 implements Execu
 		String fileName = "ExportCsvDomandeBando" + idBando + ".csv";
 		//String downloadName = "ExportCsvDomandeBando" + idBando;
 		String labelFile = "Export Csv Domande Bando";
-		flowsTaskService.buildCsv((List<HistoricProcessInstanceResponse>) flussiAttivaPerBando.getData(), writer, processDefinitionKey);
+		List<HistoricProcessInstanceResponse> data = (List<HistoricProcessInstanceResponse>) flussiAttivaPerBando.getData();
+		flowsTaskService.buildCsv(data, writer, processDefinitionKey);
 		byte[] contents = FileUtils.readFileToByteArray(tempFile);
 		FlowsAttachment documentoGenerato = new FlowsAttachment();
 		documentoGenerato.setFilename(fileName);

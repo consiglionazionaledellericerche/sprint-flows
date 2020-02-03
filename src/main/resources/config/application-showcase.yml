@@ -31,12 +31,15 @@ ajp:
   timeout: 120000
 
 cnr:
-  filesystem:
-    directory: /tmp/sprint-flows-showcase
+  storage:
+    driver: filesystem
+    filesystem:
+      directory: /tmp/sprint-flows-showcase
 
 showcase:
   mail:
     mail.port: 587
     mail.user:
     mail.password:
+
 
