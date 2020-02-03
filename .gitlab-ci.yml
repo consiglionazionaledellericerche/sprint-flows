@@ -1,4 +1,3 @@
-
 image: docker:stable
 
 variables:
@@ -106,6 +105,7 @@ release_artifact:
 
 buildprodcontainer:
   stage: build_prod_container
+  image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   tags:
     - shared
   only:
