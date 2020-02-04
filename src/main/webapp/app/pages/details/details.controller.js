@@ -9,8 +9,17 @@
 
     function DetailsController($scope, $rootScope, Principal, $state, $localStorage, dataService, $log, utils, $uibModal) {
         var vm = this;
+        vm.searchParams = {};
         vm.data = {};
         vm.taskId = $state.params.taskId;
+        //vm.searchParams.statoFinaleDomanda = {};        
+        vm.showGerarchia = false;
+        vm.searchParams.active = true;
+        vm.searchParams.order = "ASC";
+        vm.searchParams.page = 1;
+        vm.searchParams.processDefinitionKey = "short-term-mobility-domande";
+        vm.searchParams.statoFinaleDomanda = "text=VALUTATA_SCIENTIFICAMENTE";
+
 
         $scope.processInstanceId = $state.params.processInstanceId; // mi torna comodo per gli attachments -martin
 
@@ -38,7 +47,14 @@
                     if(vm.data.entity.variabili.valutazioneEsperienze_json){
                         vm.experiences = jQuery.parseJSON(vm.data.entity.variabili.valutazioneEsperienze_json);
                     }
-
+                    if(processDefinition[0] != null & processDefinition[0] == "short-term-mobility-bando-dipartimento") {
+                    		vm.showGerarchia = true;
+                	}
+                    vm.searchParams.idBando = "text="+response.data.variabili.idBando.value;
+                    vm.searchParams.dipartimentoId = "text="+response.data.variabili.dipartimentoId.value;
+                    
+                    
+                    
                     vm.data.history.forEach(function(el) {
                         //recupero l'ultimo task (quello ancora da eseguire)
                         if (el.historyTask.endTime === null) {
@@ -166,5 +182,19 @@
                 delete $localStorage.cart;
             }
         }
+        
+        $scope.exportCsv = function() {
+            dataService.search
+              .exportCsv(vm.searchParams, -1, -1)
+              .success(function(response) {
+                var filename = "Graduatoria.xls",
+                  file = new Blob([response], {
+                    type: "application/vnd.ms-excel"
+                  });
+                $log.info(file, filename);
+                saveAs(file, filename);
+              });
+          };
+          
     }
 })();
