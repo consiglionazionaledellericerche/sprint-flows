@@ -42,12 +42,15 @@
                     vm.diagramUrl = '/rest/diagram/processInstance/' + vm.data.entity.id + "?" + new Date().getTime();
 
                     var processDefinition = response.data.entity.processDefinitionId.split(":");
+                    var stato = response.data.history[0].historyTask.name;
+
                     vm.detailsView = 'api/views/' + processDefinition[0] + '/' + processDefinition[1] + '/detail';
 
                     if(vm.data.entity.variabili.valutazioneEsperienze_json){
                         vm.experiences = jQuery.parseJSON(vm.data.entity.variabili.valutazioneEsperienze_json);
                     }
-                    if(processDefinition[0] != null & processDefinition[0] == "short-term-mobility-bando-dipartimento") {
+                    if(processDefinition[0] != null & processDefinition[0] == "short-term-mobility-bando-dipartimento" & stato == "PROVVEDIMENTO GRADUATORIA"
+) {
                     		vm.showGerarchia = true;
                 	}
                     vm.searchParams.idBando = "text="+response.data.variabili.idBando.value;
