@@ -59,8 +59,8 @@ public class FlowsProcessInstanceResource {
 	private RestResponseFactory restResponseFactory;
 	@Inject
 	private HistoryService historyService;
-	@Inject
-	private ProcessInstanceResource processInstanceResource;
+//	@Inject
+//	private ProcessInstanceResource processInstanceResource;
 	@Inject
 	private RuntimeService runtimeService;
 	@Inject
@@ -162,9 +162,9 @@ public class FlowsProcessInstanceResource {
 	public ProcessInstanceResponse suspend(
 			HttpServletRequest request,
 			@RequestParam(value = "processInstanceId", required = true) String processInstanceId) {
-		ProcessInstanceActionRequest action = new ProcessInstanceActionRequest();
-		action.setAction(ProcessInstanceActionRequest.ACTION_SUSPEND);
-		return processInstanceResource.performProcessInstanceAction(processInstanceId, action, request);
+
+		runtimeService.suspendProcessInstanceById(processInstanceId);
+		return null; //TODO
 	}
 
 
