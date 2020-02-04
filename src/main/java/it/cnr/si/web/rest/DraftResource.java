@@ -34,10 +34,9 @@ public class DraftResource {
      * NEL CASO IN CUI NON SI SPECIFICHI L`USERNAME SI RECUPERA UN DRAFT CHE PUÒ ESSERE LETTO DA TUTTI,
      * VICEVERSA, SE SI SPECIFICA UNO USERNAME, IL DRAFT POTRÀ ESSERE LETTO SOLO DA QURELLO USERNAME
      *
-     * @param taskId   taskId del draft: SE È 0 ALLORA IL TASKID NON C`È ==> IL DRAFT È ASSOCIATO AD UNA PI CHE SI STA CREANDO
+     * @param taskId   taskId del draft: SE È 0 ALLORA IL TASKID NON C`È, allora IL DRAFT È ASSOCIATO AD UNA PI CHE SI STA CREANDO
      * @param username the username
      * @return the ResponseEntity with status 200 (OK) and with body the updated draft, or with status 400 (Bad Request) if the draft is not valid, or with status 500 (Internal Server Error) if the draft couldnt be updated
-     * @throws URISyntaxException if the Location URI syntax is incorrect
      */
     @PutMapping(value = "/drafts/updateDraft",
                 produces = MediaType.APPLICATION_JSON_VALUE)

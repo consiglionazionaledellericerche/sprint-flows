@@ -59,7 +59,7 @@ public class MembershipService {
         return membershipRepository.findOne(id);
     }
 
-    /**
+    /*
      *  delete the  membership by id.
      */
     public void delete(Long id) {
@@ -112,8 +112,8 @@ public class MembershipService {
      *
      * I nomi dei gruppi NON hanno il ROLE_
      *
-     * @param username
-     * @return
+     * @param username per chi cercare i gruppi
+     * @return Set di tutti i gruppi dell'utente
      */
     public Set<String> getAllGroupsForUser(String username) {
 
@@ -128,13 +128,13 @@ public class MembershipService {
 
     /* --- */
 
-    /**
+    /*
      * DEPRACATED : questo metodo va a scalare solo un livello di relationship tra gruppi
      * @param groupName
      * @return
      */
-    @Deprecated
-    public List<String> getUsersInGroup(String groupName) {
+    @Deprecated // TODO delete
+    private List<String> getUsersInGroup(String groupName) {
         List<String> result = membershipRepository.findMembersInGroup(groupName);
         Set<String> users = getUsersInAceGroup(groupName);
         result.addAll(users);
