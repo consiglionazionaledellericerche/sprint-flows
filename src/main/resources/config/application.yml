@@ -147,6 +147,9 @@ org:
   apache:
     chemistry:
       opencmis:
+        session:
+          repository:
+            id: -default-
         binding:
           atompub:
             url: ${repository.base.url}api/-default-/public/cmis/versions/1.1/atom
