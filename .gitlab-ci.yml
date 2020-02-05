@@ -135,6 +135,7 @@ deploydockprod01:
   script:
     - echo "Deploy sprint-flows to dockprod01"
     - echo "setting secrets"
+    - cat ./src/main/docker/app-prod.yml
     - sed -i "s/docker.si.cnr.it\/sprint-flows/docker.si.cnr.it\/sprint-flows:prod/g" ./src/main/docker/app-prod.yml
     - sed -i "s/SPRING_DATASOURCE_PASSWORD_SED/$POSTGRESS_PASSWORD/g" ./src/main/docker/app-prod.yml
     - sed -i "s/SPRING_LDAP_MANAGERPASSWORD_SED/$LDAP_PASSWORD/g" ./src/main/docker/app-prod.yml
@@ -161,7 +162,7 @@ deploydockprod02:
   script:
     - echo "Deploy sprint-flows to dockprod02"
     - echo "setting secrets"
-    #    - sed -i "s/docker.si.cnr.it\/sprint-flows/docker.si.cnr.it\/sprint-flows:LATEST/g" ./src/main/docker/app-prod.yml
+    - sed -i "s/docker.si.cnr.it\/sprint-flows/docker.si.cnr.it\/sprint-flows:prod/g" ./src/main/docker/app-prod.yml
     - sed -i "s/SPRING_DATASOURCE_PASSWORD_SED/$POSTGRESS_PASSWORD/g" ./src/main/docker/app-prod.yml
     - sed -i "s/SPRING_LDAP_MANAGERPASSWORD_SED/$LDAP_PASSWORD/g" ./src/main/docker/app-prod.yml
     - sed -i "s/ACE_PASSWORD_SED/$ACE_PASSWORD/g" ./src/main/docker/app-prod.yml

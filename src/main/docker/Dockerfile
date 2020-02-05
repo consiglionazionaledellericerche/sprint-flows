@@ -10,4 +10,4 @@ EXPOSE 8080
 
 WORKDIR /opt/
 
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom", "-jar","/opt/app.war", "--spring.profiles.active=native,showcase,test,swagger" ]
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom", "-jar","/opt/app.war"]
