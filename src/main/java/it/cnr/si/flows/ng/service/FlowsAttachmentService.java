@@ -61,8 +61,6 @@ public class FlowsAttachmentService {
     private FlowsAttachmentService attachmentService;
     @Inject
     private StoreService storeService;
-    @Inject
-    private StorageService storageService;
 	@Inject
 	private Environment env;
 
