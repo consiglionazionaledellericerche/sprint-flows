@@ -20,6 +20,7 @@ cache:
 
 stages:
   - test
+  - build
   - deploy_snapshot
   - build_test_container
   - deploy_test_container
@@ -34,6 +35,11 @@ test:
     - mvn -B clean compile sonar:sonar -Dsonar.host.url=http://sonar.si.cnr.it test package -fae
   allow_failure: true
 
+build:
+  stage: build
+  image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
+  script:
+    - mvn package -fae -B -DskipTests
 
 deploy_snapshot:
   stage: deploy_snapshot
