@@ -8,6 +8,7 @@ import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.stereotype.Component;
 
 /**
+ * @author paoloenricocirone
  * "Registra" nel registro dei bean la mia definizione customizzata del bean "liquibase"
  * che "punta" a FlowsDatabaseConfiguration.liquibase() invece di DatabaseConfiguration.liquibase()
  *

@@ -12,7 +12,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.inject.Inject;
 
-@Profile("!unittests")
+@Profile("cnr")
 @EnableScheduling
 @Configuration
 public class EventScheduler {

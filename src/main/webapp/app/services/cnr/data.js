@@ -181,6 +181,20 @@
                         '&firstResult=' + firstResult +
                         '&maxResults=' + maxResults, searchParams);
                 },
+                exportCsvAndSaveInProcess: function (searchParams, firstResult, maxResults) {
+                    var processDefinitionKey;
+                    if (searchParams.processDefinitionKey !== undefined) {
+                        processDefinitionKey = searchParams.processDefinitionKey;
+                    } else {
+                        processDefinitionKey = 'all';
+                    }
+                    var processInstanceId = searchParams.processInstanceId;
+                    return $http.post('api/search/exportCsvAndSaveInProcess/' + processDefinitionKey + '/' + processInstanceId +
+                        '?active=' + searchParams.active +
+                        '&order=' + searchParams.order +
+                        '&firstResult=' + firstResult +
+                        '&maxResults=' + maxResults, searchParams);
+                },
             },
             lookup: {
                 uo: function (id) {
@@ -287,7 +301,7 @@
                         url: 'api/draft/getDraftByTaskId',
                         method: 'GET',
                         params: {
-                            taskId: taskId,
+                            taskId: taskId ? taskId : '0',
                             username: (username ? username : '')
                         },
                     });
@@ -297,10 +311,10 @@
                         url: 'api/drafts/updateDraft?',
                         method: 'PUT',
                         params: {
-                            taskId: taskId,
-                            json: json,
+                            taskId: taskId ? taskId : '0',
                             username: (username ? username : '')
-                        }
+                        },
+                        data: json
                     });
                 }
             },

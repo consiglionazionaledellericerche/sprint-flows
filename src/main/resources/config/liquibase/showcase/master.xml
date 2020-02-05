@@ -42,6 +42,9 @@
     <include file="classpath:config/liquibase/showcase/changelog/20190320102314_added_entity_ExternalMessage.xml"
              relativeToChangelogFile="false"/>
 
+    <include file="classpath:config/liquibase/showcase/changelog/20190723085228_added_entity_Draft.xml"
+             relativeToChangelogFile="false"/>
+
     <include file="classpath:config/liquibase/showcase/changelog/20190723085228_added_entity_Faq.xml"
              relativeToChangelogFile="false"/>
 </databaseChangeLog>

@@ -208,7 +208,7 @@
                     <!-- jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here -->
                 </ul>
             </li>
-            <li ng-class="{active: vm.$state.includes('admin')}"  ng-switch-when="true" has-authority="ROLE_ADMIN" uib-dropdown class="dropdown pointer">
+            <li ng-class="{active: vm.$state.includes('admin')}"  ng-switch-when="true" has-any-authority="ROLE_ADMIN, ROLE_amministratori-supporto-tecnico@0000" uib-dropdown class="dropdown pointer">
                 <a class="dropdown-toggle" uib-dropdown-toggle href="" id="admin-menu">
                     <span>
                         <span class="glyphicon glyphicon-tower"></span>
@@ -224,36 +224,36 @@
                         </a>
                     </li>
                     <li ui-sref-active="active">
-                        <a ui-sref="jhi-metrics" ng-click="vm.collapseNavbar()">
+                        <a ui-sref="jhi-metrics" ng-click="vm.collapseNavbar()" has-authority="ROLE_ADMIN">
                             <span class="glyphicon glyphicon-dashboard"></span>&nbsp;
                             <span translate="global.menu.admin.metrics">Metrics</span>
                         </a>
                     </li>
                     <li ui-sref-active="active">
-                        <a ui-sref="jhi-health" ng-click="vm.collapseNavbar()">
+                        <a ui-sref="jhi-health" ng-click="vm.collapseNavbar()" has-authority="ROLE_ADMIN">
                             <span class="glyphicon glyphicon-heart"></span>&nbsp;
                             <span translate="global.menu.admin.health">Health</span>
                         </a>
                     </li>
                     <li ui-sref-active="active">
-                        <a ui-sref="jhi-configuration" ng-click="vm.collapseNavbar()">
+                        <a ui-sref="jhi-configuration" ng-click="vm.collapseNavbar()" has-authority="ROLE_ADMIN">
                             <span class="glyphicon glyphicon-list-alt"></span>&nbsp;
                             <span translate="global.menu.admin.configuration">Configuration</span>
                         </a>
                     </li>
                     <li ui-sref-active="active">
-                        <a ui-sref="audits" ng-click="vm.collapseNavbar()">
+                        <a ui-sref="audits" ng-click="vm.collapseNavbar()" has-authority="ROLE_ADMIN">
                             <span class="glyphicon glyphicon-bell"></span>&nbsp;
                             <span translate="global.menu.admin.audits">Audits</span>
                         </a>
                     </li>
                     <li ui-sref-active="active">
-                        <a ui-sref="logs" ng-click="vm.collapseNavbar()">
+                        <a ui-sref="logs" ng-click="vm.collapseNavbar()" has-authority="ROLE_ADMIN">
                             <span class="glyphicon glyphicon-tasks"></span>&nbsp;
                             <span translate="global.menu.admin.logs">Logs</span>
                         </a>
                     </li>
-                    <li ng-show="vm.swaggerEnabled" ui-sref-active="active">
+                    <li ng-show="vm.swaggerEnabled" ui-sref-active="active" has-authority="ROLE_ADMIN">
                         <a ui-sref="docs" ng-click="vm.collapseNavbar()">
                             <span class="glyphicon glyphicon-book"></span>&nbsp;
                             <span translate="global.menu.admin.apidocs">API</span>
@@ -261,26 +261,26 @@
                     </li>
                     <!-- jhipster-needle-add-element-to-admin-menu - JHipster will add entities to the admin menu here -->
                     <li ng-hide="inProduction">
-                        <a href='/h2-console' target="_tab" ng-click="vm.collapseNavbar()">
+                        <a href='/h2-console' target="_tab" ng-click="vm.collapseNavbar()" has-authority="ROLE_ADMIN">
                             <span class="glyphicon glyphicon-hdd"></span>&nbsp;
                             <span translate="global.menu.admin.database">Database</span>
                         </a>
                     </li>
                     <li ui-sref-active="active">
-                        <a ui-sref="manageprocessdefinitions" ng-click="vm.collapseNavbar()">
+                        <a ui-sref="manageprocessdefinitions" ng-click="vm.collapseNavbar()" has-authority="ROLE_ADMIN">
                             <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
                             <span>Gestisci Process Definition</span>
                         </a>
                     </li>
                     <li ui-sref-active="active">
-                        <a ui-sref="managemail" ng-click="vm.collapseNavbar()">
+                        <a ui-sref="managemail" ng-click="vm.collapseNavbar()" has-authority="ROLE_ADMIN">
                             <span class="glyphicon glyphicon-envelope"></span>&nbsp;
                             <span>Gestisci Notifiche Email</span>
                         </a>
                     </li>
                     <!-- jhipster-needle-add-element-to-admin-menu - JHipster will add entities to the admin menu here -->
                     <li>
-                        <a href="" ng-click="vm.switchUser()" id="switchuser">
+                        <a href="" ng-click="vm.switchUser()" id="switchuser" has-any-authority="ROLE_ADMIN, ROLE_amministratori-supporto-tecnico@0000">
                             <span class="glyphicon glyphicon-log-in"></span>&nbsp;
                             <span>Impersona Utente</span>
                         </a>
