@@ -5,9 +5,9 @@
         .module('sprintApp')
         .controller('DetailsController', DetailsController);
 
-    DetailsController.$inject = ['$scope', '$rootScope', 'Principal', '$state', '$localStorage', 'dataService', '$log', 'utils', '$uibModal'];
+    DetailsController.$inject = ['$scope', '$rootScope', 'Principal', '$state', '$localStorage', 'dataService', 'AlertService', '$log', 'utils', '$uibModal'];
 
-    function DetailsController($scope, $rootScope, Principal, $state, $localStorage, dataService, $log, utils, $uibModal) {
+    function DetailsController($scope, $rootScope, Principal, $state, $localStorage, dataService, AlertService, $log, utils, $uibModal) {
         var vm = this;
         vm.searchParams = {};
         vm.data = {};
@@ -18,6 +18,7 @@
         vm.searchParams.order = "ASC";
         vm.searchParams.page = 1;
         vm.searchParams.processDefinitionKey = "short-term-mobility-domande";
+        vm.searchParams.processInstanceId = "0";
         vm.searchParams.statoFinaleDomanda = "text=VALUTATA_SCIENTIFICAMENTE";
 
 
@@ -55,8 +56,7 @@
                 	}
                     vm.searchParams.idBando = "text="+response.data.variabili.idBando.value;
                     vm.searchParams.dipartimentoId = "text="+response.data.variabili.dipartimentoId.value;
-                    
-                    
+                    vm.searchParams.processInstanceId = response.data.variabili.processInstanceId.value;
                     
                     vm.data.history.forEach(function(el) {
                         //recupero l'ultimo task (quello ancora da eseguire)
@@ -188,14 +188,9 @@
         
         $scope.exportCsv = function() {
             dataService.search
-              .exportCsv(vm.searchParams, -1, -1)
+              .exportCsvAndSaveInProcess(vm.searchParams, -1, -1)
               .success(function(response) {
-                var filename = "Graduatoria.xls",
-                  file = new Blob([response], {
-                    type: "application/vnd.ms-excel"
-                  });
-                $log.info(file, filename);
-                saveAs(file, filename);
+                  AlertService.success("File Graduatoria Inserito correttamente nel fascicolo del Flusso");
               });
           };
           
