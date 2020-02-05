@@ -181,6 +181,20 @@
                         '&firstResult=' + firstResult +
                         '&maxResults=' + maxResults, searchParams);
                 },
+                exportCsvAndSaveInProcess: function (searchParams, firstResult, maxResults) {
+                    var processDefinitionKey;
+                    if (searchParams.processDefinitionKey !== undefined) {
+                        processDefinitionKey = searchParams.processDefinitionKey;
+                    } else {
+                        processDefinitionKey = 'all';
+                    }
+                    var processInstanceId = searchParams.processInstanceId;
+                    return $http.post('api/search/exportCsvAndSaveInProcess/' + processDefinitionKey + '/' + processInstanceId +
+                        '?active=' + searchParams.active +
+                        '&order=' + searchParams.order +
+                        '&firstResult=' + firstResult +
+                        '&maxResults=' + maxResults, searchParams);
+                },
             },
             lookup: {
                 uo: function (id) {

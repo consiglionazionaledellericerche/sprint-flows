@@ -147,17 +147,17 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 			case "pre-accettazione-start": {
 				if(sceltaUtente.equals("Respingi")) {
 					execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.RESPINTA.toString());
-					restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.RESPINTA);
+					//restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.RESPINTA);
 					flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.RESPINTA.toString());
 				} else {
 					if(sceltaUtente.equals("Annulla")) {
 						execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.ANNULLATA.toString());
-						restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.ANNULLATA);
+						//restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.ANNULLATA);
 						flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.ANNULLATA.toString());
 					}
 					else{
 						execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.VALIDATA.toString());
-						restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.VALIDATA);
+						//restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.VALIDATA);
 						flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.VALIDATA.toString());
 					}
 				}
@@ -204,7 +204,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 					//	domandaCorrenteAccettata = 1;
 					execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.ACCETTATA.toString());
 					execution.setVariable("domandaCorrenteAccettataFlag", "true");
-					restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.ACCETTATA);
+					//restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.ACCETTATA);
 					flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.ACCETTATA.toString());
 				}
 				List<ProcessInstance> processinstancesListaDomandeAccettatePerBando = runtimeService.createProcessInstanceQuery()
@@ -255,7 +255,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 				} else {
 					execution.setVariable("domandaCorrenteValutataFlag", "true");
 					execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE.toString());
-					restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE);
+					//restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE);
 					flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE.toString());
 					//CREAZIONE PDF VALUTAZIONE
 					String nomeFile="valutazioneShortTermMobility";

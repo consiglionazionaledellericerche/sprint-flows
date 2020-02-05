@@ -5,12 +5,22 @@
         .module('sprintApp')
         .controller('DetailsController', DetailsController);
 
-    DetailsController.$inject = ['$scope', '$rootScope', 'Principal', '$state', '$localStorage', 'dataService', '$log', 'utils', '$uibModal'];
+    DetailsController.$inject = ['$scope', '$rootScope', 'Principal', '$state', '$localStorage', 'dataService', 'AlertService', '$log', 'utils', '$uibModal'];
 
-    function DetailsController($scope, $rootScope, Principal, $state, $localStorage, dataService, $log, utils, $uibModal) {
+    function DetailsController($scope, $rootScope, Principal, $state, $localStorage, dataService, AlertService, $log, utils, $uibModal) {
         var vm = this;
+        vm.searchParams = {};
         vm.data = {};
         vm.taskId = $state.params.taskId;
+        //vm.searchParams.statoFinaleDomanda = {};        
+        vm.showGerarchia = false;
+        vm.searchParams.active = true;
+        vm.searchParams.order = "ASC";
+        vm.searchParams.page = 1;
+        vm.searchParams.processDefinitionKey = "short-term-mobility-domande";
+        vm.searchParams.processInstanceId = "0";
+        vm.searchParams.statoFinaleDomanda = "text=VALUTATA_SCIENTIFICAMENTE";
+
 
         $scope.processInstanceId = $state.params.processInstanceId; // mi torna comodo per gli attachments -martin
 
@@ -33,12 +43,21 @@
                     vm.diagramUrl = '/rest/diagram/processInstance/' + vm.data.entity.id + "?" + new Date().getTime();
 
                     var processDefinition = response.data.entity.processDefinitionId.split(":");
+                    var stato = response.data.history[0].historyTask.name;
+
                     vm.detailsView = 'api/views/' + processDefinition[0] + '/' + processDefinition[1] + '/detail';
 
                     if(vm.data.entity.variabili.valutazioneEsperienze_json){
                         vm.experiences = jQuery.parseJSON(vm.data.entity.variabili.valutazioneEsperienze_json);
                     }
-
+                    if(processDefinition[0] != null & processDefinition[0] == "short-term-mobility-bando-dipartimento" & stato == "PROVVEDIMENTO GRADUATORIA"
+) {
+                    		vm.showGerarchia = true;
+                	}
+                    vm.searchParams.idBando = "text="+response.data.variabili.idBando.value;
+                    vm.searchParams.dipartimentoId = "text="+response.data.variabili.dipartimentoId.value;
+                    vm.searchParams.processInstanceId = response.data.variabili.processInstanceId.value;
+                    
                     vm.data.history.forEach(function(el) {
                         //recupero l'ultimo task (quello ancora da eseguire)
                         if (el.historyTask.endTime === null) {
@@ -166,5 +185,14 @@
                 delete $localStorage.cart;
             }
         }
+        
+        $scope.exportCsv = function() {
+            dataService.search
+              .exportCsvAndSaveInProcess(vm.searchParams, -1, -1)
+              .success(function(response) {
+                  AlertService.success("File Graduatoria Inserito correttamente nel fascicolo del Flusso");
+              });
+          };
+          
     }
 })();

@@ -65,6 +65,13 @@
 
 			<hr>
 
+    <div class="col-md-offset-9" role="group" ng-show="vm.showGerarchia">
+    			<button ng-click="exportCsv()" class="btn btn-info">
+				<span class="glyphicon glyphicon-export"></span>
+				Genera File Graduatoria.csv
+			</button>
+    </div>
+			
 			<h3>Documenti</h3>
 			<attachments process-instance-id="{{processInstanceId}}"
 						 attachments="{{vm.data.attachments}}"
