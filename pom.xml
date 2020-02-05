@@ -52,7 +52,7 @@
         <spring.version>4.3.2.RELEASE</spring.version>
         <sprint.version>2.3.17</sprint.version>
         <start-class>it.cnr.si.FlowsApp</start-class>
-        <storage-cloud.version>1.0.4</storage-cloud.version>
+        <storage-cloud.version>0.0.6</storage-cloud.version>
     </properties>
 
     <dependencyManagement>
