@@ -52,7 +52,7 @@
         <spring.version>4.3.2.RELEASE</spring.version>
         <sprint.version>2.3.17</sprint.version>
         <start-class>it.cnr.si.FlowsApp</start-class>
-        <storage-cloud.version>1.0.6</storage-cloud.version>
+        <storage-cloud.version>2.0.0</storage-cloud.version>
     </properties>
 
     <dependencyManagement>
@@ -218,21 +218,21 @@
             <version>${sprint.version}</version>
         </dependency>
 
-        <!--        <dependency>-->
-        <!--            <groupId>it.cnr.si</groupId>-->
-        <!--            <artifactId>storage-cloud-cmis</artifactId>-->
-        <!--            <version>${storage-cloud.version}</version>-->
-        <!--        </dependency>-->
+                <dependency>
+                    <groupId>it.cnr.si.storage</groupId>
+                    <artifactId>storage-cloud-cmis</artifactId>
+                    <version>${storage-cloud.version}</version>
+                </dependency>
         <dependency>
             <groupId>it.cnr.si.storage</groupId>
             <artifactId>storage-cloud-commons</artifactId>
             <version>${storage-cloud.version}</version>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>it.cnr.si.storage</groupId>
             <artifactId>storage-cloud-filesystem</artifactId>
             <version>${storage-cloud.version}</version>
-        </dependency>
+        </dependency>-->
 
         <!-- EE dependencies for Java11 -->
         <dependency>

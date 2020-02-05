@@ -49,3 +49,5 @@ ace:
 cnr:
   abil:
     url: https://attivitainternazionali.cnr.it
+  storage:
+    driver: cmis
