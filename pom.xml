@@ -219,12 +219,12 @@
         </dependency>
 
                 <dependency>
-                    <groupId>it.cnr.si.storage</groupId>
+                    <groupId>it.cnr.si</groupId>
                     <artifactId>storage-cloud-cmis</artifactId>
                     <version>${storage-cloud.version}</version>
                 </dependency>
         <dependency>
-            <groupId>it.cnr.si.storage</groupId>
+            <groupId>it.cnr.si</groupId>
             <artifactId>storage-cloud-commons</artifactId>
             <version>${storage-cloud.version}</version>
         </dependency>
