@@ -15,6 +15,7 @@ import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
+import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceActionRequest;
@@ -59,8 +60,6 @@ public class FlowsProcessInstanceResource {
 	private RestResponseFactory restResponseFactory;
 	@Inject
 	private HistoryService historyService;
-//	@Inject
-//	private ProcessInstanceResource processInstanceResource;
 	@Inject
 	private RuntimeService runtimeService;
 	@Inject
@@ -155,19 +154,22 @@ public class FlowsProcessInstanceResource {
 		return new ResponseEntity(HttpStatus.OK);
 	}
 
-	// TODO ???
-	@DeleteMapping(value = "suspendProcessInstance", produces = MediaType.APPLICATION_JSON_VALUE)
-	@PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.isResponsabile(#taskId, #processInstanceId, @flowsUserDetailsService)")
-	@Timed
-	public ProcessInstanceResponse suspend(
-			HttpServletRequest request,
-			@RequestParam(value = "processInstanceId", required = true) String processInstanceId) {
-
-		runtimeService.suspendProcessInstanceById(processInstanceId);
-		return null; //TODO
-	}
-
-
+	// TODO martin
+	// TODO questo metodo implmentato apparentemente senza motivo
+	// TODO oggi, 05/02/2020 lo commento
+	// TODO se entro 05/05/2020 non gli abbiamo trovato un uso, eliminarlo
+//	@DeleteMapping(value = "suspendProcessInstance", produces = MediaType.APPLICATION_JSON_VALUE)
+//	@PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.isResponsabile(#taskId, #processInstanceId, @flowsUserDetailsService)")
+//	@Timed
+//	public ProcessInstanceResponse suspend(
+//			HttpServletRequest request,
+//			@RequestParam(value = "processInstanceId", required = true) String processInstanceId) {
+//
+//		runtimeService.suspendProcessInstanceById(processInstanceId);
+//		ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).includeProcessVariables().singleResult();
+//		ProcessInstanceResponse response =  restResponseFactory.createProcessInstanceResponse(processInstance);
+//		return response;
+//	}
 
 	@PostMapping(value = "/variable", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
