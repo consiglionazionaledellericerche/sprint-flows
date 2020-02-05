@@ -117,7 +117,7 @@ buildprodcontainer:
     - echo "Running build image and push image for release tag"
     - echo $CI_COMMIT_REF_NAME
     - docker build --file src/main/docker/Dockerfile -t sprint-flows:prod .
-    - docker push docker.si.cnr.it/sprint-flows:prod
+    - docker push sprint-flows:prod
     - echo "Done pushing image to local docker repo. Now pushing to dockerhub."
     - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
     - docker tag $CI_PROJECT_NAME:$CI_COMMIT_REF_NAME $DOCKER_HUB_ORGANIZATION/$CI_PROJECT_NAME:prod
