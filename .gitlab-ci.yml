@@ -42,9 +42,6 @@ deploy_snapshot:
     - master
   script:
     - mvn -B clean compile package deploy -DskipTests -Pprod -U
-  artifacts:
-    paths:
-      - target/app.war
 
 buildtestcontainer:
   stage: build_test_container
