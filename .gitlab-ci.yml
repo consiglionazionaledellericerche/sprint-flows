@@ -40,6 +40,7 @@ build:
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   script:
     - mvn -B clean compile package deploy -DskipTests -Pprod -U
+    - ls -la ./target
 
 deploy_snapshot:
   stage: deploy_snapshot
