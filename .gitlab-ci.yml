@@ -20,6 +20,7 @@ cache:
 
 stages:
   - test
+  - build
   - deploy_snapshot
   - build_test_container
   - deploy_test_container
@@ -34,6 +35,12 @@ test:
     - mvn -B clean compile sonar:sonar -Dsonar.host.url=http://sonar.si.cnr.it test package -fae
   allow_failure: true
 
+build:
+  stage: build
+  image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
+  script:
+    - mvn -B clean compile package deploy -DskipTests -Pprod -U
+    - ls -la ./target
 
 deploy_snapshot:
   stage: deploy_snapshot
@@ -52,6 +59,7 @@ buildtestcontainer:
     - demo
   script:
     - echo "Running build image and push image"
+    - ls -la ./target
     - docker build --file src/main/docker/test/Dockerfile -t docker.si.cnr.it/sprint-flows-$CI_COMMIT_REF_NAME .
     - docker push docker.si.cnr.it/sprint-flows-$CI_COMMIT_REF_NAME
 
@@ -110,10 +118,12 @@ buildprodcontainer:
   only:
     - tags
   script:
+    - mvn -B clean compile package -DskipTests -Pprod -U
+    - cp ./target/*.war ./target/app.war
     - echo "Running build image and push image for release tag"
     - echo $CI_COMMIT_REF_NAME
     - docker build --file src/main/docker/Dockerfile -t $CI_PROJECT_NAME:$CI_COMMIT_REF_NAME .
-#    - docker push $CI_PROJECT_NAME:$CI_COMMIT_REF_NAME
+    #    - docker push $CI_PROJECT_NAME:$CI_COMMIT_REF_NAME
     - echo "Done pushing image to local docker repo. Now pushing to dockerhub."
     - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
     - docker tag $CI_PROJECT_NAME:$CI_COMMIT_REF_NAME $DOCKER_HUB_ORGANIZATION/$CI_PROJECT_NAME:$CI_COMMIT_REF_NAME

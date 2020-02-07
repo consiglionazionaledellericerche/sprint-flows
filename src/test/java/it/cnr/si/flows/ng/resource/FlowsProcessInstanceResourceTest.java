@@ -150,15 +150,15 @@ public class FlowsProcessInstanceResourceTest {
     }
 
 
-    @Test
-    public void testSuspend() throws Exception {
-        processInstance = util.mySetUp(acquisti);
-        assertEquals(false, processInstance.isSuspended());
-        //solo admin può sospendere il flow
-        util.loginAdmin();
-        ProcessInstanceResponse response = flowsProcessInstanceResource.suspend(new MockHttpServletRequest(), processInstance.getId());
-        assertEquals(true, response.isSuspended());
-    }
+//    @Test
+//    public void testSuspend() throws Exception {
+//        processInstance = util.mySetUp(acquisti);
+//        assertEquals(false, processInstance.isSuspended());
+//        //solo admin può sospendere il flow
+//        util.loginAdmin();
+//        ProcessInstanceResponse response = flowsProcessInstanceResource.suspend(new MockHttpServletRequest(), processInstance.getId());
+//        assertEquals(true, response.isSuspended());
+//    }
 
 
     @Test
