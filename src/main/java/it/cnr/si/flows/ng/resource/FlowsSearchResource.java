@@ -159,7 +159,7 @@ public class FlowsSearchResource {
 		if(processVariables.get("pathFascicoloDocumenti") != null) {
 			documentoGenerato.setPath(processVariables.get("pathFascicoloDocumenti").toString());
 		}
-		String fileName = "ExportCsvGraduatoriaBando" + processVariables.get("idBando") + "Dipartimento" + processVariables.get("dipartimentoId") + ".csv";
+		String fileName = "ExportCsvGraduatoriaBando" + processVariables.get("idBando") + "Dipartimento" + processVariables.get("dipartimentoId") + ".xls";
 		String labelFile = "Export Csv Graduatoria Bando" + processVariables.get("idBando") + " Dipartimento" + processVariables.get("dipartimentoId");
 		documentoGenerato.setFilename(fileName);
 		documentoGenerato.setName(fileName);

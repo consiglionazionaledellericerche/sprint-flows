@@ -245,7 +245,7 @@ public class ManageProcessShortTermMobilityBandoDipartimento_v1 implements Execu
 		//File tempFile = File.createTempFile("MyAppName-", ".tmp");
 		PrintWriter writer = new PrintWriter(tempFile);
 		//creo il csv corrispondente
-		String fileName = "ExportCsvGraduatoriaBando" + idBando + "Dipartimento" + dipartimentoId + ".csv";
+		String fileName = "ExportCsvGraduatoriaBando" + idBando + "Dipartimento" + dipartimentoId + ".xls";
 		String labelFile = "Export Csv Graduatoria Bando" + idBando + " Dipartimento" + dipartimentoId;
 		List<HistoricProcessInstanceResponse> data = (List<HistoricProcessInstanceResponse>) flussiAttivaPerBando.getData();
 		flowsTaskService.buildCsv(data, writer, processDefinitionKey);

@@ -194,7 +194,7 @@ public class ManageProcessAccordiInternazionaliBandi_v1 implements ExecutionList
 		//File tempFile = File.createTempFile("MyAppName-", ".tmp");
 		PrintWriter writer = new PrintWriter(tempFile);
 		//creo il csv corrispondente
-		String fileName = "ExportCsvDomandeBando" + idBando + ".csv";
+		String fileName = "ExportCsvDomandeBando" + idBando + ".xls";
 		//String downloadName = "ExportCsvDomandeBando" + idBando;
 		String labelFile = "Export Csv Domande Bando";
 		flowsTaskService.buildCsv((List<HistoricProcessInstanceResponse>) flussiAttivaPerBando.getData(), writer, processDefinitionKey);
