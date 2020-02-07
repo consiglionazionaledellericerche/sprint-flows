@@ -3,8 +3,6 @@ package it.cnr.si;
 import it.cnr.si.config.Constants;
 import it.cnr.si.config.DefaultProfileUtil;
 import it.cnr.si.config.JHipsterProperties;
-import org.activiti.spring.boot.*;
-import org.activiti.spring.boot.JpaProcessEngineAutoConfiguration.JpaConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -31,15 +29,6 @@ import java.util.Collection;
 @EnableAutoConfiguration(exclude = {
         MetricFilterAutoConfiguration.class,
         MetricRepositoryAutoConfiguration.class,
-        RestApiAutoConfiguration.class,
-        SecurityAutoConfiguration.class,
-        SecurityAutoConfiguration.UserDetailsServiceConfiguration.class,
-        JpaProcessEngineAutoConfiguration.class,
-        EndpointAutoConfiguration.class,
-        DataSourceProcessEngineAutoConfiguration.class,
-        AbstractProcessEngineAutoConfiguration.class,
-        JpaProcessEngineAutoConfiguration.class,
-        JpaConfiguration.class,
         SprintApp.class
 })
 @EnableConfigurationProperties({ JHipsterProperties.class, LiquibaseProperties.class })

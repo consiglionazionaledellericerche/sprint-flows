@@ -35,6 +35,7 @@ public class DraftResource {
      * VICEVERSA, SE SI SPECIFICA UNO USERNAME, IL DRAFT POTRÀ ESSERE LETTO SOLO DA QURELLO USERNAME
      *
      * @param taskId   taskId del draft: SE È 0 ALLORA IL TASKID NON C`È, allora IL DRAFT È ASSOCIATO AD UNA PI CHE SI STA CREANDO
+     * @param json la draft vera a propria, contenuta nel body della richiesta
      * @param username the username
      * @return the ResponseEntity with status 200 (OK) and with body the updated draft, or with status 400 (Bad Request) if the draft is not valid, or with status 500 (Internal Server Error) if the draft couldnt be updated
      */
