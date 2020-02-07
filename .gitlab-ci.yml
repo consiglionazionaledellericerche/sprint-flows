@@ -37,16 +37,15 @@ stages:
 
 build:
   stage: build
+#  image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   tags:
     - shared
-  only:
-    - test
-    - demo
   script:
-    - echo "Running build image and push image"
+    - sleep 3600
+    - docker run hello-world
+    - mvn -B compile package deploy -DskipTests -U
     - ls -la ./target
     - docker build --file src/main/docker/test/Dockerfile -t docker.si.cnr.it/sprint-flows-$CI_COMMIT_REF_NAME .
-    - docker push docker.si.cnr.it/sprint-flows-$CI_COMMIT_REF_NAME
 
 #build:
 #  stage: build
@@ -63,18 +62,18 @@ build:
 #  script:
 #    - mvn -B clean compile package deploy -DskipTests -Pprod -U
 #
-#buildtestcontainer:
-#  stage: build
-#  tags:
-#    - shared
-#  only:
-#    - test
-#    - demo
-#  script:
-#    - echo "Running build image and push image"
-#    - ls -la ./target
-#    - docker build --file src/main/docker/test/Dockerfile -t docker.si.cnr.it/sprint-flows-$CI_COMMIT_REF_NAME .
-#    - docker push docker.si.cnr.it/sprint-flows-$CI_COMMIT_REF_NAME
+buildtestcontainer:
+  stage: build
+  tags:
+    - shared
+  only:
+    - test
+    - demo
+  script:
+    - echo "Running build image and push image"
+    - ls -la ./target
+    - docker build --file src/main/docker/test/Dockerfile -t docker.si.cnr.it/sprint-flows-$CI_COMMIT_REF_NAME .
+    - docker push docker.si.cnr.it/sprint-flows-$CI_COMMIT_REF_NAME
 #
 #
 #deploydockertest01e02:
