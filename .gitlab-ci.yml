@@ -42,9 +42,9 @@ build:
     - shared
   script:
     - echo "Running build image and push image"
-    - mvn package
-    - docker -v
     - docker build --file src/main/docker/test/Dockerfile -t docker.si.cnr.it/sprint-flows-$CI_COMMIT_REF_NAME .
+    - mvn package -DskipTests
+    - docker -v
     - ls -la ./target
     - docker push docker.si.cnr.it/sprint-flows-$CI_COMMIT_REF_NAME
 
