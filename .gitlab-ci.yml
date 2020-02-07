@@ -3,7 +3,7 @@ image: docker:stable
 variables:
   DOCKER_DRIVER: overlay2
   MAVEN_OPTS: -Dmaven.repo.local=./.m2 -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-  CNR_MAVEN_VERSION: 3.4.0
+  CNR_MAVEN_VERSION: 3.8.0
 
 services:
   - docker:dind
@@ -41,149 +41,158 @@ build:
   script:
     - mvn -B clean compile package deploy -DskipTests -Pprod -U
     - ls -la ./target
-
-deploy_snapshot:
-  stage: deploy_snapshot
-  image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
-  only:
-    - master
-  script:
-    - mvn -B clean compile package deploy -DskipTests -Pprod -U
-
-buildtestcontainer:
-  stage: build_test_container
-  tags:
-    - shared
-  only:
-    - test
-    - demo
-  script:
-    - echo "Running build image and push image"
-    - ls -la ./target
+    - docker -v
     - docker build --file src/main/docker/test/Dockerfile -t docker.si.cnr.it/sprint-flows-$CI_COMMIT_REF_NAME .
-    - docker push docker.si.cnr.it/sprint-flows-$CI_COMMIT_REF_NAME
 
-
-deploydockertest01e02:
-  stage: deploy_test_container
-  image: scolagreco/alpine-ssh:latest
-  tags:
-    - shared
-  only:
-    - test
-  script:
-    - echo "Deploy to dockertest01"
-    - sed -i "s/CONFIG_REPO_TOKEN/$CONFIG_REPO_TOKEN/g" ./src/main/docker/test/app-con-mancenter.yml
-    - sshremote $SSH_CONNECT_DOCKERTEST01 "if [ -f  ''/sites/sprint-flows-test/app.yml'' ]; then docker-compose -p sprint-flows-test -f /sites/sprint-flows-test/app.yml down --remove-orphans; fi && rm -rf /sites/sprint-flows-test && mkdir -p /sites/sprint-flows-test || echo NODIR"
-    - scpremote ./src/main/docker/test/app-con-mancenter.yml $SSH_CONNECT_DOCKERTEST01:/sites/sprint-flows-test/app.yml
-    - sshremote $SSH_CONNECT_DOCKERTEST01 "cd /sites/sprint-flows-test && docker-compose -p sprint-flows-test -f app.yml pull && docker-compose -p sprint-flows-test -f app.yml up -d"
-    - echo "Deploy to dockertest02"
-    - sed -i "s/CONFIG_REPO_TOKEN/$CONFIG_REPO_TOKEN/g" ./src/main/docker/test/app-senza-mancenter.yml
-    - sshremote $SSH_CONNECT_DOCKERTEST02 "if [ -f  ''/sites/sprint-flows-test/app.yml'' ]; then docker-compose -p sprint-flows-test -f /sites/sprint-flows-test/app.yml down --remove-orphans; fi && rm -rf /sites/sprint-flows-test && mkdir -p /sites/sprint-flows-test || echo NODIR"
-    - scpremote ./src/main/docker/test/app-senza-mancenter.yml $SSH_CONNECT_DOCKERTEST02:/sites/sprint-flows-test/app.yml
-    - sshremote $SSH_CONNECT_DOCKERTEST02 "cd /sites/sprint-flows-test && docker-compose -p sprint-flows-test -f app.yml pull && docker-compose -p sprint-flows-test -f app.yml up -d"
-  environment:
-    name: dockertest01
-    url: http://dockerwebtest01.si.cnr.it:1480
-
-
-#release_war:
-#  stage: release
+#build:
+#  stage: build
 #  image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
 #  script:
-#    - mvn -Dresume=false release:prepare release:perform -Pprod -DskipTests -DpushChanges=false -DlocalCheckout=true -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -Darguments="-Dmaven.javadoc.skip=true -DskipTests -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
-
-release_artifact:
-  stage: release
-  image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
-  only:
-    - master
-  script:
-    - git checkout -B "$CI_BUILD_REF_NAME"
-    # mi metto in condizione del push per l'utente con la deploy key
-    - git remote set-url --push origin git@git.si.cnr.it:documentale/sprint-flows.git
-    - mvn -B -Dresume=false release:prepare release:perform -Pprod -DpushChanges=false -DlocalCheckout=true -DskipTests -Darguments="-Dmaven.test.skip=true -DskipTests"
-    - git remote set-url --push origin git@git.si.cnr.it:documentale/sprint-flows.git
-    - git push --tags
-    - git commit --amend -m "[ci skip] prepare for next development iteration"
-    - git push --set-upstream origin $CI_BUILD_REF_NAME
-  when: manual
-  allow_failure: false
-
-
-buildprodcontainer:
-  stage: build_prod_container
-  tags:
-    - shared
-  only:
-    - tags
-  script:
-    - mvn -B clean compile package -DskipTests -Pprod -U
-    - cp ./target/*.war ./target/app.war
-    - echo "Running build image and push image for release tag"
-    - echo $CI_COMMIT_REF_NAME
-    - docker build --file src/main/docker/Dockerfile -t $CI_PROJECT_NAME:$CI_COMMIT_REF_NAME .
-#    - docker push $CI_PROJECT_NAME:$CI_COMMIT_REF_NAME
-    - echo "Done pushing image to local docker repo. Now pushing to dockerhub."
-    - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
-    - docker tag $CI_PROJECT_NAME:$CI_COMMIT_REF_NAME $DOCKER_HUB_ORGANIZATION/$CI_PROJECT_NAME:$CI_COMMIT_REF_NAME
-    - docker tag $CI_PROJECT_NAME:$CI_COMMIT_REF_NAME $DOCKER_HUB_ORGANIZATION/$CI_PROJECT_NAME:latest
-    - docker push $DOCKER_HUB_ORGANIZATION/$CI_PROJECT_NAME:$CI_COMMIT_REF_NAME
-    - docker push $DOCKER_HUB_ORGANIZATION/$CI_PROJECT_NAME:latest
-
-
-deploydockprod01:
-  stage: deploy_prod_container
-  image: scolagreco/alpine-ssh:latest
-  only:
-    - prod
-  tags:
-    - shared
-  when: manual
-  script:
-    - echo "Deploy sprint-flows to dockprod01"
-    - echo "setting secrets"
-    - sed -i "s/docker.si.cnr.it\/sprint-flows/docker.si.cnr.it\/sprint-flows:$CI_COMMIT_TAG/g" ./src/main/docker/app-prod.yml
-    - sed -i "s/SPRING_DATASOURCE_PASSWORD_SED/$POSTGRESS_PASSWORD/g" ./src/main/docker/app-prod.yml
-    - sed -i "s/SPRING_LDAP_MANAGERPASSWORD_SED/$LDAP_PASSWORD/g" ./src/main/docker/app-prod.yml
-    - sed -i "s/ACE_PASSWORD_SED/$ACE_PASSWORD/g" ./src/main/docker/app-prod.yml
-    - sed -i "s/CMIS_PASSWORD/$CMIS_PASSWORD/g" ./src/main/docker/app-prod.yml
-    - sed -i "s/CONFIG_REPO_TOKEN/$CONFIG_REPO_TOKEN/g" ./src/main/docker/app-prod.yml
-    - echo "stopping service"
-    - sshremote $SSH_CONNECT_DOCPROD01 "docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml down -v --remove-orphans || echo NOFILE"
-    - sshremote $SSH_CONNECT_DOCPROD01 "rm -rf /sites/docker-flows/ && mkdir -p /sites/docker-flows/"    - echo "copying docker-compose file"
-    - scpremote ./src/main/docker/app-prod.yml $SSH_CONNECT_DOCPROD01:/sites/docker-flows/app.yml
-    - echo "starting service"
-    - sshremote $SSH_CONNECT_DOCPROD01 "docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml pull && docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml up -d"
-  environment:
-    name: dockprod01
-    url: http://dockprod01.cedrc.cnr.it:1480
-
-deploydockprod02:
-  stage: deploy_prod_container
-  image: scolagreco/alpine-ssh:latest
-  only:
-    - prod
-  tags:
-    - shared
-  when: manual
-  script:
-    - echo "Deploy sprint-flows to dockprod02"
-    - echo "setting secrets"
-    #    - sed -i "s/docker.si.cnr.it\/sprint-flows/docker.si.cnr.it\/sprint-flows:LATEST/g" ./src/main/docker/app-prod.yml
-    - sed -i "s/SPRING_DATASOURCE_PASSWORD_SED/$POSTGRESS_PASSWORD/g" ./src/main/docker/app-prod.yml
-    - sed -i "s/SPRING_LDAP_MANAGERPASSWORD_SED/$LDAP_PASSWORD/g" ./src/main/docker/app-prod.yml
-    - sed -i "s/ACE_PASSWORD_SED/$ACE_PASSWORD/g" ./src/main/docker/app-prod.yml
-    - sed -i "s/CMIS_PASSWORD/$CMIS_PASSWORD/g" ./src/main/docker/app-prod.yml
-    - sed -i "s/CONFIG_REPO_TOKEN/$CONFIG_REPO_TOKEN/g" ./src/main/docker/app-prod.yml
-    - echo "stopping service"
-    - sshremote $SSH_CONNECT_DOCPROD02 "docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml down -v --remove-orphans || echo NOFILE"
-    - sshremote $SSH_CONNECT_DOCPROD02 "rm -rf /sites/docker-flows/ && mkdir -p /sites/docker-flows/"
-    - echo "copying docker-compose file"
-    - scpremote ./src/main/docker/app-prod.yml $SSH_CONNECT_DOCPROD02:/sites/docker-flows/app.yml
-    - echo "starting services"
-    - sshremote $SSH_CONNECT_DOCPROD02 "docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml pull && docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml up -d"
-  environment:
-    name: dockprod02
-    url: http://dockprod02.cedrc.cnr.it:1480
-
+#    - mvn -B clean compile package deploy -DskipTests -Pprod -U
+#    - ls -la ./target
+#
+#deploy_snapshot:
+#  stage: deploy_snapshot
+#  image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
+#  only:
+#    - master
+#  script:
+#    - mvn -B clean compile package deploy -DskipTests -Pprod -U
+#
+#buildtestcontainer:
+#  stage: build_test_container
+#  tags:
+#    - shared
+#  only:
+#    - test
+#    - demo
+#  script:
+#    - echo "Running build image and push image"
+#    - ls -la ./target
+#    - docker build --file src/main/docker/test/Dockerfile -t docker.si.cnr.it/sprint-flows-$CI_COMMIT_REF_NAME .
+#    - docker push docker.si.cnr.it/sprint-flows-$CI_COMMIT_REF_NAME
+#
+#
+#deploydockertest01e02:
+#  stage: deploy_test_container
+#  image: scolagreco/alpine-ssh:latest
+#  tags:
+#    - shared
+#  only:
+#    - test
+#  script:
+#    - echo "Deploy to dockertest01"
+#    - sed -i "s/CONFIG_REPO_TOKEN/$CONFIG_REPO_TOKEN/g" ./src/main/docker/test/app-con-mancenter.yml
+#    - sshremote $SSH_CONNECT_DOCKERTEST01 "if [ -f  ''/sites/sprint-flows-test/app.yml'' ]; then docker-compose -p sprint-flows-test -f /sites/sprint-flows-test/app.yml down --remove-orphans; fi && rm -rf /sites/sprint-flows-test && mkdir -p /sites/sprint-flows-test || echo NODIR"
+#    - scpremote ./src/main/docker/test/app-con-mancenter.yml $SSH_CONNECT_DOCKERTEST01:/sites/sprint-flows-test/app.yml
+#    - sshremote $SSH_CONNECT_DOCKERTEST01 "cd /sites/sprint-flows-test && docker-compose -p sprint-flows-test -f app.yml pull && docker-compose -p sprint-flows-test -f app.yml up -d"
+#    - echo "Deploy to dockertest02"
+#    - sed -i "s/CONFIG_REPO_TOKEN/$CONFIG_REPO_TOKEN/g" ./src/main/docker/test/app-senza-mancenter.yml
+#    - sshremote $SSH_CONNECT_DOCKERTEST02 "if [ -f  ''/sites/sprint-flows-test/app.yml'' ]; then docker-compose -p sprint-flows-test -f /sites/sprint-flows-test/app.yml down --remove-orphans; fi && rm -rf /sites/sprint-flows-test && mkdir -p /sites/sprint-flows-test || echo NODIR"
+#    - scpremote ./src/main/docker/test/app-senza-mancenter.yml $SSH_CONNECT_DOCKERTEST02:/sites/sprint-flows-test/app.yml
+#    - sshremote $SSH_CONNECT_DOCKERTEST02 "cd /sites/sprint-flows-test && docker-compose -p sprint-flows-test -f app.yml pull && docker-compose -p sprint-flows-test -f app.yml up -d"
+#  environment:
+#    name: dockertest01
+#    url: http://dockerwebtest01.si.cnr.it:1480
+#
+#
+##release_war:
+##  stage: release
+##  image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
+##  script:
+##    - mvn -Dresume=false release:prepare release:perform -Pprod -DskipTests -DpushChanges=false -DlocalCheckout=true -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -Darguments="-Dmaven.javadoc.skip=true -DskipTests -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
+#
+#release_artifact:
+#  stage: release
+#  image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
+#  only:
+#    - master
+#  script:
+#    - git checkout -B "$CI_BUILD_REF_NAME"
+#    # mi metto in condizione del push per l'utente con la deploy key
+#    - git remote set-url --push origin git@git.si.cnr.it:documentale/sprint-flows.git
+#    - mvn -B -Dresume=false release:prepare release:perform -Pprod -DpushChanges=false -DlocalCheckout=true -DskipTests -Darguments="-Dmaven.test.skip=true -DskipTests"
+#    - git remote set-url --push origin git@git.si.cnr.it:documentale/sprint-flows.git
+#    - git push --tags
+#    - git commit --amend -m "[ci skip] prepare for next development iteration"
+#    - git push --set-upstream origin $CI_BUILD_REF_NAME
+#  when: manual
+#  allow_failure: false
+#
+#
+#buildprodcontainer:
+#  stage: build_prod_container
+#  tags:
+#    - shared
+#  only:
+#    - tags
+#  script:
+#    - mvn -B clean compile package -DskipTests -Pprod -U
+#    - cp ./target/*.war ./target/app.war
+#    - echo "Running build image and push image for release tag"
+#    - echo $CI_COMMIT_REF_NAME
+#    - docker build --file src/main/docker/Dockerfile -t $CI_PROJECT_NAME:$CI_COMMIT_REF_NAME .
+##    - docker push $CI_PROJECT_NAME:$CI_COMMIT_REF_NAME
+#    - echo "Done pushing image to local docker repo. Now pushing to dockerhub."
+#    - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
+#    - docker tag $CI_PROJECT_NAME:$CI_COMMIT_REF_NAME $DOCKER_HUB_ORGANIZATION/$CI_PROJECT_NAME:$CI_COMMIT_REF_NAME
+#    - docker tag $CI_PROJECT_NAME:$CI_COMMIT_REF_NAME $DOCKER_HUB_ORGANIZATION/$CI_PROJECT_NAME:latest
+#    - docker push $DOCKER_HUB_ORGANIZATION/$CI_PROJECT_NAME:$CI_COMMIT_REF_NAME
+#    - docker push $DOCKER_HUB_ORGANIZATION/$CI_PROJECT_NAME:latest
+#
+#
+#deploydockprod01:
+#  stage: deploy_prod_container
+#  image: scolagreco/alpine-ssh:latest
+#  only:
+#    - prod
+#  tags:
+#    - shared
+#  when: manual
+#  script:
+#    - echo "Deploy sprint-flows to dockprod01"
+#    - echo "setting secrets"
+#    - sed -i "s/docker.si.cnr.it\/sprint-flows/docker.si.cnr.it\/sprint-flows:$CI_COMMIT_TAG/g" ./src/main/docker/app-prod.yml
+#    - sed -i "s/SPRING_DATASOURCE_PASSWORD_SED/$POSTGRESS_PASSWORD/g" ./src/main/docker/app-prod.yml
+#    - sed -i "s/SPRING_LDAP_MANAGERPASSWORD_SED/$LDAP_PASSWORD/g" ./src/main/docker/app-prod.yml
+#    - sed -i "s/ACE_PASSWORD_SED/$ACE_PASSWORD/g" ./src/main/docker/app-prod.yml
+#    - sed -i "s/CMIS_PASSWORD/$CMIS_PASSWORD/g" ./src/main/docker/app-prod.yml
+#    - sed -i "s/CONFIG_REPO_TOKEN/$CONFIG_REPO_TOKEN/g" ./src/main/docker/app-prod.yml
+#    - echo "stopping service"
+#    - sshremote $SSH_CONNECT_DOCPROD01 "docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml down -v --remove-orphans || echo NOFILE"
+#    - sshremote $SSH_CONNECT_DOCPROD01 "rm -rf /sites/docker-flows/ && mkdir -p /sites/docker-flows/"    - echo "copying docker-compose file"
+#    - scpremote ./src/main/docker/app-prod.yml $SSH_CONNECT_DOCPROD01:/sites/docker-flows/app.yml
+#    - echo "starting service"
+#    - sshremote $SSH_CONNECT_DOCPROD01 "docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml pull && docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml up -d"
+#  environment:
+#    name: dockprod01
+#    url: http://dockprod01.cedrc.cnr.it:1480
+#
+#deploydockprod02:
+#  stage: deploy_prod_container
+#  image: scolagreco/alpine-ssh:latest
+#  only:
+#    - prod
+#  tags:
+#    - shared
+#  when: manual
+#  script:
+#    - echo "Deploy sprint-flows to dockprod02"
+#    - echo "setting secrets"
+#    #    - sed -i "s/docker.si.cnr.it\/sprint-flows/docker.si.cnr.it\/sprint-flows:LATEST/g" ./src/main/docker/app-prod.yml
+#    - sed -i "s/SPRING_DATASOURCE_PASSWORD_SED/$POSTGRESS_PASSWORD/g" ./src/main/docker/app-prod.yml
+#    - sed -i "s/SPRING_LDAP_MANAGERPASSWORD_SED/$LDAP_PASSWORD/g" ./src/main/docker/app-prod.yml
+#    - sed -i "s/ACE_PASSWORD_SED/$ACE_PASSWORD/g" ./src/main/docker/app-prod.yml
+#    - sed -i "s/CMIS_PASSWORD/$CMIS_PASSWORD/g" ./src/main/docker/app-prod.yml
+#    - sed -i "s/CONFIG_REPO_TOKEN/$CONFIG_REPO_TOKEN/g" ./src/main/docker/app-prod.yml
+#    - echo "stopping service"
+#    - sshremote $SSH_CONNECT_DOCPROD02 "docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml down -v --remove-orphans || echo NOFILE"
+#    - sshremote $SSH_CONNECT_DOCPROD02 "rm -rf /sites/docker-flows/ && mkdir -p /sites/docker-flows/"
+#    - echo "copying docker-compose file"
+#    - scpremote ./src/main/docker/app-prod.yml $SSH_CONNECT_DOCPROD02:/sites/docker-flows/app.yml
+#    - echo "starting services"
+#    - sshremote $SSH_CONNECT_DOCPROD02 "docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml pull && docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml up -d"
+#  environment:
+#    name: dockprod02
+#    url: http://dockprod02.cedrc.cnr.it:1480
+#
