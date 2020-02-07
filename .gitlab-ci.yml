@@ -39,6 +39,7 @@ build:
   stage: build
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   script:
+    - dockerd
     - mvn -B compile package deploy -DskipTests -U
     - ls -la ./target
     - docker -v /var/run/docker.sock:/var/run/docker.sock build --file src/main/docker/test/Dockerfile -t docker.si.cnr.it/sprint-flows-$CI_COMMIT_REF_NAME .
