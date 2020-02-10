@@ -285,6 +285,7 @@ public class FlowsPdfService {
 						String valueEscaped = "campo erroneamente compilato";
 						if (runtimeService.getVariable(processInstanceId,value.getName()) != null) {
 							valueEscaped = Jsoup.parse(StringEscapeUtils.escapeHtml(runtimeService.getVariable(processInstanceId,value.getName()).toString().replaceAll("\t", "  "))).text();
+							valueEscaped = valueEscaped.replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;");
 							variableInstanceJson.put(key, valueEscaped);
 						}
 					}
