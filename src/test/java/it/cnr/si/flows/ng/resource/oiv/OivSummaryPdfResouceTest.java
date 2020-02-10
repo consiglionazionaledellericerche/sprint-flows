@@ -1,7 +1,9 @@
-package it.cnr.si.flows.ng.resource;
+package it.cnr.si.flows.ng.resource.oiv;
 
 import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.TestServices;
+import it.cnr.si.flows.ng.resource.FlowsAttachmentResource;
+import it.cnr.si.flows.ng.resource.FlowsTaskResource;
 import it.cnr.si.flows.ng.service.FlowsPdfService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -31,7 +33,8 @@ import static org.springframework.http.HttpStatus.OK;
 
 
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "native,unittests,oiv")
+//@ActiveProfiles(profiles = "native,unittests,oiv")
+@ActiveProfiles(profiles = "oiv,unittests")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
 public class OivSummaryPdfResouceTest {
@@ -65,12 +68,6 @@ public class OivSummaryPdfResouceTest {
 
 
     @Test
-    public void testSummaryPdfProcessCompleted() throws Exception {
-        processInstance = util.mySetUp(iscrizioneElencoOiv);
-        //todo: da fare quando l'ambiente sarà più stabile
-    }
-
-    @Test
     public void testSummaryPdfService() throws Exception {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         processInstance = util.mySetUp(iscrizioneElencoOiv);
@@ -88,7 +85,7 @@ public class OivSummaryPdfResouceTest {
     private void completeTask() throws Exception {
         //completo il primo task
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
-        req.setParameter("taskId", taskService.createTaskQuery().singleResult().getId());
+        req.setParameter("taskId", util.getFirstTaskId());
         req.setParameter("processDefinitionId", processInstance.getProcessDefinitionId());
         req.setParameter("sceltaUtente", "prendo_in_carico_la_domanda");
         req.setParameter("commento", "commento di presa in carico della domanda " + JUNIT_TEST);

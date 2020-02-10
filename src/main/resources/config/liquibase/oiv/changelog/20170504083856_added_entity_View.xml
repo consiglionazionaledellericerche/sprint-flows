@@ -39,20 +39,20 @@
         </createTable>
         
         <loadData encoding="UTF-8"
-                  file="config/liquibase/cnr/view.csv"
-                  separator=";"
-                  tableName="view"/>
-        <loadData encoding="UTF-8"
-                  file="config/liquibase/cnr/view-acquisti-v1.csv"
-                  separator=";"
-                  tableName="view"/>
-        <loadData encoding="UTF-8"
-                  file="config/liquibase/cnr/view-accordi-internazionali-v1.csv"
-                  separator=";"
-                  tableName="view"/>
-        <loadData encoding="UTF-8"
                   file="config/liquibase/oiv/view.csv"
                   separator=";"
                   tableName="view"/>
+<!--        <loadData encoding="UTF-8"-->
+<!--                  file="config/liquibase/oiv/view-acquisti-v1.csv"-->
+<!--                  separator=";"-->
+<!--                  tableName="view"/>-->
+<!--        <loadData encoding="UTF-8"-->
+<!--                  file="config/liquibase/oiv/view-accordi-internazionali-v1.csv"-->
+<!--                  separator=";"-->
+<!--                  tableName="view"/>-->
+<!--        <loadData encoding="UTF-8"-->
+<!--                  file="config/liquibase/oiv/view.csv"-->
+<!--                  separator=";"-->
+<!--                  tableName="view"/>-->
     </changeSet>
 </databaseChangeLog>
