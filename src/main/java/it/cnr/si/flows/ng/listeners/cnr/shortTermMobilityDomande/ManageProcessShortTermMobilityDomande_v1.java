@@ -261,7 +261,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 					//CREAZIONE PDF VALUTAZIONE
 					String nomeFile="valutazioneShortTermMobility";
 					String labelFile="Scheda Valutazione Domanda";
-					Integer punteggioTotale= (int)(Double.parseDouble(execution.getVariable("punteggio_curriculum").toString().replaceAll(",", ".")) + Double.parseDouble(execution.getVariable("punteggio_patnerIstituzioneStraniera").toString().replaceAll(",", "."))+ Double.parseDouble(execution.getVariable("punteggio_programmaDiRicerca").toString().replaceAll(",", ".")));
+					Double punteggioTotale= Double.parseDouble(execution.getVariable("punteggio_curriculum").toString().replaceAll(",", ".")) + Double.parseDouble(execution.getVariable("punteggio_patnerIstituzioneStraniera").toString().replaceAll(",", "."))+ Double.parseDouble(execution.getVariable("punteggio_programmaDiRicerca").toString().replaceAll(",", "."));
 					execution.setVariable("punteggio_totale", punteggioTotale.toString());
 					flowsPdfService.makePdf(nomeFile, processInstanceId);
 					FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
