@@ -110,7 +110,7 @@ public class FlowsProcessInstanceResource {
         return documentiPubblicabili;
     }
 
-    /**
+    /*
      * Restituisce le Processs Instances avviate dall'utente loggato
      *
      * @param active booleano che indica se recuperare le MIE Process Instancess attive o quelle terminate
@@ -208,7 +208,7 @@ public class FlowsProcessInstanceResource {
         return processInstanceResource.performProcessInstanceAction(processInstanceId, action, request);
     }
 
-    /**
+    /*
      * Restituisce le Process Instances attive o terminate.
      *
      * @param active boolean active

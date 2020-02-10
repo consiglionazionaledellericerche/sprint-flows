@@ -14,13 +14,13 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 
 /**
  *
- * @author mtrycz & cironepa
+ * @author mtrycz + cironepa
  *
  * Questa classe ci serve come estensione della questy che offre Activity
  * Abbiamo voluto usare questo approccio per questioni di performance, ma activiti non forniva tutte le query che ci piaceva avere
  * in particolare per quel che riguarda la visibilita' sui flussi (che salviamo negli IdentityLinks)
  *
- * Un esempio di utilizzo di questa classe e' in {@link it.cnr.si.flows.ng.serviceFlowsProcessInstanceService.search}
+ * Un esempio di utilizzo di questa classe e' in it.cnr.si.flows.ng.serviceFlowsProcessInstanceService.search
  *
  *
  *

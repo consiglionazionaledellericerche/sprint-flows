@@ -34,13 +34,9 @@ public class FlowsSearchResource {
     @Inject
     private FlowsTaskService flowsTaskService;
 
-    /**
+    /*
      * Funzionalità di Ricerca delle Process Instances.
      *
-     * @param processInstanceId Il processInstanceId della ricerca
-     * @param active            Boolean che indica se ricercare le Process Instances attive o terminate
-     * @param order             L'ordine in cui vogliamo i risltati ('ASC' o 'DESC')
-     * @return le response entity frutto della ricerca
      */
     @RequestMapping(value = "/", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)

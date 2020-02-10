@@ -166,7 +166,7 @@ public class DynamiclistResource {
     }
 
 
-    /**
+    /*
      * DELETE  /dynamiclists/:id : delete the "id" dynamiclist.
      *
      * @param id the id of the dynamiclist to delete

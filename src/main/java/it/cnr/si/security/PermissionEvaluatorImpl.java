@@ -159,13 +159,9 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
     }
 
 
-    /**
+    /*
      * Verifica che l'utente abbia la visibilità sulla Process Instance.
      *
-     * @param idStruttura          the id struttura
-     * @param authorities          le authorities dell'utente loggato
-     * @param currentUserLogin             userName loggato
-     * @return the boolean
      */
 
     public boolean canVisualize(String idStruttura, String processDefinitionKey, String processInstanceId, List<String> authorities, String currentUserLogin) {

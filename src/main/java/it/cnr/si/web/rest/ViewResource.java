@@ -124,7 +124,7 @@ public class ViewResource {
             .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    /**
+    /*
      * GET  /views/:id : get the "id" view.
      *
      * @param id the id of the view to retrieve

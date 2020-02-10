@@ -343,7 +343,7 @@ public class FlowsProcessDiagramGenerator extends DefaultProcessDiagramGenerator
         });
     }
 
-    /**
+    /*
      * This method makes coordinates of connection flow better.
      *
      * @param processDiagramCanvas
@@ -363,7 +363,7 @@ public class FlowsProcessDiagramGenerator extends DefaultProcessDiagramGenerator
         return processDiagramCanvas.connectionPerfectionizer(sourceShapeType, targetShapeType, sourceGraphicInfo, targetGraphicInfo, graphicInfoList);
     }
 
-    /**
+    /*
      * This method returns shape type of base element.<br>
      * Each element can be presented as rectangle, rhombus, or ellipse.
      *

@@ -48,11 +48,11 @@ public class FlowsAttachmentService {
 	@Inject
 	private HistoryService historyService;
 
-	/**
+	/*
 	 * Servizio che trasforma i multipart file in FlowsAttachment
 	 * per il successivo salbvataggio sul db
 	 *
-	 * IMPORTANTE: gli <input file multiple> devono avere il prefisso NEW_ATTACHMENT_PREFIX
+	 * IMPORTANTE: gli "input file multiple" devono avere il prefisso NEW_ATTACHMENT_PREFIX
 	 * (dovrebbe essere automatizzato nel componente, e non riguardare l'API pubblica)
 	 */
 	public Map<String, FlowsAttachment> extractAttachmentsVariables(MultipartHttpServletRequest req) throws IOException {
@@ -145,7 +145,7 @@ public class FlowsAttachmentService {
 		execution.setVariable(arrayName +"["+ nextIndex +"]", att);
 	}
 
-	/**
+	/*
 	 * Se ho degli attachments multipli (per esempio allegati[0])
 	 * Ho bisogno di salvarli con nomi univoci
 	 * (per poter aggiornare gli allegati gia' presenti (es. allegato[0] e allegato[1]) e caricarne di nuovi (es. allegato[2])

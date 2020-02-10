@@ -129,7 +129,6 @@ public class FlowsPdfResource {
 	 * @param startDateGreat       the start date great
 	 * @param startDateLess        the start date less
 	 * @return the response entity
-	 * @throws ParseException the parse exception
 	 */
 //    todo:  TEST
 	@RequestMapping(value = "/makeStatisticPdf", headers = "Accept=application/pdf", method = RequestMethod.GET, produces = "application/pdf")

@@ -34,7 +34,7 @@ public class MembershipService {
     @Autowired(required = false)
     private AceBridgeService aceService;
 
-    /**
+    /*
      * Save a membership.
      * @return the persisted entity
      */
@@ -43,7 +43,7 @@ public class MembershipService {
         return membershipRepository.save(membership);
     }
 
-    /**
+    /*
      *  get all the memberships.
      *  @return the list of entities
      */
@@ -53,7 +53,7 @@ public class MembershipService {
         return membershipRepository.findAll(pageable);
     }
 
-    /**
+    /*
      *  get one membership by id.
      *  @return the entity
      */
@@ -63,7 +63,7 @@ public class MembershipService {
         return membershipRepository.findOne(id);
     }
 
-    /**
+    /*
      *  delete the  membership by id.
      */
     public void delete(Long id) {
