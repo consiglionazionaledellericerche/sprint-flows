@@ -13,13 +13,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -31,17 +29,15 @@ import java.io.ByteArrayOutputStream;
 import java.util.Map;
 
 import static it.cnr.si.flows.ng.TestServices.JUNIT_TEST;
-import static it.cnr.si.flows.ng.utils.Enum.Actions.revoca;
-import static it.cnr.si.flows.ng.utils.Enum.Actions.revocaSemplice;
+import static it.cnr.si.flows.ng.utils.Enum.Actions.annulla;
 import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
 import static org.junit.Assert.*;
 import static org.springframework.http.HttpStatus.OK;
 
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "native,showcase,unittests")
+@ActiveProfiles(profiles = "cnr,unittests")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
-//todo: verificare quando sarà stabile ace
 public class CnrSummaryPdfResouceTest {
 
     @Inject
@@ -88,7 +84,7 @@ public class CnrSummaryPdfResouceTest {
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
         req.setParameter("taskId", taskService.createTaskQuery().singleResult().getId());
         req.setParameter("processDefinitionId", processInstance.getProcessDefinitionId());
-        req.setParameter("sceltaUtente", revoca.getValue());
+        req.setParameter("sceltaUtente", annulla.getValue());
         req.setParameter("commentoRevoca", "commento di revoca" + JUNIT_TEST);
         assertEquals(OK, flowsTaskResource.completeTask(req).getStatusCode());
         //acceddo come ra e confermo la revoca semplice
@@ -97,7 +93,7 @@ public class CnrSummaryPdfResouceTest {
         req = new MockMultipartHttpServletRequest();
         req.setParameter("taskId", taskService.createTaskQuery().singleResult().getId());
         req.setParameter("processDefinitionId", processInstance.getProcessDefinitionId());
-        req.setParameter("sceltaUtente", revocaSemplice.getValue());
+        req.setParameter("sceltaUtente", annulla.getValue());
         req.setParameter("commento", "commento di revoca semplice" + JUNIT_TEST);
         assertEquals(OK, flowsTaskResource.completeTask(req).getStatusCode());
         //controllo che non ci siano task attivi

@@ -8,3 +8,21 @@ cache:
   hazelcast:
     name: sprint-oiv
     port: 5707
+oiv:
+  baseurl: http://cool-jconon-funzione-pubblica.test.si.cnr.it
+  esperienza-noncoerente: ${oiv.baseurl}/rest/application-fp/esperienza-noncoerente
+  ricalcola-fascia: ${oiv.baseurl}/rest/application-fp/applications-ricalcola-fascia
+  iscrivi-inelenco: ${oiv.baseurl}/rest/application-fp/iscrivi-inelenco
+  soccorso-istruttorio: ${oiv.baseurl}/rest/application-fp/soccorso-istruttorio
+  preavviso-rigetto: ${oiv.baseurl}/rest/application-fp/preavviso-rigetto
+  comunicazioni: ${oiv.baseurl}/rest/application-fp/comunicazioni
+  usr: admin
+  psw: admin
+  mail:
+    mail.host: servizi.palazzochigi.it
+    mail.protocol: smtp
+    mail.port: 587
+    mail.user: elenco.oiv
+    mail.password: elencooiv2016
+    mail.send.error.to: massimo.fraticelli@cnr.it
+    mail.from: no-reply@scrivaniadigitale

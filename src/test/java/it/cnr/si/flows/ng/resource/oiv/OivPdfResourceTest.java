@@ -1,20 +1,22 @@
-package it.cnr.si.flows.ng.resource;
+package it.cnr.si.flows.ng.resource.oiv;
 
 import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.TestServices;
+import it.cnr.si.flows.ng.resource.FlowsPdfResource;
+import it.cnr.si.flows.ng.resource.FlowsProcessInstanceResource;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -29,10 +31,9 @@ import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.iscrizioneElen
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "native,showcase,unittests")
-@EnableTransactionManagement
-@RunWith(SpringRunner.class)
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
+@ActiveProfiles(profiles = "oiv,unittests")
 public class OivPdfResourceTest {
 
     @Inject
