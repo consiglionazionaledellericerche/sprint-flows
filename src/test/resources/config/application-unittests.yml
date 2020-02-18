@@ -1,4 +1,10 @@
 spring:
+  ldap:
+    userSearchBase: o=cnr, c=it
+    userSearchFilter: uid={0}
+    url: ldap://virtest1.si.cnr.it:389
+    managerDn: cn=mastercnrapp2,ou=account,o=cnr,c=it
+    managerPassword: pippa
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     # l'url del db viene modificata all'avvio dell'applicazione a seconda del profilo (cnr => flows-cnr,
@@ -11,13 +17,13 @@ spring:
     database-platform: it.cnr.si.domain.util.FixedH2Dialect
     database: H2
     show-sql: false
-    properties:
-      hibernate.cache.use_second_level_cache: false
-      hibernate.cache.use_query_cache: false
-      hibernate.generate_statistics: false
-      hibernate.cache.region.factory_class: it.cnr.si.config.hazelcast.HazelcastCacheRegionFactory
-      hibernate.cache.use_minimal_puts: true
-      hibernate.cache.hazelcast.use_lite_member: true
+#    properties:
+#      hibernate.cache.use_second_level_cache: false
+#      hibernate.cache.use_query_cache: false
+#      hibernate.generate_statistics: false
+#      hibernate.cache.region.factory_class: it.cnr.si.config.hazelcast.HazelcastCacheRegionFactory
+#      hibernate.cache.use_minimal_puts: true
+#      hibernate.cache.hazelcast.use_lite_member: true
   proxy:
     OIL:
       username: admin
@@ -27,12 +33,32 @@ spring:
       instance: /HDSiper
   mail:
     url: localhost:8080
+  cloud:
+    config:
+      allowOverride: true
+      overrideNone: true
+      overrideSystemProperties: false
 
 
 cnr:
+  storage:
+    driver: cmis
+    filesystem:
+      directory: ${java.io.tmpdir}
   activiti:
     diagram-font: DejaVu Sans
 
 
 cache.hazelcast.port: 5709
 cache.hazelcast.packages: it.cnr.si
+ace:
+  url: "http://ace-webapp.test.si.cnr.it:5555/api"
+  username: app.scrivaniadigitale
+  password: portacigliarancini2019
+
+org:
+  apache:
+    chemistry:
+      opencmis:
+        user: admin
+        password: admin

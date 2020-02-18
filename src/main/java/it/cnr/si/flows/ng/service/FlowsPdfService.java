@@ -8,7 +8,6 @@ import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JsonDataSource;
-import net.sf.jasperreports.engine.util.LocalJasperReportsContext;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -51,9 +50,8 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.ZoneId;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Aggiornamento;
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Caricamento;
@@ -347,8 +345,7 @@ public class FlowsPdfService {
 			parameters.put(JRParameter.REPORT_RESOURCE_BUNDLE, resourceBundle);
 			parameters.put(JRParameter.REPORT_DATA_SOURCE, datasource);
 
-			LocalJasperReportsContext ctx = new LocalJasperReportsContext(DefaultJasperReportsContext.getInstance());
-			ctx.setClassLoader(ClassLoader.getSystemClassLoader());
+			SimpleJasperReportsContext ctx = new SimpleJasperReportsContext(DefaultJasperReportsContext.getInstance());
 			JasperFillManager fillmgr = JasperFillManager.getInstance(ctx);
 
 			//il nome del file jasper da caricare(dipende dal tipo di pdf da creare)
@@ -417,8 +414,7 @@ public class FlowsPdfService {
 			parameters.put(JRParameter.REPORT_RESOURCE_BUNDLE, resourceBundle);
 			parameters.put(JRParameter.REPORT_DATA_SOURCE, datasource);
 
-			LocalJasperReportsContext ctx = new LocalJasperReportsContext(DefaultJasperReportsContext.getInstance());
-			ctx.setClassLoader(ClassLoader.getSystemClassLoader());
+			SimpleJasperReportsContext ctx = new SimpleJasperReportsContext(DefaultJasperReportsContext.getInstance());
 			JasperFillManager fillmgr = JasperFillManager.getInstance(ctx);
 
 			//il nome del file jasper da caricare(dipende dal tipo di pdf da creare)
@@ -587,7 +583,7 @@ public class FlowsPdfService {
 
 		image = new ImageElement(diagram);
 		Dimension scaledDim = getScaledDimension(new Dimension((int) image.getWidth(), (int) image.getHeight()),
-				dimension, margineSx);
+												 dimension, margineSx);
 		image.setHeight((float) scaledDim.getHeight());
 		image.setWidth((float) scaledDim.getWidth());
 		image.setAbsolutePosition(new Position(20, 700));

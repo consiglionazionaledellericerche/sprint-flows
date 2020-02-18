@@ -38,4 +38,7 @@
 
     <include file="classpath:config/liquibase/oiv/changelog/20190125124942_added_entity_Avviso.xml"
              relativeToChangelogFile="false"/>
+
+    <include file="classpath:config/liquibase/oiv/changelog/20190723085228_added_entity_Draft.xml"
+             relativeToChangelogFile="false"/>
 </databaseChangeLog>
