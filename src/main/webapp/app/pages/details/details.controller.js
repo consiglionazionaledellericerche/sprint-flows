@@ -55,10 +55,10 @@
 							vm.showGerarchia = true;
 						}
 
-						if(response.data.variabili.idBando.value){
+						if(response.data.variabili.idBando){
 							vm.searchParams.idBando = "text="+response.data.variabili.idBando.value;
 						}
-						if(response.data.variabili.dipartimentoId.value){
+						if(response.data.variabili.dipartimentoId){
 							vm.searchParams.dipartimentoId = "text="+response.data.variabili.dipartimentoId.value;
 						}
 						vm.searchParams.processInstanceId = response.data.variabili.processInstanceId.value;
