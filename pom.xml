@@ -35,6 +35,7 @@
         <gelf.version>1.12.0</gelf.version>
         <jacoco-maven-plugin.version>0.7.7.201606060606</jacoco-maven-plugin.version>
         <janino.version>3.0.6</janino.version>
+        <!--        <jasperreports.version>6.6.0</jasperreports.version>-->
         <jasperreports.version>6.11.0</jasperreports.version>
         <json-path.version>2.2.0</json-path.version>
         <liquibase-hibernate4.version>3.5</liquibase-hibernate4.version>
@@ -252,11 +253,6 @@
             <version>1.1.0</version>
         </dependency>
         <dependency>
-            <groupId>net.dongliu</groupId>
-            <artifactId>gson-java8-datatype</artifactId>
-            <version>1.1.0</version>
-        </dependency>
-        <dependency>
             <groupId>net.sf.jasperreports</groupId>
             <artifactId>jasperreports</artifactId>
             <version>${jasperreports.version}</version>
@@ -297,60 +293,8 @@
         </dependency>
         <dependency>
             <groupId>net.sf.jasperreports</groupId>
-            <artifactId>jasperreports</artifactId>
-            <version>${jasperreports.version}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>xml-apis</artifactId>
-                    <groupId>xml-apis</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jackson-databind</artifactId>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jackson-core</artifactId>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jackson-annotations</artifactId>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>castor</artifactId>
-                    <groupId>org.codehaus.castor</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jdtcore</artifactId>
-                    <groupId>eclipse</groupId>
-                </exclusion>
-
-                <exclusion>
-                    <artifactId>org.olap4j</artifactId>
-                    <groupId>olap4j</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.jasperreports</groupId>
             <artifactId>jasperreports-fonts</artifactId>
             <version>6.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.jasperreports</groupId>
-            <artifactId>jasperreports-fonts</artifactId>
-            <version>6.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy</artifactId>
-            <version>2.4.3</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.activiti</groupId>
-            <artifactId>activiti-spring</artifactId>
-            <version>${activiti.version}</version>
         </dependency>
         <dependency>
             <groupId>org.activiti</groupId>
@@ -358,10 +302,15 @@
             <version>${activiti.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
+                    <groupId>org.slf4j</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.activiti</groupId>
+            <artifactId>activiti-spring</artifactId>
+            <version>${activiti.version}</version>
         </dependency>
         <!--BUONA versione vecchia di pdfbox (exportPdf)-->
         <dependency>
@@ -380,17 +329,23 @@
             <version>1.13</version>
         </dependency>
         <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy</artifactId>
+            <version>2.4.3</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>org.codehaus.janino</groupId>
             <artifactId>janino</artifactId>
             <version>${janino.version}</version>
         </dependency>
 
         <!-- DEPRECATED -->
-<!--        <dependency>-->
-<!--            <groupId>org.json</groupId>-->
-<!--            <artifactId>json</artifactId>-->
-<!--            <version>20160810</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.json</groupId>-->
+        <!--            <artifactId>json</artifactId>-->
+        <!--            <version>20160810</version>-->
+        <!--        </dependency>-->
 
         <dependency>
             <groupId>org.jsoup</groupId>
@@ -770,24 +725,6 @@
                     <!-- Enable the line below to have remote debugging of
                         your application on port 5005 <jvmArguments>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005</jvmArguments> -->
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>com.coderplus.maven.plugins</groupId>
-                <artifactId>copy-rename-maven-plugin</artifactId>
-                <version>1.0</version>
-                <executions>
-                    <execution>
-                        <id>copy-file</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <sourceFile>target/${project.build.finalName}.war</sourceFile>
-                            <destinationFile>target/app.war</destinationFile>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

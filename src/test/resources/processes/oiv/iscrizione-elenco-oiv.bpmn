@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="iscrizione-elenco-oiv" name="Iscrizione Elenco Oiv" isExecutable="true">
+    <extensionElements>
+      <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+        <activiti:field name="faseEsecuzione">
+          <activiti:string><![CDATA[process-start]]></activiti:string>
+        </activiti:field>
+      </activiti:executionListener>
+      <activiti:executionListener event="end" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+        <activiti:field name="faseEsecuzione">
+          <activiti:string><![CDATA[process-end]]></activiti:string>
+        </activiti:field>
+      </activiti:executionListener>
+    </extensionElements>
+    <subProcess id="valutazione-domande" name="VALUTAZIONE DOMANDE">
+      <startEvent id="startevent1" name="Start"></startEvent>
+      <sequenceFlow id="flow10" sourceRef="startevent1" targetRef="smistamento"></sequenceFlow>
+      <userTask id="istruttoria" name="ISTRUTTORIA" activiti:assignee="${istruttoreIncaricato}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[istruttoria-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[istruttoria-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <sequenceFlow id="flow4" sourceRef="istruttoria" targetRef="exclusivegateway1"></sequenceFlow>
+      <userTask id="soccorso-istruttorio" name="SOCCORSO ISTRUTTORIO" activiti:assignee="${initiator}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[soccorso-istruttorio-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[soccorso-istruttorio-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <sequenceFlow id="flow32" sourceRef="soccorso-istruttorio" targetRef="istruttoria"></sequenceFlow>
+      <boundaryEvent id="boundarytimer2" name="Timer" attachedToRef="soccorso-istruttorio" cancelActivity="true">
+        <extensionElements>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[scadenza-tempi-soccorso-istruttorio]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+        <timerEventDefinition>
+          <timeDuration>P5D</timeDuration>
+        </timerEventDefinition>
+      </boundaryEvent>
+      <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway" default="flow99"></exclusiveGateway>
+      <userTask id="cambio-istruttore" name="CAMBIO ISTRUTTORE" activiti:candidateGroups="${gruppoCoordinatoreResponsabile}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[cambio-istruttore-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[cambio-istruttore-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <sequenceFlow id="flow36" sourceRef="cambio-istruttore" targetRef="exclusivegateway14"></sequenceFlow>
+      <userTask id="valutazione" name="VALUTAZIONE" activiti:candidateGroups="${gruppoCoordinatoreResponsabile}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[valutazione-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[valutazione-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <userTask id="preavviso-rigetto" name="PREAVVISO RIGETTO" activiti:assignee="${initiator}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[preavviso-rigetto-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[preavviso-rigetto-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <userTask id="istruttoria-su-preavviso" name="ISTRUTTORIA SU PREAVVISO" activiti:assignee="${istruttoreIncaricato}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[istruttoria-su-preavviso-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[istruttoria-su-preavviso-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <userTask id="valutazione-preavviso" name="VALUTAZIONE SU PREAVVISO" activiti:candidateGroups="${gruppoCoordinatoreResponsabile}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[valutazione-preavviso-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[valutazione-preavviso-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <userTask id="firma-dg-rigetto" name="FIRMA DG RIGETTO" activiti:candidateGroups="${gruppoFirmaRigetto}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[firma-dg-rigetto-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[firma-dg-rigetto-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <endEvent id="end-improcedibile" name="IMPROCEDIBILE">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[end-improcedibile]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </endEvent>
+      <boundaryEvent id="boundarytimer5" name="Timer" attachedToRef="preavviso-rigetto" cancelActivity="true">
+        <extensionElements>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[scadenza-tempi-preavviso-rigetto]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+        <timerEventDefinition>
+          <timeDuration>P2D</timeDuration>
+        </timerEventDefinition>
+      </boundaryEvent>
+      <sequenceFlow id="flow72" sourceRef="boundarytimer5" targetRef="valutazione-preavviso"></sequenceFlow>
+      <exclusiveGateway id="exclusivegateway11" name="Exclusive Gateway" default="flow76"></exclusiveGateway>
+      <sequenceFlow id="flow74" sourceRef="valutazione-preavviso" targetRef="exclusivegateway11"></sequenceFlow>
+      <sequenceFlow id="flow76" sourceRef="exclusivegateway11" targetRef="firma-dg-rigetto"></sequenceFlow>
+      <exclusiveGateway id="exclusivegateway12" name="Exclusive Gateway" default="flow80"></exclusiveGateway>
+      <sequenceFlow id="flow77" sourceRef="firma-dg-rigetto" targetRef="exclusivegateway12"></sequenceFlow>
+      <sequenceFlow id="flow78" sourceRef="preavviso-rigetto" targetRef="istruttoria-su-preavviso"></sequenceFlow>
+      <sequenceFlow id="flow79" sourceRef="exclusivegateway12" targetRef="valutazione-preavviso">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'riproponi_in_valutazione'}]]></conditionExpression>
+      </sequenceFlow>
+      <endEvent id="end-respinta" name="RESPINTA">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[end-respinta]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </endEvent>
+      <sequenceFlow id="flow80" name="respinta" sourceRef="exclusivegateway12" targetRef="end-respinta"></sequenceFlow>
+      <sequenceFlow id="flow83" sourceRef="istruttoria-su-preavviso" targetRef="valutazione-preavviso"></sequenceFlow>
+      <sequenceFlow id="flow84" name="improcedibile" sourceRef="exclusivegateway1" targetRef="end-improcedibile">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'domanda_improcedibile'}]]></conditionExpression>
+      </sequenceFlow>
+      <exclusiveGateway id="exclusivegateway13" name="Exclusive Gateway" default="flow86"></exclusiveGateway>
+      <sequenceFlow id="flow86" name="approvata" sourceRef="exclusivegateway13" targetRef="end-approvata"></sequenceFlow>
+      <sequenceFlow id="flow88" sourceRef="valutazione" targetRef="exclusivegateway13"></sequenceFlow>
+      <sequenceFlow id="flow89" sourceRef="exclusivegateway13" targetRef="soccorso-istruttorio">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'richiesta_soccorso_istruttorio' && soccorsoIstruttoriaFlag != '1'}]]></conditionExpression>
+      </sequenceFlow>
+      <endEvent id="end-approvata" name="APPROVATA">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[end-approvata]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </endEvent>
+      <sequenceFlow id="flow93" sourceRef="exclusivegateway11" targetRef="end-approvata">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'approva'}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="flow94" sourceRef="exclusivegateway13" targetRef="preavviso-rigetto">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'invia_preavviso_di_rigetto'}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="flow95" sourceRef="exclusivegateway13" targetRef="valutazione">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'genera_PDF_preavviso_di_rigetto' || sceltaUtente == 'calcola_punteggio' || sceltaUtente == 'aggiorna_PDF_preavviso_di_rigetto'}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="flow96" sourceRef="exclusivegateway11" targetRef="valutazione-preavviso">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'genera_PDF_rigetto' || sceltaUtente == 'calcola_punteggio'  ||  sceltaUtente == 'aggiorna_PDF_rigetto'}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="flow98" sourceRef="exclusivegateway1" targetRef="soccorso-istruttorio">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'richiesta_soccorso_istruttorio' && soccorsoIstruttoriaFlag != '1'}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="flow99" sourceRef="exclusivegateway1" targetRef="valutazione"></sequenceFlow>
+      <sequenceFlow id="flow100" sourceRef="exclusivegateway1" targetRef="cambio-istruttore">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'richiesto_cambio_istruttore'}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="flow101" sourceRef="boundarytimer2" targetRef="valutazione"></sequenceFlow>
+      <userTask id="smistamento" name="SMISTAMENTO" activiti:candidateGroups="${gruppoIstruttori}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[smistamento-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[smistamento-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
+      <sequenceFlow id="flow102" sourceRef="smistamento" targetRef="istruttoria"></sequenceFlow>
+      <exclusiveGateway id="exclusivegateway14" name="Exclusive Gateway" default="flow103"></exclusiveGateway>
+      <sequenceFlow id="flow103" sourceRef="exclusivegateway14" targetRef="istruttoria"></sequenceFlow>
+      <sequenceFlow id="flow104" sourceRef="exclusivegateway14" targetRef="smistamento">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'approva_cambio_istruttore'}]]></conditionExpression>
+      </sequenceFlow>
+    </subProcess>
+    <startEvent id="startevent2" name="Start"></startEvent>
+    <sequenceFlow id="flow48" name="START" sourceRef="startevent2" targetRef="valutazione-domande"></sequenceFlow>
+    <boundaryEvent id="boundarytimer3" name="Timer" attachedToRef="valutazione-domande" cancelActivity="false">
+      <timerEventDefinition>
+        <timeDuration>P5D</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="flow65" sourceRef="boundarytimer3" targetRef="scadenza-tempi-procedurali"></sequenceFlow>
+    <scriptTask id="scadenza-tempi-procedurali" name="SCADENZA TEMPI PROCEDURALI" scriptFormat="javascript" activiti:autoStoreVariables="false">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[scadenza-tempi-procedurali-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+      <script>execution.setVariable('istruttoriaInevasa', true);
+			</script>
+    </scriptTask>
+    <endEvent id="fine" name="FINE"></endEvent>
+    <sequenceFlow id="flow82" name="END" sourceRef="valutazione-domande" targetRef="fine"></sequenceFlow>
+    <scriptTask id="avviso-scadenza-tempi-procedurali" name="AVVISO SCADENZA TEMPI PROCEDURALI" scriptFormat="javascript" activiti:autoStoreVariables="false">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessIscrizioneElencoOiv}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[avviso-scadenza-tempi-procedurali-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+      <script>execution.setVariable('avvisoIstruttoriaInevasa', true);
+			</script>
+    </scriptTask>
+    <boundaryEvent id="boundarytimer6" name="Timer" attachedToRef="valutazione-domande" cancelActivity="false">
+      <timerEventDefinition>
+        <timeDuration>P4D</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="flow97" sourceRef="boundarytimer6" targetRef="avviso-scadenza-tempi-procedurali"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_iscrizione-elenco-oiv">
+    <bpmndi:BPMNPlane bpmnElement="iscrizione-elenco-oiv" id="BPMNPlane_iscrizione-elenco-oiv">
+      <bpmndi:BPMNShape bpmnElement="valutazione-domande" id="BPMNShape_valutazione-domande">
+        <omgdc:Bounds height="541.0" width="585.0" x="76.0" y="10.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="85.0" y="260.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="istruttoria" id="BPMNShape_istruttoria">
+        <omgdc:Bounds height="55.0" width="105.0" x="178.0" y="133.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="soccorso-istruttorio" id="BPMNShape_soccorso-istruttorio">
+        <omgdc:Bounds height="67.0" width="121.0" x="170.0" y="219.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="boundarytimer2" id="BPMNShape_boundarytimer2">
+        <omgdc:Bounds height="30.0" width="30.0" x="270.0" y="239.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="373.0" y="140.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="cambio-istruttore" id="BPMNShape_cambio-istruttore">
+        <omgdc:Bounds height="66.0" width="128.0" x="330.0" y="43.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="valutazione" id="BPMNShape_valutazione">
+        <omgdc:Bounds height="67.0" width="131.0" x="328.0" y="219.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="preavviso-rigetto" id="BPMNShape_preavviso-rigetto">
+        <omgdc:Bounds height="68.0" width="105.0" x="158.0" y="374.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="boundarytimer5" id="BPMNShape_boundarytimer5">
+        <omgdc:Bounds height="30.0" width="30.0" x="249.0" y="394.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="istruttoria-su-preavviso" id="BPMNShape_istruttoria-su-preavviso">
+        <omgdc:Bounds height="70.0" width="105.0" x="158.0" y="464.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="valutazione-preavviso" id="BPMNShape_valutazione-preavviso">
+        <omgdc:Bounds height="68.0" width="105.0" x="303.0" y="374.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="firma-dg-rigetto" id="BPMNShape_firma-dg-rigetto">
+        <omgdc:Bounds height="66.0" width="105.0" x="413.0" y="463.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="end-improcedibile" id="BPMNShape_end-improcedibile">
+        <omgdc:Bounds height="35.0" width="35.0" x="603.0" y="143.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway11" id="BPMNShape_exclusivegateway11">
+        <omgdc:Bounds height="40.0" width="40.0" x="445.0" y="387.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway12" id="BPMNShape_exclusivegateway12">
+        <omgdc:Bounds height="40.0" width="40.0" x="543.0" y="475.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="end-respinta" id="BPMNShape_end-respinta">
+        <omgdc:Bounds height="35.0" width="35.0" x="603.0" y="478.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway13" id="BPMNShape_exclusivegateway13">
+        <omgdc:Bounds height="40.0" width="40.0" x="517.0" y="232.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="end-approvata" id="BPMNShape_end-approvata">
+        <omgdc:Bounds height="35.0" width="35.0" x="603.0" y="304.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="smistamento" id="BPMNShape_smistamento">
+        <omgdc:Bounds height="60.0" width="105.0" x="85.0" y="46.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway14" id="BPMNShape_exclusivegateway14">
+        <omgdc:Bounds height="40.0" width="40.0" x="210.0" y="55.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="boundarytimer3" id="BPMNShape_boundarytimer3">
+        <omgdc:Bounds height="30.0" width="30.0" x="641.0" y="51.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="boundarytimer6" id="BPMNShape_boundarytimer6">
+        <omgdc:Bounds height="30.0" width="30.0" x="641.0" y="144.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="startevent2" id="BPMNShape_startevent2">
+        <omgdc:Bounds height="35.0" width="35.0" x="9.0" y="263.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scadenza-tempi-procedurali" id="BPMNShape_scadenza-tempi-procedurali">
+        <omgdc:Bounds height="85.0" width="105.0" x="700.0" y="21.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="fine" id="BPMNShape_fine">
+        <omgdc:Bounds height="35.0" width="35.0" x="721.0" y="263.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="avviso-scadenza-tempi-procedurali" id="BPMNShape_avviso-scadenza-tempi-procedurali">
+        <omgdc:Bounds height="85.0" width="105.0" x="700.0" y="115.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="120.0" y="277.0"></omgdi:waypoint>
+        <omgdi:waypoint x="137.0" y="277.0"></omgdi:waypoint>
+        <omgdi:waypoint x="137.0" y="106.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="283.0" y="160.0"></omgdi:waypoint>
+        <omgdi:waypoint x="373.0" y="160.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow32" id="BPMNEdge_flow32">
+        <omgdi:waypoint x="230.0" y="219.0"></omgdi:waypoint>
+        <omgdi:waypoint x="230.0" y="188.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow36" id="BPMNEdge_flow36">
+        <omgdi:waypoint x="330.0" y="76.0"></omgdi:waypoint>
+        <omgdi:waypoint x="250.0" y="75.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow72" id="BPMNEdge_flow72">
+        <omgdi:waypoint x="279.0" y="409.0"></omgdi:waypoint>
+        <omgdi:waypoint x="303.0" y="408.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow74" id="BPMNEdge_flow74">
+        <omgdi:waypoint x="408.0" y="408.0"></omgdi:waypoint>
+        <omgdi:waypoint x="445.0" y="407.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow76" id="BPMNEdge_flow76">
+        <omgdi:waypoint x="465.0" y="427.0"></omgdi:waypoint>
+        <omgdi:waypoint x="465.0" y="463.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow77" id="BPMNEdge_flow77">
+        <omgdi:waypoint x="518.0" y="496.0"></omgdi:waypoint>
+        <omgdi:waypoint x="543.0" y="495.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow78" id="BPMNEdge_flow78">
+        <omgdi:waypoint x="210.0" y="442.0"></omgdi:waypoint>
+        <omgdi:waypoint x="210.0" y="464.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow79" id="BPMNEdge_flow79">
+        <omgdi:waypoint x="563.0" y="515.0"></omgdi:waypoint>
+        <omgdi:waypoint x="562.0" y="537.0"></omgdi:waypoint>
+        <omgdi:waypoint x="355.0" y="537.0"></omgdi:waypoint>
+        <omgdi:waypoint x="355.0" y="442.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow80" id="BPMNEdge_flow80">
+        <omgdi:waypoint x="583.0" y="495.0"></omgdi:waypoint>
+        <omgdi:waypoint x="603.0" y="495.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="39.0" x="570.0" y="463.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow83" id="BPMNEdge_flow83">
+        <omgdi:waypoint x="263.0" y="499.0"></omgdi:waypoint>
+        <omgdi:waypoint x="355.0" y="498.0"></omgdi:waypoint>
+        <omgdi:waypoint x="355.0" y="442.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow84" id="BPMNEdge_flow84">
+        <omgdi:waypoint x="413.0" y="160.0"></omgdi:waypoint>
+        <omgdi:waypoint x="603.0" y="160.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="62.0" x="542.0" y="133.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow86" id="BPMNEdge_flow86">
+        <omgdi:waypoint x="557.0" y="252.0"></omgdi:waypoint>
+        <omgdi:waypoint x="620.0" y="252.0"></omgdi:waypoint>
+        <omgdi:waypoint x="620.0" y="304.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="49.0" x="560.0" y="290.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow88" id="BPMNEdge_flow88">
+        <omgdi:waypoint x="459.0" y="252.0"></omgdi:waypoint>
+        <omgdi:waypoint x="517.0" y="252.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow89" id="BPMNEdge_flow89">
+        <omgdi:waypoint x="537.0" y="272.0"></omgdi:waypoint>
+        <omgdi:waypoint x="465.0" y="317.0"></omgdi:waypoint>
+        <omgdi:waypoint x="229.0" y="317.0"></omgdi:waypoint>
+        <omgdi:waypoint x="230.0" y="286.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow93" id="BPMNEdge_flow93">
+        <omgdi:waypoint x="485.0" y="407.0"></omgdi:waypoint>
+        <omgdi:waypoint x="620.0" y="407.0"></omgdi:waypoint>
+        <omgdi:waypoint x="620.0" y="339.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow94" id="BPMNEdge_flow94">
+        <omgdi:waypoint x="537.0" y="272.0"></omgdi:waypoint>
+        <omgdi:waypoint x="536.0" y="331.0"></omgdi:waypoint>
+        <omgdi:waypoint x="211.0" y="331.0"></omgdi:waypoint>
+        <omgdi:waypoint x="211.0" y="339.0"></omgdi:waypoint>
+        <omgdi:waypoint x="210.0" y="374.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow95" id="BPMNEdge_flow95">
+        <omgdi:waypoint x="537.0" y="232.0"></omgdi:waypoint>
+        <omgdi:waypoint x="537.0" y="194.0"></omgdi:waypoint>
+        <omgdi:waypoint x="392.0" y="194.0"></omgdi:waypoint>
+        <omgdi:waypoint x="393.0" y="219.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow96" id="BPMNEdge_flow96">
+        <omgdi:waypoint x="465.0" y="387.0"></omgdi:waypoint>
+        <omgdi:waypoint x="465.0" y="354.0"></omgdi:waypoint>
+        <omgdi:waypoint x="355.0" y="354.0"></omgdi:waypoint>
+        <omgdi:waypoint x="355.0" y="374.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow98" id="BPMNEdge_flow98">
+        <omgdi:waypoint x="393.0" y="180.0"></omgdi:waypoint>
+        <omgdi:waypoint x="230.0" y="219.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow99" id="BPMNEdge_flow99">
+        <omgdi:waypoint x="393.0" y="180.0"></omgdi:waypoint>
+        <omgdi:waypoint x="393.0" y="219.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow100" id="BPMNEdge_flow100">
+        <omgdi:waypoint x="393.0" y="140.0"></omgdi:waypoint>
+        <omgdi:waypoint x="394.0" y="109.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow101" id="BPMNEdge_flow101">
+        <omgdi:waypoint x="300.0" y="254.0"></omgdi:waypoint>
+        <omgdi:waypoint x="328.0" y="252.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow102" id="BPMNEdge_flow102">
+        <omgdi:waypoint x="137.0" y="106.0"></omgdi:waypoint>
+        <omgdi:waypoint x="137.0" y="159.0"></omgdi:waypoint>
+        <omgdi:waypoint x="178.0" y="160.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow103" id="BPMNEdge_flow103">
+        <omgdi:waypoint x="230.0" y="95.0"></omgdi:waypoint>
+        <omgdi:waypoint x="230.0" y="133.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow104" id="BPMNEdge_flow104">
+        <omgdi:waypoint x="210.0" y="75.0"></omgdi:waypoint>
+        <omgdi:waypoint x="190.0" y="76.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow48" id="BPMNEdge_flow48">
+        <omgdi:waypoint x="44.0" y="280.0"></omgdi:waypoint>
+        <omgdi:waypoint x="76.0" y="280.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="34.0" x="8.0" y="248.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow65" id="BPMNEdge_flow65">
+        <omgdi:waypoint x="671.0" y="66.0"></omgdi:waypoint>
+        <omgdi:waypoint x="700.0" y="63.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow82" id="BPMNEdge_flow82">
+        <omgdi:waypoint x="661.0" y="280.0"></omgdi:waypoint>
+        <omgdi:waypoint x="721.0" y="280.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="20.0" x="729.0" y="248.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow97" id="BPMNEdge_flow97">
+        <omgdi:waypoint x="671.0" y="159.0"></omgdi:waypoint>
+        <omgdi:waypoint x="700.0" y="157.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

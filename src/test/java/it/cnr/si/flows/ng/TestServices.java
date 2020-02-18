@@ -1,17 +1,16 @@
 package it.cnr.si.flows.ng;
 
+import it.cnr.si.flows.ng.resource.FlowsProcessInstanceResource;
 import it.cnr.si.flows.ng.resource.FlowsTaskResource;
 import it.cnr.si.flows.ng.utils.Enum;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.rest.service.api.runtime.process.ProcessInstanceResource;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,7 +20,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -34,7 +32,6 @@ import static it.cnr.si.flows.ng.utils.Enum.SiglaList.TIPOLOGIA_ACQUISIZIONE;
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 /**
@@ -68,7 +65,7 @@ public class TestServices {
     @Inject
     private FlowsTaskResource flowsTaskResource;
     @Inject
-    private ProcessInstanceResource processInstanceResource;
+    FlowsProcessInstanceResource flowsProcessInstanceResource;
     @Inject
     private UserDetailsService flowsUserDetailsService;
     private String processDefinition;
@@ -157,14 +154,14 @@ public class TestServices {
 
 
     public int myTearDown() {
-
+        loginAdmin();
         //cancello le Process Instance creata all'inizio del test'
         List<ProcessInstance> list = runtimeService.createProcessInstanceQuery().list();
-        HttpServletResponse res = new MockHttpServletResponse();
+        ResponseEntity res;
         int processDeleted = 0;
         for (ProcessInstance pi : list) {
-            processInstanceResource.deleteProcessInstance(pi.getProcessInstanceId(), "TEST", res);
-            assertEquals(NO_CONTENT.value(), res.getStatus());
+            res = flowsProcessInstanceResource.delete(pi.getProcessInstanceId(), "TEST");
+            assertEquals(OK, res.getStatusCode());
             processDeleted++;
         }
         logout();
@@ -206,6 +203,7 @@ public class TestServices {
                 req.setParameter("richiestaDiAcquisto_label", "Richiesta di Acquisto");
                 req.setParameter("tipologiaAffidamentoDiretto", "semplificata");
                 req.setParameter("idStruttura", "2216");
+                req.setParameter("tempiCompletamentoProceduraFine", "2216");
 
                 break;
             case testAcquistiAvvisi:
@@ -249,7 +247,7 @@ public class TestServices {
                 req.setParameter("titolo", "titolo");
                 req.setParameter("descrizione", "descrizione");
                 req.addFile(new MockMultipartFile("richiestaFerie", "domanda.pdf", MediaType.APPLICATION_PDF.getType() + "/" + MediaType.APPLICATION_PDF.getSubtype(),
-                        this.getClass().getResourceAsStream("/pdf-test/domanda.pdf")));
+                                                  this.getClass().getResourceAsStream("/pdf-test/domanda.pdf")));
 
                 break;
         }
