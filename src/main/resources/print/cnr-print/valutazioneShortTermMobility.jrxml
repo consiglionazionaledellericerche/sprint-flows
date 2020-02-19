@@ -560,7 +560,7 @@
 	</background>
 	<title>
 		<band height="63" splitType="Stretch">
-			<textField>
+			<textField textAdjust="ScaleFont">
 				<reportElement x="0" y="4" width="556" height="40" uuid="1c38430f-18c4-4353-b5a3-4c46137ce2cb"/>
 				<textElement textAlignment="Center">
 					<font size="26" isBold="true"/>
