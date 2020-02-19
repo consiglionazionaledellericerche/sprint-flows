@@ -62,7 +62,7 @@ public class FlowsListenersConfiguration {
                 System.exit(1);
 
             for (Resource resource : appContext.getResources("classpath:processes/" + dir + "/*.bpmn*")) {
-                LOGGER.info("\n ------- definition {}", resource.getFilename());
+                LOGGER.info("Deploying process definition {}", resource.getFilename());
                 List<ProcessDefinition> processes = repositoryService.createProcessDefinitionQuery()
                         .processDefinitionKey(resource.getFilename().split("[.]")[0])
                         .list();
