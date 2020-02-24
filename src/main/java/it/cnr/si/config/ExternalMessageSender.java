@@ -76,7 +76,7 @@ public class ExternalMessageSender {
         // STM
 
         RestTemplate stmTemplate = new RestTemplate();
-        interceptors = abilTemplate.getInterceptors();
+        interceptors = stmTemplate.getInterceptors();
         interceptors.add(new StmRequestInterceptor());
         stmTemplate.setInterceptors(interceptors);
         ExternalApplication.STM.setTemplate(stmTemplate);
