@@ -14,6 +14,7 @@
             scope: {
                 processInstanceId: '@?',
                 attachments: '@?',
+                businesskey: '@?',
                 taskId: '@?',
                 showHistory: '@?',
                 canPublish: '=',
@@ -88,6 +89,9 @@
                             },
                             processInstanceId: function() {
                                 return $scope.processInstanceId;
+                            },
+                            businesskey: function() {
+                                return $scope.businesskey;
                             }
                         }
                     });
