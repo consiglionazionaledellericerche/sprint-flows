@@ -41,6 +41,7 @@
 						vm.data.attachments = utils.parseAttachments(response.data.attachments);
 						vm.data.identityLinks = response.data.identityLinks;
 						vm.diagramUrl = '/rest/diagram/processInstance/' + vm.data.entity.id + "?" + new Date().getTime();
+						vm.data.businessKey = response.data.entity.businessKey;
 
 						var processDefinition = response.data.entity.processDefinitionId.split(":");
 						var stato = response.data.history[0].historyTask.name;

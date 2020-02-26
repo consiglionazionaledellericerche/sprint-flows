@@ -5,9 +5,9 @@
   .controller('AttachmentActionsModalController', AttachmentActionsModalController);
 
 
-  AttachmentActionsModalController.$inject = ['$scope', '$uibModalInstance', 'dataService', 'attachment', 'processInstanceId', 'Upload', 'AlertService', '$log', 'utils'];
+  AttachmentActionsModalController.$inject = ['$scope', '$uibModalInstance', 'dataService', 'attachment', 'businesskey', 'processInstanceId', 'Upload', 'AlertService', '$log', 'utils'];
 
-  function AttachmentActionsModalController ($scope, $uibModalInstance, dataService, attachment, processInstanceId, Upload, AlertService, $log, utils) {
+  function AttachmentActionsModalController ($scope, $uibModalInstance, dataService, attachment, businesskey, processInstanceId, Upload, AlertService, $log, utils) {
 
     var vm = this;
 
@@ -15,10 +15,11 @@
     $scope.attachments[attachment.name] = attachment;
     $scope.data = {};
     $scope.data.processInstanceId = processInstanceId;
+
     vm.attachment = attachment;
 
     vm.pubblicatoTrasparenza = vm.attachment.stati.indexOf("PubblicatoTrasparenza") >= 0;
-
+    vm.businesskey = businesskey;
     $scope.pubblicaDocumentoTrasparenza = function(flag) {
       dataService.attachments.pubblicaDocumentoTrasparenza(processInstanceId, attachment.name, flag)
       .then(function() {

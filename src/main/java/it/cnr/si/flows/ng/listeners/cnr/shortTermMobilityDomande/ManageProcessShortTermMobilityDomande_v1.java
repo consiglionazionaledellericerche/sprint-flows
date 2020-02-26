@@ -142,7 +142,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 				//				flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
 			};break;  	 
 			case "modifica-start": {
-				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.IN_MODIFICA);
+				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.APERTA);
 			};break;
 
 			case "pre-accettazione-start": {
