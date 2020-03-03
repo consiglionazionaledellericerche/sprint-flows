@@ -66,9 +66,9 @@
                     function(response){
                         //popolo i campi col contenuto del json
                         var json = JSON.parse(response.data.json);
-                        for (var key in Object.keys(json)) {
-                            $scope.data["" + key] = json[key]
-                        }
+                        Object.keys(json).forEach(function(key) {
+                            $scope.data["" + key] = json[key];
+                        })
                     }
                 );
 			});
@@ -147,8 +147,6 @@
             delete json.processDefinitionId;
             delete json.sceltaUtente;
             delete json.taskId;
-            delete json.dipartimentoId;
-            delete json.dipartimento;
             //salvo il draft con username null perchè deve essere visibile a tutti
 			dataService.draft.updateDraft($state.params.taskId, json, null);
 		}
