@@ -116,7 +116,7 @@ public class StartShortTermMobilityDomandeSetGroupsAndVisibility {
 			//DA CAMBIARE - ricavando il direttore della persona che afferisce alla sua struttura
 			String gruppoDirigenteProponente = "responsabile-struttura@" + idEntitaorganizzativaResponsabileUtente;
 
-			String applicazioneSTM = "app.abil";
+			String applicazioneSTM = "app.stm";
 			String applicazioneScrivaniaDigitale = "app.scrivaniadigitale";
 
 			LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}",  gruppoValidatoriShortTermMobility, gruppoResponsabileAccordiInternazionali, gruppoUfficioProtocollo);
