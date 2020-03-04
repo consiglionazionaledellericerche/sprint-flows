@@ -42,7 +42,7 @@ spring:
 
 cnr:
   storage:
-    driver: cmis
+    driver: filesystem
     filesystem:
       directory: ${java.io.tmpdir}
   activiti:
