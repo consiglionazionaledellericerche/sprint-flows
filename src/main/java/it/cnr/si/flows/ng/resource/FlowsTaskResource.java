@@ -185,13 +185,13 @@ public class FlowsTaskResource {
 
 
 
-    @PutMapping(value = "/reassign/{assignee:.*}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/reassign/", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.isResponsabile(#taskId, #processInstanceId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Map<String, Object>> reassignTask(
             @RequestParam(name = "processInstanceId", required=false) String processInstanceId,
             @RequestParam(name = "taskId", required=false) String taskId,
-            @PathVariable(value = "assignee") String assignee) {
+            @RequestParam(value = "assignee") String assignee) {
 
         if(taskId == null) {
             // se vengo da pagine in cui ho solo il processInstanceId (tipo ricerca) trovo il taskId

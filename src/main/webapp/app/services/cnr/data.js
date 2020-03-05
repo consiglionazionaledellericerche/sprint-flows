@@ -47,7 +47,8 @@
                 },
                 reassign: function (taskId, processInstanceId, assignee) {
                     return $http({
-                        url: 'api/tasks/reassign/' + assignee + '?' +
+                        url: 'api/tasks/reassign/?' +
+                            'assignee=' + assignee + '&' +
                             (taskId ? 'taskId=' + taskId + '&' : '') +
                             (processInstanceId ? 'processInstanceId=' + processInstanceId : ''),
                         method: 'PUT',
