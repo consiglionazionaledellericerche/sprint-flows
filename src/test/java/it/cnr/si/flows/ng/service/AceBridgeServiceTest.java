@@ -15,6 +15,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.inject.Inject;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -72,4 +74,24 @@ public class AceBridgeServiceTest {
         Assert.assertEquals(Integer.valueOf(2216), parents.get(0).getPadre().getId());
 
     }
+
+    @Test
+    public void testCacheExtendedGroupName() {
+        Instant startSlow = Instant.now();
+        aceBridgeService.getExtendedGroupNome("sfd@2216");
+        Instant endedSlow = Instant.now();
+        Long fetchDuration = Duration.between(startSlow, endedSlow).toMillis();
+        log.info("Slow fetch duration: {}", fetchDuration);
+
+        Instant startCached = Instant.now();
+        aceBridgeService.getExtendedGroupNome("sfd@2216");
+        Instant ended = Instant.now();
+        Long cacheDuration = Duration.between(startCached, ended).toMillis();
+        log.info("Cache hit duration: {}", cacheDuration);
+
+        Assert.assertTrue("Cache did not work, second request was not significantly slower",
+                (fetchDuration / cacheDuration) > 10 );
+
+    }
+
 }
