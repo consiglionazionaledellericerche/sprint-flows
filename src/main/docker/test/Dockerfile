@@ -7,7 +7,7 @@ ARG JAR_FILE=./target/app.war
 ADD ${JAR_FILE} /opt/app.war
 
 EXPOSE 8080
-EXPOSE 8099
+EXPOSE 8899
 
 WORKDIR /opt/
 
