@@ -16,7 +16,6 @@ cache:
     - node/
     - node/modules/
     - src/main/webapp/bower_components
-    - target/app.war
 
 stages:
   - test
@@ -41,6 +40,10 @@ build:
   script:
     - mvn -B clean compile package deploy -DskipTests -Pprod -U
     - ls -la ./target
+  artifacts:
+    paths:
+      - ./target/app.war
+    expire_in: 2 days
 
 deploy_snapshot:
   stage: deploy_snapshot
