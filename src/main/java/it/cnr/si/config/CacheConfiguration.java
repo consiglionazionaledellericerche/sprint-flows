@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 
 @Configuration
-@EnableCaching
 @AutoConfigureAfter(value = { MetricsConfiguration.class, DatabaseConfiguration.class })
 public class CacheConfiguration {
 
