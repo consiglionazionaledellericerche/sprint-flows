@@ -131,7 +131,7 @@ public class AceBridgeService {
 		return aceService.entitaOrganizzativaById(id);
 	}
 
-	//    @Cacheable("nomiEstesiGruppiRuoloStruttura")
+	// @Cacheable("getExtendedGroupNome")
 	public String getExtendedGroupNome(String groupRuoloStrutturaName) {
 		if (groupRuoloStrutturaName == null)
 			return null;
