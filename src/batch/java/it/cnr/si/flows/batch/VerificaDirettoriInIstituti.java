@@ -71,32 +71,51 @@ public class VerificaDirettoriInIstituti {
 		int tipo = 1;
 		List<EntitaOrganizzativaWebDto> elencoIstituti = aceBridgeService.getUoByTipo(tipo);
 		elencoIstituti.forEach( istituto -> {
-			log.info("******  {}", personNr);
-			log.info("******  {} [{} - ({})]  ******", istituto.getDenominazione(), istituto.getSigla(), istituto.getId());
+			if (istituto.getIdnsip() == null) {
+				Integer idEo = istituto.getId();
+				//21	Direttore	direttore
+				Integer idDirettore = aceService.getRuoloBySigla("direttore").getId();
+				//30	Direttore F.F.	direttoreFF
+				Integer idDirettoreDFF = aceService.getRuoloBySigla("direttoreFF").getId();
+				//33	DIRETTORE AD INTERIM	direttoreAI
+				Integer idDirettoreAI = aceService.getRuoloBySigla("direttoreAI").getId();
+				//35	DIRETTORE GENERALE F.F.	direttoreGeneraleFF
+				Integer idDirettoreGeneraleFF = aceService.getRuoloBySigla("direttoreGeneraleFF").getId();
+				
+				String userNameDirettore = "";
+
+				Integer totaleDirettore = aceService.getUtentiInRuoloEo(idDirettore, idEo).size();
+				if (totaleDirettore == 1) {
+					userNameDirettore = aceService.getUtentiInRuoloEo(idDirettore, idEo).get(0).getUsername();
+				}
+				Integer totaleDirettorDFF = aceService.getUtentiInRuoloEo(idDirettoreDFF, idEo).size();
+				if (totaleDirettorDFF == 1) {
+					userNameDirettore = aceService.getUtentiInRuoloEo(idDirettoreDFF, idEo).get(0).getUsername();
+				}
+				Integer totaleDirettoreAI = aceService.getUtentiInRuoloEo(idDirettoreAI, idEo).size();
+				if (totaleDirettoreAI == 1) {
+					userNameDirettore = aceService.getUtentiInRuoloEo(totaleDirettoreAI, idEo).get(0).getUsername();
+				}		
+				Integer totaleDirettoreGeneraleFF = aceService.getUtentiInRuoloEo(idDirettoreGeneraleFF, idEo).size();
+				if (totaleDirettoreGeneraleFF == 1) {
+					userNameDirettore = aceService.getUtentiInRuoloEo(totaleDirettoreGeneraleFF, idEo).get(0).getUsername();
+				}
+				Integer totaleDirettori = totaleDirettore + totaleDirettorDFF + totaleDirettoreAI + totaleDirettoreGeneraleFF;
+
+				if(totaleDirettori == 0 ) {
+					log.info("******  {}", personNr);
+					log.info("****** ERRORE NON CI SONO DIRETTORI IN {} [{} - ({})]", istituto.getSigla(), istituto.getSigla(), istituto.getId());
+				}
+				if(totaleDirettori > 1 ) {
+					log.info("******  {}", personNr);
+					log.info("****** WRNING  CI {} SONO DIRETTORI IN {} [{} - ({})]", totaleDirettori, istituto.getSigla(), istituto.getSigla(), istituto.getId());
+				}
+				if(totaleDirettori == 1 ) {
+					log.info("******  {}", personNr);
+					log.info("****** IL DIRETTORE - {} - IN {} [{} - ({})]", userNameDirettore, istituto.getSigla(), istituto.getSigla(), istituto.getId());
+				}
+			}
 			personNr = personNr + 1;
-			Integer idEo = istituto.getId();
-			//21	Direttore	direttore
-			Integer idDirettore = aceService.getRuoloBySigla("direttore").getId();
-			//30	Direttore F.F.	direttoreFF
-			Integer idDirettoreDFF = aceService.getRuoloBySigla("direttoreFF").getId();
-			//33	DIRETTORE AD INTERIM	direttoreAI
-			Integer idDirettoreAI = aceService.getRuoloBySigla("direttoreAI").getId();
-			//35	DIRETTORE GENERALE F.F.	direttoreGeneraleFF
-			Integer idDirettoreGeneraleFF = aceService.getRuoloBySigla("direttoreGeneraleFF").getId();
-
-			Integer totaleDirettore = aceService.getUtentiInRuoloEo(idDirettore, idEo).size();
-			Integer totaleDirettorDFF = aceService.getUtentiInRuoloEo(idDirettoreDFF, idEo).size();
-			Integer totaleDirettoreAI = aceService.getUtentiInRuoloEo(idDirettoreAI, idEo).size();
-			Integer totaleDirettoreGeneraleFF = aceService.getUtentiInRuoloEo(idDirettoreGeneraleFF, idEo).size();
-
-			Integer totaleDirettori = totaleDirettore + totaleDirettorDFF + totaleDirettoreAI + totaleDirettoreGeneraleFF;
-
-			if(totaleDirettori == 0 ) {
-				log.info("****** ERRORE NON CI SONO DIRETTORI IN  {}", istituto.getSigla());
-			}
-			if(totaleDirettori > 1 ) {
-				log.info("****** WRNING  CI {} SONO DIRETTORI IN  {}", totaleDirettori, istituto.getSigla());
-			}
 		});
 	}
 }
