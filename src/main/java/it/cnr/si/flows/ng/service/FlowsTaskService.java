@@ -513,8 +513,16 @@ public class FlowsTaskService {
 		}
 	}
 
-
 	static String ellipsis(String in, int length) {
-		return in.length() < length ? in: in.substring(0, length - 3) + "...";
+		if (in!= null) {
+			if (in.length() < length) {
+			return in;
+		} else
+		{
+			return in.substring(0, length - 3) + "...";
+		}
+	}else {
+		return "";
+		}
 	}
 }
