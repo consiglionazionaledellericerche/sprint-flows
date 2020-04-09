@@ -118,8 +118,10 @@ public class MembershipService {
     public Set<String> getAllGroupsForUser(String username) {
 
         Set<String> groups = new HashSet<>();
+
         groups.addAll( getAceGroupsForUser(username) );
         groups.addAll( getLocalGroupsForUser(username) );
+        groups.add("USER");
 
         groups.addAll( getAllChildGroupsRecursively(groups, new HashSet<>()) );
 
