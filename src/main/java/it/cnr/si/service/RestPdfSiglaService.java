@@ -33,16 +33,15 @@ public class RestPdfSiglaService {
 	private String usr;
 	@Value("${cnr.sigla.psw}")
 	private String psw;
+	@Value("${cnr.sigla.print.url}")
+	private String printServerURL;
 
 	public byte[] getSiglaPdf(String data) {
-		// String jsonResponse = null;
-		String URL_STRING = "http://sigla-print.test.si.cnr.it/api/v1/get/print";
-		String QUERY_STRING = data;
 		byte[] pdfByteArray = null;
 
 		// Dynamiclist dynamiclist = new Dynamiclist();
 		try {
-			URL url = new URL(URL_STRING);
+			URL url = new URL(printServerURL);
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setRequestMethod("POST");
 			conn.setRequestProperty("Content-Type", "application/json");
@@ -54,7 +53,7 @@ public class RestPdfSiglaService {
 			OutputStream os = conn.getOutputStream();
 			OutputStreamWriter osw = new OutputStreamWriter(os, StandardCharsets.UTF_8.name());
 
-			osw.write(QUERY_STRING);
+			osw.write(data);
 			osw.flush();
 			osw.close();
 			os.close();
