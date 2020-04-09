@@ -95,7 +95,7 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 			LOGGER.info("--- WARNING MISMATCH DIRETTORE - L'utente {} ha  {} come direttore in ACE e {} come come direttore in SIPER", initiator.toString(), usernameDirettoreAce, usernameDirettoreSiper);
 		}
 
-		LOGGER.info("L'utente {} ha come  {} per la struttura {} ({}} - id:{}", initiator.toString(), usernameDirettoreAce, direttoreAce.getSiglaRuolo(), direttoreAce.getDenominazioneEO(), direttoreAce.getSiglaEO(), IdEntitaOrganizzativaDirettore);
+		LOGGER.info("L'utente {} ha come  {} per la struttura {} ({}} - id:{}", initiator.toString(), direttoreAce.getSiglaRuolo(), usernameDirettoreAce, direttoreAce.getDenominazioneEO(), direttoreAce.getSiglaEO(), IdEntitaOrganizzativaDirettore);
 
 		String gruppoResponsabileProponente = "responsabile-struttura@" + IdEntitaOrganizzativaDirettore;
 

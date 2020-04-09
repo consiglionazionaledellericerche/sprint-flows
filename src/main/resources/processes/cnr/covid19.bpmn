@@ -43,7 +43,7 @@
     <sequenceFlow id="flow16" name="END" sourceRef="exclusivegateway6" targetRef="endevent3">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Firma'}]]></conditionExpression>
     </sequenceFlow>
-    <userTask id="usertask1" name="MODIFICA" activiti:assignee="${initiator}">
+    <userTask id="modifica" name="MODIFICA" activiti:assignee="${initiator}">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageCovid19_v1}">
           <activiti:field name="faseEsecuzione">
@@ -57,8 +57,8 @@
         </activiti:executionListener>
       </extensionElements>
     </userTask>
-    <sequenceFlow id="flow17" sourceRef="exclusivegateway6" targetRef="usertask1"></sequenceFlow>
-    <sequenceFlow id="flow18" sourceRef="usertask1" targetRef="firma"></sequenceFlow>
+    <sequenceFlow id="flow17" sourceRef="exclusivegateway6" targetRef="modifica"></sequenceFlow>
+    <sequenceFlow id="flow18" sourceRef="modifica" targetRef="firma"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_covid19">
     <bpmndi:BPMNPlane bpmnElement="covid19" id="BPMNPlane_covid19">
@@ -74,7 +74,7 @@
       <bpmndi:BPMNShape bpmnElement="exclusivegateway6" id="BPMNShape_exclusivegateway6">
         <omgdc:Bounds height="40.0" width="40.0" x="250.0" y="43.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+      <bpmndi:BPMNShape bpmnElement="modifica" id="BPMNShape_modifica">
         <omgdc:Bounds height="71.0" width="109.0" x="111.0" y="130.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
