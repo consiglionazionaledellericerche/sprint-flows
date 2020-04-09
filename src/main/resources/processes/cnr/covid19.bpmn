@@ -41,7 +41,7 @@
     <exclusiveGateway id="exclusivegateway6" name="Exclusive Gateway" default="flow17"></exclusiveGateway>
     <sequenceFlow id="flow15" sourceRef="firma" targetRef="exclusivegateway6"></sequenceFlow>
     <sequenceFlow id="flow16" name="END" sourceRef="exclusivegateway6" targetRef="endevent3">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Firma'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Firma' ||  sceltaUtente == 'Firma Multipla'}]]></conditionExpression>
     </sequenceFlow>
     <userTask id="modifica" name="MODIFICA" activiti:assignee="${initiator}">
       <extensionElements>
