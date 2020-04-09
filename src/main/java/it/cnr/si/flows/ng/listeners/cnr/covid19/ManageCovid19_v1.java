@@ -122,11 +122,9 @@ public class ManageCovid19_v1 implements ExecutionListener {
 			startCovid19SetGroupsAndVisibility_v1.configuraVariabiliStart(execution);
 		};break;    
 		case "firma-start": {
-			
-			// 	INSERIMENTO VARIABILI FLUSSO
+			// INSERIMENTO VARIABILI FLUSSO
 		    execution.setVariable("titolo", "Scheda " + execution.getVariable("tipoAttivita").toString() + " - " + execution.getVariable("initiator").toString());
 		    execution.setVariable("descrizione", "Scheda Attività" );
-			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
 			String tipoAttivita = "rendicontazione";
 			if (execution.getVariable("tipoAttivita") != null) {
 				tipoAttivita = execution.getVariable("tipoAttivita").toString();
@@ -149,6 +147,7 @@ public class ManageCovid19_v1 implements ExecutionListener {
 			valoreParamJson.put("mese", execution.getVariable("mese").toString());
 			valoreParamJson.put("anno", execution.getVariable("anno").toString());
 			valoreParamJson.put("attivita_svolta", execution.getVariable("attivita").toString());
+			valoreParamJson.put("tipoAttivita", execution.getVariable("tipoAttivita").toString());
 			
 			//esempio:
 			// "{'matricola' : '15221','cds': 'ASR','direttore': 'MAURIZIO LANCIA','mese': 'Marzo','attivita_svolta': 'Ho partecipato a svariate riunioni<br>e ho svilupòpato<BR> ed ho lavorato per molto tempo'}"
@@ -160,6 +159,9 @@ public class ManageCovid19_v1 implements ExecutionListener {
 			} else {
 				labelFile="Programmazione Attività Personale";
 			}
+			// UPDATE VARIABILI FLUSSO
+			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
+			// GENERAZIONE PDF
 			flowsPdfBySiglaRestService.makePdf(execution, nomeFile, labelFile, report, valoreParam, tipologiaDoc, processInstanceId, utenteFile);
 		};break;      
 		case "firma-end": {
