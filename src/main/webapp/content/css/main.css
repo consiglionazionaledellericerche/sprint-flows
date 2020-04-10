@@ -646,3 +646,16 @@ select.ng-touched.ng-invalid {
 .jstree-default .jstree-search {
     color: #0d6500;
 }
+
+/* TRIX EDITOR */
+.trix-button--icon-increase-nesting-level,
+.trix-button--icon-decrease-nesting-level,
+.trix-button--icon-link,
+.trix-button--icon-strike,
+.trix-button--icon-heading-1,
+.trix-button--icon-quote,
+.trix-button--icon-code,
+[data-trix-button-group="file-tools"],
+[data-trix-button-group="history-tools"]{
+    display: none!important;
+}

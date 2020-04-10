@@ -113,7 +113,8 @@ public class ManageCovid19_v1 implements ExecutionListener {
                         Optional.ofNullable(execution.getVariable("attivita"))
                                 .filter(String.class::isInstance)
                                 .map(String.class::cast)
-                                .map(s -> s.replaceAll("\n", "<BR>"))
+                                .map(s -> s.replaceAll("strong>", "b>"))
+                                .map(s -> s.replaceAll("em>", "i>"))
                                 .orElse("")
                 );
                 valoreParamJson.put("tipoAttivita", execution.getVariable("tipoAttivita").toString());
@@ -122,7 +123,8 @@ public class ManageCovid19_v1 implements ExecutionListener {
                             Optional.ofNullable(execution.getVariable("modalita"))
                                     .filter(String.class::isInstance)
                                     .map(String.class::cast)
-                                    .map(s -> s.replaceAll("\n", "<BR>"))
+                                    .map(s -> s.replaceAll("strong>", "b>"))
+                                    .map(s -> s.replaceAll("em>", "i>"))
                                     .orElse("")
                     );
                     valoreParamJson.put("dataAvvioSmartWorking", execution.getVariable("dataAvvioSmartWorking"));
