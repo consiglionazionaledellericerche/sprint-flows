@@ -23,7 +23,8 @@
             'toggle-switch',
             'ui.select',
             'ngSanitize',
-            'dc.inputAddOn'
+            'dc.inputAddOn',
+            'angularTrix'
         ])
         .run(run);
 

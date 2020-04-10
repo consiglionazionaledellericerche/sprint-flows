@@ -61,6 +61,9 @@ public class AceBridgeService {
 
 		String[] split = groupName.split("@");
 		String sigla = split[0];
+		if ("STRUTTURA".equals(split[1]))
+			return new ArrayList<String>();
+		
 		int idEo = Integer.parseInt(split[1]);
 
 		int idRuolo = getIdRuoloBySigla(sigla);

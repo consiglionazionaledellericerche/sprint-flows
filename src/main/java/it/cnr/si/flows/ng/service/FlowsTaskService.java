@@ -327,14 +327,15 @@ public class FlowsTaskService {
 		// metadati da visualizzare in ricerca, li metto nel Name per comodita' in ricerca
 		org.json.JSONObject name = new org.json.JSONObject();
 
-		String titolo = (String) data.get(Enum.VariableEnum.titolo.name());
+		Map<String, Object> variables = runtimeService.getVariables(instance.getId());
+		String titolo = String.valueOf(variables.get(Enum.VariableEnum.titolo.name()));
 		name.put(Enum.VariableEnum.titolo.name(), ellipsis(titolo, LENGTH_TITOLO) );
-		String descrizione = (String) data.get(Enum.VariableEnum.descrizione.name());
+		String descrizione = String.valueOf(variables.get(Enum.VariableEnum.descrizione.name()));
 		name.put(Enum.VariableEnum.descrizione.name(), ellipsis(descrizione, LENGTH_DESCTIZIONE) );
 		//metto l`utente REALE che ha avviato il flusso nel JSON nel name
 		name.put(Enum.VariableEnum.initiator.name(), SecurityUtils.getRealUserLogged());
 		if (taskService.createTaskQuery().processInstanceId(instance.getProcessInstanceId()).count() == 0) {
-			name.put(stato.name(),ellipsis("START", LENGTH_FASE) );
+			name.put(stato.name(), ellipsis("START", LENGTH_FASE) );
 
 		} else {
 			String taskName = taskService.createTaskQuery()
@@ -347,6 +348,8 @@ public class FlowsTaskService {
 		LOGGER.info("Avviata istanza di processo {}, id: {}", key, instance.getId());
 		return instance;
 	}
+	
+	
 	public ProcessInstance startProcessInstanceAsApplication(String definitionId, Map<String, Object> data, String applicationName) {
 
 		ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitionId).singleResult();
@@ -513,8 +516,16 @@ public class FlowsTaskService {
 		}
 	}
 
-
 	static String ellipsis(String in, int length) {
-		return in.length() < length ? in: in.substring(0, length - 3) + "...";
+		if (in!= null) {
+			if (in.length() < length) {
+			return in;
+		} else
+		{
+			return in.substring(0, length - 3) + "...";
+		}
+	}else {
+		return "";
+		}
 	}
 }

@@ -166,7 +166,8 @@ public class Enum {
         valutazioneProgettoAccordiBilaterali,
         domandaAccordiBilaterali,
         valutazioneShortTermMobility,
-        preavvisoRigettoCambioFascia;
+        preavvisoRigettoCambioFascia,
+        monitoraggioAttivitaCovid19;
 
         PdfType() {
         }

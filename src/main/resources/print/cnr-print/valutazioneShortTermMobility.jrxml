@@ -247,9 +247,9 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="strutturaValutazioneDirigente"/>
 		<fieldDescription><![CDATA[strutturaValutazioneDirigente]]></fieldDescription>
 	</field>
-	<field name="nomeFruitore" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="nomeFruitore"/>
-		<fieldDescription><![CDATA[nomeFruitore]]></fieldDescription>
+	<field name="nomeCognomeFruitore" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="nomeCognomeFruitore"/>
+		<fieldDescription><![CDATA[nomeCognomeFruitore]]></fieldDescription>
 	</field>
 	<field name="initiator" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="initiator"/>
@@ -259,10 +259,6 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="nomeCognomeProponente"/>
 		<fieldDescription><![CDATA[nomeCognomeProponente]]></fieldDescription>
 	</field>
-	<field name="dataNascitaFruitore" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="dataNascitaFruitore"/>
-		<fieldDescription><![CDATA[dataNascitaFruitore]]></fieldDescription>
-	</field>
 	<field name="pathFascicoloDocumenti" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="pathFascicoloDocumenti"/>
 		<fieldDescription><![CDATA[pathFascicoloDocumenti]]></fieldDescription>
@@ -270,6 +266,62 @@
 	<field name="codiceFiscaleFruitore" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="codiceFiscaleFruitore"/>
 		<fieldDescription><![CDATA[codiceFiscaleFruitore]]></fieldDescription>
+	</field>
+	<field name="istitutoOspitanteFruitore" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="istitutoOspitanteFruitore"/>
+		<fieldDescription><![CDATA[istitutoOspitanteFruitore]]></fieldDescription>
+	</field>
+	<field name="dataPartenzaFruitore" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="dataPartenzaFruitore"/>
+		<fieldDescription><![CDATA[dataPartenzaFruitore]]></fieldDescription>
+	</field>
+	<field name="viaIstitutoOspitanteFruitore" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="viaIstitutoOspitanteFruitore"/>
+		<fieldDescription><![CDATA[viaIstitutoOspitanteFruitore]]></fieldDescription>
+	</field>
+	<field name="viaIstitutoProvenienzaFruitore" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="viaIstitutoProvenienzaFruitore"/>
+		<fieldDescription><![CDATA[viaIstitutoProvenienzaFruitore]]></fieldDescription>
+	</field>
+	<field name="nomecognomeReferenteIstitutoOspitanteFruitore" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="nomecognomeReferenteIstitutoOspitanteFruitore"/>
+		<fieldDescription><![CDATA[nomecognomeReferenteIstitutoOspitanteFruitore]]></fieldDescription>
+	</field>
+	<field name="telefonoFruitore" class="java.lang.Integer">
+		<property name="net.sf.jasperreports.json.field.expression" value="telefonoFruitore"/>
+		<fieldDescription><![CDATA[telefonoFruitore]]></fieldDescription>
+	</field>
+	<field name="emailFruitore" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="emailFruitore"/>
+		<fieldDescription><![CDATA[emailFruitore]]></fieldDescription>
+	</field>
+	<field name="qualificaRicopertaFruitore" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="qualificaRicopertaFruitore"/>
+		<fieldDescription><![CDATA[qualificaRicopertaFruitore]]></fieldDescription>
+	</field>
+	<field name="capIstitutoOspitanteFruitore" class="java.lang.Integer">
+		<property name="net.sf.jasperreports.json.field.expression" value="capIstitutoOspitanteFruitore"/>
+		<fieldDescription><![CDATA[capIstitutoOspitanteFruitore]]></fieldDescription>
+	</field>
+	<field name="istitutoProvenienzaFruitore" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="istitutoProvenienzaFruitore"/>
+		<fieldDescription><![CDATA[istitutoProvenienzaFruitore]]></fieldDescription>
+	</field>
+	<field name="cittaIstitutoOspitanteFruitore" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="cittaIstitutoOspitanteFruitore"/>
+		<fieldDescription><![CDATA[cittaIstitutoOspitanteFruitore]]></fieldDescription>
+	</field>
+	<field name="telefonoIstitutoOspitanteFruitore" class="java.lang.Long">
+		<property name="net.sf.jasperreports.json.field.expression" value="telefonoIstitutoOspitanteFruitore"/>
+		<fieldDescription><![CDATA[telefonoIstitutoOspitanteFruitore]]></fieldDescription>
+	</field>
+	<field name="emailIstitutoOspitanteFruitore" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="emailIstitutoOspitanteFruitore"/>
+		<fieldDescription><![CDATA[emailIstitutoOspitanteFruitore]]></fieldDescription>
+	</field>
+	<field name="posizioneFruitore" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="posizioneFruitore"/>
+		<fieldDescription><![CDATA[posizioneFruitore]]></fieldDescription>
 	</field>
 	<field name="dataNascitaProponente" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="dataNascitaProponente"/>
@@ -334,10 +386,6 @@
 	<field name="domandaCorrenteValutataFlag" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="domandaCorrenteValutataFlag"/>
 		<fieldDescription><![CDATA[domandaCorrenteValutataFlag]]></fieldDescription>
-	</field>
-	<field name="cognomeFruitore" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="cognomeFruitore"/>
-		<fieldDescription><![CDATA[cognomeFruitore]]></fieldDescription>
 	</field>
 	<field name="titolo" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="titolo"/>
@@ -539,7 +587,7 @@
 					<textElement>
 						<font size="12" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA[$F{nomeFruitore} + " " + $F{cognomeFruitore} + " [" + $F{codiceFiscaleFruitore} + "]"]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{nomeCognomeFruitore} + " [" + $F{codiceFiscaleFruitore} + "]"]]></textFieldExpression>
 				</textField>
 				<textField>
 					<reportElement x="0" y="120" width="130" height="20" isRemoveLineWhenBlank="true" uuid="0002560d-1a54-496b-8543-5c6a8967b0aa"/>
