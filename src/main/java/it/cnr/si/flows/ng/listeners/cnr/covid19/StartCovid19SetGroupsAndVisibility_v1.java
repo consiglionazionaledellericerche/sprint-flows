@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import feign.FeignException;
 
@@ -80,7 +81,8 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 
 		}
 		// VERIFICA DIRETTORE
-		String usernameDirettoreSiper = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("uid").toString();			
+		String usernameDirettoreSiper = "";
+
 		try {
 			direttoreAce = aceService.bossDirettoreByUsername(initiator);
 			usernameDirettoreAce = direttoreAce.getUsername();
@@ -90,35 +92,43 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 			throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + initiator + " <br>Si prega di contattare l'help desk in merito<br>");
 		}
 
-		//CONFRONTO DIRETTORE SIPER CON DIRETTORE ACE
-		if (!usernameDirettoreAce.equals(usernameDirettoreSiper)) {
-			LOGGER.info("--- WARNING MISMATCH DIRETTORE - L'utente {} ha  {} come direttore in ACE e {} come come direttore in SIPER", initiator.toString(), usernameDirettoreAce, usernameDirettoreSiper);
+		try {
+			usernameDirettoreSiper = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("uid").toString();
+
+		} catch(UnexpectedResultException | FeignException | HttpClientErrorException e) {
+			usernameDirettoreSiper = "not found";
 		}
+		finally {
 
-		LOGGER.info("L'utente {} ha come  {} per la struttura {} ({}} - id:{}", initiator.toString(), direttoreAce.getSiglaRuolo(), usernameDirettoreAce, direttoreAce.getDenominazioneEO(), direttoreAce.getSiglaEO(), IdEntitaOrganizzativaDirettore);
+			//CONFRONTO DIRETTORE SIPER CON DIRETTORE ACE
+			if (!usernameDirettoreAce.equals(usernameDirettoreSiper)) {
+				LOGGER.info("--- WARNING MISMATCH DIRETTORE - L'utente {} ha  {} come direttore in ACE e {} come come direttore in SIPER", initiator.toString(), usernameDirettoreAce, usernameDirettoreSiper);
+			}
 
-		String gruppoResponsabileProponente = "responsabile-struttura@" + IdEntitaOrganizzativaDirettore;
+			LOGGER.info("L'utente {} ha come  {} per la struttura {} ({}} - id:{}", initiator.toString(), direttoreAce.getSiglaRuolo(), usernameDirettoreAce, direttoreAce.getDenominazioneEO(), direttoreAce.getSiglaEO(), IdEntitaOrganizzativaDirettore);
 
-		String applicazioneScrivaniaDigitale = "app.scrivaniadigitale";
-		
-		
-		EntitaOrganizzativaWebDto utenteAce = aceBridgeService.getAfferenzaUtente(execution.getVariable("initiator").toString());
-		BossDto utenteBoss = aceService.bossDirettoreByUsername(execution.getVariable("initiator").toString());
-		UtenteDto utente = aceService.getUtente(execution.getVariable("initiator").toString());
-		
-		execution.setVariable("matricola", utente.getPersona().getMatricola());
-		execution.setVariable("nomeCognomeUtente", utente.getPersona().getNome() + " " + utente.getPersona().getCognome());
-		execution.setVariable("tipoContratto", utente.getPersona().getTipoContratto());
-		execution.setVariable("cds", utenteAce.getCdsuo());
-		execution.setVariable("direttore", utenteBoss.getNome() + " " +  utenteBoss.getCognome());
-	
-		
-		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileProponente, PROCESS_VISUALIZER);
-		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneScrivaniaDigitale, PROCESS_VISUALIZER);
+			String gruppoResponsabileProponente = "responsabile-struttura@" + IdEntitaOrganizzativaDirettore;
+
+			String applicazioneScrivaniaDigitale = "app.scrivaniadigitale";
 
 
-		execution.setVariable("gruppoResponsabileProponente", gruppoResponsabileProponente);
-		execution.setVariable("applicazioneScrivaniaDigitale", applicazioneScrivaniaDigitale);
+			EntitaOrganizzativaWebDto utenteAce = aceBridgeService.getAfferenzaUtente(execution.getVariable("initiator").toString());
+			BossDto utenteBoss = aceService.bossDirettoreByUsername(execution.getVariable("initiator").toString());
+			UtenteDto utente = aceService.getUtente(execution.getVariable("initiator").toString());
 
+			execution.setVariable("matricola", utente.getPersona().getMatricola());
+			execution.setVariable("nomeCognomeUtente", utente.getPersona().getNome() + " " + utente.getPersona().getCognome());
+			execution.setVariable("tipoContratto", utente.getPersona().getTipoContratto());
+			execution.setVariable("cds", utenteAce.getCdsuo());
+			execution.setVariable("direttore", utenteBoss.getNome() + " " +  utenteBoss.getCognome());
+
+
+			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileProponente, PROCESS_VISUALIZER);
+			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneScrivaniaDigitale, PROCESS_VISUALIZER);
+
+
+			execution.setVariable("gruppoResponsabileProponente", gruppoResponsabileProponente);
+			execution.setVariable("applicazioneScrivaniaDigitale", applicazioneScrivaniaDigitale);
+		}
 	}
 }
