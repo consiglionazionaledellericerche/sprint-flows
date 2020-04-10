@@ -153,7 +153,7 @@ public class ManageCovid19_v1 implements ExecutionListener {
 			break;
             case "modifica-start": {
             	//AGGIORNA DIRETTORE
-        		BossDto utenteBoss = aceService.bossDirettoreByUsername(execution.getVariable("initiator").toString());
+        		BossDto utenteBoss = aceService.bossLevelByUsername(0, execution.getVariable("initiator").toString());
         		execution.setVariable("direttore", utenteBoss.getNome() + " " +  utenteBoss.getCognome());
             }
 			break;

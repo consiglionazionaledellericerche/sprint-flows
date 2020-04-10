@@ -84,7 +84,7 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 		String usernameDirettoreSiper = "";
 
 		try {
-			direttoreAce = aceService.bossDirettoreByUsername(initiator);
+			direttoreAce = aceService.bossLevelByUsername(0,initiator);
 			usernameDirettoreAce = direttoreAce.getUsername();
 			IdEntitaOrganizzativaDirettore = direttoreAce.getIdEntitaOrganizzativa();
 		} catch(UnexpectedResultException | FeignException e) {
@@ -113,14 +113,13 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 
 
 			EntitaOrganizzativaWebDto utenteAce = aceBridgeService.getAfferenzaUtente(execution.getVariable("initiator").toString());
-			BossDto utenteBoss = aceService.bossDirettoreByUsername(execution.getVariable("initiator").toString());
 			UtenteDto utente = aceService.getUtente(execution.getVariable("initiator").toString());
 
 			execution.setVariable("matricola", utente.getPersona().getMatricola());
 			execution.setVariable("nomeCognomeUtente", utente.getPersona().getNome() + " " + utente.getPersona().getCognome());
 			execution.setVariable("tipoContratto", utente.getPersona().getTipoContratto());
 			execution.setVariable("cds", utenteAce.getCdsuo());
-			execution.setVariable("direttore", utenteBoss.getNome() + " " +  utenteBoss.getCognome());
+			execution.setVariable("direttore", direttoreAce.getNome() + " " +  direttoreAce.getCognome());
 
 
 			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileProponente, PROCESS_VISUALIZER);
