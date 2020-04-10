@@ -99,11 +99,16 @@ public class MembershipService {
 
     // Se a qualcuno dovesse servire puo' rendere questo metodo public, ma non credo - martin 4/9/19
     private Set<String> getAceGroupsForUser(String username) {
-        return Optional.ofNullable(aceBridgeService)
-                .map(aceBridgeService -> aceBridgeService.getAceGroupsForUser(username))
-                .map(strings -> strings.stream())
-                .orElse(Stream.empty())
-                .collect(Collectors.toSet());
+    	try {
+	        return Optional.ofNullable(aceBridgeService)
+	                .map(aceBridgeService -> aceBridgeService.getAceGroupsForUser(username))
+	                .map(strings -> strings.stream())
+	                .orElse(Stream.empty())
+	                .collect(Collectors.toSet());
+    	} catch (Exception e) {
+    		log.debug(e.getMessage()); // Succede se admin chiede i gruppi da ace
+    		return new HashSet<String>();
+    	}
     }
 
     /**
@@ -118,8 +123,10 @@ public class MembershipService {
     public Set<String> getAllGroupsForUser(String username) {
 
         Set<String> groups = new HashSet<>();
+
         groups.addAll( getAceGroupsForUser(username) );
         groups.addAll( getLocalGroupsForUser(username) );
+        groups.add("USER");
 
         groups.addAll( getAllChildGroupsRecursively(groups, new HashSet<>()) );
 

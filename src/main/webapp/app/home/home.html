@@ -9,7 +9,22 @@
                     You are logged in as user "{{vm.account.login}}".
                 </div>
                 <div ng-switch-when="false" ng-if="app == 'cnr'">
-                    Per autenticarsi usare il menu' "Utente" usando le credenziali Siper.
+                    Per autenticarsi usare le credenziali Siper.
+                <hr>
+                
+                <form class="form" role="form" ng-submit="vm.signin($event)">
+	                <div class="form-group">
+	                    <label for="username" translate="global.form.username">Login</label>
+	                    <input type="text" class="form-control" id="username" style="text-transform: lowercase;"
+	                           placeholder="{{'global.form.username.placeholder' | translate}}" ng-model="vm.username">
+	                </div>
+	                <div class="form-group">
+	                    <label for="password">Password</label>
+	                    <input type="password" class="form-control" id="password" style="text-transform: lowercase;"
+	                           placeholder="{{'la tua password siper'}}" ng-model="vm.password">
+	                </div>
+	                <button type="submit" class="btn btn-primary">Login</button>
+	            </form>
                 </div>
                 <div ng-switch-when="false" ng-if="app !== 'cnr'">
                     Per autenticarsi usare il menu' "Utente" usando le credenziali dell'applicazione.

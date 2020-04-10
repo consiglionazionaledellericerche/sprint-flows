@@ -5,9 +5,9 @@
         .module('sprintApp')
         .controller('HomeController', HomeController);
 
-    HomeController.$inject = ['$scope', 'Principal', 'LoginService', 'ProfileService', '$q', '$state', 'dataService'];
+    HomeController.$inject = ['$scope', 'Principal', 'LoginService', 'ProfileService', '$q', '$state', 'dataService', 'Auth', '$rootScope'];
 
-    function HomeController ($scope, Principal, LoginService, ProfileService, $q, $state, dataService) {
+    function HomeController ($scope, Principal, LoginService, ProfileService, $q, $state, dataService, Auth, $rootScope) {
         var vm = this;
 
         vm.account = null;
@@ -24,6 +24,26 @@
             vm.avvisi = response.data;
         })
 
+        // Duplicato da login.controller.js per l'emergenza Covid19 
+        // TODO non duplicare codice, spostare in un service
+        vm.signin = function(event) {
+            event.preventDefault();
+            Auth.login({
+                username: vm.username.toLowerCase(),
+                password: vm.password,
+                rememberMe: vm.rememberMe
+            }).then(function () {
+                vm.authenticationError = false;
+
+                $state.go('availableTasks');
+
+                $rootScope.$broadcast('authenticationSuccess');
+
+            }).catch(function () {
+                vm.authenticationError = true;
+            });
+        }
+        
         /* --- */
 
         function getTasksCount() {

@@ -50,6 +50,7 @@ public class FlowsFirmaService {
         put("firma-revoca", "ProvvedimentoDiRevoca");
         put("firma-contratto", "contratto");
         put("firma-verbale", "verbale");
+        put("firma", "monitoraggioAttivitaCovid19");
     }};
 
     public static final Map<String, String> ERRORI_ARUBA = new HashMap<String, String>() {{
