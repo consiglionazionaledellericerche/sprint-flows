@@ -5,6 +5,9 @@ import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.*;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.service.AceService;
+import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
+import it.cnr.si.service.dto.anagrafica.scritture.UtenteDto;
+
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.DelegateExecution;
@@ -81,10 +84,15 @@ public class ManageCovid19_v1 implements ExecutionListener {
             }
 			break;
             case "firma-start": {
+            	//AGGIORNA DIRETTORE
+        		BossDto utenteBoss = aceService.bossDirettoreByUsername(execution.getVariable("initiator").toString());
+        		execution.setVariable("direttore", utenteBoss.getNome() + " " +  utenteBoss.getCognome());
+        		
                 // INSERIMENTO VARIABILI FLUSSO
                 execution.setVariable("titolo", "Scheda " + execution.getVariable("tipoAttivita") + " - " + execution.getVariable("initiator"));
                 execution.setVariable("descrizione", "Scheda Attività - " + execution.getVariable("mese") + " " + execution.getVariable("anno"));
-
+                
+                //PARAMETRI GENERAZIONE PDF
                 String tipoAttivita = "rendicontazione";
                 if (execution.getVariable("tipoAttivita") != null) {
                     tipoAttivita = execution.getVariable("tipoAttivita").toString();
@@ -95,10 +103,9 @@ public class ManageCovid19_v1 implements ExecutionListener {
                 //tipologiaDoc è la tipologia del file
                 String tipologiaDoc = Enum.PdfType.valueOf("monitoraggioAttivitaCovid19").name();
                 String utenteFile = execution.getVariable("initiator").toString();
-                //valoreParam p il json che racchiude i dati della stampa
-
+                
+                //valoreParam per il json che racchiude i dati della stampa
                 JSONObject valoreParamJson = new JSONObject();
-
                 valoreParamJson.put("matricola", execution.getVariable("matricola"));
                 valoreParamJson.put("nomeCognomeUtente", execution.getVariable("nomeCognomeUtente"));
                 valoreParamJson.put("tipoContratto", execution.getVariable("tipoContratto"));
