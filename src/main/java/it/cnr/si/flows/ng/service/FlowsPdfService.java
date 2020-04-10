@@ -43,10 +43,12 @@ import rst.pdfbox.layout.text.Position;
 
 import javax.inject.Inject;
 import java.awt.*;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -96,8 +98,6 @@ public class FlowsPdfService {
 	private int nrFlussiTerminati = 0;
 	private int allTerminatedProcessInstancesDurationInMillis = 0;
 	private Calendar newDate = Calendar.getInstance();
-
-
 
 	public String makeSummaryPdf(String processInstanceId, ByteArrayOutputStream outputStream) throws IOException, ParseException {
 
@@ -186,7 +186,10 @@ public class FlowsPdfService {
 						.findFirst();
 				if (variable.isPresent()) {
 					variables.remove(variable.get());
-					paragraphField.addText(label + ": " + variable.get().getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
+					String value = String.valueOf(variable.get().getValue());
+					if (type.equals("wysiwyg"))
+						value = Jsoup.parse(value).text();
+					paragraphField.addText(label + ": " + value + "\n", FONT_SIZE, HELVETICA_BOLD);
 				}
 			}
 		}
