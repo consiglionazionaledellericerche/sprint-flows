@@ -83,11 +83,7 @@ public class ManageCovid19_v1 implements ExecutionListener {
                 startCovid19SetGroupsAndVisibility_v1.configuraVariabiliStart(execution);
             }
 			break;
-            case "firma-start": {
-            	//AGGIORNA DIRETTORE
-        		BossDto utenteBoss = aceService.bossDirettoreByUsername(execution.getVariable("initiator").toString());
-        		execution.setVariable("direttore", utenteBoss.getNome() + " " +  utenteBoss.getCognome());
-        		
+            case "firma-start": {        		
                 // INSERIMENTO VARIABILI FLUSSO
                 execution.setVariable("titolo", "Scheda " + execution.getVariable("tipoAttivita") + " - " + execution.getVariable("initiator"));
                 execution.setVariable("descrizione", "Scheda Attività - " + execution.getVariable("mese") + " " + execution.getVariable("anno"));
@@ -151,8 +147,10 @@ public class ManageCovid19_v1 implements ExecutionListener {
                 }
             }
 			break;
-            case "modifica-end": {
-
+            case "modifica-start": {
+            	//AGGIORNA DIRETTORE
+        		BossDto utenteBoss = aceService.bossDirettoreByUsername(execution.getVariable("initiator").toString());
+        		execution.setVariable("direttore", utenteBoss.getNome() + " " +  utenteBoss.getCognome());
             }
 			break;
             case "protocollo-end": {
