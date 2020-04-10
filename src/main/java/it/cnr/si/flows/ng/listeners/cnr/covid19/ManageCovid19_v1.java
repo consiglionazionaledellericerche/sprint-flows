@@ -132,6 +132,8 @@ public class ManageCovid19_v1 implements ExecutionListener {
 
                 if (tipoAttivita.equals("rendicontazione")) {
                     labelFile = "Rendicontazione Attività Personale";
+                    execution.setVariable("modalita", null);
+                    execution.setVariable("dataAvvioSmartWorking", null);
                 } else {
                     labelFile = "Programmazione Attività Personale";
                 }
