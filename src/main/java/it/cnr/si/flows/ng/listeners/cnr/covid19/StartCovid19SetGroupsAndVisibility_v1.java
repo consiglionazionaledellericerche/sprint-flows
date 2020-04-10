@@ -11,6 +11,7 @@ import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
+import it.cnr.si.service.dto.anagrafica.scritture.TipoEntitaOrganizzativaDto;
 import it.cnr.si.service.dto.anagrafica.scritture.UtenteDto;
 
 import org.activiti.engine.ManagementService;
@@ -82,14 +83,28 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 		}
 		// VERIFICA DIRETTORE
 		String usernameDirettoreSiper = "";
+		Integer tipologiaStrutturaUtente = aceBridgeService.getAfferenzaUtente(initiator.toString()).getTipo().getId();
 
-		try {
-			direttoreAce = aceService.bossLevelByUsername(0,initiator);
-			usernameDirettoreAce = direttoreAce.getUsername();
-			IdEntitaOrganizzativaDirettore = direttoreAce.getIdEntitaOrganizzativa();
-		} catch(UnexpectedResultException | FeignException e) {
-			cdsuoAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(initiator.toString()).get("codice_uo").toString();
-			throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + initiator + " <br>Si prega di contattare l'help desk in merito<br>");
+		if((tipologiaStrutturaUtente != null) && ((tipologiaStrutturaUtente == 1) || (tipologiaStrutturaUtente == 21) || (tipologiaStrutturaUtente == 23) | (tipologiaStrutturaUtente == 24))) {
+			try {
+				direttoreAce = aceService.bossDirettoreByUsername(initiator);
+				usernameDirettoreAce = direttoreAce.getUsername();
+				IdEntitaOrganizzativaDirettore = direttoreAce.getIdEntitaOrganizzativa();
+			} catch(UnexpectedResultException | FeignException e) {
+				cdsuoAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(initiator.toString()).get("codice_uo").toString();
+				throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + initiator + " <br>Si prega di contattare l'help desk in merito<br>");
+			}
+
+		} else {
+
+			try {
+				direttoreAce = aceService.bossLevelByUsername(0,initiator);
+				usernameDirettoreAce = direttoreAce.getUsername();
+				IdEntitaOrganizzativaDirettore = direttoreAce.getIdEntitaOrganizzativa();
+			} catch(UnexpectedResultException | FeignException e) {
+				cdsuoAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(initiator.toString()).get("codice_uo").toString();
+				throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + initiator + " <br>Si prega di contattare l'help desk in merito<br>");
+			}
 		}
 
 		try {
