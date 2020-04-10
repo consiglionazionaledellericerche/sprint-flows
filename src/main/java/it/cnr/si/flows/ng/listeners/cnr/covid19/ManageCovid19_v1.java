@@ -132,11 +132,6 @@ public class ManageCovid19_v1 implements ExecutionListener {
                     valoreParamJson.put("dataAvvioSmartWorking", execution.getVariable("dataAvvioSmartWorking"));
                 }
 
-
-                //esempio:
-                // "{'matricola' : '15221','cds': 'ASR','direttore': 'MAURIZIO LANCIA','mese': 'Marzo','attivita_svolta': 'Ho partecipato a svariate riunioni<br>e ho svilupòpato<BR> ed ho lavorato per molto tempo'}"
-
-
                 String valoreParam = valoreParamJson.toString();
 
                 if (tipoAttivita.equals("rendicontazione")) {
