@@ -157,15 +157,9 @@ public class ManageCovid19_v1 implements ExecutionListener {
 		break;
 		case "modifica-start": {
 			//AGGIORNA DIRETTORE
-			Integer tipologiaStrutturaUtente = aceBridgeService.getAfferenzaUtente(execution.getVariable("initiator").toString()).getTipo().getId();
-			if((tipologiaStrutturaUtente != null) && ((tipologiaStrutturaUtente == 1) || (tipologiaStrutturaUtente == 21) || (tipologiaStrutturaUtente == 23) | (tipologiaStrutturaUtente == 24))) {
-				BossDto utenteBoss = aceService.bossDirettoreByUsername(execution.getVariable("initiator").toString());
-				execution.setVariable("direttore", utenteBoss.getNome() + " " +  utenteBoss.getCognome());
-			} else {
-
-				BossDto utenteBoss = aceService.bossLevelByUsername(0, execution.getVariable("initiator").toString());
-				execution.setVariable("direttore", utenteBoss.getNome() + " " +  utenteBoss.getCognome());
-			}
+			
+			BossDto utenteBoss = aceService.bossFirmatarioByUsername(execution.getVariable("initiator").toString());
+			execution.setVariable("direttore", utenteBoss.getNome() + " " +  utenteBoss.getCognome());
 		}
 		case "protocollo-end": {
 			if (sceltaUtente != null && sceltaUtente.equals("Protocolla")) {
