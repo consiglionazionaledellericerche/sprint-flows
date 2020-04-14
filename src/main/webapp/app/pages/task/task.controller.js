@@ -62,6 +62,10 @@
 				if ([21, 23].includes(Number(vm.taskVariables["strumentoAcquisizioneId"])))
 					$scope.data["tipologiaProceduraSelettiva"] = vm.taskVariables["tipologiaProceduraSelettiva"];
 
+				// TODO: rimuovere i casi specifici e sostituire con gestione di casi generali
+				$scope.data['attivita'] = vm.taskVariables["attivita"]
+				$scope.data['modalita'] = vm.taskVariables["modalita"]
+				
 				dataService.draft.getDraftByTaskId($state.params.taskId, null).then(
                     function(response){
                         //popolo i campi col contenuto del json
