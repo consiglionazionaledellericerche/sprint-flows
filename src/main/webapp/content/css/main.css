@@ -659,3 +659,12 @@ select.ng-touched.ng-invalid {
 [data-trix-button-group="history-tools"]{
     display: none!important;
 }
+
+@media screen and (max-width: 425px) {
+    .label {
+        white-space: normal;
+    }
+    .banner {
+        display: none;
+    }
+}
