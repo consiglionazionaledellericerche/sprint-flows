@@ -1,6 +1,7 @@
 package it.cnr.si.flows.ng.service;
 
 import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
+import it.cnr.si.firmadigitale.firma.arss.stub.PdfSignApparence;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
 import org.activiti.engine.delegate.BpmnError;
@@ -26,7 +27,7 @@ public class FirmaDocumentoService {
     @Inject
     private FlowsAttachmentService flowsAttachmentService;
 
-    public void eseguiFirma(DelegateExecution execution, String nomeVariabileFile) {
+    public void eseguiFirma(DelegateExecution execution, String nomeVariabileFile, PdfSignApparence apparence) {
 
         if (nomeVariabileFile == null)
             throw new IllegalStateException("Questo Listener ha bisogno del campo 'nomeFileDaFirmare' nella process definition (nel Task Listener - Fields).");
@@ -45,7 +46,7 @@ public class FirmaDocumentoService {
             byte[] bytes = flowsAttachmentService.getAttachmentContentBytes(att);
 
             try {
-                byte[] bytesfirmati = flowsFirmaService.firma(username, password, otp, bytes);
+                byte[] bytesfirmati = flowsFirmaService.firma(username, password, otp, bytes, apparence);
                 att.setFilename(getSignedFilename(att.getFilename()));
                 att.setAzione(Firma);
                 att.addStato(Firmato);

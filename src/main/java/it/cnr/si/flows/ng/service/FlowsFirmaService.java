@@ -79,14 +79,13 @@ public class FlowsFirmaService {
         this.props = props;
     }
 
-    public byte[] firma(String username, String password, String otp, byte[] bytes) throws ArubaSignServiceException {
+    public byte[] firma(String username, String password, String otp, byte[] bytes, PdfSignApparence apparence) throws ArubaSignServiceException {
 
         // TODO verificare se poter usare un singolo client, e non ricrearlo ogni volta
         ArubaSignServiceClient client = new ArubaSignServiceClient();
 
         client.setProps(props);
 
-        PdfSignApparence apparence = getApparence();
         Auth identity = getIdentity(username, password, otp);
 
         byte[] signed = pdfsignatureV2(identity, bytes, apparence);
@@ -117,25 +116,6 @@ public class FlowsFirmaService {
         } catch (TypeOfTransportNotImplemented_Exception e) {
             throw new ArubaSignServiceException("error while invoking pdfsignatureV2", e);
         }
-    }
-
-    /**
-     * TODO Convenire su un formato adeguato per la firma grafica, se la si vuole
-     *
-     * @return
-     */
-    private PdfSignApparence getApparence() {
-//
-//      PdfSignApparence apparence = new PdfSignApparence();
-//      apparence.setLeftx(100);
-//      apparence.setLefty(100);
-//      apparence.setRightx(300);
-//      apparence.setRighty(200);
-//      apparence.setPage(1);
-//      apparence.setLocation("Rome");
-//
-//      apparence.setTesto("Firmato digitalmente da "+ username +" in data "+ new Date());
-        return null;
     }
 
     /**

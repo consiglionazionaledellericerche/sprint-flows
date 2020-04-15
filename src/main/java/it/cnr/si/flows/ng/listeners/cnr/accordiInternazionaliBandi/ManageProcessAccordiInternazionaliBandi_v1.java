@@ -108,7 +108,7 @@ public class ManageProcessAccordiInternazionaliBandi_v1 implements ExecutionList
 		case "firma-verbale-end": {
 
 			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
-				firmaDocumentoService.eseguiFirma(execution, "verbale");
+				firmaDocumentoService.eseguiFirma(execution, "verbale", null);
 			}
 		};break; 
 		case "protocollo-verbale-end": {

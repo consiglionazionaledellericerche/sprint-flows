@@ -122,7 +122,7 @@ public class ManageProcessShortTermMobilityBandoDipartimento_v1 implements Execu
 		case "firma-graduatoria-end": {
 
 			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
-				firmaDocumentoService.eseguiFirma(execution, "graduatoria");
+				firmaDocumentoService.eseguiFirma(execution, "graduatoria", null);
 			}
 		};break; 
 		case "protocollo-graduatoria-end": {
