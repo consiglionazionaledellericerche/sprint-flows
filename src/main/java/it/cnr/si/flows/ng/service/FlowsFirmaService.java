@@ -94,7 +94,7 @@ public class FlowsFirmaService {
         return signed;
     }
 
-    public List<SignReturnV2> firmaMultipla(String username, String password, String otp, List<byte[]> files) throws ArubaSignServiceException {
+    public List<SignReturnV2> firmaMultipla(String username, String password, String otp, List<byte[]> files, PdfSignApparence pdfSignApparence) throws ArubaSignServiceException {
 
         ArubaSignService service = getServicePort();
         Auth identity = getIdentity(username, password, otp);
@@ -105,7 +105,7 @@ public class FlowsFirmaService {
                     .collect(Collectors.toList());
 
             SignReturnV2Multiple signReturnV2Multiple =
-                    service.pdfsignatureV2Multiple(identity, requests, null, PdfProfile.fromValue(RemotePdfprofile), null);
+                    service.pdfsignatureV2Multiple(identity, requests, pdfSignApparence, PdfProfile.fromValue(RemotePdfprofile), null);
 
             if (signReturnV2Multiple.getStatus().equals("OK")) {
                 return signReturnV2Multiple.getReturnSigns();
