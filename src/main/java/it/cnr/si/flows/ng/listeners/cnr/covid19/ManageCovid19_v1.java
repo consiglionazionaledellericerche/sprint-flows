@@ -18,17 +18,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Properties;
 
 @Component
 @Profile("cnr")
@@ -62,8 +58,8 @@ public class ManageCovid19_v1 implements ExecutionListener {
     private AceBridgeService aceBridgeService;
     @Inject
     private AceService aceService;
-	@Inject
-	private PdfSignApparence covid19Apparence;
+    @Inject
+    private PdfSignApparence monitoraggioAttivitaCovid19;
 
     private Expression faseEsecuzione;
 
@@ -156,7 +152,7 @@ public class ManageCovid19_v1 implements ExecutionListener {
             break;
             case "firma-end": {
                 if (sceltaUtente != null && sceltaUtente.equals("Firma")) {
-                    firmaDocumentoService.eseguiFirma(execution, Enum.PdfType.valueOf("monitoraggioAttivitaCovid19").name(), covid19Apparence);
+                    firmaDocumentoService.eseguiFirma(execution, Enum.PdfType.valueOf("monitoraggioAttivitaCovid19").name(), monitoraggioAttivitaCovid19);
                 }
             }
             break;
@@ -190,7 +186,7 @@ public class ManageCovid19_v1 implements ExecutionListener {
         }
     }
 
-    @Bean(name = {"covid19Apparence"})
+    @Bean(name = {"monitoraggioAttivitaCovid19"})
     @ConfigurationProperties(prefix = "cnr.firma.covid19")
     public CNRPdfSignApparence create() throws IOException {
         return new CNRPdfSignApparence();
