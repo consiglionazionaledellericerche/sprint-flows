@@ -1,6 +1,6 @@
 cnr:
   firma:
-    imagepath: ./src/main/resources/print/firma_digitale.png
+    imagepath: print/firma_digitale.png
     covid19:
       imagepath: ${cnr.firma.imagepath}
       page: 1

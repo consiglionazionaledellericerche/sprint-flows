@@ -102,7 +102,6 @@
 
 			if ($scope.taskForm.$invalid) {
 				angular.forEach($scope.taskForm.$error, function (field) {
-					console.log(field);
 					angular.forEach(field, function (errorField) {
 						errorField.$setTouched();
 					});
