@@ -16,7 +16,8 @@
             templateUrl: 'app/inputs/wysiwyg/wysiwyg.html',
             scope: {
                 ngModel: '=',
-                ngRequired: '@'
+                ngRequired: '@',
+                placeholder: '@'
             },
             link: function($scope, element, attrs) {
             	
