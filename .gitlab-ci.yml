@@ -36,14 +36,16 @@ test:
 
 build_dev:
   stage: build
-  only: dev
+  only: 
+    - dev
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   script:
     - mvn -B clean compile package deploy -DskipTests -U
 
 build:
   stage: build
-  except: dev
+  except: 
+    - dev
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   script:
     - mvn -B clean compile package deploy -DskipTests -Pprod -U
