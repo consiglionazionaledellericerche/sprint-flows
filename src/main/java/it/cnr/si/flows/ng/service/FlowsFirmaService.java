@@ -94,6 +94,11 @@ public class FlowsFirmaService {
 
 		return signed;
 	}
+	
+	public List<SignReturnV2> firmaMultipla(String username, String password, String otp, List<byte[]> files) throws ArubaSignServiceException {
+		return firmaMultipla(username, password, otp, files, null);
+	}
+
 
 	public List<SignReturnV2> firmaMultipla(String username, String password, String otp, List<byte[]> files, PdfSignApparence pdfSignApparence) throws ArubaSignServiceException {
 
