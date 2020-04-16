@@ -49,7 +49,7 @@ public class FirmaServiceTest {
         byte[] bytes = Files.readAllBytes(Paths.get("./src/test/resources/pdf-test/summaryCreato.pdf"));
         
         try {
-            byte[] bytesfirmati = firmaService.firma(username, password, otp, bytes);
+            byte[] bytesfirmati = firmaService.firma(username, password, otp, bytes, null);
             Files.write(Paths.get("./src/test/resources/pdf-test/summaryFirmato.pdf"), bytesfirmati);
             
         } catch (ArubaSignServiceException e) {

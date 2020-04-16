@@ -1,0 +1,24 @@
+<p class="input-group">
+  <input type="text" 
+    class="form-control" 
+    uib-datepicker-popup="dd/MM/yyyy" 
+    ng-model="ngModel" 
+    is-open="isOpen"
+    current-text="Oggi"
+    close-text="Chiudi"
+    clear-text="Svuota"
+    alt-input-formats="altInputFormats"
+    ng-required="ngRequired"\
+    ng-readonly="true"
+    ng-click="open()"
+    />
+    
+ <span class="input-group-btn">
+    <button 
+      type="button" 
+      class="btn btn-default" 
+      ng-click="open()">
+        <i class="glyphicon glyphicon-calendar"></i>
+    </button>
+  </span>
+</p>
