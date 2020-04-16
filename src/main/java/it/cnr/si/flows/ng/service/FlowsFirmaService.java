@@ -35,180 +35,161 @@ import org.springframework.stereotype.Service;
 @Service
 public class FlowsFirmaService {
 
-    private static final Logger LOGGER = Logger
-            .getLogger(FlowsFirmaService.class);
-    private static final String STATUS_OK = "OK";
-    private static final String CERT_ID = "arubaRemoteSignService.certId";
-    private static final String URL = "arubaRemoteSignService.url";
-    private static final String TYPE_OTP_AUTH = "arubaRemoteSignService.typeOtpAuth";
+	private static final Logger LOGGER = Logger
+			.getLogger(FlowsFirmaService.class);
+	private static final String STATUS_OK = "OK";
+	private static final String CERT_ID = "arubaRemoteSignService.certId";
+	private static final String URL = "arubaRemoteSignService.url";
+	private static final String TYPE_OTP_AUTH = "arubaRemoteSignService.typeOtpAuth";
 
-    private Properties props;
+	private Properties props;
 
-    public static final Map<String, String> NOME_FILE_FIRMA = new HashMap<String, String>() {{
-        put("firma-decisione", "decisioneContrattare");
-        put("firma-provvedimento-aggiudicazione", "provvedimentoAggiudicazione");
-        put("firma-revoca", "ProvvedimentoDiRevoca");
-        put("firma-contratto", "contratto");
-        put("firma-verbale", "verbale");
-        put("firma", "monitoraggioAttivitaCovid19");
-    }};
+	public static final Map<String, String> NOME_FILE_FIRMA = new HashMap<String, String>() {{
+		put("firma-decisione", "decisioneContrattare");
+		put("firma-provvedimento-aggiudicazione", "provvedimentoAggiudicazione");
+		put("firma-revoca", "ProvvedimentoDiRevoca");
+		put("firma-contratto", "contratto");
+		put("firma-verbale", "verbale");
+		put("firma", "monitoraggioAttivitaCovid19");
+		put("firma-graduatoria", "graduatoria");
+	}};
 
-    public static final Map<String, String> ERRORI_ARUBA = new HashMap<String, String>() {{
-        put("0001", "Formato file errato");
-        put("0003", "Credenziali errate");
-        put("0004", "PIN errato");
-    }};
+	public static final Map<String, String> ERRORI_ARUBA = new HashMap<String, String>() {{
+		put("0001", "Formato file errato");
+		put("0003", "Credenziali errate");
+		put("0004", "PIN errato");
+	}};
 
-    @Value("${cnr.firma.signcertid}")
-    private String RemoteSignServiceCertId;
-    @Value("${cnr.firma.typeotpauth}")
-    private String RemoteSignServiceTypeOtpAuth;
-    @Value("${cnr.firma.url}")
-    private String RemoteSignServiceUrl;
-    @Value("${cnr.firma.pdfprofile}")
-    private String RemotePdfprofile;
+	@Value("${cnr.firma.signcertid}")
+	private String RemoteSignServiceCertId;
+	@Value("${cnr.firma.typeotpauth}")
+	private String RemoteSignServiceTypeOtpAuth;
+	@Value("${cnr.firma.url}")
+	private String RemoteSignServiceUrl;
+	@Value("${cnr.firma.pdfprofile}")
+	private String RemotePdfprofile;
 
-    @PostConstruct
-    public void init() {
-        Properties props = new Properties();
-        props.setProperty("arubaRemoteSignService.url", RemoteSignServiceUrl);
-        props.setProperty("arubaRemoteSignService.typeOtpAuth", RemoteSignServiceTypeOtpAuth);
-        props.setProperty("arubaRemoteSignService.certId", RemoteSignServiceCertId);
-        props.setProperty("arubaRemoteSignService.pdfprofile", RemotePdfprofile);
+	@PostConstruct
+	public void init() {
+		Properties props = new Properties();
+		props.setProperty("arubaRemoteSignService.url", RemoteSignServiceUrl);
+		props.setProperty("arubaRemoteSignService.typeOtpAuth", RemoteSignServiceTypeOtpAuth);
+		props.setProperty("arubaRemoteSignService.certId", RemoteSignServiceCertId);
+		props.setProperty("arubaRemoteSignService.pdfprofile", RemotePdfprofile);
 
-        this.props = props;
-    }
+		this.props = props;
+	}
 
-    public byte[] firma(String username, String password, String otp, byte[] bytes) throws ArubaSignServiceException {
+	public byte[] firma(String username, String password, String otp, byte[] bytes, PdfSignApparence apparence) throws ArubaSignServiceException {
 
-        // TODO verificare se poter usare un singolo client, e non ricrearlo ogni volta
-        ArubaSignServiceClient client = new ArubaSignServiceClient();
+		// TODO verificare se poter usare un singolo client, e non ricrearlo ogni volta
+		ArubaSignServiceClient client = new ArubaSignServiceClient();
 
-        client.setProps(props);
+		client.setProps(props);
 
-        PdfSignApparence apparence = getApparence();
-        Auth identity = getIdentity(username, password, otp);
+		Auth identity = getIdentity(username, password, otp);
 
-        byte[] signed = pdfsignatureV2(identity, bytes, apparence);
-//        byte[] out = client.verify(signed);
+		byte[] signed = pdfsignatureV2(identity, bytes, apparence);
+		//        byte[] out = client.verify(signed);
 
-        return signed;
-    }
+		return signed;
+	}
 
-    public List<SignReturnV2> firmaMultipla(String username, String password, String otp, List<byte[]> files) throws ArubaSignServiceException {
+	public List<SignReturnV2> firmaMultipla(String username, String password, String otp, List<byte[]> files, PdfSignApparence pdfSignApparence) throws ArubaSignServiceException {
 
-        ArubaSignService service = getServicePort();
-        Auth identity = getIdentity(username, password, otp);
+		ArubaSignService service = getServicePort();
+		Auth identity = getIdentity(username, password, otp);
 
-        try {
-            List<SignRequestV2> requests = files.stream()
-                    .map(b -> getRequest(identity, b))
-                    .collect(Collectors.toList());
+		try {
+			List<SignRequestV2> requests = files.stream()
+					.map(b -> getRequest(identity, b))
+					.collect(Collectors.toList());
 
-            SignReturnV2Multiple signReturnV2Multiple =
-                    service.pdfsignatureV2Multiple(identity, requests, null, PdfProfile.fromValue(RemotePdfprofile), null);
+			SignReturnV2Multiple signReturnV2Multiple =
+					service.pdfsignatureV2Multiple(identity, requests, pdfSignApparence, PdfProfile.fromValue(RemotePdfprofile), null);
 
-            if (signReturnV2Multiple.getStatus().equals("OK")) {
-                return signReturnV2Multiple.getReturnSigns();
-            } else
-                throw new ArubaSignServiceException(signReturnV2Multiple.getReturnCode());
+			if (signReturnV2Multiple.getStatus().equals("OK")) {
+				return signReturnV2Multiple.getReturnSigns();
+			} else
+				throw new ArubaSignServiceException(signReturnV2Multiple.getReturnCode());
 
 
-        } catch (TypeOfTransportNotImplemented_Exception e) {
-            throw new ArubaSignServiceException("error while invoking pdfsignatureV2", e);
-        }
-    }
+		} catch (TypeOfTransportNotImplemented_Exception e) {
+			throw new ArubaSignServiceException("error while invoking pdfsignatureV2", e);
+		}
+	}
 
-    /**
-     * TODO Convenire su un formato adeguato per la firma grafica, se la si vuole
-     *
-     * @return
-     */
-    private PdfSignApparence getApparence() {
-//
-//      PdfSignApparence apparence = new PdfSignApparence();
-//      apparence.setLeftx(100);
-//      apparence.setLefty(100);
-//      apparence.setRightx(300);
-//      apparence.setRighty(200);
-//      apparence.setPage(1);
-//      apparence.setLocation("Rome");
-//
-//      apparence.setTesto("Firmato digitalmente da "+ username +" in data "+ new Date());
-        return null;
-    }
+	/**
+	 *  Questo e' il metodo personalizzato da firmadigitale-1.11.jar
+	 */
+	private byte[] pdfsignatureV2(Auth identity, byte[] bytes,
+			PdfSignApparence apparence) throws ArubaSignServiceException {
 
-    /**
-     *  Questo e' il metodo personalizzato da firmadigitale-1.11.jar
-     */
-    private byte[] pdfsignatureV2(Auth identity, byte[] bytes,
-                                  PdfSignApparence apparence) throws ArubaSignServiceException {
+		ArubaSignService service = getServicePort();
+		LOGGER.debug("version " + service.getVersion());
 
-        ArubaSignService service = getServicePort();
-        LOGGER.debug("version " + service.getVersion());
+		try {
+			SignRequestV2 req = getRequest(identity, bytes);
 
-        try {
-            SignRequestV2 req = getRequest(identity, bytes);
+			SignReturnV2 response = service.pdfsignatureV2(req, apparence,
+					PdfProfile.fromValue(RemotePdfprofile), null, null);
 
-            SignReturnV2 response = service.pdfsignatureV2(req, apparence,
-                    PdfProfile.fromValue(RemotePdfprofile), null, null);
+			LOGGER.debug(response.getReturnCode() + " " + response.getStatus());
 
-            LOGGER.debug(response.getReturnCode() + " " + response.getStatus());
+			if (response.getStatus().equals(STATUS_OK)) {
+				return response.getBinaryoutput();
+			} else {
+				throw new ArubaSignServiceException("Server side error code "
+						+ response.getReturnCode() + ", "
+						+ response.getStatus());
+			}
 
-            if (response.getStatus().equals(STATUS_OK)) {
-                return response.getBinaryoutput();
-            } else {
-                throw new ArubaSignServiceException("Server side error code "
-                        + response.getReturnCode() + ", "
-                        + response.getStatus());
-            }
+		} catch (TypeOfTransportNotImplemented_Exception e) {
+			throw new ArubaSignServiceException(
+					"error while invoking pdfsignatureV2", e);
+		}
+	}
 
-        } catch (TypeOfTransportNotImplemented_Exception e) {
-            throw new ArubaSignServiceException(
-                    "error while invoking pdfsignatureV2", e);
-        }
-    }
+	/**
+	 * Questo metodo di utilita' e' ricopiato dalla libreria perche' e' privato
+	 */
+	private ArubaSignService getServicePort() throws ArubaSignServiceException {
+		URL url;
+		try {
+			url = new URL(props.getProperty(URL));
+			LOGGER.debug(url);
+		} catch (MalformedURLException e) {
+			throw new ArubaSignServiceException("URL: " + URL, e);
+		}
+		QName qname = new QName("http://arubasignservice.arubapec.it/",
+				"ArubaSignServiceService");
+		return new ArubaSignServiceService(url, qname)
+				.getArubaSignServicePort();
+	}
 
-    /**
-     * Questo metodo di utilita' e' ricopiato dalla libreria perche' e' privato
-     */
-    private ArubaSignService getServicePort() throws ArubaSignServiceException {
-        URL url;
-        try {
-            url = new URL(props.getProperty(URL));
-            LOGGER.debug(url);
-        } catch (MalformedURLException e) {
-            throw new ArubaSignServiceException("URL: " + URL, e);
-        }
-        QName qname = new QName("http://arubasignservice.arubapec.it/",
-                "ArubaSignServiceService");
-        return new ArubaSignServiceService(url, qname)
-                .getArubaSignServicePort();
-    }
+	/**
+	 * Questo metodo di utilita' e' ricopiato dalla libreria perche' e' privato
+	 */
+	private SignRequestV2 getRequest(Auth identity, byte[] bytes) {
+		SignRequestV2 request = new SignRequestV2();
+		request.setIdentity(identity);
+		request.setCertID(props.getProperty(CERT_ID));
+		request.setTransport(TypeTransport.BYNARYNET);
+		request.setBinaryinput(bytes);
 
-    /**
-     * Questo metodo di utilita' e' ricopiato dalla libreria perche' e' privato
-     */
-    private SignRequestV2 getRequest(Auth identity, byte[] bytes) {
-        SignRequestV2 request = new SignRequestV2();
-        request.setIdentity(identity);
-        request.setCertID(props.getProperty(CERT_ID));
-        request.setTransport(TypeTransport.BYNARYNET);
-        request.setBinaryinput(bytes);
+		return request;
+	}
 
-        return request;
-    }
+	/**
+	 * Questo metodo di utilita' e' ricopiato dalla libreria perche' e' privato
+	 */
+	private Auth getIdentity(String username, String password, String otp) {
 
-    /**
-     * Questo metodo di utilita' e' ricopiato dalla libreria perche' e' privato
-     */
-    private Auth getIdentity(String username, String password, String otp) {
-
-        Auth identity = new Auth();
-        identity.setUser(username);
-        identity.setUserPWD(password);
-        identity.setOtpPwd(otp);
-        identity.setTypeOtpAuth(props.getProperty(TYPE_OTP_AUTH));
-        return identity;
-    }
+		Auth identity = new Auth();
+		identity.setUser(username);
+		identity.setUserPWD(password);
+		identity.setOtpPwd(otp);
+		identity.setTypeOtpAuth(props.getProperty(TYPE_OTP_AUTH));
+		return identity;
+	}
 }

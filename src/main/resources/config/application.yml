@@ -1,0 +1,10 @@
+cnr:
+  firma:
+    imagepath: ./src/main/resources/print/firma_digitale.png
+    covid19:
+      imagepath: ${cnr.firma.imagepath}
+      page: 1
+      leftx: 350
+      lefty: 50
+      rightx: 550
+      righty: 120

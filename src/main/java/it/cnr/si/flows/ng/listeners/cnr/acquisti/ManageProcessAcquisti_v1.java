@@ -565,7 +565,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			};break;  
 			case "firma-decisione-end": {
 				if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
-					firmaDocumentoService.eseguiFirma(execution, "decisioneContrattare");
+					firmaDocumentoService.eseguiFirma(execution, "decisioneContrattare", null);
 				}
 			};break; 
 			case "protocollo-decisione-end": {
@@ -623,7 +623,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			};break; 
 			case "firma-provvedimento-aggiudicazione-end": {
 				if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
-					firmaDocumentoService.eseguiFirma(execution, "provvedimentoAggiudicazione");
+					firmaDocumentoService.eseguiFirma(execution, "provvedimentoAggiudicazione", null);
 				}
 			};break;  
 			case "protocollo-provvedimento-aggiudicazione-end": {
@@ -653,7 +653,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			};break;
 			case "firma-contratto-end": {
 				if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
-					firmaDocumentoService.eseguiFirma(execution, "contratto");
+					firmaDocumentoService.eseguiFirma(execution, "contratto", null);
 					execution.setVariable("usernameFirmatarioContratto", SecurityUtils.getCurrentUserLogin());
 					Date dataStipulaContratto = new Date();
 					execution.setVariable("dataStipulaContratto", dataStipulaContratto);	
@@ -744,7 +744,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			// START REVOCA
 
 			case "firma-revoca-end": {
-				firmaDocumentoService.eseguiFirma(execution, "ProvvedimentoDiRevoca");
+				firmaDocumentoService.eseguiFirma(execution, "ProvvedimentoDiRevoca", null);
 			};break; 
 			case "protocollo-revoca-end": {
 				if(sceltaUtente != null && sceltaUtente.equals("Protocolla")) {
