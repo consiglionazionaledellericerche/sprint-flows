@@ -21,8 +21,8 @@ cache:
 stages:
   - test
   - deploy_snapshot
-  - build_container
-  - deploy_container
+  - build_test_container
+  - deploy_test_container
   - release
   - build_prod_container
   - deploy_prod_container
@@ -43,8 +43,8 @@ deploy_snapshot:
   script:
     - mvn -B clean compile package deploy -DskipTests -Pprod -U
 
-buildcontainer:
-  stage: build_container
+buildtestcontainer:
+  stage: build_test_container
   tags:
     - shared
   only:
@@ -57,7 +57,7 @@ buildcontainer:
 
 
 deploydockertest01e02:
-  stage: deploy_container
+  stage: deploy_test_container
   image: scolagreco/alpine-ssh:latest
   tags:
     - shared
