@@ -4,7 +4,7 @@ cnr:
     covid19:
       imagepath: ${cnr.firma.imagepath}
       page: 1
-      leftx: 300
+      leftx: 350
       lefty: 50
       rightx: 550
       righty: 120
