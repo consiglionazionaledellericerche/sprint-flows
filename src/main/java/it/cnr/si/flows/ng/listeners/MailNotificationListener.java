@@ -236,7 +236,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
 									.forEach(groupVariableName -> {
 										LOGGER.debug("groupVariableName: {}", groupVariableName);
 										String groupName = (String) groupVariableName;
-										List<String> members = membershipService.getAllUsersInGroup(groupName);
+										Set<String> members = membershipService.getAllUsersInGroup(groupName);
 										LOGGER.debug("Invio la mail {} al gruppo {} con utenti {}", nt, groupName, members);
 										members.forEach(member -> {
 											mailService.sendFlowEventNotification(nt, variables, tn, member, groupName);
