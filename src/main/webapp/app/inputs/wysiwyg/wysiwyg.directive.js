@@ -13,28 +13,40 @@
     function wysiwyg(dataService, $log) {
         return {
             restrict: 'E',
+            require: 'ngModel',
             templateUrl: 'app/inputs/wysiwyg/wysiwyg.html',
             scope: {
                 ngModel: '=',
                 ngRequired: '@',
                 placeholder: '@'
             },
-            link: function($scope, element, attrs) {
+            link: function($scope, element, attrs, ngModel) {
             	
-            	// workaround necessario se ci sono piu' editor sulla stessa pagina
-            	// bug: angular non aggiorna le classi css
-            	var events = ['trixInitialize', 'trixChange', 'trixSelectionChange', 'trixFocus', 'trixBlur', 'trixFileAccept', 'trixAttachmentAdd', 'trixAttachmentRemove'];
-            	for (var i = 0; i < events.length; i++) {
-            	    $scope[events[i]] = function(e, editor) {
-            	        console.log('Event type:', e.type);
-            	    }
-            	};
+            	var editorElement = element[0].children[1];
+            	var editor = editorElement.editor;
             	
+                ngModel.$render = function() {
+                    if (editor) {
+                    	editor.loadHTML(ngModel.$modelValue);
+                    }
+                    
+                    editorElement.addEventListener('trix-change', function() {
+                    	ngModel.$setViewValue(editorElement.innerHTML)
+                    });
+                    
+                    editorElement.addEventListener('trix-blur', function() {
+                    	if (!editorElement.innerHTML)
+                    		element[0].classList.add('ng-touched')
+                    });
+                };
             	
                 if ('autofill' in attrs) {
                     var nomeModelId = attrs.ngModel.split('.').pop();
                     $scope.ngModel = $scope.$parent.data.entity.variabili[nomeModelId];
-                }   
+                }
+                if ('placeholder' in attrs) {
+                	$(editorElement).attr('placeholder',$scope.placeholder);
+                }
             }
         };
     }
