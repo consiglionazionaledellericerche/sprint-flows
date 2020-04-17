@@ -369,7 +369,7 @@ textarea.ng-touched.ng-invalid,
 div.ng-touched.ng-invalid,
 cnr-tree.ng-touched.ng-invalid > .jstree-bootstrap,
 select.ng-touched.ng-invalid,
-trix-editor.ng-touched.ng-invalid {
+wysiwyg.ng-touched.ng-invalid > trix-editor {
   border: solid 1px red;
 }
 

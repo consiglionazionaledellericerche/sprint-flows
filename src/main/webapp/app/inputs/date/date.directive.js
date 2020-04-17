@@ -12,7 +12,7 @@
 			templateUrl: 'app/inputs/date/date.html',
 			scope: {
 				ngModel: '=',
-				ngRequired: '@'
+				ngRequired: '='
 			},
 			link: function($scope, element, attrs) {
 
