@@ -10,6 +10,6 @@ import it.cnr.si.firmadigitale.firma.arss.stub.PdfSignApparence;
 public class CNRPdfSignApparence extends PdfSignApparence {
 	public void setImagepath(String imagepath) throws IOException {
 		InputStream reasourceStream = getClass().getClassLoader().getResourceAsStream(imagepath);
-		IOUtils.toByteArray(reasourceStream);
+		setImageBin(IOUtils.toByteArray(reasourceStream));
 	}
 }
