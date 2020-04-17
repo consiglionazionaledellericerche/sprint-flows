@@ -1,17 +1,18 @@
 package it.cnr.si.flows.ng.service;
 
 import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
+import it.cnr.si.firmadigitale.firma.arss.stub.PdfSignApparence;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.Date;
-import java.util.List;
 
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Firma;
 import static it.cnr.si.flows.ng.utils.Enum.Stato.Firmato;
@@ -21,12 +22,12 @@ import static it.cnr.si.flows.ng.utils.Enum.Stato.Firmato;
 public class FirmaDocumentoService {
     private static final Logger LOGGER = LoggerFactory.getLogger(FirmaDocumentoService.class);
 
-    @Inject
+    @Autowired(required = false)
     private FlowsFirmaService flowsFirmaService;
     @Inject
     private FlowsAttachmentService flowsAttachmentService;
 
-    public void eseguiFirma(DelegateExecution execution, String nomeVariabileFile) {
+    public void eseguiFirma(DelegateExecution execution, String nomeVariabileFile, PdfSignApparence apparence) {
 
         if (nomeVariabileFile == null)
             throw new IllegalStateException("Questo Listener ha bisogno del campo 'nomeFileDaFirmare' nella process definition (nel Task Listener - Fields).");
@@ -45,7 +46,7 @@ public class FirmaDocumentoService {
             byte[] bytes = flowsAttachmentService.getAttachmentContentBytes(att);
 
             try {
-                byte[] bytesfirmati = flowsFirmaService.firma(username, password, otp, bytes);
+                byte[] bytesfirmati = flowsFirmaService.firma(username, password, otp, bytes, apparence);
                 att.setFilename(getSignedFilename(att.getFilename()));
                 att.setAzione(Firma);
                 att.addStato(Firmato);
