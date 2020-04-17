@@ -13,18 +13,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -36,14 +35,14 @@ import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.initiator;
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.titolo;
 import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
 import static it.cnr.si.flows.ng.utils.Utils.ASC;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.springframework.http.HttpStatus.OK;
 
 
+@SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles(profiles = "native,showcase,unittests")
+@EnableTransactionManagement
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "test,cnr")
 public class FlowsTaskResourceTest {
 
     private static final String FIRST_TASK_NAME = "Verifica Decisione";
@@ -90,13 +89,9 @@ public class FlowsTaskResourceTest {
 
         flowsTaskResource.claimTask(util.getFirstTaskId());
 
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        String content = "{\"processParams\":" +
-                "[{\"key\":\"" + titolo + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
-                "{\"key\":\"" + initiator + "\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
-                "\"taskParams\":" +
-                "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
-//        request.setContent(content.getBytes());
+        String content = "[{\"type\":\"text=\",\"key\":\"" + titolo + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\"}," +
+                "{\"type\":\"text=\",\"key\":\"Fase\",\"value\":\"Verifica Decisione\"},"+
+                "{\"type\":\"text=\",\"key\":\"" + initiator + "\",\"value\":\"" + TestServices.getRA() + "\"}]";
         response = flowsTaskResource.getMyTasks(ALL_PROCESS_INSTANCES, 0, 100, ASC, content);
         myTasks = (ArrayList) response.getBody().getData();
         assertEquals(1, response.getBody().getSize());
@@ -205,53 +200,70 @@ public class FlowsTaskResourceTest {
     public void testTaskAssignedInMyGroups() throws Exception {
         processInstance = util.mySetUp(acquisti);
 
-        //sfd NON deve vedere NESSUN Task prima dell'assegnazione del task a responsabileAcquisti2
+        //sfd NON deve vedere NESSUN Task prima dell'assegnazione del task
         util.loginSfd();
         ResponseEntity<DataResponse> response = flowsTaskResource.taskAssignedInMyGroups(ALL_PROCESS_INSTANCES, 0, 100, ASC, null);
         assertEquals(OK, response.getStatusCode());
         assertEquals(0, (new ArrayList((Collection) response.getBody().getData())).size());
 
-        //assegno il task a responsabileAcquisti2
-        util.loginResponsabileAcquisti2();
+        //assegno il task a sfd
         ResponseEntity<Map<String, Object>> resp = flowsTaskResource.claimTask(util.getFirstTaskId());
         assertEquals(OK, resp.getStatusCode());
+        //verifico che sfd veda il task assegnatogli in precedenza tra i suoi task e non nei task di gruppo
+        response = flowsTaskResource.getMyTasks(ALL_PROCESS_INSTANCES, 0, 100, ASC, null);
+        assertEquals(OK, response.getStatusCode());
+        assertEquals(1, (new ArrayList((Collection) response.getBody().getData())).size());
         response = flowsTaskResource.taskAssignedInMyGroups(ALL_PROCESS_INSTANCES, 0, 100, ASC, null);
         assertEquals(OK, response.getStatusCode());
         assertEquals(0, (new ArrayList((Collection) response.getBody().getData())).size());
 
-        //verifico che responsabileAcquisti veda il task assegnato ad responsabileaquisti2 PERCHÈ FANNO PARTE DELLO STESSO GRUPPO (RA)
+        //verifico che ResponsabileAcquisti1 NON veda il task assegnato all`SFD
         util.loginResponsabileAcquisti();
-        response = flowsTaskResource.taskAssignedInMyGroups(ALL_PROCESS_INSTANCES, 0, 100, ASC, null);
+        response = flowsTaskResource.getMyTasks(ALL_PROCESS_INSTANCES, 0, 100, ASC, null);
         assertEquals(OK, response.getStatusCode());
-        assertEquals(1, (new ArrayList((Collection) response.getBody().getData())).size());
+        assertEquals(0, (new ArrayList((Collection) response.getBody().getData())).size());
 
-        //sfd NON deve vedere il Task assegnato a responsabileAcquisti2 perchè NON hanno NESSUN gruppo in comune
+        //ResponsabileAcquisti2 NON deve vedere il Task assegnato all`sfd
+        util.loginResponsabileAcquisti2();
+        response = flowsTaskResource.getMyTasks(ALL_PROCESS_INSTANCES, 0, 100, ASC, null);
+        assertEquals(OK, response.getStatusCode());
+        assertEquals(0, (new ArrayList((Collection) response.getBody().getData())).size());
+
+        // tolgo il task all`sfd e verifico che non lo veda più tra i suoi task
         util.loginSfd();
-        response = flowsTaskResource.taskAssignedInMyGroups(ALL_PROCESS_INSTANCES, 0, 100, ASC, null);
+        resp = flowsTaskResource.unclaimTask(util.getFirstTaskId());
+        assertEquals(OK, resp.getStatusCode());
+        response = flowsTaskResource.getMyTasks(ALL_PROCESS_INSTANCES, 0, 100, ASC, null);
         assertEquals(OK, response.getStatusCode());
         assertEquals(0, (new ArrayList((Collection) response.getBody().getData())).size());
     }
 
-    // non uso expected perche' voglio controllare *esttamente* dove viene lanciata l'eccezione
+    // non uso expected perche' voglio controllare *esattamente* dove viene lanciata l'eccezione
     @Test
     public void testClaimTask() throws Exception {
         processInstance = util.mySetUp(acquisti);
 
 //      sfd è sfd@sisinfo quindi può prendere in carico il flusso
         util.loginSfd();
-        ResponseEntity<Map<String, Object>> response = flowsTaskResource.claimTask(util.getFirstTaskId());
-        assertEquals(OK, response.getStatusCode());
-        response = flowsTaskResource.unclaimTask(util.getFirstTaskId());
-        assertEquals(OK, response.getStatusCode());
+        ResponseEntity<Map<String, Object>> respClaim = flowsTaskResource.claimTask(util.getFirstTaskId());
+        assertEquals(OK, respClaim.getStatusCode());
+        ResponseEntity<DataResponse> respMyTasks = flowsTaskResource.getMyTasks(ALL_PROCESS_INSTANCES, 0, 100, ASC, null);
+        assertEquals(OK, respMyTasks.getStatusCode());
+        assertEquals(1, (new ArrayList((Collection) respMyTasks.getBody().getData())).size());
+
+        respClaim = flowsTaskResource.unclaimTask(util.getFirstTaskId());
+        assertEquals(OK, respClaim.getStatusCode());
+        respMyTasks = flowsTaskResource.getMyTasks(ALL_PROCESS_INSTANCES, 0, 100, ASC, null);
+        assertEquals(OK, respMyTasks.getStatusCode());
+        assertEquals(0, (new ArrayList((Collection) respMyTasks.getBody().getData())).size());
         util.logout();
 
-//        todo: testare il caso in cui un utente non opuò richiamare il metodo(non spaclient)
-////      spaclient NON è sfd@sisinfo quindi NON può richiamare il metodo
-//        util.loginSpaclient();
-//        try {
-//            response = flowsTaskResource.claimTask(util.getFirstTaskId());
-//            fail("Expected AccessDeniedException");
-//        } catch (AccessDeniedException e) { /* expected */}
+        //responsabileAcquisti NON è sfd@sisinfo quindi NON può richiamare il metodo
+        util.loginResponsabileAcquisti();
+        try {
+            flowsTaskResource.claimTask(util.getFirstTaskId());
+            fail("Expected AccessDeniedException");
+        } catch (AccessDeniedException e) { /* expected */}
     }
 
 
@@ -266,16 +278,18 @@ public class FlowsTaskResourceTest {
         assertEquals(OK, response.getStatusCode());
 
         //assegno il task a user
-        flowsTaskResource.reassignTask("", util.getFirstTaskId(), "user");
+        String taskId = taskService.createTaskQuery().singleResult().getId();
+        util.loginResponsabileFlussoAcquistiForStruttura();
+        flowsTaskResource.reassignTask("", taskId, "user");
         //Setto user come owner dello stesso task
-        taskService.setOwner(taskService.createTaskQuery().singleResult().getId(), "user");
+        taskService.setOwner(taskId, "user");
 
         //Recupero solo il flusso completato da user e non quello assegnatogli né quello di cui è owner
+        util.loginSfd();
         ResponseEntity<Object> response2 = flowsTaskResource.getTasksCompletedByMe(ALL_PROCESS_INSTANCES, 0, 1000, ASC, null);
         assertEquals(OK, response.getStatusCode());
         ArrayList<HistoricTaskInstanceResponse> tasks = (ArrayList<HistoricTaskInstanceResponse>) ((DataResponse) response2.getBody()).getData();
         assertTrue(tasks.stream().anyMatch(t -> t.getId().equals(util.getFirstTaskId())));
-
 
         //Verifico che il metodo funzioni anche con ADMIN
         util.logout();

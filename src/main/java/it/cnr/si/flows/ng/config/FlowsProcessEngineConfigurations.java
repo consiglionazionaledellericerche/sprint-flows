@@ -198,14 +198,13 @@ public class FlowsProcessEngineConfigurations {
         return processEingine.getProcessEngineConfiguration().getProcessDiagramGenerator();
     }
 
-    /**
+    /*
      * Voglio che il JobExecutor parta soltanto dopo l'avvio di tutto l'ambaradam
-     * @param event
      */
     @EventListener
     public void onApplicationEvent(ContextStartedEvent event) {
 
-        System.out.println("Increment counter "+ event);
+        LOGGER.info("Increment counter "+ event);
         ProcessEngines.getDefaultProcessEngine().getProcessEngineConfiguration().getJobExecutor().start();
     }
 }

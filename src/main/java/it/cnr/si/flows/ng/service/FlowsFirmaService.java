@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
  * @author mtrycz
  *
  */
+@Profile("cnr")
 @Service
 public class FlowsFirmaService {
 
@@ -48,6 +49,8 @@ public class FlowsFirmaService {
         put("firma-revoca", "ProvvedimentoDiRevoca");
         put("firma-contratto", "contratto");
         put("firma-verbale", "verbale");
+		put("firma", "monitoraggioAttivitaCovid19");
+		put("firma-graduatoria", "graduatoria");
     }};
 
     public static final Map<String, String> ERRORI_ARUBA = new HashMap<String, String>() {{
@@ -76,14 +79,13 @@ public class FlowsFirmaService {
         this.props = props;
     }
 
-    public byte[] firma(String username, String password, String otp, byte[] bytes) throws ArubaSignServiceException {
+	public byte[] firma(String username, String password, String otp, byte[] bytes, PdfSignApparence apparence) throws ArubaSignServiceException {
         
         // TODO verificare se poter usare un singolo client, e non ricrearlo ogni volta
         ArubaSignServiceClient client = new ArubaSignServiceClient();
 
         client.setProps(props);
 
-        PdfSignApparence apparence = getApparence();
         Auth identity = getIdentity(username, password, otp);
 
         byte[] signed = pdfsignatureV2(identity, bytes, apparence);
@@ -92,7 +94,12 @@ public class FlowsFirmaService {
         return signed;
     }
 
-    public List<SignReturnV2> firmaMultipla(String username, String password, String otp, List<byte[]> files) throws ArubaSignServiceException {
+	
+	public List<SignReturnV2> firmaMultipla(String username, String password, String otp, List<byte[]> files) throws ArubaSignServiceException {
+		return firmaMultipla(username, password, otp, files, null);
+	}
+
+	public List<SignReturnV2> firmaMultipla(String username, String password, String otp, List<byte[]> files, PdfSignApparence pdfSignApparence) throws ArubaSignServiceException {
 
         ArubaSignService service = getServicePort();
         Auth identity = getIdentity(username, password, otp);
@@ -103,7 +110,7 @@ public class FlowsFirmaService {
                     .collect(Collectors.toList());
 
             SignReturnV2Multiple signReturnV2Multiple =
-                    service.pdfsignatureV2Multiple(identity, requests, null, PdfProfile.fromValue(RemotePdfprofile), null);
+					service.pdfsignatureV2Multiple(identity, requests, pdfSignApparence, PdfProfile.fromValue(RemotePdfprofile), null);
 
             if (signReturnV2Multiple.getStatus().equals("OK")) {
                 return signReturnV2Multiple.getReturnSigns();
@@ -116,25 +123,6 @@ public class FlowsFirmaService {
         }
     }
     
-    /**
-     * TODO Convenire su un formato adeguato per la firma grafica, se la si vuole
-     * 
-     * @return
-     */
-    private PdfSignApparence getApparence() {
-//      
-//      PdfSignApparence apparence = new PdfSignApparence();
-//      apparence.setLeftx(100);
-//      apparence.setLefty(100);
-//      apparence.setRightx(300);
-//      apparence.setRighty(200);
-//      apparence.setPage(1);
-//      apparence.setLocation("Rome");
-//
-//      apparence.setTesto("Firmato digitalmente da "+ username +" in data "+ new Date());
-        return null;
-    }
-
     /**
      *  Questo e' il metodo personalizzato da firmadigitale-1.11.jar 
      */

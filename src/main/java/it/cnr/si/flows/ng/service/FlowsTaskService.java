@@ -12,6 +12,8 @@ import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
 import it.cnr.si.security.PermissionEvaluatorImpl;
+import it.cnr.si.service.DraftService;
+import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricIdentityLink;
@@ -69,8 +71,6 @@ public class FlowsTaskService {
 	private HistoryService historyService;
 	@Inject
 	private TaskService taskService;
-	@Autowired(required = false)
-	private AceBridgeService aceBridgeService;
 	@Inject
 	private FlowsAttachmentResource attachmentResource;
 	@Inject
@@ -88,6 +88,8 @@ public class FlowsTaskService {
 	@Inject
 	private RelationshipService relationshipService;
 	@Inject
+	private MembershipService membershipService;
+	@Inject
 	private ViewRepository viewRepository;
 	@Inject
 	private Utils utils;
@@ -95,6 +97,8 @@ public class FlowsTaskService {
 	private RestResponseFactory restResponseFactory;
 	@Inject
 	private Environment env;
+	@Inject
+	private DraftService draftService;
 
 	public DataResponse search(Map<String, String> params, String processInstanceId, boolean active, String order, int firstResult, int maxResults) {
 		HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery();
@@ -235,27 +239,27 @@ public class FlowsTaskService {
 
 		List<TaskResponse> result = new ArrayList<>();
 
-		List<String> usersInMyGroups = relationshipService.getUsersInMyGroups(username);
+		Set<String> usersInMyGroups = membershipService.getUsersInMyGroups(username);
 
 		//risulta avere prestazioni leggermente migliori questo approccio rispetto a quello commentato
-        // (test effettuati con 300 Pi e 30 Task assegnati ad altri utenti nei miei gruppi
+		// (test effettuati con 300 Pi e 30 Task assegnati ad altri utenti nei miei gruppi
 		//      prendo i task assegnati agli utenti trovati
 		for (String user : usersInMyGroups) {
-            List<Task> tasks = taskQuery.taskAssignee(user).list()
-                    .stream()
-                    .filter(t ->
-                            taskService.getIdentityLinksForTask(t.getId()).stream().anyMatch(il ->
-                                    il.getType().equals(IdentityLinkType.CANDIDATE) && userAuthorities.contains(il.getGroupId()) )
-                    ).collect(Collectors.toList());
+			List<Task> tasks = taskQuery.taskAssignee(user).list()
+					.stream()
+					.filter(t ->
+							taskService.getIdentityLinksForTask(t.getId()).stream().anyMatch(il ->
+									il.getType().equals(IdentityLinkType.CANDIDATE) && userAuthorities.contains(il.getGroupId()) )
+					).collect(Collectors.toList());
 
-            result.addAll(restResponseFactory.createTaskResponseList(tasks));
-        }
-//		result = restResponseFactory.createTaskResponseList(taskQuery.list().stream()
-//																	.filter(t -> usersInMyGroups.contains(t.getAssignee()) || taskService.getIdentityLinksForTask(t.getId()).stream().anyMatch(il -> il.getType().equals(IdentityLinkType.CANDIDATE) && userAuthorities.contains(il.getGroupId())))
-//																	.collect(Collectors.toList()));
+			result.addAll(restResponseFactory.createTaskResponseList(tasks));
+		}
+		//		result = restResponseFactory.createTaskResponseList(taskQuery.list().stream()
+		//																	.filter(t -> usersInMyGroups.contains(t.getAssignee()) || taskService.getIdentityLinksForTask(t.getId()).stream().anyMatch(il -> il.getType().equals(IdentityLinkType.CANDIDATE) && userAuthorities.contains(il.getGroupId())))
+		//																	.collect(Collectors.toList()));
 
 		List<TaskResponse> responseList = result.subList(firstResult <= result.size() ? firstResult : result.size(),
-														 maxResults <= result.size() ? maxResults : result.size());
+				maxResults <= result.size() ? maxResults : result.size());
 		DataResponse response = new DataResponse();
 		response.setStart(firstResult);
 		response.setSize(responseList.size());
@@ -312,9 +316,50 @@ public class FlowsTaskService {
 		String counterId = processDefinition.getName() + "-" + Calendar.getInstance().get(Calendar.YEAR);
 		String key = counterId + "-" + counterService.getNext(counterId);
 		data.put("key", key);
+		//L`utenza reale (admin o ROLE_amministratori-supporto-tecnico@0000)
+		// non può avviare il flusso quindi ho bisogno dell`utenza "fittizia"/impersonata
+		data.put(initiator.name(), SecurityUtils.getCurrentUserLogin());
+		data.put(startDate.name(), new Date());
+
+		ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
+		runtimeService.setVariable(instance.getId(), "processInstanceId", instance.getId());
+
+		// metadati da visualizzare in ricerca, li metto nel Name per comodita' in ricerca
+		org.json.JSONObject name = new org.json.JSONObject();
+
+		Map<String, Object> variables = runtimeService.getVariables(instance.getId());
+		String titolo = String.valueOf(variables.get(Enum.VariableEnum.titolo.name()));
+		name.put(Enum.VariableEnum.titolo.name(), ellipsis(titolo, LENGTH_TITOLO) );
+		String descrizione = String.valueOf(variables.get(Enum.VariableEnum.descrizione.name()));
+		name.put(Enum.VariableEnum.descrizione.name(), ellipsis(descrizione, LENGTH_DESCTIZIONE) );
+		//metto l`utente REALE che ha avviato il flusso nel JSON nel name
+		name.put(Enum.VariableEnum.initiator.name(), SecurityUtils.getRealUserLogged());
+		if (taskService.createTaskQuery().processInstanceId(instance.getProcessInstanceId()).count() == 0) {
+			name.put(stato.name(), ellipsis("START", LENGTH_FASE) );
+
+		} else {
+			String taskName = taskService.createTaskQuery()
+					.processInstanceId(instance.getProcessInstanceId())
+					.singleResult().getName();
+			name.put(stato.name(), ellipsis(taskName, LENGTH_FASE) );
+		}
+		runtimeService.setProcessInstanceName(instance.getId(), name.toString());
+
+		LOGGER.info("Avviata istanza di processo {}, id: {}", key, instance.getId());
+		return instance;
+	}
+	
+	
+	public ProcessInstance startProcessInstanceAsApplication(String definitionId, Map<String, Object> data, String applicationName) {
+
+		ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitionId).singleResult();
+		String counterId = processDefinition.getName() + "-" + Calendar.getInstance().get(Calendar.YEAR);
+		String key = counterId + "-" + counterService.getNext(counterId);
+		data.put("key", key);
 
 		String username = SecurityUtils.getCurrentUserLogin();
-		data.put(initiator.name(), username);
+
+		data.put(applicationName, username);
 		data.put(startDate.name(), new Date());
 
 		ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
@@ -329,11 +374,15 @@ public class FlowsTaskService {
 		name.put(Enum.VariableEnum.descrizione.name(), ellipsis(descrizione, LENGTH_DESCTIZIONE) );
 		String initiator = (String) data.get(Enum.VariableEnum.initiator.name());
 		name.put(Enum.VariableEnum.initiator.name(), initiator);
-		String taskName = taskService.createTaskQuery()
-				.processInstanceId(instance.getProcessInstanceId())
-				.singleResult().getName();
-		name.put(stato.name(), ellipsis(taskName, LENGTH_FASE) );
+		if (taskService.createTaskQuery().processInstanceId(instance.getProcessInstanceId()).count() == 0) {
+			name.put(stato.name(),ellipsis("START", LENGTH_FASE) );
 
+		} else {
+			String taskName = taskService.createTaskQuery()
+					.processInstanceId(instance.getProcessInstanceId())
+					.singleResult().getName();
+			name.put(stato.name(), ellipsis(taskName, LENGTH_FASE) );
+		}
 		runtimeService.setProcessInstanceName(instance.getId(), name.toString());
 
 		LOGGER.info("Avviata istanza di processo {}, id: {}", key, instance.getId());
@@ -343,13 +392,15 @@ public class FlowsTaskService {
 
 	public void completeTask(String taskId, Map<String, Object> data) {
 
-		String username = SecurityUtils.getCurrentUserLogin();
+		String username = SecurityUtils.getRealUserLogged();
 
 		// aggiungo l'identityLink che indica l'utente che esegue il task
 		taskService.setVariablesLocal(taskId, data);
 		taskService.addUserIdentityLink(taskId, username, TASK_EXECUTOR);
 		try {
 			taskService.complete(taskId, data);
+
+			draftService.deleteDraftByTaskId(Long.valueOf(taskId));
 		} catch (Exception e) {
 			if (e instanceof ActivitiObjectNotFoundException)
 				LOGGER.error("Task {} NON trovato", taskId);
@@ -403,6 +454,7 @@ public class FlowsTaskService {
 		ArrayList<String[]> entriesIterable = new ArrayList<>();
 		boolean hasHeaders = false;
 		ArrayList<String> headers = new ArrayList<>();
+		headers.add("processInstanceId");
 		headers.add("Identificativo Flusso");
 		headers.add("Titolo");
 		headers.add("Descrizione");
@@ -415,6 +467,7 @@ public class FlowsTaskService {
 			List<RestVariable> variables = processInstance.getVariables();
 			ArrayList<String> tupla = new ArrayList<>();
 			//field comuni a tutte le Process Instances (name , Start date)
+			tupla.add(processInstance.getId());
 			tupla.add(processInstance.getBusinessKey());
 
 			// inizio spacchettamento fields
@@ -457,14 +510,22 @@ public class FlowsTaskService {
 			isUnclaimableVariable.setName("isReleasable");
 			// if has candidate groups or users -> can release
 			isUnclaimableVariable.setValue(taskService.getIdentityLinksForTask(task.getId())
-												   .stream()
-												   .anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
+					.stream()
+					.anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
 			task.getVariables().add(isUnclaimableVariable);
 		}
 	}
 
-
-	private static String ellipsis(String in, int length) {
-		return in.length() < length ? in: in.substring(0, length - 3) + "...";
+	static String ellipsis(String in, int length) {
+		if (in!= null) {
+			if (in.length() < length) {
+			return in;
+		} else
+		{
+			return in.substring(0, length - 3) + "...";
+		}
+	}else {
+		return "";
+		}
 	}
 }

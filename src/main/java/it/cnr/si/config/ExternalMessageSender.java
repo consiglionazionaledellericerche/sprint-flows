@@ -19,6 +19,7 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
@@ -45,6 +46,14 @@ public class ExternalMessageSender {
     private String abilPassword;
     @Value("${cnr.abil.loginPath}")
     private String abilLoginPath;
+    @Value("${cnr.stm.url}")
+    private String stmUrl;
+    @Value("${cnr.stm.username}")
+    private String stmUsername;
+    @Value("${cnr.stm.password}")
+    private String stmPassword;
+    @Value("${cnr.stm.loginPath}")
+    private String stmLoginPath;
 
 
     @Inject
@@ -63,6 +72,14 @@ public class ExternalMessageSender {
         abilTemplate.setInterceptors(interceptors);
 
         ExternalApplication.ABIL.setTemplate(abilTemplate);
+
+        // STM
+
+        RestTemplate stmTemplate = new RestTemplate();
+        interceptors = stmTemplate.getInterceptors();
+        interceptors.add(new StmRequestInterceptor());
+        stmTemplate.setInterceptors(interceptors);
+        ExternalApplication.STM.setTemplate(stmTemplate);
 
         // GENERIC
 
@@ -107,6 +124,7 @@ public class ExternalMessageSender {
     }
 
     private void send(ExternalMessage msg) {
+    // TODO refactor : il metodo send dovrebbe sendare, non sendare-e-salvare
 
         log.debug("Tentativo della rest {}", msg);
 
@@ -174,6 +192,44 @@ public class ExternalMessageSender {
                         headers,
                         HttpMethod.POST,
                         URI.create(abilUrl + abilLoginPath));
+
+                ResponseEntity<Map> resp = new RestTemplate().exchange(entity, Map.class);
+
+                this.id_token = (String) resp.getBody().get("id_token");
+
+                request.getHeaders().set("Authorization", "Bearer "+ id_token);
+                request.getHeaders().set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+                response = execution.execute(request, body);
+            }
+
+            return response;
+        }
+    }
+
+    private class StmRequestInterceptor implements ClientHttpRequestInterceptor {
+
+        private String id_token = null;
+
+        @Override
+        public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
+
+            request.getHeaders().set("Authorization", "Bearer "+ id_token);
+            request.getHeaders().set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+            ClientHttpResponse response = execution.execute(request, body);
+
+            if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+
+                Map<String, String> auth = new HashMap<>();
+                auth.put("username", stmUsername);
+                auth.put("password", stmPassword);
+                MultiValueMap<String, String> headers = new HttpHeaders();
+                headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+
+                RequestEntity entity = new RequestEntity(
+                        auth,
+                        headers,
+                        HttpMethod.POST,
+                        URI.create(stmUrl + stmLoginPath));
 
                 ResponseEntity<Map> resp = new RestTemplate().exchange(entity, Map.class);
 

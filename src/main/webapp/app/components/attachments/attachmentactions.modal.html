@@ -1,135 +1,160 @@
 <div class="modal-header">
-  <h4 class="modal-title">Azioni sul file {{vm.attachment.name}}</h4>
+	<h4 class="modal-title">Azioni sul file {{vm.attachment.name}}</h4>
 </div>
 <div class="modal-body">
 
-  <div class="row" ng-if="canPublish">
-    <div class="col-md-12">
-      <h4>Pubblica Documento in Trasparenza</h4>
-      <div class="btn-group">
-        <p>
-          Stato attuale del documento:
-          <span ng-if="vm.attachment.stati.indexOf('PubblicatoTrasparenza') == -1">Non</span>
-          Pubblico in Trasparenza
-        <p>
-          <button type="button" ng-if="vm.attachment.stati.indexOf('PubblicatoTrasparenza') == -1" class="btn btn-success btn-sm" ng-click="pubblicaDocumentoTrasparenza(true)"><span class="glyphicon glyphicon-eye-open"></span> Pubblica in Trasparenza</button>
-          <button type="button" ng-if="vm.attachment.stati.indexOf('PubblicatoTrasparenza') !== -1" class="btn btn-danger btn-sm" ng-click="pubblicaDocumentoTrasparenza(false)"><span class="glyphicon glyphicon-eye-close"></span> Rimuovi da Trasparenza</button>
-      </div>
-    </div>
-  </div>
-  <div class="row" ng-if="canPublish">
-    <div class="col-md-12">
-      <h4>Pubblica Documento in Urp</h4>
-      <div class="btn-group">
-        <p>
-          Stato attuale del documento:
-          <span ng-if="vm.attachment.stati.indexOf('PubblicatoUrp') == -1">Non</span>
-          Pubblico in Urp
-        <p>
-          <button type="button" ng-if="vm.attachment.stati.indexOf('PubblicatoUrp') == -1" class="btn btn-success btn-sm" ng-click="pubblicaDocumentoUrp(true)"><span class="glyphicon glyphicon-eye-open"></span> Pubblica in Urp</button>
-          <button type="button" ng-if="vm.attachment.stati.indexOf('PubblicatoUrp') !== -1" class="btn btn-danger btn-sm" ng-click="pubblicaDocumentoUrp(false)"><span class="glyphicon glyphicon-eye-close"></span> Rimuovi da Urp</button>
-      </div>
-    </div>
-  </div>
+	<div class="row" ng-if="vm.businesskey.indexOf('Acquisti') == 0">
+		<div class="row" ng-if="canPublish">
+			<div class="col-md-12">
+				<h4>Pubblica Documento in Trasparenza</h4>
+				<div class="btn-group">
+					<p>
+						Stato attuale del documento: <span
+							ng-if="vm.attachment.stati.indexOf('PubblicatoTrasparenza') == -1">Non</span>
+						Pubblico in Trasparenza
+					<p>
+						<button type="button"
+							ng-if="vm.attachment.stati.indexOf('PubblicatoTrasparenza') == -1"
+							class="btn btn-success btn-sm"
+							ng-click="pubblicaDocumentoTrasparenza(true)">
+							<span class="glyphicon glyphicon-eye-open"></span> Pubblica in
+							Trasparenza
+						</button>
+						<button type="button"
+							ng-if="vm.attachment.stati.indexOf('PubblicatoTrasparenza') !== -1"
+							class="btn btn-danger btn-sm"
+							ng-click="pubblicaDocumentoTrasparenza(false)">
+							<span class="glyphicon glyphicon-eye-close"></span> Rimuovi da
+							Trasparenza
+						</button>
+				</div>
+			</div>
+		</div>
+		<div class="row" ng-if="canPublish">
+			<div class="col-md-12">
+				<h4>Pubblica Documento in Urp</h4>
+				<div class="btn-group">
+					<p>
+						Stato attuale del documento: <span
+							ng-if="vm.attachment.stati.indexOf('PubblicatoUrp') == -1">Non</span>
+						Pubblico in Urp
+					<p>
+						<button type="button"
+							ng-if="vm.attachment.stati.indexOf('PubblicatoUrp') == -1"
+							class="btn btn-success btn-sm"
+							ng-click="pubblicaDocumentoUrp(true)">
+							<span class="glyphicon glyphicon-eye-open"></span> Pubblica in
+							Urp
+						</button>
+						<button type="button"
+							ng-if="vm.attachment.stati.indexOf('PubblicatoUrp') !== -1"
+							class="btn btn-danger btn-sm"
+							ng-click="pubblicaDocumentoUrp(false)">
+							<span class="glyphicon glyphicon-eye-close"></span> Rimuovi da
+							Urp
+						</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
-  <hr>
-  <div class="row" ng-if="canUpdateAttachments">
-    <div class="col-md-12" ng-if="vm.attachment.stati.indexOf('Protocollato') == -1">
-      <h4>Aggiorna Documento</h4>
-      <form novalidate class="flows-form" name="aggiornaDocumentoForm" ng-submit="submitAggiornaDocumento(picFile)">
+	<hr>
+	<div class="row" ng-if="canUpdateAttachments">
+		<div class="col-md-12"
+			ng-if="vm.attachment.stati.indexOf('Protocollato') == -1">
+			<h4>Aggiorna Documento</h4>
+			<form novalidate class="flows-form" name="aggiornaDocumentoForm"
+				ng-submit="submitAggiornaDocumento(picFile)">
 
-        <div>
-          <fileinput
-                name="{{vm.attachment.name}}"
-                multiple=false
-                metadati-protocollo="true"
-                mostra-modifica="false"
-                cnr-required=true />
-        </div>
-        <button class="btn btn-primary" type="submit" ng-disabled="aggiornaDocumentoForm.$invalid">
-          invia
-          <span class="glyphicon glyphicon-arrow-right"></span>
-        </button>
+				<div>
+					<fileinput name="{{vm.attachment.name}}" multiple=false
+						metadati-protocollo="true" mostra-modifica="false"
+						cnr-required=true />
+				</div>
+				<button class="btn btn-primary" type="submit"
+					ng-disabled="aggiornaDocumentoForm.$invalid">
+					invia <span class="glyphicon glyphicon-arrow-right"></span>
+				</button>
 
-      </form>
-    </div>
+			</form>
+		</div>
 
-    <div class="col-md-12" ng-if="vm.attachment.stati.indexOf('Protocollato') != -1">
-      <h4>Aggiorna Documento Protocollato</h4>
+		<div class="col-md-12"
+			ng-if="vm.attachment.stati.indexOf('Protocollato') != -1">
+			<h4>Aggiorna Documento Protocollato</h4>
 
-      <div class="col-lg-20 col-lg-offset-0 bg-info cnr-descrizione-task">I documenti protocollati non possono essere sostituiti allo stesso modo dei documenti non protocollati. Selezionare se inserire una RETTIFICA a un documento protocollato, o una SOSTITUZIONE di un nuovo file con un nuovo protocollo</div>
+			<div class="col-lg-20 col-lg-offset-0 bg-info cnr-descrizione-task">I
+				documenti protocollati non possono essere sostituiti allo stesso
+				modo dei documenti non protocollati. Selezionare se inserire una
+				RETTIFICA a un documento protocollato, o una SOSTITUZIONE di un
+				nuovo file con un nuovo protocollo</div>
 
-        <div class="form-group text-center">
-          <label for="tipoModifica">Tipo Modifica</label>
-          <select id="tipoModifica" style="width: auto;" ng-model="data.tipoModifica">
-            <option value="sostituzione">Sostituzione</option>
-            <option value="rettifica">Rettifica</option>
-          </select>
-        </div>
+			<div class="form-group text-center">
+				<label for="tipoModifica">Tipo Modifica</label> <select
+					id="tipoModifica" style="width: auto;" ng-model="data.tipoModifica">
+					<option value="sostituzione">Sostituzione</option>
+					<option value="rettifica">Rettifica</option>
+				</select>
+			</div>
 
-        <div class="row" ng-if="data.tipoModifica == 'sostituzione'">
-          <div class="col-md-12">
-            <form novalidate class="flows-form" name="aggiornaSostituzioneForm" ng-submit="submitAggiornaDocumento(picFile)">
-              <div>
-                <fileinput
-                      name="{{vm.attachment.name}}_sostituzione"
-                      label="{{vm.attachment.label}}"
-                      multiple="false"
-                      cnr-required="true"
-                      metadati-protocollo="true"
-                      protocollo="true"
-                      metadati-pubblicazione="true"
-                      pubblicazione-trasparenza="vm.attachment.pubblicazioneTrasparenza"
-                      pubblicazione-urp="vm.attachment.pubblicazioneUrp"
-                      pubblicazione-disabilitato="true"
-                      slider-protocollo-disabilitato="true"
-              />
-              </div>
+			<div class="row" ng-if="data.tipoModifica == 'sostituzione'">
+				<div class="col-md-12">
+					<form novalidate class="flows-form" name="aggiornaSostituzioneForm"
+						ng-submit="submitAggiornaDocumento(picFile)">
+						<div>
+							<fileinput name="{{vm.attachment.name}}_sostituzione"
+								label="{{vm.attachment.label}}" multiple="false"
+								cnr-required="true" metadati-protocollo="true" protocollo="true"
+								metadati-pubblicazione="true"
+								pubblicazione-trasparenza="vm.attachment.pubblicazioneTrasparenza"
+								pubblicazione-urp="vm.attachment.pubblicazioneUrp"
+								pubblicazione-disabilitato="true"
+								slider-protocollo-disabilitato="true" />
+						</div>
 
-              <div class="form-group">
-                <label for="motivoSostituzione">Motivo sostituzione</label>
-                <input type="text" id="motivoSostituzione" ng-model="data.motivoSostituzione" class="form-control" required>
+						<div class="form-group">
+							<label for="motivoSostituzione">Motivo sostituzione</label> <input
+								type="text" id="motivoSostituzione"
+								ng-model="data.motivoSostituzione" class="form-control" required>
 
-              </div>
-              <button class="btn btn-primary" type="submit" ng-disabled="aggiornaSostituzioneForm.$invalid">
-                invia
-                <span class="glyphicon glyphicon-arrow-right"></span>
-              </button>
-            </form>
-          </div>
-        </div>
+						</div>
+						<button class="btn btn-primary" type="submit"
+							ng-disabled="aggiornaSostituzioneForm.$invalid">
+							invia <span class="glyphicon glyphicon-arrow-right"></span>
+						</button>
+					</form>
+				</div>
+			</div>
 
-      <div class="row" ng-if="data.tipoModifica == 'rettifica'">
-        <div class="col-md-12">
-          <form novalidate class="flows-form" name="rettificaForm" ng-submit="submitAggiornaDocumento(picFile)">
-            <div>
-              <fileinput
-                    name="{{vm.attachment.name}}_rettifica"
-                    label="Rettifica {{vm.attachment.label}}"
-                    multiple="false"
-                    cnr-required="true"
-                    metadati-protocollo="true"
-                    protocollo="true"
-                    metadati-pubblicazione="true"
-                    pubblicazione-trasparenza="vm.attachment.pubblicazioneTrasparenza"
-                    pubblicazione-urp="vm.attachment.pubblicazioneUrp"
-                    pubblicazione-disabilitato="true"
-                    slider-protocollo-disabilitato="true"
-            />
-            </div>
+			<div class="row" ng-if="data.tipoModifica == 'rettifica'">
+				<div class="col-md-12">
+					<form novalidate class="flows-form" name="rettificaForm"
+						ng-submit="submitAggiornaDocumento(picFile)">
+						<div>
+							<fileinput name="{{vm.attachment.name}}_rettifica"
+								label="Rettifica {{vm.attachment.label}}" multiple="false"
+								cnr-required="true" metadati-protocollo="true" protocollo="true"
+								metadati-pubblicazione="true"
+								pubblicazione-trasparenza="vm.attachment.pubblicazioneTrasparenza"
+								pubblicazione-urp="vm.attachment.pubblicazioneUrp"
+								pubblicazione-disabilitato="true"
+								slider-protocollo-disabilitato="true" />
+						</div>
 
-            <button class="btn btn-primary" type="submit" ng-disabled="rettificaForm.$invalid">
-              invia
-              <span class="glyphicon glyphicon-arrow-right"></span>
-            </button>
-          </form>
-        </div>
-      </div>
+						<button class="btn btn-primary" type="submit"
+							ng-disabled="rettificaForm.$invalid">
+							invia <span class="glyphicon glyphicon-arrow-right"></span>
+						</button>
+					</form>
+				</div>
+			</div>
 
-    </div>
+		</div>
 
-  </div>
+	</div>
 </div>
 <div class="modal-footer">
-  <button class="btn btn-primary" type="button" ng-click="$dismiss()"><span class="glyphicon glyphicon-remove"></span> Chiudi</button>
+	<button class="btn btn-primary" type="button" ng-click="$dismiss()">
+		<span class="glyphicon glyphicon-remove"></span> Chiudi
+	</button>
 </div>

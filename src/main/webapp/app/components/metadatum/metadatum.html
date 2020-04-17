@@ -29,6 +29,9 @@
                 </tbody>
             </table>
         </span>
+        <span ng-switch-when="wysiwyg">
+            <strong>{{label}}:</strong><div ng-bind-html="value"></div>
+        </span>
         <span ng-switch-default><strong>{{label}}:</strong> {{value}}</span>
     </span>
 </li>

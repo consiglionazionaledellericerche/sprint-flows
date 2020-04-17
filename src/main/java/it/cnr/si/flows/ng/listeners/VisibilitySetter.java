@@ -24,7 +24,7 @@ import it.cnr.si.flows.ng.utils.Utils;
 @Component
 public class VisibilitySetter implements ActivitiEventListener {
 
-
+ 
 	@SuppressWarnings("unused")
 	private final Logger log = LoggerFactory.getLogger(VisibilitySetter.class);
 

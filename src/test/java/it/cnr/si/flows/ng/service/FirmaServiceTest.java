@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -23,9 +24,11 @@ import java.util.Optional;
 
 import static org.junit.Assert.fail;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "test,cnr")
+@ActiveProfiles(profiles = "native,unittests,cnr")
+@EnableTransactionManagement
+@RunWith(SpringRunner.class)
+@Ignore // TODO per ora testiamo solo Showcase, funzionalita' CNR da testare separatamente
 public class FirmaServiceTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FirmaServiceTest.class);
@@ -46,7 +49,7 @@ public class FirmaServiceTest {
         byte[] bytes = Files.readAllBytes(Paths.get("./src/test/resources/pdf-test/summaryCreato.pdf"));
         
         try {
-            byte[] bytesfirmati = firmaService.firma(username, password, otp, bytes);
+            byte[] bytesfirmati = firmaService.firma(username, password, otp, bytes, null);
             Files.write(Paths.get("./src/test/resources/pdf-test/summaryFirmato.pdf"), bytesfirmati);
             
         } catch (ArubaSignServiceException e) {

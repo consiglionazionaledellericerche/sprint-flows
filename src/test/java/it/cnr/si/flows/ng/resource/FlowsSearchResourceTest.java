@@ -2,22 +2,21 @@ package it.cnr.si.flows.ng.resource;
 
 import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.TestServices;
-import it.cnr.si.flows.ng.utils.Utils;
+import org.activiti.engine.HistoryService;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
-import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -27,28 +26,30 @@ import java.util.*;
 
 import static it.cnr.si.flows.ng.TestServices.TITOLO_DELL_ISTANZA_DEL_FLUSSO;
 import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.initiator;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.titolo;
 import static it.cnr.si.flows.ng.utils.Utils.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.http.HttpStatus.OK;
 
 
-@SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "test,cnr")
+@SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles(profiles = "native,showcase,unittests")
+@EnableTransactionManagement
 @RunWith(SpringRunner.class)
 public class FlowsSearchResourceTest {
 
     @Inject
-    private TestServices util;
-    @Inject
-    private Utils utils;
+    private TestServices testServices;
     @Inject
     private FlowsProcessInstanceResource flowsProcessInstanceResource;
     @Inject
     private FlowsTaskResource flowsTaskResource;
     @Inject
     private FlowsSearchResource flowsSearchResource;
+    @Inject
+    private HistoryService historyService;
 
     private ProcessInstanceResponse processInstance;
 
@@ -63,14 +64,14 @@ public class FlowsSearchResourceTest {
 
     @After
     public void tearDown() {
-        util.myTearDown();
+        testServices.myTearDown();
     }
 
 
     @Test
     public void testProcessInstanceSearch() throws Exception {
-        processInstance = util.mySetUp(acquisti);
-        util.loginAdmin();
+        processInstance = testServices.mySetUp(acquisti);
+        testServices.loginAdmin();
 
         final Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, +1);
@@ -81,7 +82,7 @@ public class FlowsSearchResourceTest {
         Map<String, String> requestParams = new HashMap<>();
         requestParams.put(titolo.name(), "text=" + TITOLO_DELL_ISTANZA_DEL_FLUSSO);
         requestParams.put(initiator.name(), "text="+ TestServices.getRA());
-        requestParams.put("processDefinitionKey", util.getProcessDefinition().split(":")[0]);
+        requestParams.put("processDefinitionKey", testServices.getProcessDefinition().split(":")[0]);
         requestParams.put("order", ASC);
         requestParams.put("active", "true");
         requestParams.put("isTaskQuery", "false");
@@ -96,11 +97,18 @@ public class FlowsSearchResourceTest {
         response = flowsSearchResource.search(requestParams);
         verifySearchResponse(response, 1, 1);
 
-        //verifico che le Process Instance completate (active = false) siano quelle cancellate nel tearDown di questa classe (processDeleted)
+        //verifico che le Process Instance completate (active = false) siano quelle cancellate nei vari tearDown eseguiti finora
+        requestParams.put("maxResult", "50");
         requestParams.put("active", "false");
         requestParams.put("order", DESC);
         response = flowsSearchResource.search(requestParams);
-        verifySearchResponse(response, 1, 1);
+        int allProcessDeleted = (int) historyService.createHistoricProcessInstanceQuery().finished().count();
+        verifySearchResponse(response, allProcessDeleted, allProcessDeleted);
+
+        // verifico che  il parametro maxResult funzioni correttamente
+        requestParams.put("maxResult", "5");
+        response = flowsSearchResource.search(requestParams);
+        verifySearchResponse(response, allProcessDeleted, 5);
 
         /*
          * VERIFICA GESTIONE DELLE AUTHORITIES TODO
@@ -109,12 +117,10 @@ public class FlowsSearchResourceTest {
 
 
         //parametri sbagliati (strumentoAcquisizioneId 12 invece di 11, initiator = admin invece dell'RA) ==> 0 risultati
-        requestParams.put("titolo", "textEqual=12");
+        requestParams.put("strumentoAcquisizioneId", "textEqual=12");
         requestParams.put("initiator", "text=admin");
         requestParams.put("order", ASC);
         requestParams.put("active", "true");
-        requestParams.put("firstResult", "0");
-        requestParams.put("maxResults", "20");
 
         response = flowsSearchResource.search(requestParams);
         verifySearchResponse(response, 0, 0);
@@ -258,10 +264,12 @@ public class FlowsSearchResourceTest {
 
         if (responseList.size() > 0) {
             for (int i = 0; i < (expectedTotalItems > expectedResponseItems ? expectedResponseItems : expectedTotalItems); i++) {
-                HistoricProcessInstanceResponse taskresponse = ((HistoricProcessInstanceResponse) responseList.get(i));
-                assertTrue(taskresponse.getProcessDefinitionId().contains(util.getProcessDefinition()));
+                HistoricProcessInstanceResponse taskResponse = ((HistoricProcessInstanceResponse) responseList.get(i));
+                //non so perchè ma eseguendo tutti i test si creano processDefinition diverse(ad es.: acquisti:2:152 e acquisti:3:284)
+                assertTrue("taskResponse.getProcessDefinitionId() = " + taskResponse.getProcessDefinitionId() + " - testServices.getProcessDefinition() = " + testServices.getProcessDefinition(),
+                           taskResponse.getProcessDefinitionId().contains(testServices.getProcessDefinition().split(":")[0]));
                 //verifico che le Process Instance restituite dalla search rispettino i parametri della ricerca
-                org.json.JSONObject json = new org.json.JSONObject(taskresponse.getName());
+                org.json.JSONObject json = new org.json.JSONObject(taskResponse.getName());
                 assertEquals(TITOLO_DELL_ISTANZA_DEL_FLUSSO, json.getString(titolo.name()));
                 assertEquals(TestServices.getRA(), json.getString(initiator.name()));
             }
@@ -272,17 +280,11 @@ public class FlowsSearchResourceTest {
     /* ----- TASKS ----- */
     @Test
     public void testTaskSearch() throws Exception {
-        processInstance = util.mySetUp(acquisti);
+        processInstance = testServices.mySetUp(acquisti);
 
-        util.logout();
-        util.loginSfd();
+        testServices.logout();
+        testServices.loginSfd();
         //verifico che la ricerca recuperi il primo task della process instance appena avviata
-        String content = "{\"processParams\":" +
-                "[{\"key\":\"" + titolo + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
-                "{\"key\":\"" + initiator + "\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
-                "\"taskParams\":" +
-                "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
-
         Map<String, String> requestParams = new HashMap<>();
 
         requestParams.put("titolo", "textEqual=" + TITOLO_DELL_ISTANZA_DEL_FLUSSO);
@@ -293,13 +295,11 @@ public class FlowsSearchResourceTest {
         requestParams.put("firstResult", "0");
         requestParams.put("maxResults", "100");
 
-
-        // TODO fixare e decommentare
-//        ResponseEntity response = flowsSearchResource.search(request, ALL_PROCESS_INSTANCES, true, ASC, 0, 100);
-//        ArrayList<HistoricTaskInstanceResponse> tasks = (ArrayList<HistoricTaskInstanceResponse>) ((HashMap) response.getBody()).get("tasks");
-//        assertEquals(Long.valueOf("1"), ((HashMap) response.getBody()).get("totalItems"));
-//        assertEquals(1, tasks.size());
-//        assertEquals(util.getFirstTaskId(), ((HistoricTaskInstanceResponse) tasks.get(0)).getId());
+        ResponseEntity response = flowsSearchResource.search(requestParams);
+        DataResponse dataResponse = ((DataResponse)response.getBody());
+        assertEquals(Optional.of(Long.valueOf("1")), Optional.of(dataResponse.getTotal()));
+        ArrayList<HistoricProcessInstanceResponse> pi = ((ArrayList<HistoricProcessInstanceResponse>)(dataResponse.getData()));
+        assertEquals(1, pi.size());
 
         //verifico che con parametri di ricerca sbagliati non abbia task nel searchResult
         verifyBadTaskSearchParams();
@@ -309,29 +309,23 @@ public class FlowsSearchResourceTest {
         String content;
         ResponseEntity<DataResponse> response;//verifico che non prenda nessun elemento (SEARCH PARAMS SBAGLIATI)
         //titolo flusso sbagliato
-        content = "{\"processParams\":" +
-                "[{\"key\":\"" + titolo + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "AAA\",\"type\":\"text\"}," +
-                "{\"key\":\"" + initiator + "\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
-                "\"taskParams\":" +
-                "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
+        content = "[{\"type\":\"text=\",\"key\":\"" + titolo + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "AAA\"}," +
+                "{\"type\":\"text=\",\"key\":\"Fase\",\"value\":\"Verifica Decisione\"},"+
+                "{\"type\":\"text=\",\"key\":\"" + initiator + "\",\"value\":\"" + TestServices.getRA() + "\"}]";
         response = flowsTaskResource.getMyTasks(ALL_PROCESS_INSTANCES, 0, 100, ASC, content);
         assertEquals(0, response.getBody().getSize());
         assertEquals(0, ((ArrayList) response.getBody().getData()).size());
         //initiator sbaliato
-        content = "{\"processParams\":" +
-                "[{\"key\":\"" + titolo + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
-                "{\"key\":\"" + initiator + "\",\"value\":\"admi\",\"type\":\"textEqual\"}]," +
-                "\"taskParams\":" +
-                "[{\"key\":\"Fase\",\"value\":\"Verifica Decisione\",\"type\":null}]}";
+        content = "[{\"type\":\"text=\",\"key\":\"" + titolo + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\"}," +
+                "{\"type\":\"text=\",\"key\":\"Fase\",\"value\":\"Verifica Decisione\"},"+
+                "{\"type\":\"text=\",\"key\":\"" + initiator + "\",\"value\":\"admi\"}]";
         response = flowsTaskResource.getMyTasks(ALL_PROCESS_INSTANCES, 0, 100, ASC, content);
         assertEquals(0, response.getBody().getSize());
         assertEquals(0, ((ArrayList) response.getBody().getData()).size());
         //Fase sbaliata
-        content = "{\"processParams\":" +
-                "[{\"key\":\"" + titolo + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\",\"type\":\"text\"}," +
-                "{\"key\":\"" + initiator + "\",\"value\":\"" + TestServices.getRA() + "\",\"type\":\"textEqual\"}]," +
-                "\"taskParams\":" +
-                "[{\"key\":\"Fase\",\"value\":\"Verifica DecisioneEEEEE\",\"type\":null}]}";
+        content = "[{\"type\":\"text=\",\"key\":\"" + titolo + "\",\"value\":\"" + TITOLO_DELL_ISTANZA_DEL_FLUSSO + "\"}," +
+                "{\"type\":\"text=\",\"key\":\"Fase\",\"value\":\"Verifica DecisioneEEEEE\"},"+
+                "{\"type\":\"text=\",\"key\":\"" + initiator + "\",\"value\":\"" + TestServices.getRA() + "\"}]";
         response = flowsTaskResource.getMyTasks(ALL_PROCESS_INSTANCES, 0, 100, ASC, content);
         assertEquals(0, response.getBody().getSize());
         assertEquals(0, ((ArrayList) response.getBody().getData()).size());

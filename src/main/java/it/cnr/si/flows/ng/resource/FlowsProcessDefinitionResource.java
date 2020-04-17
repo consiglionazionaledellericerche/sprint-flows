@@ -2,8 +2,11 @@ package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
 
+import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.service.MembershipService;
+
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.repository.DeploymentBuilder;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -33,6 +36,8 @@ public class FlowsProcessDefinitionResource {
 
     @Inject
     private RepositoryService repositoryService;
+    @Inject
+    private MembershipService membershipService;
 
 
     @Autowired
@@ -89,10 +94,9 @@ public class FlowsProcessDefinitionResource {
 
 
     public boolean canStartProcesByDefinitionKey(String definitionKey) {
-
-        return SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+    	
+        return membershipService.getAllGroupsForUser(SecurityUtils.getCurrentUserLogin())
                 .stream()
-                .map(GrantedAuthority::<String>getAuthority)
                 .map(Utils::removeLeadingRole)
                 .anyMatch(a -> a.startsWith("abilitati#" + definitionKey + "@") );
     }

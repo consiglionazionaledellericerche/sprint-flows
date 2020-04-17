@@ -4,6 +4,7 @@ import com.opencsv.CSVWriter;
 import it.cnr.si.domain.View;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery;
+import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
 import it.cnr.si.security.PermissionEvaluatorImpl;
@@ -36,9 +37,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static it.cnr.si.flows.ng.resource.FlowsProcessInstanceResource.EXPORT_TRASPARENZA;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.Annullato;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.Revocato;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
 import static it.cnr.si.flows.ng.utils.Utils.*;
-
+import static it.cnr.si.flows.ng.service.FlowsTaskService.*;
 
 /**
  * Created by cirone on 15/06/17.
@@ -71,6 +74,10 @@ public class FlowsProcessInstanceService {
 	private UserDetailsService flowsUserDetailsService;
 	@Inject
 	private Utils utils;
+    @Inject
+    private FlowsAttachmentService attachmentService;
+
+
 
 	public HistoricTaskInstance getCurrentTaskOfProcessInstance(String processInstanceId) {
 		return historyService.createHistoricTaskInstanceQuery()
@@ -221,6 +228,10 @@ public class FlowsProcessInstanceService {
 
 		FlowsHistoricProcessInstanceQuery processQuery = new FlowsHistoricProcessInstanceQuery(managementService);
 
+        if (firstResult != -1 && maxResults != -1) {
+            processQuery.setFirstResult(firstResult);
+            processQuery.setMaxResults(maxResults);
+        }
 		setSearchTerms(searchParams, processQuery);
 
 		List<String> authorities = Utils.getCurrentUserAuthorities();
@@ -324,35 +335,31 @@ public class FlowsProcessInstanceService {
 
 	public void updateSearchTerms(String executionId, String processInstanceId, String stato) {
 
-		String initiator =   runtimeService.getVariable(executionId , INITIATOR).toString();
-		String titolo =  runtimeService.getVariable(executionId , TITOLO).toString();
-		String descrizione =  runtimeService.getVariable(executionId , DESCRIZIONE).toString();
+        String initiator = "";
+        String titolo = "";
+        String descrizione = "";
 
-		JSONObject name = new JSONObject();
+        if (runtimeService.getVariable(executionId , INITIATOR) != null) {
+            initiator =   runtimeService.getVariable(executionId , INITIATOR).toString();
+        }
+        if (runtimeService.getVariable(executionId , TITOLO) != null) {
+            titolo =   runtimeService.getVariable(executionId , TITOLO).toString();
+        }
+        if (runtimeService.getVariable(executionId , DESCRIZIONE) != null) {
+            descrizione =   runtimeService.getVariable(executionId , DESCRIZIONE).toString();
+        }
 
-		name.put(DESCRIZIONE, descrizione);
-		name.put(TITOLO, titolo);
-		name.put("stato", stato);
-		name.put(INITIATOR, initiator);
-
-		runtimeService.setProcessInstanceName(processInstanceId, name.toString());
+        JSONObject name = new JSONObject();
 
 
-		//		String appo = "";
-		//
-		//		//i campi "titolo, "title", "initiator", "descrizione" sono salvati in un json in name e non come variabili di Process Instance
-		//		if (stato != null || titolo != null || initiator != null || descrizione != null) {
-		//			//l'ordine delle field di ricerca è importante nella query sul campo singolo "name"
-		//			//todo: è una porcata ma avere i campi in "name" migliora di moltissimo le prestazioni della ricerca
-		//			if (descrizione != null)
-		//				appo += "%\"descrizione\":\"%" + descrizione.substring(descrizione.indexOf('=') + 1) + "%\"%";
-		//			if (titolo != null)
-		//				appo += "%\"titolo\":\"%" + titolo.substring(titolo.indexOf('=') + 1) + "%\"%";
-		//			if (initiator != null)
-		//				appo += "%\"initiator\":\"%" + initiator.substring(initiator.indexOf('=') + 1) + "%\"%";
-		//			if (stato != null)
-		//				appo += "%\"stato\":\"%" + stato.substring(stato.indexOf('=') + 1) + "%\"%";
-		//		}
+
+        name.put(DESCRIZIONE, ellipsis(descrizione, LENGTH_DESCTIZIONE));
+        name.put(TITOLO, ellipsis(titolo, LENGTH_TITOLO));
+        name.put("stato", ellipsis(stato, LENGTH_FASE) );
+        name.put(INITIATOR, initiator);
+
+        runtimeService.setProcessInstanceName(processInstanceId, name.toString());
+
 
 	}
 
@@ -402,27 +409,75 @@ public class FlowsProcessInstanceService {
 		writer.close();
 	}
 
-	public List<HistoricProcessInstance> getPIForExternalServices(String processDefinition, Date startDate, Date endDate, int firstResult, int maxResults, String order) {
-		List<HistoricProcessInstance> historicProcessInstances;
+    public List<HistoricProcessInstance> getProcessInstancesForURP(int terminiRicorso, Boolean avvisiScaduti, Boolean gareScadute, int firstResult, int maxResults, String order) {
 
-		HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()
-				.unfinished()
-				.processDefinitionKey(processDefinition)
-				.startedAfter(startDate)
-				.startedBefore(endDate)
-				.includeProcessVariables();
-		if (order != null && order.equals(DESC)){
-			historicProcessInstances = historicProcessInstanceQuery
-					.orderByProcessInstanceStartTime().desc()
-					.listPage(firstResult, maxResults);
-		} else {
-//        	default
-			historicProcessInstances = historicProcessInstanceQuery
-					.orderByProcessInstanceStartTime().asc()
-					.listPage(firstResult, maxResults);
-		}
-		return historicProcessInstances;
-	}
+        HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()
+                .includeProcessVariables()
+                .processDefinitionKey("acquisti")
+                .or()
+                .variableValueNotEquals(statoFinaleDomanda.name(), Annullato.name())
+                .variableValueNotEquals(statoFinaleDomanda.name(), Revocato.name())
+                .endOr();
+        Calendar dataTerminiRicorso = Calendar.getInstance();
+        dataTerminiRicorso.setTime(new Date());
+
+        String now = utils.formattaData(new Date());
+        if(gareScadute != null){
+            historicProcessInstanceQuery
+                    .variableValueLike("strumentoAcquisizione", "PROCEDURA SELETTIVA%");
+            if(gareScadute){
+                // GARE SCADUTE IN ATTESA DI ESITO: data scadenza presentazione offerta < NOW  && data scadenza presentazione offerta - termini di ricorso >= NOW
+                if(terminiRicorso != 0)
+                    dataTerminiRicorso.add(Calendar.DAY_OF_MONTH, -terminiRicorso);
+
+                historicProcessInstanceQuery
+                        .variableValueLessThan(dataScadenzaBando.name(), now)
+                        .variableValueGreaterThanOrEqual(dataScadenzaBando.name(), utils.formattaData(dataTerminiRicorso.getTime()));
+                LOGGER.info("SCADUTE IN ATTESA DI ESITO nr flussi {}", historicProcessInstanceQuery.count());
+
+            } else {
+                // GARE IN CORSO data scadenza presentazione offerta >= NOW
+                historicProcessInstanceQuery
+                        .variableValueGreaterThanOrEqual(dataScadenzaBando.name(), now);
+                LOGGER.info("GARE IN CORSO nei flussi {}", historicProcessInstanceQuery.count());
+
+            }
+        }
+
+        if(avvisiScaduti != null){
+            if(avvisiScaduti){
+                // AVVISI SCADUTI: data scadenza presentazione offerta  < NOW && data scadenza presentazione offerta + terminiRicorso >= NOW
+                dataTerminiRicorso.add(Calendar.DAY_OF_MONTH, -terminiRicorso);
+
+                historicProcessInstanceQuery
+                        .variableValueLessThan(dataScadenzaAvvisoPreDetermina.name(), now)
+                        .variableValueGreaterThanOrEqual(dataScadenzaAvvisoPreDetermina.name(), utils.formattaData(dataTerminiRicorso.getTime()));
+            }else{
+                // AVVISI IN CORSO: data scadenza presentazione offerta >= NOW
+                historicProcessInstanceQuery
+                        .variableValueGreaterThanOrEqual(dataScadenzaAvvisoPreDetermina.name(), now);
+            }
+        }
+        utils.orderProcess(order, historicProcessInstanceQuery);
+
+        return historicProcessInstanceQuery.listPage(firstResult, maxResults);
+    }
+
+
+
+    public List<HistoricProcessInstance> getProcessInstancesForTrasparenza(int firstResult, int maxResults, String order) {
+
+        HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()
+                .includeProcessVariables()
+                .processDefinitionKey("acquisti")
+                .unfinished()
+                .variableValueEquals(flagIsTrasparenza.name(), "true");
+
+        utils.orderProcess(order, historicProcessInstanceQuery);
+
+        return historicProcessInstanceQuery.listPage(firstResult, maxResults);
+    }
+
 
 
 	private void processDate(HistoricProcessInstanceQuery processQuery, String key, String value) {

@@ -3,8 +3,6 @@ package it.cnr.si;
 import it.cnr.si.config.Constants;
 import it.cnr.si.config.DefaultProfileUtil;
 import it.cnr.si.config.JHipsterProperties;
-import org.activiti.spring.boot.*;
-import org.activiti.spring.boot.JpaProcessEngineAutoConfiguration.JpaConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -14,6 +12,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -27,19 +26,11 @@ import java.util.Arrays;
 import java.util.Collection;
 
 @ComponentScan
+@EnableCaching
 @SpringBootApplication
 @EnableAutoConfiguration(exclude = {
         MetricFilterAutoConfiguration.class,
         MetricRepositoryAutoConfiguration.class,
-        RestApiAutoConfiguration.class,
-        SecurityAutoConfiguration.class,
-        SecurityAutoConfiguration.UserDetailsServiceConfiguration.class,
-        JpaProcessEngineAutoConfiguration.class,
-        EndpointAutoConfiguration.class,
-        DataSourceProcessEngineAutoConfiguration.class,
-        AbstractProcessEngineAutoConfiguration.class,
-        JpaProcessEngineAutoConfiguration.class,
-        JpaConfiguration.class,
         SprintApp.class
 })
 @EnableConfigurationProperties({ JHipsterProperties.class, LiquibaseProperties.class })
@@ -75,7 +66,7 @@ public class FlowsApp {
                 .filter(p -> p.equals("cnr") || p.equals("oiv") || p.equals("showcase"))
                 .count();
         if (profiles != 1) {
-            log.error("Selezionare esattamente un profilo tra 'cnr' e 'oiv'");
+            log.error("Selezionare esattamente un profilo tra 'cnr', 'oiv' e 'showcase'");
             System.exit(1);
         }
     }
@@ -94,9 +85,9 @@ public class FlowsApp {
 
         Environment env = appContext.getEnvironment();
         log.info("\n----------------------------------------------------------\n\t" +
-                "Application '{}' is running! Access URLs:\n\t" +
-                "Local: \t\thttp://127.0.0.1:{}\n\t" +
-                "External: \thttp://{}:{}\n----------------------------------------------------------",
+                        "Application '{}' is running! Access URLs:\n\t" +
+                        "Local: \t\thttp://127.0.0.1:{}\n\t" +
+                        "External: \thttp://{}:{}\n----------------------------------------------------------",
                 env.getProperty("spring.application.name"),
                 env.getProperty("server.port"),
                 InetAddress.getLocalHost().getHostAddress(),

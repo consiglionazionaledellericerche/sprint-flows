@@ -45,10 +45,11 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
                 .and()
                 .antMatcher("/impersonate/**")
                 .authorizeRequests()
-                .antMatchers(IMPERSONATE_START_URL).hasRole("ADMIN")
+                .antMatchers(IMPERSONATE_START_URL).hasAnyRole("ROLE_ADMIN", "ROLE_amministratori-supporto-tecnico@0000")
                 .antMatchers(IMPERSONATE_EXIT_URL).hasRole("PREVIOUS_ADMINISTRATOR")
                 .and()
-                .addFilterAfter(switchUserFilter(), FilterSecurityInterceptor.class);
+                .addFilterAfter(switchUserFilter(), FilterSecurityInterceptor.class)
+                .addFilterAfter(logPrologSettingFilter(), OAuthCookieSwithUserFilter.class);
     }
     
     @Profile(value = {"cnr"})
@@ -105,5 +106,10 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
         filter.setExitUserUrl(IMPERSONATE_EXIT_URL);
         filter.setTargetUrl("/");
         return filter;
+    }
+
+    @Bean
+    public LogPrologSettingFilter logPrologSettingFilter() {
+        return new LogPrologSettingFilter();
     }
 }

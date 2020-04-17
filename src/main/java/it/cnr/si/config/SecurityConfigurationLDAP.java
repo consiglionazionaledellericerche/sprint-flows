@@ -47,7 +47,7 @@ public class SecurityConfigurationLDAP extends WebSecurityConfigurerAdapter {
             String url = propertyResolver.getProperty("url");
             if (propertyResolver != null && url != null) {
                 log.info("ldap server: " + url);
-    
+
                 auth.ldapAuthentication()
                         .userDetailsContextMapper(userDetailsContextMapper)
                         .ldapAuthoritiesPopulator(authPopulator)

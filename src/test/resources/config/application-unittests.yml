@@ -1,0 +1,68 @@
+spring:
+  ldap:
+    userSearchBase: o=cnr, c=it
+    userSearchFilter: uid={0}
+    url: ldap://virtest1.si.cnr.it:389
+    managerDn: cn=mastercnrapp2,ou=account,o=cnr,c=it
+    managerPassword: pippa
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    # l'url del db viene modificata all'avvio dell'applicazione a seconda del profilo (cnr => flows-cnr,
+    # oiv => flows-oiv) in modo che l'applicazione punti un db diverso a seconda del profilo
+    url: jdbc:h2:mem:flows-test;DB_CLOSE_DELAY=-1
+    #       url: jdbc:h2:file:./DB-H2/flows-test;DB_CLOSE_DELAY=-1
+    username: flows
+    password: flows
+  jpa:
+    database-platform: it.cnr.si.domain.util.FixedH2Dialect
+    database: H2
+    show-sql: false
+#    properties:
+#      hibernate.cache.use_second_level_cache: false
+#      hibernate.cache.use_query_cache: false
+#      hibernate.generate_statistics: false
+#      hibernate.cache.region.factory_class: it.cnr.si.config.hazelcast.HazelcastCacheRegionFactory
+#      hibernate.cache.use_minimal_puts: true
+#      hibernate.cache.hazelcast.use_lite_member: true
+  proxy:
+    OIL:
+      username: admin
+      password: ubiquitous
+      url: http://helpwildfly.si.cnr.it:8080/rest/
+      newProblem: pest
+      instance: /HDSiper
+  mail:
+    url: localhost:8080
+  cloud:
+    config:
+      allowOverride: true
+      overrideNone: true
+      overrideSystemProperties: false
+
+
+cnr:
+  storage:
+    driver: filesystem
+    filesystem:
+      directory: ${java.io.tmpdir}
+  activiti:
+    diagram-font: DejaVu Sans
+
+
+cache:
+  hazelcast:
+    port: 5709
+    packages: it.cnr.si
+    localIp: 127.0.0.1
+
+ace:
+  url: "http://ace-webapp.test.si.cnr.it:5555/api"
+  username: app.scrivaniadigitale
+  password: 
+
+org:
+  apache:
+    chemistry:
+      opencmis:
+        user: admin
+        password: admin

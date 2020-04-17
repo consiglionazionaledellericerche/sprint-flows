@@ -4,6 +4,13 @@ body {
     color: #222;
 }
 
+.browsehappy {
+  color: #900;
+  display: none;
+  text-align: center;
+  margin-top: 30px;
+}
+
 .container {
 	background-color: #fff;
 	box-shadow: inset 0 1px 0 rgba(255,255,255,.55),0 1px 15px rgba(0,0,0,.25);
@@ -361,7 +368,8 @@ button.ng-touched.ng-invalid,
 textarea.ng-touched.ng-invalid,
 div.ng-touched.ng-invalid,
 cnr-tree.ng-touched.ng-invalid > .jstree-bootstrap,
-select.ng-touched.ng-invalid {
+select.ng-touched.ng-invalid,
+wysiwyg.ng-touched.ng-invalid > trix-editor {
   border: solid 1px red;
 }
 
@@ -645,4 +653,26 @@ select.ng-touched.ng-invalid {
 /* fix per JsTree: i risultati della ricerca appaiono in verde */
 .jstree-default .jstree-search {
     color: #0d6500;
+}
+
+/* TRIX EDITOR */
+.trix-button--icon-increase-nesting-level,
+.trix-button--icon-decrease-nesting-level,
+.trix-button--icon-link,
+.trix-button--icon-strike,
+.trix-button--icon-heading-1,
+.trix-button--icon-quote,
+.trix-button--icon-code,
+[data-trix-button-group="file-tools"],
+[data-trix-button-group="history-tools"]{
+    display: none!important;
+}
+
+@media screen and (max-width: 425px) {
+    .label {
+        white-space: normal;
+    }
+    .banner {
+        display: none;
+    }
 }

@@ -47,7 +47,8 @@
                 },
                 reassign: function (taskId, processInstanceId, assignee) {
                     return $http({
-                        url: 'api/tasks/reassign/' + assignee + '?' +
+                        url: 'api/tasks/reassign/?' +
+                            'assignee=' + assignee + '&' +
                             (taskId ? 'taskId=' + taskId + '&' : '') +
                             (processInstanceId ? 'processInstanceId=' + processInstanceId : ''),
                         method: 'PUT',
@@ -181,6 +182,20 @@
                         '&firstResult=' + firstResult +
                         '&maxResults=' + maxResults, searchParams);
                 },
+                exportCsvAndSaveInProcess: function (searchParams, firstResult, maxResults) {
+                    var processDefinitionKey;
+                    if (searchParams.processDefinitionKey !== undefined) {
+                        processDefinitionKey = searchParams.processDefinitionKey;
+                    } else {
+                        processDefinitionKey = 'all';
+                    }
+                    var processInstanceId = searchParams.processInstanceId;
+                    return $http.post('api/search/exportCsvAndSaveInProcess/' + processDefinitionKey + '/' + processInstanceId +
+                        '?active=' + searchParams.active +
+                        '&order=' + searchParams.order +
+                        '&firstResult=' + firstResult +
+                        '&maxResults=' + maxResults, searchParams);
+                },
             },
             lookup: {
                 uo: function (id) {
@@ -188,6 +203,9 @@
                 },
                 users: function (username) {
                     return $http.get('api/lookup/ldap/user/' + username);
+                },
+                mycdsuos: function () {
+                    return $http.get('api/lookup/ace/user/cdsuoabilitate');
                 }
             },
             mail: {
@@ -276,6 +294,29 @@
             faq: {
                 getReadable: function () {
                     return $http.get("api/faqs/readable");
+                }
+            },
+            draft: {
+                getDraftByTaskId: function (taskId, username) {
+                    return $http({
+                        url: 'api/draft/getDraftByTaskId',
+                        method: 'GET',
+                        params: {
+                            taskId: taskId ? taskId : '0',
+                            username: (username ? username : '')
+                        },
+                    });
+                },
+                updateDraft: function (taskId, json, username) {
+                    return $http({
+                        url: 'api/drafts/updateDraft?',
+                        method: 'PUT',
+                        params: {
+                            taskId: taskId ? taskId : '0',
+                            username: (username ? username : '')
+                        },
+                        data: json
+                    });
                 }
             },
             signMany: function (username, password, otp, ids) {

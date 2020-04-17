@@ -8,7 +8,6 @@ import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JsonDataSource;
-import net.sf.jasperreports.engine.util.LocalJasperReportsContext;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -44,16 +43,17 @@ import rst.pdfbox.layout.text.Position;
 
 import javax.inject.Inject;
 import java.awt.*;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.ZoneId;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Aggiornamento;
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Caricamento;
@@ -98,8 +98,6 @@ public class FlowsPdfService {
 	private int nrFlussiTerminati = 0;
 	private int allTerminatedProcessInstancesDurationInMillis = 0;
 	private Calendar newDate = Calendar.getInstance();
-
-
 
 	public String makeSummaryPdf(String processInstanceId, ByteArrayOutputStream outputStream) throws IOException, ParseException {
 
@@ -188,7 +186,10 @@ public class FlowsPdfService {
 						.findFirst();
 				if (variable.isPresent()) {
 					variables.remove(variable.get());
-					paragraphField.addText(label + ": " + variable.get().getValue() + "\n", FONT_SIZE, HELVETICA_BOLD);
+					String value = String.valueOf(variable.get().getValue());
+					if (type.equals("wysiwyg"))
+						value = Jsoup.parse(value).text();
+					paragraphField.addText(label + ": " + value + "\n", FONT_SIZE, HELVETICA_BOLD);
 				}
 			}
 		}
@@ -285,10 +286,11 @@ public class FlowsPdfService {
 						String valueEscaped = "campo erroneamente compilato";
 						if (runtimeService.getVariable(processInstanceId,value.getName()) != null) {
 							valueEscaped = Jsoup.parse(StringEscapeUtils.escapeHtml(runtimeService.getVariable(processInstanceId,value.getName()).toString().replaceAll("\t", "  "))).text();
+							valueEscaped = valueEscaped.replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;");
 							variableInstanceJson.put(key, valueEscaped);
 						}
 					}
-				}	
+				}
 			}
 			LOGGER.info("variableInstanceJson: {}", variableInstanceJson);
 		}
@@ -297,12 +299,18 @@ public class FlowsPdfService {
 		JSONObject processVariables = mappingVariables(variableInstanceJson, processInstanceId);
 		//creo il pdf corrispondente
 		String utenteRichiedente = "sistema";
-		String fileName = tipologiaDoc + ".pdf";			
+		String fileName = tipologiaDoc + ".pdf";
 
 		if(processVariables.has("nomeRichiedente")) {
 			utenteRichiedente = processVariables.getString("nomeRichiedente");
 			fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
-		} 
+		}
+
+		if(processVariables.has("userNameRichiedente")) {
+			utenteRichiedente = processVariables.getString("userNameRichiedente");
+			fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
+		}
+
 
 		return Pair.of(fileName, makePdf(Enum.PdfType.valueOf(tipologiaDoc), processVariables, fileName, utenteRichiedente, processInstanceId));
 	}
@@ -340,8 +348,7 @@ public class FlowsPdfService {
 			parameters.put(JRParameter.REPORT_RESOURCE_BUNDLE, resourceBundle);
 			parameters.put(JRParameter.REPORT_DATA_SOURCE, datasource);
 
-			LocalJasperReportsContext ctx = new LocalJasperReportsContext(DefaultJasperReportsContext.getInstance());
-			ctx.setClassLoader(ClassLoader.getSystemClassLoader());
+			SimpleJasperReportsContext ctx = new SimpleJasperReportsContext(DefaultJasperReportsContext.getInstance());
 			JasperFillManager fillmgr = JasperFillManager.getInstance(ctx);
 
 			//il nome del file jasper da caricare(dipende dal tipo di pdf da creare)
@@ -410,8 +417,7 @@ public class FlowsPdfService {
 			parameters.put(JRParameter.REPORT_RESOURCE_BUNDLE, resourceBundle);
 			parameters.put(JRParameter.REPORT_DATA_SOURCE, datasource);
 
-			LocalJasperReportsContext ctx = new LocalJasperReportsContext(DefaultJasperReportsContext.getInstance());
-			ctx.setClassLoader(ClassLoader.getSystemClassLoader());
+			SimpleJasperReportsContext ctx = new SimpleJasperReportsContext(DefaultJasperReportsContext.getInstance());
 			JasperFillManager fillmgr = JasperFillManager.getInstance(ctx);
 
 			//il nome del file jasper da caricare(dipende dal tipo di pdf da creare)
@@ -580,7 +586,7 @@ public class FlowsPdfService {
 
 		image = new ImageElement(diagram);
 		Dimension scaledDim = getScaledDimension(new Dimension((int) image.getWidth(), (int) image.getHeight()),
-				dimension, margineSx);
+												 dimension, margineSx);
 		image.setHeight((float) scaledDim.getHeight());
 		image.setWidth((float) scaledDim.getWidth());
 		image.setAbsolutePosition(new Position(20, 700));

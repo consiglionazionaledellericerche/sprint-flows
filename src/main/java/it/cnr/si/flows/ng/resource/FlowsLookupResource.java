@@ -4,6 +4,7 @@ import it.cnr.si.config.ExternalMessageSender;
 import it.cnr.si.flows.ng.ldap.LdapPersonToSearchResultMapper;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.SiperService;
+import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.FlowsLdapAccountService;
@@ -28,6 +29,7 @@ import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/lookup")
@@ -39,7 +41,7 @@ public class FlowsLookupResource {
     @Inject
     private LdapTemplate ldapTemplate;
     @Inject
-    private AceBridgeService aceService;
+    private AceBridgeService aceBridgeService;
     @Inject
     private ManagementService managementService;
     @Inject
@@ -54,29 +56,48 @@ public class FlowsLookupResource {
     @RequestMapping(value = "/ace/user/{username:.+}", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.ADMIN)
     public List<String> getAce(@PathVariable String username) {
-        return aceService.getAceGroupsForUser(username);
+        return aceBridgeService.getAceGroupsForUser(username);
     }
 
     @RequestMapping(value = "/ace/usersingroup/{groupname:.+}", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.ADMIN)
     public List<String> getAceGroup(@PathVariable String groupname) {
-        return aceService.getUsersInAceGroup(groupname);
+        return aceBridgeService.getUsersInAceGroup(groupname);
     }
 
     @RequestMapping(value = "/ace/groupdetail/{id:.+}", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.ADMIN)
     public String getAceGroupDetail(@PathVariable Integer id) {
-        return aceService.getNomeStruturaById(id);
+        return aceBridgeService.getNomeStruturaById(id);
     }
 
     @RequestMapping(value = "/ace/uo/{id:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Utils.SearchResult> getUoById(@PathVariable Integer id) {
 
-        EntitaOrganizzativaWebDto s = aceService.getUoById(id);
+        EntitaOrganizzativaWebDto s = aceBridgeService.getUoById(id);
         Utils.SearchResult r = new Utils.SearchResult(s.getId().toString(), s.getCdsuo() +" - "+ s.getDenominazione());
 
         return ResponseEntity.ok(r);
+    }
+
+    @RequestMapping(value = "/ace/user/cdsuoabilitate", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
+    public ResponseEntity<List<Utils.SearchResult>> getCdsUoAbilitate() {
+
+        List<Utils.SearchResult> CDSUOs = SecurityUtils.getCurrentUserAuthorities().stream()
+                .map(Utils::removeLeadingRole)
+                .filter(role -> role.startsWith("staffAmministrativo"))
+                .map(role -> role.split("@")[1])
+                .map(idEo -> {
+                    Integer id = Integer.parseInt(idEo);
+                    return aceBridgeService.getStrutturaById(id);
+                })
+                .map(eo -> {
+                    return new Utils.SearchResult(String.valueOf(eo.getId()), eo.getCdsuo() +" - "+ eo.getDenominazioneBreve());
+                }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(CDSUOs);
     }
 
     @RequestMapping(value = "/ldap/user/{username:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -114,8 +135,8 @@ public class FlowsLookupResource {
     public ResponseEntity<Void> runCron() {
 
         log.info("Running crons");
-        extenalMessageSender.sendMessagesDo();
-        extenalMessageSender.sendErrorMessagesDo();
+        extenalMessageSender.sendMessages();
+        extenalMessageSender.sendErrorMessages();
         return ResponseEntity.ok().build();
     }
 

@@ -1,65 +1,33 @@
 package it.cnr.si.flows.ng.batch;
 
+import com.opencsv.CSVParser;
+import it.cnr.si.FlowsApp;
+import it.cnr.si.flows.ng.service.AceBridgeService;
+import it.cnr.si.service.AceService;
+import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
+import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
+import org.junit.Ignore;
+import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import javax.inject.Inject;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collection;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
-import java.time.LocalDate;
-
-import it.cnr.si.FlowsApp;
-import org.activiti.spring.boot.AbstractProcessEngineAutoConfiguration;
-import org.activiti.spring.boot.DataSourceProcessEngineAutoConfiguration;
-import org.activiti.spring.boot.EndpointAutoConfiguration;
-import org.activiti.spring.boot.JpaProcessEngineAutoConfiguration;
-import org.activiti.spring.boot.RestApiAutoConfiguration;
-import org.activiti.spring.boot.SecurityAutoConfiguration;
-import org.activiti.spring.boot.JpaProcessEngineAutoConfiguration.JpaConfiguration;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.actuate.autoconfigure.MetricFilterAutoConfiguration;
-import org.springframework.boot.actuate.autoconfigure.MetricRepositoryAutoConfiguration;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.core.env.Environment;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.web.servlet.mvc.method.annotation.CompletionStageReturnValueHandler;
-
-import com.opencsv.CSVParser;
-
-import it.cnr.si.SprintApp;
-import it.cnr.si.config.Constants;
-import it.cnr.si.config.DefaultProfileUtil;
-import it.cnr.si.config.JHipsterProperties;
-import it.cnr.si.flows.ng.service.AceBridgeService;
-import it.cnr.si.service.AceService;
-import it.cnr.si.service.dto.anagrafica.base.PageDto;
-import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
-import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
-
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(profiles = "dev,cnr")
 @RunWith(SpringJUnit4ClassRunner.class)
+@Ignore
 public class PopolazioneProfiliAcquistiBatch {
 
 	private static final Logger log = LoggerFactory.getLogger(PopolazioneProfiliAcquistiBatch.class);

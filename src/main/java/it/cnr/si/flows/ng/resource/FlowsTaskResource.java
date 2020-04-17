@@ -2,6 +2,7 @@ package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
+import it.cnr.si.firmadigitale.firma.arss.stub.PdfSignApparence;
 import it.cnr.si.firmadigitale.firma.arss.stub.SignReturnV2;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.exception.FlowsPermissionException;
@@ -9,7 +10,6 @@ import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
 import it.cnr.si.flows.ng.service.*;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.security.FlowsUserDetailsService;
 import it.cnr.si.security.PermissionEvaluatorImpl;
 import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.ActivitiObjectNotFoundException;
@@ -25,7 +25,9 @@ import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.task.TaskResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -39,6 +41,9 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static it.cnr.si.flows.ng.service.FlowsFirmaService.ERRORI_ARUBA;
 import static it.cnr.si.flows.ng.service.FlowsFirmaService.NOME_FILE_FIRMA;
@@ -75,7 +80,7 @@ public class FlowsTaskResource {
     private RelationshipService relationshipService;
     @Inject
     private FlowsAttachmentService attachmentService;
-    @Inject
+    @Autowired(required = false)
     private FlowsFirmaService flowsFirmaService;
     @Inject
     private FlowsAttachmentService flowsAttachmentService;
@@ -84,6 +89,8 @@ public class FlowsTaskResource {
     @Inject
     private UserDetailsService flowsUserDetailsService;
 
+    @Autowired
+    private ApplicationContext context;
 
     @PostMapping(value = "/mytasks", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
@@ -156,7 +163,7 @@ public class FlowsTaskResource {
 
 
     @GetMapping(value = "/activeByProcessInstanceId/{processInstanceId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<TaskResponse> getActiveTaskByProcessInstanceId(@PathVariable("processInstanceId") String processInstanceId) {
 
@@ -186,13 +193,13 @@ public class FlowsTaskResource {
 
 
 
-    @PutMapping(value = "/reassign/{assignee:.*}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/reassign/", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.isResponsabile(#taskId, #processInstanceId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Map<String, Object>> reassignTask(
             @RequestParam(name = "processInstanceId", required=false) String processInstanceId,
             @RequestParam(name = "taskId", required=false) String taskId,
-            @PathVariable(value = "assignee") String assignee) {
+            @RequestParam(value = "assignee") String assignee) {
 
         if(taskId == null) {
             // se vengo da pagine in cui ho solo il processInstanceId (tipo ricerca) trovo il taskId
@@ -336,10 +343,19 @@ public class FlowsTaskResource {
             fileDaFirmare.add(taskService.getVariable(id, nomiFileDaFirmare.get(i), FlowsAttachment.class));
             fileContents.add(flowsAttachmentService.getAttachmentContentBytes(fileDaFirmare.get(i)));
         }
+        PdfSignApparence pdfSignApparence = null;
+        if (nomiFileDaFirmare.stream().distinct().count() == 1) {
+            final String s = nomiFileDaFirmare.stream().findFirst().get();
+            try {
+                pdfSignApparence = context.getBean(s, PdfSignApparence.class);
+            } catch (BeansException _ex) {
+                LOGGER.warn("Cannot find bean for pdfSignApparence {}", s);
+            }
+        }
 
         List<String> succesfulTasks = new ArrayList<>();
         List<String> failedTasks    = new ArrayList<>();
-        List<SignReturnV2> signResponses = flowsFirmaService.firmaMultipla(username, password, otp, fileContents);
+        List<SignReturnV2> signResponses = flowsFirmaService.firmaMultipla(username, password, otp, fileContents, pdfSignApparence);
 
         for (int i = 0; i < taskIds.size(); i++) {
             SignReturnV2 signResponse = signResponses.get(i);

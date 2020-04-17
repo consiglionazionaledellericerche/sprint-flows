@@ -16,41 +16,54 @@ cache:
     - node/
     - node/modules/
     - src/main/webapp/bower_components
-    - target/app.war
 
 stages:
+  - test
+  - build
   - deploy_snapshot
-  - build_test_container
-  - deploy_test_container
+  - build_container
+  - deploy_container
   - release
   - build_prod_container
   - deploy_prod_container
 
-
-deploy_dev_snapshot:
-  stage: deploy_snapshot
+test:
+  stage: test
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
-  only:
-    - dev
   script:
-    - mvn -B clean compile package deploy -DskipTests -Pdev
+    - mvn -B sonar:sonar -Dsonar.host.url=http://sonar.si.cnr.it test package -fae
+  allow_failure: true
 
+build_dev:
+  stage: build
+  only: 
+    - dev
+  image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
+  script:
+    - mvn -B deploy -DskipTests -U
 
-# branch TEST & DEMO
+build:
+  stage: build
+  except: 
+    - dev
+  image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
+  script:
+    - mvn -B deploy -DskipTests -Pprod -U
+  artifacts:
+    paths:
+      - ./target/app.war
+    expire_in: 2 days
 
 deploy_snapshot:
   stage: deploy_snapshot
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   only:
-    - test
-    - demo
-    - prod
+    - master
   script:
-    - mvn -B clean compile package -DskipTests -Pprod -U $MAVEN_OPTS
-    - cp ./target/*.war ./target/app.war
+    - mvn -B clean compile package deploy -DskipTests -Pprod -U
 
-buildtestcontainer:
-  stage: build_test_container
+buildcontainer:
+  stage: build_container
   tags:
     - shared
   only:
@@ -58,12 +71,13 @@ buildtestcontainer:
     - demo
   script:
     - echo "Running build image and push image"
+    - ls -la ./target
     - docker build --file src/main/docker/test/Dockerfile -t docker.si.cnr.it/sprint-flows-$CI_COMMIT_REF_NAME .
     - docker push docker.si.cnr.it/sprint-flows-$CI_COMMIT_REF_NAME
 
 
 deploydockertest01e02:
-  stage: deploy_test_container
+  stage: deploy_container
   image: scolagreco/alpine-ssh:latest
   tags:
     - shared
@@ -71,10 +85,12 @@ deploydockertest01e02:
     - test
   script:
     - echo "Deploy to dockertest01"
+    - sed -i "s/CONFIG_REPO_TOKEN/$CONFIG_REPO_TOKEN/g" ./src/main/docker/test/app-con-mancenter.yml
     - sshremote $SSH_CONNECT_DOCKERTEST01 "if [ -f  ''/sites/sprint-flows-test/app.yml'' ]; then docker-compose -p sprint-flows-test -f /sites/sprint-flows-test/app.yml down --remove-orphans; fi && rm -rf /sites/sprint-flows-test && mkdir -p /sites/sprint-flows-test || echo NODIR"
     - scpremote ./src/main/docker/test/app-con-mancenter.yml $SSH_CONNECT_DOCKERTEST01:/sites/sprint-flows-test/app.yml
     - sshremote $SSH_CONNECT_DOCKERTEST01 "cd /sites/sprint-flows-test && docker-compose -p sprint-flows-test -f app.yml pull && docker-compose -p sprint-flows-test -f app.yml up -d"
     - echo "Deploy to dockertest02"
+    - sed -i "s/CONFIG_REPO_TOKEN/$CONFIG_REPO_TOKEN/g" ./src/main/docker/test/app-senza-mancenter.yml
     - sshremote $SSH_CONNECT_DOCKERTEST02 "if [ -f  ''/sites/sprint-flows-test/app.yml'' ]; then docker-compose -p sprint-flows-test -f /sites/sprint-flows-test/app.yml down --remove-orphans; fi && rm -rf /sites/sprint-flows-test && mkdir -p /sites/sprint-flows-test || echo NODIR"
     - scpremote ./src/main/docker/test/app-senza-mancenter.yml $SSH_CONNECT_DOCKERTEST02:/sites/sprint-flows-test/app.yml
     - sshremote $SSH_CONNECT_DOCKERTEST02 "cd /sites/sprint-flows-test && docker-compose -p sprint-flows-test -f app.yml pull && docker-compose -p sprint-flows-test -f app.yml up -d"

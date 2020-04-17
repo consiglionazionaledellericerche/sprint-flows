@@ -1,23 +1,20 @@
 package it.cnr.si.flows.ng.service;
 
 import it.cnr.si.FlowsApp;
-import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.inject.Inject;
 
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.Assert.*;
-
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles(profiles = "native,showcase,unittests")
+@EnableTransactionManagement
+@RunWith(SpringRunner.class)
 public class FlowsAttachmentServiceTest {
 
     @Inject

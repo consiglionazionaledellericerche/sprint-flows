@@ -47,9 +47,11 @@ public class AceBridgeService {
 				.collect(Collectors.toList());
 	}
 
-	/**
+	/*
 	 * ATTENZIONE! Usare ???() per prendere tutti gli utenti, compresi col ruolo-nel-ruolo
 	 * Usare questo solo per prendere solo i gruppi di uno specifico gruppo Ace
+	 *
+	 * L'unico utilizzo giustificato di questo service e' in MembershipService
 	 */
 	@Deprecated
 	public List<String> getUsersInAceGroup(String groupName) {
@@ -59,6 +61,9 @@ public class AceBridgeService {
 
 		String[] split = groupName.split("@");
 		String sigla = split[0];
+		if ("STRUTTURA".equals(split[1]))
+			return new ArrayList<String>();
+		
 		int idEo = Integer.parseInt(split[1]);
 
 		int idRuolo = getIdRuoloBySigla(sigla);
@@ -92,7 +97,7 @@ public class AceBridgeService {
 	}
 
 
-//	todo: in futuro rendere cacheable?
+	//	todo: in futuro rendere cacheable?
 	public List<EntitaOrganizzativaWebDto> getUoByTipo(int tipo) {
 
 		return aceService.entitaOrganizzativaFind(null, null, null, LocalDate.now(), tipo)
@@ -115,17 +120,21 @@ public class AceBridgeService {
 		return aceService.getRuoloBySigla(sigla).getDescr();
 	}
 
-	//    @Cacheable("nomiStrutture")
+	@Cacheable("nomiStrutture")
 	public String getNomeStruturaById(Integer id) {
 
 		if (id == 0) {
 			return "CNR";
 		} else {
-			return aceService.entitaOrganizzativaById(id).getDenominazione();
+			return getStrutturaById(id).getDenominazione();
 		}
 	}
 
-	//    @Cacheable("nomiEstesiGruppiRuoloStruttura")
+	public EntitaOrganizzativaWebDto getStrutturaById(Integer id) {
+		return aceService.entitaOrganizzativaById(id);
+	}
+
+	@Cacheable("getExtendedGroupNome")
 	public String getExtendedGroupNome(String groupRuoloStrutturaName) {
 		if (groupRuoloStrutturaName == null)
 			return null;
@@ -162,21 +171,42 @@ public class AceBridgeService {
 	}
 
 
-    public EntitaOrganizzativaWebDto getEntitaOrganizzativaDellUtente(String username) {
+	public EntitaOrganizzativaWebDto getAfferenzaUtenteTipoSede(String username) {
 
-        String cdsuo = getAfferenzaUtente(username).getCdsuo();
+		PersonaWebDto persona = aceService.getPersonaByUsername(username);
+		List<PersonaEntitaOrganizzativaWebDto> personaEntitaOrganizzativaWebDtos = aceService.personaEntitaOrganizzativaFind(null, null, null, persona.getId(), TipoAppartenenza.SEDE, null, null, null, null);
+		List<PersonaEntitaOrganizzativaWebDto> afferenze = personaEntitaOrganizzativaWebDtos.stream()
+				.filter(p -> Objects.isNull(p.getFineValidita()))
+				.collect(Collectors.toList());
 
-        PageDto<EntitaOrganizzativaWebDto> entitaOrganizzativaWebDtoPageDto = aceService.entitaOrganizzativaFind(null, null, cdsuo, LocalDate.now(), null);
+		if (afferenze.size() == 0)
+			throw new UnexpectedResultException("Nessuna afferenza corrente per l'utente: "+ username);
+		if (afferenze.size() > 1)
+			throw new UnexpectedResultException("L'utente risulta avere piu' di una afferenza: "+ username);
 
-        List<EntitaOrganizzativaWebDto> eos = entitaOrganizzativaWebDtoPageDto.getItems().stream()
-                .filter(eo -> Objects.isNull(eo.getEntitaLocale()))
-                .collect(Collectors.toList());
+		return afferenze.get(0).getEntitaOrganizzativa();
+	}
 
-        if (eos.size() == 0)
-            throw new UnexpectedResultException("Nessuna entita' organizzativa per il cdsuo: "+ cdsuo);
-        if (eos.size() > 1)
-            throw new UnexpectedResultException("Il Cdsuo risulta avere piu' entita' organizzative: "+ username);
 
-        return eos.get(0);
-    }
+	public EntitaOrganizzativaWebDto getEntitaOrganizzativaDellUtente(String username) {
+
+		String cdsuo = getAfferenzaUtente(username).getCdsuo();
+
+		PageDto<EntitaOrganizzativaWebDto> entitaOrganizzativaWebDtoPageDto = aceService.entitaOrganizzativaFind(null, null, cdsuo, LocalDate.now(), null);
+
+		List<EntitaOrganizzativaWebDto> eos = entitaOrganizzativaWebDtoPageDto.getItems().stream()
+				.filter(eo -> Objects.isNull(eo.getEntitaLocale()))
+				.collect(Collectors.toList());
+
+		if (eos.size() == 0)
+			throw new UnexpectedResultException("Nessuna entita' organizzativa per il cdsuo: "+ cdsuo);
+		if (eos.size() > 1)
+			throw new UnexpectedResultException("Il Cdsuo risulta avere piu' entita' organizzative: "+ username);
+
+		return eos.get(0);
+	}
+
+    public List<GerarchiaWebDto> getParents(long id) {
+		return aceService.getParentsForEo(id);
+	}
 }

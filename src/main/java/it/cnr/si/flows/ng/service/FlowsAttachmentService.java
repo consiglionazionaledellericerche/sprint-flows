@@ -381,7 +381,7 @@ public class FlowsAttachmentService {
     public InputStream getAttachmentContent(String key) {
         return storeService.getResource(key);
     }
-
+ 
     public byte[] getAttachmentContentBytes(String key) {
         try {
             return IOUtils.toByteArray(getAttachmentContent(key));

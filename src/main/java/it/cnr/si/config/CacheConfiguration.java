@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 
 @Configuration
-@EnableCaching
 @AutoConfigureAfter(value = { MetricsConfiguration.class, DatabaseConfiguration.class })
 public class CacheConfiguration {
 
@@ -78,7 +77,7 @@ public class CacheConfiguration {
 
         NetworkConfig networkConfig = config.getNetworkConfig();
         InterfacesConfig networkInterface = networkConfig.getInterfaces();
-        String hostAddress = InetAddress.getLocalHost().getHostAddress();
+        String hostAddress = env.getProperty("cache.hazelcast.localIp", InetAddress.getLocalHost().getHostAddress());
         log.info("Local IP: "+ hostAddress);
         networkInterface.setEnabled(true).addInterface(hostAddress);
         if(publicIp != null)

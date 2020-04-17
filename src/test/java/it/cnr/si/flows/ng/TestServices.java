@@ -1,17 +1,16 @@
 package it.cnr.si.flows.ng;
 
+import it.cnr.si.flows.ng.resource.FlowsProcessInstanceResource;
 import it.cnr.si.flows.ng.resource.FlowsTaskResource;
 import it.cnr.si.flows.ng.utils.Enum;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.rest.service.api.runtime.process.ProcessInstanceResource;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,7 +20,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,11 +29,9 @@ import java.util.Collection;
 import java.util.List;
 
 import static it.cnr.si.flows.ng.utils.Enum.SiglaList.TIPOLOGIA_ACQUISIZIONE;
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.descrizione;
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.titolo;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 /**
@@ -69,7 +65,7 @@ public class TestServices {
     @Inject
     private FlowsTaskResource flowsTaskResource;
     @Inject
-    private ProcessInstanceResource processInstanceResource;
+    FlowsProcessInstanceResource flowsProcessInstanceResource;
     @Inject
     private UserDetailsService flowsUserDetailsService;
     private String processDefinition;
@@ -107,6 +103,11 @@ public class TestServices {
     public void loginAbilitatiIscrizioneElencoOiv() {
         logout();
         login(TestServices.APP, "");
+    }
+
+    public void loginUtente1() {
+        logout();
+        login(TestServices.APP, "utente1");
     }
 
     public void loginSfd() {
@@ -153,13 +154,14 @@ public class TestServices {
 
 
     public int myTearDown() {
-        int processDeleted = 0;
+        loginAdmin();
         //cancello le Process Instance creata all'inizio del test'
         List<ProcessInstance> list = runtimeService.createProcessInstanceQuery().list();
-        HttpServletResponse res = new MockHttpServletResponse();
+        ResponseEntity res;
+        int processDeleted = 0;
         for (ProcessInstance pi : list) {
-            processInstanceResource.deleteProcessInstance(pi.getProcessInstanceId(), "TEST", res);
-            assertEquals(NO_CONTENT.value(), res.getStatus());
+            res = flowsProcessInstanceResource.delete(pi.getProcessInstanceId(), "TEST");
+            assertEquals(OK, res.getStatusCode());
             processDeleted++;
         }
         logout();
@@ -179,7 +181,7 @@ public class TestServices {
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
 
         processDefinition = repositoryService.createProcessDefinitionQuery()
-                .processDefinitionKey(processDefinitionKey.getValue())
+                .processDefinitionKey(processDefinitionKey.getProcessDefinition())
                 .latestVersion()
                 .singleResult()
                 .getId();
@@ -200,6 +202,20 @@ public class TestServices {
                 req.setParameter("impegni_json", "[{\"descrizione\":\"Impegno numero 1\",\"percentualeIva\":20,\"importoNetto\":100,\"vocedispesa\":\"11001 - Arretrati per anni precedenti corrisposti al personale a tempo indeterminato\",\"vocedispesaid\":\"11001\",\"uo\":\"2216\",\"gae\":\"spaclient\",\"progetto\":\"Progetto impegno 1\"}]");
                 req.setParameter("richiestaDiAcquisto_label", "Richiesta di Acquisto");
                 req.setParameter("tipologiaAffidamentoDiretto", "semplificata");
+                req.setParameter("idStruttura", "2216");
+                req.setParameter("tempiCompletamentoProceduraFine", "2216");
+
+                break;
+            case testAcquistiAvvisi:
+                loginResponsabileAcquisti();
+                req.setParameter("sceltaUtente", "GestionePreDetermina");
+                req.setParameter("commento", "commento prova Pre-Determina(Junit)");
+                req.setParameter(titolo.name(), TITOLO_DELL_ISTANZA_DEL_FLUSSO);
+                req.setParameter(descrizione.name(), "descrizione prova Pre-Determina(Junit)");
+                req.setParameter(dataScadenzaAvvisoPreDetermina.name(), "2019-09-04T00:00:00.000Z");
+                req.setParameter(dataScadenzaBando.name(), "2019-09-04T00:00:00.000Z");
+                req.setParameter("idStruttura", "2216");
+                req.setParameter("strumentoAcquisizione", "PROCEDURA SELETTIVA");
 
                 break;
             case iscrizioneElencoOiv:
@@ -223,6 +239,15 @@ public class TestServices {
                                                   this.getClass().getResourceAsStream("/pdf-test/domanda.pdf")));
                 req.addFile(new MockMultipartFile("cv", "cv.pdf", MediaType.APPLICATION_PDF.getType() + "/" + MediaType.APPLICATION_PDF.getSubtype(),
                                                   this.getClass().getResourceAsStream("/pdf-test/cv.pdf")));
+
+                break;
+            case permessiFerie:
+                loginUtente1();
+                loginAbilitatiIscrizioneElencoOiv();
+                req.setParameter("titolo", "titolo");
+                req.setParameter("descrizione", "descrizione");
+                req.addFile(new MockMultipartFile("richiestaFerie", "domanda.pdf", MediaType.APPLICATION_PDF.getType() + "/" + MediaType.APPLICATION_PDF.getSubtype(),
+                                                  this.getClass().getResourceAsStream("/pdf-test/domanda.pdf")));
 
                 break;
         }

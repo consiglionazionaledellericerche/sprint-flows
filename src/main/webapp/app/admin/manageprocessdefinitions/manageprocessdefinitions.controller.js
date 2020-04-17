@@ -13,12 +13,15 @@
         $scope.data = {};
         $scope.attachments = {};
 
-        dataService.definitions.all().then(function(response) {
-           vm.procDefs = response.data.data
-        });
+        load();
+
+        function load() {
+            dataService.definitions.all().then(function(response) {
+               vm.procDefs = response.data.all;
+            });
+        }
 
         $scope.submitProcessDefinition = function(file) {
-//            $log.info(Object.keys(vm.data));
 
             utils.prepareForSubmit($scope.data, $scope.attachments)
 
@@ -28,7 +31,8 @@
             }).then(function (response) {
                 $log.info(response);
                 AlertService.success("Richiesta completata con successo");
-
+                $scope.data.procDef.data = undefined;
+                load();
             }, function (err) {
                 $log.error(err);
                 AlertService.error("Richiesta non riuscita<br>"+ err.data.message);

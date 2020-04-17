@@ -1,7 +1,7 @@
 package it.cnr.si.security;
 
 import it.cnr.si.flows.ng.resource.FlowsProcessDefinitionResource;
-import it.cnr.si.flows.ng.service.AceBridgeService;
+import it.cnr.si.service.MembershipService;
 import it.cnr.si.flows.ng.utils.Utils;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
@@ -58,8 +58,8 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
     HistoryService historyService;
     @Inject
     RestResponseFactory restResponseFactory;
-    @Autowired(required = false)
-    private AceBridgeService aceBridgeService;
+    @Autowired
+    private MembershipService membershipService;
 
 
     /**
@@ -266,7 +266,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
     public boolean isResponsabile(String taskId, String processInstanceId, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
         String user = SecurityUtils.getCurrentUserLogin();
-        List<String> groups = aceBridgeService.getAceGroupsForUser(user); // TODO
+        Set<String> groups = membershipService.getAllGroupsForUser(user);
         Task task;
         if(!processInstanceId.isEmpty()){
             task = taskService.createTaskQuery()
@@ -319,7 +319,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
                                 a.contains(responsabile + "#flussi@" + idStruttura));
         boolean isRuoloFlusso = false;
 
-        if (instance.getProcessDefinitionKey().equals(acquisti.getValue())) {
+        if (instance.getProcessDefinitionKey().equals(acquisti.getProcessDefinition())) {
 
             String rup = String.valueOf(instance.getProcessVariables().get("rup"));
             String nomeGruppoFirma = "responsabileFirmaAcquisti@" + idStruttura;
@@ -341,7 +341,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
                 .singleResult();
         String username = SecurityUtils.getCurrentUserLogin();
 
-        if (instance.getProcessDefinitionKey().equals(acquisti.getValue())) {
+        if (instance.getProcessDefinitionKey().equals(acquisti.getProcessDefinition())) {
 
             String rup = String.valueOf(instance.getProcessVariables().get("rup"));
             if (username.equals(rup))

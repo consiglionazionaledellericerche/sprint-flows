@@ -6,6 +6,7 @@ public class Enum {
     public enum Actions {
 
         revoca("Revoca"),
+        annulla("Annulla"),
         revocaSemplice("RevocaSemplice"),
         RevocaConProvvedimento("RevocaConProvvedimento");
 
@@ -54,7 +55,8 @@ public class Enum {
         Annullato,
         PubblicatoUrp,
         PubblicatoTrasparenza,
-        Sostituito
+        Sostituito,
+        Revocato
     }
 
 
@@ -78,25 +80,48 @@ public class Enum {
     }
 
     public enum StatoDomandeAccordiInternazionaliEnum {
-    	APERTA,
-    	CHIUSA,
-    	INVIATA,
-    	RESPINTA,
-    	VALUTATA_SCIENTIFICAMENTE,
-    	ACCETATA,
-    	CANCELLATA;
+        APERTA,
+        CHIUSA,
+        INVIATA,
+        RESPINTA,
+        VALUTATA_SCIENTIFICAMENTE,
+        ACCETATA,
+        CANCELLATA;
+    }
+
+    public enum StatoDomandeSTMEnum {
+        APERTA,
+        CHIUSA,
+        INVIATA,
+        VALIDATA,
+        NON_VALIDATA,
+        IN_MODIFICA,
+        RESPINTA,
+        VALUTATA_SCIENTIFICAMENTE,
+        AUTORIZZATA,
+        ANNULLATA,
+        ACCETTATA,
+        ACCETTAZIONE,
+        CANCELLATA;
     }
 
     public enum ProcessDefinitionEnum {
-        acquisti("acquisti"),
-        permessiFerie("permessi-ferie"),
-        accordiInternazionaliBandi("accordi-internazionali-bandi"),
-        accordiInternazionaliDomande("accordi-internazionali-domande"),
-        iscrizioneElencoOiv("iscrizione-elenco-oiv");
+        acquisti("acquisti","acquisti"),
+        permessiFerie("permessi-ferie", "permessi-ferie"),
+        accordiInternazionaliBandi("accordi-internazionali-bandi", "accordi-internazionali-bandi"),
+        accordiInternazionaliDomande("accordi-internazionali-domande", "accordi-internazionali-domande"),
+        iscrizioneElencoOiv("iscrizione-elenco-oiv", "iscrizione-elenco-oiv"),
+        testAcquistiAvvisi("testAcquistiAvvisi", "acquisti");
+
 
         private String value;
 
-        ProcessDefinitionEnum(String value) {
+        private String processDefinition;
+
+        public String getProcessDefinition() { return processDefinition;  }
+
+        ProcessDefinitionEnum(String value, String processDefinition) {
+            this.processDefinition = processDefinition;
             this.value = value;
         }
 
@@ -119,7 +144,11 @@ public class Enum {
         startDate,
         endDate,
         gruppoRA,
-    	gruppoStaffAmministrativo;
+        gruppoStaffAmministrativo,
+        dataScadenzaAvvisoPreDetermina,
+        dataScadenzaBando,
+        flagIsTrasparenza,
+        statoFinaleDomanda;
     }
 
 
@@ -136,7 +165,9 @@ public class Enum {
         preavvisoRigettoDef10Giorni,
         valutazioneProgettoAccordiBilaterali,
         domandaAccordiBilaterali,
-        preavvisoRigettoCambioFascia;
+        valutazioneShortTermMobility,
+        preavvisoRigettoCambioFascia,
+        monitoraggioAttivitaCovid19;
 
         PdfType() {
         }

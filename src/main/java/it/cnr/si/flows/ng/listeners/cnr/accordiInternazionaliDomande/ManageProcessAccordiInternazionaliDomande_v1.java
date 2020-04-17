@@ -1,7 +1,13 @@
 package it.cnr.si.flows.ng.listeners.cnr.accordiInternazionaliDomande;
 
 
-
+import it.cnr.si.domain.enumeration.ExternalApplication;
+import it.cnr.si.domain.enumeration.ExternalMessageVerb;
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.service.*;
+import it.cnr.si.flows.ng.utils.Enum;
+import it.cnr.si.flows.ng.utils.Enum.StatoDomandeAccordiInternazionaliEnum;
+import it.cnr.si.service.ExternalMessageService;
 import org.activiti.engine.ManagementService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -15,32 +21,19 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import it.cnr.si.flows.ng.service.FirmaDocumentoService;
-import it.cnr.si.flows.ng.service.FlowsAttachmentService;
-import it.cnr.si.flows.ng.service.FlowsMailService;
-import it.cnr.si.flows.ng.service.FlowsPdfService;
-import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
-import it.cnr.si.flows.ng.service.ProtocolloDocumentoService;
-import it.cnr.si.service.ExternalMessageService;
-import it.cnr.si.domain.enumeration.ExternalMessageVerb;
-import it.cnr.si.flows.ng.utils.Enum;
-import it.cnr.si.flows.ng.utils.Enum.StatoDomandeAccordiInternazionaliEnum;
-import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
-import it.cnr.si.domain.enumeration.ExternalApplication;
-
+import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.statoFinaleDomanda;
+import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 
 @Component
 @Profile("cnr")
 public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionListener {
 	private static final long serialVersionUID = 686169707042367215L;
 	private static final Logger LOGGER = LoggerFactory.getLogger(ManageProcessAccordiInternazionaliDomande_v1.class);
-	public static final String STATO_FINALE_DOMANDA = "statoFinaleDomanda";
 
 
 	@Value("${cnr.abil.url}")
@@ -160,27 +153,30 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 				restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.VALUTATA_SCIENTIFICAMENTE);
 			};break;    
 			case "endevent-respinta-start": {
-				execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA RESPINTA");
+				execution.setVariable(statoFinaleDomanda.name(), "DOMANDA RESPINTA");
 				restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA);
 				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "RESPINTA");
 			};break;    	
 			case "endevent-non-autorizzata-start": {
-				execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA NON AUTORIZZATA");
+				execution.setVariable(statoFinaleDomanda.name(), "DOMANDA NON AUTORIZZATA");
+				if(execution.getVariable("sceltaUtente") != "Respingi") {
+					execution.setVariable("notaDomandaRespinta", "Scadenza termini temporali Valutazione Dirigente");
+				}
 				restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA);
 				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "NON AUTORIZZATA");
 			};break;  
 			case "endevent-annullata-start": {
-				execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA ANNULLATA");
+				execution.setVariable(statoFinaleDomanda.name(), "DOMANDA ANNULLATA");
 				restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA);
 				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "ANNULLATA");
 			};break;  
 			case "endevent-non-finanziata-start": {
-				execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA NON FINANZIATA");
+				execution.setVariable(statoFinaleDomanda.name(), "DOMANDA NON FINANZIATA");
 				restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA);
 				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "NON FINANZIATA");
 			};break;  	
 			case "endevent-approvata-start": {
-				execution.setVariable(STATO_FINALE_DOMANDA, "DOMANDA APPROVATA");
+				execution.setVariable(statoFinaleDomanda.name(), "DOMANDA APPROVATA");
 				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA.toString());
 				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "APPROVATA");
 				restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.ACCETATA);

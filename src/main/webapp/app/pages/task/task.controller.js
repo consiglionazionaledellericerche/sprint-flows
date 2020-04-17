@@ -2,8 +2,8 @@
 	'use strict';
 
 	angular
-		.module('sprintApp')
-		.controller('TaskController', HomeController);
+	.module('sprintApp')
+	.controller('TaskController', TaskController);
 
 	/**
 	 * Questo e' un po' il cuore di tutta l'applicazione, per questo e' un pochino piu' complicato di altri
@@ -25,9 +25,9 @@
 	 *
 	 * @author mtrycz
 	 */
-	HomeController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log', '$http', '$q', 'Upload', 'utils', '$localStorage'];
+	TaskController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log', '$http', '$q', 'Upload', 'utils', '$localStorage'];
 
-	function HomeController($scope, Principal, LoginService, $state, dataService, AlertService, $log, $http, $q, Upload, utils, $localStorage) {
+	function TaskController($scope, Principal, LoginService, $state, dataService, AlertService, $log, $http, $q, Upload, utils, $localStorage) {
 		var vm = this;
 		$scope.data = {};
 		vm.taskId = $state.params.taskId;
@@ -40,45 +40,57 @@
 		// Ho bisogno di caricare piu' risorse contemporaneamente (form e data);
 		// quando sono finite entrambe, autofillo la form
 		var formPromise = $q.defer(),
-			dataPromise = $q.defer();
+		dataPromise = $q.defer();
 		$scope.autofill = function () {
 			formPromise.resolve(2);
 		}; // usato nell'html
 
+
 		$q.all([formPromise.promise, dataPromise.promise])
-			.then(function (value) {
-				angular.forEach(taskForm, function (el) {
-					if (el.attributes.autofill)
-						$scope.data[el.id] = vm.taskVariables[el.id];
-				});
-				//Autofill dei campi che, essendo caricati solo in alcuni casi specifici, non vengono valorizzati a questo punto nella form
-				if ([11, 12, 13, 15, 16, 18, 21, 22, 23].includes(Number(vm.taskVariables["tipologiaAcquisizioneId"])))
-					$scope.data["strumentoAcquisizione"] = vm.taskVariables["strumentoAcquisizione"];
-				if ([14, 17].includes(Number(vm.taskVariables["tipologiaAcquisizioneId"])))
-					$scope.data["strumentoAcquisizioneId"] = vm.taskVariables["strumentoAcquisizioneId"];
-				if ([11, 12, 13].includes(Number(vm.taskVariables["strumentoAcquisizioneId"])))
-					$scope.data["tipologiaAffidamentoDiretto"] = vm.taskVariables["tipologiaAffidamentoDiretto"];
-				if ([21, 23].includes(Number(vm.taskVariables["strumentoAcquisizioneId"])))
-					$scope.data["tipologiaProceduraSelettiva"] = vm.taskVariables["tipologiaProceduraSelettiva"];
+		.then(function (value) {
+			angular.forEach(taskForm, function (el) {
+				if (el.attributes.autofill)
+					$scope.data[el.id] = vm.taskVariables[el.id];
 			});
+			//Autofill dei campi che, essendo caricati solo in alcuni casi specifici, non vengono valorizzati a questo punto nella form
+			if ([11, 12, 13, 15, 16, 18, 21, 22, 23].includes(Number(vm.taskVariables["tipologiaAcquisizioneId"])))
+				$scope.data["strumentoAcquisizione"] = vm.taskVariables["strumentoAcquisizione"];
+			if ([14, 17].includes(Number(vm.taskVariables["tipologiaAcquisizioneId"])))
+				$scope.data["strumentoAcquisizioneId"] = vm.taskVariables["strumentoAcquisizioneId"];
+			if ([11, 12, 13].includes(Number(vm.taskVariables["strumentoAcquisizioneId"])))
+				$scope.data["tipologiaAffidamentoDiretto"] = vm.taskVariables["tipologiaAffidamentoDiretto"];
+			if ([21, 23].includes(Number(vm.taskVariables["strumentoAcquisizioneId"])))
+				$scope.data["tipologiaProceduraSelettiva"] = vm.taskVariables["tipologiaProceduraSelettiva"];
+
+
+			dataService.draft.getDraftByTaskId($state.params.taskId, null).then(
+					function(response){
+						//popolo i campi col contenuto del json
+						var json = JSON.parse(response.data.json);
+						Object.keys(json).forEach(function(key) {
+							$scope.data["" + key] = json[key];
+						})
+					}
+			);
+		});
 
 		if ($state.params.taskId) {
 			dataService.tasks.getTask($state.params.taskId).then(
-				function (response) {
-					$scope.data.taskId = $state.params.taskId;
-					//visualizzazione dei metadati del task in esecuzione
-					var processDefinition = response.data.task.processDefinitionId.split(":");
-					vm.detailsView = 'api/views/' + processDefinition[0] + '/' + processDefinition[1] + '/detail';
-					$scope.data.entity = utils.refactoringVariables([response.data.task])[0];
+					function (response) {
+						$scope.data.taskId = $state.params.taskId;
+						//visualizzazione dei metadati del task in esecuzione
+						var processDefinition = response.data.task.processDefinitionId.split(":");
+						vm.detailsView = 'api/views/' + processDefinition[0] + '/' + processDefinition[1] + '/detail';
+						$scope.data.entity = utils.refactoringVariables([response.data.task])[0];
 
-					vm.taskVariables = $scope.data.entity.variabili;
-					$scope.attachments = utils.parseAttachments(response.data.attachments);
-					//                    $scope.attachments = response.data.attachments;
+						vm.taskVariables = $scope.data.entity.variabili;
+						$scope.attachments = utils.parseAttachments(response.data.attachments);
+						//                    $scope.attachments = response.data.attachments;
 
-					vm.diagramUrl = '/rest/diagram/taskInstance/' + $scope.data.taskId + "?" + new Date().getTime();
-					vm.formUrl = 'api/forms/task/' + $scope.data.taskId;
-					dataPromise.resolve();
-				});
+						vm.diagramUrl = '/rest/diagram/taskInstance/' + $scope.data.taskId + "?" + new Date().getTime();
+						vm.formUrl = 'api/forms/task/' + $scope.data.taskId;
+						dataPromise.resolve();
+					});
 		} else {
 			dataPromise.reject("");
 
@@ -97,11 +109,9 @@
 				AlertService.warning("Inserire tutti i valori obbligatori.");
 
 			} else {
-
 				// Serializzo gli oggetti complessi in stringhe
 				// E' necessario copiarli in un nuovo campo, senno' angular si incasina
 				// Non posso usare angular.copy() perche' ho degli oggetti File non gestiti bene
-
 				utils.prepareForSubmit($scope.data, $scope.attachments);
 
 				Upload.upload({
@@ -129,6 +139,17 @@
 
 		$scope.downloadFile = function (url, filename, mimetype) {
 			utils.downloadFile(url, filename, mimetype);
+		}
+
+		$scope.createDraft = function (taskId) {
+			//copio scope.data e tolgo i campi che non voglio salvare nel Draft
+			var json = Object.assign({}, $scope.data);
+			delete json.entity;
+			delete json.processDefinitionId;
+			delete json.sceltaUtente;
+			delete json.taskId;
+			//salvo il draft con username null perchè deve essere visibile a tutti
+			dataService.draft.updateDraft($state.params.taskId, json, null);
 		}
 
 		function removeFromCart(taskId) {

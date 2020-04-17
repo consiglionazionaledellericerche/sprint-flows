@@ -7,6 +7,8 @@ import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.dto.anagrafica.base.PageDto;
 import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
+import it.cnr.si.service.dto.anagrafica.scritture.PersonaDto;
+import it.cnr.si.service.dto.anagrafica.scritture.UtenteDto;
 import org.activiti.engine.ManagementService;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,13 +49,20 @@ public class FlowsUserResourceAce {
 
         Map<String, Object> response = new HashMap<>();
 
-        Map<String, String> query = new HashMap<String, String>() {{put("term", username);}};
-        PageDto<PersonaWebDto> persone = aceService.getPersone(query);
+        Map<String, String> query = new HashMap<String, String>() {{put("username", username);}};
+        PageDto<UtenteDto> utenti = aceService.searchUtenti(query);
 
-        response.put("more", persone.getCount() > 10);
-        response.put("results", persone.getItems().stream()
+        response.put("more", utenti.getCount() > 10);
+        response.put("results", utenti.getItems().stream()
                 .limit(10)
-                .map(p -> new Utils.SearchResult(p.getUsername(), p.getNome() +" "+ p.getCognome()))
+                .map(u ->  {
+                    PersonaDto p = u.getPersona();
+                    String label = p != null ? p.getNome() +" "+ p.getCognome() : u.getUsername();
+                    return new Utils.SearchResult(
+                            u.getUsername(),
+                            label
+                    );
+                })
                 .collect(Collectors.toList()));
 
         return ResponseEntity.ok(response);

@@ -13,7 +13,7 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: none
-      naming:
+      naming: 
         strategy: org.springframework.boot.orm.jpa.hibernate.SpringNamingStrategy
     properties:
       hibernate.cache.use_second_level_cache: true
