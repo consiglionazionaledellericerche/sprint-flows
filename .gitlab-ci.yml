@@ -31,7 +31,7 @@ test:
   stage: test
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   script:
-    - mvn -B clean sonar:sonar -Dsonar.host.url=http://sonar.si.cnr.it test package -fae
+    - mvn -B sonar:sonar -Dsonar.host.url=http://sonar.si.cnr.it test package -fae
   allow_failure: true
 
 build_dev:
@@ -40,7 +40,7 @@ build_dev:
     - dev
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   script:
-    - mvn -B clean deploy -DskipTests -U
+    - mvn -B deploy -DskipTests -U
 
 build:
   stage: build
