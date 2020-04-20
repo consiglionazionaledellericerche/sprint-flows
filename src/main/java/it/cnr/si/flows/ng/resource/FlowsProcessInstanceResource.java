@@ -148,9 +148,17 @@ public class FlowsProcessInstanceResource {
 			flowsProcessInstanceService.updateSearchTerms(flowsProcessInstanceService.getCurrentTaskOfProcessInstance(processInstanceId).getExecutionId(), processInstanceId, "ELIMINATO");
 		} catch(RuntimeException  error1) {
 			return new ResponseEntity("Errore nell`aggiornamento di stato, DESCRIZIONE, TITOLO, INITIATOR nel \"name\" della PI", HttpStatus.INTERNAL_SERVER_ERROR);
-		}finally {
+		} finally {
 			runtimeService.deleteProcessInstance(processInstanceId, deleteReason);
 		}
+		return new ResponseEntity(HttpStatus.OK);
+	}
+	
+	@DeleteMapping(value = "eraseFinishedProcessInstance", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Secured(AuthoritiesConstants.ADMIN)
+	@Timed	
+	public ResponseEntity erase(@RequestParam(value = "processInstanceId", required = true) String processInstanceId) {
+		historyService.deleteHistoricProcessInstance(processInstanceId);
 		return new ResponseEntity(HttpStatus.OK);
 	}
 
