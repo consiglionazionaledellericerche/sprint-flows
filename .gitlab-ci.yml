@@ -157,6 +157,7 @@ deploydockprod01:
     - sed -i "s/SPRING_LDAP_MANAGERPASSWORD_SED/$LDAP_PASSWORD/g" ./src/main/docker/app-prod.yml
     - sed -i "s/ACE_PASSWORD_SED/$ACE_PASSWORD/g" ./src/main/docker/app-prod.yml
     - sed -i "s/CMIS_PASSWORD/$CMIS_PASSWORD/g" ./src/main/docker/app-prod.yml
+    - sed -i "s/CONFIG_REPO_TOKEN/$CONFIG_REPO_TOKEN/g" ./src/main/docker/app-prod.yml
     - echo "stopping service"
     - sshremote $SSH_CONNECT_DOCPROD01 "docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml down -v --remove-orphans || echo NOFILE"
     - sshremote $SSH_CONNECT_DOCPROD01 "rm -rf /sites/docker-flows/ && mkdir -p /sites/docker-flows/"    - echo "copying docker-compose file"
@@ -183,6 +184,7 @@ deploydockprod02:
     - sed -i "s/SPRING_LDAP_MANAGERPASSWORD_SED/$LDAP_PASSWORD/g" ./src/main/docker/app-prod.yml
     - sed -i "s/ACE_PASSWORD_SED/$ACE_PASSWORD/g" ./src/main/docker/app-prod.yml
     - sed -i "s/CMIS_PASSWORD/$CMIS_PASSWORD/g" ./src/main/docker/app-prod.yml
+    - sed -i "s/CONFIG_REPO_TOKEN/$CONFIG_REPO_TOKEN/g" ./src/main/docker/app-prod.yml
     - echo "stopping service"
     - sshremote $SSH_CONNECT_DOCPROD02 "docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml down -v --remove-orphans || echo NOFILE"
     - sshremote $SSH_CONNECT_DOCPROD02 "rm -rf /sites/docker-flows/ && mkdir -p /sites/docker-flows/"
