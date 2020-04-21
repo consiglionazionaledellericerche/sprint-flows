@@ -147,7 +147,7 @@
             },
             oil: {
                 byCategory: function (category) {
-                    return $http.get('api/proxy/OIL/?proxyURL=catg/HDSiper/' + category);
+                    return $http.get('api/proxy/OIL/?proxyURL=catg/HDSiper/');
                 }
             },
             view: function (processid, version, type) {
