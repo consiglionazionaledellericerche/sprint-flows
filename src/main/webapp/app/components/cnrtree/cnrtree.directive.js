@@ -71,7 +71,7 @@
         }
 
         if ($scope.stringList) {
-          dataService.oil.byCategory(56).then(
+          dataService.oil.byCategory().then(
             function (response) {
               $scope.jsonlist = listToTree(response.data);
               $scope.$parent.vm.taskVariables = $scope.jsonlist;

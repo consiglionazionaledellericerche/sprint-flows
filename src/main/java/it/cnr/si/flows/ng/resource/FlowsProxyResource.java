@@ -11,6 +11,7 @@ import it.cnr.si.service.ProxyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -33,6 +34,8 @@ public class FlowsProxyResource {
     public final static String PROXY_URL = "proxyURL";
     @Autowired
     private ProxyService proxyService;
+    @Value("${spring.proxy.OIL.categoryScrivania}")
+    private String categoryId;
 
 
     @RequestMapping(method = RequestMethod.GET,
@@ -40,8 +43,11 @@ public class FlowsProxyResource {
     @RolesAllowed(AuthoritiesConstants.USER)
     public ResponseEntity<String> get(@PathVariable String app, @RequestParam(value=PROXY_URL) String url, HttpServletRequest request, HttpServletResponse response) {
         if (log.isDebugEnabled())
-            log.debug("GET from app: " + app + " with proxyURL: " + url);
-        return process(HttpMethod.GET, null, app, url, request, response);
+        	// martin 21/04/2020 Sto rompendo il Proxy per far funzionare il Helpdesk
+        	// se la cosa comporta problemi, l'unic omodo giusto di sistemarli e' di eliminare Proxy
+        	// (e anche se non pone problemi)
+            log.debug("GET from app: " + app + " with proxyURL: " + url + categoryId); 
+        return process(HttpMethod.GET, null, app, url + categoryId, request, response);
     }
 
     @RequestMapping(method = RequestMethod.POST,
