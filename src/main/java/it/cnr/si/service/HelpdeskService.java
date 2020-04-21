@@ -6,6 +6,8 @@ import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.flows.ng.utils.proxy.ResultProxy;
 import it.cnr.si.security.SecurityUtils;
 import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
+import it.cnr.si.service.dto.anagrafica.scritture.UtenteDto;
+
 import org.hibernate.service.spi.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,13 +37,14 @@ public class HelpdeskService {
 
     public Long newProblem(ExternalProblem hd) throws ServiceException {
 
-        PersonaWebDto flowsUser = aceService.getPersonaByUsername(SecurityUtils.getCurrentUserLogin());
+//    	PersonaWebDto flowsUser = aceService.getPersonaByUsername(SecurityUtils.getCurrentUserLogin());
+        UtenteDto flowsUser = aceService.getUtente(SecurityUtils.getCurrentUserLogin());
         hd.setLogin(flowsUser.getUsername());
 
-        hd.setFirstName(flowsUser.getNome());
-        hd.setFamilyName(flowsUser.getCognome());
+        hd.setFirstName(flowsUser.getPersona().getNome());
+        hd.setFamilyName(flowsUser.getPersona().getCognome());
 //		todo: da mettere l`email quando sarà disponibile da ACE
-        hd.setEmail(flowsUser.getUsername() + "@cnr.it");
+        hd.setEmail(flowsUser.getEmail());
 //		todo: e confirmRequested: mettere a true per gli utenti non loggati in caso si voglia estendere l`helpdesk anche a loro
         hd.setConfirmRequested(false);
 
