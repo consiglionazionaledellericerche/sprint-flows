@@ -13,14 +13,10 @@ services:
             - SPRING_CLOUD_CONFIG_SERVER_GIT_PASSWORD=CONFIG_REPO_TOKEN
             - JHIPSTER_SLEEP=10 # gives time for the database to boot before the application
             - CACHE_HAZELCAST_MEMBERS=150.146.7.79:1481,150.146.7.52:1481
+            - GRAYLOG_HOST=log.cedrc.cnr.it
+            - GRAYLOG_PORT=3514
+            - GRAYLOG_LOGLEVEL=INFOG
         ports:
             - 1480:8080
             - 1481:1481
             - 1482:1482
-        logging:
-          driver: "gelf"
-          options:
-            gelf-address: "udp://log.cedrc.cnr.it:3514"
-            tag: "sprint-flows"
-            gelf-compression-type: "gzip"
-            gelf-compression-level: "3"
