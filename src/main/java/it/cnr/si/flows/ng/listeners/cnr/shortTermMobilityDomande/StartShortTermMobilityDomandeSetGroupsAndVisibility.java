@@ -10,9 +10,11 @@ import it.cnr.si.flows.ng.service.SiperService;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
+import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 
 import org.activiti.engine.ManagementService;
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.runtime.Job;
 import org.h2.util.New;
@@ -22,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import feign.FeignException;
 
@@ -57,27 +60,27 @@ public class StartShortTermMobilityDomandeSetGroupsAndVisibility {
 	private ManagementService managementService;
 	@Inject
 	private FlowsTimerService flowsTimerService;	
-	
+
 	public void configuraVariabiliStart(DelegateExecution execution)  throws IOException, ParseException  {
 
 		String initiator = (String) execution.getVariable(Enum.VariableEnum.initiator.name());		
 		//SET TIMER
-//		LOGGER.debug("scadenzaPresentazioneDomande {}",  execution.getVariable("scadenzaPresentazioneDomande").toString());
+		//		LOGGER.debug("scadenzaPresentazioneDomande {}",  execution.getVariable("scadenzaPresentazioneDomande").toString());
 		String scadenzaPresentazioneDomande = execution.getVariable("scadenzaPresentazioneDomande", String.class);
 		execution.setVariable("statoFinaleDomanda",  Enum.StatoDomandeSTMEnum.APERTA.toString());
-		
+
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		Date newTimerDate = sdf.parse(scadenzaPresentazioneDomande); 
-	    ////SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  
+		////SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  
 		//Date newTimerDate = formatter.parse(execution.getVariable("scadenzaPresentazioneDomande").toString().substring(0, 19));
-	    //LocalDateTime newTimerLocalDate = LocalDateTime.parse( execution.getVariable("scadenzaPresentazioneDomande").toString() ) ;
-	    //Date newTimerDate = Date.from(newTimerLocalDate.atZone(ZoneId.systemDefault()).toInstant());
+		//LocalDateTime newTimerLocalDate = LocalDateTime.parse( execution.getVariable("scadenzaPresentazioneDomande").toString() ) ;
+		//Date newTimerDate = Date.from(newTimerLocalDate.atZone(ZoneId.systemDefault()).toInstant());
 
-	    //2011-03-11T12:13:14
+		//2011-03-11T12:13:14
 		//2019-09-21T01:12:00.000Z
 		String timerId = "timerChiusuraBando";
-		
+
 		List<Job> jobTimerChiusuraBando = flowsTimerService.getTimer(execution.getProcessInstanceId(),timerId);
 		if(jobTimerChiusuraBando.size() > 0){
 			LOGGER.info("------ DATA: {} per timer: {} " + jobTimerChiusuraBando.get(0).getDuedate(), timerId);
@@ -85,36 +88,56 @@ public class StartShortTermMobilityDomandeSetGroupsAndVisibility {
 		} else {
 			LOGGER.info("------ " + timerId + ": TIMER SCADUTO: ");	
 		}
-		
-		
+
+
 		String proponente = execution.getVariable("userNameProponente", String.class);
 		// LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable(Enum.VariableEnum.title.name()));
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
-		//Integer cdsuoAppartenenzaUtente = aceBridgeService.getEntitaOrganizzativaDellUtente(proponente.toString()).getId();
 		String cdsuoAppartenenzaUtente = null;
+		String usernameDirettoreAce = null;
+		BossDto direttoreAce = null;
+		Integer IdEntitaOrganizzativaDirettore = 0;
+		// VERIFICA AFFERENZA
 		try {
-			cdsuoAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(proponente.toString()).getCdsuo();
+			cdsuoAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(proponente).getCdsuo();
 		} catch(UnexpectedResultException | FeignException e) {
-			cdsuoAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(proponente.toString()).get("codice_uo").toString();
+			cdsuoAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(proponente).get("codice_uo").toString();
+			throw new BpmnError("412", "l'utenza: " + initiator + " non risulta associata ad alcuna struttura<br>");
+
+		}
+		// VERIFICA DIRETTORE
+		String usernameDirettoreSiper = "";
+		Integer tipologiaStrutturaUtente = aceBridgeService.getAfferenzaUtente(proponente).getTipo().getId();
+
+		try {
+			direttoreAce = aceService.bossFirmatarioByUsername(proponente);
+			//direttoreAce = aceService.bossDirettoreByUsername(initiator);
+			usernameDirettoreAce = direttoreAce.getUsername();
+			IdEntitaOrganizzativaDirettore = direttoreAce.getIdEntitaOrganizzativa();
+		} catch(UnexpectedResultException | FeignException e) {
+			cdsuoAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(proponente).get("codice_uo").toString();
+			throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + initiator + " <br>Si prega di contattare l'help desk in merito<br>");
+		}
+
+
+		try {
+			usernameDirettoreSiper = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("uid").toString();
+
+		} catch(UnexpectedResultException | FeignException | HttpClientErrorException e) {
+			usernameDirettoreSiper = "not found";
 		}
 		finally {
-			LOGGER.debug("getDirettoreCDSUO  FUNZIONA ");
-			Object insdipResponsabileUo = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("codice_sede");
-			String usernameDirettore = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("uid").toString();
-			EntitaOrganizzativaWebDto entitaOrganizzativaDirUo = aceService.entitaOrganizzativaFindByTerm(insdipResponsabileUo.toString()).get(0);
-			Integer idEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getId();
-			String siglaEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getSigla().toString();
-			String denominazioneEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getDenominazione().toString();
-			String cdsuoEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getCdsuo().toString();
-			String idnsipEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getIdnsip().toString();			
-			LOGGER.info("L'utente {} ha come direttore {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", proponente.toString(), usernameDirettore, denominazioneEntitaorganizzativaResponsabileUtente, siglaEntitaorganizzativaResponsabileUtente, idEntitaorganizzativaResponsabileUtente, cdsuoEntitaorganizzativaResponsabileUtente, idnsipEntitaorganizzativaResponsabileUtente);
-			
+
+			//CONFRONTO DIRETTORE SIPER CON DIRETTORE ACE
+			if (!usernameDirettoreAce.equals(usernameDirettoreSiper)) {
+				LOGGER.info("--- WARNING MISMATCH DIRETTORE - L'utente {} ha  {} come direttore in ACE e {} come come direttore in SIPER", proponente, usernameDirettoreAce, usernameDirettoreSiper);
+			}
 			String gruppoValidatoriShortTermMobility = "validatoriShortTermMobility@0000";
 			String gruppoUfficioProtocollo = "ufficioProtocolloShortTermMobility@0000";
 			String gruppoValutatoreScientificoSTMDipartimento = "valutatoreScientificoSTMDipartimento@0000";
 			String gruppoResponsabileAccordiInternazionali = "responsabileAccordiInternazionali@0000";
 			//DA CAMBIARE - ricavando il direttore della persona che afferisce alla sua struttura
-			String gruppoDirigenteProponente = "responsabile-struttura@" + idEntitaorganizzativaResponsabileUtente;
+			String gruppoDirigenteProponente = "responsabile-struttura@" + IdEntitaOrganizzativaDirettore;
 
 			String applicazioneSTM = "app.stm";
 			String applicazioneScrivaniaDigitale = "app.scrivaniadigitale";
@@ -130,7 +153,7 @@ public class StartShortTermMobilityDomandeSetGroupsAndVisibility {
 			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValutatoreScientificoSTMDipartimento, PROCESS_VISUALIZER);
 			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneScrivaniaDigitale, PROCESS_VISUALIZER);
 
-			execution.setVariable("strutturaValutazioneDirigente", idEntitaorganizzativaResponsabileUtente + "-" + denominazioneEntitaorganizzativaResponsabileUtente);
+			execution.setVariable("strutturaValutazioneDirigente", IdEntitaOrganizzativaDirettore + "-" + direttoreAce.getDenominazioneEO());
 			execution.setVariable("gruppoValidatoriShortTermMobility", gruppoValidatoriShortTermMobility);
 			execution.setVariable("gruppoResponsabileAccordiInternazionali", gruppoResponsabileAccordiInternazionali);
 			execution.setVariable("gruppoUfficioProtocollo", gruppoUfficioProtocollo);
