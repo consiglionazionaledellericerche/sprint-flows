@@ -15,7 +15,7 @@ services:
             - CACHE_HAZELCAST_MEMBERS=150.146.7.79:1481,150.146.7.52:1481
             - GRAYLOG_HOST=log.cedrc.cnr.it
             - GRAYLOG_PORT=3514
-            - GRAYLOG_LOGLEVEL=INFOG
+            - GRAYLOG_LOGLEVEL=INFO
         ports:
             - 1480:8080
             - 1481:1481
