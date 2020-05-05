@@ -555,20 +555,6 @@
 					<textFieldExpression><![CDATA[$F{nomeCognomeProponente} + " [" + $F{codiceFiscaleProponente} + "]"]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="0" y="39" width="200" height="20" uuid="e7a8c74b-7c2c-4f66-9947-f963ba87b319"/>
-					<textElement textAlignment="Left">
-						<font size="12" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA["STM"]]></textFieldExpression>
-				</textField>
-				<textField>
-					<reportElement x="205" y="39" width="350" height="20" uuid="98938555-b16e-4e4e-afac-50014726ba8a"/>
-					<textElement>
-						<font size="12" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{shortTermMobilityName}]]></textFieldExpression>
-				</textField>
-				<textField>
 					<reportElement x="0" y="13" width="200" height="20" uuid="5d6522a2-b6b0-4961-9e77-9969e6dd9281"/>
 					<textElement textAlignment="Left">
 						<font size="12" isBold="true"/>
