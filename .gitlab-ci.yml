@@ -160,7 +160,8 @@ deploydockprod01:
     - sed -i "s/CONFIG_REPO_TOKEN/$CONFIG_REPO_TOKEN/g" ./src/main/docker/app-prod.yml
     - echo "stopping service"
     - sshremote $SSH_CONNECT_DOCPROD01 "docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml down -v --remove-orphans || echo NOFILE"
-    - sshremote $SSH_CONNECT_DOCPROD01 "rm -rf /sites/docker-flows/ && mkdir -p /sites/docker-flows/"    - echo "copying docker-compose file"
+    - sshremote $SSH_CONNECT_DOCPROD01 "rm -rf /sites/docker-flows/ && mkdir -p /sites/docker-flows/"
+    - echo "copying docker-compose file"
     - scpremote ./src/main/docker/app-prod.yml $SSH_CONNECT_DOCPROD01:/sites/docker-flows/app.yml
     - echo "starting service"
     - sshremote $SSH_CONNECT_DOCPROD01 "docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml pull && docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml up -d"
