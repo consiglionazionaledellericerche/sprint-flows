@@ -32,6 +32,7 @@ exec:
     - sshremote $SSH_CONNECT_DOCPROD02 "docker ps -a"
     - sshremote $SSH_CONNECT_DOCPROD01 "docker-compose -f /sites/docker-flows/app.yml ps"
     - sshremote $SSH_CONNECT_DOCPROD02 "docker-compose -f /sites/docker-flows/app.yml ps"
+    - sshremote #SSH_CONNECT_DOCPROD01 "docker stop 5340ab75b7bd"
 #    - sshremote $SSH_CONNECT_DOCPROD02 "docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml down -v --remove-orphans || echo NOFILE"
 
 
