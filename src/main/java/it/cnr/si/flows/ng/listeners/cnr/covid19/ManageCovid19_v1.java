@@ -100,7 +100,7 @@ public class ManageCovid19_v1 implements ExecutionListener {
                 }
                 String nomeFile = tipoAttivita + ".pdf";
                 String labelFile = "Monitoraggio Attività Personale";
-                String report = "scrivaniadigitale/smart_working.jrxml";
+                String report = "/scrivaniadigitale/smart_working.jrxml";
                 //tipologiaDoc è la tipologia del file
                 String tipologiaDoc = Enum.PdfType.valueOf("monitoraggioAttivitaCovid19").name();
                 String utenteFile = execution.getVariable("initiator").toString();
