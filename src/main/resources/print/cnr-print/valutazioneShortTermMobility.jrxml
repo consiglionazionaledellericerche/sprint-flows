@@ -463,7 +463,7 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="gruppoValidatoriShortTermMobility"/>
 		<fieldDescription><![CDATA[gruppoValidatoriShortTermMobility]]></fieldDescription>
 	</field>
-	<field name="cdsuoProponente" class="java.lang.Integer">
+	<field name="cdsuoProponente" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="cdsuoProponente"/>
 		<fieldDescription><![CDATA[cdsuoProponente]]></fieldDescription>
 	</field>
