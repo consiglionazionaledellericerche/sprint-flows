@@ -287,7 +287,7 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="nomecognomeReferenteIstitutoOspitanteFruitore"/>
 		<fieldDescription><![CDATA[nomecognomeReferenteIstitutoOspitanteFruitore]]></fieldDescription>
 	</field>
-	<field name="telefonoFruitore" class="java.lang.Integer">
+	<field name="telefonoFruitore" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="telefonoFruitore"/>
 		<fieldDescription><![CDATA[telefonoFruitore]]></fieldDescription>
 	</field>
@@ -299,7 +299,7 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="qualificaRicopertaFruitore"/>
 		<fieldDescription><![CDATA[qualificaRicopertaFruitore]]></fieldDescription>
 	</field>
-	<field name="capIstitutoOspitanteFruitore" class="java.lang.Integer">
+	<field name="capIstitutoOspitanteFruitore" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="capIstitutoOspitanteFruitore"/>
 		<fieldDescription><![CDATA[capIstitutoOspitanteFruitore]]></fieldDescription>
 	</field>
@@ -311,7 +311,7 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="cittaIstitutoOspitanteFruitore"/>
 		<fieldDescription><![CDATA[cittaIstitutoOspitanteFruitore]]></fieldDescription>
 	</field>
-	<field name="telefonoIstitutoOspitanteFruitore" class="java.lang.Long">
+	<field name="telefonoIstitutoOspitanteFruitore" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="telefonoIstitutoOspitanteFruitore"/>
 		<fieldDescription><![CDATA[telefonoIstitutoOspitanteFruitore]]></fieldDescription>
 	</field>
@@ -327,7 +327,7 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="dataNascitaProponente"/>
 		<fieldDescription><![CDATA[dataNascitaProponente]]></fieldDescription>
 	</field>
-	<field name="idBando" class="java.lang.Integer">
+	<field name="idBando" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="idBando"/>
 		<fieldDescription><![CDATA[idBando]]></fieldDescription>
 	</field>
@@ -343,7 +343,7 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="provinciaNascitaProponente"/>
 		<fieldDescription><![CDATA[provinciaNascitaProponente]]></fieldDescription>
 	</field>
-	<field name="processInstanceId" class="java.lang.Integer">
+	<field name="processInstanceId" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="processInstanceId"/>
 		<fieldDescription><![CDATA[processInstanceId]]></fieldDescription>
 	</field>
