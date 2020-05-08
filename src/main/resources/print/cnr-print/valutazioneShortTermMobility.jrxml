@@ -687,7 +687,7 @@
 					<font fontName="SansSerif" size="11" isBold="true" isItalic="false"/>
 					<paragraph lineSpacing="1_1_2"/>
 				</textElement>
-				<textFieldExpression><![CDATA["1 - Curriculum vitae - pubblicazioni\r\nPunteggio: "  + $F{punteggio_curriculum} + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commentoCurriculum} +"\r\n\r\n</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["1 - Curriculum vitae - pubblicazioni\r\nPunteggio (attribuire un punteggio da 1 a 5): : "  + $F{punteggio_curriculum} + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commentoCurriculum} +"\r\n\r\n</style>"]]></textFieldExpression>
 			</textField>
 		</band>
 		<band height="28">
@@ -698,7 +698,7 @@
 					<font fontName="SansSerif" size="11" isBold="true" isItalic="false"/>
 					<paragraph lineSpacing="1_1_2"/>
 				</textElement>
-				<textFieldExpression><![CDATA["2 - Partner e Istituzione straniera\r\nPunteggio: "  + $F{punteggio_patnerIstituzioneStraniera}  + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commentoPatnerIstituzioneStraniera} +"\r\n\r\n</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["2 - Partner e Istituzione straniera\r\nPunteggio (attribuire un punteggio da 1 a 3): "  +  $F{punteggio_patnerIstituzioneStraniera}  + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commentoPatnerIstituzioneStraniera} +"\r\n\r\n</style>"]]></textFieldExpression>
 			</textField>
 		</band>
 		<band height="28" splitType="Stretch">
@@ -709,19 +709,10 @@
 					<font fontName="SansSerif" size="11" isBold="true" isItalic="false"/>
 					<paragraph lineSpacing="1_1_2"/>
 				</textElement>
-				<textFieldExpression><![CDATA["3 - Curriculum vitae - pubblicazioni\r\nPunteggio: "  + $F{punteggio_programmaDiRicerca}  + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commentoProgrammaDiRicerca} +"\r\n\r\n</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["3 - Programma di ricerca\r\nPunteggio (attribuire un punteggio da 1 a 7): "  + $F{punteggio_programmaDiRicerca}  + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commentoProgrammaDiRicerca} +"\r\n\r\n</style>"]]></textFieldExpression>
 			</textField>
 		</band>
-		<band height="28" splitType="Stretch">
-			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="555" height="17" uuid="3343383e-0a16-46ea-8eb2-afc5ca44f303"/>
-				<textElement textAlignment="Justified" markup="styled">
-					<font fontName="SansSerif" size="11" isBold="true" isItalic="false"/>
-					<paragraph lineSpacing="1_1_2"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Commento generale : \r\nPunteggio: "  + "<style isBold=\"false\">" + $F{commentoValutazione} +"\r\n\r\n</style>"]]></textFieldExpression>
-			</textField>
-		</band>
+		<band height="28" splitType="Stretch"/>
 	</detail>
 	<columnFooter>
 		<band splitType="Stretch"/>
