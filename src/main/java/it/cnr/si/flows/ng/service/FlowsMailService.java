@@ -50,6 +50,7 @@ public class FlowsMailService extends MailService {
 
     @Async
     public void sendFlowEventNotification(String notificationType, Map<String, Object> variables, String taskName, String username, final String groupName) {
+    	try {
         Context ctx = new Context();
         ctx.setVariables(variables);
         ctx.setVariable("username", username);
@@ -107,5 +108,9 @@ public class FlowsMailService extends MailService {
                         false,
                         true);
         }
+    	} catch (Exception e) {
+    		LOGGER.error("Errore nell'invio della mail", e);
+    		throw e;
+    	}
     }
 }
