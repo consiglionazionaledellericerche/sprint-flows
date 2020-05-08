@@ -116,6 +116,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
 			if (Optional.ofNullable(aceBridgeService).isPresent()) {
 				candidates.forEach(c -> {
 					if (c.getGroupId() != null) {
+						LOGGER.info("Recupero membri del gruppo {}", c);
                         Set<String> members = membershipService.getAllUsersInGroup(c.getGroupId());
 						LOGGER.info("Sto inviando mail standard a {} del gruppo {} per il task", members, c.getGroupId(), task.getName());
 						members.forEach(m -> {
