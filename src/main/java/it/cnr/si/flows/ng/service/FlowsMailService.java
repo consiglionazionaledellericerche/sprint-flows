@@ -51,6 +51,9 @@ public class FlowsMailService extends MailService {
 	@Async
 	public void sendFlowEventNotification(String notificationType, Map<String, Object> variables, String taskName, String username, final String groupName) {
 		try {
+			
+			LOGGER.info("Invio della mail all'utente "+ username);
+
 			Context ctx = new Context();
 			ctx.setVariables(variables);
 			ctx.setVariable("username", username);
@@ -79,6 +82,8 @@ public class FlowsMailService extends MailService {
 			} else if (Arrays.asList(env.getActiveProfiles()).contains("showcase")) {
 				ctx.setVariable("profile", "showcase");
 			}
+			
+			LOGGER.info("Recupero dell'email per l'utente "+ username);
 
 			String htmlContent = templateEngine.process(notificationType, ctx);
 			String mailUtente = aceService.getUtente(username).getEmail();
