@@ -30,7 +30,7 @@
   <hr>
 
   <div class="row">
-    <div ng-if="$state.params.taskId" class="col-md-offset-9" role="group">
+    <div ng-show="vm.taskId != null" class="col-md-offset-9" role="group">
       <button ng-click="createDraft($state.params.taskId)" class="btn btn-info"><span class="glyphicon glyphicon glyphicon-floppy-save"></span>Salva Appunti</button>
     </div>
     <div class="col-md-6 col-md-offset-3">
