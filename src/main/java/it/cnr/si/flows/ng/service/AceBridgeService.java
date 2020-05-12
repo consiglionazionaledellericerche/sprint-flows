@@ -70,9 +70,9 @@ public class AceBridgeService {
 		int idRuolo = getIdRuoloBySigla(sigla);
 
 		if (idEo != 0 )
-			return aceService.getUtentiInRuoloEo(idRuolo, idEo)
-					.stream()
-					.map(p -> p.getUsername())
+			return aceService.getUtentiInRuoloEo(idRuolo, idEo).stream()
+					.map(p -> aceService.getUtente(p.getUtente()))
+					.map(u -> u.getUsername())
 					.collect(Collectors.toList());
 		else
 			return aceService.getUtentiInRuoloCnr(idRuolo)
