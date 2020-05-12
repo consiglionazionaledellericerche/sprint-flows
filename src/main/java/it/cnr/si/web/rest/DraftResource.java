@@ -56,7 +56,8 @@ public class DraftResource {
 
         Draft result = draftService.save(dbDraft);
         return ResponseEntity.ok()
-                .headers(HeaderUtil.createEntityUpdateAlert("draft", result.getId().toString()))
+//                .headers(HeaderUtil.createEntityUpdateAlert("draft", result.getId().toString()))
+                .headers(HeaderUtil.createAlert("Appunti salvati correttamente!", result.getId().toString()))
                 .body(result);
     }
 
