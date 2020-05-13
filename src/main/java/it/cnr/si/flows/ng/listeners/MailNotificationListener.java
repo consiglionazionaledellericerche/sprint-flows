@@ -64,7 +64,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
         ActivitiEventType type = event.getType();
 
         if (type == ActivitiEventType.TASK_CREATED )
-            sendStandardCandidateNotification(event);
+            sendStandardNotification(event);
 
         if (ACCEPTED_EVENTS.contains(type) )
             sendRuleNotification(event);
@@ -100,7 +100,15 @@ public class MailNotificationListener  implements ActivitiEventListener {
         return variables;
     }
 
-    private Map<String, Object> sendStandardCandidateNotification(ActivitiEvent event) {
+    /**
+     * Questo metodo esegue l'invio delle mail per eventi predefiniti:
+     * 1. E' stato creato un compito di gruppo per uno dei gruppi dell'utente
+     * 2. E' stato creato un compito assegnato direttamente all'utente
+     * 
+     * @param event
+     * @return
+     */
+    private void sendStandardNotification(ActivitiEvent event) {
 
         String executionId = event.getExecutionId();
         Map<String, Object> variables = runtimeService.getVariables(executionId);
@@ -111,33 +119,17 @@ public class MailNotificationListener  implements ActivitiEventListener {
         TaskEntity task = (TaskEntity) taskEvent.getEntity();
 
         Set<IdentityLink> candidates = ((TaskEntity)taskEvent.getEntity()).getCandidates();
-        if (Arrays.asList(env.getActiveProfiles()).contains("cnr")) {
 
-            if (Optional.ofNullable(aceBridgeService).isPresent()) {
-                candidates.forEach(c -> {
-                    if (c.getGroupId() != null) {
-                        Set<String> members = membershipService.getAllUsersInGroup(c.getGroupId());
-                        LOGGER.info("Sto inviando mail standard a {} del gruppo {} per il task", members, c.getGroupId(), task.getName());
-                        members.forEach(m -> {
-                            mailService.sendFlowEventNotification(FlowsMailService.TASK_ASSEGNATO_AL_GRUPPO_HTML, integratedVariables, task.getName(), m, c.getGroupId());
-                        });
-                    }
+        candidates.forEach(c -> {
+            if (c.getGroupId() != null) {
+                Set<String> members = membershipService.getAllUsersInGroup(c.getGroupId());
+                LOGGER.info("Sto inviando mail standard a {} del gruppo {} per il task", members, c.getGroupId(), task.getName());
+                members.forEach(m -> {
+                    mailService.sendFlowEventNotification(FlowsMailService.TASK_ASSEGNATO_AL_GRUPPO_HTML, integratedVariables, task.getName(), m, c.getGroupId());
                 });
             }
-
-        } else {
-
-            candidates.forEach(c -> {
-                if (c.getGroupId() != null) {
-                    Set<String> members = membershipService.getAllUsersInGroup(c.getGroupId());
-                    members.forEach(m -> {
-                        mailService.sendFlowEventNotification(FlowsMailService.TASK_ASSEGNATO_AL_GRUPPO_HTML, integratedVariables, task.getName(), m, c.getGroupId());
-                    });
-                }
-            });
-
-        }
-        return integratedVariables;
+        });
+            
     }
 
     private void sendRuleNotification(ActivitiEvent event) {
