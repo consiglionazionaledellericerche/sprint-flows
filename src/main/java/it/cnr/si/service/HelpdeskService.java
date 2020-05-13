@@ -5,7 +5,7 @@ import it.cnr.si.flows.ng.exception.AwesomeException;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.flows.ng.utils.proxy.ResultProxy;
 import it.cnr.si.security.SecurityUtils;
-import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
+import it.cnr.si.service.dto.anagrafica.scritture.PersonaDto;
 import it.cnr.si.service.dto.anagrafica.scritture.UtenteDto;
 
 import org.hibernate.service.spi.ServiceException;
@@ -35,22 +35,34 @@ public class HelpdeskService {
     private AceService aceService;
 
 
-    public Long newProblem(ExternalProblem hd) throws ServiceException {
+    public Long newProblem(ExternalProblem hd, String browser) throws ServiceException {
 
 //    	PersonaWebDto flowsUser = aceService.getPersonaByUsername(SecurityUtils.getCurrentUserLogin());
         UtenteDto flowsUser = aceService.getUtente(SecurityUtils.getCurrentUserLogin());
         hd.setLogin(flowsUser.getUsername());
 
-        hd.setFirstName(flowsUser.getPersona().getNome());
-        hd.setFamilyName(flowsUser.getPersona().getCognome());
+        PersonaDto persona = flowsUser.getPersona();
+        String nomeCognomeString = "";
+        if(persona != null) {
+            hd.setFirstName(persona.getNome());
+            hd.setFamilyName(persona.getCognome());
+            nomeCognomeString = "Nome: " + hd.getFirstName() + " Cognome: " + hd.getFamilyName();
+        } else {
+//            todo: per gli assegnisti, non avendo l' oggetto persona in flowsUser, carico le uniche informazioni che ho
+            hd.setFirstName(flowsUser.getUsername());
+            hd.setFamilyName(flowsUser.getEmail());
+            nomeCognomeString = "Nome e Cognome: " + flowsUser.getUsername();
+        }
 //		todo: da mettere l`email quando sarà disponibile da ACE
         hd.setEmail(flowsUser.getEmail());
 //		todo: e confirmRequested: mettere a true per gli utenti non loggati in caso si voglia estendere l`helpdesk anche a loro
         hd.setConfirmRequested(false);
 
-        String descrizione = hd.getDescrizione() + System.getProperty("line.separator") + System.getProperty("line.separator")
-                + hd.getFirstName() + " " + hd.getFamilyName() + "  Email: " + hd.getEmail() +
-                "  Data: " + utils.formattaDataOra(new Date());
+        String descrizione = hd.getDescrizione() + System.getProperty("line.separator") + System.getProperty("line.separator") +
+                nomeCognomeString + System.getProperty("line.separator") +
+                "Email: " + hd.getEmail() + System.getProperty("line.separator")  +
+                "Data: " + utils.formattaDataOra(new Date()) + System.getProperty("line.separator") +
+                "Browser: " + browser ;
 
         hd.setDescrizione(descrizione);
 
