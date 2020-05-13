@@ -22,6 +22,9 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
+
+import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
@@ -158,9 +161,18 @@ public class ManageCovid19_v1 implements ExecutionListener {
             break;
             case "modifica-start": {
                 //AGGIORNA DIRETTORE
-
+        		Integer IdEntitaOrganizzativaDirettore = 0;
                 BossDto utenteBoss = aceService.bossFirmatarioByUsername(execution.getVariable("initiator").toString());
                 execution.setVariable("direttore", utenteBoss.getNome() + " " + utenteBoss.getCognome());
+    			IdEntitaOrganizzativaDirettore = utenteBoss.getIdEntitaOrganizzativa();
+    			String gruppoResponsabileProponente = "responsabile-struttura@" + IdEntitaOrganizzativaDirettore;
+    			String gruppoResponsabileProponenteOld = execution.getVariable("gruppoResponsabileProponente").toString();
+    			if (!gruppoResponsabileProponenteOld.equals(gruppoResponsabileProponente)) {
+        			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileProponente, PROCESS_VISUALIZER);
+        			runtimeService.deleteGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileProponenteOld, PROCESS_VISUALIZER);
+    			}
+    			execution.setVariable("gruppoResponsabileProponente", gruppoResponsabileProponente);
+
             }
             case "protocollo-end": {
                 if (sceltaUtente != null && sceltaUtente.equals("Protocolla")) {

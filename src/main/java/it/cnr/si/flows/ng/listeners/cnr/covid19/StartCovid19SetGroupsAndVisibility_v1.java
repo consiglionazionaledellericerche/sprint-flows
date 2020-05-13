@@ -69,21 +69,24 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 		String initiator = (String) execution.getVariable(Enum.VariableEnum.initiator.name());		
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
 		//Integer cdsuoAppartenenzaUtente = aceBridgeService.getEntitaOrganizzativaDellUtente(proponente.toString()).getId();
-		String cdsuoAppartenenzaUtente = null;
+		//String cdsuoAppartenenzaUtente = null;
+		String idnsipAppartenenzaUtente = null;
 		String usernameDirettoreAce = null;
 		BossDto direttoreAce = null;
 		Integer IdEntitaOrganizzativaDirettore = 0;
 		// VERIFICA AFFERENZA
 		try {
-			cdsuoAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(initiator.toString()).getCdsuo();
+			//cdsuoAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(initiator.toString()).getCdsuo();
+			idnsipAppartenenzaUtente = aceBridgeService.getAfferenzaUtentePerSede(initiator.toString()).getIdnsip();
 		} catch(UnexpectedResultException | FeignException e) {
-			cdsuoAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(initiator.toString()).get("codice_uo").toString();
+			//cdsuoAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(initiator.toString()).get("codice_uo").toString();
+			idnsipAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(initiator.toString()).get("codice_sede").toString();
 			throw new BpmnError("412", "l'utenza: " + initiator + " non risulta associata ad alcuna struttura<br>");
 
 		}
 		// VERIFICA DIRETTORE
 		String usernameDirettoreSiper = "";
-		Integer tipologiaStrutturaUtente = aceBridgeService.getAfferenzaUtente(initiator.toString()).getTipo().getId();
+		Integer tipologiaStrutturaUtente = aceBridgeService.getAfferenzaUtentePerSede(initiator.toString()).getTipo().getId();
 
 		try {
 			direttoreAce = aceService.bossFirmatarioByUsername(initiator);
@@ -91,13 +94,15 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 			usernameDirettoreAce = direttoreAce.getUsername();
 			IdEntitaOrganizzativaDirettore = direttoreAce.getIdEntitaOrganizzativa();
 		} catch(UnexpectedResultException | FeignException e) {
-			cdsuoAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(initiator.toString()).get("codice_uo").toString();
+			//cdsuoAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(initiator.toString()).get("codice_uo").toString();
+			idnsipAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(initiator.toString()).get("codice_sede").toString();
 			throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + initiator + " <br>Si prega di contattare l'help desk in merito<br>");
 		}
 
 
 		try {
-			usernameDirettoreSiper = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("uid").toString();
+			//usernameDirettoreSiper = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("uid").toString();
+			usernameDirettoreSiper = siperService.getDirettoreIDNSIP(idnsipAppartenenzaUtente).get(0).get("uid").toString();
 
 		} catch(UnexpectedResultException | FeignException | HttpClientErrorException e) {
 			usernameDirettoreSiper = "not found";
@@ -106,7 +111,7 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 
 			//CONFRONTO DIRETTORE SIPER CON DIRETTORE ACE
 			if (!usernameDirettoreAce.equals(usernameDirettoreSiper)) {
-				LOGGER.info("--- WARNING MISMATCH DIRETTORE - L'utente {} ha  {} come direttore in ACE e {} come come direttore in SIPER", initiator.toString(), usernameDirettoreAce, usernameDirettoreSiper);
+				LOGGER.info("--- WARNING MISMATCH DIRETTORE - L'utente {} ha  {} come direttore in ACE e {} come come direttore in SIPER per idNsip = {}", initiator.toString(), usernameDirettoreAce, usernameDirettoreSiper, idnsipAppartenenzaUtente);
 			}
 
 			LOGGER.info("L'utente {} ha come  {} per la struttura {} ({}} - id:{}", initiator.toString(), direttoreAce.getSiglaRuolo(), usernameDirettoreAce, direttoreAce.getDenominazioneEO(), direttoreAce.getSiglaEO(), IdEntitaOrganizzativaDirettore);
@@ -116,13 +121,14 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 			String applicazioneScrivaniaDigitale = "app.scrivaniadigitale";
 
 
-			EntitaOrganizzativaWebDto utenteAce = aceBridgeService.getAfferenzaUtente(execution.getVariable("initiator").toString());
+			EntitaOrganizzativaWebDto utenteAce = aceBridgeService.getAfferenzaUtentePerSede(execution.getVariable("initiator").toString());
 			UtenteDto utente = aceService.getUtente(execution.getVariable("initiator").toString());
 
 			execution.setVariable("matricola", utente.getPersona().getMatricola());
 			execution.setVariable("nomeCognomeUtente", utente.getPersona().getNome() + " " + utente.getPersona().getCognome());
 			execution.setVariable("tipoContratto", utente.getPersona().getTipoContratto());
 			execution.setVariable("cds", utenteAce.getCdsuo());
+			execution.setVariable("idnsip", utenteAce.getIdnsip());
 			execution.setVariable("direttore", direttoreAce.getNome() + " " +  direttoreAce.getCognome());
 
 

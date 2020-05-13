@@ -6,9 +6,13 @@ import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.SiperService;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.flows.ng.utils.Utils;
+import it.cnr.si.flows.ng.utils.Utils.SearchResult;
 import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.service.AceService;
 import it.cnr.si.service.FlowsLdapAccountService;
 import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
+import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
+
 import org.activiti.engine.ManagementService;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.slf4j.Logger;
@@ -26,6 +30,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.inject.Inject;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,9 +49,7 @@ public class FlowsLookupResource {
     @Inject
     private AceBridgeService aceBridgeService;
     @Inject
-    private ManagementService managementService;
-    @Inject
-    private RestResponseFactory restResponseFactory;
+    private AceService aceService;
     @Inject
     private FlowsLdapAccountService flowsLdapAccountService;
     @Inject
@@ -53,6 +57,16 @@ public class FlowsLookupResource {
     @Inject
     private ExternalMessageSender extenalMessageSender;
 
+    
+    @RequestMapping(value = "/ace/boss", method = RequestMethod.GET)
+    @Secured(AuthoritiesConstants.USER)
+    public ResponseEntity<Utils.SearchResult> getBossForCurrentUser() {
+    	String username = SecurityUtils.getCurrentUserLogin();
+    	BossDto boss = aceService.bossFirmatarioByUsername(username);
+    	String nome = boss.getNome() +" "+ boss.getCognome();
+        return ResponseEntity.ok(new Utils.SearchResult(nome, nome));
+    }
+    
     @RequestMapping(value = "/ace/user/{username:.+}", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.ADMIN)
     public List<String> getAce(@PathVariable String username) {

@@ -206,6 +206,9 @@
                 },
                 mycdsuos: function () {
                     return $http.get('api/lookup/ace/user/cdsuoabilitate');
+                },
+                boss: function () {
+                    return $http.get('api/lookup/ace/boss');
                 }
             },
             mail: {
