@@ -166,7 +166,11 @@ public class ManageCovid19_v1 implements ExecutionListener {
                 execution.setVariable("direttore", utenteBoss.getNome() + " " + utenteBoss.getCognome());
     			IdEntitaOrganizzativaDirettore = utenteBoss.getIdEntitaOrganizzativa();
     			String gruppoResponsabileProponente = "responsabile-struttura@" + IdEntitaOrganizzativaDirettore;
-    			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileProponente, PROCESS_VISUALIZER);
+    			String gruppoResponsabileProponenteOld = execution.getVariable("gruppoResponsabileProponente").toString();
+    			if (!gruppoResponsabileProponenteOld.equals(gruppoResponsabileProponente)) {
+        			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileProponente, PROCESS_VISUALIZER);
+        			runtimeService.deleteGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileProponenteOld, PROCESS_VISUALIZER);
+    			}
     			execution.setVariable("gruppoResponsabileProponente", gruppoResponsabileProponente);
 
             }
