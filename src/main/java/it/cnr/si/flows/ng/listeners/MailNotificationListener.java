@@ -1,15 +1,21 @@
 package it.cnr.si.flows.ng.listeners;
 
-import it.cnr.si.domain.NotificationRule;
-import it.cnr.si.flows.ng.config.MailConfguration;
-import it.cnr.si.flows.ng.service.AceBridgeService;
-import it.cnr.si.flows.ng.service.FlowsMailService;
-import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
-import it.cnr.si.repository.NotificationRuleRepository;
-import it.cnr.si.service.MembershipService;
-import it.cnr.si.service.RelationshipService;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import javax.inject.Inject;
+
 import org.activiti.engine.RuntimeService;
-import org.activiti.engine.delegate.event.*;
+import org.activiti.engine.delegate.event.ActivitiEntityEvent;
+import org.activiti.engine.delegate.event.ActivitiEntityWithVariablesEvent;
+import org.activiti.engine.delegate.event.ActivitiEvent;
+import org.activiti.engine.delegate.event.ActivitiEventListener;
+import org.activiti.engine.delegate.event.ActivitiEventType;
+import org.activiti.engine.delegate.event.ActivitiSequenceFlowTakenEvent;
 import org.activiti.engine.delegate.event.impl.ActivitiEntityEventImpl;
 import org.activiti.engine.delegate.event.impl.ActivitiProcessCancelledEventImpl;
 import org.activiti.engine.delegate.event.impl.ActivitiSequenceFlowTakenEventImpl;
@@ -22,9 +28,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import javax.inject.Inject;
-import java.util.*;
-import java.util.stream.Stream;
+import it.cnr.si.domain.NotificationRule;
+import it.cnr.si.flows.ng.config.MailConfguration;
+import it.cnr.si.flows.ng.service.AceBridgeService;
+import it.cnr.si.flows.ng.service.FlowsMailService;
+import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
+import it.cnr.si.flows.ng.utils.Utils;
+import it.cnr.si.repository.NotificationRuleRepository;
+import it.cnr.si.service.MembershipService;
+import it.cnr.si.service.RelationshipService;
 
 @Component
 public class MailNotificationListener  implements ActivitiEventListener {
