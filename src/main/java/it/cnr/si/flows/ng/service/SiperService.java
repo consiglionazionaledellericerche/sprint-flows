@@ -28,6 +28,8 @@ public class SiperService {
     private String url;
     private String pathResponsabile = "/siper/json/sedi?titCa={cdsuo}&userinfo=true&ruolo=resp";
     private String pathDirettore = "/siper/json/sedi?titCa={cdsuo}&userinfo=true&ruolo=dircds";
+    private String pathResponsabileIdnsip = "/siper/json/sedi?sedeId={idnsip}&userinfo=true&ruolo=resp";
+    private String pathDirettoreIdnsip = "/siper/json/sedi?sedeId={idnsip}&userinfo=true&ruolo=dircds";
     private String pathCDSUOAfferenzaUtente = "/siper/json/userinfo/{userName}";
     
     @Inject
@@ -74,7 +76,34 @@ public class SiperService {
 
         return response;
     }
+
     
+    public List<Map<String, Object>> getResponsabileIDNSIP(String idnsip) {
+        //request
+        ResponseEntity responseString = siperRestTemplate.exchange(this.url + pathResponsabileIdnsip, HttpMethod.GET,
+                                                                   new HttpEntity<>("body"), String.class, idnsip);
+        // mapping della response in una List<Map<String, Object>>
+        Gson gson = new Gson();
+        Type type = new TypeToken<List<Map<String, Object>>>() {}.getType();
+        BufferedReader reader = new BufferedReader(new StringReader(((String)responseString.getBody())));
+        List<Map<String, Object>> response = gson.fromJson(reader, type);
+
+        return response;
+    }
+
+    public List<Map<String, Object>> getDirettoreIDNSIP(String idnsip) {
+
+        //request
+        ResponseEntity responseString = siperRestTemplate.exchange(this.url + pathDirettoreIdnsip, HttpMethod.GET,
+                                                                   new HttpEntity<>("body"), String.class, idnsip);
+        // mapping della response in una List<Map<String, Object>>
+        Gson gson = new Gson();
+        Type type = new TypeToken<List<Map<String, Object>>>() {}.getType();
+        BufferedReader reader = new BufferedReader(new StringReader(((String)responseString.getBody())));
+        List<Map<String, Object>> response = gson.fromJson(reader, type);
+
+        return response;
+    }
 
     public Map<String, Object> getCDSUOAfferenzaUtente(String userName) {
 
