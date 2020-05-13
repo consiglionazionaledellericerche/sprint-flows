@@ -5,6 +5,7 @@ import it.cnr.si.flows.ng.config.MailConfguration;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.FlowsMailService;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
+import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.NotificationRuleRepository;
 import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.RelationshipService;
@@ -125,10 +126,17 @@ public class MailNotificationListener  implements ActivitiEventListener {
                 Set<String> members = membershipService.getAllUsersInGroup(c.getGroupId());
                 LOGGER.info("Sto inviando mail standard a {} del gruppo {} per il task", members, c.getGroupId(), task.getName());
                 members.forEach(m -> {
-                    mailService.sendFlowEventNotification(FlowsMailService.TASK_ASSEGNATO_AL_GRUPPO_HTML, integratedVariables, task.getName(), m, c.getGroupId());
+                    mailService.sendFlowEventNotification(FlowsMailService.TASK_ASSEGNATO_AL_GRUPPO, integratedVariables, task.getName(), m, c.getGroupId());
                 });
             }
         });
+        
+        String assignee = ((TaskEntity)taskEvent.getEntity()).getAssignee();
+
+        if (Utils.isNotEmpty(assignee)) {
+            LOGGER.info("Sto inviando mail standard all'assegnatario {} per il task",assignee, task.getName());
+            mailService.sendFlowEventNotification(FlowsMailService.TASK_IN_CARICO_ALL_UTENTE, integratedVariables, task.getName(), assignee, null);
+        }
             
     }
 
