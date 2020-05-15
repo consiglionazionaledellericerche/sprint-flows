@@ -126,6 +126,7 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 
 			execution.setVariable("matricola", utente.getPersona().getMatricola());
 			execution.setVariable("nomeCognomeUtente", utente.getPersona().getNome() + " " + utente.getPersona().getCognome());
+			execution.setVariable("userNameUtente", utente.getUsername());
 			execution.setVariable("tipoContratto", utente.getPersona().getTipoContratto());
 			execution.setVariable("cds", utenteAce.getCdsuo());
 			execution.setVariable("idnsip", utenteAce.getIdnsip());
