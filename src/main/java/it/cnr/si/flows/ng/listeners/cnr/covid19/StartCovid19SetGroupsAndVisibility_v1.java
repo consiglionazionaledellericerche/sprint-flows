@@ -74,6 +74,7 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 		String usernameDirettoreAce = null;
 		BossDto direttoreAce = null;
 		Integer IdEntitaOrganizzativaDirettore = 0;
+		String denominazioneEO  = null;
 		// VERIFICA AFFERENZA
 		try {
 			//cdsuoAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(initiator.toString()).getCdsuo();
@@ -93,6 +94,7 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 			//direttoreAce = aceService.bossDirettoreByUsername(initiator);
 			usernameDirettoreAce = direttoreAce.getUsername();
 			IdEntitaOrganizzativaDirettore = direttoreAce.getIdEntitaOrganizzativa();
+			denominazioneEO = direttoreAce.getDenominazioneEO();
 		} catch(UnexpectedResultException | FeignException e) {
 			//cdsuoAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(initiator.toString()).get("codice_uo").toString();
 			idnsipAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(initiator.toString()).get("codice_sede").toString();
@@ -131,8 +133,9 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 			execution.setVariable("cds", utenteAce.getCdsuo());
 			execution.setVariable("idnsip", utenteAce.getIdnsip());
 			execution.setVariable("direttore", direttoreAce.getNome() + " " +  direttoreAce.getCognome());
+			execution.setVariable("denominazioneEO", denominazioneEO);
 
-
+			
 			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileProponente, PROCESS_VISUALIZER);
 			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneScrivaniaDigitale, PROCESS_VISUALIZER);
 

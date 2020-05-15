@@ -179,6 +179,7 @@ public class ManageCovid19_v1 implements ExecutionListener {
 			BossDto utenteBoss = aceService.bossFirmatarioByUsername(execution.getVariable("initiator").toString());
 			execution.setVariable("direttore", utenteBoss.getNome() + " " + utenteBoss.getCognome());
 			IdEntitaOrganizzativaDirettore = utenteBoss.getIdEntitaOrganizzativa();
+			String denominazioneEO = utenteBoss.getDenominazioneEO();
 			String gruppoResponsabileProponente = "responsabile-struttura@" + IdEntitaOrganizzativaDirettore;
 			String gruppoResponsabileProponenteOld = execution.getVariable("gruppoResponsabileProponente").toString();
 			if (!gruppoResponsabileProponenteOld.equals(gruppoResponsabileProponente)) {
@@ -186,6 +187,7 @@ public class ManageCovid19_v1 implements ExecutionListener {
 				runtimeService.deleteGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileProponenteOld, PROCESS_VISUALIZER);
 			}
 			execution.setVariable("gruppoResponsabileProponente", gruppoResponsabileProponente);
+			execution.setVariable("denominazioneEO", denominazioneEO);
 
 		}
 		case "protocollo-end": {
