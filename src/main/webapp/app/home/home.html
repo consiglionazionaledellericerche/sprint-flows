@@ -3,34 +3,34 @@
         <div class="col-md-8 col-md-offset-2">
             <h1>Benvenuti</h1>
             <p class="lead" >Benvenuti nella Scrivania Digitale CNR</p>
+            <hr>
 
+            <div ng-show="vm.avvisi.length > 0">
+                <h2>Avvisi</h2>
+                <div class="alert alert-warning" ng-repeat="avviso in vm.avvisi">{{avviso.contenuto}}</div>
+                <hr>
+            </div>
+                
             <div ng-switch="vm.isAuthenticated()">
                 <div class="alert alert-success" ng-switch-when="true" translate="home.logged.message" translate-values="{username: '{{vm.account.login}}'}">
                     You are logged in as user "{{vm.account.login}}".
                 </div>
                 <div ng-switch-when="false" ng-if="app == 'cnr'">
-                    Per autenticarsi usare le credenziali Siper.
-                <hr>
+                    <p>Per autenticarsi usare le credenziali Siper.</p>
                 
-	            <div ng-show="vm.avvisi.length > 0">
-	                <h2>Avvisi</h2>
-	                <div class="alert alert-warning" ng-repeat="avviso in vm.avvisi">{{avviso.contenuto}}</div>
-	            </div>
-
-                
-                <form class="form" role="form" ng-submit="vm.signin($event)">
-	                <div class="form-group">
-	                    <label for="username" translate="global.form.username">Login</label>
-	                    <input type="text" class="form-control" id="username" style="text-transform: lowercase;"
-	                           placeholder="{{'global.form.username.placeholder' | translate}}" ng-model="vm.username">
-	                </div>
-	                <div class="form-group">
-	                    <label for="password">Password</label>
-	                    <input type="password" class="form-control" id="password" style="text-transform: lowercase;"
-	                           placeholder="{{'la tua password siper'}}" ng-model="vm.password">
-	                </div>
-	                <button type="submit" class="btn btn-primary">Login</button>
-	            </form>
+	                <form class="form" role="form" ng-submit="vm.signin($event)">
+		                <div class="form-group">
+		                    <label for="username" translate="global.form.username">Login</label>
+		                    <input type="text" class="form-control" id="username" style="text-transform: lowercase;"
+		                           placeholder="{{'global.form.username.placeholder' | translate}}" ng-model="vm.username">
+		                </div>
+		                <div class="form-group">
+		                    <label for="password">Password</label>
+		                    <input type="password" class="form-control" id="password" style="text-transform: lowercase;"
+		                           placeholder="{{'la tua password siper'}}" ng-model="vm.password">
+		                </div>
+		                <button type="submit" class="btn btn-primary">Login</button>
+		            </form>
 	            </div>
                 <div ng-switch-when="false" ng-if="app !== 'cnr'">
                     Per autenticarsi usare il menu' "Utente" usando le credenziali dell'applicazione.
