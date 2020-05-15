@@ -249,10 +249,12 @@ public class ManageCovid19_v1 implements ExecutionListener {
 			} else {
 				activeFlag = false;
 				DataResponse flussiTerminatiPerBando = flowsProcessInstanceService.search(req, processDefinitionKey, activeFlag, order, firstResult, maxResults, false);
-				if (flussiTerminatiPerBando.getSize() > 0) {
+				req.put("statoFinaleDomanda", "text=ELIMINATO");
+				DataResponse flussiEliminatiPerBando = flowsProcessInstanceService.search(req, processDefinitionKey, activeFlag, order, firstResult, maxResults, false);				
+				if (flussiTerminatiPerBando.getSize() - flussiEliminatiPerBando.getSize() > 0) {
 					throw new BpmnError("413", "Risulta già presente un flusso associato all'utenza: " + userNameUtente + 
-							"<br>per il mese: " + mese + "anno" + anno + 
-							"<br>per per la tipologia: " + tipoAttivita + "<br>");
+							"<br>per il mese: " + mese + " - anno: " + anno + 
+							"<br>per la tipologia: " + tipoAttivita + "<br>");
 				}
 			}
 
