@@ -12,6 +12,12 @@
                     Per autenticarsi usare le credenziali Siper.
                 <hr>
                 
+	            <div ng-show="vm.avvisi.length > 0">
+	                <h2>Avvisi</h2>
+	                <div class="alert alert-warning" ng-repeat="avviso in vm.avvisi">{{avviso.contenuto}}</div>
+	            </div>
+
+                
                 <form class="form" role="form" ng-submit="vm.signin($event)">
 	                <div class="form-group">
 	                    <label for="username" translate="global.form.username">Login</label>
@@ -48,11 +54,6 @@
                     <p>Nella schermata della ricerca è possibile ricercare i flussi avviati e terminati, anche per chiavi di ricerca (definite per tipo di flusso).
                     <hr>
                     <p>In questa versione della Scrivania Digitale le notifiche email sono disabilitate.
-                </div>
-
-                <div ng-show="vm.avvisi.length > 0">
-                    <h2>Avvisi</h2>
-                    <div class="alert alert-warning" ng-repeat="avviso in vm.avvisi">{{avviso.contenuto}}</div>
                 </div>
 
                 <div class="row" ng-switch-when="true" ng-if="app == 'cnr'">

@@ -12,7 +12,7 @@
 
             avvisi: {
                 getAttivi: function () {
-                    return $http.get('api/avvisiattivi');
+                    return $http.get('flows/api/avvisiattivi');
                 }
             },
             authentication: {
