@@ -32,6 +32,7 @@ import com.google.common.net.MediaType;
 import javax.inject.Inject;
 
 import static it.cnr.si.flows.ng.utils.Enum.Azione.GenerazioneDaSistema;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.statoFinaleDomanda;
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 
 import java.io.File;
@@ -198,8 +199,12 @@ public class ManageCovid19_v1 implements ExecutionListener {
 		break;
 		case "endevent-covid19-start": {
 			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "APPROVATO");
+			if((execution.getVariable("sceltaUtente").toString().equalsIgnoreCase("Firma")) || (execution.getVariable("sceltaUtente").toString().equalsIgnoreCase("Firma Multipla"))) {
+				execution.setVariable(statoFinaleDomanda.name(), "APPROVATO");
+			}
 		}
 		break;
+		
 
 		case "process-end": {
 			//
