@@ -1,15 +1,26 @@
 package it.cnr.si.web.rest;
 
-import it.cnr.si.config.JHipsterProperties;
-import org.springframework.cache.annotation.Cacheable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.inject.Inject;
-import java.util.*;
+import com.codahale.metrics.annotation.Timed;
+
+import it.cnr.si.config.JHipsterProperties;
+import it.cnr.si.domain.Avviso;
+import it.cnr.si.repository.AvvisoRepository;
 
 @RestController
 @RequestMapping("/flows/api")
@@ -17,7 +28,8 @@ public class ProfileInfoResource {
 
     @Inject
     Environment env;
-
+    @Inject
+    private AvvisoRepository avvisoRepository;
     @Inject
     private JHipsterProperties jHipsterProperties;
 
@@ -47,5 +59,13 @@ public class ProfileInfoResource {
         response.put("activeProfiles", activeProfiles);
 
         return response;
+    }
+    
+    @GetMapping("/avvisiattivi")
+    @Timed
+    public ResponseEntity<List<Avviso>> getAvvisiAttivi() {
+
+        return ResponseEntity.ok(avvisoRepository.findByAttivoTrueOrderByIdDesc());
+
     }
 }
