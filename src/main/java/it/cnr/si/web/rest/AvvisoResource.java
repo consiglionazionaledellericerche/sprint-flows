@@ -34,8 +34,7 @@ public class AvvisoResource {
         
     @Inject
     private AvvisoService avvisoService;
-    @Inject
-    private AvvisoRepository avvisoRepository;
+
 
     /**
      * POST  /avvisos : Create a new avviso.
@@ -136,14 +135,6 @@ public class AvvisoResource {
         log.debug("REST request to delete Avviso : {}", id);
         avvisoService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("avviso", id.toString())).build();
-    }
-
-    @GetMapping("/avvisiattivi")
-    @Timed
-    public ResponseEntity<List<Avviso>> getAvvisiAttivi() {
-
-        return ResponseEntity.ok(avvisoRepository.findByAttivoTrueOrderByIdDesc());
-
     }
 
 }

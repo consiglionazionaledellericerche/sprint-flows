@@ -1,6 +1,5 @@
 package it.cnr.si.flows.ng.config;
 
-import it.cnr.si.flows.ng.ldap.FlowsAuthoritiesPopulator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.ApplicationContext;
@@ -23,6 +22,8 @@ import org.springframework.security.ldap.userdetails.LdapUserDetailsService;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
 
+import it.cnr.si.flows.ng.ldap.FlowsAuthoritiesPopulator;
+
 
 @Configuration
 @Order(202)
@@ -33,12 +34,13 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
 
     @Autowired
     private UserDetailsService userDetailsService;
-
+    
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 //url per vedere con che profilo è avviata l'applicazione(serve per caricare la giusta immagine della home)
                 .antMatcher("/flows/api/profile-info**")
+                .antMatcher("/flows/api/avvisiattivi**")
                 .authorizeRequests()
                 .anyRequest()
                 .permitAll()
