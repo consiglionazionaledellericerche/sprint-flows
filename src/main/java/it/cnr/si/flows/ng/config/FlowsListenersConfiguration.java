@@ -30,82 +30,82 @@ import static org.activiti.engine.delegate.event.ActivitiEventType.*;
 @AutoConfigureAfter(FlowsProcessEngineConfigurations.class)
 public class FlowsListenersConfiguration {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FlowsListenersConfiguration.class);
-    @Inject
-    private ApplicationContext appContext;
-    @Inject
-    private RepositoryService repositoryService;
-    @Inject
-    private RuntimeService runtimeService;
-    @Inject
-    private Environment env;
+	private static final Logger LOGGER = LoggerFactory.getLogger(FlowsListenersConfiguration.class);
+	@Inject
+	private ApplicationContext appContext;
+	@Inject
+	private RepositoryService repositoryService;
+	@Inject
+	private RuntimeService runtimeService;
+	@Inject
+	private Environment env;
 
-    @PostConstruct
-    public void init() throws IOException {
-        createDeployments();
-        addGlobalListeners();
-    }
+	@PostConstruct
+	public void init() throws IOException {
+		createDeployments();
+		addGlobalListeners();
+	}
 
-    private void createDeployments() throws IOException {
+	private void createDeployments() throws IOException {
 
-        Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
+		Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
         if (activeProfiles.contains("dev") || activeProfiles.contains("unittests") || activeProfiles.contains("showcase")) {
 
-            String dir = null;
-            if (activeProfiles.contains("cnr"))
-                dir = "cnr";
-            else if (activeProfiles.contains("oiv"))
-                dir = "oiv";
-            else if (activeProfiles.contains("showcase"))
-                dir = "showcase";
-            else
-                System.exit(1);
+			String dir = null;
+			if (activeProfiles.contains("cnr"))
+				dir = "cnr";
+			else if (activeProfiles.contains("oiv"))
+				dir = "oiv";
+			else if (activeProfiles.contains("showcase"))
+				dir = "showcase";
+			else
+				System.exit(1);
 
-            for (Resource resource : appContext.getResources("classpath:processes/" + dir + "/*.bpmn*")) {
+			for (Resource resource : appContext.getResources("classpath:processes/" + dir + "/*.bpmn*")) {
                 LOGGER.info("Deploying process definition {}", resource.getFilename());
-                List<ProcessDefinition> processes = repositoryService.createProcessDefinitionQuery()
-                        .processDefinitionKey(resource.getFilename().split("[.]")[0])
-                        .list();
+				List<ProcessDefinition> processes = repositoryService.createProcessDefinitionQuery()
+						.processDefinitionKey(resource.getFilename().split("[.]")[0])
+						.list();
 
-                if (processes.size() == 0) {
-                    DeploymentBuilder builder = repositoryService.createDeployment();
-                    builder.addInputStream(resource.getFilename(), resource.getInputStream());
-                    builder.deploy();
-                }
-            }
-        }
-    }
+				if (processes.size() == 0) {
+					DeploymentBuilder builder = repositoryService.createDeployment();
+					builder.addInputStream(resource.getFilename(), resource.getInputStream());
+					builder.deploy();
+				}
+			}
+		}
+	}
 
-    /**
-     * ATTENZIONE: L'ordine dei listener e' importante
-     */
-    private void addGlobalListeners() {
-        LOGGER.info("Adding Flows Listeners");
+	/**
+	 * ATTENZIONE: L'ordine dei listener e' importante
+	 */
+	private void addGlobalListeners() {
+		LOGGER.info("Adding Flows Listeners");
 
-        SaveSummaryAtProcessCompletion processEndListener = (SaveSummaryAtProcessCompletion)
-                appContext.getAutowireCapableBeanFactory().createBean(SaveSummaryAtProcessCompletion.class,
-                        AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
-        SetStato beanSetStato = (SetStato) appContext.getAutowireCapableBeanFactory()
-                .createBean(SetStato.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
-        MailNotificationListener mailSender = (MailNotificationListener)
-                appContext.getAutowireCapableBeanFactory().createBean(MailNotificationListener.class,
-                        AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
-        VisibilitySetter visibilitySetter = (VisibilitySetter)
-                appContext.getAutowireCapableBeanFactory().createBean(VisibilitySetter.class,
-                        AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
+		SaveSummaryAtProcessCompletion processEndListener = (SaveSummaryAtProcessCompletion)
+				appContext.getAutowireCapableBeanFactory().createBean(SaveSummaryAtProcessCompletion.class,
+																	  AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
+		SetStato beanSetStato = (SetStato) appContext.getAutowireCapableBeanFactory()
+				.createBean(SetStato.class, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
+		MailNotificationListener mailSender = (MailNotificationListener)
+				appContext.getAutowireCapableBeanFactory().createBean(MailNotificationListener.class,
+																	  AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
+		VisibilitySetter visibilitySetter = (VisibilitySetter)
+				appContext.getAutowireCapableBeanFactory().createBean(VisibilitySetter.class,
+																	  AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
 
-        AddFlowsAttachmentsListener addAttachments = (AddFlowsAttachmentsListener)
-                appContext.getAutowireCapableBeanFactory().createBean(AddFlowsAttachmentsListener.class,
-                        AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
+		AddFlowsAttachmentsListener addAttachments = (AddFlowsAttachmentsListener)
+				appContext.getAutowireCapableBeanFactory().createBean(AddFlowsAttachmentsListener.class,
+						AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
 
-        //quando viene "iniziato un task" e quando viene svolta una qualsiasi attività (serve per la "fine della Process Instance)
-        runtimeService.addEventListener(mailSender);
-        runtimeService.addEventListener(visibilitySetter);
-        runtimeService.addEventListener(addAttachments, PROCESS_STARTED, TASK_COMPLETED);
-        runtimeService.addEventListener(processEndListener, PROCESS_COMPLETED);
-        runtimeService.addEventListener(beanSetStato, TASK_CREATED, HISTORIC_ACTIVITY_INSTANCE_ENDED);
+		//quando viene "iniziato un task" e quando viene svolta una qualsiasi attività (serve per la "fine della Process Instance)
+		runtimeService.addEventListener(mailSender);
+		runtimeService.addEventListener(visibilitySetter);
+		runtimeService.addEventListener(addAttachments, PROCESS_STARTED, TASK_COMPLETED);
+		runtimeService.addEventListener(processEndListener, PROCESS_COMPLETED);
+		runtimeService.addEventListener(beanSetStato, TASK_CREATED, HISTORIC_ACTIVITY_INSTANCE_ENDED);
 
 
 
-    }
+	}
 }

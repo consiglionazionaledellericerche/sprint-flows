@@ -53,7 +53,7 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
                 .addFilterAfter(switchUserFilter(), FilterSecurityInterceptor.class)
                 .addFilterAfter(logPrologSettingFilter(), OAuthCookieSwithUserFilter.class);
     }
-
+    
     @Profile(value = {"cnr"})
     @Bean public LdapUserDetailsManager getLdapUserDetailsManager(LdapContextSource ctx) {
         return new LdapUserDetailsManager(ctx);

@@ -1,8 +1,8 @@
 package it.cnr.si.security;
 
 import it.cnr.si.flows.ng.resource.FlowsProcessDefinitionResource;
-import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.service.MembershipService;
+import it.cnr.si.flows.ng.utils.Utils;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -61,6 +61,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
     RestResponseFactory restResponseFactory;
     @Autowired
     private MembershipService membershipService;
+
 
     /**
      * Determina se un utente ha i permessi per visualizzare un Task.
@@ -341,7 +342,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
                 .singleResult();
         String username = SecurityUtils.getCurrentUserLogin();
 
-            if (instance.getProcessDefinitionKey().equals(acquisti.getProcessDefinition())) {
+        if (instance.getProcessDefinitionKey().equals(acquisti.getProcessDefinition())) {
 
             String rup = String.valueOf(instance.getProcessVariables().get("rup"));
             if (username.equals(rup))
