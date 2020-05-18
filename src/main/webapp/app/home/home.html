@@ -17,11 +17,6 @@
                 </div>
                 <div ng-switch-when="false" ng-if="app == 'cnr'">
                     <p>Per autenticarsi usare le credenziali Siper.</p>
-                
-	            <div ng-show="vm.avvisi.length > 0">
-	                <h2>Avvisi</h2>
-	                <div class="alert alert-warning" ng-repeat="avviso in vm.avvisi">{{avviso.contenuto}}</div>
-	            </div>
 
                 
                 <form class="form" role="form" ng-submit="vm.signin($event)">
