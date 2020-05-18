@@ -13,7 +13,7 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: none
-      naming:
+      naming: 
         strategy: org.springframework.boot.orm.jpa.hibernate.SpringNamingStrategy
     properties:
       hibernate.cache.use_second_level_cache: true
@@ -31,15 +31,12 @@ ajp:
   timeout: 120000
 
 cnr:
-  storage:
-    driver: filesystem
-    filesystem:
-      directory: /tmp/sprint-flows-showcase
+  filesystem:
+    directory: /tmp/sprint-flows-showcase
 
 showcase:
   mail:
     mail.port: 587
     mail.user:
     mail.password:
-
 

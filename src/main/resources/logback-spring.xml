@@ -73,7 +73,6 @@
                 <port>${graylog.port}</port>
                 <!--<originHost>ace.cnr.it</originHost>-->
                 <version>1.1</version>
-                <facility>ace-prova</facility>
                 <extractStackTrace>true</extractStackTrace>
                 <filterStackTrace>true</filterStackTrace>
                 <mdcProfiling>true</mdcProfiling>
@@ -81,12 +80,10 @@
                 <maximumMessageSize>8192</maximumMessageSize>
 
                 <!-- This are static fields -->
-                <additionalFields>
-                    environment=dev,
-                    tag=sprint-flows
+                <additionalFields>tag=sprint-flows
                 </additionalFields>
                 <!--&lt;!&ndash; Optional: Specify field types &ndash;&gt;-->
-                <additionalFieldTypes>environment=String,tag=String</additionalFieldTypes>
+                <additionalFieldTypes>tag=String</additionalFieldTypes>
 
                 <!-- This are fields using MDC -->
                 <mdcFields>mdcField1,mdcField2</mdcFields>

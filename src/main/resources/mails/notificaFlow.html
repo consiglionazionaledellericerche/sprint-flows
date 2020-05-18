@@ -1,43 +1,43 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Notifica relativa ad un flusso</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-</head>
-<body>
-<h1> Notifica relativa al flusso <span th:text="${businessKey}">NOME FLUSSO</span></h1>
-<span th:if="${titolo}">
+    <head>
+        <title>Notifica relativa ad un flusso</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    </head>
+    <body>
+        <h1> Notifica relativa al flusso <span th:text="${businessKey}">NOME FLUSSO</span></h1>
+        <span th:if="${titolo}">
               <br><i>dal titolo: "<bold th:text="${titolo}">OGGETTO FLUSSO</bold>"</i></span>
-<hr>
-<hr>
-<p>
-    Gentile <span th:text="${username}">nome.cognome</span><br>
-    <span th:if="${groupname}">
+        <hr>
+        <hr>
+        <p> 
+            Gentile <span th:text="${username}">nome.cognome</span><br>
+            <span th:if="${groupname}">
                 Riceve questa notifica in quanto parte del gruppo <bold th:text="${groupname}">NOME GRUPPO</bold></span>
-<p th:if="${taskName!=null and taskName!= ''}">
-    Si notifica che il flusso in oggetto ha raggiunto la fase "<bold th:text="${taskName}">FASE</bold>"
-<p th:if="${commento!=null and commento!= ''}">
-    Il compito presenta la seguente nota di commento:
-<pre th:text="${commento}">Commento</pre>
-<hr>
+        <p th:if="${taskName!=null and taskName!= ''}">
+            Si notifica che il flusso in oggetto ha raggiunto la fase "<bold th:text="${taskName}">FASE</bold>"
+        <p th:if="${commento!=null and commento!= ''}">
+            Il compito presenta la seguente nota di commento:
+            <pre th:text="${commento}">Commento</pre>
+        <hr>
 
-<a th:href="${processLink}">
-    Link per accedere direttamente al dettali del flusso
-</a>
+        <a th:href="${processLink}">
+            Link per accedere direttamente al dettali del flusso
+        </a>
 
-<hr>
-<footer th:if="${profile == 'oiv'}" style="color: dark-gray; font-size: 0.8em;">
-    <p>Si prega di non rispondere alla presente mail generata automaticamente dal sistema.
-    <p>Accedere alla scrivania digitale utlizzando il seguente il link:<br>
-        https://scrivaniadigitale.palazzochigi.it
-    <p>Cordiali saluti,<br>DIPARTIMENTO FUNZIONE PUBBLICA - Scrivania Digitale
-</footer>
-
-<footer th:if="${profile == 'cnr'}" style="color: dark-gray; font-size: 0.8em;">
-    <p>Si prega di non rispondere alla presente mail generata automaticamente dal sistema.
-    <p>Accedere alla scrivania digitale utlizzando il seguente il link:<br>
-        https://nuovascrivaniadigitale.cnr.it
-    <p>Cordiali saluti,<br>CNR - Scrivania Digitale
-</footer>
-</body>
+        <hr>
+        <footer th:if="${profile == 'oiv'}" style="color: dark-gray; font-size: 0.8em;">
+          <p>Si prega di non rispondere alla presente mail generata automaticamente dal sistema.
+          <p>Accedere alla scrivania digitale utlizzando il seguente il link:<br>
+            https://scrivaniadigitale.palazzochigi.it
+          <p>Cordiali saluti,<br>DIPARTIMENTO FUNZIONE PUBBLICA - Scrivania Digitale
+        </footer>
+        
+        <footer th:if="${profile == 'cnr'}" style="color: dark-gray; font-size: 0.8em;">
+          <p>Si prega di non rispondere alla presente mail generata automaticamente dal sistema.
+          <p>Accedere alla scrivania digitale utlizzando il seguente il link:<br>
+            https://nuovascrivaniadigitale.cnr.it
+          <p>Cordiali saluti,<br>CNR - Scrivania Digitale
+        </footer>
+    </body>
 </html>
