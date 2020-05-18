@@ -43,7 +43,7 @@ public class HelpdeskResource {
 		hd.setDescrizione(req.getParameter("descrizione"));
 		hd.setCategoria(new Integer(req.getParameter("categoria")));
 		hd.setCategoriaDescrizione(req.getParameter("categoriaDescrizione"));
-		Long id = helpdeskService.newProblem(hd);
+		Long id = helpdeskService.newProblem(hd, req.getHeader("User-Agent"));
 		helpdeskService.addAttachments(id, allegato);
 
 		response.put("segnalazioneId", id);
@@ -52,11 +52,11 @@ public class HelpdeskResource {
 
 
 	@PostMapping(value = "/helpdesk/sendWithoutAttachment", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity sendWithoutAttachment(@RequestBody ExternalProblem hdDataModel) {
+	public ResponseEntity sendWithoutAttachment(@RequestBody ExternalProblem hdDataModel, HttpServletRequest req) {
 		log.info("InvHashmaio mail helpdesk senza allegato");
 		HashMap response = new HashMap();
 		hdDataModel.setTitolo(PREFISSO_TITOLO + hdDataModel.getTitolo());
-		response.put("segnalazioneId", helpdeskService.newProblem(hdDataModel));
+		response.put("segnalazioneId", helpdeskService.newProblem(hdDataModel, req.getHeader("User-Agent")));
 
 		return JSONResponseEntity.ok(response);
 	}
