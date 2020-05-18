@@ -50,13 +50,15 @@ public class AuditingAspect {
 
     }
 
-    @AfterThrowing("inFlowsMailService() && args(notificationType, variables, taskName, username, groupName)")
-    public void auditMailsendFailure(JoinPoint joinPoint, String notificationType, Map<String, Object> variables, String taskName, String username, String groupName) {
+    @AfterThrowing(pointcut="inFlowsMailService() && args(notificationType, variables, taskName, username, groupName)", 
+    	    throwing="excep")
+    public void auditMailsendFailure(JoinPoint joinPoint, String notificationType, Map<String, Object> variables, String taskName, String username, String groupName, Throwable excep) {
 
         Object[] args = joinPoint.getArgs();
 
         log.info("Tentativo di inviare la mail fallito {} a {} del gruppo {}, task {}", notificationType, username, taskName, groupName);
-
+        log.error(excep.getMessage(), excep);
+        
         AuditEvent event = new AuditEvent(username, "EMAIL_SEND_FAILURE", "username="+ username, "groupName=" + groupName, TITLE + "=" + variables.get(TITLE), "notificationType=" + notificationType);
         repo.add(event);
     }

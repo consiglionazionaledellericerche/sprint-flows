@@ -26,88 +26,98 @@ import java.util.Optional;
 @Primary
 public class FlowsMailService extends MailService {
 
-    public static final String FLOW_NOTIFICATION = "notificaFlow.html";
-    public static final String PROCESS_NOTIFICATION = "notificaProcesso.html";
-    public static final String TASK_NOTIFICATION = "notificaTask.html";
+	public static final String FLOW_NOTIFICATION = "notificaFlow.html";
+	public static final String PROCESS_NOTIFICATION = "notificaProcesso.html";
+	public static final String TASK_NOTIFICATION = "notificaTask.html";
     public static final String TASK_ASSEGNATO_AL_GRUPPO = "taskAssegnatoAlGruppo.html";
     public static final String TASK_IN_CARICO_ALL_UTENTE = "taskInCaricoAllUtente.html";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FlowsMailService.class);
-    @Inject
-    private TemplateEngine templateEngine;
-    @Inject
-    private MailConfguration mailConfig;
-    @Inject
-    private Environment env;
-    @Inject
-    private CnrgroupService cnrgroupService;
-    @Autowired(required = false)
-    private AceBridgeService aceBridgeService;
-    @Autowired(required = false) //TODO
-    private AceService aceService;
-    @Inject
-    private FlowsUserService flowsUserService;
-    @Autowired
-    private UserDetailsService flowsUserDetailsService;
+	private static final Logger LOGGER = LoggerFactory.getLogger(FlowsMailService.class);
+	@Inject
+	private TemplateEngine templateEngine;
+	@Inject
+	private MailConfguration mailConfig;
+	@Inject
+	private Environment env;
+	@Inject
+	private CnrgroupService cnrgroupService;
+	@Autowired(required = false)
+	private AceBridgeService aceBridgeService;
+	@Autowired(required = false) //TODO
+	private AceService aceService;
+	@Inject
+	private FlowsUserService flowsUserService;
+	@Autowired
+	private UserDetailsService flowsUserDetailsService;
 
-    @Async
-    public void sendFlowEventNotification(String notificationType, Map<String, Object> variables, String taskName, String username, final String groupName) {
-        Context ctx = new Context();
-        ctx.setVariables(variables);
-        ctx.setVariable("username", username);
+	@Async
+	public void sendFlowEventNotification(String notificationType, Map<String, Object> variables, String taskName, String username, final String groupName) {
+		try {
+			
+			LOGGER.info("Invio della mail all'utente "+ username);
 
-        ctx.setVariable("taskLink", variables.get("serverUrl") + "/#/details?processInstanceId="+ variables.get("processInstanceId") +"&taskId="+ variables.get("nextTaskId"));
-        ctx.setVariable("processLink", variables.get("serverUrl") + "/#/details?processInstanceId="+ variables.get("processInstanceId"));
+			Context ctx = new Context();
+			ctx.setVariables(variables);
+			ctx.setVariable("username", username);
 
-        // ${serverUrl}/#/details?processInstanceId=${processInstanceId}&amp;taskId=${nextTaskId}}
+			ctx.setVariable("taskLink", variables.get("serverUrl") + "/#/details?processInstanceId="+ variables.get("processInstanceId") +"&taskId="+ variables.get("nextTaskId"));
+			ctx.setVariable("processLink", variables.get("serverUrl") + "/#/details?processInstanceId="+ variables.get("processInstanceId"));
 
-        if (groupName != null) {
-            if (Arrays.asList(env.getActiveProfiles()).contains("cnr")) {
-                ctx.setVariable("groupname", Optional.ofNullable(aceBridgeService)
-                        .flatMap(aceBridgeService -> Optional.ofNullable(groupName))
-                        .map(s -> aceBridgeService.getExtendedGroupNome(s))
-                        .orElse(groupName));
-            } else {
-                ctx.setVariable("profile", "oiv");
-                ctx.setVariable("groupname", cnrgroupService.findDisplayName(groupName));
-            }
-        }
-        ctx.setVariable("taskName", taskName);
-        if (Arrays.asList(env.getActiveProfiles()).contains("cnr")) {
-            ctx.setVariable("profile", "cnr");
-        } else if (Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
-            ctx.setVariable("profile", "oiv");
-        } else if (Arrays.asList(env.getActiveProfiles()).contains("showcase")) {
-            ctx.setVariable("profile", "showcase");
-        }
+			// ${serverUrl}/#/details?processInstanceId=${processInstanceId}&amp;taskId=${nextTaskId}}
 
-        String htmlContent = templateEngine.process(notificationType, ctx);
-        String mailUtente = aceService.getUtente(username).getEmail();
+			if (groupName != null) {
+				if (Arrays.asList(env.getActiveProfiles()).contains("cnr")) {
+					ctx.setVariable("groupname", Optional.ofNullable(aceBridgeService)
+							.flatMap(aceBridgeService -> Optional.ofNullable(groupName))
+							.map(s -> aceBridgeService.getExtendedGroupNome(s))
+							.orElse(groupName));
+				} else {
+					ctx.setVariable("profile", "oiv");
+					ctx.setVariable("groupname", cnrgroupService.findDisplayName(groupName));
+				}
+			}
+			ctx.setVariable("taskName", taskName);
+			if (Arrays.asList(env.getActiveProfiles()).contains("cnr")) {
+				ctx.setVariable("profile", "cnr");
+			} else if (Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
+				ctx.setVariable("profile", "oiv");
+			} else if (Arrays.asList(env.getActiveProfiles()).contains("showcase")) {
+				ctx.setVariable("profile", "showcase");
+			}
+			
+			LOGGER.info("Recupero dell'email per l'utente "+ username);
 
-        LOGGER.info("Invio della mail all'utente "+ username +" con indirizzo "+ mailUtente);
+			String htmlContent = templateEngine.process(notificationType, ctx);
+			String mailUtente = aceService.getUtente(username).getEmail();
 
-        if (!mailConfig.isMailActivated()) {
-            // Per le prove mando *tutte* le email agli indirizzi di prova (e non ai veri destinatari)
-            mailConfig.getMailRecipients().stream()
-                    .filter(s -> !s.isEmpty())
-                    .forEach(s -> {
-                        LOGGER.debug("Invio mail a {} con titolo Notifica relativa al flusso {} del tipo {} nello stato {} e con contenuto {}",
-                                s,
-                                variables.get("key"),
-                                notificationType,
-                                variables.get("stato"),
-                                StringUtils.abbreviate(htmlContent, 30));
-                        LOGGER.trace("Corpo email per intero: {}", htmlContent);
-                        sendEmail(s, "Notifica relativa al flusso " + variables.get("key"), htmlContent, false, true);
-                    });
-        } else {
-            // In produzione mando le email ai veri destinatari
-            if(mailUtente != null)
-                sendEmail(mailUtente,
-                        "Notifica relativa al flusso " + variables.get("key"),
-                        htmlContent,
-                        false,
-                        true);
-        }
-    }
+			LOGGER.info("Invio della mail all'utente "+ username +" con indirizzo "+ mailUtente);
+
+			if (mailConfig.isMailActivated()) {
+				// In produzione mando le email ai veri destinatari
+				if(mailUtente != null)
+					sendEmail(mailUtente,
+							"Notifica relativa al flusso " + variables.get("key"),
+							htmlContent,
+							false,
+							true);
+			}
+			
+			// Per le prove mando *tutte* le email agli indirizzi di prova (e non ai veri destinatari)
+			mailConfig.getMailRecipients().stream()
+			.filter(s -> !s.isEmpty())
+			.forEach(s -> {
+				LOGGER.debug("Invio mail a {} con titolo Notifica relativa al flusso {} del tipo {} nello stato {} e con contenuto {}",
+						s,
+						variables.get("key"),
+						notificationType,
+						variables.get("stato"),
+						StringUtils.abbreviate(htmlContent, 30));
+				LOGGER.trace("Corpo email per intero: {}", htmlContent);
+				sendEmail(s, "Notifica relativa al flusso " + variables.get("key"), htmlContent, false, true);
+			});
+		} catch (Exception e) {
+			LOGGER.error("Errore nell'invio della mail", e);
+			throw e;
+		}
+	}
 }
