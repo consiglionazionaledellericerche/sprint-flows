@@ -38,6 +38,9 @@ import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -110,7 +113,12 @@ public class ManageCovid19_v1 implements ExecutionListener {
 			// INSERIMENTO VARIABILI FLUSSO
 			execution.setVariable("titolo", "Scheda " + execution.getVariable("tipoAttivita") + " - " + execution.getVariable("initiator"));
 			execution.setVariable("descrizione", "Scheda Attività - " + execution.getVariable("mese") + " " + execution.getVariable("anno"));
-
+			
+			// CONTROLLO DATA AVVIO SMART WORKING
+			if (execution.getVariable("tipoAttivita").toString().equals("programmazione")){
+				controlloDataAvvioSmartWorking(execution);
+			}
+			
 			//PARAMETRI GENERAZIONE PDF
 			String tipoAttivita = "rendicontazione";
 			if (execution.getVariable("tipoAttivita") != null) {
@@ -204,7 +212,7 @@ public class ManageCovid19_v1 implements ExecutionListener {
 			}
 		}
 		break;
-		
+
 
 		case "process-end": {
 			//
@@ -225,6 +233,59 @@ public class ManageCovid19_v1 implements ExecutionListener {
 		return new CNRPdfSignApparence();
 	}
 
+	private void controlloDataAvvioSmartWorking(DelegateExecution execution) {
+
+		//IMPOSTARE LA DATA COME 1 GIORNO DEL MESE CORRENTE
+		if (execution.getVariable("dataAvvioSmartWorking") == null || execution.getVariable("dataAvvioSmartWorking").equals("null")) {
+			String anno = execution.getVariable("anno").toString() ;
+			String meseLettere = execution.getVariable("mese").toString() ;
+			String meseNumerico; 
+			switch(meseLettere){
+			case "gennaio":
+				meseNumerico = "01";
+				break;
+			case "febbraio":
+				meseNumerico = "02";
+				break;
+			case "marzo":
+				meseNumerico = "03";
+				break;
+			case "aprile":
+				meseNumerico = "04";
+				break;
+			case "maggio":
+				meseNumerico = "05";
+				break;
+			case "giugno":
+				meseNumerico = "06";
+				break;
+			case "luglio":
+				meseNumerico = "07";
+				break;
+			case "agosto":
+				meseNumerico = "08";
+				break;
+			case "settembre":
+				meseNumerico = "09";
+				break;
+			case "ottobre":
+				meseNumerico = "10";
+				break;
+			case "novembre":
+				meseNumerico = "11";
+				break;
+			case "dicembre":
+				meseNumerico = "12";
+				break;
+			default:
+				meseNumerico = "Invalid month";
+				break;
+			} 
+
+			String data01MeseCorrente = anno + "-" + meseNumerico + "-01T00:00:00.000Z";
+			execution.setVariable("dataAvvioSmartWorking", data01MeseCorrente);
+		}
+	}
 
 	private void controlloFlussoEsistente(DelegateExecution execution) {
 		// CONTROLLO UNICITA' SCHEDA -MESE ANNO TIPOLOGIA UTENTE
