@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 
 import feign.FeignException;
 
@@ -107,27 +108,21 @@ public class StartShortTermMobilityDomandeSetGroupsAndVisibility {
 		}
 		// VERIFICA DIRETTORE
 		String usernameDirettoreSiper = "";
-		Integer tipologiaStrutturaUtente = aceBridgeService.getAfferenzaUtente(proponente).getTipo().getId();
-
 		try {
-			direttoreAce = aceService.bossFirmatarioByUsername(proponente);
-			//direttoreAce = aceService.bossDirettoreByUsername(initiator);
+			//direttoreAce = aceService.bossFirmatarioByUsername(proponente);
+			direttoreAce = aceService.bossFirmatarioUoByUsername(proponente);
 			usernameDirettoreAce = direttoreAce.getUsername();
 			IdEntitaOrganizzativaDirettore = direttoreAce.getIdEntitaOrganizzativa();
 		} catch(UnexpectedResultException | FeignException e) {
 			cdsuoAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(proponente).get("codice_uo").toString();
 			throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + initiator + " <br>Si prega di contattare l'help desk in merito<br>");
 		}
-
-
 		try {
 			usernameDirettoreSiper = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("uid").toString();
-
-		} catch(UnexpectedResultException | FeignException | HttpClientErrorException e) {
+		} catch(UnexpectedResultException | FeignException | HttpClientErrorException | HttpServerErrorException e) {
 			usernameDirettoreSiper = "not found";
 		}
 		finally {
-
 			//CONFRONTO DIRETTORE SIPER CON DIRETTORE ACE
 			if (!usernameDirettoreAce.equals(usernameDirettoreSiper)) {
 				LOGGER.info("--- WARNING MISMATCH DIRETTORE - L'utente {} ha  {} come direttore in ACE e {} come come direttore in SIPER", proponente, usernameDirettoreAce, usernameDirettoreSiper);
