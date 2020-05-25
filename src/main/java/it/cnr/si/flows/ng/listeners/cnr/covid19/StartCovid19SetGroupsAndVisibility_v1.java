@@ -28,6 +28,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 
 import feign.FeignException;
 
@@ -106,7 +107,8 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 			//usernameDirettoreSiper = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("uid").toString();
 			usernameDirettoreSiper = siperService.getDirettoreIDNSIP(idnsipAppartenenzaUtente).get(0).get("uid").toString();
 
-		} catch(UnexpectedResultException | FeignException | HttpClientErrorException e) {
+		} catch(UnexpectedResultException | FeignException | HttpClientErrorException | HttpServerErrorException e) {
+	//	} catch(UnexpectedResultException | FeignException | HttpClientErrorException e) {
 			usernameDirettoreSiper = "not found";
 		}
 		finally {
@@ -135,7 +137,7 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 			execution.setVariable("direttore", direttoreAce.getNome() + " " +  direttoreAce.getCognome());
 			execution.setVariable("denominazioneEO", denominazioneEO);
 
-			
+
 			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileProponente, PROCESS_VISUALIZER);
 			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneScrivaniaDigitale, PROCESS_VISUALIZER);
 
