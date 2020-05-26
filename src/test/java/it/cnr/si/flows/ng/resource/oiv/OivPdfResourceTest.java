@@ -7,6 +7,7 @@ import it.cnr.si.flows.ng.resource.FlowsProcessInstanceResource;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,6 +32,7 @@ import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.iscrizioneElen
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+@Ignore // TODO TUTTI I TESTS FUNZIONALI DA SPOSTARE FUORI DA JUNIT
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(profiles = "oiv,unittests")
