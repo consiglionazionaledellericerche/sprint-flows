@@ -3,6 +3,7 @@ package it.cnr.si.flows.ng.security;
 import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.config.SwitchUserSecurityConfiguration;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Ignore // TODO TUTTI I TESTS FUNZIONALI DA SPOSTARE FUORI DA JUNIT
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(profiles = "native,showcase,unittests")
 @EnableTransactionManagement

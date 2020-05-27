@@ -40,7 +40,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles(profiles = "native,showcase,unittests")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
-@Ignore
 public class RelationshipResourceIntTest {
     private static final String DEFAULT_GROUP_NAME = "AAAAA";
     private static final String UPDATED_GROUP_NAME = "BBBBB";

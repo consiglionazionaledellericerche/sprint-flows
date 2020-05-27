@@ -62,18 +62,18 @@ public class MembershipServiceTest {
     }
 
     @Test
-    public void testGetLanciaByResponsabileStrutture() {
+    public void testGetAllUsersInGroup() {
 
-        Set<String> allUsersInGroup = membershipService.getAllUsersInGroup("responsabile-struttura@34408");
-        assertTrue("Il gruppo responsabile-struttura@34408 non contiene maurizio.lancia", allUsersInGroup.contains("maurizio.lancia"));
-        log.info(""+allUsersInGroup);
+        Set<String> allUsersInGroup = membershipService.getAllUsersInGroup("segreteria");
+        assertTrue("Il gruppo segreteria non contiene utente2", allUsersInGroup.contains("utente2"));
+        assertTrue("Il gruppo segreteria non contiene utente3", allUsersInGroup.contains("utente3"));
     }
 
     @Test
     public void testGetUsersInMyGroups() {
 
         Set<String> usersInMyGroups = membershipService.getUsersInMyGroups("utente2");
-        log.info("All groups for user "+membershipService.getAllGroupsForUser(TestServices.getRA()));
+        log.info("All groups for user "+ membershipService.getAllGroupsForUser("utente2"));
         assertTrue(usersInMyGroups.contains("utente3"));
 
     }

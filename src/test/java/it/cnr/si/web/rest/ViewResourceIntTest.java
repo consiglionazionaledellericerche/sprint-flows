@@ -40,7 +40,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles(profiles = "native,showcase,unittests")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
-@Ignore
 public class ViewResourceIntTest {
     private static final String DEFAULT_PROCESS_ID = "AAAAA";
     private static final String UPDATED_PROCESS_ID = "BBBBB";

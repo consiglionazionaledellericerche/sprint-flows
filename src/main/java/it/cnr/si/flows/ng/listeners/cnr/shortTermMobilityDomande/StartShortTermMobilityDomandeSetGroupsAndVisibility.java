@@ -90,32 +90,43 @@ public class StartShortTermMobilityDomandeSetGroupsAndVisibility {
 			LOGGER.info("------ " + timerId + ": TIMER SCADUTO: ");	
 		}
 
-
-		String proponente = execution.getVariable("userNameProponente", String.class);
-		// LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable(Enum.VariableEnum.title.name()));
-		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
+		String userNameProponente = execution.getVariable("userNameProponente", String.class);
 		String cdsuoAppartenenzaUtente = null;
 		String usernameDirettoreAce = null;
+		String denominazioneEODirettore = null;
+		String denominazioneEOProponente = null;
 		BossDto direttoreAce = null;
-		Integer IdEntitaOrganizzativaDirettore = 0;
+		Integer idEntitaOrganizzativaDirettore = 0;
+		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", userNameProponente, execution.getId(), execution.getVariable("title"));
+		
 		// VERIFICA AFFERENZA
 		try {
-			cdsuoAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(proponente).getCdsuo();
+			cdsuoAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(userNameProponente).getCdsuo();
 		} catch(UnexpectedResultException | FeignException e) {
-			cdsuoAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(proponente).get("codice_uo").toString();
-			throw new BpmnError("412", "l'utenza: " + initiator + " non risulta associata ad alcuna struttura<br>");
+			cdsuoAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(userNameProponente).get("codice_uo").toString();
+			throw new BpmnError("412", "l'utenza: " + userNameProponente + " non risulta associata ad alcuna struttura<br>");
 
 		}
 		// VERIFICA DIRETTORE
 		String usernameDirettoreSiper = "";
 		try {
-			//direttoreAce = aceService.bossFirmatarioByUsername(proponente);
-			direttoreAce = aceService.bossFirmatarioUoByUsername(proponente);
+			//direttoreAce = aceService.bossFirmatarioByUsername(userNameProponente);
+			direttoreAce = aceService.bossFirmatarioUoByUsername(userNameProponente);
 			usernameDirettoreAce = direttoreAce.getUsername();
-			IdEntitaOrganizzativaDirettore = direttoreAce.getIdEntitaOrganizzativa();
+			idEntitaOrganizzativaDirettore = direttoreAce.getIdEntitaOrganizzativa();
+			//CHECK CORRISPONDENZA EO TRA DICHIARATO UTENTE E ACE
+			denominazioneEODirettore = direttoreAce.getDenominazioneEO();
+			denominazioneEOProponente = execution.getVariable("istitutoProponente").toString().substring(9);
+			if (!denominazioneEODirettore.equals(denominazioneEOProponente)) {
+				throw new BpmnError("414", "La struttura dichiarata dall'utente: " + userNameProponente + ": <br>" 
+						+ denominazioneEOProponente
+						+ "<br>non coincide con quella di afferenza amministrativa"
+						+ "<br>presente in anagrafica:<br>" + denominazioneEODirettore
+						+ "<br>contattare l'help desk in merito<br>");
+			}
 		} catch(UnexpectedResultException | FeignException e) {
-			cdsuoAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(proponente).get("codice_uo").toString();
-			throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + initiator + " <br>Si prega di contattare l'help desk in merito<br>");
+			cdsuoAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(userNameProponente).get("codice_uo").toString();
+			throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + userNameProponente + " <br>Si prega di contattare l'help desk in merito<br>");
 		}
 		try {
 			usernameDirettoreSiper = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("uid").toString();
@@ -125,14 +136,14 @@ public class StartShortTermMobilityDomandeSetGroupsAndVisibility {
 		finally {
 			//CONFRONTO DIRETTORE SIPER CON DIRETTORE ACE
 			if (!usernameDirettoreAce.equals(usernameDirettoreSiper)) {
-				LOGGER.info("--- WARNING MISMATCH DIRETTORE - L'utente {} ha  {} come direttore in ACE e {} come come direttore in SIPER", proponente, usernameDirettoreAce, usernameDirettoreSiper);
+				LOGGER.info("--- WARNING MISMATCH DIRETTORE - L'utente {} ha  {} come direttore in ACE e {} come come direttore in SIPER", userNameProponente, usernameDirettoreAce, usernameDirettoreSiper);
 			}
 			String gruppoValidatoriShortTermMobility = "validatoriShortTermMobility@0000";
 			String gruppoUfficioProtocollo = "ufficioProtocolloShortTermMobility@0000";
 			String gruppoValutatoreScientificoSTMDipartimento = "valutatoreScientificoSTMDipartimento@0000";
 			String gruppoResponsabileAccordiInternazionali = "responsabileAccordiInternazionali@0000";
 			//DA CAMBIARE - ricavando il direttore della persona che afferisce alla sua struttura
-			String gruppoDirigenteProponente = "responsabile-struttura@" + IdEntitaOrganizzativaDirettore;
+			String gruppoDirigenteProponente = "responsabile-struttura@" + idEntitaOrganizzativaDirettore;
 
 			String applicazioneSTM = "app.stm";
 			String applicazioneScrivaniaDigitale = "app.scrivaniadigitale";
@@ -148,7 +159,7 @@ public class StartShortTermMobilityDomandeSetGroupsAndVisibility {
 			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValutatoreScientificoSTMDipartimento, PROCESS_VISUALIZER);
 			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneScrivaniaDigitale, PROCESS_VISUALIZER);
 
-			execution.setVariable("strutturaValutazioneDirigente", IdEntitaOrganizzativaDirettore + "-" + direttoreAce.getDenominazioneEO());
+			execution.setVariable("strutturaValutazioneDirigente", idEntitaOrganizzativaDirettore + "-" + direttoreAce.getDenominazioneEO());
 			execution.setVariable("gruppoValidatoriShortTermMobility", gruppoValidatoriShortTermMobility);
 			execution.setVariable("gruppoResponsabileAccordiInternazionali", gruppoResponsabileAccordiInternazionali);
 			execution.setVariable("gruppoUfficioProtocollo", gruppoUfficioProtocollo);
