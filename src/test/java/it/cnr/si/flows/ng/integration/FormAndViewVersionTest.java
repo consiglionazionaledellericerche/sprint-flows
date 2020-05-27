@@ -11,6 +11,7 @@ import org.activiti.engine.RepositoryService;
 import org.activiti.engine.TaskService;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -34,6 +35,7 @@ import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
 import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.permessiFerie;
 import static org.junit.Assert.assertEquals;
 
+@Ignore // TODO TUTTI I TESTS FUNZIONALI DA SPOSTARE FUORI DA JUNIT
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(profiles = "native,showcase,unittests")
 @EnableTransactionManagement

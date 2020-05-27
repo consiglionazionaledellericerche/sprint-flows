@@ -31,7 +31,7 @@ import java.util.stream.Stream;
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(profiles = "dev,cnr")
 @RunWith(SpringJUnit4ClassRunner.class)
-@Ignore
+@Ignore // TODO TUTTI I TESTS FUNZIONALI e DIPENDENTI DA ACE/SIPER/ALTRI SERVIZI DA SPOSTARE FUORI DA JUNIT
 public class VerificaDomandeAccordiBilaterali {
 
 	private static final Logger log = LoggerFactory.getLogger(VerificaDomandeAccordiBilaterali.class);

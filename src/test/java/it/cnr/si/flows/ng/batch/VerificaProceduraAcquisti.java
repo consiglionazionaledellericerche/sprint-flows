@@ -26,10 +26,9 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-//@ActiveProfiles(profiles = "dev,cnr")
 @ActiveProfiles(profiles = "dev,cnr")
 @RunWith(SpringJUnit4ClassRunner.class)
-@Ignore
+@Ignore // TODO TUTTI I TESTS FUNZIONALI e DIPENDENTI DA ACE/SIPER DA SPOSTARE FUORI DA JUNIT
 public class VerificaProceduraAcquisti {
 
 	private static final Logger log = LoggerFactory.getLogger(VerificaProceduraAcquisti.class);

@@ -15,6 +15,7 @@ import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,12 +47,11 @@ import static it.cnr.si.flows.ng.utils.Utils.ASC;
 import static org.junit.Assert.*;
 import static org.springframework.http.HttpStatus.OK;
 
-
+@Ignore // TODO TUTTI I TESTS FUNZIONALI DA SPOSTARE FUORI DA JUNIT
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(profiles = "native,showcase,unittests")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
-//@ActiveProfiles(profiles = "native,unittests,oiv")
 public class FlowsProcessInstanceResourceTest {
 
     private static final int LOAD_TEST_PROCESS_INSTANCES = 700;
