@@ -132,7 +132,7 @@
         function logout () {
             $rootScope.wfDefsBootable = [];
             $rootScope.wfDefsStatistics = [];
-            $rootScope.wfDefsAll = [];
+            $localStorage.wfDefsAll = [];
             delete $localStorage.cart;
 
             AuthServerProvider.logout();
