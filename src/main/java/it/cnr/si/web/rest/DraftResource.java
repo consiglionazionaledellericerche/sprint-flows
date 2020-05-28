@@ -33,8 +33,8 @@ public class DraftResource {
      * PUT  /drafts : Save or Updates an existing draft.
      * Draft associato a username e taskid (in caso di avvio del flusso il taskId è sostituito da -deploymentID della processDefinition che si sta avviando
      *
-     * @param taskId   taskId del draft: SE È <0 ALLORA IL TASKID NON C`È, allora IL DRAFT È ASSOCIATO AD UNA PI CHE SI STA CREANDO (-deploimentid tipo di flusso che si sta avviando)
-     * @param json la draft vera a propria, contenuta nel body della richiesta
+     * @param taskId taskId del draft: SE E' < 0 ALLORA IL TASKID NON C`E' ==> IL DRAFT E' ASSOCIATO AD UNA Pi CHE SI STA CREANDO (-deploimentid tipo di flusso che si sta avviando)
+     * @param json il draft vero a proprio, contenuto nel body della richiesta
      * @return the ResponseEntity with status 200 (OK) and with body the updated draft, or with status 400 (Bad Request) if the draft is not valid, or with status 500 (Internal Server Error) if the draft couldnt be updated
      */
     @PutMapping(value = "/drafts/updateDraft",
