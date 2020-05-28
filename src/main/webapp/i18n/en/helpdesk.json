@@ -2,7 +2,7 @@
   "helpdesk": {
     "title": "HelpDesk",
     "form": {
-      "avviso": "Fill in all the data to send a helpdesk report",
+      "avviso": "Fill in all the data to send a helpdesk report and check FAQ session",
       "oggetto": "Object",
       "messaggio": "Message",
       "nota": "Annotation",

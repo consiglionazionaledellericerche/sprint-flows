@@ -2,7 +2,7 @@
 	"helpdesk": {
 		"title": "HelpDesk",
 		"form": {
-			"avviso": "Compilare tutti i dati per inviare una segnalazione helpdesk.",
+			"avviso": "Prima di inviare una segnalazione Helpdesk, controllare bene la sezione Faq e compilare tutti i campi richiesti.",
 			"oggetto": "Oggetto",
 			"messaggio": "Messaggio",
 			"nota": "Annotazione",
