@@ -28,7 +28,7 @@
 	TaskController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log', '$http', '$q', 'Upload', 'utils', '$localStorage'];
 
 	function TaskController($scope, Principal, LoginService, $state, dataService, AlertService, $log, $http, $q, Upload, utils, $localStorage) {
-		var vm = this;
+		var vm = this, deploymentId;
 		$scope.data = {};
 		vm.taskId = $state.params.taskId;
 		$scope.taskId = $state.params.taskId;
@@ -62,8 +62,7 @@
 			if ([21, 23].includes(Number(vm.taskVariables["strumentoAcquisizioneId"])))
 				$scope.data["tipologiaProceduraSelettiva"] = vm.taskVariables["tipologiaProceduraSelettiva"];
 
-
-			dataService.draft.getDraftByTaskId($state.params.taskId, null).then(
+			dataService.draft.getDraftByTaskId($state.params.taskId).then(
 					function(response){
 						//popolo i campi col contenuto del json
 						var json = JSON.parse(response.data.json);
@@ -92,6 +91,19 @@
 						dataPromise.resolve();
 					});
 		} else {
+		    deploymentId = $localStorage.wfDefsAll.filter(function(el){return el.id == $state.params.processDefinitionId})[0].deploymentId;
+//		    autofill draft (deploymentId(negativo))
+		    dataService.draft.getDraftByTaskId(-deploymentId).then(
+                    function(response){
+                        //popolo i campi col contenuto del json
+                        var json = JSON.parse(response.data.json);
+                        Object.keys(json).forEach(function(key) {
+                            $scope.data["" + key] = json[key];
+                        })
+                    }
+            );
+
+
 			dataPromise.reject("");
 
 			vm.diagramUrl = "/rest/diagram/processDefinition/" + $state.params.processDefinitionId + "?" + new Date().getTime();
@@ -149,7 +161,7 @@
 			delete json.sceltaUtente;
 			delete json.taskId;
 			//salvo il draft con username null perchè deve essere visibile a tutti
-			dataService.draft.updateDraft($state.params.taskId, json, null);
+			dataService.draft.updateDraft($state.params.taskId ? $state.params.taskId : -deploymentId, json);
 		}
 
 		function removeFromCart(taskId) {

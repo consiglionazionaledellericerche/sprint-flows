@@ -2,6 +2,7 @@ package it.cnr.si.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.domain.Draft;
+import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.service.DraftService;
 import it.cnr.si.web.rest.util.HeaderUtil;
 import org.slf4j.Logger;
@@ -12,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,28 +31,25 @@ public class DraftResource {
 
     /**
      * PUT  /drafts : Save or Updates an existing draft.
-     * NEL CASO IN CUI NON SI SPECIFICHI L`USERNAME SI RECUPERA UN DRAFT CHE PUÒ ESSERE LETTO DA TUTTI,
-     * VICEVERSA, SE SI SPECIFICA UNO USERNAME, IL DRAFT POTRÀ ESSERE LETTO SOLO DA QURELLO USERNAME
+     * Draft associato a username e taskid (in caso di avvio del flusso il taskId è sostituito da -deploymentID della processDefinition che si sta avviando
      *
-     * @param taskId   taskId del draft: SE È 0 ALLORA IL TASKID NON C`È, allora IL DRAFT È ASSOCIATO AD UNA PI CHE SI STA CREANDO
+     * @param taskId   taskId del draft: SE È <0 ALLORA IL TASKID NON C`È, allora IL DRAFT È ASSOCIATO AD UNA PI CHE SI STA CREANDO (-deploimentid tipo di flusso che si sta avviando)
      * @param json la draft vera a propria, contenuta nel body della richiesta
-     * @param username the username
      * @return the ResponseEntity with status 200 (OK) and with body the updated draft, or with status 400 (Bad Request) if the draft is not valid, or with status 500 (Internal Server Error) if the draft couldnt be updated
      */
     @PutMapping(value = "/drafts/updateDraft",
                 produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<Draft> updateDraft(@RequestParam("taskId") Long taskId,
-                                             @RequestBody String json,
-                                             @RequestParam("username") String username){
-        Draft dbDraft = draftService.findDraft(taskId, username);
+                                             @RequestBody String json){
+        Draft dbDraft = draftService.findDraft(taskId, SecurityUtils.getCurrentUserLogin());
 
         if (dbDraft == null)
             dbDraft = new Draft();
 
         dbDraft.setJson(json);
         dbDraft.setTaskId(taskId);
-        dbDraft.setUsername(username.isEmpty() ? null : username);
+        dbDraft.setUsername(SecurityUtils.getCurrentUserLogin());
 
         Draft result = draftService.save(dbDraft);
         return ResponseEntity.ok()
@@ -104,15 +101,15 @@ public class DraftResource {
      * GET  /drafts/getDraftByTaskId : restituisce i draft associati ad un utente
      *
      * @param taskId   the id of the draft to retrieve
-     * @param username the username
      * @return the ResponseEntity with status 200 (OK) and with body the draft, or with status 404 (Not Found)
      */
     @GetMapping(value = "/draft/getDraftByTaskId",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Draft> getDraftByTaskId(@RequestParam("taskId") Long taskId, @RequestParam("username") String username) {
+    public ResponseEntity<Draft> getDraftByTaskId(@RequestParam("taskId") Long taskId) {
         log.debug("REST request to get Draft by taskId : {}", taskId);
-        Draft draft = draftService.findDraft(taskId, username);
+
+        Draft draft = draftService.findDraft(taskId, SecurityUtils.getCurrentUserLogin());
 
         return Optional.ofNullable(draft)
                 .map(result -> new ResponseEntity<>(
