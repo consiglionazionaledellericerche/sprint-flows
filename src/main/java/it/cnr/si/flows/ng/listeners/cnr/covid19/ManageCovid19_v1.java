@@ -106,6 +106,7 @@ public class ManageCovid19_v1 implements ExecutionListener {
 		case "process-start": {
 			// CONTROLLO UNICITA' SCHEDA -MESE ANNO TIPOLOGIA UTENTE
 			controlloFlussoEsistente(execution);
+			calcoloMeseNumerico(execution);
 			startCovid19SetGroupsAndVisibility_v1.configuraVariabiliStart(execution);
 		}
 		break;
@@ -113,12 +114,15 @@ public class ManageCovid19_v1 implements ExecutionListener {
 			// INSERIMENTO VARIABILI FLUSSO
 			execution.setVariable("titolo", "Scheda " + execution.getVariable("tipoAttivita") + " - " + execution.getVariable("initiator"));
 			execution.setVariable("descrizione", "Scheda Attività - " + execution.getVariable("mese") + " " + execution.getVariable("anno"));
-			
+
 			// CONTROLLO DATA AVVIO SMART WORKING
 			if (execution.getVariable("tipoAttivita").toString().equals("programmazione")){
-				controlloDataAvvioSmartWorking(execution);
+				if (execution.getVariable("dataAvvioSmartWorking") == null || execution.getVariable("dataAvvioSmartWorking").equals("null")) {
+					String data01MeseCorrente = execution.getVariable("anno").toString() + "-" + execution.getVariable("meseNumerico").toString() + "-01T00:00:00.000Z";
+					execution.setVariable("dataAvvioSmartWorking", data01MeseCorrente);
+				}
 			}
-			
+
 			//PARAMETRI GENERAZIONE PDF
 			String tipoAttivita = "rendicontazione";
 			if (execution.getVariable("tipoAttivita") != null) {
@@ -183,21 +187,15 @@ public class ManageCovid19_v1 implements ExecutionListener {
 		}
 		break;
 		case "modifica-start": {
-			//AGGIORNA DIRETTORE
-			Integer IdEntitaOrganizzativaDirettore = 0;
-			BossDto utenteBoss = aceService.bossFirmatarioByUsername(execution.getVariable("initiator").toString());
-			execution.setVariable("direttore", utenteBoss.getNome() + " " + utenteBoss.getCognome());
-			IdEntitaOrganizzativaDirettore = utenteBoss.getIdEntitaOrganizzativa();
-			String denominazioneEO = utenteBoss.getDenominazioneEO();
-			String gruppoResponsabileProponente = "responsabile-struttura@" + IdEntitaOrganizzativaDirettore;
+			//AGGIORNA PARAMETRI
 			String gruppoResponsabileProponenteOld = execution.getVariable("gruppoResponsabileProponente").toString();
+			startCovid19SetGroupsAndVisibility_v1.configuraVariabiliStart(execution);
+			String gruppoResponsabileProponente = execution.getVariable("gruppoResponsabileProponente").toString();
+			// RIMOZIONE VISIBILITA' IN CASO CAMBIO DIRETTORE
 			if (!gruppoResponsabileProponenteOld.equals(gruppoResponsabileProponente)) {
 				runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileProponente, PROCESS_VISUALIZER);
 				runtimeService.deleteGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileProponenteOld, PROCESS_VISUALIZER);
 			}
-			execution.setVariable("gruppoResponsabileProponente", gruppoResponsabileProponente);
-			execution.setVariable("denominazioneEO", denominazioneEO);
-
 		}
 		case "protocollo-end": {
 			if (sceltaUtente != null && sceltaUtente.equals("Protocolla")) {
@@ -233,58 +231,55 @@ public class ManageCovid19_v1 implements ExecutionListener {
 		return new CNRPdfSignApparence();
 	}
 
-	private void controlloDataAvvioSmartWorking(DelegateExecution execution) {
+	private void calcoloMeseNumerico(DelegateExecution execution) {
 
 		//IMPOSTARE LA DATA COME 1 GIORNO DEL MESE CORRENTE
-		if (execution.getVariable("dataAvvioSmartWorking") == null || execution.getVariable("dataAvvioSmartWorking").equals("null")) {
-			String anno = execution.getVariable("anno").toString() ;
-			String meseLettere = execution.getVariable("mese").toString() ;
-			String meseNumerico; 
-			switch(meseLettere){
-			case "gennaio":
-				meseNumerico = "01";
-				break;
-			case "febbraio":
-				meseNumerico = "02";
-				break;
-			case "marzo":
-				meseNumerico = "03";
-				break;
-			case "aprile":
-				meseNumerico = "04";
-				break;
-			case "maggio":
-				meseNumerico = "05";
-				break;
-			case "giugno":
-				meseNumerico = "06";
-				break;
-			case "luglio":
-				meseNumerico = "07";
-				break;
-			case "agosto":
-				meseNumerico = "08";
-				break;
-			case "settembre":
-				meseNumerico = "09";
-				break;
-			case "ottobre":
-				meseNumerico = "10";
-				break;
-			case "novembre":
-				meseNumerico = "11";
-				break;
-			case "dicembre":
-				meseNumerico = "12";
-				break;
-			default:
-				meseNumerico = "Invalid month";
-				break;
-			} 
+		String anno = execution.getVariable("anno").toString() ;
+		String meseLettere = execution.getVariable("mese").toString() ;
+		String meseNumerico; 
+		switch(meseLettere){
+		case "gennaio":
+			meseNumerico = "01";
+			break;
+		case "febbraio":
+			meseNumerico = "02";
+			break;
+		case "marzo":
+			meseNumerico = "03";
+			break;
+		case "aprile":
+			meseNumerico = "04";
+			break;
+		case "maggio":
+			meseNumerico = "05";
+			break;
+		case "giugno":
+			meseNumerico = "06";
+			break;
+		case "luglio":
+			meseNumerico = "07";
+			break;
+		case "agosto":
+			meseNumerico = "08";
+			break;
+		case "settembre":
+			meseNumerico = "09";
+			break;
+		case "ottobre":
+			meseNumerico = "10";
+			break;
+		case "novembre":
+			meseNumerico = "11";
+			break;
+		case "dicembre":
+			meseNumerico = "12";
+			break;
+		default:
+			meseNumerico = "Invalid month";
+			break;
+		} 
+		execution.setVariable("meseNumerico", meseNumerico);
 
-			String data01MeseCorrente = anno + "-" + meseNumerico + "-01T00:00:00.000Z";
-			execution.setVariable("dataAvvioSmartWorking", data01MeseCorrente);
-		}
 	}
 
 	private void controlloFlussoEsistente(DelegateExecution execution) {
