@@ -2,7 +2,7 @@
   "helpdesk": {
     "title": "HelpDesk",
     "form": {
-      "avviso": "Fill in all the data to send a helpdesk report and check FAQ session",
+      "avviso": "Before proceeding with the sending of a Helpdesk report, it is recommended that you read the FAQ carefully and, if necessary, proceed by filling in all the required fields.",
       "oggetto": "Object",
       "messaggio": "Message",
       "nota": "Annotation",
