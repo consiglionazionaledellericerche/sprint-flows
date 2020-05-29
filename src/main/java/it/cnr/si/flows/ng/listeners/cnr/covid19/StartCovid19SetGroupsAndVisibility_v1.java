@@ -86,7 +86,7 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 			//VERIFICA DIPENDENTI CESSATI
 			if (aceService.getPersonaByUsername(initiator.toString()).getDataCessazione() != null) {			
 				LocalDate dateRif = LocalDate.of(Integer.parseInt(execution.getVariable("anno").toString()), Integer.parseInt(execution.getVariable("meseNumerico").toString()), 1);
-				if (aceService.getPersonaByUsername(initiator.toString()).getDataCessazione().isBefore(dateRif)) {
+				if (aceService.getPersonaByUsername(initiator.toString()).getDataCessazione().minusDays(1).isBefore(dateRif)) {
 					throw new BpmnError("416", "l'utenza: " + initiator + " non risulta associata <br>ad alcuna struttura per il periodo di riferimento<br>");
 				} else {
 					direttoreAce = aceService.bossFirmatarioByUsername(initiator, dateRif);
