@@ -2,7 +2,7 @@
 	"helpdesk": {
 		"title": "HelpDesk",
 		"form": {
-			"avviso": "Prima di procedere all'invio di una segnalazione Helpdesk si raccomanda di leggere attentamente le FAQ ed eventualmente procedere compilando tutti i campi richiesti.",
+			"avviso": "Prima di procedere all'invio di una segnalazione Helpdesk si raccomanda di leggere attentamente le <a href=\"#/manualistica\">FAQ</a> ed eventualmente procedere compilando tutti i campi richiesti.",
 			"oggetto": "Oggetto",
 			"messaggio": "Messaggio",
 			"nota": "Annotazione",

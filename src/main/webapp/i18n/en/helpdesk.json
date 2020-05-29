@@ -2,7 +2,7 @@
   "helpdesk": {
     "title": "HelpDesk",
     "form": {
-      "avviso": "Before proceeding with the sending of a Helpdesk report, it is recommended that you read the FAQ carefully and, if necessary, proceed by filling in all the required fields.",
+      "avviso": "Before proceeding with the sending of a Helpdesk report, it is recommended that you read the <a href=\"#/manualistica\">FAQ</a> carefully and, if necessary, proceed by filling in all the required fields.",
       "oggetto": "Object",
       "messaggio": "Message",
       "nota": "Annotation",
