@@ -27,14 +27,7 @@ public class DraftService {
      * @return the draft
      */
     public Draft findDraft(Long taskId, String username) {
-        Draft dbDraft;
-
-        if(username.isEmpty())
-            dbDraft = draftRepository.getDraftByTaskId(taskId);
-        else
-            dbDraft = draftRepository.getDraftByTaskIdAndUsername(taskId, username);
-
-        return dbDraft;
+        return draftRepository.getDraftByTaskIdAndUsername(taskId, username);
     }
 
 
@@ -86,5 +79,17 @@ public class DraftService {
         for(Draft draft : drafts) {
             draftRepository.delete(draft.getId());
         }
+    }
+
+    /**
+     * Delete draft by task id and Username.
+     *
+     * @param taskId   the task id
+     * @param username the username
+     */
+    public void deleteDraftByTaskIdAndUsername(Long taskId, String username) {
+        Draft draft = draftRepository.getDraftByTaskIdAndUsername(taskId, username);
+
+        draftRepository.delete(draft.getId());
     }
 }

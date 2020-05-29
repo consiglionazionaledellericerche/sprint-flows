@@ -300,23 +300,21 @@
                 }
             },
             draft: {
-                getDraftByTaskId: function (taskId, username) {
+                getDraftByTaskId: function (taskId) {
                     return $http({
                         url: 'api/draft/getDraftByTaskId',
                         method: 'GET',
                         params: {
-                            taskId: taskId ? taskId : '0',
-                            username: (username ? username : '')
+                            taskId: taskId
                         },
                     });
                 },
-                updateDraft: function (taskId, json, username) {
+                updateDraft: function (taskId, json) {
                     return $http({
                         url: 'api/drafts/updateDraft?',
                         method: 'PUT',
                         params: {
-                            taskId: taskId ? taskId : '0',
-                            username: (username ? username : '')
+                            taskId: taskId
                         },
                         data: json
                     });
