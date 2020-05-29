@@ -37,6 +37,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -72,26 +73,39 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 		//Integer cdsuoAppartenenzaUtente = aceBridgeService.getEntitaOrganizzativaDellUtente(proponente.toString()).getId();
 		//String cdsuoAppartenenzaUtente = null;
 		String idnsipAppartenenzaUtente = null;
+		String cdsuoAppartenenzaUtente = null;
 		String usernameDirettoreAce = null;
 		BossDto direttoreAce = null;
 		Integer IdEntitaOrganizzativaDirettore = 0;
 		String denominazioneEO  = null;
-		// VERIFICA AFFERENZA
-		try {
-			//cdsuoAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(initiator.toString()).getCdsuo();
-			idnsipAppartenenzaUtente = aceBridgeService.getAfferenzaUtentePerSede(initiator.toString()).getIdnsip();
-		} catch(UnexpectedResultException | FeignException e) {
-			//cdsuoAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(initiator.toString()).get("codice_uo").toString();
-			idnsipAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(initiator.toString()).get("codice_sede").toString();
-			throw new BpmnError("412", "l'utenza: " + initiator + " non risulta associata ad alcuna struttura<br>");
 
-		}
+
 		// VERIFICA DIRETTORE
 		String usernameDirettoreSiper = "";
-		Integer tipologiaStrutturaUtente = aceBridgeService.getAfferenzaUtentePerSede(initiator.toString()).getTipo().getId();
-
 		try {
-			direttoreAce = aceService.bossFirmatarioByUsername(initiator);
+			//VERIFICA DIPENDENTI CESSATI
+			if (aceService.getPersonaByUsername(initiator.toString()).getDataCessazione() != null) {			
+				LocalDate dateRif = LocalDate.of(Integer.parseInt(execution.getVariable("anno").toString()), Integer.parseInt(execution.getVariable("meseNumerico").toString()), 1);
+				if (aceService.getPersonaByUsername(initiator.toString()).getDataCessazione().minusDays(1).isBefore(dateRif)) {
+					throw new BpmnError("416", "l'utenza: " + initiator + " non risulta associata <br>ad alcuna struttura per il periodo di riferimento<br>");
+				} else {
+					direttoreAce = aceService.bossFirmatarioByUsername(initiator, dateRif);
+					idnsipAppartenenzaUtente = aceService.entitaOrganizzativaById(direttoreAce.getIdEntitaOrganizzativa()).getIdnsip();
+					cdsuoAppartenenzaUtente = aceService.entitaOrganizzativaById(direttoreAce.getIdEntitaOrganizzativa()).getCdsuo();
+				}
+			} else {
+				direttoreAce = aceService.bossFirmatarioByUsername(initiator);
+				// VERIFICA AFFERENZA
+				try {
+					//cdsuoAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(initiator.toString()).getCdsuo();
+					idnsipAppartenenzaUtente = aceBridgeService.getAfferenzaUtentePerSede(initiator.toString()).getIdnsip();
+					cdsuoAppartenenzaUtente = aceBridgeService.getAfferenzaUtentePerSede(initiator.toString()).getCdsuo();
+				} catch(UnexpectedResultException | FeignException e) {
+					//cdsuoAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(initiator.toString()).get("codice_uo").toString();
+					idnsipAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(initiator.toString()).get("codice_sede").toString();
+					throw new BpmnError("412", "l'utenza: " + initiator + " non risulta associata ad alcuna struttura<br>");
+				}
+			}
 			//direttoreAce = aceService.bossDirettoreByUsername(initiator);
 			usernameDirettoreAce = direttoreAce.getUsername();
 			IdEntitaOrganizzativaDirettore = direttoreAce.getIdEntitaOrganizzativa();
@@ -102,13 +116,12 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 			throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + initiator + " <br>Si prega di contattare l'help desk in merito<br>");
 		}
 
-
 		try {
 			//usernameDirettoreSiper = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("uid").toString();
 			usernameDirettoreSiper = siperService.getDirettoreIDNSIP(idnsipAppartenenzaUtente).get(0).get("uid").toString();
 
 		} catch(UnexpectedResultException | FeignException | HttpClientErrorException | HttpServerErrorException e) {
-	//	} catch(UnexpectedResultException | FeignException | HttpClientErrorException e) {
+			//	} catch(UnexpectedResultException | FeignException | HttpClientErrorException e) {
 			usernameDirettoreSiper = "not found";
 		}
 		finally {
@@ -125,15 +138,15 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 			String applicazioneScrivaniaDigitale = "app.scrivaniadigitale";
 
 
-			EntitaOrganizzativaWebDto utenteAce = aceBridgeService.getAfferenzaUtentePerSede(execution.getVariable("initiator").toString());
+			//EntitaOrganizzativaWebDto utenteAce = aceBridgeService.getAfferenzaUtentePerSede(execution.getVariable("initiator").toString());
 			UtenteDto utente = aceService.getUtente(execution.getVariable("initiator").toString());
 
 			execution.setVariable("matricola", utente.getPersona().getMatricola());
 			execution.setVariable("nomeCognomeUtente", utente.getPersona().getNome() + " " + utente.getPersona().getCognome());
 			execution.setVariable("userNameUtente", utente.getUsername());
 			execution.setVariable("tipoContratto", utente.getPersona().getTipoContratto());
-			execution.setVariable("cds", utenteAce.getCdsuo());
-			execution.setVariable("idnsip", utenteAce.getIdnsip());
+			execution.setVariable("cds", cdsuoAppartenenzaUtente);
+			execution.setVariable("idnsip", idnsipAppartenenzaUtente);
 			execution.setVariable("direttore", direttoreAce.getNome() + " " +  direttoreAce.getCognome());
 			execution.setVariable("denominazioneEO", denominazioneEO);
 
