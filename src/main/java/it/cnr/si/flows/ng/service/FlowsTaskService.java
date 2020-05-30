@@ -345,10 +345,7 @@ public class FlowsTaskService {
 		}
 		runtimeService.setProcessInstanceName(instance.getId(), name.toString());
 		//cancello i Draft collegati all'avvio del flusso
-		Long deploimentId = Long.parseLong(repositoryService.createDeploymentQuery()
-												   .processDefinitionKey(instance.getProcessDefinitionKey())
-												   .singleResult()
-												   .getId());
+		Long deploimentId = Long.parseLong(processDefinition.getDeploymentId());
 		draftService.deleteDraftByTaskIdAndUsername(-deploimentId, SecurityUtils.getCurrentUserLogin());
 
 		return instance;
