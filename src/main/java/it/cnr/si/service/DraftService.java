@@ -89,7 +89,7 @@ public class DraftService {
      */
     public void deleteDraftByTaskIdAndUsername(Long taskId, String username) {
         Draft draft = draftRepository.getDraftByTaskIdAndUsername(taskId, username);
-
-        draftRepository.delete(draft.getId());
+        if(draft != null)
+            draftRepository.delete(draft.getId());
     }
 }
