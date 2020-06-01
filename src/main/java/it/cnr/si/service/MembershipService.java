@@ -135,30 +135,18 @@ public class MembershipService {
 
     /* --- */
 
-    /*
-     * DEPRACATED : questo metodo va a scalare solo un livello di relationship tra gruppi
-     * @param groupName
-     * @return
-     */
-    @Deprecated // TODO delete
+    @SuppressWarnings("deprecation")
     private List<String> getUsersInGroup(String groupName) {
         List<String> result = membershipRepository.findMembersInGroup(groupName);
-        Set<String> users = getUsersInAceGroup(groupName);
-        result.addAll(users);
-        return result;
-    }
-
-    // Se a qualcuno dovesse servire puo' rendere questo metodo public, ma non credo - martin 4/9/19
-    @SuppressWarnings("deprecation") // Questo e' l'unico modo giusto di usare il metodo aceBridgeService.getUsersInAceGroup
-    private Set<String> getUsersInAceGroup(String groupName) {
-        return Optional.ofNullable(aceBridgeService)
+        Set<String> users = Optional.ofNullable(aceBridgeService)
                 .map(aceBridgeService -> aceBridgeService.getUsersInAceGroup(groupName))
                 .filter(strings -> !strings.isEmpty())
                 .map(strings -> strings.stream())
                 .orElse(Stream.empty())
                 .collect(Collectors.toSet());
+        result.addAll(users);
+        return result;
     }
-
 
     public Set<String> getAllUsersInGroup(String groupName) {
 
@@ -166,10 +154,8 @@ public class MembershipService {
         groups.add(groupName);
         groups.addAll( getAllParentGroupsRecursively(groups, new HashSet<>()) );
 
-        Set<String> result = new HashSet<>();
-
         return groups.stream()
-                .map(this::getUsersInAceGroup)
+                .map(this::getUsersInGroup)
                 .flatMap(list -> list.stream())
                 .collect(Collectors.toSet());
     }

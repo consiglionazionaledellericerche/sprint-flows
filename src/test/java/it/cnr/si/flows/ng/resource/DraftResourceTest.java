@@ -7,6 +7,7 @@ import it.cnr.si.web.rest.DraftResource;
 import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,7 +30,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.springframework.http.HttpStatus.OK;
 
-
+@Ignore // TODO TUTTI I TESTS FUNZIONALI DA SPOSTARE FUORI DA JUNIT
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(profiles = "native,showcase,unittests")
 @EnableTransactionManagement
@@ -43,6 +44,8 @@ public class DraftResourceTest {
     @Inject
     private TestServices util;
     private ProcessInstanceResponse processInstance;
+    private String json = "{\"commento_qualitaProgetto\":\"commento 1\",\"commento_qualitaGruppoDiRicerca\":\"commento 2\",\"commento_pianoDiLavoro\":\"commento 3\",\"commento_valoreAggiunto\":\"commento 4\",\"commento\":\"commento 5\",\"punteggio_qualitaProgetto\":1,\"punteggio_qualitaGruppoDiRicerca\":1.95,\"punteggio_pianoDiLavoro\":3,\"punteggio_valoreAggiunto\":4}";
+
 
 
 
@@ -63,7 +66,14 @@ public class DraftResourceTest {
 
 
     @Test
-    public void testDeleteDraft() throws Exception {
+    public void testDeleteDraft(){
+        ResponseEntity<Draft> responseDirettore = draftResource.updateDraft(Long.valueOf(util.getFirstTaskId()), json);
+        assertEquals(OK, responseDirettore.getStatusCode());
+        assertNotNull(responseDirettore.getBody().getId());
+
+        ResponseEntity<List<Draft>> allDraftsRE = draftResource.getAllDrafts();
+        assertEquals(OK, allDraftsRE.getStatusCode());
+        assertEquals(1, allDraftsRE.getBody().size());
 
         // vado avanti col flusso (Pre-determina -> Verifica))
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
@@ -75,31 +85,25 @@ public class DraftResourceTest {
         assertEquals(OK, response.getStatusCode());
 
         //testo che il completamento del task comporti la rimozione del draft
-        ResponseEntity<List<Draft>> allDraftsRE = draftResource.getAllDrafts();
+        allDraftsRE = draftResource.getAllDrafts();
         assertEquals(OK, allDraftsRE.getStatusCode());
         assertEquals(0, allDraftsRE.getBody().size());
     }
 
 
 
-
     @Test
     public void testDraft() throws Exception {
         processInstance = util.mySetUp(acquisti);
-        String json = "{\"commento_qualitaProgetto\":\"commento 1\",\"commento_qualitaGruppoDiRicerca\":\"commento 2\",\"commento_pianoDiLavoro\":\"commento 3\",\"commento_valoreAggiunto\":\"commento 4\",\"commento\":\"commento 5\",\"punteggio_qualitaProgetto\":1,\"punteggio_qualitaGruppoDiRicerca\":1.95,\"punteggio_pianoDiLavoro\":3,\"punteggio_valoreAggiunto\":4}";
 
-        ResponseEntity<Draft> responseUserEmpty = draftResource.updateDraft(Long.valueOf(util.getFirstTaskId()), json, "");
-        assertEquals(OK, responseUserEmpty.getStatusCode());
-        assertNotNull(responseUserEmpty.getBody().getId());
-
-        String user = "paoloenricocirone";
-        ResponseEntity<Draft> responsePaoloenricocirone = draftResource.updateDraft(Long.valueOf(util.getFirstTaskId()), json, user);
-        assertEquals(OK, responsePaoloenricocirone.getStatusCode());
-        assertNotNull(responsePaoloenricocirone.getBody().getId());
+        util.loginDirettore();
+        ResponseEntity<Draft> responseDirettore = draftResource.updateDraft(Long.valueOf(util.getFirstTaskId()), json);
+        assertEquals(OK, responseDirettore.getStatusCode());
+        assertNotNull(responseDirettore.getBody().getId());
 
 
         ResponseEntity<List<Draft>> allDraftsRE = draftResource.getAllDrafts();
-        assertEquals(2, allDraftsRE.getBody().size());
+        assertEquals(1, allDraftsRE.getBody().size());
         Draft expectedDraft = allDraftsRE.getBody().get(0);
         assertEquals(json, expectedDraft.getJson());
         //nel primo Draft lo username è null
@@ -107,7 +111,7 @@ public class DraftResourceTest {
         assertEquals(Long.valueOf(util.getFirstTaskId()), expectedDraft.getTaskId());
         assertEquals(json, expectedDraft.getJson());
         assertEquals(json, allDraftsRE.getBody().get(1).getJson());
-        assertEquals(user, allDraftsRE.getBody().get(1).getUsername());
+        assertEquals("maurizio.lancia", allDraftsRE.getBody().get(1).getUsername());
         assertEquals(Long.valueOf(util.getFirstTaskId()), allDraftsRE.getBody().get(1).getTaskId());
 
         //Testo getDraftById
@@ -116,13 +120,9 @@ public class DraftResourceTest {
         assertEquals(expectedDraft.getUsername(), draftRE.getBody().getUsername());
 
         //Testo getdraftByTaskId (con username paoloenricocirone)
-        ResponseEntity<Draft> draftsUserRE = draftResource.getDraftByTaskId(Long.valueOf(util.getFirstTaskId()), user);
+        util.loginDirettore();
+        ResponseEntity<Draft> draftsUserRE = draftResource.getDraftByTaskId(Long.valueOf(util.getFirstTaskId()));
         assertEquals(OK, draftsUserRE.getStatusCode());
-        assertEquals(user, draftsUserRE.getBody().getUsername());
-
-        //Testo getdraftByTaskId (senza username)
-        ResponseEntity<Draft> draftsRE = draftResource.getDraftByTaskId(Long.valueOf(util.getFirstTaskId()), "");
-        assertEquals(OK, draftsRE.getStatusCode());
-        assertEquals(null, draftsRE.getBody().getUsername());
+        assertEquals("maurizio.lancia", draftsUserRE.getBody().getUsername());
     }
 }

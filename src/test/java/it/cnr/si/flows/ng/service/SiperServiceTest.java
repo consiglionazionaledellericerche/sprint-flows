@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 @ActiveProfiles(profiles = "native,unittests,cnr")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
-@Ignore // TODO per ora testiamo solo Showcase, funzionalita' CNR da testare separatamente
+@Ignore // TODO TUTTI I TESTS FUNZIONALI e DIPENDENTI DA ACE/SIPER DA SPOSTARE FUORI DA JUNIT
 public class SiperServiceTest {
 
     @Inject

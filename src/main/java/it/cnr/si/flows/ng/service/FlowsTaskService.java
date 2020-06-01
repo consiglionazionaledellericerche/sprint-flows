@@ -344,8 +344,10 @@ public class FlowsTaskService {
 			name.put(stato.name(), ellipsis(taskName, LENGTH_FASE) );
 		}
 		runtimeService.setProcessInstanceName(instance.getId(), name.toString());
+		//cancello i Draft collegati all'avvio del flusso
+		Long deploimentId = Long.parseLong(processDefinition.getDeploymentId());
+		draftService.deleteDraftByTaskIdAndUsername(-deploimentId, SecurityUtils.getCurrentUserLogin());
 
-		LOGGER.info("Avviata istanza di processo {}, id: {}", key, instance.getId());
 		return instance;
 	}
 	

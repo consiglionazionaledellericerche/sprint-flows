@@ -32,7 +32,7 @@ import java.util.stream.Stream;
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(profiles = "dev,cnr")
 @RunWith(SpringJUnit4ClassRunner.class)
-@Ignore
+@Ignore // TODO TUTTI I TESTS FUNZIONALI e DIPENDENTI DA ACE/SIPER DA SPOSTARE FUORI DA JUNIT
 public class PopolazioneProfiliPerCDSUOAcquistiBatch {
 
 	private static final Logger log = LoggerFactory.getLogger(PopolazioneProfiliPerCDSUOAcquistiBatch.class);

@@ -34,7 +34,7 @@ public class FlowsProxyResource {
     public final static String PROXY_URL = "proxyURL";
     @Autowired
     private ProxyService proxyService;
-    @Value("${spring.proxy.OIL.categoryScrivania}")
+    @Value("${spring.proxy.OIL.categoryScrivania:}")
     private String categoryId;
 
 
