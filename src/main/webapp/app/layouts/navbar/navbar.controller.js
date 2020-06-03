@@ -85,6 +85,7 @@
 					name: "ALL"
 				});
 				//lista di TUTTE le Process Definition
+				$rootScope.wfDefsAll = response.data.all;
 				$localStorage.wfDefsAll = response.data.all;
 
 				//popolo l'array delle process Definitions di cui l'utente loggato può vedere le statistiche
