@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.5.1.final utlizzo versione della libreria JasperReports6.5.1  -->
+<!-- Created with Jaspersoft Studio version 6.11.0.final utlizzo versione della libreria JasperReports6.11.0-0c4056ccaa4d25a5a8c45672d2f764ea3498bebb  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="domandaAccordiBilaterali" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="NoPages" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c0187353-db16-46fc-a7a4-9ece39bc4976">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
@@ -409,7 +409,7 @@
 		<groupExpression><![CDATA[(int)($V{REPORT_COUNT}/5)]]></groupExpression>
 		<groupHeader>
 			<band height="30">
-				<textField isStretchWithOverflow="true">
+				<textField textAdjust="ScaleFont">
 					<reportElement x="0" y="0" width="555" height="30" uuid="34639f49-4225-42a1-a30d-4e24330aba5e"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle" markup="styled">
 						<font size="16" isBold="true"/>
@@ -432,21 +432,21 @@
 					</textElement>
 					<textFieldExpression><![CDATA["Codice Fiscale Responabile Italiano "]]></textFieldExpression>
 				</textField>
-				<textField>
+				<textField textAdjust="ScaleFont">
 					<reportElement x="205" y="145" width="350" height="20" uuid="3e52ff3f-483e-4920-b355-25d51972e403"/>
 					<textElement>
 						<font size="12" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{codiceFiscaleRichiedente}]]></textFieldExpression>
 				</textField>
-				<textField>
+				<textField textAdjust="ScaleFont">
 					<reportElement x="204" y="124" width="351" height="20" uuid="126fd6fc-1a28-4bcc-98da-bd2779998024"/>
 					<textElement>
 						<font size="12" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{nomeCognomeRichiedente}]]></textFieldExpression>
 				</textField>
-				<textField>
+				<textField textAdjust="ScaleFont">
 					<reportElement x="0" y="0" width="549" height="34" uuid="410d787a-4aca-46a3-b201-85c7d3f714b7"/>
 					<textElement textAlignment="Center">
 						<font size="14" isBold="true"/>
@@ -460,7 +460,7 @@
 					</textElement>
 					<textFieldExpression><![CDATA["Bando"]]></textFieldExpression>
 				</textField>
-				<textField>
+				<textField textAdjust="ScaleFont">
 					<reportElement x="205" y="84" width="350" height="20" uuid="2faaf530-c1d3-45df-969e-4177f0042ee4"/>
 					<textElement>
 						<font size="12" isBold="true"/>
@@ -474,7 +474,7 @@
 					</textElement>
 					<textFieldExpression><![CDATA["Accordo Bilaterale"]]></textFieldExpression>
 				</textField>
-				<textField>
+				<textField textAdjust="ScaleFont">
 					<reportElement x="205" y="64" width="350" height="20" uuid="98938555-b16e-4e4e-afac-50014726ba8a"/>
 					<textElement>
 						<font size="12" isBold="true"/>
@@ -488,7 +488,7 @@
 					</textElement>
 					<textFieldExpression><![CDATA["Scadenza Presentazione Domande "]]></textFieldExpression>
 				</textField>
-				<textField>
+				<textField textAdjust="ScaleFont">
 					<reportElement x="205" y="104" width="350" height="20" uuid="ae9bad14-d0ec-42d8-bb37-0040e5c56a9e"/>
 					<textElement>
 						<font size="12" isBold="true"/>
@@ -502,7 +502,7 @@
 					</textElement>
 					<textFieldExpression><![CDATA["ID Domanda"]]></textFieldExpression>
 				</textField>
-				<textField>
+				<textField textAdjust="ScaleFont">
 					<reportElement x="205" y="38" width="350" height="20" uuid="4ca93f6a-ca17-4bc7-b901-24db5406f40e"/>
 					<textElement>
 						<font size="12" isBold="true"/>
@@ -524,7 +524,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA["DOMANDA "]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
+			<textField textAdjust="StretchHeight">
 				<reportElement x="0" y="42" width="555" height="21" uuid="10119319-030e-4176-a69a-e86a174f58cc"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isItalic="true"/>
@@ -542,8 +542,8 @@
 	<detail>
 		<band height="30" splitType="Stretch">
 			<printWhenExpression><![CDATA[$F{propostaDiRicerca}  != null]]></printWhenExpression>
-			<textField isStretchWithOverflow="true">
-				<reportElement positionType="Float" x="0" y="7" width="556" height="17" uuid="4cfea49b-9713-48e6-82db-09b68941541c"/>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="-1" y="7" width="556" height="17" uuid="4cfea49b-9713-48e6-82db-09b68941541c"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle" markup="styled">
 					<font fontName="SansSerif" size="11" isBold="false" isItalic="false"/>
 				</textElement>
@@ -552,8 +552,8 @@
 		</band>
 		<band height="30" splitType="Stretch">
 			<printWhenExpression><![CDATA[$F{obiettivi}  != null]]></printWhenExpression>
-			<textField isStretchWithOverflow="true">
-				<reportElement positionType="Float" x="0" y="7" width="556" height="17" uuid="fc86c61f-eeb7-450c-927f-26dcba4a6561"/>
+			<textField textAdjust="StretchHeight">
+				<reportElement style="Column header" positionType="Float" x="0" y="7" width="556" height="17" uuid="fc86c61f-eeb7-450c-927f-26dcba4a6561"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle" markup="styled">
 					<font fontName="SansSerif" size="11" isBold="false" isItalic="false"/>
 					<paragraph lineSpacing="Single"/>
@@ -563,7 +563,7 @@
 		</band>
 		<band height="30" splitType="Stretch">
 			<printWhenExpression><![CDATA[$F{pianoDiLavoroPrimoAnno}  != null]]></printWhenExpression>
-			<textField isStretchWithOverflow="true">
+			<textField textAdjust="StretchHeight">
 				<reportElement positionType="Float" x="0" y="7" width="556" height="17" uuid="793a2d50-7d78-4253-b286-9c299dfe44fb"/>
 				<textElement textAlignment="Left" verticalAlignment="Justified" markup="styled">
 					<font fontName="SansSerif" size="11" isBold="false" isItalic="false"/>
@@ -574,7 +574,7 @@
 		</band>
 		<band height="30" splitType="Stretch">
 			<printWhenExpression><![CDATA[$F{pianoDiLavoroSecondoAnno}!= null]]></printWhenExpression>
-			<textField isStretchWithOverflow="true">
+			<textField textAdjust="StretchHeight">
 				<reportElement positionType="Float" x="0" y="7" width="556" height="17" uuid="7675df53-8a74-4b6e-8fac-3428dc3502d8"/>
 				<textElement textAlignment="Left" verticalAlignment="Justified" markup="styled">
 					<font fontName="SansSerif" size="11" isBold="false" isItalic="false"/>
@@ -585,7 +585,7 @@
 		</band>
 		<band height="30" splitType="Stretch">
 			<printWhenExpression><![CDATA[$F{pianoDiLavoroTerzoAnno} != null]]></printWhenExpression>
-			<textField isStretchWithOverflow="true">
+			<textField textAdjust="StretchHeight">
 				<reportElement positionType="Float" x="0" y="7" width="556" height="17" uuid="da07140c-21bd-43d8-945a-ac7f569dab75"/>
 				<textElement textAlignment="Left" verticalAlignment="Justified" markup="styled">
 					<font fontName="SansSerif" size="11" isBold="false" isItalic="false"/>
