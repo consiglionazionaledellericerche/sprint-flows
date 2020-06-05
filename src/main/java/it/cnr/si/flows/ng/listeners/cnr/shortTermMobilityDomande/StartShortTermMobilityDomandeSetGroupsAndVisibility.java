@@ -98,7 +98,7 @@ public class StartShortTermMobilityDomandeSetGroupsAndVisibility {
 		BossDto direttoreAce = null;
 		Integer idEntitaOrganizzativaDirettore = 0;
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", userNameProponente, execution.getId(), execution.getVariable("title"));
-		
+
 		// VERIFICA AFFERENZA
 		try {
 			cdsuoAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(userNameProponente).getCdsuo();
@@ -116,13 +116,15 @@ public class StartShortTermMobilityDomandeSetGroupsAndVisibility {
 			idEntitaOrganizzativaDirettore = direttoreAce.getIdEntitaOrganizzativa();
 			//CHECK CORRISPONDENZA EO TRA DICHIARATO UTENTE E ACE
 			denominazioneEODirettore = direttoreAce.getDenominazioneEO();
-			denominazioneEOProponente = execution.getVariable("istitutoProponente").toString().substring(9);
-			if (!denominazioneEODirettore.equals(denominazioneEOProponente)) {
-				throw new BpmnError("400", "La struttura dichiarata dall'utente: " + userNameProponente + ": <br>" 
-						+ denominazioneEOProponente
-						+ "<br>non coincide con quella di afferenza amministrativa"
-						+ "<br>presente in anagrafica:<br>" + denominazioneEODirettore
-						+ "<br>contattare l'help desk in merito<br>");
+			if (!execution.getVariable("istitutoProponente").toString().equals("SEDE CENTRALE - DIPARTIMENTO")){
+				denominazioneEOProponente = execution.getVariable("istitutoProponente").toString().substring(9);
+				if (!denominazioneEODirettore.equals(denominazioneEOProponente)) {
+					throw new BpmnError("400", "La struttura dichiarata dall'utente: " + userNameProponente + ": <br>" 
+							+ denominazioneEOProponente
+							+ "<br>non coincide con quella di afferenza amministrativa"
+							+ "<br>presente in anagrafica:<br>" + denominazioneEODirettore
+							+ "<br>contattare l'help desk in merito<br>");
+				}
 			}
 		} catch(UnexpectedResultException | FeignException e) {
 			cdsuoAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(userNameProponente).get("codice_uo").toString();
