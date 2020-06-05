@@ -601,14 +601,14 @@
 					</textElement>
 					<textFieldExpression><![CDATA["Nome Proponente: "]]></textFieldExpression>
 				</textField>
-				<textField>
+				<textField textAdjust="ScaleFont">
 					<reportElement x="134" y="10" width="418" height="20" isRemoveLineWhenBlank="true" uuid="126fd6fc-1a28-4bcc-98da-bd2779998024"/>
 					<textElement>
 						<font size="12" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{nomeCognomeProponente}]]></textFieldExpression>
 				</textField>
-				<textField>
+				<textField textAdjust="ScaleFont">
 					<reportElement x="135" y="31" width="417" height="20" isRemoveLineWhenBlank="true" uuid="3552b885-2a22-4a09-a403-8c87c016eba9"/>
 					<textElement>
 						<font size="12" isBold="true"/>
