@@ -60,7 +60,13 @@ public class FirmaDocumentoService {
             } catch (ArubaSignServiceException e) {
                 LOGGER.error("FIRMA NON ESEGUITA", e);
                 if (e.getMessage().indexOf("error code 0001") != -1) {
-                    textMessage = "controlla il formato del file sottoposto alla firma<br>";
+                    textMessage = "-- errore generico --"
+                    		+ "<br>- veirificare che l'estensione del file sia di tipo PDF"
+                    		+ "<br>- veirificare la corretta digitazione del codice OTP"
+                    		+ "<br>se il problema persiste"
+                    		+ "<br>provare a risincronizzare il dispositivo OTP"
+                    		+ "<br>seguendo le istruzioni presenti nella pagina"
+                    		+ "<br>Manualistica&Faq<br>";
                 } else if(e.getMessage().indexOf("error code 0003") != -1) {
                     textMessage = "CREDENZIALI ERRATE<br>";
                 } else if(e.getMessage().indexOf("error code 0004") != -1) {
