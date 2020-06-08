@@ -29,6 +29,8 @@
 
 	function TaskController($scope, Principal, LoginService, $state, dataService, AlertService, $log, $http, $q, Upload, utils, $localStorage) {
 		var vm = this, deploymentId;
+
+        $scope.button={};
 		$scope.data = {};
 		vm.taskId = $state.params.taskId;
 		$scope.taskId = $state.params.taskId;
@@ -111,6 +113,7 @@
 		}
 
 		$scope.submitTask = function (file) {
+		    $scope.button.disabled = true;
 
 			if ($scope.taskForm.$invalid) {
 				angular.forEach($scope.taskForm.$error, function (field) {
@@ -136,6 +139,7 @@
 					removeFromCart($state.params.taskId)
 					$state.go('availableTasks');
 
+        		    $scope.button.disabled = false;
 				}, function (err) {
 					$log.error(err);
 					if (err.status == 412) {
@@ -145,6 +149,7 @@
 					} else {
 						AlertService.error("Richiesta non riuscita<br>" + err.data.message);
 					}
+				    $scope.button.disabled = false;
 				});
 			}
 		}
