@@ -1,9 +1,13 @@
 package it.cnr.si.flows.ng.service;
 
-import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
-import it.cnr.si.firmadigitale.firma.arss.stub.PdfSignApparence;
-import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.utils.SecurityUtils;
+import static it.cnr.si.flows.ng.utils.Enum.Azione.Firma;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.Firmato;
+
+import java.util.Date;
+
+import javax.inject.Inject;
+
+import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
@@ -11,11 +15,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
-import java.util.Date;
-
-import static it.cnr.si.flows.ng.utils.Enum.Azione.Firma;
-import static it.cnr.si.flows.ng.utils.Enum.Stato.Firmato;
+import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
+import it.cnr.si.firmadigitale.firma.arss.stub.PdfSignApparence;
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.utils.SecurityUtils;
 
 
 @Service
@@ -29,11 +32,13 @@ public class FirmaDocumentoService {
 
     public void eseguiFirma(DelegateExecution execution, String nomeVariabileFile, PdfSignApparence apparence) {
 
+        TaskService taskService = execution.getEngineServices().getTaskService();
+
         if (nomeVariabileFile == null)
             throw new IllegalStateException("Questo Listener ha bisogno del campo 'nomeFileDaFirmare' nella process definition (nel Task Listener - Fields).");
         if (execution.getVariable("sceltaUtente") != null &&
-            !"Firma Multipla".equals(execution.getVariable("sceltaUtente")) &&
-            "Firma".equals(execution.getVariable("sceltaUtente")) ) {
+                !"Firma Multipla".equals(execution.getVariable("sceltaUtente")) &&
+                "Firma".equals(execution.getVariable("sceltaUtente")) ) {
 
             String stringaOscurante = "******";
             // TODO: validare presenza di queste tre variabili
@@ -55,18 +60,22 @@ public class FirmaDocumentoService {
                 att.setTime(new Date());
 
                 flowsAttachmentService.saveAttachment(execution, nomeVariabileFile, att, bytesfirmati);
+
+                String taskId = execution.getVariable("taskId", String.class);
+                taskService.setVariable(taskId, "otp", stringaOscurante);
+                taskService.setVariable(taskId, "password", stringaOscurante);
                 execution.setVariable("otp", stringaOscurante);
                 execution.setVariable("password", stringaOscurante);
             } catch (ArubaSignServiceException e) {
                 LOGGER.error("FIRMA NON ESEGUITA", e);
                 if (e.getMessage().indexOf("error code 0001") != -1) {
                     textMessage = "-- errore generico --"
-                    		+ "<br>- veirificare che l'estensione del file sia di tipo PDF"
-                    		+ "<br>- veirificare la corretta digitazione del codice OTP"
-                    		+ "<br>se il problema persiste"
-                    		+ "<br>provare a risincronizzare il dispositivo OTP"
-                    		+ "<br>seguendo le istruzioni presenti nella pagina"
-                    		+ "<br>Manualistica&Faq<br>";
+                            + "<br>- veirificare che l'estensione del file sia di tipo PDF"
+                            + "<br>- veirificare la corretta digitazione del codice OTP"
+                            + "<br>se il problema persiste"
+                            + "<br>provare a risincronizzare il dispositivo OTP"
+                            + "<br>seguendo le istruzioni presenti nella pagina"
+                            + "<br>Manualistica&Faq<br>";
                 } else if(e.getMessage().indexOf("error code 0003") != -1) {
                     textMessage = "CREDENZIALI ERRATE<br>";
                 } else if(e.getMessage().indexOf("error code 0004") != -1) {
