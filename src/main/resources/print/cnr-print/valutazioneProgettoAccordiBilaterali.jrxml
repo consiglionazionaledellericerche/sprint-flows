@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.5.1.final utlizzo versione della libreria JasperReports6.5.1  -->
+<!-- Created with Jaspersoft Studio version 6.11.0.final utlizzo versione della libreria JasperReports6.11.0-0c4056ccaa4d25a5a8c45672d2f764ea3498bebb  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="valutazioneProgettoAccordiBilaterali" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="NoPages" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c0187353-db16-46fc-a7a4-9ece39bc4976">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DataAdapter.xml"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Acquisti.xml"/>
 	<style name="SubTitle" forecolor="#736343" fontName="Arial" fontSize="18"/>
 	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
 	<style name="Detail" fontName="Arial" fontSize="12"/>
@@ -181,55 +181,6 @@
 			<rightPen lineWidth="0.5" lineColor="#000000"/>
 		</box>
 	</style>
-	<subDataset name="impegni_json" uuid="43718d59-fac1-44c4-8e31-33ea348b2df2">
-		<queryString language="json">
-			<![CDATA[]]>
-		</queryString>
-		<field name="descrizione" class="java.lang.String">
-			<fieldDescription><![CDATA[descrizione]]></fieldDescription>
-		</field>
-		<field name="vocedispesa" class="java.lang.String">
-			<fieldDescription><![CDATA[vocedispesa]]></fieldDescription>
-		</field>
-		<field name="uo" class="java.lang.String">
-			<fieldDescription><![CDATA[uo]]></fieldDescription>
-		</field>
-		<field name="gae" class="java.lang.String">
-			<fieldDescription><![CDATA[gae]]></fieldDescription>
-		</field>
-		<field name="uo_label" class="java.lang.String">
-			<fieldDescription><![CDATA[uo_label]]></fieldDescription>
-		</field>
-	</subDataset>
-	<subDataset name="ditteInvitate_json" uuid="eef62cf4-2b7b-484b-8ffe-88dc754bde57">
-		<queryString language="json">
-			<![CDATA[]]>
-		</queryString>
-		<field name="ragioneSocialeDittaInvitata" class="java.lang.String">
-			<fieldDescription><![CDATA[ragioneSocialeDittaInvitata]]></fieldDescription>
-		</field>
-		<field name="pIvaCodiceFiscaleDittaInvitata" class="java.lang.String">
-			<fieldDescription><![CDATA[pIvaCodiceFiscaleDittaInvitata]]></fieldDescription>
-		</field>
-		<field name="valutazioneDittaInvitata" class="java.lang.String">
-			<fieldDescription><![CDATA[valutazioneDittaInvitata]]></fieldDescription>
-		</field>
-		<field name="offertaPresentataDittaInvitata" class="java.lang.String">
-			<fieldDescription><![CDATA[offertaPresentataDittaInvitata]]></fieldDescription>
-		</field>
-	</subDataset>
-	<subDataset name="ditteRTI_json" uuid="219b88f3-c360-4469-8343-3d58e24a749b">
-		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="valutazioneProgettoAccordiBilaterali"/>
-		<queryString language="json">
-			<![CDATA[]]>
-		</queryString>
-		<field name="ragioneSocialeDittaInvitata" class="java.lang.String">
-			<fieldDescription><![CDATA[ragioneSocialeDittaInvitata]]></fieldDescription>
-		</field>
-		<field name="pIvaCodiceFiscaleDittaInvitata" class="java.lang.String">
-			<fieldDescription><![CDATA[pIvaCodiceFiscaleDittaInvitata]]></fieldDescription>
-		</field>
-	</subDataset>
 	<parameter name="ANN_IMAGE" class="java.io.InputStream"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["C:\\CNR\\1_PROGETTI\\OIV\\PDF - JASPER REPORT\\print\\"]]></defaultValueExpression>
@@ -237,18 +188,6 @@
 	<queryString language="json">
 		<![CDATA[]]>
 	</queryString>
-	<field name="accordoBilaterale" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="accordoBilaterale"/>
-		<fieldDescription><![CDATA[accordoBilaterale]]></fieldDescription>
-	</field>
-	<field name="nomeCognomeRichiedente" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="nomeCognomeRichiedente"/>
-		<fieldDescription><![CDATA[nomeCognomeRichiedente]]></fieldDescription>
-	</field>
-	<field name="strutturaValutazioneDirigente" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="strutturaValutazioneDirigente"/>
-		<fieldDescription><![CDATA[strutturaValutazioneDirigente]]></fieldDescription>
-	</field>
 	<field name="titolo" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="titolo"/>
 		<fieldDescription><![CDATA[titolo]]></fieldDescription>
@@ -261,51 +200,35 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="initiator"/>
 		<fieldDescription><![CDATA[initiator]]></fieldDescription>
 	</field>
-	<field name="bando" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="bando"/>
-		<fieldDescription><![CDATA[bando]]></fieldDescription>
-	</field>
 	<field name="commento_pianoDiLavoro" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="commento_pianoDiLavoro"/>
 		<fieldDescription><![CDATA[commento_pianoDiLavoro]]></fieldDescription>
-	</field>
-	<field name="linkToOtherWorkflows" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="linkToOtherWorkflows"/>
-		<fieldDescription><![CDATA[linkToOtherWorkflows]]></fieldDescription>
-	</field>
-	<field name="dipartimentoId" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="dipartimentoId"/>
-		<fieldDescription><![CDATA[dipartimentoId]]></fieldDescription>
 	</field>
 	<field name="applicazioneScrivaniaDigitale" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="applicazioneScrivaniaDigitale"/>
 		<fieldDescription><![CDATA[applicazioneScrivaniaDigitale]]></fieldDescription>
 	</field>
-	<field name="punteggio_pianoDiLavoro" class="java.lang.String">
+	<field name="punteggio_pianoDiLavoro" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="punteggio_pianoDiLavoro"/>
 		<fieldDescription><![CDATA[punteggio_pianoDiLavoro]]></fieldDescription>
 	</field>
-	<field name="punteggio_qualitaProgetto" class="java.lang.String">
+	<field name="punteggio_qualitaProgetto" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="punteggio_qualitaProgetto"/>
 		<fieldDescription><![CDATA[punteggio_qualitaProgetto]]></fieldDescription>
 	</field>
-	<field name="punteggio_totale" class="java.lang.String">
+	<field name="punteggio_totale" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="punteggio_totale"/>
 		<fieldDescription><![CDATA[punteggio_totale]]></fieldDescription>
 	</field>
-	<field name="gruppoValidatoriAccordiInternazionali" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="gruppoValidatoriAccordiInternazionali"/>
-		<fieldDescription><![CDATA[gruppoValidatoriAccordiInternazionali]]></fieldDescription>
+	<field name="gruppoValidatoriAccordiInternazionalcodiceFiscaleRichiedentei" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="gruppoValidatoriAccordiInternazionalcodiceFiscaleRichiedentei"/>
+		<fieldDescription><![CDATA[gruppoValidatoriAccordiInternazionalcodiceFiscaleRichiedentei]]></fieldDescription>
 	</field>
 	<field name="pathFascicoloDocumenti" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="pathFascicoloDocumenti"/>
 		<fieldDescription><![CDATA[pathFascicoloDocumenti]]></fieldDescription>
 	</field>
-	<field name="codiceFiscaleRichiedente" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="codiceFiscaleRichiedente"/>
-		<fieldDescription><![CDATA[codiceFiscaleRichiedente]]></fieldDescription>
-	</field>
-	<field name="idDomanda" class="java.lang.String">
+	<field name="idDomanda" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="idDomanda"/>
 		<fieldDescription><![CDATA[idDomanda]]></fieldDescription>
 	</field>
@@ -317,7 +240,7 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="applicazioneAccordiInternazionali"/>
 		<fieldDescription><![CDATA[applicazioneAccordiInternazionali]]></fieldDescription>
 	</field>
-	<field name="idBando" class="java.lang.String">
+	<field name="idBando" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="idBando"/>
 		<fieldDescription><![CDATA[idBando]]></fieldDescription>
 	</field>
@@ -333,17 +256,17 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="numeriProtocollo"/>
 		<fieldDescription><![CDATA[numeriProtocollo]]></fieldDescription>
 	</field>
-	<field name="processInstanceId" class="java.lang.String">
+	<field name="processDefinitionId" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="processDefinitionId"/>
+		<fieldDescription><![CDATA[processDefinitionId]]></fieldDescription>
+	</field>
+	<field name="processInstanceId" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="processInstanceId"/>
 		<fieldDescription><![CDATA[processInstanceId]]></fieldDescription>
 	</field>
 	<field name="gruppoValutatoreScientificoDipartimento" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="gruppoValutatoreScientificoDipartimento"/>
 		<fieldDescription><![CDATA[gruppoValutatoreScientificoDipartimento]]></fieldDescription>
-	</field>
-	<field name="processDefinitionId" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="processDefinitionId"/>
-		<fieldDescription><![CDATA[processDefinitionId]]></fieldDescription>
 	</field>
 	<field name="dataInvioDomanda" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="dataInvioDomanda"/>
@@ -357,37 +280,17 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="commento"/>
 		<fieldDescription><![CDATA[commento]]></fieldDescription>
 	</field>
-	<field name="cdsuoRichiedente" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="cdsuoRichiedente"/>
-		<fieldDescription><![CDATA[cdsuoRichiedente]]></fieldDescription>
-	</field>
-	<field name="valutazioneProgettoAccordiBilaterali" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="valutazioneProgettoAccordiBilaterali"/>
-		<fieldDescription><![CDATA[valutazioneProgettoAccordiBilaterali]]></fieldDescription>
-	</field>
 	<field name="dataNascitaRichiedente" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="dataNascitaRichiedente"/>
 		<fieldDescription><![CDATA[dataNascitaRichiedente]]></fieldDescription>
-	</field>
-	<field name="scadenzaPresentazioneDomande" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="scadenzaPresentazioneDomande"/>
-		<fieldDescription><![CDATA[scadenzaPresentazioneDomande]]></fieldDescription>
-	</field>
-	<field name="domanda" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="domanda"/>
-		<fieldDescription><![CDATA[domanda]]></fieldDescription>
 	</field>
 	<field name="gruppoResponsabileAccordiInternazionali" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="gruppoResponsabileAccordiInternazionali"/>
 		<fieldDescription><![CDATA[gruppoResponsabileAccordiInternazionali]]></fieldDescription>
 	</field>
-	<field name="sessoRichiedente" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="sessoRichiedente"/>
-		<fieldDescription><![CDATA[sessoRichiedente]]></fieldDescription>
-	</field>
-	<field name="emailRichiedente" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="emailRichiedente"/>
-		<fieldDescription><![CDATA[emailRichiedente]]></fieldDescription>
+	<field name="codiceDipartimento" class="java.lang.Integer">
+		<property name="net.sf.jasperreports.json.field.expression" value="codiceDipartimento"/>
+		<fieldDescription><![CDATA[codiceDipartimento]]></fieldDescription>
 	</field>
 	<field name="descrizione" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="descrizione"/>
@@ -397,13 +300,9 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="commento_valoreAggiunto"/>
 		<fieldDescription><![CDATA[commento_valoreAggiunto]]></fieldDescription>
 	</field>
-	<field name="punteggio_valoreAggiunto" class="java.lang.String">
+	<field name="punteggio_valoreAggiunto" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="punteggio_valoreAggiunto"/>
 		<fieldDescription><![CDATA[punteggio_valoreAggiunto]]></fieldDescription>
-	</field>
-	<field name="dipartimento" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="dipartimento"/>
-		<fieldDescription><![CDATA[dipartimento]]></fieldDescription>
 	</field>
 	<field name="gruppoUfficioProtocollo" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="gruppoUfficioProtocollo"/>
@@ -413,13 +312,37 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="startDate"/>
 		<fieldDescription><![CDATA[startDate]]></fieldDescription>
 	</field>
-	<field name="punteggio_qualitaGruppoDiRicerca" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="punteggio_qualitaGruppoDiRicerca"/>
-		<fieldDescription><![CDATA[punteggio_qualitaGruppoDiRicerca]]></fieldDescription>
-	</field>
-	<field name="taskId" class="java.lang.String">
+	<field name="taskId" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="taskId"/>
 		<fieldDescription><![CDATA[taskId]]></fieldDescription>
+	</field>
+	<field name="codiceFiscaleRichiedente" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="codiceFiscaleRichiedente"/>
+		<fieldDescription><![CDATA[codiceFiscaleRichiedente]]></fieldDescription>
+	</field>
+	<field name="nomeCognomeRichiedente" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="nomeCognomeRichiedente"/>
+		<fieldDescription><![CDATA[nomeCognomeRichiedente]]></fieldDescription>
+	</field>
+	<field name="strutturaValutazioneDirigente" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="strutturaValutazioneDirigente"/>
+		<fieldDescription><![CDATA[strutturaValutazioneDirigente]]></fieldDescription>
+	</field>
+	<field name="bando" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="bando"/>
+		<fieldDescription><![CDATA[bando]]></fieldDescription>
+	</field>
+	<field name="accordoBilaterale" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="accordoBilaterale"/>
+		<fieldDescription><![CDATA[accordoBilaterale]]></fieldDescription>
+	</field>
+	<field name="scadenzaPresentazioneDomande" class="java.lang.Long">
+		<property name="net.sf.jasperreports.json.field.expression" value="scadenzaPresentazioneDomande"/>
+		<fieldDescription><![CDATA[scadenzaPresentazioneDomande]]></fieldDescription>
+	</field>
+	<field name="punteggio_qualitaGruppoDiRicerca" class="java.lang.Integer">
+		<property name="net.sf.jasperreports.json.field.expression" value="punteggio_qualitaGruppoDiRicerca"/>
+		<fieldDescription><![CDATA[punteggio_qualitaGruppoDiRicerca]]></fieldDescription>
 	</field>
 	<field name="commento_qualitaGruppoDiRicerca" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="commento_qualitaGruppoDiRicerca"/>
@@ -429,7 +352,7 @@
 		<groupExpression><![CDATA[(int)($V{REPORT_COUNT}/5)]]></groupExpression>
 		<groupHeader>
 			<band height="30">
-				<textField isStretchWithOverflow="true">
+				<textField textAdjust="ScaleFont">
 					<reportElement x="0" y="0" width="555" height="30" uuid="34639f49-4225-42a1-a30d-4e24330aba5e"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle" markup="styled">
 						<font size="16" isBold="true"/>
@@ -438,7 +361,7 @@
 				</textField>
 			</band>
 			<band height="36">
-				<textField isStretchWithOverflow="true">
+				<textField textAdjust="ScaleFont">
 					<reportElement x="0" y="0" width="555" height="30" uuid="4f214ac5-1b60-4da5-9c89-1cbd6db078dd"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font size="11" isBold="true" isItalic="true"/>
@@ -447,91 +370,77 @@
 				</textField>
 			</band>
 			<band height="193">
-				<textField>
-					<reportElement x="0" y="124" width="200" height="20" uuid="cfa4daaf-6dcb-40f2-9881-83fce970ef94"/>
+				<textField textAdjust="StretchHeight">
+					<reportElement x="0" y="104" width="200" height="20" uuid="cfa4daaf-6dcb-40f2-9881-83fce970ef94"/>
 					<textElement textAlignment="Left">
 						<font size="12" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA["Responsabile Italiano : "]]></textFieldExpression>
+					<textFieldExpression><![CDATA["Responsabile Italiano"]]></textFieldExpression>
 				</textField>
-				<textField>
-					<reportElement x="0" y="145" width="200" height="20" uuid="8e513d02-1f0c-40cd-b8dc-6132e4757503"/>
+				<textField textAdjust="StretchHeight">
+					<reportElement x="0" y="128" width="200" height="20" uuid="8e513d02-1f0c-40cd-b8dc-6132e4757503"/>
 					<textElement textAlignment="Left" verticalAlignment="Justified">
 						<font size="12" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA["Codice Fiscale Responabile Italiano "]]></textFieldExpression>
+					<textFieldExpression><![CDATA["Codice Fiscale Resp. Italiano"]]></textFieldExpression>
 				</textField>
-				<textField>
-					<reportElement x="205" y="145" width="350" height="20" uuid="3e52ff3f-483e-4920-b355-25d51972e403"/>
+				<textField textAdjust="ScaleFont">
+					<reportElement x="205" y="128" width="350" height="20" uuid="3e52ff3f-483e-4920-b355-25d51972e403"/>
 					<textElement>
 						<font size="12" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{codiceFiscaleRichiedente}]]></textFieldExpression>
 				</textField>
-				<textField>
-					<reportElement x="204" y="124" width="351" height="20" uuid="126fd6fc-1a28-4bcc-98da-bd2779998024"/>
+				<textField textAdjust="ScaleFont">
+					<reportElement x="205" y="104" width="351" height="20" uuid="126fd6fc-1a28-4bcc-98da-bd2779998024"/>
 					<textElement>
 						<font size="12" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{nomeCognomeRichiedente}]]></textFieldExpression>
 				</textField>
-				<textField>
-					<reportElement x="0" y="0" width="549" height="34" uuid="410d787a-4aca-46a3-b201-85c7d3f714b7"/>
+				<textField textAdjust="ScaleFont">
+					<reportElement x="0" y="0" width="549" height="20" uuid="410d787a-4aca-46a3-b201-85c7d3f714b7"/>
 					<textElement textAlignment="Center">
 						<font size="14" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA["Struttura: " + $F{strutturaValutazioneDirigente}]]></textFieldExpression>
 				</textField>
-				<textField>
-					<reportElement x="0" y="84" width="200" height="20" uuid="49f5c242-35a6-4c33-a1b4-b2edb2e07c5d"/>
+				<textField textAdjust="StretchHeight">
+					<reportElement x="0" y="82" width="200" height="20" uuid="49f5c242-35a6-4c33-a1b4-b2edb2e07c5d"/>
 					<textElement textAlignment="Left">
 						<font size="12" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA["Bando"]]></textFieldExpression>
 				</textField>
-				<textField>
-					<reportElement x="205" y="84" width="350" height="20" uuid="2faaf530-c1d3-45df-969e-4177f0042ee4"/>
+				<textField textAdjust="ScaleFont">
+					<reportElement x="205" y="82" width="350" height="20" uuid="2faaf530-c1d3-45df-969e-4177f0042ee4"/>
 					<textElement>
 						<font size="12" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{bando} +" (" + $F{idBando} +")"]]></textFieldExpression>
 				</textField>
-				<textField>
-					<reportElement x="0" y="64" width="200" height="20" uuid="e7a8c74b-7c2c-4f66-9947-f963ba87b319"/>
+				<textField textAdjust="StretchHeight">
+					<reportElement x="0" y="60" width="200" height="20" uuid="e7a8c74b-7c2c-4f66-9947-f963ba87b319"/>
 					<textElement textAlignment="Left">
 						<font size="12" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA["Accordo Bilaterale"]]></textFieldExpression>
 				</textField>
-				<textField>
-					<reportElement x="205" y="64" width="350" height="20" uuid="98938555-b16e-4e4e-afac-50014726ba8a"/>
+				<textField textAdjust="ScaleFont">
+					<reportElement x="205" y="60" width="350" height="20" uuid="98938555-b16e-4e4e-afac-50014726ba8a"/>
 					<textElement>
 						<font size="12" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{accordoBilaterale}]]></textFieldExpression>
 				</textField>
-				<textField>
-					<reportElement x="0" y="104" width="200" height="20" uuid="2791698a-0302-41fd-8647-c29b52aeb377"/>
-					<textElement textAlignment="Left" verticalAlignment="Justified">
-						<font size="12" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA["Scadenza Presentazione Domande "]]></textFieldExpression>
-				</textField>
-				<textField>
-					<reportElement x="205" y="104" width="350" height="20" uuid="ae9bad14-d0ec-42d8-bb37-0040e5c56a9e"/>
-					<textElement>
-						<font size="12" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA[!$F{scadenzaPresentazioneDomande}.equals("null") ? $F{scadenzaPresentazioneDomande}.substring(0,10) : "N/A"]]></textFieldExpression>
-				</textField>
-				<textField>
+				<textField textAdjust="StretchHeight">
 					<reportElement x="0" y="38" width="200" height="20" uuid="5d6522a2-b6b0-4961-9e77-9969e6dd9281"/>
 					<textElement textAlignment="Left">
 						<font size="12" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA["ID Domanda"]]></textFieldExpression>
 				</textField>
-				<textField>
+				<textField textAdjust="ScaleFont">
 					<reportElement x="205" y="38" width="350" height="20" uuid="4ca93f6a-ca17-4bc7-b901-24db5406f40e"/>
 					<textElement>
 						<font size="12" isBold="true"/>
@@ -546,14 +455,14 @@
 	</background>
 	<title>
 		<band height="63" splitType="Stretch">
-			<textField>
+			<textField textAdjust="StretchHeight">
 				<reportElement x="0" y="4" width="556" height="40" uuid="1c38430f-18c4-4353-b5a3-4c46137ce2cb"/>
 				<textElement textAlignment="Center">
 					<font size="26" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["SCHEDA VALUTAZIONE DEL PROGETTO "]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
+			<textField>
 				<reportElement x="0" y="42" width="555" height="21" uuid="10119319-030e-4176-a69a-e86a174f58cc"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isItalic="true"/>
@@ -570,7 +479,7 @@
 	</columnHeader>
 	<detail>
 		<band height="87">
-			<textField isStretchWithOverflow="true">
+			<textField>
 				<reportElement positionType="Float" x="0" y="7" width="556" height="17" uuid="4cfea49b-9713-48e6-82db-09b68941541c"/>
 				<textElement textAlignment="Justified" markup="styled">
 					<font fontName="SansSerif" size="11" isBold="true" isItalic="false"/>
@@ -578,7 +487,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA["Punteggio totale : "+ $F{punteggio_totale} +"\r\n"]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
+			<textField textAdjust="StretchHeight">
 				<reportElement positionType="Float" x="0" y="62" width="556" height="17" uuid="b420b75b-f40b-4349-bff9-9bba77f18bad"/>
 				<textElement textAlignment="Justified" markup="styled">
 					<font fontName="SansSerif" size="11" isBold="true" isItalic="false"/>
@@ -586,7 +495,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA["3 - Appropriatezza e giustificazione del piano di lavoro\r\nPunteggio: "  +$F{punteggio_pianoDiLavoro}+ "\r\ncommento: " +$F{commento_pianoDiLavoro} +"\r\n\r\n"]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
+			<textField textAdjust="StretchHeight">
 				<reportElement positionType="Float" x="0" y="25" width="556" height="17" uuid="7ac903fa-55d2-4e21-a610-fa7dda8d3df3"/>
 				<textElement textAlignment="Justified" markup="styled">
 					<font fontName="SansSerif" size="11" isBold="true" isItalic="false"/>
@@ -594,7 +503,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA["1 - Qualità del progetto\r\nPunteggio: "  + $F{punteggio_qualitaProgetto} + "\r\ncommento: "  +$F{commento_qualitaProgetto} +"\r\n\r\n"]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true">
+			<textField textAdjust="StretchHeight">
 				<reportElement positionType="Float" x="0" y="43" width="556" height="17" uuid="ae569f93-4b65-45b7-8ff9-06ecb89dfdb5"/>
 				<textElement textAlignment="Justified" markup="styled">
 					<font fontName="SansSerif" size="11" isBold="true" isItalic="false"/>
@@ -604,13 +513,13 @@
 			</textField>
 		</band>
 		<band height="37">
-			<textField isStretchWithOverflow="true">
+			<textField textAdjust="StretchHeight">
 				<reportElement positionType="Float" x="0" y="-7" width="556" height="17" uuid="7acde80e-0913-4ad3-9e0f-a67a7b6d7f9d"/>
 				<textElement textAlignment="Justified" markup="styled">
 					<font fontName="SansSerif" size="11" isBold="true" isItalic="false"/>
 					<paragraph lineSpacing="1_1_2"/>
 				</textElement>
-				<textFieldExpression><![CDATA[" 4 -Valore aggiunto e più ampio impatto della cooperazione bilaterale\r\nPunteggio: "  +$F{punteggio_valoreAggiunto}+ "\r\ncommento: " +$F{commento_valoreAggiunto} +"\r\n\r\n"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["4 - Valore aggiunto e più ampio impatto della cooperazione bilaterale\r\nPunteggio: "  +$F{punteggio_valoreAggiunto}+ "\r\ncommento: " +$F{commento_valoreAggiunto} +"\r\n\r\n"]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
@@ -620,11 +529,11 @@
 	<pageFooter>
 		<band height="24" splitType="Stretch">
 			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.HorizontalRowLayout"/>
-			<textField pattern="MMMMM dd, yyyy">
+			<textField textAdjust="StretchHeight" pattern="MMMMM dd, yyyy">
 				<reportElement x="0" y="0" width="278" height="24" uuid="dacc5f7c-bbbe-42dd-819e-e2a5e9bd9417"/>
 				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight">
 				<reportElement x="278" y="0" width="277" height="24" uuid="7d7a58c9-4fc7-4299-9d45-04299337ceb4"/>
 				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA["Pagina " + $V{PAGE_NUMBER} + "/" +$V{PAGE_COUNT}]]></textFieldExpression>
