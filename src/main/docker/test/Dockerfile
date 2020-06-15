@@ -2,6 +2,7 @@ FROM scolagreco/alpine-openjdk:v3.9.2
 
 VOLUME /tmp
 
+RUN apk add --update --no-cache tzdata curl
 RUN cp /usr/share/zoneinfo/Europe/Rome /etc/localtime
 RUN echo "Europe/Rome" >  /etc/timezone
 
