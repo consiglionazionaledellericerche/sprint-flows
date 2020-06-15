@@ -2,6 +2,9 @@ FROM scolagreco/alpine-openjdk:v3.9.2
 
 VOLUME /tmp
 
+RUN cp /usr/share/zoneinfo/Europe/Rome /etc/localtime
+RUN echo "Europe/Rome" >  /etc/timezone
+
 RUN apk add --update --no-cache ttf-dejavu curl
 ARG JAR_FILE=./target/app.war
 ADD ${JAR_FILE} /opt/app.war
