@@ -3,6 +3,7 @@ services:
     sprint-flows-cnr:
         image: docker.si.cnr.it/sprint-flows
         environment:
+            - TZ=Europe/Rome
             - SPRING_PROFILES_ACTIVE=prod,cnr,swagger
             - SPRING_DATASOURCE_PASSWORD=SPRING_DATASOURCE_PASSWORD_SED
             - SPRING_LDAP_MANAGERPASSWORD=SPRING_LDAP_MANAGERPASSWORD_SED
