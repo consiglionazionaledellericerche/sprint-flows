@@ -5,6 +5,7 @@ VOLUME /tmp
 RUN apk add --update --no-cache tzdata curl
 RUN cp /usr/share/zoneinfo/Europe/Rome /etc/localtime
 RUN echo "Europe/Rome" >  /etc/timezone
+RUN export TZ='America/Los_Angeles'
 
 RUN apk add --update --no-cache ttf-dejavu curl
 ADD ./target/app.war /opt/app.war
