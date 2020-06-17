@@ -12,7 +12,7 @@ var gulp = require('gulp'),
     del = require('del'),
     runSequence = require('run-sequence'),
     browserSync = require('browser-sync'),
-    KarmaServer = require('karma').Server,
+//    KarmaServer = require('karma').Server,
     plumber = require('gulp-plumber'),
     changed = require('gulp-changed'),
     gulpIf = require('gulp-if');
@@ -29,10 +29,9 @@ var config = require('./gulp/config');
 gulp.task('clean', function () {
     return del([config.dist], { dot: true });
 });
-
-gulp.task('copy', ['copy:i18n', 'copy:fonts', 'copy:common', 'copy:jstree', 'copy:ace', 'copy:customjs']);
-
 gulp.task('copy:i18n', copy.i18n);
+//gulp.task('copy', ['copy:i18n', 'copy:fonts', 'copy:common', 'copy:jstree', 'copy:ace', 'copy:customjs']);
+
 
 gulp.task('copy:languages', copy.languages);
 
@@ -49,6 +48,7 @@ gulp.task('copy:jstree', copy.jstree);
 gulp.task('copy:ace', copy.ace);
 gulp.task('copy:customjs', copy.customjs);
 
+gulp.task('copy', gulp.series(['copy:i18n', 'copy:fonts', 'copy:common', 'copy:jstree', 'copy:ace', 'copy:customjs'], function(){}));
 
 gulp.task('images', function () {
     return gulp.src(config.app + 'content/images/**')
@@ -66,26 +66,27 @@ gulp.task('images', function () {
 });
 
 
-gulp.task('styles', [], function () {
+gulp.task('styles', gulp.series([], function () {
     return gulp.src(config.app + 'content/css')
         .pipe(browserSync.reload({stream: true}));
-});
+}));
 
-gulp.task('inject', function() {
-    runSequence('inject:dep', 'inject:app');
-});
+gulp.task('inject:vendor', inject.vendor);
 
-gulp.task('inject:dep', ['inject:test', 'inject:vendor']);
+//gulp.task('inject:dep', gulp.series(['inject:test', 'inject:vendor'], function(){}));
+//gulp.task('inject:dep', gulp.series(['inject:vendor'], function(){}));
+gulp.task('inject:dep', gulp.series(['inject:vendor']));
 
 gulp.task('inject:app', inject.app);
 
-gulp.task('inject:vendor', inject.vendor);
+//gulp.task('inject', function() {
+//    runSequence('inject:dep', 'inject:app');
+//});
+gulp.task('inject', gulp.series('inject:dep', 'inject:app'));
 
 gulp.task('inject:test', inject.test);
 
 gulp.task('inject:troubleshoot', inject.troubleshoot);
-
-gulp.task('assets:prod', ['images', 'styles', 'html', 'copy:swagger', 'copy:images'], build);
 
 gulp.task('html', function () {
     return gulp.src(config.app + 'app/**/*.html')
@@ -97,6 +98,8 @@ gulp.task('html', function () {
         }))
         .pipe(gulp.dest(config.tmp));
 });
+
+gulp.task('assets:prod', gulp.series(['images', 'styles', 'html', 'copy:swagger', 'copy:images'], function(){ build }));
 
 gulp.task('ngconstant:dev', function () {
     return ngConstant({
@@ -146,13 +149,14 @@ gulp.task('eslint:fix', function () {
         .pipe(gulpIf(util.isLintFixed, gulp.dest(config.app + 'app')));
 });
 
-gulp.task('test', ['inject:test', 'ngconstant:dev'], function (done) {
+//gulp.task('test', gulp.series(['inject:test', 'ngconstant:dev'], function (done) {
+gulp.task('test', gulp.series(['ngconstant:dev'], function (done) {
 //    new KarmaServer({
 //        configFile: __dirname + '/' + config.test + 'karma.conf.js',
 //        singleRun: true
 //    }, done).start();
     done();
-});
+}));
 
 
 gulp.task('watch', function () {
@@ -164,14 +168,20 @@ gulp.task('watch', function () {
     gulp.watch([config.app + '*.html', config.app + 'app/**', config.app + 'i18n/**']).on('change', browserSync.reload);
 });
 
-gulp.task('install', function () {
-    runSequence(['inject:dep', 'ngconstant:dev'], 'copy:languages', 'inject:app', 'inject:troubleshoot');
-});
+//gulp.task('install', function () {
+//    runSequence(['inject:dep', 'ngconstant:dev'], 'copy:languages', 'inject:app', 'inject:troubleshoot');
+//});
 
-gulp.task('serve', ['install'], serve);
+gulp.task('install',
+//    runSequence(['inject:dep', 'ngconstant:dev'], 'copy:languages', 'inject:app', 'inject:troubleshoot');
+    gulp.series(gulp.parallel('inject:dep', 'ngconstant:dev'), 'copy:languages', 'inject:app', 'inject:troubleshoot'));
 
-gulp.task('build', ['clean'], function (cb) {
-    runSequence(['copy', 'inject:vendor', 'ngconstant:prod', 'copy:languages'], 'inject:app', 'inject:troubleshoot', 'assets:prod', cb);
-});
+gulp.task('serve', gulp.series(['install'], function(){ serve } ));
 
-gulp.task('default', ['serve']);
+//gulp.task('build', ['clean'], function (cb) {
+//    runSequence(['copy', 'inject:vendor', 'ngconstant:prod', 'copy:languages'], 'inject:app', 'inject:troubleshoot', 'assets:prod', cb);
+//});
+gulp.task('build', gulp.series(['clean']), gulp.series(
+    gulp.parallel('copy', 'inject:vendor', 'ngconstant:prod', 'copy:languages'), 'inject:app', 'inject:troubleshoot', 'assets:prod'));
+
+gulp.task('default', gulp.series(['serve'], function(){}));

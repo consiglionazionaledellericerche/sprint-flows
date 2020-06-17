@@ -37,8 +37,9 @@ function languages() {
 //    var locales = yorc.languages.map(function (locale) {
 //        return config.bower + 'angular-i18n/angular-locale_' + locale + '.js';
 //    });
-    var locales = [config.bower + 'angular-i18n/angular-locale_' + 'it_IT' + '.js'];
-    return gulp.src(locales)
+//    var locales = [config.bower + 'angular-i18n/angular-locale_' + 'it_IT' + '.js'];
+    var locales = [config.bower + 'angular-i18n/angular-locale_' + 'it_it' + '.js'];
+    return gulp.src(locales, { allowEmpty: true })
         .pipe(plumber({errorHandler: handleErrors}))
         .pipe(changed(config.app + 'i18n/'))
         .pipe(gulp.dest(config.app + 'i18n/'));
