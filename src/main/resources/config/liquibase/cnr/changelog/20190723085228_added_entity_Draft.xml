@@ -22,12 +22,16 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="task_id" type="bigint">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
             <column name="json" type="varchar()">
                 <constraints nullable="false" />
             </column>
+
             <column name="username" type="varchar()"></column>
+
+            <column name="process_definition_id" type="varchar()"></column>
+
             <!-- jhipster-needle-liquibase-add-column - Jhipster will add columns here, do not remove-->
         </createTable>
     </changeSet>
