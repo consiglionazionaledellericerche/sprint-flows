@@ -297,24 +297,39 @@
             faq: {
                 getReadable: function () {
                     return $http.get("api/faqs/readable");
+                },
+                getReadableForProcessDefinition: function (procesDefinition) {
+                    return $http.get("api/faqs/readableForProcessDefinition/" + procesDefinition);
                 }
             },
             draft: {
-                getDraftByTaskId: function (taskId) {
+                getDraftByTaskId: function (taskId, isShared) {
                     return $http({
                         url: 'api/draft/getDraftByTaskId',
                         method: 'GET',
                         params: {
-                            taskId: taskId
+                            taskId: taskId,
+                            isShared: isShared
                         },
                     });
                 },
-                updateDraft: function (taskId, json) {
+                getDraftByProcessDefinitionId: function (processDefinitionId) {
+                    return $http({
+                        url: 'api/draft/getDraftByProcessDefinitionId',
+                        method: 'GET',
+                        params: {
+                            processDefinitionId: processDefinitionId
+                        }
+                    });
+                },
+                updateDraft: function (taskId, json, processDefinitionId, isShared) {
                     return $http({
                         url: 'api/drafts/updateDraft?',
                         method: 'PUT',
                         params: {
-                            taskId: taskId
+                            taskId: taskId ? taskId : '',
+                            processDefinitionId: processDefinitionId ? processDefinitionId: '',
+                            isShared: isShared ? isShared : false
                         },
                         data: json
                     });
