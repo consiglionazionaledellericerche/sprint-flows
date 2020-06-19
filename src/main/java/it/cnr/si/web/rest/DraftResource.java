@@ -41,22 +41,34 @@ public class DraftResource {
                 produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
     public ResponseEntity<Draft> updateDraft(@RequestParam("taskId") Long taskId,
-                                             @RequestBody String json){
-        Draft dbDraft = draftService.findDraft(taskId, SecurityUtils.getCurrentUserLogin());
+                                             @RequestParam("processDefinitionId") String processDefinitionId,
+                                             @RequestBody String json,
+                                             @RequestParam("isShared") boolean isShared){
+        Draft dbDraft;
+        String currentUserLogin = null;
+        if(!isShared)
+          currentUserLogin = SecurityUtils.getCurrentUserLogin();
+
+        if(taskId != null){
+            dbDraft = draftService.findDraftByTaskId(taskId, currentUserLogin);
+        } else{
+            dbDraft = draftService.findDraftByProcessDefinitionId(processDefinitionId, currentUserLogin);
+        }
 
         if (dbDraft == null)
             dbDraft = new Draft();
 
         dbDraft.setJson(json);
         dbDraft.setTaskId(taskId);
-        dbDraft.setUsername(SecurityUtils.getCurrentUserLogin());
+        dbDraft.setProcessDefinitionId(processDefinitionId);
+        dbDraft.setUsername(currentUserLogin);
 
         Draft result = draftService.save(dbDraft);
         return ResponseEntity.ok()
-//                .headers(HeaderUtil.createEntityUpdateAlert("draft", result.getId().toString()))
                 .headers(HeaderUtil.createAlert("Appunti salvati correttamente!", result.getId().toString()))
                 .body(result);
     }
+
 
     /**
      * GET  /drafts : get all the drafts.
@@ -97,6 +109,7 @@ public class DraftResource {
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+
     /**
      * GET  /drafts/getDraftByTaskId : restituisce i draft associati ad un utente
      *
@@ -106,10 +119,15 @@ public class DraftResource {
     @GetMapping(value = "/draft/getDraftByTaskId",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<Draft> getDraftByTaskId(@RequestParam("taskId") Long taskId) {
+    public ResponseEntity<Draft> getDraftByTaskId(@RequestParam("taskId") Long taskId, @RequestParam("isShared") boolean isShared) {
         log.debug("REST request to get Draft by taskId : {}", taskId);
 
-        Draft draft = draftService.findDraft(taskId, SecurityUtils.getCurrentUserLogin());
+        Draft draft;
+        if(isShared)
+            draft = draftService.findDraftByTaskId(taskId);
+        else
+            draft = draftService.findDraftByTaskId(taskId, SecurityUtils.getCurrentUserLogin());
+
 
         return Optional.ofNullable(draft)
                 .map(result -> new ResponseEntity<>(
@@ -117,6 +135,29 @@ public class DraftResource {
                         HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+
+
+    /**
+     * GET  /drafts/getDraftByProcessDefinition : restituisce i draft associati ad un utente
+     *
+     * @param processDefinitionId   the processDefinition of the draft to retrieve
+     * @return the ResponseEntity with status 200 (OK) and with body the draft, or with status 404 (Not Found)
+     */
+    @GetMapping(value = "/draft/getDraftByProcessDefinitionId",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<Draft> getDraftByProcessDefinitionId(@RequestParam("processDefinitionId") String processDefinitionId) {
+        log.debug("REST request to get Draft by ProcessDefinition : {}", processDefinitionId);
+
+        Draft draft = draftService.findDraftByProcessDefinitionId(processDefinitionId, SecurityUtils.getCurrentUserLogin());
+
+        return Optional.ofNullable(draft)
+                .map(result -> new ResponseEntity<>(
+                        result,
+                        HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
 
     /**
      * DELETE  /draft/:id : delete the "id" Draft.
@@ -130,6 +171,7 @@ public class DraftResource {
     public ResponseEntity<Void> deleteDraft(@PathVariable Long id) {
         log.debug("REST request to delete Draft : {}", id);
         draftService.delete(id);
+
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("draft", id.toString())).build();
     }
 }

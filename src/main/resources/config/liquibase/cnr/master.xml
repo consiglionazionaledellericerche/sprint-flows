@@ -39,7 +39,7 @@
     <include file="classpath:config/liquibase/cnr/changelog/20190723085228_added_entity_Draft.xml"
              relativeToChangelogFile="false"/>
 
-<!--esemplio di mvn liquibase:update per cambiare tabella nel DB-->
+<!--esempio di mvn liquibase:update per cambiare tabella nel DB-->
 <!--    <include file="src/main/resources/config/liquibase/cnr/changelog/addColumnInDraft.xml"-->
 <!--             relativeToChangelogFile="false"/>-->
 

@@ -67,7 +67,7 @@ public class DraftResourceTest {
 
     @Test
     public void testDeleteDraft(){
-        ResponseEntity<Draft> responseDirettore = draftResource.updateDraft(Long.valueOf(util.getFirstTaskId()), json);
+        ResponseEntity<Draft> responseDirettore = draftResource.updateDraft(Long.valueOf(util.getFirstTaskId()), json, null, false);
         assertEquals(OK, responseDirettore.getStatusCode());
         assertNotNull(responseDirettore.getBody().getId());
 
@@ -97,7 +97,7 @@ public class DraftResourceTest {
         processInstance = util.mySetUp(acquisti);
 
         util.loginDirettore();
-        ResponseEntity<Draft> responseDirettore = draftResource.updateDraft(Long.valueOf(util.getFirstTaskId()), json);
+        ResponseEntity<Draft> responseDirettore = draftResource.updateDraft(Long.valueOf(util.getFirstTaskId()), json, null, false);
         assertEquals(OK, responseDirettore.getStatusCode());
         assertNotNull(responseDirettore.getBody().getId());
 
@@ -119,9 +119,9 @@ public class DraftResourceTest {
         assertEquals(OK, draftRE.getStatusCode());
         assertEquals(expectedDraft.getUsername(), draftRE.getBody().getUsername());
 
-        //Testo getdraftByTaskId (con username paoloenricocirone)
+        //Testo getdraftByTaskId (isShared = false)
         util.loginDirettore();
-        ResponseEntity<Draft> draftsUserRE = draftResource.getDraftByTaskId(Long.valueOf(util.getFirstTaskId()));
+        ResponseEntity<Draft> draftsUserRE = draftResource.getDraftByTaskId(Long.valueOf(util.getFirstTaskId()), false);
         assertEquals(OK, draftsUserRE.getStatusCode());
         assertEquals("maurizio.lancia", draftsUserRE.getBody().getUsername());
     }
