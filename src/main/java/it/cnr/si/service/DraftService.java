@@ -26,8 +26,31 @@ public class DraftService {
      * @param username the username
      * @return the draft
      */
-    public Draft findDraft(Long taskId, String username) {
-        return draftRepository.getDraftByTaskIdAndUsername(taskId, username);
+    public Draft findDraftByTaskId(Long taskId, String username) {
+        if(username != null)
+            return draftRepository.getDraftByTaskIdAndUsername(taskId, username);
+        else
+            return draftRepository.getDraftByTaskId(taskId);
+    }
+
+
+
+    /**
+     * Find draft draft.
+     * nel caso in cui non si specifichi l`username si recupera un Draft che può essere letto da tutti
+     *
+     * @param processDefinitionId   the process Definition Id
+     * @param username the username
+     * @return the draft
+     */
+    public Draft findDraftByProcessDefinitionId(String processDefinitionId, String username) {
+        return draftRepository.getDraftByProcessInstanceIdAndUsername(processDefinitionId, username);
+    }
+
+
+    public Draft findDraftByTaskId(Long taskId) {
+        return draftRepository.getDraftByTaskId(taskId);
+
     }
 
 
@@ -69,26 +92,27 @@ public class DraftService {
         draftRepository.delete(id);
     }
 
-    /**
-     * Delete draft by task id.
-     *
-     * @param taskId the task id
-     */
-    public void deleteDraftByTaskId(Long taskId) {
-        List<Draft> drafts = draftRepository.getAllDraftByTaskId(taskId);
-        for(Draft draft : drafts) {
-            draftRepository.delete(draft.getId());
-        }
-    }
 
     /**
-     * Delete draft by task id and Username.
+     * Delete draft by task id
      *
      * @param taskId   the task id
+     */
+    public void deleteDraftByTaskId(Long taskId) {
+        Draft draft = draftRepository.getDraftByTaskId(taskId);
+        if(draft != null)
+            draftRepository.delete(draft.getId());
+    }
+
+
+    /**
+     * Delete draft by process Instance id and Username.
+     *
+     * @param processDefinitionId   the process Definition Id
      * @param username the username
      */
-    public void deleteDraftByTaskIdAndUsername(Long taskId, String username) {
-        Draft draft = draftRepository.getDraftByTaskIdAndUsername(taskId, username);
+    public void deleteDraftByProcessInstanceIdAndUsername(String processDefinitionId, String username) {
+        Draft draft = draftRepository.getDraftByProcessInstanceIdAndUsername(processDefinitionId, username);
         if(draft != null)
             draftRepository.delete(draft.getId());
     }
