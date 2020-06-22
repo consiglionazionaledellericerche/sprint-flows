@@ -28,7 +28,7 @@
 	TaskController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log', '$http', '$q', 'Upload', 'utils', '$localStorage'];
 
 	function TaskController($scope, Principal, LoginService, $state, dataService, AlertService, $log, $http, $q, Upload, utils, $localStorage) {
-		var vm = this, deploymentId;
+		var vm = this, deploymentId, isShared = false;
 
         $scope.button={};
 		$scope.data = {};
@@ -64,15 +64,30 @@
 			if ([21, 23].includes(Number(vm.taskVariables["strumentoAcquisizioneId"])))
 				$scope.data["tipologiaProceduraSelettiva"] = vm.taskVariables["tipologiaProceduraSelettiva"];
 
-			dataService.draft.getDraftByTaskId($state.params.taskId).then(
-					function(response){
-						//popolo i campi col contenuto del json
-						var json = JSON.parse(response.data.json);
-						Object.keys(json).forEach(function(key) {
-							$scope.data["" + key] = json[key];
-						})
-					}
-			);
+            if($state.params.taskId){
+                if($state.params.processDefinitionId.includes('short-term-mobility-domande'))
+                    isShared = true;
+
+                dataService.draft.getDraftByTaskId($state.params.taskId, isShared).then(
+                        function(response){
+                            //popolo i campi col contenuto del json
+                            var json = JSON.parse(response.data.json);
+                            Object.keys(json).forEach(function(key) {
+                                $scope.data["" + key] = json[key];
+                            })
+                        }
+                );
+            } else{
+                dataService.draft.getDraftByProcessDefinitionId($state.params.processDefinitionId.split(':')[0]).then(
+                        function(response){
+                            //popolo i campi col contenuto del json
+                            var json = JSON.parse(response.data.json);
+                            Object.keys(json).forEach(function(key) {
+                                $scope.data["" + key] = json[key];
+                            })
+                        }
+                );
+            }
 		});
 
 		if ($state.params.taskId) {
@@ -93,9 +108,9 @@
 						dataPromise.resolve();
 					});
 		} else {
-		    deploymentId = $localStorage.wfDefsAll.filter(function(el){return el.id == $state.params.processDefinitionId})[0].deploymentId;
+//		    deploymentId = $localStorage.wfDefsAll.filter(function(el){return el.id == $state.params.processDefinitionId})[0].deploymentId;
 //		    autofill draft (deploymentId(negativo))
-		    dataService.draft.getDraftByTaskId(-deploymentId).then(
+		    dataService.draft.getDraftByProcessDefinitionId($state.params.processDefinitionId.split(':')[0]).then(
                     function(response){
                         //popolo i campi col contenuto del json
                         var json = JSON.parse(response.data.json);
@@ -163,10 +178,18 @@
 			var json = Object.assign({}, $scope.data);
 			delete json.entity;
 			delete json.processDefinitionId;
-			delete json.sceltaUtente;
+//			delete json.sceltaUtente;
 			delete json.taskId;
-			//salvo il draft con username null perchè deve essere visibile a tutti
-			dataService.draft.updateDraft($state.params.taskId ? $state.params.taskId : -deploymentId, json);
+			//salvo il draft
+//			todo: da testare
+			if($state.params.processDefinitionId.includes('short-term-mobility-domande'))
+			    isShared = true;
+
+			if($state.params.taskId){
+			    dataService.draft.updateDraft($state.params.taskId , json, null, isShared);
+			} else{
+			    dataService.draft.updateDraft(null, json, $state.params.processDefinitionId.split(':')[0], isShared);
+			}
 		}
 
 		function removeFromCart(taskId) {
