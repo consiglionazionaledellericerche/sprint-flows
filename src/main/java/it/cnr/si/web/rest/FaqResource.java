@@ -108,6 +108,23 @@ public class FaqResource {
         return faqs;
     }
 
+
+    /**
+     * GET  /readableForProcessDefinition : get all readable faqs for process definition.
+     *
+     * @param procesDefinition the proces definition
+     * @return the ResponseEntity with status 200 (OK) and the list of faqs readable in body
+     */
+    @RequestMapping(value = "/faqs/readableForProcessDefinition/{procesDefinition}",
+        method = RequestMethod.GET,
+        produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public List<Faq> getReadableForProcessDefinition(@PathVariable String procesDefinition) {
+        log.debug("REST request to get all Faqs for process definition");
+
+        return faqRepository.getReadableForProcessDefinition(procesDefinition);
+    }
+
     /**
      * GET  /faqs/:id : get the "id" faq.
      *
