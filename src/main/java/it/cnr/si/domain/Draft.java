@@ -1,19 +1,16 @@
 package it.cnr.si.domain;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * A Faq.
+ * A Draft.
  */
 @Entity
 @Table(name = "draft")
-@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class Draft implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -22,67 +19,29 @@ public class Draft implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @NotNull
-    @Column(name = "task_id", nullable = false)
+    @Column(name = "task_id")
     private Long taskId;
+
+    @Column(name = "username")
+    private String username;
 
     @NotNull
     @Column(name = "json", nullable = false)
     private String json;
 
-    @Column(name = "username")
-    private String username;
+    @Column(name = "process_definition_id")
+    private String processDefinitionId;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Draft draft = (Draft) o;
-        return Objects.equals(id, draft.id) &&
-                Objects.equals(taskId, draft.taskId) &&
-                Objects.equals(json, draft.json) &&
-                Objects.equals(username, draft.username);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, taskId, json);
-    }
-
-    public static long getSerialVersionUID() {
-        return serialVersionUID;
+    public Long getId() {
+        return id;
     }
 
     public void setId(Long id) {
         this.id = id;
     }
 
-    public void setTaskId(Long taskId) {
-        this.taskId = taskId;
-    }
-
-    public void setJson(String json) {
-        this.json = json;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
     public Long getTaskId() {
         return taskId;
-    }
-
-    public String getJson() {
-        return json;
-    }
-
-    public String getUsername() {
-        return username;
     }
 
     public Draft taskId(Long taskId) {
@@ -90,19 +49,77 @@ public class Draft implements Serializable {
         return this;
     }
 
+    public void setTaskId(Long taskId) {
+        this.taskId = taskId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public Draft username(String username) {
+        this.username = username;
+        return this;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getJson() {
+        return json;
+    }
+
     public Draft json(String json) {
         this.json = json;
         return this;
     }
 
+    public void setJson(String json) {
+        this.json = json;
+    }
+
+    public String getProcessDefinitionId() {
+        return processDefinitionId;
+    }
+
+    public Draft processDefinitionId(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
+        return this;
+    }
+
+    public void setProcessDefinitionId(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Draft draft = (Draft) o;
+        if(draft.id == null || id == null) {
+            return false;
+        }
+        return Objects.equals(id, draft.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 
     @Override
     public String toString() {
         return "Draft{" +
-                "id=" + id +
-                ", taskId=" + taskId +
-                ", json='" + json + '\'' +
-                ", username='" + username + '\'' +
-                '}';
+            "id=" + id +
+            ", taskId='" + taskId + "'" +
+            ", username='" + username + "'" +
+            ", json='" + json + "'" +
+            ", processDefinitionId='" + processDefinitionId + "'" +
+            '}';
     }
 }
