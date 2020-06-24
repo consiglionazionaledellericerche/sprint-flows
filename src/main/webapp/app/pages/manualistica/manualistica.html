@@ -1,23 +1,61 @@
 <div class="row">
-    <div class="col-sm-6 col-sm-offset-3">
-        <h2>Manualistica</h2>
-        <ul>
-            <!--<li><a href="https://doc-cnr.si.cnr.it/rest/content?nodeRef=e6765d0c-eca5-4503-93ca-b5dde27ea68a">Manuale utente Flusso Acquisti</a></li>-->
-            <li ng-repeat="manuale in vm.manuali">
-                <a ng-click="downloadManuale(manuale)">
-                    {{manuale}}
-                </a>
-            </li>
-            <li>
-                <a href="https://e-learning.formazione.cnr.it/course/view.php?id=5">Video Tutorial</a>
-            </li>
-        </ul>
-        <h2>Faq</h2>
-        <ul>
-            <li ng-repeat="faq in vm.faqs">
-                <b>{{faq.domanda}}</b><br>
-                <em>{{faq.risposta}}</em>
-            </li>
-        </ul>
+    <div class="row">
+        <div class="col-md-3 padding-top">
+            <br>
+            <h4>Tipologie</h4>
+            <div id="tipologieDiv">
+                <div>
+                    <div class="dropdown md-menu-origin">
+                        <ui-select ng-model="vm.processDefinitionKey" title="Tipologie"
+                                   on-select="searchFaq()">
+                            <ui-select-match placeholder="Seleziona la tipologia di flusso" allow-clear="true">
+                                {{$select.selected.name}}
+                            </ui-select-match>
+                            <ui-select-choices repeat="processDefinition.key as processDefinition in wfDefsAll">
+                                <span ng-bind-html="processDefinition.name"></span>
+                            </ui-select-choices>
+                        </ui-select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="resultDiv" class="col-md-9" ng-cloak>
+            <h2 style="color:#069">Manualistica</h2>
+            <ul>
+                <!--<li><a href="https://doc-cnr.si.cnr.it/rest/content?nodeRef=e6765d0c-eca5-4503-93ca-b5dde27ea68a">Manuale utente Flusso Acquisti</a></li>-->
+                <li ng-repeat="manuale in vm.manuali">
+                    <a ng-click="downloadManuale(manuale)">
+                        {{manuale}}
+                    </a>
+                </li>
+                <li>
+                    <a href="https://e-learning.formazione.cnr.it/course/view.php?id=5">Video Tutorial</a>
+                </li>
+            </ul>
+            <br>
+            <hr width="700px;" color="#069" size="10">
+            <br>
+            <h2 style="color: #069;">Faq</h2>
+            <br>
+            <h4>Per vedere ANCHE le Faq specifiche di ogni tipologia di flusso, selezionarlo dal menù laterale</h4>
+            <br>
+            <h3 style="color:#069">Scrivania Digitale</h3>
+            <br>
+            <ul>
+                <li ng-repeat="faq in vm.faqs">
+                    <b>{{faq.domanda}}</b><br>
+                    <em>{{faq.risposta}}</em>
+                </li>
+            </ul>
+            <br>
+            <h3 style="color:#069">{{vm.processDefinitionKey}}</h3>
+            <br>
+            <ul>
+                <li ng-repeat="specificFaq in vm.specificFaqs">
+                    <b>{{specificFaq.domanda}}</b><br>
+                    <em>{{specificFaq.risposta}}</em>
+                </li>
+            </ul>
+        </div>
     </div>
 </div>

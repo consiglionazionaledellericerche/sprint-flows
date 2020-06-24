@@ -296,7 +296,7 @@ public class FlowsTaskResource {
         if (isEmpty(taskId)) {
             ProcessInstance instance = flowsTaskService.startProcessInstance(definitionId, data);
 
-            draftService.deleteDraftByProcessInstanceIdAndUsername(definitionId, SecurityUtils.getCurrentUserLogin());
+            draftService.deleteDraftByProcessInstanceIdAndUsername(definitionId.split(":")[0], SecurityUtils.getCurrentUserLogin());
 
             return ResponseEntity.ok(restResponseFactory.createProcessInstanceResponse(instance));
         } else {
