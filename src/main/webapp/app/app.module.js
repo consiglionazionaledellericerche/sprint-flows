@@ -25,8 +25,7 @@
             'ngSanitize',
             'dc.inputAddOn',
             'angularTrix'
-        ])
-        .run(run);
+        ]).run(run);
 
     run.$inject = ['stateHandler', 'translationHandler'];
 
@@ -36,12 +35,13 @@
     }
     
     function isChromeOrFirefox() {
-        var is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1
-        var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
-        var is_edge = window.navigator.userAgent.indexOf("Edge") > -1;
-        return (is_firefox || is_chrome) && !is_edge;
+        var is_firefox, is_chrome, is_edge;
+        is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+        is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+        is_edge = window.navigator.userAgent.indexOf('Edge') > -1;
+        return ((is_firefox || is_chrome) && !is_edge);
     }
 
     if(!isChromeOrFirefox())
-        $('.browsehappy').show();
+        $(".browsehappy").show();
 })();
