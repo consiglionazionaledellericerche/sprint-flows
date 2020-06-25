@@ -10,7 +10,7 @@
     function ManualisticaController($scope, $state, dataService, utils) {
         var vm = this;
         //Recupero i Manuali
-        dataService.manuali.getElenco().then(function (response) {
+        dataService.manuali.getElenco().then(function(response) {
             vm.manuali = response.data;
         });
         //Recupero le Faq readable (generiche)
@@ -44,14 +44,13 @@
             if(!vm.processDefinitionKey)
                 vm.specificFaqs = {};
         });
-    }
-
-    // rimuovo il prefisso (la process definition) presente nele domande delle faq
-    function removePrefix(faqs) {
-        var faqsWithoutPrefix = $.extend({}, faqs);
-        for (let key in faqs) {
-            faqsWithoutPrefix[key].domanda = faqs[key].domanda.substring(faqs[key].domanda.indexOf(' - ') + 2);
-        }
-        return faqsWithoutPrefix;
+            // rimuovo il prefisso (la process definition) presente nele domande delle faq
+            function removePrefix(faqs) {
+                var faqsWithoutPrefix = $.extend({}, faqs), key;
+                for (key in faqs) {
+                    faqsWithoutPrefix[key].domanda = faqs[key].domanda.substring(faqs[key].domanda.indexOf(' - ') + 2);
+                }
+                return faqsWithoutPrefix;
+            }
     }
 })();
