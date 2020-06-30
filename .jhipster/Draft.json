@@ -1,0 +1,30 @@
+{
+    "fluentMethods": true,
+    "relationships": [],
+    "fields": [
+        {
+            "fieldName": "taskId",
+            "fieldType": "Long"
+        },
+        {
+            "fieldName": "username",
+            "fieldType": "String"
+        },
+        {
+            "fieldName": "json",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "processDefinitionId",
+            "fieldType": "String"
+        }
+    ],
+    "changelogDate": "20170503122545",
+    "dto": "no",
+    "service": "si",
+    "entityTableName": "draft",
+    "pagination": "no"
+}

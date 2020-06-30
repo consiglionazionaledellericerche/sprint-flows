@@ -11,6 +11,7 @@ import it.cnr.si.flows.ng.service.*;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.PermissionEvaluatorImpl;
+import it.cnr.si.service.DraftService;
 import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.RepositoryService;
@@ -41,9 +42,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static it.cnr.si.flows.ng.service.FlowsFirmaService.ERRORI_ARUBA;
 import static it.cnr.si.flows.ng.service.FlowsFirmaService.NOME_FILE_FIRMA;
@@ -88,6 +86,8 @@ public class FlowsTaskResource {
     private PermissionEvaluatorImpl permissionEvaluator;
     @Inject
     private UserDetailsService flowsUserDetailsService;
+    @Inject
+    private DraftService draftService;
 
     @Autowired
     private ApplicationContext context;
@@ -295,6 +295,8 @@ public class FlowsTaskResource {
 
         if (isEmpty(taskId)) {
             ProcessInstance instance = flowsTaskService.startProcessInstance(definitionId, data);
+
+            draftService.deleteDraftByProcessInstanceIdAndUsername(definitionId.split(":")[0], SecurityUtils.getCurrentUserLogin());
 
             return ResponseEntity.ok(restResponseFactory.createProcessInstanceResponse(instance));
         } else {
