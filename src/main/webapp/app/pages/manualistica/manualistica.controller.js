@@ -29,13 +29,19 @@
             )
         }
         //Recupero le Faq readable (specifiche)
-         $scope.searchFaq = function() {
+        $scope.searchFaq = function() {
             if (vm.processDefinitionKey) {
                 dataService.faq.getReadableForProcessDefinition(vm.processDefinitionKey).then(function (specificFaqs) {
-                    //rimuovo il prefisso delle domande
-                    vm.specificFaqs = removePrefix(specificFaqs.data);
+                    var splitStr = vm.processDefinitionKey.replace(/\-/g, " ").split(' ');
+                    //rimpiazzo "-" con spazi e le prime lettere delle parose maiuscole
+                    for (var i = 0; i < splitStr.length; i++) {
+                       splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
+                    }
+                    //riassemblo myProcessDefinitionKey (con le prime lettere maiuscole e senza -)
+                    vm.myProcessDefinitionKey = splitStr.join(' ');
 
-                    vm.processDefinitionKey = vm.processDefinitionKey.charAt(0).toUpperCase() + vm.processDefinitionKey.slice(1);
+                    //rimuovo il prefisso delle domande delle Faq
+                    vm.specificFaqs = removePrefix(specificFaqs.data);
                 });
             }
         };
@@ -44,13 +50,13 @@
             if(!vm.processDefinitionKey)
                 vm.specificFaqs = {};
         });
-            // rimuovo il prefisso (la process definition) presente nele domande delle faq
-            function removePrefix(faqs) {
-                var faqsWithoutPrefix = $.extend({}, faqs), key;
-                for (key in faqs) {
-                    faqsWithoutPrefix[key].domanda = faqs[key].domanda.substring(faqs[key].domanda.indexOf(' - ') + 2);
-                }
-                return faqsWithoutPrefix;
+        // rimuovo il prefisso (la process definition) presente nele domande delle faq
+        function removePrefix(faqs) {
+            var faqsWithoutPrefix = $.extend({}, faqs), key;
+            for (key in faqs) {
+                faqsWithoutPrefix[key].domanda = faqs[key].domanda.substring(faqs[key].domanda.indexOf(' - ') + 2);
             }
+            return faqsWithoutPrefix;
+        }
     }
 })();
