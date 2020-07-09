@@ -25,9 +25,9 @@
 	 *
 	 * @author mtrycz
 	 */
-	TaskController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log', '$http', '$q', 'Upload', 'utils', '$localStorage'];
+	TaskController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log', '$http', '$q', 'Upload', 'utils', '$localStorage', '$uibModal'];
 
-	function TaskController($scope, Principal, LoginService, $state, dataService, AlertService, $log, $http, $q, Upload, utils, $localStorage) {
+	function TaskController($scope, Principal, LoginService, $state, dataService, AlertService, $log, $http, $q, Upload, utils, $localStorage, $uibModal) {
 		var vm = this, deploymentId, isShared = false;
 
         $scope.button={};
@@ -92,40 +92,52 @@
 
 		if ($state.params.taskId) {
 			dataService.tasks.getTask($state.params.taskId).then(
-					function (response) {
-						$scope.data.taskId = $state.params.taskId;
-						//visualizzazione dei metadati del task in esecuzione
-						var processDefinition = response.data.task.processDefinitionId.split(":");
-						vm.detailsView = 'api/views/' + processDefinition[0] + '/' + processDefinition[1] + '/detail';
-						$scope.data.entity = utils.refactoringVariables([response.data.task])[0];
+				function (response) {
+					$scope.data.taskId = $state.params.taskId;
+					//visualizzazione dei metadati del task in esecuzione
+					var processDefinition = response.data.task.processDefinitionId.split(":");
+					vm.detailsView = 'api/views/' + processDefinition[0] + '/' + processDefinition[1] + '/detail';
+					$scope.data.entity = utils.refactoringVariables([response.data.task])[0];
 
-						vm.taskVariables = $scope.data.entity.variabili;
-						$scope.attachments = utils.parseAttachments(response.data.attachments);
-						//                    $scope.attachments = response.data.attachments;
+					vm.taskVariables = $scope.data.entity.variabili;
+					$scope.attachments = utils.parseAttachments(response.data.attachments);
+					//                    $scope.attachments = response.data.attachments;
 
-						vm.diagramUrl = '/rest/diagram/taskInstance/' + $scope.data.taskId + "?" + new Date().getTime();
-						vm.formUrl = 'api/forms/task/' + $scope.data.taskId;
-						dataPromise.resolve();
-					});
+					vm.diagramUrl = '/rest/diagram/taskInstance/' + $scope.data.taskId + "?" + new Date().getTime();
+					vm.formUrl = 'api/forms/task/' + $scope.data.taskId;
+					dataPromise.resolve();
+				});
 		} else {
 //		    deploymentId = $localStorage.wfDefsAll.filter(function(el){return el.id == $state.params.processDefinitionId})[0].deploymentId;
 //		    autofill draft (deploymentId(negativo))
 		    dataService.draft.getDraftByProcessDefinitionId($state.params.processDefinitionId.split(':')[0]).then(
-                    function(response){
-                        //popolo i campi col contenuto del json
-                        var json = JSON.parse(response.data.json);
-                        Object.keys(json).forEach(function(key) {
-                            $scope.data["" + key] = json[key];
-                        })
-                    }
+				function(response){
+					//popolo i campi col contenuto del json
+					var json = JSON.parse(response.data.json);
+					Object.keys(json).forEach(function(key) {
+						$scope.data["" + key] = json[key];
+					})
+				}
             );
-
 
 			dataPromise.reject("");
 
 			vm.diagramUrl = "/rest/diagram/processDefinition/" + $state.params.processDefinitionId + "?" + new Date().getTime();
 			vm.formUrl = 'api/forms/' + $scope.processDefinitionKey + "/" + $scope.processVersion + "/" + $state.params.taskName
 		}
+
+// lancia la modale di conferma se la taskDefinition è valutazione-scientifica, altrimenti completa il task
+		$scope.preSubmitTask = function (file) {
+            if($scope.data.entity.taskDefinitionKey == "valutazione-scientifica"){
+                $uibModal.open({
+                    templateUrl: 'confirmModal.html',
+                    scope: $scope
+                });
+            } else {
+                $scope.submitTask(file);
+            }
+
+		};
 
 		$scope.submitTask = function (file) {
 		    $scope.button.disabled = true;
@@ -136,6 +148,7 @@
 						errorField.$setTouched();
 					});
 				});
+				$("#confirmModal").hide() //rimuovo la modale di conferma
 				AlertService.warning("Inserire tutti i valori obbligatori.");
 
 			} else {
@@ -155,6 +168,7 @@
 					$state.go('availableTasks');
 
         		    $scope.button.disabled = false;
+        		    $("#confirmModal").hide() //rimuovo la modale di conferma
 				}, function (err) {
 					$log.error(err);
 					if (err.status == 412) {
@@ -165,6 +179,7 @@
 						AlertService.error("Richiesta non riuscita<br>" + err.data.message);
 					}
 				    $scope.button.disabled = false;
+			    	$("#confirmModal").hide() //rimuovo la modale di conferma
 				});
 			}
 		}
@@ -181,7 +196,7 @@
 //			delete json.sceltaUtente;
 			delete json.taskId;
 			//salvo il draft
-//			todo: da testare
+			//todo: da testare
 			if($state.params.processDefinitionId.includes('short-term-mobility-domande'))
 			    isShared = true;
 
