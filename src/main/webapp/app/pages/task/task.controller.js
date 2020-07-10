@@ -128,7 +128,7 @@
 
 // lancia la modale di conferma se la taskDefinition è valutazione-scientifica, altrimenti completa il task
 		$scope.preSubmitTask = function (file) {
-            if($scope.data.entity.taskDefinitionKey == "valutazione-scientifica"){
+            if($scope.data.entity.taskDefinitionKey == "valutazione-scientifica" && !$scope.taskForm.$invalid){
                 $uibModal.open({
                     templateUrl: 'confirmModal.html',
                     scope: $scope
