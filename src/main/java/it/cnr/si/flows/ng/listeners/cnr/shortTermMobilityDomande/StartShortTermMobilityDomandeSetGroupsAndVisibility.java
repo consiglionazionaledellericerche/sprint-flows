@@ -118,7 +118,7 @@ public class StartShortTermMobilityDomandeSetGroupsAndVisibility {
 			denominazioneEODirettore = direttoreAce.getDenominazioneEO();
 			if (!execution.getVariable("istitutoProponente").toString().equals("SEDE CENTRALE - DIPARTIMENTO")){
 				denominazioneEOProponente = execution.getVariable("istitutoProponente").toString().substring(9);
-				if (!denominazioneEODirettore.equals(denominazioneEOProponente)) {
+				if (!denominazioneEODirettore.equalsIgnoreCase(denominazioneEOProponente)) {
 					throw new BpmnError("400", "La struttura dichiarata dall'utente: " + userNameProponente + ": <br>" 
 							+ denominazioneEOProponente
 							+ "<br>non coincide con quella di afferenza amministrativa"
