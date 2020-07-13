@@ -126,15 +126,23 @@
 			vm.formUrl = 'api/forms/' + $scope.processDefinitionKey + "/" + $scope.processVersion + "/" + $state.params.taskName
 		}
 
-// lancia la modale di conferma se la taskDefinition è valutazione-scientifica, altrimenti completa il task
 		$scope.preSubmitTask = function (file) {
-            if($scope.data.entity.taskDefinitionKey == "valutazione-scientifica" && !$scope.taskForm.$invalid){
+		
+		    if ($scope.taskForm.$invalid) {
+                angular.forEach($scope.taskForm.$error, function (field) {
+                    angular.forEach(field, function (errorField) {
+                        errorField.$setTouched();
+                    });
+                });
+                $("#confirmModal").hide() //rimuovo la modale di conferma
+                AlertService.warning("Inserire tutti i valori obbligatori.");
+                //$scope.button.disabled = false;
+
+            } else {
                 $uibModal.open({
                     templateUrl: 'confirmModal.html',
                     scope: $scope
                 });
-            } else {
-                $scope.submitTask(file);
             }
 		};
 
@@ -149,6 +157,7 @@
 				});
 				$("#confirmModal").hide() //rimuovo la modale di conferma
 				AlertService.warning("Inserire tutti i valori obbligatori.");
+				//$scope.button.disabled = false;
 
 			} else {
 				// Serializzo gli oggetti complessi in stringhe
