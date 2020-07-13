@@ -25,9 +25,9 @@
 	 *
 	 * @author mtrycz
 	 */
-	TaskController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log', '$http', '$q', 'Upload', 'utils', '$localStorage'];
+	TaskController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log', '$http', '$q', 'Upload', 'utils', '$localStorage', '$uibModal'];
 
-	function TaskController($scope, Principal, LoginService, $state, dataService, AlertService, $log, $http, $q, Upload, utils, $localStorage) {
+	function TaskController($scope, Principal, LoginService, $state, dataService, AlertService, $log, $http, $q, Upload, utils, $localStorage, $uibModal) {
 		var vm = this, deploymentId, isShared = false;
 
         $scope.button={};
@@ -92,40 +92,59 @@
 
 		if ($state.params.taskId) {
 			dataService.tasks.getTask($state.params.taskId).then(
-					function (response) {
-						$scope.data.taskId = $state.params.taskId;
-						//visualizzazione dei metadati del task in esecuzione
-						var processDefinition = response.data.task.processDefinitionId.split(":");
-						vm.detailsView = 'api/views/' + processDefinition[0] + '/' + processDefinition[1] + '/detail';
-						$scope.data.entity = utils.refactoringVariables([response.data.task])[0];
+				function (response) {
+					$scope.data.taskId = $state.params.taskId;
+					//visualizzazione dei metadati del task in esecuzione
+					var processDefinition = response.data.task.processDefinitionId.split(":");
+					vm.detailsView = 'api/views/' + processDefinition[0] + '/' + processDefinition[1] + '/detail';
+					$scope.data.entity = utils.refactoringVariables([response.data.task])[0];
 
-						vm.taskVariables = $scope.data.entity.variabili;
-						$scope.attachments = utils.parseAttachments(response.data.attachments);
-						//                    $scope.attachments = response.data.attachments;
+					vm.taskVariables = $scope.data.entity.variabili;
+					$scope.attachments = utils.parseAttachments(response.data.attachments);
+					//                    $scope.attachments = response.data.attachments;
 
-						vm.diagramUrl = '/rest/diagram/taskInstance/' + $scope.data.taskId + "?" + new Date().getTime();
-						vm.formUrl = 'api/forms/task/' + $scope.data.taskId;
-						dataPromise.resolve();
-					});
+					vm.diagramUrl = '/rest/diagram/taskInstance/' + $scope.data.taskId + "?" + new Date().getTime();
+					vm.formUrl = 'api/forms/task/' + $scope.data.taskId;
+					dataPromise.resolve();
+				});
 		} else {
 //		    deploymentId = $localStorage.wfDefsAll.filter(function(el){return el.id == $state.params.processDefinitionId})[0].deploymentId;
 //		    autofill draft (deploymentId(negativo))
 		    dataService.draft.getDraftByProcessDefinitionId($state.params.processDefinitionId.split(':')[0]).then(
-                    function(response){
-                        //popolo i campi col contenuto del json
-                        var json = JSON.parse(response.data.json);
-                        Object.keys(json).forEach(function(key) {
-                            $scope.data["" + key] = json[key];
-                        })
-                    }
+				function(response){
+					//popolo i campi col contenuto del json
+					var json = JSON.parse(response.data.json);
+					Object.keys(json).forEach(function(key) {
+						$scope.data["" + key] = json[key];
+					})
+				}
             );
-
 
 			dataPromise.reject("");
 
 			vm.diagramUrl = "/rest/diagram/processDefinition/" + $state.params.processDefinitionId + "?" + new Date().getTime();
 			vm.formUrl = 'api/forms/' + $scope.processDefinitionKey + "/" + $scope.processVersion + "/" + $state.params.taskName
 		}
+
+		$scope.preSubmitTask = function (file) {
+		
+		    if ($scope.taskForm.$invalid) {
+                angular.forEach($scope.taskForm.$error, function (field) {
+                    angular.forEach(field, function (errorField) {
+                        errorField.$setTouched();
+                    });
+                });
+                $("#confirmModal").hide() //rimuovo la modale di conferma
+                AlertService.warning("Inserire tutti i valori obbligatori.");
+                //$scope.button.disabled = false;
+
+            } else {
+                $uibModal.open({
+                    templateUrl: 'confirmModal.html',
+                    scope: $scope
+                });
+            }
+		};
 
 		$scope.submitTask = function (file) {
 		    $scope.button.disabled = true;
@@ -136,9 +155,12 @@
 						errorField.$setTouched();
 					});
 				});
+				$("#confirmModal").hide() //rimuovo la modale di conferma
 				AlertService.warning("Inserire tutti i valori obbligatori.");
+				//$scope.button.disabled = false;
 
 			} else {
+			    $("#confirmModal").hide() //rimuovo la modale di conferma
 				// Serializzo gli oggetti complessi in stringhe
 				// E' necessario copiarli in un nuovo campo, senno' angular si incasina
 				// Non posso usare angular.copy() perche' ho degli oggetti File non gestiti bene
@@ -181,7 +203,7 @@
 //			delete json.sceltaUtente;
 			delete json.taskId;
 			//salvo il draft
-//			todo: da testare
+			//todo: da testare
 			if($state.params.processDefinitionId.includes('short-term-mobility-domande'))
 			    isShared = true;
 

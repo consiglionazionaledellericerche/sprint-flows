@@ -34,7 +34,7 @@
         stateHandler.initialize();
         translationHandler.initialize();
     }
-    
+
     function isChromeOrFirefox() {
         var is_firefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1
         var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
