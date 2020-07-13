@@ -151,6 +151,7 @@
 				AlertService.warning("Inserire tutti i valori obbligatori.");
 
 			} else {
+			    $("#confirmModal").hide() //rimuovo la modale di conferma
 				// Serializzo gli oggetti complessi in stringhe
 				// E' necessario copiarli in un nuovo campo, senno' angular si incasina
 				// Non posso usare angular.copy() perche' ho degli oggetti File non gestiti bene
@@ -167,7 +168,6 @@
 					$state.go('availableTasks');
 
         		    $scope.button.disabled = false;
-        		    $("#confirmModal").hide() //rimuovo la modale di conferma
 				}, function (err) {
 					$log.error(err);
 					if (err.status == 412) {
@@ -178,7 +178,6 @@
 						AlertService.error("Richiesta non riuscita<br>" + err.data.message);
 					}
 				    $scope.button.disabled = false;
-			    	$("#confirmModal").hide() //rimuovo la modale di conferma
 				});
 			}
 		}
