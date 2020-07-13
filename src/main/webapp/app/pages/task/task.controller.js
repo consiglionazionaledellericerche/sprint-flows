@@ -136,7 +136,6 @@
             } else {
                 $scope.submitTask(file);
             }
-
 		};
 
 		$scope.submitTask = function (file) {
