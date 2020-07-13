@@ -75,16 +75,16 @@
 <script type="text/ng-template" id="confirmModal.html">
   <div id="confirmModal">
     <div class="modal-header">
-      <h4 class="modal-title">Sei sicuro di voler approvare il Task?</h4>
+      <h4 class="modal-title">Si è sicuri di voler procedere?</h4>
     </div>
     <div class="modal-body">
-      L'azione, una volta eseguita, non potrà essere annullata ed il Flusso proseguirà il suo iter
+      L'azione, una volta eseguita, non potrà essere annullata ed il Flusso proseguirà il suo iter. 
     </div>
     <div class="modal-footer">
       <button class="btn btn-default" type="button" ng-click="$dismiss()">Annulla
         <span class="glyphicon glyphicon-remove"></span>
       </button>
-      <button data-dismiss="modal" class="btn btn-primary" ng-click="submitTask(picFile)">Invia
+      <button data-dismiss="modal" class="btn btn-primary" ng-click="submitTask(picFile); $dismiss()">Invia
         <span class="glyphicon glyphicon-arrow-right"></span>
       </button>
     </div>

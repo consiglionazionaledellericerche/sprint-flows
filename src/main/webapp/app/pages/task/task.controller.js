@@ -126,15 +126,23 @@
 			vm.formUrl = 'api/forms/' + $scope.processDefinitionKey + "/" + $scope.processVersion + "/" + $state.params.taskName
 		}
 
-// lancia la modale di conferma se la taskDefinition è valutazione-scientifica, altrimenti completa il task
 		$scope.preSubmitTask = function (file) {
-            if($scope.data.entity.taskDefinitionKey == "valutazione-scientifica" && !$scope.taskForm.$invalid){
+		
+		    if ($scope.taskForm.$invalid) {
+                angular.forEach($scope.taskForm.$error, function (field) {
+                    angular.forEach(field, function (errorField) {
+                        errorField.$setTouched();
+                    });
+                });
+                $("#confirmModal").hide() //rimuovo la modale di conferma
+                AlertService.warning("Inserire tutti i valori obbligatori.");
+                //$scope.button.disabled = false;
+
+            } else {
                 $uibModal.open({
                     templateUrl: 'confirmModal.html',
                     scope: $scope
                 });
-            } else {
-                $scope.submitTask(file);
             }
 		};
 
@@ -149,8 +157,10 @@
 				});
 				$("#confirmModal").hide() //rimuovo la modale di conferma
 				AlertService.warning("Inserire tutti i valori obbligatori.");
+				//$scope.button.disabled = false;
 
 			} else {
+			    $("#confirmModal").hide() //rimuovo la modale di conferma
 				// Serializzo gli oggetti complessi in stringhe
 				// E' necessario copiarli in un nuovo campo, senno' angular si incasina
 				// Non posso usare angular.copy() perche' ho degli oggetti File non gestiti bene
@@ -167,7 +177,6 @@
 					$state.go('availableTasks');
 
         		    $scope.button.disabled = false;
-        		    $("#confirmModal").hide() //rimuovo la modale di conferma
 				}, function (err) {
 					$log.error(err);
 					if (err.status == 412) {
@@ -178,7 +187,6 @@
 						AlertService.error("Richiesta non riuscita<br>" + err.data.message);
 					}
 				    $scope.button.disabled = false;
-			    	$("#confirmModal").hide() //rimuovo la modale di conferma
 				});
 			}
 		}
