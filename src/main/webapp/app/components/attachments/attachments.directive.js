@@ -4,9 +4,9 @@
     angular.module('sprintApp')
         .directive('attachments', attachmentsDirective);
 
-    attachmentsDirective.$inject = ['dataService', '$sessionStorage', '$log', '$http', '$uibModal', 'utils', 'Principal'];
+    attachmentsDirective.$inject = ['dataService', '$sessionStorage', '$log', '$http', '$uibModal', 'utils', 'Principal', 'AlertService'];
 
-    function attachmentsDirective(dataService, $sessionStorage, $log, $http, $uibModal, utils, Principal) {
+    function attachmentsDirective(dataService, $sessionStorage, $log, $http, $uibModal, utils, Principal, AlertService) {
 
         return {
             restrict: 'E',
@@ -110,6 +110,40 @@
                         }
                     });
                 };
+                
+                $scope.viewPdf = function(attachment) {
+                    $scope.pdfTitle = attachment.filename;
+            
+                    updatePreview(attachment);
+            
+                    $scope.modalInstance = $uibModal.open({
+                      templateUrl: 'myModalContent.html',
+                      size: 'lg',
+                      scope: $scope
+                    });                    
+                }
+                
+                $scope.onError = function(error) {
+                    $scope.showPdfError = true;
+                    $scope.pdfError = error.message;
+                }
+                
+                function updatePreview(attachment) {
+                    $scope.loading = 'loading';
+                    $scope.pdfUrl = '';
+                    $scope.xmlContent = '';
+                    $http.get('/api/attachments/'+ $scope.processInstanceId +'/'+ attachment.name +'/data', {responseType: "arraybuffer"}).then(function(response) {
+                        
+                        $scope.loading = '';
+                        $scope.total = response.data.total;
+                        
+                        var currentBlob = new Blob([response.data], {type: 'application/pdf'});
+                        $scope.pdfUrl = URL.createObjectURL(currentBlob);
+                        $scope.showPdfError = false;
+                    }, function(err) {
+                        $scope.onError(err.data)
+                    });
+                }
 
                 init();
             }

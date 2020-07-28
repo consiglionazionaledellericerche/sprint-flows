@@ -24,7 +24,8 @@
             'ui.select',
             'ngSanitize',
             'dc.inputAddOn',
-            'angularTrix'
+            'angularTrix',
+            'pdf'
         ])
         .run(run);
 
