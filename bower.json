@@ -72,7 +72,12 @@
       "main": [
         "dist/css/bootstrap.css"
       ]
-    }
+    },
+    "pdfjs-dist": {
+      "main": [
+        "build/pdf.combined.js"
+      ]
+   }
   },
   "resolutions": {
     "angular": "1.5.8",

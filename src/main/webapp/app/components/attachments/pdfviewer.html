@@ -1,13 +1,15 @@
 <nav ng-class="getNavStyle(fit)">
-    <div class="btn-group" role="group" aria-label="pages">
-	    <button class="btn btn-primary" ng-click="goPrevious()"><span class="glyphicon glyphicon-chevron-left"></span></button>
-	    <button class="btn btn-primary" ng-click="goNext()"><span class="glyphicon glyphicon-chevron-right"></span></button>
-    </div>
-
-    <div class="btn-group" role="group" aria-label="zoom">
-	    <button class="btn btn-primary" ng-click="zoomIn()"><span class="glyphicon glyphicon-zoom-in"></span></button>
-	    <button class="btn btn-primary" ng-click="fit()"><span>100%</span></button>
-	    <button class="btn btn-primary" ng-click="zoomOut()"><span class="glyphicon glyphicon-zoom-out"></span></button>
+	<div class="btn-toolbar" role="toolbar"></div>
+	    <div class="btn-group" role="group" aria-label="pages">
+		    <button class="btn btn-primary" ng-click="goPrevious()"><span class="glyphicon glyphicon-chevron-left"></span></button>
+		    <button class="btn btn-primary" ng-click="goNext()"><span class="glyphicon glyphicon-chevron-right"></span></button>
+	    </div>
+	    
+	    <div class="btn-group" role="group" aria-label="zoom">
+		    <button class="btn btn-primary" ng-click="zoomIn()"><span class="glyphicon glyphicon-zoom-in"></span></button>
+		    <button class="btn btn-primary" ng-click="fit()"><span>100%</span></button>
+		    <button class="btn btn-primary" ng-click="zoomOut()"><span class="glyphicon glyphicon-zoom-out"></span></button>
+	    </div>
     </div>
 </nav>
 
