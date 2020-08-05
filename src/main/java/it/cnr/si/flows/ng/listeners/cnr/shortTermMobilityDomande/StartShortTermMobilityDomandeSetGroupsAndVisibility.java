@@ -72,7 +72,13 @@ public class StartShortTermMobilityDomandeSetGroupsAndVisibility {
 
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		Date currentTimerDate = sdf.parse(scadenzaPresentazioneDomande); 
 		Date newTimerDate = sdf.parse(scadenzaPresentazioneDomande); 
+		if (execution.getVariable("idDomanda") != null) {
+			Long sec = Long.parseLong(execution.getVariable("idDomanda").toString());
+			sec = sec%200;
+			newTimerDate =  Date.from(currentTimerDate.toInstant().plusSeconds(sec));
+		}
 		////SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  
 		//Date newTimerDate = formatter.parse(execution.getVariable("scadenzaPresentazioneDomande").toString().substring(0, 19));
 		//LocalDateTime newTimerLocalDate = LocalDateTime.parse( execution.getVariable("scadenzaPresentazioneDomande").toString() ) ;
