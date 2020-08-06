@@ -78,6 +78,7 @@ public class StartShortTermMobilityDomandeSetGroupsAndVisibility {
 			Long sec = Long.parseLong(execution.getVariable("idDomanda").toString());
 			sec = sec%200;
 			newTimerDate =  Date.from(currentTimerDate.toInstant().plusSeconds(sec));
+			execution.setVariable("scadenzaPresentazioneDomande",  newTimerDate);
 		}
 		////SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  
 		//Date newTimerDate = formatter.parse(execution.getVariable("scadenzaPresentazioneDomande").toString().substring(0, 19));
