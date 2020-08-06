@@ -5,6 +5,8 @@
            ng-click="downloadFile('/api/attachments/'+ processInstanceId +'/'+ attachment.name +'/data', attachment.filename, attachment.mimetype)">
             {{attachment.filename}}
         </a>
+        <a href ng-if="attachment.mimetype === 'application/pdf'" ng-click="viewPdf(attachment)">
+            <span class="glyphicon glyphicon-search" title="Visualizza"></span></a>        
         <a href ng-if="showHistory === true" ng-click="showFileHistory(attachment.name)">
             <span class="glyphicon glyphicon-time" title="Cronologia"></span></a>
         <a href ng-if="canPublish || canUpdateAttachments" ng-click="showFileActions(attachment)">
@@ -55,5 +57,24 @@
     </div>
     <div class="modal-footer">
         <button class="btn btn-primary" type="button" ng-click="$dismiss()">Chiudi</button>
+    </div>
+</script>
+
+<script type="text/ng-template" id="myModalContent.html">
+    <div class="modal-header">
+        <h3 class="modal-title" id="modal-title">Visualizzazione del file {{pdfTitle}}</h3>
+    </div>
+    <div class="modal-body" id="modal-body" ng-show="!loading">
+
+        <div>
+            <ng-pdf template-url="app/components/attachments/pdfviewer.html" scale="page-fit"></ng-pdf>
+        </div>
+
+    </div>
+    <div class="modal-body" id="modal-body-loading" ng-show="loading">
+        <div class="text-center"><h3>Caricamento</h3></div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="modalInstance.close()">OK</button>
     </div>
 </script>
