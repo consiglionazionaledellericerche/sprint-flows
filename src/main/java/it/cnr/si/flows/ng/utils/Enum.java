@@ -102,6 +102,8 @@ public class Enum {
         ANNULLATA,
         ACCETTATA,
         ACCETTAZIONE,
+        RESPINTO_UO,
+        RESPINTO_UO_SPESA,
         CANCELLATA;
     }
 
