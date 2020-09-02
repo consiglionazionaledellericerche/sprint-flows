@@ -48,8 +48,8 @@ public class FlowsAdminTools {
     private AceBridgeService aceBridgeService;
     
     /**
-     * La startDate deve essere in format dd/MM/yyyy
-     * @param startDate La startDate deve essere in format dd/MM/yyyy
+     * La ddMMyyyy deve essere in format dd/MM/yyyy
+     * @param ddMMyyyy La startDate deve essere in format dd/MM/yyyy
      * @return
      * @throws ParseException
      */
