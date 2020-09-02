@@ -5,9 +5,9 @@
         .module('sprintApp')
         .controller('HomeController', HomeController);
 
-    HomeController.$inject = ['$scope', 'Principal', 'LoginService', 'ProfileService', '$q', '$state', 'dataService', 'Auth', '$rootScope'];
+    HomeController.$inject = ['$scope', 'Principal', 'LoginService', 'ProfileService', '$q', '$state', 'dataService', 'AuthServerProvider', '$rootScope'];
 
-    function HomeController ($scope, Principal, LoginService, ProfileService, $q, $state, dataService, Auth, $rootScope) {
+    function HomeController ($scope, Principal, LoginService, ProfileService, $q, $state, dataService, AuthServerProvider, $rootScope) {
         var vm = this;
 
         vm.account = null;
@@ -26,19 +26,17 @@
 
         // Duplicato da login.controller.js per l'emergenza Covid19 
         // TODO non duplicare codice, spostare in un service
+        // TODO: prima passava da auth.service.js(login()) che poi richiamava auth.oauth2.service.js
         vm.signin = function(event) {
             event.preventDefault();
-            Auth.login({
+            AuthServerProvider.login({
                 username: vm.username.toLowerCase(),
                 password: vm.password,
                 rememberMe: vm.rememberMe
             }).then(function () {
                 vm.authenticationError = false;
-
                 $state.go('availableTasks');
-
                 $rootScope.$broadcast('authenticationSuccess');
-
             }).catch(function () {
                 vm.authenticationError = true;
             });
