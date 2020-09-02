@@ -20,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -46,11 +47,17 @@ public class FlowsAdminTools {
     @Inject
     private AceBridgeService aceBridgeService;
     
-    @RequestMapping(value = "firmatario-errato", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<String>> getFirmatarioErrato() throws ParseException {
+    /**
+     * La startDate deve essere in format dd/MM/yyyy
+     * @param startDate La startDate deve essere in format dd/MM/yyyy
+     * @return
+     * @throws ParseException
+     */
+    @RequestMapping(value = "firmatario-errato/{ddMMyyyy:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<String>> getFirmatarioErrato(@PathVariable String ddMMyyyy) throws ParseException {
         
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        Date start = sdf.parse("01/09/2020");
+        SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy");
+        Date start = sdf.parse(ddMMyyyy);
         List<HistoricProcessInstance> instances = historyService.createHistoricProcessInstanceQuery()
                 .processDefinitionKey("covid19")
                 .unfinished()
