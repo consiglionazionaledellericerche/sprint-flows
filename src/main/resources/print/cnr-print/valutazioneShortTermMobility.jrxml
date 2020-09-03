@@ -586,7 +586,7 @@
 		<groupHeader>
 			<band height="36">
 				<textField textAdjust="ScaleFont">
-					<reportElement x="0" y="6" width="549" height="20" uuid="88fd5150-843a-4200-ad6e-f334740e6bad"/>
+					<reportElement x="0" y="7" width="549" height="20" uuid="88fd5150-843a-4200-ad6e-f334740e6bad"/>
 					<textElement textAlignment="Left">
 						<font size="14" isBold="true"/>
 					</textElement>
