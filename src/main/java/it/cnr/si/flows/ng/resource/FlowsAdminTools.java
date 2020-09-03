@@ -62,7 +62,6 @@ public class FlowsAdminTools {
                 .processDefinitionKey("covid19")
                 .unfinished()
                 .startedAfter(start)
-//                .includeProcessVariables()
                 .list();
         
         Map<String, BossDto> bossCache = new HashMap<String, BossDto>(); // uso una cache per risparmiare sui roundtrip con ACE
@@ -89,7 +88,7 @@ public class FlowsAdminTools {
                 String gruppoFirmatarioDellUtente = "responsabile-struttura@"+ boss.getIdEntitaOrganizzativa();
                 if(!gruppoFirmatarioAttuale.equals(gruppoFirmatarioDellUtente)) {
                     String e = "Il Flusso "+ i.getId() +" avviato dall'utente "+ initiator +" è andato al Gruppo "+ gruppoFirmatarioAttuale +
-                            " invece che a "+ boss.getUsername() +" del gruppo "+ gruppoFirmatarioDellUtente;
+                            " invece che a "+ boss.getUsername() +" del gruppo "+ gruppoFirmatarioDellUtente +" ("+ boss.getDenominazioneEO() +")";
                     log.info(e);
                     result.add(e);
                 }
