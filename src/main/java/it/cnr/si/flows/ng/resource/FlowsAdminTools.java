@@ -65,8 +65,11 @@ public class FlowsAdminTools {
 //                .includeProcessVariables()
                 .list();
         
-        List<String> result = new ArrayList<String>();
         Map<String, BossDto> bossCache = new HashMap<String, BossDto>(); // uso una cache per risparmiare sui roundtrip con ACE
+        List<String> result = new ArrayList<String>();
+        String info = "Dal "+ ddMMyyyy +" ad oggi ci sono "+ instances.size() +" flussi ancora attivi, seguono eventuali incongruenze di assegnazioni";
+        result.add(info);
+        log.info(info);
         
         instances.forEach(i -> {
             try {
