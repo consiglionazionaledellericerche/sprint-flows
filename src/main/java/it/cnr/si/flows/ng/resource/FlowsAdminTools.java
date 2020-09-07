@@ -28,6 +28,7 @@ import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.MembershipService;
+import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 
 @Controller
@@ -54,7 +55,7 @@ public class FlowsAdminTools {
      * @throws ParseException
      */
     @RequestMapping(value = "firmatario-errato/{ddMMyyyy:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<String>> getFirmatarioErrato(@PathVariable String ddMMyyyy) throws ParseException {
+    public ResponseEntity<Map<String, List<String>>> getFirmatarioErrato(@PathVariable String ddMMyyyy) throws ParseException {
         
         SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy");
         Date start = sdf.parse(ddMMyyyy);
@@ -65,9 +66,10 @@ public class FlowsAdminTools {
                 .list();
         
         Map<String, BossDto> bossCache = new HashMap<String, BossDto>(); // uso una cache per risparmiare sui roundtrip con ACE
-        List<String> result = new ArrayList<String>();
+        List<String> results = new ArrayList<String>();
+        List<String> errors = new ArrayList<String>();
         String info = "Dal "+ ddMMyyyy +" ad oggi ci sono "+ instances.size() +" flussi ancora attivi, seguono eventuali incongruenze di assegnazioni";
-        result.add(info);
+        results.add(info);
         log.info(info);
         
         instances.forEach(i -> {
@@ -84,19 +86,30 @@ public class FlowsAdminTools {
                         .singleResult()
                         .getValue()
                         .toString();
+                EntitaOrganizzativaWebDto strutturaFirmatarioAttuale = aceBridgeService.getStrutturaById(Integer.parseInt(gruppoFirmatarioAttuale.split("@")[1]));
                 BossDto boss = bossCache.computeIfAbsent(initiator, k -> aceService.bossFirmatarioByUsername(initiator));
                 String gruppoFirmatarioDellUtente = "responsabile-struttura@"+ boss.getIdEntitaOrganizzativa();
+                EntitaOrganizzativaWebDto strutturaFirmatarioDellUtente = aceBridgeService.getStrutturaById(Integer.parseInt(gruppoFirmatarioDellUtente.split("@")[1]));
                 if(!gruppoFirmatarioAttuale.equals(gruppoFirmatarioDellUtente)) {
-                    String e = "Il Flusso "+ i.getId() +" avviato dall'utente "+ initiator +" è andato al Gruppo "+ gruppoFirmatarioAttuale +
-                            " invece che a "+ boss.getUsername() +" del gruppo "+ gruppoFirmatarioDellUtente +" ("+ boss.getDenominazioneEO() +")";
+                    String e = "Il Flusso "+ i.getId() +" avviato dall'utente "+ initiator +" "
+                            + "il giorno "+ i.getStartTime() +" "
+                            + "è andato al Gruppo "+ gruppoFirmatarioAttuale + " "
+                            + "("+ strutturaFirmatarioAttuale.getDenominazioneBreve() +" - "+ strutturaFirmatarioAttuale.getDenominazione() +" - "+ strutturaFirmatarioAttuale.getCdsuo() +") "
+                            + " invece che a "+ boss.getUsername() +" del gruppo "+ gruppoFirmatarioDellUtente +" "
+                            + "("+ strutturaFirmatarioDellUtente.getDenominazioneBreve() +" - "+ strutturaFirmatarioDellUtente.getDenominazione() +" - "+ strutturaFirmatarioDellUtente.getCdsuo() +") ";
                     log.info(e);
-                    result.add(e);
+                    results.add(e);
                 }
             } catch (Exception e) {
-                log.error("firmatario-errato: Errore nel processamento del flusso "+ i.getId(), e);
+                String err = "firmatario-errato: Errore nel processamento del flusso "+ i.getId() +" con messaggio "+ e.getMessage();
+                log.error(err, e);
+                errors.add(err);
             }
         });
         
+        Map<String, List<String>> result = new HashMap();
+        result.put("results", results);
+        result.put("errors", errors);
         return ResponseEntity.ok(result);
     }
 
