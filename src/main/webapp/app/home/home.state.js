@@ -24,6 +24,7 @@
             resolve: {
                 mainTranslatePartialLoader: ['$translate', '$translatePartialLoader', function ($translate,$translatePartialLoader) {
                     $translatePartialLoader.addPart('home');
+                    $translatePartialLoader.addPart('login'); //serve per caricare il json con il messaggio di errore in caso di login non riuscito
                     return $translate.refresh();
                 }]
             }
