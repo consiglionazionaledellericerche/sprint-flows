@@ -77,35 +77,41 @@ public class FlowsAdminTools {
         ForkJoinPool customThreadPool = new ForkJoinPool(6);
         customThreadPool.submit(
                 () -> instances.parallelStream().forEach(i -> {
+                    String gruppoFirmatarioAttuale = historyService.createHistoricVariableInstanceQuery()
+                            .processInstanceId(i.getId())
+                            .variableName("gruppoResponsabileProponente")
+                            .singleResult()
+                            .getValue()
+                            .toString();
+                    String initiator = historyService.createHistoricVariableInstanceQuery()
+                            .processInstanceId(i.getId())
+                            .variableName("initiator")
+                            .singleResult()
+                            .getValue()
+                            .toString();
+                    String gruppoFirmatarioDellUtente = null;
                     try {
-                        String gruppoFirmatarioAttuale = historyService.createHistoricVariableInstanceQuery()
-                                .processInstanceId(i.getId())
-                                .variableName("gruppoResponsabileProponente")
-                                .singleResult()
-                                .getValue()
-                                .toString();
-                        String initiator = historyService.createHistoricVariableInstanceQuery()
-                                .processInstanceId(i.getId())
-                                .variableName("initiator")
-                                .singleResult()
-                                .getValue()
-                                .toString();
                         EntitaOrganizzativaWebDto strutturaFirmatarioAttuale = aceBridgeService.getStrutturaById(Integer.parseInt(gruppoFirmatarioAttuale.split("@")[1]));
                         BossDto boss = bossCache.computeIfAbsent(initiator, k -> aceService.bossFirmatarioByUsername(initiator));
-                        String gruppoFirmatarioDellUtente = "responsabile-struttura@"+ boss.getIdEntitaOrganizzativa();
+                        gruppoFirmatarioDellUtente = "responsabile-struttura@"+ boss.getIdEntitaOrganizzativa();
                         EntitaOrganizzativaWebDto strutturaFirmatarioDellUtente = aceBridgeService.getStrutturaById(Integer.parseInt(gruppoFirmatarioDellUtente.split("@")[1]));
                         if(!gruppoFirmatarioAttuale.equals(gruppoFirmatarioDellUtente)) {
-                            String e = "Il Flusso "+ i.getId() +" avviato dall'utente "+ initiator +" "
-                                    + "il giorno "+ i.getStartTime() +" "
-                                    + "è andato al Gruppo "+ gruppoFirmatarioAttuale + " "
-                                    + "("+ strutturaFirmatarioAttuale.getDenominazioneBreve() +" - "+ strutturaFirmatarioAttuale.getDenominazione() +" - "+ strutturaFirmatarioAttuale.getCdsuo() +") "
-                                    + " invece che a "+ boss.getUsername() +" del gruppo "+ gruppoFirmatarioDellUtente +" "
-                                    + "("+ strutturaFirmatarioDellUtente.getDenominazioneBreve() +" - "+ strutturaFirmatarioDellUtente.getDenominazione() +" - "+ strutturaFirmatarioDellUtente.getCdsuo() +") ";
+                            String e = "Il flusso "+ i.getId() +" avviato dall'utente "+ initiator
+                                    + " il giorno "+ i.getStartTime()
+                                    + " è andato al gruppo "+ gruppoFirmatarioAttuale
+                                    + " ("+ strutturaFirmatarioAttuale.getDenominazioneBreve() +" - "+ strutturaFirmatarioAttuale.getDenominazione() +" - "+ strutturaFirmatarioAttuale.getCdsuo() +")"
+                                    + " invece che a "+ boss.getUsername() +" del gruppo "+ gruppoFirmatarioDellUtente
+                                    + " ("+ strutturaFirmatarioDellUtente.getDenominazioneBreve() +" - "+ strutturaFirmatarioDellUtente.getDenominazione() +" - "+ strutturaFirmatarioDellUtente.getCdsuo() +")";
                             log.info(e);
                             results.add(e);
                         }
                     } catch (Exception e) {
-                        String err = "firmatario-errato: Errore nel processamento del flusso "+ i.getId() +" con messaggio "+ e.getMessage();
+                        String err = "firmatario-errato: Errore nel processamento del flusso "+ i.getId() 
+                        +" avviato dall'utente "+initiator
+                        +" il giorno "+ i.getStartTime()
+                        +" che è andato al gruppo "+ gruppoFirmatarioAttuale
+                        +" (invece che al gruppo "+ gruppoFirmatarioDellUtente +")"
+                        +" con messaggio: "+ e.getMessage();
                         log.error(err, e);
                         errors.add(err);
                     }
