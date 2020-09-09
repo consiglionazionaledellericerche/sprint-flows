@@ -90,18 +90,32 @@ public class FlowsAdminTools {
                             .getValue()
                             .toString();
                     String gruppoFirmatarioDellUtente = null;
+                    String dbsfa = null;
+                    String dsfa = null;
+                    String cdsuosfa = null;
+                    String usernameBoss = null;
+                    String dbsfu = null;
+                    String dsfu = null;
+                    String cdsuosfu = null;
                     try {
                         EntitaOrganizzativaWebDto strutturaFirmatarioAttuale = aceBridgeService.getStrutturaById(Integer.parseInt(gruppoFirmatarioAttuale.split("@")[1]));
+                        dbsfa = strutturaFirmatarioAttuale.getDenominazioneBreve();
+                        dsfa = strutturaFirmatarioAttuale.getDenominazione();
+                        cdsuosfa = strutturaFirmatarioAttuale.getCdsuo();
                         BossDto boss = bossCache.computeIfAbsent(initiator, k -> aceService.bossFirmatarioByUsername(initiator));
+                        usernameBoss = boss.getUsername();
                         gruppoFirmatarioDellUtente = "responsabile-struttura@"+ boss.getIdEntitaOrganizzativa();
                         EntitaOrganizzativaWebDto strutturaFirmatarioDellUtente = aceBridgeService.getStrutturaById(Integer.parseInt(gruppoFirmatarioDellUtente.split("@")[1]));
+                        dbsfu = strutturaFirmatarioDellUtente.getDenominazioneBreve();
+                        dsfu = strutturaFirmatarioDellUtente.getDenominazione();
+                        cdsuosfu = strutturaFirmatarioDellUtente.getCdsuo();
                         if(!gruppoFirmatarioAttuale.equals(gruppoFirmatarioDellUtente)) {
                             String e = "Il flusso "+ i.getId() +" avviato dall'utente "+ initiator
                                     + " il giorno "+ i.getStartTime()
                                     + " è andato al gruppo "+ gruppoFirmatarioAttuale
-                                    + " ("+ strutturaFirmatarioAttuale.getDenominazioneBreve() +" - "+ strutturaFirmatarioAttuale.getDenominazione() +" - "+ strutturaFirmatarioAttuale.getCdsuo() +")"
-                                    + " invece che a "+ boss.getUsername() +" del gruppo "+ gruppoFirmatarioDellUtente
-                                    + " ("+ strutturaFirmatarioDellUtente.getDenominazioneBreve() +" - "+ strutturaFirmatarioDellUtente.getDenominazione() +" - "+ strutturaFirmatarioDellUtente.getCdsuo() +")";
+                                    + " ("+ dbsfa +" - "+ dsfa +" - "+ cdsuosfa +")"
+                                    + " invece che a "+ usernameBoss +" del gruppo "+ gruppoFirmatarioDellUtente
+                                    + " ("+ dbsfu +" - "+ dsfu +" - "+ cdsuosfu +")";
                             log.info(e);
                             results.add(e);
                         }
@@ -110,7 +124,9 @@ public class FlowsAdminTools {
                         +" avviato dall'utente "+initiator
                         +" il giorno "+ i.getStartTime()
                         +" che è andato al gruppo "+ gruppoFirmatarioAttuale
-                        +" (invece che al gruppo "+ gruppoFirmatarioDellUtente +")"
+                        + " ("+ dbsfa +" - "+ dsfa +" - "+ cdsuosfa +")"
+                        +" invece che a "+ usernameBoss +" del gruppo "+ gruppoFirmatarioDellUtente +")"
+                        + " ("+ dbsfu +" - "+ dsfu +" - "+ cdsuosfu +")"
                         +" con messaggio: "+ e.getMessage();
                         log.error(err, e);
                         errors.add(err);
