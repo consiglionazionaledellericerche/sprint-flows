@@ -974,8 +974,10 @@
 					</textElement>
 					<textFieldExpression><![CDATA["Dipartimento: " + $F{dipartimento}]]></textFieldExpression>
 				</textField>
-				<textField textAdjust="ScaleFont">
-					<reportElement x="0" y="40" width="549" height="23" uuid="410d787a-4aca-46a3-b201-85c7d3f714b7"/>
+				<textField textAdjust="ScaleFont" isBlankWhenNull="false">
+					<reportElement x="0" y="40" width="549" height="23" isRemoveLineWhenBlank="true" printWhenGroupChanges="Group2" uuid="410d787a-4aca-46a3-b201-85c7d3f714b7">
+						<printWhenExpression><![CDATA[$F{nazioneResidenzaFruitore}!=null]]></printWhenExpression>
+					</reportElement>
 					<textElement>
 						<font size="14" isBold="true"/>
 					</textElement>
