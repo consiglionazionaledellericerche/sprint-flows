@@ -155,19 +155,12 @@ public class FlowsProcessInstanceService {
         // ProcessDefinition (static) metadata
         ReadOnlyProcessDefinition processDefinition = ((RepositoryServiceImpl) repositoryService).getDeployedProcessDefinition(processInstance.getProcessDefinitionId());
 
-        // Attachments
-        Map<String, FlowsAttachment> attachements = flowsAttachmentService.getAttachementsForProcessInstance(processInstanceId);
-
-        result.put("attachments", attachements);
-
         final Map<String, Object> identityLinks = new LinkedHashMap<>();
         Map<String, Object> processLinks = new HashMap<>();
         processLinks.put("links", restResponseFactory.createHistoricIdentityLinkResponseList(historyService.getHistoricIdentityLinksForProcessInstance(processInstanceId)));
         identityLinks.put("process", processLinks);
 
         List<HistoricTaskInstance> taskList = historyService.createHistoricTaskInstanceQuery()
-//                .includeTaskLocalVariables()
-                .includeProcessVariables()
                 .processInstanceId(processInstanceId)
                 .list();
 
