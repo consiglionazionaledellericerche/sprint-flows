@@ -166,7 +166,7 @@ public class FlowsProcessInstanceService {
         identityLinks.put("process", processLinks);
 
         List<HistoricTaskInstance> taskList = historyService.createHistoricTaskInstanceQuery()
-                .includeTaskLocalVariables()
+//                .includeTaskLocalVariables()
                 .includeProcessVariables()
                 .processInstanceId(processInstanceId)
                 .list();

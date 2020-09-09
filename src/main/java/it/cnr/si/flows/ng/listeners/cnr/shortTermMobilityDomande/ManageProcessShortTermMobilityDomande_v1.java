@@ -111,10 +111,9 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 		if(execution.getVariable("sceltaUtente") != null) {
 			sceltaUtente =  (String) execution.getVariable("sceltaUtente");	
 		}
-		LOGGER.info("ProcessInstanceId: " + processInstanceId);
 		String faseEsecuzioneValue = "noValue";
 		faseEsecuzioneValue = faseEsecuzione.getValue(execution).toString();
-		LOGGER.info("-- azioneScelta: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
+		LOGGER.info("ProcessInstanceId: " + processInstanceId + "-- azioneScelta: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 		//CHECK PER ANNULLO FLUSSO 
 		if (execution.getVariableInstance("motivazioneEliminazione") == null) {
 			switch(faseEsecuzioneValue){  
