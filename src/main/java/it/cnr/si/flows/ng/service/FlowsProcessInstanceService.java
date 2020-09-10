@@ -2,9 +2,7 @@ package it.cnr.si.flows.ng.service;
 
 import com.opencsv.CSVWriter;
 import it.cnr.si.domain.View;
-import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery;
-import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
 import it.cnr.si.security.PermissionEvaluatorImpl;
@@ -29,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -38,11 +35,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static it.cnr.si.flows.ng.service.FlowsTaskService.*;
 import static it.cnr.si.flows.ng.utils.Enum.Stato.Annullato;
 import static it.cnr.si.flows.ng.utils.Enum.Stato.Revocato;
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
 import static it.cnr.si.flows.ng.utils.Utils.*;
-import static it.cnr.si.flows.ng.service.FlowsTaskService.*;
 
 /**
  * Created by cirone on 15/06/17.
@@ -160,6 +157,30 @@ public class FlowsProcessInstanceService {
         processLinks.put("links", restResponseFactory.createHistoricIdentityLinkResponseList(historyService.getHistoricIdentityLinksForProcessInstance(processInstanceId)));
         identityLinks.put("process", processLinks);
 
+        result.put("identityLinks", identityLinks);
+
+        // permessi aggiuntivi
+        result.put("canPublish", permissionEvaluator.canPublishAttachment(processInstanceId));
+        result.put("canUpdateAttachments", permissionEvaluator.canUpdateAttachment(processInstanceId, flowsUserDetailsService));
+
+
+        return result;
+    }
+
+
+    public ArrayList<Map<String, Object>> getHistoryForPi(String processInstanceId){
+        // PrecessInstance metadata
+        HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .includeProcessVariables()
+                .singleResult();
+
+        final Map<String, Object> identityLinks = new LinkedHashMap<>();
+
+
+        ReadOnlyProcessDefinition processDefinition = ((RepositoryServiceImpl) repositoryService).
+                getDeployedProcessDefinition(processInstance.getProcessDefinitionId());
+
         List<HistoricTaskInstance> taskList = historyService.createHistoricTaskInstanceQuery()
                 .processInstanceId(processInstanceId)
                 .list();
@@ -168,53 +189,44 @@ public class FlowsProcessInstanceService {
         ArrayList<Map<String, Object>> history = new ArrayList<>();
 
         taskList
-        .forEach(
-                task -> {
-                    List<HistoricIdentityLink> links = historyService.getHistoricIdentityLinksForTask(task.getId());
-                    HashMap<String, Object> entity = new HashMap<>();
-                    entity.put("historyTask", restResponseFactory.createHistoricTaskInstanceResponse(task));
+                .forEach(
+                        task -> {
+                            List<HistoricIdentityLink> links = historyService.getHistoricIdentityLinksForTask(task.getId());
+                            HashMap<String, Object> entity = new HashMap<>();
+                            entity.put("historyTask", restResponseFactory.createHistoricTaskInstanceResponse(task));
 
-                    // Sostituisco l'id interno del gruppo con la dicitura estesa
-                    entity.put("historyIdentityLink", Optional.ofNullable(links)
-                            .map(historicIdentityLinks -> restResponseFactory.createHistoricIdentityLinkResponseList(historicIdentityLinks))
-                            .filter(historicIdentityLinkResponses -> !historicIdentityLinkResponses.isEmpty())
-                            .map(historicIdentityLinkResponses -> historicIdentityLinkResponses.stream())
-                            .orElse(Stream.empty())
-                            .map(h -> {
-                                if (Optional.ofNullable(aceBridgeService).isPresent()) {
-                                    h.setGroupId(aceBridgeService.getExtendedGroupNome(h.getGroupId()));
-                                }
-                                return h;
-                            }).collect(Collectors.toList()));
-                    history.add(entity);
+                            // Sostituisco l'id interno del gruppo con la dicitura estesa
+                            entity.put("historyIdentityLink", Optional.ofNullable(links)
+                                    .map(historicIdentityLinks -> restResponseFactory.createHistoricIdentityLinkResponseList(historicIdentityLinks))
+                                    .filter(historicIdentityLinkResponses -> !historicIdentityLinkResponses.isEmpty())
+                                    .map(historicIdentityLinkResponses -> historicIdentityLinkResponses.stream())
+                                    .orElse(Stream.empty())
+                                    .map(h -> {
+                                        if (Optional.ofNullable(aceBridgeService).isPresent()) {
+                                            h.setGroupId(aceBridgeService.getExtendedGroupNome(h.getGroupId()));
+                                        }
+                                        return h;
+                                    }).collect(Collectors.toList()));
+                            history.add(entity);
 
-                    // se il task è quello attivo prendo anche i gruppi o gli utenti assegnee/candidate
-                    if(task.getEndTime() == null) {
-                        Map<String, Object> identityLink = new HashMap<>();
-                        String taskDefinitionKey = task.getTaskDefinitionKey();
-                        PvmActivity taskDefinition = processDefinition.findActivity(taskDefinitionKey);
-                        TaskDefinition taskDef = (TaskDefinition) taskDefinition.getProperty("taskDefinition");
-                        List<IdentityLink> taskLinks = taskService.getIdentityLinksForTask(task.getId());
+                            // se il task è quello attivo prendo anche i gruppi o gli utenti assegnee/candidate
+                            if(task.getEndTime() == null) {
+                                Map<String, Object> identityLink = new HashMap<>();
+                                String taskDefinitionKey = task.getTaskDefinitionKey();
+                                PvmActivity taskDefinition = processDefinition.findActivity(taskDefinitionKey);
+                                TaskDefinition taskDef = (TaskDefinition) taskDefinition.getProperty("taskDefinition");
+                                List<IdentityLink> taskLinks = taskService.getIdentityLinksForTask(task.getId());
 
-                        identityLink.put("links", restResponseFactory.createRestIdentityLinks(taskLinks));
-                        identityLink.put("assignee", taskDef.getAssigneeExpression());
-                        identityLink.put("candidateGroups", taskDef.getCandidateGroupIdExpressions());
-                        identityLink.put("candidateUsers", taskDef.getCandidateUserIdExpressions());
+                                identityLink.put("links", restResponseFactory.createRestIdentityLinks(taskLinks));
+                                identityLink.put("assignee", taskDef.getAssigneeExpression());
+                                identityLink.put("candidateGroups", taskDef.getCandidateGroupIdExpressions());
+                                identityLink.put("candidateUsers", taskDef.getCandidateUserIdExpressions());
 
-                        identityLinks.put(task.getId(), identityLink);
-                    }
-                });
+                                identityLinks.put(task.getId(), identityLink);
+                            }
+                        });
 
-        result.put("identityLinks", identityLinks);
-
-        result.put("history", history);
-
-        // permessi aggiuntivi
-        result.put("canPublish", permissionEvaluator.canPublishAttachment(processInstanceId));
-        result.put("canUpdateAttachments", permissionEvaluator.canUpdateAttachment(processInstanceId, flowsUserDetailsService));
-
-
-        return result;
+        return history;
     }
 
 
