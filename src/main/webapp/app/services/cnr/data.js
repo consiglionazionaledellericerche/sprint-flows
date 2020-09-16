@@ -346,6 +346,11 @@
                         taskIds: ids
                     }
                 })
+            },
+            archive: {
+                search: function(params) {
+                    return $http.post('api/archive/search/', params);
+                }
             }
         };
     }

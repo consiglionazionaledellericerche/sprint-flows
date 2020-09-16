@@ -21,9 +21,9 @@
                         <h4>Stato: {{process.name | get: 'stato'}}</h4>
                     </li>
                     <li>
-                        Avviato il <strong>{{process.startTime | dataora}}</strong> da <strong> {{process.name | get:
-                                                                                                'initiator'}} </strong>
+                        Avviato il <strong>{{process.startTime | dataora}}</strong> da asdasd as <strong> {{process.startUserId}} </strong>
                     </li>
+                    <pre>{{process | json}}</pre>
                     <ng-include src="'api/views/' + process.processDefinitionId.split(':')[0] + '/' + process.processDefinitionId.split(':')[1] + '/search'" />
                 </ul>
             </div>
@@ -40,6 +40,7 @@
 <div class="loading-spiner-holder" style="text-align: center" data-loading>
     <div class="loading-spiner spinner-loader"></div>
 </div>
+<pre>{{processes | json}}</pre>
 <div ng-show="paging" style="text-align: center">
     <paginator paging="paging"></paginator>
 </div>

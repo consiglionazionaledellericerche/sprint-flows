@@ -5,6 +5,8 @@ import it.cnr.si.flows.ng.service.FlowsRuntimeService;
 import org.activiti.engine.*;
 import org.activiti.engine.impl.bpmn.data.ItemInstance;
 import org.activiti.engine.impl.bpmn.webservice.MessageInstance;
+import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.impl.variable.*;
 import org.activiti.image.ProcessDiagramGenerator;
@@ -18,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -114,6 +117,7 @@ public class FlowsProcessEngineConfigurations {
     }
 
     @Bean(name = "processEngine")
+    @Primary
     public ProcessEngine getProcessEngine(
             SpringProcessEngineConfiguration conf) throws Exception {
         //modifica per il flusso test-timer
@@ -145,6 +149,35 @@ public class FlowsProcessEngineConfigurations {
         variableTypes.addType(new CustomObjectType("message", MessageInstance.class));
 
         conf.setVariableTypes(variableTypes);
+
+        ProcessEngineFactoryBean factory = new ProcessEngineFactoryBean();
+        factory.setApplicationContext(appContext);
+        factory.setProcessEngineConfiguration(conf);
+
+        return factory.getObject();
+    }
+    
+    @Bean(name = "archiveProcessEngine")
+    public ProcessEngine getArchiveProcessEngine() throws Exception {
+        
+        StandaloneProcessEngineConfiguration conf = new StandaloneProcessEngineConfiguration();
+
+        // ci assicuriamo che l'engine sia nel contesto giusto (senno' se ne crea uno suo)
+        // conf.setApplicationContext(appContext);
+
+        // il DataSource configurato da JHipster/Sprint
+//        conf.setDataSource(dataSource);
+        conf.setJdbcDriver("org.postgresql.Driver");
+        conf.setJdbcUrl("jdbc:postgresql://localhost:5432/alfresco");
+        conf.setJdbcUsername("alfprod");
+        conf.setJdbcPassword("alfprodpw");
+        conf.setDatabaseType(ProcessEngineConfigurationImpl.DATABASE_TYPE_POSTGRES);        
+        
+        conf.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+
+        //Serve per recuperare molte process istances/task nelle search dell'app (si riferisce al numero di variabili recuperabili nelle query (default 20000))
+        conf.setHistoricProcessInstancesQueryLimit(VARIABLE_LIMIT);
+        conf.setHistoricTaskQueryLimit(VARIABLE_LIMIT);
 
         ProcessEngineFactoryBean factory = new ProcessEngineFactoryBean();
         factory.setApplicationContext(appContext);

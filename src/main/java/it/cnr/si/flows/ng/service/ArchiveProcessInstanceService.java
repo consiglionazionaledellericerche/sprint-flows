@@ -1,15 +1,33 @@
 package it.cnr.si.flows.ng.service;
 
-import com.opencsv.CSVWriter;
-import it.cnr.si.domain.View;
-import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery;
-import it.cnr.si.flows.ng.utils.Enum;
-import it.cnr.si.flows.ng.utils.Utils;
-import it.cnr.si.repository.ViewRepository;
-import it.cnr.si.security.PermissionEvaluatorImpl;
-import org.activiti.engine.*;
-import org.activiti.engine.history.*;
+import static it.cnr.si.flows.ng.utils.Utils.ALL_PROCESS_INSTANCES;
+import static it.cnr.si.flows.ng.utils.Utils.ASC;
+import static it.cnr.si.flows.ng.utils.Utils.DESC;
+import static it.cnr.si.flows.ng.utils.Utils.DESCRIZIONE;
+import static it.cnr.si.flows.ng.utils.Utils.INITIATOR;
+import static it.cnr.si.flows.ng.utils.Utils.TITOLO;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.inject.Inject;
+
+import org.activiti.engine.HistoryService;
+import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.RepositoryService;
+import org.activiti.engine.TaskService;
+import org.activiti.engine.history.HistoricIdentityLink;
+import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.history.HistoricProcessInstanceQuery;
+import org.activiti.engine.history.HistoricTaskInstance;
+import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.impl.RepositoryServiceImpl;
 import org.activiti.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.activiti.engine.impl.pvm.PvmActivity;
@@ -20,81 +38,35 @@ import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.core.env.Environment;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.inject.Inject;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import it.cnr.si.flows.ng.utils.Utils;
+import it.cnr.si.security.PermissionEvaluatorImpl;
 
-import static it.cnr.si.flows.ng.utils.Enum.Stato.Annullato;
-import static it.cnr.si.flows.ng.utils.Enum.Stato.Revocato;
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
-import static it.cnr.si.flows.ng.utils.Utils.*;
-import static it.cnr.si.flows.ng.service.FlowsTaskService.*;
 
-/**
- * Created by cirone on 15/06/17.
- */
 @Service
-public class FlowsProcessInstanceService {
+public class ArchiveProcessInstanceService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FlowsProcessInstanceService.class);
-    @Inject
-    private FlowsAttachmentService flowsAttachmentService;
-    @Inject
-    private HistoryService historyService;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ArchiveProcessInstanceService.class);
     @Inject
     private RestResponseFactory restResponseFactory;
-    @Inject
-    private RepositoryService repositoryService;
-    @Inject
-    private TaskService taskService;
-    @Inject
-    private ViewRepository viewRepository;
-    @Inject
-    private ManagementService managementService;
-    @Inject
-    private RuntimeService runtimeService;
     @Autowired(required = false)
     private AceBridgeService aceBridgeService;
     @Inject
     PermissionEvaluatorImpl permissionEvaluator;
     @Inject
     private UserDetailsService flowsUserDetailsService;
-    @Inject
-    private Utils utils;
-    @Inject
-    private FlowsAttachmentService attachmentService;
-    @Inject
-    private ApplicationContext context;
+    @Inject @Qualifier("archiveProcessEngine")
+    private ProcessEngine archiveProcessEngine;
 
-
-    public HistoricTaskInstance getCurrentTaskOfProcessInstance(String processInstanceId) {
-        return historyService.createHistoricTaskInstanceQuery()
-                .processInstanceId(processInstanceId)
-                .list()
-                .stream()
-                .filter(historicTaskInstance -> !Optional.ofNullable(historicTaskInstance.getEndTime()).isPresent())
-                .findAny()
-                .orElseThrow(() -> new RuntimeException("Nessun Task attivo"));
-    }
 
     public HistoricProcessInstance getProcessInstance(String processInstanceId) {
-        return historyService.createHistoricProcessInstanceQuery()
+        return archiveProcessEngine.getHistoryService().createHistoricProcessInstanceQuery()
                 .processInstanceId(processInstanceId)
                 .singleResult();
     }
@@ -102,6 +74,9 @@ public class FlowsProcessInstanceService {
     public Map<String, Object> getProcessInstanceWithDetails(String processInstanceId) {
         Map<String, Object> result = new HashMap<>();
 
+        HistoryService historyService = archiveProcessEngine.getHistoryService();
+        RepositoryService repositoryService = archiveProcessEngine.getRepositoryService();
+        TaskService taskService = archiveProcessEngine.getTaskService();
         // PrecessInstance metadata
         HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery()
                 .processInstanceId(processInstanceId)
@@ -223,21 +198,17 @@ public class FlowsProcessInstanceService {
 
     public DataResponse search(Map<String, String> searchParams, String processDefinitionKey, boolean active, String order, int firstResult, int maxResults, boolean includeVariables) {
 
-        FlowsHistoricProcessInstanceQuery processQuery = new FlowsHistoricProcessInstanceQuery(managementService);
-
-        if (firstResult != -1 && maxResults != -1) {
-            processQuery.setFirstResult(firstResult);
-            processQuery.setMaxResults(maxResults);
-        }
+        HistoryService historyService = archiveProcessEngine.getHistoryService();
+        HistoricProcessInstanceQuery processQuery = historyService.createHistoricProcessInstanceQuery();
         setSearchTerms(searchParams, processQuery);
 
-        List<String> authorities = Utils.getCurrentUserAuthorities();
+//        List<String> authorities = Utils.getCurrentUserAuthorities();
 
         // solo l'admin e se sto facendo una query per "flussi avvaiti da me" IGNORO LE REGOLE DI VISIBILITÀ
-        if (!authorities.contains("ADMIN") || searchParams.containsKey(Utils.INITIATOR) ) {
-            processQuery.setVisibleToGroups(authorities);
-            processQuery.setVisibleToUser(SecurityContextHolder.getContext().getAuthentication().getName());
-        }
+//        if (!authorities.contains("ADMIN") || searchParams.containsKey(Utils.INITIATOR) ) {
+//            processQuery.setVisibleToGroups(authorities);
+//            processQuery.setVisibleToUser(SecurityContextHolder.getContext().getAuthentication().getName());
+//        }
 
         if (!processDefinitionKey.equals(ALL_PROCESS_INSTANCES))
             processQuery.processDefinitionKey(processDefinitionKey);
@@ -265,7 +236,7 @@ public class FlowsProcessInstanceService {
                 hpie.setQueryVariables(list);
             });
         }
-
+        
 
         DataResponse response = new DataResponse();
         response.setStart(firstResult);
@@ -277,7 +248,7 @@ public class FlowsProcessInstanceService {
     }
 
 
-    private void setSearchTerms(Map<String, String> params, FlowsHistoricProcessInstanceQuery processQuery) {
+    private void setSearchTerms(Map<String, String> params, HistoricProcessInstanceQuery processQuery) {
 
         String title = params.remove("title");
         String titolo = params.remove(TITOLO);
@@ -332,154 +303,6 @@ public class FlowsProcessInstanceService {
             }
         });
     }
-
-
-    public void updateSearchTerms(String executionId, String processInstanceId, String stato) {
-
-        String initiator = "";
-        String titolo = "";
-        String descrizione = "";
-
-        if (runtimeService.getVariable(executionId , INITIATOR) != null) {
-            initiator =   runtimeService.getVariable(executionId , INITIATOR).toString();
-        }
-        if (runtimeService.getVariable(executionId , TITOLO) != null) {
-            titolo =   runtimeService.getVariable(executionId , TITOLO).toString();
-        }
-        if (runtimeService.getVariable(executionId , DESCRIZIONE) != null) {
-            descrizione =   runtimeService.getVariable(executionId , DESCRIZIONE).toString();
-        }
-
-        JSONObject name = new JSONObject();
-
-
-
-        name.put(DESCRIZIONE, ellipsis(descrizione, LENGTH_DESCTIZIONE));
-        name.put(TITOLO, ellipsis(titolo, LENGTH_TITOLO));
-        name.put("stato", ellipsis(stato, LENGTH_FASE) );
-        name.put(INITIATOR, initiator);
-
-        runtimeService.setProcessInstanceName(processInstanceId, name.toString());
-
-
-    }
-
-    public void buildCsv(List<HistoricProcessInstanceResponse> processInstances, PrintWriter printWriter, String processDefinitionKey) throws IOException {
-        // vista (campi e variabili) da inserire nel csv in base alla tipologia di flusso selezionato
-        View view = null;
-        if (!processDefinitionKey.equals(ALL_PROCESS_INSTANCES)) {
-            view = viewRepository.getViewByProcessidType(processDefinitionKey, "export-csv");
-        }
-        CSVWriter writer = new CSVWriter(printWriter, '\t');
-        ArrayList<String[]> entriesIterable = new ArrayList<>();
-        boolean hasHeaders = false;
-        ArrayList<String> headers = new ArrayList<>();
-        headers.add("Business Key");
-        headers.add("Start Date");
-        for (HistoricProcessInstanceResponse pi : processInstances) {
-            List<RestVariable> variables = pi.getVariables();
-            ArrayList<String> tupla = new ArrayList<>();
-            //field comuni a tutte le Process Instances (Business Key, Start date)
-            tupla.add(pi.getBusinessKey());
-            tupla.add(utils.formattaDataOra(pi.getStartTime()));
-
-            //field specifici per ogni procesDefinition
-            if (view != null) {
-                try {
-                    JSONArray fields = new JSONArray(view.getView());
-                    for (int i = 0; i < fields.length(); i++) {
-                        JSONObject field = fields.getJSONObject(i);
-                        tupla.add(Utils.filterProperties(variables, field.getString("varName")));
-                        //solo per il primo ciclo, prendo le label dei field specifici
-                        if (!hasHeaders)
-                            headers.add(field.getString("label"));
-                    }
-                } catch (JSONException e) {
-                    LOGGER.error("Errore nel processamento del JSON", e);
-                    throw new IOException(e);
-                }
-            }
-            if (!hasHeaders) {
-                //inserisco gli headers come intestazione dei field del csv
-                entriesIterable.add(0, utils.getArray(headers));
-                hasHeaders = true;
-            }
-            entriesIterable.add(utils.getArray(tupla));
-        }
-        writer.writeAll(entriesIterable);
-        writer.close();
-    }
-
-    public List<HistoricProcessInstance> getProcessInstancesForURP(int terminiRicorso, Boolean avvisiScaduti, Boolean gareScadute, int firstResult, int maxResults, String order) {
-
-        HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()
-                .includeProcessVariables()
-                .processDefinitionKey("acquisti")
-                .or()
-                .variableValueNotEquals(statoFinaleDomanda.name(), Annullato.name())
-                .variableValueNotEquals(statoFinaleDomanda.name(), Revocato.name())
-                .endOr();
-        Calendar dataTerminiRicorso = Calendar.getInstance();
-        dataTerminiRicorso.setTime(new Date());
-
-        String now = utils.formattaData(new Date());
-        if(gareScadute != null){
-            historicProcessInstanceQuery
-            .variableValueLike("strumentoAcquisizione", "PROCEDURA SELETTIVA%");
-            if(gareScadute){
-                // GARE SCADUTE IN ATTESA DI ESITO: data scadenza presentazione offerta < NOW  && data scadenza presentazione offerta - termini di ricorso >= NOW
-                if(terminiRicorso != 0)
-                    dataTerminiRicorso.add(Calendar.DAY_OF_MONTH, -terminiRicorso);
-
-                historicProcessInstanceQuery
-                .variableValueLessThan(dataScadenzaBando.name(), now)
-                .variableValueGreaterThanOrEqual(dataScadenzaBando.name(), utils.formattaData(dataTerminiRicorso.getTime()));
-                LOGGER.info("SCADUTE IN ATTESA DI ESITO nr flussi {}", historicProcessInstanceQuery.count());
-
-            } else {
-                // GARE IN CORSO data scadenza presentazione offerta >= NOW
-                historicProcessInstanceQuery
-                .variableValueGreaterThanOrEqual(dataScadenzaBando.name(), now);
-                LOGGER.info("GARE IN CORSO nei flussi {}", historicProcessInstanceQuery.count());
-
-            }
-        }
-
-        if(avvisiScaduti != null){
-            if(avvisiScaduti){
-                // AVVISI SCADUTI: data scadenza presentazione offerta  < NOW && data scadenza presentazione offerta + terminiRicorso >= NOW
-                dataTerminiRicorso.add(Calendar.DAY_OF_MONTH, -terminiRicorso);
-
-                historicProcessInstanceQuery
-                .variableValueLessThan(dataScadenzaAvvisoPreDetermina.name(), now)
-                .variableValueGreaterThanOrEqual(dataScadenzaAvvisoPreDetermina.name(), utils.formattaData(dataTerminiRicorso.getTime()));
-            }else{
-                // AVVISI IN CORSO: data scadenza presentazione offerta >= NOW
-                historicProcessInstanceQuery
-                .variableValueGreaterThanOrEqual(dataScadenzaAvvisoPreDetermina.name(), now);
-            }
-        }
-        utils.orderProcess(order, historicProcessInstanceQuery);
-
-        return historicProcessInstanceQuery.listPage(firstResult, maxResults);
-    }
-
-
-
-    public List<HistoricProcessInstance> getProcessInstancesForTrasparenza(int firstResult, int maxResults, String order) {
-
-        HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()
-                .includeProcessVariables()
-                .processDefinitionKey("acquisti")
-                .unfinished()
-                .variableValueEquals(flagIsTrasparenza.name(), "true");
-
-        utils.orderProcess(order, historicProcessInstanceQuery);
-
-        return historicProcessInstanceQuery.listPage(firstResult, maxResults);
-    }
-
-
 
     private void processDate(HistoricProcessInstanceQuery processQuery, String key, String value) {
         // TODO remove deprecated api javax.xml

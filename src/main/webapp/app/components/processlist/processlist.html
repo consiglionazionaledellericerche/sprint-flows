@@ -21,8 +21,7 @@
                         <h4>Stato: {{process.name | get: 'stato'}}</h4>
                     </li>
                     <li>
-                        Avviato il <strong>{{process.startTime | dataora}}</strong> da <strong> {{process.name | get:
-                                                                                                'initiator'}} </strong>
+                        Avviato il <strong>{{process.startTime | dataora}}</strong> da <strong> {{process.startUserId}} </strong>
                     </li>
                     <ng-include src="'api/views/' + process.processDefinitionId.split(':')[0] + '/' + process.processDefinitionId.split(':')[1] + '/search'" />
                 </ul>
