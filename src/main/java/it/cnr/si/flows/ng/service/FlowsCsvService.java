@@ -94,7 +94,7 @@ public class FlowsCsvService {
 
 			for (HistoricProcessInstanceResponse pi : processInstances) {
 				String processInstanceId = pi.getId();
-				Map<String, Object> processInstanceDetails = flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId);
+				Map<String, Object> processInstanceDetails = flowsProcessInstanceService.getHistoricProcessInstanceWithDetails(processInstanceId);
 				HistoricProcessInstanceResponse processInstance = (HistoricProcessInstanceResponse) processInstanceDetails.get("entity");
 				// LISTA DEI PARAMETRI BASATI SULLE VARIABILI DELL'ISTANZA DI PROCESSO
 				List<RestVariable> variables = processInstance.getVariables();
