@@ -110,6 +110,13 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 			// START
 			case "process-start": {
 				startAccordiInternazionaliDomandeSetGroupsAndVisibility.configuraVariabiliStart(execution);
+				// GENERO LA DOMANDA
+				String nomeFile="domandaAccordiBilaterali";
+				String labelFile="Domanda";
+				flowsPdfService.makePdf(nomeFile, processInstanceId);
+				FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
+				documentoGenerato.setLabel(labelFile);
+				flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
 			};break;    
 			// START
 			case "valutazione-scientifica-end": {
@@ -138,12 +145,12 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 				execution.setVariable("gruppoValutatoreScientificoDipartimento", gruppoValutatoreScientificoDipartimento);
 				LOGGER.debug("Imposto i gruppi dipartimento : {} - del flusso {}", idDipartimento, gruppoValutatoreScientificoDipartimento);
 				// GENERO LA DOMANDA
-				String nomeFile="domandaAccordiBilaterali";
-				String labelFile="Domanda";
-				flowsPdfService.makePdf(nomeFile, processInstanceId);
-				FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
-				documentoGenerato.setLabel(labelFile);
-				flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
+//				String nomeFile="domandaAccordiBilaterali";
+//				String labelFile="Domanda";
+//				flowsPdfService.makePdf(nomeFile, processInstanceId);
+//				FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
+//				documentoGenerato.setLabel(labelFile);
+//				flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
 			};break;  			
 			// START
 			case "validazione-start": {
