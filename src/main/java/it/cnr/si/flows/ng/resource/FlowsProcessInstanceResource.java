@@ -112,7 +112,7 @@ public class FlowsProcessInstanceResource {
 		if (!detail) {
 			return new ResponseEntity(flowsProcessInstanceService.getProcessInstance(processInstanceId), HttpStatus.OK);
 		} else {
-			return new ResponseEntity(flowsProcessInstanceService.getHistoricProcessInstanceWithDetails(processInstanceId), HttpStatus.OK);
+			return new ResponseEntity(flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId), HttpStatus.OK);
 		}
 	}
 
@@ -148,10 +148,10 @@ public class FlowsProcessInstanceResource {
 		}
 		return new ResponseEntity(HttpStatus.OK);
 	}
-
+	
 	@DeleteMapping(value = "eraseFinishedProcessInstance", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Secured(AuthoritiesConstants.ADMIN)
-	@Timed
+	@Timed	
 	public ResponseEntity erase(@RequestParam(value = "processInstanceId", required = true) String processInstanceId) {
 		historyService.deleteHistoricProcessInstance(processInstanceId);
 		return new ResponseEntity(HttpStatus.OK);

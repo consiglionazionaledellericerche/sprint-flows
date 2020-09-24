@@ -21,7 +21,6 @@ import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricIdentityLinkResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
-import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.json.JSONArray;
@@ -106,7 +105,7 @@ public class FlowsPdfService {
 		Paragraph paragraphDocs = new Paragraph();
 		Paragraph paragraphHistory = new Paragraph();
 
-		Map<String, Object> map = flowsProcessInstanceService.getHistoricProcessInstanceWithDetails(processInstanceId);
+		Map<String, Object> map = flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId);
 
 		HistoricProcessInstanceResponse processInstance = (HistoricProcessInstanceResponse) map.get("entity");
 		String fileName = "Summary_" + processInstance.getBusinessKey() + ".pdf";
@@ -221,7 +220,7 @@ public class FlowsPdfService {
 
 		Map<String, Object> map = flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId);
 
-		ProcessInstanceResponse processInstance = (ProcessInstanceResponse) map.get("entity");
+		HistoricProcessInstanceResponse processInstance = (HistoricProcessInstanceResponse) map.get("entity");
 		variables.put("businessKey", processInstance.getBusinessKey());
 
 
@@ -420,58 +419,9 @@ public class FlowsPdfService {
 			String taskId = taskService.createTaskQuery().processInstanceId(processInstanceId).active().singleResult().getId();
 			flowsAttachmentService.saveAttachment(taskId, pdfType.name(), attachment, pdfByteArray);
 		}catch (NullPointerException e){
-			//se la Pi non è ancora stata avviata la query restituirà una NullPointerException quindi salverò l'attachments fuori dall Pi
 			flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, pdfType.name(), attachment, pdfByteArray);
 		}
 		return pdfByteArray;
-	}
-
-
-	public Pair<String, byte[]> makePdfBeforeStart(String tipologiaDoc, String processInstanceId) {
-
-		//Sotituisco la lista di variabili da quelle storiche (historicProcessInstance.getProcessVariables() )a quelle attuali (variableInstanceJson)
-		JSONObject variableInstanceJson = new JSONObject();
-
-		Map<String, VariableInstance> tutteVariabiliMap = runtimeService.getVariableInstances(processInstanceId);
-		for (Map.Entry<String, VariableInstance> entry : tutteVariabiliMap.entrySet()) {
-			String key = entry.getKey();
-			VariableInstance value = entry.getValue();
-			//le variabili di tipo serializable (file) non vanno inseriti nel json delle variabili che verranno inseriti nel pdf
-			//(ho testato valutazioni esperienze_Json fino a 11000 caratteri ed a questo livello appare come longString)
-			if((!(((VariableInstanceEntity) value).getType() instanceof SerializableType)) || (((VariableInstanceEntity) value).getType() instanceof LongStringType)){
-				if(key.toString().equals("startDate")) {
-					Date startDate = (Date)value.getValue();
-					SimpleDateFormat sdf = new  SimpleDateFormat("dd/MM/yyyy HH:mm");
-					sdf.setTimeZone(TimeZone.getTimeZone("Europe/Rome"));
-					variableInstanceJson.put(key, sdf.format(startDate));
-				} else {
-					String valueEscaped = "campo erroneamente compilato";
-					if (runtimeService.getVariable(processInstanceId,value.getName()) != null) {
-						valueEscaped = Jsoup.parse(StringEscapeUtils.escapeHtml(runtimeService.getVariable(processInstanceId,value.getName()).toString().replaceAll("\t", "  "))).text();
-						valueEscaped = valueEscaped.replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;");
-						variableInstanceJson.put(key, valueEscaped);
-					}
-				}
-			}
-		}
-		LOGGER.info("variableInstanceJson: {}", variableInstanceJson);
-
-		//Sotituisco la lista di variabili da quelle storiche (historicProcessInstance.getProcessVariables() )a quelle attuali (variableInstanceJson)
-		JSONObject processVariables = mappingVariableBeforeStart(variableInstanceJson, processInstanceId);
-		//creo il pdf corrispondente
-		String utenteRichiedente = "sistema";
-		String fileName = tipologiaDoc + ".pdf";
-
-		if(processVariables.has("nomeRichiedente")) {
-			utenteRichiedente = processVariables.getString("nomeRichiedente");
-			fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
-		}
-
-		if(processVariables.has("userNameRichiedente")) {
-			utenteRichiedente = processVariables.getString("userNameRichiedente");
-			fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
-		}
-		return Pair.of(fileName, makePdf(Enum.PdfType.valueOf(tipologiaDoc), processVariables, fileName, utenteRichiedente, processInstanceId));
 	}
 
 
@@ -621,6 +571,55 @@ public class FlowsPdfService {
 
 		return variableStatisticsJson;
 	}
+
+
+	public Pair<String, byte[]> makePdfBeforeStart(String tipologiaDoc, String processInstanceId) {
+
+		//Sotituisco la lista di variabili da quelle storiche (historicProcessInstance.getProcessVariables() )a quelle attuali (variableInstanceJson)
+		JSONObject variableInstanceJson = new JSONObject();
+
+		Map<String, VariableInstance> tutteVariabiliMap = runtimeService.getVariableInstances(processInstanceId);
+		for (Map.Entry<String, VariableInstance> entry : tutteVariabiliMap.entrySet()) {
+			String key = entry.getKey();
+			VariableInstance value = entry.getValue();
+			//le variabili di tipo serializable (file) non vanno inseriti nel json delle variabili che verranno inseriti nel pdf
+			//(ho testato valutazioni esperienze_Json fino a 11000 caratteri ed a questo livello appare come longString)
+			if((!(((VariableInstanceEntity) value).getType() instanceof SerializableType)) || (((VariableInstanceEntity) value).getType() instanceof LongStringType)){
+				if(key.toString().equals("startDate")) {
+					Date startDate = (Date)value.getValue();
+					SimpleDateFormat sdf = new  SimpleDateFormat("dd/MM/yyyy HH:mm");
+					sdf.setTimeZone(TimeZone.getTimeZone("Europe/Rome"));
+					variableInstanceJson.put(key, sdf.format(startDate));
+				} else {
+					String valueEscaped = "campo erroneamente compilato";
+					if (runtimeService.getVariable(processInstanceId,value.getName()) != null) {
+						valueEscaped = Jsoup.parse(StringEscapeUtils.escapeHtml(runtimeService.getVariable(processInstanceId,value.getName()).toString().replaceAll("\t", "  "))).text();
+						valueEscaped = valueEscaped.replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;");
+						variableInstanceJson.put(key, valueEscaped);
+					}
+				}
+			}
+		}
+		LOGGER.info("variableInstanceJson: {}", variableInstanceJson);
+
+		//Sotituisco la lista di variabili da quelle storiche (historicProcessInstance.getProcessVariables() )a quelle attuali (variableInstanceJson)
+		JSONObject processVariables = mappingVariableBeforeStart(variableInstanceJson, processInstanceId);
+		//creo il pdf corrispondente
+		String utenteRichiedente = "sistema";
+		String fileName = tipologiaDoc + ".pdf";
+
+		if(processVariables.has("nomeRichiedente")) {
+			utenteRichiedente = processVariables.getString("nomeRichiedente");
+			fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
+		}
+
+		if(processVariables.has("userNameRichiedente")) {
+			utenteRichiedente = processVariables.getString("userNameRichiedente");
+			fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
+		}
+		return Pair.of(fileName, makePdf(Enum.PdfType.valueOf(tipologiaDoc), processVariables, fileName, utenteRichiedente, processInstanceId));
+	}
+
 
 	//GESTIONE DEI PARAMETRI DA VISUALIZZARE
 	private void resetStatisticvariables() {

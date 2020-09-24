@@ -99,7 +99,7 @@ public class OivSetGroupsAndVisibility {
 
 		Date dataNow = new Date();
 		String processInstanceId =  execution.getProcessInstanceId();
-		Map<String, Object> processInstanceDetails = flowsProcessInstanceService.getHistoricProcessInstanceWithDetails(processInstanceId);
+		Map<String, Object> processInstanceDetails = flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId);
 		HistoricProcessInstanceResponse processInstance = (HistoricProcessInstanceResponse) processInstanceDetails.get("entity");
 		int giorniDurataFlusso = operazioniTimer.calcolaGiorniTraDate(processInstance.getStartTime(), dataNow);
 		int giorniEffettiviDurataProcedimentoOiv =  giorniDurataFlusso - parseInt(execution.getVariable("giorniDurataPreavvisoRigetto").toString()) - parseInt(execution.getVariable("giorniDurataSoccorsoIstruttorio").toString()); 

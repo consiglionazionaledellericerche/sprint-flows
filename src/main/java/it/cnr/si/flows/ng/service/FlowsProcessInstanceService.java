@@ -13,13 +13,11 @@ import org.activiti.engine.impl.persistence.entity.HistoricProcessInstanceEntity
 import org.activiti.engine.impl.pvm.PvmActivity;
 import org.activiti.engine.impl.pvm.ReadOnlyProcessDefinition;
 import org.activiti.engine.impl.task.TaskDefinition;
-import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
-import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -95,10 +93,10 @@ public class FlowsProcessInstanceService {
                 .singleResult();
     }
 
-    public Map<String, Object> getHistoricProcessInstanceWithDetails(String processInstanceId) {
+    public Map<String, Object> getProcessInstanceWithDetails(String processInstanceId) {
         Map<String, Object> result = new HashMap<>();
 
-        //HisporicPrecessInstance metadata
+        // PrecessInstance metadata
         HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery()
                 .processInstanceId(processInstanceId)
                 .includeProcessVariables()
@@ -113,113 +111,60 @@ public class FlowsProcessInstanceService {
             entity.getVariables().forEach(v -> variabili.put(v.getName(), v));
             result.put("variabili", variabili); // Modifica per vedere piu' comodamente le variabili
 
-            addLinks(processInstanceId, result);
-        }
-
-        addHistoricField(processInstanceId, result, processInstance);
-
-        return result;
-    }
+            HistoricVariableInstance links = historyService
+                    .createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstanceId)
+                    .variableName("linkToOtherWorkflows")
+                    .singleResult();
 
 
+            if (links != null) {
 
-    public Map<String, Object> getProcessInstanceWithDetails(String processInstanceId) {
-        Map<String, Object> result = new HashMap<>();
+                List<Map<String, Object>> linkedFlows = new ArrayList<>();
+                String value = (String) links.getValue();
+                String[] values = value.split(",");
 
-        //PrecessInstance metadata
-        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery()
-                .processInstanceId(processInstanceId)
-                .includeProcessVariables()
-                .singleResult();
+                for (String linkedProcessId : values) {
+                    if(permissionEvaluator.canVisualize(linkedProcessId, flowsUserDetailsService)) {
+                        HistoricProcessInstance linkedProcessInstance = historyService
+                                .createHistoricProcessInstanceQuery()
+                                .processInstanceId(linkedProcessId)
+                                .includeProcessVariables()
+                                .singleResult();
 
-        //Durante la fase di creazione di una Process Instance viene richiamato questo metodo ma la query sarà vuota perchè la Pi effettivamente non è stata ancora creata
-        if(processInstance != null) {
-            ProcessInstanceResponse entity = restResponseFactory.createProcessInstanceResponse(processInstance);
-            result.put("entity", entity);
+                        if (linkedProcessInstance != null) {
+                            String key = linkedProcessInstance.getBusinessKey();
 
-            Map<String, RestVariable> variabili = new HashMap<>();
-            entity.getVariables().forEach(v -> variabili.put(v.getName(), v));
-            result.put("variabili", variabili); // Modifica per vedere piu' comodamente le variabili
+                            Map<String, Object> linkedObject = new HashMap<>();
+                            linkedObject.put("id", linkedProcessId);
+                            linkedObject.put("key", key);
+                            linkedObject.put("titolo", linkedProcessInstance.getProcessVariables().get("titolo"));
 
-            addLinks(processInstanceId, result);
-        }
-
-        addField(processInstanceId, result, processInstance);
-
-        return result;
-    }
-
-    private void addField(String processInstanceId, Map<String, Object> result, ProcessInstance processInstance) {
-        // ProcessDefinition (static) metadata
-        ReadOnlyProcessDefinition processDefinition = ((RepositoryServiceImpl) repositoryService).getDeployedProcessDefinition(processInstance.getProcessDefinitionId());
-
-        final Map<String, Object> identityLinks = new LinkedHashMap<>();
-        Map<String, Object> processLinks = new HashMap<>();
-        processLinks.put("links", restResponseFactory.createHistoricIdentityLinkResponseList(historyService.getHistoricIdentityLinksForProcessInstance(processInstanceId)));
-        identityLinks.put("process", processLinks);
-
-        result.put("identityLinks", identityLinks);
-
-        // permessi aggiuntivi
-        result.put("canPublish", permissionEvaluator.canPublishAttachment(processInstanceId));
-        result.put("canUpdateAttachments", permissionEvaluator.canUpdateAttachment(processInstanceId, flowsUserDetailsService));
-    }
-
-
-
-    private void addHistoricField(String processInstanceId, Map<String, Object> result, HistoricProcessInstance processInstance) {
-        // ProcessDefinition (static) metadata
-        ReadOnlyProcessDefinition processDefinition = ((RepositoryServiceImpl) repositoryService).getDeployedProcessDefinition(processInstance.getProcessDefinitionId());
-
-        final Map<String, Object> identityLinks = new LinkedHashMap<>();
-        Map<String, Object> processLinks = new HashMap<>();
-        processLinks.put("links", restResponseFactory.createHistoricIdentityLinkResponseList(historyService.getHistoricIdentityLinksForProcessInstance(processInstanceId)));
-        identityLinks.put("process", processLinks);
-
-        result.put("identityLinks", identityLinks);
-
-        // permessi aggiuntivi
-        result.put("canPublish", permissionEvaluator.canPublishAttachment(processInstanceId));
-        result.put("canUpdateAttachments", permissionEvaluator.canUpdateAttachment(processInstanceId, flowsUserDetailsService));
-    }
-
-    private void addLinks(String processInstanceId, Map<String, Object> result) {
-        HistoricVariableInstance links = historyService
-                .createHistoricVariableInstanceQuery()
-                .processInstanceId(processInstanceId)
-                .variableName("linkToOtherWorkflows")
-                .singleResult();
-
-
-        if (links != null) {
-
-            List<Map<String, Object>> linkedFlows = new ArrayList<>();
-            String value = (String) links.getValue();
-            String[] values = value.split(",");
-
-            for (String linkedProcessId : values) {
-                if(permissionEvaluator.canVisualize(linkedProcessId, flowsUserDetailsService)) {
-                    HistoricProcessInstance linkedProcessInstance = historyService
-                            .createHistoricProcessInstanceQuery()
-                            .processInstanceId(linkedProcessId)
-                            .includeProcessVariables()
-                            .singleResult();
-
-                    if (linkedProcessInstance != null) {
-                        String key = linkedProcessInstance.getBusinessKey();
-
-                        Map<String, Object> linkedObject = new HashMap<>();
-                        linkedObject.put("id", linkedProcessId);
-                        linkedObject.put("key", key);
-                        linkedObject.put("titolo", linkedProcessInstance.getProcessVariables().get("titolo"));
-
-                        linkedFlows.add(linkedObject);
+                            linkedFlows.add(linkedObject);
+                        }
                     }
                 }
+                if (!linkedFlows.isEmpty())
+                    result.put("linkedProcesses", linkedFlows);
             }
-            if (!linkedFlows.isEmpty())
-                result.put("linkedProcesses", linkedFlows);
         }
+
+        // ProcessDefinition (static) metadata
+        ReadOnlyProcessDefinition processDefinition = ((RepositoryServiceImpl) repositoryService).getDeployedProcessDefinition(processInstance.getProcessDefinitionId());
+
+        final Map<String, Object> identityLinks = new LinkedHashMap<>();
+        Map<String, Object> processLinks = new HashMap<>();
+        processLinks.put("links", restResponseFactory.createHistoricIdentityLinkResponseList(historyService.getHistoricIdentityLinksForProcessInstance(processInstanceId)));
+        identityLinks.put("process", processLinks);
+
+        result.put("identityLinks", identityLinks);
+
+        // permessi aggiuntivi
+        result.put("canPublish", permissionEvaluator.canPublishAttachment(processInstanceId));
+        result.put("canUpdateAttachments", permissionEvaluator.canUpdateAttachment(processInstanceId, flowsUserDetailsService));
+
+
+        return result;
     }
 
 
@@ -324,7 +269,7 @@ public class FlowsProcessInstanceService {
 
         if(includeVariables) {
             processesRaw.stream().forEach(hpi -> {
-                HistoricProcessInstanceEntity hpie = (HistoricProcessInstanceEntity) hpi;
+                HistoricProcessInstanceEntity hpie = (HistoricProcessInstanceEntity) hpi; 
                 List list = historyService.createHistoricVariableInstanceQuery().processInstanceId(hpie.getProcessInstanceId()).list();
                 hpie.setQueryVariables(list);
             });
@@ -374,17 +319,17 @@ public class FlowsProcessInstanceService {
                         processQuery.processInstanceBusinessKey(value);
                     } else {
                         switch (type) {
-                            case "textEqual":
-                                processQuery.variableValueEquals(key, value);
-                                break;
-                            case "boolean":
-                                // gestione variabili booleane
-                                processQuery.variableValueEquals(key, Boolean.valueOf(value));
-                                break;
-                            default:
-                                //variabili con la wildcard  (%value%)
-                                processQuery.variableValueLikeIgnoreCase(key, "%" + value + "%");
-                                break;
+                        case "textEqual":
+                            processQuery.variableValueEquals(key, value);
+                            break;
+                        case "boolean":
+                            // gestione variabili booleane
+                            processQuery.variableValueEquals(key, Boolean.valueOf(value));
+                            break;
+                        default:
+                            //variabili con la wildcard  (%value%)
+                            processQuery.variableValueLikeIgnoreCase(key, "%" + value + "%");
+                            break;
                         }
                     }
                 }
@@ -489,21 +434,21 @@ public class FlowsProcessInstanceService {
         String now = utils.formattaData(new Date());
         if(gareScadute != null){
             historicProcessInstanceQuery
-                    .variableValueLike("strumentoAcquisizione", "PROCEDURA SELETTIVA%");
+            .variableValueLike("strumentoAcquisizione", "PROCEDURA SELETTIVA%");
             if(gareScadute){
                 // GARE SCADUTE IN ATTESA DI ESITO: data scadenza presentazione offerta < NOW  && data scadenza presentazione offerta - termini di ricorso >= NOW
                 if(terminiRicorso != 0)
                     dataTerminiRicorso.add(Calendar.DAY_OF_MONTH, -terminiRicorso);
 
                 historicProcessInstanceQuery
-                        .variableValueLessThan(dataScadenzaBando.name(), now)
-                        .variableValueGreaterThanOrEqual(dataScadenzaBando.name(), utils.formattaData(dataTerminiRicorso.getTime()));
+                .variableValueLessThan(dataScadenzaBando.name(), now)
+                .variableValueGreaterThanOrEqual(dataScadenzaBando.name(), utils.formattaData(dataTerminiRicorso.getTime()));
                 LOGGER.info("SCADUTE IN ATTESA DI ESITO nr flussi {}", historicProcessInstanceQuery.count());
 
             } else {
                 // GARE IN CORSO data scadenza presentazione offerta >= NOW
                 historicProcessInstanceQuery
-                        .variableValueGreaterThanOrEqual(dataScadenzaBando.name(), now);
+                .variableValueGreaterThanOrEqual(dataScadenzaBando.name(), now);
                 LOGGER.info("GARE IN CORSO nei flussi {}", historicProcessInstanceQuery.count());
 
             }
@@ -515,12 +460,12 @@ public class FlowsProcessInstanceService {
                 dataTerminiRicorso.add(Calendar.DAY_OF_MONTH, -terminiRicorso);
 
                 historicProcessInstanceQuery
-                        .variableValueLessThan(dataScadenzaAvvisoPreDetermina.name(), now)
-                        .variableValueGreaterThanOrEqual(dataScadenzaAvvisoPreDetermina.name(), utils.formattaData(dataTerminiRicorso.getTime()));
+                .variableValueLessThan(dataScadenzaAvvisoPreDetermina.name(), now)
+                .variableValueGreaterThanOrEqual(dataScadenzaAvvisoPreDetermina.name(), utils.formattaData(dataTerminiRicorso.getTime()));
             }else{
                 // AVVISI IN CORSO: data scadenza presentazione offerta >= NOW
                 historicProcessInstanceQuery
-                        .variableValueGreaterThanOrEqual(dataScadenzaAvvisoPreDetermina.name(), now);
+                .variableValueGreaterThanOrEqual(dataScadenzaAvvisoPreDetermina.name(), now);
             }
         }
         utils.orderProcess(order, historicProcessInstanceQuery);
