@@ -110,7 +110,10 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 			// START
 			case "process-start": {
 				startAccordiInternazionaliDomandeSetGroupsAndVisibility.configuraVariabiliStart(execution);
-			};break;    
+				// GENERO LA DOMANDA
+				String nomeFile="domandaAccordiBilaterali";
+				flowsPdfService.makePdfBeforeStart(nomeFile, processInstanceId);
+			};break;
 			// START
 			case "valutazione-scientifica-end": {
 				LOGGER.info("-- valutazione-scientifica: valutazione-scientifica");
@@ -137,14 +140,7 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 				runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValutatoreScientificoDipartimento, PROCESS_VISUALIZER);
 				execution.setVariable("gruppoValutatoreScientificoDipartimento", gruppoValutatoreScientificoDipartimento);
 				LOGGER.debug("Imposto i gruppi dipartimento : {} - del flusso {}", idDipartimento, gruppoValutatoreScientificoDipartimento);
-				// GENERO LA DOMANDA
-				String nomeFile="domandaAccordiBilaterali";
-				String labelFile="Domanda";
-				flowsPdfService.makePdf(nomeFile, processInstanceId);
-				FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
-				documentoGenerato.setLabel(labelFile);
-				flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
-			};break;  			
+			};break;
 			// START
 			case "validazione-start": {
 				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
