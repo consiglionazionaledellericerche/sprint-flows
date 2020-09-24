@@ -21,6 +21,7 @@ import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricIdentityLinkResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
+import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.json.JSONArray;
@@ -105,7 +106,7 @@ public class FlowsPdfService {
 		Paragraph paragraphDocs = new Paragraph();
 		Paragraph paragraphHistory = new Paragraph();
 
-		Map<String, Object> map = flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId);
+		Map<String, Object> map = flowsProcessInstanceService.getHistoricProcessInstanceWithDetails(processInstanceId);
 
 		HistoricProcessInstanceResponse processInstance = (HistoricProcessInstanceResponse) map.get("entity");
 		String fileName = "Summary_" + processInstance.getBusinessKey() + ".pdf";
@@ -220,7 +221,7 @@ public class FlowsPdfService {
 
 		Map<String, Object> map = flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId);
 
-		HistoricProcessInstanceResponse processInstance = (HistoricProcessInstanceResponse) map.get("entity");
+		ProcessInstanceResponse processInstance = (ProcessInstanceResponse) map.get("entity");
 		variables.put("businessKey", processInstance.getBusinessKey());
 
 
