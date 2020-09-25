@@ -6,11 +6,13 @@
 	DetailsController.$inject = ['$scope', '$rootScope', 'Principal', '$state', '$localStorage', 'dataService', 'AlertService', '$log', 'utils', '$uibModal'];
 
 	function DetailsController($scope, $rootScope, Principal, $state, $localStorage, dataService, AlertService, $log, utils, $uibModal) {
+		$scope.button={};
+		$scope.button.disabled = true;
 		var vm = this;
 		vm.searchParams = {};
 		vm.data = {};
 		vm.taskId = $state.params.taskId;
-		//vm.searchParams.statoFinaleDomanda = {};        
+		//vm.searchParams.statoFinaleDomanda = {};
 		vm.showGerarchia = false;
 		vm.searchParams.active = true;
 		vm.searchParams.order = "ASC";
@@ -71,7 +73,9 @@
 							vm.authorities.includes("ROLE_responsabile#flussi") ||
 							vm.authorities.includes("ROLE_responsabile#" + vm.data.entity.processDefinitionId.split(':')[0] + "@0000") ||
 							vm.authorities.includes("ROLE_responsabile#" + vm.data.entity.processDefinitionId.split(':')[0] + "@" + vm.data.entity.variabili.idStruttura) ||
-							vm.authorities.includes("ROLE_ADMIN")) 
+							vm.authorities.includes("ROLE_ADMIN"));
+        		    //riattivo il bottone delle "azioni"
+        		    $scope.button.disabled = false;
 				}
 			);
 		}
