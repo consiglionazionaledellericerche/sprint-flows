@@ -254,7 +254,7 @@ public class FlowsPdfService {
 
 
 	//Sotituisco il mapping direttamente con il json delle variabili attuali
-	private JSONObject mappingVariableBeforeStart(JSONObject variables, String processInstanceId) {
+	private JSONObject mappingVariableBeforeStartPi(JSONObject variables, String processInstanceId) {
 
 		//refactoring della stringona contenete le esperienze in un jsonArray
 		if (variables.has(VALUTAZIONE_ESPERIENZE_JSON)) {
@@ -573,7 +573,7 @@ public class FlowsPdfService {
 	}
 
 
-	public Pair<String, byte[]> makePdfBeforeStart(String tipologiaDoc, String processInstanceId) {
+	public Pair<String, byte[]> makePdfBeforeStartPi(String tipologiaDoc, String processInstanceId) {
 
 		//Sotituisco la lista di variabili da quelle storiche (historicProcessInstance.getProcessVariables() )a quelle attuali (variableInstanceJson)
 		JSONObject variableInstanceJson = new JSONObject();
@@ -603,7 +603,7 @@ public class FlowsPdfService {
 		LOGGER.info("variableInstanceJson: {}", variableInstanceJson);
 
 		//Sotituisco la lista di variabili da quelle storiche (historicProcessInstance.getProcessVariables() )a quelle attuali (variableInstanceJson)
-		JSONObject processVariables = mappingVariableBeforeStart(variableInstanceJson, processInstanceId);
+		JSONObject processVariables = mappingVariableBeforeStartPi(variableInstanceJson, processInstanceId);
 		//creo il pdf corrispondente
 		String utenteRichiedente = "sistema";
 		String fileName = tipologiaDoc + ".pdf";

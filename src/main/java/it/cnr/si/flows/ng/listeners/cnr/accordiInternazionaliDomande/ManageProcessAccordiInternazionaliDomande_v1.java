@@ -112,7 +112,7 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 				startAccordiInternazionaliDomandeSetGroupsAndVisibility.configuraVariabiliStart(execution);
 				// GENERO LA DOMANDA
 				String nomeFile="domandaAccordiBilaterali";
-				flowsPdfService.makePdfBeforeStart(nomeFile, processInstanceId);
+				flowsPdfService.makePdfBeforeStartPi(nomeFile, processInstanceId);
 			};break;
 			// START
 			case "valutazione-scientifica-end": {

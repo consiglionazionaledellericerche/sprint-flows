@@ -256,7 +256,9 @@ public class FlowsAttachmentService {
 
     }
 
+
     public Map<String, FlowsAttachment> getAttachementsForProcessInstance(String processInstanceId) {
+        Map<String, FlowsAttachment> response;
         try {
             Map<String, Object> processVariables = historyService.createHistoricProcessInstanceQuery()
                     .processInstanceId(processInstanceId)
@@ -264,15 +266,15 @@ public class FlowsAttachmentService {
                     .singleResult()
                     .getProcessVariables();
 
-
-            return processVariables.entrySet().stream()
+            response = processVariables.entrySet().stream()
                     .filter(e -> e.getValue() instanceof FlowsAttachment)
 //                .peek(e -> ((FlowsAttachment) e.getValue()).setBytes(null))
                     .collect(Collectors.toMap(k -> k.getKey(), v -> ((FlowsAttachment) v.getValue())));
         }catch (NullPointerException e){
             //se il flusso deve ancora iniziare la query restituisce una NullPointerException quindi restituisco una hashMap vuota
-            return new HashMap<String, FlowsAttachment>();
+            response = new HashMap<>();
         }
+        return response;
     }
 
 
