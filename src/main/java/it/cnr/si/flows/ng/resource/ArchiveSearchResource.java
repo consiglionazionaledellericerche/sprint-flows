@@ -67,7 +67,7 @@ public class ArchiveSearchResource {
 
         DataResponse result;
 
-        result = archiveProcessInstanceService.search(params, processDefinitionKey, active, order, firstResult, maxResults, false);
+        result = archiveProcessInstanceService.search(params, processDefinitionKey, active, order, firstResult, maxResults, true);
         return ResponseEntity.ok(result);
     }
 }
