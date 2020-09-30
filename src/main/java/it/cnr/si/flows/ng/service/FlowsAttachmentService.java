@@ -1,6 +1,7 @@
 package it.cnr.si.flows.ng.service;
 
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.listeners.AddFlowsAttachmentsListener;
 import it.cnr.si.security.SecurityUtils;
 import it.cnr.si.spring.storage.*;
 import it.cnr.si.spring.storage.bulk.StorageFile;
@@ -63,7 +64,9 @@ public class FlowsAttachmentService {
     private StoreService storeService;
 	@Inject
 	private Environment env;
-
+	@Inject
+	private AddFlowsAttachmentsListener addFlowsAttachmentsListener;
+	
     /**
      *
      * Quando ricevo una MultiPartHTTPRequest e ne ho estratto una Map(String, Object) data
@@ -203,6 +206,9 @@ public class FlowsAttachmentService {
         att.setUsername(SecurityUtils.getCurrentUserLogin());
         att.setTime(new Date());
         att.setTaskName("Fuori task");
+        if(att.getPath() == null) {
+        	att.setPath(addFlowsAttachmentsListener.getDefaultPathFascicoloDocumenti(executionId));
+        }
 
         if (content != null) {
             String key = runtimeService.getVariable(executionId, "key", String.class);
