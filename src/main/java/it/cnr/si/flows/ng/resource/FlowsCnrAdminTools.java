@@ -49,7 +49,7 @@ public class FlowsCnrAdminTools {
     private ExternalMessageSender extenalMessageSender;
     
 
-    @RequestMapping(value = "/runcron", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/resendExternalMessages", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Void> resendExternalMessages() {
 
