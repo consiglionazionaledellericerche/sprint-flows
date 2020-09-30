@@ -17,6 +17,7 @@ import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
 import org.apache.commons.io.FileUtils;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -38,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
+@Profile("cnr")
 @RequestMapping("api/archive")
 public class ArchiveSearchResource {
 

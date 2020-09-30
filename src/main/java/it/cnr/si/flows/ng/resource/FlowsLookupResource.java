@@ -1,20 +1,12 @@
 package it.cnr.si.flows.ng.resource;
 
-import it.cnr.si.config.ExternalMessageSender;
-import it.cnr.si.flows.ng.ldap.LdapPersonToSearchResultMapper;
-import it.cnr.si.flows.ng.service.AceBridgeService;
-import it.cnr.si.flows.ng.service.SiperService;
-import it.cnr.si.flows.ng.utils.SecurityUtils;
-import it.cnr.si.flows.ng.utils.Utils;
-import it.cnr.si.flows.ng.utils.Utils.SearchResult;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.service.AceService;
-import it.cnr.si.service.FlowsLdapAccountService;
-import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
-import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-import org.activiti.engine.ManagementService;
-import org.activiti.rest.service.api.RestResponseFactory;
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -29,13 +21,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.inject.Inject;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import it.cnr.si.flows.ng.ldap.LdapPersonToSearchResultMapper;
+import it.cnr.si.flows.ng.service.AceBridgeService;
+import it.cnr.si.flows.ng.service.SiperService;
+import it.cnr.si.flows.ng.utils.SecurityUtils;
+import it.cnr.si.flows.ng.utils.Utils;
+import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.service.AceService;
+import it.cnr.si.service.FlowsLdapAccountService;
+import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
+import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 
 @RestController
 @RequestMapping("api/lookup")
@@ -54,8 +49,6 @@ public class FlowsLookupResource {
     private FlowsLdapAccountService flowsLdapAccountService;
     @Inject
     private SiperService siperService;
-    @Inject
-    private ExternalMessageSender extenalMessageSender;
 
     
     @RequestMapping(value = "/ace/boss", method = RequestMethod.GET)
@@ -142,16 +135,6 @@ public class FlowsLookupResource {
     public ResponseEntity<List<Map<String, Object>>> getResponsabileSede(@PathVariable String cdsuo) {
 
         return ResponseEntity.ok(siperService.getResponsabileCDSUO(cdsuo));
-    }
-
-    @RequestMapping(value = "/runcron", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured(AuthoritiesConstants.USER)
-    public ResponseEntity<Void> runCron() {
-
-        log.info("Running crons");
-        extenalMessageSender.sendMessages();
-        extenalMessageSender.sendErrorMessages();
-        return ResponseEntity.ok().build();
     }
 
 }

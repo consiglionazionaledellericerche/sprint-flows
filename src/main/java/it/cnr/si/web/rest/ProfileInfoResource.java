@@ -46,14 +46,13 @@ public class ProfileInfoResource {
 
         if (displayOnActiveProfiles == null) {
             response.put("ribbonEnv", null);
-        }
-
-        List<String> ribbonProfiles = new ArrayList<>(Arrays.asList(displayOnActiveProfiles));
-        List<String> springBootProfiles = Arrays.asList(activeProfiles);
-        ribbonProfiles.retainAll(springBootProfiles);
-
-        if (!ribbonProfiles.isEmpty()) {
-            response.put("ribbonEnv", ribbonProfiles.get(0));
+        } else {
+            List<String> ribbonProfiles = new ArrayList<>(Arrays.asList(displayOnActiveProfiles));
+            List<String> springBootProfiles = Arrays.asList(activeProfiles);
+            ribbonProfiles.retainAll(springBootProfiles);
+            if (!ribbonProfiles.isEmpty()) {
+                response.put("ribbonEnv", ribbonProfiles.get(0));
+            }
         }
 
         response.put("activeProfiles", activeProfiles);
