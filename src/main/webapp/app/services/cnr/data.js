@@ -117,6 +117,10 @@
                     return $http.get('api/processInstances/variable?' +
                         'processInstanceId=' + processInstanceId +
                         '&variableName=' + variableName);
+                },
+                getHistoryForPi: function (processInstanceId) {
+                    return $http.get('api/processInstances/getHistoryForPi?' +
+                        'processInstanceId=' + processInstanceId);
                 }
             },
             attachments: {

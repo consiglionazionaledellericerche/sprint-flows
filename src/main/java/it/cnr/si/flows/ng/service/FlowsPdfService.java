@@ -43,12 +43,10 @@ import rst.pdfbox.layout.text.Position;
 
 import javax.inject.Inject;
 import java.awt.*;
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -217,7 +215,7 @@ public class FlowsPdfService {
 		return fileName;
 	}
 
-	//Sotituisco il mapping direttamente con il json delle variabili sttuali
+	//Sotituisco il mapping direttamente con il json delle variabili attuali
 	private JSONObject mappingVariables(JSONObject variables, String processInstanceId) {
 
 		Map<String, Object> map = flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId);
@@ -225,6 +223,38 @@ public class FlowsPdfService {
 		HistoricProcessInstanceResponse processInstance = (HistoricProcessInstanceResponse) map.get("entity");
 		variables.put("businessKey", processInstance.getBusinessKey());
 
+
+		//refactoring della stringona contenete le esperienze in un jsonArray
+		if (variables.has(VALUTAZIONE_ESPERIENZE_JSON)) {
+			JSONArray esperienze = new JSONArray(variables.getString(VALUTAZIONE_ESPERIENZE_JSON));
+			variables.put(VALUTAZIONE_ESPERIENZE_JSON, esperienze);
+		}
+
+		if (variables.has(IMPEGNI_JSON)) {
+			JSONArray esperienze = new JSONArray(variables.getString(IMPEGNI_JSON));
+			variables.put(IMPEGNI_JSON, esperienze);
+		}
+
+		if (variables.has(DITTEINVITATEJSON)) {
+			JSONArray esperienze = new JSONArray(variables.getString(DITTEINVITATEJSON));
+			variables.put(DITTEINVITATEJSON, esperienze);
+		}
+
+		if (variables.has(DITTECANDIDATEJSON)) {
+			JSONArray esperienze = new JSONArray(variables.getString(DITTECANDIDATEJSON));
+			variables.put(DITTECANDIDATEJSON, esperienze);
+		}
+
+		if (variables.has(DITTERTIJSON)) {
+			JSONArray esperienze = new JSONArray(variables.getString(DITTERTIJSON));
+			variables.put(DITTERTIJSON, esperienze);
+		}
+		return variables;
+	}
+
+
+	//Sotituisco il mapping direttamente con il json delle variabili attuali
+	private JSONObject mappingVariableBeforeStartPi(JSONObject variables, String processInstanceId) {
 
 		//refactoring della stringona contenete le esperienze in un jsonArray
 		if (variables.has(VALUTAZIONE_ESPERIENZE_JSON)) {
@@ -375,7 +405,7 @@ public class FlowsPdfService {
 			//salvo il pdf nel flusso
 			attachment = new FlowsAttachment();
 			attachment.setAzione(Caricamento);
-			attachment.setPath(runtimeService.getVariable(processInstanceId, "pathFascicoloDocumenti", String.class));;
+			attachment.setPath(runtimeService.getVariable(processInstanceId, "pathFascicoloDocumenti", String.class));
 			attachment.setTaskId(null);
 			attachment.setTaskName(null);
 			attachment.setTime(new Date());
@@ -384,9 +414,13 @@ public class FlowsPdfService {
 			attachment.setMimetype(com.google.common.net.MediaType.PDF.toString());
 			attachment.setUsername(utenteRichiedente);
 		}
-		String taskId = taskService.createTaskQuery().processInstanceId(processInstanceId).active().singleResult().getId();
-		flowsAttachmentService.saveAttachment(taskId, pdfType.name(), attachment, pdfByteArray);
 
+		try {
+			String taskId = taskService.createTaskQuery().processInstanceId(processInstanceId).active().singleResult().getId();
+			flowsAttachmentService.saveAttachment(taskId, pdfType.name(), attachment, pdfByteArray);
+		}catch (NullPointerException e){
+			flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, pdfType.name(), attachment, pdfByteArray);
+		}
 		return pdfByteArray;
 	}
 
@@ -537,6 +571,55 @@ public class FlowsPdfService {
 
 		return variableStatisticsJson;
 	}
+
+
+	public Pair<String, byte[]> makePdfBeforeStartPi(String tipologiaDoc, String processInstanceId) {
+
+		//Sotituisco la lista di variabili da quelle storiche (historicProcessInstance.getProcessVariables() )a quelle attuali (variableInstanceJson)
+		JSONObject variableInstanceJson = new JSONObject();
+
+		Map<String, VariableInstance> tutteVariabiliMap = runtimeService.getVariableInstances(processInstanceId);
+		for (Map.Entry<String, VariableInstance> entry : tutteVariabiliMap.entrySet()) {
+			String key = entry.getKey();
+			VariableInstance value = entry.getValue();
+			//le variabili di tipo serializable (file) non vanno inseriti nel json delle variabili che verranno inseriti nel pdf
+			//(ho testato valutazioni esperienze_Json fino a 11000 caratteri ed a questo livello appare come longString)
+			if((!(((VariableInstanceEntity) value).getType() instanceof SerializableType)) || (((VariableInstanceEntity) value).getType() instanceof LongStringType)){
+				if(key.toString().equals("startDate")) {
+					Date startDate = (Date)value.getValue();
+					SimpleDateFormat sdf = new  SimpleDateFormat("dd/MM/yyyy HH:mm");
+					sdf.setTimeZone(TimeZone.getTimeZone("Europe/Rome"));
+					variableInstanceJson.put(key, sdf.format(startDate));
+				} else {
+					String valueEscaped = "campo erroneamente compilato";
+					if (runtimeService.getVariable(processInstanceId,value.getName()) != null) {
+						valueEscaped = Jsoup.parse(StringEscapeUtils.escapeHtml(runtimeService.getVariable(processInstanceId,value.getName()).toString().replaceAll("\t", "  "))).text();
+						valueEscaped = valueEscaped.replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;");
+						variableInstanceJson.put(key, valueEscaped);
+					}
+				}
+			}
+		}
+		LOGGER.info("variableInstanceJson: {}", variableInstanceJson);
+
+		//Sotituisco la lista di variabili da quelle storiche (historicProcessInstance.getProcessVariables() )a quelle attuali (variableInstanceJson)
+		JSONObject processVariables = mappingVariableBeforeStartPi(variableInstanceJson, processInstanceId);
+		//creo il pdf corrispondente
+		String utenteRichiedente = "sistema";
+		String fileName = tipologiaDoc + ".pdf";
+
+		if(processVariables.has("nomeRichiedente")) {
+			utenteRichiedente = processVariables.getString("nomeRichiedente");
+			fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
+		}
+
+		if(processVariables.has("userNameRichiedente")) {
+			utenteRichiedente = processVariables.getString("userNameRichiedente");
+			fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
+		}
+		return Pair.of(fileName, makePdf(Enum.PdfType.valueOf(tipologiaDoc), processVariables, fileName, utenteRichiedente, processInstanceId));
+	}
+
 
 	//GESTIONE DEI PARAMETRI DA VISUALIZZARE
 	private void resetStatisticvariables() {

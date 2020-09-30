@@ -33,13 +33,12 @@ import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 
 @Controller
 @RequestMapping("api/attachments")
-@Profile("cnr")
 @Secured(AuthoritiesConstants.ADMIN)
+@Profile("cnr")
 public class FlowsCnrAdminTools {
     
     private final Logger log = LoggerFactory.getLogger(FlowsCnrAdminTools.class);
 
-    
     @Inject
     private HistoryService historyService;
     @Inject
@@ -49,10 +48,12 @@ public class FlowsCnrAdminTools {
     @Inject
     private ExternalMessageSender extenalMessageSender;
     
-    @RequestMapping(value = "/runcron", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> runCron() {
 
-        log.info("Running crons");
+    @RequestMapping(value = "/runcron", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
+    public ResponseEntity<Void> resendExternalMessages() {
+
+        log.info("Resending External Messages (manual trigger)");
         extenalMessageSender.sendMessages();
         extenalMessageSender.sendErrorMessages();
         return ResponseEntity.ok().build();
