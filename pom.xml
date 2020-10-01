@@ -397,6 +397,21 @@
             <version>3.0.6.RELEASE</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.alfresco</groupId>
+            <artifactId>alfresco-data-model</artifactId>
+            <version>4.2.4</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/alfresco-data-model-4.2.4.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.alfresco</groupId>
+            <artifactId>alfresco-core</artifactId>
+            <version>4.2.4</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/alfresco-core-4.2.4.jar</systemPath>
+        </dependency>
+
     </dependencies>
 
     <repositories>
