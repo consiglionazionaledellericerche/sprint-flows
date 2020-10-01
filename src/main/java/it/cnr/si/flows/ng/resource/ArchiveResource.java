@@ -18,14 +18,13 @@ import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
 import org.apache.commons.io.FileUtils;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
@@ -41,13 +40,13 @@ import java.util.Map;
 @Controller
 @Profile("cnr")
 @RequestMapping("api/archive")
-public class ArchiveSearchResource {
+public class ArchiveResource {
 
     @Inject
     private Utils util;
     @Inject
     private ArchiveProcessInstanceService archiveProcessInstanceService;
-    
+
     /**
      * Funzionalità di Ricerca delle Process Instances.
      *
@@ -55,7 +54,7 @@ public class ArchiveSearchResource {
      * @return le response entity frutto della ricerca
      */
     @PostMapping(value = "/search", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured(AuthoritiesConstants.USER)
+    @Secured(AuthoritiesConstants.ADMIN)
     @Timed
     public ResponseEntity<DataResponse> search(@RequestBody Map<String, String> params) {
 
@@ -71,5 +70,12 @@ public class ArchiveSearchResource {
 
         result = archiveProcessInstanceService.search(params, processDefinitionKey, active, order, firstResult, maxResults, true);
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping(value = "processInstances", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.ADMIN)
+    @Timed
+    public ResponseEntity getProcessInstanceById(@RequestParam("processInstanceId") String processInstanceId) {
+        return new ResponseEntity(archiveProcessInstanceService.getProcessInstanceWithDetails(processInstanceId), HttpStatus.OK);
     }
 }

@@ -12,7 +12,7 @@
     $scope.reload = false;
 
     vm.searchParams = $location.search();
-    vm.searchParams.active = $location.search().active || true;
+    vm.searchParams.active = false;
     vm.searchParams.order = $location.search().order || "ASC";
     vm.searchParams.page = $location.search().page || 1;
     vm.searchParams.processDefinitionKey = "all";

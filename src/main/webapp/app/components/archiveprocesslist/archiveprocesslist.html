@@ -1,36 +1,34 @@
 <div ng-show="processes" class="margin-bottom-helper tasks">
     <div class="row vertical-align-center well" ng-repeat="process in processes">
         <div class="col-md-10 col-sm-10">
-            <a ng-href="#/details?processInstanceId={{process.id}}"
-               title="dettagli del flusso {{process.id}}">
+            <a ng-href="#/details?processInstanceId={{process.id}}">
                 <small class="label"
                        ng-class="{'label-info' : process.endTime, 'label-primary' : !process.endTime}">
-                    {{process.businessKey}}
+                    {{process.variabili.wfcnr_wfCounterId}}
                 </small>
                 <br>
             </a>
             <div>
                 <ul class="list-unstyled">
                     <li>
-                        <h4>Titolo: {{process.name | get: 'titolo'}}</h4>
+                        <h4>Titolo: {{process.variabili.bpm_workflowDescription}}</h4>
                     </li>
                     <li>
-                        <h4>Descrizione: {{process.name | get: 'descrizione'}}</h4>
+                        <h4>Descrizione: {{process.variabili.bpm_description}}</h4>
                     </li>
                     <li>
-                        <h4>Stato: {{process.name | get: 'stato'}}</h4>
+                        <h4>Stato: {{process.variabili.bpm_status}}</h4>
                     </li>
                     <li>
-                        Avviato il <strong>{{process.startTime | dataora}}</strong> da asdasd as <strong> {{process.startUserId}} </strong>
+                        Avviato il <strong>{{process.startTime | dataora}}</strong> da <strong> {{process.startUserId}} </strong>
                     </li>
-                    <pre>{{process | json}}</pre>
                     <ng-include src="'api/views/' + process.processDefinitionId.split(':')[0] + '/' + process.processDefinitionId.split(':')[1] + '/search'" />
                 </ul>
             </div>
         </div>
         <div class="col-md-2 col-sm-2 text-right vertical-align-center">
             <div class="btn-group" role="group" aria-label="Left Align">
-                <a class="btn btn-default btn-sm" ng-href="#/details?processInstanceId={{process.id}}">
+                <a class="btn btn-default btn-sm" ng-href="#/archivedetails?processInstanceId={{process.id}}">
                     <span class="glyphicon glyphicon-hand-right" aria-hidden="true"></span> dettagli
                 </a>
             </div>
@@ -40,7 +38,6 @@
 <div class="loading-spiner-holder" style="text-align: center" data-loading>
     <div class="loading-spiner spinner-loader"></div>
 </div>
-<pre>{{processes | json}}</pre>
 <div ng-show="paging" style="text-align: center">
     <paginator paging="paging"></paginator>
 </div>

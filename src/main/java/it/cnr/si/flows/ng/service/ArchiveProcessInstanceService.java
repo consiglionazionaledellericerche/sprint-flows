@@ -66,13 +66,6 @@ public class ArchiveProcessInstanceService {
     @Inject @Qualifier("archiveProcessEngine")
     private ProcessEngine archiveProcessEngine;
 
-
-    public HistoricProcessInstance getProcessInstance(String processInstanceId) {
-        return archiveProcessEngine.getHistoryService().createHistoricProcessInstanceQuery()
-                .processInstanceId(processInstanceId)
-                .singleResult();
-    }
-
     public Map<String, Object> getProcessInstanceWithDetails(String processInstanceId) {
         Map<String, Object> result = new HashMap<>();
 
@@ -243,7 +236,7 @@ public class ArchiveProcessInstanceService {
         DataResponse response = new DataResponse();
         response.setStart(firstResult);
         response.setSize(processesRaw.size());// numero di task restituiti
-        response.setTotal(processQuery.count()); //numero totale di task avviati da me
+        response.setTotal(processQuery.count());
         response.setData(restResponseFactory.createHistoricProcessInstanceResponseList(processesRaw));
 
         return response;

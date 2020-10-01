@@ -2,16 +2,8 @@
 	<div class="row form-group">
 		<div class="col-md-12">
 			<ul class="nav nav-pills nav-justified">
-				<li role="presentation" ng-class="{'active': vm.searchParams.active}">
-					<a class="pointer" ng-click="vm.searchParams.active = true; search()" data-toggle="tab">
-						<h3>
-							<i class="glyphicon glyphicon-edit"></i>
-							Flussi attivi
-						</h3>
-					</a>
-				</li>
-				<li role="presentation" ng-class="{'active-info': !vm.searchParams.active}">
-					<a class="pointer" ng-click="vm.searchParams.active = false; search()" data-toggle="tab">
+				<li role="presentation" ng-class="{'active-info': true}">
+					<a class="pointer" data-toggle="tab">
 						<h3>
 							<i class="glyphicon glyphicon-check"></i>
 							Flussi terminati
@@ -24,7 +16,7 @@
 	<div class="row">
 		<div class="col-md-3 padding-top">
 
-<!-- 			<div>
+ 			<div>
 				<h4>Ordinamento temporale</h4>
 				<div>
 					<button class="btn btn-default btn-block margin-top-20"
@@ -65,19 +57,19 @@
 			<button ng-click="exportCsv()" class="btn btn-info">
 				<span class="glyphicon glyphicon-export"></span>
 				Esporta Csv
-			</button> -->
+			</button>
 		</div>
 
 
 		<div id="resultDiv" class="col-md-9" ng-cloak>
-			<h3>Flussi {{vm.searchParams.active ? 'attivi' : 'terminati'}}</h3>
+			<h3>Flussi terminati</h3>
 			<div class="row">
 				<div ng-show="vm.loading" class="text-center col-md-12">
 					<div ng-show="vm.loading" class="sprint-loader sprint-loader-mini"></div>
 					Loading...
 				</div>
 				<div ng-hide="vm.loading" class="col-md-12">
-					<process-list processes="vm.results" paging="paging"></process-list>
+					<archive-process-list processes="vm.results" paging="paging"></archive-process-list>
 				</div>
 			</div>
 

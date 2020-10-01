@@ -354,7 +354,11 @@
             archive: {
                 search: function(params) {
                     return $http.post('api/archive/search/', params);
-                }
+                },
+                byProcessInstanceId: function (processInstanceId, detail) {
+                    return $http.get('api/archive/processInstances' +
+                        '?processInstanceId=' + processInstanceId);
+                },
             }
         };
     }

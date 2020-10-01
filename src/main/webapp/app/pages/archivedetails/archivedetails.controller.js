@@ -1,11 +1,11 @@
 (function() {
 	'use strict';
 
-	angular.module('sprintApp').controller('DetailsController', DetailsController);
+	angular.module('sprintApp').controller('ArchiveDetailsController', ArchiveDetailsController);
 
-	DetailsController.$inject = ['$scope', '$rootScope', 'Principal', '$state', '$localStorage', 'dataService', 'AlertService', '$log', 'utils', '$uibModal'];
+	ArchiveDetailsController.$inject = ['$scope', '$rootScope', 'Principal', '$state', '$localStorage', 'dataService', 'AlertService', '$log', 'utils', '$uibModal'];
 
-	function DetailsController($scope, $rootScope, Principal, $state, $localStorage, dataService, AlertService, $log, utils, $uibModal) {
+	function ArchiveDetailsController($scope, $rootScope, Principal, $state, $localStorage, dataService, AlertService, $log, utils, $uibModal) {
 		$scope.button={};
 		$scope.button.disabled = true;
 		var vm = this;
@@ -30,7 +30,7 @@
 		});
 
 		if ($state.params.processInstanceId) {
-			dataService.archiveProcessInstances.byProcessInstanceId($state.params.processInstanceId, true).then(
+			dataService.archive.byProcessInstanceId($state.params.processInstanceId, true).then(
 				function(response) {
 					vm.data.entity = utils.refactoringVariables([response.data.entity])[0];
 					vm.initiator = JSON.parse(vm.data.entity.name).initiator; //serve per richiamare la "cronologia"
