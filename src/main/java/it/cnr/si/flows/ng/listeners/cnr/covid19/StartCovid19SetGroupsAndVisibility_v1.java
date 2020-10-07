@@ -3,6 +3,7 @@ package it.cnr.si.flows.ng.listeners.cnr.covid19;
 
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.service.AceService;
+import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
 import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import it.cnr.si.service.dto.anagrafica.scritture.UtenteDto;
@@ -55,7 +56,8 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 			} 			}
 		else {
 			//direttoreAce = aceService.bossFirmatarioByUsername(initiator, dateRif);
-			responsabileStruttura = aceService.findResponsabileStruttura(initiator, dateRif, null, "SEDE");
+			responsabileStruttura = aceService.findResponsabileStruttura(initiator, dateRif, TipoAppartenenza.SEDE, "responsabile-struttura");
+
 			if (responsabileStruttura.getUtente()== null) {
 				throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + initiator + " <br>Si prega di contattare l'help desk in merito<br>");
 			} else {

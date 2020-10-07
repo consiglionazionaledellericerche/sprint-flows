@@ -6,6 +6,7 @@ import it.cnr.si.flows.ng.repository.SetTimerDuedateCmd;
 import it.cnr.si.flows.ng.service.FlowsTimerService;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.service.AceService;
+import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
 import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import org.activiti.engine.ManagementService;
@@ -88,7 +89,7 @@ public class StartShortTermMobilityDomandeSetGroupsAndVisibility {
 
 		// VERIFICA DIRETTORE
 		//direttoreAce = aceService.bossFirmatarioByUsername(userNameProponente, dateRif);
-		responsabileStruttura = aceService.findResponsabileStruttura(userNameProponente, dateRif, null, "SEDE");
+		responsabileStruttura = aceService.findResponsabileStruttura(userNameProponente, dateRif, TipoAppartenenza.SEDE, "responsabile-struttura");
 		if (responsabileStruttura.getUtente()== null) {
 			throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + userNameProponente + " <br>Si prega di contattare l'help desk in merito<br>");
 		} else {

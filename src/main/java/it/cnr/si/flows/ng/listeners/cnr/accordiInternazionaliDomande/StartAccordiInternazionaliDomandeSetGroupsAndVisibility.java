@@ -3,6 +3,7 @@ package it.cnr.si.flows.ng.listeners.cnr.accordiInternazionaliDomande;
 
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.service.AceService;
+import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
 import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import org.activiti.engine.RuntimeService;
@@ -53,7 +54,7 @@ public class StartAccordiInternazionaliDomandeSetGroupsAndVisibility {
 
 		// VERIFICA RESPOSNABILE STRUTTURA AFFERENZA CDSUO
 		//direttoreAce = aceService.bossFirmatarioByUsername(userNameRichiedente, dateRif);
-		responsabileStruttura = aceService.findResponsabileStruttura(userNameRichiedente, dateRif, null, "AFFERENZA_UO");
+		responsabileStruttura = aceService.findResponsabileStruttura(userNameRichiedente, dateRif, TipoAppartenenza.AFFERENZA_UO, "responsabile-struttura");
 		if (responsabileStruttura.getUtente()== null) {
 			throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + userNameRichiedente + " <br>Si prega di contattare l'help desk in merito<br>");
 		} else {
