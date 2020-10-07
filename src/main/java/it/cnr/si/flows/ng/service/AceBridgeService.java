@@ -6,6 +6,7 @@ import it.cnr.si.service.AceService;
 import it.cnr.si.service.dto.anagrafica.base.PageDto;
 import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
 import it.cnr.si.service.dto.anagrafica.letture.*;
+import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
@@ -224,5 +225,9 @@ public class AceBridgeService {
 
     public List<GerarchiaWebDto> getParents(long id) {
 		return aceService.getParentsForEo(id);
+	}
+
+	public BossDto bossFirmatarioByUsername(String username) {
+		return aceService.findResponsabileUtente(username);
 	}
 }

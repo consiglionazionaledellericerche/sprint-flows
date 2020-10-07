@@ -23,8 +23,6 @@ import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 
 @Component
 @Profile("cnr")
-
-@Service
 public class StartCovid19SetGroupsAndVisibility_v1 {
 	private static final Logger LOGGER = LoggerFactory.getLogger(StartCovid19SetGroupsAndVisibility_v1.class);
 
@@ -32,8 +30,6 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 	private RuntimeService runtimeService;
 	@Inject
 	private AceService aceService;
-	@Inject
-
 
 	public void configuraVariabiliStart(DelegateExecution execution)  throws IOException, ParseException  {
 

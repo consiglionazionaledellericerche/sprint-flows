@@ -112,9 +112,9 @@ public class FlowsCnrAdminTools {
                         dbsfa = strutturaFirmatarioAttuale.getDenominazioneBreve();
                         dsfa = strutturaFirmatarioAttuale.getDenominazione();
                         cdsuosfa = strutturaFirmatarioAttuale.getCdsuo();
-                        BossDto boss = bossCache.computeIfAbsent(initiator, k -> aceService.bossFirmatarioByUsername(initiator));
-                        usernameBoss = boss.getUsername();
-                        gruppoFirmatarioDellUtente = "responsabile-struttura@"+ boss.getIdEntitaOrganizzativa();
+                        BossDto boss = bossCache.computeIfAbsent(initiator, k -> aceBridgeService.bossFirmatarioByUsername(initiator));
+                        usernameBoss = boss.getUtente().getUsername();
+                        gruppoFirmatarioDellUtente = "responsabile-struttura@"+ boss.getEntitaOrganizzativa().getId();
                         EntitaOrganizzativaWebDto strutturaFirmatarioDellUtente = aceBridgeService.getStrutturaById(Integer.parseInt(gruppoFirmatarioDellUtente.split("@")[1]));
                         dbsfu = strutturaFirmatarioDellUtente.getDenominazioneBreve();
                         dsfu = strutturaFirmatarioDellUtente.getDenominazione();

@@ -44,8 +44,6 @@ public class FlowsLookupResource {
     @Inject
     private AceBridgeService aceBridgeService;
     @Inject
-    private AceService aceService;
-    @Inject
     private FlowsLdapAccountService flowsLdapAccountService;
     @Inject
     private SiperService siperService;
@@ -55,9 +53,9 @@ public class FlowsLookupResource {
     @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Utils.SearchResult> getBossForCurrentUser() {
     	String username = SecurityUtils.getCurrentUserLogin();
-    	BossDto boss = aceService.bossFirmatarioByUsername(username);
-    	String nome = boss.getNome() +" "+ boss.getCognome();
-        return ResponseEntity.ok(new Utils.SearchResult(nome, nome));
+    	BossDto boss = aceBridgeService.bossFirmatarioByUsername(username);
+    	String fullname = boss.getUtente().getPersona().getNome() +" "+ boss.getUtente().getPersona().getCognome();
+        return ResponseEntity.ok(new Utils.SearchResult(fullname, fullname));
     }
     
     @RequestMapping(value = "/ace/user/{username:.+}", method = RequestMethod.GET)
