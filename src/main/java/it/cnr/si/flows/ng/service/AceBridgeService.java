@@ -228,6 +228,6 @@ public class AceBridgeService {
 	}
 
 	public BossDto bossFirmatarioByUsername(String username) {
-		return aceService.findResponsabileUtente(username);
+		return aceService.findResponsabileStruttura(username);
 	}
 }
