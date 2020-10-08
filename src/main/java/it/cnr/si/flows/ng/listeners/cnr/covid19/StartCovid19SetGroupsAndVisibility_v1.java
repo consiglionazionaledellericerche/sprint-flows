@@ -63,10 +63,10 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 			} else {
 				direttoreAce = responsabileStruttura.getUtente();
 			}
-			if (responsabileStruttura.getId()== null) {
+			if (responsabileStruttura.getEntitaOrganizzativa().getId()== null) {
 				throw new BpmnError("412", "l'utenza: " + initiator + " non risulta associata ad alcuna struttura<br>");
 			} else {
-				IdEntitaOrganizzativaDirettore = responsabileStruttura.getId();
+				IdEntitaOrganizzativaDirettore = responsabileStruttura.getEntitaOrganizzativa().getId();
 				entitaOrganizzativaDirettore = aceService.entitaOrganizzativaById(IdEntitaOrganizzativaDirettore);
 				cdsuoAppartenenzaUtente = entitaOrganizzativaDirettore.getCdsuo();
 				idnsipAppartenenzaUtente = entitaOrganizzativaDirettore.getIdnsip();					}

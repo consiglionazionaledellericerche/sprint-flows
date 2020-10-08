@@ -94,10 +94,10 @@ public class StartShortTermMobilityDomandeSetGroupsAndVisibility {
 			throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + userNameProponente + " <br>Si prega di contattare l'help desk in merito<br>");
 		} else {
 		}
-		if (responsabileStruttura.getId()== null) {
+		if (responsabileStruttura.getEntitaOrganizzativa().getId()== null) {
 			throw new BpmnError("412", "l'utenza: " + userNameProponente + " non risulta associata ad alcuna struttura<br>");
 		} else {
-			IdEntitaOrganizzativaDirettore = responsabileStruttura.getId();
+			IdEntitaOrganizzativaDirettore = responsabileStruttura.getEntitaOrganizzativa().getId();
 			entitaOrganizzativaDirettore = aceService.entitaOrganizzativaById(IdEntitaOrganizzativaDirettore);
 			cdsuoAppartenenzaUtente = entitaOrganizzativaDirettore.getCdsuo();
 		}
