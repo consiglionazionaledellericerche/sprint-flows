@@ -331,6 +331,7 @@ public class FlowsTaskResource {
                                                               @RequestParam("taskIds") List<String> taskIds)
             throws ArubaSignServiceException, FlowsPermissionException {
 
+        LOGGER.info("L'utente {} ha chiesto di effettuare la firma multipla sui task: {}", username, taskIds);
         verificaPrecondizioniFirmaMultipla(taskIds);
 
         List<Task> tasks = new ArrayList<>();
@@ -395,11 +396,12 @@ public class FlowsTaskResource {
             }
         }
 
-        return ResponseEntity.ok(
-                new HashMap<String, List<String>>() {{
-                    put("success", succesfulTasks);
-                    put("failure", failedTasks);
-                }});
+        Map<String, List<String>> response = new HashMap<String, List<String>>() {{
+            put("success", succesfulTasks);
+            put("failure", failedTasks);
+        }};
+        LOGGER.info("L'esito della richiesta dell'utente {}: {}", username, response);
+        return ResponseEntity.ok(response);
 
     }
 
