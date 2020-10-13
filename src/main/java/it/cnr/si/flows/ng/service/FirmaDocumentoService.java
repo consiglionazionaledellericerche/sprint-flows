@@ -10,9 +10,11 @@ import javax.inject.Inject;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
+import org.apache.pdfbox.pdmodel.encryption.SecurityHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.stereotype.Service;
 
 import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
@@ -31,7 +33,8 @@ public class FirmaDocumentoService {
     private FlowsAttachmentService flowsAttachmentService;
 
     public void eseguiFirma(DelegateExecution execution, String nomeVariabileFile, PdfSignApparence apparence) {
-
+        String currentUser = SecurityUtils.getCurrentUserLogin();
+        LOGGER.info("L'utente {} sta firmando il file {}", currentUser, nomeVariabileFile);
         TaskService taskService = execution.getEngineServices().getTaskService();
 
         if (nomeVariabileFile == null)
