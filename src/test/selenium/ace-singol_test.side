@@ -5,7 +5,7 @@
   "url": "https://nuovascrivaniadigitale.cnr.it/",
   "tests": [{
     "id": "4f0f3260-b8f9-48c2-822d-e319f39192c0",
-    "name": "roberto.puccinelli",
+    "name": "sebastiano.faro",
     "commands": [{
       "id": "529bf7c2-c081-42bc-bf37-ce939f2ce5d4",
       "comment": "",
@@ -24,7 +24,7 @@
       "id": "92d3cf18-bb89-4bbb-8ff8-dbb377dcd732",
       "comment": "",
       "command": "store",
-      "target": "roberto.puccinelli",
+      "target": "sebastiano.faro",
       "targets": [],
       "value": "user"
     }, {
@@ -425,10 +425,17 @@
       ],
       "value": ""
     }, {
+      "id": "1be68a27-231b-4563-a8ca-74717d4b67f3",
+      "comment": "",
+      "command": "//waitForText",
+      "target": "css=div:nth-child(2) > .text-center .info",
+      "targets": [],
+      "value": "//info[!contains(., 'Showing 1 - of items')]"
+    }, {
       "id": "40141262-7aa2-4c02-9a1f-25c7fc1d55ce",
       "comment": "",
       "command": "waitForElementNotPresent",
-      "target": "css=div.loading-spiner spinner-loader",
+      "target": "css=div.loading-spiner-holder",
       "targets": [
         ["css=div:nth-child(2) > .text-center .info", "css:finder"],
         ["xpath=//div[2]/div/jhi-item-count/div", "xpath:position"]
@@ -527,7 +534,7 @@
       "id": "0a7806b1-36ed-496a-bed9-ab793c4ee361",
       "comment": "",
       "command": "waitForElementNotPresent",
-      "target": "css=div.loading-spiner spinner-loader",
+      "target": "css=div.loading-spiner-holder",
       "targets": [
         ["css=div:nth-child(2) > .text-center .info", "css:finder"],
         ["xpath=//div[2]/div/jhi-item-count/div", "xpath:position"]
@@ -578,7 +585,7 @@
       "id": "c0d6ff79-8a8a-4cf2-8498-32f181f3bdfd",
       "comment": "",
       "command": "waitForElementNotPresent",
-      "target": "css=div.loading-spiner spinner-loader",
+      "target": "css=div.loading-spiner-holder",
       "targets": [
         ["css=div:nth-child(2) > .text-center .info", "css:finder"],
         ["xpath=//div[2]/div/jhi-item-count/div", "xpath:position"]
@@ -617,7 +624,7 @@
       "id": "a0fe6445-3933-4a9d-9220-07bad61079f6",
       "comment": "",
       "command": "waitForElementNotPresent",
-      "target": "css=div.loading-spiner spinner-loader",
+      "target": "css=div.loading-spiner-holder",
       "targets": [
         ["css=div:nth-child(2) > .text-center .info", "css:finder"],
         ["xpath=//div[2]/div/jhi-item-count/div", "xpath:position"]

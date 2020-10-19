@@ -114,13 +114,6 @@
       ],
       "value": "${user}"
     }, {
-      "id": "631c1064-5cad-48e8-bb6e-3cf938ac8bf3",
-      "comment": "",
-      "command": "//type",
-      "target": "id=username",
-      "targets": [],
-      "value": "roberto.puccinelli"
-    }, {
       "id": "59bb139d-3c56-4f4a-b7b3-9f1e32b15609",
       "comment": "",
       "command": "sendKeys",
@@ -428,7 +421,7 @@
       "id": "40141262-7aa2-4c02-9a1f-25c7fc1d55ce",
       "comment": "",
       "command": "waitForElementNotPresent",
-      "target": "css=div.loading-spiner spinner-loader",
+      "target": "css=div.loading-spiner-holder",
       "targets": [
         ["css=div:nth-child(2) > .text-center .info", "css:finder"],
         ["xpath=//div[2]/div/jhi-item-count/div", "xpath:position"]
@@ -476,7 +469,7 @@
       "id": "eee45ed2-1287-4f95-81ad-859e0d066694",
       "comment": "",
       "command": "waitForElementNotPresent",
-      "target": "css=div.loading-spiner spinner-loader",
+      "target": "css=div.loading-spiner-holder",
       "targets": [
         ["css=div:nth-child(2) > .text-center .info", "css:finder"],
         ["xpath=//div[2]/div/jhi-item-count/div", "xpath:position"]
@@ -527,7 +520,7 @@
       "id": "0a7806b1-36ed-496a-bed9-ab793c4ee361",
       "comment": "",
       "command": "waitForElementNotPresent",
-      "target": "css=div.loading-spiner spinner-loader",
+      "target": "css=div.loading-spiner-holder",
       "targets": [
         ["css=div:nth-child(2) > .text-center .info", "css:finder"],
         ["xpath=//div[2]/div/jhi-item-count/div", "xpath:position"]
@@ -803,13 +796,6 @@
         ["xpath=//input", "xpath:position"]
       ],
       "value": "${user}"
-    }, {
-      "id": "fbda30d8-2efb-4283-8f2b-9b25f5d00496",
-      "comment": "",
-      "command": "//type",
-      "target": "id=username",
-      "targets": [],
-      "value": "roberto.puccinelli"
     }, {
       "id": "f9dcc194-d5c3-46ce-9d68-233fd160d46c",
       "comment": "",
@@ -1494,13 +1480,6 @@
       ],
       "value": "${user}"
     }, {
-      "id": "8e9b9353-d393-4c5f-9b63-a53cbf46ef88",
-      "comment": "",
-      "command": "//type",
-      "target": "id=username",
-      "targets": [],
-      "value": "roberto.puccinelli"
-    }, {
       "id": "2b2af30f-3589-4ae8-bff2-5ca926e183e6",
       "comment": "",
       "command": "sendKeys",
@@ -2183,13 +2162,6 @@
         ["xpath=//input", "xpath:position"]
       ],
       "value": "${user}"
-    }, {
-      "id": "db4a00dc-f960-467b-92ee-c84a16dd6758",
-      "comment": "",
-      "command": "//type",
-      "target": "id=username",
-      "targets": [],
-      "value": "roberto.puccinelli"
     }, {
       "id": "6eb830aa-aeaf-456d-9905-fdb0695653db",
       "comment": "",
@@ -2874,13 +2846,6 @@
       ],
       "value": "${user}"
     }, {
-      "id": "8a7f9037-5cf8-4d16-96b2-19e61e071d26",
-      "comment": "",
-      "command": "//type",
-      "target": "id=username",
-      "targets": [],
-      "value": "roberto.puccinelli"
-    }, {
       "id": "171d7f13-9dd2-4949-9e38-f5bb7e48de8d",
       "comment": "",
       "command": "sendKeys",
@@ -3563,13 +3528,6 @@
         ["xpath=//input", "xpath:position"]
       ],
       "value": "${user}"
-    }, {
-      "id": "757560d7-768d-4cce-ba7b-feef37825c2b",
-      "comment": "",
-      "command": "//type",
-      "target": "id=username",
-      "targets": [],
-      "value": "roberto.puccinelli"
     }, {
       "id": "68268054-1951-4db9-9515-add956ec2f28",
       "comment": "",
@@ -4254,13 +4212,6 @@
       ],
       "value": "${user}"
     }, {
-      "id": "060395a5-0981-4f82-ab52-f01cb72cbedb",
-      "comment": "",
-      "command": "//type",
-      "target": "id=username",
-      "targets": [],
-      "value": "roberto.puccinelli"
-    }, {
       "id": "928e114c-d02c-49dc-b8eb-6f80d64b6581",
       "comment": "",
       "command": "sendKeys",
@@ -4944,13 +4895,6 @@
       ],
       "value": "${user}"
     }, {
-      "id": "1b285201-7fe4-437f-9a6c-6b22ab9d5a78",
-      "comment": "",
-      "command": "//type",
-      "target": "id=username",
-      "targets": [],
-      "value": "roberto.puccinelli"
-    }, {
       "id": "479234aa-fcc3-45a4-b818-08a03fa4fc53",
       "comment": "",
       "command": "sendKeys",
@@ -5255,15 +5199,22 @@
       ],
       "value": ""
     }, {
-      "id": "29b2116d-1c18-49c0-90c0-fd1a1d2f86de",
+      "id": "962b326a-1b7b-41fb-996a-e6059514529f",
       "comment": "",
       "command": "waitForElementNotPresent",
-      "target": "css=div.loading-spiner spinner-loader",
+      "target": "css=div.loading-spiner-holder",
       "targets": [
         ["css=div:nth-child(2) > .text-center .info", "css:finder"],
         ["xpath=//div[2]/div/jhi-item-count/div", "xpath:position"]
       ],
       "value": "10000"
+    }, {
+      "id": "29b2116d-1c18-49c0-90c0-fd1a1d2f86de",
+      "comment": "",
+      "command": "//waitForText",
+      "target": "css=div:nth-child(2) > .text-center .info",
+      "targets": [],
+      "value": "//html/body/div[3]/div[3]/div/div[2]/div[3]/div[2]/div/jhi-item-count/div[!contains(., 'Showing 1 - of items.')]"
     }, {
       "id": "1f27d5bb-ea2a-4763-9113-66c631106ed8",
       "comment": "",
@@ -5306,7 +5257,7 @@
       "id": "0983502e-73fe-42f3-82fd-1b7e875d32d0",
       "comment": "",
       "command": "waitForElementNotPresent",
-      "target": "css=div.loading-spiner spinner-loader",
+      "target": "css=div.loading-spiner-holder",
       "targets": [
         ["css=div:nth-child(2) > .text-center .info", "css:finder"],
         ["xpath=//div[2]/div/jhi-item-count/div", "xpath:position"]
@@ -5357,7 +5308,7 @@
       "id": "35fe847c-504a-4c91-8bdd-27c80c525df3",
       "comment": "",
       "command": "waitForElementNotPresent",
-      "target": "css=div.loading-spiner spinner-loader",
+      "target": "css=div.loading-spiner-holder",
       "targets": [
         ["css=div:nth-child(2) > .text-center .info", "css:finder"],
         ["xpath=//div[2]/div/jhi-item-count/div", "xpath:position"]
@@ -5421,6 +5372,13 @@
       "target": "css=div:nth-child(3) > .text-center .info",
       "targets": [],
       "value": "processInstanceActiveLocalhost"
+    }, {
+      "id": "cffa594d-ad1b-4249-8577-a73c8bc1f195",
+      "comment": "",
+      "command": "echo",
+      "target": "",
+      "targets": [],
+      "value": "${processInstanceActive} - ${processInstanceActiveLocalhost}"
     }, {
       "id": "0e1731fc-b6a8-4b67-8042-502498d383dc",
       "comment": "",
@@ -5633,13 +5591,6 @@
         ["xpath=//input", "xpath:position"]
       ],
       "value": "${user}"
-    }, {
-      "id": "ee73c898-4f96-4e81-838e-af27707b1dbb",
-      "comment": "",
-      "command": "//type",
-      "target": "id=username",
-      "targets": [],
-      "value": "roberto.puccinelli"
     }, {
       "id": "87e67bfa-6d3c-4f4c-a701-500baefaf7b0",
       "comment": "",
