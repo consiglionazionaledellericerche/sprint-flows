@@ -77,7 +77,7 @@ public class StartAccordiInternazionaliDomandeSetGroupsAndVisibility {
 		//		String cdsuoEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getCdsuo().toString();
 		//		String idnsipEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getIdnsip().toString();	
 
-		LOGGER.info("L'utente {} ha come direttore {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", userNameRichiedente, responsabileStruttura.getUtente().getUsername(), denominazioneEntitaorganizzativaResponsabileUtente, entitaOrganizzativaDirettore.getSigla(), entitaOrganizzativaDirettore.getId(), entitaOrganizzativaDirettore.getCdsuo(), entitaOrganizzativaDirettore.getIdnsip());
+		LOGGER.info("L'utente {} ha come responabile-struttura [{}] {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", userNameRichiedente, responsabileStruttura.getRuolo().getDescr(), responsabileStruttura.getUtente().getUsername(), denominazioneEntitaorganizzativaResponsabileUtente, entitaOrganizzativaDirettore.getSigla(), entitaOrganizzativaDirettore.getId(), entitaOrganizzativaDirettore.getCdsuo(), entitaOrganizzativaDirettore.getIdnsip());
 
 		String gruppoValidatoriAccordiInternazionali = "validatoriAccordiInternazionali@0000";
 		String gruppoUfficioProtocollo = "ufficioProtocolloAccordiInternazionali@0000";
