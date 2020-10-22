@@ -82,7 +82,7 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 
 
 		//EntitaOrganizzativaWebDto utenteAce = aceBridgeService.getAfferenzaUtentePerSede(execution.getVariable("initiator").toString());
-		UtenteDto utente = aceService.getUtente(execution.getVariable("initiator").toString());
+		SimpleUtenteWebDto utente = aceService.getUtente(execution.getVariable("initiator").toString());
 
 		execution.setVariable("matricola", utente.getPersona().getMatricola());
 		execution.setVariable("nomeCognomeUtente", utente.getPersona().getNome() + " " + utente.getPersona().getCognome());

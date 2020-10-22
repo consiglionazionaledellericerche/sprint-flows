@@ -30,6 +30,7 @@ import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
 
 @Controller
 @RequestMapping("api/attachments")
@@ -108,15 +109,13 @@ public class FlowsCnrAdminTools {
                     String dsfu = null;
                     String cdsuosfu = null;
                     try {
-                        EntitaOrganizzativaWebDto strutturaFirmatarioAttuale = aceBridgeService.getStrutturaById(Integer.parseInt(gruppoFirmatarioAttuale.split("@")[1]));
-                        dbsfa = strutturaFirmatarioAttuale.getDenominazioneBreve();
+                        SimpleEntitaOrganizzativaWebDto strutturaFirmatarioAttuale = aceBridgeService.getStrutturaById(Integer.parseInt(gruppoFirmatarioAttuale.split("@")[1]));
                         dsfa = strutturaFirmatarioAttuale.getDenominazione();
                         cdsuosfa = strutturaFirmatarioAttuale.getCdsuo();
                         BossDto boss = bossCache.computeIfAbsent(initiator, k -> aceBridgeService.bossFirmatarioByUsername(initiator));
                         usernameBoss = boss.getUtente().getUsername();
                         gruppoFirmatarioDellUtente = "responsabile-struttura@"+ boss.getEntitaOrganizzativa().getId();
-                        EntitaOrganizzativaWebDto strutturaFirmatarioDellUtente = aceBridgeService.getStrutturaById(Integer.parseInt(gruppoFirmatarioDellUtente.split("@")[1]));
-                        dbsfu = strutturaFirmatarioDellUtente.getDenominazioneBreve();
+                        SimpleEntitaOrganizzativaWebDto strutturaFirmatarioDellUtente = aceBridgeService.getStrutturaById(Integer.parseInt(gruppoFirmatarioDellUtente.split("@")[1]));
                         dsfu = strutturaFirmatarioDellUtente.getDenominazione();
                         cdsuosfu = strutturaFirmatarioDellUtente.getCdsuo();
                         if(!gruppoFirmatarioAttuale.equals(gruppoFirmatarioDellUtente)) {

@@ -31,6 +31,7 @@ import it.cnr.si.service.AceService;
 import it.cnr.si.service.FlowsLdapAccountService;
 import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
 
 @RestController
 @RequestMapping("api/lookup")
@@ -80,7 +81,7 @@ public class FlowsLookupResource {
     @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Utils.SearchResult> getUoById(@PathVariable Integer id) {
 
-        EntitaOrganizzativaWebDto s = aceBridgeService.getUoById(id);
+        SimpleEntitaOrganizzativaWebDto s = aceBridgeService.getUoById(id);
         Utils.SearchResult r = new Utils.SearchResult(s.getId().toString(), s.getCdsuo() +" - "+ s.getDenominazione());
 
         return ResponseEntity.ok(r);

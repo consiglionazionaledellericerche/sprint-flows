@@ -9,6 +9,8 @@ import it.cnr.si.service.AceService;
 import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
 import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
+
 import org.activiti.engine.ManagementService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.BpmnError;
@@ -83,7 +85,7 @@ public class StartShortTermMobilityDomandeSetGroupsAndVisibility {
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", userNameProponente, execution.getId(), execution.getVariable("title"));
 		String cdsuoAppartenenzaUtente = null;
 		Integer IdEntitaOrganizzativaDirettore = 0;
-		EntitaOrganizzativaWebDto entitaOrganizzativaDirettore = null;
+		SimpleEntitaOrganizzativaWebDto entitaOrganizzativaDirettore = null;
 		LocalDate dateRif = LocalDate.now();
 		BossDto responsabileStruttura = null;
 

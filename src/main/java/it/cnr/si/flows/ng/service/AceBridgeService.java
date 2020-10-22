@@ -7,6 +7,10 @@ import it.cnr.si.service.dto.anagrafica.base.PageDto;
 import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
 import it.cnr.si.service.dto.anagrafica.letture.*;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
@@ -35,7 +39,7 @@ public class AceBridgeService {
 
 		log.debug("Recupero i ruoli per l'utente {}", loginUsername);
 
-		ArrayList<RuoloUtenteWebDto> ruoliUtente = aceService.ruoloUtente(loginUsername);
+		ArrayList<BossDto> ruoliUtente = aceService.ruoloUtente(loginUsername);
 
 		return ruoliUtente.stream()
 				.filter(r -> r.getAttivo())
@@ -68,52 +72,41 @@ public class AceBridgeService {
 		
 		int idEo = Integer.parseInt(split[1]);
 
-		int idRuolo = getIdRuoloBySigla(sigla);
-
 		if (idEo != 0 )
-			return aceService.getUtentiInRuoloEo(idRuolo, idEo).stream()
+			return aceService.getUtentiInRuoloEo(sigla, idEo).stream()
 					.map(p -> aceService.getUtente(p.getUtente()))
 					.map(u -> u.getUsername())
 					.collect(Collectors.toList());
 		else
-			return aceService.getUtentiInRuoloCnr(idRuolo)
+			return aceService.getUtentiInRuoloCnr(sigla)
 					.stream()
-					.map(RuoloUtenteWebDto::getUtente)
-					.map(UtenteWebDto::getUsername)
+					.map(BossDto::getUtente)
+					.map(SimpleUtenteWebDto::getUsername)
 					.collect(Collectors.toList());
 	}
 
-	public EntitaOrganizzativaWebDto getUoById(int id) {
+	public SimpleEntitaOrganizzativaWebDto getUoById(int id) {
 
 		return aceService.entitaOrganizzativaById(id);
 	}
 
-	public List<EntitaOrganizzativaWebDto> getUoLike(String uoName) {
+	public List<SimpleEntitaOrganizzativaWebDto> getUoLike(String uoName) {
 
-		return aceService.entitaOrganizzativaFind(null, null, uoName, LocalDate.now(), null)
-				.getItems()
+		return aceService.entitaOrganizzativaFind(null, uoName, LocalDate.now(), null)
 				.stream()
-				.filter(e -> Enum.TipiEOPerAutocomplete.contains(e.getTipo().getId()))
-				//                .map(e -> Pair.of(e.getId(), e.getCdsuo() +" - "+ e.getDenominazione()))
+                // TODO qui sicuramente c'e' un errore perche' e' cambiato il tipo (da int a String) di Tipi
+//				.filter(e -> Enum.TipiEOPerAutocomplete.contains(e.getTipo().getId()))
 				.collect(Collectors.toList());
 	}
 
+	public List<SimpleEntitaOrganizzativaWebDto> getUoByTipo(int tipo) {
 
-	//	todo: in futuro rendere cacheable?
-	public List<EntitaOrganizzativaWebDto> getUoByTipo(int tipo) {
-
-		return aceService.entitaOrganizzativaFind(null, null, null, LocalDate.now(), tipo)
-				.getItems()
+		return aceService.entitaOrganizzativaFind(null, null, LocalDate.now(), tipo)
 				.stream()
-				.filter(e -> Enum.TipiEOPerAutocomplete.contains(e.getTipo().getId()))
+				// TODO qui sicuramente c'e' un errore perche' e' cambiato il tipo di Tipi
+//				.filter(e -> Enum.TipiEOPerAutocomplete.contains(e.getTipo().getDescr())) 
 				//                .map(e -> Pair.of(e.getId(), e.getCdsuo() +" - "+ e.getDenominazione()))
 				.collect(Collectors.toList());
-	}
-
-	@Cacheable("idRuoloBySigla")
-	public int getIdRuoloBySigla(String sigla) {
-
-		return aceService.getRuoloBySigla(sigla).getId();
 	}
 
 	@Cacheable("nuomeRuoloBySigla")
@@ -132,7 +125,7 @@ public class AceBridgeService {
 		}
 	}
 
-	public EntitaOrganizzativaWebDto getStrutturaById(Integer id) {
+	public SimpleEntitaOrganizzativaWebDto getStrutturaById(Integer id) {
 		return aceService.entitaOrganizzativaById(id);
 	}
 
@@ -158,7 +151,7 @@ public class AceBridgeService {
 
 	public EntitaOrganizzativaWebDto getAfferenzaUtente(String username) {
 
-		PersonaWebDto persona = aceService.getPersonaByUsername(username);
+		SimplePersonaWebDto persona = aceService.getPersonaByUsername(username);
 		List<PersonaEntitaOrganizzativaWebDto> personaEntitaOrganizzativaWebDtos = aceService.personaEntitaOrganizzativaFind(null, null, null, persona.getId(), TipoAppartenenza.AFFERENZA_UO, null, null, null, null);
 		List<PersonaEntitaOrganizzativaWebDto> afferenze = personaEntitaOrganizzativaWebDtos.stream()
 				.filter(p -> Objects.isNull(p.getFineValidita()))
@@ -174,7 +167,7 @@ public class AceBridgeService {
 
 	public EntitaOrganizzativaWebDto getAfferenzaUtentePerSede(String username) {
 
-		PersonaWebDto persona = aceService.getPersonaByUsername(username);
+	    SimplePersonaWebDto persona = aceService.getPersonaByUsername(username);
 		List<PersonaEntitaOrganizzativaWebDto> personaEntitaOrganizzativaWebDtos = aceService.personaEntitaOrganizzativaFind(null, null, null, persona.getId(), TipoAppartenenza.SEDE, null, null, null, null);
 		List<PersonaEntitaOrganizzativaWebDto> afferenze = personaEntitaOrganizzativaWebDtos.stream()
 				.filter(p -> Objects.isNull(p.getFineValidita()))
@@ -190,7 +183,7 @@ public class AceBridgeService {
 
 	public EntitaOrganizzativaWebDto getAfferenzaUtenteTipoSede(String username) {
 
-		PersonaWebDto persona = aceService.getPersonaByUsername(username);
+	    SimplePersonaWebDto persona = aceService.getPersonaByUsername(username);
 		List<PersonaEntitaOrganizzativaWebDto> personaEntitaOrganizzativaWebDtos = aceService.personaEntitaOrganizzativaFind(null, null, null, persona.getId(), TipoAppartenenza.SEDE, null, null, null, null);
 		List<PersonaEntitaOrganizzativaWebDto> afferenze = personaEntitaOrganizzativaWebDtos.stream()
 				.filter(p -> Objects.isNull(p.getFineValidita()))
@@ -205,14 +198,15 @@ public class AceBridgeService {
 	}
 
 
-	public EntitaOrganizzativaWebDto getEntitaOrganizzativaDellUtente(String username) {
+	public SimpleEntitaOrganizzativaWebDto getEntitaOrganizzativaDellUtente(String username) {
 
 		String cdsuo = getAfferenzaUtente(username).getCdsuo();
 
-		PageDto<EntitaOrganizzativaWebDto> entitaOrganizzativaWebDtoPageDto = aceService.entitaOrganizzativaFind(null, null, cdsuo, LocalDate.now(), null);
+		List<SimpleEntitaOrganizzativaWebDto> entitaOrganizzativaWebDtoPageDto = aceService.entitaOrganizzativaFind(null, cdsuo, LocalDate.now(), null);
 
-		List<EntitaOrganizzativaWebDto> eos = entitaOrganizzativaWebDtoPageDto.getItems().stream()
-				.filter(eo -> Objects.isNull(eo.getEntitaLocale()))
+		List<SimpleEntitaOrganizzativaWebDto> eos = entitaOrganizzativaWebDtoPageDto.stream()
+		        // TODO verificare che finalita' avesse questo check eo.getEntitaLocale()
+//				.filter(eo -> Objects.isNull(eo.getEntitaLocale()))
 				.collect(Collectors.toList());
 
 		if (eos.size() == 0)

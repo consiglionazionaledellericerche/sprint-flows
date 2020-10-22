@@ -6,6 +6,8 @@ import it.cnr.si.service.AceService;
 import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
 import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
+
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
@@ -44,7 +46,7 @@ public class StartAccordiInternazionaliDomandeSetGroupsAndVisibility {
 		//Integer cdsuoAppartenenzaUtente = aceBridgeService.getEntitaOrganizzativaDellUtente(richiedente.toString()).getId();
 		String cdsuoAppartenenzaUtente = null;
 		Integer IdEntitaOrganizzativaDirettore = 0;
-		EntitaOrganizzativaWebDto entitaOrganizzativaDirettore = null;
+		SimpleEntitaOrganizzativaWebDto entitaOrganizzativaDirettore = null;
 		LocalDate dateRif = LocalDate.now();
 		BossDto responsabileStruttura = null;
 		String denominazioneEntitaorganizzativaResponsabileUtente = null;
