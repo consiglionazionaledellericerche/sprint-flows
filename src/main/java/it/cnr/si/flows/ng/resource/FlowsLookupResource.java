@@ -100,7 +100,7 @@ public class FlowsLookupResource {
                     return aceBridgeService.getStrutturaById(id);
                 })
                 .map(eo -> {
-                    return new Utils.SearchResult(String.valueOf(eo.getId()), eo.getCdsuo() +" - "+ eo.getDenominazioneBreve());
+                    return new Utils.SearchResult(String.valueOf(eo.getId()), eo.getCdsuo() +" - "+ eo.getDenominazione());
                 }).collect(Collectors.toList());
 
         return ResponseEntity.ok(CDSUOs);

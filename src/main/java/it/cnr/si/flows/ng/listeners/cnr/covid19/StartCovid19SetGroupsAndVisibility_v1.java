@@ -7,6 +7,7 @@ import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
 import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import it.cnr.si.service.dto.anagrafica.scritture.UtenteDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.BpmnError;
@@ -43,7 +44,7 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 		SimpleUtenteWebDto direttoreAce = null;
 		Integer IdEntitaOrganizzativaDirettore = 0;
 		String denominazioneEO  = null;
-		EntitaOrganizzativaWebDto entitaOrganizzativaDirettore = null;
+		SimpleEntitaOrganizzativaWebDto entitaOrganizzativaDirettore = null;
 		LocalDate dateRif = LocalDate.now();
 		BossDto responsabileStruttura = null;
 

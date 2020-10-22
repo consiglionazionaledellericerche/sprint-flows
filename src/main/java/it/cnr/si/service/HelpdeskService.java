@@ -7,6 +7,8 @@ import it.cnr.si.flows.ng.utils.proxy.ResultProxy;
 import it.cnr.si.security.SecurityUtils;
 import it.cnr.si.service.dto.anagrafica.scritture.PersonaDto;
 import it.cnr.si.service.dto.anagrafica.scritture.UtenteDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
 
 import org.hibernate.service.spi.ServiceException;
 import org.slf4j.Logger;
@@ -38,10 +40,10 @@ public class HelpdeskService {
     public Long newProblem(ExternalProblem hd, String browser) throws ServiceException {
 
 //    	PersonaWebDto flowsUser = aceService.getPersonaByUsername(SecurityUtils.getCurrentUserLogin());
-        UtenteDto flowsUser = aceService.getUtente(SecurityUtils.getCurrentUserLogin());
+        SimpleUtenteWebDto flowsUser = aceService.getUtente(SecurityUtils.getCurrentUserLogin());
         hd.setLogin(flowsUser.getUsername());
 
-        PersonaDto persona = flowsUser.getPersona();
+        SimplePersonaWebDto persona = flowsUser.getPersona();
         String nomeCognomeString = "";
         if(persona != null) {
             hd.setFirstName(persona.getNome());
