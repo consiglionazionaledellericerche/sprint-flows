@@ -42,7 +42,6 @@ public class AceBridgeService {
 		ArrayList<BossDto> ruoliUtente = aceService.ruoloUtente(loginUsername);
 
 		return ruoliUtente.stream()
-				.filter(r -> r.getAttivo())
 				.map(ruoloUtente -> {
 					if ( ruoloUtente.getEntitaOrganizzativa() != null) {
 						return ruoloUtente.getRuolo().getSigla() + "@" + ruoloUtente.getEntitaOrganizzativa().getId();
