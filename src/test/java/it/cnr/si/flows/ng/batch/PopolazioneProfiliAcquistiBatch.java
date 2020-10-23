@@ -30,83 +30,83 @@ import java.util.stream.Stream;
 @RunWith(SpringJUnit4ClassRunner.class)
 @Ignore
 public class PopolazioneProfiliAcquistiBatch {
-
-	private static final Logger log = LoggerFactory.getLogger(PopolazioneProfiliAcquistiBatch.class);
-
-	@Inject
-	private AceService aceService;
-	@Inject
-	private AceBridgeService aceBridgeService;
-	private final Map<String, String> errors = new HashMap<>();
-
-	//@Test questa riga non va mai messa su git
-	public void runBatch() throws IOException {
-		Map<String, String> persone = getPersoneDaFile();
-
-		persone.forEach( (username, siglaRuolo) -> {
-			inserisciRuolo(username, siglaRuolo);
-		});
-
-		errors.forEach( (tripla, risultato) -> {
-			log.error(tripla +": "+ risultato);
-		});
-	}
-
-	private void inserisciRuolo(String username, String siglaRuolo) {
-
-		EntitaOrganizzativaWebDto afferenzaUtente = aceBridgeService.getAfferenzaUtente(username);
-		String cdsuo = afferenzaUtente.getCdsuo();
-
-
-		List<SimpleEntitaOrganizzativaWebDto> eos = aceService.entitaOrganizzativaFind(null, cdsuo, LocalDate.now(), null);
-		SimpleUtenteWebDto persona = aceService.getUtente(username);
-
-		eos.forEach(eo -> {
-
-			Integer idRuolo = aceService.getRuoloBySigla(siglaRuolo).getId();
-			Integer idEo = eo.getId();
-			Integer idPersona = persona.getId();
-
-			try {
-				aceService.associaRuoloPersona(idRuolo, idPersona, idEo);
-				log.info("Associato ruolo {} persona {} eo {}", idRuolo, idPersona, idEo);
-				errors.put(username + " "+ siglaRuolo + " "+ eo.getSigla() + "("+ eo.getId() +")", "OK");
-			} catch (RuntimeException e) {
-				if (e.getMessage().contains("Il Ruolo specificato e' gia' presente")) {
-					errors.put(username + " "+ siglaRuolo + " "+ eo.getSigla() + "("+ eo.getId() +")", "PRESENTE");
-				} else {
-					log.error("Errore nella richiesta", e);
-					errors.put(username + " "+ siglaRuolo + " "+ eo.getSigla() + "("+ eo.getId() +")", e.getMessage());	
-				}
-			}
-		});
-
-
-	}
-
-	private Map<String, String> getPersoneDaFile() throws IOException {
-
-		CSVParser parser = new CSVParser(',');
-
-		Stream<String> lines = Files.lines(Paths.get("./src/test/resources/batch/190627 associazione utenze ruolo per ACE 07 maggio.csv"));
-
-		Map<String, String> associazioni = new HashMap<>();
-
-		lines
-				.skip(1).
-				forEach(l -> {
-					try {
-
-						String[] values = parser.parseLine(l);
-						log.info(values[0] + " " + values[1]);
-						associazioni.put(values[0], values[1]);
-
-					} catch (IOException e) {e.printStackTrace();}
-				});
-
-
-		return associazioni;
-	}
+//
+//	private static final Logger log = LoggerFactory.getLogger(PopolazioneProfiliAcquistiBatch.class);
+//
+//	@Inject
+//	private AceService aceService;
+//	@Inject
+//	private AceBridgeService aceBridgeService;
+//	private final Map<String, String> errors = new HashMap<>();
+//
+//	//@Test questa riga non va mai messa su git
+//	public void runBatch() throws IOException {
+//		Map<String, String> persone = getPersoneDaFile();
+//
+//		persone.forEach( (username, siglaRuolo) -> {
+//			inserisciRuolo(username, siglaRuolo);
+//		});
+//
+//		errors.forEach( (tripla, risultato) -> {
+//			log.error(tripla +": "+ risultato);
+//		});
+//	}
+//
+//	private void inserisciRuolo(String username, String siglaRuolo) {
+//
+//		EntitaOrganizzativaWebDto afferenzaUtente = aceBridgeService.getAfferenzaUtente(username);
+//		String cdsuo = afferenzaUtente.getCdsuo();
+//
+//
+//		List<SimpleEntitaOrganizzativaWebDto> eos = aceService.entitaOrganizzativaFind(null, cdsuo, LocalDate.now(), null);
+//		SimpleUtenteWebDto persona = aceService.getUtente(username);
+//
+//		eos.forEach(eo -> {
+//
+//			Integer idRuolo = aceService.getRuoloBySigla(siglaRuolo).getId();
+//			Integer idEo = eo.getId();
+//			Integer idPersona = persona.getId();
+//
+//			try {
+//				aceService.associaRuoloPersona(idRuolo, idPersona, idEo);
+//				log.info("Associato ruolo {} persona {} eo {}", idRuolo, idPersona, idEo);
+//				errors.put(username + " "+ siglaRuolo + " "+ eo.getSigla() + "("+ eo.getId() +")", "OK");
+//			} catch (RuntimeException e) {
+//				if (e.getMessage().contains("Il Ruolo specificato e' gia' presente")) {
+//					errors.put(username + " "+ siglaRuolo + " "+ eo.getSigla() + "("+ eo.getId() +")", "PRESENTE");
+//				} else {
+//					log.error("Errore nella richiesta", e);
+//					errors.put(username + " "+ siglaRuolo + " "+ eo.getSigla() + "("+ eo.getId() +")", e.getMessage());
+//				}
+//			}
+//		});
+//
+//
+//	}
+//
+//	private Map<String, String> getPersoneDaFile() throws IOException {
+//
+//		CSVParser parser = new CSVParser(',');
+//
+//		Stream<String> lines = Files.lines(Paths.get("./src/test/resources/batch/190627 associazione utenze ruolo per ACE 07 maggio.csv"));
+//
+//		Map<String, String> associazioni = new HashMap<>();
+//
+//		lines
+//				.skip(1).
+//				forEach(l -> {
+//					try {
+//
+//						String[] values = parser.parseLine(l);
+//						log.info(values[0] + " " + values[1]);
+//						associazioni.put(values[0], values[1]);
+//
+//					} catch (IOException e) {e.printStackTrace();}
+//				});
+//
+//
+//		return associazioni;
+//	}
 }
 
 

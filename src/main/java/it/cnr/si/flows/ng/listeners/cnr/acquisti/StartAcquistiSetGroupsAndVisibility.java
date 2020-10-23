@@ -2,7 +2,7 @@ package it.cnr.si.flows.ng.listeners.cnr.acquisti;
 
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.CounterService;
-import it.cnr.si.flows.ng.service.SiperService;
+import it.cnr.si.flows.ng.service.FlowsSiperService;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.MembershipService;
@@ -45,7 +45,7 @@ public class StartAcquistiSetGroupsAndVisibility {
 	@Inject
 	private AceService aceService;
 	@Inject
-	private SiperService siperService;
+	private FlowsSiperService flowsSiperService;
 	@Inject
 	private MembershipService membershipService;
 

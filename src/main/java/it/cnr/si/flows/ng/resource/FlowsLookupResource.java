@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import it.cnr.si.flows.ng.service.FlowsSiperService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -23,13 +24,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import it.cnr.si.flows.ng.ldap.LdapPersonToSearchResultMapper;
 import it.cnr.si.flows.ng.service.AceBridgeService;
-import it.cnr.si.flows.ng.service.SiperService;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.service.AceService;
 import it.cnr.si.service.FlowsLdapAccountService;
-import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
 
@@ -47,7 +45,7 @@ public class FlowsLookupResource {
     @Inject
     private FlowsLdapAccountService flowsLdapAccountService;
     @Inject
-    private SiperService siperService;
+    private FlowsSiperService flowsSiperService;
 
     
     @RequestMapping(value = "/ace/boss", method = RequestMethod.GET)
@@ -133,7 +131,7 @@ public class FlowsLookupResource {
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<List<Map<String, Object>>> getResponsabileSede(@PathVariable String cdsuo) {
 
-        return ResponseEntity.ok(siperService.getResponsabileCDSUO(cdsuo));
+        return ResponseEntity.ok(flowsSiperService.getResponsabileCDSUO(cdsuo));
     }
 
 }
