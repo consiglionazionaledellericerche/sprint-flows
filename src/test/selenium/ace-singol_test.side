@@ -46,53 +46,28 @@
       "comment": "",
       "command": "mouseOver",
       "target": "id=entity-menu",
-      "targets": [
-        ["id=entity-menu", "id"],
-        ["linkText=Entità", "linkText"],
-        ["css=#entity-menu", "css:finder"],
-        ["xpath=//a[@id='entity-menu']", "xpath:attributes"],
-        ["xpath=(//a[contains(@href, '')])[11]", "xpath:href"],
-        ["xpath=//li[8]/a", "xpath:position"],
-        ["xpath=//a[contains(.,' Entità')]", "xpath:innerText"]
-      ],
+      "targets": [],
       "value": ""
     }, {
       "id": "ee4ca31b-2df7-4871-8c71-36f367fd9290",
       "comment": "",
       "command": "mouseOut",
       "target": "id=entity-menu",
-      "targets": [
-        ["id=entity-menu", "id"],
-        ["linkText=Entità", "linkText"],
-        ["css=#entity-menu", "css:finder"],
-        ["xpath=//a[@id='entity-menu']", "xpath:attributes"],
-        ["xpath=(//a[contains(@href, '')])[12]", "xpath:href"],
-        ["xpath=//li[8]/a", "xpath:position"],
-        ["xpath=//a[contains(.,' Entità')]", "xpath:innerText"]
-      ],
+      "targets": [],
       "value": ""
     }, {
       "id": "617ff4df-d9e4-4adb-b3dc-9effc7788282",
       "comment": "",
       "command": "click",
       "target": "css=#admin-menu .hidden-sm",
-      "targets": [
-        ["css=#admin-menu .hidden-sm", "css:finder"],
-        ["xpath=//a[@id='admin-menu']/span/span[2]", "xpath:idRelative"],
-        ["xpath=//li[9]/a/span/span[2]", "xpath:position"]
-      ],
+      "targets": [],
       "value": ""
     }, {
       "id": "99961259-f05a-4279-a36f-17c8e422dd3c",
       "comment": "",
       "command": "click",
       "target": "css=#switchuser > span:nth-child(2)",
-      "targets": [
-        ["css=#switchuser > span:nth-child(2)", "css:finder"],
-        ["xpath=//a[@id='switchuser']/span[2]", "xpath:idRelative"],
-        ["xpath=//li[9]/ul/li[11]/a/span[2]", "xpath:position"],
-        ["xpath=//span[contains(.,'Impersona Utente')]", "xpath:innerText"]
-      ],
+      "targets": [],
       "value": ""
     }, {
       "id": "9bfba42f-ab75-4217-bed0-9840f0008d89",
@@ -106,62 +81,35 @@
       "comment": "",
       "command": "type",
       "target": "id=username",
-      "targets": [
-        ["id=username", "id"],
-        ["css=#username", "css:finder"],
-        ["xpath=//input[@id='username']", "xpath:attributes"],
-        ["xpath=//input", "xpath:position"]
-      ],
-      "value": "${user}"
-    }, {
-      "id": "631c1064-5cad-48e8-bb6e-3cf938ac8bf3",
-      "comment": "",
-      "command": "//type",
-      "target": "id=username",
       "targets": [],
-      "value": "roberto.puccinelli"
+      "value": "${user}"
     }, {
       "id": "59bb139d-3c56-4f4a-b7b3-9f1e32b15609",
       "comment": "",
       "command": "sendKeys",
       "target": "id=username",
-      "targets": [
-        ["id=username", "id"],
-        ["css=#username", "css:finder"],
-        ["xpath=//input[@id='username']", "xpath:attributes"],
-        ["xpath=//input", "xpath:position"]
-      ],
+      "targets": [],
       "value": "${KEY_ENTER}"
     }, {
       "id": "2d140a65-fee6-491e-9785-c8b3bea5e95d",
       "comment": "",
       "command": "click",
       "target": "css=li:nth-child(2) .hidden-sm",
-      "targets": [
-        ["css=li:nth-child(2) .hidden-sm", "css:finder"],
-        ["xpath=//li[2]/a/span[2]", "xpath:position"],
-        ["xpath=//span[contains(.,'I miei compiti')]", "xpath:innerText"]
-      ],
+      "targets": [],
       "value": ""
     }, {
       "id": "3a282899-71e7-4a30-b428-e18a319615a3",
       "comment": "",
       "command": "waitForElementNotPresent",
       "target": "css=div.loading-spiner spinner-loader",
-      "targets": [
-        ["css=div:nth-child(2) > .text-center .info", "css:finder"],
-        ["xpath=//div[2]/div/jhi-item-count/div", "xpath:position"]
-      ],
+      "targets": [],
       "value": "10000"
     }, {
       "id": "fbc2fffa-6921-4086-8e68-1b8e698a6f73",
       "comment": "",
       "command": "storeText",
       "target": "css=div:nth-child(2) > .text-center .info",
-      "targets": [
-        ["css=div:nth-child(2) > .text-center .info", "css:finder"],
-        ["xpath=//div[2]/div/jhi-item-count/div", "xpath:position"]
-      ],
+      "targets": [],
       "value": "availableTasks"
     }, {
       "id": "4c84bbce-5008-4711-80cb-81b23cdb211b",
@@ -175,184 +123,119 @@
       "comment": "",
       "command": "click",
       "target": "css=.mine h3",
-      "targets": [
-        ["css=.mine h3", "css:finder"],
-        ["xpath=//h3", "xpath:position"],
-        ["xpath=//h3[contains(.,' Compiti assegnati a me: 1')]", "xpath:innerText"]
-      ],
+      "targets": [],
       "value": ""
     }, {
       "id": "f1bfefbe-b745-4ee2-9954-98fd9ef15342",
       "comment": "",
       "command": "waitForElementNotPresent",
       "target": "css=div.loading-spiner spinner-loader",
-      "targets": [
-        ["css=div:nth-child(2) > .text-center .info", "css:finder"],
-        ["xpath=//div[2]/div/jhi-item-count/div", "xpath:position"]
-      ],
+      "targets": [],
       "value": "10000"
     }, {
       "id": "1094867a-775f-4db4-9722-6c19cbe3bc32",
       "comment": "",
       "command": "storeText",
       "target": "css=div:nth-child(1) > .text-center .info",
-      "targets": [
-        ["css=div:nth-child(1) > .text-center .info", "css:finder"],
-        ["xpath=//jhi-item-count/div", "xpath:position"]
-      ],
+      "targets": [],
       "value": "myTask"
     }, {
       "id": "f37bed97-0d5d-4cbb-aa2c-56676ccb31e3",
       "comment": "",
       "command": "click",
       "target": "css=.others h3",
-      "targets": [
-        ["css=.others h3", "css:finder"],
-        ["xpath=//li[3]/a/uib-tab-heading/h3", "xpath:position"]
-      ],
+      "targets": [],
       "value": ""
     }, {
       "id": "6cab0b18-2e08-4b91-a8e3-83d28aaccff7",
       "comment": "",
       "command": "waitForElementNotPresent",
       "target": "css=div.loading-spiner spinner-loader",
-      "targets": [
-        ["css=div:nth-child(2) > .text-center .info", "css:finder"],
-        ["xpath=//div[2]/div/jhi-item-count/div", "xpath:position"]
-      ],
+      "targets": [],
       "value": "10000"
     }, {
       "id": "7ecf4623-9f8b-4dcc-ad63-c3b964d4cfdf",
       "comment": "",
       "command": "storeText",
       "target": "css=div:nth-child(3) > .text-center .info",
-      "targets": [
-        ["css=div:nth-child(1) > .text-center .info", "css:finder"],
-        ["xpath=//jhi-item-count/div", "xpath:position"]
-      ],
+      "targets": [],
       "value": "taskAssignedInMyGroups"
     }, {
       "id": "cc660c57-ae87-469e-ab19-27201321a57b",
       "comment": "",
       "command": "click",
       "target": "css=li:nth-child(5) .hidden-sm",
-      "targets": [
-        ["css=li:nth-child(5) .hidden-sm", "css:finder"],
-        ["xpath=//li[5]/a/span[2]", "xpath:position"],
-        ["xpath=//span[contains(.,'Ricerca')]", "xpath:innerText"]
-      ],
+      "targets": [],
       "value": ""
     }, {
       "id": "88ff4045-4ed2-4067-adcf-1cfccf7702e3",
       "comment": "",
       "command": "mouseOver",
       "target": "linkText=Ricerca",
-      "targets": [
-        ["linkText=Ricerca", "linkText"],
-        ["css=.active:nth-child(5) > a", "css:finder"],
-        ["xpath=//a[contains(@href, '#/search')]", "xpath:href"],
-        ["xpath=//li[5]/a", "xpath:position"],
-        ["xpath=//a[contains(.,' Ricerca')]", "xpath:innerText"]
-      ],
+      "targets": [],
       "value": ""
     }, {
       "id": "a7af9a36-baf4-42d8-9a95-61617247aa40",
       "comment": "",
       "command": "waitForElementNotPresent",
       "target": "css=div.loading-spiner spinner-loader",
-      "targets": [
-        ["css=div:nth-child(2) > .text-center .info", "css:finder"],
-        ["xpath=//div[2]/div/jhi-item-count/div", "xpath:position"]
-      ],
+      "targets": [],
       "value": "10000"
     }, {
       "id": "8ccba495-a55c-437c-a039-d16f6d889965",
       "comment": "",
       "command": "storeText",
       "target": "css=div:nth-child(3) > .text-center .info",
-      "targets": [
-        ["css=div:nth-child(1) > .text-center .info", "css:finder"],
-        ["xpath=//jhi-item-count/div", "xpath:position"]
-      ],
+      "targets": [],
       "value": "processInstanceActive"
     }, {
       "id": "14bfe90b-a054-42df-92fd-706951dec708",
       "comment": "",
       "command": "click",
       "target": "linkText=Flussi terminati",
-      "targets": [
-        ["linkText=Flussi terminati", "linkText"],
-        ["css=li:nth-child(2) > .pointer", "css:finder"],
-        ["xpath=//div/div/ul/li[2]/a", "xpath:position"],
-        ["xpath=//a[contains(.,' Flussi terminati')]", "xpath:innerText"]
-      ],
+      "targets": [],
       "value": ""
     }, {
       "id": "12551950-f30e-4adf-a5e1-bf8061ad493a",
       "comment": "",
       "command": "waitForElementNotPresent",
       "target": "css=div.loading-spiner spinner-loader",
-      "targets": [
-        ["css=div:nth-child(2) > .text-center .info", "css:finder"],
-        ["xpath=//div[2]/div/jhi-item-count/div", "xpath:position"]
-      ],
+      "targets": [],
       "value": "10000"
     }, {
       "id": "3b37c761-ba5b-498e-b4de-a9afcec42d09",
       "comment": "",
       "command": "storeText",
       "target": "css=div:nth-child(3) > .text-center .info",
-      "targets": [
-        ["css=div:nth-child(1) > .text-center .info", "css:finder"],
-        ["xpath=//jhi-item-count/div", "xpath:position"]
-      ],
+      "targets": [],
       "value": "processInstanceTerminated"
     }, {
       "id": "2b9b54f4-bf8b-4942-b4ce-31068eb04fc5",
       "comment": "",
       "command": "click",
       "target": "css=.label-warning",
-      "targets": [
-        ["css=.label-warning", "css:finder"],
-        ["xpath=//div[2]/ul/li[11]/a/span", "xpath:position"],
-        ["xpath=//span[contains(.,' Impersonating: roberto.puccinelli')]", "xpath:innerText"]
-      ],
+      "targets": [],
       "value": ""
     }, {
       "id": "b35e9c13-ec31-4b7a-8572-6271fd896f8e",
       "comment": "",
       "command": "mouseOver",
       "target": "linkText=Home",
-      "targets": [
-        ["linkText=Home", "linkText"],
-        ["css=.navbar-nav > li:nth-child(1) > a", "css:finder"],
-        ["xpath=(//a[contains(@href, '#/')])[3]", "xpath:href"],
-        ["xpath=//li/a", "xpath:position"],
-        ["xpath=//a[contains(.,' Home')]", "xpath:innerText"]
-      ],
+      "targets": [],
       "value": ""
     }, {
       "id": "216afe73-9615-47e8-893a-b08a73c1593c",
       "comment": "",
       "command": "mouseOut",
       "target": "linkText=Home",
-      "targets": [
-        ["linkText=Home", "linkText"],
-        ["css=.navbar-nav > li:nth-child(1) > a", "css:finder"],
-        ["xpath=(//a[contains(@href, '#/')])[3]", "xpath:href"],
-        ["xpath=//li/a", "xpath:position"],
-        ["xpath=//a[contains(.,' Home')]", "xpath:innerText"]
-      ],
+      "targets": [],
       "value": ""
     }, {
       "id": "9bcf5e0d-5dad-428f-8779-b8d35b40e7c0",
       "comment": "",
       "command": "mouseOver",
       "target": "css=.active h3",
-      "targets": [
-        ["css=.active h3", "css:finder"],
-        ["xpath=//li[2]/a/uib-tab-heading/h3", "xpath:position"]
-      ],
+      "targets": [],
       "value": ""
     }, {
       "id": "178d386a-d592-4a9d-b928-d176e0c49515",
@@ -434,13 +317,24 @@
     }, {
       "id": "40141262-7aa2-4c02-9a1f-25c7fc1d55ce",
       "comment": "",
-      "command": "waitForElementNotPresent",
+      "command": "//waitForElementNotPresent",
       "target": "css=div.loading-spiner-holder",
-      "targets": [
-        ["css=div:nth-child(2) > .text-center .info", "css:finder"],
-        ["xpath=//div[2]/div/jhi-item-count/div", "xpath:position"]
-      ],
-      "value": "10000"
+      "targets": [],
+      "value": "30000"
+    }, {
+      "id": "75963538-bbdb-401e-bbc1-af7c11ec915b",
+      "comment": "",
+      "command": "//waitForText",
+      "target": "css=div:nth-child(2) > .text-center .info",
+      "targets": [],
+      "value": "Showing [0-9]+[0-9]* - [0-9]+[0-9]* of [0-9]+[0-9]* items."
+    }, {
+      "id": "ebcf0a36-f684-49e5-96bc-1ade069bab15",
+      "comment": "",
+      "command": "waitForElementPresent",
+      "target": "css=div:nth-child(2) > .text-center .info",
+      "targets": [],
+      "value": "30000"
     }, {
       "id": "73d8c511-71cb-4199-a17b-91e7a47ecdc7",
       "comment": "",
@@ -482,13 +376,17 @@
     }, {
       "id": "eee45ed2-1287-4f95-81ad-859e0d066694",
       "comment": "",
-      "command": "waitForElementNotPresent",
+      "command": "//waitForElementNotPresent",
       "target": "css=div.loading-spiner spinner-loader",
-      "targets": [
-        ["css=div:nth-child(2) > .text-center .info", "css:finder"],
-        ["xpath=//div[2]/div/jhi-item-count/div", "xpath:position"]
-      ],
+      "targets": [],
       "value": "10000"
+    }, {
+      "id": "7f4d495a-b8c7-48cd-aae0-92ff183c8b6c",
+      "comment": "",
+      "command": "waitForElementPresent",
+      "target": "css=div:nth-child(1) > .text-center .info",
+      "targets": [],
+      "value": "30000"
     }, {
       "id": "bf601c99-dacd-482e-b2dc-9fd73e684e22",
       "comment": "",
@@ -533,13 +431,17 @@
     }, {
       "id": "0a7806b1-36ed-496a-bed9-ab793c4ee361",
       "comment": "",
-      "command": "waitForElementNotPresent",
+      "command": "//waitForElementNotPresent",
       "target": "css=div.loading-spiner-holder",
-      "targets": [
-        ["css=div:nth-child(2) > .text-center .info", "css:finder"],
-        ["xpath=//div[2]/div/jhi-item-count/div", "xpath:position"]
-      ],
+      "targets": [],
       "value": "10000"
+    }, {
+      "id": "7a30ba5f-9c9f-4c25-946e-61ba724f38a0",
+      "comment": "",
+      "command": "waitForElementPresent",
+      "target": "css=div:nth-child(3) > .text-center .info",
+      "targets": [],
+      "value": "30000"
     }, {
       "id": "2eb5cac9-39f9-4427-8b7c-aae53a7561f6",
       "comment": "",
@@ -585,10 +487,11 @@
       "id": "c0d6ff79-8a8a-4cf2-8498-32f181f3bdfd",
       "comment": "",
       "command": "waitForElementNotPresent",
-      "target": "css=div.loading-spiner-holder",
+      "target": "css=.row:nth-child(2) > .text-center",
       "targets": [
-        ["css=div:nth-child(2) > .text-center .info", "css:finder"],
-        ["xpath=//div[2]/div/jhi-item-count/div", "xpath:position"]
+        ["css=.row:nth-child(2) > .text-center", "css:finder"],
+        ["xpath=//div[@id='resultDiv']/div/div", "xpath:idRelative"],
+        ["xpath=//div[2]/div[2]/div/div", "xpath:position"]
       ],
       "value": "10000"
     }, {
@@ -629,7 +532,7 @@
         ["css=div:nth-child(2) > .text-center .info", "css:finder"],
         ["xpath=//div[2]/div/jhi-item-count/div", "xpath:position"]
       ],
-      "value": "10000"
+      "value": "20000"
     }, {
       "id": "e8db8a73-67ac-43c3-b1f8-908014766c1a",
       "comment": "",
