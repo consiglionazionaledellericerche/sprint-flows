@@ -10,6 +10,8 @@ import it.cnr.si.service.dto.anagrafica.scritture.UtenteDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
 
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
 import org.hibernate.service.spi.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +46,7 @@ public class HelpdeskService {
         hd.setLogin(flowsUser.getUsername());
 
         SimplePersonaWebDto persona = flowsUser.getPersona();
-        String nomeCognomeString = "";
+        String nomeCognomeString;
         if(persona != null) {
             hd.setFirstName(persona.getNome());
             hd.setFamilyName(persona.getCognome());
