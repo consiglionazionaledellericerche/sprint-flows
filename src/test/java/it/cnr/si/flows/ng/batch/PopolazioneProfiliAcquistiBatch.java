@@ -5,7 +5,8 @@ import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
-import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -57,8 +58,8 @@ public class PopolazioneProfiliAcquistiBatch {
 		String cdsuo = afferenzaUtente.getCdsuo();
 
 
-		List<EntitaOrganizzativaWebDto> eos = aceService.entitaOrganizzativaFind(null, null, cdsuo, LocalDate.now(), null).getItems();
-		PersonaWebDto persona = aceService.personaByUsername(username);
+		List<SimpleEntitaOrganizzativaWebDto> eos = aceService.entitaOrganizzativaFind(null, cdsuo, LocalDate.now(), null);
+		SimpleUtenteWebDto persona = aceService.getUtente(username);
 
 		eos.forEach(eo -> {
 

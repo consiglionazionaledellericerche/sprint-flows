@@ -10,7 +10,7 @@ import it.cnr.si.flows.ng.utils.Utils.associazioneRuoloPersonaCDSUO;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.RelationshipService;
-import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -96,7 +96,7 @@ public class PopolazioneProfiliPerCDSUOAcquistiBatch {
 			}
 			Object insdipResponsabileUo = new Object();
 			String usernameResponsabileUO = null;
-			EntitaOrganizzativaWebDto entitaOrganizzativaRespUo = null;
+			SimpleEntitaOrganizzativaWebDto entitaOrganizzativaRespUo = null;
 			try {
 				insdipResponsabileUo = siperService.getResponsabileCDSUO(cdsuoAppartenenzaUtente).get(0).get("codice_sede");
 				log.info("getResponsabileCDSUO  FUNZIONA ");

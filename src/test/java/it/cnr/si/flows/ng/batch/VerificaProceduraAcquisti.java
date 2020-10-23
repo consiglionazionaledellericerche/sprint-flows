@@ -7,7 +7,7 @@ import it.cnr.si.flows.ng.exception.UnexpectedResultException;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.SiperService;
 import it.cnr.si.service.AceService;
-import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -86,7 +86,7 @@ public class VerificaProceduraAcquisti {
 					String idnsipResponsabileUo = responsabileUo.get("codice_sede").toString();
 					log.info("-------------- getResponsabileCDSUO  FUNZIONA per CDSUO {} con IDNSIP {}", cdsuoAppartenenzaUtente, idnsipResponsabileUo);
 					String usernameResponsabile = responsabileUo.get("uid").toString();
-					EntitaOrganizzativaWebDto entitaOrganizzativaRespUo = null;
+					SimpleEntitaOrganizzativaWebDto entitaOrganizzativaRespUo = null;
 					try {
 						entitaOrganizzativaRespUo = aceService.entitaOrganizzativaFindByTerm(idnsipResponsabileUo.toString()).get(0);
 					} catch(UnexpectedResultException | FeignException | HttpClientErrorException error4) {
