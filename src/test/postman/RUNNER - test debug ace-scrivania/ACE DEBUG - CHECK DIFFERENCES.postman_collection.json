@@ -611,7 +611,7 @@
 							"\r",
 							"console.log(\"TEST_nr_active_tasks = \", postman.getGlobalVariable(\"TEST_nr_active_tasks\"));\r",
 							"\r",
-							"pm.test(\"nr_active_tasks for: \" + postman.getGlobalVariable(\"nomeUtente\"), function () {\r",
+							"pm.test(\"nr_active_tasks for PROD (\" + postman.getGlobalVariable(\"PROD_nr_active_tasks\") + \") and TEST (\" + postman.getGlobalVariable(\"TEST_nr_active_tasks\") + \") --- \" + postman.getGlobalVariable(\"nomeUtente\"), function () {\r",
 							"    pm.expect(postman.getGlobalVariable(\"PROD_nr_active_tasks\")).to.equal(postman.getGlobalVariable(\"TEST_nr_active_tasks\"));\r",
 							"});\r",
 							""
@@ -688,7 +688,7 @@
 							"\r",
 							"console.log(\"TEST_nr_available_tasks = \", postman.getGlobalVariable(\"TEST_nr_available_tasks\"));\r",
 							"\r",
-							"pm.test(\"nr_available_tasks for: \" + postman.getGlobalVariable(\"nomeUtente\"), function () {\r",
+							"pm.test(\"nr_available_tasks for PROD (\" + postman.getGlobalVariable(\"PROD_nr_available_tasks\") + \") and TEST (\" + postman.getGlobalVariable(\"TEST_nr_available_tasks\") + \") --- \" + postman.getGlobalVariable(\"nomeUtente\"), function () {\r",
 							"    pm.expect(postman.getGlobalVariable(\"PROD_nr_available_tasks\")).to.equal(postman.getGlobalVariable(\"TEST_nr_available_tasks\"));\r",
 							"});\r",
 							""
@@ -765,7 +765,7 @@
 							"\r",
 							"console.log(\"TEST_nr_AssignedInMyGroups_tasks = \", postman.getGlobalVariable(\"TEST_nr_AssignedInMyGroups_tasks\"));\r",
 							"\r",
-							"pm.test(\"nr_AssignedInMyGroups_tasks for: \" + postman.getGlobalVariable(\"nomeUtente\"), function () {\r",
+							"pm.test(\"nr_AssignedInMyGroups_tasks for PROD (\" + postman.getGlobalVariable(\"PROD_nr_AssignedInMyGroups_tasks\") + \") and TEST (\" + postman.getGlobalVariable(\"TEST_nr_AssignedInMyGroups_tasks\") + \") --- \" + postman.getGlobalVariable(\"nomeUtente\"), function () {\r",
 							"    pm.expect(postman.getGlobalVariable(\"PROD_nr_AssignedInMyGroups_tasks\")).to.equal(postman.getGlobalVariable(\"TEST_nr_AssignedInMyGroups_tasks\"));\r",
 							"});\r",
 							""
@@ -845,7 +845,7 @@
 							"console.log(\"--- = \",  postman.getGlobalVariable(\"nomeUtente\") );\r",
 							"\r",
 							"\r",
-							"pm.test(\"nr_active_processess for: \" + data.username  + \"   \" + postman.getGlobalVariable(\"nomeUtente\"), function () {\r",
+							"pm.test(\"nr_active_processess for PROD (\" + postman.getGlobalVariable(\"PROD_nr_active_processess\") + \") and TEST (\" + postman.getGlobalVariable(\"TEST_nr_active_processess\") + \") --- \" + postman.getGlobalVariable(\"nomeUtente\"), function () {\r",
 							"    pm.expect(postman.getGlobalVariable(\"PROD_nr_active_processess\")).to.equal(postman.getGlobalVariable(\"TEST_nr_active_processess\"));\r",
 							"});\r",
 							""
@@ -920,7 +920,7 @@
 							"console.log(\"TEST_nr_terminated_processess = \", postman.getGlobalVariable(\"TEST_nr_terminated_processess\"));\r",
 							"\r",
 							"\r",
-							"pm.test(\"nr_terminated_processess for: \" + postman.getGlobalVariable(\"nomeUtente\"), function () {\r",
+							"pm.test(\"nr_terminated_processess for PROD (\" + postman.getGlobalVariable(\"PROD_nr_terminated_processess\") + \") and TEST (\" + postman.getGlobalVariable(\"TEST_nr_terminated_processess\") + \") --- \" + postman.getGlobalVariable(\"nomeUtente\"), function () {\r",
 							"    pm.expect(postman.getGlobalVariable(\"PROD_nr_terminated_processess\")).to.equal(postman.getGlobalVariable(\"TEST_nr_terminated_processess\"));\r",
 							"});\r",
 							"\r",
