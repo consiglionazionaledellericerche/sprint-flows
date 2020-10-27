@@ -3,6 +3,7 @@ package it.cnr.si.flows.ng.resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -59,8 +60,8 @@ public class FlowsLookupResource {
     
     @RequestMapping(value = "/ace/user/{username:.+}", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.ADMIN)
-    public List<String> getAce(@PathVariable String username) {
-        return aceBridgeService.getAceGroupsForUser(username);
+    public Set<String> getAce(@PathVariable String username) {
+        return aceBridgeService.getAceRolesForUser(username);
     }
 
     @RequestMapping(value = "/ace/usersingroup/{groupname:.+}", method = RequestMethod.GET)

@@ -49,7 +49,7 @@ public class FlowsAuthoritiesPopulator implements LdapAuthoritiesPopulator {
             log.debug("no attribute {} defined for user {}", DEPARTMENT_NUMBER, username);
         }
 
-        List<GrantedAuthority> fullGrantedAuthorities = membershipService.getAllGroupsForUser(username)
+        List<GrantedAuthority> fullGrantedAuthorities = membershipService.getAllRolesForUser(username)
                 .stream()
                 .map(Utils::addLeadingRole)
                 .map(SimpleGrantedAuthority::new)

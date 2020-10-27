@@ -19,9 +19,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static it.cnr.si.security.PermissionEvaluatorImpl.CNR_CODE;
@@ -35,21 +33,19 @@ public class AceBridgeService {
 	@Inject
 	private AceService aceService;
 
-	public List<String> getAceGroupsForUser(String loginUsername) {
+	public Set<String> getAceRolesForUser(String username) {
 
-		log.debug("Recupero i ruoli per l'utente {}", loginUsername);
-
-		ArrayList<BossDto> ruoliUtente = aceService.ruoloUtente(loginUsername);
-
-		return ruoliUtente.stream()
-				.map(ruoloUtente -> {
-					if ( ruoloUtente.getEntitaOrganizzativa() != null) {
-						return ruoloUtente.getRuolo().getSigla() + "@" + ruoloUtente.getEntitaOrganizzativa().getId();
-					} else {
-						return ruoloUtente.getRuolo().getSigla() + "@" + CNR_CODE;
-					}
-				})
-				.collect(Collectors.toList());
+		Set<String> ruoli = new HashSet<>();
+		aceService.ruoloUtente(username).stream().forEach(ruoloUtente -> {
+					String idStruttura = ruoloUtente.getEntitaOrganizzativa() != null ?
+							ruoloUtente.getEntitaOrganizzativa().getId().toString() :
+							CNR_CODE;
+					ruoli.add(ruoloUtente.getRuolo().getSigla() + "@" + idStruttura);
+					ruoloUtente.getRuolo().getRuoliGruppoAssociati().stream().forEach(ruoloAssociato ->
+						ruoli.add(ruoloAssociato.getSigla() + "@" + idStruttura));
+				});
+		log.debug("Ruoli da ace per l'utente {}: {}", username, ruoli);
+		return ruoli;
 	}
 
 	/*

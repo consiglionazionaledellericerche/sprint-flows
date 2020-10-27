@@ -56,7 +56,7 @@ public class StartAcquistiSetGroupsAndVisibility {
 		// LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable(Enum.VariableEnum.title.name()));
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
 
-		List<String> groups = membershipService.getAllGroupsForUser(initiator).stream()
+		List<String> groups = membershipService.getAllRolesForUser(initiator).stream()
 				.filter(g -> g.startsWith("staffAmministrativo@"))
 				.collect(Collectors.toList());
 
