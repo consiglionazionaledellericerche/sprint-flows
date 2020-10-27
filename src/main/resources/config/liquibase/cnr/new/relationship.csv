@@ -2,14 +2,6 @@ ID;GROUP_NAME;GROUP_RELATIONSHIP;GROUP_ROLE
 1;staffAmministrativo@STRUTTURA;supervisore#acquisti@STRUTTURA;member
 2;afferenza@2216;gestori_strutture@2216;member
 3;staffAmministrativo@STRUTTURA;abilitati#acquisti@STRUTTURA;coordinator
-4;direttore@99999;delegatofirma@99999;coordinator
-5;direttore@STRUTTURA;responsabile-struttura@STRUTTURA;member
-6;responsabileSede@STRUTTURA;responsabile-struttura@STRUTTURA;member
-8;direttoreFF@STRUTTURA;responsabile-struttura@STRUTTURA;member
-9;direttoreAI@STRUTTURA;responsabile-struttura@STRUTTURA;member
-10;direttoreGeneraleFF@STRUTTURA;responsabile-struttura@STRUTTURA;member
-11;dirigente@STRUTTURA;responsabile-struttura@STRUTTURA;member
-12;dirigenteAI@STRUTTURA;responsabile-struttura@STRUTTURA;member
 15;direttore@STRUTTURA;responsabileFirmaAcquisti@STRUTTURA;member
 16;responsabileSede@STRUTTURA;responsabileFirmaAcquisti@STRUTTURA;member
 17;direttoreFF@STRUTTURA;responsabileFirmaAcquisti@STRUTTURA;member
@@ -19,7 +11,4 @@ ID;GROUP_NAME;GROUP_RELATIONSHIP;GROUP_ROLE
 21;dirigenteAI@STRUTTURA;responsabileFirmaAcquisti@STRUTTURA;member
 30;delegato@34409;responsabileAccordiInternazionali@0000;member
 31;responsabile-struttura@34403;responsabileAccordiInternazionali@0000;member
-32;delegato@STRUTTURA;responsabile-struttura@STRUTTURA;member
 33;USER;abilitati#covid19@STRUTTURA;member
-34;dirigenteArt19@STRUTTURA;responsabile-struttura@STRUTTURA;member
-35;coordinatore@STRUTTURA;responsabile-struttura@STRUTTURA;member
