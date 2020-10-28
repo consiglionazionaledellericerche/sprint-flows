@@ -94,13 +94,12 @@ public class AceBridgeService {
 				.collect(Collectors.toList());
 	}
 
-	public List<SimpleEntitaOrganizzativaWebDto> getUoByTipo(int tipo) {
+	public List<SimpleEntitaOrganizzativaWebDto> getUoByTipo(int idTipo) {
 
-		return aceService.entitaOrganizzativaFind(null, null, LocalDate.now(), tipo)
+		return aceService.entitaOrganizzativaFind(null, null, LocalDate.now(), idTipo)
 				.stream()
-				// TODO qui sicuramente c'e' un errore perche' e' cambiato il tipo di Tipi
-//				.filter(e -> Enum.TipiEOPerAutocomplete.contains(e.getTipo().getDescr())) 
-				//                .map(e -> Pair.of(e.getId(), e.getCdsuo() +" - "+ e.getDenominazione()))
+				.filter(e -> e.getTipo().getDescr().equals(Enum.TipiEOPerAutocomplete.byId(idTipo).name()) )
+//				                .map(e -> Pair.of(e.getId(), e.getCdsuo() +" - "+ e.getDenominazione()))
 				.collect(Collectors.toList());
 	}
 
