@@ -3,6 +3,7 @@ package it.cnr.si.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.domain.Draft;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
+import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.DraftService;
 import it.cnr.si.web.rest.util.HeaderUtil;
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -146,6 +148,7 @@ public class DraftResource {
     @GetMapping(value = "/draft/getDraftByProcessDefinitionId",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
+    @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Draft> getDraftByProcessDefinitionId(@RequestParam("processDefinitionId") String processDefinitionId) {
         log.debug("REST request to get Draft by ProcessDefinition : {}", processDefinitionId);
 
