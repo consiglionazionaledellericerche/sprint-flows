@@ -36,7 +36,7 @@ public class AceBridgeService {
 	public Set<String> getAceRolesForUser(String username) {
 
 		Set<String> ruoli = new HashSet<>();
-		aceService.ruoloUtente(username).stream().forEach(ruoloUtente -> {
+		aceService.ruoliUtenteAttivi(username).stream().forEach(ruoloUtente -> {
 					String idStruttura = ruoloUtente.getEntitaOrganizzativa() != null ?
 							ruoloUtente.getEntitaOrganizzativa().getId().toString() :
 							CNR_CODE;
