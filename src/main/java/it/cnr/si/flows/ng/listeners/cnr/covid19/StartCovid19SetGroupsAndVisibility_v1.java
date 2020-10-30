@@ -17,6 +17,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+
+import feign.FeignException;
+
 import javax.inject.Inject;
 import java.io.IOException;
 import java.text.ParseException;
@@ -56,25 +59,27 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 				throw new BpmnError("416", "l'utenza: " + initiator + " non risulta associata <br>ad alcuna struttura per il periodo di riferimento<br>");
 			} 			}
 		else {
-			//direttoreAce = aceService.bossFirmatarioByUsername(initiator, dateRif);
-			responsabileStruttura = aceService.findResponsabileStruttura(initiator, dateRif, TipoAppartenenza.SEDE, "responsabile-struttura");
+			try {
 
-			if (responsabileStruttura.getUtente()== null) {
-				throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + initiator + " <br>Si prega di contattare l'help desk in merito<br>");
-			} else {
-				direttoreAce = responsabileStruttura.getUtente();
+				//direttoreAce = aceService.bossFirmatarioByUsername(initiator, dateRif);
+				responsabileStruttura = aceService.findResponsabileStruttura(initiator, dateRif, TipoAppartenenza.SEDE, "responsabile-struttura");
+
+				if (responsabileStruttura.getUtente()== null) {
+					throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + initiator + " <br>Si prega di contattare l'help desk in merito<br>");
+				} else {
+					direttoreAce = responsabileStruttura.getUtente();
+				}
+				if (responsabileStruttura.getEntitaOrganizzativa().getId()== null) {
+					throw new BpmnError("412", "l'utenza: " + initiator + " non risulta associata ad alcuna struttura<br>");
+				} else {
+					IdEntitaOrganizzativaDirettore = responsabileStruttura.getEntitaOrganizzativa().getId();
+					entitaOrganizzativaDirettore = aceService.entitaOrganizzativaById(IdEntitaOrganizzativaDirettore);
+					cdsuoAppartenenzaUtente = entitaOrganizzativaDirettore.getCdsuo();
+					idnsipAppartenenzaUtente = entitaOrganizzativaDirettore.getIdnsip();					}
+			} catch ( FeignException  e) {
+				throw new BpmnError("412", "Errore nell'avvio del flusso " + e.getMessage().toString());
 			}
-			if (responsabileStruttura.getEntitaOrganizzativa().getId()== null) {
-				throw new BpmnError("412", "l'utenza: " + initiator + " non risulta associata ad alcuna struttura<br>");
-			} else {
-				IdEntitaOrganizzativaDirettore = responsabileStruttura.getEntitaOrganizzativa().getId();
-				entitaOrganizzativaDirettore = aceService.entitaOrganizzativaById(IdEntitaOrganizzativaDirettore);
-				cdsuoAppartenenzaUtente = entitaOrganizzativaDirettore.getCdsuo();
-				idnsipAppartenenzaUtente = entitaOrganizzativaDirettore.getIdnsip();					}
-
 		}
-
-
 		LOGGER.info("L'utente {} ha  {} come responsabile-struttura [{}] per la struttura {} ({}} - id:{}", initiator.toString(), direttoreAce.getUsername(), responsabileStruttura.getRuolo().getDescr(), entitaOrganizzativaDirettore.getDenominazione(), entitaOrganizzativaDirettore.getSigla(), IdEntitaOrganizzativaDirettore);
 
 		String gruppoResponsabileProponente = "responsabile-struttura@" + IdEntitaOrganizzativaDirettore;

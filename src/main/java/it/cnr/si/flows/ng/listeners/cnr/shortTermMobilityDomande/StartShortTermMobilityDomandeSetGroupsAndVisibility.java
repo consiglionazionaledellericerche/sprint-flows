@@ -21,6 +21,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+
+import feign.FeignException;
+
 import javax.inject.Inject;
 import java.io.IOException;
 import java.text.ParseException;
@@ -91,25 +94,28 @@ public class StartShortTermMobilityDomandeSetGroupsAndVisibility {
 
 		// VERIFICA DIRETTORE
 		//direttoreAce = aceService.bossFirmatarioByUsername(userNameProponente, dateRif);
-		responsabileStruttura = aceService.findResponsabileStruttura(userNameProponente, dateRif, TipoAppartenenza.SEDE, "responsabile-struttura");
-		if (responsabileStruttura.getUtente()== null) {
-			throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + userNameProponente + " <br>Si prega di contattare l'help desk in merito<br>");
-		} else {
-		}
-		if (responsabileStruttura.getEntitaOrganizzativa().getId()== null) {
-			throw new BpmnError("412", "l'utenza: " + userNameProponente + " non risulta associata ad alcuna struttura<br>");
-		} else {
-			IdEntitaOrganizzativaDirettore = responsabileStruttura.getEntitaOrganizzativa().getId();
-			entitaOrganizzativaDirettore = aceService.entitaOrganizzativaById(IdEntitaOrganizzativaDirettore);
-			cdsuoAppartenenzaUtente = entitaOrganizzativaDirettore.getCdsuo();
+		try {
+			responsabileStruttura = aceService.findResponsabileStruttura(userNameProponente, dateRif, TipoAppartenenza.SEDE, "responsabile-struttura");
+			if (responsabileStruttura.getUtente()== null) {
+				throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + userNameProponente + " <br>Si prega di contattare l'help desk in merito<br>");
+			} else {
+			}
+			if (responsabileStruttura.getEntitaOrganizzativa().getId()== null) {
+				throw new BpmnError("412", "l'utenza: " + userNameProponente + " non risulta associata ad alcuna struttura<br>");
+			} else {
+				IdEntitaOrganizzativaDirettore = responsabileStruttura.getEntitaOrganizzativa().getId();
+				entitaOrganizzativaDirettore = aceService.entitaOrganizzativaById(IdEntitaOrganizzativaDirettore);
+				cdsuoAppartenenzaUtente = entitaOrganizzativaDirettore.getCdsuo();
+			}
+
+		} catch ( FeignException  e) {
+			throw new BpmnError("412", "Errore nell'avvio del flusso " + e.getMessage().toString());
 		}
 		LOGGER.info("L'utente {} ha come responsabile-struttura [{}] (per SEDE) {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", userNameProponente, responsabileStruttura.getRuolo().getDescr(), responsabileStruttura.getUtente().getUsername(), entitaOrganizzativaDirettore.getDenominazione(), entitaOrganizzativaDirettore.getSigla(), entitaOrganizzativaDirettore.getId(), entitaOrganizzativaDirettore.getCdsuo(), entitaOrganizzativaDirettore.getIdnsip());
 
-
-
 		//CHECK CORRISPONDENZA EO TRA DICHIARATO UTENTE E ACE
 		String denominazioneEODirettore = entitaOrganizzativaDirettore.getDenominazione();
-		if (!execution.getVariable("istitutoProponente").toString().equals("SEDE CENTRALE - DIPARTIMENTO")){
+		if (execution.getVariable("istitutoProponente") != null && !execution.getVariable("istitutoProponente").toString().equals("SEDE CENTRALE - DIPARTIMENTO")){
 			String denominazioneEOProponente = execution.getVariable("istitutoProponente").toString().substring(9);
 			if (!denominazioneEODirettore.equalsIgnoreCase(denominazioneEOProponente)) {
 				throw new BpmnError("400", "La struttura dichiarata dall'utente: " + userNameProponente + ": <br>" 

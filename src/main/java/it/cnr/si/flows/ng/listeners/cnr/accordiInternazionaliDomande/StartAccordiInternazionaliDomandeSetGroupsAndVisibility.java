@@ -11,11 +11,15 @@ import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDt
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+
+import feign.FeignException;
+
 import javax.inject.Inject;
 import java.io.IOException;
 import java.text.ParseException;
@@ -56,18 +60,24 @@ public class StartAccordiInternazionaliDomandeSetGroupsAndVisibility {
 
 		// VERIFICA RESPOSNABILE STRUTTURA AFFERENZA CDSUO
 		//direttoreAce = aceService.bossFirmatarioByUsername(userNameRichiedente, dateRif);
-		responsabileStruttura = aceService.findResponsabileStruttura(userNameRichiedente, dateRif, TipoAppartenenza.AFFERENZA_UO, "responsabile-struttura");
-		if (responsabileStruttura.getUtente()== null) {
-			throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + userNameRichiedente + " <br>Si prega di contattare l'help desk in merito<br>");
-		} else {
-		}
-		if (responsabileStruttura.getEntitaOrganizzativa().getId()== null) {
-			throw new BpmnError("412", "l'utenza: " + userNameRichiedente + " non risulta associata ad alcuna struttura<br>");
-		} else {
-			IdEntitaOrganizzativaDirettore = responsabileStruttura.getEntitaOrganizzativa().getId();
-			entitaOrganizzativaDirettore = aceService.entitaOrganizzativaById(IdEntitaOrganizzativaDirettore);
-			cdsuoAppartenenzaUtente = entitaOrganizzativaDirettore.getCdsuo();
-			denominazioneEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirettore.getDenominazione();
+		//412 Precondition Failed per i casi tipo    "message": "L'utente fabio.diloreto risulta assegnato ad una sede esterna (id: 34611) in data 2020-10-09",
+
+		try {
+			responsabileStruttura = aceService.findResponsabileStruttura(userNameRichiedente, dateRif, TipoAppartenenza.SEDE, "responsabile-struttura");
+			if (responsabileStruttura.getUtente()== null) {
+				throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + userNameRichiedente + " <br>Si prega di contattare l'help desk in merito<br>");
+			} else {
+			}
+			if (responsabileStruttura.getEntitaOrganizzativa().getId()== null) {
+				throw new BpmnError("412", "l'utenza: " + userNameRichiedente + " non risulta associata ad alcuna struttura<br>");
+			} else {
+				IdEntitaOrganizzativaDirettore = responsabileStruttura.getEntitaOrganizzativa().getId();
+				entitaOrganizzativaDirettore = aceService.entitaOrganizzativaById(IdEntitaOrganizzativaDirettore);
+				cdsuoAppartenenzaUtente = entitaOrganizzativaDirettore.getCdsuo();
+				denominazioneEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirettore.getDenominazione();
+			}
+		} catch ( FeignException  e) {
+			throw new BpmnError("412", "Errore nell'avvio del flusso " + e.getMessage().toString());
 		}
 
 		//		Object insdipResponsabileUo = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("codice_sede");
