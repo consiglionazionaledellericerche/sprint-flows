@@ -10,6 +10,7 @@ import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.ExternalMessageService;
 import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
 import it.cnr.si.spring.storage.StorageObject;
 import it.cnr.si.spring.storage.StoreService;
 import org.activiti.engine.RuntimeService;
@@ -337,12 +338,12 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				put("dt_registrazione", endStrDate);
 				// codfisPivaRupExt CD_TERZO_RESP 
 				if(execution.getVariable("rup") != null){
-					PersonaWebDto rupUser = aceService.getPersonaByUsername(execution.getVariable("rup").toString());
+					SimplePersonaWebDto rupUser = aceService.getPersonaByUsername(execution.getVariable("rup").toString());
 					put("codfisPivaRupExt", rupUser.getCodiceFiscale());
 				}
 				// CD_TERZO_FIRMATARIO - codfisPivaFirmatarioExt
 				if(execution.getVariable("usernameFirmatarioContratto") != null){
-					PersonaWebDto firmatarioUser = aceService.getPersonaByUsername(execution.getVariable("usernameFirmatarioContratto").toString());
+					SimplePersonaWebDto firmatarioUser = aceService.getPersonaByUsername(execution.getVariable("usernameFirmatarioContratto").toString());
 					put("codfisPivaFirmatarioExt", firmatarioUser.getCodiceFiscale());
 				}
 				// FIG_GIUR_EST  - codfisPivaAggiudicatarioExt

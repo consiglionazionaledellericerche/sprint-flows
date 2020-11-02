@@ -1,20 +1,14 @@
 package it.cnr.si.flows.ng.resource;
 
-import it.cnr.si.config.ExternalMessageSender;
-import it.cnr.si.flows.ng.ldap.LdapPersonToSearchResultMapper;
-import it.cnr.si.flows.ng.service.AceBridgeService;
-import it.cnr.si.flows.ng.service.SiperService;
-import it.cnr.si.flows.ng.utils.SecurityUtils;
-import it.cnr.si.flows.ng.utils.Utils;
-import it.cnr.si.flows.ng.utils.Utils.SearchResult;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.service.AceService;
-import it.cnr.si.service.FlowsLdapAccountService;
-import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
-import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.activiti.engine.ManagementService;
-import org.activiti.rest.service.api.RestResponseFactory;
+import javax.inject.Inject;
+
+import it.cnr.si.flows.ng.service.FlowsSiperService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -29,13 +23,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.inject.Inject;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import it.cnr.si.flows.ng.ldap.LdapPersonToSearchResultMapper;
+import it.cnr.si.flows.ng.service.AceBridgeService;
+import it.cnr.si.flows.ng.utils.SecurityUtils;
+import it.cnr.si.flows.ng.utils.Utils;
+import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.service.FlowsLdapAccountService;
+import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
 
 @RestController
 @RequestMapping("api/lookup")
@@ -49,28 +44,24 @@ public class FlowsLookupResource {
     @Inject
     private AceBridgeService aceBridgeService;
     @Inject
-    private AceService aceService;
-    @Inject
     private FlowsLdapAccountService flowsLdapAccountService;
     @Inject
-    private SiperService siperService;
-    @Inject
-    private ExternalMessageSender extenalMessageSender;
+    private FlowsSiperService flowsSiperService;
 
     
     @RequestMapping(value = "/ace/boss", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Utils.SearchResult> getBossForCurrentUser() {
     	String username = SecurityUtils.getCurrentUserLogin();
-    	BossDto boss = aceService.bossFirmatarioByUsername(username);
-    	String nome = boss.getNome() +" "+ boss.getCognome();
-        return ResponseEntity.ok(new Utils.SearchResult(nome, nome));
+    	BossDto boss = aceBridgeService.bossFirmatarioByUsername(username);
+    	String fullname = boss.getUtente().getPersona().getNome() +" "+ boss.getUtente().getPersona().getCognome();
+        return ResponseEntity.ok(new Utils.SearchResult(fullname, fullname));
     }
     
     @RequestMapping(value = "/ace/user/{username:.+}", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.ADMIN)
-    public List<String> getAce(@PathVariable String username) {
-        return aceBridgeService.getAceGroupsForUser(username);
+    public Set<String> getAce(@PathVariable String username) {
+        return aceBridgeService.getAceRolesForUser(username);
     }
 
     @RequestMapping(value = "/ace/usersingroup/{groupname:.+}", method = RequestMethod.GET)
@@ -89,7 +80,7 @@ public class FlowsLookupResource {
     @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Utils.SearchResult> getUoById(@PathVariable Integer id) {
 
-        EntitaOrganizzativaWebDto s = aceBridgeService.getUoById(id);
+        SimpleEntitaOrganizzativaWebDto s = aceBridgeService.getUoById(id);
         Utils.SearchResult r = new Utils.SearchResult(s.getId().toString(), s.getCdsuo() +" - "+ s.getDenominazione());
 
         return ResponseEntity.ok(r);
@@ -108,7 +99,7 @@ public class FlowsLookupResource {
                     return aceBridgeService.getStrutturaById(id);
                 })
                 .map(eo -> {
-                    return new Utils.SearchResult(String.valueOf(eo.getId()), eo.getCdsuo() +" - "+ eo.getDenominazioneBreve());
+                    return new Utils.SearchResult(String.valueOf(eo.getId()), eo.getCdsuo() +" - "+ eo.getDenominazione());
                 }).collect(Collectors.toList());
 
         return ResponseEntity.ok(CDSUOs);
@@ -141,17 +132,7 @@ public class FlowsLookupResource {
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<List<Map<String, Object>>> getResponsabileSede(@PathVariable String cdsuo) {
 
-        return ResponseEntity.ok(siperService.getResponsabileCDSUO(cdsuo));
-    }
-
-    @RequestMapping(value = "/runcron", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured(AuthoritiesConstants.USER)
-    public ResponseEntity<Void> runCron() {
-
-        log.info("Running crons");
-        extenalMessageSender.sendMessages();
-        extenalMessageSender.sendErrorMessages();
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(flowsSiperService.getResponsabileCDSUO(cdsuo));
     }
 
 }

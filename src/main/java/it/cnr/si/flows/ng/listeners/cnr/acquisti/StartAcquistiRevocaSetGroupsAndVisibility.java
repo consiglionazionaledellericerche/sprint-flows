@@ -38,7 +38,7 @@ public class StartAcquistiRevocaSetGroupsAndVisibility implements ExecutionListe
         String initiator = (String) execution.getVariable("initiator");
         LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
 
-        List<String> groups = membershipService.getAllGroupsForUser(initiator).stream()
+        List<String> groups = membershipService.getAllRolesForUser(initiator).stream()
                 .filter(g -> g.startsWith("responsabile#"))
                 .collect(Collectors.toList());
 

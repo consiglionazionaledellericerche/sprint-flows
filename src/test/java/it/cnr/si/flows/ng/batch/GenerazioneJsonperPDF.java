@@ -2,7 +2,7 @@ package it.cnr.si.flows.ng.batch;
 
 import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.service.AceBridgeService;
-import it.cnr.si.flows.ng.service.SiperService;
+import it.cnr.si.flows.ng.service.FlowsSiperService;
 import it.cnr.si.service.AceService;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
@@ -42,7 +42,7 @@ public class GenerazioneJsonperPDF {
 	@Inject
 	private AceBridgeService aceBridgeService;
 	@Inject
-	private SiperService siperService;
+	private FlowsSiperService flowsSiperService;
 	@Inject
 	private HistoryService historyService;
 	@Inject

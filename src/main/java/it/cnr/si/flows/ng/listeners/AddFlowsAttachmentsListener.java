@@ -103,7 +103,7 @@ public class AddFlowsAttachmentsListener implements ActivitiEventListener {
      * @param processInstanceId
      * @return
      */
-    private String getDefaultPathFascicoloDocumenti(String processInstanceId) {
+    public String getDefaultPathFascicoloDocumenti(String processInstanceId) {
 
         String path = runtimeService.getVariable(processInstanceId, "pathFascicoloDocumenti", String.class);
         if ( path != null ) {

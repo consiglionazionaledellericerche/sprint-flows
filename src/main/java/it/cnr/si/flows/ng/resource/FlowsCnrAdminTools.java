@@ -12,11 +12,10 @@ import java.util.concurrent.ForkJoinPool;
 import javax.inject.Inject;
 
 import org.activiti.engine.HistoryService;
-import org.activiti.engine.RuntimeService;
 import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.history.HistoricVariableInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -25,29 +24,41 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import it.cnr.si.config.ExternalMessageSender;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.AceService;
-import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
 
 @Controller
 @RequestMapping("api/attachments")
 @Secured(AuthoritiesConstants.ADMIN)
-public class FlowsAdminTools {
+@Profile("cnr")
+public class FlowsCnrAdminTools {
     
-    private final Logger log = LoggerFactory.getLogger(FlowsAdminTools.class);
+    private final Logger log = LoggerFactory.getLogger(FlowsCnrAdminTools.class);
 
-    
-    @Inject
-    private RuntimeService runtimeService;
     @Inject
     private HistoryService historyService;
     @Inject
     private AceService aceService;
     @Inject
     private AceBridgeService aceBridgeService;
+    @Inject
+    private ExternalMessageSender extenalMessageSender;
+    
+
+    @RequestMapping(value = "/resendExternalMessages", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
+    public ResponseEntity<Void> resendExternalMessages() {
+
+        log.info("Resending External Messages (manual trigger)");
+        extenalMessageSender.sendMessages();
+        extenalMessageSender.sendErrorMessages();
+        return ResponseEntity.ok().build();
+    }
     
     /**
      * La ddMMyyyy deve essere in format dd/MM/yyyy
@@ -98,15 +109,13 @@ public class FlowsAdminTools {
                     String dsfu = null;
                     String cdsuosfu = null;
                     try {
-                        EntitaOrganizzativaWebDto strutturaFirmatarioAttuale = aceBridgeService.getStrutturaById(Integer.parseInt(gruppoFirmatarioAttuale.split("@")[1]));
-                        dbsfa = strutturaFirmatarioAttuale.getDenominazioneBreve();
+                        SimpleEntitaOrganizzativaWebDto strutturaFirmatarioAttuale = aceBridgeService.getStrutturaById(Integer.parseInt(gruppoFirmatarioAttuale.split("@")[1]));
                         dsfa = strutturaFirmatarioAttuale.getDenominazione();
                         cdsuosfa = strutturaFirmatarioAttuale.getCdsuo();
-                        BossDto boss = bossCache.computeIfAbsent(initiator, k -> aceService.bossFirmatarioByUsername(initiator));
-                        usernameBoss = boss.getUsername();
-                        gruppoFirmatarioDellUtente = "responsabile-struttura@"+ boss.getIdEntitaOrganizzativa();
-                        EntitaOrganizzativaWebDto strutturaFirmatarioDellUtente = aceBridgeService.getStrutturaById(Integer.parseInt(gruppoFirmatarioDellUtente.split("@")[1]));
-                        dbsfu = strutturaFirmatarioDellUtente.getDenominazioneBreve();
+                        BossDto boss = bossCache.computeIfAbsent(initiator, k -> aceBridgeService.bossFirmatarioByUsername(initiator));
+                        usernameBoss = boss.getUtente().getUsername();
+                        gruppoFirmatarioDellUtente = "responsabile-struttura@"+ boss.getEntitaOrganizzativa().getId();
+                        SimpleEntitaOrganizzativaWebDto strutturaFirmatarioDellUtente = aceBridgeService.getStrutturaById(Integer.parseInt(gruppoFirmatarioDellUtente.split("@")[1]));
                         dsfu = strutturaFirmatarioDellUtente.getDenominazione();
                         cdsuosfu = strutturaFirmatarioDellUtente.getCdsuo();
                         if(!gruppoFirmatarioAttuale.equals(gruppoFirmatarioDellUtente)) {
