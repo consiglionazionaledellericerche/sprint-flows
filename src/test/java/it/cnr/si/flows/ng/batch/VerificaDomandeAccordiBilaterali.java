@@ -5,11 +5,11 @@ import feign.FeignException;
 import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.exception.UnexpectedResultException;
 import it.cnr.si.flows.ng.service.AceBridgeService;
-import it.cnr.si.flows.ng.service.SiperService;
+import it.cnr.si.flows.ng.service.FlowsSiperService;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.RelationshipService;
-import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -41,7 +41,7 @@ public class VerificaDomandeAccordiBilaterali {
 	@Inject
 	private AceBridgeService aceBridgeService;
 	@Inject
-	private SiperService siperService;
+	private FlowsSiperService flowsSiperService;
 	@Inject
 	private MembershipService membershipService;
 	@Inject
@@ -76,16 +76,16 @@ public class VerificaDomandeAccordiBilaterali {
 			cdsuoAppartenenzaUtente = aceBridgeService.getAfferenzaUtente(username).getCdsuo();
 		} catch(UnexpectedResultException | FeignException | HttpClientErrorException error1) {
 			log.info("WARNING: L'UTENTE {} NON esiste in anagrafica ACE !!!!!!!!!!!!!!! ", username);
-			cdsuoAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(username).get("codice_uo").toString();
+			cdsuoAppartenenzaUtente = flowsSiperService.getCDSUOAfferenzaUtente(username).get("codice_uo").toString();
 		}
 		finally {
 			Object insdipResponsabileUo = new Object();
 			String usernameDirettore = null;
-			EntitaOrganizzativaWebDto entitaOrganizzativaDirUo = null;
+			SimpleEntitaOrganizzativaWebDto entitaOrganizzativaDirUo = null;
 			try {
-				insdipResponsabileUo = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("codice_sede");
+				insdipResponsabileUo = flowsSiperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("codice_sede");
 				log.info("getDirettoreCDSUO  FUNZIONA ");
-				usernameDirettore = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("uid").toString();
+				usernameDirettore = flowsSiperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("uid").toString();
 				try {
 					entitaOrganizzativaDirUo = aceService.entitaOrganizzativaFindByTerm(insdipResponsabileUo.toString()).get(0);
 				} catch(UnexpectedResultException | FeignException | HttpClientErrorException error3) {

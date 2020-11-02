@@ -18,15 +18,15 @@ import static org.junit.Assert.assertEquals;
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
 @Ignore // TODO TUTTI I TESTS FUNZIONALI e DIPENDENTI DA ACE/SIPER DA SPOSTARE FUORI DA JUNIT
-public class SiperServiceTest {
+public class FlowsSiperServiceTest {
 
     @Inject
-    private SiperService siperService;
+    private FlowsSiperService flowsSiperService;
 
     @Test
     public void testGetResponsabileUo() {
 
-        String responsabile = (String) siperService.getResponsabileCDSUO("ASR108").get(0).get("uid");
+        String responsabile = (String) flowsSiperService.getResponsabileCDSUO("ASR108").get(0).get("uid");
 
         assertEquals("maurizio.lancia", responsabile);
 

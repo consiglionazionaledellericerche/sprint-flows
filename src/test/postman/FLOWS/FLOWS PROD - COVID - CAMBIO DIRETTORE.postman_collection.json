@@ -1,0 +1,637 @@
+{
+	"info": {
+		"_postman_id": "6bfd7f59-7eea-4ca0-bfd0-c65f31b41155",
+		"name": "FLOWS PROD - COVID - CAMBIO DIRETTORE",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Richiesta token FLOWS",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b525690b-c926-4dbe-a452-1356b00c9132",
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"postman.setGlobalVariable(\"ACCESS_TOKEN\", data.access_token);",
+							"postman.setGlobalVariable(\"REFRESH_TOKEN\", data.refresh_token);",
+							"postman.setGlobalVariable(\"ID_PROCESSINTANCE\", \"6084538\");",
+							"postman.setGlobalVariable(\"ID_ENTITAORGANIZZATIVA_NEW\", \"34334\");",
+							"postman.setGlobalVariable(\"ID_ENTITAORGANIZZATIVA_OLD\", \"2137\");",
+							"postman.setGlobalVariable(\"ID_ENTITAORGANIZZATIVA_NOME\", \"ISTITUTO DI TECNOLOGIE AVANZATE PER L'ENERGIA NICOLA GIORDANO\");",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic c3ByaW50YXBwOm15LXNlY3JldC10b2tlbi10by1jaGFuZ2UtaW4tcHJvZHVjdGlvbg=="
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "Sp@si@n0!",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "read write",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://nuovascrivaniadigitale.cnr.it/oauth/token",
+					"protocol": "https",
+					"host": [
+						"nuovascrivaniadigitale",
+						"cnr",
+						"it"
+					],
+					"path": [
+						"oauth",
+						"token"
+					]
+				},
+				"description": "Ottiene il token (impostare una passoword)."
+			},
+			"response": []
+		},
+		{
+			"name": "SPRINT_FLOWS - dettagli flusso",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2dc83ab8-4454-4bba-b482-805220592403",
+						"exec": [
+							"//postman.setGlobalVariable(\"ID_PROCESSINTANCE\", \"7529\");",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "cacheBuster",
+						"value": "150399103591"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "https://nuovascrivaniadigitale.cnr.it/api/processInstances?processInstanceId={{ID_PROCESSINTANCE}}&detail=true",
+					"protocol": "https",
+					"host": [
+						"nuovascrivaniadigitale",
+						"cnr",
+						"it"
+					],
+					"path": [
+						"api",
+						"processInstances"
+					],
+					"query": [
+						{
+							"key": "processInstanceId",
+							"value": "{{ID_PROCESSINTANCE}}"
+						},
+						{
+							"key": "detail",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SPRINT_FLOWS - cambio variabile gruppoResponsabileProponente",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c3d79c19-60bc-4e72-8fa6-bce2e0004a79",
+						"exec": [
+							"//postman.setGlobalVariable(\"TASK_ID\", \"5335\");",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "cacheBuster",
+						"value": "150399103591"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "processInstanceId",
+						"type": "text",
+						"value": "{{ID_PROCESSINTANCE}}"
+					},
+					{
+						"key": "gruppoDirigenteRichiedente",
+						"type": "text",
+						"value": "responsabile-struttura@34241"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "processInstanceId",
+							"value": "{{ID_PROCESSINTANCE}}",
+							"type": "text"
+						},
+						{
+							"key": "variableName",
+							"value": "gruppoResponsabileProponente",
+							"type": "text"
+						},
+						{
+							"key": "value",
+							"value": "responsabile-struttura@{{ID_ENTITAORGANIZZATIVA_NEW}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://nuovascrivaniadigitale.cnr.it/api/processInstances/variable",
+					"protocol": "https",
+					"host": [
+						"nuovascrivaniadigitale",
+						"cnr",
+						"it"
+					],
+					"path": [
+						"api",
+						"processInstances",
+						"variable"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SPRINT_FLOWS - TASK ATTIVO PER FLUSSO",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5e48da94-f5c6-492b-bbf1-816bc2336edd",
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"    console.log(data.history.length);",
+							"    for (var i = 0; i < data.history.length;i++ ) {",
+							"        ",
+							"  if (data.history[i].historyTask.endTime == null) {",
+							"    console.log(\"TASK name: \" + data.history[i].historyTask.name);",
+							"    console.log(\"taskId: \" + data.history[i].historyTask.id);",
+							"    postman.setGlobalVariable(\"taskId\", data.history[i].historyTask.id);",
+							"  }",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "cacheBuster",
+						"value": "150399103591"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "https://nuovascrivaniadigitale.cnr.it/api/processInstances?processInstanceId={{ID_PROCESSINTANCE}}&detail=true",
+					"protocol": "https",
+					"host": [
+						"nuovascrivaniadigitale",
+						"cnr",
+						"it"
+					],
+					"path": [
+						"api",
+						"processInstances"
+					],
+					"query": [
+						{
+							"key": "processInstanceId",
+							"value": "{{ID_PROCESSINTANCE}}"
+						},
+						{
+							"key": "detail",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SPRINT_FLOWS - aggiungo gruppo assegnatario",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "7a660134-79be-4bfa-9b57-061ede39e896",
+						"exec": [
+							"//postman.setGlobalVariable(\"TASK_ID\", \"5335\");",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "cacheBuster",
+						"value": "150399103591"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "processInstanceId",
+						"type": "text",
+						"value": "{{ID_PROCESSINTANCE}}"
+					},
+					{
+						"key": "gruppoDirigenteRichiedente",
+						"type": "text",
+						"value": "responsabile-struttura@34241"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "processInstanceId",
+							"value": "{{ID_PROCESSINTANCE}}",
+							"type": "text"
+						},
+						{
+							"key": "group",
+							"value": "responsabile-struttura@{{ID_ENTITAORGANIZZATIVA_NEW}}",
+							"type": "text"
+						},
+						{
+							"key": "taskId",
+							"value": "{{taskId}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://nuovascrivaniadigitale.cnr.it/api/tasks/addCandidateGroup/responsabile-struttura%40{{ID_ENTITAORGANIZZATIVA_NEW}}?processInstanceId={{ID_PROCESSINTANCE}}&taskId={{taskId}}",
+					"protocol": "https",
+					"host": [
+						"nuovascrivaniadigitale",
+						"cnr",
+						"it"
+					],
+					"path": [
+						"api",
+						"tasks",
+						"addCandidateGroup",
+						"responsabile-struttura%40{{ID_ENTITAORGANIZZATIVA_NEW}}"
+					],
+					"query": [
+						{
+							"key": "processInstanceId",
+							"value": "{{ID_PROCESSINTANCE}}"
+						},
+						{
+							"key": "taskId",
+							"value": "{{taskId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SPRINT_FLOWS - rimuovo gruppo assegnatario",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1fadb56a-3872-4fd7-9670-8ef51271dd2d",
+						"exec": [
+							"//postman.setGlobalVariable(\"TASK_ID\", \"5335\");",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "cacheBuster",
+						"value": "150399103591"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "processInstanceId",
+						"type": "text",
+						"value": "{{ID_PROCESSINTANCE}}"
+					},
+					{
+						"key": "gruppoDirigenteRichiedente",
+						"type": "text",
+						"value": "responsabile-struttura@34241"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "processInstanceId",
+							"value": "{{ID_PROCESSINTANCE}}",
+							"type": "text"
+						},
+						{
+							"key": "group",
+							"value": "responsabile-struttura@{{ID_ENTITAORGANIZZATIVA_OLD}}",
+							"type": "text"
+						},
+						{
+							"key": "taskId",
+							"value": "{{taskId}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://nuovascrivaniadigitale.cnr.it/api/tasks/removeCandidateGroup/responsabile-struttura%40{{ID_ENTITAORGANIZZATIVA_OLD}}?processInstanceId={{ID_PROCESSINTANCE}}&taskId={{taskId}}",
+					"protocol": "https",
+					"host": [
+						"nuovascrivaniadigitale",
+						"cnr",
+						"it"
+					],
+					"path": [
+						"api",
+						"tasks",
+						"removeCandidateGroup",
+						"responsabile-struttura%40{{ID_ENTITAORGANIZZATIVA_OLD}}"
+					],
+					"query": [
+						{
+							"key": "processInstanceId",
+							"value": "{{ID_PROCESSINTANCE}}"
+						},
+						{
+							"key": "taskId",
+							"value": "{{taskId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SPRINT_FLOWS - VISUALIZZATORE AGGIUNGI",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d5cc6867-ab69-4aa3-82d7-f19c79217441",
+						"exec": [
+							"//postman.setGlobalVariable(\"TASK_ID\", \"5335\");",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "cacheBuster",
+						"value": "150399103591"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://nuovascrivaniadigitale.cnr.it/api/processInstances/identityLinks?processInstanceId={{ID_PROCESSINTANCE}}&identityLinkType=visualizzatore&groupId=responsabile-struttura@{{ID_ENTITAORGANIZZATIVA_NEW}}",
+					"protocol": "https",
+					"host": [
+						"nuovascrivaniadigitale",
+						"cnr",
+						"it"
+					],
+					"path": [
+						"api",
+						"processInstances",
+						"identityLinks"
+					],
+					"query": [
+						{
+							"key": "processInstanceId",
+							"value": "{{ID_PROCESSINTANCE}}"
+						},
+						{
+							"key": "identityLinkType",
+							"value": "visualizzatore"
+						},
+						{
+							"key": "groupId",
+							"value": "responsabile-struttura@{{ID_ENTITAORGANIZZATIVA_NEW}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SPRINT_FLOWS - VISUALIZZATORE RIMUOVI",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "cfb0429a-44c4-4681-94f6-ed246262d96b",
+						"exec": [
+							"//postman.setGlobalVariable(\"TASK_ID\", \"5335\");",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "cacheBuster",
+						"value": "150399103591"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://nuovascrivaniadigitale.cnr.it/api/processInstances/identityLinks?processInstanceId={{ID_PROCESSINTANCE}}&identityLinkType=visualizzatore&groupId=responsabile-struttura@{{ID_ENTITAORGANIZZATIVA_OLD}}",
+					"protocol": "https",
+					"host": [
+						"nuovascrivaniadigitale",
+						"cnr",
+						"it"
+					],
+					"path": [
+						"api",
+						"processInstances",
+						"identityLinks"
+					],
+					"query": [
+						{
+							"key": "processInstanceId",
+							"value": "{{ID_PROCESSINTANCE}}"
+						},
+						{
+							"key": "identityLinkType",
+							"value": "visualizzatore"
+						},
+						{
+							"key": "groupId",
+							"value": "responsabile-struttura@{{ID_ENTITAORGANIZZATIVA_OLD}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

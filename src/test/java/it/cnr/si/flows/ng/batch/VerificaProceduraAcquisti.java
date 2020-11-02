@@ -5,9 +5,9 @@ import feign.FeignException;
 import it.cnr.si.FlowsApp;
 import it.cnr.si.flows.ng.exception.UnexpectedResultException;
 import it.cnr.si.flows.ng.service.AceBridgeService;
-import it.cnr.si.flows.ng.service.SiperService;
+import it.cnr.si.flows.ng.service.FlowsSiperService;
 import it.cnr.si.service.AceService;
-import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -38,7 +38,7 @@ public class VerificaProceduraAcquisti {
 	@Inject
 	private AceBridgeService aceBridgeService;
 	@Inject
-	private SiperService siperService;
+	private FlowsSiperService flowsSiperService;
 	private final Map<String, String> errors = new HashMap<>();
 	int personNr = 0;
 
@@ -68,7 +68,7 @@ public class VerificaProceduraAcquisti {
 		} catch(UnexpectedResultException | FeignException | HttpClientErrorException error1) {
 			log.info("L'UTENTE {} NON esiste in anagrafica ACE !!!!!!!!!!!!!!! ", username);
 			try {
-				cdsuoAppartenenzaUtente = siperService.getCDSUOAfferenzaUtente(username).get("codice_uo").toString();
+				cdsuoAppartenenzaUtente = flowsSiperService.getCDSUOAfferenzaUtente(username).get("codice_uo").toString();
 			} catch(UnexpectedResultException | FeignException | HttpClientErrorException error2) {
 				log.info("L'UTENTE {} NON esiste in anagrafica SIPER !!!!!!!!!!!!!!! ", username);
 			}
@@ -82,11 +82,11 @@ public class VerificaProceduraAcquisti {
 			} else {
 				Map<String, Object> responsabileUo;
 				try {
-					responsabileUo = siperService.getResponsabileCDSUO(cdsuoAppartenenzaUtente).get(0);
+					responsabileUo = flowsSiperService.getResponsabileCDSUO(cdsuoAppartenenzaUtente).get(0);
 					String idnsipResponsabileUo = responsabileUo.get("codice_sede").toString();
 					log.info("-------------- getResponsabileCDSUO  FUNZIONA per CDSUO {} con IDNSIP {}", cdsuoAppartenenzaUtente, idnsipResponsabileUo);
 					String usernameResponsabile = responsabileUo.get("uid").toString();
-					EntitaOrganizzativaWebDto entitaOrganizzativaRespUo = null;
+					SimpleEntitaOrganizzativaWebDto entitaOrganizzativaRespUo = null;
 					try {
 						entitaOrganizzativaRespUo = aceService.entitaOrganizzativaFindByTerm(idnsipResponsabileUo.toString()).get(0);
 					} catch(UnexpectedResultException | FeignException | HttpClientErrorException error4) {
