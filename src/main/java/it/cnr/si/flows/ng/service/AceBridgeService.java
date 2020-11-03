@@ -55,29 +55,28 @@ public class AceBridgeService {
 	 * L'unico utilizzo giustificato di questo service e' in MembershipService
 	 */
 	@Deprecated
-	public List<String> getUsersInAceGroup(String groupName) {
+	public Set<String> getUsersInAceGroup(String groupName) {
 
 		if (!groupName.contains("@"))
-			return new ArrayList<>();
+			return Collections.emptySet();
 
 		String[] split = groupName.split("@");
 		String sigla = split[0];
 		if ("STRUTTURA".equals(split[1]))
-			return new ArrayList<String>();
+			return Collections.emptySet();
 		
 		int idEo = Integer.parseInt(split[1]);
 
 		if (idEo != 0 )
 			return aceService.getUtentiInRuoloEo(sigla, idEo).stream()
-					.map(p -> aceService.getUtente(p.getUtente()))
 					.map(u -> u.getUsername())
-					.collect(Collectors.toList());
+					.collect(Collectors.toSet());
 		else
 			return aceService.getUtentiInRuoloCnr(sigla)
 					.stream()
 					.map(BossDto::getUtente)
 					.map(SimpleUtenteWebDto::getUsername)
-					.collect(Collectors.toList());
+					.collect(Collectors.toSet());
 	}
 
 	public SimpleEntitaOrganizzativaWebDto getUoById(int id) {
