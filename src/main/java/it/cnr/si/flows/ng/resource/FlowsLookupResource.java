@@ -66,7 +66,7 @@ public class FlowsLookupResource {
 
     @RequestMapping(value = "/ace/usersingroup/{groupname:.+}", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.ADMIN)
-    public List<String> getAceGroup(@PathVariable String groupname) {
+    public Set<String> getAceGroup(@PathVariable String groupname) {
         return aceBridgeService.getUsersInAceGroup(groupname);
     }
 

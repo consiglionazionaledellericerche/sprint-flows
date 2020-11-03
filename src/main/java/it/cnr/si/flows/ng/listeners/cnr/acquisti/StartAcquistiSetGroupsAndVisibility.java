@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.idStruttura;
@@ -89,7 +90,7 @@ public class StartAcquistiSetGroupsAndVisibility {
 			LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoStaffAmministrativo, gruppoSFD, gruppoStaffAmministrativo, gruppoFirmaAcquisti);
 
 			//Check se il gruppo SFD ha membri
-			List<String> members = aceBridgeService.getUsersInAceGroup(gruppoSFD);
+			Set<String> members = aceBridgeService.getUsersInAceGroup(gruppoSFD);
 			if (members.isEmpty()) {
 				execution.setVariable("organizzazioneStruttura", "Semplice");
 			} else {
