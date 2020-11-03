@@ -1,6 +1,5 @@
 ID;GROUP_NAME;GROUP_RELATIONSHIP;GROUP_ROLE
 1;staffAmministrativo@STRUTTURA;supervisore#acquisti@STRUTTURA;member
-2;afferenza@2216;gestori_strutture@2216;member
 3;staffAmministrativo@STRUTTURA;abilitati#acquisti@STRUTTURA;coordinator
 15;direttore@STRUTTURA;responsabileFirmaAcquisti@STRUTTURA;member
 16;responsabileSede@STRUTTURA;responsabileFirmaAcquisti@STRUTTURA;member
