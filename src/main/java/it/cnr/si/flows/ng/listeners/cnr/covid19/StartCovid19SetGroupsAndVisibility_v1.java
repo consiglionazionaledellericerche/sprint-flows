@@ -49,37 +49,39 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 		String denominazioneEO  = null;
 		SimpleEntitaOrganizzativaWebDto entitaOrganizzativaDirettore = null;
 		LocalDate dateRif = LocalDate.now();
+		LocalDate dataUltimoGiornoServizio = LocalDate.now();
 		BossDto responsabileStruttura = null;
 
 		// VERIFICA DIRETTORE
 		//VERIFICA DIPENDENTI CESSATI
 		if (aceService.getPersonaByUsername(initiator.toString()).getDataCessazione() != null) {			
 			dateRif = LocalDate.of(Integer.parseInt(execution.getVariable("anno").toString()), Integer.parseInt(execution.getVariable("meseNumerico").toString()), 1);
-			if (aceService.getPersonaByUsername(initiator.toString()).getDataCessazione().minusDays(1).isBefore(dateRif)) {
-				throw new BpmnError("416", "l'utenza: " + initiator + " non risulta associata <br>ad alcuna struttura per il periodo di riferimento<br>");
-			} 			}
-		else {
-			try {
-
-				//direttoreAce = aceService.bossFirmatarioByUsername(initiator, dateRif);
-				responsabileStruttura = aceService.findResponsabileStruttura(initiator, dateRif, TipoAppartenenza.SEDE, "responsabile-struttura");
-
-				if (responsabileStruttura.getUtente()== null) {
-					throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + initiator + " <br>Si prega di contattare l'help desk in merito<br>");
-				} else {
-					direttoreAce = responsabileStruttura.getUtente();
-				}
-				if (responsabileStruttura.getEntitaOrganizzativa().getId()== null) {
-					throw new BpmnError("412", "l'utenza: " + initiator + " non risulta associata ad alcuna struttura<br>");
-				} else {
-					IdEntitaOrganizzativaDirettore = responsabileStruttura.getEntitaOrganizzativa().getId();
-					entitaOrganizzativaDirettore = aceService.entitaOrganizzativaById(IdEntitaOrganizzativaDirettore);
-					cdsuoAppartenenzaUtente = entitaOrganizzativaDirettore.getCdsuo();
-					idnsipAppartenenzaUtente = entitaOrganizzativaDirettore.getIdnsip();					}
-			} catch ( FeignException  e) {
-				throw new BpmnError("412", "Errore nell'avvio del flusso " + e.getMessage().toString());
-			}
+			dataUltimoGiornoServizio = aceService.getPersonaByUsername(initiator.toString()).getDataCessazione().minusDays(1);
+			if (dataUltimoGiornoServizio.isBefore(dateRif)) {
+				throw new BpmnError("416", "l'utenza: " + initiator + " non risulta associata <br>ad alcuna struttura per il periodo di riferimento<br> "+ execution.getVariable("mese").toString() + " - " + execution.getVariable("anno").toString());
+			} 	
 		}
+		try {
+
+			//direttoreAce = aceService.bossFirmatarioByUsername(initiator, dateRif);
+			responsabileStruttura = aceService.findResponsabileStruttura(initiator, dateRif, TipoAppartenenza.SEDE, "responsabile-struttura");
+
+			if (responsabileStruttura.getUtente()== null) {
+				throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + initiator + " <br>Si prega di contattare l'help desk in merito<br>");
+			} else {
+				direttoreAce = responsabileStruttura.getUtente();
+			}
+			if (responsabileStruttura.getEntitaOrganizzativa().getId()== null) {
+				throw new BpmnError("412", "l'utenza: " + initiator + " non risulta associata ad alcuna struttura<br>");
+			} else {
+				IdEntitaOrganizzativaDirettore = responsabileStruttura.getEntitaOrganizzativa().getId();
+				entitaOrganizzativaDirettore = aceService.entitaOrganizzativaById(IdEntitaOrganizzativaDirettore);
+				cdsuoAppartenenzaUtente = entitaOrganizzativaDirettore.getCdsuo();
+				idnsipAppartenenzaUtente = entitaOrganizzativaDirettore.getIdnsip();					}
+		} catch ( FeignException  e) {
+			throw new BpmnError("412", "Errore nell'avvio del flusso " + e.getMessage().toString());
+		}
+
 		LOGGER.info("L'utente {} ha  {} come responsabile-struttura [{}] per la struttura {} ({}} - id:{}", initiator.toString(), direttoreAce.getUsername(), responsabileStruttura.getRuolo().getDescr(), entitaOrganizzativaDirettore.getDenominazione(), entitaOrganizzativaDirettore.getSigla(), IdEntitaOrganizzativaDirettore);
 
 		String gruppoResponsabileProponente = "responsabile-struttura@" + IdEntitaOrganizzativaDirettore;
