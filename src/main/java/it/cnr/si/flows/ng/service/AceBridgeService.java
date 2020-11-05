@@ -69,7 +69,7 @@ public class AceBridgeService {
 
 		if (idEo != 0 )
 			return aceService.getUtentiInRuoloEo(sigla, idEo).stream()
-					.map(u -> u.getUsername())
+					.map(SimpleUtenteWebDto::getUsername)
 					.collect(Collectors.toSet());
 		else
 			return aceService.getUtentiInRuoloCnr(sigla)
