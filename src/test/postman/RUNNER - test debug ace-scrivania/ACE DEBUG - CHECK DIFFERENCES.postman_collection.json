@@ -1,0 +1,986 @@
+{
+	"info": {
+		"_postman_id": "b2a65b33-075c-4313-b861-68aee367be8d",
+		"name": "ACE DEBUG - CHECK DIFFERENCES",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "TEST Richiesta token FLOWS",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6a0f3b5c-e102-4512-8cce-233a6c0844d6",
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"postman.setGlobalVariable(\"ACCESS_TOKEN\", data.access_token);",
+							"postman.setGlobalVariable(\"REFRESH_TOKEN\", data.refresh_token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic c3ByaW50YXBwOm15LXNlY3JldC10b2tlbi10by1jaGFuZ2UtaW4tcHJvZHVjdGlvbg=="
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "Sp@si@n0!",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "read write",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/oauth/token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"oauth",
+						"token"
+					]
+				},
+				"description": "Ottiene il token (impostare una passoword)."
+			},
+			"response": []
+		},
+		{
+			"name": "TEST IMPERSONATE",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ec6ea5fd-7ccc-4609-860a-824e631ff58b",
+						"exec": [
+							"postman.setGlobalVariable(\"nomeUtente\", pm.iterationData.get(\"username\"));\r",
+							"console.log(\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX \", pm.iterationData.get(\"username\"));\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{ACCESS_TOKEN}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/impersonate/start?impersonate_username={{username}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"impersonate",
+						"start"
+					],
+					"query": [
+						{
+							"key": "impersonate_username",
+							"value": "{{username}}"
+						}
+					]
+				},
+				"description": "Lista dei ruoli assegnati alla persona con lo username specificato"
+			},
+			"response": []
+		},
+		{
+			"name": "1) TEST CERCA TASK ATTIVI",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e6e3f86d-360a-4d7e-8674-968b89206946",
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"console.log(\"TEST_nr_active_tasks = \", data.total);\r",
+							"postman.setGlobalVariable(\"TEST_nr_active_tasks\", data.total);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{ACCESS_TOKEN}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/tasks/mytasks?processDefinition=all&firstResult=0&maxResults=0&order=ASC",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"tasks",
+						"mytasks"
+					],
+					"query": [
+						{
+							"key": "processDefinition",
+							"value": "all"
+						},
+						{
+							"key": "firstResult",
+							"value": "0"
+						},
+						{
+							"key": "maxResults",
+							"value": "0"
+						},
+						{
+							"key": "order",
+							"value": "ASC"
+						}
+					]
+				},
+				"description": "Lista dei ruoli assegnati alla persona con lo username specificato"
+			},
+			"response": []
+		},
+		{
+			"name": "2) TEST CERCA NR AVAILABLE TASK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ee7002fe-7a12-47dd-9d07-eff0d5d63e93",
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"console.log(\"TEST_nr_available_tasks = \", data.total);\r",
+							"postman.setGlobalVariable(\"TEST_nr_available_tasks\", data.total);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{ACCESS_TOKEN}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/tasks/availabletasks?processDefinition=all&firstResult=0&maxResults=0&order=ASC\n",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"tasks",
+						"availabletasks"
+					],
+					"query": [
+						{
+							"key": "processDefinition",
+							"value": "all"
+						},
+						{
+							"key": "firstResult",
+							"value": "0"
+						},
+						{
+							"key": "maxResults",
+							"value": "0"
+						},
+						{
+							"key": "order",
+							"value": "ASC\n"
+						}
+					]
+				},
+				"description": "Lista dei ruoli assegnati alla persona con lo username specificato"
+			},
+			"response": []
+		},
+		{
+			"name": "3) TEST CERCA NR TASK IN MY GROUPS",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "9c7b0617-7faf-4455-89d0-28143ae43bbf",
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"console.log(\"TEST_nr_AssignedInMyGroups_tasks = \", data.total);\r",
+							"postman.setGlobalVariable(\"TEST_nr_AssignedInMyGroups_tasks\", data.total);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{ACCESS_TOKEN}}"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/tasks/taskAssignedInMyGroups?processDefinition=all&firstResult=0&maxResults=0&order=ASC\n",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"tasks",
+						"taskAssignedInMyGroups"
+					],
+					"query": [
+						{
+							"key": "processDefinition",
+							"value": "all"
+						},
+						{
+							"key": "firstResult",
+							"value": "0"
+						},
+						{
+							"key": "maxResults",
+							"value": "0"
+						},
+						{
+							"key": "order",
+							"value": "ASC\n"
+						}
+					]
+				},
+				"description": "Lista dei ruoli assegnati alla persona con lo username specificato"
+			},
+			"response": []
+		},
+		{
+			"name": "4) TEST CERCA FLUSSI ATTIVI",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "777241c7-5fc9-4d01-9492-7a7e1cb061b3",
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"console.log(\"TEST_nr_active_processess = \", data.total);\r",
+							"postman.setGlobalVariable(\"TEST_nr_active_processess\", data.total);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{ACCESS_TOKEN}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"active\":true,\"order\":\"ASC\",\"page\":0,\"processDefinitionKey\":\"all\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/search/?",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"search",
+						""
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null
+						}
+					]
+				},
+				"description": "Lista dei ruoli assegnati alla persona con lo username specificato"
+			},
+			"response": []
+		},
+		{
+			"name": "5) TEST CERCA FLUSSI TERMINATI",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "077abd84-37d4-40bd-9100-34167239d4d6",
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"console.log(\"TEST_nr_terminated_processess = \", data.total);\r",
+							"postman.setGlobalVariable(\"TEST_nr_terminated_processess\", data.total);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{ACCESS_TOKEN}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"active\":false,\"order\":\"ASC\",\"page\":0,\"processDefinitionKey\":\"all\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/search/?",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"search",
+						""
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null
+						}
+					]
+				},
+				"description": "Lista dei ruoli assegnati alla persona con lo username specificato"
+			},
+			"response": []
+		},
+		{
+			"name": "PROD Richiesta token FLOWS",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "1afcf6e9-a806-4607-a2c7-e5e1dce58495",
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"postman.setGlobalVariable(\"ACCESS_TOKEN\", data.access_token);",
+							"postman.setGlobalVariable(\"REFRESH_TOKEN\", data.refresh_token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic c3ByaW50YXBwOm15LXNlY3JldC10b2tlbi10by1jaGFuZ2UtaW4tcHJvZHVjdGlvbg=="
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "Sp@si@n0!",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "read write",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://nuovascrivaniadigitale.cnr.it//oauth/token",
+					"protocol": "https",
+					"host": [
+						"nuovascrivaniadigitale",
+						"cnr",
+						"it"
+					],
+					"path": [
+						"",
+						"oauth",
+						"token"
+					]
+				},
+				"description": "Ottiene il token (impostare una passoword)."
+			},
+			"response": []
+		},
+		{
+			"name": "PROD IMPERSONATE",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fc1a2c7d-1062-41d4-952a-a378b342a1e7",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{ACCESS_TOKEN}}"
+					}
+				],
+				"url": {
+					"raw": "https://nuovascrivaniadigitale.cnr.it/impersonate/start?impersonate_username={{username}}",
+					"protocol": "https",
+					"host": [
+						"nuovascrivaniadigitale",
+						"cnr",
+						"it"
+					],
+					"path": [
+						"",
+						"impersonate",
+						"start"
+					],
+					"query": [
+						{
+							"key": "impersonate_username",
+							"value": "{{username}}"
+						}
+					]
+				},
+				"description": "Lista dei ruoli assegnati alla persona con lo username specificato"
+			},
+			"response": []
+		},
+		{
+			"name": "6) PROD CERCA TASK ATTIVI",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3a72548c-77ec-4630-be8b-69234612637b",
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"console.log(\"PROD_nr_active_tasks = \", data.total);\r",
+							"postman.setGlobalVariable(\"PROD_nr_active_tasks\", data.total);\r",
+							"\r",
+							"console.log(\"TEST_nr_active_tasks = \", postman.getGlobalVariable(\"TEST_nr_active_tasks\"));\r",
+							"\r",
+							"pm.test(\"nr_active_tasks for PROD (\" + postman.getGlobalVariable(\"PROD_nr_active_tasks\") + \") and TEST (\" + postman.getGlobalVariable(\"TEST_nr_active_tasks\") + \") --- \" + postman.getGlobalVariable(\"nomeUtente\"), function () {\r",
+							"    pm.expect(postman.getGlobalVariable(\"PROD_nr_active_tasks\")).to.equal(postman.getGlobalVariable(\"TEST_nr_active_tasks\"));\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{ACCESS_TOKEN}}"
+					}
+				],
+				"url": {
+					"raw": "https://nuovascrivaniadigitale.cnr.it/api/tasks/mytasks?processDefinition=all&firstResult=0&maxResults=0&order=ASC",
+					"protocol": "https",
+					"host": [
+						"nuovascrivaniadigitale",
+						"cnr",
+						"it"
+					],
+					"path": [
+						"api",
+						"tasks",
+						"mytasks"
+					],
+					"query": [
+						{
+							"key": "processDefinition",
+							"value": "all"
+						},
+						{
+							"key": "firstResult",
+							"value": "0"
+						},
+						{
+							"key": "maxResults",
+							"value": "0"
+						},
+						{
+							"key": "order",
+							"value": "ASC"
+						}
+					]
+				},
+				"description": "Lista dei ruoli assegnati alla persona con lo username specificato"
+			},
+			"response": []
+		},
+		{
+			"name": "7) PROD CERCA NR AVAILABLE TASK",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "67775f81-05ff-4c0a-b5b8-cfc44596189e",
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"console.log(\"PROD_nr_available_tasks = \", data.total);\r",
+							"postman.setGlobalVariable(\"PROD_nr_available_tasks\", data.total);\r",
+							"\r",
+							"console.log(\"TEST_nr_available_tasks = \", postman.getGlobalVariable(\"TEST_nr_available_tasks\"));\r",
+							"\r",
+							"pm.test(\"nr_available_tasks for PROD (\" + postman.getGlobalVariable(\"PROD_nr_available_tasks\") + \") and TEST (\" + postman.getGlobalVariable(\"TEST_nr_available_tasks\") + \") --- \" + postman.getGlobalVariable(\"nomeUtente\"), function () {\r",
+							"    pm.expect(postman.getGlobalVariable(\"PROD_nr_available_tasks\")).to.equal(postman.getGlobalVariable(\"TEST_nr_available_tasks\"));\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{ACCESS_TOKEN}}"
+					}
+				],
+				"url": {
+					"raw": "https://nuovascrivaniadigitale.cnr.it/api/tasks/availabletasks?processDefinition=all&firstResult=0&maxResults=0&order=ASC\n",
+					"protocol": "https",
+					"host": [
+						"nuovascrivaniadigitale",
+						"cnr",
+						"it"
+					],
+					"path": [
+						"api",
+						"tasks",
+						"availabletasks"
+					],
+					"query": [
+						{
+							"key": "processDefinition",
+							"value": "all"
+						},
+						{
+							"key": "firstResult",
+							"value": "0"
+						},
+						{
+							"key": "maxResults",
+							"value": "0"
+						},
+						{
+							"key": "order",
+							"value": "ASC\n"
+						}
+					]
+				},
+				"description": "Lista dei ruoli assegnati alla persona con lo username specificato"
+			},
+			"response": []
+		},
+		{
+			"name": "8) PROD CERCA NR TASK IN MY GROUPS",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "54f6ccad-75be-480c-bdc4-3e5420d7d9c4",
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"console.log(\"PROD_nr_AssignedInMyGroups_tasks = \", data.total);\r",
+							"postman.setGlobalVariable(\"PROD_nr_AssignedInMyGroups_tasks\", data.total);\r",
+							"\r",
+							"console.log(\"TEST_nr_AssignedInMyGroups_tasks = \", postman.getGlobalVariable(\"TEST_nr_AssignedInMyGroups_tasks\"));\r",
+							"\r",
+							"pm.test(\"nr_AssignedInMyGroups_tasks for PROD (\" + postman.getGlobalVariable(\"PROD_nr_AssignedInMyGroups_tasks\") + \") and TEST (\" + postman.getGlobalVariable(\"TEST_nr_AssignedInMyGroups_tasks\") + \") --- \" + postman.getGlobalVariable(\"nomeUtente\"), function () {\r",
+							"    pm.expect(postman.getGlobalVariable(\"PROD_nr_AssignedInMyGroups_tasks\")).to.equal(postman.getGlobalVariable(\"TEST_nr_AssignedInMyGroups_tasks\"));\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{ACCESS_TOKEN}}"
+					}
+				],
+				"url": {
+					"raw": "https://nuovascrivaniadigitale.cnr.it/api/tasks/taskAssignedInMyGroups?processDefinition=all&firstResult=0&maxResults=0&order=ASC\n",
+					"protocol": "https",
+					"host": [
+						"nuovascrivaniadigitale",
+						"cnr",
+						"it"
+					],
+					"path": [
+						"api",
+						"tasks",
+						"taskAssignedInMyGroups"
+					],
+					"query": [
+						{
+							"key": "processDefinition",
+							"value": "all"
+						},
+						{
+							"key": "firstResult",
+							"value": "0"
+						},
+						{
+							"key": "maxResults",
+							"value": "0"
+						},
+						{
+							"key": "order",
+							"value": "ASC\n"
+						}
+					]
+				},
+				"description": "Lista dei ruoli assegnati alla persona con lo username specificato"
+			},
+			"response": []
+		},
+		{
+			"name": "9) PROD CERCA FLUSSI ATTIVI",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b723ded9-6e1e-488d-ac65-9714161aee82",
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"console.log(\"PROD_nr_active_processess = \", data.total);\r",
+							"postman.setGlobalVariable(\"PROD_nr_active_processess\", data.total);\r",
+							"\r",
+							"console.log(\"TEST_nr_active_processess = \", postman.getGlobalVariable(\"TEST_nr_active_processess\"));\r",
+							"\r",
+							"console.log(\"--- = \",  postman.getGlobalVariable(\"nomeUtente\") );\r",
+							"\r",
+							"\r",
+							"pm.test(\"nr_active_processess for PROD (\" + postman.getGlobalVariable(\"PROD_nr_active_processess\") + \") and TEST (\" + postman.getGlobalVariable(\"TEST_nr_active_processess\") + \") --- \" + postman.getGlobalVariable(\"nomeUtente\"), function () {\r",
+							"    pm.expect(postman.getGlobalVariable(\"PROD_nr_active_processess\")).to.equal(postman.getGlobalVariable(\"TEST_nr_active_processess\"));\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{ACCESS_TOKEN}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"active\":true,\"order\":\"ASC\",\"page\":0,\"processDefinitionKey\":\"all\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://nuovascrivaniadigitale.cnr.it/api/search/?",
+					"protocol": "https",
+					"host": [
+						"nuovascrivaniadigitale",
+						"cnr",
+						"it"
+					],
+					"path": [
+						"api",
+						"search",
+						""
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null
+						}
+					]
+				},
+				"description": "Lista dei ruoli assegnati alla persona con lo username specificato"
+			},
+			"response": []
+		},
+		{
+			"name": "10) PROD CERCA FLUSSI TERMINATI",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0191c193-28d0-4b09-886b-ba1978a90eb6",
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"console.log(\"PROD_nr_terminated_processess = \", data.total);\r",
+							"postman.setGlobalVariable(\"PROD_nr_terminated_processess\", data.total);\r",
+							"\r",
+							"console.log(\"TEST_nr_terminated_processess = \", postman.getGlobalVariable(\"TEST_nr_terminated_processess\"));\r",
+							"\r",
+							"\r",
+							"pm.test(\"nr_terminated_processess for PROD (\" + postman.getGlobalVariable(\"PROD_nr_terminated_processess\") + \") and TEST (\" + postman.getGlobalVariable(\"TEST_nr_terminated_processess\") + \") --- \" + postman.getGlobalVariable(\"nomeUtente\"), function () {\r",
+							"    pm.expect(postman.getGlobalVariable(\"PROD_nr_terminated_processess\")).to.equal(postman.getGlobalVariable(\"TEST_nr_terminated_processess\"));\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{ACCESS_TOKEN}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"active\":false,\"order\":\"ASC\",\"page\":0,\"processDefinitionKey\":\"all\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://nuovascrivaniadigitale.cnr.it/api/search/?",
+					"protocol": "https",
+					"host": [
+						"nuovascrivaniadigitale",
+						"cnr",
+						"it"
+					],
+					"path": [
+						"api",
+						"search",
+						""
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null
+						}
+					]
+				},
+				"description": "Lista dei ruoli assegnati alla persona con lo username specificato"
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

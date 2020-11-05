@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
-        <title>Un nuovo compito è stato assegnato al gruppo</title>
+        <title>Un nuovo compito &egrave;' stato assegnato al gruppo</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     </head>
     <body> 
-        <h1> Un nuovo compito è stato assegnato al gruppo <span th:text="${groupname}">NOME GRUPPO</span></h1>
+        <h1> Un nuovo compito &egrave; stato assegnato al gruppo <span th:text="${groupname}">NOME GRUPPO</span></h1>
         <hr>
         <p>
             Gentile <span th:text="${username}">nome.cognome</span>
@@ -17,7 +17,7 @@
             <span th:if="${key}">
               <br><i>dal titolo: "<bold th:text="${titolo}">OGGETTO FLUSSO</bold>"</i></span>
         <hr>
-            è stato assegnato al gruppo <strong th:text="${groupname}">NOME GRUPPO</strong>
+            &egrave; stato assegnato al gruppo <strong th:text="${groupname}">NOME GRUPPO</strong>
         <p th:if="${commento!=null and commento!= ''}">
             Il compito presenta la seguente nota di commento:
             <pre th:text="${commento}">Commento</pre>

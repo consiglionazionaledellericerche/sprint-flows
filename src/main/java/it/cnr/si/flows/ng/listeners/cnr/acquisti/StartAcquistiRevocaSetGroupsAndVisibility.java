@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
@@ -38,7 +39,7 @@ public class StartAcquistiRevocaSetGroupsAndVisibility implements ExecutionListe
         String initiator = (String) execution.getVariable("initiator");
         LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
 
-        List<String> groups = membershipService.getAllGroupsForUser(initiator).stream()
+        List<String> groups = membershipService.getAllRolesForUser(initiator).stream()
                 .filter(g -> g.startsWith("responsabile#"))
                 .collect(Collectors.toList());
 
@@ -58,7 +59,7 @@ public class StartAcquistiRevocaSetGroupsAndVisibility implements ExecutionListe
             LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoRT, gruppoSFD, gruppoStaffAmministrativo, gruppoFirmaAcquisti);
 
             //Check se il gruppo SFD ha membri
-            List<String> members = aceBridgeService.getUsersInAceGroup(gruppoSFD);
+            Set<String> members = aceBridgeService.getUsersInAceGroup(gruppoSFD);
             if ( members.size() == 0 ) {
                 execution.setVariable("organizzazioneStruttura", "Semplice");
             } else {

@@ -1,0 +1,163 @@
+{
+	"info": {
+		"_postman_id": "1104a1d1-9b04-4726-b26d-1fa556463bee",
+		"name": "ACE PROD get username list dei ruoli direttore ... valutatore",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Richiesta token JWT Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "edeea87d-577c-43ac-98eb-61235babbb3e",
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"postman.setGlobalVariable(\"ACCESS_TOKEN\", data.access_token);",
+							"postman.setGlobalVariable(\"REFRESH_TOKEN\", data.refresh_token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{OBTAIN_TOKEN_AUTHORIZATION}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "{{OBTAIN_TOKEN_GRANT_TYPE}}",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "{{OBTAIN_TOKEN_SCOPE}}",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "{{USERNAME}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{PASSWORD}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://api.ace.cnr.it/api/authentication/auth/oauth/token",
+					"protocol": "https",
+					"host": [
+						"api",
+						"ace",
+						"cnr",
+						"it"
+					],
+					"path": [
+						"api",
+						"authentication",
+						"auth",
+						"oauth",
+						"token"
+					]
+				},
+				"description": "Ottiene il token (impostare una passoword)."
+			},
+			"response": []
+		},
+		{
+			"name": "ricerca tutti i direttori",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "627fc88f-1e25-4281-81eb-61b5946ddfa3",
+						"exec": [
+							"var response = JSON.parse(responseBody); \r",
+							"var ids = [];\r",
+							"  console.log(\"ELENCO -- \" + postman.getGlobalVariable(\"elenco\"));\r",
+							"\r",
+							"\r",
+							"if((postman.getGlobalVariable(\"elenco\") ===  undefined) || (postman.getGlobalVariable(\"elenco\") ===  null)) {\r",
+							"  console.log(\"elenco NON presente\");\r",
+							"} else {\r",
+							"  ids.push(postman.getGlobalVariable(\"elenco\"));\r",
+							"  console.log(\"elenco presente\");\r",
+							"}\r",
+							"\r",
+							"//console.log(\"nr entitaOrganizzative: \" + response.items.length);\r",
+							"response.items.forEach(function(item){\r",
+							"    if (!ids.includes(item.utente.username)){\r",
+							"     console.log(\"persona da testare : \" + item.utente.username +  \"come: \" + pm.iterationData.get(\"descrizione\"));\r",
+							"     ids.push(item.utente.username);\r",
+							"    }\r",
+							"})\r",
+							"    console.log(\"direttore: \" + ids);\r",
+							"    postman.setGlobalVariable(\"elenco\", ids);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{ACCESS_TOKEN}}"
+					}
+				],
+				"url": {
+					"raw": "http://api.ace.cnr.it/api/ace/v1/ruolopersona?ruolo={{ruolo}}",
+					"protocol": "http",
+					"host": [
+						"api",
+						"ace",
+						"cnr",
+						"it"
+					],
+					"path": [
+						"api",
+						"ace",
+						"v1",
+						"ruolopersona"
+					],
+					"query": [
+						{
+							"key": "ruolo",
+							"value": "{{ruolo}}"
+						}
+					]
+				},
+				"description": "Lista dei ruoli assegnati alla persona con lo username specificato"
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -53,15 +54,15 @@ public class AceBridgeServiceTest {
     @Test(expected = FeignException.class)
     public void testGetRuoliUtente() {
 
-        List<String> aceGroupsForUser = aceBridgeService.getAceGroupsForUser("marcinireneusz.trycz");
+        Set<String> aceGroupsForUser = aceBridgeService.getAceRolesForUser("marcinireneusz.trycz");
         log.info("{}", aceGroupsForUser);
-        aceGroupsForUser = aceBridgeService.getAceGroupsForUser("app.abil");
+        aceGroupsForUser = aceBridgeService.getAceRolesForUser("app.abil");
         log.info("{}", aceGroupsForUser);
-        aceGroupsForUser = aceBridgeService.getAceGroupsForUser("susanna.monti");
+        aceGroupsForUser = aceBridgeService.getAceRolesForUser("susanna.monti");
         log.info("{}", aceGroupsForUser);
-        aceGroupsForUser = aceBridgeService.getAceGroupsForUser("luciana.baldoni");
+        aceGroupsForUser = aceBridgeService.getAceRolesForUser("luciana.baldoni");
         log.info("{}", aceGroupsForUser);
-        aceGroupsForUser = aceBridgeService.getAceGroupsForUser("");
+        aceGroupsForUser = aceBridgeService.getAceRolesForUser("");
         log.info("{}", aceGroupsForUser);
     }
 

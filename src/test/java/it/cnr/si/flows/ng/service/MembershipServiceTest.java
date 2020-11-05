@@ -38,7 +38,7 @@ public class MembershipServiceTest {
     @Test
     public void testGetAllGroupsForUser() throws Exception {
 
-        Set<String> groupsForRa = membershipService.getAllGroupsForUser(TestServices.getRA());
+        Set<String> groupsForRa = membershipService.getAllRolesForUser(TestServices.getRA());
 
         //aggiungo una nuova relationship
         Relationship relationship = new Relationship();
@@ -49,14 +49,14 @@ public class MembershipServiceTest {
         relationship = relationshipService.save(relationship);
 
         //verifico che getAllGroupsForUser prenda la modifica per entrambi gli utenti
-        Set<String> groupsForRa2 = membershipService.getAllGroupsForUser(TestServices.getRA());
+        Set<String> groupsForRa2 = membershipService.getAllRolesForUser(TestServices.getRA());
 
         assertEquals("Aggiungendo una relationship NON viene rilevata da getAllGroupsForUser "+ groupsForRa + groupsForRa2, groupsForRa.size() + 1, groupsForRa2.size());
         assertTrue("Aggiungendo una relationship NON viene rilevata da getAllGroupsForUser", groupsForRa2.contains(GROUP_RELATIONSHIP));
 
         //elimino la relazione e verifico che tutto funzioni come prima
         relationshipService.delete(relationship.getId());
-        Set<String> groupsForRa3 = membershipService.getAllGroupsForUser(TestServices.getRA());
+        Set<String> groupsForRa3 = membershipService.getAllRolesForUser(TestServices.getRA());
 
         assertEquals("Due utenti che appartengono allo stesso gruppo hanno RELAZIONI DIVERSE dopo la cancellazione della relationship", groupsForRa, groupsForRa3);
     }
@@ -73,7 +73,7 @@ public class MembershipServiceTest {
     public void testGetUsersInMyGroups() {
 
         Set<String> usersInMyGroups = membershipService.getUsersInMyGroups("utente2");
-        log.info("All groups for user "+ membershipService.getAllGroupsForUser("utente2"));
+        log.info("All groups for user "+ membershipService.getAllRolesForUser("utente2"));
         assertTrue(usersInMyGroups.contains("utente3"));
 
     }

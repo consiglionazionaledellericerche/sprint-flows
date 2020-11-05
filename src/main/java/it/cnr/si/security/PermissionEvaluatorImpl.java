@@ -267,7 +267,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
     public boolean isResponsabile(String taskId, String processInstanceId, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
         String user = SecurityUtils.getCurrentUserLogin();
-        Set<String> groups = membershipService.getAllGroupsForUser(user);
+        Set<String> groups = membershipService.getAllRolesForUser(user);
         Task task;
         if(!processInstanceId.isEmpty()){
             task = taskService.createTaskQuery()

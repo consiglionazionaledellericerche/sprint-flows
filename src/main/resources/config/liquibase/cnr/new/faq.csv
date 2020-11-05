@@ -1,3 +1,4 @@
 id;domanda;risposta;is_readable
 1;generiche - Perché mi arriva una mail di notifica e non trovo il flusso segnalato tra i compiti assegnati?;Alcune notifiche sono solo per segnalare la presenza di un flusso di interesse per l'utente;TRUE
 39239;generiche - Come posso vedere lo stato di un flusso anche se non è tra i miei compiti?;Attraverso la pagina di ricerca;TRUE
+4018177;generiche - Mi è arrivata una notifica di assegnazione compito e non trovo compiti assegnati nella pagina "I miei compiti";La pagina "I miei compiti" mostra di default i "compiti di gruppo". Oltre che la sezione relativa ai "compiti di gruppo" deve essere controllata anche la sezione "compiti assegnati a me" che elenca i compiti assegnati esclusivamente alla singola persona.;TRUE
