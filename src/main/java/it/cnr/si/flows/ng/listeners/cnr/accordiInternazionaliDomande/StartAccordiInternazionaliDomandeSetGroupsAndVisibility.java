@@ -41,7 +41,7 @@ public class StartAccordiInternazionaliDomandeSetGroupsAndVisibility {
 	private AceService aceService;
 
 
-	public void configuraVariabiliStart(DelegateExecution execution)  throws IOException, ParseException  {
+	public void configuraVariabiliStart(DelegateExecution execution)  throws IOException, ParseException, FeignException  {
 
 		String initiator = (String) execution.getVariable(Enum.VariableEnum.initiator.name());
 		//String richiedente = execution.getVariable("userNameRichiedente", String.class);
@@ -76,7 +76,7 @@ public class StartAccordiInternazionaliDomandeSetGroupsAndVisibility {
 				cdsuoAppartenenzaUtente = entitaOrganizzativaDirettore.getCdsuo();
 				denominazioneEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirettore.getDenominazione();
 			}
-		} catch ( FeignException  e) {
+		} catch (Exception  e) {
 			throw new BpmnError("412", "Errore nell'avvio del flusso " + e.getMessage().toString());
 		}
 
