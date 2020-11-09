@@ -105,7 +105,7 @@ public class FlowsPdfService {
 		Paragraph paragraphDocs = new Paragraph();
 		Paragraph paragraphHistory = new Paragraph();
 
-		Map<String, Object> map = flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId);
+		Map<String, Object> map = flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId, true);
 
 		HistoricProcessInstanceResponse processInstance = (HistoricProcessInstanceResponse) map.get("entity");
 		String fileName = "Summary_" + processInstance.getBusinessKey() + ".pdf";
@@ -218,7 +218,7 @@ public class FlowsPdfService {
 	//Sotituisco il mapping direttamente con il json delle variabili attuali
 	private JSONObject mappingVariables(JSONObject variables, String processInstanceId) {
 
-		Map<String, Object> map = flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId);
+		Map<String, Object> map = flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId, false);
 
 		HistoricProcessInstanceResponse processInstance = (HistoricProcessInstanceResponse) map.get("entity");
 		variables.put("businessKey", processInstance.getBusinessKey());

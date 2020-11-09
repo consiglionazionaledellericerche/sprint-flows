@@ -64,7 +64,7 @@ public class OivPdfService {
 		LOGGER.info("createPdf - ProcessInstanceId: " + processInstanceId);
 		//FlowsProcessInstanceService flowsProcessInstanceService = new FlowsProcessInstanceService();
 
-		Map<String, Object> map = flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId);
+		Map<String, Object> map = flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId, false);
 		//Map<String, Object> map = flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId);
 
 		HistoricProcessInstanceResponse processInstance = (HistoricProcessInstanceResponse) map.get("entity");

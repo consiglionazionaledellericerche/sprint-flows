@@ -93,7 +93,7 @@ public class FlowsProcessInstanceService {
                 .singleResult();
     }
 
-    public Map<String, Object> getProcessInstanceWithDetails(String processInstanceId) {
+    public Map<String, Object> getProcessInstanceWithDetails(String processInstanceId, boolean whitTaskList) {
         Map<String, Object> result = new HashMap<>();
 
         // PrecessInstance metadata
@@ -163,7 +163,9 @@ public class FlowsProcessInstanceService {
         result.put("canPublish", permissionEvaluator.canPublishAttachment(processInstanceId));
         result.put("canUpdateAttachments", permissionEvaluator.canUpdateAttachment(processInstanceId, flowsUserDetailsService));
 
-
+        if(whitTaskList){
+            result.put("history", getHistoryForPi(processInstanceId));
+        }
         return result;
     }
 
