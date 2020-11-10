@@ -112,7 +112,7 @@ public class FlowsProcessInstanceResource {
 		if (!detail) {
 			return new ResponseEntity(flowsProcessInstanceService.getProcessInstance(processInstanceId), HttpStatus.OK);
 		} else {
-			return new ResponseEntity(flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId, false), HttpStatus.OK);
+			return new ResponseEntity(flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId, true), HttpStatus.OK);
 		}
 	}
 
