@@ -43,6 +43,16 @@
 					vm.diagramUrl = '/rest/diagram/processInstance/' + vm.data.entity.id + "?" + new Date().getTime();
 					vm.data.businessKey = response.data.entity.businessKey;
 
+    				vm.data.history = response.data.history;
+                    vm.data.history.forEach(function(el) {
+                        //recupero l'ultimo task (quello ancora da eseguire)
+                        if (el.historyTask.endTime === null) {
+                            //recupero la fase
+                            vm.activeTask = el.historyTask;
+                            utils.refactoringVariables(vm.activeTask);
+                        }
+                    })
+
 					var processDefinition = response.data.entity.processDefinitionId.split(":");
 //						var stato = response.data.history[0].historyTask.name;
 					var stato = JSON.parse(response.data.entity.name).stato;
