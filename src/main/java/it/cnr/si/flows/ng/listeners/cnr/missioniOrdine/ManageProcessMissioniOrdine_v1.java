@@ -32,6 +32,7 @@ import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Enum.StatoDomandeSTMEnum;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.ExternalMessageService;
+import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import it.cnr.si.domain.enumeration.ExternalApplication;
 import it.cnr.si.domain.enumeration.ExternalMessageVerb;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
@@ -62,7 +63,7 @@ public class ManageProcessMissioniOrdine_v1 implements ExecutionListener {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ManageProcessMissioniOrdine_v1.class);
 	public static final String STATO_FINALE_GRADUATORIA = "statoFinaleDomanda";
 
-	
+
 	@Value("${cnr.missioni.url}")
 	private String urlMissioni;
 	@Value("${cnr.missioni.domandePath}")
@@ -76,7 +77,8 @@ public class ManageProcessMissioniOrdine_v1 implements ExecutionListener {
 	private StartMissioniOrdineSetGroupsAndVisibility startMissioniOrdineSetGroupsAndVisibility;
 	@Inject
 	private ExternalMessageService externalMessageService;	
-
+	@Inject
+	private AceService aceService;
 
 	private Expression faseEsecuzione;
 
@@ -128,12 +130,6 @@ public class ManageProcessMissioniOrdine_v1 implements ExecutionListener {
 			execution.setVariable("tutteDomandeAccettateFlag", "false");
 		};break;    
 
-		case "elenco-domande-start": {
-			// VERIFICA TUTTE LE DOMANDE DI FLUSSI ATTIVI PER QUEL BANDO
-
-
-		};break;  
-
 		// START
 		case "respinto-uo-start": {
 			restToApplicazioneMissioni(execution, Enum.StatoDomandeSTMEnum.RESPINTO_UO);
@@ -149,18 +145,28 @@ public class ManageProcessMissioniOrdine_v1 implements ExecutionListener {
 			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
 				firmaDocumentoService.eseguiFirma(execution, "missioni-ordine", null);
 			}
-		};break; 
+			//SE I DUE FIRMATARI SPESA E UO SONO LA STESSA PERSONA
+			if (execution.getVariable("validazioneSpesaFlag").toString().equalsIgnoreCase("si")) {
+				String gruppoFirmatarioUo = execution.getVariable("gruppoFirmatarioUo").toString();
+				String gruppoFirmatarioSpesa = execution.getVariable("gruppoFirmatarioSpesa").toString();
+				List<BossDto> utentiGruppoFirmatarioUo = aceService.getUtentiInRuoloCnr(gruppoFirmatarioUo);
+				List<BossDto> utentiGruppoFirmatarioSpesa = aceService.getUtentiInRuoloCnr(gruppoFirmatarioSpesa);
+				if (!utentiGruppoFirmatarioUo.equals(utentiGruppoFirmatarioSpesa)) {
+					execution.setVariable("firmaSpesaFlag", "si");
+				}
+			}
+			};break; 
 		case "firma-spesa-end": {
 			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
 				firmaDocumentoService.eseguiFirma(execution, "missioni-ordine", null);
 			}
 		};break; 
- 		
+
 		case "endevent-respintoUo-start": {
 			execution.setVariable("STATO_FINALE_DOMANDA", "RESPINTO UO");
 			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "RESPINTO UO");
 		};break;    	
- 		
+
 		case "endevent-respintoUoSpesa-start": {
 			execution.setVariable("STATO_FINALE_DOMANDA", "RESPINTO UO SPESA");
 			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "RESPINTO UO SPESA");
@@ -170,7 +176,7 @@ public class ManageProcessMissioniOrdine_v1 implements ExecutionListener {
 			execution.setVariable("STATO_FINALE_DOMANDA", "FIRMATO");
 			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "FIRMATO");
 		};break;  
-		
+
 		case "process-end": {
 			//sbloccaDomandeBando(execution);
 		};break; 
@@ -179,7 +185,7 @@ public class ManageProcessMissioniOrdine_v1 implements ExecutionListener {
 		};break;    
 
 		} 
+		}
+
+
 	}
-
-
-}

@@ -41,7 +41,7 @@
     <exclusiveGateway id="exclusivegateway6" name="Exclusive Gateway" default="flow17"></exclusiveGateway>
     <sequenceFlow id="flow15" sourceRef="firma-uo" targetRef="exclusivegateway6"></sequenceFlow>
     <sequenceFlow id="flow16" name="FIRMATO " sourceRef="exclusivegateway6" targetRef="endevent3">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente != 'Respingi' && validazioneSpesaFlag != 'si'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente != 'Respingi' && firmaSpesaFlag != 'si'}]]></conditionExpression>
     </sequenceFlow>
     <userTask id="respinto-uo" name="RESPINTO UO " activiti:assignee="${initiator}">
       <extensionElements>
@@ -76,8 +76,7 @@
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow20" sourceRef="exclusivegateway6" targetRef="firma-spesa">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente != 'Respingi' && validazioneSpesaFlag == 'si'}
-]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente != 'Respingi' && firmaSpesaFlag == 'si'}]]></conditionExpression>
     </sequenceFlow>
     <userTask id="respinto-spesa" name="RESPINTO SPESA" activiti:assignee="${initiator}">
       <extensionElements>
@@ -234,7 +233,7 @@
         <omgdi:waypoint x="389.0" y="221.0"></omgdi:waypoint>
         <omgdi:waypoint x="430.0" y="221.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="16.0" width="100.0" x="399.0" y="180.0"></omgdc:Bounds>
+          <omgdc:Bounds height="16.0" width="92.0" x="399.0" y="180.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
