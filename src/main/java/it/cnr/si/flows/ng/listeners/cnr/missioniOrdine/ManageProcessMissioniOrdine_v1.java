@@ -33,6 +33,8 @@ import it.cnr.si.flows.ng.utils.Enum.StatoDomandeSTMEnum;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.ExternalMessageService;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleRuoloWebDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
 import it.cnr.si.domain.enumeration.ExternalApplication;
 import it.cnr.si.domain.enumeration.ExternalMessageVerb;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
@@ -149,13 +151,17 @@ public class ManageProcessMissioniOrdine_v1 implements ExecutionListener {
 			if (execution.getVariable("validazioneSpesaFlag").toString().equalsIgnoreCase("si")) {
 				String gruppoFirmatarioUo = execution.getVariable("gruppoFirmatarioUo").toString();
 				String gruppoFirmatarioSpesa = execution.getVariable("gruppoFirmatarioSpesa").toString();
-				List<BossDto> utentiGruppoFirmatarioUo = aceService.getUtentiInRuoloCnr(gruppoFirmatarioUo);
-				List<BossDto> utentiGruppoFirmatarioSpesa = aceService.getUtentiInRuoloCnr(gruppoFirmatarioSpesa);
+				String gruppoFirmatarioUoSigla = gruppoFirmatarioUo.split("@")[0];
+				int gruppoFirmatarioUoIdEO = Integer.parseInt(gruppoFirmatarioUo.split("@")[1].toString());
+				String gruppoFirmatarioSpesaSigla = gruppoFirmatarioSpesa.split("@")[0];
+				int gruppoFirmatarioSpesaIdEO = Integer.parseInt(gruppoFirmatarioSpesa.split("@")[1].toString());
+				List<SimpleUtenteWebDto> utentiGruppoFirmatarioUo =  aceService.getUtentiInRuoloEo(gruppoFirmatarioUoSigla, gruppoFirmatarioUoIdEO);
+				List<SimpleUtenteWebDto> utentiGruppoFirmatarioSpesa =  aceService.getUtentiInRuoloEo(gruppoFirmatarioSpesaSigla, gruppoFirmatarioSpesaIdEO);
 				if (!utentiGruppoFirmatarioUo.equals(utentiGruppoFirmatarioSpesa)) {
 					execution.setVariable("firmaSpesaFlag", "si");
 				}
 			}
-			};break; 
+		};break; 
 		case "firma-spesa-end": {
 			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
 				firmaDocumentoService.eseguiFirma(execution, "missioni-ordine", null);
@@ -185,7 +191,7 @@ public class ManageProcessMissioniOrdine_v1 implements ExecutionListener {
 		};break;    
 
 		} 
-		}
-
-
 	}
+
+
+}
