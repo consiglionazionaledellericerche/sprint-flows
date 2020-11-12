@@ -40,7 +40,7 @@ public class StartMissioniOrdineSetGroupsAndVisibility {
 	@Inject
 	private RuntimeService runtimeService;
 
-	
+
 	public void configuraVariabiliStart(DelegateExecution execution)  throws IOException, ParseException  {
 
 		String initiator = (String) execution.getVariable(Enum.VariableEnum.initiator.name());
@@ -48,18 +48,25 @@ public class StartMissioniOrdineSetGroupsAndVisibility {
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
 
 		// TODO  DA CAMBIARE IL NOME DEL GRUPPO da  responsabile-struttura@ a responsbile-missioni@
+		String missioneEsteraFlag = execution.getVariable("missioneEsteraFlag").toString();
 		String gruppoFirmatarioUo = "firma-missioni@" + (String) execution.getVariable("idStrutturaUoMissioni");
+		//assegnazione fittizia per spesa
 		String gruppoFirmatarioSpesa = "firma-missioni@" + (String) execution.getVariable("idStrutturaUoMissioni").toString();
+		if (missioneEsteraFlag.equals("si")) {
+			gruppoFirmatarioUo = "firma-missioni-estere@" + (String) execution.getVariable("idStrutturaUoMissioni");
+		} 
 		String tipologiaFirmaMissione = execution.getVariable("validazioneSpesaFlag").toString();
 		if (tipologiaFirmaMissione.equals("si")) {
-			// TODO  DA CAMBIARE IL NOME DEL GRUPPO
-			//gruppoFirmatarioSpesa = "responsbile-missioni@" + (String) execution.getVariable("idStrutturaSpesaMissioni");
 			gruppoFirmatarioSpesa = "firma-missioni@" + (String) execution.getVariable("idStrutturaSpesaMissioni");
+			if (missioneEsteraFlag.equals("si")) {
+				gruppoFirmatarioSpesa = "firma-missioni-estere@" + (String) execution.getVariable("idStrutturaSpesaMissioni");
+			} 
+
 			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoFirmatarioSpesa, PROCESS_VISUALIZER);
 		}
 		String applicazioneMissioni = "app.missioni";
 
-		LOGGER.debug("Imposto i gruppi del flusso {}, {}",  gruppoFirmatarioUo, gruppoFirmatarioSpesa);
+		LOGGER.debug("Imposto i gruppi del flusso gruppoFirmatarioUo {} - gruppoFirmatarioSpesa {} - per il flusso con missioneEsteraFlag {} - tipologiaFirmaMissione {}",  gruppoFirmatarioUo, gruppoFirmatarioSpesa, missioneEsteraFlag, tipologiaFirmaMissione);
 
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoFirmatarioUo, PROCESS_VISUALIZER);
 		execution.setVariable("gruppoFirmatarioUo", gruppoFirmatarioUo);
