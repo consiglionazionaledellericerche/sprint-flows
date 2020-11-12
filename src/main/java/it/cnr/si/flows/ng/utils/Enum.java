@@ -79,6 +79,11 @@ public class Enum {
         GenerazioneDaSistema
     }
 
+    public enum StatoDomandeMissioniEnum {
+        RESPINTO_UO,
+        RESPINTO_UO_SPESA,
+        FIRMATO;
+    }
     public enum StatoDomandeAccordiInternazionaliEnum {
         APERTA,
         CHIUSA,

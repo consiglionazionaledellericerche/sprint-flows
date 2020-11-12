@@ -29,7 +29,7 @@ import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.service.FlowsTaskService;
 import it.cnr.si.flows.ng.service.ProtocolloDocumentoService;
 import it.cnr.si.flows.ng.utils.Enum;
-import it.cnr.si.flows.ng.utils.Enum.StatoDomandeSTMEnum;
+import it.cnr.si.flows.ng.utils.Enum.StatoDomandeMissioniEnum;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.ExternalMessageService;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
@@ -84,7 +84,7 @@ public class ManageProcessMissioniOrdine_v1 implements ExecutionListener {
 
 	private Expression faseEsecuzione;
 
-	public void restToApplicazioneMissioni(DelegateExecution execution, StatoDomandeSTMEnum statoDomanda) {
+	public void restToApplicazioneMissioni(DelegateExecution execution, StatoDomandeMissioniEnum statoMissione) {
 
 		// @Value("${cnr.accordi-bilaterali.url}")
 		// private String urlShortTermMobility;
@@ -93,12 +93,12 @@ public class ManageProcessMissioniOrdine_v1 implements ExecutionListener {
 		// @Value("${cnr.accordi-bilaterali.psw}")
 		// private String pswAccordiBilaterali;
 		//Double idDomanda = Double.parseDouble(execution.getVariable("idDomanda").toString());
-		String idDomanda = execution.getVariable("idDomanda").toString();
+		String idMissioneOrdine = execution.getVariable("idMissioneOrdine").toString();
 		Map<String, Object> stmPayload = new HashMap<String, Object>()
 		{
 			{
-				put("idDomanda", idDomanda);
-				put("stato", statoDomanda.name().toString());
+				put("idMissioneOrdine", idMissioneOrdine);
+				put("stato", statoMissione.name().toString());
 			}	
 		};
 
@@ -134,12 +134,12 @@ public class ManageProcessMissioniOrdine_v1 implements ExecutionListener {
 
 		// START
 		case "respinto-uo-start": {
-			restToApplicazioneMissioni(execution, Enum.StatoDomandeSTMEnum.RESPINTO_UO);
+			//restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.RESPINTO_UO);
 		};break;
 
 
 		case "respinto-spesa-start": {
-			restToApplicazioneMissioni(execution, Enum.StatoDomandeSTMEnum.RESPINTO_UO_SPESA);
+			//restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.RESPINTO_UO_SPESA);
 		};break;
 
 
@@ -157,6 +157,7 @@ public class ManageProcessMissioniOrdine_v1 implements ExecutionListener {
 				int gruppoFirmatarioSpesaIdEO = Integer.parseInt(gruppoFirmatarioSpesa.split("@")[1].toString());
 				List<SimpleUtenteWebDto> utentiGruppoFirmatarioUo =  aceService.getUtentiInRuoloEo(gruppoFirmatarioUoSigla, gruppoFirmatarioUoIdEO);
 				List<SimpleUtenteWebDto> utentiGruppoFirmatarioSpesa =  aceService.getUtentiInRuoloEo(gruppoFirmatarioSpesaSigla, gruppoFirmatarioSpesaIdEO);
+				//TUTTI I MEMBRI DEI GRUPPI DEVONO ESSERE UGUALI
 				if (!utentiGruppoFirmatarioUo.equals(utentiGruppoFirmatarioSpesa)) {
 					execution.setVariable("firmaSpesaFlag", "si");
 				}
@@ -169,18 +170,22 @@ public class ManageProcessMissioniOrdine_v1 implements ExecutionListener {
 		};break; 
 
 		case "endevent-respintoUo-start": {
-			execution.setVariable("STATO_FINALE_DOMANDA", "RESPINTO UO");
-			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "RESPINTO UO");
+			execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoDomandeMissioniEnum.RESPINTO_UO.toString());
+			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeMissioniEnum.RESPINTO_UO.toString());
+			restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.RESPINTO_UO);
 		};break;    	
 
 		case "endevent-respintoUoSpesa-start": {
-			execution.setVariable("STATO_FINALE_DOMANDA", "RESPINTO UO SPESA");
-			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "RESPINTO UO SPESA");
+			execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoDomandeMissioniEnum.RESPINTO_UO_SPESA);
+			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeMissioniEnum.RESPINTO_UO_SPESA.toString());
+			restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.RESPINTO_UO_SPESA);
 		};break;    	
 
 		case "endevent-firmato-start": {
 			execution.setVariable("STATO_FINALE_DOMANDA", "FIRMATO");
 			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "FIRMATO");
+			restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.FIRMATO);
+
 		};break;  
 
 		case "process-end": {
