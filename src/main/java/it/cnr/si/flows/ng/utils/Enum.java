@@ -84,6 +84,12 @@ public class Enum {
         RESPINTO_UO_SPESA,
         FIRMATO;
     }
+    
+    public enum TipologieeMissioniEnum {
+    	ordine,
+    	rimborso,
+    	revoca;
+    }
     public enum StatoDomandeAccordiInternazionaliEnum {
         APERTA,
         CHIUSA,
