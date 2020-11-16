@@ -283,16 +283,14 @@ public class ExternalMessageSender {
 
             if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 
-                MultiValueMap<String, String> auth = new LinkedMultiValueMap<>();
-                auth.add("username", missioniUsername);
-                auth.add("password", missioniPassword);
-                auth.add("client_id", missioniClientId);
-                auth.add("client_secret", missioniClientSecret);
-                auth.add("grant_type", "password");
-                auth.add("scope", "read write");
+//                MultiValueMap<String, String> auth = new LinkedMultiValueMap<>();
+                Map<String, String> auth = new HashMap<>();
+                auth.put("username", missioniUsername);
+                auth.put("password", missioniPassword);
+                auth.put("rememberMe", "true");
 
                 HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+                headers.setContentType(MediaType.APPLICATION_JSON);
 
                 RequestEntity entity = new RequestEntity(
                         auth,
@@ -300,7 +298,7 @@ public class ExternalMessageSender {
                         HttpMethod.POST,
                         URI.create(missioniUrl + missioniLoginPath));
                 ResponseEntity<Map> resp = new RestTemplate().exchange(entity, Map.class);
-                this.access_token = (String) resp.getBody().get("access_token");
+                this.access_token = (String) resp.getBody().get("id_token");
 
                 request.getHeaders().set("Authorization", "Bearer "+ access_token);
                 request.getHeaders().setContentType(MediaType.APPLICATION_JSON);

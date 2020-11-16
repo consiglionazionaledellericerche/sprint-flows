@@ -131,7 +131,7 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 				//List<SimpleUtenteWebDto> utentiGruppoFirmatarioUo =  aceService.getUtentiInRuoloEo(gruppoFirmatarioUoSigla, gruppoFirmatarioUoIdEO);
 				List<SimpleUtenteWebDto> utentiGruppoFirmatarioSpesa =  aceService.getUtentiInRuoloEo(gruppoFirmatarioSpesaSigla, gruppoFirmatarioSpesaIdEO);
 				// SE L'UTENTE CORRENTE FA PARTE DEL GRUPPO FIRMATARIO SPESA
-				for(int i=0;i<utentiGruppoFirmatarioSpesa.size();i++) { 
+				for(int i=0;i<utentiGruppoFirmatarioSpesa.size();i++) { 	
 					LOGGER.info("l'utente {} nel gruppo è {} ",  i , utentiGruppoFirmatarioSpesa.get(i).getUsername());
 					if(utentiGruppoFirmatarioSpesa.get(i).getUsername().equalsIgnoreCase(currentUser)) {
 						execution.setVariable("firmaSpesaFlag", "no");
