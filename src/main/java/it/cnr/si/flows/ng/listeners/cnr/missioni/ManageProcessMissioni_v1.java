@@ -49,7 +49,7 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 	@Inject
 	private AceService aceService;
 
-	  
+
 	private Expression faseEsecuzione;
 
 	public void restToApplicazioneMissioni(DelegateExecution execution, StatoDomandeMissioniEnum statoMissione) {
@@ -121,21 +121,22 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 			//SE I DUE FIRMATARI SPESA E UO SONO LA STESSA PERSONA
 			String currentUser = SecurityUtils.getCurrentUserLogin();
 			if (execution.getVariable("validazioneSpesaFlag").toString().equalsIgnoreCase("si")) {
-//				String gruppoFirmatarioUo = execution.getVariable("gruppoFirmatarioUo").toString();
+				execution.setVariable("firmaSpesaFlag", "si");
+				//				String gruppoFirmatarioUo = execution.getVariable("gruppoFirmatarioUo").toString();
 				String gruppoFirmatarioSpesa = execution.getVariable("gruppoFirmatarioSpesa").toString();
-//				String gruppoFirmatarioUoSigla = gruppoFirmatarioUo.split("@")[0];
-//				int gruppoFirmatarioUoIdEO = Integer.parseInt(gruppoFirmatarioUo.split("@")[1].toString());
+				//				String gruppoFirmatarioUoSigla = gruppoFirmatarioUo.split("@")[0];
+				//				int gruppoFirmatarioUoIdEO = Integer.parseInt(gruppoFirmatarioUo.split("@")[1].toString());
 				String gruppoFirmatarioSpesaSigla = gruppoFirmatarioSpesa.split("@")[0];
 				int gruppoFirmatarioSpesaIdEO = Integer.parseInt(gruppoFirmatarioSpesa.split("@")[1].toString());
 				//List<SimpleUtenteWebDto> utentiGruppoFirmatarioUo =  aceService.getUtentiInRuoloEo(gruppoFirmatarioUoSigla, gruppoFirmatarioUoIdEO);
 				List<SimpleUtenteWebDto> utentiGruppoFirmatarioSpesa =  aceService.getUtentiInRuoloEo(gruppoFirmatarioSpesaSigla, gruppoFirmatarioSpesaIdEO);
-				//TUTTI I MEMBRI DEI GRUPPI DEVONO ESSERE UGUALI
-//				if (!utentiGruppoFirmatarioUo.equals(utentiGruppoFirmatarioSpesa)) {
-//					execution.setVariable("firmaSpesaFlag", "si");
-//				}
-				if (utentiGruppoFirmatarioSpesa.contains(currentUser)) {
-					execution.setVariable("firmaSpesaFlag", "si");
-				}
+				// SE L'UTENTE CORRENTE FA PARTE DEL GRUPPO FIRMATARIO SPESA
+				for(int i=0;i<utentiGruppoFirmatarioSpesa.size();i++) { 
+					LOGGER.info("l'utente {} nel gruppo è {} ",  i , utentiGruppoFirmatarioSpesa.get(i).getUsername());
+					if(utentiGruppoFirmatarioSpesa.get(i).getUsername().equalsIgnoreCase(currentUser)) {
+						execution.setVariable("firmaSpesaFlag", "no");
+					}
+				} 
 			}
 		};break; 
 		case "firma-spesa-end": {
