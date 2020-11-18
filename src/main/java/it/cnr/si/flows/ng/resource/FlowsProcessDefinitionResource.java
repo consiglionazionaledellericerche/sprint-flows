@@ -22,10 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @RestController
 @RequestMapping("api/processDefinitions")
@@ -47,12 +44,12 @@ public class FlowsProcessDefinitionResource {
 
         Map<String, List<ProcessDefinitionResponse>> result = new HashMap<>();
         //lista di TUTTE le Process Definition
-        List<ProcessDefinition> list = repositoryService.createProcessDefinitionQuery().latestVersion().list();
-        List<ProcessDefinitionResponse> responseList = restResponseFactory.createProcessDefinitionResponseList(list);
-        result.put("all", responseList);
+        List<ProcessDefinition> allPD = repositoryService.createProcessDefinitionQuery().latestVersion().list();
+        List<ProcessDefinitionResponse> responseListAll = restResponseFactory.createProcessDefinitionResponseList(allPD);
+        result.put("all", responseListAll);
 
         //lista delle Process Definition che l'utente loggato può avviare
-        List<ProcessDefinition> listBootable = list.stream().filter(d -> canStartProcesByDefinitionKey(d.getKey())).collect(Collectors.toList());
+        List<ProcessDefinition> listBootable = canStartProcesByDefinitionList(allPD);
         List<ProcessDefinitionResponse> responseListBootable = restResponseFactory.createProcessDefinitionResponseList(listBootable);
         result.put("bootable", responseListBootable);
 
@@ -96,5 +93,20 @@ public class FlowsProcessDefinitionResource {
                 .stream()
                 .map(Utils::removeLeadingRole)
                 .anyMatch(a -> a.startsWith("abilitati#" + definitionKey + "@") );
+    }
+
+
+    public List<ProcessDefinition> canStartProcesByDefinitionList(List<ProcessDefinition> processDefinitions) {
+        List<ProcessDefinition> response = new ArrayList<>();
+        Set<String> allRolesForUser = membershipService.getAllRolesForUser(SecurityUtils.getCurrentUserLogin());
+        for (ProcessDefinition processDefinition : processDefinitions) {
+            if(allRolesForUser
+                    .stream()
+                    .map(Utils::removeLeadingRole)
+                    .anyMatch(a -> a.startsWith("abilitati#" + processDefinition.getKey() + "@"))){
+                response.add(processDefinition);
+            }
+        }
+        return response;
     }
 }
