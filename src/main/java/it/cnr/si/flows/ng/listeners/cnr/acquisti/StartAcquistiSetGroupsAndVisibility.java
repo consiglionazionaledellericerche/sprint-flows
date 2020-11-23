@@ -2,7 +2,7 @@ package it.cnr.si.flows.ng.listeners.cnr.acquisti;
 
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.CounterService;
-import it.cnr.si.flows.ng.service.SiperService;
+import it.cnr.si.flows.ng.service.FlowsSiperService;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.MembershipService;
@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.idStruttura;
@@ -45,7 +46,7 @@ public class StartAcquistiSetGroupsAndVisibility {
 	@Inject
 	private AceService aceService;
 	@Inject
-	private SiperService siperService;
+	private FlowsSiperService flowsSiperService;
 	@Inject
 	private MembershipService membershipService;
 
@@ -56,7 +57,7 @@ public class StartAcquistiSetGroupsAndVisibility {
 		// LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable(Enum.VariableEnum.title.name()));
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
 
-		List<String> groups = membershipService.getAllGroupsForUser(initiator).stream()
+		List<String> groups = membershipService.getAllRolesForUser(initiator).stream()
 				.filter(g -> g.startsWith("staffAmministrativo@"))
 				.collect(Collectors.toList());
 
@@ -89,7 +90,7 @@ public class StartAcquistiSetGroupsAndVisibility {
 			LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoStaffAmministrativo, gruppoSFD, gruppoStaffAmministrativo, gruppoFirmaAcquisti);
 
 			//Check se il gruppo SFD ha membri
-			List<String> members = aceBridgeService.getUsersInAceGroup(gruppoSFD);
+			Set<String> members = aceBridgeService.getUsersInAceGroup(gruppoSFD);
 			if (members.isEmpty()) {
 				execution.setVariable("organizzazioneStruttura", "Semplice");
 			} else {

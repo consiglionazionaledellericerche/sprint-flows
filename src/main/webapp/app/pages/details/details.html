@@ -117,7 +117,7 @@
 				</div>
 				<div class="col-sm-6 col-md-12">
 					<button class="btn btn-default btn-block"
-							ng-click="history(vm.data.history, vm.data.startEvent, vm.initiator)"><span
+							ng-click="history(processInstanceId, vm.data.startEvent, vm.initiator)"><span
 							class="glyphicon glyphicon-time"></span> Visualizza Cronologia
 					</button>
 
@@ -135,7 +135,7 @@
 		<div class="col-md-4 col-md-offset-4">
 			<div class="btn-group btn-group-justified" role="group">
 				<a class="btn btn-primary" back><span class="glyphicon glyphicon-arrow-left"></span> Ritorna</a>
-				<a class="btn btn-primary" ng-if="vm.taskId && (vm.activeTask.assignee ? vm.activeTask.assignee == vm.username : true)"
+				<a class="btn btn-primary" ng-disabled="button.disabled" ng-if="vm.taskId && (vm.activeTask.assignee ? vm.activeTask.assignee == vm.username : true)"
 				   ui-sref="task({processDefinitionId: vm.data.entity.processDefinitionId, taskId: vm.taskId})">
 					<span class="glyphicon glyphicon-cog"></span> Azioni <span
 						class="glyphicon glyphicon-arrow-right"></span>

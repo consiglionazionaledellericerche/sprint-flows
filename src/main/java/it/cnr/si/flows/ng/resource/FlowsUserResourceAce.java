@@ -9,6 +9,9 @@ import it.cnr.si.service.dto.anagrafica.base.PageDto;
 import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
 import it.cnr.si.service.dto.anagrafica.scritture.PersonaDto;
 import it.cnr.si.service.dto.anagrafica.scritture.UtenteDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
+
 import org.activiti.engine.ManagementService;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,13 +53,13 @@ public class FlowsUserResourceAce {
         Map<String, Object> response = new HashMap<>();
 
         Map<String, String> query = new HashMap<String, String>() {{put("username", username);}};
-        PageDto<UtenteDto> utenti = aceService.searchUtenti(query);
+        List<SimpleUtenteWebDto> utenti = aceService.searchUtenti(query);
 
-        response.put("more", utenti.getCount() > 10);
-        response.put("results", utenti.getItems().stream()
+        response.put("more", utenti.size() > 10);
+        response.put("results", utenti.stream()
                 .limit(10)
                 .map(u ->  {
-                    PersonaDto p = u.getPersona();
+                    SimplePersonaWebDto p = u.getPersona();
                     String label = p != null ? p.getNome() +" "+ p.getCognome() : u.getUsername();
                     return new Utils.SearchResult(
                             u.getUsername(),

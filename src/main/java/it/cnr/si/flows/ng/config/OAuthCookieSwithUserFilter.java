@@ -151,7 +151,7 @@ public class OAuthCookieSwithUserFilter extends SwitchUserFilter {
 
 
         if (this.logger.isDebugEnabled()) {
-            this.logger.debug("Attempt to switch to user [" + username + "]");
+            this.logger.trace("Attempt to switch to user [" + username + "]");
         }
 
         UserDetails targetUser;
@@ -163,7 +163,7 @@ public class OAuthCookieSwithUserFilter extends SwitchUserFilter {
         targetUserRequest = createSwitchUserToken(request, targetUser);
 
         if (this.logger.isDebugEnabled()) {
-            this.logger.debug("Switch User Token [" + targetUserRequest + "]");
+            this.logger.trace("Switch User Token [" + targetUserRequest + "]");
         }
 
         // publish event

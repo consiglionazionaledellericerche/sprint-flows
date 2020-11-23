@@ -15,12 +15,8 @@ import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
-import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
-import org.activiti.rest.service.api.runtime.process.ProcessInstanceActionRequest;
-import org.activiti.rest.service.api.runtime.process.ProcessInstanceResource;
-import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -36,7 +32,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import javax.websocket.server.PathParam;
 import java.io.IOException;
 import java.util.*;
@@ -117,7 +112,7 @@ public class FlowsProcessInstanceResource {
 		if (!detail) {
 			return new ResponseEntity(flowsProcessInstanceService.getProcessInstance(processInstanceId), HttpStatus.OK);
 		} else {
-			return new ResponseEntity(flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId), HttpStatus.OK);
+			return new ResponseEntity(flowsProcessInstanceService.getProcessInstanceWithDetails(processInstanceId, true), HttpStatus.OK);
 		}
 	}
 
@@ -349,6 +344,17 @@ public class FlowsProcessInstanceResource {
 			}
 		}
 		return ResponseEntity.ok().build();
+	}
+
+
+	@GetMapping(value = "/getHistoryForPi", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<List<Map<String, Object>>> getHistoryForPi(
+			@RequestParam("processInstanceId") String processInstanceId){
+
+		ArrayList<Map<String, Object>> historicProcessInstances = flowsProcessInstanceService
+				.getHistoryForPi(processInstanceId);
+		return new ResponseEntity<>(historicProcessInstances, HttpStatus.OK);
 	}
 
 

@@ -93,20 +93,20 @@ public class MembershipService {
     /* --- */
 
     // Se a qualcuno dovesse servire puo' rendere questo metodo public, ma non credo - martin 4/9/19
-    private Set<String> getLocalGroupsForUser(String username) {
+    private Set<String> getLocalRolesForUser(String username) {
         return membershipRepository.findGroupNamesForUser(username);
     }
 
     // Se a qualcuno dovesse servire puo' rendere questo metodo public, ma non credo - martin 4/9/19
-    private Set<String> getAceGroupsForUser(String username) {
+    private Set<String> getAceRolessForUser(String username) {
     	try {
 	        return Optional.ofNullable(aceBridgeService)
-	                .map(aceBridgeService -> aceBridgeService.getAceGroupsForUser(username))
+	                .map(aceBridgeService -> aceBridgeService.getAceRolesForUser(username))
 	                .map(strings -> strings.stream())
 	                .orElse(Stream.empty())
 	                .collect(Collectors.toSet());
     	} catch (Exception e) {
-    		log.debug(e.getMessage()); // Succede se admin chiede i gruppi da ace
+    		log.debug(e.getMessage(), e); // Succede se admin chiede i gruppi da ace
     		return new HashSet<String>();
     	}
     }
@@ -120,17 +120,19 @@ public class MembershipService {
      * @param username per chi cercare i gruppi
      * @return Set di tutti i gruppi dell'utente
      */
-    public Set<String> getAllGroupsForUser(String username) {
+    public Set<String> getAllRolesForUser(String username) {
 
-        Set<String> groups = new HashSet<>();
+        Set<String> roles = new HashSet<>();
 
-        groups.addAll( getAceGroupsForUser(username) );
-        groups.addAll( getLocalGroupsForUser(username) );
-        groups.add("USER");
+        roles.addAll( getAceRolessForUser(username) );
+        roles.addAll( getLocalRolesForUser(username) );
+        roles.add("USER");
 
-        groups.addAll( getAllChildGroupsRecursively(groups, new HashSet<>()) );
+        roles.addAll( getAllChildRolesRecursively(roles, new HashSet<>()) );
 
-        return groups;
+        log.debug("Ruoli ace e locali per l'utente {}: {}", username, roles);
+
+        return roles;
     }
 
     /* --- */
@@ -171,7 +173,7 @@ public class MembershipService {
         Set<String> otherUsers = null;
         try {
             otherUsers = forkJoinPool.submit(
-                    () -> getAllGroupsForUser(username).parallelStream()     // recupero tutti i gruppi per l'utente richiesto
+                    () -> getAllRolesForUser(username).parallelStream()     // recupero tutti i gruppi per l'utente richiesto
                             .map(myGroup -> getAllUsersInGroup(myGroup)) // per ogni gruppo recupero i suoi membri
                             .flatMap(list -> list.stream())           // ho uno stream di liste di stringhe che trasformo in uno stream di stringhe
                             .filter(user -> !user.equals(username))   // non mi interessa includere l'utente con cui ho chiamato
@@ -183,7 +185,7 @@ public class MembershipService {
         }
     }
 
-    private Set<String> getAllChildGroupsRecursively(Set<String> resultSoFar, Set<String> visited) {
+    private Set<String> getAllChildRolesRecursively(Set<String> resultSoFar, Set<String> visited) {
 
         log.trace("resultsSoFar {}, visited {}", resultSoFar, visited);
         Set<String> buffer = new HashSet<>();
@@ -211,7 +213,7 @@ public class MembershipService {
         }
 
         if (!buffer.isEmpty())
-            resultSoFar.addAll(getAllChildGroupsRecursively(buffer, visited));
+            resultSoFar.addAll(getAllChildRolesRecursively(buffer, visited));
 
         return buffer;
 

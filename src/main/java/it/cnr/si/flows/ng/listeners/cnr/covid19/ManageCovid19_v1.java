@@ -9,6 +9,7 @@ import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import it.cnr.si.service.dto.anagrafica.scritture.UtenteDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
 
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -285,7 +286,7 @@ public class ManageCovid19_v1 implements ExecutionListener {
 	private void controlloFlussoEsistente(DelegateExecution execution) {
 		// CONTROLLO UNICITA' SCHEDA -MESE ANNO TIPOLOGIA UTENTE
 		String userNameUtente = execution.getVariable("initiator").toString();
-		UtenteDto utente = aceService.getUtente(execution.getVariable("initiator").toString());
+		SimpleUtenteWebDto utente = aceService.getUtente(execution.getVariable("initiator").toString());
 		String nomeCognomeUtente = utente.getPersona().getNome() + " " + utente.getPersona().getCognome();
 		String mese = execution.getVariable("mese").toString();
 		String anno = execution.getVariable("anno").toString();

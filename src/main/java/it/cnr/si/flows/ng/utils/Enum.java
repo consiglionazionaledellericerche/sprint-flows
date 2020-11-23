@@ -195,12 +195,12 @@ public class Enum {
             return value;
         }
 
-        public static boolean contains(int id) {
+        public static TipiEOPerAutocomplete byId(int id){
             for (TipiEOPerAutocomplete t : TipiEOPerAutocomplete.values()) {
                 if (t.value == id)
-                    return true;
+                    return t;
             }
-            return false;
+            return null;
         }
     }
 

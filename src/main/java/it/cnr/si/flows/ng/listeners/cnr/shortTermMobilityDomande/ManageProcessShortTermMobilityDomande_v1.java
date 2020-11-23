@@ -53,7 +53,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 	@Inject
 	private FlowsProcessInstanceService flowsProcessInstanceService;
 	@Inject
-	private StartShortTermMobilityDomandeSetGroupsAndVisibility startAccordiInternazionaliDomandeSetGroupsAndVisibility;
+	private StartShortTermMobilityDomandeSetGroupsAndVisibility startShortTermMobilityDomandeSetGroupsAndVisibility;
 	@Inject
 	private RuntimeService runtimeService;
 	@Inject
@@ -119,7 +119,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 			switch(faseEsecuzioneValue){  
 			// START
 			case "process-start": {
-				startAccordiInternazionaliDomandeSetGroupsAndVisibility.configuraVariabiliStart(execution);
+				startShortTermMobilityDomandeSetGroupsAndVisibility.configuraVariabiliStart(execution);
 			};break;    	
 			// START
 			case "validazione-start": {

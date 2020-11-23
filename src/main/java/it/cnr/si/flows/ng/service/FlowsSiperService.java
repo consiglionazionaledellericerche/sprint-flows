@@ -22,7 +22,7 @@ import java.util.Map;
 
 @Service
 @Profile("cnr")
-public class SiperService {
+public class FlowsSiperService {
 
     private RestTemplate siperRestTemplate;
     private String url;

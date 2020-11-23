@@ -1,18 +1,18 @@
 (function() {
 	'use strict';
 
-	angular
-	.module('sprintApp')
-	.controller('DetailsController', DetailsController);
+	angular.module('sprintApp').controller('DetailsController', DetailsController);
 
 	DetailsController.$inject = ['$scope', '$rootScope', 'Principal', '$state', '$localStorage', 'dataService', 'AlertService', '$log', 'utils', '$uibModal'];
 
 	function DetailsController($scope, $rootScope, Principal, $state, $localStorage, dataService, AlertService, $log, utils, $uibModal) {
+		$scope.button={};
+		$scope.button.disabled = true;
 		var vm = this;
 		vm.searchParams = {};
 		vm.data = {};
 		vm.taskId = $state.params.taskId;
-		//vm.searchParams.statoFinaleDomanda = {};        
+		//vm.searchParams.statoFinaleDomanda = {};
 		vm.showGerarchia = false;
 		vm.searchParams.active = true;
 		vm.searchParams.order = "ASC";
@@ -31,68 +31,63 @@
 
 		if ($state.params.processInstanceId) {
 			dataService.processInstances.byProcessInstanceId($state.params.processInstanceId, true).then(
-					function(response) {
-						vm.data.entity = utils.refactoringVariables([response.data.entity])[0];
-						vm.initiator = JSON.parse(vm.data.entity.name).initiator; //serve per richiamare la "cronologia"
-						vm.data.linkedProcesses = response.data.linkedProcesses;
-						vm.data.history = response.data.history;
-						//in response.data.entity.variables ci sono anche le properties della Process Instance (initiator, startdate, ecc.)
-						vm.data.startEvent = response.data.entity.variables;
-						vm.data.attachments = utils.parseAttachments(response.data.attachments);
-						vm.data.identityLinks = response.data.identityLinks;
-						vm.diagramUrl = '/rest/diagram/processInstance/' + vm.data.entity.id + "?" + new Date().getTime();
-						vm.data.businessKey = response.data.entity.businessKey;
+				function(response) {
+					vm.data.entity = utils.refactoringVariables([response.data.entity])[0];
+					vm.initiator = JSON.parse(vm.data.entity.name).initiator; //serve per richiamare la "cronologia"
+					vm.data.linkedProcesses = response.data.linkedProcesses;
+//						vm.data.history = response.data.history;
+					//in response.data.entity.variables ci sono anche le properties della Process Instance (initiator, startdate, ecc.)
+					vm.data.startEvent = response.data.entity.variables;
+					vm.data.attachments = utils.parseAttachments(response.data.attachments);
+					vm.data.identityLinks = response.data.identityLinks;
+					vm.diagramUrl = '/rest/diagram/processInstance/' + vm.data.entity.id + "?" + new Date().getTime();
+					vm.data.businessKey = response.data.entity.businessKey;
 
-						var processDefinition = response.data.entity.processDefinitionId.split(":");
-						var stato = response.data.history[0].historyTask.name;
+    				vm.data.history = response.data.history;
+                    vm.data.history.forEach(function(el) {
+                        //recupero l'ultimo task (quello ancora da eseguire)
+                        if (el.historyTask.endTime === null) {
+                            //recupero la fase
+                            vm.activeTask = el.historyTask;
+                            utils.refactoringVariables(vm.activeTask);
+                        }
+                    })
 
-						vm.detailsView = 'api/views/' + processDefinition[0] + '/' + processDefinition[1] + '/detail';
+					var processDefinition = response.data.entity.processDefinitionId.split(":");
+//						var stato = response.data.history[0].historyTask.name;
+					var stato = JSON.parse(response.data.entity.name).stato;
 
-						if(vm.data.entity.variabili.valutazioneEsperienze_json){
-							vm.experiences = jQuery.parseJSON(vm.data.entity.variabili.valutazioneEsperienze_json);
-						}
-						if(processDefinition[0] != null & processDefinition[0] == "short-term-mobility-bando-dipartimento" & stato == "PROVVEDIMENTO GRADUATORIA"
-						) {
-							vm.showGerarchia = true;
-						}
+					vm.detailsView = 'api/views/' + processDefinition[0] + '/' + processDefinition[1] + '/detail';
 
-						if(response.data.variabili.idBando){
-							vm.searchParams.idBando = "text="+response.data.variabili.idBando.value;
-						}
-						if(response.data.variabili.dipartimentoId){
-							vm.searchParams.dipartimentoId = "text="+response.data.variabili.dipartimentoId.value;
-						}
-						vm.searchParams.processInstanceId = response.data.variabili.processInstanceId.value;
+					if(vm.data.entity.variabili.valutazioneEsperienze_json){
+						vm.experiences = jQuery.parseJSON(vm.data.entity.variabili.valutazioneEsperienze_json);
+					}
+					if(processDefinition[0] != null & processDefinition[0] == "short-term-mobility-bando-dipartimento" & stato == "PROVVEDIMENTO GRADUATORIA"
+					) {
+						vm.showGerarchia = true;
+					}
 
-						vm.data.history.forEach(function(el) {
-							//recupero l'ultimo task (quello ancora da eseguire)
-							if (el.historyTask.endTime === null) {
-								//recupero la fase
-								vm.activeTask = el.historyTask;
-								utils.refactoringVariables(vm.activeTask);
+					if(response.data.variabili.idBando){
+						vm.searchParams.idBando = "text="+response.data.variabili.idBando.value;
+					}
+					if(response.data.variabili.dipartimentoId){
+						vm.searchParams.dipartimentoId = "text="+response.data.variabili.dipartimentoId.value;
+					}
+					vm.searchParams.processInstanceId = response.data.variabili.processInstanceId.value;
 
-								vm.data.fase = el.historyTask.name;
-								//recupero il gruppo/l'utente assegnatario del task
-								el.historyIdentityLink.forEach(function(il) {
-									if (il.type === "candidate")
-										if (il.groupId !== null)
-											vm.data.groupCandidate = il.groupId;
-										else
-											vm.data.userCandidate = il.userId
-								})
-							}
-						});
+					$scope.canPublish = response.data.canPublish;
+					$scope.canUpdateAttachments = response.data.canUpdateAttachments;
+					$scope.canSign = false;
 
-						$scope.canPublish = response.data.canPublish;
-						$scope.canUpdateAttachments = response.data.canUpdateAttachments;
-						$scope.canSign = false;
-
-						$scope.isResponsabile = (vm.authorities.includes("ROLE_responsabile-struttura@" + vm.data.entity.variabili.idStruttura) ||
-								vm.authorities.includes("ROLE_responsabile#flussi") ||
-								vm.authorities.includes("ROLE_responsabile#" + vm.data.entity.processDefinitionId.split(':')[0] + "@0000") ||
-								vm.authorities.includes("ROLE_responsabile#" + vm.data.entity.processDefinitionId.split(':')[0] + "@" + vm.data.entity.variabili.idStruttura) ||
-								vm.authorities.includes("ROLE_ADMIN")) 
-					});   
+					$scope.isResponsabile = (vm.authorities.includes("ROLE_responsabile-struttura@" + vm.data.entity.variabili.idStruttura) ||
+							vm.authorities.includes("ROLE_responsabile#flussi") ||
+							vm.authorities.includes("ROLE_responsabile#" + vm.data.entity.processDefinitionId.split(':')[0] + "@0000") ||
+							vm.authorities.includes("ROLE_responsabile#" + vm.data.entity.processDefinitionId.split(':')[0] + "@" + vm.data.entity.variabili.idStruttura) ||
+							vm.authorities.includes("ROLE_ADMIN"));
+        		    //riattivo il bottone delle "azioni"
+        		    $scope.button.disabled = false;
+				}
+			);
 		}
 
 
@@ -123,16 +118,16 @@
 		};
 
 
-		$scope.history = function(tasks, startTask, initiator) {
+		$scope.history = function(processInstanceId, startTask, initiator) {
 			$uibModal.open({
 				templateUrl: 'app/pages/details/history.modal.html',
 				controller: 'HistoryModalController',
 				controllerAs: 'vm',
 				size: 'md',
 				resolve: {
-					tasks: function() {
-						return tasks;
-					},
+					processInstanceId: function() {
+                        return $scope.processInstanceId;
+                    },
 					initiator: function() {
 						return initiator;
 					},

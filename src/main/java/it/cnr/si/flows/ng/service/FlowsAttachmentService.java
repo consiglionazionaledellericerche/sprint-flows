@@ -1,6 +1,7 @@
 package it.cnr.si.flows.ng.service;
 
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.listeners.AddFlowsAttachmentsListener;
 import it.cnr.si.security.SecurityUtils;
 import it.cnr.si.spring.storage.*;
 import it.cnr.si.spring.storage.bulk.StorageFile;
@@ -63,7 +64,9 @@ public class FlowsAttachmentService {
     private StoreService storeService;
 	@Inject
 	private Environment env;
-
+	@Inject
+	private AddFlowsAttachmentsListener addFlowsAttachmentsListener;
+	
     /**
      *
      * Quando ricevo una MultiPartHTTPRequest e ne ho estratto una Map(String, Object) data
@@ -203,6 +206,9 @@ public class FlowsAttachmentService {
         att.setUsername(SecurityUtils.getCurrentUserLogin());
         att.setTime(new Date());
         att.setTaskName("Fuori task");
+        if(att.getPath() == null) {
+        	att.setPath(addFlowsAttachmentsListener.getDefaultPathFascicoloDocumenti(executionId));
+        }
 
         if (content != null) {
             String key = runtimeService.getVariable(executionId, "key", String.class);
@@ -256,17 +262,25 @@ public class FlowsAttachmentService {
 
     }
 
-    public Map<String, FlowsAttachment> getAttachementsForProcessInstance(String processInstanceId) {
-        Map<String, Object> processVariables = historyService.createHistoricProcessInstanceQuery()
-                .processInstanceId(processInstanceId)
-                .includeProcessVariables()
-                .singleResult()
-                .getProcessVariables();
 
-        return processVariables.entrySet().stream()
-                .filter(e -> e.getValue() instanceof FlowsAttachment)
+    public Map<String, FlowsAttachment> getAttachementsForProcessInstance(String processInstanceId) {
+        Map<String, FlowsAttachment> response;
+        try {
+            Map<String, Object> processVariables = historyService.createHistoricProcessInstanceQuery()
+                    .processInstanceId(processInstanceId)
+                    .includeProcessVariables()
+                    .singleResult()
+                    .getProcessVariables();
+
+            response = processVariables.entrySet().stream()
+                    .filter(e -> e.getValue() instanceof FlowsAttachment)
 //                .peek(e -> ((FlowsAttachment) e.getValue()).setBytes(null))
-                .collect(Collectors.toMap(k -> k.getKey(), v -> ((FlowsAttachment) v.getValue())));
+                    .collect(Collectors.toMap(k -> k.getKey(), v -> ((FlowsAttachment) v.getValue())));
+        }catch (NullPointerException e){
+            //se il flusso deve ancora iniziare la query restituisce una NullPointerException quindi restituisco una hashMap vuota
+            response = new HashMap<>();
+        }
+        return response;
     }
 
 
