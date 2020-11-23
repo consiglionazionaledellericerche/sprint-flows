@@ -340,11 +340,13 @@ public class FlowsTaskResource {
         List<byte[]> fileContents = new ArrayList<>();
 
         for (int i = 0; i < taskIds.size(); i++) {
+            long start = System.currentTimeMillis();
             String id = taskIds.get(i);
             tasks.add(taskService.createTaskQuery().taskId(id).singleResult());
             nomiFileDaFirmare.add(NOME_FILE_FIRMA.get(tasks.get(i).getTaskDefinitionKey()));
             fileDaFirmare.add(taskService.getVariable(id, nomiFileDaFirmare.get(i), FlowsAttachment.class));
             fileContents.add(flowsAttachmentService.getAttachmentContentBytes(fileDaFirmare.get(i)));
+            LOGGER.info("Recuperato il documento {} in {}ms", username, fileDaFirmare.get(i).getFilename(), System.currentTimeMillis()-start);
         }
         PdfSignApparence pdfSignApparence = null;
         if (nomiFileDaFirmare.stream().distinct().count() == 1) {
@@ -358,6 +360,7 @@ public class FlowsTaskResource {
 
         List<String> succesfulTasks = new ArrayList<>();
         List<String> failedTasks    = new ArrayList<>();
+        LOGGER.info("L'utente {} ha recuperato il documento {} in {}ms", username);
         List<SignReturnV2> signResponses = flowsFirmaService.firmaMultipla(username, password, otp, fileContents, pdfSignApparence);
 
         for (int i = 0; i < taskIds.size(); i++) {
