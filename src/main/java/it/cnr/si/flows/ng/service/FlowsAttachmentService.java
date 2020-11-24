@@ -2,6 +2,7 @@ package it.cnr.si.flows.ng.service;
 
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.listeners.AddFlowsAttachmentsListener;
+import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.SecurityUtils;
 import it.cnr.si.spring.storage.*;
 import it.cnr.si.spring.storage.bulk.StorageFile;
@@ -368,9 +369,13 @@ public class FlowsAttachmentService {
 
     public String saveOrUpdateBytes(byte[] bytes, String attachmentName, String fileName, String processKey, String path) {
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-		Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
+        if(Utils.isFullPath(path)) {
+            path = path.substring(0, path.lastIndexOf('/'));
+            attachmentName = path.substring(path.lastIndexOf('/')+1);
+        }
 
+        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+        
         StorageFile storageFile = new StorageFile(bais,
                 getMimetype(bais),
                 attachmentName);

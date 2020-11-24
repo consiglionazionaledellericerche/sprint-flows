@@ -314,4 +314,14 @@ public final class Utils {
     public boolean getBoolean(Map<String, String> params, String paramName, boolean defaultValue) {
         return Boolean.parseBoolean( getString(params, paramName, String.valueOf(defaultValue)) ) ;
     }
+    
+    public static boolean isFullPath(String path) {
+        try {
+            String regex = "^.*/.+[.]\\D{3,6}$";
+            return path.matches(regex);
+        } catch (Exception e) {
+            return false;
+        }
+        
+    }
 }
