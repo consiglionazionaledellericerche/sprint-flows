@@ -71,6 +71,8 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 				put("tipologiaMissione", tipologiaMissione);
 				put("idMissione", idMissioneFinal);
 				put("stato", statoMissione.name().toString());
+				put("processInstanceId", execution.getProcessInstanceId().toString());
+				put("commento", execution.getVariable("commento").toString());
 			}	
 		};
 
