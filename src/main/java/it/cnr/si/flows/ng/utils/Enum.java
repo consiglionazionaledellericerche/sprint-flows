@@ -82,7 +82,8 @@ public class Enum {
     public enum StatoDomandeMissioniEnum {
         RESPINTO_UO,
         RESPINTO_UO_SPESA,
-        FIRMATO;
+        FIRMATO,
+        ANNULLATO;
     }
     
     public enum TipologieeMissioniEnum {
