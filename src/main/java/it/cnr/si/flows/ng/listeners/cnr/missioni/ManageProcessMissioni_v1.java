@@ -143,6 +143,9 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 						}
 					} 
 				}
+				execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoDomandeMissioniEnum.FIRMATO_UO);
+				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeMissioniEnum.FIRMATO_UO.toString());
+				restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.FIRMATO_UO);
 			}
 		};break; 
 		case "firma-spesa-end": {
