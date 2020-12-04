@@ -74,6 +74,8 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 				put("processInstanceId", execution.getProcessInstanceId().toString());
 				if(execution.getVariable("commento") != null) {
 					put("commento", execution.getVariable("commento").toString());
+				} else {
+					put("commento", "");
 				}
 			}	
 		};
