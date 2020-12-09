@@ -161,7 +161,7 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 		case "endevent-annulla": {
 			execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoDomandeMissioniEnum.ANNULLATO);
 			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeMissioniEnum.ANNULLATO.toString());
-			restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.ANNULLATO);
+			//restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.ANNULLATO);
 		};break;    	
 
 
@@ -169,7 +169,6 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 			execution.setVariable("STATO_FINALE_DOMANDA", "FIRMATO");
 			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "FIRMATO");
 			restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.FIRMATO);
-
 		};break;  
 
 		case "process-end": {
