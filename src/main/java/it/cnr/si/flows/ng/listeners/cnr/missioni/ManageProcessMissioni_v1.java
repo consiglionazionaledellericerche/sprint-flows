@@ -125,6 +125,10 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 		};break;
 
 
+		case "firma-uo-start": {
+			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "FIRMA UO");
+		}
+		
 		case "firma-uo-end": {
 			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
 				List<String> nomiVariabiliFile = new ArrayList<String>();
@@ -161,6 +165,9 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 				restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.FIRMATO_UO);
 			}
 		};break; 
+		case "firma-spesa-start": {
+			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "FIRMA SPESA");
+		}
 		case "firma-spesa-end": {
 			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
 				List<String> nomiVariabiliFile = new ArrayList<String>();
