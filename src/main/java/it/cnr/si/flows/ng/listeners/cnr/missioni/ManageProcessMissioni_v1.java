@@ -21,6 +21,8 @@ import it.cnr.si.service.ExternalMessageService;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
 import it.cnr.si.domain.enumeration.ExternalApplication;
 import it.cnr.si.domain.enumeration.ExternalMessageVerb;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -125,7 +127,14 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 
 		case "firma-uo-end": {
 			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
-				firmaDocumentoService.eseguiFirma(execution, "missioni", null);
+				List<String> nomiVariabiliFile = new ArrayList<String>();
+				nomiVariabiliFile.add("missioni");
+				if (execution.getVariable("tipologiaMissione").toString().equals("ordine")){
+					if (execution.getVariable("missioneConAnticipoFlag") != null && execution.getVariable("missioneConAnticipoFlag").toString().equals("si")) {
+						nomiVariabiliFile.add("anticipoMissione");
+					} 
+				}
+				firmaDocumentoService.eseguiFirma(execution, nomiVariabiliFile, null);
 
 				//SE I DUE FIRMATARI SPESA E UO SONO LA STESSA PERSONA
 				String currentUser = SecurityUtils.getCurrentUserLogin();
@@ -154,7 +163,14 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 		};break; 
 		case "firma-spesa-end": {
 			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
-				firmaDocumentoService.eseguiFirma(execution, "missioni", null);
+				List<String> nomiVariabiliFile = new ArrayList<String>();
+				nomiVariabiliFile.add("missioni");
+				if (execution.getVariable("tipologiaMissione").toString().equals("ordine")){
+					if (execution.getVariable("missioneConAnticipoFlag") != null && execution.getVariable("missioneConAnticipoFlag").toString().equals("si")) {
+						nomiVariabiliFile.add("anticipoMissione");
+					} 
+				}
+				firmaDocumentoService.eseguiFirma(execution, nomiVariabiliFile, null);
 			}
 		};break; 
 
