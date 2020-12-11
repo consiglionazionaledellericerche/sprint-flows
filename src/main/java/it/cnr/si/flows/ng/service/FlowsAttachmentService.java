@@ -382,8 +382,8 @@ public class FlowsAttachmentService {
     public String saveOrUpdateBytes(byte[] bytes, String attachmentName, String fileName, String processKey, String path) {
 
         if(Utils.isFullPath(path)) {
-            path = path.substring(0, path.lastIndexOf('/'));
             attachmentName = path.substring(path.lastIndexOf('/')+1);
+            path = path.substring(0, path.lastIndexOf('/'));
         }
 
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
