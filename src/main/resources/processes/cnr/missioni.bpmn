@@ -116,6 +116,9 @@
     <sequenceFlow id="flow28" sourceRef="exclusivegateway9" targetRef="endevent-annulla">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Annulla'}]]></conditionExpression>
     </sequenceFlow>
+    <sequenceFlow id="flow29" sourceRef="exclusivegateway9" targetRef="firma-uo">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'FirmaUo'}]]></conditionExpression>
+    </sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_missioni">
     <bpmndi:BPMNPlane bpmnElement="missioni" id="BPMNPlane_missioni">
@@ -214,12 +217,19 @@
         <omgdi:waypoint x="389.0" y="221.0"></omgdi:waypoint>
         <omgdi:waypoint x="573.0" y="221.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="507.0" y="186.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="63.0" x="507.0" y="186.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow28" id="BPMNEdge_flow28">
         <omgdi:waypoint x="590.0" y="58.0"></omgdi:waypoint>
         <omgdi:waypoint x="590.0" y="204.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow29" id="BPMNEdge_flow29">
+        <omgdi:waypoint x="610.0" y="38.0"></omgdi:waypoint>
+        <omgdi:waypoint x="640.0" y="38.0"></omgdi:waypoint>
+        <omgdi:waypoint x="640.0" y="-47.0"></omgdi:waypoint>
+        <omgdi:waypoint x="155.0" y="-47.0"></omgdi:waypoint>
+        <omgdi:waypoint x="155.0" y="97.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
