@@ -2,6 +2,7 @@ package it.cnr.si.flows.ng.service;
 
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.listeners.AddFlowsAttachmentsListener;
+import it.cnr.si.flows.ng.utils.Enum.Stato;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.SecurityUtils;
 import it.cnr.si.spring.storage.*;
@@ -14,6 +15,7 @@ import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -142,6 +144,15 @@ public class FlowsAttachmentService {
         att.setPubblicazioneTrasparenza("true".equals(data.get(fileName+"_pubblicazioneTrasparenza")));
         att.setProtocollo(				"true".equals(data.get(fileName+"_protocollo")));
 
+        // Questo sovrascriverà il set degli stati già presenti.
+        // L'alternativa è quella di aggiungere soltanto
+        // ma in quel caso non c'è la possibilità di togliere uno stato.
+        // martin 10/12/2020
+        if (data.get(fileName+"_stati_json") != null) {
+            Set<Stato> statiSet = extractStati((String)data.get(fileName+"_stati_json"));
+            att.setStati(statiSet);
+        }
+        
         if (att.isProtocollo()) {
             att.setDataProtocollo(      String.valueOf(data.get(fileName+"_dataProtocollo")));
             att.setNumeroProtocollo(    String.valueOf(data.get(fileName+"_numeroProtocollo")));
@@ -151,6 +162,7 @@ public class FlowsAttachmentService {
         }
 
     }
+
 
     /**
      * Salva gli attachment di un Process Instance dai listners (e non dai service)
@@ -370,8 +382,8 @@ public class FlowsAttachmentService {
     public String saveOrUpdateBytes(byte[] bytes, String attachmentName, String fileName, String processKey, String path) {
 
         if(Utils.isFullPath(path)) {
-            path = path.substring(0, path.lastIndexOf('/'));
             attachmentName = path.substring(path.lastIndexOf('/')+1);
+            path = path.substring(0, path.lastIndexOf('/'));
         }
 
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
@@ -415,5 +427,21 @@ public class FlowsAttachmentService {
 
     public byte[] getAttachmentContentBytes(FlowsAttachment att) {
         return getAttachmentContentBytes(att.getUrl());
+    }
+    
+    private static Set<Stato> extractStati(String stati) {
+        Set<Stato> result = new HashSet<>();
+        // Rimuovo '[' e ']'
+        if (stati.charAt(0) == '[') stati = stati.substring(1);
+        if (stati.charAt(stati.length()-1) == ']') stati = stati.substring(0, stati.length()-1);
+        String[] statiArray = stati.split(",");
+        for (String stato : statiArray) {
+            stato = stato.trim();
+            if (stato.charAt(0) == '"') stato = stato.substring(1);
+            if (stato.charAt(stato.length()-1) == '"') stato = stato.substring(0, stato.length()-1);
+            result.add(Stato.valueOf(stato));
+        }
+        
+        return result;
     }
 }
