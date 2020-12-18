@@ -54,7 +54,7 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 
 	private Expression faseEsecuzione;
 
-	public void restToApplicazioneMissioni(DelegateExecution execution, StatoDomandeMissioniEnum statoMissione) {
+	public void restToApplicazioneMissioni(DelegateExecution execution, StatoDomandeMissioniEnum statoMissione, String user) {
 
 
 		String idMissioneOrdine = execution.getVariable("idMissioneOrdine").toString();
@@ -74,6 +74,7 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 				put("idMissione", idMissioneFinal);
 				put("stato", statoMissione.name().toString());
 				put("processInstanceId", execution.getProcessInstanceId().toString());
+				put("user", user);
 				if(execution.getVariable("commento") != null) {
 					put("commento", execution.getVariable("commento").toString());
 				} else {
@@ -90,7 +91,7 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 	@Override
 	public void notify(DelegateExecution execution) throws Exception {
 		//(OivPdfService oivPdfService = new OivPdfService();
-
+		String currentUser = SecurityUtils.getCurrentUserLogin();
 		String processInstanceId =  execution.getProcessInstanceId();
 		String executionId =  execution.getId();
 		String stato =  execution.getCurrentActivityName();
@@ -115,20 +116,20 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 		case "respinto-uo-start": {
 			execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoDomandeMissioniEnum.RESPINTO_UO.toString());
 			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeMissioniEnum.RESPINTO_UO.toString());
-			restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.RESPINTO_UO);		
+			restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.RESPINTO_UO, currentUser);		
 		};break;
 
 		case "respinto-spesa-start": {
 			execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoDomandeMissioniEnum.RESPINTO_UO_SPESA);
 			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeMissioniEnum.RESPINTO_UO_SPESA.toString());
-			restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.RESPINTO_UO_SPESA);
+			restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.RESPINTO_UO_SPESA, currentUser);
 		};break;
 
 
 		case "firma-uo-start": {
 			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "FIRMA UO");
 		};break; 
-		
+
 		case "firma-uo-end": {
 			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
 				List<String> nomiVariabiliFile = new ArrayList<String>();
@@ -140,37 +141,41 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 				}
 				firmaDocumentoService.eseguiFirma(execution, nomiVariabiliFile, null);
 			}
-			
-			//SE I DUE FIRMATARI SPESA E UO SONO LA STESSA PERSONA
-			String currentUser = SecurityUtils.getCurrentUserLogin();
-			if (execution.getVariable("validazioneSpesaFlag").toString().equalsIgnoreCase("si")) {
-				execution.setVariable("firmaSpesaFlag", "si");
-				//				String gruppoFirmatarioUo = execution.getVariable("gruppoFirmatarioUo").toString();
-				String gruppoFirmatarioSpesa = execution.getVariable("gruppoFirmatarioSpesa").toString();
-				//				String gruppoFirmatarioUoSigla = gruppoFirmatarioUo.split("@")[0];
-				//				int gruppoFirmatarioUoIdEO = Integer.parseInt(gruppoFirmatarioUo.split("@")[1].toString());
-				String gruppoFirmatarioSpesaSigla = gruppoFirmatarioSpesa.split("@")[0];
-				int gruppoFirmatarioSpesaIdEO = Integer.parseInt(gruppoFirmatarioSpesa.split("@")[1].toString());
-				//List<SimpleUtenteWebDto> utentiGruppoFirmatarioUo =  aceService.getUtentiInRuoloEo(gruppoFirmatarioUoSigla, gruppoFirmatarioUoIdEO);
-				List<SimpleUtenteWebDto> utentiGruppoFirmatarioSpesa =  aceService.getUtentiInRuoloEo(gruppoFirmatarioSpesaSigla, gruppoFirmatarioSpesaIdEO);
-				// SE L'UTENTE CORRENTE FA PARTE DEL GRUPPO FIRMATARIO SPESA
-				for(int i=0;i<utentiGruppoFirmatarioSpesa.size();i++) { 	
-					LOGGER.info("l'utente {} nel gruppo è {} ",  i , utentiGruppoFirmatarioSpesa.get(i).getUsername());
-					if(utentiGruppoFirmatarioSpesa.get(i).getUsername().equalsIgnoreCase(currentUser)) {
-						execution.setVariable("firmaSpesaFlag", "no");
-					}
-				} 
+
+			if(sceltaUtente != null && (sceltaUtente.equals("Firma") || sceltaUtente.equals("Firma Multipla"))) {
+
+				//SE I DUE FIRMATARI SPESA E UO SONO LA STESSA PERSONA
+				if (execution.getVariable("validazioneSpesaFlag").toString().equalsIgnoreCase("si")) {
+					execution.setVariable("firmaSpesaFlag", "si");
+					//				String gruppoFirmatarioUo = execution.getVariable("gruppoFirmatarioUo").toString();
+					String gruppoFirmatarioSpesa = execution.getVariable("gruppoFirmatarioSpesa").toString();
+					//				String gruppoFirmatarioUoSigla = gruppoFirmatarioUo.split("@")[0];
+					//				int gruppoFirmatarioUoIdEO = Integer.parseInt(gruppoFirmatarioUo.split("@")[1].toString());
+					String gruppoFirmatarioSpesaSigla = gruppoFirmatarioSpesa.split("@")[0];
+					int gruppoFirmatarioSpesaIdEO = Integer.parseInt(gruppoFirmatarioSpesa.split("@")[1].toString());
+					//List<SimpleUtenteWebDto> utentiGruppoFirmatarioUo =  aceService.getUtentiInRuoloEo(gruppoFirmatarioUoSigla, gruppoFirmatarioUoIdEO);
+					List<SimpleUtenteWebDto> utentiGruppoFirmatarioSpesa =  aceService.getUtentiInRuoloEo(gruppoFirmatarioSpesaSigla, gruppoFirmatarioSpesaIdEO);
+					// SE L'UTENTE CORRENTE FA PARTE DEL GRUPPO FIRMATARIO SPESA
+					for(int i=0;i<utentiGruppoFirmatarioSpesa.size();i++) { 	
+						LOGGER.info("l'utente {} nel gruppo è {} ",  i , utentiGruppoFirmatarioSpesa.get(i).getUsername());
+						if(utentiGruppoFirmatarioSpesa.get(i).getUsername().equalsIgnoreCase(currentUser)) {
+							execution.setVariable("firmaSpesaFlag", "no");
+						}
+					} 
+				}
+				if (execution.getVariable("firmaSpesaFlag").toString().equalsIgnoreCase("si")) {
+					execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoDomandeMissioniEnum.FIRMATO_UO);
+					flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeMissioniEnum.FIRMATO_UO.toString());
+					restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.FIRMATO_UO, currentUser);
+				}
 			}
-			execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoDomandeMissioniEnum.FIRMATO_UO);
-			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeMissioniEnum.FIRMATO_UO.toString());
-			restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.FIRMATO_UO);
 
 		};break; 
-		
+
 		case "firma-spesa-start": {
 			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "FIRMA SPESA");
 		};break; 
-		
+
 		case "firma-spesa-end": {
 			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
 				List<String> nomiVariabiliFile = new ArrayList<String>();
@@ -194,7 +199,7 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 		case "endevent-firmato-start": {
 			execution.setVariable("STATO_FINALE_DOMANDA", "FIRMATO");
 			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "FIRMATO");
-			restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.FIRMATO);
+			restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.FIRMATO, currentUser);
 		};break;  
 
 		case "process-end": {
