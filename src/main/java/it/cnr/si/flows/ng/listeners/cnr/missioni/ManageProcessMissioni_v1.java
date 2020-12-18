@@ -54,7 +54,7 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 
 	private Expression faseEsecuzione;
 
-	public void restToApplicazioneMissioni(DelegateExecution execution, StatoDomandeMissioniEnum statoMissione) {
+	public void restToApplicazioneMissioni(DelegateExecution execution, StatoDomandeMissioniEnum statoMissione, String user) {
 
 
 		String idMissioneOrdine = execution.getVariable("idMissioneOrdine").toString();
@@ -74,6 +74,7 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 				put("idMissione", idMissioneFinal);
 				put("stato", statoMissione.name().toString());
 				put("processInstanceId", execution.getProcessInstanceId().toString());
+				put("user", user);
 				if(execution.getVariable("commento") != null) {
 					put("commento", execution.getVariable("commento").toString());
 				} else {
@@ -90,7 +91,7 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 	@Override
 	public void notify(DelegateExecution execution) throws Exception {
 		//(OivPdfService oivPdfService = new OivPdfService();
-
+		String currentUser = SecurityUtils.getCurrentUserLogin();
 		String processInstanceId =  execution.getProcessInstanceId();
 		String executionId =  execution.getId();
 		String stato =  execution.getCurrentActivityName();
@@ -115,20 +116,20 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 		case "respinto-uo-start": {
 			execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoDomandeMissioniEnum.RESPINTO_UO.toString());
 			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeMissioniEnum.RESPINTO_UO.toString());
-			restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.RESPINTO_UO);		};break;
-
+			restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.RESPINTO_UO, currentUser);		
+		};break;
 
 		case "respinto-spesa-start": {
 			execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoDomandeMissioniEnum.RESPINTO_UO_SPESA);
 			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeMissioniEnum.RESPINTO_UO_SPESA.toString());
-			restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.RESPINTO_UO_SPESA);
+			restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.RESPINTO_UO_SPESA, currentUser);
 		};break;
 
 
 		case "firma-uo-start": {
 			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "FIRMA UO");
-		}
-		
+		};break; 
+
 		case "firma-uo-end": {
 			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
 				List<String> nomiVariabiliFile = new ArrayList<String>();
@@ -139,9 +140,11 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 					} 
 				}
 				firmaDocumentoService.eseguiFirma(execution, nomiVariabiliFile, null);
+			}
+
+			if(sceltaUtente != null && (sceltaUtente.equals("Firma") || sceltaUtente.equals("Firma Multipla"))) {
 
 				//SE I DUE FIRMATARI SPESA E UO SONO LA STESSA PERSONA
-				String currentUser = SecurityUtils.getCurrentUserLogin();
 				if (execution.getVariable("validazioneSpesaFlag").toString().equalsIgnoreCase("si")) {
 					execution.setVariable("firmaSpesaFlag", "si");
 					//				String gruppoFirmatarioUo = execution.getVariable("gruppoFirmatarioUo").toString();
@@ -160,14 +163,19 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 						}
 					} 
 				}
-				execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoDomandeMissioniEnum.FIRMATO_UO);
-				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeMissioniEnum.FIRMATO_UO.toString());
-				restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.FIRMATO_UO);
+				if (execution.getVariable("firmaSpesaFlag").toString().equalsIgnoreCase("si")) {
+					execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoDomandeMissioniEnum.FIRMATO_UO);
+					flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeMissioniEnum.FIRMATO_UO.toString());
+					restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.FIRMATO_UO, currentUser);
+				}
 			}
+
 		};break; 
+
 		case "firma-spesa-start": {
 			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "FIRMA SPESA");
-		}
+		};break; 
+
 		case "firma-spesa-end": {
 			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
 				List<String> nomiVariabiliFile = new ArrayList<String>();
@@ -191,15 +199,15 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 		case "endevent-firmato-start": {
 			execution.setVariable("STATO_FINALE_DOMANDA", "FIRMATO");
 			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "FIRMATO");
-			restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.FIRMATO);
+			restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.FIRMATO, currentUser);
 		};break;  
 
 		case "process-end": {
 			//sbloccaDomandeBando(execution);
 		};break; 
 		// DEFAULT  
-		default:  {
-		};break;    
+		default: {
+		};break;
 
 		} 
 	}
