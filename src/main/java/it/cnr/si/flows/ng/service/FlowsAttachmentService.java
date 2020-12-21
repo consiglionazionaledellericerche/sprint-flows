@@ -434,12 +434,14 @@ public class FlowsAttachmentService {
         // Rimuovo '[' e ']'
         if (stati.charAt(0) == '[') stati = stati.substring(1);
         if (stati.charAt(stati.length()-1) == ']') stati = stati.substring(0, stati.length()-1);
-        String[] statiArray = stati.split(",");
-        for (String stato : statiArray) {
-            stato = stato.trim();
-            if (stato.charAt(0) == '"') stato = stato.substring(1);
-            if (stato.charAt(stato.length()-1) == '"') stato = stato.substring(0, stato.length()-1);
-            result.add(Stato.valueOf(stato));
+        if (stati.length() != 0) {
+            String[] statiArray = stati.split(",");
+            for (String stato : statiArray) {
+                stato = stato.trim();
+                if (stato.charAt(0) == '"') stato = stato.substring(1);
+                if (stato.charAt(stato.length()-1) == '"') stato = stato.substring(0, stato.length()-1);
+                result.add(Stato.valueOf(stato));
+            }
         }
         
         return result;
