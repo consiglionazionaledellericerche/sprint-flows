@@ -2,6 +2,7 @@ package it.cnr.si.flows.ng.listeners.cnr.missioni;
 
 
 
+import it.cnr.si.flows.ng.utils.Utils;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
@@ -50,6 +51,8 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 	private ExternalMessageService externalMessageService;	
 	@Inject
 	private AceService aceService;
+	@Inject
+	private Utils utils;
 
 
 	private Expression faseEsecuzione;
@@ -115,19 +118,19 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 		// START
 		case "respinto-uo-start": {
 			execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoDomandeMissioniEnum.RESPINTO_UO.toString());
-			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeMissioniEnum.RESPINTO_UO.toString());
+			utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeMissioniEnum.RESPINTO_UO.toString());
 			restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.RESPINTO_UO, currentUser);		
 		};break;
 
 		case "respinto-spesa-start": {
 			execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoDomandeMissioniEnum.RESPINTO_UO_SPESA);
-			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeMissioniEnum.RESPINTO_UO_SPESA.toString());
+			utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeMissioniEnum.RESPINTO_UO_SPESA.toString());
 			restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.RESPINTO_UO_SPESA, currentUser);
 		};break;
 
 
 		case "firma-uo-start": {
-			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "FIRMA UO");
+			utils.updateJsonSearchTerms(executionId, processInstanceId, "FIRMA UO");
 		};break; 
 
 		case "firma-uo-end": {
@@ -165,7 +168,7 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 				}
 				if (execution.getVariable("firmaSpesaFlag").toString().equalsIgnoreCase("si")) {
 					execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoDomandeMissioniEnum.FIRMATO_UO);
-					flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeMissioniEnum.FIRMATO_UO.toString());
+					utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeMissioniEnum.FIRMATO_UO.toString());
 					restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.FIRMATO_UO, currentUser);
 				}
 			}
@@ -173,7 +176,7 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 		};break; 
 
 		case "firma-spesa-start": {
-			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "FIRMA SPESA");
+			utils.updateJsonSearchTerms(executionId, processInstanceId, "FIRMA SPESA");
 		};break; 
 
 		case "firma-spesa-end": {
@@ -191,14 +194,14 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 
 		case "endevent-annulla": {
 			execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoDomandeMissioniEnum.ANNULLATO);
-			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeMissioniEnum.ANNULLATO.toString());
+			utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeMissioniEnum.ANNULLATO.toString());
 			//restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.ANNULLATO);
 		};break;    	
 
 
 		case "endevent-firmato-start": {
 			execution.setVariable("STATO_FINALE_DOMANDA", "FIRMATO");
-			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "FIRMATO");
+			utils.updateJsonSearchTerms(executionId, processInstanceId, "FIRMATO");
 			restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.FIRMATO, currentUser);
 		};break;  
 

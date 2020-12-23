@@ -3,6 +3,7 @@ package it.cnr.si.flows.ng.listeners.cnr.shortTermMobilityBandoDipartimento;
 
 
 
+import it.cnr.si.flows.ng.utils.Utils;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.DelegateExecution;
@@ -74,6 +75,8 @@ public class ManageProcessShortTermMobilityBandoDipartimento_v1 implements Execu
 	private FlowsAttachmentService flowsAttachmentService;
 	@Inject
 	private FlowsTaskService flowsTaskService;
+	@Inject
+	private Utils utils;
 
 
 	private Expression faseEsecuzione;
@@ -115,7 +118,7 @@ public class ManageProcessShortTermMobilityBandoDipartimento_v1 implements Execu
 
 		// START
 		case "provvedimento-graduatoria-start": {
-			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
+			utils.updateJsonSearchTerms(executionId, processInstanceId, stato);
 			creaExportCsvDomandePerBandoDipartimento(execution, (execution.getVariable("idBando").toString()), (execution.getVariable("dipartimentoId").toString()));
 		};break;  
 
@@ -132,7 +135,7 @@ public class ManageProcessShortTermMobilityBandoDipartimento_v1 implements Execu
 		};break;  	
 		case "endevent-bando-dipartimento-start": {
 			execution.setVariable(STATO_FINALE_GRADUATORIA, "GRADUATORIA APPROVATO");
-			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "APPROVATO");
+			utils.updateJsonSearchTerms(executionId, processInstanceId, "APPROVATO");
 		};break;    	
 
 		case "process-end": {

@@ -35,7 +35,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static it.cnr.si.flows.ng.service.FlowsTaskService.*;
 import static it.cnr.si.flows.ng.utils.Enum.Stato.Annullato;
 import static it.cnr.si.flows.ng.utils.Enum.Stato.Revocato;
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
@@ -345,35 +344,7 @@ public class FlowsProcessInstanceService {
     }
 
 
-    public void updateSearchTerms(String executionId, String processInstanceId, String stato) {
 
-        String initiator = "";
-        String titolo = "";
-        String descrizione = "";
-
-        if (runtimeService.getVariable(executionId , INITIATOR) != null) {
-            initiator =   runtimeService.getVariable(executionId , INITIATOR).toString();
-        }
-        if (runtimeService.getVariable(executionId , TITOLO) != null) {
-            titolo =   runtimeService.getVariable(executionId , TITOLO).toString();
-        }
-        if (runtimeService.getVariable(executionId , DESCRIZIONE) != null) {
-            descrizione =   runtimeService.getVariable(executionId , DESCRIZIONE).toString();
-        }
-
-        JSONObject name = new JSONObject();
-
-
-
-        name.put(DESCRIZIONE, ellipsis(descrizione, LENGTH_DESCTIZIONE));
-        name.put(TITOLO, ellipsis(titolo, LENGTH_TITOLO));
-        name.put("stato", ellipsis(stato, LENGTH_FASE) );
-        name.put(INITIATOR, initiator);
-
-        runtimeService.setProcessInstanceName(processInstanceId, name.toString());
-
-
-    }
 
     public void buildCsv(List<HistoricProcessInstanceResponse> processInstances, PrintWriter printWriter, String processDefinitionKey) throws IOException {
         // vista (campi e variabili) da inserire nel csv in base alla tipologia di flusso selezionato

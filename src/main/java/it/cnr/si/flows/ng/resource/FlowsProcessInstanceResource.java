@@ -140,7 +140,7 @@ public class FlowsProcessInstanceResource {
 		runtimeService.setVariable(processInstanceId, statoFinaleDomanda.name(), "ELIMINATO");
 		runtimeService.setVariable(processInstanceId, "motivazioneEliminazione", deleteReason);
 		try {
-			flowsProcessInstanceService.updateSearchTerms(flowsProcessInstanceService.getCurrentTaskOfProcessInstance(processInstanceId).getExecutionId(), processInstanceId, "ELIMINATO");
+			utils.updateJsonSearchTerms(flowsProcessInstanceService.getCurrentTaskOfProcessInstance(processInstanceId).getExecutionId(), processInstanceId, "ELIMINATO");
 		} catch(RuntimeException  error1) {
 			return new ResponseEntity("Errore nell`aggiornamento di stato, DESCRIZIONE, TITOLO, INITIATOR nel \"name\" della PI", HttpStatus.INTERNAL_SERVER_ERROR);
 		} finally {
