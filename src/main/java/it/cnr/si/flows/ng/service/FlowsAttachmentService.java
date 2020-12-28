@@ -110,7 +110,8 @@ public class FlowsAttachmentService {
             att.setUrl(nodeRef);
             att.setMimetype( (String) data.get(fileName + "_mimetype") );
             att.setPath( (String) data.get(fileName + "_path") );
-        }
+        } else
+            throw new RuntimeException("File vuoto: "+ fileName);
 
         return att;
     }
