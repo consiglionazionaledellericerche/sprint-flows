@@ -32,15 +32,18 @@ public class FirmaDocumentoService {
 	@Inject
 	private FlowsAttachmentService flowsAttachmentService;
 
-	
+
 	public void eseguiFirma(DelegateExecution execution, String nomeVariabileFile, PdfSignApparence apparence) {
+
+		String currentUser = SecurityUtils.getCurrentUserLogin();
+		LOGGER.info("L'utente {} sta firmando il file {}", currentUser, nomeVariabileFile);
 
 		List<String> nomiVariabiliFile = new ArrayList<String>();
 		nomiVariabiliFile.add(nomeVariabileFile);
 		eseguiFirma(execution, nomiVariabiliFile, null);
 
 		}
-		
+
 	public void eseguiFirma(DelegateExecution execution, List<String> nomiVariabiliFile, PdfSignApparence apparence) {
 
 		TaskService taskService = execution.getEngineServices().getTaskService();
