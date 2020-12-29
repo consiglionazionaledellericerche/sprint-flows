@@ -11,13 +11,26 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.xml.namespace.QName;
 
-import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceClient;
-import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
-import it.cnr.si.firmadigitale.firma.arss.stub.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import com.google.common.collect.Lists;
+
+import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceClient;
+import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
+import it.cnr.si.firmadigitale.firma.arss.stub.ArubaSignService;
+import it.cnr.si.firmadigitale.firma.arss.stub.ArubaSignServiceService;
+import it.cnr.si.firmadigitale.firma.arss.stub.Auth;
+import it.cnr.si.firmadigitale.firma.arss.stub.PdfProfile;
+import it.cnr.si.firmadigitale.firma.arss.stub.PdfSignApparence;
+import it.cnr.si.firmadigitale.firma.arss.stub.SignRequestV2;
+import it.cnr.si.firmadigitale.firma.arss.stub.SignReturnV2;
+import it.cnr.si.firmadigitale.firma.arss.stub.SignReturnV2Multiple;
+import it.cnr.si.firmadigitale.firma.arss.stub.TypeOfTransportNotImplemented_Exception;
+import it.cnr.si.firmadigitale.firma.arss.stub.TypeTransport;
 
 
 /**
@@ -44,15 +57,32 @@ public class FlowsFirmaService {
 
     private Properties props;
 
-    public static final Map<String, String> NOME_FILE_FIRMA = new HashMap<String, String>() {{
-        put("firma-decisione", "decisioneContrattare");
-        put("firma-provvedimento-aggiudicazione", "provvedimentoAggiudicazione");
-        put("firma-revoca", "ProvvedimentoDiRevoca");
-        put("firma-contratto", "contratto");
-        put("firma-verbale", "verbale");
-		put("firma", "monitoraggioAttivitaCovid19");
-		put("firma-graduatoria", "graduatoria");
-    }};
+    public static class FileAllaFirma {
+        public String nome;
+        public boolean opzionale;
+        public FileAllaFirma(String nome, boolean opzionale) {
+            this.nome = nome;
+            this.opzionale = opzionale;
+        }
+        public FileAllaFirma(String nome) {
+            this.nome = nome;
+            this.opzionale = false;
+        }
+    }
+    
+    public static final Map<String, List<FileAllaFirma>> NOME_FILE_FIRMA;
+    static {
+        NOME_FILE_FIRMA = new HashMap<>();
+        NOME_FILE_FIRMA.put("firma-decisione", Lists.newArrayList(new FileAllaFirma("decisioneContrattare")));
+        NOME_FILE_FIRMA.put("firma-provvedimento-aggiudicazione", Lists.newArrayList(new FileAllaFirma("provvedimentoAggiudicazione")));
+        NOME_FILE_FIRMA.put("firma-revoca", Lists.newArrayList(new FileAllaFirma("ProvvedimentoDiRevoca")));
+        NOME_FILE_FIRMA.put("firma-contratto", Lists.newArrayList(new FileAllaFirma("contratto")));
+        NOME_FILE_FIRMA.put("firma-verbale", Lists.newArrayList(new FileAllaFirma("verbale")));
+        NOME_FILE_FIRMA.put("firma", Lists.newArrayList(new FileAllaFirma("monitoraggioAttivitaCovid19")));
+        NOME_FILE_FIRMA.put("firma-graduatoria", Lists.newArrayList(new FileAllaFirma("graduatoria")));
+        NOME_FILE_FIRMA.put("firma-uo", Lists.newArrayList(new FileAllaFirma("missioni"), new FileAllaFirma("anticipoMissione", true)));
+        NOME_FILE_FIRMA.put("firma-spesa", Lists.newArrayList(new FileAllaFirma("missioni"), new FileAllaFirma("anticipoMissione", true)));
+    }
 
     public static final Map<String, String> ERRORI_ARUBA = new HashMap<String, String>() {{
         put("0001", "Formato file errato");
@@ -199,4 +229,5 @@ public class FlowsFirmaService {
         identity.setTypeOtpAuth(props.getProperty(TYPE_OTP_AUTH));
         return identity;
     }
+    
 }

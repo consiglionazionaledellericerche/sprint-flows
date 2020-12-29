@@ -66,31 +66,20 @@ public class FlowsTaskResource {
     private FlowsTaskService flowsTaskService;
     @Inject
     private RestResponseFactory restResponseFactory;
-    @Inject
-    private RepositoryService repositoryService;
 
     @Autowired(required = false) @Deprecated
     private CoolFlowsBridgeService coolBridgeService;
 
     @Inject
     private RuntimeService runtimeService;
-    @Inject
-    private RelationshipService relationshipService;
-    @Inject
-    private FlowsAttachmentService attachmentService;
     @Autowired(required = false)
-    private FlowsFirmaService flowsFirmaService;
-    @Inject
-    private FlowsAttachmentService flowsAttachmentService;
+    private FlowsFirmaMultiplaService flowsFirmaMultiplaService;
     @Inject
     private PermissionEvaluatorImpl permissionEvaluator;
     @Inject
     private UserDetailsService flowsUserDetailsService;
     @Inject
     private DraftService draftService;
-
-    @Autowired
-    private ApplicationContext context;
 
     @PostMapping(value = "/mytasks", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
@@ -334,78 +323,7 @@ public class FlowsTaskResource {
         LOGGER.info("L'utente {} ha chiesto di effettuare la firma multipla sui task: {}", username, taskIds);
         verificaPrecondizioniFirmaMultipla(taskIds);
 
-        List<Task> tasks = new ArrayList<>();
-        List<String> nomiFileDaFirmare = new ArrayList<>();
-        List<FlowsAttachment> fileDaFirmare = new ArrayList<>();
-        List<byte[]> fileContents = new ArrayList<>();
-
-        for (int i = 0; i < taskIds.size(); i++) {
-            long start = System.currentTimeMillis();
-            String id = taskIds.get(i);
-            tasks.add(taskService.createTaskQuery().taskId(id).singleResult());
-            nomiFileDaFirmare.add(NOME_FILE_FIRMA.get(tasks.get(i).getTaskDefinitionKey()));
-            fileDaFirmare.add(taskService.getVariable(id, nomiFileDaFirmare.get(i), FlowsAttachment.class));
-            fileContents.add(flowsAttachmentService.getAttachmentContentBytes(fileDaFirmare.get(i)));
-            LOGGER.info("Recuperato il documento {} in {}ms", username, fileDaFirmare.get(i).getFilename(), System.currentTimeMillis()-start);
-        }
-        PdfSignApparence pdfSignApparence = null;
-        if (nomiFileDaFirmare.stream().distinct().count() == 1) {
-            final String s = nomiFileDaFirmare.stream().findFirst().get();
-            try {
-                pdfSignApparence = context.getBean(s, PdfSignApparence.class);
-            } catch (BeansException _ex) {
-                LOGGER.warn("Cannot find bean for pdfSignApparence {}", s);
-            }
-        }
-
-        List<String> succesfulTasks = new ArrayList<>();
-        List<String> failedTasks    = new ArrayList<>();
-        LOGGER.info("L'utente {} ha recuperato il documento {} in {}ms", username);
-        List<SignReturnV2> signResponses = flowsFirmaService.firmaMultipla(username, password, otp, fileContents, pdfSignApparence);
-
-        for (int i = 0; i < taskIds.size(); i++) {
-            SignReturnV2 signResponse = signResponses.get(i);
-            String taskId = taskIds.get(i);
-            String nomeFile = nomiFileDaFirmare.get(i);
-            FlowsAttachment att = fileDaFirmare.get(i);
-
-            if (signResponse.getStatus().equals("OK")) {
-                String key = taskService.getVariable(taskId, "key", String.class);
-                String path = att.getPath();
-                String signedFileName = FirmaDocumentoService.getSignedFilename(att.getFilename());
-                String uid = flowsAttachmentService.saveOrUpdateBytes(signResponse.getBinaryoutput(), nomeFile, signedFileName, key, path);
-
-                att.setUrl(uid);
-                att.setFilename(signedFileName);
-                att.setAzione(Firma);
-                att.addStato(Firmato);
-                att.setUsername(SecurityUtils.getCurrentUserLogin());
-                att.setTime(new Date());
-                att.setTaskId(taskId);
-                att.setTaskName(tasks.get(i).getName());
-
-                Map<String, Object> data = new HashMap<String, Object>() {{
-                    put(nomeFile, att);
-                    put("sceltaUtente", "Firma Multipla");
-                }};
-                flowsTaskService.completeTask(taskId, data);
-
-                succesfulTasks.add(taskId);
-
-            } else {
-                String taskError = ERRORI_ARUBA.getOrDefault(signResponse.getReturnCode(), "Errore sconosciuto");
-                String key = taskService.getVariable(taskId, "key", String.class);
-                failedTasks.add(taskId +":"+ key +" - "+ taskError);
-            }
-        }
-
-        Map<String, List<String>> response = new HashMap<String, List<String>>() {{
-            put("success", succesfulTasks);
-            put("failure", failedTasks);
-        }};
-        LOGGER.info("L'esito della richiesta dell'utente {}: {}", username, response);
-        return ResponseEntity.ok(response);
-
+        return flowsFirmaMultiplaService.signMany(username, password, otp, taskIds);
     }
 
 

@@ -2,6 +2,8 @@ package it.cnr.si.flows.ng.service;
 
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.listeners.AddFlowsAttachmentsListener;
+import it.cnr.si.flows.ng.utils.Enum.Stato;
+import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.SecurityUtils;
 import it.cnr.si.spring.storage.*;
 import it.cnr.si.spring.storage.bulk.StorageFile;
@@ -13,6 +15,7 @@ import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,41 +92,27 @@ public class FlowsAttachmentService {
         byte[] filebytes = (byte[]) data.get(fileName + "_data");
         String originalFilename  = (String) data.get(fileName + "_filename");
         String nodeRef  = (String) data.get(fileName + "_nodeRef");
-
+        boolean nuovoFile = false;
         if (att == null) {
-            if (filebytes != null) {
-                att = new FlowsAttachment();
-
-                setAttachmentProperties(att, taskId, taskName, fileName, data);
-                att.setAzione(Caricamento);
-
-                att.setFilename(originalFilename);
-                att.setMimetype(getMimetype(filebytes));
-                att.setUrl(saveOrUpdateBytes(filebytes, fileName, originalFilename, processKey, path));
-                att.setPath(path);
-
-            } else if (nodeRef != null) {
-                att = new FlowsAttachment();
-
-                setAttachmentProperties(att, taskId, taskName, fileName, data);
-                att.setAzione(linkDaAltraApplicazione);
-
-                att.setFilename(originalFilename);
-                att.setUrl(nodeRef);
-                att.setMimetype( (String) data.get(fileName + "_mimetype") );
-                att.setPath( (String) data.get(fileName + "_path") );
-            }
-        } else {
-            setAttachmentProperties(att, taskId, taskName, fileName, data);
-            att.setAzione(Aggiornamento);
-
-            if (filebytes != null) {
-                att.setFilename(originalFilename);
-                att.setMimetype(getMimetype(filebytes));
-                att.setUrl(saveOrUpdateBytes(filebytes, fileName, originalFilename, processKey, path));
-                att.setPath(path);
-            }
+            att = new FlowsAttachment();
+            nuovoFile = true;
         }
+        
+        setAttachmentProperties(att, taskId, taskName, fileName, data);
+        att.setFilename(originalFilename);
+        if (filebytes != null) {
+            att.setAzione(nuovoFile ? Caricamento : Aggiornamento);
+            att.setUrl(saveOrUpdateBytes(filebytes, fileName, originalFilename, processKey, path));
+            att.setMimetype(getMimetype(filebytes));
+            att.setPath(path);
+        } else if (nodeRef != null) {
+            att.setAzione(linkDaAltraApplicazione);
+            att.setUrl(nodeRef);
+            att.setMimetype( (String) data.get(fileName + "_mimetype") );
+            att.setPath( (String) data.get(fileName + "_path") );
+        } else
+            throw new RuntimeException("File vuoto: "+ fileName);
+
         return att;
     }
 
@@ -141,6 +130,15 @@ public class FlowsAttachmentService {
         att.setPubblicazioneTrasparenza("true".equals(data.get(fileName+"_pubblicazioneTrasparenza")));
         att.setProtocollo(				"true".equals(data.get(fileName+"_protocollo")));
 
+        // Questo sovrascriverà il set degli stati già presenti.
+        // L'alternativa è quella di aggiungere soltanto
+        // ma in quel caso non c'è la possibilità di togliere uno stato.
+        // martin 10/12/2020
+        if (data.get(fileName+"_stati_json") != null) {
+            Set<Stato> statiSet = extractStati((String)data.get(fileName+"_stati_json"));
+            att.setStati(statiSet);
+        }
+        
         if (att.isProtocollo()) {
             att.setDataProtocollo(      String.valueOf(data.get(fileName+"_dataProtocollo")));
             att.setNumeroProtocollo(    String.valueOf(data.get(fileName+"_numeroProtocollo")));
@@ -150,6 +148,7 @@ public class FlowsAttachmentService {
         }
 
     }
+
 
     /**
      * Salva gli attachment di un Process Instance dai listners (e non dai service)
@@ -368,9 +367,13 @@ public class FlowsAttachmentService {
 
     public String saveOrUpdateBytes(byte[] bytes, String attachmentName, String fileName, String processKey, String path) {
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-		Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
+        if(Utils.isFullPath(path)) {
+            attachmentName = path.substring(path.lastIndexOf('/')+1);
+            path = path.substring(0, path.lastIndexOf('/'));
+        }
 
+        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+        
         StorageFile storageFile = new StorageFile(bais,
                 getMimetype(bais),
                 attachmentName);
@@ -410,5 +413,23 @@ public class FlowsAttachmentService {
 
     public byte[] getAttachmentContentBytes(FlowsAttachment att) {
         return getAttachmentContentBytes(att.getUrl());
+    }
+    
+    private static Set<Stato> extractStati(String stati) {
+        Set<Stato> result = new HashSet<>();
+        // Rimuovo '[' e ']'
+        if (stati.charAt(0) == '[') stati = stati.substring(1);
+        if (stati.charAt(stati.length()-1) == ']') stati = stati.substring(0, stati.length()-1);
+        if (stati.length() != 0) {
+            String[] statiArray = stati.split(",");
+            for (String stato : statiArray) {
+                stato = stato.trim();
+                if (stato.charAt(0) == '"') stato = stato.substring(1);
+                if (stato.charAt(stato.length()-1) == '"') stato = stato.substring(0, stato.length()-1);
+                result.add(Stato.valueOf(stato));
+            }
+        }
+        
+        return result;
     }
 }

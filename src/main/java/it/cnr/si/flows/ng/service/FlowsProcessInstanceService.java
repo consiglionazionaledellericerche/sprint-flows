@@ -174,7 +174,6 @@ public class FlowsProcessInstanceService {
         // PrecessInstance metadata
         HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery()
                 .processInstanceId(processInstanceId)
-                .includeProcessVariables()
                 .singleResult();
 
         final Map<String, Object> identityLinks = new LinkedHashMap<>();
@@ -185,6 +184,7 @@ public class FlowsProcessInstanceService {
 
         List<HistoricTaskInstance> taskList = historyService.createHistoricTaskInstanceQuery()
                 .processInstanceId(processInstanceId)
+                .includeTaskLocalVariables()
                 .list();
 
         //History

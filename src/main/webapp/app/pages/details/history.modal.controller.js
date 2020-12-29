@@ -8,6 +8,7 @@
 
     function HistoryModalController(processInstanceId, startTask, initiator, dataService, utils) {
         var vm = this;
+        vm.data = {};
 
         vm.startTask = startTask;
         vm.initiator = initiator;
