@@ -3,7 +3,6 @@ package it.cnr.si.config;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.Member;
 import it.cnr.si.service.ExternalMessageSender;
-import it.cnr.si.service.ExternalMessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
@@ -20,8 +19,6 @@ public class EventScheduler {
 
     private final Logger log = LoggerFactory.getLogger(EventScheduler.class);
 
-    @Inject
-    private ExternalMessageService externalMessageService;
     @Inject
     private HazelcastInstance hazelcastInstance;
     @Inject

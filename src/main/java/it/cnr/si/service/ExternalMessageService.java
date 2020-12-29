@@ -97,10 +97,13 @@ public class ExternalMessageService {
         msg.setRetries(0);
         msg.setLastErrorMessage(null);
 
+        // probabilmente il save prima del primo invio non serve
+        // ma lo faccio lo stesso nel caso qualcosa vada storto nell'invio
         save(msg);
 
         // tento un primo invio non appena il messaggio viene inserito
         externalMessageSender.send(msg);
+        save(msg);
     }
 
     public List<ExternalMessage> getNewExternalMessages() {
