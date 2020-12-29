@@ -44,7 +44,7 @@ public class FlowsProcessDefinitionResource {
 
         Map<String, List<ProcessDefinitionResponse>> result = new HashMap<>();
         //lista di TUTTE le Process Definition
-        List<ProcessDefinition> allPD = repositoryService.createProcessDefinitionQuery().latestVersion().list();
+        List<ProcessDefinition> allPD = repositoryService.createProcessDefinitionQuery().latestVersion().active().list();
         List<ProcessDefinitionResponse> responseListAll = restResponseFactory.createProcessDefinitionResponseList(allPD);
         result.put("all", responseListAll);
 
@@ -70,6 +70,27 @@ public class FlowsProcessDefinitionResource {
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    
+    
+    
+    @RequestMapping(value = "/activate/{key}", method = RequestMethod.POST)
+    @Secured(AuthoritiesConstants.ADMIN)
+    @Timed
+    public ResponseEntity<Void> activateProcessDefinitionByKey(@PathVariable String key) throws IOException {
+    	repositoryService.activateProcessDefinitionByKey(key);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+   
+    
+    
+    @RequestMapping(value = "/suspend/{key}", method = RequestMethod.POST)
+    @Secured(AuthoritiesConstants.ADMIN)
+    @Timed
+    public ResponseEntity<Void> suspendProcessDefinitionByKey(@PathVariable String key) throws IOException {
+    	repositoryService.suspendProcessDefinitionByKey(key);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 
