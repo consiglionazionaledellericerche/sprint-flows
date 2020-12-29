@@ -229,5 +229,5 @@ public class FlowsFirmaService {
         identity.setTypeOtpAuth(props.getProperty(TYPE_OTP_AUTH));
         return identity;
     }
-    
+
 }
