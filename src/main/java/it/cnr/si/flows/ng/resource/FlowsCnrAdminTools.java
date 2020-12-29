@@ -24,11 +24,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import it.cnr.si.config.ExternalMessageSender;
+import it.cnr.si.service.ExternalMessageSender;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.AceService;
-import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
 

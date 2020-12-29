@@ -29,6 +29,8 @@ public class ExternalMessageService {
     
     @Inject
     private ExternalMessageRepository externalMessageRepository;
+    @Inject
+    private ExternalMessageSender externalMessageSender;
 
     /**
      * Save a externalMessage.
@@ -96,6 +98,9 @@ public class ExternalMessageService {
         msg.setLastErrorMessage(null);
 
         save(msg);
+
+        // tento un primo invio non appena il messaggio viene inserito
+        externalMessageSender.send(msg);
     }
 
     public List<ExternalMessage> getNewExternalMessages() {

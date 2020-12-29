@@ -2,6 +2,7 @@ package it.cnr.si.config;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.Member;
+import it.cnr.si.service.ExternalMessageSender;
 import it.cnr.si.service.ExternalMessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,9 +36,10 @@ public class EventScheduler {
         // https://github.com/hazelcast/hazelcast/issues/3760#issuecomment-57928166
         Member master = hazelcastInstance.getCluster().getMembers().iterator().next();
         if (master == hazelcastInstance.getCluster().getLocalMember()) {
+            log.info("Sono il master, processo le rest ExternalMessage");
             externalMessageSender.sendMessages();
         } else {
-            log.debug("Non sono il master, non processo le rest ExternalMessage");
+            log.info("Non sono il master, non processo le rest ExternalMessage");
         }
     }
 
