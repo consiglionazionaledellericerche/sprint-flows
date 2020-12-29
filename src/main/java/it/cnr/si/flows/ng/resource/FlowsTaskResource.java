@@ -1,18 +1,20 @@
 package it.cnr.si.flows.ng.resource;
 
-import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
-import static it.cnr.si.flows.ng.utils.Utils.isEmpty;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import javax.inject.Inject;
-
+import com.codahale.metrics.annotation.Timed;
+import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
+import it.cnr.si.firmadigitale.firma.arss.stub.PdfSignApparence;
+import it.cnr.si.firmadigitale.firma.arss.stub.SignReturnV2;
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.exception.FlowsPermissionException;
+import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
+import it.cnr.si.flows.ng.service.*;
+import it.cnr.si.flows.ng.utils.SecurityUtils;
+import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.security.PermissionEvaluatorImpl;
+import it.cnr.si.service.DraftService;
+import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.ActivitiObjectNotFoundException;
+import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.util.json.JSONArray;
@@ -24,7 +26,9 @@ import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.task.TaskResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -32,29 +36,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import com.codahale.metrics.annotation.Timed;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.*;
 
-import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
-import it.cnr.si.flows.ng.exception.FlowsPermissionException;
-import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
-import it.cnr.si.flows.ng.service.CoolFlowsBridgeService;
-import it.cnr.si.flows.ng.service.FlowsFirmaMultiplaService;
-import it.cnr.si.flows.ng.service.FlowsTaskService;
-import it.cnr.si.flows.ng.utils.SecurityUtils;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.security.PermissionEvaluatorImpl;
-import it.cnr.si.service.DraftService;
+import static it.cnr.si.flows.ng.service.FlowsFirmaService.ERRORI_ARUBA;
+import static it.cnr.si.flows.ng.service.FlowsFirmaService.NOME_FILE_FIRMA;
+import static it.cnr.si.flows.ng.utils.Enum.Azione.Firma;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.Firmato;
+import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
+import static it.cnr.si.flows.ng.utils.Utils.isEmpty;
 
 /**
  * @author mtrycz
@@ -326,6 +320,7 @@ public class FlowsTaskResource {
                                                               @RequestParam("taskIds") List<String> taskIds)
             throws ArubaSignServiceException, FlowsPermissionException {
 
+        LOGGER.info("L'utente {} ha chiesto di effettuare la firma multipla sui task: {}", username, taskIds);
         verificaPrecondizioniFirmaMultipla(taskIds);
 
         return flowsFirmaMultiplaService.signMany(username, password, otp, taskIds);
