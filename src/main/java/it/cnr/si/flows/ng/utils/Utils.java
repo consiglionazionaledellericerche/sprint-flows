@@ -1,5 +1,7 @@
 package it.cnr.si.flows.ng.utils;
 
+import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
+import org.activiti.engine.RuntimeService;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.impl.util.json.JSONArray;
@@ -21,6 +23,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static it.cnr.si.flows.ng.service.FlowsTaskService.*;
+
 
 @Component("utils")
 public final class Utils {
@@ -30,6 +34,7 @@ public final class Utils {
     public static final String INITIATOR = "initiator";
     public static final String TITOLO = "titolo";
     public static final String DESCRIZIONE = "descrizione";
+    public static final String STATO = "stato";
 
     public static final String TASK_EXECUTOR = "esecutore";
     public static final String PROCESS_VISUALIZER = "visualizzatore";
@@ -48,6 +53,11 @@ public final class Utils {
     private static final String ROLE = "ROLE_";
     private static DateFormat formatoData = new SimpleDateFormat("yyyy-MM-dd");
     private static DateFormat formatoDataOra = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.ENGLISH);
+    @Inject
+    private RuntimeService runtimeService;
+    @Inject
+    private FlowsProcessInstanceService flowsProcessInstanceService;
+
 
     @Inject
     private Environment env;
@@ -323,5 +333,58 @@ public final class Utils {
             return false;
         }
         
+    }
+
+
+
+    /**
+     * Aggiorna il json con i campi che senvono per velocizzare
+     * le ricerce (stato, initiator, titolo e descrizione)
+     * all'interno del name della ProcessInstance.
+     *
+     * @param executionId       the execution id
+     * @param processInstanceId the process instance id
+     * @param stato             the stato
+     */
+    public void updateJsonSearchTerms(String executionId, String processInstanceId, String stato) {
+
+        String initiator = "";
+        String titolo = "";
+        String descrizione = "";
+
+        if(executionId == null)
+            executionId = flowsProcessInstanceService.getCurrentTaskOfProcessInstance(processInstanceId).getExecutionId();
+
+        if (runtimeService.getVariable(executionId , INITIATOR) != null)
+            initiator = runtimeService.getVariable(executionId , INITIATOR).toString();
+
+        if (runtimeService.getVariable(executionId , TITOLO) != null)
+            titolo =   runtimeService.getVariable(executionId , TITOLO).toString();
+
+        if (runtimeService.getVariable(executionId , DESCRIZIONE) != null)
+            descrizione =   runtimeService.getVariable(executionId , DESCRIZIONE).toString();
+
+        org.json.JSONObject name = new org.json.JSONObject();
+        name.put(DESCRIZIONE, ellipsis(descrizione, LENGTH_DESCRIZIONE));
+        name.put(TITOLO, ellipsis(titolo, LENGTH_TITOLO));
+        name.put(STATO, ellipsis(stato, LENGTH_STATO) );
+        name.put(INITIATOR, initiator);
+
+        runtimeService.setProcessInstanceName(processInstanceId, name.toString());
+    }
+
+
+
+    public String ellipsis(String in, int length) {
+        if (in!= null) {
+            if (in.length() < length) {
+                return in;
+            } else
+            {
+                return in.substring(0, length - 3) + "...";
+            }
+        }else {
+            return "";
+        }
     }
 }

@@ -2,15 +2,12 @@ package it.cnr.si.flows.ng.listeners.cnr.covid19;
 
 
 import it.cnr.si.firmadigitale.firma.arss.stub.PdfSignApparence;
-import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.*;
 import it.cnr.si.flows.ng.utils.CNRPdfSignApparence;
 import it.cnr.si.flows.ng.utils.Enum;
+import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.service.AceService;
-import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
-import it.cnr.si.service.dto.anagrafica.scritture.UtenteDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
-
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.BpmnError;
@@ -18,8 +15,6 @@ import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
 import org.activiti.rest.common.api.DataResponse;
-import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
-import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,24 +23,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import com.google.common.net.MediaType;
-
 import javax.inject.Inject;
-
-import static it.cnr.si.flows.ng.utils.Enum.Azione.GenerazioneDaSistema;
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.statoFinaleDomanda;
-import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
-
-import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.statoFinaleDomanda;
+import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 
 @Component
 @Profile("cnr")
@@ -81,6 +66,8 @@ public class ManageCovid19_v1 implements ExecutionListener {
 	private AceService aceService;
 	@Inject
 	private PdfSignApparence monitoraggioAttivitaCovid19;
+	@Inject
+	private Utils utils;
 
 	private Expression faseEsecuzione;
 
@@ -176,7 +163,7 @@ public class ManageCovid19_v1 implements ExecutionListener {
 				labelFile = "Programmazione Attività Personale";
 			}
 			// UPDATE VARIABILI FLUSSO
-			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
+			utils.updateJsonSearchTerms(executionId, processInstanceId, stato);
 			// GENERAZIONE PDF
 			flowsPdfBySiglaRestService.makePdf(execution, nomeFile, labelFile, report, valoreParam, tipologiaDoc, processInstanceId, utenteFile);
 		}
@@ -205,7 +192,7 @@ public class ManageCovid19_v1 implements ExecutionListener {
 		}
 		break;
 		case "endevent-covid19-start": {
-			flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "APPROVATO");
+			utils.updateJsonSearchTerms(executionId, processInstanceId, "APPROVATO");
 			if((execution.getVariable("sceltaUtente").toString().equalsIgnoreCase("Firma")) || (execution.getVariable("sceltaUtente").toString().equalsIgnoreCase("Firma Multipla"))) {
 				execution.setVariable(statoFinaleDomanda.name(), "APPROVATO");
 			}
