@@ -92,41 +92,27 @@ public class FlowsAttachmentService {
         byte[] filebytes = (byte[]) data.get(fileName + "_data");
         String originalFilename  = (String) data.get(fileName + "_filename");
         String nodeRef  = (String) data.get(fileName + "_nodeRef");
-
+        boolean nuovoFile = false;
         if (att == null) {
-            if (filebytes != null) {
-                att = new FlowsAttachment();
-
-                setAttachmentProperties(att, taskId, taskName, fileName, data);
-                att.setAzione(Caricamento);
-
-                att.setFilename(originalFilename);
-                att.setMimetype(getMimetype(filebytes));
-                att.setUrl(saveOrUpdateBytes(filebytes, fileName, originalFilename, processKey, path));
-                att.setPath(path);
-
-            } else if (nodeRef != null) {
-                att = new FlowsAttachment();
-
-                setAttachmentProperties(att, taskId, taskName, fileName, data);
-                att.setAzione(linkDaAltraApplicazione);
-
-                att.setFilename(originalFilename);
-                att.setUrl(nodeRef);
-                att.setMimetype( (String) data.get(fileName + "_mimetype") );
-                att.setPath( (String) data.get(fileName + "_path") );
-            }
-        } else {
-            setAttachmentProperties(att, taskId, taskName, fileName, data);
-            att.setAzione(Aggiornamento);
-
-            if (filebytes != null) {
-                att.setFilename(originalFilename);
-                att.setMimetype(getMimetype(filebytes));
-                att.setUrl(saveOrUpdateBytes(filebytes, fileName, originalFilename, processKey, path));
-                att.setPath(path);
-            }
+            att = new FlowsAttachment();
+            nuovoFile = true;
         }
+        
+        setAttachmentProperties(att, taskId, taskName, fileName, data);
+        att.setFilename(originalFilename);
+        if (filebytes != null) {
+            att.setAzione(nuovoFile ? Caricamento : Aggiornamento);
+            att.setUrl(saveOrUpdateBytes(filebytes, fileName, originalFilename, processKey, path));
+            att.setMimetype(getMimetype(filebytes));
+            att.setPath(path);
+        } else if (nodeRef != null) {
+            att.setAzione(linkDaAltraApplicazione);
+            att.setUrl(nodeRef);
+            att.setMimetype( (String) data.get(fileName + "_mimetype") );
+            att.setPath( (String) data.get(fileName + "_path") );
+        } else
+            throw new RuntimeException("File vuoto: "+ fileName);
+
         return att;
     }
 
@@ -434,12 +420,14 @@ public class FlowsAttachmentService {
         // Rimuovo '[' e ']'
         if (stati.charAt(0) == '[') stati = stati.substring(1);
         if (stati.charAt(stati.length()-1) == ']') stati = stati.substring(0, stati.length()-1);
-        String[] statiArray = stati.split(",");
-        for (String stato : statiArray) {
-            stato = stato.trim();
-            if (stato.charAt(0) == '"') stato = stato.substring(1);
-            if (stato.charAt(stato.length()-1) == '"') stato = stato.substring(0, stato.length()-1);
-            result.add(Stato.valueOf(stato));
+        if (stati.length() != 0) {
+            String[] statiArray = stati.split(",");
+            for (String stato : statiArray) {
+                stato = stato.trim();
+                if (stato.charAt(0) == '"') stato = stato.substring(1);
+                if (stato.charAt(stato.length()-1) == '"') stato = stato.substring(0, stato.length()-1);
+                result.add(Stato.valueOf(stato));
+            }
         }
         
         return result;

@@ -8,6 +8,7 @@ import it.cnr.si.flows.ng.service.*;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Enum.StatoDomandeSTMEnum;
 import it.cnr.si.flows.ng.utils.Enum.StatoDomandeSTMEnum;
+import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.ExternalMessageService;
 import org.activiti.engine.ManagementService;
@@ -74,6 +75,8 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 	private AceBridgeService aceBridgeService;
 	@Inject
 	private AceService aceService;
+	@Inject
+	private Utils utils;
 
 	private Expression faseEsecuzione;
 
@@ -123,7 +126,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 			};break;    	
 			// START
 			case "validazione-start": {
-				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
+				utils.updateJsonSearchTerms(executionId, processInstanceId, stato);
 			};break;  
 			case "validazione-end": {
 				//flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
@@ -148,17 +151,17 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 				if(sceltaUtente.equals("Respingi")) {
 					execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.RESPINTA.toString());
 					//restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.RESPINTA);
-					flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.RESPINTA.toString());
+					utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.RESPINTA.toString());
 				} else {
 					if(sceltaUtente.equals("Annulla")) {
 						execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.ANNULLATA.toString());
 						//restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.ANNULLATA);
-						flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.ANNULLATA.toString());
+						utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.ANNULLATA.toString());
 					}
 					else{
 						execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.VALIDATA.toString());
 						//restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.VALIDATA);
-						flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.VALIDATA.toString());
+						utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.VALIDATA.toString());
 					}
 				}
 			};break; 			
@@ -185,12 +188,12 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 			case "endevent-respinta-start": {
 				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.RESPINTA.toString());
 				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.RESPINTA);
-				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.RESPINTA.toString());
+				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.RESPINTA.toString());
 			};break;					
 			case "endevent-autorizzata-start": {
 				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.AUTORIZZATA.toString());
 				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.AUTORIZZATA);
-				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.AUTORIZZATA.toString());
+				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.AUTORIZZATA.toString());
 			};break;						
 			case "accettazione-start": {
 				LOGGER.debug("**** accettazione-start");
@@ -205,7 +208,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 					execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.ACCETTATA.toString());
 					execution.setVariable("domandaCorrenteAccettataFlag", "true");
 					//restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.ACCETTATA);
-					flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.ACCETTATA.toString());
+					utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.ACCETTATA.toString());
 				}
 				List<ProcessInstance> processinstancesListaDomandeAccettatePerBando = runtimeService.createProcessInstanceQuery()
 						.processDefinitionKey("short-term-mobility-domande")
@@ -256,7 +259,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 					execution.setVariable("domandaCorrenteValutataFlag", "true");
 					execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE.toString());
 					//restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE);
-					flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE.toString());
+					utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE.toString());
 					//CREAZIONE PDF VALUTAZIONE
 					String nomeFile="valutazioneShortTermMobility";
 					String labelFile="Scheda Valutazione Domanda";

@@ -7,6 +7,7 @@ import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.*;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Enum.StatoDomandeAccordiInternazionaliEnum;
+import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.service.ExternalMessageService;
 import org.activiti.engine.ManagementService;
 import org.activiti.engine.RuntimeService;
@@ -56,11 +57,13 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 	@Inject
 	private FlowsAttachmentService flowsAttachmentService;
 	@Inject
-	private ExternalMessageService externalMessageService;	
+	private ExternalMessageService externalMessageService;
 	@Inject
 	private TaskService taskService;
 	@Inject
 	private ManagementService managementService;
+	@Inject
+	private Utils utils;
 
 
 	private Expression faseEsecuzione;
@@ -70,7 +73,7 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 		// @Value("${cnr.accordi-bilaterali.url}")
 		// private String urlAccordiBilaterali;
 		// @Value("${cnr.accordi-bilaterali.usr}")
-		// private String usrAccordiBilaterali;	
+		// private String usrAccordiBilaterali;
 		// @Value("${cnr.accordi-bilaterali.psw}")
 		// private String pswAccordiBilaterali;
 		Double idDomanda = Double.parseDouble(execution.getVariable("idDomanda").toString());
@@ -79,7 +82,7 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 			{
 				put("idDomanda", idDomanda);
 				put("stato", statoDomanda.name().toString());
-			}	
+			}
 		};
 
 		String url = urlAccordiBilaterali + pathDomandeAccordiBilaterali;
@@ -97,16 +100,16 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 		String stato =  execution.getCurrentActivityName();
 		String sceltaUtente = "start";
 		if(execution.getVariable("sceltaUtente") != null) {
-			sceltaUtente =  (String) execution.getVariable("sceltaUtente");	
+			sceltaUtente =  (String) execution.getVariable("sceltaUtente");
 		}
 
 		LOGGER.info("ProcessInstanceId: " + processInstanceId);
 		String faseEsecuzioneValue = "noValue";
 		faseEsecuzioneValue = faseEsecuzione.getValue(execution).toString();
 		LOGGER.info("-- azioneScelta: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
-		//CHECK PER ANNULLO FLUSSO 
+		//CHECK PER ANNULLO FLUSSO
 		if (execution.getVariableInstance("motivazioneEliminazione") == null) {
-			switch(faseEsecuzioneValue){  
+			switch(faseEsecuzioneValue){
 			// START
 			case "process-start": {
 				startAccordiInternazionaliDomandeSetGroupsAndVisibility.configuraVariabiliStart(execution);
@@ -132,9 +135,9 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 					documentoGenerato.setLabel(labelFile);
 					flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
 				}
-			};break;  
+			};break;
 			case "validazione-end": {
-				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
+				utils.updateJsonSearchTerms(executionId, processInstanceId, stato);
 				String idDipartimento = execution.getVariable("dipartimentoId").toString();
 				String gruppoValutatoreScientificoDipartimento = "valutatoreScientificoDipartimento@" + idDipartimento;
 				runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValutatoreScientificoDipartimento, PROCESS_VISUALIZER);
@@ -147,69 +150,70 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 //				FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
 //				documentoGenerato.setLabel(labelFile);
 //				flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
-			};break;  			
+			};break;
 			// START
 			case "validazione-start": {
-				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
-			};break;  
+				utils.updateJsonSearchTerms(executionId, processInstanceId, stato);
+			};break;
 			case "valutazione-domande-bando-start": {
 				restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.VALUTATA_SCIENTIFICAMENTE);
-			};break;    
+			};break;
 			case "endevent-respinta-start": {
 				execution.setVariable(statoFinaleDomanda.name(), "DOMANDA RESPINTA");
 				restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA);
-				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "RESPINTA");
-			};break;    	
+				utils.updateJsonSearchTerms(executionId, processInstanceId, "RESPINTA");
+			};break;
 			case "endevent-non-autorizzata-start": {
 				execution.setVariable(statoFinaleDomanda.name(), "DOMANDA NON AUTORIZZATA");
 				if(execution.getVariable("sceltaUtente") != "Respingi") {
 					execution.setVariable("notaDomandaRespinta", "Scadenza termini temporali Valutazione Dirigente");
 				}
 				restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA);
-				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "NON AUTORIZZATA");
-			};break;  
+				utils.updateJsonSearchTerms(executionId, processInstanceId, "NON AUTORIZZATA");
+			};break;
 			case "endevent-annullata-start": {
 				execution.setVariable(statoFinaleDomanda.name(), "DOMANDA ANNULLATA");
 				restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA);
-				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "ANNULLATA");
-			};break;  
+				utils.updateJsonSearchTerms(executionId, processInstanceId, "ANNULLATA");
+			};break;
 			case "endevent-non-finanziata-start": {
 				execution.setVariable(statoFinaleDomanda.name(), "DOMANDA NON FINANZIATA");
 				restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA);
-				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "NON FINANZIATA");
-			};break;  	
+				utils.updateJsonSearchTerms(executionId, processInstanceId, "NON FINANZIATA");
+			};break;
 			case "endevent-approvata-start": {
 				execution.setVariable(statoFinaleDomanda.name(), "DOMANDA APPROVATA");
-				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA.toString());
-				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "APPROVATA");
+				//todo: controllare quale dei due agiornamenti di stato sia corretto o se sia un comportamento voluto aggiornarlo 2 volte
+				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeAccordiInternazionaliEnum.RESPINTA.toString());
+				utils.updateJsonSearchTerms(executionId, processInstanceId, "APPROVATA");
 				restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.ACCETATA);
-			};break;   	
+			};break;
 			case "notificatask-start": {
 				LOGGER.debug("**** notificatask-start");
-			};break;  
+			};break;
 			//TIMERS
 			case "timer2-end": {
 				int nrNotifiche = 1;
 				if(execution.getVariable("numeroNotificheTimer2") != null) {
 					nrNotifiche = (Integer.parseInt(execution.getVariable("numeroNotificheTimer2").toString()) + 1);
-				} 
+				}
 				execution.setVariable("numeroNotificheTimer2", nrNotifiche);
 				LOGGER.debug("Timer2 nrNotifiche: {}", nrNotifiche);
-			};break;  
+			};break;
 			case "timer2-end-script": {
 				int nrNotifiche = 1;
 				if(execution.getVariable("numeroNotificheTimer2") != null) {
 					nrNotifiche = (Integer.parseInt(execution.getVariable("numeroNotificheTimer2").toString()) + 1);
-				} 
+				}
 				execution.setVariable("numeroNotificheTimer2", nrNotifiche);
 				LOGGER.debug("Timer2 nrNotifiche: {}", nrNotifiche);
-			};break;  
+			};break;
 
-			// DEFAULT  
+			// DEFAULT
 			default:  {
-			};break;    
+			};break;
 
-			} 
+			}
 		} else {
 			restToApplicazioneAccordiBilaterali(execution, Enum.StatoDomandeAccordiInternazionaliEnum.CANCELLATA);
 			List<Job> timerAttivi = managementService.createJobQuery().timers().processInstanceId(processInstanceId).list();

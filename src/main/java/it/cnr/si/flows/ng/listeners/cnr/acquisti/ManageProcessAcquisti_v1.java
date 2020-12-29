@@ -7,6 +7,7 @@ import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.listeners.cnr.acquisti.service.AcquistiService;
 import it.cnr.si.flows.ng.service.*;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
+import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.ExternalMessageService;
 import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
@@ -76,6 +77,8 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 	AceService aceService;
 	@Inject
 	private StoreService storeService;
+	@Inject
+	private Utils utils;
 
 	private Expression faseEsecuzione;
 
@@ -550,7 +553,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			};break;     
 			case "end-annullato-start": {
 				execution.setVariable(statoFinaleDomanda.name(), "ANNULLATO");
-				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "ANNULLATO");
+				utils.updateJsonSearchTerms(executionId, processInstanceId, "ANNULLATO");
 			};break;     
 			// START DECISIONE-CONTRATTARE
 			case "DECISIONE-CONTRATTARE-start": {
@@ -562,7 +565,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				CalcolaTotaleImpegni(execution);
 			};break;		
 			case "verifica-decisione-start": {
-				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
+				utils.updateJsonSearchTerms(executionId, processInstanceId, stato);
 			};break;  
 			case "firma-decisione-end": {
 				if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
@@ -713,7 +716,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				pubblicaTuttiFilePubblicabili(execution);
 				controllaFilePubblicabiliTrasparenza(execution);
 				execution.setVariable(statoFinaleDomanda.name(), "STIPULATO");
-				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, "STIPULATO");
+				utils.updateJsonSearchTerms(executionId, processInstanceId, "STIPULATO");
 				//TODO implementare le url a seconda del contesto
 				String urlSigla = "www.google.it";
 				Map<String, Object> siglaPayload = createSiglaPayload(execution);
@@ -758,7 +761,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 
 			case "end-revocato-start": {
 				execution.setVariable(statoFinaleDomanda.name(), Revocato);
-				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Revocato.name());
+				utils.updateJsonSearchTerms(executionId, processInstanceId, Revocato.name());
 			};break;
 
 			// FINE FLUSSO  

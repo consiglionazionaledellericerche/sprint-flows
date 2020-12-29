@@ -61,9 +61,9 @@ public class FlowsTaskService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FlowsTaskService.class);
 	public static final int LENGTH_TITOLO = 65;
-	public static final int LENGTH_DESCTIZIONE = 75;
+	public static final int LENGTH_DESCRIZIONE = 75;
 	public static final int LENGTH_INITIATOR = 45;
-	public static final int LENGTH_FASE = 45;
+	public static final int LENGTH_STATO = 45;
 
 	@Autowired @Qualifier("processEngine")
 	protected ProcessEngine engine;
@@ -324,31 +324,22 @@ public class FlowsTaskService {
 		ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
 		runtimeService.setVariable(instance.getId(), "processInstanceId", instance.getId());
 
-		// metadati da visualizzare in ricerca, li metto nel Name per comodita' in ricerca
-		org.json.JSONObject name = new org.json.JSONObject();
-
-		Map<String, Object> variables = runtimeService.getVariables(instance.getId());
-		String titolo = String.valueOf(variables.get(Enum.VariableEnum.titolo.name()));
-		name.put(Enum.VariableEnum.titolo.name(), ellipsis(titolo, LENGTH_TITOLO) );
-		String descrizione = String.valueOf(variables.get(Enum.VariableEnum.descrizione.name()));
-		name.put(Enum.VariableEnum.descrizione.name(), ellipsis(descrizione, LENGTH_DESCTIZIONE) );
-		//metto l`utente REALE che ha avviato il flusso nel JSON nel name
-		name.put(Enum.VariableEnum.initiator.name(), SecurityUtils.getRealUserLogged());
+		String statoPI;
 		if (taskService.createTaskQuery().processInstanceId(instance.getProcessInstanceId()).count() == 0) {
-			name.put(stato.name(), ellipsis("START", LENGTH_FASE) );
-
+			statoPI = utils.ellipsis("START", LENGTH_STATO);
 		} else {
 			String taskName = taskService.createTaskQuery()
 					.processInstanceId(instance.getProcessInstanceId())
 					.singleResult().getName();
-			name.put(stato.name(), ellipsis(taskName, LENGTH_FASE) );
+			statoPI = utils.ellipsis(taskName, LENGTH_STATO);
 		}
-		runtimeService.setProcessInstanceName(instance.getId(), name.toString());
+		utils.updateJsonSearchTerms(null, instance.getProcessInstanceId(), statoPI);
 
 		return instance;
 	}
-	
-	
+
+
+
 	public ProcessInstance startProcessInstanceAsApplication(String definitionId, Map<String, Object> data, String applicationName) {
 
 		ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(definitionId).singleResult();
@@ -365,24 +356,38 @@ public class FlowsTaskService {
 		runtimeService.setVariable(instance.getId(), "processInstanceId", instance.getId());
 
 		// metadati da visualizzare in ricerca, li metto nel Name per comodita' in ricerca
-		org.json.JSONObject name = new org.json.JSONObject();
+//		org.json.JSONObject name = new org.json.JSONObject();
+//
+//		String titolo = (String) data.get(Enum.VariableEnum.titolo.name());
+//		name.put(Enum.VariableEnum.titolo.name(), utils.ellipsis(titolo, LENGTH_TITOLO) );
+//		String descrizione = (String) data.get(Enum.VariableEnum.descrizione.name());
+//		name.put(Enum.VariableEnum.descrizione.name(), utils.ellipsis(descrizione, LENGTH_DESCRIZIONE) );
+//		String initiator = utils.ellipsis((String) data.get(Enum.VariableEnum.initiator.name()), LENGTH_INITIATOR);
+//		name.put(Enum.VariableEnum.initiator.name(), initiator);
+//		if (taskService.createTaskQuery().processInstanceId(instance.getProcessInstanceId()).count() == 0) {
+//			name.put(stato.name(), utils.ellipsis("START", LENGTH_STATO) );
+//		} else {
+//			String taskName = taskService.createTaskQuery()
+//					.processInstanceId(instance.getProcessInstanceId())
+//					.singleResult().getName();
+//			name.put(stato.name(), utils.ellipsis(taskName, LENGTH_STATO) );
+//		}
+//		runtimeService.setProcessInstanceName(instance.getId(), name.toString());
 
-		String titolo = (String) data.get(Enum.VariableEnum.titolo.name());
-		name.put(Enum.VariableEnum.titolo.name(), ellipsis(titolo, LENGTH_TITOLO) );
-		String descrizione = (String) data.get(Enum.VariableEnum.descrizione.name());
-		name.put(Enum.VariableEnum.descrizione.name(), ellipsis(descrizione, LENGTH_DESCTIZIONE) );
-		String initiator = (String) data.get(Enum.VariableEnum.initiator.name());
-		name.put(Enum.VariableEnum.initiator.name(), initiator);
+
+
+//todo: da testare
+		String statoPI;
 		if (taskService.createTaskQuery().processInstanceId(instance.getProcessInstanceId()).count() == 0) {
-			name.put(stato.name(),ellipsis("START", LENGTH_FASE) );
-
+			statoPI = utils.ellipsis("START", LENGTH_STATO);
 		} else {
 			String taskName = taskService.createTaskQuery()
 					.processInstanceId(instance.getProcessInstanceId())
 					.singleResult().getName();
-			name.put(stato.name(), ellipsis(taskName, LENGTH_FASE) );
+			statoPI = utils.ellipsis(taskName, LENGTH_STATO);
 		}
-		runtimeService.setProcessInstanceName(instance.getId(), name.toString());
+
+		utils.updateJsonSearchTerms( null, instance.getProcessInstanceId(), statoPI);
 
 		LOGGER.info("Avviata istanza di processo {}, id: {}", key, instance.getId());
 		return instance;
@@ -512,19 +517,6 @@ public class FlowsTaskService {
 					.stream()
 					.anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
 			task.getVariables().add(isUnclaimableVariable);
-		}
-	}
-
-	static String ellipsis(String in, int length) {
-		if (in!= null) {
-			if (in.length() < length) {
-			return in;
-		} else
-		{
-			return in.substring(0, length - 3) + "...";
-		}
-	}else {
-		return "";
 		}
 	}
 }
