@@ -14,12 +14,33 @@
         $scope.attachments = {};
 
         load();
+        
+        $scope.suspend = function(key) {
+            dataService.definitions.suspend(key).then(success, error);
+        }
+        
+        $scope.activate = function(key) {
+            dataService.definitions.activate(key).then(success, error);
+        }
+
+        function success(response) {
+            $log.info(response);
+            AlertService.success("Richiesta completata con successo");
+            $scope.data.procDef = undefined;
+            load();
+        }
+        
+        function error(err) {
+            $log.error(err);
+            AlertService.error("Richiesta non riuscita<br>"+ err.data.message);
+        }
 
         function load() {
-            dataService.definitions.all().then(function(response) {
+            dataService.definitions.all(true).then(function(response) {
                vm.procDefs = response.data.all;
             });
         }
+        
 
         $scope.submitProcessDefinition = function(file) {
 
@@ -28,15 +49,7 @@
             Upload.upload({
                 url: 'api/processDefinitions/send',
                 data: $scope.data,
-            }).then(function (response) {
-                $log.info(response);
-                AlertService.success("Richiesta completata con successo");
-                $scope.data.procDef.data = undefined;
-                load();
-            }, function (err) {
-                $log.error(err);
-                AlertService.error("Richiesta non riuscita<br>"+ err.data.message);
-            });
+            }).then(success, error);
         }
     }
 })();
