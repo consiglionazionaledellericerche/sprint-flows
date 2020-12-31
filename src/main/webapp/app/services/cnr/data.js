@@ -135,9 +135,15 @@
                 },
             },
             definitions: {
-                all: function () {
-                    return $http.get('api/processDefinitions/all');
+                all: function (includeSuspended) {
+                    return $http.get('api/processDefinitions/all?'+ (includeSuspended?"includeSuspended=true":"") );
                 },
+                activate:  function (key) {
+                    return $http.post('api/processDefinitions/activate/'+ key);
+                },
+                suspend: function (key) {
+                    return $http.post('api/processDefinitions/suspend/'+ key);
+                }
             },
             dynamiclist: {
                 byName: function (name) {

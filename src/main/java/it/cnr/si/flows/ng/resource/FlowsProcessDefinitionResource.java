@@ -10,6 +10,7 @@ import it.cnr.si.service.MembershipService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.repository.DeploymentBuilder;
 import org.activiti.engine.repository.ProcessDefinition;
+import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.repository.ProcessDefinitionResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/processDefinitions")
@@ -40,16 +42,24 @@ public class FlowsProcessDefinitionResource {
     @RequestMapping(value = "/all", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
-    public ResponseEntity<Map<String, List<ProcessDefinitionResponse>>> getAllProcessDefinitions() {
+    public ResponseEntity<Map<String, List<ProcessDefinitionResponse>>> getAllProcessDefinitions(
+            @RequestParam(value="includeSuspended", required=false) boolean includeSuspended) {
 
         Map<String, List<ProcessDefinitionResponse>> result = new HashMap<>();
-        //lista di TUTTE le Process Definition
-        List<ProcessDefinition> allPD = repositoryService.createProcessDefinitionQuery().latestVersion().active().list();
+
+        ProcessDefinitionQuery pdQuery = repositoryService.createProcessDefinitionQuery().latestVersion();
+        if (!includeSuspended)
+            pdQuery.active();
+        List<ProcessDefinition> allPD = pdQuery.list();
+
+        // lista delle Process Definition che l'utente loggato può avviare
+        List<ProcessDefinition> listBootable = allPD.stream()
+                .filter(pd -> !pd.isSuspended())
+                .filter(pd -> canStartProcesByDefinitionKey(pd.getKey()))
+                .collect(Collectors.toList());
+
         List<ProcessDefinitionResponse> responseListAll = restResponseFactory.createProcessDefinitionResponseList(allPD);
         result.put("all", responseListAll);
-
-        //lista delle Process Definition che l'utente loggato può avviare
-        List<ProcessDefinition> listBootable = canStartProcesByDefinitionList(allPD);
         List<ProcessDefinitionResponse> responseListBootable = restResponseFactory.createProcessDefinitionResponseList(listBootable);
         result.put("bootable", responseListBootable);
 
@@ -72,9 +82,7 @@ public class FlowsProcessDefinitionResource {
         }
     }
 
-    
-    
-    
+
     @RequestMapping(value = "/activate/{key}", method = RequestMethod.POST)
     @Secured(AuthoritiesConstants.ADMIN)
     @Timed
@@ -117,17 +125,13 @@ public class FlowsProcessDefinitionResource {
     }
 
 
-    public List<ProcessDefinition> canStartProcesByDefinitionList(List<ProcessDefinition> processDefinitions) {
+    private List<ProcessDefinition> canStartProcesByDefinitionList(List<ProcessDefinition> processDefinitions) {
         List<ProcessDefinition> response = new ArrayList<>();
-        Set<String> allRolesForUser = membershipService.getAllRolesForUser(SecurityUtils.getCurrentUserLogin());
         for (ProcessDefinition processDefinition : processDefinitions) {
-            if(allRolesForUser
-                    .stream()
-                    .map(Utils::removeLeadingRole)
-                    .anyMatch(a -> a.startsWith("abilitati#" + processDefinition.getKey() + "@"))){
+            if (canStartProcesByDefinitionKey(processDefinition.getKey()))
                 response.add(processDefinition);
-            }
         }
         return response;
     }
+    
 }
