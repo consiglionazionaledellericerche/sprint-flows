@@ -6,6 +6,11 @@
 				<ul>
 					<li ng-repeat="procDef in vm.procDefs">
 						{{procDef.id}}
+						<span ng-if="procDef.suspended" class="label label-primary">Sospeso</span>
+						<a href ng-if="procDef.suspended" ng-click="activate(procDef.key)">
+                            <span class="glyphicon glyphicon-arrow-up" title="Attiva"></span></a>
+                        <a href ng-if="!procDef.suspended" ng-click="suspend(procDef.key)">
+                            <span class="glyphicon glyphicon-arrow-down" title="Sospendi"></span></a>
 					</li>
 				</ul>
 			</p>
