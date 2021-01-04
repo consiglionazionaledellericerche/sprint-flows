@@ -155,8 +155,8 @@ public class FlowsCnrAdminTools {
         return ResponseEntity.ok(result);
     }
     
-    @RequestMapping(value = "aggiornaName", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> agiornaName() {
+    @RequestMapping(value = "aggiornaName/{aggiorna}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> agiornaName(@PathVariable("aggiorna") Boolean aggiorna) {
         
         List<HistoricProcessInstance> instances = historyService
             .createHistoricProcessInstanceQuery()
@@ -195,10 +195,11 @@ public class FlowsCnrAdminTools {
             
             log.info("Inserisco nella ProcessInstance "+ pi.getId() +" il name:"+ pi.getName());
             
-            historyService
-                .createNativeHistoricProcessInstanceQuery()
-                .sql("update act_hi_procinst set name_ = '"+ name +"' where proc_inst_id_ = "+ pi.getId())
-                .singleResult();
+            if (aggiorna) 
+                historyService
+                    .createNativeHistoricProcessInstanceQuery()
+                    .sql("update act_hi_procinst set name_ = '"+ name +"' where proc_inst_id_ = "+ pi.getId())
+                    .singleResult();
             
             log.info("ProcessInstance "+ pi.getId() +" aggiornata con successo");
         });
