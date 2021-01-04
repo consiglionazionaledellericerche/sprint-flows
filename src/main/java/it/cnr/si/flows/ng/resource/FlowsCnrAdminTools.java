@@ -1,5 +1,9 @@
 package it.cnr.si.flows.ng.resource;
 
+import static it.cnr.si.flows.ng.service.FlowsTaskService.LENGTH_DESCRIZIONE;
+import static it.cnr.si.flows.ng.service.FlowsTaskService.LENGTH_STATO;
+import static it.cnr.si.flows.ng.service.FlowsTaskService.LENGTH_TITOLO;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -13,6 +17,7 @@ import javax.inject.Inject;
 
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.history.HistoricVariableInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -26,10 +31,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import it.cnr.si.service.ExternalMessageSender;
 import it.cnr.si.flows.ng.service.AceBridgeService;
+import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
+
+import static it.cnr.si.flows.ng.utils.Utils.*;
 
 @Controller
 @RequestMapping("api/attachments")
@@ -146,5 +154,88 @@ public class FlowsCnrAdminTools {
         result.put("errors", errors);
         return ResponseEntity.ok(result);
     }
+    
+    @RequestMapping(value = "aggiornaName", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> agiornaName() {
+        
+        List<HistoricProcessInstance> instances = historyService
+            .createHistoricProcessInstanceQuery()
+            .processInstanceNameLike("{\"stato\":\"\"%")
+            .list();
+        
+        instances.stream().forEach(pi -> {
 
+            log.info("Processo la ProcessInstance "+ pi.getId() +" con name "+ pi.getName());
+            
+            HistoricVariableInstance statoFinale = null;
+            if(pi.getProcessDefinitionKey().equals("missioni")) {
+                statoFinale = historyService
+                        .createHistoricVariableInstanceQuery()
+                        .processInstanceId(pi.getId())
+                        .variableName("STATO_FINALE_DOMANDA")
+                        .singleResult();
+            } else if (pi.getProcessDefinitionKey().contains("covid")) {
+                statoFinale = historyService
+                        .createHistoricVariableInstanceQuery()
+                        .processInstanceId(pi.getId())
+                        .variableName("statoFinaleDomanda")
+                        .singleResult();
+            } else {
+                log.info("Parametro sconosciuto per la pi "+ pi.getId() +", la salto.");
+                return;
+            }
+            
+            if (statoFinale == null || statoFinale.getValue() == null) {
+                log.info("Questa pi non ha lo stato finale: "+ pi.getId());
+                return;
+            }
+            
+            String stato = statoFinale.getValue().toString();
+            String name = getName(pi.getId(), stato);
+            
+            log.info("Inserisco nella ProcessInstance "+ pi.getId() +" il name:"+ pi.getName());
+            
+            historyService
+                .createNativeHistoricProcessInstanceQuery()
+                .sql("update act_hi_procinst set name_ = '"+ name +"' where proc_inst_id_ = "+ pi.getId())
+                .singleResult();
+            
+            log.info("ProcessInstance "+ pi.getId() +" aggiornata con successo");
+        });
+        
+        return ResponseEntity.ok().build();
+    }
+
+    private String getName(String processInstanceId, String stato) {
+
+        String initiator = "";
+        String titolo = "";
+        String descrizione = "";
+
+        initiator = historyService
+            .createHistoricVariableInstanceQuery()
+            .processInstanceId(processInstanceId)
+            .variableName(INITIATOR)
+            .singleResult().getValue().toString();
+        
+        titolo = historyService
+                .createHistoricVariableInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .variableName(TITOLO)
+                .singleResult().getValue().toString();
+        
+        descrizione = historyService
+                .createHistoricVariableInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .variableName(DESCRIZIONE)
+                .singleResult().getValue().toString();
+
+        org.json.JSONObject name = new org.json.JSONObject();
+        name.put(DESCRIZIONE, ellipsis(descrizione, LENGTH_DESCRIZIONE));
+        name.put(TITOLO, ellipsis(titolo, LENGTH_TITOLO));
+        name.put(STATO, ellipsis(stato, LENGTH_STATO) );
+        name.put(INITIATOR, initiator);
+
+        return name.toString();
+    }
 }

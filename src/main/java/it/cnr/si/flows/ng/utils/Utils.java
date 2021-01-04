@@ -375,7 +375,7 @@ public final class Utils {
 
 
 
-    public String ellipsis(String in, int length) {
+    public static String ellipsis(String in, int length) {
         if (in!= null) {
             if (in.length() < length) {
                 return in;
