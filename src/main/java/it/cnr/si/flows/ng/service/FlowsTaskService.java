@@ -355,27 +355,6 @@ public class FlowsTaskService {
 		ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
 		runtimeService.setVariable(instance.getId(), "processInstanceId", instance.getId());
 
-		// metadati da visualizzare in ricerca, li metto nel Name per comodita' in ricerca
-//		org.json.JSONObject name = new org.json.JSONObject();
-//
-//		String titolo = (String) data.get(Enum.VariableEnum.titolo.name());
-//		name.put(Enum.VariableEnum.titolo.name(), utils.ellipsis(titolo, LENGTH_TITOLO) );
-//		String descrizione = (String) data.get(Enum.VariableEnum.descrizione.name());
-//		name.put(Enum.VariableEnum.descrizione.name(), utils.ellipsis(descrizione, LENGTH_DESCRIZIONE) );
-//		String initiator = utils.ellipsis((String) data.get(Enum.VariableEnum.initiator.name()), LENGTH_INITIATOR);
-//		name.put(Enum.VariableEnum.initiator.name(), initiator);
-//		if (taskService.createTaskQuery().processInstanceId(instance.getProcessInstanceId()).count() == 0) {
-//			name.put(stato.name(), utils.ellipsis("START", LENGTH_STATO) );
-//		} else {
-//			String taskName = taskService.createTaskQuery()
-//					.processInstanceId(instance.getProcessInstanceId())
-//					.singleResult().getName();
-//			name.put(stato.name(), utils.ellipsis(taskName, LENGTH_STATO) );
-//		}
-//		runtimeService.setProcessInstanceName(instance.getId(), name.toString());
-
-
-
 //todo: da testare
 		String statoPI;
 		if (taskService.createTaskQuery().processInstanceId(instance.getProcessInstanceId()).count() == 0) {
