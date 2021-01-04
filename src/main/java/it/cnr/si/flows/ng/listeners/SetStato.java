@@ -33,6 +33,8 @@ public class SetStato implements ActivitiEventListener {
 
 		ProcessInstance processInstance = null;
 		String stato = "";
+		if(runtimeService.hasVariable(event.getProcessInstanceId(), "statoFinaleDomanda"))
+			stato = (String) runtimeService.getVariable(event.getProcessInstanceId(), "statoFinaleDomanda");
 
 		if (event.getType() == ActivitiEventType.TASK_CREATED) {
 			processInstance = runtimeService.createProcessInstanceQuery()
