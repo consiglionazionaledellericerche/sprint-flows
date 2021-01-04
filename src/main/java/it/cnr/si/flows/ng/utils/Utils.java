@@ -367,7 +367,12 @@ public final class Utils {
         org.json.JSONObject name = new org.json.JSONObject();
         name.put(DESCRIZIONE, ellipsis(descrizione, LENGTH_DESCRIZIONE));
         name.put(TITOLO, ellipsis(titolo, LENGTH_TITOLO));
-        name.put(STATO, ellipsis(stato, LENGTH_STATO) );
+        if(stato.isEmpty()){
+            String vecchioStato = new org.json.JSONObject(flowsProcessInstanceService.getProcessInstance(processInstanceId).getName()).getString("stato");
+            name.put(STATO, ellipsis(vecchioStato, LENGTH_STATO) );
+        }else
+            name.put(STATO, ellipsis(stato, LENGTH_STATO) );
+
         name.put(INITIATOR, initiator);
 
         runtimeService.setProcessInstanceName(processInstanceId, name.toString());
