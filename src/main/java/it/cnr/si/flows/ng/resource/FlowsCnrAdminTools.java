@@ -193,12 +193,12 @@ public class FlowsCnrAdminTools {
             String stato = statoFinale.getValue().toString();
             String name = getName(pi.getId(), stato);
             
-            log.info("Inserisco nella ProcessInstance "+ pi.getId() +" il name:"+ pi.getName());
+            log.info("Inserisco nella ProcessInstance "+ pi.getId() +" il name:"+ name);
             
             if (aggiorna) 
                 historyService
                     .createNativeHistoricProcessInstanceQuery()
-                    .sql("update act_hi_procinst set name_ = '"+ name +"' where proc_inst_id_ = "+ pi.getId())
+                    .sql("update act_hi_procinst set name_ = '"+ name +"' where proc_inst_id_ = '"+ pi.getId()+"'")
                     .singleResult();
             
             log.info("ProcessInstance "+ pi.getId() +" aggiornata con successo");
