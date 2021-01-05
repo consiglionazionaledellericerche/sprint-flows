@@ -338,7 +338,7 @@ public final class Utils {
 
 
     /**
-     * Aggiorna il json con i campi che senvono per velocizzare
+     * Aggiorna il json con i campi che servono per velocizzare
      * le ricerce (stato, initiator, titolo e descrizione)
      * all'interno del name della ProcessInstance.
      *
