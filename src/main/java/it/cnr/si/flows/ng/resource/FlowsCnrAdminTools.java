@@ -193,7 +193,7 @@ public class FlowsCnrAdminTools {
             String stato = statoFinale.getValue().toString();
             String name = getName(pi.getId(), stato);
             
-            log.info("Inserisco nella ProcessInstance "+ pi.getId() +" il name:"+ pi.getName());
+            log.info("Inserisco nella ProcessInstance "+ pi.getId() +" il name:"+ name);
             
             if (aggiorna) 
                 historyService
