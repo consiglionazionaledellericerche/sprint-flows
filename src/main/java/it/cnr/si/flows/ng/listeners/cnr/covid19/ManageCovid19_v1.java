@@ -192,7 +192,8 @@ public class ManageCovid19_v1 implements ExecutionListener {
 		}
 		break;
 		case "endevent-covid19-start": {
-			utils.updateJsonSearchTerms(executionId, processInstanceId, "APPROVATO");
+			execution.setVariable("statoFinale", "APPROVATO");
+			utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
 			if((execution.getVariable("sceltaUtente").toString().equalsIgnoreCase("Firma")) || (execution.getVariable("sceltaUtente").toString().equalsIgnoreCase("Firma Multipla"))) {
 				execution.setVariable(statoFinaleDomanda.name(), "APPROVATO");
 			}
