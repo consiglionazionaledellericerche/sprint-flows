@@ -135,7 +135,8 @@ public class ManageProcessShortTermMobilityBandoDipartimento_v1 implements Execu
 		};break;  	
 		case "endevent-bando-dipartimento-start": {
 			execution.setVariable(STATO_FINALE_GRADUATORIA, "GRADUATORIA APPROVATO");
-			utils.updateJsonSearchTerms(executionId, processInstanceId, "APPROVATO");
+			execution.setVariable("statoFinale", "APPROVATO");
+			utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
 		};break;    	
 
 		case "process-end": {
