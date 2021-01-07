@@ -27,7 +27,8 @@ import java.util.Optional;
 public class FlowsMailService extends MailService {
 
 	public static final String FLOW_NOTIFICATION = "notificaFlow.html";
-	public static final String PROCESS_NOTIFICATION = "notificaProcesso.html";
+    public static final String PROCESS_NOTIFICATION = "notificaProcesso.html";
+	public static final String PROCESS_COMPLETED_NOTIFICATION = "notificaProcessoCompletato.html";
 	public static final String TASK_NOTIFICATION = "notificaTask.html";
     public static final String TASK_ASSEGNATO_AL_GRUPPO = "taskAssegnatoAlGruppo.html";
     public static final String TASK_IN_CARICO_ALL_UTENTE = "taskInCaricoAllUtente.html";
