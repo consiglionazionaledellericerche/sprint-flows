@@ -4,6 +4,7 @@ package it.cnr.si.flows.ng.listeners.cnr.accordiInternazionaliBandi;
 import com.google.common.net.MediaType;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.*;
+import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -102,8 +103,9 @@ public class ManageProcessAccordiInternazionaliBandi_v1 implements ExecutionList
 			}
 		};break;  	
 		case "endevent-bando-start": {
-			execution.setVariable(STATO_FINALE_VERBALE, "VERBALE APPROVATO");
-			utils.updateJsonSearchTerms(executionId, processInstanceId, "APPROVATO");
+			execution.setVariable(STATO_FINALE_VERBALE, "APPROVATO");
+			execution.setVariable("statoFinale", "APPROVATO");
+			utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
 		};break;    	
 
 		case "process-end": {

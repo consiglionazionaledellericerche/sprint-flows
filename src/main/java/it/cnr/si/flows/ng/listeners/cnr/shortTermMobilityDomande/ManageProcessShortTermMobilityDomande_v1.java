@@ -188,12 +188,14 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 			case "endevent-respinta-start": {
 				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.RESPINTA.toString());
 				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.RESPINTA);
-				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.RESPINTA.toString());
+				execution.setVariable("statoFinale", Enum.StatoDomandeSTMEnum.RESPINTA.toString());
+				utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
 			};break;					
 			case "endevent-autorizzata-start": {
 				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.AUTORIZZATA.toString());
 				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.AUTORIZZATA);
-				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.AUTORIZZATA.toString());
+				execution.setVariable("statoFinale", Enum.StatoDomandeSTMEnum.AUTORIZZATA.toString());
+				utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
 			};break;						
 			case "accettazione-start": {
 				LOGGER.debug("**** accettazione-start");
