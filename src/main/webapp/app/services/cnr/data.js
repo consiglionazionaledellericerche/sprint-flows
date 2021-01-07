@@ -298,10 +298,16 @@
             },
             manuali: {
                 getElenco: function () {
-                    return $http.get("api/manual/");
+                    return $http.get("api/manual");
                 },
-                getManuale: function (nome) {
-                    return $http.get("api/manual/" + nome, { responseType: 'arraybuffer' });
+                getManuale: function (manuale) {
+                    return $http({
+                        url: 'api/manual',
+                        method: 'GET',
+                        params: {
+                            manuale: manuale
+                        },
+                    });
                 }
             },
             faq: {
