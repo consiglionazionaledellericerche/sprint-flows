@@ -184,11 +184,15 @@ public class MailNotificationListener  implements ActivitiEventListener {
 				break;
 
 			case PROCESS_STARTED:
-			case PROCESS_COMPLETED:
 			case PROCESS_CANCELLED:
 				notificationRules = notificationService.findGroupsByProcessIdEventType(processDefinitionKey, type.toString());
 				send(integratedVariables, notificationRules, FlowsMailService.PROCESS_NOTIFICATION, null);
 				break;
+				
+			case PROCESS_COMPLETED:
+			    notificationRules = notificationService.findGroupsByProcessIdEventType(processDefinitionKey, type.toString());
+			    send(integratedVariables, notificationRules, FlowsMailService.PROCESS_COMPLETED_NOTIFICATION, null);
+			    break;
 
 			default:
 				// no action
