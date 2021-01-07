@@ -17,12 +17,12 @@ public interface NotificationRuleRepository extends JpaRepository<NotificationRu
             + "where notificationrule.processId =:processId "
             + "and notificationrule.eventType =:eventType "
             + "and notificationrule.taskName =:taskName")
-    public List<NotificationRule> findGroupsByProcessIdEventTypeTaskName(@Param("processId") String processId, @Param("eventType") String eventType, @Param("taskName") String taskName);
+    public List<NotificationRule> findRulesByProcessIdEventTypeTaskName(@Param("processId") String processId, @Param("eventType") String eventType, @Param("taskName") String taskName);
 
     @Query("select notificationrule from NotificationRule notificationrule "
             + "where notificationrule.processId =:processId "
             + "and notificationrule.eventType =:eventType")
-    public List<NotificationRule> findGroupsByProcessIdEventType(@Param("processId") String processId, @Param("eventType") String eventType);
+    public List<NotificationRule> findRulesByProcessIdEventType(@Param("processId") String processId, @Param("eventType") String eventType);
 
 
 }

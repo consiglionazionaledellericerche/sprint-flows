@@ -173,20 +173,20 @@ public class MailNotificationListener  implements ActivitiEventListener {
 			case TASK_COMPLETED:
 				ActivitiEntityEvent taskEvent = (ActivitiEntityEvent) event;
 				TaskEntity task = (TaskEntity) taskEvent.getEntity();
-				notificationRules = notificationService.findGroupsByProcessIdEventTypeTaskName(processDefinitionKey, type.toString(), task.getTaskDefinitionKey());
+				notificationRules = notificationService.findRulesByProcessIdEventTypeTaskName(processDefinitionKey, type.toString(), task.getTaskDefinitionKey());
 				send(integratedVariables, notificationRules, FlowsMailService.TASK_NOTIFICATION, task.getName());
 				break;
 
 			case SEQUENCEFLOW_TAKEN:
                 ActivitiSequenceFlowTakenEvent seqTaken = (ActivitiSequenceFlowTakenEvent) event;
-				notificationRules = notificationService.findGroupsByProcessIdEventTypeTaskName(processDefinitionKey, type.toString(), seqTaken.getId());
+				notificationRules = notificationService.findRulesByProcessIdEventTypeTaskName(processDefinitionKey, type.toString(), seqTaken.getId());
 				send(integratedVariables, notificationRules, FlowsMailService.FLOW_NOTIFICATION, null);
 				break;
 
 			case PROCESS_STARTED:
 			case PROCESS_COMPLETED:
 			case PROCESS_CANCELLED:
-				notificationRules = notificationService.findGroupsByProcessIdEventType(processDefinitionKey, type.toString());
+				notificationRules = notificationService.findRulesByProcessIdEventType(processDefinitionKey, type.toString());
 				send(integratedVariables, notificationRules, FlowsMailService.PROCESS_NOTIFICATION, null);
 				break;
 
