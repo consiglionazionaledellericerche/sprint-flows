@@ -218,7 +218,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
 								.map(s -> s.trim())
 								.forEach(personVariableName -> {
 									LOGGER.debug("personVariableName: {}", personVariableName);
-									String person = (String) personVariableName;
+									String person = (String) variables.get(personVariableName);
 									LOGGER.debug("Invio la mail {} all'utente {}", nt, person);
 									mailService.sendFlowEventNotification(nt, variables, tn, person, null);
 								});
