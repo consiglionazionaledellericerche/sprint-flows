@@ -55,7 +55,7 @@ public class StartMissioniSetGroupsAndVisibility {
 
 		String tipologiaFirmaMissione = execution.getVariable("validazioneSpesaFlag").toString();
 		if (tipologiaFirmaMissione.equals("si")) {
-			gruppoFirmatarioSpesa = execution.getVariable("gruppoFirmatarioUo").toString();
+			gruppoFirmatarioSpesa = execution.getVariable("gruppoFirmatarioSpesa").toString();
 			String gruppoFirmatarioSpesaSigla = gruppoFirmatarioSpesa.split("@")[0];
 			int idStrutturaSpesaMissioni = Integer.parseInt(gruppoFirmatarioSpesa.split("@")[1].toString());
 			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoFirmatarioSpesa, PROCESS_VISUALIZER);
