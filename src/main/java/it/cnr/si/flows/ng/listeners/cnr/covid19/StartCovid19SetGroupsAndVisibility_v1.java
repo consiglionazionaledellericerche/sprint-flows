@@ -108,7 +108,7 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 
 		execution.setVariable("gruppoResponsabileProponente", gruppoResponsabileProponente);
 		execution.setVariable("applicazioneScrivaniaDigitale", applicazioneScrivaniaDigitale);
-		execution.setVariable("idStruttura", IdEntitaOrganizzativaDirettore);
+		execution.setVariable("idStruttura", String.valueOf(IdEntitaOrganizzativaDirettore));
 
 	}
 }

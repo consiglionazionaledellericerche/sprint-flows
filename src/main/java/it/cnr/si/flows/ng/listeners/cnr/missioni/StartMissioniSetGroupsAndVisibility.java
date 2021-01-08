@@ -60,7 +60,7 @@ public class StartMissioniSetGroupsAndVisibility {
 			int idStrutturaSpesaMissioni = Integer.parseInt(gruppoFirmatarioSpesa.split("@")[1].toString());
 			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoFirmatarioSpesa, PROCESS_VISUALIZER);
 			execution.setVariable("idStrutturaSpesaMissioni", idStrutturaSpesaMissioni);
-			execution.setVariable("idStruttureSupervisione", idStrutturaSpesaMissioni);	
+			execution.setVariable("idStruttureSupervisione", String.valueOf(idStrutturaSpesaMissioni));	
 		}
 
 		LOGGER.debug("Imposto i gruppi del flusso gruppoFirmatarioUo {} - gruppoFirmatarioSpesa {} - per il flusso con missioneEsteraFlag {} - tipologiaFirmaMissione {}",  gruppoFirmatarioUo, gruppoFirmatarioSpesa, missioneEsteraFlag, tipologiaFirmaMissione);
@@ -74,7 +74,7 @@ public class StartMissioniSetGroupsAndVisibility {
 
 		execution.setVariable("gruppoFirmatarioUo", gruppoFirmatarioUo);
 		execution.setVariable("idStrutturaUoMissioni", idStrutturaUoMissioni);
-		execution.setVariable("idStruttura", idStrutturaUoMissioni);
+		execution.setVariable("idStruttura",  String.valueOf(idStrutturaUoMissioni));
 		//FLAG CHE VERRA' IMPOSTATO IN FIRMA UO END
 		execution.setVariable("firmaSpesaFlag", "no");
 	}

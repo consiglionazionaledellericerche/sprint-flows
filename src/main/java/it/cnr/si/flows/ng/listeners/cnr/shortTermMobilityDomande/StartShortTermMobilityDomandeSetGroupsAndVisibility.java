@@ -157,6 +157,6 @@ public class StartShortTermMobilityDomandeSetGroupsAndVisibility {
 		execution.setVariable("gruppoValutatoreScientificoSTMDipartimento", gruppoValutatoreScientificoSTMDipartimento);
 		execution.setVariable("applicazioneScrivaniaDigitale", applicazioneScrivaniaDigitale);
 		execution.setVariable("cdsuoProponente", cdsuoAppartenenzaUtente);
-		execution.setVariable("idStruttura", IdEntitaOrganizzativaDirettore);
+		execution.setVariable("idStruttura", String.valueOf(IdEntitaOrganizzativaDirettore));
 	}
 }

@@ -121,7 +121,7 @@ public class StartAccordiInternazionaliDomandeSetGroupsAndVisibility {
 		execution.setVariable("gruppoValutatoreScientificoDipartimento", gruppoValutatoreScientificoDipartimento);
 		execution.setVariable("applicazioneScrivaniaDigitale", applicazioneScrivaniaDigitale);
 		execution.setVariable("cdsuoRichiedente", cdsuoAppartenenzaUtente);
-		execution.setVariable("idStruttura", IdEntitaOrganizzativaDirettore);
+		execution.setVariable("idStruttura", String.valueOf(IdEntitaOrganizzativaDirettore));
 
 	}
 }
