@@ -56,8 +56,6 @@ public class SetStato implements ActivitiEventListener {
 				LOGGER.info("Setto lo stato finale ({}) della Process Instance {}", stato, processInstance.getId());
 			}
 		}
-
-		//todo: aggiorna il name del flusso (json con stato, descrizione, ecc.)
 		utils.updateJsonSearchTerms(event.getExecutionId(), event.getProcessInstanceId(), stato);
 	}
 
