@@ -64,6 +64,13 @@ public class StartMissioniSetGroupsAndVisibility {
 
 		LOGGER.debug("Imposto i gruppi del flusso gruppoFirmatarioUo {} - gruppoFirmatarioSpesa {} - per il flusso con missioneEsteraFlag {} - tipologiaFirmaMissione {}",  gruppoFirmatarioUo, gruppoFirmatarioSpesa, missioneEsteraFlag, tipologiaFirmaMissione);
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoFirmatarioUo, PROCESS_VISUALIZER);
+		if (execution.getVariable("userNameUtenteMissione") != null) {
+			runtimeService.addUserIdentityLink(execution.getProcessInstanceId(), execution.getVariable("userNameUtenteMissione").toString(), PROCESS_VISUALIZER);
+		}
+		if (execution.getVariable("userNameRichiedente") != null) {
+			runtimeService.addUserIdentityLink(execution.getProcessInstanceId(), execution.getVariable("userNameRichiedente").toString(), PROCESS_VISUALIZER);
+		}
+
 		execution.setVariable("gruppoFirmatarioUo", gruppoFirmatarioUo);
 		execution.setVariable("idStrutturaUoMissioni", idStrutturaUoMissioni);
 		//FLAG CHE VERRA' IMPOSTATO IN FIRMA UO END
