@@ -103,9 +103,7 @@ public class FlowsListenersConfiguration {
 		runtimeService.addEventListener(visibilitySetter);
 		runtimeService.addEventListener(addAttachments, PROCESS_STARTED, TASK_COMPLETED);
 		runtimeService.addEventListener(processEndListener, PROCESS_COMPLETED);
-		runtimeService.addEventListener(beanSetStato, TASK_CREATED, HISTORIC_ACTIVITY_INSTANCE_ENDED);
-
-
+		runtimeService.addEventListener(beanSetStato, TASK_CREATED, HISTORIC_ACTIVITY_INSTANCE_ENDED, PROCESS_COMPLETED);
 
 	}
 }
