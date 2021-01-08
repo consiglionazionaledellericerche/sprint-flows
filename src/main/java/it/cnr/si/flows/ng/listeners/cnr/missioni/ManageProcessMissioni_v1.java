@@ -194,14 +194,16 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 
 		case "endevent-annulla": {
 			execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoDomandeMissioniEnum.ANNULLATO);
-			utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeMissioniEnum.ANNULLATO.toString());
+			execution.setVariable("statoFinale", Enum.StatoDomandeMissioniEnum.ANNULLATO.toString());
+			utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
 			//restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.ANNULLATO);
 		};break;    	
 
 
 		case "endevent-firmato-start": {
-			execution.setVariable("STATO_FINALE_DOMANDA", "FIRMATO");
-			utils.updateJsonSearchTerms(executionId, processInstanceId, "FIRMATO");
+			execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoDomandeMissioniEnum.FIRMATO.toString());
+			execution.setVariable("statoFinale", Enum.StatoDomandeMissioniEnum.FIRMATO.toString());
+			utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
 			restToApplicazioneMissioni(execution, Enum.StatoDomandeMissioniEnum.FIRMATO, currentUser);
 		};break;  
 
