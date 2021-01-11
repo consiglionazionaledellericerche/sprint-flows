@@ -47,6 +47,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
     public static final String CNR_CODE = "0000";
     public static final String ID_STRUTTURA = "idStruttura";
+    public static final String ID_STRUTTURE_SUPERVISIONE = "idStruttureSupervisione";
     private final Logger log = LoggerFactory.getLogger(PermissionEvaluatorImpl.class);
 
     @Inject
