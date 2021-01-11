@@ -269,7 +269,7 @@ public class ExternalMessageSender {
                 this.access_token = (String) resp.getBody().get("id_token");
 
                 request.getHeaders().set("Authorization", "Bearer "+ access_token);
-                request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+                request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
                 response = execution.execute(request, body);
             }
 
