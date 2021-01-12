@@ -1,35 +1,28 @@
 package it.cnr.si.flows.ng.service;
 
-import static it.cnr.si.flows.ng.service.FlowsFirmaService.NOME_FILE_FIRMA;
-import static it.cnr.si.flows.ng.utils.Enum.Azione.Firma;
-import static it.cnr.si.flows.ng.utils.Enum.Stato.Firmato;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import org.activiti.engine.TaskService;
-import org.activiti.engine.task.Task;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-
 import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
 import it.cnr.si.firmadigitale.firma.arss.stub.PdfSignApparence;
 import it.cnr.si.firmadigitale.firma.arss.stub.SignReturnV2;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.FlowsFirmaService.FileAllaFirma;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.TaskService;
+import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.Task;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+import javax.inject.Inject;
+import java.util.*;
+
+import static it.cnr.si.flows.ng.service.FlowsFirmaService.NOME_FILE_FIRMA;
+import static it.cnr.si.flows.ng.utils.Enum.Azione.Firma;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.Firmato;
 
 @Service
 public class FlowsFirmaMultiplaService {
@@ -42,10 +35,12 @@ public class FlowsFirmaMultiplaService {
     private FlowsTaskService flowsTaskService;
     @Inject
     private FlowsAttachmentService flowsAttachmentService;
-    @Autowired
+    @Inject
     private ApplicationContext context;
-    @Autowired
+    @Inject
     private FlowsFirmaService flowsFirmaService;
+    @Inject
+    private RuntimeService runtimeService;
 
 
     public ResponseEntity<Map<String, List<String>>> signMany(String username, String password, String otp, List<String> taskIds) throws ArubaSignServiceException {
@@ -114,81 +109,12 @@ public class FlowsFirmaMultiplaService {
                 String key = taskService.getVariable(taskId, "key", String.class);
                 failedTasks.add(taskId +":"+ key +" - "+ taskError);
             }
-
-            //            for (FileAllaFirma file : filesPerQuestoTask) {
-            //                String taskId = task.getId();
-            //                String nomeFile = file.nome;
-            //                FlowsAttachment att = taskService.getVariable(taskId, file.nome, FlowsAttachment.class);
-            //                
-            //                if (signResponse.getStatus().equals("OK")) {
-            //                    String key = taskService.getVariable(taskId, "key", String.class);
-            //                    String path = att.getPath();
-            //                    String signedFileName = FirmaDocumentoService.getSignedFilename(att.getFilename());
-            //                    String uid = flowsAttachmentService.saveOrUpdateBytes(signResponse.getBinaryoutput(), nomeFile, signedFileName, key, path);
-            //
-            //                    att.setUrl(uid);
-            //                    att.setFilename(signedFileName);
-            //                    att.setAzione(Firma);
-            //                    att.addStato(Firmato);
-            //                    att.setUsername(SecurityUtils.getCurrentUserLogin());
-            //                    att.setTime(new Date());
-            //                    att.setTaskId(taskId);
-            //                    att.setTaskName(task.getName());
-            //
-            //                    succesfulTasks.add(taskId);
-            //
-            //                } else {
-            //                    String taskError = ERRORI_ARUBA.getOrDefault(signResponse.getReturnCode(), "Errore sconosciuto");
-            //                    String key = taskService.getVariable(taskId, "key", String.class);
-            //                    failedTasks.add(taskId +":"+ key +" - "+ taskError);
-            //                }
-            //                flowsTaskService.completeTask(taskId, data);
-            //            }
-
-
         }
         
         return new HashMap<String, List<String>>() {{
             put("success", succesfulTasks);
             put("failure", failedTasks);
         }};
-
-
-        //        for (int i = 0; i < taskIds.size(); i++) { 
-        //            SignReturnV2 signResponse = signResponses.get(i);
-        //            String taskId = taskIds.get(i);
-        //            String nomeFile = nomiFileDaFirmare.get(i);
-        //            FlowsAttachment att = fileDaFirmare.get(i);
-        //
-        //            if (signResponse.getStatus().equals("OK")) {
-        //                String key = taskService.getVariable(taskId, "key", String.class);
-        //                String path = att.getPath();
-        //                String signedFileName = FirmaDocumentoService.getSignedFilename(att.getFilename());
-        //                String uid = flowsAttachmentService.saveOrUpdateBytes(signResponse.getBinaryoutput(), nomeFile, signedFileName, key, path);
-        //
-        //                att.setUrl(uid);
-        //                att.setFilename(signedFileName);
-        //                att.setAzione(Firma);
-        //                att.addStato(Firmato);
-        //                att.setUsername(SecurityUtils.getCurrentUserLogin());
-        //                att.setTime(new Date());
-        //                att.setTaskId(taskId);
-        //                att.setTaskName(tasks.get(i).getName());
-        //
-        //                Map<String, Object> data = new HashMap<String, Object>() {{
-        //                    put(nomeFile, att);
-        //                    put("sceltaUtente", "Firma Multipla");
-        //                }};
-        //                flowsTaskService.completeTask(taskId, data);
-        //
-        //                succesfulTasks.add(taskId);
-        //
-        //            } else {
-        //                String taskError = ERRORI_ARUBA.getOrDefault(signResponse.getReturnCode(), "Errore sconosciuto");
-        //                String key = taskService.getVariable(taskId, "key", String.class);
-        //                failedTasks.add(taskId +":"+ key +" - "+ taskError);
-        //            }
-        //        }
     }
 
     // restituisce il primo errore incontrato
@@ -229,7 +155,11 @@ public class FlowsFirmaMultiplaService {
         for (int i = 0; i < taskIds.size(); i++) {
             String id = taskIds.get(i);
             Task task = taskService.createTaskQuery().taskId(id).singleResult();
-            List<FileAllaFirma> filesDaFirmare = NOME_FILE_FIRMA.get(task.getTaskDefinitionKey());
+            ProcessInstance pi = runtimeService.createProcessInstanceQuery()
+                    .processInstanceId(task.getProcessInstanceId())
+                    .singleResult();
+            String key = pi.getProcessDefinitionKey() +"#"+ task.getTaskDefinitionKey();
+            List<FileAllaFirma> filesDaFirmare = NOME_FILE_FIRMA.get(key);
             Iterator<FileAllaFirma> it = filesDaFirmare.iterator();
             while (it.hasNext()) {
                 FileAllaFirma file = it.next();
