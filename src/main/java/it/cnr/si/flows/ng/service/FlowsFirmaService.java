@@ -73,15 +73,15 @@ public class FlowsFirmaService {
     public static final Map<String, List<FileAllaFirma>> NOME_FILE_FIRMA;
     static {
         NOME_FILE_FIRMA = new HashMap<>();
-        NOME_FILE_FIRMA.put("firma-decisione", Lists.newArrayList(new FileAllaFirma("decisioneContrattare")));
-        NOME_FILE_FIRMA.put("firma-provvedimento-aggiudicazione", Lists.newArrayList(new FileAllaFirma("provvedimentoAggiudicazione")));
-        NOME_FILE_FIRMA.put("firma-revoca", Lists.newArrayList(new FileAllaFirma("ProvvedimentoDiRevoca")));
-        NOME_FILE_FIRMA.put("firma-contratto", Lists.newArrayList(new FileAllaFirma("contratto")));
-        NOME_FILE_FIRMA.put("firma-verbale", Lists.newArrayList(new FileAllaFirma("verbale")));
-        NOME_FILE_FIRMA.put("firma", Lists.newArrayList(new FileAllaFirma("monitoraggioAttivitaCovid19")));
-        NOME_FILE_FIRMA.put("firma-graduatoria", Lists.newArrayList(new FileAllaFirma("graduatoria")));
-        NOME_FILE_FIRMA.put("firma-uo", Lists.newArrayList(new FileAllaFirma("missioni"), new FileAllaFirma("anticipoMissione", true)));
-        NOME_FILE_FIRMA.put("firma-spesa", Lists.newArrayList(new FileAllaFirma("missioni"), new FileAllaFirma("anticipoMissione", true)));
+        NOME_FILE_FIRMA.put("acquisti#firma-decisione", Lists.newArrayList(new FileAllaFirma("decisioneContrattare")));
+        NOME_FILE_FIRMA.put("acquisti#firma-provvedimento-aggiudicazione", Lists.newArrayList(new FileAllaFirma("provvedimentoAggiudicazione")));
+        NOME_FILE_FIRMA.put("acquisti#firma-revoca", Lists.newArrayList(new FileAllaFirma("ProvvedimentoDiRevoca")));
+        NOME_FILE_FIRMA.put("acquisti#firma-contratto", Lists.newArrayList(new FileAllaFirma("contratto")));
+        NOME_FILE_FIRMA.put("accordi-internazionali-domande#firma-verbale", Lists.newArrayList(new FileAllaFirma("verbale")));
+        NOME_FILE_FIRMA.put("covid19#firma", Lists.newArrayList(new FileAllaFirma("monitoraggioAttivitaCovid19")));
+        NOME_FILE_FIRMA.put("short-term-mobility-bando-dipartimento#firma-graduatoria", Lists.newArrayList(new FileAllaFirma("graduatoria")));
+        NOME_FILE_FIRMA.put("missioni#firma-uo", Lists.newArrayList(new FileAllaFirma("missioni"), new FileAllaFirma("anticipoMissione", true)));
+        NOME_FILE_FIRMA.put("missioni#firma-spesa", Lists.newArrayList(new FileAllaFirma("missioni"), new FileAllaFirma("anticipoMissione", true)));
     }
 
     public static final Map<String, String> ERRORI_ARUBA = new HashMap<String, String>() {{
