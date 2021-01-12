@@ -180,10 +180,10 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
      */
 
     public boolean canVisualize(String idStruttura, String processDefinitionKey, String processInstanceId, List<String> authorities, String currentUserLogin) {
-        boolean canVisualize = false;
 
         if (authorities.contains("ADMIN") || verifyAuthorities(idStruttura, processDefinitionKey, authorities)) {
-            canVisualize = true;
+            return true;
+            
         } else {
             //controllo gli Identity Link "visualizzatore" (o "assignee" o "candidate") per gli user senza authorities di "supervisore" o "responsabile"
             Stream<HistoricIdentityLink> identityLinkStream = historyService.getHistoricIdentityLinksForProcessInstance(processInstanceId).stream();
@@ -195,18 +195,16 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
             if (ilv.stream()
                     .filter(il -> il.getUserId() != null)
                     .anyMatch(il -> il.getUserId().equals(currentUserLogin))) {
-                canVisualize = true;
+                return true;
             } else {
-                //controllo gli Identity Link con groupId(tutti gli altri)
-                //TODO controllo su supervisore/responsabile da rivedere
+                
                 if (ilv.stream()
                         .filter(il -> il.getGroupId() != null)
-                        .filter(il -> !(il.getGroupId().startsWith(String.valueOf(responsabile)+"#") || il.getGroupId().startsWith(String.valueOf(supervisore)+"#") || il.getGroupId().startsWith(String.valueOf(responsabile)+"@") || il.getGroupId().startsWith(String.valueOf(supervisore)+"@") || il.getGroupId().startsWith(String.valueOf(responsabile)+"Struttura@") || il.getGroupId().startsWith(String.valueOf(supervisore)+"Struttura@")))
                         .anyMatch(il -> authorities.contains(il.getGroupId())))
-                    canVisualize = true;
+                    return true;
             }
         }
-        return canVisualize;
+        return false;
     }
 
 
