@@ -44,12 +44,13 @@
 					vm.data.businessKey = response.data.entity.businessKey;
 
     				vm.data.history = response.data.history;
+    				//aggiungo le variabili del task (servono quando si aggiunge il task al carrello firma)
+    				vm.data.history[0].historyTask.variabili = response.data.entity.variabili;
                     vm.data.history.forEach(function(el) {
                         //recupero l'ultimo task (quello ancora da eseguire)
                         if (el.historyTask.endTime === null) {
                             //recupero la fase
                             vm.activeTask = el.historyTask;
-                            utils.refactoringVariables(vm.activeTask);
                         }
                     })
 
