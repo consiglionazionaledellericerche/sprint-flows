@@ -8,7 +8,7 @@
 	function DetailsController($scope, $rootScope, Principal, $state, $localStorage, dataService, AlertService, $log, utils, $uibModal) {
 		$scope.button={};
 		$scope.button.disabled = true;
-		var vm = this;
+		var vm = this, activeTaskVariables;
 		vm.searchParams = {};
 		vm.data = {};
 		vm.taskId = $state.params.taskId;
@@ -45,12 +45,14 @@
 
     				vm.data.history = response.data.history;
     				//aggiungo le variabili del task (servono quando si aggiunge il task al carrello firma)
-    				vm.data.history[0].historyTask.variabili = response.data.entity.variabili;
+    				//le devo aggiungerne per tutti i task?
+    				activeTaskVariables = response.data.entity.variabili;
                     vm.data.history.forEach(function(el) {
-                        //recupero l'ultimo task (quello ancora da eseguire)
+                        //recupero l'ultimo task (quello ancora da eseguire)...
                         if (el.historyTask.endTime === null) {
-                            //recupero la fase
+                            //...e gli metto le variabili
                             vm.activeTask = el.historyTask;
+                            vm.activeTask.variabili = activeTaskVariables;
                         }
                     })
 
