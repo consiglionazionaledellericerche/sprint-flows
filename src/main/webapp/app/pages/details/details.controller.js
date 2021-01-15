@@ -45,13 +45,12 @@
 
     				vm.data.history = response.data.history;
     				//aggiungo le variabili del task (servono quando si aggiunge il task al carrello firma)
-    				//le devo aggiungerne per tutti i task?
     				activeTaskVariables = response.data.entity.variabili;
                     vm.data.history.forEach(function(el) {
                         //recupero l'ultimo task (quello ancora da eseguire)...
                         if (el.historyTask.endTime === null) {
-                            //...e gli metto le variabili
                             vm.activeTask = el.historyTask;
+                            //...e gli metto le variabili
                             vm.activeTask.variabili = activeTaskVariables;
                         }
                     })
