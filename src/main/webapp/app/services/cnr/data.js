@@ -300,12 +300,12 @@
                 getElenco: function () {
                     return $http.get("api/manual");
                 },
-                getManuale: function (nameFile) {
+                getManuale: function (nameDoc) {
                     return $http({
                         url: 'api/manual/doc',
                         method: 'GET',
                         params: {
-                            nameFile: nameFile
+                            nameDoc: nameDoc
                         },
                     });
                 }
