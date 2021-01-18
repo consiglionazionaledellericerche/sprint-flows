@@ -76,6 +76,7 @@ public class FlowsAttachmentService {
      * Estraggo i singoli parametri dalla mappa in un {@link FlowsAttachment} att aggiornato, secondo il fileName
      *
      * Se passo un att nullo, verra' creato un att nuovo
+     * Se non passo ne' bytes ne' nodeRef, verra' restituito null
      *
      * @param att           att
      * @param data          att
@@ -84,7 +85,7 @@ public class FlowsAttachmentService {
      * @param processKey    att
      * @param fileName      att
      * @param path          att
-     * @return att nuovo o aggiornato
+     * @return att nuovo o aggiornato, o null
      */
     public FlowsAttachment extractSingleAttachment(FlowsAttachment att, Map<String, Object> data, String taskId, String taskName, String processKey, String fileName, String path) {
 
@@ -110,8 +111,11 @@ public class FlowsAttachmentService {
             att.setUrl(nodeRef);
             att.setMimetype( (String) data.get(fileName + "_mimetype") );
             att.setPath( (String) data.get(fileName + "_path") );
-        } else
-            throw new RuntimeException("File vuoto: "+ fileName);
+        } 
+        else {
+            LOGGER.warn("File Vuoto: "+ fileName);
+            return null;
+        }
 
         return att;
     }
