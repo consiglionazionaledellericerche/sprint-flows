@@ -44,13 +44,14 @@ public class FlowsManualResource {
         return ResponseEntity.ok(paths);
     }
 
-    @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+
+    @RequestMapping(value = "/doc", method = RequestMethod.GET, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @ResponseBody
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<byte[]> getManuale(
-            @RequestParam("manuale") String manuale) throws IOException {
-        StorageObject manObject = storeService.getStorageObjectByPath(DIR_MANUALI + manuale, false);
+            @RequestParam("nameDoc") String nameDoc) throws IOException {
+        StorageObject manObject = storeService.getStorageObjectByPath(DIR_MANUALI + nameDoc, false);
 
         InputStream stream = storeService.getResource(manObject.getKey());
 
