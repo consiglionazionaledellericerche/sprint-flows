@@ -51,6 +51,7 @@ public class FlowsManualResource {
     @Timed
     public ResponseEntity<byte[]> getManuale(
             @RequestParam("nameDoc") String nameDoc) throws IOException {
+
         StorageObject manObject = storeService.getStorageObjectByPath(DIR_MANUALI + nameDoc, false);
 
         InputStream stream = storeService.getResource(manObject.getKey());
