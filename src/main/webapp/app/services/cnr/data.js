@@ -307,6 +307,7 @@
                         params: {
                             nameDoc: nameDoc
                         },
+                        responseType: 'arraybuffer'
                     });
                 }
             },
