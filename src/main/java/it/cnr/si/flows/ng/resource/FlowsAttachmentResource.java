@@ -119,9 +119,10 @@ public class FlowsAttachmentResource {
                     .stream()
                     .map(h -> (HistoricDetailVariableInstanceUpdateEntity) h)
                     .filter(h -> h.getName().equals(attachmentName))
+                    // TODO rimuovere questo obbrobbrio
                     .map(h -> {
                         FlowsAttachment a = (FlowsAttachment) h.getValue();
-                        a.setUrl("api/attachments/"+ h.getId() +"/data");
+                        a.setUrl("api/attachments/byAttachmentId/"+ processInstanceId +"/"+ h.getId() +"/data");
                         return a;
                     })
                     .sorted( (l, r) -> l.getTime().compareTo(r.getTime()) )
@@ -270,27 +271,30 @@ public class FlowsAttachmentResource {
         }
     }
 
-// TODO martin - eliminare per 15/04/2021
+    @RequestMapping(value = "byAttachmentId/{processInstanceId}/{variableId}/data", method = RequestMethod.GET)
+    @ResponseBody
+    @PreAuthorize("@permissionEvaluator.canUpdateAttachment(#processInstanceId, @flowsUserDetailsService)")
+    @Timed
+    public void getHistoricAttachment(
+            HttpServletResponse response,
+            @PathVariable("processInstanceId") String processInstanceId,
+            @PathVariable("variableId") String variableId) throws IOException {
 
-//    @RequestMapping(value = "{variableId}/data", method = RequestMethod.GET)
-//    @ResponseBody
-//    @Secured(AuthoritiesConstants.USER)
-//    @Timed
-//    public void getHistoricAttachment(
-//            HttpServletResponse response,
-//            @PathVariable("variableId") String variableId) throws IOException {
-//
-//        HistoricDetailVariableInstanceUpdateEntity variable = (HistoricDetailVariableInstanceUpdateEntity)
-//                historyService.createHistoricDetailQuery()
-//                        .id(variableId)
-//                        .singleResult();
-//        FlowsAttachment attachment = (FlowsAttachment) variable.getValue();
-//
-//        ServletOutputStream output = response.getOutputStream();
-//        response.setContentType(attachment.getMimetype());
-//        InputStream baos = flowsAttachmentService.getAttachmentContent(attachment.getUrl());
-//        IOUtils.copy(baos, output);
-//    }
+        HistoricDetailVariableInstanceUpdateEntity variable = (HistoricDetailVariableInstanceUpdateEntity)
+                historyService.createHistoricDetailQuery()
+                        .id(variableId)
+                        .singleResult();
+        FlowsAttachment attachment = (FlowsAttachment) variable.getValue();
+
+        if(!variable.getProcessInstanceId().equals(processInstanceId))
+            response.sendError(403);
+        else {
+            ServletOutputStream output = response.getOutputStream();
+            response.setContentType(attachment.getMimetype());
+            InputStream baos = flowsAttachmentService.getAttachmentContent(attachment.getUrl());
+            IOUtils.copy(baos, output);
+        }
+    }
 
     @RequestMapping(value = "task/{taskId}/{attachmentName}/data", method = RequestMethod.GET)
     @ResponseBody
