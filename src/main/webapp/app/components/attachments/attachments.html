@@ -45,7 +45,7 @@
                 L'utente <strong>{{file.username}}</strong> <br>
                 <span ng-if="file.metadati.azione">ha compiuto l'azione <strong>{{file.metadati.azione}}</strong><br></span>
                 <span ng-if="file.metadati.azione == 'SostituzioneProtocollo'">con motivo <strong>{{file.metadati.motivoSostituzione}}</strong><br></span>
-                sul file <a href ng-click="downloadFile(file.url, file.filename, file.mimetype)">{{file.filename}}</a>
+                sul file {{file.url}} <a href ng-click="downloadFile(file.url, file.filename, file.mimetype)">{{file.filename}}</a>
                 <span ng-repeat="state in file.metadati.stati">
                     <span class="label label-primary label-{{state}}">{{state}}
                         <span ng-if="stato == 'Protocollato'"> ({{file.numeroProtocollo}})</span>
