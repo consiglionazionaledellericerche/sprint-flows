@@ -5,16 +5,17 @@
     .module("sprintApp")
     .controller("AvailableTasksController", AvailableTasksController);
 
-  AvailableTasksController.$inject = ["$scope", "paginationConstants", "dataService", "utils", "$log", "$location"];
+  AvailableTasksController.$inject = ["$scope", "paginationConstants", "dataService", "utils", "$log", "$localStorage"];
 
-  function AvailableTasksController($scope, paginationConstants, dataService, utils, $log, $location) {
+  function AvailableTasksController($scope, paginationConstants, dataService, utils, $log, $localStorage) {
     var vm = this;
-    //Carico i parametri di ricerca "salvati" se torno dlla pagine dei "details"
-    vm.searchParams = $location.search();
-    vm.searchParams.active = $location.search().active || true;
-    vm.searchParams.order = $location.search().order || "ASC";
-    vm.searchParams.page = $location.search().page || 1;
-    vm.searchParams.processDefinitionKey = $location.search().processDefinitionKey || "all";
+
+    // Metto i parametri della ricerca e la processDefinitionKey in
+    // $localStorage per "salvarli" quando dalla pagina dei "dettagli" ritorno alla pagina dei "i miei 
+    if($localStorage.searchParams && $scope.fromState.url.includes('/details'))
+        vm.searchParams = $localStorage.searchParams;
+    if($localStorage.processDefinitionKey && $scope.fromState.url.includes('/details'))
+        vm.processDefinitionKey = $localStorage.processDefinitionKey;
 
     vm.order = "ASC";
     // variabili per la paginazione delle due pagine (availableTask e myTask)
@@ -36,6 +37,7 @@
       // variabili usate nella paginazione
       var myFirstResult,
         myMaxResults;
+//        searchParams = {};
 
       // carico le form di ricerca specifiche per ogni tipologia di Process Definitions
       $scope.formUrl = utils.loadSearchFields(vm.processDefinitionKey, true);
@@ -51,7 +53,9 @@
           myFirstResult,
           myMaxResults,
           vm.order,
-          utils.populateTaskParams(vm.searchParams)
+          utils.populateTaskParams(vm.searchParams),
+          $localStorage.searchParams = vm.searchParams,
+          $localStorage.processDefinitionKey = vm.processDefinitionKey
         )
         .then(
           function(response) {
@@ -81,7 +85,9 @@
           firstResultAvailable,
           maxResultsAvailable,
           vm.order,
-          utils.populateTaskParams(vm.searchParams)
+          utils.populateTaskParams(vm.searchParams),
+          $localStorage.searchParams = vm.searchParams,
+          $localStorage.processDefinitionKey = vm.processDefinitionKey
         )
         .then(
           function(response) {
@@ -111,7 +117,9 @@
           firstResultTAIMG,
           maxResultsTAIMG,
           vm.order,
-          utils.populateTaskParams(vm.searchParams)
+          utils.populateTaskParams(vm.searchParams),
+          $localStorage.searchParams = vm.searchParams,
+          $localStorage.processDefinitionKey = vm.processDefinitionKey
         )
         .then(
           function(response) {
@@ -147,8 +155,6 @@
     };
 
     $scope.loadTasks = function() {
-      //"salvo" i parametri di ricerca
-      $location.search(vm.searchParams);
       $scope.loadMyTasks();
       $scope.loadAvailableTasks();
       $scope.loadTaskAssignedInMyGroups();
