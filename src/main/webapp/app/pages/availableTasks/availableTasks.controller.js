@@ -5,10 +5,17 @@
     .module("sprintApp")
     .controller("AvailableTasksController", AvailableTasksController);
 
-  AvailableTasksController.$inject = ["$scope", "paginationConstants", "dataService", "utils", "$log"];
+  AvailableTasksController.$inject = ["$scope", "paginationConstants", "dataService", "utils", "$log", "$location"];
 
-  function AvailableTasksController($scope, paginationConstants, dataService, utils, $log) {
+  function AvailableTasksController($scope, paginationConstants, dataService, utils, $log, $location) {
     var vm = this;
+    //Carico i parametri di ricerca "salvati" se torno dlla pagine dei "details"
+    vm.searchParams = $location.search();
+    vm.searchParams.active = $location.search().active || true;
+    vm.searchParams.order = $location.search().order || "ASC";
+    vm.searchParams.page = $location.search().page || 1;
+    vm.searchParams.processDefinitionKey = $location.search().processDefinitionKey || "all";
+
     vm.order = "ASC";
     // variabili per la paginazione delle due pagine (availableTask e myTask)
     vm.myPage = 1;
@@ -28,8 +35,7 @@
     $scope.loadMyTasks = function() {
       // variabili usate nella paginazione
       var myFirstResult,
-        myMaxResults,
-        searchParams = {};
+        myMaxResults;
 
       // carico le form di ricerca specifiche per ogni tipologia di Process Definitions
       $scope.formUrl = utils.loadSearchFields(vm.processDefinitionKey, true);
@@ -141,6 +147,8 @@
     };
 
     $scope.loadTasks = function() {
+      //"salvo" i parametri di ricerca
+      $location.search(vm.searchParams);
       $scope.loadMyTasks();
       $scope.loadAvailableTasks();
       $scope.loadTaskAssignedInMyGroups();
