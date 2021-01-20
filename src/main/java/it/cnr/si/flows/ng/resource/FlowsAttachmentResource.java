@@ -273,7 +273,7 @@ public class FlowsAttachmentResource {
 
     @RequestMapping(value = "byAttachmentId/{processInstanceId}/{variableId}/data", method = RequestMethod.GET)
     @ResponseBody
-    @PreAuthorize("@permissionEvaluator.canUpdateAttachment(#processInstanceId, @flowsUserDetailsService)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
     @Timed
     public void getHistoricAttachment(
             HttpServletResponse response,
