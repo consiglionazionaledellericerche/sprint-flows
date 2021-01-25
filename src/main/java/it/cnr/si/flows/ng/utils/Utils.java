@@ -202,10 +202,13 @@ public final class Utils {
                 }
             }
 
-            //la "Fase" equivale al nome del task - quindi bisogna fare una ricerca "a parte" (non in base al "type")
+            //la "Fase" equivale al nome del task - quindi bisogna fare una ricerca "a parte" (non in base al "type") ...
             if (key.equals("Fase")) {
                 taskQuery.taskNameLikeIgnoreCase("%" + value + "%");
-            } else {
+            }else if (key.equals("businessKey")) {
+                //... stesso discorso per la "businessKey"
+                taskQuery.processInstanceBusinessKeyLike("%" + value + "%");
+            }else {
                 //wildcard ("%") di default ma non a TUTTI i campi
                 switch (type) {
                     case TEXT_EQUAL:
@@ -287,7 +290,7 @@ public final class Utils {
         public String getPersona() {
             return persona;
         }
-        
+
         public String getCdsuo() {
             return cdsuo;
         }
@@ -299,7 +302,7 @@ public final class Utils {
         public void setCdsuo(String cdsuo) {
             this.cdsuo = cdsuo;
         }
-        
+
         public void setPersona(String persona) {
             this.persona = persona;
         }
@@ -324,7 +327,7 @@ public final class Utils {
     public boolean getBoolean(Map<String, String> params, String paramName, boolean defaultValue) {
         return Boolean.parseBoolean( getString(params, paramName, String.valueOf(defaultValue)) ) ;
     }
-    
+
     public static boolean isFullPath(String path) {
         try {
             String regex = "^.*/.+[.]\\D{3,6}$";
@@ -332,7 +335,7 @@ public final class Utils {
         } catch (Exception e) {
             return false;
         }
-        
+
     }
 
 
