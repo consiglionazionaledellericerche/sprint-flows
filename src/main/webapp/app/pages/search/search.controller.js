@@ -9,13 +9,14 @@
     var vm = this,
       oldUrl = $scope.formUrl;
 
-    $scope.reload = false;
 
+    $scope.reload = false;
+    // "conservo" i parametri della ricerca  ...
     vm.searchParams = $location.search();
     vm.searchParams.active = $location.search().active || true;
     vm.searchParams.order = $location.search().order || "ASC";
     vm.searchParams.page = $location.search().page || 1;
-    vm.searchParams.processDefinitionKey = "all";
+    vm.searchParams.processDefinitionKey = $location.search().processDefinitionKey || "all";
 
     $scope.search = function() {
       //serve per evitare di ricaricare le form di ricerca associate alla Process Definition ad ogni nuova ricerca
