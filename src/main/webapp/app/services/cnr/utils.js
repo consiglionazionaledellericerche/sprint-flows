@@ -88,8 +88,9 @@
                             appo.type = value.substr(0, value.indexOf('=') + 1);
                             appo.key = key;
                             appo.value = value.substr(value.indexOf('=') + 1);
-
-                            searchParamsToSent.push(appo);
+                            //serve per in caso di cancellazione di un parametro di ricerca
+                            if(appo.value !== "")
+                                searchParamsToSent.push(appo);
                         }
                     });
                 }
