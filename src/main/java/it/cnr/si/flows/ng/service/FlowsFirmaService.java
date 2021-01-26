@@ -171,14 +171,15 @@ public class FlowsFirmaService {
             SignReturnV2 response = service.pdfsignatureV2(req, apparence,
                     PdfProfile.fromValue(RemotePdfprofile), null, null);
 
-            LOGGER.debug(response.getReturnCode() + " " + response.getStatus());
+            LOGGER.debug(response.getReturnCode() +" "+ response.getStatus() +" "+ response.getDescription());
 
             if (response.getStatus().equals(STATUS_OK)) {
                 return response.getBinaryoutput();
             } else {
                 throw new ArubaSignServiceException("Server side error code "
                         + response.getReturnCode() + ", "
-                        + response.getStatus());
+                        + response.getStatus() + ", "
+                        + response.getDescription());
             }
 
         } catch (TypeOfTransportNotImplemented_Exception e) {
