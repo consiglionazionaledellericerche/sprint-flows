@@ -3,6 +3,7 @@ package it.cnr.si.flows.ng.service;
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Firma;
 import static it.cnr.si.flows.ng.utils.Enum.Stato.Firmato;
 
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
 import it.cnr.si.firmadigitale.firma.arss.stub.PdfSignApparence;
+import it.cnr.si.firmadigitale.firma.arss.stub.SignReturnV2;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
 
@@ -42,7 +44,7 @@ public class FirmaDocumentoService {
 		nomiVariabiliFile.add(nomeVariabileFile);
 		eseguiFirma(execution, nomiVariabiliFile, null);
 
-		}
+	}
 
 	public void eseguiFirma(DelegateExecution execution, List<String> nomiVariabiliFile, PdfSignApparence apparence) {
 
@@ -105,6 +107,73 @@ public class FirmaDocumentoService {
 		}
 	}
 
+
+	public void eseguiFirmaMultipla(DelegateExecution execution, List<String> nomiVariabiliFile, PdfSignApparence apparence) {
+
+		TaskService taskService = execution.getEngineServices().getTaskService();
+
+		if (nomiVariabiliFile == null)
+			throw new IllegalStateException("Questo Listener ha bisogno di almeno un campo 'nomiVariabiliFile' nella process definition (nel Task Listener - Fields).");
+		if (execution.getVariable("sceltaUtente") != null &&
+				!"Firma Multipla".equals(execution.getVariable("sceltaUtente")) &&
+				"Firma".equals(execution.getVariable("sceltaUtente")) ) {
+
+			String stringaOscurante = "******";
+			// TODO: validare presenza di queste tre variabili
+			String username = (String) execution.getVariable("username");
+			String password = (String) execution.getVariable("password");
+			String otp = (String) execution.getVariable("otp");
+			String textMessage = "";
+			List<byte[]> bytes = new ArrayList();
+			List<FlowsAttachment> att = new ArrayList();
+
+			for (int i = 0; i < nomiVariabiliFile.size(); i++) {
+				String nomeVariabileFile = nomiVariabiliFile.get(i);
+				att.add((FlowsAttachment) execution.getVariable(nomeVariabileFile));
+				byte[] byteSingle = flowsAttachmentService.getAttachmentContentBytes(att.get(i));
+				bytes.add(flowsAttachmentService.getAttachmentContentBytes(att.get(i)));
+			}
+			try {
+				List<SignReturnV2> bytesMultiplifirmati = flowsFirmaService.firmaMultipla(username, password, otp, bytes, apparence);
+				for (int i = 0; i < bytesMultiplifirmati.size(); i++) {
+
+					att.get(i).setFilename(getSignedFilename(att.get(i).getFilename()));
+					att.get(i).setAzione(Firma);
+					att.get(i).addStato(Firmato);
+					//setto l`username dell`utente che sta eseguendo la firma e la data
+					att.get(i).setUsername(SecurityUtils.getCurrentUserLogin());
+					att.get(i).setTime(new Date());
+
+					flowsAttachmentService.saveAttachment(execution, nomiVariabiliFile.get(i), att.get(i), bytesMultiplifirmati.get(i).getBinaryoutput());
+
+					String taskId = execution.getVariable("taskId", String.class);
+					taskService.setVariable(taskId, "otp", stringaOscurante);
+					taskService.setVariable(taskId, "password", stringaOscurante);
+					execution.setVariable("otp", stringaOscurante);
+					execution.setVariable("password", stringaOscurante);
+				}
+			} catch (ArubaSignServiceException e) {
+				LOGGER.error("FIRMA NON ESEGUITA", e);
+				if (e.getMessage().indexOf("error code 0001") != -1) {
+					textMessage = "-- errore generico --"
+							+ "<br>- veirificare che l'estensione del file sia di tipo PDF"
+							+ "<br>- veirificare la corretta digitazione del codice OTP"
+							+ "<br>se il problema persiste"
+							+ "<br>provare a risincronizzare il dispositivo OTP"
+							+ "<br>seguendo le istruzioni presenti nella pagina"
+							+ "<br>Manualistica&Faq<br>";
+				} else if(e.getMessage().indexOf("error code 0003") != -1) {
+					textMessage = "CREDENZIALI ERRATE<br>";
+				} else if(e.getMessage().indexOf("error code 0004") != -1) {
+					textMessage = "PIN ERRATO<br>";
+				} else {
+					textMessage = "errore generico<br>";
+				}
+				throw new BpmnError("500", "<b>FIRMA NON ESEGUITA<br>" + textMessage + "</b>");
+			}
+		}
+	}
+
 	public static String getSignedFilename(String filename) {
 		String result = filename.substring(0, filename.lastIndexOf('.'));
 		result += ".signed";
@@ -113,3 +182,6 @@ public class FirmaDocumentoService {
 	}
 
 }
+
+
+
