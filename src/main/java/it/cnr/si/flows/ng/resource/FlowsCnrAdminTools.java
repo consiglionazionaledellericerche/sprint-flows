@@ -44,13 +44,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import it.cnr.si.service.ExternalMessageSender;
-import it.cnr.si.flows.ng.command.AddIdentityLinkForHistoricProcessInstanceCmd;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import static it.cnr.si.flows.ng.utils.Utils.*;
 
@@ -171,14 +171,15 @@ public class FlowsCnrAdminTools {
         return ResponseEntity.ok(result);
     }
     
-    @RequestMapping(value = "addHistoricIdentityLink/{procInstId}/{userId:.*}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "addHistoricIdentityLink", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> addHistoricIdentityLink(
-            @PathVariable("procInstId") String procInstId, 
-            @PathVariable("userId") String userId) {
+            @RequestParam("procInstId") String procInstId,
+            @RequestParam(name = "userId", required = false) String userId,
+            @RequestParam(value = "groupId", required = false) String groupId) {
 
-        AddIdentityLinkForHistoricProcessInstanceCmd cmd = new AddIdentityLinkForHistoricProcessInstanceCmd(procInstId, userId, null, Utils.PROCESS_VISUALIZER);
+        AddIdentityLinkForHistoricProcessInstanceCmd cmd = new AddIdentityLinkForHistoricProcessInstanceCmd(procInstId, userId, groupId, Utils.PROCESS_VISUALIZER);
         processEngine.getManagementService().executeCommand(cmd);
-//        Context.getCommandContext().getHistoryManager().recordIdentityLinkCreated(identityLinkEntity);
+
         return ResponseEntity.ok().build();
     }
     
@@ -302,11 +303,7 @@ public class FlowsCnrAdminTools {
             throw new ActivitiObjectNotFoundException("Cannot find process instance with id " + processInstanceId, HistoricProcessInstance.class);
           }
 
-          //  String id = dbSqlSessionFactory.getIdGenerator().getNextId();  
-
-//          commandContext.getHistoryManager().createProcessInstanceIdentityLinkComment(processInstanceId, userId, groupId, type, true);
           HistoricIdentityLinkEntity il = new HistoricIdentityLinkEntity();
-          il.setGroupId(this.groupId);
           il.setProcessInstanceId(processInstanceId);
           il.setGroupId(this.groupId);
           il.setUserId(this.userId);
