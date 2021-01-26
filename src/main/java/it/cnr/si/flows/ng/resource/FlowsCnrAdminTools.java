@@ -4,6 +4,7 @@ import static it.cnr.si.flows.ng.service.FlowsTaskService.LENGTH_DESCRIZIONE;
 import static it.cnr.si.flows.ng.service.FlowsTaskService.LENGTH_STATO;
 import static it.cnr.si.flows.ng.service.FlowsTaskService.LENGTH_TITOLO;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -14,10 +15,23 @@ import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
 
 import javax.inject.Inject;
+import javax.websocket.server.PathParam;
 
+import org.activiti.engine.ActivitiIllegalArgumentException;
+import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.HistoryService;
+import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricVariableInstance;
+import org.activiti.engine.impl.cmd.AddIdentityLinkForProcessInstanceCmd;
+import org.activiti.engine.impl.context.Context;
+import org.activiti.engine.impl.interceptor.Command;
+import org.activiti.engine.impl.interceptor.CommandContext;
+import org.activiti.engine.impl.persistence.entity.HistoricIdentityLinkEntity;
+import org.activiti.engine.impl.persistence.entity.HistoricIdentityLinkEntityManager;
+import org.activiti.engine.impl.persistence.entity.IdentityLinkEntity;
+import org.activiti.engine.impl.persistence.entity.IdentityLinkEntityManager;
+import org.activiti.engine.task.IdentityLinkType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -30,6 +44,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import it.cnr.si.service.ExternalMessageSender;
+import it.cnr.si.flows.ng.command.AddIdentityLinkForHistoricProcessInstanceCmd;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
@@ -55,7 +70,8 @@ public class FlowsCnrAdminTools {
     private AceBridgeService aceBridgeService;
     @Inject
     private ExternalMessageSender extenalMessageSender;
-    
+    @Inject
+    private ProcessEngine processEngine;
 
     @RequestMapping(value = "/resendExternalMessages", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
@@ -155,6 +171,17 @@ public class FlowsCnrAdminTools {
         return ResponseEntity.ok(result);
     }
     
+    @RequestMapping(value = "addHistoricIdentityLink/{procInstId}/{userId:.*}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> addHistoricIdentityLink(
+            @PathVariable("procInstId") String procInstId, 
+            @PathVariable("userId") String userId) {
+
+        AddIdentityLinkForHistoricProcessInstanceCmd cmd = new AddIdentityLinkForHistoricProcessInstanceCmd(procInstId, userId, null, Utils.PROCESS_VISUALIZER);
+        processEngine.getManagementService().executeCommand(cmd);
+//        Context.getCommandContext().getHistoryManager().recordIdentityLinkCreated(identityLinkEntity);
+        return ResponseEntity.ok().build();
+    }
+    
     // mtrycz 06/01/21 - metodo disabilitato, ci era servito una volta.
     // @RequestMapping(value = "aggiornaName/{aggiorna}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> agiornaName(@PathVariable("aggiorna") Boolean aggiorna) {
@@ -230,4 +257,65 @@ public class FlowsCnrAdminTools {
 
         return name.toString();
     }
+    
+    public class AddIdentityLinkForHistoricProcessInstanceCmd implements Command<Void>, Serializable {
+
+        private static final long serialVersionUID = 1L;
+
+        protected String processInstanceId;
+
+        protected String userId;
+
+        protected String groupId;
+
+        protected String type;
+
+        public AddIdentityLinkForHistoricProcessInstanceCmd(String processInstanceId, String userId, String groupId, String type) {
+          validateParams(processInstanceId, userId, groupId, type);
+          this.processInstanceId = processInstanceId;
+          this.userId = userId;
+          this.groupId = groupId;
+          this.type = type;
+        }
+
+        protected void validateParams(String processInstanceId, String userId, String groupId, String type) {
+
+          if (processInstanceId == null) {
+            throw new ActivitiIllegalArgumentException("processInstanceId is null");
+          }
+
+          if (type == null) {
+            throw new ActivitiIllegalArgumentException("type is required when adding a new process instance identity link");
+          }
+
+          if (userId == null && groupId == null) {
+            throw new ActivitiIllegalArgumentException("userId and groupId cannot both be null");
+          }
+
+        }
+
+        public Void execute(CommandContext commandContext) {
+
+          HistoricProcessInstance processInstance = commandContext.getHistoricProcessInstanceEntityManager().findHistoricProcessInstance(processInstanceId);
+
+          if (processInstance == null) {
+            throw new ActivitiObjectNotFoundException("Cannot find process instance with id " + processInstanceId, HistoricProcessInstance.class);
+          }
+
+          //  String id = dbSqlSessionFactory.getIdGenerator().getNextId();  
+
+//          commandContext.getHistoryManager().createProcessInstanceIdentityLinkComment(processInstanceId, userId, groupId, type, true);
+          HistoricIdentityLinkEntity il = new HistoricIdentityLinkEntity();
+          il.setGroupId(this.groupId);
+          il.setProcessInstanceId(processInstanceId);
+          il.setGroupId(this.groupId);
+          il.setUserId(this.userId);
+          il.setType(this.type);
+
+          commandContext.getDbSqlSession().insert(il);
+          return null;
+        }
+
+      }
+
 }
