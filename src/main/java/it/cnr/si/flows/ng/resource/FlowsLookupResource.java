@@ -1,14 +1,14 @@
 package it.cnr.si.flows.ng.resource;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-
+import it.cnr.si.flows.ng.ldap.LdapPersonToSearchResultMapper;
+import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.FlowsSiperService;
+import it.cnr.si.flows.ng.utils.SecurityUtils;
+import it.cnr.si.flows.ng.utils.Utils;
+import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.service.FlowsLdapAccountService;
+import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -23,14 +23,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import it.cnr.si.flows.ng.ldap.LdapPersonToSearchResultMapper;
-import it.cnr.si.flows.ng.service.AceBridgeService;
-import it.cnr.si.flows.ng.utils.SecurityUtils;
-import it.cnr.si.flows.ng.utils.Utils;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.service.FlowsLdapAccountService;
-import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
-import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
+import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/lookup")
@@ -98,9 +96,9 @@ public class FlowsLookupResource {
                     Integer id = Integer.parseInt(idEo);
                     return aceBridgeService.getStrutturaById(id);
                 })
-                .map(eo -> {
-                    return new Utils.SearchResult(String.valueOf(eo.getId()), eo.getCdsuo() +" - "+ eo.getDenominazione());
-                }).collect(Collectors.toList());
+                .map(eo -> new Utils.SearchResult(String.valueOf(eo.getId()),
+                                              eo.getIdnsip() +" - "+ eo.getDenominazione() + ", " + aceBridgeService.personaEntitaOrganizzativaById(eo.getId()).getEntitaOrganizzativa().getIndirizzoPrincipale().getComune()))
+                .collect(Collectors.toList());
 
         return ResponseEntity.ok(CDSUOs);
     }
