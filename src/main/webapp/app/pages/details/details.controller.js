@@ -81,8 +81,7 @@
 					$scope.canUpdateAttachments = response.data.canUpdateAttachments;
 					$scope.canSign = false;
 
-					$scope.isResponsabile = (vm.authorities.includes("ROLE_responsabile-struttura@" + vm.data.entity.variabili.idStruttura) ||
-							vm.authorities.includes("ROLE_responsabile#flussi") ||
+					$scope.isResponsabile = (vm.authorities.includes(vm.authorities.includes("ROLE_responsabile#flussi") ||
 							vm.authorities.includes("ROLE_responsabile#" + vm.data.entity.processDefinitionId.split(':')[0] + "@0000") ||
 							vm.authorities.includes("ROLE_responsabile#" + vm.data.entity.processDefinitionId.split(':')[0] + "@" + vm.data.entity.variabili.idStruttura) ||
 							vm.authorities.includes("ROLE_ADMIN"));
