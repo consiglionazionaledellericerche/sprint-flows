@@ -55,7 +55,7 @@ public class FlowsAuthoritiesPopulator implements LdapAuthoritiesPopulator {
 
         list.addAll(fullGrantedAuthorities);
 
-        log.info("Full Groups for {}, including from local relationship {}", username, fullGrantedAuthorities);
+        log.debug("Full Groups for {}, including from local relationship {}", username, fullGrantedAuthorities);
 
         return list;
     }

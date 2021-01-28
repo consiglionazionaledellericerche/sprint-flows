@@ -40,7 +40,7 @@ import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDt
 import static it.cnr.si.flows.ng.utils.Utils.*;
 
 @Controller
-@RequestMapping("api/attachments")
+@RequestMapping("api/admin")
 @Secured(AuthoritiesConstants.ADMIN)
 @Profile("cnr")
 public class FlowsCnrAdminTools {
@@ -155,38 +155,27 @@ public class FlowsCnrAdminTools {
         return ResponseEntity.ok(result);
     }
     
-    @RequestMapping(value = "aggiornaName/{aggiorna}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    // mtrycz 06/01/21 - metodo disabilitato, ci era servito una volta.
+    // @RequestMapping(value = "aggiornaName/{aggiorna}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> agiornaName(@PathVariable("aggiorna") Boolean aggiorna) {
         
         List<HistoricProcessInstance> instances = historyService
             .createHistoricProcessInstanceQuery()
-            .processInstanceNameLike("{\"stato\":\"\"%")
+            .processInstanceNameLike("{\"stato\":\"\"%") // prendo le PI con lo stato vuoto
             .list();
         
         instances.stream().forEach(pi -> {
 
             log.info("Processo la ProcessInstance "+ pi.getId() +" con name "+ pi.getName());
             
-            HistoricVariableInstance statoFinale = null;
-            if(pi.getProcessDefinitionKey().equals("missioni")) {
-                statoFinale = historyService
-                        .createHistoricVariableInstanceQuery()
-                        .processInstanceId(pi.getId())
-                        .variableName("STATO_FINALE_DOMANDA")
-                        .singleResult();
-            } else if (pi.getProcessDefinitionKey().contains("covid")) {
-                statoFinale = historyService
-                        .createHistoricVariableInstanceQuery()
-                        .processInstanceId(pi.getId())
-                        .variableName("statoFinaleDomanda")
-                        .singleResult();
-            } else {
-                log.info("Parametro sconosciuto per la pi "+ pi.getId() +", la salto.");
-                return;
-            }
+            HistoricVariableInstance statoFinale = historyService
+                    .createHistoricVariableInstanceQuery()
+                    .processInstanceId(pi.getId())
+                    .variableName("statoFinale")
+                    .singleResult();
             
             if (statoFinale == null || statoFinale.getValue() == null) {
-                log.info("Questa pi non ha lo stato finale: "+ pi.getId());
+                log.info("Questa pi non ha lo statoFinale: "+ pi.getId());
                 return;
             }
             

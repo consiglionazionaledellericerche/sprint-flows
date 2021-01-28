@@ -8,7 +8,7 @@
 	function DetailsController($scope, $rootScope, Principal, $state, $localStorage, dataService, AlertService, $log, utils, $uibModal) {
 		$scope.button={};
 		$scope.button.disabled = true;
-		var vm = this;
+		var vm = this, activeTaskVariables;
 		vm.searchParams = {};
 		vm.data = {};
 		vm.taskId = $state.params.taskId;
@@ -44,12 +44,14 @@
 					vm.data.businessKey = response.data.entity.businessKey;
 
     				vm.data.history = response.data.history;
+    				//aggiungo le variabili del task (servono quando si aggiunge il task al carrello firma)
+    				activeTaskVariables = response.data.entity.variabili;
                     vm.data.history.forEach(function(el) {
-                        //recupero l'ultimo task (quello ancora da eseguire)
+                        //recupero l'ultimo task (quello ancora da eseguire)...
                         if (el.historyTask.endTime === null) {
-                            //recupero la fase
                             vm.activeTask = el.historyTask;
-                            utils.refactoringVariables(vm.activeTask);
+                            //...e gli metto le variabili
+                            vm.activeTask.variabili = activeTaskVariables;
                         }
                     })
 
