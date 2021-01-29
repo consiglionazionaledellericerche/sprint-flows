@@ -97,7 +97,7 @@ public class FlowsLookupResource {
                     return aceBridgeService.getStrutturaById(id);
                 })
                 .map(eo -> new Utils.SearchResult(String.valueOf(eo.getId()),
-                                              eo.getIdnsip() +" - "+ eo.getDenominazione() + ", " + aceBridgeService.personaEntitaOrganizzativaById(eo.getId()).getEntitaOrganizzativa().getIndirizzoPrincipale().getComune()))
+                                              eo.getIdnsip() +" - "+ eo.getDenominazione() +", "+ eo.getIndirizzoPrincipale().getComune()))
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(CDSUOs);
