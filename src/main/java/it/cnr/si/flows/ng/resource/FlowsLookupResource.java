@@ -55,7 +55,7 @@ public class FlowsLookupResource {
     	String fullname = boss.getUtente().getPersona().getNome() +" "+ boss.getUtente().getPersona().getCognome();
         return ResponseEntity.ok(new Utils.SearchResult(fullname, fullname));
     }
-    
+
     @RequestMapping(value = "/ace/user/{username:.+}", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.ADMIN)
     public Set<String> getAce(@PathVariable String username) {
@@ -107,8 +107,6 @@ public class FlowsLookupResource {
     @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Utils.SearchResult> getUserByUsername(@PathVariable String username) {
 
-        Map<String, Object> response = new HashMap<>();
-
         ContainerCriteria criteria = LdapQueryBuilder.query().where("uid").is(username);
         List<Utils.SearchResult> result = ldapTemplate.search( criteria, new LdapPersonToSearchResultMapper());
 
@@ -118,8 +116,6 @@ public class FlowsLookupResource {
     @RequestMapping(value = "/ldap/userfull/{username:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Map<String, String>> getFullUserByUsername(@PathVariable String username) {
-
-        Map<String, Object> response = new HashMap<>();
 
         List<Map<String, String>> result = flowsLdapAccountService.getFulluser(username);
 
