@@ -1,14 +1,14 @@
 package it.cnr.si.flows.ng.resource;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-
+import it.cnr.si.flows.ng.ldap.LdapPersonToSearchResultMapper;
+import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.FlowsSiperService;
+import it.cnr.si.flows.ng.utils.SecurityUtils;
+import it.cnr.si.flows.ng.utils.Utils;
+import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.service.FlowsLdapAccountService;
+import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -23,14 +23,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import it.cnr.si.flows.ng.ldap.LdapPersonToSearchResultMapper;
-import it.cnr.si.flows.ng.service.AceBridgeService;
-import it.cnr.si.flows.ng.utils.SecurityUtils;
-import it.cnr.si.flows.ng.utils.Utils;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.service.FlowsLdapAccountService;
-import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
-import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
+import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/lookup")
@@ -57,7 +55,7 @@ public class FlowsLookupResource {
     	String fullname = boss.getUtente().getPersona().getNome() +" "+ boss.getUtente().getPersona().getCognome();
         return ResponseEntity.ok(new Utils.SearchResult(fullname, fullname));
     }
-    
+
     @RequestMapping(value = "/ace/user/{username:.+}", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.ADMIN)
     public Set<String> getAce(@PathVariable String username) {
@@ -98,9 +96,9 @@ public class FlowsLookupResource {
                     Integer id = Integer.parseInt(idEo);
                     return aceBridgeService.getStrutturaById(id);
                 })
-                .map(eo -> {
-                    return new Utils.SearchResult(String.valueOf(eo.getId()), eo.getCdsuo() +" - "+ eo.getDenominazione());
-                }).collect(Collectors.toList());
+                .map(eo -> new Utils.SearchResult(String.valueOf(eo.getId()),
+                                              eo.getIdnsip() +" - "+ eo.getDenominazione() +", "+ eo.getIndirizzoPrincipale().getComune()))
+                .collect(Collectors.toList());
 
         return ResponseEntity.ok(CDSUOs);
     }
@@ -108,8 +106,6 @@ public class FlowsLookupResource {
     @RequestMapping(value = "/ldap/user/{username:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Utils.SearchResult> getUserByUsername(@PathVariable String username) {
-
-        Map<String, Object> response = new HashMap<>();
 
         ContainerCriteria criteria = LdapQueryBuilder.query().where("uid").is(username);
         List<Utils.SearchResult> result = ldapTemplate.search( criteria, new LdapPersonToSearchResultMapper());
@@ -120,8 +116,6 @@ public class FlowsLookupResource {
     @RequestMapping(value = "/ldap/userfull/{username:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Map<String, String>> getFullUserByUsername(@PathVariable String username) {
-
-        Map<String, Object> response = new HashMap<>();
 
         List<Map<String, String>> result = flowsLdapAccountService.getFulluser(username);
 

@@ -7,6 +7,8 @@ import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.RelationshipService;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
+
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
@@ -105,6 +107,11 @@ public class StartAcquistiSetGroupsAndVisibility {
 			runtimeService.addUserIdentityLink(execution.getProcessInstanceId(), applicazioneSigla, PROCESS_VISUALIZER);
 			//            runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), "segreteria@" + struttura, PROCESS_VISUALIZER);
 
+			
+			SimpleEntitaOrganizzativaWebDto strutturaAcquisto = aceService.entitaOrganizzativaById(Integer.parseInt(struttura));
+			execution.setVariable("cdsuo", strutturaAcquisto.getCdsuo());
+			execution.setVariable("idnsip", strutturaAcquisto.getIdnsip());
+			execution.setVariable("denominazione", strutturaAcquisto.getDenominazione());
 			execution.setVariable("gruppoStaffAmministrativo", gruppoStaffAmministrativo);
 			execution.setVariable("gruppoFirmaAcquisti", gruppoFirmaAcquisti);
 			execution.setVariable(Enum.VariableEnum.gruppoStaffAmministrativo.name(), gruppoStaffAmministrativo);

@@ -3,14 +3,14 @@ package it.cnr.si.flows.ng.service;
 import it.cnr.si.flows.ng.exception.UnexpectedResultException;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.service.AceService;
-import it.cnr.si.service.dto.anagrafica.base.PageDto;
 import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
-import it.cnr.si.service.dto.anagrafica.letture.*;
+import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
+import it.cnr.si.service.dto.anagrafica.letture.GerarchiaWebDto;
+import it.cnr.si.service.dto.anagrafica.letture.PersonaEntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
@@ -216,5 +216,9 @@ public class AceBridgeService {
 
 	public BossDto bossFirmatarioByUsername(String username) {
 		return aceService.findResponsabileStruttura(username);
+	}
+
+	public PersonaEntitaOrganizzativaWebDto personaEntitaOrganizzativaById(Integer id) {
+		return aceService.personaEntitaOrganizzativaById(id);
 	}
 }
