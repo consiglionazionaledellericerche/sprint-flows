@@ -155,8 +155,6 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
                 .anyMatch(
                         a -> a.contains(supervisore + "@" + CNR_CODE) ||
                                 a.contains(responsabile + "@" + CNR_CODE) ||
-                                a.contains(supervisoreStruttura + "@" + idStruttura) ||
-                                a.contains(responsabileStruttura + "@" + idStruttura) ||
                                 a.contains(supervisore + "#" + processDefinitionKey + "@" + CNR_CODE) ||
                                 a.contains(responsabile + "#" + processDefinitionKey + "@" + CNR_CODE) ||
                                 a.contains(supervisore + "#" + processDefinitionKey + "@" + idStruttura) ||
@@ -284,8 +282,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
         String tipoFlusso = task.getProcessDefinitionId().split(":")[0];
 
-        return (groups.contains("responsabile-struttura@" + idStruttura) ||
-                groups.contains("responsabile#flussi") ||
+        return (groups.contains("responsabile#flussi") ||
                 groups.contains("responsabile#" + tipoFlusso + "@" + CNR_CODE)||
                 groups.contains("responsabile#" + tipoFlusso + "@" + idStruttura));
     }
@@ -312,7 +309,6 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
         boolean isResponsabile = authorities.stream()
                 .anyMatch(
                         a -> a.contains(responsabile + "@" + CNR_CODE) ||
-                                a.contains(responsabileStruttura + "@" + idStruttura) ||
                                 a.contains(responsabile + "#" + processDefinitionKey + "@" + CNR_CODE) ||
                                 a.contains(responsabile + "#" + processDefinitionKey + "@" + idStruttura) ||
                                 a.contains(responsabile + "#flussi@" + CNR_CODE) ||
