@@ -114,6 +114,7 @@ public class FlowsProcessInstanceService {
                     .createHistoricVariableInstanceQuery()
                     .processInstanceId(processInstanceId)
                     .variableName("linkToOtherWorkflows")
+                    .excludeTaskVariables()
                     .singleResult();
 
 
