@@ -148,10 +148,10 @@ public class FlowsProcessInstanceResource {
 		}
 		return new ResponseEntity(HttpStatus.OK);
 	}
-	
+
 	@DeleteMapping(value = "eraseFinishedProcessInstance", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Secured(AuthoritiesConstants.ADMIN)
-	@Timed	
+	@Timed
 	public ResponseEntity erase(@RequestParam(value = "processInstanceId", required = true) String processInstanceId) {
 		historyService.deleteHistoricProcessInstance(processInstanceId);
 		return new ResponseEntity(HttpStatus.OK);
@@ -222,7 +222,7 @@ public class FlowsProcessInstanceResource {
 	 * @return le process instances da esportare in trasparenza
 	 */
 	@GetMapping(value = "/getProcessInstancesForTrasparenza", produces = MediaType.APPLICATION_JSON_VALUE)
-	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_applicazione-portalecnr@0000')")
+	@PreAuthorize("hasAnyRole('applicazione-portalecnr@0000','ROLE_ADMIN')")
 	@Timed
 	public ResponseEntity<List<Map<String, Object>>> getProcessInstancesForTrasparenza(
 			@RequestParam("firstResult") int firstResult,
@@ -237,7 +237,7 @@ public class FlowsProcessInstanceResource {
 
 
 	@GetMapping(value = "/getProcessInstancesForURP", produces = MediaType.APPLICATION_JSON_VALUE)
-	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_applicazione-portalecnr@0000')")
+	@PreAuthorize("hasAnyRole('ROLE_applicazione-portalecnr@0000','ROLE_ADMIN')")
 	@Timed
 	public ResponseEntity<List<Map<String, Object>>> getProcessInstancesForURP(
 			@RequestParam("terminiRicorso") int terminiRicorso,
