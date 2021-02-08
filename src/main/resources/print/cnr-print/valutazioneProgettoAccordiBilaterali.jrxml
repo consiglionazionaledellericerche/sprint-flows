@@ -208,15 +208,15 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="applicazioneScrivaniaDigitale"/>
 		<fieldDescription><![CDATA[applicazioneScrivaniaDigitale]]></fieldDescription>
 	</field>
-	<field name="punteggio_pianoDiLavoro" class="java.lang.Integer">
+	<field name="punteggio_pianoDiLavoro" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="punteggio_pianoDiLavoro"/>
 		<fieldDescription><![CDATA[punteggio_pianoDiLavoro]]></fieldDescription>
 	</field>
-	<field name="punteggio_qualitaProgetto" class="java.lang.Integer">
+	<field name="punteggio_qualitaProgetto" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="punteggio_qualitaProgetto"/>
 		<fieldDescription><![CDATA[punteggio_qualitaProgetto]]></fieldDescription>
 	</field>
-	<field name="punteggio_totale" class="java.lang.Integer">
+	<field name="punteggio_totale" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="punteggio_totale"/>
 		<fieldDescription><![CDATA[punteggio_totale]]></fieldDescription>
 	</field>
@@ -300,7 +300,7 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="commento_valoreAggiunto"/>
 		<fieldDescription><![CDATA[commento_valoreAggiunto]]></fieldDescription>
 	</field>
-	<field name="punteggio_valoreAggiunto" class="java.lang.Integer">
+	<field name="punteggio_valoreAggiunto" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="punteggio_valoreAggiunto"/>
 		<fieldDescription><![CDATA[punteggio_valoreAggiunto]]></fieldDescription>
 	</field>
@@ -340,7 +340,7 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="scadenzaPresentazioneDomande"/>
 		<fieldDescription><![CDATA[scadenzaPresentazioneDomande]]></fieldDescription>
 	</field>
-	<field name="punteggio_qualitaGruppoDiRicerca" class="java.lang.Integer">
+	<field name="punteggio_qualitaGruppoDiRicerca" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="punteggio_qualitaGruppoDiRicerca"/>
 		<fieldDescription><![CDATA[punteggio_qualitaGruppoDiRicerca]]></fieldDescription>
 	</field>
