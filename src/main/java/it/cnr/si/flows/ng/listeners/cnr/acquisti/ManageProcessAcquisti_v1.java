@@ -177,9 +177,10 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			} catch (JSONException e) {
 				LOGGER.error("Formato Impegno Non Valido {} nel flusso {} - {}", impegno.getString("importoLordo"), execution.getId(), execution.getVariable("title"));
 				throw new BpmnError("400", "Formato Impegno Non Valido: " + impegno.getString("importoLordo"));
-			}			
-			impegno.put("uo_label", aceBridgeService.getUoById(Integer.parseInt(impegno.get("uo").toString())).getDenominazione());
-			impegno.put("cdsuo", aceBridgeService.getUoById(Integer.parseInt(impegno.get("uo").toString())).getCdsuo());
+			}
+			
+			impegno.put("uo_label", aceService.entitaOrganizzativaFindByTerm(impegno.get("uo").toString()).get(0).getDenominazione());
+			impegno.put("cdsuo", impegno.get("uo").toString());
 		}
 
 		execution.setVariable("impegni_json", impegni.toString());
