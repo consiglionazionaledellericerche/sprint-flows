@@ -5,13 +5,8 @@ import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.AceService;
-import it.cnr.si.service.dto.anagrafica.base.PageDto;
-import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
-import it.cnr.si.service.dto.anagrafica.scritture.PersonaDto;
-import it.cnr.si.service.dto.anagrafica.scritture.UtenteDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
-
 import org.activiti.engine.ManagementService;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +40,7 @@ public class FlowsUserResourceAce {
     @Inject
     private RestResponseFactory restResponseFactory;
 
-    @RequestMapping(value = "/{username:.+}/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{username:.+}/search", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<Map<String, Object>> searchUsers(@PathVariable String username) {
@@ -71,7 +66,7 @@ public class FlowsUserResourceAce {
         return ResponseEntity.ok(response);
     }
 
-    @RequestMapping(value = "/struttura/{struttura:.+}/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/struttura/{struttura:.+}/search", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
     public ResponseEntity<Map<String, Object>> getUoLike(@PathVariable String struttura) {
@@ -80,7 +75,8 @@ public class FlowsUserResourceAce {
 
         List<Utils.SearchResult> collect = aceBridgeService.getUoLike(struttura)
                 .stream()
-                .map(p -> new Utils.SearchResult(p.getId().toString(), p.getCdsuo() +" - "+ p.getDenominazione()))
+                .map(p -> new Utils.SearchResult(p.getCdsuo(), p.getCdsuo() +" - "+ p.getDenominazione()))
+                .distinct()
                 .collect(Collectors.toList());
 
         response.put("more", collect.size() > 10);

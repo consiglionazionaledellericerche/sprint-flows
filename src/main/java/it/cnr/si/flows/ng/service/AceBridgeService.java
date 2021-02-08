@@ -28,6 +28,7 @@ import static it.cnr.si.security.PermissionEvaluatorImpl.CNR_CODE;
 @Profile("cnr")
 public class AceBridgeService {
 
+	public static final String SEDE_PRINCIPALE = "SPRINC";
 	private final Logger log = LoggerFactory.getLogger(AceBridgeService.class);
 
 	@Inject
@@ -88,8 +89,6 @@ public class AceBridgeService {
 
 		return aceService.entitaOrganizzativaFind(null, uoName, LocalDate.now(), null)
 				.stream()
-                // TODO qui sicuramente c'e' un errore perche' e' cambiato il tipo (da int a String) di Tipi
-//				.filter(e -> Enum.TipiEOPerAutocomplete.contains(e.getTipo().getId()))
 				.collect(Collectors.toList());
 	}
 
