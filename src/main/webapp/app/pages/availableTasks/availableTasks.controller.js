@@ -25,7 +25,7 @@
             vm.order = 'ASC';
             $scope.formUrl = utils.loadSearchFields(vm.processDefinitionKey, true);
         }
-        vm.page = vm.availablePage = vm.TAIMGPage = 1;
+        vm.page = vm.myPage = vm.availablePage = vm.TAIMGPage = 1;
 
         // JSON che conterrà i risultati delle due query
         vm.myTasks = {
