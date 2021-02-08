@@ -89,7 +89,6 @@ public class AceBridgeService {
 
 		return aceService.entitaOrganizzativaFind(null, uoName, LocalDate.now(), null)
 				.stream()
-				.filter(e -> e.getTipo().getSigla().contains(SEDE_PRINCIPALE))
 				.collect(Collectors.toList());
 	}
 
