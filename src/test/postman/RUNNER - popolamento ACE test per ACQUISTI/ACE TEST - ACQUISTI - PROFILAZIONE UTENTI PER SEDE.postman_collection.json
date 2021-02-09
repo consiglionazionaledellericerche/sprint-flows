@@ -1,0 +1,327 @@
+{
+	"info": {
+		"_postman_id": "7d8a7e2d-ab44-4927-8cd1-dbe78a62d672",
+		"name": "ACE TEST - ACQUISTI - PROFILAZIONE UTENTI PER SEDE",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Richiesta token JWT",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"postman.setGlobalVariable(\"ACCESS_TOKEN\", data.access_token);",
+							"postman.setGlobalVariable(\"REFRESH_TOKEN\", data.refresh_token);",
+							"// postman.setGlobalVariable(\"userName\", \"enzo.lucia\");",
+							"// postman.setGlobalVariable(\"siglaRuolo\", \"staffAmministrativo\");",
+							"// postman.setGlobalVariable(\"NR_IDNSIP\", \"226100\");",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{OBTAIN_TOKEN_AUTHORIZATION}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "{{OBTAIN_TOKEN_GRANT_TYPE}}",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "{{OBTAIN_TOKEN_SCOPE}}",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "{{USERNAME}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{PASSWORD}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://ace-webapp.test.si.cnr.it:5555/api/authentication/auth/oauth/token",
+					"protocol": "http",
+					"host": [
+						"ace-webapp",
+						"test",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "5555",
+					"path": [
+						"api",
+						"authentication",
+						"auth",
+						"oauth",
+						"token"
+					]
+				},
+				"description": "Ottiene il token (impostare una passoword)."
+			},
+			"response": []
+		},
+		{
+			"name": "Ricerca ID_USER e ID_PERSONA by userId",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"pm.globals.set(\"ID_USER\", Number(data.id));",
+							"console.log(\"ID_USER: \" + pm.globals.get(\"ID_USER\"))",
+							"",
+							"pm.globals.set(\"ID_PERSONA\", Number(data.persona.id));",
+							"console.log(\"ID_PERSONA: \" + pm.globals.get(\"ID_PERSONA\"))",
+							"",
+							"",
+							"pm.test(\"UserName non presente\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"username\");",
+							"});",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{ACCESS_TOKEN}}"
+					}
+				],
+				"url": {
+					"raw": "http://ace-webapp.test.si.cnr.it:5555/api/ace/v1/utente/{{userName}}",
+					"protocol": "http",
+					"host": [
+						"ace-webapp",
+						"test",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "5555",
+					"path": [
+						"api",
+						"ace",
+						"v1",
+						"utente",
+						"{{userName}}"
+					]
+				},
+				"description": "Lista dei ruoli assegnati alla persona con lo username specificato"
+			},
+			"response": []
+		},
+		{
+			"name": "Ricerca ID_IDNSIP per idnsip",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"data.forEach(function(entita){",
+							"    pm.globals.set(\"ID_IDNSIP\", Number(entita.id));",
+							"    console.log(\"ID_IDNSIP: \" + pm.globals.get(\"ID_IDNSIP\"))",
+							"    console.log(\"entita.tipo.descr: \" + entita.tipo.descr)",
+							"",
+							"})",
+							"",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{ACCESS_TOKEN}}"
+					}
+				],
+				"url": {
+					"raw": "http://ace-webapp.test.si.cnr.it:5555/api/ace/v1/entitaorganizzativa/find?idnsip={{NR_IDNSIP}}",
+					"protocol": "http",
+					"host": [
+						"ace-webapp",
+						"test",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "5555",
+					"path": [
+						"api",
+						"ace",
+						"v1",
+						"entitaorganizzativa",
+						"find"
+					],
+					"query": [
+						{
+							"key": "idnsip",
+							"value": "{{NR_IDNSIP}}"
+						}
+					]
+				},
+				"description": "Lista dei ruoli assegnati alla persona con lo username specificato"
+			},
+			"response": []
+		},
+		{
+			"name": "Ricerca ruolo",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"pm.globals.set(\"ID_RUOLO\", Number(data.id));",
+							"console.log(\"ID_RUOLO: \" + pm.globals.get(\"ID_RUOLO\"))",
+							"",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{ACCESS_TOKEN}}"
+					}
+				],
+				"url": {
+					"raw": "http://ace-webapp.test.si.cnr.it:5555/api/ace/v1/ruolo/{{siglaRuolo}}",
+					"protocol": "http",
+					"host": [
+						"ace-webapp",
+						"test",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "5555",
+					"path": [
+						"api",
+						"ace",
+						"v1",
+						"ruolo",
+						"{{siglaRuolo}}"
+					]
+				},
+				"description": "Lista dei ruoli assegnati alla persona con lo username specificato"
+			},
+			"response": []
+		},
+		{
+			"name": "associazione ruolo persona con id variabili & ID_IDNSP",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"console.log(\"l'utente (\"+ pm.globals.get(\"ID_USER\") +\") viene iserito con il ruolo  (\"+ pm.globals.get(\"ID_RUOLO\") +\") nella entitaOrganizzativa  (\"+ pm.globals.get(\"ID_IDNSIP\") +\")\");\r",
+							"\r",
+							"\r",
+							"//pm.test(\"INSERITO o GIA' PRESENTE\", function () {\r",
+							"//    pm.response.to.have.status(200) ||    pm.expect(pm.response.text()).to.include(\"Il Ruolo specificato e' gia' presente\");\r",
+							"//});\r",
+							"\r",
+							"tests[\"INSERITO o GIA' PRESENTE\"] = responseCode.code === 200 || responseCode.code === 400;\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{ACCESS_TOKEN}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"inizioValidita\": \"{{inizioValidita}}\",\r\n    \"fineValidita\": \"\",\r\n    \"utente\": {{ID_USER}},\r\n    \"ruolo\": {{ID_RUOLO}},\r\n    \"entitaOrganizzativa\": {{ID_IDNSIP}},\r\n    \"note\": \"\",\r\n    \"provvedimento\": \"\",\r\n    \"indennita\": true,\r\n    \"delega\": false\r\n}\r\n"
+				},
+				"url": {
+					"raw": "http://ace-webapp.test.si.cnr.it:5555/api/ace/v1/ruoloutente/create",
+					"protocol": "http",
+					"host": [
+						"ace-webapp",
+						"test",
+						"si",
+						"cnr",
+						"it"
+					],
+					"port": "5555",
+					"path": [
+						"api",
+						"ace",
+						"v1",
+						"ruoloutente",
+						"create"
+					]
+				},
+				"description": "associazione ruolo persona"
+			},
+			"response": []
+		}
+	]
+}
