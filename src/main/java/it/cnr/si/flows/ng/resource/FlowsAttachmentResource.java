@@ -62,7 +62,7 @@ public class FlowsAttachmentResource {
 
     @RequestMapping(value = "{processInstanceId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    @Secured(AuthoritiesConstants.USER)
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Map<String, FlowsAttachment>> getAttachementsForProcessInstance(
             @PathVariable("processInstanceId") String processInstanceId) {
@@ -72,22 +72,23 @@ public class FlowsAttachmentResource {
         return ResponseEntity.ok(result);
     }
 
+    // TODO matrin - eliminare entro il 15/04/2021
 
-    @RequestMapping(value = "{processInstanceId}/getPublicDocuments", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    @Secured(AuthoritiesConstants.USER)
-    @Timed
-    public ResponseEntity<Map<String, FlowsAttachment>> getPublicDocumentsForProcessInstance(
-            @PathVariable("processInstanceId") String processInstanceId) {
-
-        Map<String, FlowsAttachment> result = null;//flowsAttachmentService.getPublicDocumentsForProcessInstance(processInstanceId);
-
-        return ResponseEntity.ok(result);
-    }
+//    @RequestMapping(value = "{processInstanceId}/getPublicDocuments", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+//    @ResponseBody
+//    @Secured(AuthoritiesConstants.USER)
+//    @Timed
+//    public ResponseEntity<Map<String, FlowsAttachment>> getPublicDocumentsForProcessInstance(
+//            @PathVariable("processInstanceId") String processInstanceId) {
+//
+//        Map<String, FlowsAttachment> result = null;//flowsAttachmentService.getPublicDocumentsForProcessInstance(processInstanceId);
+//
+//        return ResponseEntity.ok(result);
+//    }
 
     @RequestMapping(value = "task/{taskId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    @Secured(AuthoritiesConstants.USER)
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Map<String, FlowsAttachment>> getAttachementsForTask(
             @PathVariable("taskId") String taskId) {
@@ -98,7 +99,7 @@ public class FlowsAttachmentResource {
 
     @RequestMapping(value = "/history/{processInstanceId}/{attachmentName}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    @Secured(AuthoritiesConstants.USER)
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<List<FlowsAttachment>> getAttachementHistory(
             @PathVariable("processInstanceId") String processInstanceId,
@@ -118,9 +119,10 @@ public class FlowsAttachmentResource {
                     .stream()
                     .map(h -> (HistoricDetailVariableInstanceUpdateEntity) h)
                     .filter(h -> h.getName().equals(attachmentName))
+                    // TODO rimuovere questo obbrobbrio
                     .map(h -> {
                         FlowsAttachment a = (FlowsAttachment) h.getValue();
-                        a.setUrl("api/attachments/"+ h.getId() +"/data");
+                        a.setUrl("api/attachments/byAttachmentId/"+ processInstanceId +"/"+ h.getId() +"/data");
                         return a;
                     })
                     .sorted( (l, r) -> l.getTime().compareTo(r.getTime()) )
@@ -137,7 +139,6 @@ public class FlowsAttachmentResource {
     @RequestMapping(value = "{processInstanceId}/{attachmentName}/data", method = RequestMethod.GET)
     @ResponseBody
     @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
-    @Secured(AuthoritiesConstants.USER)
     @Timed
     public void getAttachment(
             HttpServletResponse response,
@@ -208,7 +209,6 @@ public class FlowsAttachmentResource {
 
     @RequestMapping(value = "{processInstanceId}/{attachmentName}/data/sostituzione", method = RequestMethod.POST)
     @ResponseBody
-    @Secured(AuthoritiesConstants.USER)
     @PreAuthorize("@permissionEvaluator.canUpdateAttachment(#processInstanceId, @flowsUserDetailsService)")
     @Timed
     public void updateAttachmentSostituzioneProtocollo(@PathVariable("processInstanceId") String processInstanceId,
@@ -235,7 +235,6 @@ public class FlowsAttachmentResource {
 
     @RequestMapping(value = "{processInstanceId}/{attachmentName}/data/rettifica", method = RequestMethod.POST)
     @ResponseBody
-    @Secured(AuthoritiesConstants.USER)
     @PreAuthorize("@permissionEvaluator.canUpdateAttachment(#processInstanceId, @flowsUserDetailsService)")
     @Timed
     public void updateAttachmentRettificaProtocollo(@PathVariable("processInstanceId") String processInstanceId,
@@ -272,13 +271,13 @@ public class FlowsAttachmentResource {
         }
     }
 
-
-    @RequestMapping(value = "{variableId}/data", method = RequestMethod.GET)
+    @RequestMapping(value = "byAttachmentId/{processInstanceId}/{variableId}/data", method = RequestMethod.GET)
     @ResponseBody
-    @Secured(AuthoritiesConstants.USER)
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
     @Timed
     public void getHistoricAttachment(
             HttpServletResponse response,
+            @PathVariable("processInstanceId") String processInstanceId,
             @PathVariable("variableId") String variableId) throws IOException {
 
         HistoricDetailVariableInstanceUpdateEntity variable = (HistoricDetailVariableInstanceUpdateEntity)
@@ -287,15 +286,19 @@ public class FlowsAttachmentResource {
                         .singleResult();
         FlowsAttachment attachment = (FlowsAttachment) variable.getValue();
 
-        ServletOutputStream output = response.getOutputStream();
-        response.setContentType(attachment.getMimetype());
-        InputStream baos = flowsAttachmentService.getAttachmentContent(attachment.getUrl());
-        IOUtils.copy(baos, output);
+        if(!variable.getProcessInstanceId().equals(processInstanceId))
+            response.sendError(403);
+        else {
+            ServletOutputStream output = response.getOutputStream();
+            response.setContentType(attachment.getMimetype());
+            InputStream baos = flowsAttachmentService.getAttachmentContent(attachment.getUrl());
+            IOUtils.copy(baos, output);
+        }
     }
 
     @RequestMapping(value = "task/{taskId}/{attachmentName}/data", method = RequestMethod.GET)
     @ResponseBody
-    @Secured(AuthoritiesConstants.USER)
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId, @flowsUserDetailsService)")
     @Timed
     public void getAttachmentForTask(
             HttpServletResponse response,
@@ -308,8 +311,7 @@ public class FlowsAttachmentResource {
 
     @RequestMapping(value = "{processInstanceId}/{attachmentName}/pubblicaTrasparenza", method = RequestMethod.POST)
     @ResponseBody
-    @Secured(AuthoritiesConstants.USER)
-    @PreAuthorize("@permissionEvaluator.canPublishAttachment(#processInstanceId)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canPublishAttachment(#processInstanceId)")
     @Timed
     public void setPubblicabileTrasparenza(
             HttpServletResponse response,
@@ -323,8 +325,7 @@ public class FlowsAttachmentResource {
 
     @RequestMapping(value = "{processInstanceId}/{attachmentName}/pubblicaUrp", method = RequestMethod.POST)
     @ResponseBody
-    @Secured(AuthoritiesConstants.USER)
-    @PreAuthorize("@permissionEvaluator.canPublishAttachment(#processInstanceId)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canPublishAttachment(#processInstanceId)")
     @Timed
     public void setPubblicabileUrp(
             HttpServletResponse response,

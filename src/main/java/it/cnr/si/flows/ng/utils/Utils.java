@@ -39,9 +39,6 @@ public final class Utils {
     public static final String TASK_EXECUTOR = "esecutore";
     public static final String PROCESS_VISUALIZER = "visualizzatore";
 
-    private static final String TASK_PARAMS = "taskParams";
-    public static final String PROCESS_PARAMS = "processParams";
-    private static final String ERRORE_NELLA_LETTURE_DELLO_STREAM_DELLA_REQUEST = "Errore nella letture dello stream della request";
     public static final String ASC = "ASC";
     public static final String DESC = "DESC";
     public static final String ALL_PROCESS_INSTANCES = "all";
@@ -202,10 +199,13 @@ public final class Utils {
                 }
             }
 
-            //la "Fase" equivale al nome del task - quindi bisogna fare una ricerca "a parte" (non in base al "type")
+            //la "Fase" equivale al nome del task - quindi bisogna fare una ricerca "a parte" (non in base al "type") ...
             if (key.equals("Fase")) {
                 taskQuery.taskNameLikeIgnoreCase("%" + value + "%");
-            } else {
+            }else if (key.equals("businessKey")) {
+                //... stesso discorso per la "businessKey"
+                taskQuery.processInstanceBusinessKeyLike("%" + value + "%");
+            }else {
                 //wildcard ("%") di default ma non a TUTTI i campi
                 switch (type) {
                     case TEXT_EQUAL:
@@ -258,6 +258,19 @@ public final class Utils {
         String value;
         String label;
 
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            SearchResult that = (SearchResult) o;
+            return Objects.equals(value, that.value) && Objects.equals(label, that.label);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(value, label);
+        }
+
         public SearchResult(String v, String l) {
             value = v;
             label = l;
@@ -287,7 +300,7 @@ public final class Utils {
         public String getPersona() {
             return persona;
         }
-        
+
         public String getCdsuo() {
             return cdsuo;
         }
@@ -299,7 +312,7 @@ public final class Utils {
         public void setCdsuo(String cdsuo) {
             this.cdsuo = cdsuo;
         }
-        
+
         public void setPersona(String persona) {
             this.persona = persona;
         }
@@ -324,7 +337,7 @@ public final class Utils {
     public boolean getBoolean(Map<String, String> params, String paramName, boolean defaultValue) {
         return Boolean.parseBoolean( getString(params, paramName, String.valueOf(defaultValue)) ) ;
     }
-    
+
     public static boolean isFullPath(String path) {
         try {
             String regex = "^.*/.+[.]\\D{3,6}$";
@@ -332,7 +345,7 @@ public final class Utils {
         } catch (Exception e) {
             return false;
         }
-        
+
     }
 
 
@@ -370,7 +383,7 @@ public final class Utils {
 
         //Se il campo "stato" è vuoto ==> riscrivo nel json lo stato che aveva ...
         if(stato.isEmpty()){
-            String vecchioStato = new org.json.JSONObject(flowsProcessInstanceService.getProcessInstance(processInstanceId).getName()).getString("stato");
+            String vecchioStato = new org.json.JSONObject(flowsProcessInstanceService.getProcessInstance(processInstanceId).getName()).getString(STATO);
             name.put(STATO, ellipsis(vecchioStato, LENGTH_STATO) );
         }else {
             // ... altrimenti aggiorno con il nuovo stato

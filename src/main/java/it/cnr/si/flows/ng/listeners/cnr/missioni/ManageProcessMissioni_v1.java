@@ -140,9 +140,11 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 				if (execution.getVariable("tipologiaMissione").toString().equals("ordine")){
 					if (execution.getVariable("missioneConAnticipoFlag") != null && execution.getVariable("missioneConAnticipoFlag").toString().equals("si")) {
 						nomiVariabiliFile.add("anticipoMissione");
-					} 
+						firmaDocumentoService.eseguiFirmaMultipla(execution, nomiVariabiliFile, null);
+					} else {
+						firmaDocumentoService.eseguiFirma(execution, nomiVariabiliFile, null);
+					}
 				}
-				firmaDocumentoService.eseguiFirma(execution, nomiVariabiliFile, null);
 			}
 
 			if(sceltaUtente != null && (sceltaUtente.equals("Firma") || sceltaUtente.equals("Firma Multipla"))) {
@@ -186,9 +188,12 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 				if (execution.getVariable("tipologiaMissione").toString().equals("ordine")){
 					if (execution.getVariable("missioneConAnticipoFlag") != null && execution.getVariable("missioneConAnticipoFlag").toString().equals("si")) {
 						nomiVariabiliFile.add("anticipoMissione");
-					} 
+						firmaDocumentoService.eseguiFirmaMultipla(execution, nomiVariabiliFile, null);
+
+					} else {
+						firmaDocumentoService.eseguiFirma(execution, nomiVariabiliFile, null);
+					}
 				}
-				firmaDocumentoService.eseguiFirma(execution, nomiVariabiliFile, null);
 			}
 		};break; 
 

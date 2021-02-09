@@ -85,11 +85,12 @@
                     $.map(searchParams, function (value, key) {
                         if (value) {
                             var appo = {};
-                            appo.type = value.substr(0, value.indexOf('=') + 1);
+                            appo.type = (value.toString().indexOf('=') !== -1 ) ? value.substr(0, value.indexOf('=') + 1) : value;
                             appo.key = key;
                             appo.value = value.substr(value.indexOf('=') + 1);
-
-                            searchParamsToSent.push(appo);
+                            //serve per in caso di cancellazione di un parametro di ricerca
+                            if(appo.value !== "")
+                                searchParamsToSent.push(appo);
                         }
                     });
                 }
@@ -164,9 +165,9 @@
 
             loadSearchFields: function (processDefinitionKey, isTaskQuery) {
                 var formUrl = undefined;
-                //Di default, al caricamento della pagina, la processDefinitionKey è 'undefined'
-                // quindi carico la form per tutte le Process Definitions ('all')
-                if (processDefinitionKey === undefined) {
+                //Al caricamento della pagina, la processDefinitionKey è 'undefined'
+                //(null in caso di cancellazione della select) ==> carico la form per tutte le PD('all')
+                if (processDefinitionKey === undefined || processDefinitionKey === null) {
                     processDefinitionKey = 'all';
                 }
                 if (isTaskQuery) {
