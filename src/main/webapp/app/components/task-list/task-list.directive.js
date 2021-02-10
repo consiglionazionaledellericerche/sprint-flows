@@ -24,7 +24,7 @@
                     dataService.tasks.claim(taskId, take).then(function (data) {
                         $log.debug(data);
                         scope.pooled[taskId] = user !== undefined;
-                        scope.$parent.loadTasks();
+                        scope.$parent.loadAllTasks();
                     }, function (err) {
                         $log.error(err);
                         AlertService.error("Richiesta non riuscita<br>" + err.data.message);
