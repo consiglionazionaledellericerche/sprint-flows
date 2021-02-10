@@ -140,7 +140,7 @@
             $location.active = vm.active;
             // Se RICARICO la pagina aggiorno TUTTE le "viste" (i miei compiti, compiti di gruppo,
             // compiti dei miei gruppi assegnati ad altri) e cancello i searchParams
-            if (performance.navigation.type == performance.navigation.TYPE_RELOAD) {
+            if (performance.navigation.type == performance.navigation.TYPE_RELOAD || performance.navigation.type ==performance.navigation.TYPE_NAVIGATE) {
                 $scope.loadAllTasks();
             } else {
                 switch (vm.activeContent) {
