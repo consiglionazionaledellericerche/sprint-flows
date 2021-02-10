@@ -40,10 +40,10 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 
 		String initiator = (String) execution.getVariable(Enum.VariableEnum.initiator.name());		
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
-		//Integer cdsuoAppartenenzaUtente = aceBridgeService.getEntitaOrganizzativaDellUtente(proponente.toString()).getId();
-		//String cdsuoAppartenenzaUtente = null;
-		String idnsipAppartenenzaUtente = null;
-		String cdsuoAppartenenzaUtente = null;
+		//Integer cdsuoAppartenenzaResponsabile = aceBridgeService.getEntitaOrganizzativaDellUtente(proponente.toString()).getId();
+		//String cdsuoAppartenenzaResponsabile = null;
+		String idnsipAppartenenzaResponsabile = null;
+		String cdsuoAppartenenzaResponsabile = null;
 		SimpleUtenteWebDto direttoreAce = null;
 		Integer IdEntitaOrganizzativaDirettore = 0;
 		String denominazioneEO  = null;
@@ -51,7 +51,8 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 		LocalDate dateRif = LocalDate.now();
 		LocalDate dataUltimoGiornoServizio = LocalDate.now();
 		BossDto responsabileStruttura = null;
-
+		String idSedeUtenteRichiedente = null;
+				
 		// VERIFICA DIRETTORE
 		//VERIFICA DIPENDENTI CESSATI
 		if (aceService.getPersonaByUsername(initiator.toString()).getDataCessazione() != null) {			
@@ -62,7 +63,7 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 			} 	
 		}
 		try {
-
+			idSedeUtenteRichiedente = aceService.getPersonaByUsername(initiator.toString()).getSede().getIdnsip();
 			//direttoreAce = aceService.bossFirmatarioByUsername(initiator, dateRif);
 			responsabileStruttura = aceService.findResponsabileStruttura(initiator, dateRif, TipoAppartenenza.SEDE, "responsabile-struttura");
 
@@ -76,8 +77,8 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 			} else {
 				IdEntitaOrganizzativaDirettore = responsabileStruttura.getEntitaOrganizzativa().getId();
 				entitaOrganizzativaDirettore = aceService.entitaOrganizzativaById(IdEntitaOrganizzativaDirettore);
-				cdsuoAppartenenzaUtente = entitaOrganizzativaDirettore.getCdsuo();
-				idnsipAppartenenzaUtente = entitaOrganizzativaDirettore.getIdnsip();					}
+				cdsuoAppartenenzaResponsabile = entitaOrganizzativaDirettore.getCdsuo();
+				idnsipAppartenenzaResponsabile = entitaOrganizzativaDirettore.getIdnsip();					}
 		} catch ( FeignException  e) {
 			throw new BpmnError("412", "Errore nell'avvio del flusso " + e.getMessage().toString());
 		}
@@ -96,11 +97,12 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 		execution.setVariable("nomeCognomeUtente", utente.getPersona().getNome() + " " + utente.getPersona().getCognome());
 		execution.setVariable("userNameUtente", utente.getUsername());
 		execution.setVariable("tipoContratto", utente.getPersona().getTipoContratto());
-		execution.setVariable("cds", cdsuoAppartenenzaUtente);
-		execution.setVariable("idnsip", idnsipAppartenenzaUtente);
+		execution.setVariable("cds", cdsuoAppartenenzaResponsabile);
+		execution.setVariable("idnsip", idnsipAppartenenzaResponsabile);
 		execution.setVariable("direttore", direttoreAce.getPersona().getNome() + " " +  direttoreAce.getPersona().getCognome());
 		execution.setVariable("denominazioneEO", denominazioneEO);
-
+		execution.setVariable("idSedeUtenteRichiedente", idSedeUtenteRichiedente);
+		
 
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileProponente, PROCESS_VISUALIZER);
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneScrivaniaDigitale, PROCESS_VISUALIZER);
