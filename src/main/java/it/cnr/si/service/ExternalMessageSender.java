@@ -1,5 +1,7 @@
 package it.cnr.si.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.Member;
 import it.cnr.si.domain.ExternalMessage;
@@ -22,6 +24,7 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -121,7 +124,7 @@ public class ExternalMessageSender {
 
             RestTemplate template = msg.getApplication().getTemplate();
 
-             response = template.exchange(
+            response = template.exchange(
                     msg.getUrl(),
                     msg.getVerb().value(),
                     new HttpEntity<>(msg.getPayload()),
@@ -246,8 +249,14 @@ public class ExternalMessageSender {
         public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 
             request.getHeaders().set("Authorization", "Bearer "+ access_token);
-            request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-            ClientHttpResponse response = execution.execute(request, body);
+            request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
+            ObjectMapper om = new ObjectMapper();
+            String stringRepresentation = new String(body, "UTF-8");
+            JsonNode jsonRepresentation = om.readTree(stringRepresentation);
+            byte[] byteRepresentation = jsonRepresentation.toString().getBytes(StandardCharsets.UTF_8);
+
+            ClientHttpResponse response = execution.execute(request, byteRepresentation);
+
 
             if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 
@@ -270,7 +279,7 @@ public class ExternalMessageSender {
 
                 request.getHeaders().set("Authorization", "Bearer "+ access_token);
                 request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
-                response = execution.execute(request, body);
+                response = execution.execute(request, byteRepresentation);
             }
 
             return response;
