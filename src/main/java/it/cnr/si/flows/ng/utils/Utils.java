@@ -186,11 +186,10 @@ public final class Utils {
             //solo per le HistoricTaskInstanceQuery si fa la query in base alla data di completamento del task
             if (taskQuery instanceof HistoricTaskInstanceQuery) {
                 try {
-                    if (key.equals("taskCompletedGreat")) {
+                    if ("taskCompletedGreat".equals(key)) {
                         ((HistoricTaskInstanceQuery) taskQuery).taskCompletedAfter(formatoData.parse(value));
                         break;
-                    }
-                    if (key.equals("taskCompletedLess")) {
+                    } else if ("taskCompletedLess".equals(key)) {
                         ((HistoricTaskInstanceQuery) taskQuery).taskCompletedBefore(formatoData.parse(value));
                         break;
                     }
@@ -199,36 +198,44 @@ public final class Utils {
                 }
             }
 
-            //la "Fase" equivale al nome del task - quindi bisogna fare una ricerca "a parte" (non in base al "type") ...
-            if (key.equals("Fase")) {
-                taskQuery.taskNameLikeIgnoreCase("%" + value + "%");
-            }else if (key.equals("businessKey")) {
-                //... stesso discorso per la "businessKey"
-                taskQuery.processInstanceBusinessKeyLike("%" + value + "%");
-            }else {
-                //wildcard ("%") di default ma non a TUTTI i campi
-                switch (type) {
-                    case TEXT_EQUAL:
-                        taskQuery.or()
-                                .taskVariableValueEquals(key, value)
-                                .processVariableValueEquals(key, value).endOr();
-                        break;
-                    case BOOLEAN:
-                        // gestione variabili booleane
-                        taskQuery.or()
-                                .taskVariableValueEquals(key, Boolean.valueOf(value))
-                                .processVariableValueEquals(key, Boolean.valueOf(value)).endOr();
-                        break;
-                    case "date":
-                        taskQuery = historicTaskDate(taskQuery, key, value);
-                        break;
-                    default:
-                        //variabili con la wildcard  (%value%)
-                        taskQuery.or()
-                                .taskVariableValueLikeIgnoreCase(key, "%" + value + "%")
-                                .processVariableValueLikeIgnoreCase(key, "%" + value + "%").endOr();
-                        break;
-                }
+            switch (key) {
+                case "Fase":
+                    //la "Fase" equivale al nome del task - quindi bisogna fare una ricerca "a parte" (non in base al "type") ...
+                    taskQuery.taskNameLikeIgnoreCase("%" + value + "%");
+                    break;
+                case "businessKey":
+                    //... stesso discorso per la "businessKey"
+                    taskQuery.processInstanceBusinessKeyLike("%" + value + "%");
+                    break;
+                case "processInstanceId":
+                    //... stesso discorso per la "processInstanceId"
+                    taskQuery.processInstanceId(value);
+                    break;
+                default:
+                    //wildcard ("%") di default ma non a TUTTI i campi
+                    switch (type) {
+                        case TEXT_EQUAL:
+                            taskQuery.or()
+                                    .taskVariableValueEquals(key, value)
+                                    .processVariableValueEquals(key, value).endOr();
+                            break;
+                        case BOOLEAN:
+                            // gestione variabili booleane
+                            taskQuery.or()
+                                    .taskVariableValueEquals(key, Boolean.valueOf(value))
+                                    .processVariableValueEquals(key, Boolean.valueOf(value)).endOr();
+                            break;
+                        case "date":
+                            taskQuery = historicTaskDate(taskQuery, key, value);
+                            break;
+                        default:
+                            //variabili con la wildcard  (%value%)
+                            taskQuery.or()
+                                    .taskVariableValueLikeIgnoreCase(key, "%" + value + "%")
+                                    .processVariableValueLikeIgnoreCase(key, "%" + value + "%").endOr();
+                            break;
+                    }
+                    break;
             }
         }
         return taskQuery;
@@ -345,7 +352,6 @@ public final class Utils {
         } catch (Exception e) {
             return false;
         }
-
     }
 
 
