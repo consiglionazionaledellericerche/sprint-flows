@@ -432,7 +432,7 @@ public class FlowsProcessInstanceResource {
 					metadatiDocumento.put("label", attachment.getLabel());
 					metadatiDocumento.put("key", attachment.getUrl());
 					metadatiDocumento.put("path", attachment.getPath());
-					metadatiDocumento.put("download", env.getProperty("repository.base.url") + "d/a/workspace/SpacesStore/" + attachment.getUrl().split(";")[0] + "/" + attachment.getName());
+					metadatiDocumento.put("download", env.getProperty("cnr.doc-cnr.url") + "rest/content?nodeRef=" + attachment.getUrl());
 					documentiPubblicabili.add(metadatiDocumento);
 				}
 			}
