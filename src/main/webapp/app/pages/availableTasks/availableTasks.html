@@ -71,7 +71,7 @@
                 <div>
                     <div class="dropdown md-menu-origin">
                         <ui-select ng-model="vm.processDefinitionKey" title="Tipologie"
-                                   on-select="loadMyTasks()">
+                                   on-select="loadAllTasks()">
                             <ui-select-match placeholder="Seleziona la tipologia di flusso" allow-clear="true">
                                 {{$select.selected.name}}
                             </ui-select-match>
