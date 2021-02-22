@@ -178,8 +178,8 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				LOGGER.error("Formato Impegno Non Valido {} nel flusso {} - {}", impegno.getString("importoLordo"), execution.getId(), execution.getVariable("title"));
 				throw new BpmnError("400", "Formato Impegno Non Valido: " + impegno.getString("importoLordo"));
 			}
-			
-			impegno.put("uo_label", aceService.entitaOrganizzativaFindByTerm(impegno.get("uo").toString()).get(0).getDenominazione());
+
+			impegno.put("uo_label", aceBridgeService.getUoLike(impegno.get("uo").toString()).get(0).getDenominazione());
 			impegno.put("cdsuo", impegno.get("uo").toString());
 		}
 
