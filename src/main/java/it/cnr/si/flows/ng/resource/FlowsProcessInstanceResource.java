@@ -232,8 +232,7 @@ public class FlowsProcessInstanceResource {
 
 		HistoricProcessInstanceQuery query = flowsProcessInstanceService.getProcessInstancesForTrasparenza(order);
 		//popolo la responseMap con tutti i campi associati alla view "export-trasparenza"
-		List<Map<String, Object>> responseMap = new ArrayList<>();
-		responseMap = mappingPI("acquisti", query.listPage(firstResult, maxResults), EXPORT_TRASPARENZA);
+		List<Map<String, Object>> responseMap = mappingPI("acquisti", query.listPage(firstResult, maxResults), EXPORT_TRASPARENZA);
 
 		//numero totale di Pi della query (per la paginazione dal lato del portale del CNR)
 		HashMap<String, Object> totNumItems = new HashMap<>();
@@ -370,7 +369,7 @@ public class FlowsProcessInstanceResource {
 		String view = viewRepository.getViewByProcessidType(processDefinition, typeView).getView();
 		JSONArray jsonFieldsToExport = new JSONArray(view);
 
-		List<Map<String, Object>> response = null;
+		List<Map<String, Object>> response = new ArrayList<>();
 
 		if(typeView != null) {
 			if (typeView.equals(EXPORT_URP)) {
