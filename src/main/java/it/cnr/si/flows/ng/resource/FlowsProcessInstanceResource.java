@@ -12,6 +12,7 @@ import it.cnr.si.security.SecurityUtils;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
@@ -229,10 +230,17 @@ public class FlowsProcessInstanceResource {
 			@RequestParam("maxResults") int maxResults,
 			@RequestParam(name = "order", required = false) String order) {
 
-		List<HistoricProcessInstance> historicProcessInstances =
-				flowsProcessInstanceService.getProcessInstancesForTrasparenza(firstResult, maxResults, order);
+		HistoricProcessInstanceQuery query = flowsProcessInstanceService.getProcessInstancesForTrasparenza(order);
+		//popolo la responseMap con tutti i campi associati alla view "export-trasparenza"
+		List<Map<String, Object>> responseMap = new ArrayList<>();
+		responseMap = mappingPI("acquisti", query.listPage(firstResult, maxResults), EXPORT_TRASPARENZA);
 
-		return new ResponseEntity<>(mappingPI("acquisti", historicProcessInstances, EXPORT_TRASPARENZA), HttpStatus.OK);
+		//numero totale di Pi della query (per la paginazione dal lato del portale del CNR)
+		HashMap<String, Object> totNumItems = new HashMap<>();
+		totNumItems.put("totalNumItems", query.count());
+		responseMap.add(totNumItems);
+
+		return new ResponseEntity<>(responseMap, HttpStatus.OK);
 	}
 
 
