@@ -449,7 +449,7 @@ public class FlowsProcessInstanceService {
 
 
 
-    public List<HistoricProcessInstance> getProcessInstancesForTrasparenza(int firstResult, int maxResults, String order) {
+    public HistoricProcessInstanceQuery getProcessInstancesForTrasparenza(String order) {
 
         HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()
                 .includeProcessVariables()
@@ -459,7 +459,7 @@ public class FlowsProcessInstanceService {
 
         utils.orderProcess(order, historicProcessInstanceQuery);
 
-        return historicProcessInstanceQuery.listPage(firstResult, maxResults);
+        return historicProcessInstanceQuery;
     }
 
 
