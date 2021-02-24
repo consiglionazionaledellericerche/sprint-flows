@@ -1,0 +1,406 @@
+{
+	"info": {
+		"_postman_id": "d9db7efb-dca9-4489-9afe-5168c3bcf09f",
+		"name": "Andrea Pompili",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "DEMO",
+			"item": [
+				{
+					"name": "autenticazione",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var data = JSON.parse(responseBody);",
+									"postman.setGlobalVariable(\"ACCESS_TOKEN\", data.access_token);",
+									"postman.setGlobalVariable(\"REFRESH_TOKEN\", data.refresh_token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Connection",
+								"value": "keep-alive"
+							},
+							{
+								"key": "Pragma",
+								"value": "no-cache"
+							},
+							{
+								"key": "Cache-Control",
+								"value": "no-cache"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic c3ByaW50YXBwOm15LXNlY3JldC10b2tlbi10by1jaGFuZ2UtaW4tcHJvZHVjdGlvbg=="
+							},
+							{
+								"key": "User-Agent",
+								"value": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.151 Safari/537.36"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							},
+							{
+								"key": "Origin",
+								"value": "https://demoscrivaniadigitale-cnr.si.cnr.it"
+							},
+							{
+								"key": "Sec-Fetch-Site",
+								"value": "same-origin"
+							},
+							{
+								"key": "Sec-Fetch-Mode",
+								"value": "cors"
+							},
+							{
+								"key": "Sec-Fetch-Dest",
+								"value": "empty"
+							},
+							{
+								"key": "Referer",
+								"value": "https://demoscrivaniadigitale-cnr.si.cnr.it/"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7"
+							},
+							{
+								"key": "Cookie",
+								"value": "experimentation_subject_id=ImQ5OTFkMzE4LTYzNDctNGQ2Mi1iNDMzLWE0YmMzOTlmNzc3MSI%3D--6d37b9db4fef95ad054432ed8d1435dc550f7bae; NG_TRANSLATE_LANG_KEY=%22it%22"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "username",
+									"value": "app.portalecnr",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "!!PorTale2019#!",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "scope",
+									"value": "read write",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "my-secret-token-to-change-in-production",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "sprintapp",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://demoscrivaniadigitale-cnr.si.cnr.it/oauth/token",
+							"protocol": "https",
+							"host": [
+								"demoscrivaniadigitale-cnr",
+								"si",
+								"cnr",
+								"it"
+							],
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getProcessInstancesForTrasparenza",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{ACCESS_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://as3dock.si.cnr.it:9200/api/processInstances/getProcessInstancesForTrasparenza?firstResult=0&maxResults=100&order=ASC\n",
+							"protocol": "http",
+							"host": [
+								"as3dock",
+								"si",
+								"cnr",
+								"it"
+							],
+							"port": "9200",
+							"path": [
+								"api",
+								"processInstances",
+								"getProcessInstancesForTrasparenza"
+							],
+							"query": [
+								{
+									"key": "firstResult",
+									"value": "0"
+								},
+								{
+									"key": "maxResults",
+									"value": "100"
+								},
+								{
+									"key": "order",
+									"value": "ASC\n"
+								}
+							]
+						},
+						"description": "export flussi URP\n"
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "LOCALHOST",
+			"item": [
+				{
+					"name": "oauth/token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var data = JSON.parse(responseBody);",
+									"postman.setGlobalVariable(\"ACCESS_TOKEN\", data.access_token);",
+									"postman.setGlobalVariable(\"REFRESH_TOKEN\", data.refresh_token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Connection",
+								"value": "keep-alive"
+							},
+							{
+								"key": "Pragma",
+								"value": "no-cache"
+							},
+							{
+								"key": "Cache-Control",
+								"value": "no-cache"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Basic c3ByaW50YXBwOm15LXNlY3JldC10b2tlbi10by1jaGFuZ2UtaW4tcHJvZHVjdGlvbg=="
+							},
+							{
+								"key": "User-Agent",
+								"value": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.151 Safari/537.36"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							},
+							{
+								"key": "Origin",
+								"value": "https://demoscrivaniadigitale-cnr.si.cnr.it"
+							},
+							{
+								"key": "Sec-Fetch-Site",
+								"value": "same-origin"
+							},
+							{
+								"key": "Sec-Fetch-Mode",
+								"value": "cors"
+							},
+							{
+								"key": "Sec-Fetch-Dest",
+								"value": "empty"
+							},
+							{
+								"key": "Referer",
+								"value": "https://demoscrivaniadigitale-cnr.si.cnr.it/"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7"
+							},
+							{
+								"key": "Cookie",
+								"value": "experimentation_subject_id=ImQ5OTFkMzE4LTYzNDctNGQ2Mi1iNDMzLWE0YmMzOTlmNzc3MSI%3D--6d37b9db4fef95ad054432ed8d1435dc550f7bae; NG_TRANSLATE_LANG_KEY=%22it%22"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "username",
+									"value": "app.portalecnr",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "!!PorTale2019#!",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "scope",
+									"value": "read write",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "my-secret-token-to-change-in-production",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "sprintapp",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/oauth/token",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"oauth",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getProcessInstancesForTrasparenza Copy",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{ACCESS_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/processInstances/getProcessInstancesForTrasparenza?firstResult=0&maxResults=100&order=ASC\n",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"processInstances",
+								"getProcessInstancesForTrasparenza"
+							],
+							"query": [
+								{
+									"key": "firstResult",
+									"value": "0"
+								},
+								{
+									"key": "maxResults",
+									"value": "100"
+								},
+								{
+									"key": "order",
+									"value": "ASC\n"
+								}
+							]
+						},
+						"description": "export flussi URP\n"
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	]
+}
