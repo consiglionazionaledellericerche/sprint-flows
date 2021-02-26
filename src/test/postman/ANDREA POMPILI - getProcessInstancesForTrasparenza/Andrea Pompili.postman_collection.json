@@ -151,7 +151,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://as3dock.si.cnr.it:9200/api/processInstances/getProcessInstancesForTrasparenza?firstResult=0&maxResults=100&order=ASC\n",
+							"raw": "http://as3dock.si.cnr.it:9200/api/processInstances/getProcessInstancesForTrasparenza?firstResult=0&maxResults=100&order=ASC\n&searchField=33",
 							"protocol": "http",
 							"host": [
 								"as3dock",
@@ -177,6 +177,10 @@
 								{
 									"key": "order",
 									"value": "ASC\n"
+								},
+								{
+									"key": "searchField",
+									"value": "33"
 								}
 							]
 						},
@@ -350,7 +354,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/processInstances/getProcessInstancesForTrasparenza?firstResult=0&maxResults=100&order=ASC\n",
+							"raw": "http://localhost:8080/api/processInstances/getProcessInstancesForTrasparenza?firstResult=0&maxResults=10&order=ASC\n&searchField=biologia",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -368,11 +372,15 @@
 								},
 								{
 									"key": "maxResults",
-									"value": "100"
+									"value": "10"
 								},
 								{
 									"key": "order",
 									"value": "ASC\n"
+								},
+								{
+									"key": "searchField",
+									"value": "biologia"
 								}
 							]
 						},

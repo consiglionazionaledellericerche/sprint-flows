@@ -449,13 +449,18 @@ public class FlowsProcessInstanceService {
 
 
 
-    public HistoricProcessInstanceQuery getProcessInstancesForTrasparenza(String order) {
+    public HistoricProcessInstanceQuery getProcessInstancesForTrasparenza(String order, String searchField) {
 
         HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()
                 .includeProcessVariables()
                 .processDefinitionKey("acquisti")
                 .unfinished()
-                .variableValueEquals(flagIsTrasparenza.name(), "true");
+                .variableValueEquals(flagIsTrasparenza.name(), "true")
+                .or()
+                .variableValueLikeIgnoreCase("nomeStruttura", "%" + searchField + "%")
+                .variableValueLikeIgnoreCase("cig", "%" + searchField + "%")
+                .variableValueLikeIgnoreCase("descrizione", "%" + searchField + "%") //todo: descrizione
+                .endOr();
 
         utils.orderProcess(order, historicProcessInstanceQuery);
 
