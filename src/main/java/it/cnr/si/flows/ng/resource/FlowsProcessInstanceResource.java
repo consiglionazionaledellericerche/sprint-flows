@@ -225,19 +225,20 @@ public class FlowsProcessInstanceResource {
 	@GetMapping(value = "/getProcessInstancesForTrasparenza", produces = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyRole('applicazione-portalecnr@0000','ROLE_ADMIN')")
 	@Timed
-	public ResponseEntity<List<Map<String, Object>>> getProcessInstancesForTrasparenza(
+	public ResponseEntity<Map<String, Object>> getProcessInstancesForTrasparenza(
 			@RequestParam("firstResult") int firstResult,
 			@RequestParam("maxResults") int maxResults,
+			@RequestParam(name = "searchField", required = false) String searchField,
 			@RequestParam(name = "order", required = false) String order) {
 
-		HistoricProcessInstanceQuery query = flowsProcessInstanceService.getProcessInstancesForTrasparenza(order);
-		//popolo la responseMap con tutti i campi associati alla view "export-trasparenza"
-		List<Map<String, Object>> responseMap = mappingPI("acquisti", query.listPage(firstResult, maxResults), EXPORT_TRASPARENZA);
+		HistoricProcessInstanceQuery query = flowsProcessInstanceService.getProcessInstancesForTrasparenza(order, searchField);
+		//popolo la listPi con tutti i campi associati alla view "export-trasparenza"
+		Map<String, Object> responseMap = new HashMap();
+
+		responseMap.put("data", mappingPI("acquisti", query.listPage(firstResult, maxResults), EXPORT_TRASPARENZA));
 
 		//numero totale di Pi della query (per la paginazione dal lato del portale del CNR)
-		HashMap<String, Object> totNumItems = new HashMap<>();
-		totNumItems.put("totalNumItems", query.count());
-		responseMap.add(totNumItems);
+		responseMap.put("totalNumItems", query.count());
 
 		return new ResponseEntity<>(responseMap, HttpStatus.OK);
 	}
