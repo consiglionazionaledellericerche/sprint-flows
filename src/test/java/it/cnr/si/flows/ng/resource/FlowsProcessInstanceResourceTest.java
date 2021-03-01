@@ -353,10 +353,10 @@ public class FlowsProcessInstanceResourceTest {
         // Admin vede la Process Instance che ha avviato
         Map<String, String> searchParams = new HashMap<>();
 
-        ResponseEntity<Map<String, Object>> response = flowsProcessInstanceResource.getMyProcessInstances(0, 10, ASC, true, ALL_PROCESS_INSTANCES, searchParams);
+        ResponseEntity<DataResponse> response = flowsProcessInstanceResource.getMyProcessInstances(0, 10, ASC, true, ALL_PROCESS_INSTANCES, searchParams);
         assertEquals(OK, response.getStatusCode());
 
-        ArrayList processInstances = (ArrayList) ((DataResponse)response.getBody()).getData();
+        ArrayList processInstances = (ArrayList) (response.getBody()).getData();
         assertEquals(startedByRA, processInstances.size());
         if (processInstances.size() > 0)
             proceeeInstanceID = ((HistoricProcessInstanceResponse)processInstances.get(0)).getId() ;
