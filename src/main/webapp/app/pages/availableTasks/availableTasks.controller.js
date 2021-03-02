@@ -15,6 +15,7 @@
             //Carico i parametri di ricerca "salvati" se torno dalla pagine dei "details"
             vm.searchParams = $location.search();
             vm.active = $location.active;
+            vm.activeContent = $location.activeContent;
             vm.order = $location.order;
             switch($location.activeContent){
                 case 'myTasks':
@@ -179,8 +180,9 @@
             $scope.loadTaskAssignedInMyGroups();
         };
 
-        $scope.setActiveContent = function (choice) {
-            vm.activeContent = $location.activeContent = choice;
+        $scope.setActiveContent = function (choice, fromStateUrl) {
+            if (!fromStateUrl.includes('details?'))
+                vm.activeContent = $location.activeContent = choice;
         };
 
         $scope.resetSearcParams = function () {
