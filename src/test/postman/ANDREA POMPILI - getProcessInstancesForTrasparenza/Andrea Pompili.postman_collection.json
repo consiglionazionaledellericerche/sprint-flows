@@ -136,7 +136,7 @@
 					"response": []
 				},
 				{
-					"name": "getProcessInstancesForTrasparenza",
+					"name": "getPIForTrasparenza",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -181,6 +181,46 @@
 								{
 									"key": "searchField",
 									"value": "33"
+								}
+							]
+						},
+						"description": "export flussi URP\n"
+					},
+					"response": []
+				},
+				{
+					"name": "getPIForTrasparenzaById",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{ACCESS_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://demoscrivaniadigitale-cnr.si.cnr.it/api/processInstances/getProcessInstanceForTrasparenzaById?processInstanceId=7095",
+							"protocol": "http",
+							"host": [
+								"demoscrivaniadigitale-cnr",
+								"si",
+								"cnr",
+								"it"
+							],
+							"path": [
+								"api",
+								"processInstances",
+								"getProcessInstanceForTrasparenzaById"
+							],
+							"query": [
+								{
+									"key": "processInstanceId",
+									"value": "7095"
 								}
 							]
 						},
@@ -339,7 +379,7 @@
 					"response": []
 				},
 				{
-					"name": "getProcessInstancesForTrasparenza Copy",
+					"name": "getPIForTrasparenza",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -354,7 +394,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/processInstances/getProcessInstancesForTrasparenza?firstResult=0&maxResults=10&order=ASC\n&searchField=biologia",
+							"raw": "http://localhost:8080/api/processInstances/getProcessInstancesForTrasparenza?firstResult=0&maxResults=10&order=ASC\n&searchField=",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -380,7 +420,45 @@
 								},
 								{
 									"key": "searchField",
-									"value": "biologia"
+									"value": ""
+								}
+							]
+						},
+						"description": "export flussi URP\n"
+					},
+					"response": []
+				},
+				{
+					"name": "getPIForTrasparenzaById",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{ACCESS_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/processInstances/getProcessInstanceForTrasparenzaById?processInstanceId=7095",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"processInstances",
+								"getProcessInstanceForTrasparenzaById"
+							],
+							"query": [
+								{
+									"key": "processInstanceId",
+									"value": "7095"
 								}
 							]
 						},

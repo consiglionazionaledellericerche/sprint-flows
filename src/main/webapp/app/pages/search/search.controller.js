@@ -15,7 +15,8 @@
     vm.searchParams = $location.search();
     vm.searchParams.active = $location.search().active || true;
     vm.searchParams.order = $location.search().order || "ASC";
-    vm.searchParams.page = $location.search().page || 1;
+    if(!vm.searchParams.page)
+      vm.page = vm.searchParams.page = $location.search().page || 1;
     vm.searchParams.processDefinitionKey = $location.search().processDefinitionKey || "all";
 
     $scope.search = function() {
@@ -74,7 +75,7 @@
               vm.searchParams.processDefinitionKey +
               "/1/search-pi";
         } else {
-          $scope.formUrl = undefined;
+          $scope.formUrl = "api/forms/all/1/search-pi";
         }
       }
     );
