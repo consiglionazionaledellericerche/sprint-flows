@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-
+npm install
+bower install
 mvn clean compile package -DskipTests
 java -jar target/sprint-flows-0.2.1-SNAPSHOT.war --spring.profiles.active=dev,oiv,swagger
 
