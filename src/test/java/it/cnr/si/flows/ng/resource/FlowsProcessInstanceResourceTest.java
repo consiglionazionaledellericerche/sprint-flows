@@ -314,8 +314,8 @@ public class FlowsProcessInstanceResourceTest {
         processInstance = util.mySetUp(acquisti);
         // Finchè non esco dalla macro-fase "DECISIONE A CONTRATTARE" il flagIsTrasparenza è false quindi la Pi nn appare nella ricerca
         util.loginPortaleCnr();
-        ResponseEntity<List<Map<String, Object>>> res = flowsProcessInstanceResource
-                .getProcessInstancesForTrasparenza(0, 10, ASC);
+        ResponseEntity<Map<String, Object>> res = flowsProcessInstanceResource
+                .getProcessInstancesForTrasparenza(0, 10, "",ASC);
         assertEquals(OK, res.getStatusCode());
         assertEquals(0, res.getBody().size());
 
@@ -327,7 +327,7 @@ public class FlowsProcessInstanceResourceTest {
 
         util.loginPortaleCnr();
         res = flowsProcessInstanceResource
-                .getProcessInstancesForTrasparenza(0, 10, ASC);
+                .getProcessInstancesForTrasparenza(0, 10, "", ASC);
         assertEquals(OK, res.getStatusCode());
         assertEquals(1, res.getBody().size());
     }
@@ -335,8 +335,8 @@ public class FlowsProcessInstanceResourceTest {
 
     private Callable<Integer> getPIForTrasparenzaSize() throws ParseException {
         util.loginPortaleCnr();
-        ResponseEntity<List<Map<String, Object>>> res1 = flowsProcessInstanceResource
-                .getProcessInstancesForTrasparenza(0, 10, ASC);
+        ResponseEntity<Map<String, Object>> res1 = flowsProcessInstanceResource
+                .getProcessInstancesForTrasparenza(0, 10, "", ASC);
 
         assertEquals(OK, res1.getStatusCode());
         return () -> res1.getBody().size();
@@ -353,10 +353,10 @@ public class FlowsProcessInstanceResourceTest {
         // Admin vede la Process Instance che ha avviato
         Map<String, String> searchParams = new HashMap<>();
 
-        ResponseEntity<Map<String, Object>> response = flowsProcessInstanceResource.getMyProcessInstances(0, 10, ASC, true, ALL_PROCESS_INSTANCES, searchParams);
+        ResponseEntity<DataResponse> response = flowsProcessInstanceResource.getMyProcessInstances(0, 10, ASC, true, ALL_PROCESS_INSTANCES, searchParams);
         assertEquals(OK, response.getStatusCode());
 
-        ArrayList processInstances = (ArrayList) ((DataResponse)response.getBody()).getData();
+        ArrayList processInstances = (ArrayList) (response.getBody()).getData();
         assertEquals(startedByRA, processInstances.size());
         if (processInstances.size() > 0)
             proceeeInstanceID = ((HistoricProcessInstanceResponse)processInstances.get(0)).getId() ;
