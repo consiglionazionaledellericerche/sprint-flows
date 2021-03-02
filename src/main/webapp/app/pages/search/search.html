@@ -71,6 +71,16 @@
 
 		<div id="resultDiv" class="col-md-9" ng-cloak>
 			<h3>Flussi {{vm.searchParams.active ? 'attivi' : 'terminati'}}</h3>
+			<!--Paginazione -->
+			<div class="row">
+				<div class="text-center col-md-12">
+					<jhi-item-count page="vm.searchParams.page" total="vm.totalItems"
+									items-per-page="20"></jhi-item-count>
+					<uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.searchParams.page"
+									ng-change="search()"></uib-pagination>
+				</div>
+			</div>
+
 			<div class="row">
 				<div ng-show="vm.loading" class="text-center col-md-12">
 					<div ng-show="vm.loading" class="sprint-loader sprint-loader-mini"></div>
@@ -80,7 +90,7 @@
 					<process-list processes="vm.results" paging="paging"></process-list>
 				</div>
 			</div>
-
+			<!--Paginazione -->
 			<div class="row">
 				<div class="text-center col-md-12">
 					<jhi-item-count page="vm.searchParams.page" total="vm.totalItems"
