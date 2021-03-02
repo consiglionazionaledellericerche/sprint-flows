@@ -20,12 +20,15 @@
             switch($location.activeContent){
                 case 'myTasks':
                     vm.myPage = $location.page;
+                    vm.availablePage = vm.TAIMGPage = 1;
                 break;
                 case 'availables':
                     vm.availablePage = $location.page;
+                    vm.myPage = vm.TAIMGPage = 1;
                 break;
                 case 'taskAssignedInMyGroups':
                     vm.TAIMGPage = $location.page;
+                    vm.availablePage = vm.myPage = 1;
                 break;
             }
 
@@ -163,12 +166,15 @@
                 switch (vm.activeContent) {
                     case 'myTasks':
                         $scope.loadMyTasks();
+                        vm.availablePage = vm.TAIMGPage = 1;
                         break;
                     case 'availables':
                         $scope.loadAvailableTasks();
+                        vm.myPage = vm.TAIMGPage = 1;
                         break;
                     case 'taskAssignedInMyGroups':
                         $scope.loadTaskAssignedInMyGroups();
+                        vm.availablePage = vm.myPage = 1;
                         break;
                 }
             }
