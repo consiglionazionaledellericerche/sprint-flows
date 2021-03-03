@@ -13,6 +13,12 @@
     $scope.reload = false;
     // "conservo" i parametri della ricerca  ...
     vm.searchParams = $location.search();
+    //parso bene i searchParams che sono date
+    if(vm.searchParams.hasOwnProperty('startDateLess'))
+      vm.searchParams.startDateLess = new Date(vm.searchParams.startDateLess);
+    if(vm.searchParams.hasOwnProperty('startDateGreat'))
+      vm.searchParams.startDateGreat = new Date(vm.searchParams.startDateGreat);
+
     vm.searchParams.active = $location.search().active || true;
     vm.searchParams.order = $location.search().order || "ASC";
     if(!vm.searchParams.page)
