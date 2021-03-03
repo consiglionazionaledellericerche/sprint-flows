@@ -116,7 +116,7 @@
                 </task-list>
 
                 <!--paginazione myTasks-->
-                <div class="text-center">
+                <div class="text-center" ng-show="vm.myTotalItems > 0">
                     <jhi-item-count page="vm.myPage" total="vm.myQueryCount"
                                     items-per-page="vm.itemsPerPage"></jhi-item-count>
                     <uib-pagination class="pagination-sm" total-items="vm.myTotalItems"
@@ -147,7 +147,7 @@
                 </task-list>
 
                 <!--paginazione availabletasks-->
-                <div class="text-center">
+                <div class="text-center" ng-show="vm.availableTotalItems > 0">
                     <jhi-item-count page="vm.availablePage" total="vm.availableQueryCount"
                                     items-per-page="vm.itemsPerPage"></jhi-item-count>
                     <uib-pagination class="pagination-sm" total-items="vm.availableTotalItems"
@@ -176,7 +176,7 @@
                 </task-list>
 
                 <!--paginazione TaskAssignedInMyGroups-->
-                <div class="text-center">
+                <div class="text-center" ng-show="vm.TAIMGTotalItems > 0">
                     <jhi-item-count page="vm.TAIMGPage" total="vm.TAIMGQueryCount"
                                     items-per-page="vm.itemsPerPage"></jhi-item-count>
                     <uib-pagination class="pagination-sm" total-items="vm.TAIMGTotalItems" ng-model="vm.TAIMGPage"
