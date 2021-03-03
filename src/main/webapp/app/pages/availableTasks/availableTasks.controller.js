@@ -10,6 +10,7 @@
     function AvailableTasksController($scope, $rootScope, paginationConstants, dataService, utils, $log, $location) {
         var vm = this;
         vm.searchParams = {};
+        $scope.indextab = 1;
 
         if ($rootScope.fromState.url.includes('details?')) {
             //Carico i parametri di ricerca "salvati" se torno dalla pagine dei "details"
@@ -21,14 +22,17 @@
                 case 'myTasks':
                     vm.myPage = $location.page;
                     vm.availablePage = vm.TAIMGPage = 1;
+                    $scope.indextab = 0;
                 break;
                 case 'availables':
                     vm.availablePage = $location.page;
                     vm.myPage = vm.TAIMGPage = 1;
+                    $scope.indextab = 1;
                 break;
                 case 'taskAssignedInMyGroups':
                     vm.TAIMGPage = $location.page;
                     vm.availablePage = vm.myPage = 1;
+                    $scope.indextab = 2;
                 break;
             }
 
@@ -44,8 +48,8 @@
 
 //      se le variabili usate per la paginazione non sono inizializzate le inizializzo,
 //      altrimenti se sto tornando dalla pagina dei dettagli una di loro sarà già inizializzata
-        if(!(vm.page || vm.myPage || vm.availablePage || vm.TAIMGPage))
-            vm.page = vm.myPage = vm.availablePage = vm.TAIMGPage = 1;
+        if(!(vm.myPage || vm.availablePage || vm.TAIMGPage))
+            $location.page = vm.myPage = vm.availablePage = vm.TAIMGPage = 1;
 
         // JSON che conterrà i risultati delle due query
         vm.myTasks = {
