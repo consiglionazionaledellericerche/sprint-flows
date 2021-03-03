@@ -2,7 +2,7 @@
 	<div class="row form-group">
 		<div class="col-md-12">
 			<ul class="nav nav-pills nav-justified">
-				<li role="presentation" ng-class="{'active': vm.searchParams.active}">
+				<li role="presentation" ng-class="vm.searchParams.active == true ? 'active' : ''">
 					<a class="pointer" ng-click="vm.searchParams.active = true; vm.searchParams.page = 1; search()" data-toggle="tab">
 						<h3>
 							<i class="glyphicon glyphicon-edit"></i>
@@ -10,7 +10,7 @@
 						</h3>
 					</a>
 				</li>
-				<li role="presentation" ng-class="{'active-info': !vm.searchParams.active}">
+				<li role="presentation" ng-class="vm.searchParams.active == true ? '': 'active-info'">
 					<a class="pointer" ng-click="vm.searchParams.active = false; vm.searchParams.page = 1; search()" data-toggle="tab">
 						<h3>
 							<i class="glyphicon glyphicon-check"></i>
