@@ -3,7 +3,7 @@
 		<div class="col-md-12">
 			<ul class="nav nav-pills nav-justified">
 				<li role="presentation" ng-class="{'active': vm.searchParams.active}">
-					<a class="pointer" ng-click="vm.searchParams.active = true; search()" data-toggle="tab">
+					<a class="pointer" ng-click="vm.searchParams.active = true; vm.searchParams.page = 1; search()" data-toggle="tab">
 						<h3>
 							<i class="glyphicon glyphicon-edit"></i>
 							Flussi attivi
@@ -11,7 +11,7 @@
 					</a>
 				</li>
 				<li role="presentation" ng-class="{'active-info': !vm.searchParams.active}">
-					<a class="pointer" ng-click="vm.searchParams.active = false; search()" data-toggle="tab">
+					<a class="pointer" ng-click="vm.searchParams.active = false; vm.searchParams.page = 1; search()" data-toggle="tab">
 						<h3>
 							<i class="glyphicon glyphicon-check"></i>
 							Flussi terminati
