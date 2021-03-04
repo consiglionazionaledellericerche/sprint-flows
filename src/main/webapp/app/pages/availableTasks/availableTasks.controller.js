@@ -21,17 +21,20 @@
             switch($location.activeContent){
                 case 'myTasks':
                     vm.myPage = $location.page;
-                    vm.availablePage = vm.TAIMGPage = 1;
+                    vm.availablePage = 1;
+                    vm.TAIMGPage = 1;
                     $scope.indextab = 0;
                 break;
                 case 'availables':
                     vm.availablePage = $location.page;
-                    vm.myPage = vm.TAIMGPage = 1;
+                    vm.myPage = 1;
+                    vm.TAIMGPage = 1;
                     $scope.indextab = 1;
                 break;
                 case 'taskAssignedInMyGroups':
                     vm.TAIMGPage = $location.page;
-                    vm.availablePage = vm.myPage = 1;
+                    vm.availablePage = 1;
+                    vm.myPage = 1;
                     $scope.indextab = 2;
                 break;
             }
