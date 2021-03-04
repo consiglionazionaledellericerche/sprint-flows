@@ -336,4 +336,18 @@ public class FlowsAttachmentResource {
         flowsAttachmentService.setPubblicabileUrp(processInstanceId, attachmentName, pubblica);
 
     }
+    
+    @RequestMapping(value = "{processInstanceId}/{attachmentName}/updateAttachmentPath", method = RequestMethod.POST)
+    @ResponseBody
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Timed
+    public void updateAttachmentPath(
+            HttpServletResponse response,
+            @PathVariable("processInstanceId") String processInstanceId,
+            @PathVariable("attachmentName") String attachmentName,
+    		@RequestBody String valorePath)  {
+
+        flowsAttachmentService.updateAttachmentPath(processInstanceId, attachmentName, valorePath);
+
+    }
 }

@@ -1,8 +1,8 @@
 <div ng-cloak>
     <div class="row form-group">
         <div class="col-md-12">
-            <uib-tabset active="1" justified="true" type="pills">
-                <uib-tab index="0" classes="mine" select="setActiveContent('myTasks')">
+            <uib-tabset active="indextab" justified="true" type="pills">
+                <uib-tab index="0" classes="mine" select="setActiveContent('myTasks', fromState.url)">
                     <uib-tab-heading>
                         <h3>
                             <i class="glyphicon glyphicon-inbox"></i>
@@ -10,7 +10,7 @@
                         </h3>
                     </uib-tab-heading>
                 </uib-tab>
-                <uib-tab index="1" classes="available" select="setActiveContent('availables')">
+                <uib-tab index="1" classes="available" select="setActiveContent('availables', fromState.url)">
                     <uib-tab-heading>
                         <h3>
                             <i class="glyphicon glyphicon-user"></i>
@@ -19,7 +19,7 @@
                     </uib-tab-heading>
                 </uib-tab>
                 </uib-tab>
-                <uib-tab index="2" classes="others" select="setActiveContent('taskAssignedInMyGroups')">
+                <uib-tab index="2" classes="others" select="setActiveContent('taskAssignedInMyGroups', fromState.url)">
                     <uib-tab-heading>
                         <h3>
                             <i class="glyphicon glyphicon-tasks"></i>
@@ -101,17 +101,27 @@
                 Lista dei compiti assegnati a me
               </span>
                 </h3>
+                <!--paginazione myTasks-->
+                <div class="text-center" ng-show="vm.myTotalItems > 0">
+                    <jhi-item-count page="vm.myPage" total="vm.myQueryCount"
+                                    items-per-page="vm.itemsPerPage"></jhi-item-count>
+                    <uib-pagination class="pagination-sm" total-items="vm.myTotalItems"
+                                    ng-model="vm.myPage"
+                                    ng-change="vm.transition(vm.myPage)"></uib-pagination>
+                </div>
+
                 <task-list tasks="vm.myTasks.data"
                            action-buttons="true"
                            completed="false">
                 </task-list>
 
                 <!--paginazione myTasks-->
-                <div class="text-center">
+                <div class="text-center" ng-show="vm.myTotalItems > 0">
                     <jhi-item-count page="vm.myPage" total="vm.myQueryCount"
                                     items-per-page="vm.itemsPerPage"></jhi-item-count>
-                    <uib-pagination class="pagination-sm" total-items="vm.myTotalItems" ng-model="vm.myPage"
-                                    ng-change="vm.transition()"></uib-pagination>
+                    <uib-pagination class="pagination-sm" total-items="vm.myTotalItems"
+                                    ng-model="vm.myPage"
+                                    ng-change="vm.transition(vm.myPage)"></uib-pagination>
                 </div>
             </div>
 
@@ -122,18 +132,27 @@
                 Lista dei compiti di gruppo da prendere in carico
               </span>
                 </h3>
+                <!--paginazione availabletasks-->
+                <div class="text-center" ng-show="vm.availableTotalItems > 0" >
+                    <jhi-item-count page="vm.availablePage" total="vm.availableQueryCount"
+                                    items-per-page="vm.itemsPerPage"></jhi-item-count>
+                    <uib-pagination class="pagination-sm" total-items="vm.availableTotalItems"
+                                    ng-model="vm.availablePage"
+                                    ng-change="vm.transition(vm.availablePage)"></uib-pagination>
+                </div>
+
                 <task-list tasks="vm.availableTasks.data"
                            action-buttons="true"
                            completed="false">
                 </task-list>
 
                 <!--paginazione availabletasks-->
-                <div class="text-center">
+                <div class="text-center" ng-show="vm.availableTotalItems > 0">
                     <jhi-item-count page="vm.availablePage" total="vm.availableQueryCount"
                                     items-per-page="vm.itemsPerPage"></jhi-item-count>
                     <uib-pagination class="pagination-sm" total-items="vm.availableTotalItems"
                                     ng-model="vm.availablePage"
-                                    ng-change="vm.transition()"></uib-pagination>
+                                    ng-change="vm.transition(vm.availablePage)"></uib-pagination>
                 </div>
             </div>
 
@@ -144,16 +163,24 @@
                 Lista dei compiti di gruppo presi in carico da altri
               </span>
                 </h3>
+                <!--paginazione TaskAssignedInMyGroups-->
+                <div class="text-center" ng-show="vm.TAIMGTotalItems > 0">
+                    <jhi-item-count page="vm.TAIMGPage" total="vm.TAIMGQueryCount"
+                                    items-per-page="vm.itemsPerPage"></jhi-item-count>
+                    <uib-pagination class="pagination-sm" total-items="vm.TAIMGTotalItems" ng-model="vm.TAIMGPage"
+                                    ng-change="vm.transition(vm.TAIMGPage)"></uib-pagination>
+                </div>
+
                 <task-list tasks="vm.taskAssignedInMyGroups.data"
                            completed="false">
                 </task-list>
 
-                <!--paginazione availabletasks-->
-                <div class="text-center">
+                <!--paginazione TaskAssignedInMyGroups-->
+                <div class="text-center" ng-show="vm.TAIMGTotalItems > 0">
                     <jhi-item-count page="vm.TAIMGPage" total="vm.TAIMGQueryCount"
                                     items-per-page="vm.itemsPerPage"></jhi-item-count>
                     <uib-pagination class="pagination-sm" total-items="vm.TAIMGTotalItems" ng-model="vm.TAIMGPage"
-                                    ng-change="vm.transition()"></uib-pagination>
+                                    ng-change="vm.transition(vm.TAIMGPage)"></uib-pagination>
                 </div>
             </div>
 

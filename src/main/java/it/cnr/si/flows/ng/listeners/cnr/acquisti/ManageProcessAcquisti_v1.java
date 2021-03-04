@@ -24,6 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -79,7 +80,12 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 	private StoreService storeService;
 	@Inject
 	private Utils utils;
-
+    @Value("${cnr.sigla.url}")
+    private String urlSigla;
+    @Value("${cnr.sigla.contrattoPath}")
+    private String contrattoPath;
+    
+    
 	private Expression faseEsecuzione;
 
 	public void pubblicaFilePubblicabili(DelegateExecution execution, Boolean pubblicaFlag) {
@@ -178,8 +184,8 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				LOGGER.error("Formato Impegno Non Valido {} nel flusso {} - {}", impegno.getString("importoLordo"), execution.getId(), execution.getVariable("title"));
 				throw new BpmnError("400", "Formato Impegno Non Valido: " + impegno.getString("importoLordo"));
 			}
-			
-			impegno.put("uo_label", aceService.entitaOrganizzativaFindByTerm(impegno.get("uo").toString()).get(0).getDenominazione());
+
+			impegno.put("uo_label", aceBridgeService.getUoLike(impegno.getString("uo")).get(0).getDenominazione());
 			impegno.put("cdsuo", impegno.get("uo").toString());
 		}
 
@@ -719,9 +725,9 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				execution.setVariable(statoFinaleDomanda.name(), "STIPULATO");
 				utils.updateJsonSearchTerms(executionId, processInstanceId, "STIPULATO");
 				//TODO implementare le url a seconda del contesto
-				String urlSigla = "www.google.it";
+				//String urlSigla = "www.google.it";
 				Map<String, Object> siglaPayload = createSiglaPayload(execution);
-				externalMessageService.createExternalMessage(urlSigla, ExternalMessageVerb.POST, siglaPayload, ExternalApplication.SIGLA);
+				externalMessageService.createExternalMessage(urlSigla + contrattoPath, ExternalMessageVerb.POST, siglaPayload, ExternalApplication.SIGLA);
 				prepareFilesToSigla(execution);
 			};break;     
 			case "end-stipulato-end": {

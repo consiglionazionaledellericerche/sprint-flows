@@ -25,266 +25,314 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Base64;
 
 @EnableScheduling
 @Profile("cnr")
 @Configuration
 public class ExternalMessageSender {
 
-    private final Logger log = LoggerFactory.getLogger(ExternalMessageSender.class);
+	private final Logger log = LoggerFactory.getLogger(ExternalMessageSender.class);
 
-    @Value("${cnr.abil.url}")
-    private String abilUrl;
-    @Value("${cnr.abil.username}")
-    private String abilUsername;
-    @Value("${cnr.abil.password}")
-    private String abilPassword;
-    @Value("${cnr.abil.loginPath}")
-    private String abilLoginPath;
-    @Value("${cnr.stm.url}")
-    private String stmUrl;
-    @Value("${cnr.stm.username}")
-    private String stmUsername;
-    @Value("${cnr.stm.password}")
-    private String stmPassword;
-    @Value("${cnr.stm.loginPath}")
-    private String stmLoginPath;
-    @Value("${cnr.missioni.url}")
-    private String missioniUrl;
-    @Value("${cnr.missioni.username}")
-    private String missioniUsername;
-    @Value("${cnr.missioni.password}")
-    private String missioniPassword;
-    @Value("${cnr.missioni.loginPath}")
-    private String missioniLoginPath;
-    @Value("${cnr.missioni.client_id}")
-    private String missioniClientId;
-    @Value("${cnr.missioni.client_secret}")
-    private String missioniClientSecret;
-
-    @Inject
-    private ExternalMessageService externalMessageService;
-    @Inject
-    private HazelcastInstance hazelcastInstance;
-
-    @PostConstruct
-    public void init() {
-
-        // ABIL
-
-        RestTemplate abilTemplate = new RestTemplate();
-        List<ClientHttpRequestInterceptor> interceptors = abilTemplate.getInterceptors();
-        interceptors.add(new AbilRequestInterceptor());
-        abilTemplate.setInterceptors(interceptors);
-
-        ExternalApplication.ABIL.setTemplate(abilTemplate);
-
-        // STM
-
-        RestTemplate stmTemplate = new RestTemplate();
-        interceptors = stmTemplate.getInterceptors();
-        interceptors.add(new StmRequestInterceptor());
-        stmTemplate.setInterceptors(interceptors);
-        ExternalApplication.STM.setTemplate(stmTemplate);
-
-        // STM
-
-        RestTemplate missioniTemplate = new RestTemplate();
-        interceptors = missioniTemplate.getInterceptors();
-        interceptors.add(new MissioniRequestInterceptor());
-        missioniTemplate.setInterceptors(interceptors);
-        ExternalApplication.MISSIONI.setTemplate(missioniTemplate);
-
-        // GENERIC
-
-        ExternalApplication.GENERIC.setTemplate(new RestTemplate());
-
-    }
-
-    public void sendMessages() {
-        log.info("Processo le rest ExternalMessage");
-        externalMessageService.getNewExternalMessages().forEach(this::send);
-    }
-
-    public void sendErrorMessages() {
-        log.info("Processo le rest ExternalMessage in errore");
-        externalMessageService.getFailedExternalMessages().forEach(this::send);
-    }
-
-    /* friendly */ void send(ExternalMessage msg) {
-    // TODO refactor : il metodo send dovrebbe sendare, non sendare-e-salvare
-
-        log.debug("Tentativo della rest {}", msg);
-
-        ResponseEntity<String> response = null;
-        try {
-
-            RestTemplate template = msg.getApplication().getTemplate();
-
-            response = template.exchange(
-                    msg.getUrl(),
-                    msg.getVerb().value(),
-                    new HttpEntity<>(msg.getPayload()),
-                    String.class
-            );
-
-            if (response.getStatusCode() != HttpStatus.OK)
-                throw new Exception();
-
-            msg.setStatus(ExternalMessageStatus.SENT);
-            msg.setLastErrorMessage(StringUtils.substring(response.getBody(), 0, 254));
-            externalMessageService.save(msg);
-            log.info("Rest eseguita con successo {} ", msg);
-
-        } catch (Exception e) {
-
-            String responseMessage;
-            if (response == null)
-                responseMessage = e.getMessage();
-            else if (response.getBody() == null)
-                responseMessage = String.valueOf(response.getStatusCodeValue());
-            else
-                responseMessage = response.getBody();
-
-            log.error("Rest fallita con messaggio {} {} ", responseMessage, msg, e);
-
-            msg.setStatus(ExternalMessageStatus.ERROR);
-            msg.setRetries(msg.getRetries() + 1);
-            msg.setLastErrorMessage(StringUtils.substring(responseMessage, 0, 254));
-            externalMessageService.save(msg);
-        }
-    }
+	@Value("${cnr.abil.url}")
+	private String abilUrl;
+	@Value("${cnr.abil.username}")
+	private String abilUsername;
+	@Value("${cnr.abil.password}")
+	private String abilPassword;
+	@Value("${cnr.abil.loginPath}")
+	private String abilLoginPath;
+	@Value("${cnr.stm.url}")
+	private String stmUrl;
+	@Value("${cnr.stm.username}")
+	private String stmUsername;
+	@Value("${cnr.stm.password}")
+	private String stmPassword;
+	@Value("${cnr.stm.loginPath}")
+	private String stmLoginPath;
+	@Value("${cnr.missioni.url}")
+	private String missioniUrl;
+	@Value("${cnr.missioni.username}")
+	private String missioniUsername;
+	@Value("${cnr.missioni.password}")
+	private String missioniPassword;
+	@Value("${cnr.missioni.loginPath}")
+	private String missioniLoginPath;
+	@Value("${cnr.missioni.client_id}")
+	private String missioniClientId;
+	@Value("${cnr.missioni.client_secret}")
+	private String missioniClientSecret;
+	@Value("${cnr.sigla.url}")
+	private String siglaUrl;
+	@Value("${cnr.sigla.usr}")
+	private String siglaUsername;
+	@Value("${cnr.sigla.psw}")
+	private String siglaPassword;
 
 
-    /* ---------------- REST TEMPLATES ---------------- */
 
-    private class AbilRequestInterceptor implements ClientHttpRequestInterceptor {
+	@Inject
+	private ExternalMessageService externalMessageService;
+	@Inject
+	private HazelcastInstance hazelcastInstance;
 
-        private String id_token = null;
+	@PostConstruct
+	public void init() {
 
-        @Override
-        public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
+		// ABIL
 
-            request.getHeaders().set("Authorization", "Bearer "+ id_token);
-            request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-            ClientHttpResponse response = execution.execute(request, body);
+		RestTemplate abilTemplate = new RestTemplate();
+		List<ClientHttpRequestInterceptor> interceptors = abilTemplate.getInterceptors();
+		interceptors.add(new AbilRequestInterceptor());
+		abilTemplate.setInterceptors(interceptors);
 
-            if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+		ExternalApplication.ABIL.setTemplate(abilTemplate);
 
-                Map<String, String> auth = new HashMap<>();
-                auth.put("username", abilUsername);
-                auth.put("password", abilPassword);
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_JSON);
+		// STM
 
-                RequestEntity entity = new RequestEntity(
-                        auth,
-                        headers,
-                        HttpMethod.POST,
-                        URI.create(abilUrl + abilLoginPath));
+		RestTemplate stmTemplate = new RestTemplate();
+		interceptors = stmTemplate.getInterceptors();
+		interceptors.add(new StmRequestInterceptor());
+		stmTemplate.setInterceptors(interceptors);
+		ExternalApplication.STM.setTemplate(stmTemplate);
 
-                ResponseEntity<Map> resp = new RestTemplate().exchange(entity, Map.class);
+		// MISSIONI
 
-                this.id_token = (String) resp.getBody().get("id_token");
+		RestTemplate missioniTemplate = new RestTemplate();
+		interceptors = missioniTemplate.getInterceptors();
+		interceptors.add(new MissioniRequestInterceptor());
+		missioniTemplate.setInterceptors(interceptors);
+		ExternalApplication.MISSIONI.setTemplate(missioniTemplate);
 
-                request.getHeaders().set("Authorization", "Bearer "+ id_token);
-                request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-                response = execution.execute(request, body);
-            }
+		// MISSIONI
 
-            return response;
-        }
-    }
+		RestTemplate siglaTemplate = new RestTemplate();
+		interceptors = siglaTemplate.getInterceptors();
+		interceptors.add(new SiglaRequestInterceptor());
+		siglaTemplate.setInterceptors(interceptors);
+		ExternalApplication.SIGLA.setTemplate(siglaTemplate);
 
-    private class StmRequestInterceptor implements ClientHttpRequestInterceptor {
+		// GENERIC
 
-        private String id_token = null;
+		ExternalApplication.GENERIC.setTemplate(new RestTemplate());
 
-        @Override
-        public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
+	}
 
-            request.getHeaders().set("Authorization", "Bearer "+ id_token);
-            request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-            ClientHttpResponse response = execution.execute(request, body);
+	public void sendMessages() {
+		log.info("Processo le rest ExternalMessage");
+		externalMessageService.getNewExternalMessages().forEach(this::send);
+	}
 
-            if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+	public void sendErrorMessages() {
+		log.info("Processo le rest ExternalMessage in errore");
+		externalMessageService.getFailedExternalMessages().forEach(this::send);
+	}
 
-                Map<String, String> auth = new HashMap<>();
-                auth.put("username", stmUsername);
-                auth.put("password", stmPassword);
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_JSON);
+	/* friendly */ void send(ExternalMessage msg) {
+		// TODO refactor : il metodo send dovrebbe sendare, non sendare-e-salvare
 
-                RequestEntity entity = new RequestEntity(
-                        auth,
-                        headers,
-                        HttpMethod.POST,
-                        URI.create(stmUrl + stmLoginPath));
+		log.debug("Tentativo della rest {}", msg);
 
-                ResponseEntity<Map> resp = new RestTemplate().exchange(entity, Map.class);
+		ResponseEntity<String> response = null;
+		try {
 
-                this.id_token = (String) resp.getBody().get("id_token");
+			RestTemplate template = msg.getApplication().getTemplate();
 
-                request.getHeaders().set("Authorization", "Bearer "+ id_token);
-                request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
-                response = execution.execute(request, body);
-            }
+			response = template.exchange(
+					msg.getUrl(),
+					msg.getVerb().value(),
+					new HttpEntity<>(msg.getPayload()),
+					String.class
+					);
 
-            return response;
-        }
-    }
+			if (response.getStatusCode() != HttpStatus.OK)
+				throw new Exception();
 
-    /**
-     * Missioni, per la login, usa /oauth/token e una richiesta POST com FORM_DATA
-     * Per questo ho delle peculiarita': devo usare una MultiValueMap
-     */
-    private class MissioniRequestInterceptor implements ClientHttpRequestInterceptor {
+			msg.setStatus(ExternalMessageStatus.SENT);
+			msg.setLastErrorMessage(StringUtils.substring(response.getBody(), 0, 254));
+			externalMessageService.save(msg);
+			log.info("Rest eseguita con successo {} ", msg);
 
-        private String access_token = null;
+		} catch (Exception e) {
 
-        @Override
-        public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
+			String responseMessage;
+			if (response == null)
+				responseMessage = e.getMessage();
+			else if (response.getBody() == null)
+				responseMessage = String.valueOf(response.getStatusCodeValue());
+			else
+				responseMessage = response.getBody();
 
-            request.getHeaders().set("Authorization", "Bearer "+ access_token);
-            request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
-            ObjectMapper om = new ObjectMapper();
-            String stringRepresentation = new String(body, "UTF-8");
-            JsonNode jsonRepresentation = om.readTree(stringRepresentation);
-            byte[] byteRepresentation = jsonRepresentation.toString().getBytes(StandardCharsets.UTF_8);
+			log.error("Rest fallita con messaggio {} {} ", responseMessage, msg, e);
 
-            ClientHttpResponse response = execution.execute(request, byteRepresentation);
+			msg.setStatus(ExternalMessageStatus.ERROR);
+			msg.setRetries(msg.getRetries() + 1);
+			msg.setLastErrorMessage(StringUtils.substring(responseMessage, 0, 254));
+			externalMessageService.save(msg);
+		}
+	}
 
 
-            if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+	/* ---------------- REST TEMPLATES ---------------- */
 
-//                MultiValueMap<String, String> auth = new LinkedMultiValueMap<>();
-                Map<String, String> auth = new HashMap<>();
-                auth.put("username", missioniUsername);
-                auth.put("password", missioniPassword);
-                auth.put("rememberMe", "true");
+	private class AbilRequestInterceptor implements ClientHttpRequestInterceptor {
 
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_JSON);
+		private String id_token = null;
 
-                RequestEntity entity = new RequestEntity(
-                        auth,
-                        headers,
-                        HttpMethod.POST,
-                        URI.create(missioniUrl + missioniLoginPath));
-                ResponseEntity<Map> resp = new RestTemplate().exchange(entity, Map.class);
-                this.access_token = (String) resp.getBody().get("id_token");
+		@Override
+		public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 
-                request.getHeaders().set("Authorization", "Bearer "+ access_token);
-                request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
-                response = execution.execute(request, byteRepresentation);
-            }
+			request.getHeaders().set("Authorization", "Bearer "+ id_token);
+			request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+			ClientHttpResponse response = execution.execute(request, body);
 
-            return response;
-        }
-    }
+			if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+
+				Map<String, String> auth = new HashMap<>();
+				auth.put("username", abilUsername);
+				auth.put("password", abilPassword);
+				HttpHeaders headers = new HttpHeaders();
+				headers.setContentType(MediaType.APPLICATION_JSON);
+
+				RequestEntity entity = new RequestEntity(
+						auth,
+						headers,
+						HttpMethod.POST,
+						URI.create(abilUrl + abilLoginPath));
+
+				ResponseEntity<Map> resp = new RestTemplate().exchange(entity, Map.class);
+
+				this.id_token = (String) resp.getBody().get("id_token");
+
+				request.getHeaders().set("Authorization", "Bearer "+ id_token);
+				request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+				response = execution.execute(request, body);
+			}
+
+			return response;
+		}
+	}
+
+	private class StmRequestInterceptor implements ClientHttpRequestInterceptor {
+
+		private String id_token = null;
+
+		@Override
+		public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
+
+			request.getHeaders().set("Authorization", "Bearer "+ id_token);
+			request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+			ClientHttpResponse response = execution.execute(request, body);
+
+			if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+
+				Map<String, String> auth = new HashMap<>();
+				auth.put("username", stmUsername);
+				auth.put("password", stmPassword);
+				HttpHeaders headers = new HttpHeaders();
+				headers.setContentType(MediaType.APPLICATION_JSON);
+
+				RequestEntity entity = new RequestEntity(
+						auth,
+						headers,
+						HttpMethod.POST,
+						URI.create(stmUrl + stmLoginPath));
+
+				ResponseEntity<Map> resp = new RestTemplate().exchange(entity, Map.class);
+
+				this.id_token = (String) resp.getBody().get("id_token");
+
+				request.getHeaders().set("Authorization", "Bearer "+ id_token);
+				request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+				response = execution.execute(request, body);
+			}
+
+			return response;
+		}
+	}
+
+	/**
+	 * Missioni, per la login, usa /oauth/token e una richiesta POST com FORM_DATA
+	 * Per questo ho delle peculiarita': devo usare una MultiValueMap
+	 */
+	private class MissioniRequestInterceptor implements ClientHttpRequestInterceptor {
+
+		private String access_token = null;
+
+		@Override
+		public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
+
+			request.getHeaders().set("Authorization", "Bearer "+ access_token);
+			request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
+			ObjectMapper om = new ObjectMapper();
+			String stringRepresentation = new String(body, "UTF-8");
+			JsonNode jsonRepresentation = om.readTree(stringRepresentation);
+			byte[] byteRepresentation = jsonRepresentation.toString().getBytes(StandardCharsets.UTF_8);
+
+			ClientHttpResponse response = execution.execute(request, byteRepresentation);
+
+
+			if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+
+				//                MultiValueMap<String, String> auth = new LinkedMultiValueMap<>();
+
+				Map<String, String> auth = new HashMap<>();
+				auth.put("username", missioniUsername);
+				auth.put("password", missioniPassword);
+				auth.put("rememberMe", "true");
+
+				HttpHeaders headers = new HttpHeaders();
+				headers.setContentType(MediaType.APPLICATION_JSON);
+
+				RequestEntity entity = new RequestEntity(
+						auth,
+						headers,
+						HttpMethod.POST,
+						URI.create(missioniUrl + missioniLoginPath));
+				ResponseEntity<Map> resp = new RestTemplate().exchange(entity, Map.class);
+				this.access_token = (String) resp.getBody().get("id_token");
+				request.getHeaders().set("Authorization", "Bearer "+ access_token);
+				request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
+				response = execution.execute(request, byteRepresentation);
+			}
+
+			return response;
+		}
+	}
+
+	/**
+	 * Missioni, per la login, usa /oauth/token e una richiesta POST com FORM_DATA
+	 * Per questo ho delle peculiarita': devo usare una MultiValueMap
+	 */
+	private class SiglaRequestInterceptor implements ClientHttpRequestInterceptor {
+
+		private String access_token = null;
+
+		@Override
+		public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
+
+			LocalDate dateRif = LocalDate.now();
+			String annoEsercizio = String.valueOf(dateRif.getYear());
+			String encoding = Base64.getEncoder().encodeToString((siglaUsername + ":" + siglaPassword).getBytes(StandardCharsets.UTF_8));
+			request.getHeaders().set("Authorization", "Basic "+ encoding);
+			request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
+			request.getHeaders().set("X-sigla-cd-cdr", "999.000.000");
+			request.getHeaders().set("X-sigla-cd-cds", "999");
+			request.getHeaders().set("X-sigla-cd-unita-organizzativa", "999.000");
+			request.getHeaders().set("X-sigla-esercizio", annoEsercizio);
+			ObjectMapper om = new ObjectMapper();
+			String stringRepresentation = new String(body, "UTF-8");
+			JsonNode jsonRepresentation = om.readTree(stringRepresentation);
+			byte[] byteRepresentation = jsonRepresentation.toString().getBytes(StandardCharsets.UTF_8);
+
+			ClientHttpResponse response = execution.execute(request, byteRepresentation);
+			return response;
+		}
+	}
 }
 
 

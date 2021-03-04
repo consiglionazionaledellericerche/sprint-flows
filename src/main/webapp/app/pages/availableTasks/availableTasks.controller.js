@@ -10,12 +10,32 @@
     function AvailableTasksController($scope, $rootScope, paginationConstants, dataService, utils, $log, $location) {
         var vm = this;
         vm.searchParams = {};
+        $scope.indextab = 1;
 
         if ($rootScope.fromState.url.includes('details?')) {
             //Carico i parametri di ricerca "salvati" se torno dalla pagine dei "details"
             vm.searchParams = $location.search();
             vm.active = $location.active;
+            vm.activeContent = $location.activeContent;
             vm.order = $location.order;
+            switch($location.activeContent){
+                case 'myTasks':
+                    vm.myPage = $location.page;
+                    vm.availablePage = vm.TAIMGPage = 1;
+                    $scope.indextab = 0;
+                break;
+                case 'availables':
+                    vm.availablePage = $location.page;
+                    vm.myPage = vm.TAIMGPage = 1;
+                    $scope.indextab = 1;
+                break;
+                case 'taskAssignedInMyGroups':
+                    vm.TAIMGPage = $location.page;
+                    vm.availablePage = vm.myPage = 1;
+                    $scope.indextab = 2;
+                break;
+            }
+
             //carico la form url
             $scope.formUrl = $location.formUrl || null;
             vm.processDefinitionKey = $location.processDefinitionKey;
@@ -25,7 +45,11 @@
             vm.order = 'ASC';
             $scope.formUrl = utils.loadSearchFields(vm.processDefinitionKey, true);
         }
-        vm.page = vm.myPage = vm.availablePage = vm.TAIMGPage = 1;
+
+//      se le variabili usate per la paginazione non sono inizializzate le inizializzo,
+//      altrimenti se sto tornando dalla pagina dei dettagli una di loro sarà già inizializzata
+        if(!(vm.myPage || vm.availablePage || vm.TAIMGPage))
+            $location.page = vm.myPage = vm.availablePage = vm.TAIMGPage = 1;
 
         // JSON che conterrà i risultati delle due query
         vm.myTasks = {
@@ -140,18 +164,21 @@
             $location.active = vm.active;
             // Se RICARICO la pagina aggiorno TUTTE le "viste" (i miei compiti, compiti di gruppo,
             // compiti dei miei gruppi assegnati ad altri) e cancello i searchParams
-            if (performance.navigation.type == performance.navigation.TYPE_RELOAD || performance.navigation.type ==performance.navigation.TYPE_NAVIGATE) {
+            if (performance.navigation.type == performance.navigation.TYPE_RELOAD || performance.navigation.type == performance.navigation.TYPE_NAVIGATE) {
                 $scope.loadAllTasks();
             } else {
                 switch (vm.activeContent) {
                     case 'myTasks':
                         $scope.loadMyTasks();
+                        vm.availablePage = vm.TAIMGPage = 1;
                         break;
                     case 'availables':
                         $scope.loadAvailableTasks();
+                        vm.myPage = vm.TAIMGPage = 1;
                         break;
                     case 'taskAssignedInMyGroups':
                         $scope.loadTaskAssignedInMyGroups();
+                        vm.availablePage = vm.myPage = 1;
                         break;
                 }
             }
@@ -163,8 +190,9 @@
             $scope.loadTaskAssignedInMyGroups();
         };
 
-        $scope.setActiveContent = function (choice) {
-            vm.activeContent = choice;
+        $scope.setActiveContent = function (choice, fromStateUrl) {
+            if (!fromStateUrl.includes('details?'))
+                vm.activeContent = $location.activeContent = choice;
         };
 
         $scope.resetSearcParams = function () {
@@ -181,8 +209,9 @@
         });
 
         // funzione richiamata quando si chiede una nuova "pagina" dei risultati
-        vm.transition = function transition() {
+        vm.transition = function transition(page) {
             $scope.showProcessInstances();
+            $location.page = page;
         };
     }
 })();

@@ -2,16 +2,16 @@
 	<div class="row form-group">
 		<div class="col-md-12">
 			<ul class="nav nav-pills nav-justified">
-				<li role="presentation" ng-class="{'active': vm.searchParams.active}">
-					<a class="pointer" ng-click="vm.searchParams.active = true; search()" data-toggle="tab">
+				<li role="presentation" ng-class="vm.searchParams.active == true ? 'active' : ''">
+					<a class="pointer" ng-click="vm.searchParams.active = true; vm.searchParams.page = 1; search()" data-toggle="tab">
 						<h3>
 							<i class="glyphicon glyphicon-edit"></i>
 							Flussi attivi
 						</h3>
 					</a>
 				</li>
-				<li role="presentation" ng-class="{'active-info': !vm.searchParams.active}">
-					<a class="pointer" ng-click="vm.searchParams.active = false; search()" data-toggle="tab">
+				<li role="presentation" ng-class="vm.searchParams.active == true ? '': 'active-info'">
+					<a class="pointer" ng-click="vm.searchParams.active = false; vm.searchParams.page = 1; search()" data-toggle="tab">
 						<h3>
 							<i class="glyphicon glyphicon-check"></i>
 							Flussi terminati
@@ -71,6 +71,16 @@
 
 		<div id="resultDiv" class="col-md-9" ng-cloak>
 			<h3>Flussi {{vm.searchParams.active ? 'attivi' : 'terminati'}}</h3>
+			<!--Paginazione -->
+			<div class="row" ng-show="vm.totalItems > 0">
+				<div class="text-center col-md-12">
+					<jhi-item-count page="vm.searchParams.page" total="vm.totalItems"
+									items-per-page="20"></jhi-item-count>
+					<uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.searchParams.page"
+									ng-change="search()"></uib-pagination>
+				</div>
+			</div>
+
 			<div class="row">
 				<div ng-show="vm.loading" class="text-center col-md-12">
 					<div ng-show="vm.loading" class="sprint-loader sprint-loader-mini"></div>
@@ -80,9 +90,9 @@
 					<process-list processes="vm.results" paging="paging"></process-list>
 				</div>
 			</div>
-
+			<!--Paginazione -->
 			<div class="row">
-				<div class="text-center col-md-12">
+				<div class="text-center col-md-12" ng-show="vm.totalItems > 0">
 					<jhi-item-count page="vm.searchParams.page" total="vm.totalItems"
 									items-per-page="20"></jhi-item-count>
 					<uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.searchParams.page"

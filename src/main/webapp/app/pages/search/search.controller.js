@@ -13,9 +13,16 @@
     $scope.reload = false;
     // "conservo" i parametri della ricerca  ...
     vm.searchParams = $location.search();
+    //parso bene i searchParams che sono date
+    if(vm.searchParams.hasOwnProperty('startDateLess'))
+      vm.searchParams.startDateLess = new Date(vm.searchParams.startDateLess);
+    if(vm.searchParams.hasOwnProperty('startDateGreat'))
+      vm.searchParams.startDateGreat = new Date(vm.searchParams.startDateGreat);
+
     vm.searchParams.active = $location.search().active || true;
     vm.searchParams.order = $location.search().order || "ASC";
-    vm.searchParams.page = $location.search().page || 1;
+    if(!vm.searchParams.page)
+      vm.page = vm.searchParams.page = $location.search().page || 1;
     vm.searchParams.processDefinitionKey = $location.search().processDefinitionKey || "all";
 
     $scope.search = function() {
@@ -74,7 +81,7 @@
               vm.searchParams.processDefinitionKey +
               "/1/search-pi";
         } else {
-          $scope.formUrl = undefined;
+          $scope.formUrl = "api/forms/all/1/search-pi";
         }
       }
     );
