@@ -728,7 +728,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				//TODO implementare le url a seconda del contesto
 				//String urlSigla = "www.google.it";
 				Map<String, Object> siglaPayload = createSiglaPayload(execution);
-				externalMessageService.createExternalMessage(urlSigla + contrattoPath, ExternalMessageVerb.POST, siglaPayload, ExternalApplication.SIGLA);
+				externalMessageService.createExternalMessage(urlSigla + contrattoPath, ExternalMessageVerb.PUT, siglaPayload, ExternalApplication.SIGLA);
 				prepareFilesToSigla(execution);
 			};break;     
 			case "end-stipulato-end": {
