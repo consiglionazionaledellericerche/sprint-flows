@@ -508,6 +508,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 						JSONObject impegno = impegni.getJSONObject(i);						
 						impegno.put("uo_label", aceBridgeService.getUoLike(impegno.getString("cdsuo")).get(0).getDenominazione());
 						impegno.put("uo", impegno.get("cdsuo").toString());
+						impegno.remove("cdsuo");
 					}
 					execution.setVariable("impegni_json", impegni.toString());
 					put("listaUoAbilitateExt", impegni);
