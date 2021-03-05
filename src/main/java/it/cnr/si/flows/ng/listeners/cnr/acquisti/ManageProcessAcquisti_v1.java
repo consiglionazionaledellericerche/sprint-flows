@@ -506,8 +506,8 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 					JSONArray impegni = new JSONArray(impegniString);
 					for ( int i = 0; i < impegni.length(); i++) {
 						JSONObject impegno = impegni.getJSONObject(i);						
-						impegno.put("uo_label", aceBridgeService.getUoLike(impegno.getString("uo")).get(0).getDenominazione());
-						impegno.put("uo", impegno.get("uo").toString());
+						impegno.put("uo_label", aceBridgeService.getUoLike(impegno.getString("cdsuo")).get(0).getDenominazione());
+						impegno.put("uo", impegno.get("cdsuo").toString());
 					}
 					execution.setVariable("impegni_json", impegni.toString());
 					put("listaUoAbilitateExt", impegni);
