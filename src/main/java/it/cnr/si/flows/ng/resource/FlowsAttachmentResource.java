@@ -349,5 +349,19 @@ public class FlowsAttachmentResource {
 
         flowsAttachmentService.updateAttachmentPath(processInstanceId, attachmentName, valorePath);
 
+    }    
+    
+    @RequestMapping(value = "{processInstanceId}/{attachmentName}/updateAttachmentUrl", method = RequestMethod.POST)
+    @ResponseBody
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Timed
+    public void updateAttachmentUrl(
+            HttpServletResponse response,
+            @PathVariable("processInstanceId") String processInstanceId,
+            @PathVariable("attachmentName") String attachmentName,
+    		@RequestBody String valoreUrl)  {
+
+        flowsAttachmentService.updateAttachmentUrl(processInstanceId, attachmentName, valoreUrl);
+
     }
 }

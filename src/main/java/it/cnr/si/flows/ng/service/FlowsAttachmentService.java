@@ -447,5 +447,14 @@ public class FlowsAttachmentService {
 			saveAttachmentFuoriTask(processInstanceId, nomeFile, att, null);
 		}
 	}
+	
+	public void updateAttachmentUrl(String processInstanceId, String nomeFile, String valoreUrl) {
+		Map<String, FlowsAttachment> attachmentList =  attachmentService.getAttachementsForProcessInstance(processInstanceId);
+		FlowsAttachment att = attachmentList.get(nomeFile);
+		if (att != null) {
+			att.setUrl(valoreUrl);
+			saveAttachmentFuoriTask(processInstanceId, nomeFile, att, null);
+		}
+	}
 
 }
