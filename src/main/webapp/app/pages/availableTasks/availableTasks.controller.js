@@ -159,7 +159,7 @@
                 );
         };
 
-        $scope.showProcessInstances = function (requestedPage) {
+        $scope.showProcessInstances = function () {
             //"salvo" i parametri di ricerca
             $location.search(vm.searchParams);
             $location.processDefinitionKey = vm.processDefinitionKey;
@@ -193,8 +193,8 @@
             $scope.loadTaskAssignedInMyGroups();
         };
 
-        $scope.setActiveContent = function (choice, fromStateUrl) {
-            if (!fromStateUrl.includes('details?'))
+        $scope.setActiveContent = function (choice) {
+            if (!$scope.formUrl.includes('details?'))
                 vm.activeContent = $location.activeContent = choice;
         };
 
