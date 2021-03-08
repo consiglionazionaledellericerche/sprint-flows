@@ -42,7 +42,7 @@
             //carico la form url
             $scope.formUrl = $location.formUrl || null;
             vm.processDefinitionKey = $location.processDefinitionKey;
-        } else {
+        } else; {
             //nella ricerca di default (quando carico la pagina) NON devo settare i searchParams
             vm.active = true;
             vm.order = 'ASC';
@@ -159,7 +159,7 @@
                 );
         };
 
-        $scope.showProcessInstances = function (requestedPage) {
+        $scope.showProcessInstances = function () {
             //"salvo" i parametri di ricerca
             $location.search(vm.searchParams);
             $location.processDefinitionKey = vm.processDefinitionKey;

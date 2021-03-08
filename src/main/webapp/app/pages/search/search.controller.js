@@ -21,8 +21,10 @@
 
         vm.searchParams.active = $location.search().active || true;
         vm.searchParams.order = $location.search().order || "ASC";
-        if (!vm.searchParams.page)
-            vm.page = vm.searchParams.page = $location.search().page || 1;
+        if (!vm.searchParams.page){
+            vm.page = $location.search().page || 1;
+            vm.searchParams.page = $location.search().page || 1;
+        }
         vm.searchParams.processDefinitionKey = $location.search().processDefinitionKey || "all";
 
         $scope.search = function() {
