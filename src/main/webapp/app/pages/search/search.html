@@ -5,7 +5,7 @@
 				<li role="presentation" ng-class="vm.searchParams.active == true ? 'active' : ''">
 					<a class="pointer" ng-click="vm.searchParams.active = true; vm.searchParams.page = 1; search()" data-toggle="tab">
 						<h3>
-							<i class="glyphicon glyphicon-edit"></i>
+							<em class="glyphicon glyphicon-edit"></em>
 							Flussi attivi
 						</h3>
 					</a>
@@ -13,7 +13,7 @@
 				<li role="presentation" ng-class="vm.searchParams.active == true ? '': 'active-info'">
 					<a class="pointer" ng-click="vm.searchParams.active = false; vm.searchParams.page = 1; search()" data-toggle="tab">
 						<h3>
-							<i class="glyphicon glyphicon-check"></i>
+							<em class="glyphicon glyphicon-check"></em>
 							Flussi terminati
 						</h3>
 					</a>
@@ -27,8 +27,7 @@
 			<div>
 				<h4>Ordinamento temporale</h4>
 				<div>
-					<button class="btn btn-default btn-block margin-top-20"
-							ng-click="vm.searchParams.order ===  'ASC' ?  vm.searchParams.order  = 'DESC' : vm.searchParams.order  = 'ASC'; search()">
+					<button class="btn btn-default btn-block margin-top-20" ng-click="vm.searchParams.order ===  'ASC' ?  vm.searchParams.order  = 'DESC' : vm.searchParams.order  = 'ASC'; search()">
 						<span class="glyphicon glyphicon-sort"></span>
 						{{vm.searchParams.order === 'ASC' ? 'Crescente' : 'Descrescente'}}
 					</button>
@@ -40,8 +39,7 @@
 			<div id="tipologieDiv">
 				<div>
 					<div class="dropdown md-menu-origin">
-						<ui-select ng-model="vm.searchParams.processDefinitionKey" title="Tipologie"
-								   on-select="search()">
+						<ui-select ng-model="vm.searchParams.processDefinitionKey" title="Tipologie" on-select="search()">
 							<ui-select-match placeholder="Seleziona la tipologia di flusso" allow-clear="true">
 								{{$select.selected.name}}
 							</ui-select-match>
@@ -74,10 +72,8 @@
 			<!--Paginazione -->
 			<div class="row" ng-show="vm.totalItems > 0">
 				<div class="text-center col-md-12">
-					<jhi-item-count page="vm.searchParams.page" total="vm.totalItems"
-									items-per-page="20"></jhi-item-count>
-					<uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.searchParams.page"
-									ng-change="search()"></uib-pagination>
+					<jhi-item-count page="vm.searchParams.page" total="vm.totalItems" items-per-page="20"></jhi-item-count>
+					<uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.searchParams.page" ng-change="search()"></uib-pagination>
 				</div>
 			</div>
 
@@ -93,14 +89,12 @@
 			<!--Paginazione -->
 			<div class="row">
 				<div class="text-center col-md-12" ng-show="vm.totalItems > 0">
-					<jhi-item-count page="vm.searchParams.page" total="vm.totalItems"
-									items-per-page="20"></jhi-item-count>
-					<uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.searchParams.page"
-									ng-change="search()"></uib-pagination>
+					<jhi-item-count page="vm.searchParams.page" total="vm.totalItems" items-per-page="20"></jhi-item-count>
+					<uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.searchParams.page" ng-change="search()"></uib-pagination>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
 
-<pre ng-if="isDevelopment">	{{vm | json}} </pre>
+<pre ng-if="isDevelopment"> {{vm | json}} </pre>
