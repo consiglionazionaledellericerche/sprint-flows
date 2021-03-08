@@ -1,11 +1,11 @@
 (function () {
     'use strict';
 
-  angular
-    .module("sprintApp")
-    .controller("AvailableTasksController", AvailableTasksController);
+    angular
+        .module("sprintApp")
+        .controller("AvailableTasksController", AvailableTasksController);
 
-  AvailableTasksController.$inject = ['$scope', '$rootScope', 'paginationConstants', 'dataService', 'utils', '$log', '$location'];
+    AvailableTasksController.$inject = ['$scope', '$rootScope', 'paginationConstants', 'dataService', 'utils', '$log', '$location'];
 
     function AvailableTasksController($scope, $rootScope, paginationConstants, dataService, utils, $log, $location) {
         var vm = this;
@@ -18,22 +18,25 @@
             vm.active = $location.active;
             vm.activeContent = $location.activeContent;
             vm.order = $location.order;
-            switch($location.activeContent){
+            switch ($location.activeContent) {
                 case 'myTasks':
                     vm.myPage = $location.page;
-                    vm.availablePage = vm.TAIMGPage = 1;
+                    vm.availablePage = 1;
+                    vm.TAIMGPage = 1;
                     $scope.indextab = 0;
-                break;
+                    break;
                 case 'availables':
                     vm.availablePage = $location.page;
-                    vm.myPage = vm.TAIMGPage = 1;
+                    vm.myPage = 1;
+                    vm.TAIMGPage = 1;
                     $scope.indextab = 1;
-                break;
+                    break;
                 case 'taskAssignedInMyGroups':
                     vm.TAIMGPage = $location.page;
-                    vm.availablePage = vm.myPage = 1;
+                    vm.availablePage = 1;
+                    vm.myPage = 1;
                     $scope.indextab = 2;
-                break;
+                    break;
             }
 
             //carico la form url
@@ -46,9 +49,9 @@
             $scope.formUrl = utils.loadSearchFields(vm.processDefinitionKey, true);
         }
 
-//      se le variabili usate per la paginazione non sono inizializzate le inizializzo,
-//      altrimenti se sto tornando dalla pagina dei dettagli una di loro sarà già inizializzata
-        if(!(vm.myPage || vm.availablePage || vm.TAIMGPage))
+        //se le variabili usate per la paginazione no/*  */n sono inizializzate le inizializzo,
+        //altrimenti se sto tornando dalla pagina dei dettagli una di loro sarà già inizializzata
+        if (!(vm.myPage || vm.availablePage || vm.TAIMGPage))
             $location.page = vm.myPage = vm.availablePage = vm.TAIMGPage = 1;
 
         // JSON che conterrà i risultati delle due query
@@ -156,7 +159,7 @@
                 );
         };
 
-        $scope.showProcessInstances = function (requestedPage) {
+        $scope.showProcessInstances = function () {
             //"salvo" i parametri di ricerca
             $location.search(vm.searchParams);
             $location.processDefinitionKey = vm.processDefinitionKey;
@@ -190,8 +193,8 @@
             $scope.loadTaskAssignedInMyGroups();
         };
 
-        $scope.setActiveContent = function (choice, fromStateUrl) {
-            if (!fromStateUrl.includes('details?'))
+        $scope.setActiveContent = function (choice) {
+            if (!$scope.formUrl.includes('details?'))
                 vm.activeContent = $location.activeContent = choice;
         };
 

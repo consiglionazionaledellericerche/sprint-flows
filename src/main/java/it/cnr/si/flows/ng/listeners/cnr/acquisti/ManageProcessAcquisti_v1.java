@@ -334,9 +334,10 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				}
 				// CD_UNITA_ORGANIZZATIVA 
 				if(execution.getVariable(ID_STRUTTURA) != null){
-					Map<String, String> unita_organizzativa = new HashMap<>();
-					unita_organizzativa.put("cd_unita_organizzativa",aceBridgeService.getUoById(Integer.parseInt(execution.getVariable(ID_STRUTTURA).toString())).getCdsuo().toString());
-					put("unita_organizzativa", unita_organizzativa);
+					//Map<String, String> unita_organizzativa = new HashMap<>();
+					//unita_organizzativa.put("cd_unita_organizzativa",aceBridgeService.getUoById(Integer.parseInt(execution.getVariable(ID_STRUTTURA).toString())).getCdsuo().toString());
+					//put("unita_organizzativa", unita_organizzativa);
+					put("cd_unita_organizzativa",aceBridgeService.getUoById(Integer.parseInt(execution.getVariable(ID_STRUTTURA).toString())).getCdsuo().toString());
 				}
 				// DT_REGISTRAZIONE 
 				DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
@@ -362,49 +363,49 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				}
 				// NATURA_CONTABILE 
 				put("natura_contabile", "P");
-				Map<String, String> proceduraAmministrativa = new HashMap<>();
+				//Map<String, String> proceduraAmministrativa = new HashMap<>();
 				if(execution.getVariable("tipologiaAcquisizioneId") != null){
 					String tipologiaAcquisizioneId = execution.getVariable("tipologiaAcquisizioneId").toString();
 					// CD_PROC_AMM 
 					if(tipologiaAcquisizioneId.equals("11")) {
-						proceduraAmministrativa.put("cd_proc_amm", "PA55");
+						put("cd_proc_amm", "PA55");
 					}
 					if(tipologiaAcquisizioneId.equals("12")) {
-						proceduraAmministrativa.put("cd_proc_amm", "PR55");
+						put("cd_proc_amm", "PR55");
 					}	
 					if(tipologiaAcquisizioneId.equals("13")) {
-						proceduraAmministrativa.put("cd_proc_amm", "PN56");
+						put("cd_proc_amm", "PN56");
 					}	
 					if(tipologiaAcquisizioneId.equals("14")) {
-						proceduraAmministrativa.put("cd_proc_amm", "PN57");
+						put("cd_proc_amm", "PN57");
 					}	
 					if(tipologiaAcquisizioneId.equals("15")) {
-						proceduraAmministrativa.put("cd_proc_amm", "DC58");
+						put("cd_proc_amm", "DC58");
 					}		
 					if(tipologiaAcquisizioneId.equals("16")) {
-						proceduraAmministrativa.put("cd_proc_amm", "PN56");
+						put("cd_proc_amm", "PN56");
 					}		
 					if(tipologiaAcquisizioneId.equals("17")) {
-						proceduraAmministrativa.put("cd_proc_amm", "PSCE");
+						put("cd_proc_amm", "PSCE");
 					}		
 					if(tipologiaAcquisizioneId.equals("18")) {
-						proceduraAmministrativa.put("cd_proc_amm", "ADCC");
+						put("cd_proc_amm", "ADCC");
 					}		
 					if(tipologiaAcquisizioneId.equals("21")) {
-						proceduraAmministrativa.put("cd_proc_amm", "PNS");
+						put("cd_proc_amm", "PNS");
 					}	
 					if(tipologiaAcquisizioneId.equals("22")) {
-						proceduraAmministrativa.put("cd_proc_amm", "PNSS");
+						put("cd_proc_amm", "PNSS");
 					}		
 					if(tipologiaAcquisizioneId.equals("23")) {
-						proceduraAmministrativa.put("cd_proc_amm", "PNS");
+						put("cd_proc_amm", "PNS");
 					}
 				}
 				// CD_PROC_AMM 
 				if(execution.getVariable("strumentoAcquisizioneId") != null){
 					String strumentoAcquisizioneId = execution.getVariable("strumentoAcquisizioneId").toString();
 					if(strumentoAcquisizioneId.equals("12")) {
-						proceduraAmministrativa.put("cd_proc_amm", "ADAC");
+						put("cd_proc_amm", "ADAC");
 					}	
 					// FL_MEPA 
 					if(strumentoAcquisizioneId.equals("11") || strumentoAcquisizioneId.equals("21") ) {
@@ -413,7 +414,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 						put("fl_mepa", Boolean.valueOf("false"));
 					}
 				}
-				put("procedura_amministrativa", proceduraAmministrativa);
+				//put("procedura_amministrativa", proceduraAmministrativa);
 
 				// OGGETTO 
 				if(execution.getVariable("descrizione") != null){
@@ -437,9 +438,9 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				// IM_CONTRATTO_PASSIVO 
 				put("im_contratto_passivo", new BigDecimal(execution.getVariable("importoTotaleLordo").toString()));
 				// CD_TIPO_ATTO 
-				Map<String, String> atto = new HashMap<>();
-				atto.put("cd_tipo_atto","DET");
-				put("atto", atto);
+				// Map<String, String> atto = new HashMap<>();
+				// atto.put("cd_tipo_atto","DET");
+				// put("atto", atto);
 				if(runtimeService.getVariable(execution.getProcessInstanceId(), "decisioneContrattare", FlowsAttachment.class) != null) {
 					FlowsAttachment determina = runtimeService.getVariable(execution.getProcessInstanceId(), "decisioneContrattare", FlowsAttachment.class);
 					// DS_ATTO 
@@ -504,9 +505,10 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 					String impegniString = execution.getVariable("impegni_json").toString();
 					JSONArray impegni = new JSONArray(impegniString);
 					for ( int i = 0; i < impegni.length(); i++) {
-						JSONObject impegno = impegni.getJSONObject(i);
-						impegno.put("uo_label", aceBridgeService.getUoById(Integer.parseInt(impegno.get("uo").toString())).getDenominazione());
-						impegno.put("cdsuo", aceBridgeService.getUoById(Integer.parseInt(impegno.get("uo").toString())).getCdsuo());
+						JSONObject impegno = impegni.getJSONObject(i);						
+						impegno.put("uo_label", aceBridgeService.getUoLike(impegno.getString("cdsuo")).get(0).getDenominazione());
+						impegno.put("uo", impegno.get("cdsuo").toString());
+						impegno.remove("cdsuo");
 					}
 					execution.setVariable("impegni_json", impegni.toString());
 					put("listaUoAbilitateExt", impegni);
@@ -727,7 +729,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 				//TODO implementare le url a seconda del contesto
 				//String urlSigla = "www.google.it";
 				Map<String, Object> siglaPayload = createSiglaPayload(execution);
-				externalMessageService.createExternalMessage(urlSigla + contrattoPath, ExternalMessageVerb.POST, siglaPayload, ExternalApplication.SIGLA);
+				externalMessageService.createExternalMessage(urlSigla + contrattoPath, ExternalMessageVerb.PUT, siglaPayload, ExternalApplication.SIGLA);
 				prepareFilesToSigla(execution);
 			};break;     
 			case "end-stipulato-end": {
