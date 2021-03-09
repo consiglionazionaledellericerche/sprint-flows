@@ -457,4 +457,14 @@ public class FlowsAttachmentService {
 		}
 	}
 
+	
+	public void updateAttachmentMimetypeToPDF(String processInstanceId, String nomeFile) {
+		Map<String, FlowsAttachment> attachmentList =  attachmentService.getAttachementsForProcessInstance(processInstanceId);
+		FlowsAttachment att = attachmentList.get(nomeFile);
+		if (att != null) {
+			att.setMimetype(com.google.common.net.MediaType.PDF.toString());
+			saveAttachmentFuoriTask(processInstanceId, nomeFile, att, null);
+		}
+	}
+
 }
