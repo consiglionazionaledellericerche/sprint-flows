@@ -149,7 +149,7 @@ public class ExternalMessageSender {
 					String.class
 					);
 
-			if (response.getStatusCode() != HttpStatus.OK)
+			if ((response.getStatusCode() != HttpStatus.OK) && (response.getStatusCode() != HttpStatus.CREATED))
 				throw new Exception();
 
 			msg.setStatus(ExternalMessageStatus.SENT);
