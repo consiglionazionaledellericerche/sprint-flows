@@ -85,14 +85,8 @@
             myFirstResult = vm.itemsPerPage * (vm.myPage - 1);
             myMaxResults = vm.itemsPerPage;
 
-            dataService.tasks
-                .myTasks(
-                    vm.processDefinitionKey,
-                    myFirstResult,
-                    myMaxResults,
-                    vm.order,
-                    utils.populateTaskParams(vm.searchParams)
-                )
+            dataService.tasks.myTasks(vm.processDefinitionKey, myFirstResult,
+                    myMaxResults, vm.order, utils.populateTaskParams(vm.searchParams))
                 .then(
                     function (response) {
                         utils.refactoringVariables(response.data.data);
@@ -115,14 +109,8 @@
             firstResultAvailable = vm.itemsPerPage * (vm.availablePage - 1);
             maxResultsAvailable = vm.itemsPerPage;
 
-            dataService.tasks
-                .myTasksAvailable(
-                    vm.processDefinitionKey,
-                    firstResultAvailable,
-                    maxResultsAvailable,
-                    vm.order,
-                    utils.populateTaskParams(vm.searchParams)
-                )
+            dataService.tasks.myTasksAvailable(vm.processDefinitionKey, firstResultAvailable,
+                    maxResultsAvailable, vm.order, utils.populateTaskParams(vm.searchParams))
                 .then(
                     function (response) {
                         utils.refactoringVariables(response.data.data);
@@ -145,14 +133,8 @@
             firstResultTAIMG = vm.itemsPerPage * (vm.availablePage - 1);
             maxResultsTAIMG = vm.itemsPerPage;
 
-            dataService.tasks
-                .taskAssignedInMyGroups(
-                    vm.processDefinitionKey,
-                    firstResultTAIMG,
-                    maxResultsTAIMG,
-                    vm.order,
-                    utils.populateTaskParams(vm.searchParams)
-                )
+            dataService.tasks.taskAssignedInMyGroups(vm.processDefinitionKey, firstResultTAIMG,
+                    maxResultsTAIMG, vm.order, utils.populateTaskParams(vm.searchParams))
                 .then(
                     function (response) {
                         utils.refactoringVariables(response.data.data);
