@@ -5,38 +5,38 @@
         .module("sprintApp")
         .controller("AvailableTasksController", AvailableTasksController);
 
-    AvailableTasksController.$inject = ['$scope', '$rootScope', 'paginationConstants', 'dataService', 'utils', '$log', '$location'];
+    AvailableTasksController.$inject = ["$scope", "$rootScope", "paginationConstants", "dataService", "utils", "$log", "$location"];
 
     function AvailableTasksController($scope, $rootScope, paginationConstants, dataService, utils, $log, $location) {
         var vm = this;
         vm.searchParams = {};
         $scope.indextab = 1;
 
-        if ($rootScope.fromState.url.includes('details?')) {
+        if ($rootScope.fromState.url.includes("details?")) {
             //Carico i parametri di ricerca "salvati" se torno dalla pagine dei "details"
             vm.searchParams = $location.search();
             vm.active = $location.active;
             vm.activeContent = $location.activeContent;
             vm.order = $location.order;
             switch ($location.activeContent) {
-                case 'myTasks':
-                    vm.myPage = $location.page;
-                    vm.availablePage = 1;
-                    vm.TAIMGPage = 1;
-                    $scope.indextab = 0;
-                    break;
-                case 'availables':
-                    vm.availablePage = $location.page;
-                    vm.myPage = 1;
-                    vm.TAIMGPage = 1;
-                    $scope.indextab = 1;
-                    break;
-                case 'taskAssignedInMyGroups':
-                    vm.TAIMGPage = $location.page;
-                    vm.availablePage = 1;
-                    vm.myPage = 1;
-                    $scope.indextab = 2;
-                    break;
+            case "myTasks":
+                vm.myPage = $location.page;
+                vm.availablePage = 1;
+                vm.TAIMGPage = 1;
+                $scope.indextab = 0;
+                break;
+            case "availables":
+                vm.availablePage = $location.page;
+                vm.myPage = 1;
+                vm.TAIMGPage = 1;
+                $scope.indextab = 1;
+                break;
+            case "taskAssignedInMyGroups":
+                vm.TAIMGPage = $location.page;
+                vm.availablePage = 1;
+                vm.myPage = 1;
+                $scope.indextab = 2;
+                break;
             }
 
             //carico la form url
@@ -45,24 +45,28 @@
         } else {
             //nella ricerca di default (quando carico la pagina) NON devo settare i searchParams
             vm.active = true;
-            vm.order = 'ASC';
+            vm.order = "ASC";
             $scope.formUrl = utils.loadSearchFields(vm.processDefinitionKey, true);
         }
 
         //se le variabili usate per la paginazione no/*  */n sono inizializzate le inizializzo,
         //altrimenti se sto tornando dalla pagina dei dettagli una di loro sarà già inizializzata
-        if (!(vm.myPage || vm.availablePage || vm.TAIMGPage))
-            $location.page = vm.myPage = vm.availablePage = vm.TAIMGPage = 1;
+        if (!(vm.myPage || vm.availablePage || vm.TAIMGPage)) {
+            $location.page = 1;
+            vm.myPage = 1;
+            vm.availablePage = 1;
+            vm.TAIMGPage = 1;
+        }
 
         // JSON che conterrà i risultati delle due query
         vm.myTasks = {
-            total: 0,
+            total: 0
         };
         vm.availableTasks = {
-            total: 0,
+            total: 0
         };
         vm.taskAssignedInMyGroups = {
-            total: 0,
+            total: 0
         };
 
         $scope.loadMyTasks = function () {
@@ -70,21 +74,19 @@
             var myFirstResult, myMaxResults;
 
             // carico le form di ricerca specifiche per ogni tipologia di Process Definitions e le salvo in $location
-            $location.formUrl = $scope.formUrl = utils.loadSearchFields(vm.processDefinitionKey, true);
+            $scope.formUrl = utils.loadSearchFields(
+                vm.processDefinitionKey,
+                true
+            );
+            $location.formUrl = $scope.formUrl;
 
             vm.itemsPerPage = paginationConstants.itemsPerPage;
             vm.myTotalItems = vm.itemsPerPage * vm.myPage;
             myFirstResult = vm.itemsPerPage * (vm.myPage - 1);
             myMaxResults = vm.itemsPerPage;
 
-            dataService.tasks
-                .myTasks(
-                    vm.processDefinitionKey,
-                    myFirstResult,
-                    myMaxResults,
-                    vm.order,
-                    utils.populateTaskParams(vm.searchParams)
-                )
+            dataService.tasks.myTasks(vm.processDefinitionKey, myFirstResult,
+                    myMaxResults, vm.order, utils.populateTaskParams(vm.searchParams))
                 .then(
                     function (response) {
                         utils.refactoringVariables(response.data.data);
@@ -107,14 +109,8 @@
             firstResultAvailable = vm.itemsPerPage * (vm.availablePage - 1);
             maxResultsAvailable = vm.itemsPerPage;
 
-            dataService.tasks
-                .myTasksAvailable(
-                    vm.processDefinitionKey,
-                    firstResultAvailable,
-                    maxResultsAvailable,
-                    vm.order,
-                    utils.populateTaskParams(vm.searchParams)
-                )
+            dataService.tasks.myTasksAvailable(vm.processDefinitionKey, firstResultAvailable,
+                    maxResultsAvailable, vm.order, utils.populateTaskParams(vm.searchParams))
                 .then(
                     function (response) {
                         utils.refactoringVariables(response.data.data);
@@ -137,14 +133,8 @@
             firstResultTAIMG = vm.itemsPerPage * (vm.availablePage - 1);
             maxResultsTAIMG = vm.itemsPerPage;
 
-            dataService.tasks
-                .taskAssignedInMyGroups(
-                    vm.processDefinitionKey,
-                    firstResultTAIMG,
-                    maxResultsTAIMG,
-                    vm.order,
-                    utils.populateTaskParams(vm.searchParams)
-                )
+            dataService.tasks.taskAssignedInMyGroups(vm.processDefinitionKey, firstResultTAIMG,
+                    maxResultsTAIMG, vm.order, utils.populateTaskParams(vm.searchParams))
                 .then(
                     function (response) {
                         utils.refactoringVariables(response.data.data);
@@ -171,18 +161,21 @@
                 $scope.loadAllTasks();
             } else {
                 switch (vm.activeContent) {
-                    case 'myTasks':
-                        $scope.loadMyTasks();
-                        vm.availablePage = vm.TAIMGPage = 1;
-                        break;
-                    case 'availables':
-                        $scope.loadAvailableTasks();
-                        vm.myPage = vm.TAIMGPage = 1;
-                        break;
-                    case 'taskAssignedInMyGroups':
-                        $scope.loadTaskAssignedInMyGroups();
-                        vm.availablePage = vm.myPage = 1;
-                        break;
+                case "myTasks":
+                    $scope.loadMyTasks();
+                    vm.availablePage = 1;
+                    vm.TAIMGPage = 1;
+                    break;
+                case "availables":
+                    $scope.loadAvailableTasks();
+                    vm.myPage = 1;
+                    vm.TAIMGPage = 1;
+                    break;
+                case "taskAssignSedInMyGroups":
+                    $scope.loadTaskAssignedInMyGroups();
+                    vm.availablePage = 1;
+                    vm.myPage = 1;
+                    break;
                 }
             }
         };
@@ -194,20 +187,20 @@
         };
 
         $scope.setActiveContent = function (choice) {
-            if (!$scope.formUrl.includes('details?'))
-                vm.activeContent = $location.activeContent = choice;
+            vm.activeContent = choice;
+            $location.activeContent = choice;
         };
 
         $scope.resetSearcParams = function () {
             vm.searchParams = {};
-            vm.processDefinitionKey = '';
-            vm.order = 'ASC';
+            vm.processDefinitionKey = "";
+            vm.order = "ASC";
             vm.active = true;
             $scope.showProcessInstances();
         };
 
         // aggiornamento pagina in caso di cambio "ordinamento" o Process definition
-        $scope.$watchGroup(['vm.order'], function () {
+        $scope.$watchGroup(["vm.order"], function () {
             $scope.showProcessInstances();
         });
 
