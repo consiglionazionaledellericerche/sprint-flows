@@ -393,7 +393,7 @@ public class FlowsProcessInstanceService {
         writer.close();
     }
 
-    public List<HistoricProcessInstance> getProcessInstancesForURP(int terminiRicorso, Boolean avvisiScaduti, Boolean gareScadute, int firstResult, int maxResults, String order) {
+    public HistoricProcessInstanceQuery getProcessInstancesForURP(int terminiRicorso, Boolean avvisiScaduti, Boolean gareScadute, String order) {
 
         HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery()
                 .includeProcessVariables()
@@ -444,7 +444,7 @@ public class FlowsProcessInstanceService {
         }
         utils.orderProcess(order, historicProcessInstanceQuery);
 
-        return historicProcessInstanceQuery.listPage(firstResult, maxResults);
+        return historicProcessInstanceQuery;
     }
 
 
