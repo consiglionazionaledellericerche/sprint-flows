@@ -189,6 +189,71 @@
 					"response": []
 				},
 				{
+					"name": "getPIForURP",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{ACCESS_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://as3dock.si.cnr.it:9200/api/processInstances/getProcessInstancesForURP?firstResult=0&maxResults=100&order=ASC\n&searchField=33&terminiRicorso=200&avvisiScaduti&gareScadute",
+							"protocol": "http",
+							"host": [
+								"as3dock",
+								"si",
+								"cnr",
+								"it"
+							],
+							"port": "9200",
+							"path": [
+								"api",
+								"processInstances",
+								"getProcessInstancesForURP"
+							],
+							"query": [
+								{
+									"key": "firstResult",
+									"value": "0"
+								},
+								{
+									"key": "maxResults",
+									"value": "100"
+								},
+								{
+									"key": "order",
+									"value": "ASC\n"
+								},
+								{
+									"key": "searchField",
+									"value": "33"
+								},
+								{
+									"key": "terminiRicorso",
+									"value": "200"
+								},
+								{
+									"key": "avvisiScaduti",
+									"value": null
+								},
+								{
+									"key": "gareScadute",
+									"value": null
+								}
+							]
+						},
+						"description": "export flussi URP\n"
+					},
+					"response": []
+				},
+				{
 					"name": "getPIForTrasparenzaById",
 					"request": {
 						"auth": {
@@ -204,7 +269,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://demoscrivaniadigitale-cnr.si.cnr.it/api/processInstances/getProcessInstanceForTrasparenzaById?processInstanceId=7095",
+							"raw": "http://demoscrivaniadigitale-cnr.si.cnr.it/api/processInstances/getProcessInstanceForPartaleCnrById?processInstanceId=7095&service=trasparenza",
 							"protocol": "http",
 							"host": [
 								"demoscrivaniadigitale-cnr",
@@ -215,16 +280,98 @@
 							"path": [
 								"api",
 								"processInstances",
-								"getProcessInstanceForTrasparenzaById"
+								"getProcessInstanceForPartaleCnrById"
 							],
 							"query": [
 								{
 									"key": "processInstanceId",
 									"value": "7095"
+								},
+								{
+									"key": "service",
+									"value": "trasparenza"
 								}
 							]
 						},
 						"description": "export flussi URP\n"
+					},
+					"response": []
+				},
+				{
+					"name": "getPIForUrpById",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{ACCESS_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://demoscrivaniadigitale-cnr.si.cnr.it/api/processInstances/getProcessInstanceForPartaleCnrById?processInstanceId=5&service=urp",
+							"protocol": "http",
+							"host": [
+								"demoscrivaniadigitale-cnr",
+								"si",
+								"cnr",
+								"it"
+							],
+							"path": [
+								"api",
+								"processInstances",
+								"getProcessInstanceForPartaleCnrById"
+							],
+							"query": [
+								{
+									"key": "processInstanceId",
+									"value": "5"
+								},
+								{
+									"key": "service",
+									"value": "urp"
+								}
+							]
+						},
+						"description": "export flussi URP\n"
+					},
+					"response": []
+				},
+				{
+					"name": "getDoc for doccnr",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "experimentation_subject_id=ImQ5OTFkMzE4LTYzNDctNGQ2Mi1iNDMzLWE0YmMzOTlmNzc3MSI%3D--6d37b9db4fef95ad054432ed8d1435dc550f7bae; ticket=TICKET_46f5c3230ee8ab9e44061f3dc435b8ef3d866b8c"
+							}
+						],
+						"url": {
+							"raw": "http://as2dock.si.cnr.it:8380/rest/content?nodeRef=80ace790-3faa-44c2-9922-cf6665e6d17c",
+							"protocol": "http",
+							"host": [
+								"as2dock",
+								"si",
+								"cnr",
+								"it"
+							],
+							"port": "8380",
+							"path": [
+								"rest",
+								"content"
+							],
+							"query": [
+								{
+									"key": "nodeRef",
+									"value": "80ace790-3faa-44c2-9922-cf6665e6d17c"
+								}
+							]
+						}
 					},
 					"response": []
 				}
@@ -379,6 +526,110 @@
 					"response": []
 				},
 				{
+					"name": "getPIForURP",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{ACCESS_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/processInstances/getProcessInstancesForURP?firstResult=0&maxResults=100&order=ASC\n&searchField=33&terminiRicorso=200&avvisiScaduti&gareScadute",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"processInstances",
+								"getProcessInstancesForURP"
+							],
+							"query": [
+								{
+									"key": "firstResult",
+									"value": "0"
+								},
+								{
+									"key": "maxResults",
+									"value": "100"
+								},
+								{
+									"key": "order",
+									"value": "ASC\n"
+								},
+								{
+									"key": "searchField",
+									"value": "33"
+								},
+								{
+									"key": "terminiRicorso",
+									"value": "200"
+								},
+								{
+									"key": "avvisiScaduti",
+									"value": null
+								},
+								{
+									"key": "gareScadute",
+									"value": null
+								}
+							]
+						},
+						"description": "export flussi URP\n"
+					},
+					"response": []
+				},
+				{
+					"name": "getPIForUrpById",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{ACCESS_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/processInstances/getProcessInstanceForPartaleCnrById?processInstanceId=16822&service=urp",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"processInstances",
+								"getProcessInstanceForPartaleCnrById"
+							],
+							"query": [
+								{
+									"key": "processInstanceId",
+									"value": "16822"
+								},
+								{
+									"key": "service",
+									"value": "urp"
+								}
+							]
+						},
+						"description": "export flussi URP\n"
+					},
+					"response": []
+				},
+				{
 					"name": "getPIForTrasparenza",
 					"request": {
 						"auth": {
@@ -444,7 +695,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/processInstances/getProcessInstanceForTrasparenzaById?processInstanceId=7095",
+							"raw": "http://localhost:8080/api/processInstances/getProcessInstanceForPartaleCnrById?processInstanceId=7095&service=trasparenza",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -453,12 +704,16 @@
 							"path": [
 								"api",
 								"processInstances",
-								"getProcessInstanceForTrasparenzaById"
+								"getProcessInstanceForPartaleCnrById"
 							],
 							"query": [
 								{
 									"key": "processInstanceId",
 									"value": "7095"
+								},
+								{
+									"key": "service",
+									"value": "trasparenza"
 								}
 							]
 						},
