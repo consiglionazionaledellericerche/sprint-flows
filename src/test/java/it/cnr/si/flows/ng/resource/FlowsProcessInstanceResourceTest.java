@@ -255,17 +255,17 @@ public class FlowsProcessInstanceResourceTest {
         //AVVISI SCADUTI
         util.loginPortaleCnr();
         // terminiRicorso > (oggi - startFlusso) ==> resultSet = 1
-        ResponseEntity<List<Map<String, Object>>> res = flowsProcessInstanceResource
+        ResponseEntity<Map<String, Object>> res = flowsProcessInstanceResource
                 .getProcessInstancesForURP((int) (dataScadenzaAvvisoPreDetermina.until(LocalDate.now(), ChronoUnit.DAYS) + 1), true, null, 0, 10, ASC);
         assertEquals(OK, res.getStatusCode());
-        assertEquals(1, res.getBody().size());
+        assertEquals(1, ((List<Map<String, Object>>)res.getBody().get("data")).size());
 
         // terminiRicorso < (oggi - startFlusso) ==> resultSet = 0
         res = flowsProcessInstanceResource
                 .getProcessInstancesForURP((int) (dataScadenzaAvvisoPreDetermina.until(LocalDate.now(), ChronoUnit.DAYS) - 1), true, null, 0, 10, ASC);
 
         assertEquals(OK, res.getStatusCode());
-        assertEquals(0, res.getBody().size());
+        assertEquals(0, ((List<Map<String, Object>>)res.getBody().get("data")).size());
 
         // vado avanti col flusso (Pre-determina -> Verifica))
         MockMultipartHttpServletRequest req = new MockMultipartHttpServletRequest();
