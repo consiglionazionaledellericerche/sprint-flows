@@ -393,19 +393,19 @@ wysiwyg.ng-touched.ng-invalid > trix-editor {
 }
 
 
-.nav-pills > li.mine.active > a, .nav-pills > li.mine.active > a:hover, .nav-pills > li.mine.active > a:focus {
+.nav-pills > li.mine.active > a, body > div.container > div.maincontent > div > div:nth-child(2) > div.col-sm-9 > div:nth-child(1) > h3 > span, body > div.container > div.maincontent > div > div:nth-child(2) > div.col-md-12 > div > div > div.progress-bar-striped.progress-bar.progress-bar-success,  .nav-pills > li.mine.active > a:hover, .nav-pills > li.mine.active > a:focus {
     color: #fff;
-    background-color: #449d44;
+    background-color: #2C6B39;
 }
 
-.nav-pills > li.available.active > a, .nav-pills > li.available.active > a:hover, .nav-pills > li.available.active > a:focus {
+.nav-pills > li.available.active > a, body > div.container > div.maincontent > div > div:nth-child(2) > div.col-sm-9 > div:nth-child(2) > h3 > span, body > div.container > div.maincontent > div > div:nth-child(2) > div.col-md-12 > div > div > div.progress-bar-striped.progress-bar.progress-bar-primary, .nav-pills > li.available.active > a:hover, .nav-pills > li.available.active > a:focus {
     color: #fff;
-    background-color: #286090;
+    background-color: #9DBAA0;
 }
 
-.nav-pills > li.others.active > a, .nav-pills > li.others.active > a:hover, .nav-pills > li.others.active > a:focus {
+.nav-pills > li.others.active > a, body > div.container > div.maincontent > div > div:nth-child(2) > div.col-sm-9 > div:nth-child(3) > h3 > span, body > div.container > div.maincontent > div > div:nth-child(2) > div.col-md-12 > div > div > div.progress-bar-striped.progress-bar.progress-bar-info, .nav-pills > li.others.active > a:hover, .nav-pills > li.others.active > a:focus {
     color: #fff;
-    background-color: #5bc0de;
+    background-color: #64A492;
 }
 
 .nav-pills{
