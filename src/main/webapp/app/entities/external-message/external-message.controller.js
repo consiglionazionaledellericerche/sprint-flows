@@ -10,7 +10,7 @@
     function ExternalMessageController ($scope, $state, ExternalMessage, ParseLinks, AlertService, pagingParams, paginationConstants) {
         var vm = this;
 
-        vm.searchParams = {};
+        vm.searchTerms = "";
         vm.loadPage = loadPage;
         vm.predicate = pagingParams.predicate;
         vm.reverse = pagingParams.ascending;
@@ -22,8 +22,7 @@
                 page: pagingParams.page - 1,
                 size: vm.itemsPerPage,
                 sort: sort(),
-                url: vm.searchParams.url,
-                payload: vm.searchParams.payload
+                searchTerms: vm.searchTerms
             }, onSuccess, onError);
             function sort() {
                 var result = [vm.predicate + ',' + (vm.reverse ? 'asc' : 'desc')];

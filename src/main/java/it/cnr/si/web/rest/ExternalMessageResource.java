@@ -89,11 +89,10 @@ public class ExternalMessageResource {
     @GetMapping(value = "/external-messages",
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<List<ExternalMessage>> getAllExternalMessages(@RequestParam(name = "url", required = false) String url,
-                                                                        @RequestParam(name = "payload", required = false) String payload,
+    public ResponseEntity<List<ExternalMessage>> getAllExternalMessages(@RequestParam(name = "searchTerms", required = false) String searchTerms,
                                                                         Pageable pageable) throws URISyntaxException {
         log.debug("REST request to get a page of ExternalMessages");
-        Page<ExternalMessage> page = externalMessageService.findAll(url, payload, pageable);
+        Page<ExternalMessage> page = externalMessageService.findAll(searchTerms, pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/external-messages");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

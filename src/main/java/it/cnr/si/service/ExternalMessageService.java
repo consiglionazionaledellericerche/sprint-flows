@@ -50,18 +50,9 @@ public class ExternalMessageService {
      *  @return the list of entities
      */
     @Transactional(readOnly = true) 
-    public Page<ExternalMessage> findAll(String url, String payload, Pageable pageable) {
+    public Page<ExternalMessage> findAll(String searchTerms, Pageable pageable) {
         log.debug("Request to get all ExternalMessages");
-        Page<ExternalMessage> result;
-
-        if(url != null && !url.isEmpty() )
-            result = externalMessageRepository.findAllByUrl(url, pageable);
-        else if(payload != null && !payload.isEmpty())
-            result = externalMessageRepository.findAllByPayload(payload, pageable);
-        else
-            result = externalMessageRepository.findAll(pageable);
-
-        return result;
+        return externalMessageRepository.findAllByUrlOrPayload(searchTerms, pageable);
     }
 
     /**
