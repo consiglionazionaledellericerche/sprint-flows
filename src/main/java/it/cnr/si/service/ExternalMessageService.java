@@ -40,8 +40,7 @@ public class ExternalMessageService {
      */
     public ExternalMessage save(ExternalMessage externalMessage) {
         log.debug("Request to save ExternalMessage : {}", externalMessage);
-        ExternalMessage result = externalMessageRepository.save(externalMessage);
-        return result;
+        return externalMessageRepository.save(externalMessage);
     }
 
     /**
@@ -51,9 +50,17 @@ public class ExternalMessageService {
      *  @return the list of entities
      */
     @Transactional(readOnly = true) 
-    public Page<ExternalMessage> findAll(Pageable pageable) {
+    public Page<ExternalMessage> findAll(String url, String payload, Pageable pageable) {
         log.debug("Request to get all ExternalMessages");
-        Page<ExternalMessage> result = externalMessageRepository.findAll(pageable);
+        Page<ExternalMessage> result;
+
+        if(url != null && !url.isEmpty() )
+            result = externalMessageRepository.findAllByUrl(url, pageable);
+        else if(payload != null && !payload.isEmpty())
+            result = externalMessageRepository.findAllByPayload(payload, pageable);
+        else
+            result = externalMessageRepository.findAll(pageable);
+
         return result;
     }
 
@@ -66,8 +73,7 @@ public class ExternalMessageService {
     @Transactional(readOnly = true) 
     public ExternalMessage findOne(Long id) {
         log.debug("Request to get ExternalMessage : {}", id);
-        ExternalMessage externalMessage = externalMessageRepository.findOne(id);
-        return externalMessage;
+        return externalMessageRepository.findOne(id);
     }
 
     /**

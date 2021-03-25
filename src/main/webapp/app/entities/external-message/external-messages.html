@@ -15,6 +15,14 @@
     </div>
     <br/>
     <div class="table-responsive">
+        <div class="bg-info">
+            <label>Search Url: <input ng-model="vm.searchParams.url"></label><br>
+            <label>Search Payload: <input ng-model="vm.searchParams.payload"></label>
+            <button ng-click="loadAll()" class="btn btn-primary">
+                <span class="glyphicon glyphicon-filter"></span>
+                Filtra
+            </button>
+        </div>
         <table class="jh-table table table-striped">
             <thead>
                 <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.transition()">
