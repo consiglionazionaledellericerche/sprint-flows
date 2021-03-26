@@ -345,13 +345,6 @@ ui bootstrap tweaks
     cursor: pointer;
 }
 
-.ellipsis {
-    max-width: 40px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-}
-
 .datetime-picker-dropdown > li.date-picker-menu div > table .btn-default,
 .uib-datepicker-popup  > li > div.uib-datepicker > table .btn-default {
     border: 0;
