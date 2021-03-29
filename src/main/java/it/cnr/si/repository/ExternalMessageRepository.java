@@ -26,6 +26,15 @@ public interface ExternalMessageRepository extends JpaRepository<ExternalMessage
             " and externalmessage.retries >= 6 and externalmessage.retries < 15")
     List<ExternalMessage> getFailedExternalMessages();
 
-    @Query("select externalmessage from ExternalMessage externalmessage where externalmessage.url LIKE CONCAT('%',:searchTerms,'%') OR externalmessage.payload LIKE CONCAT('%',:searchTerms,'%')")
+    @Query("SELECT em from ExternalMessage em " +
+            "WHERE em.url LIKE CONCAT('%',:searchTerms,'%') " +
+            "OR em.url LIKE CONCAT('%',:searchTerms1,'%') " +
+            "OR em.payload LIKE CONCAT('%',:searchTerms,'%') " +
+            "OR em.payload LIKE CONCAT('%',:searchTerms1,'%') ")
+    Page<ExternalMessage> findAllByUrlsOrPayloads(@Param("searchTerms") String searchTerms, @Param("searchTerms1") String searchTerms1, Pageable pageable);
+
+    @Query("SELECT em from ExternalMessage em " +
+            "WHERE em.url LIKE CONCAT('%',:searchTerms,'%') " +
+            "OR em.payload LIKE CONCAT('%',:searchTerms,'%') ")
     Page<ExternalMessage> findAllByUrlOrPayload(@Param("searchTerms") String searchTerms, Pageable pageable);
 }

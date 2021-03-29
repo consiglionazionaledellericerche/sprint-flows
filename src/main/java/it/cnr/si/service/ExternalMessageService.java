@@ -15,8 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Service Implementation for managing ExternalMessage.
@@ -52,7 +51,19 @@ public class ExternalMessageService {
     @Transactional(readOnly = true) 
     public Page<ExternalMessage> findAll(String searchTerms, Pageable pageable) {
         log.debug("Request to get all ExternalMessages");
-        return externalMessageRepository.findAllByUrlOrPayload(searchTerms, pageable);
+        String[] searchTermsArray = new String[2];
+        if(searchTerms.contains(" "))
+            searchTermsArray = searchTerms.split(" ");
+        else
+            searchTermsArray[0] = searchTerms;
+
+        Page<ExternalMessage> result = null;
+        if(searchTermsArray[0] != null)
+            result = externalMessageRepository.findAllByUrlOrPayload(searchTermsArray[0], pageable);
+        else
+            result = externalMessageRepository.findAllByUrlsOrPayloads(searchTermsArray[0], searchTermsArray[1], pageable);
+
+        return result;
     }
 
     /**
