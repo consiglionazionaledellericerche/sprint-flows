@@ -97,7 +97,7 @@ public class FormResource {
     /**
      * GET  /forms : get all the forms.
      *
-//     * @param pageable the pagination information
+     * @param pageable the pagination information
      * @return the ResponseEntity with status 200 (OK) and the list of forms in body
      * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
      */
@@ -105,13 +105,12 @@ public class FormResource {
         method = RequestMethod.GET,
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<List<Form>> getAllForms()
+    public ResponseEntity<List<Form>> getAllForms(Pageable pageable)
         throws URISyntaxException {
         log.debug("REST request to get a page of Forms");
-        List<Form> page = formRepository.findAll();
-//        todo: controllare
-//        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/forms");
-        return new ResponseEntity<>(page, HttpStatus.OK);
+        Page<Form> page = formRepository.findAll(pageable);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/forms");
+        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 
     /**
