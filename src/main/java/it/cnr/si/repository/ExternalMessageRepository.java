@@ -27,14 +27,12 @@ public interface ExternalMessageRepository extends JpaRepository<ExternalMessage
     List<ExternalMessage> getFailedExternalMessages();
 
     @Query("SELECT em from ExternalMessage em " +
-            "WHERE em.url LIKE CONCAT('%',:searchTerms,'%') " +
-            "OR em.url LIKE CONCAT('%',:searchTerms1,'%') " +
-            "OR em.payload LIKE CONCAT('%',:searchTerms,'%') " +
-            "OR em.payload LIKE CONCAT('%',:searchTerms1,'%') ")
-    Page<ExternalMessage> findAllByUrlsOrPayloads(@Param("searchTerms") String searchTerms, @Param("searchTerms1") String searchTerms1, Pageable pageable);
-
-    @Query("SELECT em from ExternalMessage em " +
-            "WHERE em.url LIKE CONCAT('%',:searchTerms,'%') " +
-            "OR em.payload LIKE CONCAT('%',:searchTerms,'%') ")
-    Page<ExternalMessage> findAllByUrlOrPayload(@Param("searchTerms") String searchTerms, Pageable pageable);
+            "WHERE em.payload LIKE CONCAT('%',:payload,'%') " +
+            "AND em.status  LIKE CONCAT('%',:status,'%') " +
+            "AND em.application  LIKE CONCAT('%',:application,'%') " +
+            "AND em.lastErrorMessage  LIKE CONCAT('%',:lastErrorMessage,'%') ")
+    Page<ExternalMessage> findAllBySearchTerms(@Param("status") String status,
+                                               @Param("application") String application,
+                                               @Param("payload") String payload,
+                                               @Param("lastErrorMessage") String lastErrorMessage, Pageable pageable);
 }
