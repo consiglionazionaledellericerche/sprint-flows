@@ -11,6 +11,7 @@
         var vm = this;
 
         vm.searchTerms = "";
+        vm.externalMessage = {};
         vm.loadPage = loadPage;
         vm.predicate = pagingParams.predicate;
         vm.reverse = pagingParams.ascending;
@@ -22,7 +23,10 @@
                 page: pagingParams.page - 1,
                 size: vm.itemsPerPage,
                 sort: sort(),
-                searchTerms: vm.searchTerms
+                application: vm.externalMessage.application  || '',
+                status: vm.externalMessage.status || '',
+                payload: vm.externalMessage.payload || '',
+                lastErrorMessage: vm.externalMessage.lastErrorMessage || '',
             }, onSuccess, onError);
             function sort() {
                 var result = [vm.predicate + ',' + (vm.reverse ? 'asc' : 'desc')];

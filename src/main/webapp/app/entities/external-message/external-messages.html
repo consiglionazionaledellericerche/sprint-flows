@@ -16,7 +16,55 @@
     <br/>
     <div class="table-responsive">
         <div class="bg-info">
-            <label>Search (massimo 2 Termini di Ricerca separati da uno spazio - Case Sensitive): <input ng-model="vm.searchTerms"></label><br>
+                <div class="form-group">
+                    <label class="control-label" translate="sprintApp.externalMessage.payload" for="field_payload">Payload</label>
+                    <input type="text" class="form-control" name="payload" id="field_payload"
+                           ng-model="vm.externalMessage.payload"
+                           required />
+                    <div ng-show="editForm.payload.$invalid">
+                        <p class="help-block"
+                           ng-show="editForm.payload.$error.required" translate="entity.validation.required">
+                            This field is required.
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" translate="sprintApp.externalMessage.status" for="field_status">Status</label>
+                    <select class="form-control" name="status" ng-model="vm.externalMessage.status" id="field_status" required>
+                        <option value="NEW" translate="sprintApp.ExternalMessageStatus.NEW">NEW</option>
+                        <option value="SENT" translate="sprintApp.ExternalMessageStatus.SENT">SENT</option>
+                        <option value="DELETED" translate="sprintApp.ExternalMessageStatus.DELETED">DELETED</option>
+                        <option value="ERROR" translate="sprintApp.ExternalMessageStatus.ERROR">ERROR</option>
+                    </select>
+                    <div ng-show="editForm.status.$invalid">
+                        <p class="help-block"
+                           ng-show="editForm.status.$error.required" translate="entity.validation.required">
+                            This field is required.
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" translate="sprintApp.externalMessage.lastErrorMessage" for="field_lastErrorMessage">Last Error Message</label>
+                    <input type="text" class="form-control" name="lastErrorMessage" id="field_lastErrorMessage"
+                           ng-model="vm.externalMessage.lastErrorMessage"/>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" translate="sprintApp.externalMessage.application" for="field_application">Application</label>
+                    <select class="form-control" name="application" ng-model="vm.externalMessage.application" id="field_application" required>
+                        <option value="ABIL" translate="sprintApp.ExternalApplication.ABIL">ABIL</option>
+                        <option value="SIGLA" translate="sprintApp.ExternalApplication.SIGLA">SIGLA</option>
+                        <option value="ACE" translate="sprintApp.ExternalApplication.ACE">ACE</option>
+                        <option value="MISSIONI" translate="sprintApp.ExternalApplication.MISSIONI">MISSIONI</option>
+                        <option value="ATTESTATI" translate="sprintApp.ExternalApplication.ATTESTATI">ATTESTATI</option>
+                        <option value="GENERIC" translate="sprintApp.ExternalApplication.GENERIC">GENERIC</option>
+                    </select>
+                    <div ng-show="editForm.application.$invalid">
+                        <p class="help-block"
+                           ng-show="editForm.application.$error.required" translate="entity.validation.required">
+                            This field is required.
+                        </p>
+                    </div>
+            </div>
             <button ng-click="loadAll()" class="btn btn-primary">
                 <span class="glyphicon glyphicon-filter"></span>
                 Filtra
@@ -25,14 +73,14 @@
         <table class="jh-table table table-striped">
             <thead>
                 <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.transition()">
-                    <th jh-sort-by="id"><span translate="global.field.id">ID</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th jh-sort-by="url"><span translate="sprintApp.externalMessage.url">Url</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th jh-sort-by="verb"><span translate="sprintApp.externalMessage.verb">Verb</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th jh-sort-by="payload"><span translate="sprintApp.externalMessage.payload">Payload</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th jh-sort-by="status"><span translate="sprintApp.externalMessage.status">Status</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th jh-sort-by="retries"><span translate="sprintApp.externalMessage.retries">Retries</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th jh-sort-by="lastErrorMessage"><span translate="sprintApp.externalMessage.lastErrorMessage">Last Error Message</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th jh-sort-by="application"><span translate="sprintApp.externalMessage.application">Application</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th id="id" jh-sort-by="id"><span translate="global.field.id">ID</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th id="url" jh-sort-by="url"><span translate="sprintApp.externalMessage.url">Url</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th id="verb" jh-sort-by="verb"><span translate="sprintApp.externalMessage.verb">Verb</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th id="payload" jh-sort-by="payload"><span translate="sprintApp.externalMessage.payload">Payload</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th id="status" jh-sort-by="status"><span translate="sprintApp.externalMessage.status">Status</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th id="retries" jh-sort-by="retries"><span translate="sprintApp.externalMessage.retries">Retries</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th id="lastErrorMessager" jh-sort-by="lastErrorMessage"><span translate="sprintApp.externalMessage.lastErrorMessage">Last Error Message</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th id="application" jh-sort-by="application"><span translate="sprintApp.externalMessage.application">Application</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th></th>
                 </tr>
             </thead>
@@ -44,7 +92,7 @@
                     <td class="ellipsis">{{externalMessage.payload}}</td>
                     <td translate="{{'sprintApp.ExternalMessageStatus.' + externalMessage.status}}">{{externalMessage.status}}</td>
                     <td>{{externalMessage.retries}}</td>
-                    <td>{{externalMessage.lastErrorMessage}}</td>
+                    <td class="ellipsis">{{externalMessage.lastErrorMessage}}</td>
                     <td translate="{{'sprintApp.ExternalApplication.' + externalMessage.application}}">{{externalMessage.application}}</td>
                     <td class="text-right">
                         <div class="btn-group flex-btn-group-container">

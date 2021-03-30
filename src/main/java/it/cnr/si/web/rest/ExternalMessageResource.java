@@ -29,7 +29,7 @@ import java.util.Optional;
 @RequestMapping("/api")
 public class ExternalMessageResource {
 
-    public String EXTERNAL_MESSAGE = "externalMessage";
+    private String externalMessage = "externalMessage";
     private final Logger log = LoggerFactory.getLogger(ExternalMessageResource.class);
         
     @Inject
@@ -48,11 +48,11 @@ public class ExternalMessageResource {
     public ResponseEntity<ExternalMessage> createExternalMessage(@Valid @RequestBody ExternalMessage externalMessage) throws URISyntaxException {
         log.debug("REST request to save ExternalMessage : {}", externalMessage);
         if (externalMessage.getId() != null) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(EXTERNAL_MESSAGE, "idexists", "A new externalMessage cannot already have an ID")).body(null);
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(this.externalMessage, "idexists", "A new externalMessage cannot already have an ID")).body(null);
         }
         ExternalMessage result = externalMessageService.save(externalMessage);
         return ResponseEntity.created(new URI("/api/external-messages/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(EXTERNAL_MESSAGE, result.getId().toString()))
+            .headers(HeaderUtil.createEntityCreationAlert(this.externalMessage, result.getId().toString()))
             .body(result);
     }
 
@@ -75,24 +75,31 @@ public class ExternalMessageResource {
         }
         ExternalMessage result = externalMessageService.save(externalMessage);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(EXTERNAL_MESSAGE, externalMessage.getId().toString()))
+            .headers(HeaderUtil.createEntityUpdateAlert(this.externalMessage, externalMessage.getId().toString()))
             .body(result);
     }
 
     /**
      * GET  /external-messages : get all the externalMessages.
      *
-     * @param pageable the pagination information
+     * @param lastErrorMessage the last error message
+     * @param application      the application
+     * @param payload          the payload
+     * @param status           the status
+     * @param pageable         the pagination information
      * @return the ResponseEntity with status 200 (OK) and the list of externalMessages in body
      * @throws URISyntaxException if there is an error to generate the pagination HTTP headers
      */
     @GetMapping(value = "/external-messages",
         produces = MediaType.APPLICATION_JSON_VALUE)
     @Timed
-    public ResponseEntity<List<ExternalMessage>> getAllExternalMessages(@RequestParam(name = "searchTerms", required = false) String searchTerms,
+    public ResponseEntity<List<ExternalMessage>> getAllExternalMessages(@RequestParam(name = "lastErrorMessage", required = false) String lastErrorMessage,
+                                                                        @RequestParam(name = "application", required = false) String application,
+                                                                        @RequestParam(name = "payload", required = false) String payload,
+                                                                        @RequestParam(name = "status", required = false) String status,
                                                                         Pageable pageable) throws URISyntaxException {
         log.debug("REST request to get a page of ExternalMessages");
-        Page<ExternalMessage> page = externalMessageService.findAll(searchTerms, pageable);
+        Page<ExternalMessage> page = externalMessageService.findAllBySearchTerms(pageable, status, application, payload, lastErrorMessage);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/external-messages");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
@@ -108,8 +115,8 @@ public class ExternalMessageResource {
     @Timed
     public ResponseEntity<ExternalMessage> getExternalMessage(@PathVariable Long id) {
         log.debug("REST request to get ExternalMessage : {}", id);
-        ExternalMessage externalMessage = externalMessageService.findOne(id);
-        return Optional.ofNullable(externalMessage)
+        ExternalMessage em = externalMessageService.findOne(id);
+        return Optional.ofNullable(em)
             .map(result -> new ResponseEntity<>(
                 result,
                 HttpStatus.OK))
@@ -128,7 +135,7 @@ public class ExternalMessageResource {
     public ResponseEntity<Void> deleteExternalMessage(@PathVariable Long id) {
         log.debug("REST request to delete ExternalMessage : {}", id);
         externalMessageService.delete(id);
-        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(EXTERNAL_MESSAGE, id.toString())).build();
+        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(externalMessage, id.toString())).build();
     }
 
 }
