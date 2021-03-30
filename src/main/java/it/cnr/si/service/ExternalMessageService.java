@@ -43,27 +43,20 @@ public class ExternalMessageService {
     }
 
     /**
-     *  Get all the externalMessages.
-     *  
-     *  @param pageable the pagination information
-     *  @return the list of entities
+     * Get all the externalMessages.
+     *
+     * @param pageable         the pagination information
+     * @param status           the status
+     * @param application      the application
+     * @param payload          the payload
+     * @param lastErrorMessage the lastErrorMessage
+     * @return the list of entities
      */
-    @Transactional(readOnly = true) 
-    public Page<ExternalMessage> findAll(String searchTerms, Pageable pageable) {
+    @Transactional(readOnly = true)
+    public Page<ExternalMessage> findAllBySearchTerms(Pageable pageable, String status, String application, String payload, String lastErrorMessage) {
         log.debug("Request to get all ExternalMessages");
-        String[] searchTermsArray = new String[2];
-        if(searchTerms.contains(" "))
-            searchTermsArray = searchTerms.split(" ");
-        else
-            searchTermsArray[0] = searchTerms;
 
-        Page<ExternalMessage> result = null;
-        if(searchTermsArray[0] != null)
-            result = externalMessageRepository.findAllByUrlOrPayload(searchTermsArray[0], pageable);
-        else
-            result = externalMessageRepository.findAllByUrlsOrPayloads(searchTermsArray[0], searchTermsArray[1], pageable);
-
-        return result;
+        return externalMessageRepository.findAllBySearchTerms(status, application, payload, lastErrorMessage, pageable);
     }
 
     /**
