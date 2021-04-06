@@ -193,7 +193,6 @@ public class ManageCovid19_v1 implements ExecutionListener {
 		break;
 		case "endevent-covid19-start": {
 			String statoFinale = "AUTORIZZATO";
-			utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
 			if((execution.getVariable("sceltaUtente").toString().equalsIgnoreCase("Firma")) || (execution.getVariable("sceltaUtente").toString().equalsIgnoreCase("Firma Multipla"))) {
 				String userNameUtente = execution.getVariable("initiator").toString();
 				SimpleUtenteWebDto utente = aceService.getUtente(execution.getVariable("initiator").toString());
@@ -203,6 +202,7 @@ public class ManageCovid19_v1 implements ExecutionListener {
 				} 		
 				execution.setVariable(statoFinaleDomanda.name(), statoFinale);
 				execution.setVariable("statoFinale", statoFinale);					
+				utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
 			}
 		}
 		break;
