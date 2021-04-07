@@ -194,8 +194,11 @@ public class ManageCovid19_v1 implements ExecutionListener {
 		case "endevent-covid19-start": {
 			if((execution.getVariable("sceltaUtente").toString().equalsIgnoreCase("Firma")) || (execution.getVariable("sceltaUtente").toString().equalsIgnoreCase("Firma Multipla"))) {
 				SimpleUtenteWebDto utente = aceService.getUtente(execution.getVariable("userNameUtente").toString());
-				String tipoProfilo = utente.getPersona().getProfilo().toString();
-				String statoFinale = (tipoProfilo.equals("1")) || (tipoProfilo.equals("2")) ? "PRESA D'ATTO" : "AUTORIZZATO";	
+				String tipoProfilo = utente.getPersona().getProfilo();
+				String statoFinale = "AUTORIZZATO";
+				if (tipoProfilo != null && (tipoProfilo.equals("1") || tipoProfilo.equals("2"))) {
+					statoFinale = "PRESA D'ATTO";
+				}  
 				execution.setVariable(statoFinaleDomanda.name(), statoFinale);
 				execution.setVariable("statoFinale", statoFinale);					
 				utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
