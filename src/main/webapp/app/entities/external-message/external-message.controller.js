@@ -9,20 +9,24 @@
 
     function ExternalMessageController ($scope, $state, ExternalMessage, ParseLinks, AlertService, pagingParams, paginationConstants) {
         var vm = this;
-        
+
+        vm.searchTerms = "";
+        vm.externalMessage = {};
         vm.loadPage = loadPage;
         vm.predicate = pagingParams.predicate;
         vm.reverse = pagingParams.ascending;
         vm.transition = transition;
         vm.itemsPerPage = paginationConstants.itemsPerPage;
 
-        loadAll();
-
-        function loadAll () {
+        $scope.loadAll = function () {
             ExternalMessage.query({
                 page: pagingParams.page - 1,
                 size: vm.itemsPerPage,
-                sort: sort()
+                sort: sort(),
+                application: vm.externalMessage.application  || '',
+                status: vm.externalMessage.status || '',
+                payload: vm.externalMessage.payload || '',
+                lastErrorMessage: vm.externalMessage.lastErrorMessage || '',
             }, onSuccess, onError);
             function sort() {
                 var result = [vm.predicate + ',' + (vm.reverse ? 'asc' : 'desc')];
@@ -55,5 +59,7 @@
                 search: vm.currentSearch
             });
         }
+
+        $scope.loadAll();
     }
 })();

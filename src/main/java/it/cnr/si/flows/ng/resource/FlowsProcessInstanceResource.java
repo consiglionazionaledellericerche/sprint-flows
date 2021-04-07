@@ -251,19 +251,23 @@ public class FlowsProcessInstanceResource {
 	 * @param processInstanceId       Process Instance Id
 	 * @return le process instances da esportare in trasparenza
 	 */
-	@GetMapping(value = "/getProcessInstanceForTrasparenzaById", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/getProcessInstanceForPartaleCnrById", produces = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyRole('applicazione-portalecnr@0000','ROLE_ADMIN')")
 	@Timed
-	public ResponseEntity<Map<String, Object>> getProcessInstanceForTrasparenzaById(
-			@RequestParam("processInstanceId") String processInstanceId) {
+	public ResponseEntity<Map<String, Object>> getProcessInstanceForPartaleCnrById(
+			@RequestParam("processInstanceId") String processInstanceId,
+			@RequestParam("service") String service) {
 
 		HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery()
 				.includeProcessVariables().processInstanceId(processInstanceId);
 		//popolo la listPi con tutti i campi associati alla view "export-trasparenza"
 		HashMap<String, Object> responseMap = new HashMap<>();
 
-		responseMap.put("data", mappingPI(acquisti, query.list(), EXPORT_TRASPARENZA, true));
-
+		if(service.equals(EXPORT_TRASPARENZA.split("-")[1])) {
+			responseMap.put("data", mappingPI(acquisti, query.list(), EXPORT_TRASPARENZA, true));
+		} else if(service.equals(EXPORT_URP.split("-")[1])){
+			responseMap.put("data", mappingPI(acquisti, query.list(), EXPORT_URP, true));
+		}
 		return new ResponseEntity<>(responseMap, HttpStatus.OK);
 	}
 
@@ -271,7 +275,7 @@ public class FlowsProcessInstanceResource {
 	@GetMapping(value = "/getProcessInstancesForURP", produces = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasAnyRole('ROLE_applicazione-portalecnr@0000','ROLE_ADMIN')")
 	@Timed
-	public ResponseEntity<List<Map<String, Object>>> getProcessInstancesForURP(
+	public ResponseEntity<Map<String, Object>> getProcessInstancesForURP(
 			@RequestParam("terminiRicorso") int terminiRicorso,
 			@RequestParam(name = "avvisiScaduti", required = false) Boolean avvisiScaduti,
 			@RequestParam(name = "gareScadute", required = false) Boolean gareScadute,
@@ -279,10 +283,15 @@ public class FlowsProcessInstanceResource {
 			@RequestParam("maxResults") int maxResults,
 			@RequestParam(name = "order", required = false) String order) {
 
-		List<HistoricProcessInstance> historicProcessInstances =
-				flowsProcessInstanceService.getProcessInstancesForURP(terminiRicorso, avvisiScaduti, gareScadute, firstResult, maxResults, order);
+		HistoricProcessInstanceQuery query = flowsProcessInstanceService.getProcessInstancesForURP(terminiRicorso, avvisiScaduti, gareScadute, order);
+		//popolo la listPi con tutti i campi associati alla view "export-trasparenza"
+		HashMap<String, Object> responseMap = new HashMap<>();
+		responseMap.put("data", mappingPI(acquisti, query.listPage(firstResult, maxResults), EXPORT_TRASPARENZA, false));
 
-		return new ResponseEntity<>(mappingPI(acquisti, historicProcessInstances, EXPORT_URP, true), HttpStatus.OK);
+		//numero totale di Pi della query (per la paginazione dal lato del portale del CNR)
+		responseMap.put("totalNumItems", query.count());
+
+		return new ResponseEntity<>(responseMap, HttpStatus.OK);
 	}
 
 
@@ -412,7 +421,8 @@ public class FlowsProcessInstanceResource {
 			if (isTrasparenza)
 				mappedVariables.put("documentiPubblicabiliInTrasparenza", getDocumentiPubblicabiliTrasparenza(instance));
 			else
-				mappedVariables.put("documentiPubblicabiliInURP", getDocumentiPubblicabiliURP(instance));
+				mappedVariables.put("documentiPubblicabiliInURP",
+                        getDocumentiPubblicabiliURP(instance));
 		}
 
 		viewExport.forEach(field -> {

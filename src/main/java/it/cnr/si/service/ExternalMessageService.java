@@ -15,8 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Service Implementation for managing ExternalMessage.
@@ -40,21 +39,24 @@ public class ExternalMessageService {
      */
     public ExternalMessage save(ExternalMessage externalMessage) {
         log.debug("Request to save ExternalMessage : {}", externalMessage);
-        ExternalMessage result = externalMessageRepository.save(externalMessage);
-        return result;
+        return externalMessageRepository.save(externalMessage);
     }
 
     /**
-     *  Get all the externalMessages.
-     *  
-     *  @param pageable the pagination information
-     *  @return the list of entities
+     * Get all the externalMessages.
+     *
+     * @param pageable         the pagination information
+     * @param status           the status
+     * @param application      the application
+     * @param payload          the payload
+     * @param lastErrorMessage the lastErrorMessage
+     * @return the list of entities
      */
-    @Transactional(readOnly = true) 
-    public Page<ExternalMessage> findAll(Pageable pageable) {
+    @Transactional(readOnly = true)
+    public Page<ExternalMessage> findAllBySearchTerms(Pageable pageable, String status, String application, String payload, String lastErrorMessage) {
         log.debug("Request to get all ExternalMessages");
-        Page<ExternalMessage> result = externalMessageRepository.findAll(pageable);
-        return result;
+
+        return externalMessageRepository.findAllBySearchTerms(status, application, payload, lastErrorMessage, pageable);
     }
 
     /**
@@ -66,8 +68,7 @@ public class ExternalMessageService {
     @Transactional(readOnly = true) 
     public ExternalMessage findOne(Long id) {
         log.debug("Request to get ExternalMessage : {}", id);
-        ExternalMessage externalMessage = externalMessageRepository.findOne(id);
-        return externalMessage;
+        return externalMessageRepository.findOne(id);
     }
 
     /**

@@ -2,10 +2,16 @@ package it.cnr.si.flows.ng.listeners.cnr.accordiInternazionaliBandi;
 
 
 import com.google.common.net.MediaType;
+
+import it.cnr.si.domain.enumeration.ExternalApplication;
+import it.cnr.si.domain.enumeration.ExternalMessageVerb;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.*;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
+import it.cnr.si.flows.ng.utils.Enum.StatoDomandeAccordiInternazionaliEnum;
+import it.cnr.si.service.ExternalMessageService;
+
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.DelegateExecution;
@@ -17,6 +23,7 @@ import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -36,6 +43,12 @@ public class ManageProcessAccordiInternazionaliBandi_v1 implements ExecutionList
 	private static final long serialVersionUID = 686169707042367215L;
 	private static final Logger LOGGER = LoggerFactory.getLogger(ManageProcessAccordiInternazionaliBandi_v1.class);
 	public static final String STATO_FINALE_VERBALE = "statoFinaleDomanda";
+
+	@Value("${cnr.abil.url}")
+	private String urlAccordiBilaterali;
+	@Value("${cnr.abil.bandiPath}")
+	private String pathBandiAccordiBilaterali;
+
 
 	@Inject
 	private FirmaDocumentoService firmaDocumentoService;
@@ -57,9 +70,34 @@ public class ManageProcessAccordiInternazionaliBandi_v1 implements ExecutionList
 	private FlowsTaskService flowsTaskService;
 	@Inject
 	private Utils utils;
-
-
+	@Inject
+	private ExternalMessageService externalMessageService;
+    @Inject
+    private FlowsAttachmentService attachmentService;
+    
 	private Expression faseEsecuzione;
+
+
+	public void restToApplicazioneAccordiBilaterali(DelegateExecution execution, Long idBando, String relazioneFinaleNodeRef) {
+
+		// @Value("${cnr.accordi-bilaterali.url}")
+		// private String urlAccordiBilaterali;
+		// @Value("${cnr.accordi-bilaterali.usr}")
+		// private String usrAccordiBilaterali;
+		// @Value("${cnr.accordi-bilaterali.psw}")
+		// private String pswAccordiBilaterali;
+		Map<String, Object> abilPayload = new HashMap<String, Object>()
+		{
+			{
+				put("idBando", idBando);
+				put("relazioneFinaleNodeRef", relazioneFinaleNodeRef);
+			}
+		};
+
+
+		String url = urlAccordiBilaterali + pathBandiAccordiBilaterali;
+		externalMessageService.createExternalMessage(url, ExternalMessageVerb.POST, abilPayload, ExternalApplication.ABIL);
+	}
 
 
 	@Override
@@ -109,7 +147,11 @@ public class ManageProcessAccordiInternazionaliBandi_v1 implements ExecutionList
 		};break;    	
 
 		case "process-end": {
-			sbloccaDomandeBando(execution);
+			sbloccaDomandeBando(execution);		
+			Long idBando = Long.parseLong(execution.getVariable("idBando").toString());
+			FlowsAttachment att = runtimeService.getVariable(processInstanceId, "verbale", FlowsAttachment.class);
+			String relazioneFinaleNodeRef = att.getUrl();	
+			restToApplicazioneAccordiBilaterali(execution, idBando, relazioneFinaleNodeRef);
 		};break; 
 		// DEFAULT  
 		default:  {
