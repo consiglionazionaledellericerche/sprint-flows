@@ -2,8 +2,7 @@
     <div class="col-xs-8">
         <ul class="list-unstyled">
             <li>
-                <small class="label"
-                       ng-class="{'label-info' : process.endTime, 'label-primary' : !process.endTime}">
+                <small class="label {{gpick}}">
                     {{task.variabili.key}}
                 </small>
             </li>
@@ -48,7 +47,7 @@
     <div class="col-xs-4 pull-right">
         <div class="btn-group-vertical btn-block" role="group">
 
-            <a class="btn btn-primary" ng-class="{'btn-xs': !advanced}"
+            <a class="btn {{gpick}} btn-primary" ng-class="{'btn-xs': !advanced}"
                ui-sref="details({processInstanceId: task.processInstanceId, taskId: task.id})">
                 <span class="glyphicon glyphicon-th-list"></span> Dettagli Flusso
             </a>

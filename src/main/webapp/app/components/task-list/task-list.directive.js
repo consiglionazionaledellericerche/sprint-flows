@@ -12,7 +12,8 @@
             restrict: 'E',
             scope: {
                 tasks: '=',
-                inFirma: '='
+                inFirma: '=',
+                gpick: '=' //class dinamica per il bottone di "dettaglio"
             },
             templateUrl: 'app/components/task-list/task-list.html',
             link: function (scope, element, attrs) {

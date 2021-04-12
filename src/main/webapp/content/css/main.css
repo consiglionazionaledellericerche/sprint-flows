@@ -345,6 +345,8 @@ ui bootstrap tweaks
     cursor: pointer;
 }
 
+
+
 .ellipsis {
     max-width: 40px;
     text-overflow: ellipsis;
@@ -400,19 +402,19 @@ wysiwyg.ng-touched.ng-invalid > trix-editor {
 }
 
 
-.nav-pills > li.mine.active > a, .nav-pills > li.mine.active > a:hover, .nav-pills > li.mine.active > a:focus {
+.nav-pills > li.mine.active > a, .nav-pills > li.mine.active > a:hover, .nav-pills > li.mine.active > a:focus, body > div.container > div.maincontent > div > div:nth-child(2) > div.col-sm-9 > div:nth-child(1) > div:nth-child(4) > ul > li.pagination-page.active > a, body > div.container > div.maincontent > div > div:nth-child(2) > div.col-sm-9 > div:nth-child(1) > div:nth-child(2) > ul > li.pagination-page.active > a{
     color: #fff;
-    background-color: #449d44;
+    background-color: #508971;
 }
 
-.nav-pills > li.available.active > a, .nav-pills > li.available.active > a:hover, .nav-pills > li.available.active > a:focus {
+.nav-pills > li.available.active > a, .nav-pills > li.available.active > a:hover, .nav-pills > li.available.active > a:focus , body > div.container > div.maincontent > div > div:nth-child(2) > div.col-sm-9 > div:nth-child(2) > div:nth-child(2) > ul > li.pagination-page.active > a, body > div.container > div.maincontent > div > div:nth-child(2) > div.col-sm-9 > div:nth-child(2) > div:nth-child(4) > ul > li.pagination-page.active > a {
     color: #fff;
-    background-color: #286090;
+    background-color: #9DBBA1;
 }
 
-.nav-pills > li.others.active > a, .nav-pills > li.others.active > a:hover, .nav-pills > li.others.active > a:focus {
+.nav-pills > li.others.active > a, .nav-pills > li.others.active > a:hover, .nav-pills > li.others.active > a:focus, body > div.container > div.maincontent > div > div:nth-child(2) > div.col-sm-9 > div:nth-child(3) > div:nth-child(4) > ul > li.pagination-page.active > a, body > div.container > div.maincontent > div > div:nth-child(2) > div.col-sm-9 > div:nth-child(3) > div:nth-child(2) > ul > li.pagination-page.active > a {
     color: #fff;
-    background-color: #5bc0de;
+    background-color: #1D6422;
 }
 
 .nav-pills{
@@ -460,6 +462,29 @@ wysiwyg.ng-touched.ng-invalid > trix-editor {
 .modal-xl {
     width: 1150px;
 }
+
+
+
+
+.myTasks {
+    background-color: #508971;
+}
+.availables {
+    background-color: #9DBBA1;
+}
+.taskAssignedInMyGroups {
+    background-color: #1D6422;
+}
+.gpick4 {
+    background-color: #508971;
+}
+.gpick5 {
+    background-color: #65A592;
+}
+
+
+
+
 
 .cnr-descrizione-task {
     border: 1px solid lightblue;
