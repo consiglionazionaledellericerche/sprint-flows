@@ -1,24 +1,24 @@
 <div ng-cloak>
 	<div class="row form-group">
 		<div class="col-md-12">
-			<ul class="nav nav-pills nav-justified">
-				<li role="presentation" ng-class="vm.searchParams.active == true ? 'active' : ''">
-					<a class="pointer" ng-click="vm.searchParams.active = true; vm.searchParams.page = 1; search()" data-toggle="tab">
+			<uib-tabset active="indextab" justified="true" type="pills">
+				<uib-tab index="0" classes="{{vm.searchParams.active == true ? 'pi-active' : ''}}" select="vm.searchParams.active = true; vm.searchParams.page = 1; search()">
+					<uib-tab-heading>
 						<h3>
 							<em class="glyphicon glyphicon-edit"></em>
-							Flussi attivi
+							Flussi Attivi
 						</h3>
-					</a>
-				</li>
-				<li role="presentation" ng-class="vm.searchParams.active == true ? '': 'active-info'">
-					<a class="pointer" ng-click="vm.searchParams.active = false; vm.searchParams.page = 1; search()" data-toggle="tab">
+					</uib-tab-heading>
+				</uib-tab>
+				<uib-tab index="1" classes="{{vm.searchParams.active == true ? '' : 'pi-terminated'}}" select="vm.searchParams.active = false; vm.searchParams.page = 1; search()">
+					<uib-tab-heading>
 						<h3>
 							<em class="glyphicon glyphicon-check"></em>
-							Flussi terminati
+							Flussi Terminati
 						</h3>
-					</a>
-				</li>
-			</ul>
+					</uib-tab-heading>
+				</uib-tab>
+			</uib-tabset>
 		</div>
 	</div>
 	<div class="row">
@@ -73,7 +73,7 @@
 			<div class="row" ng-show="vm.totalItems > 0">
 				<div class="text-center col-md-12">
 					<jhi-item-count page="vm.searchParams.page" total="vm.totalItems" items-per-page="20"></jhi-item-count>
-					<uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.searchParams.page" ng-change="search()"></uib-pagination>
+					<uib-pagination class="{{vm.searchParams.active == true ? 'pi-active' : 'pi-terminated'}}" total-items="vm.totalItems" ng-model="vm.searchParams.page" ng-change="search()"></uib-pagination>
 				</div>
 			</div>
 
@@ -83,14 +83,14 @@
 					Loading...
 				</div>
 				<div ng-hide="vm.loading" class="col-md-12">
-					<process-list processes="vm.results" paging="paging"></process-list>
+					<process-list processes="vm.results" paging="paging" gpick="vm.searchParams.active == true ? 'pi-active' : 'pi-terminated'"></process-list>
 				</div>
 			</div>
 			<!--Paginazione -->
 			<div class="row">
 				<div class="text-center col-md-12" ng-show="vm.totalItems > 0">
 					<jhi-item-count page="vm.searchParams.page" total="vm.totalItems" items-per-page="20"></jhi-item-count>
-					<uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.searchParams.page" ng-change="search()"></uib-pagination>
+					<uib-pagination class="{{vm.searchParams.active == true ? 'pi-active' : 'pi-terminated'}}" total-items="vm.totalItems" ng-model="vm.searchParams.page" ng-change="search()"></uib-pagination>
 				</div>
 			</div>
 		</div>

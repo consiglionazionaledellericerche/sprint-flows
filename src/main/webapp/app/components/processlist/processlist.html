@@ -3,7 +3,7 @@
         <div class="col-md-10 col-sm-10">
             <a ng-href="#/details?processInstanceId={{process.id}}"
                title="dettagli del flusso {{process.id}}">
-                <small class="label"
+                <small class="label  {{gpick}}"
                        ng-class="{'label-info' : process.endTime, 'label-primary' : !process.endTime}">
                     {{process.businessKey}}
                 </small>
@@ -30,7 +30,7 @@
         </div>
         <div class="col-md-2 col-sm-2 text-right vertical-align-center">
             <div class="btn-group" role="group" aria-label="Left Align">
-                <a class="btn btn-default btn-sm" ng-href="#/details?processInstanceId={{process.id}}">
+                <a class="btn {{gpick}} btn-default btn-sm" ng-href="#/details?processInstanceId={{process.id}}">
                     <span class="glyphicon glyphicon-hand-right" aria-hidden="true"></span> dettagli
                 </a>
             </div>

@@ -10,7 +10,8 @@
       restrict: "E",
       scope: {
         processes: "=",
-        paging: "="
+        paging: "=",
+        gpick: "="
       },
       templateUrl: "app/components/processlist/processlist.html",
       link: function($scope) {
