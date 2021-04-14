@@ -434,22 +434,20 @@ body > div.container > div.maincontent > div > div:nth-child(2) > div.col-sm-9 >
     color: white;
 }
 
-.pi-active,
-.nav-pills > li.pi-active.active > a,
-.nav-pills > li.pi-active.active > a:hover,
-.nav-pills > li.pi-active.active > a:focus,
-/*#resultDiv > div:nth-child(2) > div > ul > li.pagination-page.active > a*/
-body > div.container > div.maincontent > div > div.row.form-group > div > div > ul > li.uib-tab.nav-item.pi-active {
-    background-color: #508971;
+.piActive,
+.nav-pills > li.piActive.active > a,
+.nav-pills > li.piActive.active > a:focus,
+body > div.container > div.maincontent > div > div:nth-child(2) > div.col-md-9 > div:nth-child(2) > div:nth-child(1) > ul > li.pagination-page.active > a,
+body > div.container > div.maincontent > div > div:nth-child(2) > div.col-md-9 > div:nth-child(4) > div > div:nth-child(1) > ul > li.pagination-page.active > a {
+    background-color: #38604B;
     color: white;
 }
 
-.pi-terminated,
-.nav-pills > li.pi-terminated.active > a,
-.nav-pills > li.pi-terminated.active > a:hover,
-.nav-pills > li.pi-terminated.active > a:focus,
-/* #resultDiv > div:nth-child(4) > div > ul > li.pagination-page.active > a*/
-body > div.container > div.maincontent > div > div.row.form-group > div > div > ul > li.uib-tab.nav-item.pi-terminated {
+.piTerminated,
+.nav-pills > li.piTerminated.active > a,
+.nav-pills > li.piTerminated.active > a:focus,
+body > div.container > div.maincontent > div > div:nth-child(2) > div.col-md-9 > div:nth-child(2) > div:nth-child(2) > ul > li.pagination-page.active > a,
+body > div.container > div.maincontent > div > div:nth-child(2) > div.col-md-9 > div:nth-child(4) > div > div:nth-child(2) > ul > li.pagination-page.active > a {
     background-color: #65A592;
     color: white;
 }
