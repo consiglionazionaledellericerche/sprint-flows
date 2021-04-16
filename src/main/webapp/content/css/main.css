@@ -730,3 +730,59 @@ body > div.container > div.maincontent > div > div:nth-child(2) > div.col-md-9 >
         display: none;
     }
 }
+
+
+/*  SCRITTE (i miei compiti, flussi attivi terminati, ecc..) */
+
+
+a {
+    color: #132a0a;
+    text-decoration: none;
+}
+
+a:hover{
+    color: #215314;
+    text-decoration: none;
+}
+
+
+.btn-primary {
+    color: #132a0a;
+    background-color: #a6cab3;
+    border-color: #0b2407;
+}
+
+.btn-primary:hover {
+    color: #fff;
+	background-color: #456823;
+}
+
+
+.btn-info {
+    color: #fff;
+    background-color: #a6cab3;
+    border-color: #132a0a;
+}
+
+/* gli alert da blu a verde (help desk) */
+
+.alert-info {
+    color: #215314;
+    background-color: #dff0d8;
+    border-color: #132a0a;
+}
+
+.cnr-descrizione-task {
+    border: 1px solid #132a0a;
+    padding: 15px;
+    margin: 10px;
+}
+
+.bg-info {
+    background-color: #dff0d8;
+}
+
+
+.label-primary {
+    background-color: #456823;
+}
