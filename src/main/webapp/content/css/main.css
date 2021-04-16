@@ -404,9 +404,11 @@ wysiwyg.ng-touched.ng-invalid > trix-editor {
 /*I MIEI COMPITI*/
 .myTasks,
 .myTasks:hover,
+/*bordino e passaggio del muose dei bottono "dettagli"*/
 .nav-pills > li.mine.active > a,
 .nav-pills > li.mine.active > a:hover,
 .nav-pills > li.mine.active > a:focus,
+/*Paginazione*/
 body > div.container > div.maincontent > div > div:nth-child(2) > div.col-sm-9 > div:nth-child(1) > div:nth-child(4) > ul > li.pagination-page.active > a,
 body > div.container > div.maincontent > div > div:nth-child(2) > div.col-sm-9 > div:nth-child(1) > div:nth-child(2) > ul > li.pagination-page.active > a{
     background-color: #508971;
@@ -417,9 +419,11 @@ body > div.container > div.maincontent > div > div:nth-child(2) > div.col-sm-9 >
 /*COMPITI DEI MEMBRI DEI MIEI GRUPPI*/
 .availables,
 .availables:hover,
+/*bordino e passaggio del muose dei bottono "dettagli"*/
 .nav-pills > li.available.active > a,
 .nav-pills > li.available.active > a:hover,
 .nav-pills > li.available.active > a:focus,
+/*Paginazione*/
 body > div.container > div.maincontent > div > div:nth-child(2) > div.col-sm-9 > div:nth-child(2) > div:nth-child(2) > ul > li.pagination-page.active > a,
 body > div.container > div.maincontent > div > div:nth-child(2) > div.col-sm-9 > div:nth-child(2) > div:nth-child(4) > ul > li.pagination-page.active > a {
     background-color: #9DBBA1;
@@ -430,9 +434,11 @@ body > div.container > div.maincontent > div > div:nth-child(2) > div.col-sm-9 >
 /*COMPITI PRESI IN CARICO DA ALTRI DEI MIEI GRUPPI*/
 .taskAssignedInMyGroups,
 .taskAssignedInMyGroups:hover,
+/*bordino e passaggio del muose dei bottono "dettagli"*/
 .nav-pills > li.others.active > a,
 .nav-pills > li.others.active > a:hover,
 .nav-pills > li.others.active > a:focus,
+/*Paginazione*/
 body > div.container > div.maincontent > div > div:nth-child(2) > div.col-sm-9 > div:nth-child(3) > div:nth-child(4) > ul > li.pagination-page.active > a,
 body > div.container > div.maincontent > div > div:nth-child(2) > div.col-sm-9 > div:nth-child(3) > div:nth-child(2) > ul > li.pagination-page.active > a {
     background-color: #1D6422;
@@ -440,10 +446,13 @@ body > div.container > div.maincontent > div > div:nth-child(2) > div.col-sm-9 >
     color: #fff;
 }
 
+/*classe usata nel bottone dei "dettagli" e nelle tab della pagina "ricerca"*/
 .piActive,
 .piActive:hover,
+/*bordino e passaggio del muose dei bottono "dettagli"*/
 .nav-pills > li.piActive.active > a,
 .nav-pills > li.piActive.active > a:focus,
+/*Paginazione*/
 body > div.container > div.maincontent > div > div:nth-child(2) > div.col-md-9 > div:nth-child(2) > div:nth-child(1) > ul > li.pagination-page.active > a,
 body > div.container > div.maincontent > div > div:nth-child(2) > div.col-md-9 > div:nth-child(4) > div > div:nth-child(1) > ul > li.pagination-page.active > a {
     background-color: #38604B;
@@ -451,10 +460,13 @@ body > div.container > div.maincontent > div > div:nth-child(2) > div.col-md-9 >
     color: #fff;
 }
 
+/*classe usata nel bottone dei "dettagli" e nelle tab della pagina "ricerca"*/
 .piTerminated,
 .piTerminated:hover,
+/*bordino e passaggio del muose dei bottono "dettagli"*/
 .nav-pills > li.piTerminated.active > a,
 .nav-pills > li.piTerminated.active > a:focus,
+/*Paginazione*/
 body > div.container > div.maincontent > div > div:nth-child(2) > div.col-md-9 > div:nth-child(2) > div:nth-child(2) > ul > li.pagination-page.active > a,
 body > div.container > div.maincontent > div > div:nth-child(2) > div.col-md-9 > div:nth-child(4) > div > div:nth-child(2) > ul > li.pagination-page.active > a {
     background-color: #65A592;
@@ -769,6 +781,13 @@ a:hover{
 .alert-info {
     color: #215314;
     background-color: #dff0d8;
+    border-color: #132a0a;
+}
+
+
+.alert-warning {
+    color: #215314;
+    background-color: #77BF59;
     border-color: #132a0a;
 }
 
