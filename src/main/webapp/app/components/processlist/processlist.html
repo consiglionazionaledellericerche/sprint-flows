@@ -3,8 +3,7 @@
         <div class="col-md-10 col-sm-10">
             <a ng-href="#/details?processInstanceId={{process.id}}"
                title="dettagli del flusso {{process.id}}">
-                <small class="label  {{gpick}}"
-                       ng-class="{'label-info' : process.endTime, 'label-primary' : !process.endTime}">
+                <small class="label {{gpick}}">
                     {{process.businessKey}}
                 </small>
                 <br>
