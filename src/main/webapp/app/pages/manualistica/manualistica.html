@@ -20,7 +20,7 @@
             </div>
         </div>
         <div id="resultDiv" class="col-md-9" ng-cloak>
-            <h2 style="color:#069">Manualistica</h2>
+            <h2>Manualistica</h2>
             <ul>
                 <!--<li><a href="https://doc-cnr.si.cnr.it/rest/content?nodeRef=e6765d0c-eca5-4503-93ca-b5dde27ea68a">Manuale utente Flusso Acquisti</a></li>-->
                 <li ng-repeat="manuale in vm.manuali">
@@ -33,13 +33,13 @@
                 </li>
             </ul>
             <br>
-            <hr width="700px;" color="#069" size="10">
+            <hr width="700px;" size="10">
             <br>
-            <h2 style="color: #069;">Faq</h2>
+            <h2>Faq</h2>
             <br>
             <h4>Per vedere ANCHE le Faq specifiche di ogni tipologia di flusso, selezionarlo dal menù laterale</h4>
             <br>
-            <h3 style="color:#069">Scrivania Digitale</h3>
+            <h3>Scrivania Digitale</h3>
             <br>
             <ul>
                 <li ng-repeat="faq in vm.faqs">
@@ -48,7 +48,7 @@
                 </li>
             </ul>
             <br>
-            <h3 style="color:#069">{{vm.myProcessDefinitionKey}}</h3>
+            <h3>{{vm.myProcessDefinitionKey}}</h3>
             <br>
             <ul>
                 <li ng-repeat="specificFaq in vm.specificFaqs">

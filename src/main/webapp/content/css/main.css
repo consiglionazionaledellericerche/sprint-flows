@@ -749,18 +749,31 @@ a:hover{
 .btn-primary {
     color: #132a0a;
     background-color: #a6cab3;
-    border-color: #0b2407;
+    border-color: #132a0a;
 }
 
-.btn-primary:hover {
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary.active {
     color: #fff;
 	background-color: #456823;
 }
 
-
 .btn-info {
-    color: #fff;
+    color: #132a0a;
     background-color: #a6cab3;
+    border-color: #132a0a;
+}
+
+
+.btn-info:hover ,
+.btn-info:focus,
+.btn-info:active,
+.btn-info.active {
+    color: #fff;
+    background-color: #456823;
     border-color: #132a0a;
 }
 
@@ -785,4 +798,18 @@ a:hover{
 
 .label-primary {
     background-color: #456823;
+}
+
+
+input:-internal-autofill-selected {
+    appearance: menulist-button;
+    background-color: #dff0d8 !important;
+    background-image: none !important;
+    color: -internal-light-dark(black, white) !important;
+}
+
+h2,
+h3 {
+    color: #456823;
+}
 }
