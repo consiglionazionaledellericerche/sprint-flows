@@ -827,8 +827,9 @@ input:-internal-autofill-selected {
     color: -internal-light-dark(black, white) !important;
 }
 
-h2,
-h3 {
-    color: #456823;
-}
+.ui-select-bootstrap .ui-select-choices-row.active>span {
+    color: #fff;
+    text-decoration: none;
+    outline: 0;
+    background-color: #456823;
 }
