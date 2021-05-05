@@ -1,0 +1,23 @@
+{
+    "flowsApp": {
+        "blacklist" : {
+            "home": {
+                "title": "Blacklists",
+                "createLabel": "Genera un nuovo Blacklist",
+                "createOrEditLabel": "Genera o modifica un Blacklist",
+                "search": "Cerca Blacklist"
+            },
+            "created": "&Egrave; stato generato un nuovo Blacklist con identificatore { param }}",
+            "updated": "&Egrave; stato aggiornato Blacklist identificato da {{ param }}",
+            "deleted": "&Egrave; stato eliminato Blacklist con identificatore {{ param }}",
+            "delete": {
+                "question": "Sei sicuro di volere eliminare Blacklist {{ id }}?"
+            },
+            "detail": {
+                "title": "Blacklist"
+            },
+            "email": "Email",
+            "processDefinitionKey": "Process Definition Key"
+        }
+    }
+}
