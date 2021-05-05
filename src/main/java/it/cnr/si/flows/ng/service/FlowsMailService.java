@@ -100,8 +100,8 @@ public class FlowsMailService extends MailService {
 
 			if (mailConfig.isMailActivated()) {
 				// In produzione mando le email ai veri destinatari
-			    
-			    Blacklist bl = blacklistService.findOneByEmailAndKey(mailUtente, key);
+			    String procDefId = variables.get("processDefinitionId").toString().split(":")[0];
+			    Blacklist bl = blacklistService.findOneByEmailAndKey(mailUtente, procDefId);
 			    if (bl != null) {
 			        LOGGER.info("L'utente {} ha richiesto di non ricevere notifiche per il flusso {}", mailUtente, key);
 			    } else {
