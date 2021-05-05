@@ -2,6 +2,7 @@ package it.cnr.si.web.rest;
 
 import it.cnr.si.FlowsApp;
 import it.cnr.si.domain.Blacklist;
+import it.cnr.si.flows.ng.TestUtil;
 import it.cnr.si.repository.BlacklistRepository;
 import it.cnr.si.service.BlacklistService;
 
