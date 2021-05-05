@@ -1,7 +1,7 @@
 (function() {
     'use strict';
     angular
-        .module('flowsApp')
+        .module('sprintApp')
         .factory('Blacklist', Blacklist);
 
     Blacklist.$inject = ['$resource'];

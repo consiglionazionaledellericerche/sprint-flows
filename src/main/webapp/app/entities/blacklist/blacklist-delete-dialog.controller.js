@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('flowsApp')
+        .module('sprintApp')
         .controller('BlacklistDeleteController',BlacklistDeleteController);
 
     BlacklistDeleteController.$inject = ['$uibModalInstance', 'entity', 'Blacklist'];

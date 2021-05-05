@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('flowsApp')
+        .module('sprintApp')
         .controller('BlacklistDetailController', BlacklistDetailController);
 
     BlacklistDetailController.$inject = ['$scope', '$rootScope', '$stateParams', 'previousState', 'entity', 'Blacklist'];

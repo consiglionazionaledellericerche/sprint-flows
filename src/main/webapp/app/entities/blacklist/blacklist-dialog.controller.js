@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('flowsApp')
+        .module('sprintApp')
         .controller('BlacklistDialogController', BlacklistDialogController);
 
     BlacklistDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'entity', 'Blacklist'];

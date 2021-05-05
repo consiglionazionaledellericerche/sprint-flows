@@ -62,6 +62,13 @@ public class BlacklistService {
         return blacklist;
     }
 
+    
+    @Transactional(readOnly = true) 
+    public Blacklist findOneByEmailAndKey(String email, String key) {
+        Blacklist blacklist = blacklistRepository.findBlacklist(email, key);
+        return blacklist;
+    }
+    
     /**
      *  Delete the  blacklist by id.
      *

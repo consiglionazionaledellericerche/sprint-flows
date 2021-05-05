@@ -2,7 +2,7 @@
     'use strict';
 
     angular
-        .module('flowsApp')
+        .module('sprintApp')
         .config(stateConfig);
 
     stateConfig.$inject = ['$stateProvider'];
