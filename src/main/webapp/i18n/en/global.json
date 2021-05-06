@@ -18,6 +18,7 @@
                 "avviso": "Avviso",
                 "externalMessage": "External Message",
                 "faq": "Faq",
+                "blacklist": "Blacklist",
                 "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
             },
             "account": {

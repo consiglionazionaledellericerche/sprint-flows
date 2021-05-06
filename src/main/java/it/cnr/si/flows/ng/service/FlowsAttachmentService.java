@@ -252,6 +252,18 @@ public class FlowsAttachmentService {
 		}
 		return index;
 	}
+	
+	public List<FlowsAttachment> getAttachmentArray(String processInstanceId, String fileName) {
+	    List<FlowsAttachment> result = new ArrayList<>();
+	    String regex = fileName+"\\d+";
+	    
+	    runtimeService.getVariables(processInstanceId).forEach((name, value) -> {
+	        if (name.matches(regex) && value instanceof FlowsAttachment)
+	            result.add( (FlowsAttachment)value );
+	    });
+	    
+	    return result;
+	}
 
 	public Map<String, FlowsAttachment> getCurrentAttachments(DelegateExecution execution) {
 

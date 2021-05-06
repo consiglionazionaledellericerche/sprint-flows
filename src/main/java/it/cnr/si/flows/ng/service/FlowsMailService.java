@@ -1,7 +1,9 @@
 package it.cnr.si.flows.ng.service;
 
+import it.cnr.si.domain.Blacklist;
 import it.cnr.si.flows.ng.config.MailConfguration;
 import it.cnr.si.service.AceService;
+import it.cnr.si.service.BlacklistService;
 import it.cnr.si.service.CnrgroupService;
 import it.cnr.si.service.FlowsUserService;
 import it.cnr.si.service.MailService;
@@ -50,13 +52,16 @@ public class FlowsMailService extends MailService {
 	private FlowsUserService flowsUserService;
 	@Autowired
 	private UserDetailsService flowsUserDetailsService;
+	@Autowired
+	private BlacklistService blacklistService;
 
 	@Async
 	public void sendFlowEventNotification(String notificationType, Map<String, Object> variables, String taskName, String username, final String groupName) {
 		try {
 			
 			LOGGER.info("Invio della mail all'utente "+ username);
-
+			String key = (String)variables.get("key");
+			
 			Context ctx = new Context();
 			ctx.setVariables(variables);
 			ctx.setVariable("username", username);
@@ -95,12 +100,21 @@ public class FlowsMailService extends MailService {
 
 			if (mailConfig.isMailActivated()) {
 				// In produzione mando le email ai veri destinatari
-				if(mailUtente != null)
-					sendEmail(mailUtente,
-							"Notifica relativa al flusso " + variables.get("key"),
-							htmlContent,
-							false,
-							true);
+			    String procDefId = variables.get("processDefinitionId").toString().split(":")[0];
+			    Blacklist bl = blacklistService.findOneByEmailAndKey(mailUtente, procDefId);
+			    if (bl != null) {
+			        LOGGER.info("L'utente {} ha richiesto di non ricevere notifiche per il flusso {}", mailUtente, key);
+			    } else {
+    				if(mailUtente != null) {
+    					sendEmail(mailUtente,
+    							"Notifica relativa al flusso " + key,
+    							htmlContent,
+    							false,
+    							true);
+    				} else {
+    				    LOGGER.warn("L'utente {} non ha un'email associata", username);
+    				}
+			    }
 			}
 			
 			// Per le prove mando *tutte* le email agli indirizzi di prova (e non ai veri destinatari)
@@ -109,12 +123,12 @@ public class FlowsMailService extends MailService {
 			.forEach(s -> {
 				LOGGER.debug("Invio mail a {} con titolo Notifica relativa al flusso {} del tipo {} nello stato {} e con contenuto {}",
 						s,
-						variables.get("key"),
+						key,
 						notificationType,
 						variables.get("stato"),
 						StringUtils.abbreviate(htmlContent, 30));
 				LOGGER.trace("Corpo email per intero: {}", htmlContent);
-				sendEmail(s, "Notifica relativa al flusso " + variables.get("key"), htmlContent, false, true);
+				sendEmail(s, "Notifica relativa al flusso " + key, htmlContent, false, true);
 			});
 		} catch (Exception e) {
 			LOGGER.error("Errore nell'invio della mail", e);
