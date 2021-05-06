@@ -4,6 +4,7 @@ import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
 import it.cnr.si.firmadigitale.firma.arss.stub.PdfSignApparence;
 import it.cnr.si.firmadigitale.firma.arss.stub.SignReturnV2;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.exception.TaskFailedException;
 import it.cnr.si.flows.ng.service.FlowsFirmaService.FileAllaFirma;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
 import org.activiti.engine.RuntimeService;
@@ -159,16 +160,29 @@ public class FlowsFirmaMultiplaService {
                     .processInstanceId(task.getProcessInstanceId())
                     .singleResult();
             String key = pi.getProcessDefinitionKey() +"#"+ task.getTaskDefinitionKey();
-            List<FileAllaFirma> filesDaFirmare = NOME_FILE_FIRMA.get(key);
-            Iterator<FileAllaFirma> it = filesDaFirmare.iterator();
-            while (it.hasNext()) {
-                FileAllaFirma file = it.next();
-                FlowsAttachment att = taskService.getVariable(id, file.nome, FlowsAttachment.class);
-                if (att == null && file.opzionale) {
-                    LOGGER.debug("File opzionale non presente {}", file.nome);
-                    it.remove();
+            List<FileAllaFirma> filesDaFirmare = new ArrayList<FlowsFirmaService.FileAllaFirma>();
+            
+            NOME_FILE_FIRMA.get(key).forEach(file -> {
+                if (file.array == false) {
+                    FlowsAttachment att = taskService.getVariable(id, file.nome, FlowsAttachment.class);
+                    if (att == null) {
+                        if (file.opzionale)
+                            LOGGER.debug("File opzionale non presente {}, salto", file.nome);
+                        else
+                            throw new TaskFailedException("Attachment non opzionali mancanti: "+file.nome);
+                    }
+                    else 
+                        filesDaFirmare.add(file);
+                    
+                } else {
+                    List<FlowsAttachment> attachments = flowsAttachmentService.getAttachmentArray(pi.getId(), file.nome);
+                    if (attachments.size() == 0 && !file.opzionale)
+                        throw new TaskFailedException("Attachment non opzionali mancanti: "+file.nome);
+                    
+                    attachments.forEach(att -> filesDaFirmare.add(new FileAllaFirma(att.getName()))); 
                 }
-            }
+            });
+
             tasks.put(task, filesDaFirmare);
         }
         return tasks;
