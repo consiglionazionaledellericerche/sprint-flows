@@ -60,13 +60,22 @@ public class FlowsFirmaService {
     public static class FileAllaFirma {
         public String nome;
         public boolean opzionale;
+        public boolean array;
+
+        public FileAllaFirma(String nome, boolean opzionale, boolean array) {
+            this.nome = nome;
+            this.opzionale = opzionale;
+            this.array = array;
+        }
         public FileAllaFirma(String nome, boolean opzionale) {
             this.nome = nome;
             this.opzionale = opzionale;
+            this.array = false;
         }
         public FileAllaFirma(String nome) {
             this.nome = nome;
             this.opzionale = false;
+            this.array = false;
         }
     }
     
