@@ -16,6 +16,7 @@ import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.runtime.Job;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,9 +24,12 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.statoFinaleDomanda;
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
@@ -64,7 +68,8 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 	private ManagementService managementService;
 	@Inject
 	private Utils utils;
-
+	@Inject
+	private FlowsPdfBySiglaRestService flowsPdfBySiglaRestService;
 
 	private Expression faseEsecuzione;
 
@@ -114,8 +119,65 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 			case "process-start": {
 				startAccordiInternazionaliDomandeSetGroupsAndVisibility.configuraVariabiliStart(execution);
 				// GENERO LA DOMANDA
+				//String nomeFile="domandaAccordiBilaterali";
+				//flowsPdfService.makePdfBeforeStartPi(nomeFile, processInstanceId);
+
+				//PARAMETRI GENERAZIONE PDF x SIGLA PRINT
+				String tipoAttivita = "rendicontazione";
+				if (execution.getVariable("tipoAttivita") != null) {
+					tipoAttivita = execution.getVariable("tipoAttivita").toString();
+				}
 				String nomeFile="domandaAccordiBilaterali";
-				flowsPdfService.makePdfBeforeStartPi(nomeFile, processInstanceId);
+				String labelFile = "Domanda Accordi Bilaterali";
+				String report = "/scrivaniadigitale/domandaAccordiBilaterali.jrxml";
+				//tipologiaDoc è la tipologia del file
+				String tipologiaDoc = Enum.PdfType.valueOf("domandaAccordiBilaterali").name();
+				String utenteFile = execution.getVariable("initiator").toString();
+
+//				//valoreParam per il json che racchiude i dati della stampa
+//				JSONObject valoreParamJson = new JSONObject();
+//				valoreParamJson.put("accordoBilaterale", execution.getVariable("accordoBilaterale"));
+//				valoreParamJson.put("nomeCognomeRichiedente", execution.getVariable("nomeCognomeRichiedente"));
+//				valoreParamJson.put("strutturaValutazioneDirigente", execution.getVariable("strutturaValutazioneDirigente"));
+//				valoreParamJson.put("titolo", execution.getVariable("titolo"));
+//				valoreParamJson.put("sceltaUtente", execution.getVariable("sceltaUtente"));
+//				valoreParamJson.put("pianoDiLavoroSecondoAnno", execution.getVariable("pianoDiLavoroSecondoAnno").toString());
+//				valoreParamJson.put("bando", execution.getVariable("bando").toString());
+//				valoreParamJson.put("pianoDiLavoroPrimoAnno", execution.getVariable("pianoDiLavoroPrimoAnno").toString());
+//				valoreParamJson.put("dipartimentoId", execution.getVariable("dipartimentoId").toString());
+//				valoreParamJson.put("obiettivi", execution.getVariable("obiettivi").toString());				valoreParamJson.put("codiceFiscaleRichiedente", execution.getVariable("codiceFiscaleRichiedente").toString());
+//				valoreParamJson.put("idDomanda", execution.getVariable("idDomanda").toString());
+//				valoreParamJson.put("idBando", execution.getVariable("idBando").toString());
+//				valoreParamJson.put("key", execution.getVariable("key").toString());
+//				valoreParamJson.put("userNameRichiedente", execution.getVariable("userNameRichiedente").toString());
+//				valoreParamJson.put("pianoDiLavoroTerzoAnno", execution.getVariable("pianoDiLavoroTerzoAnno").toString());
+//				valoreParamJson.put("dataInvioDomanda", execution.getVariable("dataInvioDomanda").toString());
+//				valoreParamJson.put("propostaDiRicerca", execution.getVariable("initiator").toString());
+//				valoreParamJson.put("cdsuoRichiedente", execution.getVariable("cdsuoRichiedente").toString());
+//				valoreParamJson.put("sessoRichiedente", execution.getVariable("sessoRichiedente").toString());
+//				valoreParamJson.put("emailRichiedente", execution.getVariable("emailRichiedente").toString());
+//				valoreParamJson.put("descrizione", execution.getVariable("descrizione").toString());
+//				valoreParamJson.put("dipartimento", execution.getVariable("dipartimento").toString());
+//				valoreParamJson.put("startDate", execution.getVariable("startDate").toString());
+//				valoreParamJson.put("propostaDiRicerca",
+//						Optional.ofNullable(execution.getVariable("propostaDiRicerca"))
+//						.filter(String.class::isInstance)
+//						.map(String.class::cast)
+//						.map(s -> s.replaceAll("strong>", "b>"))
+//						.map(s -> s.replaceAll("em>", "i>"))
+//						.orElse("")
+//						);
+
+				//String valoreParam = valoreParamJson.toString();
+				// UPDATE VARIABILI FLUSSO
+				utils.updateJsonSearchTerms(executionId, processInstanceId, stato);
+				// GENERAZIONE PDF
+			//lowsPdfBySiglaRestService.makePdf(execution, nomeFile, labelFile, report, valoreParam, tipologiaDoc, processInstanceId, utenteFile);
+				//flowsPdfBySiglaRestService.makePdf(execution, nomeFile, labelFile, report, valoreParam, tipologiaDoc, processInstanceId, utenteFile);
+				List<String> listaVariabiliHtml = new ArrayList<String>();
+				listaVariabiliHtml.add("propostaDiRicerca");
+				flowsPdfService.makePdfBySigla(nomeFile, processInstanceId, listaVariabiliHtml);
+
 			};break;
 			// START
 			case "valutazione-scientifica-end": {
@@ -144,12 +206,12 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 				execution.setVariable("gruppoValutatoreScientificoDipartimento", gruppoValutatoreScientificoDipartimento);
 				LOGGER.debug("Imposto i gruppi dipartimento : {} - del flusso {}", idDipartimento, gruppoValutatoreScientificoDipartimento);
 				// GENERO LA DOMANDA
-//				String nomeFile="domandaAccordiBilaterali";
-//				String labelFile="Domanda";
-//				flowsPdfService.makePdf(nomeFile, processInstanceId);
-//				FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
-//				documentoGenerato.setLabel(labelFile);
-//				flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
+				//				String nomeFile="domandaAccordiBilaterali";
+				//				String labelFile="Domanda";
+				//				flowsPdfService.makePdf(nomeFile, processInstanceId);
+				//				FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
+				//				documentoGenerato.setLabel(labelFile);
+				//				flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
 			};break;
 			// START
 			case "validazione-start": {
