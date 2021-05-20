@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.inject.Inject;
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 
 
 /**
@@ -108,8 +109,25 @@ public class FlowsPdfResource {
 		return new ResponseEntity<>(filePair.getSecond(), headers, HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "/makePdfSigla", headers = "Accept=application/pdf", method = RequestMethod.GET, produces = "application/pdf")
+	@ResponseBody
+	@Timed
+	@Secured(AuthoritiesConstants.USER)
+	public ResponseEntity<byte[]> makePdfSigla(
+			@RequestParam("processInstanceId") String processInstanceId,
+			@RequestParam("tipologiaDoc") String tipologiaDoc,
+			@RequestParam("listaVariabiliHtml") List<String> listaVariabiliHtml) {
 
+        final Pair<String, byte[]> filePair = pdfService.makePdfBySigla(tipologiaDoc, processInstanceId, listaVariabiliHtml);
 
+        //popolo gli headers della response
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Content-Disposition", "attachment; filename=\"" + filePair.getFirst() + "\"");
+		headers.setContentType(MediaType.parseMediaType("application/pdf"));
+		headers.setContentLength(filePair.getSecond().length);
+
+		return new ResponseEntity<>(filePair.getSecond(), headers, HttpStatus.OK);
+	}
 	/**
 	 * Make statistic pdf response entity.
 	 *

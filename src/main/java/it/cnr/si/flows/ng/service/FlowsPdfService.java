@@ -620,6 +620,65 @@ public class FlowsPdfService {
 		return Pair.of(fileName, makePdf(Enum.PdfType.valueOf(tipologiaDoc), processVariables, fileName, utenteRichiedente, processInstanceId));
 	}
 
+	public Pair<String, byte[]> makePdfBySigla(String tipologiaDoc, String processInstanceId, List<String> listaVariabiliHtml) {
+
+		//Sotituisco la lista di variabili da quelle storiche (historicProcessInstance.getProcessVariables() )a quelle attuali (variableInstanceJson)
+		JSONObject variableInstanceJson = new JSONObject();
+
+		Map<String, VariableInstance> tutteVariabiliMap = runtimeService.getVariableInstances(processInstanceId);
+		for (Map.Entry<String, VariableInstance> entry : tutteVariabiliMap.entrySet()) {
+			String key = entry.getKey();
+			VariableInstance value = entry.getValue();
+			//le variabili di tipo serializable (file) non vanno inseriti nel json delle variabili che verranno inseriti nel pdf
+			//(ho testato valutazioni esperienze_Json fino a 11000 caratteri ed a questo livello appare come longString)
+			if((!(((VariableInstanceEntity) value).getType() instanceof SerializableType)) || (((VariableInstanceEntity) value).getType() instanceof LongStringType)){
+				if(key.toString().equals("startDate")) {
+					Date startDate = (Date)value.getValue();
+					SimpleDateFormat sdf = new  SimpleDateFormat("dd/MM/yyyy HH:mm");
+					sdf.setTimeZone(TimeZone.getTimeZone("Europe/Rome"));
+					variableInstanceJson.put(key, sdf.format(startDate));
+				} else {
+					String valueEscaped = "campo erroneamente compilato";
+					if (runtimeService.getVariable(processInstanceId,value.getName()) != null) {
+						String variabileCorrente = value.getName().toString();
+						if (listaVariabiliHtml.contains(variabileCorrente)) {
+							variableInstanceJson.put(variabileCorrente,
+									Optional.ofNullable(runtimeService.getVariable(processInstanceId, variabileCorrente))
+									.filter(String.class::isInstance)
+									.map(String.class::cast)
+									.map(s -> s.replaceAll("strong>", "b>"))
+									.map(s -> s.replaceAll("em>", "i>"))
+									.orElse("")
+									);
+
+						} else {
+							valueEscaped = Jsoup.parse(StringEscapeUtils.escapeHtml(variabileCorrente.replaceAll("\t", "  "))).text();
+							valueEscaped = valueEscaped.replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;");
+							variableInstanceJson.put(key, valueEscaped);
+						}
+					}
+				}
+			}
+		}
+		LOGGER.info("variableInstanceJson: {}", variableInstanceJson);
+
+		//Sotituisco la lista di variabili da quelle storiche (historicProcessInstance.getProcessVariables() )a quelle attuali (variableInstanceJson)
+		JSONObject processVariables = mappingVariableBeforeStartPi(variableInstanceJson, processInstanceId);
+		//creo il pdf corrispondente
+		String utenteRichiedente = "sistema";
+		String fileName = tipologiaDoc + ".pdf";
+
+		if(processVariables.has("nomeRichiedente")) {
+			utenteRichiedente = processVariables.getString("nomeRichiedente");
+			fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
+		}
+
+		if(processVariables.has("userNameRichiedente")) {
+			utenteRichiedente = processVariables.getString("userNameRichiedente");
+			fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
+		}
+		return Pair.of(fileName, makePdf(Enum.PdfType.valueOf(tipologiaDoc), processVariables, fileName, utenteRichiedente, processInstanceId));
+	}
 
 	//GESTIONE DEI PARAMETRI DA VISUALIZZARE
 	private void resetStatisticvariables() {
@@ -669,7 +728,7 @@ public class FlowsPdfService {
 
 		image = new ImageElement(diagram);
 		Dimension scaledDim = getScaledDimension(new Dimension((int) image.getWidth(), (int) image.getHeight()),
-												 dimension, margineSx);
+				dimension, margineSx);
 		image.setHeight((float) scaledDim.getHeight());
 		image.setWidth((float) scaledDim.getWidth());
 		image.setAbsolutePosition(new Position(20, 700));
