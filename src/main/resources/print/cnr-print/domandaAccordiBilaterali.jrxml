@@ -553,8 +553,8 @@
 		<band height="30" splitType="Stretch">
 			<printWhenExpression><![CDATA[$F{obiettivi}  != null]]></printWhenExpression>
 			<textField textAdjust="StretchHeight">
-				<reportElement style="table_TH" positionType="Float" x="0" y="7" width="556" height="17" uuid="fc86c61f-eeb7-450c-927f-26dcba4a6561"/>
-				<textElement textAlignment="Left" verticalAlignment="Middle" markup="styled">
+				<reportElement positionType="Float" x="0" y="7" width="556" height="17" uuid="95417880-5ad8-4a59-ac7e-ddafff7aff12"/>
+				<textElement textAlignment="Left" verticalAlignment="Justified" markup="styled">
 					<font fontName="SansSerif" size="11" isBold="false" isItalic="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
