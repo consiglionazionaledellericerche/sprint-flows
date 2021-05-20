@@ -92,6 +92,9 @@ public class Enum {
     	rimborso,
     	revoca;
     }
+    
+    
+
     public enum StatoDomandeAccordiInternazionaliEnum {
         APERTA,
         CHIUSA,
@@ -100,6 +103,12 @@ public class Enum {
         VALUTATA_SCIENTIFICAMENTE,
         ACCETATA,
         CANCELLATA;
+    }
+
+    public enum StatoFirmaDocumentiEnum {
+        FIRMATO,
+        ANNULLATO,
+        PREDISPOSTO;
     }
 
     public enum StatoDomandeSTMEnum {
