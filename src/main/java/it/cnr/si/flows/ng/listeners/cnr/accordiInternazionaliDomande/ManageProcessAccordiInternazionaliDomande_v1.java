@@ -176,7 +176,7 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 				//flowsPdfBySiglaRestService.makePdf(execution, nomeFile, labelFile, report, valoreParam, tipologiaDoc, processInstanceId, utenteFile);
 				List<String> listaVariabiliHtml = new ArrayList<String>();
 				listaVariabiliHtml.add("propostaDiRicerca");
-				flowsPdfService.makePdfBySigla(nomeFile, processInstanceId, listaVariabiliHtml);
+				flowsPdfService.makePdfBySigla(tipologiaDoc, processInstanceId, listaVariabiliHtml);
 
 			};break;
 			// START
