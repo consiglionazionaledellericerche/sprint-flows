@@ -102,6 +102,26 @@ public class FlowsLookupResource {
 
         return ResponseEntity.ok(CDSUOs);
     }
+    
+
+    @RequestMapping(value = "/ace/user/sedirichiedentefirma", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
+    public ResponseEntity<List<Utils.SearchResult>> getSediUtenteFirma() {
+
+        List<Utils.SearchResult> CDSUOs = SecurityUtils.getCurrentUserAuthorities().stream()
+                .map(Utils::removeLeadingRole)
+                .filter(role -> role.startsWith("staffFirmaDocumenti"))
+                .map(role -> role.split("@")[1])
+                .map(idEo -> {
+                    Integer id = Integer.parseInt(idEo);
+                    return aceBridgeService.getStrutturaById(id);
+                })
+                .map(eo -> new Utils.SearchResult(String.valueOf(eo.getId()),
+                                              eo.getIdnsip() +" - "+ eo.getDenominazione() +", "+ eo.getIndirizzoPrincipale().getComune()))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(CDSUOs);
+    }
 
     @RequestMapping(value = "/ldap/user/{username:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)

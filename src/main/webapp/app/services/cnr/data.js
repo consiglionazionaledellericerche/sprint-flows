@@ -217,6 +217,9 @@
                 mycdsuos: function () {
                     return $http.get('api/lookup/ace/user/cdsuoabilitate');
                 },
+                mysedifirma: function () {
+                    return $http.get('api/lookup/ace/user/sedirichiedentefirma');
+                },
                 boss: function () {
                     return $http.get('api/lookup/ace/boss');
                 }
