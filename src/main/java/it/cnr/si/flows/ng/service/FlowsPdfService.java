@@ -652,7 +652,7 @@ public class FlowsPdfService {
 									);
 
 						} else {
-							valueEscaped = Jsoup.parse(StringEscapeUtils.escapeHtml(variabileCorrente.replaceAll("\t", "  "))).text();
+							valueEscaped = Jsoup.parse(StringEscapeUtils.escapeHtml(runtimeService.getVariable(processInstanceId,value.getName()).toString().replaceAll("\t", "  "))).text();
 							valueEscaped = valueEscaped.replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;");
 							variableInstanceJson.put(key, valueEscaped);
 						}
