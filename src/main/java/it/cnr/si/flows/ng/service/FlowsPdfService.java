@@ -6,11 +6,13 @@ import it.cnr.si.flows.ng.exception.ReportException;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
+import it.cnr.si.service.RestPdfSiglaService;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JsonDataSource;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.impl.persistence.entity.VariableInstance;
 import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
@@ -89,6 +91,11 @@ public class FlowsPdfService {
 	private HistoryService historyService;
 	@Inject
 	private RuntimeService runtimeService;
+	@Inject
+	private FlowsPdfBySiglaRestService flowsPdfBySiglaRestService;
+	@Inject
+	private RestPdfSiglaService restPdfSiglaService;
+	
 
 	// ELENCO PARAMETRI STATISTICHE
 	private int nrFlussiTotali = 0;
@@ -424,6 +431,62 @@ public class FlowsPdfService {
 		return pdfByteArray;
 	}
 
+	public byte[] makeSiglaPdf(Enum.PdfType pdfType, JSONObject processvariables, String fileName, String labelFile, String report, String utenteRichiedente, String processInstanceId) {
+
+        JSONObject variabliStampa = new JSONObject();
+
+        variabliStampa.put("nomeFile", fileName);
+        variabliStampa.put("report", report);
+
+        JSONArray array = new JSONArray();
+        JSONObject arrayParams = new JSONObject();
+
+        JSONObject arrayParamsKey = new JSONObject();
+        JSONObject nomeParams = new JSONObject();
+        arrayParamsKey.put("paramType", "java.lang.String");
+        arrayParamsKey.put("valoreParam", processvariables);
+        nomeParams.put("nomeParam", "REPORT_DATA_SOURCE");
+        arrayParamsKey.put("key", nomeParams);
+
+        array.put(arrayParamsKey);
+        variabliStampa.put("params", array);
+		HashMap<String, Object> parameters = new HashMap();
+		// RICHIESTA DEL PDF
+        byte[] pdfByteArray = null;
+        pdfByteArray = restPdfSiglaService.getSiglaPdf(variabliStampa.toString());
+        
+		//"Allego" il file nel flusso
+		Map<String, FlowsAttachment> attachments = flowsAttachmentService.getAttachementsForProcessInstance(processInstanceId);
+
+		FlowsAttachment attachment = attachments.get(pdfType.name());
+		if (attachment != null) {
+			//aggiorno il pdf
+			attachment.setFilename(fileName);
+			attachment.setName(pdfType.name());
+			attachment.setAzione(Aggiornamento);
+			attachment.setUsername(utenteRichiedente);
+		} else {
+			//salvo il pdf nel flusso
+			attachment = new FlowsAttachment();
+			attachment.setAzione(Caricamento);
+			attachment.setPath(runtimeService.getVariable(processInstanceId, "pathFascicoloDocumenti", String.class));
+			attachment.setTaskId(null);
+			attachment.setTaskName(null);
+			attachment.setTime(new Date());
+			attachment.setName(pdfType.name());
+			attachment.setFilename(fileName);
+			attachment.setMimetype(com.google.common.net.MediaType.PDF.toString());
+			attachment.setUsername(utenteRichiedente);
+		}
+
+		try {
+			String taskId = taskService.createTaskQuery().processInstanceId(processInstanceId).active().singleResult().getId();
+			flowsAttachmentService.saveAttachment(taskId, pdfType.name(), attachment, pdfByteArray);
+		}catch (NullPointerException e){
+			flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, pdfType.name(), attachment, pdfByteArray);
+		}
+		return pdfByteArray;
+	}
 
 	public byte[] makeStatisticPdf( JSONObject processvariables, String fileName) {
 		byte[] pdfByteArray = null;
@@ -620,9 +683,8 @@ public class FlowsPdfService {
 		return Pair.of(fileName, makePdf(Enum.PdfType.valueOf(tipologiaDoc), processVariables, fileName, utenteRichiedente, processInstanceId));
 	}
 
-	public Pair<String, byte[]> makePdfBySigla(String tipologiaDoc, String processInstanceId, List<String> listaVariabiliHtml) {
-
-		//Sotituisco la lista di variabili da quelle storiche (historicProcessInstance.getProcessVariables() )a quelle attuali (variableInstanceJson)
+	public Pair<String, byte[]> makePdfBySigla(String tipologiaDoc, String processInstanceId, List<String> listaVariabiliHtml, String labelFile, String report) {
+			//Sotituisco la lista di variabili da quelle storiche (historicProcessInstance.getProcessVariables() )a quelle attuali (variableInstanceJson)
 		JSONObject variableInstanceJson = new JSONObject();
 
 		Map<String, VariableInstance> tutteVariabiliMap = runtimeService.getVariableInstances(processInstanceId);
@@ -677,7 +739,12 @@ public class FlowsPdfService {
 			utenteRichiedente = processVariables.getString("userNameRichiedente");
 			fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
 		}
-		return Pair.of(fileName, makePdf(Enum.PdfType.valueOf(tipologiaDoc), processVariables, fileName, utenteRichiedente, processInstanceId));
+		
+		
+		//SOTITUZIONE FIRM ACON JASPER CON FIRMA SIGLA
+		//return Pair.of(fileName, makePdf(Enum.PdfType.valueOf(tipologiaDoc), processVariables, fileName, utenteRichiedente, processInstanceId));
+		return Pair.of(fileName, makeSiglaPdf(Enum.PdfType.valueOf(tipologiaDoc), processVariables, fileName, labelFile, report, utenteRichiedente, processInstanceId));
+
 	}
 
 	//GESTIONE DEI PARAMETRI DA VISUALIZZARE
