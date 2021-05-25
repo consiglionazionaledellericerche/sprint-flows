@@ -118,7 +118,7 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 			// START
 			case "process-start": {
 				startAccordiInternazionaliDomandeSetGroupsAndVisibility.configuraVariabiliStart(execution);
-				// GENERO LA DOMANDA
+				// GENERO LA DOMANDA ---OLD
 				//String nomeFile="domandaAccordiBilaterali";
 				//flowsPdfService.makePdfBeforeStartPi(nomeFile, processInstanceId);
 
@@ -134,49 +134,12 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 				String tipologiaDoc = Enum.PdfType.valueOf("domandaAccordiBilaterali").name();
 				String utenteFile = execution.getVariable("initiator").toString();
 
-//				//valoreParam per il json che racchiude i dati della stampa
-//				JSONObject valoreParamJson = new JSONObject();
-//				valoreParamJson.put("accordoBilaterale", execution.getVariable("accordoBilaterale"));
-//				valoreParamJson.put("nomeCognomeRichiedente", execution.getVariable("nomeCognomeRichiedente"));
-//				valoreParamJson.put("strutturaValutazioneDirigente", execution.getVariable("strutturaValutazioneDirigente"));
-//				valoreParamJson.put("titolo", execution.getVariable("titolo"));
-//				valoreParamJson.put("sceltaUtente", execution.getVariable("sceltaUtente"));
-//				valoreParamJson.put("pianoDiLavoroSecondoAnno", execution.getVariable("pianoDiLavoroSecondoAnno").toString());
-//				valoreParamJson.put("bando", execution.getVariable("bando").toString());
-//				valoreParamJson.put("pianoDiLavoroPrimoAnno", execution.getVariable("pianoDiLavoroPrimoAnno").toString());
-//				valoreParamJson.put("dipartimentoId", execution.getVariable("dipartimentoId").toString());
-//				valoreParamJson.put("obiettivi", execution.getVariable("obiettivi").toString());				valoreParamJson.put("codiceFiscaleRichiedente", execution.getVariable("codiceFiscaleRichiedente").toString());
-//				valoreParamJson.put("idDomanda", execution.getVariable("idDomanda").toString());
-//				valoreParamJson.put("idBando", execution.getVariable("idBando").toString());
-//				valoreParamJson.put("key", execution.getVariable("key").toString());
-//				valoreParamJson.put("userNameRichiedente", execution.getVariable("userNameRichiedente").toString());
-//				valoreParamJson.put("pianoDiLavoroTerzoAnno", execution.getVariable("pianoDiLavoroTerzoAnno").toString());
-//				valoreParamJson.put("dataInvioDomanda", execution.getVariable("dataInvioDomanda").toString());
-//				valoreParamJson.put("propostaDiRicerca", execution.getVariable("initiator").toString());
-//				valoreParamJson.put("cdsuoRichiedente", execution.getVariable("cdsuoRichiedente").toString());
-//				valoreParamJson.put("sessoRichiedente", execution.getVariable("sessoRichiedente").toString());
-//				valoreParamJson.put("emailRichiedente", execution.getVariable("emailRichiedente").toString());
-//				valoreParamJson.put("descrizione", execution.getVariable("descrizione").toString());
-//				valoreParamJson.put("dipartimento", execution.getVariable("dipartimento").toString());
-//				valoreParamJson.put("startDate", execution.getVariable("startDate").toString());
-//				valoreParamJson.put("propostaDiRicerca",
-//						Optional.ofNullable(execution.getVariable("propostaDiRicerca"))
-//						.filter(String.class::isInstance)
-//						.map(String.class::cast)
-//						.map(s -> s.replaceAll("strong>", "b>"))
-//						.map(s -> s.replaceAll("em>", "i>"))
-//						.orElse("")
-//						);
-
-				//String valoreParam = valoreParamJson.toString();
 				// UPDATE VARIABILI FLUSSO
 				utils.updateJsonSearchTerms(executionId, processInstanceId, stato);
 				// GENERAZIONE PDF
-			//lowsPdfBySiglaRestService.makePdf(execution, nomeFile, labelFile, report, valoreParam, tipologiaDoc, processInstanceId, utenteFile);
-				//flowsPdfBySiglaRestService.makePdf(execution, nomeFile, labelFile, report, valoreParam, tipologiaDoc, processInstanceId, utenteFile);
 				List<String> listaVariabiliHtml = new ArrayList<String>();
 				listaVariabiliHtml.add("propostaDiRicerca");
-				flowsPdfService.makePdfBySigla(tipologiaDoc, processInstanceId, listaVariabiliHtml);
+				flowsPdfService.makePdfBySigla(tipologiaDoc, processInstanceId, listaVariabiliHtml, labelFile, report);
 
 			};break;
 			// START
