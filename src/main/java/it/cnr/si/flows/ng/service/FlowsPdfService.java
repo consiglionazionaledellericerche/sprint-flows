@@ -444,7 +444,10 @@ public class FlowsPdfService {
         JSONObject arrayParamsKey = new JSONObject();
         JSONObject nomeParams = new JSONObject();
         arrayParamsKey.put("paramType", "java.lang.String");
-        arrayParamsKey.put("valoreParam", processvariables);
+        // Inserisco ogni parametro
+        
+        
+        arrayParamsKey.put("valoreParam", processvariables.toString());
         nomeParams.put("nomeParam", "REPORT_DATA_SOURCE");
         arrayParamsKey.put("key", nomeParams);
 
@@ -454,7 +457,7 @@ public class FlowsPdfService {
 		// RICHIESTA DEL PDF
         byte[] pdfByteArray = null;
         pdfByteArray = restPdfSiglaService.getSiglaPdf(variabliStampa.toString());
-        
+    
 		//"Allego" il file nel flusso
 		Map<String, FlowsAttachment> attachments = flowsAttachmentService.getAttachementsForProcessInstance(processInstanceId);
 
@@ -656,8 +659,8 @@ public class FlowsPdfService {
 				} else {
 					String valueEscaped = "campo erroneamente compilato";
 					if (runtimeService.getVariable(processInstanceId,value.getName()) != null) {
-						valueEscaped = Jsoup.parse(StringEscapeUtils.escapeHtml(runtimeService.getVariable(processInstanceId,value.getName()).toString().replaceAll("\t", "  "))).text();
-						valueEscaped = valueEscaped.replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;");
+						//valueEscaped = Jsoup.parse(StringEscapeUtils.escapeHtml(runtimeService.getVariable(processInstanceId,value.getName()).toString().replaceAll("\t", "  "))).text();
+						//valueEscaped = valueEscaped.replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;");
 						variableInstanceJson.put(key, valueEscaped);
 					}
 				}
