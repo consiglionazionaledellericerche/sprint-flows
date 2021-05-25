@@ -98,9 +98,9 @@ public class FlowsPdfResource {
 			@RequestParam("processInstanceId") String processInstanceId,
 			@RequestParam("tipologiaDoc") String tipologiaDoc) {
 
-        final Pair<String, byte[]> filePair = pdfService.makePdf(tipologiaDoc, processInstanceId);
+		final Pair<String, byte[]> filePair = pdfService.makePdf(tipologiaDoc, processInstanceId);
 
-        //popolo gli headers della response
+		//popolo gli headers della response
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Content-Disposition", "attachment; filename=\"" + filePair.getFirst() + "\"");
 		headers.setContentType(MediaType.parseMediaType("application/pdf"));
@@ -116,11 +116,13 @@ public class FlowsPdfResource {
 	public ResponseEntity<byte[]> makePdfSigla(
 			@RequestParam("processInstanceId") String processInstanceId,
 			@RequestParam("tipologiaDoc") String tipologiaDoc,
-			@RequestParam("listaVariabiliHtml") List<String> listaVariabiliHtml) {
+			@RequestParam("listaVariabiliHtml") List<String> listaVariabiliHtml,
+			@RequestParam("labelFile") String labelFile,
+			@RequestParam("report") String report) {
 
-        final Pair<String, byte[]> filePair = pdfService.makePdfBySigla(tipologiaDoc, processInstanceId, listaVariabiliHtml);
+		final Pair<String, byte[]> filePair = pdfService.makePdfBySigla(tipologiaDoc, processInstanceId, listaVariabiliHtml, labelFile, report);
 
-        //popolo gli headers della response
+		//popolo gli headers della response
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Content-Disposition", "attachment; filename=\"" + filePair.getFirst() + "\"");
 		headers.setContentType(MediaType.parseMediaType("application/pdf"));
@@ -137,7 +139,7 @@ public class FlowsPdfResource {
 	 * @param idStruttura          idStruttura
 	 * @return the response entity
 	 */
-//    todo:  TEST
+	//    todo:  TEST
 	@RequestMapping(value = "/makeStatisticPdf", method = RequestMethod.GET, produces = "application/pdf")
 	@ResponseBody
 	@Timed
