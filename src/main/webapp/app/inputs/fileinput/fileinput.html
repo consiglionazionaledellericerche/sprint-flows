@@ -131,7 +131,7 @@
                     {{$parent.attachments[row.rowname].filename}}
                 </a>
 
-                <div class="row form-group">
+                <div class="row form-group" ng-if="!soloMetadati">
                     <div class="col-md-12">
                         <button class="btn btn-sm"
                                 ng-class="{'btn-success': $parent.attachments[row.rowname].data, 'btn-info': !$parent.attachments[row.rowname].data}"

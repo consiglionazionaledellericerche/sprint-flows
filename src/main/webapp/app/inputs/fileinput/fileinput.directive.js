@@ -42,7 +42,8 @@
                 pubblicazioneTrasparenzaDisabilitato: '=?',    // disabilitare gli slider di pubblicazione senza impostare i valori
                 protocolloDisabilitato: '=?',        // disabilitare gli slider di protocollo senza impostare i valori
                 sliderProtocolloDisabilitato: '=?',
-                mostraModifica: '=?'                // visualizzare la versione breve (espandibile) in modifica?
+                mostraModifica: '=?',                // visualizzare la versione breve (espandibile) in modifica?
+                soloMetadati: '=?'                // visualizzare la versione breve (espandibile) in modifica?
             },
             link: function ($scope, element, attrs) {
 
