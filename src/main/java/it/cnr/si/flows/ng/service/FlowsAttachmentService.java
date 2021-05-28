@@ -112,9 +112,11 @@ public class FlowsAttachmentService {
 			att.setMimetype( (String) data.get(fileName + "_mimetype") );
 			att.setPath( (String) data.get(fileName + "_path") );
 		} 
-		else {
-			LOGGER.warn("File Vuoto: "+ fileName);
-			return nuovoFile ? null : att;
+		else if (!nuovoFile) {
+		    att.setAzione(Protocollo);
+		} else {
+		    LOGGER.warn("File Vuoto: "+ fileName);
+            return null;
 		}
 
 		return att;
