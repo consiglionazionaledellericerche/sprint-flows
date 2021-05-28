@@ -114,7 +114,7 @@ public class FlowsAttachmentService {
 		} 
 		else {
 			LOGGER.warn("File Vuoto: "+ fileName);
-			return null;
+			return nuovoFile ? null : att;
 		}
 
 		return att;
