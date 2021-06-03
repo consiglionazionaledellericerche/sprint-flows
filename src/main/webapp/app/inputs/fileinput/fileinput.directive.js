@@ -42,7 +42,9 @@
                 pubblicazioneTrasparenzaDisabilitato: '=?',    // disabilitare gli slider di pubblicazione senza impostare i valori
                 protocolloDisabilitato: '=?',        // disabilitare gli slider di protocollo senza impostare i valori
                 sliderProtocolloDisabilitato: '=?',
-                mostraModifica: '=?'                // visualizzare la versione breve (espandibile) in modifica?
+                mostraModifica: '=?',                // visualizzare la versione breve (espandibile) in modifica?
+                soloMetadati: '=?',
+                modificaLabel: '=?'
             },
             link: function ($scope, element, attrs) {
 
@@ -112,6 +114,9 @@
                         $scope.$parent.attachments[row.rowname].pubblicazioneTrasparenza = $scope.pubblicazioneTrasparenza;
                         $scope.$parent.attachments[row.rowname].protocollo = $scope.protocollo;
                     }
+                    
+                    if ($scope.soloMetadati) 
+                        $scope.$parent.attachments[row.rowname].aggiorna = true
                 }
 
                 $scope.onClickProtocollo = function(row) {

@@ -47,7 +47,7 @@
 
                 <div class="form-group" ng-if="label === undefined">
                     <label>Tipo Documento</label>
-                    <input type="text" class="form-control" ng-model="$parent.attachments[row.rowname].label" required>
+                    <input type="text" class="form-control" ng-model="$parent.attachments[row.rowname].label" ng-readonly="modificaLabel" required>
                 </div>
                 <div class="form-group" ng-if="label !== undefined" ng-init="$parent.attachments[row.rowname].label = $parent.attachments[row.rowname].label || label">
                     <h3>{{label}}</h3>
@@ -56,7 +56,7 @@
                     </div>
                 </div>
 
-                <div class="row form-group" ng-show="row.modifica && mostraModifica">
+                <div class="row form-group" ng-show="row.modifica && mostraModifica && !soloMetadati">
                     <div class="col-md-12">
                         <button class="btn btn-primary btn-xs" ng-click="$parent.attachments[row.rowname].aggiorna = false">
                             <span class="glyphicon glyphicon-remove-sign"></span> Annulla Modifica
@@ -131,7 +131,7 @@
                     {{$parent.attachments[row.rowname].filename}}
                 </a>
 
-                <div class="row form-group">
+                <div class="row form-group" ng-if="!soloMetadati">
                     <div class="col-md-12">
                         <button class="btn btn-sm"
                                 ng-class="{'btn-success': $parent.attachments[row.rowname].data, 'btn-info': !$parent.attachments[row.rowname].data}"
