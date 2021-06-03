@@ -47,7 +47,7 @@
 
                 <div class="form-group" ng-if="label === undefined">
                     <label>Tipo Documento</label>
-                    <input type="text" class="form-control" ng-model="$parent.attachments[row.rowname].label" required>
+                    <input type="text" class="form-control" ng-model="$parent.attachments[row.rowname].label" ng-readonly="modificaLabel" required>
                 </div>
                 <div class="form-group" ng-if="label !== undefined" ng-init="$parent.attachments[row.rowname].label = $parent.attachments[row.rowname].label || label">
                     <h3>{{label}}</h3>

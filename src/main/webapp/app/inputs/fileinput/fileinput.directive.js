@@ -43,7 +43,8 @@
                 protocolloDisabilitato: '=?',        // disabilitare gli slider di protocollo senza impostare i valori
                 sliderProtocolloDisabilitato: '=?',
                 mostraModifica: '=?',                // visualizzare la versione breve (espandibile) in modifica?
-                soloMetadati: '=?'
+                soloMetadati: '=?',
+                modificaLabel: '=?'
             },
             link: function ($scope, element, attrs) {
 
