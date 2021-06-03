@@ -11,3 +11,12 @@ ID;GROUP_NAME;GROUP_RELATIONSHIP;GROUP_ROLE
 30;delegato@34409;responsabileAccordiInternazionali@0000;member
 31;responsabile-struttura@34403;responsabileAccordiInternazionali@0000;member
 33;USER;abilitati#covid19@STRUTTURA;member
+34;staffFirmaDocumenti@STRUTTURA;abilitati#firma-documenti@STRUTTURA;member
+40;direttore@STRUTTURA;responsabile-struttura@STRUTTURA;member
+41;responsabileSede@STRUTTURA;responsabile-struttura@STRUTTURA;member
+42;direttoreFF@STRUTTURA;responsabile-struttura@STRUTTURA;member
+43;direttoreAI@STRUTTURA;responsabile-struttura@STRUTTURA;member
+44;direttoreGeneraleFF@STRUTTURA;responsabile-struttura@STRUTTURA;member
+45;dirigente@STRUTTURA;responsabile-struttura@STRUTTURA;member
+46;dirigenteAI@STRUTTURA;responsabile-struttura@STRUTTURA;member
+47;direttore@STRUTTURA;responsabile-struttura@STRUTTURA;member
