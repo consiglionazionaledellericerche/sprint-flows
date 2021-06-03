@@ -56,7 +56,7 @@
                     </div>
                 </div>
 
-                <div class="row form-group" ng-show="row.modifica && mostraModifica">
+                <div class="row form-group" ng-show="row.modifica && mostraModifica && !soloMetadati">
                     <div class="col-md-12">
                         <button class="btn btn-primary btn-xs" ng-click="$parent.attachments[row.rowname].aggiorna = false">
                             <span class="glyphicon glyphicon-remove-sign"></span> Annulla Modifica

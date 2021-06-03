@@ -43,7 +43,7 @@
                 protocolloDisabilitato: '=?',        // disabilitare gli slider di protocollo senza impostare i valori
                 sliderProtocolloDisabilitato: '=?',
                 mostraModifica: '=?',                // visualizzare la versione breve (espandibile) in modifica?
-                soloMetadati: '=?'                // visualizzare la versione breve (espandibile) in modifica?
+                soloMetadati: '=?'
             },
             link: function ($scope, element, attrs) {
 
@@ -113,6 +113,9 @@
                         $scope.$parent.attachments[row.rowname].pubblicazioneTrasparenza = $scope.pubblicazioneTrasparenza;
                         $scope.$parent.attachments[row.rowname].protocollo = $scope.protocollo;
                     }
+                    
+                    if ($scope.soloMetadati) 
+                        $scope.$parent.attachments[row.rowname].aggiorna = true
                 }
 
                 $scope.onClickProtocollo = function(row) {
