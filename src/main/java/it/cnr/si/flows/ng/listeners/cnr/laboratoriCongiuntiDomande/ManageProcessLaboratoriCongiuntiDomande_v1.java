@@ -131,7 +131,7 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 			case "validazione-end": {
 				//flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
 				String idDipartimento = execution.getVariable("dipartimentoId").toString();
-				String gruppoValutatoreScientificoSTMDipartimento = "valutatoreScientificoSTMDipartimento@" + idDipartimento;
+				String gruppoValutatoreScientificoSTMDipartimento = "validatoriLaboratoriCongiunti@" + idDipartimento;
 				runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValutatoreScientificoSTMDipartimento, PROCESS_VISUALIZER);
 				execution.setVariable("gruppoValutatoreScientificoSTMDipartimento", gruppoValutatoreScientificoSTMDipartimento);
 				LOGGER.debug("Imposto i gruppi dipartimento : {} - del flusso {}", idDipartimento, gruppoValutatoreScientificoSTMDipartimento);
@@ -253,7 +253,7 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 				execution.setVariable("domandaCorrenteValutataFlag", "false");
 				if(execution.getVariable("sceltaUtente").equals("CambiaDipartimento")) {
 					String idDipartimento = execution.getVariable("dipartimentoId").toString();
-					String gruppoValutatoreScientificoSTMDipartimento = "valutatoreScientificoSTMDipartimento@" + idDipartimento;
+					String gruppoValutatoreScientificoSTMDipartimento = "validatoriLaboratoriCongiunti@" + idDipartimento;
 					runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValutatoreScientificoSTMDipartimento, PROCESS_VISUALIZER);
 					execution.setVariable("gruppoValutatoreScientificoSTMDipartimento", gruppoValutatoreScientificoSTMDipartimento);
 					LOGGER.debug("Imposto i gruppi dipartimento : {} - del flusso {}", idDipartimento, gruppoValutatoreScientificoSTMDipartimento);
