@@ -130,6 +130,14 @@ public class FirmaDocumentoService {
 			for (int i = 0; i < nomiVariabiliFile.size(); i++) {
 				String nomeVariabileFile = nomiVariabiliFile.get(i);
 				att.add((FlowsAttachment) execution.getVariable(nomeVariabileFile));
+				//Check se il fil è psf
+				if (!att.get(i).getMimetype().toString().equals("application/pdf")) {
+					textMessage = "-- errore formato del file --"
+							+ "<br>Almeno uno dei file per la firma"
+							+ "<br>non risulta essere in formato PDF<br>";
+					throw new BpmnError("500", "<b>FIRMA NON ESEGUITA<br>" + textMessage + "</b>");
+				}
+				//fine check
 				byte[] byteSingle = flowsAttachmentService.getAttachmentContentBytes(att.get(i));
 				bytes.add(flowsAttachmentService.getAttachmentContentBytes(att.get(i)));
 			}
