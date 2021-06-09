@@ -56,7 +56,7 @@
     <sequenceFlow id="flow15" sourceRef="firma-graduatoria" targetRef="exclusivegateway6"></sequenceFlow>
     <sequenceFlow id="flow16" sourceRef="exclusivegateway6" targetRef="protocollo-graduatoria"></sequenceFlow>
     <sequenceFlow id="flow17" name="END" sourceRef="protocollo-graduatoria" targetRef="endevent3"></sequenceFlow>
-    <userTask id="provvedimento-graduatoria" name="PROVVEDIMENTO GRADUATORIA" activiti:candidateGroups="${gruppoValidatoriShortTermMobility}">
+    <userTask id="provvedimento-graduatoria" name="PROVVEDIMENTO GRADUATORIA" activiti:candidateGroups="${gruppoValidatoriLaboratoriCongiunti}">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessLaboratoriCongiuntiBandoDipartimento_v1}">
           <activiti:field name="faseEsecuzione">
