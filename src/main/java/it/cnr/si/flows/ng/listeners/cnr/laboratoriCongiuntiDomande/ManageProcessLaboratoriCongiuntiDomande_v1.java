@@ -263,7 +263,7 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 					//restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE);
 					utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE.toString());
 					//CREAZIONE PDF VALUTAZIONE
-					String nomeFile="valutazioneShortTermMobility";
+					String nomeFile="valutazioneLaboratoriCongiunti";
 					String labelFile="Scheda Valutazione Domanda";
 					Double punteggioTotale= Double.parseDouble(execution.getVariable("punteggio_curriculum").toString().replaceAll(",", ".")) + Double.parseDouble(execution.getVariable("punteggio_patnerIstituzioneStraniera").toString().replaceAll(",", "."))+ Double.parseDouble(execution.getVariable("punteggio_programmaDiRicerca").toString().replaceAll(",", "."));
 					execution.setVariable("punteggio_totale", punteggioTotale.toString());
@@ -316,7 +316,7 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 						data.put("processDefinitionId", processDefinitionId);
 						data.put(initiator.name(), "app.scrivaniadigitale");
 
-						LOGGER.info("-- EFFETTUO START FLUSSO short-term-mobility-bandi CON titolo: " + data.get("titolo") + " descrizione" + data.get("descrizione")  + " initiator " + data.get("initiator")  + " idBando" + data.get("idBando") );
+						LOGGER.info("-- EFFETTUO START FLUSSO laboratori-congiunti-bando-dipartimento CON titolo: " + data.get("titolo") + " descrizione" + data.get("descrizione")  + " initiator " + data.get("initiator")  + " idBando" + data.get("idBando") );
 
 						//flowsTaskService.startProcessInstance(processDefinitionId, data);
 						flowsTaskService.startProcessInstanceAsApplication(processDefinitionId, data,"app.scrivaniadigitale");
