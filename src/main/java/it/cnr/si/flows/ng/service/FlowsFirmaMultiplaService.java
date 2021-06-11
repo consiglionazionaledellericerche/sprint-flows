@@ -54,7 +54,7 @@ public class FlowsFirmaMultiplaService {
         // la mappa LinkedHashMap preserva l'ordine di inserimento
         LinkedHashMap<Task, List<FileAllaFirma>> tasks = getTaskFilesForFirma(taskIds);
 
-        List<byte[]> fileContents = getBytesForFiles(tasks);
+        List<byte[]> fileContents = getBytesForFiles(tasks, failedTasks);
 
         // se c'e' un solo tipo di file, tento di dargli un'apparence
         PdfSignApparence pdfSignApparence = getApparenceIfOneTypeOfFile(tasks);
@@ -191,23 +191,29 @@ public class FlowsFirmaMultiplaService {
     }
 
 
-    private List<byte[]> getBytesForFiles(Map<Task, List<FileAllaFirma>> tasks) throws FileFormatException {
+    private List<byte[]> getBytesForFiles(Map<Task, List<FileAllaFirma>> tasks, List<String> failedTasks) throws FileFormatException {
 
         List<byte[]> result = new ArrayList<byte[]>();
-
+        List<Task> tasksToRemove = new ArrayList<Task>(); // per rimuovere i task fuori dal loop in un secondo momento
+        
         for (Task task : tasks.keySet()) {
 
             List<FileAllaFirma> files = tasks.get(task);
             for (FileAllaFirma file : files) {
                 FlowsAttachment att = taskService.getVariable(task.getId(), file.nome, FlowsAttachment.class);
-                if (!att.getMimetype().contains("pdf")) {
+                if (att.getMimetype().contains("pdf")) {
+                    result.add(flowsAttachmentService.getAttachmentContentBytes(att));
+                } else {
                     String key = taskService.getVariable(task.getId(), "key", String.class);
-                    throw new FileFormatException("Il file \""+ att.getFilename() +"\" nel flusso "
-                            + " "+ key +" non è del tipo pdf. La firma multipla non può procedere.");
+                    String taskError = "Il file \""+ att.getFilename() +"\" non è del tipo pdf";
+                    failedTasks.add(task.getId()+":"+ key +" - "+ taskError);
+                    tasksToRemove.add(task);
                 }
-                result.add(flowsAttachmentService.getAttachmentContentBytes(att));
             }
         }
+        
+        for (Task task : tasksToRemove)
+            tasks.remove(task);
 
         return result;
     }
