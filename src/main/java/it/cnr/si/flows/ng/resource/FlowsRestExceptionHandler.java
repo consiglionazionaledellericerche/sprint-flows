@@ -1,6 +1,7 @@
 package it.cnr.si.flows.ng.resource;
 
 import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
+import it.cnr.si.flows.ng.exception.FileFormatException;
 import it.cnr.si.flows.ng.exception.FlowsPermissionException;
 import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
 import it.cnr.si.flows.ng.exception.ReportException;
@@ -160,6 +161,15 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
         Map<String, Object> res = Utils.mapOf("message", "Errore non gestito. Contattare gli amminstratori specificando il numero di riferimento: " + rif);
         return handleExceptionInternal(ex, res,
                 new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+    }
+    
+    @ExceptionHandler(FileFormatException.class)
+    protected ResponseEntity<Object> handleFileFormatException(FileFormatException ex, WebRequest request) {
+
+        Map<String, Object> res = Utils.mapOf("message", ex.getMessage());
+        return handleExceptionInternal(ex, res,
+                new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+
     }
 
     @ExceptionHandler(RuntimeException.class)

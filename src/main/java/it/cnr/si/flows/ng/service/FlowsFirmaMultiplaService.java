@@ -4,6 +4,7 @@ import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
 import it.cnr.si.firmadigitale.firma.arss.stub.PdfSignApparence;
 import it.cnr.si.firmadigitale.firma.arss.stub.SignReturnV2;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.exception.FileFormatException;
 import it.cnr.si.flows.ng.exception.TaskFailedException;
 import it.cnr.si.flows.ng.service.FlowsFirmaService.FileAllaFirma;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
@@ -44,7 +45,8 @@ public class FlowsFirmaMultiplaService {
     private RuntimeService runtimeService;
 
 
-    public ResponseEntity<Map<String, List<String>>> signMany(String username, String password, String otp, List<String> taskIds) throws ArubaSignServiceException {
+    public ResponseEntity<Map<String, List<String>>> signMany(String username, String password, String otp, List<String> taskIds) 
+            throws ArubaSignServiceException, FileFormatException {
 
         List<String> succesfulTasks = new ArrayList<>();
         List<String> failedTasks = new ArrayList<>();
@@ -189,7 +191,7 @@ public class FlowsFirmaMultiplaService {
     }
 
 
-    private List<byte[]> getBytesForFiles(Map<Task, List<FileAllaFirma>> tasks) {
+    private List<byte[]> getBytesForFiles(Map<Task, List<FileAllaFirma>> tasks) throws FileFormatException {
 
         List<byte[]> result = new ArrayList<byte[]>();
 
@@ -198,6 +200,11 @@ public class FlowsFirmaMultiplaService {
             List<FileAllaFirma> files = tasks.get(task);
             for (FileAllaFirma file : files) {
                 FlowsAttachment att = taskService.getVariable(task.getId(), file.nome, FlowsAttachment.class);
+                if (!att.getMimetype().contains("pdf")) {
+                    String key = taskService.getVariable(task.getId(), "key", String.class);
+                    throw new FileFormatException("Il file \""+ att.getFilename() +"\" nel flusso "
+                            + " "+ key +" non è del tipo pdf. La firma multipla non può procedere.");
+                }
                 result.add(flowsAttachmentService.getAttachmentContentBytes(att));
             }
         }
