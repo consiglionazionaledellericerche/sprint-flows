@@ -4,6 +4,7 @@ import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
 import it.cnr.si.firmadigitale.firma.arss.stub.PdfSignApparence;
 import it.cnr.si.firmadigitale.firma.arss.stub.SignReturnV2;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.exception.FileFormatException;
 import it.cnr.si.flows.ng.exception.TaskFailedException;
 import it.cnr.si.flows.ng.service.FlowsFirmaService.FileAllaFirma;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
@@ -44,7 +45,8 @@ public class FlowsFirmaMultiplaService {
     private RuntimeService runtimeService;
 
 
-    public ResponseEntity<Map<String, List<String>>> signMany(String username, String password, String otp, List<String> taskIds) throws ArubaSignServiceException {
+    public ResponseEntity<Map<String, List<String>>> signMany(String username, String password, String otp, List<String> taskIds) 
+            throws ArubaSignServiceException, FileFormatException {
 
         List<String> succesfulTasks = new ArrayList<>();
         List<String> failedTasks = new ArrayList<>();
@@ -52,7 +54,7 @@ public class FlowsFirmaMultiplaService {
         // la mappa LinkedHashMap preserva l'ordine di inserimento
         LinkedHashMap<Task, List<FileAllaFirma>> tasks = getTaskFilesForFirma(taskIds);
 
-        List<byte[]> fileContents = getBytesForFiles(tasks);
+        List<byte[]> fileContents = getBytesForFiles(tasks, failedTasks);
 
         // se c'e' un solo tipo di file, tento di dargli un'apparence
         PdfSignApparence pdfSignApparence = getApparenceIfOneTypeOfFile(tasks);
@@ -189,18 +191,29 @@ public class FlowsFirmaMultiplaService {
     }
 
 
-    private List<byte[]> getBytesForFiles(Map<Task, List<FileAllaFirma>> tasks) {
+    private List<byte[]> getBytesForFiles(Map<Task, List<FileAllaFirma>> tasks, List<String> failedTasks) throws FileFormatException {
 
         List<byte[]> result = new ArrayList<byte[]>();
-
+        List<Task> tasksToRemove = new ArrayList<Task>(); // per rimuovere i task fuori dal loop in un secondo momento
+        
         for (Task task : tasks.keySet()) {
 
             List<FileAllaFirma> files = tasks.get(task);
             for (FileAllaFirma file : files) {
                 FlowsAttachment att = taskService.getVariable(task.getId(), file.nome, FlowsAttachment.class);
-                result.add(flowsAttachmentService.getAttachmentContentBytes(att));
+                if (att.getMimetype().contains("pdf")) {
+                    result.add(flowsAttachmentService.getAttachmentContentBytes(att));
+                } else {
+                    String key = taskService.getVariable(task.getId(), "key", String.class);
+                    String taskError = "Il file \""+ att.getFilename() +"\" non è del tipo pdf";
+                    failedTasks.add(task.getId()+":"+ key +" - "+ taskError);
+                    tasksToRemove.add(task);
+                }
             }
         }
+        
+        for (Task task : tasksToRemove)
+            tasks.remove(task);
 
         return result;
     }
