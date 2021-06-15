@@ -128,6 +128,24 @@ public class Enum {
         RESPINTO_UO_SPESA,
         CANCELLATA;
     }
+    
+    public enum StatoDomandeLABEnum {
+        APERTA,
+        CHIUSA,
+        INVIATA,
+        VALIDATA,
+        NON_VALIDATA,
+        IN_MODIFICA,
+        RESPINTA,
+        VALUTATA_SCIENTIFICAMENTE,
+        AUTORIZZATA,
+        ANNULLATA,
+        ACCETTATA,
+        ACCETTAZIONE,
+        RESPINTO_UO,
+        RESPINTO_UO_SPESA,
+        CANCELLATA;
+    }
 
     public enum ProcessDefinitionEnum {
         acquisti("acquisti","acquisti"),
@@ -190,6 +208,7 @@ public class Enum {
         valutazioneProgettoAccordiBilaterali,
         domandaAccordiBilaterali,
         valutazioneShortTermMobility,
+        valutazioneLaboratoriCongiunti,
         preavvisoRigettoCambioFascia,
         monitoraggioAttivitaCovid19;
 
