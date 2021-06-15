@@ -366,7 +366,7 @@ public class FlowsTaskService {
 			statoPI = utils.ellipsis(taskName, LENGTH_STATO);
 		}
 
-		utils.updateJsonSearchTerms( null, instance.getProcessInstanceId(), statoPI);
+		//utils.updateJsonSearchTerms( null, instance.getProcessInstanceId(), statoPI);
 
 		LOGGER.info("Avviata istanza di processo {}, id: {}", key, instance.getId());
 		return instance;
