@@ -21,8 +21,12 @@ import org.thymeleaf.context.Context;
 
 import javax.inject.Inject;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
+
+import static it.cnr.si.flows.ng.utils.Utils.formatoDataUF;
+
 
 @Service
 @Primary
@@ -54,6 +58,7 @@ public class FlowsMailService extends MailService {
 	private UserDetailsService flowsUserDetailsService;
 	@Autowired
 	private BlacklistService blacklistService;
+
 
 	@Async
 	public void sendFlowEventNotification(String notificationType, Map<String, Object> variables, String taskName, String username, final String groupName) {
@@ -98,6 +103,7 @@ public class FlowsMailService extends MailService {
 
 			LOGGER.info("Invio della mail all'utente "+ username +" con indirizzo "+ mailUtente);
 
+			String subject = getCustomSubject(variables, key);
 			if (mailConfig.isMailActivated()) {
 				// In produzione mando le email ai veri destinatari
 			    String procDefId = variables.get("processDefinitionId").toString().split(":")[0];
@@ -107,7 +113,7 @@ public class FlowsMailService extends MailService {
 			    } else {
     				if(mailUtente != null) {
     					sendEmail(mailUtente,
-    							"Notifica relativa al flusso " + key,
+								subject,
     							htmlContent,
     							false,
     							true);
@@ -128,11 +134,44 @@ public class FlowsMailService extends MailService {
 						variables.get("stato"),
 						StringUtils.abbreviate(htmlContent, 30));
 				LOGGER.trace("Corpo email per intero: {}", htmlContent);
-				sendEmail(s, "Notifica relativa al flusso " + key, htmlContent, false, true);
+				sendEmail(s, subject, htmlContent, false, true);
 			});
 		} catch (Exception e) {
 			LOGGER.error("Errore nell'invio della mail", e);
 			throw e;
 		}
+	}
+
+	private String getCustomSubject(Map<String, Object> variables, String key) {
+		String subject = "Notifica relativa al flusso " + key; //subject di default
+		String processDefinition = ((String)variables.get("processDefinitionId")).split(":")[0];
+		switch (processDefinition){
+			case "covid19":
+//Notifica FLUSSO Monitoraggio SW - PROGRAMMAZIONE maggio 2021 di massimo fraticelli
+				subject = "Notifica FLUSSO Monitoraggio SW - " + variables.get("tipoAttivita") +
+						" " + variables.get("mese") + " " + variables.get("anno") +
+						" di " + variables.get("nomeCognomeUtente");
+				break;
+			case "missioni":
+//Notifica FLUSSO MISSIONI - ORDINE missione di massimo fraticelli in data 21-4-2020
+				subject = "Notifica FLUSSO MISSIONI - " + ((String)variables.get("tipologiaMissione")).toUpperCase() +
+						" missione di " + variables.get("userNameUtenteMissione") +
+						" in data " + formatoDataUF.format((Date) variables.get("startDate"));
+				break;
+			case "accordi-internazionali-domande":
+				if(variables.get("stato").equals("VALIDAZIONE"))
+//Notifica per sola conoscenza FLUSSO Accordi Internazionali - VALIDAZIONE (Bando: CNR/CAS (Rep. Ceca) - triennio 2022-2024) di massimo fraticelli
+					subject = "Notifica per sola conoscenza FLUSSO Accordi Internazionali - " + variables.get("stato") +
+							" (Bando: " + variables.get("bando") +
+							") di " + variables.get("nomeCognomeRichiedente");
+				else if(variables.get("stato").equals("APPROVAZIONE"))
+//Notifica FLUSSO Accordi Internazionali - APPROVAZIONE (Bando: CNR/CAS (Rep. Ceca) - triennio 2022-2024) di massimo fraticelli
+					subject = "Notifica FLUSSO Accordi Internazionali - " + variables.get("stato") +
+							" (Bando: " + variables.get("bando") +
+							") di " + variables.get("nomeCognomeRichiedente");
+
+				break;
+		}
+		return subject;
 	}
 }
