@@ -160,13 +160,13 @@ public class FlowsMailService extends MailService {
 				break;
 			case "accordi-internazionali-domande":
 				if(isNotificationRule)
-//Notifica per sola conoscenza FLUSSO Accordi Internazionali - VALIDAZIONE (Bando: CNR/CAS (Rep. Ceca) - triennio 2022-2024) di massimo fraticelli
-					subject = "Notifica per sola conoscenza FLUSSO Accordi Internazionali - VALIDAZIONE" +
+//Notifica per sola conoscenza Flusso Accordi internazionali Domande - APROVAZIONE (Bando: CNR/CAS (Rep. Ceca) - triennio 2022-2024) di Massimo Fraticelli
+					subject = "Notifica per sola conoscenza FLUSSO Accordi Internazionali - " + variables.get("stato") +
 							" (Bando: " + variables.get("bando") +
 							") di " + variables.get("nomeCognomeRichiedente");
 				else
-//Notifica FLUSSO Accordi Internazionali - APPROVAZIONE (Bando: CNR/CAS (Rep. Ceca) - triennio 2022-2024) di massimo fraticelli
-					subject = "Notifica FLUSSO Accordi Internazionali - APPROVAZIONE" +
+//Notifica Flusso Accordi internazionali Domande - APPROVAZIONE  ( Bando: CNR/CAS (Rep. Ceca) - triennio 2022-2024  ) di Massimo Fraticelli
+					subject = "Notifica FLUSSO Accordi Internazionali - " + variables.get("stato") +
 							" (Bando: " + variables.get("bando") +
 							") di " + variables.get("nomeCognomeRichiedente");
 
