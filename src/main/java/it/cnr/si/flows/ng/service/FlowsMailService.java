@@ -33,11 +33,11 @@ import static it.cnr.si.flows.ng.utils.Utils.formatoDataUF;
 public class FlowsMailService extends MailService {
 
 	public static final String FLOW_NOTIFICATION = "notificaFlow.html";
-    public static final String PROCESS_NOTIFICATION = "notificaProcesso.html";
+	public static final String PROCESS_NOTIFICATION = "notificaProcesso.html";
 	public static final String PROCESS_COMPLETED_NOTIFICATION = "notificaProcessoCompletato.html";
 	public static final String TASK_NOTIFICATION = "notificaTask.html";
-    public static final String TASK_ASSEGNATO_AL_GRUPPO = "taskAssegnatoAlGruppo.html";
-    public static final String TASK_IN_CARICO_ALL_UTENTE = "taskInCaricoAllUtente.html";
+	public static final String TASK_ASSEGNATO_AL_GRUPPO = "taskAssegnatoAlGruppo.html";
+	public static final String TASK_IN_CARICO_ALL_UTENTE = "taskInCaricoAllUtente.html";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FlowsMailService.class);
 	@Inject
@@ -61,12 +61,12 @@ public class FlowsMailService extends MailService {
 
 
 	@Async
-	public void sendFlowEventNotification(String notificationType, Map<String, Object> variables, String taskName, String username, final String groupName, boolean notificationRule) {
+	public void sendFlowEventNotification(String notificationType, Map<String, Object> variables, String taskName, String username, final String groupName, boolean isNotificationRule) {
 		try {
-			
+
 			LOGGER.info("Invio della mail all'utente "+ username);
 			String key = (String)variables.get("key");
-			
+
 			Context ctx = new Context();
 			ctx.setVariables(variables);
 			ctx.setVariable("username", username);
@@ -95,7 +95,7 @@ public class FlowsMailService extends MailService {
 			} else if (Arrays.asList(env.getActiveProfiles()).contains("showcase")) {
 				ctx.setVariable("profile", "showcase");
 			}
-			
+
 			LOGGER.info("Recupero dell'email per l'utente "+ username);
 
 			String htmlContent = templateEngine.process(notificationType, ctx);
@@ -103,46 +103,46 @@ public class FlowsMailService extends MailService {
 
 			LOGGER.info("Invio della mail all'utente "+ username +" con indirizzo "+ mailUtente);
 
-			String subject = getCustomSubject(variables, key, notificationRule);
+			String subject = getCustomSubject(variables, key, isNotificationRule);
 			if (mailConfig.isMailActivated()) {
 				// In produzione mando le email ai veri destinatari
-			    String procDefId = variables.get("processDefinitionId").toString().split(":")[0];
-			    Blacklist bl = blacklistService.findOneByEmailAndKey(mailUtente, procDefId);
-			    if (bl != null) {
-			        LOGGER.info("L'utente {} ha richiesto di non ricevere notifiche per il flusso {}", mailUtente, key);
-			    } else {
-    				if(mailUtente != null) {
-    					sendEmail(mailUtente,
+				String procDefId = variables.get("processDefinitionId").toString().split(":")[0];
+				Blacklist bl = blacklistService.findOneByEmailAndKey(mailUtente, procDefId);
+				if (bl != null) {
+					LOGGER.info("L'utente {} ha richiesto di non ricevere notifiche per il flusso {}", mailUtente, key);
+				} else {
+					if(mailUtente != null) {
+						sendEmail(mailUtente,
 								subject,
-    							htmlContent,
-    							false,
-    							true);
-    				} else {
-    				    LOGGER.warn("L'utente {} non ha un'email associata", username);
-    				}
-			    }
+								htmlContent,
+								false,
+								true);
+					} else {
+						LOGGER.warn("L'utente {} non ha un'email associata", username);
+					}
+				}
 			}
-			
+
 			// Per le prove mando *tutte* le email agli indirizzi di prova (e non ai veri destinatari)
 			mailConfig.getMailRecipients().stream()
-			.filter(s -> !s.isEmpty())
-			.forEach(s -> {
-				LOGGER.debug("Invio mail a {} con titolo Notifica relativa al flusso {} del tipo {} nello stato {} e con contenuto {}",
-						s,
-						key,
-						notificationType,
-						variables.get("stato"),
-						StringUtils.abbreviate(htmlContent, 30));
-				LOGGER.trace("Corpo email per intero: {}", htmlContent);
-				sendEmail(s, subject, htmlContent, false, true);
-			});
+					.filter(s -> !s.isEmpty())
+					.forEach(s -> {
+						LOGGER.debug("Invio mail a {} con titolo Notifica relativa al flusso {} del tipo {} nello stato {} e con contenuto {}",
+								s,
+								key,
+								notificationType,
+								variables.get("stato"),
+								StringUtils.abbreviate(htmlContent, 30));
+						LOGGER.trace("Corpo email per intero: {}", htmlContent);
+						sendEmail(s, subject, htmlContent, false, true);
+					});
 		} catch (Exception e) {
 			LOGGER.error("Errore nell'invio della mail", e);
 			throw e;
 		}
 	}
 
-	private String getCustomSubject(Map<String, Object> variables, String key, boolean notificationRule) {
+	private String getCustomSubject(Map<String, Object> variables, String key, boolean isNotificationRule) {
 		String subject;
 		String processDefinition = ((String)variables.get("processDefinitionId")).split(":")[0];
 		switch (processDefinition){
@@ -159,7 +159,7 @@ public class FlowsMailService extends MailService {
 						" in data " + formatoDataUF.format((Date) variables.get("startDate"));
 				break;
 			case "accordi-internazionali-domande":
-				if(notificationRule)
+				if(isNotificationRule)
 //Notifica per sola conoscenza FLUSSO Accordi Internazionali - VALIDAZIONE (Bando: CNR/CAS (Rep. Ceca) - triennio 2022-2024) di massimo fraticelli
 					subject = "Notifica per sola conoscenza FLUSSO Accordi Internazionali - VALIDAZIONE" +
 							" (Bando: " + variables.get("bando") +
