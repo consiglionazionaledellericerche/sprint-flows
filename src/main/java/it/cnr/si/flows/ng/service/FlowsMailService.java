@@ -143,7 +143,7 @@ public class FlowsMailService extends MailService {
 	}
 
 	private String getCustomSubject(Map<String, Object> variables, String key) {
-		String subject = "Notifica relativa al flusso " + key; //subject di default
+		String subject;
 		String processDefinition = ((String)variables.get("processDefinitionId")).split(":")[0];
 		switch (processDefinition){
 			case "covid19":
@@ -171,6 +171,8 @@ public class FlowsMailService extends MailService {
 							") di " + variables.get("nomeCognomeRichiedente");
 
 				break;
+			default:
+				subject = "Notifica relativa al flusso " + key; //subject di default
 		}
 		return subject;
 	}
