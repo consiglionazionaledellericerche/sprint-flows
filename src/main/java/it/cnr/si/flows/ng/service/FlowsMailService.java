@@ -159,14 +159,14 @@ public class FlowsMailService extends MailService {
 						" in data " + formatoDataUF.format((Date) variables.get("startDate"));
 				break;
 			case "accordi-internazionali-domande":
-				if(variables.get("stato").equals("VALIDAZIONE"))
+				if(((String)variables.get("stato")).equalsIgnoreCase("validazione"))
 //Notifica per sola conoscenza FLUSSO Accordi Internazionali - VALIDAZIONE (Bando: CNR/CAS (Rep. Ceca) - triennio 2022-2024) di massimo fraticelli
-					subject = "Notifica per sola conoscenza FLUSSO Accordi Internazionali - " + variables.get("stato") +
+					subject = "Notifica per sola conoscenza FLUSSO Accordi Internazionali - VALIDAZIONE" +
 							" (Bando: " + variables.get("bando") +
 							") di " + variables.get("nomeCognomeRichiedente");
-				else if(variables.get("stato").equals("APPROVAZIONE"))
+				else
 //Notifica FLUSSO Accordi Internazionali - APPROVAZIONE (Bando: CNR/CAS (Rep. Ceca) - triennio 2022-2024) di massimo fraticelli
-					subject = "Notifica FLUSSO Accordi Internazionali - " + variables.get("stato") +
+					subject = "Notifica FLUSSO Accordi Internazionali - APPROVAZIONE" +
 							" (Bando: " + variables.get("bando") +
 							") di " + variables.get("nomeCognomeRichiedente");
 
