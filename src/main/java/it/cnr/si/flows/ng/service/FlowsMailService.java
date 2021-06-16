@@ -61,7 +61,7 @@ public class FlowsMailService extends MailService {
 
 
 	@Async
-	public void sendFlowEventNotification(String notificationType, Map<String, Object> variables, String taskName, String username, final String groupName, boolean isNotificationRule) {
+	public void sendFlowEventNotification(String notificationType, Map<String, Object> variables, String taskName, String username, final String groupName, boolean notificationRule) {
 		try {
 			
 			LOGGER.info("Invio della mail all'utente "+ username);
@@ -103,7 +103,7 @@ public class FlowsMailService extends MailService {
 
 			LOGGER.info("Invio della mail all'utente "+ username +" con indirizzo "+ mailUtente);
 
-			String subject = getCustomSubject(variables, key, isNotificationRule);
+			String subject = getCustomSubject(variables, key, notificationRule);
 			if (mailConfig.isMailActivated()) {
 				// In produzione mando le email ai veri destinatari
 			    String procDefId = variables.get("processDefinitionId").toString().split(":")[0];
@@ -142,7 +142,7 @@ public class FlowsMailService extends MailService {
 		}
 	}
 
-	private String getCustomSubject(Map<String, Object> variables, String key, boolean isNotificationRule) {
+	private String getCustomSubject(Map<String, Object> variables, String key, boolean notificationRule) {
 		String subject;
 		String processDefinition = ((String)variables.get("processDefinitionId")).split(":")[0];
 		switch (processDefinition){
@@ -159,7 +159,7 @@ public class FlowsMailService extends MailService {
 						" in data " + formatoDataUF.format((Date) variables.get("startDate"));
 				break;
 			case "accordi-internazionali-domande":
-				if(isNotificationRule)
+				if(notificationRule)
 //Notifica per sola conoscenza FLUSSO Accordi Internazionali - VALIDAZIONE (Bando: CNR/CAS (Rep. Ceca) - triennio 2022-2024) di massimo fraticelli
 					subject = "Notifica per sola conoscenza FLUSSO Accordi Internazionali - VALIDAZIONE" +
 							" (Bando: " + variables.get("bando") +
