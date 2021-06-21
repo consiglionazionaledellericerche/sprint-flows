@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.websocket.server.PathParam;
@@ -21,7 +22,10 @@ import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.history.HistoricTaskInstance;
+import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.impl.cmd.AddIdentityLinkForProcessInstanceCmd;
 import org.activiti.engine.impl.context.Context;
@@ -44,6 +48,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import it.cnr.si.service.ExternalMessageSender;
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
@@ -81,6 +86,59 @@ public class FlowsCnrAdminTools {
         extenalMessageSender.sendMessages();
         extenalMessageSender.sendErrorMessages();
         return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping(value = "firma-errata-missioni", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, List<String>>> getErroriFirmaMissioni() {
+        
+        List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
+            .processDefinitionKey("missioni")
+            .finished()
+            .list();
+        
+        List<HistoricProcessInstance> filteredPIs = processInstances.stream().filter(pi -> {
+            Map<String, Object> variables = historyService.
+                    createHistoricProcessInstanceQuery().
+                    processInstanceId(pi.getId()).
+                    includeProcessVariables().
+                    singleResult()
+                    .getProcessVariables();
+            String validazioneSpesaFlag = (String)variables.get("validazioneSpesaFlag");
+            FlowsAttachment fileMissione = (FlowsAttachment)variables.get("missioni");
+            if (fileMissione == null) {
+                log.error("La Process Instance "+ pi.getId() +" non ha l'allegato missioni");
+            } else {
+                if (validazioneSpesaFlag != null && validazioneSpesaFlag.equalsIgnoreCase("si")) {
+                    if (fileMissione.getFilename().contains(".signed.signed."))
+                        return false;
+                } 
+                if (fileMissione.getFilename().contains(".signed."))
+                    return false;
+                
+            }
+            return true;
+        }).collect(Collectors.toList());
+        
+        Map<String, List<String>> result = new HashMap<>();
+        
+        for ( HistoricProcessInstance pi : filteredPIs ) {
+//            List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().processInstanceId(pi.getId()).list();
+            List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().processInstanceId(pi.getId()).list();
+            
+            for ( HistoricTaskInstance task : tasks) {
+                historyService.getHistoricIdentityLinksForTask(task.getId()).stream()
+                .filter(il -> {
+                    return il.getType().equals(TASK_EXECUTOR);
+                }).forEach(il -> {
+                    String esecutore = il.getUserId();
+                    List<String> processList = result.containsKey(esecutore) ? result.get(esecutore) : new ArrayList<String>();
+                    processList.add(pi.getId());
+                    result.put(esecutore, processList);
+                });
+            }
+        }
+        
+        return ResponseEntity.ok(result);
     }
     
     /**
