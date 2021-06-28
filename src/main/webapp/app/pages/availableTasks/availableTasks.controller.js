@@ -5,9 +5,9 @@
         .module("sprintApp")
         .controller("AvailableTasksController", AvailableTasksController);
 
-    AvailableTasksController.$inject = ["$scope", "$rootScope", "paginationConstants", "dataService", "utils", "$log", "$location"];
+    AvailableTasksController.$inject = ["$scope", "$rootScope", "paginationConstants", "dataService", "utils", "$log", "$location", '$localStorage'];
 
-    function AvailableTasksController($scope, $rootScope, paginationConstants, dataService, utils, $log, $location) {
+    function AvailableTasksController($scope, $rootScope, paginationConstants, dataService, utils, $log, $location, $localStorage) {
         var vm = this;
         vm.searchParams = {};
         $scope.indextab = 1;
@@ -198,7 +198,52 @@
             vm.active = true;
             $scope.showProcessInstances();
         };
+        
+        $scope.addAllToCart = function(type) {
 
+            if (type === 'available') {
+                dataService.tasks.myTasksAvailable(vm.processDefinitionKey, 0,
+                        9999, vm.order, utils.populateTaskParams(vm.searchParams))
+                    .then(
+                        function (response) {
+                            utils.refactoringVariables(response.data.data);
+                            
+                            response.data.data.forEach(function (task) {
+                                if (task.category == 'firma' && !$scope.inCart(task.id)) {
+                                    $localStorage.cart = $localStorage.cart || {};
+                                    $localStorage.cart[task.id] = task;
+                                }
+                            });
+                        },
+                        function (response) {
+                            $log.error(response);
+                        }
+                    );
+            } else if (type === 'mine') {
+                dataService.tasks.myTasks(vm.processDefinitionKey, 0,
+                        9999, vm.order, utils.populateTaskParams(vm.searchParams))
+                    .then(
+                        function (response) {
+                            utils.refactoringVariables(response.data.data);
+                            
+                            response.data.data.forEach(function (task) {
+                                if (task.category == 'firma' && !$scope.inCart(task.id)) {
+                                    $localStorage.cart = $localStorage.cart || {};
+                                    $localStorage.cart[task.id] = task;
+                                }
+                            });
+                        },
+                        function (response) {
+                            $log.error(response);
+                        }
+                    );
+            }
+        }
+
+        $scope.inCart = function (id) {
+            return $localStorage.cart && $localStorage.cart.hasOwnProperty(id);
+        }
+        
         // aggiornamento pagina in caso di cambio "ordinamento" o Process definition
         $scope.$watchGroup(["vm.order"], function () {
             $scope.showProcessInstances();
