@@ -96,7 +96,7 @@
                 <!--paginazione myTasks-->
                 <button class="btn btn-success pull-right"ng-show="vm.myTotalItems > 0" ng-click="addAllToCart('mine')"> 
                     <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span>
-                    Aggiungi i flussi visualizzati al carrello
+                    Aggiungi al carrello tutti i flussi di questa ricerca
                 </button>
                 <div class="text-center" ng-show="vm.myTotalItems > 0">
                     <jhi-item-count page="vm.myPage" total="vm.myQueryCount" items-per-page="vm.itemsPerPage"></jhi-item-count>
@@ -124,7 +124,7 @@
 
                 <button class="btn btn-success pull-right" ng-show="vm.availableTotalItems > 0" ng-click="addAllToCart('available')"> 
                     <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span>
-                    Aggiungi i flussi visualizzati al carrello
+                    Aggiungi al carrello tutti i flussi di questa ricerca 
                 </button>
 
                 <div class="text-center" ng-show="vm.availableTotalItems > 0">
