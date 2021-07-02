@@ -94,6 +94,10 @@
                     </span>
                 </h3>
                 <!--paginazione myTasks-->
+                <button class="btn btn-success pull-right"ng-show="vm.myTotalItems > 0" ng-click="addAllToCart('mine')"> 
+                    <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span>
+                    Aggiungi al carrello tutti i flussi di questa ricerca
+                </button>
                 <div class="text-center" ng-show="vm.myTotalItems > 0">
                     <jhi-item-count page="vm.myPage" total="vm.myQueryCount" items-per-page="vm.itemsPerPage"></jhi-item-count>
                     <uib-pagination class="pagination-sm" total-items="vm.myTotalItems" ng-model="vm.myPage" ng-change="vm.transition(vm.myPage)"></uib-pagination>
@@ -117,6 +121,12 @@
                     </span>
                 </h3>
                 <!--paginazione availabletasks-->
+
+                <button class="btn btn-success pull-right" ng-show="vm.availableTotalItems > 0" ng-click="addAllToCart('available')"> 
+                    <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span>
+                    Aggiungi al carrello tutti i flussi di questa ricerca 
+                </button>
+
                 <div class="text-center" ng-show="vm.availableTotalItems > 0">
                     <jhi-item-count page="vm.availablePage" total="vm.availableQueryCount" items-per-page="vm.itemsPerPage"></jhi-item-count>
                     <uib-pagination class="pagination-sm" total-items="vm.availableTotalItems" ng-model="vm.availablePage" ng-change="vm.transition(vm.availablePage)"></uib-pagination>
