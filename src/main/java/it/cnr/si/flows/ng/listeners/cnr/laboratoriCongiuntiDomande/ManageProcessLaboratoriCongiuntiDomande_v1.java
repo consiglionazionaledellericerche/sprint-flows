@@ -265,16 +265,28 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 					//CREAZIONE PDF VALUTAZIONE
 					String nomeFile="valutazioneLaboratoriCongiunti";
 					String labelFile="Scheda Valutazione Domanda";
-					Double punteggioTotale= Double.parseDouble(execution.getVariable("punteggio_curriculum").toString().replaceAll(",", ".")) + Double.parseDouble(execution.getVariable("punteggio_patnerIstituzioneStraniera").toString().replaceAll(",", "."))+ Double.parseDouble(execution.getVariable("punteggio_programmaDiRicerca").toString().replaceAll(",", "."));
+					Double punteggioTotale= 
+							Double.parseDouble(execution.getVariable("punteggio_originalita_scientifica").toString().replaceAll(",", ".")) 
+							+ Double.parseDouble(execution.getVariable("punteggio_qualificazione_proponenti").toString().replaceAll(",", "."))
+							+ Double.parseDouble(execution.getVariable("punteggio_documentazione_presentazione_progetto").toString().replaceAll(",", "."))
+							+ Double.parseDouble(execution.getVariable("punteggio_utilita_necessita_collaborazione").toString().replaceAll(",", "."))
+							+ Double.parseDouble(execution.getVariable("punteggio_potenzialita_ricerca_sviluppo_CNR").toString().replaceAll(",", "."))
+							+ Double.parseDouble(execution.getVariable("punteggio_potenzialita_investimenti_privati").toString().replaceAll(",", "."))
+							+ Double.parseDouble(execution.getVariable("punteggio_sfruttamento_diffusione_risultati").toString().replaceAll(",", "."))
+							+ Double.parseDouble(execution.getVariable("punteggio_congruita_economica_progetto").toString().replaceAll(",", "."));
 					execution.setVariable("punteggio_totale", punteggioTotale.toString());
 					flowsPdfService.makePdf(nomeFile, processInstanceId);
 					FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
 					documentoGenerato.setLabel(labelFile);
 					flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
-					runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_curriculum", execution.getVariable("punteggio_curriculum"));
-					runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_patnerIstituzioneStraniera", execution.getVariable("punteggio_patnerIstituzioneStraniera"));
-					runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_programmaDiRicerca", execution.getVariable("punteggio_programmaDiRicerca"));
-					runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_curriculum", execution.getVariable("punteggio_curriculum"));
+					runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_originalita_scientifica", execution.getVariable("punteggio_originalita_scientifica"));
+					runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_qualificazione_proponenti", execution.getVariable("punteggio_qualificazione_proponenti"));
+					runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_documentazione_presentazione_progetto", execution.getVariable("punteggio_documentazione_presentazione_progetto"));
+					runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_utilita_necessita_collaborazione", execution.getVariable("punteggio_utilita_necessita_collaborazione"));
+					runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_potenzialita_ricerca_sviluppo_CNR", execution.getVariable("punteggio_potenzialita_ricerca_sviluppo_CNR"));
+					runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_potenzialita_investimenti_privati", execution.getVariable("punteggio_potenzialita_investimenti_privati"));
+					runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_sfruttamento_diffusione_risultati", execution.getVariable("punteggio_sfruttamento_diffusione_risultati"));
+					runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_congruita_economica_progetto", execution.getVariable("punteggio_congruita_economica_progetto"));
 				}
 			};break;	
 
