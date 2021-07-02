@@ -27,6 +27,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -261,10 +263,7 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 					execution.setVariable("domandaCorrenteValutataFlag", "true");
 					execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE.toString());
 					//restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE);
-					utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE.toString());
-					//CREAZIONE PDF VALUTAZIONE
-					String nomeFile="valutazioneLaboratoriCongiunti";
-					String labelFile="Scheda Valutazione Domanda";
+					utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE.toString());	
 					Double punteggioTotale= 
 							Double.parseDouble(execution.getVariable("punteggio_originalita_scientifica").toString().replaceAll(",", ".")) 
 							+ Double.parseDouble(execution.getVariable("punteggio_qualificazione_proponenti").toString().replaceAll(",", "."))
@@ -275,7 +274,23 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 							+ Double.parseDouble(execution.getVariable("punteggio_sfruttamento_diffusione_risultati").toString().replaceAll(",", "."))
 							+ Double.parseDouble(execution.getVariable("punteggio_congruita_economica_progetto").toString().replaceAll(",", "."));
 					execution.setVariable("punteggio_totale", punteggioTotale.toString());
-					flowsPdfService.makePdf(nomeFile, processInstanceId);
+					//CREAZIONE PDF VALUTAZIONE
+					//PARAMETRI GENERAZIONE PDF x SIGLA PRINT
+					String nomeFile="valutazioneLaboratoriCongiunti";
+					String labelFile="Scheda Valutazione Domanda";
+					String report = "/scrivaniadigitale/valutazioneLaboratoriCongiunti.jrxml";
+					//tipologiaDoc è la tipologia del file
+					String tipologiaDoc = Enum.PdfType.valueOf("valutazioneLaboratoriCongiunti").name();
+					String utenteFile = execution.getVariable("initiator").toString();
+
+					// UPDATE VARIABILI FLUSSO
+					utils.updateJsonSearchTerms(executionId, processInstanceId, stato);
+					// GENERAZIONE PDF
+					List<String> listaVariabiliHtml = new ArrayList<String>();
+					listaVariabiliHtml.add("commento");
+					flowsPdfService.makePdfBySigla(tipologiaDoc, processInstanceId, listaVariabiliHtml, labelFile, report);
+					//flowsPdfService.makePdf(nomeFile, processInstanceId);
+					
 					FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
 					documentoGenerato.setLabel(labelFile);
 					flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
