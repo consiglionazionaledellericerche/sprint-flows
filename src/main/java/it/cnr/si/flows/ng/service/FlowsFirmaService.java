@@ -92,6 +92,7 @@ public class FlowsFirmaService {
         NOME_FILE_FIRMA.put("missioni#firma-uo", Lists.newArrayList(new FileAllaFirma("missioni"), new FileAllaFirma("anticipoMissione", true)));
         NOME_FILE_FIRMA.put("missioni#firma-spesa", Lists.newArrayList(new FileAllaFirma("missioni"), new FileAllaFirma("anticipoMissione", true)));
         NOME_FILE_FIRMA.put("firma-documenti#firma", Lists.newArrayList(new FileAllaFirma("documentoDaFirmare", true, true)));
+        NOME_FILE_FIRMA.put("firma-elenco-documenti#firma", Lists.newArrayList(new FileAllaFirma("missioni", true, true)));
     }
 
     public static final Map<String, String> ERRORI_ARUBA = new HashMap<String, String>() {{

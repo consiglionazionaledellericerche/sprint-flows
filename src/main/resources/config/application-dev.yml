@@ -1,0 +1,4 @@
+#mail di default dove inviare le mail di notifica
+#spring:
+#  mail:
+#    recipients: ""
