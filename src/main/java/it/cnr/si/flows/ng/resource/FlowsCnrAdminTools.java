@@ -167,13 +167,13 @@ public class FlowsCnrAdminTools {
             }
         });
         
-        if (userId != null) {
-            startFirmaMultiplaProcess(userId, result.get(userId));
-        } else {
-            result.forEach((k, v) -> {
-                startFirmaMultiplaProcess(k, v);
-            });
-        }
+//        if (userId != null) {
+//            startFirmaMultiplaProcess(userId, result.get(userId));
+//        } else {
+//            result.forEach((k, v) -> {
+//                startFirmaMultiplaProcess(k, v);
+//            });
+//        }
         
         return ResponseEntity.ok(result);
     }
