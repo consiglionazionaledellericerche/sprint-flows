@@ -23,8 +23,10 @@ import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.RepositoryService;
 import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.history.HistoricVariableInstance;
@@ -36,7 +38,9 @@ import org.activiti.engine.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.activiti.engine.impl.persistence.entity.HistoricIdentityLinkEntityManager;
 import org.activiti.engine.impl.persistence.entity.IdentityLinkEntity;
 import org.activiti.engine.impl.persistence.entity.IdentityLinkEntityManager;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.IdentityLinkType;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -44,6 +48,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -51,12 +56,18 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import it.cnr.si.service.ExternalMessageSender;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.AceBridgeService;
+import it.cnr.si.flows.ng.service.FlowsTaskService;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import static it.cnr.si.flows.ng.utils.Utils.*;
 
@@ -78,6 +89,10 @@ public class FlowsCnrAdminTools {
     private ExternalMessageSender extenalMessageSender;
     @Inject
     private ProcessEngine processEngine;
+    @Inject
+    private FlowsTaskService flowsTaskService;
+    @Inject
+    private RepositoryService repositoryService;
 
     @RequestMapping(value = "/resendExternalMessages", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
@@ -90,7 +105,8 @@ public class FlowsCnrAdminTools {
     }
 
     @RequestMapping(value = "firma-errata-missioni", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, List<String>>> getErroriFirmaMissioni() {
+    public ResponseEntity<Map<String, List<String>>> getErroriFirmaMissioni(
+            @RequestParam(name = "userId", required = false) String userId) {
         
         List<HistoricProcessInstance> processInstances = historyService.createHistoricProcessInstanceQuery()
             .processDefinitionKey("missioni")
@@ -149,9 +165,68 @@ public class FlowsCnrAdminTools {
             }
         });
         
+        if (userId != null) {
+            startFirmaMultiplaProcess(userId, result.get(userId));
+        } else {
+            result.forEach((k, v) -> {
+                startFirmaMultiplaProcess(k, v);
+            });
+        }
+        
         return ResponseEntity.ok(result);
     }
     
+    @RequestMapping(value = "firma-errata-missioni-post", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public void postErroriFirmaMissioni(@RequestParam(name = "values") String valuesString) {
+        JsonObject o = new JsonObject();
+        Gson gson = new Gson();
+        Map<String, List<String>> values = gson.fromJson(valuesString, HashMap.class);
+//        Map<String, List<String>> values =  new ObjectMapper().convertValue(o, new TypeReference<HashMap<String, List<String>>>() {});
+        values.forEach((k, v) -> {
+            startFirmaMultiplaProcess(k, v);
+        });
+    }
+    
+    private void startFirmaMultiplaProcess(String k, List<String> v) {
+        
+        Map<String, Object> data = new HashMap<>();
+        data.put("titolo", "Retifica firma documenti flusso Missioni");
+        data.put("descrizione", "Retifica firma documenti flusso Missioni");
+        data.put("userNameFirmatario", k);
+        
+        int i = 0;
+        for (String id : v) {
+            HistoricProcessInstance pi = historyService.createHistoricProcessInstanceQuery()
+                .includeProcessVariables()
+                .processInstanceId(id)
+                .singleResult();
+            
+            Map<String, Object> vars = pi.getProcessVariables();
+            
+            FlowsAttachment missioni = (FlowsAttachment)vars.get("missioni");
+            if (missioni != null) {
+                aggiungiDocumento(data, "missioni", missioni, "allegato"+ (i++) );
+            } else {
+                log.warn("L'allegato obbligatorio missioni era assente per il flusso"+id);
+            }
+            
+            FlowsAttachment anticipoMissione = (FlowsAttachment)vars.get("anticipoMissione");
+            if (anticipoMissione != null) {
+                aggiungiDocumento(data, "anticipoMissione", anticipoMissione, "allegato"+ (i++) );
+            }
+        }
+        
+        ProcessDefinition pd = repositoryService.createProcessDefinitionQuery()
+            .processDefinitionKey("firma-elenco-documenti")
+            .latestVersion()
+            .singleResult();
+        
+        data.put("processDefinitionId", pd.getId());
+        
+        flowsTaskService.startProcessInstance(pd.getId(), data);
+        
+    }
+
     /**
      * La ddMMyyyy deve essere in format dd/MM/yyyy
      * @param ddMMyyyy La startDate deve essere in format dd/MM/yyyy
@@ -331,13 +406,9 @@ public class FlowsCnrAdminTools {
     public class AddIdentityLinkForHistoricProcessInstanceCmd implements Command<Void>, Serializable {
 
         private static final long serialVersionUID = 1L;
-
         protected String processInstanceId;
-
         protected String userId;
-
         protected String groupId;
-
         protected String type;
 
         public AddIdentityLinkForHistoricProcessInstanceCmd(String processInstanceId, String userId, String groupId, String type) {
@@ -384,4 +455,14 @@ public class FlowsCnrAdminTools {
 
       }
 
+    
+    private void aggiungiDocumento(Map params, String tipoDocumento, FlowsAttachment att, String nomeDocumentoFlows){
+        tipoDocumento = "allegato";
+        params.put(nomeDocumentoFlows+"_label", tipoDocumento);
+        params.put(nomeDocumentoFlows+"_nodeRef", att.getUrl());
+        params.put(nomeDocumentoFlows+"_mimetype", att.getMimetype());
+        params.put(nomeDocumentoFlows+"_aggiorna", "true");
+        params.put(nomeDocumentoFlows+"_path", att.getPath());
+        params.put(nomeDocumentoFlows+"_filename", att.getFilename());
+    }
 }
