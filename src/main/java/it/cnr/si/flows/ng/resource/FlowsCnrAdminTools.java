@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 
@@ -96,7 +97,10 @@ public class FlowsCnrAdminTools {
             .finished()
             .list();
         
-        List<HistoricProcessInstance> filteredPIs = processInstances.stream().filter(pi -> {
+        int total = processInstances.size();
+        log.info(""+total);
+        
+        List<HistoricProcessInstance> filteredPIs = processInstances.parallelStream().filter(pi -> {
             Map<String, Object> variables = historyService.
                     createHistoricProcessInstanceQuery().
                     processInstanceId(pi.getId()).
@@ -105,6 +109,11 @@ public class FlowsCnrAdminTools {
                     .getProcessVariables();
             String validazioneSpesaFlag = (String)variables.get("validazioneSpesaFlag");
             FlowsAttachment fileMissione = (FlowsAttachment)variables.get("missioni");
+            String statoFinaleDomanda = String.valueOf(variables.get("STATO_FINALE_DOMANDA"));
+            
+            if (!statoFinaleDomanda.startsWith("FIRMATO"))
+                return false;
+            
             if (fileMissione == null) {
                 log.error("La Process Instance "+ pi.getId() +" non ha l'allegato missioni");
             } else {
@@ -119,10 +128,12 @@ public class FlowsCnrAdminTools {
             return true;
         }).collect(Collectors.toList());
         
-        Map<String, List<String>> result = new HashMap<>();
         
-        for ( HistoricProcessInstance pi : filteredPIs ) {
-//            List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().processInstanceId(pi.getId()).list();
+        log.info(""+filteredPIs.size());
+
+        Map<String, List<String>> result = new ConcurrentHashMap<>();
+        
+        filteredPIs.parallelStream().forEach(pi -> {
             List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().processInstanceId(pi.getId()).list();
             
             for ( HistoricTaskInstance task : tasks) {
@@ -136,7 +147,7 @@ public class FlowsCnrAdminTools {
                     result.put(esecutore, processList);
                 });
             }
-        }
+        });
         
         return ResponseEntity.ok(result);
     }
