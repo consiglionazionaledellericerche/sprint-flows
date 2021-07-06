@@ -192,8 +192,8 @@ public class FlowsCnrAdminTools {
     private void startFirmaMultiplaProcess(String k, List<String> v) {
         
         Map<String, Object> data = new HashMap<>();
-        data.put("titolo", "Retifica firma documenti flusso Missioni");
-        data.put("descrizione", "Retifica firma documenti flusso Missioni");
+        data.put("titolo", "Firma elenco rimborsi e revoche per missioni");
+        data.put("descrizione", "Firma uo / spesa  missioni per rimborsi e revoche precedentemente validate");
         data.put("userNameFirmatario", k);
         
         int i = 0;
@@ -207,7 +207,7 @@ public class FlowsCnrAdminTools {
             
             FlowsAttachment missioni = (FlowsAttachment)vars.get("missioni");
             if (missioni != null) {
-                aggiungiDocumento(data, "missioni", missioni, "allegato"+ (i++) );
+                aggiungiDocumento(data, "missioni", missioni, "missioni"+ (i++) );
             } else {
                 log.warn("L'allegato obbligatorio missioni era assente per il flusso"+id);
             }
@@ -459,7 +459,7 @@ public class FlowsCnrAdminTools {
 
     
     private void aggiungiDocumento(Map params, String tipoDocumento, FlowsAttachment att, String nomeDocumentoFlows){
-        tipoDocumento = "allegato";
+        tipoDocumento = "missioni";
         params.put(nomeDocumentoFlows+"_label", tipoDocumento);
         params.put(nomeDocumentoFlows+"_nodeRef", att.getUrl());
         params.put(nomeDocumentoFlows+"_mimetype", att.getMimetype());
