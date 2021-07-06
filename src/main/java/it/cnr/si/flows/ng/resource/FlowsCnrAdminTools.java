@@ -459,7 +459,6 @@ public class FlowsCnrAdminTools {
 
     
     private void aggiungiDocumento(Map params, String tipoDocumento, FlowsAttachment att, String nomeDocumentoFlows){
-        tipoDocumento = "missioni";
         params.put(nomeDocumentoFlows+"_label", tipoDocumento);
         params.put(nomeDocumentoFlows+"_nodeRef", att.getUrl());
         params.put(nomeDocumentoFlows+"_mimetype", att.getMimetype());
