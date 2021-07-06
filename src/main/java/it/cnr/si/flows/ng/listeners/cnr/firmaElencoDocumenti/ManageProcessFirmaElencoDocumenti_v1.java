@@ -94,7 +94,7 @@ public class ManageProcessFirmaElencoDocumenti_v1 implements ExecutionListener {
 				List<FlowsAttachment> attachments = flowsAttachmentService.getAttachmentArray(processInstanceId, "missioni");
 				if (attachments.size() == 0)
 					throw new TaskFailedException("Attachment non opzionali mancanti: " + "missioni");               
-				attachments.forEach(att -> nomiVariabiliFile.add(att.getName()));
+				attachments.forEach(att -> nomiVariabiliFile.add(att.getLabel()));
 				firmaDocumentoService.eseguiFirmaMultipla(execution, nomiVariabiliFile, null);
 			}
 		};break; 
