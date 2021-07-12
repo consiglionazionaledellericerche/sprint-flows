@@ -116,7 +116,7 @@ public class StartLaboratoriCongiuntiDomandeSetGroupsAndVisibility {
 		//CHECK CORRISPONDENZA EO TRA DICHIARATO UTENTE E ACE
 		String denominazioneEODirettore = entitaOrganizzativaDirettore.getDenominazione();
 		if (execution.getVariable("istitutoProponente") != null && !execution.getVariable("istitutoProponente").toString().equals("SEDE CENTRALE - DIPARTIMENTO")){
-			String denominazioneEOProponente = execution.getVariable("istitutoProponente").toString().substring(9);
+			String denominazioneEOProponente = execution.getVariable("istitutoProponente").toString();
 			if (!denominazioneEODirettore.equalsIgnoreCase(denominazioneEOProponente)) {
 				throw new BpmnError("400", "La struttura dichiarata dall'utente: " + userNameProponente + ": <br>" 
 						+ denominazioneEOProponente
