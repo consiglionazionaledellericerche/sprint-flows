@@ -31,12 +31,14 @@ import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.RepositoryService;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.HistoricIdentityLinkEntity;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricIdentityLinkResponse;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
@@ -52,9 +54,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.google.gson.Gson;
+
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
+import it.cnr.si.flows.ng.service.FlowsTaskService;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.AceService;
@@ -82,6 +87,10 @@ public class FlowsCnrAdminTools {
     private ProcessEngine processEngine;
     @Inject
     private FlowsProcessInstanceService flowsProcessInstanceService;
+    @Inject
+    private RepositoryService repositoryService;
+    @Inject
+    private FlowsTaskService flowsTaskService;
 
     @RequestMapping(value = "/resendExternalMessages", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
@@ -195,6 +204,62 @@ public class FlowsCnrAdminTools {
         
         return ResponseEntity.ok(result);
     }
+    
+    @RequestMapping(value = "firma-errata-missioni-post", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> postErroriFirmaMissioni(
+            @RequestParam(name = "values") String valuesString,
+            @RequestParam(name = "testing", defaultValue = "true") boolean testing) {
+        Map<String, List<String>> values = new Gson().fromJson(valuesString, HashMap.class);
+//        Map<String, List<String>> values =  new ObjectMapper().convertValue(o, new TypeReference<HashMap<String, List<String>>>() {});
+        values.forEach((k, v) -> {
+            startFirmaMultiplaProcess(k, v, testing);
+        });
+        return ResponseEntity.ok().build();
+    }
+    
+    private void startFirmaMultiplaProcess(String k, List<String> v, boolean testing) {
+        
+        Map<String, Object> data = new HashMap<>();
+        data.put("titolo", "Firma elenco rimborsi e revoche per missioni");
+        data.put("descrizione", "Firma uo / spesa  missioni per rimborsi e revoche precedentemente validate");
+        data.put("userNameFirmatario", k);
+        
+        int i = 0;
+        
+        for (String id : v) {
+            HistoricProcessInstance pi = historyService.createHistoricProcessInstanceQuery()
+                .includeProcessVariables()
+                .processInstanceId(id)
+                .singleResult();
+            
+            Map<String, Object> vars = pi.getProcessVariables();
+            
+            FlowsAttachment missioni = (FlowsAttachment)vars.get("missioni");
+            if (missioni != null) {
+                aggiungiDocumento(data, "missioni", missioni, "missioni"+ (i++) );
+            } else {
+                log.warn("L'allegato obbligatorio missioni era assente per il flusso"+id);
+            }
+            
+            FlowsAttachment anticipoMissione = (FlowsAttachment)vars.get("anticipoMissione");
+            if (anticipoMissione != null) {
+                aggiungiDocumento(data, "anticipoMissione", anticipoMissione, "allegato"+ (i++) );
+            }
+        }
+        
+        log.info("Avvio process Firma Elenco Documenti per l'utente {} e dati {}", k, data);
+        if (!testing) {
+            ProcessDefinition pd = repositoryService.createProcessDefinitionQuery()
+                    .processDefinitionKey("firma-elenco-documenti")
+                    .latestVersion()
+                    .singleResult();
+            data.put("processDefinitionId", pd.getId());
+            flowsTaskService.startProcessInstance(pd.getId(), data);
+        }
+        
+    }
+
+    
     
     /**
      * La ddMMyyyy deve essere in format dd/MM/yyyy
@@ -427,5 +492,14 @@ public class FlowsCnrAdminTools {
         }
 
       }
+
+    private void aggiungiDocumento(Map params, String tipoDocumento, FlowsAttachment att, String nomeDocumentoFlows){
+        params.put(nomeDocumentoFlows+"_label", tipoDocumento);
+        params.put(nomeDocumentoFlows+"_nodeRef", att.getUrl());
+        params.put(nomeDocumentoFlows+"_mimetype", att.getMimetype());
+        params.put(nomeDocumentoFlows+"_aggiorna", "true");
+        params.put(nomeDocumentoFlows+"_path", att.getPath());
+        params.put(nomeDocumentoFlows+"_filename", att.getFilename());
+    }
 
 }
