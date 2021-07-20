@@ -72,6 +72,14 @@ public class ExternalMessageSender {
 	private String siglaUsername;
 	@Value("${cnr.sigla.psw}")
 	private String siglaPassword;
+	@Value("${cnr.labcon.url}")
+	private String labconUrl;
+	@Value("${cnr.labcon.username}")
+	private String labconUsername;
+	@Value("${cnr.labcon.password}")
+	private String labconPassword;
+	@Value("${cnr.labcon.loginPath}")
+	private String labconLoginPath;
 
 
 
@@ -278,8 +286,8 @@ public class ExternalMessageSender {
 			if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 
 				Map<String, String> auth = new HashMap<>();
-				auth.put("username", stmUsername);
-				auth.put("password", stmPassword);
+				auth.put("username", labconUsername);
+				auth.put("password", labconPassword);
 				HttpHeaders headers = new HttpHeaders();
 				headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -287,7 +295,7 @@ public class ExternalMessageSender {
 						auth,
 						headers,
 						HttpMethod.POST,
-						URI.create(stmUrl + stmLoginPath));
+						URI.create(labconUrl + labconLoginPath));
 
 				ResponseEntity<Map> resp = new RestTemplate().exchange(entity, Map.class);
 
