@@ -44,10 +44,10 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 	private static final Logger LOGGER = LoggerFactory.getLogger(ManageProcessLaboratoriCongiuntiDomande_v1.class);
 
 
-	@Value("${cnr.stm.url}")
-	private String urlShortTermMobility;
-	@Value("${cnr.stm.domandePath}")
-	private String pathDomandeShortTermMobility;
+	@Value("${cnr.labcon.url}")
+	private String urlLaboratoriCongiunti;
+	@Value("${cnr.labcon.domandePath}")
+	private String pathDomandeLaboratoriCongiunti;
 
 	@Inject
 	private FirmaDocumentoService firmaDocumentoService;
@@ -82,10 +82,10 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 
 	private Expression faseEsecuzione;
 
-	public void restToApplicazioneSTM(DelegateExecution execution, StatoDomandeSTMEnum statoDomanda) {
+	public void restToApplicazioneLabConn(DelegateExecution execution, StatoDomandeSTMEnum statoDomanda) {
 
 		// @Value("${cnr.accordi-bilaterali.url}")
-		// private String urlShortTermMobility;
+		// private String urlLaboratoriCongiunti;
 		// @Value("${cnr.accordi-bilaterali.usr}")
 		// private String usrAccordiBilaterali;	
 		// @Value("${cnr.accordi-bilaterali.psw}")
@@ -100,7 +100,7 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 			}	
 		};
 
-		String url = urlShortTermMobility + pathDomandeShortTermMobility;
+		String url = urlLaboratoriCongiunti + pathDomandeLaboratoriCongiunti;
 		externalMessageService.createExternalMessage(url, ExternalMessageVerb.POST, stmPayload, ExternalApplication.STM);
 	}
 
@@ -146,23 +146,23 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 				//				flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
 			};break;  	 
 			case "modifica-start": {
-				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.APERTA);
+				restToApplicazioneLabConn(execution, Enum.StatoDomandeSTMEnum.APERTA);
 			};break;
 
 			case "pre-accettazione-start": {
 				if(sceltaUtente.equals("Respingi")) {
 					execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.RESPINTA.toString());
-					//restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.RESPINTA);
+					//restToApplicazioneLabConn(execution, Enum.StatoDomandeSTMEnum.RESPINTA);
 					utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.RESPINTA.toString());
 				} else {
 					if(sceltaUtente.equals("Annulla")) {
 						execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.ANNULLATA.toString());
-						//restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.ANNULLATA);
+						//restToApplicazioneLabConn(execution, Enum.StatoDomandeSTMEnum.ANNULLATA);
 						utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.ANNULLATA.toString());
 					}
 					else{
 						execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.VALIDATA.toString());
-						//restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.VALIDATA);
+						//restToApplicazioneLabConn(execution, Enum.StatoDomandeSTMEnum.VALIDATA);
 						utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.VALIDATA.toString());
 					}
 				}
@@ -170,17 +170,17 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 
 			//			case "endevent-non-validata-start": {
 			//				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.RESPINTA);
-			//				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.RESPINTA);
+			//				restToApplicazioneLabConn(execution, Enum.StatoDomandeSTMEnum.RESPINTA);
 			//				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.RESPINTA.toString());
 			//			};break;    	
 			//			case "endevent-validata-start": {
 			//				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.VALIDATA);
-			//				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.VALIDATA);
+			//				restToApplicazioneLabConn(execution, Enum.StatoDomandeSTMEnum.VALIDATA);
 			//				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.VALIDATA.toString());
 			//			};break;  
 			//			case "endevent-annullata-start": {
 			//				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.ANNULLATA);
-			//				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.ANNULLATA);
+			//				restToApplicazioneLabConn(execution, Enum.StatoDomandeSTMEnum.ANNULLATA);
 			//				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.ANNULLATA.toString());
 			//			};break;
 			// SUBFLUSSO VALIDAZIONE DIRIGENTE
@@ -189,13 +189,13 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 			};break; 			
 			case "endevent-respinta-start": {
 				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.RESPINTA.toString());
-				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.RESPINTA);
+				restToApplicazioneLabConn(execution, Enum.StatoDomandeSTMEnum.RESPINTA);
 				execution.setVariable("statoFinale", Enum.StatoDomandeSTMEnum.RESPINTA.toString());
 				utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
 			};break;					
 			case "endevent-autorizzata-start": {
 				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.AUTORIZZATA.toString());
-				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.AUTORIZZATA);
+				restToApplicazioneLabConn(execution, Enum.StatoDomandeSTMEnum.AUTORIZZATA);
 				execution.setVariable("statoFinale", Enum.StatoDomandeSTMEnum.AUTORIZZATA.toString());
 				utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
 			};break;						
@@ -211,7 +211,7 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 					//	domandaCorrenteAccettata = 1;
 					execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.ACCETTATA.toString());
 					execution.setVariable("domandaCorrenteAccettataFlag", "true");
-					//restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.ACCETTATA);
+					//restToApplicazioneLabConn(execution, Enum.StatoDomandeSTMEnum.ACCETTATA);
 					utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.ACCETTATA.toString());
 				}
 				List<ProcessInstance> processinstancesListaDomandeAccettatePerBando = runtimeService.createProcessInstanceQuery()
@@ -262,7 +262,7 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 				} else {
 					execution.setVariable("domandaCorrenteValutataFlag", "true");
 					execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE.toString());
-					//restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE);
+					//restToApplicazioneLabConn(execution, Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE);
 					utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.VALUTATA_SCIENTIFICAMENTE.toString());	
 					Double punteggioTotale= 
 							Double.parseDouble(execution.getVariable("punteggio_originalita_scientifica").toString().replaceAll(",", ".")) 
@@ -371,7 +371,7 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 
 			} 
 		} else {
-			restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.CANCELLATA);
+			restToApplicazioneLabConn(execution, Enum.StatoDomandeSTMEnum.CANCELLATA);
 			List<Job> timerAttivi = managementService.createJobQuery().timers().processInstanceId(processInstanceId).list();
 			timerAttivi.forEach(singoloTimer -> {
 				if (singoloTimer.getId() != null) {
