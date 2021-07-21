@@ -117,6 +117,7 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 			sceltaUtente =  (String) execution.getVariable("sceltaUtente");	
 		}
 		String faseEsecuzioneValue = "noValue";
+		// la variabile tipologiaRespinta tiene conto delle varie possibilità di come la domanda è staata respinta
 		faseEsecuzioneValue = faseEsecuzione.getValue(execution).toString();
 		LOGGER.info("ProcessInstanceId: " + processInstanceId + "-- azioneScelta: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 		//CHECK PER ANNULLO FLUSSO 
@@ -129,6 +130,7 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 			// START
 			case "validazione-start": {
 				utils.updateJsonSearchTerms(executionId, processInstanceId, stato);
+				execution.setVariable("tipologiaRespinta", "scadenzaTimer");
 			};break;  
 			case "validazione-end": {
 				//flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
@@ -144,6 +146,9 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 				//				FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
 				//				documentoGenerato.setLabel(labelFile);
 				//				flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
+				if(sceltaUtente.equals("Respingi")) {
+					execution.setVariable("tipologiaRespinta", "respintaResponsabile");
+				}
 			};break;  	 
 			case "modifica-start": {
 				restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.APERTA);
@@ -152,6 +157,7 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 			case "pre-accettazione-start": {
 				if(sceltaUtente.equals("Respingi")) {
 					execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.RESPINTA.toString());
+					execution.setVariable("tipologiaRespinta", "respintaResponsabile");
 					//restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.RESPINTA);
 					utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeLABEnum.RESPINTA.toString());
 				} else {
@@ -192,6 +198,12 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 				restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.RESPINTA);
 				execution.setVariable("statoFinale", Enum.StatoDomandeLABEnum.RESPINTA.toString());
 				utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
+				if(execution.getVariable("tipologiaRespinta").toString().equals("scadenzaTimer")) {
+					execution.setVariable("notaDomandaRespinta", "La Domanda è stata respinta per scadenza termini temporali Valutazione Dirigente");
+				}
+				if(execution.getVariable("tipologiaRespinta").toString().equals("respintaResponsabile")) {
+					execution.setVariable("notaDomandaRespinta", "La Domanda è stata respinta dal Direttore");
+				}
 			};break;					
 			case "endevent-autorizzata-start": {
 				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.AUTORIZZATA.toString());
@@ -201,6 +213,7 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 			};break;						
 			case "accettazione-start": {
 				LOGGER.debug("**** accettazione-start");
+				execution.setVariable("tipologiaRespinta", "respintaFormale");
 			};break; 			
 			case "accettazione-end": {
 				LOGGER.debug("**** accettazione-end");
@@ -290,7 +303,7 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 					listaVariabiliHtml.add("commento");
 					flowsPdfService.makePdfBySigla(tipologiaDoc, processInstanceId, listaVariabiliHtml, labelFile, report);
 					//flowsPdfService.makePdf(nomeFile, processInstanceId);
-					
+
 					FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
 					documentoGenerato.setLabel(labelFile);
 					flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
