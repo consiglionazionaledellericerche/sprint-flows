@@ -88,10 +88,13 @@ public class Enum {
     }
     
     public enum TipologieeMissioniEnum {
-    	ordine,
-    	rimborso,
-    	revoca;
+        ordine,
+        rimborso,
+        revoca;
     }
+    
+    
+
     public enum StatoDomandeAccordiInternazionaliEnum {
         APERTA,
         CHIUSA,
@@ -102,7 +105,31 @@ public class Enum {
         CANCELLATA;
     }
 
+    public enum StatoFirmaDocumentiEnum {
+        FIRMATO,
+        ANNULLATO,
+        PREDISPOSTO;
+    }
+
     public enum StatoDomandeSTMEnum {
+        APERTA,
+        CHIUSA,
+        INVIATA,
+        VALIDATA,
+        NON_VALIDATA,
+        IN_MODIFICA,
+        RESPINTA,
+        VALUTATA_SCIENTIFICAMENTE,
+        AUTORIZZATA,
+        ANNULLATA,
+        ACCETTATA,
+        ACCETTAZIONE,
+        RESPINTO_UO,
+        RESPINTO_UO_SPESA,
+        CANCELLATA;
+    }
+    
+    public enum StatoDomandeLABEnum {
         APERTA,
         CHIUSA,
         INVIATA,
@@ -181,6 +208,7 @@ public class Enum {
         valutazioneProgettoAccordiBilaterali,
         domandaAccordiBilaterali,
         valutazioneShortTermMobility,
+        valutazioneLaboratoriCongiunti,
         preavvisoRigettoCambioFascia,
         monitoraggioAttivitaCovid19;
 
