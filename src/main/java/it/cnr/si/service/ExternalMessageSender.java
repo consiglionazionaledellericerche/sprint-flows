@@ -133,7 +133,7 @@ public class ExternalMessageSender {
 		externalMessageService.getFailedExternalMessages().forEach(this::send);
 	}
 
-	@Async
+//	@Async
 	/* friendly */ void send(ExternalMessage msg) {
 		// TODO refactor : il metodo send dovrebbe sendare, non sendare-e-salvare
 
