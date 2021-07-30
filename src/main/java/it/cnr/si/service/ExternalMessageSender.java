@@ -73,6 +73,14 @@ public class ExternalMessageSender {
 	private String siglaUsername;
 	@Value("${cnr.sigla.psw}")
 	private String siglaPassword;
+	@Value("${cnr.labcon.url}")
+	private String labconUrl;
+	@Value("${cnr.labcon.username}")
+	private String labconUsername;
+	@Value("${cnr.labcon.password}")
+	private String labconPassword;
+	@Value("${cnr.labcon.loginPath}")
+	private String labconLoginPath;
 
 
 
@@ -109,7 +117,7 @@ public class ExternalMessageSender {
 		missioniTemplate.setInterceptors(interceptors);
 		ExternalApplication.MISSIONI.setTemplate(missioniTemplate);
 
-		// MISSIONI
+		// SIGLA
 
 		RestTemplate siglaTemplate = new RestTemplate();
 		interceptors = siglaTemplate.getInterceptors();
@@ -117,6 +125,15 @@ public class ExternalMessageSender {
 		siglaTemplate.setInterceptors(interceptors);
 		ExternalApplication.SIGLA.setTemplate(siglaTemplate);
 
+
+		// LABCON
+
+		RestTemplate labconTemplate = new RestTemplate();
+		interceptors = labconTemplate.getInterceptors();
+		interceptors.add(new LabconRequestInterceptor());
+		labconTemplate.setInterceptors(interceptors);
+		ExternalApplication.LABCON.setTemplate(labconTemplate);
+		
 		// GENERIC
 
 		ExternalApplication.GENERIC.setTemplate(new RestTemplate());
@@ -257,6 +274,45 @@ public class ExternalMessageSender {
 		}
 	}
 
+	private class LabconRequestInterceptor implements ClientHttpRequestInterceptor {
+
+		private String id_token = null;
+
+		@Override
+		public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
+
+			request.getHeaders().set("Authorization", "Bearer "+ id_token);
+			request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+			ClientHttpResponse response = execution.execute(request, body);
+
+			if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+
+				Map<String, String> auth = new HashMap<>();
+				auth.put("username", labconUsername);
+				auth.put("password", labconPassword);
+				HttpHeaders headers = new HttpHeaders();
+				headers.setContentType(MediaType.APPLICATION_JSON);
+
+				RequestEntity entity = new RequestEntity(
+						auth,
+						headers,
+						HttpMethod.POST,
+						URI.create(labconUrl + labconLoginPath));
+
+				ResponseEntity<Map> resp = new RestTemplate().exchange(entity, Map.class);
+
+				this.id_token = (String) resp.getBody().get("id_token");
+
+				request.getHeaders().set("Authorization", "Bearer "+ id_token);
+				request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+				response = execution.execute(request, body);
+			}
+
+			return response;
+		}
+	}
+
+	
 	/**
 	 * Missioni, per la login, usa /oauth/token e una richiesta POST com FORM_DATA
 	 * Per questo ho delle peculiarita': devo usare una MultiValueMap

@@ -16,6 +16,7 @@ import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.runtime.Job;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,9 +24,12 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.statoFinaleDomanda;
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
@@ -64,7 +68,8 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 	private ManagementService managementService;
 	@Inject
 	private Utils utils;
-
+	@Inject
+	private FlowsPdfBySiglaRestService flowsPdfBySiglaRestService;
 
 	private Expression faseEsecuzione;
 
@@ -113,9 +118,29 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 			// START
 			case "process-start": {
 				startAccordiInternazionaliDomandeSetGroupsAndVisibility.configuraVariabiliStart(execution);
-				// GENERO LA DOMANDA
+				// GENERO LA DOMANDA ---OLD
+				//String nomeFile="domandaAccordiBilaterali";
+				//flowsPdfService.makePdfBeforeStartPi(nomeFile, processInstanceId);
+
+				//PARAMETRI GENERAZIONE PDF x SIGLA PRINT
+				String tipoAttivita = "rendicontazione";
+				if (execution.getVariable("tipoAttivita") != null) {
+					tipoAttivita = execution.getVariable("tipoAttivita").toString();
+				}
 				String nomeFile="domandaAccordiBilaterali";
-				flowsPdfService.makePdfBeforeStartPi(nomeFile, processInstanceId);
+				String labelFile = "Domanda Accordi Bilaterali";
+				String report = "/scrivaniadigitale/domandaAccordiBilaterali.jrxml";
+				//tipologiaDoc è la tipologia del file
+				String tipologiaDoc = Enum.PdfType.valueOf("domandaAccordiBilaterali").name();
+				String utenteFile = execution.getVariable("initiator").toString();
+
+				// UPDATE VARIABILI FLUSSO
+				utils.updateJsonSearchTerms(executionId, processInstanceId, stato);
+				// GENERAZIONE PDF
+				List<String> listaVariabiliHtml = new ArrayList<String>();
+				listaVariabiliHtml.add("propostaDiRicerca");
+				flowsPdfService.makePdfBySigla(tipologiaDoc, processInstanceId, listaVariabiliHtml, labelFile, report);
+
 			};break;
 			// START
 			case "valutazione-scientifica-end": {
@@ -144,12 +169,12 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 				execution.setVariable("gruppoValutatoreScientificoDipartimento", gruppoValutatoreScientificoDipartimento);
 				LOGGER.debug("Imposto i gruppi dipartimento : {} - del flusso {}", idDipartimento, gruppoValutatoreScientificoDipartimento);
 				// GENERO LA DOMANDA
-//				String nomeFile="domandaAccordiBilaterali";
-//				String labelFile="Domanda";
-//				flowsPdfService.makePdf(nomeFile, processInstanceId);
-//				FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
-//				documentoGenerato.setLabel(labelFile);
-//				flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
+				//				String nomeFile="domandaAccordiBilaterali";
+				//				String labelFile="Domanda";
+				//				flowsPdfService.makePdf(nomeFile, processInstanceId);
+				//				FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
+				//				documentoGenerato.setLabel(labelFile);
+				//				flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
 			};break;
 			// START
 			case "validazione-start": {

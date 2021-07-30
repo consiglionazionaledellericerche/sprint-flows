@@ -45,6 +45,7 @@ public final class Utils {
     public static final String LESS = "Less";
     public static final String ERRORE_NEL_PARSING_DELLA_DATA = "Errore nel parsing della data {} - ";
     public static final String GREAT = "Great";
+    public static final SimpleDateFormat formatoDataUF = new SimpleDateFormat("dd-MM-yyyy");
     private static final String TEXT_EQUAL = "textEqual";
     private static final String BOOLEAN = "boolean";
     private static final String ROLE = "ROLE_";

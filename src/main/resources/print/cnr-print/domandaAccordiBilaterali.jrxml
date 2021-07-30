@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.11.0.final utlizzo versione della libreria JasperReports6.11.0-0c4056ccaa4d25a5a8c45672d2f764ea3498bebb  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="domandaAccordiBilaterali" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="NoPages" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c0187353-db16-46fc-a7a4-9ece39bc4976">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="domandaAccordiBilaterali" pageWidth="595" pageHeight="842" whenNoDataType="NoPages" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c0187353-db16-46fc-a7a4-9ece39bc4976">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DataAdapter.xml"/>
-	<style name="SubTitle" forecolor="#736343" fontName="Arial" fontSize="18"/>
-	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
-	<style name="Detail" fontName="Arial" fontSize="12"/>
+	<style name="SubTitle" forecolor="#736343" fontName="Times New Roman" fontSize="18" pdfFontName="Times-Roman"/>
+	<style name="Column header" forecolor="#666666" fontName="Times New Roman" fontSize="12" isBold="true" pdfFontName="Times-Roman"/>
+	<style name="Detail" fontName="Times New Roman" fontSize="12" pdfFontName="Times-Roman"/>
 	<style name="Row" mode="Transparent">
 		<conditionalStyle>
 			<conditionExpression><![CDATA[$V{REPORT_COUNT}%2 == 0]]></conditionExpression>
@@ -181,55 +181,6 @@
 			<rightPen lineWidth="0.5" lineColor="#000000"/>
 		</box>
 	</style>
-	<subDataset name="impegni_json" uuid="43718d59-fac1-44c4-8e31-33ea348b2df2">
-		<queryString language="json">
-			<![CDATA[]]>
-		</queryString>
-		<field name="descrizione" class="java.lang.String">
-			<fieldDescription><![CDATA[descrizione]]></fieldDescription>
-		</field>
-		<field name="vocedispesa" class="java.lang.String">
-			<fieldDescription><![CDATA[vocedispesa]]></fieldDescription>
-		</field>
-		<field name="uo" class="java.lang.String">
-			<fieldDescription><![CDATA[uo]]></fieldDescription>
-		</field>
-		<field name="gae" class="java.lang.String">
-			<fieldDescription><![CDATA[gae]]></fieldDescription>
-		</field>
-		<field name="uo_label" class="java.lang.String">
-			<fieldDescription><![CDATA[uo_label]]></fieldDescription>
-		</field>
-	</subDataset>
-	<subDataset name="ditteInvitate_json" uuid="eef62cf4-2b7b-484b-8ffe-88dc754bde57">
-		<queryString language="json">
-			<![CDATA[]]>
-		</queryString>
-		<field name="ragioneSocialeDittaInvitata" class="java.lang.String">
-			<fieldDescription><![CDATA[ragioneSocialeDittaInvitata]]></fieldDescription>
-		</field>
-		<field name="pIvaCodiceFiscaleDittaInvitata" class="java.lang.String">
-			<fieldDescription><![CDATA[pIvaCodiceFiscaleDittaInvitata]]></fieldDescription>
-		</field>
-		<field name="valutazioneDittaInvitata" class="java.lang.String">
-			<fieldDescription><![CDATA[valutazioneDittaInvitata]]></fieldDescription>
-		</field>
-		<field name="offertaPresentataDittaInvitata" class="java.lang.String">
-			<fieldDescription><![CDATA[offertaPresentataDittaInvitata]]></fieldDescription>
-		</field>
-	</subDataset>
-	<subDataset name="ditteRTI_json" uuid="219b88f3-c360-4469-8343-3d58e24a749b">
-		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="domandaAccordiBilaterali"/>
-		<queryString language="json">
-			<![CDATA[]]>
-		</queryString>
-		<field name="ragioneSocialeDittaInvitata" class="java.lang.String">
-			<fieldDescription><![CDATA[ragioneSocialeDittaInvitata]]></fieldDescription>
-		</field>
-		<field name="pIvaCodiceFiscaleDittaInvitata" class="java.lang.String">
-			<fieldDescription><![CDATA[pIvaCodiceFiscaleDittaInvitata]]></fieldDescription>
-		</field>
-	</subDataset>
 	<parameter name="ANN_IMAGE" class="java.io.InputStream"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["C:\\CNR\\1_PROGETTI\\OIV\\PDF - JASPER REPORT\\print\\"]]></defaultValueExpression>
@@ -417,7 +368,7 @@
 					<textFieldExpression><![CDATA[$F{titolo}]]></textFieldExpression>
 				</textField>
 			</band>
-			<band height="193">
+			<band height="181">
 				<textField>
 					<reportElement x="0" y="124" width="200" height="20" uuid="cfa4daaf-6dcb-40f2-9881-83fce970ef94"/>
 					<textElement textAlignment="Left">
@@ -540,22 +491,31 @@
 		<band splitType="Stretch"/>
 	</columnHeader>
 	<detail>
-		<band height="30" splitType="Stretch">
+		<band height="49" splitType="Stretch">
 			<printWhenExpression><![CDATA[$F{propostaDiRicerca}  != null]]></printWhenExpression>
 			<textField textAdjust="StretchHeight">
-				<reportElement positionType="Float" x="-1" y="7" width="556" height="17" uuid="4cfea49b-9713-48e6-82db-09b68941541c"/>
-				<textElement textAlignment="Left" verticalAlignment="Middle" markup="styled">
-					<font fontName="SansSerif" size="11" isBold="false" isItalic="false"/>
+				<reportElement positionType="Float" x="0" y="6" width="556" height="17" uuid="291517b7-fc21-45ce-8e67-b01b6093e828"/>
+				<textElement textAlignment="Left" verticalAlignment="Justified" markup="styled">
+					<font fontName="Times New Roman" size="11" isBold="false" isItalic="false"/>
+					<paragraph lineSpacing="Single"/>
 				</textElement>
-				<textFieldExpression><![CDATA["<style isBold=\"true\" isUnderline=\"true\">Proposta di Ricerca :</style> \r\n"+ $F{propostaDiRicerca} +"\r\n"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["<style isBold=\"true\" isUnderline=\"true\">Proposta di Ricerca :</style>"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="0" y="27" width="556" height="17" uuid="c285b73c-30a0-4318-9d6f-a6e423585258"/>
+				<textElement textAlignment="Left" verticalAlignment="Justified" markup="html">
+					<font fontName="Times New Roman" size="11" isBold="false" isItalic="false"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{propostaDiRicerca} +"\r\n"]]></textFieldExpression>
 			</textField>
 		</band>
 		<band height="30" splitType="Stretch">
 			<printWhenExpression><![CDATA[$F{obiettivi}  != null]]></printWhenExpression>
 			<textField textAdjust="StretchHeight">
-				<reportElement style="Column header" positionType="Float" x="0" y="7" width="556" height="17" uuid="fc86c61f-eeb7-450c-927f-26dcba4a6561"/>
-				<textElement textAlignment="Left" verticalAlignment="Middle" markup="styled">
-					<font fontName="SansSerif" size="11" isBold="false" isItalic="false"/>
+				<reportElement positionType="Float" x="0" y="7" width="556" height="17" uuid="95417880-5ad8-4a59-ac7e-ddafff7aff12"/>
+				<textElement textAlignment="Left" verticalAlignment="Justified" markup="styled">
+					<font fontName="Times New Roman" size="11" isBold="false" isItalic="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA["<style isBold=\"true\" isUnderline=\"true\">Obiettivi :</style> \r\n "+ $F{obiettivi} +"\r\n"]]></textFieldExpression>
@@ -566,7 +526,7 @@
 			<textField textAdjust="StretchHeight">
 				<reportElement positionType="Float" x="0" y="7" width="556" height="17" uuid="793a2d50-7d78-4253-b286-9c299dfe44fb"/>
 				<textElement textAlignment="Left" verticalAlignment="Justified" markup="styled">
-					<font fontName="SansSerif" size="11" isBold="false" isItalic="false"/>
+					<font fontName="Times New Roman" size="11" isBold="false" isItalic="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA["<style isBold=\"true\" isUnderline=\"true\">Piano di Lavoro Primo Anno :</style> \r\n"+ $F{pianoDiLavoroPrimoAnno} +"\r\n"]]></textFieldExpression>
@@ -577,7 +537,7 @@
 			<textField textAdjust="StretchHeight">
 				<reportElement positionType="Float" x="0" y="7" width="556" height="17" uuid="7675df53-8a74-4b6e-8fac-3428dc3502d8"/>
 				<textElement textAlignment="Left" verticalAlignment="Justified" markup="styled">
-					<font fontName="SansSerif" size="11" isBold="false" isItalic="false"/>
+					<font fontName="Times New Roman" size="11" isBold="false" isItalic="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA["<style isBold=\"true\" isUnderline=\"true\">Piano di Lavoro Secondo Anno :</style> \r\n"+ $F{pianoDiLavoroSecondoAnno} +"\r\n"]]></textFieldExpression>
@@ -588,7 +548,7 @@
 			<textField textAdjust="StretchHeight">
 				<reportElement positionType="Float" x="0" y="7" width="556" height="17" uuid="da07140c-21bd-43d8-945a-ac7f569dab75"/>
 				<textElement textAlignment="Left" verticalAlignment="Justified" markup="styled">
-					<font fontName="SansSerif" size="11" isBold="false" isItalic="false"/>
+					<font fontName="Times New Roman" size="11" isBold="false" isItalic="false"/>
 					<paragraph lineSpacing="Single"/>
 				</textElement>
 				<textFieldExpression><![CDATA["<style isBold=\"true\" isUnderline=\"true\">Piano di Lavoro Terzo Anno :</style> \r\n"+ $F{pianoDiLavoroTerzoAnno} +"\r\n"]]></textFieldExpression>

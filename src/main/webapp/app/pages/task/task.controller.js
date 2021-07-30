@@ -25,9 +25,9 @@
 	 *
 	 * @author mtrycz
 	 */
-	TaskController.$inject = ['$scope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log', '$http', '$q', 'Upload', 'utils', '$localStorage', '$uibModal'];
+	TaskController.$inject = ['$scope', '$rootScope', 'Principal', 'LoginService', '$state', 'dataService', 'AlertService', '$log', '$http', '$q', 'Upload', 'utils', '$localStorage', '$uibModal'];
 
-	function TaskController($scope, Principal, LoginService, $state, dataService, AlertService, $log, $http, $q, Upload, utils, $localStorage, $uibModal) {
+	function TaskController($scope, $rootScope, Principal, LoginService, $state, dataService, AlertService, $log, $http, $q, Upload, utils, $localStorage, $uibModal) {
 		var vm = this, deploymentId, isShared = false;
 
         $scope.button={};
@@ -139,10 +139,14 @@
                 //$scope.button.disabled = false;
 
             } else {
-                $uibModal.open({
-                    templateUrl: 'confirmModal.html',
-                    scope: $scope
-                });
+                if($rootScope.inDevelopment){
+                    $scope.submitTask(file);
+                } else {
+                    $uibModal.open({
+                        templateUrl: 'confirmModal.html',
+                        scope: $scope
+                    });
+                }
             }
 		};
 

@@ -5,6 +5,7 @@ import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
 import it.cnr.si.firmadigitale.firma.arss.stub.PdfSignApparence;
 import it.cnr.si.firmadigitale.firma.arss.stub.SignReturnV2;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.exception.FileFormatException;
 import it.cnr.si.flows.ng.exception.FlowsPermissionException;
 import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
 import it.cnr.si.flows.ng.service.*;
@@ -318,7 +319,7 @@ public class FlowsTaskResource {
                                                               @RequestParam("password") String password,
                                                               @RequestParam("otp") String otp,
                                                               @RequestParam("taskIds") List<String> taskIds)
-            throws ArubaSignServiceException, FlowsPermissionException {
+            throws ArubaSignServiceException, FlowsPermissionException, FileFormatException {
 
         LOGGER.info("L'utente {} ha chiesto di effettuare la firma multipla sui task: {}", username, taskIds);
         verificaPrecondizioniFirmaMultipla(taskIds);

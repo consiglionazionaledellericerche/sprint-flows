@@ -46,7 +46,7 @@
         {
             "fieldName": "application",
             "fieldType": "ExternalApplication",
-            "fieldValues": "ABIL,SIGLA,ACE,MISSIONI,ATTESTATI,GENERIC",
+            "fieldValues": "ABIL,SIGLA,ACE,MISSIONI,ATTESTATI,GENERIC,STM,LABCON ",
             "fieldValidateRules": [
                 "required"
             ]

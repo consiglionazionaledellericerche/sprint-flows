@@ -146,6 +146,42 @@
             <column name="form" type="string"/>
         </loadUpdateData>
         <loadUpdateData encoding="UTF-8"
+                        file="config/liquibase/cnr/new/firma-documenti-form.csv"
+                        primaryKey="id"
+                        schemaName="public"
+                        separator=";"
+                        tableName="form">
+            <column name="id" type="numeric"/>
+            <column name="process_definition_key" type="string"/>
+            <column name="version" type="string"/>
+            <column name="task_id" type="string"/>
+            <column name="form" type="string"/>
+        </loadUpdateData>
+        <loadUpdateData encoding="UTF-8"
+                        file="config/liquibase/cnr/new/laboratori-congiunti-domande-form.csv"
+                        primaryKey="id"
+                        schemaName="public"
+                        separator=";"
+                        tableName="form">
+            <column name="id" type="numeric"/>
+            <column name="process_definition_key" type="string"/>
+            <column name="version" type="string"/>
+            <column name="task_id" type="string"/>
+            <column name="form" type="string"/>
+        </loadUpdateData>
+        <loadUpdateData encoding="UTF-8"
+                        file="config/liquibase/cnr/new/laboratori-congiunti-bando-dipartimento-form.csv"
+                        primaryKey="id"
+                        schemaName="public"
+                        separator=";"
+                        tableName="form">
+            <column name="id" type="numeric"/>
+            <column name="process_definition_key" type="string"/>
+            <column name="version" type="string"/>
+            <column name="task_id" type="string"/>
+            <column name="form" type="string"/>
+        </loadUpdateData>
+        <loadUpdateData encoding="UTF-8"
                         file="config/liquibase/cnr/new/firma-elenco-documenti-form.csv"
                         primaryKey="id"
                         schemaName="public"

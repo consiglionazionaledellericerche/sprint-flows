@@ -17,6 +17,7 @@ public enum ExternalApplication {
     ABIL,
     STM,
     SIGLA,
+    LABCON,
     ACE,
     MISSIONI,
     ATTESTATI,
