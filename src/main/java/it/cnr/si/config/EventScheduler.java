@@ -24,7 +24,7 @@ public class EventScheduler {
     @Inject
     private ExternalMessageSender externalMessageSender;
 
-    @Scheduled(fixedDelay = 600000, initialDelay = 10000) // 10m
+    @Scheduled(fixedDelay = 60000, initialDelay = 10000) // 1m
     public void scheduledSendMessages() {
 
         // Soltanto un nodo dovrebbe effettuare l'invio degli ExternalMessage
