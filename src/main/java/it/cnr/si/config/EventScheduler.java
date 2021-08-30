@@ -31,6 +31,7 @@ public class EventScheduler {
         // Verifico che il nodo corrente sia il master del cluster
         // prendendo il primo dei member e confrontando se e' il member corrente
         // https://github.com/hazelcast/hazelcast/issues/3760#issuecomment-57928166
+        log.info("Numero di nodi in questo cluster: "+ hazelcastInstance.getCluster().getMembers().size());
         Member master = hazelcastInstance.getCluster().getMembers().iterator().next();
         if (master == hazelcastInstance.getCluster().getLocalMember()) {
             log.info("Sono il master, processo le rest ExternalMessage");
