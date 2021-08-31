@@ -19,29 +19,16 @@
                 <div class="form-group">
                     <label class="control-label" translate="sprintApp.externalMessage.payload" for="field_payload">Payload</label>
                     <input type="text" class="form-control" name="payload" id="field_payload"
-                           ng-model="vm.externalMessage.payload"
-                           required />
-                    <div ng-show="editForm.payload.$invalid">
-                        <p class="help-block"
-                           ng-show="editForm.payload.$error.required" translate="entity.validation.required">
-                            This field is required.
-                        </p>
-                    </div>
+                           ng-model="vm.externalMessage.payload" />
                 </div>
                 <div class="form-group">
                     <label class="control-label" translate="sprintApp.externalMessage.status" for="field_status">Status</label>
-                    <select class="form-control" name="status" ng-model="vm.externalMessage.status" id="field_status" required>
+                    <select class="form-control" name="status" ng-model="vm.externalMessage.status" id="field_status">
                         <option value="NEW" translate="sprintApp.ExternalMessageStatus.NEW">NEW</option>
                         <option value="SENT" translate="sprintApp.ExternalMessageStatus.SENT">SENT</option>
                         <option value="DELETED" translate="sprintApp.ExternalMessageStatus.DELETED">DELETED</option>
                         <option value="ERROR" translate="sprintApp.ExternalMessageStatus.ERROR">ERROR</option>
                     </select>
-                    <div ng-show="editForm.status.$invalid">
-                        <p class="help-block"
-                           ng-show="editForm.status.$error.required" translate="entity.validation.required">
-                            This field is required.
-                        </p>
-                    </div>
                 </div>
                 <div class="form-group">
                     <label class="control-label" translate="sprintApp.externalMessage.lastErrorMessage" for="field_lastErrorMessage">Last Error Message</label>
@@ -50,7 +37,7 @@
                 </div>
                 <div class="form-group">
                     <label class="control-label" translate="sprintApp.externalMessage.application" for="field_application">Application</label>
-                    <select class="form-control" name="application" ng-model="vm.externalMessage.application" id="field_application" required>
+                    <select class="form-control" name="application" ng-model="vm.externalMessage.application" id="field_application">
                         <option value="ABIL" translate="sprintApp.ExternalApplication.ABIL">ABIL</option>
                         <option value="SIGLA" translate="sprintApp.ExternalApplication.SIGLA">SIGLA</option>
                         <option value="ACE" translate="sprintApp.ExternalApplication.ACE">ACE</option>
@@ -59,12 +46,6 @@
                         <option value="STM" translate="sprintApp.ExternalApplication.STM">SHORT-TERM-MOBILITY</option>
                         <option value="GENERIC" translate="sprintApp.ExternalApplication.GENERIC">GENERIC</option>
                     </select>
-                    <div ng-show="editForm.application.$invalid">
-                        <p class="help-block"
-                           ng-show="editForm.application.$error.required" translate="entity.validation.required">
-                            This field is required.
-                        </p>
-                    </div>
             </div>
             <button ng-click="loadAll()" class="btn btn-primary">
                 <span class="glyphicon glyphicon-filter"></span>
