@@ -101,7 +101,8 @@ public class ExternalMessageResource {
         log.debug("REST request to get a page of ExternalMessages");
         //i parametri della query vuoti vengono trasformati in null per rendere true la clausola della query in ExternalMessageTepository
         Page<ExternalMessage> page = externalMessageService.findAllBySearchTerms(pageable,
-                 status, application, payload, payload);
+                status.isEmpty() ? null : status, application.isEmpty() ? null : application,
+                payload.isEmpty() ? null : payload, lastErrorMessage.isEmpty() ? null : payload);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/external-messages");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
