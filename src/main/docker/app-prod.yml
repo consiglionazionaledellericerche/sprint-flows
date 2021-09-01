@@ -13,6 +13,7 @@ services:
             - SPRING_CLOUD_CONFIG_SERVER_GIT_USERNAME=flows
             - SPRING_CLOUD_CONFIG_SERVER_GIT_PASSWORD=CONFIG_REPO_TOKEN
             - JHIPSTER_SLEEP=10 # gives time for the database to boot before the application
+            - CACHE_HAZELCAST_PUBLICIP=CACHE_HAZELCAST_PUBLICIP_SED
             - CACHE_HAZELCAST_MEMBERS=150.146.7.79:1481,150.146.7.52:1481
             - GRAYLOG_HOST=log.cedrc.cnr.it
             - GRAYLOG_PORT=3514
