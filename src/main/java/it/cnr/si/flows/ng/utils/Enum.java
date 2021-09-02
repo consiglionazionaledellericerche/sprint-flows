@@ -88,9 +88,9 @@ public class Enum {
     }
     
     public enum TipologieeMissioniEnum {
-    	ordine,
-    	rimborso,
-    	revoca;
+        ordine,
+        rimborso,
+        revoca;
     }
     
     

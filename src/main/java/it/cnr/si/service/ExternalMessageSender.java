@@ -17,6 +17,7 @@ import org.springframework.http.*;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 
@@ -149,6 +150,7 @@ public class ExternalMessageSender {
 		externalMessageService.getFailedExternalMessages().forEach(this::send);
 	}
 
+//	@Async
 	/* friendly */ void send(ExternalMessage msg) {
 		// TODO refactor : il metodo send dovrebbe sendare, non sendare-e-salvare
 

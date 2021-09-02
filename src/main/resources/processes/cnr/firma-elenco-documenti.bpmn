@@ -14,7 +14,7 @@
       </activiti:executionListener>
     </extensionElements>
     <startEvent id="startevent1" name="Start"></startEvent>
-    <userTask id="firma" name="FIRMA" activiti:assignee="${utenteFirmatario}" activiti:category="firma">
+    <userTask id="firma" name="FIRMA" activiti:assignee="${utenteFirmatario}">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessFirmaElencoDocumenti_v1}">
           <activiti:field name="faseEsecuzione">

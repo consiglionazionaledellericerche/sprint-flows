@@ -187,15 +187,15 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 			};break; 			
 			case "endevent-respinta-start": {
 				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.RESPINTA.toString());
-				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.RESPINTA);
 				execution.setVariable("statoFinale", Enum.StatoDomandeSTMEnum.RESPINTA.toString());
 				utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
+				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.RESPINTA);
 			};break;					
 			case "endevent-autorizzata-start": {
 				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.AUTORIZZATA.toString());
-				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.AUTORIZZATA);
 				execution.setVariable("statoFinale", Enum.StatoDomandeSTMEnum.AUTORIZZATA.toString());
 				utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
+				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.AUTORIZZATA);
 			};break;						
 			case "accettazione-start": {
 				LOGGER.debug("**** accettazione-start");
@@ -344,7 +344,6 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 
 			} 
 		} else {
-			restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.CANCELLATA);
 			List<Job> timerAttivi = managementService.createJobQuery().timers().processInstanceId(processInstanceId).list();
 			timerAttivi.forEach(singoloTimer -> {
 				if (singoloTimer.getId() != null) {
@@ -352,6 +351,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 					managementService.deleteJob(singoloTimer.getId());
 				}
 			});
+			restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.CANCELLATA);
 		}
 	}
 }
