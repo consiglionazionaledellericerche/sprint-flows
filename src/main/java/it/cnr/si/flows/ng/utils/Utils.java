@@ -368,37 +368,41 @@ public final class Utils {
      */
     public void updateJsonSearchTerms(String executionId, String processInstanceId, String stato) {
 
-        String initiator = "";
-        String titolo = "";
-        String descrizione = "";
-
-        if(executionId == null)
-            executionId = flowsProcessInstanceService.getCurrentTaskOfProcessInstance(processInstanceId).getExecutionId();
-
-        if (runtimeService.getVariable(executionId , INITIATOR) != null)
-            initiator = runtimeService.getVariable(executionId , INITIATOR).toString();
-
-        if (runtimeService.getVariable(executionId , TITOLO) != null)
-            titolo =   runtimeService.getVariable(executionId , TITOLO).toString();
-
-        if (runtimeService.getVariable(executionId , DESCRIZIONE) != null)
-            descrizione =   runtimeService.getVariable(executionId , DESCRIZIONE).toString();
-
-        org.json.JSONObject name = new org.json.JSONObject();
-        name.put(DESCRIZIONE, ellipsis(descrizione, LENGTH_DESCRIZIONE));
-        name.put(TITOLO, ellipsis(titolo, LENGTH_TITOLO));
-
-        //Se il campo "stato" è vuoto ==> riscrivo nel json lo stato che aveva ...
-        if(stato.isEmpty()){
-            String vecchioStato = new org.json.JSONObject(flowsProcessInstanceService.getProcessInstance(processInstanceId).getName()).getString(STATO);
-            name.put(STATO, ellipsis(vecchioStato, LENGTH_STATO) );
-        }else {
-            // ... altrimenti aggiorno con il nuovo stato
-            name.put(STATO, ellipsis(stato, LENGTH_STATO));
+        try {
+            String initiator = "";
+            String titolo = "";
+            String descrizione = "";
+    
+            if(executionId == null)
+                executionId = flowsProcessInstanceService.getCurrentTaskOfProcessInstance(processInstanceId).getExecutionId();
+    
+            if (runtimeService.getVariable(executionId , INITIATOR) != null)
+                initiator = runtimeService.getVariable(executionId , INITIATOR).toString();
+    
+            if (runtimeService.getVariable(executionId , TITOLO) != null)
+                titolo =   runtimeService.getVariable(executionId , TITOLO).toString();
+    
+            if (runtimeService.getVariable(executionId , DESCRIZIONE) != null)
+                descrizione =   runtimeService.getVariable(executionId , DESCRIZIONE).toString();
+    
+            org.json.JSONObject name = new org.json.JSONObject();
+            name.put(DESCRIZIONE, ellipsis(descrizione, LENGTH_DESCRIZIONE));
+            name.put(TITOLO, ellipsis(titolo, LENGTH_TITOLO));
+    
+            //Se il campo "stato" è vuoto ==> riscrivo nel json lo stato che aveva ...
+            if(stato.isEmpty()){
+                String vecchioStato = new org.json.JSONObject(flowsProcessInstanceService.getProcessInstance(processInstanceId).getName()).getString(STATO);
+                name.put(STATO, ellipsis(vecchioStato, LENGTH_STATO) );
+            }else {
+                // ... altrimenti aggiorno con il nuovo stato
+                name.put(STATO, ellipsis(stato, LENGTH_STATO));
+            }
+            name.put(INITIATOR, initiator);
+    
+            runtimeService.setProcessInstanceName(processInstanceId, name.toString());
+        } catch (Exception e) {
+            LOGGER.error("Errore nell'aggiornamento del titolo della processInstance {}: {}", processInstanceId, e.getMessage(), e);
         }
-        name.put(INITIATOR, initiator);
-
-        runtimeService.setProcessInstanceName(processInstanceId, name.toString());
     }
 
 

@@ -24,13 +24,14 @@ public class EventScheduler {
     @Inject
     private ExternalMessageSender externalMessageSender;
 
-    @Scheduled(fixedDelay = 600000, initialDelay = 10000) // 10m
+    @Scheduled(fixedDelay = 60000, initialDelay = 10000) // 1m
     public void scheduledSendMessages() {
 
         // Soltanto un nodo dovrebbe effettuare l'invio degli ExternalMessage
         // Verifico che il nodo corrente sia il master del cluster
         // prendendo il primo dei member e confrontando se e' il member corrente
         // https://github.com/hazelcast/hazelcast/issues/3760#issuecomment-57928166
+        log.info("Numero di nodi in questo cluster: "+ hazelcastInstance.getCluster().getMembers().size());
         Member master = hazelcastInstance.getCluster().getMembers().iterator().next();
         if (master == hazelcastInstance.getCluster().getLocalMember()) {
             log.info("Sono il master, processo le rest ExternalMessage");

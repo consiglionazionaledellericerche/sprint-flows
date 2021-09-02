@@ -102,9 +102,11 @@ public class ExternalMessageService {
         // ma lo faccio lo stesso nel caso qualcosa vada storto nell'invio
         save(msg);
 
+        // per ora disabilito questo comportamento perche' causa problemi di soncronicita'
+        // i messaggi verranno inviati in modo asincrono
         // tento un primo invio non appena il messaggio viene inserito
-        externalMessageSender.send(msg);
-        save(msg);
+//        externalMessageSender.send(msg);
+//        save(msg);
     }
 
     public List<ExternalMessage> getNewExternalMessages() {
