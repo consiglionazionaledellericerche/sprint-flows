@@ -66,11 +66,18 @@ public class FlowsLookupResource {
         return ResponseEntity.ok(new Utils.SearchResult(fullname, fullname));
     }
 
+    /**
+     * Questo metodo restituisce il firmatario attuale 
+     */
     public BossDto getResponsabileStruttura(String username) {
         int n = 0;
         while( true ) {
             try {
-                return aceBridgeService.bossFirmatarioByUsername(username);
+                return aceService.findResponsabileStruttura(
+                        username,
+                        LocalDate.now().minusMonths(n),
+                        TipoAppartenenza.SEDE,
+                        "responsabile-struttura");
             } catch (FeignException  e) {
                 if (n++ < 6 && e.getMessage() != null && e.getMessage().indexOf("PERSONA_ASSEGNATA_SEDE_ESTERNA") >= 0 ) {
                     continue;
