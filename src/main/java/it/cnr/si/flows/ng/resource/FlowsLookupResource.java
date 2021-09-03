@@ -44,129 +44,134 @@ import java.util.stream.Collectors;
 @Profile("cnr")
 public class FlowsLookupResource {
 
-	private final Logger log = LoggerFactory.getLogger(FlowsLookupResource.class);
+    private final Logger log = LoggerFactory.getLogger(FlowsLookupResource.class);
 
-	@Inject
-	private LdapTemplate ldapTemplate;
-	@Inject
-	private AceBridgeService aceBridgeService;
-	@Inject
-	private FlowsLdapAccountService flowsLdapAccountService;
-	@Inject
-	private FlowsSiperService flowsSiperService;
-	@Inject
-	private AceService aceService;
+    @Inject
+    private LdapTemplate ldapTemplate;
+    @Inject
+    private AceBridgeService aceBridgeService;
+    @Inject
+    private FlowsLdapAccountService flowsLdapAccountService;
+    @Inject
+    private FlowsSiperService flowsSiperService;
+    @Inject
+    private AceService aceService;
 
-	@RequestMapping(value = "/ace/boss", method = RequestMethod.GET)
-	@Secured(AuthoritiesConstants.USER)
-	public ResponseEntity<Utils.SearchResult> getBossForCurrentUser() {
-		String username = SecurityUtils.getCurrentUserLogin();
-		try {
-			BossDto boss = aceBridgeService.bossFirmatarioByUsername(username);
-			String fullname = boss.getUtente().getPersona().getNome() +" "+ boss.getUtente().getPersona().getCognome();
-			return ResponseEntity.ok(new Utils.SearchResult(fullname, fullname));
-		} catch (FeignException  e) {
-			if (e.getMessage() != null && e.getMessage().indexOf("PERSONA_ASSEGNATA_SEDE_ESTERNA") >= 0 ) {
-			    BossDto responsabileStruttura = aceService.findResponsabileStruttura(username, LocalDate.now().minusMonths(1), TipoAppartenenza.SEDE, "responsabile-struttura");
-				String fullname = responsabileStruttura.getUtente().getPersona().getNome() +" "+ responsabileStruttura.getUtente().getPersona().getCognome();
-				return ResponseEntity.ok(new Utils.SearchResult(fullname, fullname));
-			} else {
-				throw e;
-			}
-		}
-	}
+    @RequestMapping(value = "/ace/boss", method = RequestMethod.GET)
+    @Secured(AuthoritiesConstants.USER)
+    public ResponseEntity<Utils.SearchResult> getBossForCurrentUser() {
+        String username = SecurityUtils.getCurrentUserLogin();
+        BossDto boss = getResponsabileStruttura(username);
+        String fullname = boss.getUtente().getPersona().getNome() +" "+ boss.getUtente().getPersona().getCognome();
+        return ResponseEntity.ok(new Utils.SearchResult(fullname, fullname));
+    }
 
-	@RequestMapping(value = "/ace/user/{username:.+}", method = RequestMethod.GET)
-	@Secured(AuthoritiesConstants.ADMIN)
-	public Set<String> getAce(@PathVariable String username) {
-		return aceBridgeService.getAceRolesForUser(username);
-	}
+    public BossDto getResponsabileStruttura(String username) {
+        int n = 0;
+        while( true ) {
+            try {
+                return aceBridgeService.bossFirmatarioByUsername(username);
+            } catch (FeignException  e) {
+                if (n++ < 36 && e.getMessage() != null && e.getMessage().indexOf("PERSONA_ASSEGNATA_SEDE_ESTERNA") >= 0 ) {
+                    continue;
+                } else {
+                    throw e;
+                }
+            }
+        }
+    }
 
-	@RequestMapping(value = "/ace/usersingroup/{groupname:.+}", method = RequestMethod.GET)
-	@Secured(AuthoritiesConstants.ADMIN)
-	public Set<String> getAceGroup(@PathVariable String groupname) {
-		return aceBridgeService.getUsersInAceGroup(groupname);
-	}
+    @RequestMapping(value = "/ace/user/{username:.+}", method = RequestMethod.GET)
+    @Secured(AuthoritiesConstants.ADMIN)
+    public Set<String> getAce(@PathVariable String username) {
+        return aceBridgeService.getAceRolesForUser(username);
+    }
 
-	@RequestMapping(value = "/ace/groupdetail/{id:.+}", method = RequestMethod.GET)
-	@Secured(AuthoritiesConstants.ADMIN)
-	public String getAceGroupDetail(@PathVariable Integer id) {
-		return aceBridgeService.getNomeStruturaById(id);
-	}
+    @RequestMapping(value = "/ace/usersingroup/{groupname:.+}", method = RequestMethod.GET)
+    @Secured(AuthoritiesConstants.ADMIN)
+    public Set<String> getAceGroup(@PathVariable String groupname) {
+        return aceBridgeService.getUsersInAceGroup(groupname);
+    }
 
-	@RequestMapping(value = "/ace/uo/{id:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@Secured(AuthoritiesConstants.USER)
-	public ResponseEntity<Utils.SearchResult> getUoById(@PathVariable Integer id) {
+    @RequestMapping(value = "/ace/groupdetail/{id:.+}", method = RequestMethod.GET)
+    @Secured(AuthoritiesConstants.ADMIN)
+    public String getAceGroupDetail(@PathVariable Integer id) {
+        return aceBridgeService.getNomeStruturaById(id);
+    }
 
-		SimpleEntitaOrganizzativaWebDto s = aceBridgeService.getUoById(id);
-		Utils.SearchResult r = new Utils.SearchResult(s.getId().toString(), s.getCdsuo() +" - "+ s.getDenominazione());
+    @RequestMapping(value = "/ace/uo/{id:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
+    public ResponseEntity<Utils.SearchResult> getUoById(@PathVariable Integer id) {
 
-		return ResponseEntity.ok(r);
-	}
+        SimpleEntitaOrganizzativaWebDto s = aceBridgeService.getUoById(id);
+        Utils.SearchResult r = new Utils.SearchResult(s.getId().toString(), s.getCdsuo() +" - "+ s.getDenominazione());
 
-	@RequestMapping(value = "/ace/user/cdsuoabilitate", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@Secured(AuthoritiesConstants.USER)
-	public ResponseEntity<List<Utils.SearchResult>> getCdsUoAbilitate() {
+        return ResponseEntity.ok(r);
+    }
 
-		List<Utils.SearchResult> CDSUOs = SecurityUtils.getCurrentUserAuthorities().stream()
-				.map(Utils::removeLeadingRole)
-				.filter(role -> role.startsWith("staffAmministrativo"))
-				.map(role -> role.split("@")[1])
-				.map(idEo -> {
-					Integer id = Integer.parseInt(idEo);
-					return aceBridgeService.getStrutturaById(id);
-				})
-				.map(eo -> new Utils.SearchResult(String.valueOf(eo.getId()),
-						eo.getIdnsip() +" - "+ eo.getDenominazione() +", "+ eo.getIndirizzoPrincipale().getComune()))
-				.collect(Collectors.toList());
+    @RequestMapping(value = "/ace/user/cdsuoabilitate", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
+    public ResponseEntity<List<Utils.SearchResult>> getCdsUoAbilitate() {
 
-		return ResponseEntity.ok(CDSUOs);
-	}
+        List<Utils.SearchResult> CDSUOs = SecurityUtils.getCurrentUserAuthorities().stream()
+                .map(Utils::removeLeadingRole)
+                .filter(role -> role.startsWith("staffAmministrativo"))
+                .map(role -> role.split("@")[1])
+                .map(idEo -> {
+                    Integer id = Integer.parseInt(idEo);
+                    return aceBridgeService.getStrutturaById(id);
+                })
+                .map(eo -> new Utils.SearchResult(String.valueOf(eo.getId()),
+                        eo.getIdnsip() +" - "+ eo.getDenominazione() +", "+ eo.getIndirizzoPrincipale().getComune()))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(CDSUOs);
+    }
 
 
-	@RequestMapping(value = "/ace/user/sedirichiedentefirma", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@Secured(AuthoritiesConstants.USER)
-	public ResponseEntity<List<Utils.SearchResult>> getSediUtenteFirma() {
+    @RequestMapping(value = "/ace/user/sedirichiedentefirma", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
+    public ResponseEntity<List<Utils.SearchResult>> getSediUtenteFirma() {
 
-		List<Utils.SearchResult> CDSUOs = SecurityUtils.getCurrentUserAuthorities().stream()
-				.map(Utils::removeLeadingRole)
-				.filter(role -> role.startsWith("staffFirmaDocumenti"))
-				.map(role -> role.split("@")[1])
-				.map(idEo -> {
-					Integer id = Integer.parseInt(idEo);
-					return aceBridgeService.getStrutturaById(id);
-				})
-				.map(eo -> new Utils.SearchResult(String.valueOf(eo.getId()),
-						eo.getIdnsip() +" - "+ eo.getDenominazione() +", "+ eo.getIndirizzoPrincipale().getComune()))
-				.collect(Collectors.toList());
+        List<Utils.SearchResult> CDSUOs = SecurityUtils.getCurrentUserAuthorities().stream()
+                .map(Utils::removeLeadingRole)
+                .filter(role -> role.startsWith("staffFirmaDocumenti"))
+                .map(role -> role.split("@")[1])
+                .map(idEo -> {
+                    Integer id = Integer.parseInt(idEo);
+                    return aceBridgeService.getStrutturaById(id);
+                })
+                .map(eo -> new Utils.SearchResult(String.valueOf(eo.getId()),
+                        eo.getIdnsip() +" - "+ eo.getDenominazione() +", "+ eo.getIndirizzoPrincipale().getComune()))
+                .collect(Collectors.toList());
 
-		return ResponseEntity.ok(CDSUOs);
-	}
+        return ResponseEntity.ok(CDSUOs);
+    }
 
-	@RequestMapping(value = "/ldap/user/{username:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@Secured(AuthoritiesConstants.USER)
-	public ResponseEntity<Utils.SearchResult> getUserByUsername(@PathVariable String username) {
+    @RequestMapping(value = "/ldap/user/{username:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
+    public ResponseEntity<Utils.SearchResult> getUserByUsername(@PathVariable String username) {
 
-		ContainerCriteria criteria = LdapQueryBuilder.query().where("uid").is(username);
-		List<Utils.SearchResult> result = ldapTemplate.search( criteria, new LdapPersonToSearchResultMapper());
+        ContainerCriteria criteria = LdapQueryBuilder.query().where("uid").is(username);
+        List<Utils.SearchResult> result = ldapTemplate.search( criteria, new LdapPersonToSearchResultMapper());
 
-		return ResponseEntity.ok(result.get(0));
-	}
+        return ResponseEntity.ok(result.get(0));
+    }
 
-	@RequestMapping(value = "/ldap/userfull/{username:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@Secured(AuthoritiesConstants.ADMIN)
-	public ResponseEntity<Map<String, String>> getFullUserByUsername(@PathVariable String username) {
+    @RequestMapping(value = "/ldap/userfull/{username:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.ADMIN)
+    public ResponseEntity<Map<String, String>> getFullUserByUsername(@PathVariable String username) {
 
-		List<Map<String, String>> result = flowsLdapAccountService.getFulluser(username);
+        List<Map<String, String>> result = flowsLdapAccountService.getFulluser(username);
 
-		return ResponseEntity.ok(result.get(0));
-	}
+        return ResponseEntity.ok(result.get(0));
+    }
 
-	@RequestMapping(value = "/siper/responsabilesede/{cdsuo:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	@Secured(AuthoritiesConstants.ADMIN)
-	public ResponseEntity<List<Map<String, Object>>> getResponsabileSede(@PathVariable String cdsuo) {
+    @RequestMapping(value = "/siper/responsabilesede/{cdsuo:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.ADMIN)
+    public ResponseEntity<List<Map<String, Object>>> getResponsabileSede(@PathVariable String cdsuo) {
 
-		return ResponseEntity.ok(flowsSiperService.getResponsabileCDSUO(cdsuo));
-	}
+        return ResponseEntity.ok(flowsSiperService.getResponsabileCDSUO(cdsuo));
+    }
 
 }
