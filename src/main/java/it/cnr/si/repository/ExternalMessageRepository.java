@@ -28,10 +28,10 @@ public interface ExternalMessageRepository extends JpaRepository<ExternalMessage
 
 
     @Query("SELECT em FROM ExternalMessage em " +
-            "WHERE ((:application IS '' OR em.application LIKE CONCAT('%',:application,'%'))  " +
+            "WHERE (:payload IS '' OR em.payload LIKE CONCAT('%',:payload,'%')) " +
             "AND (:status IS '' OR em.status LIKE CONCAT('%',:status,'%')) " +
-            "AND ((:payload IS '' OR em.payload LIKE CONCAT('%',:payload,'%'))" +
-            "OR (:lastErrorMessage IS '' OR em.lastErrorMessage LIKE CONCAT('%',:lastErrorMessage,'%')))) ")
+            "AND (:application IS '' OR em.application LIKE CONCAT('%',:application,'%')) " +
+            "AND (:lastErrorMessage IS '' OR em.lastErrorMessage LIKE CONCAT('%',:lastErrorMessage,'%')) ")
     Page<ExternalMessage> findAllBySearchTerms(@Param("status") String status,
                                                @Param("application") String application,
                                                @Param("payload") String payload,
