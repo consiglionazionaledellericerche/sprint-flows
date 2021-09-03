@@ -12,6 +12,7 @@ import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -52,7 +53,7 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 		LocalDate dataUltimoGiornoServizio = LocalDate.now();
 		BossDto responsabileStruttura = null;
 		String idSedeUtenteRichiedente = null;
-				
+
 		// VERIFICA DIRETTORE
 		//VERIFICA DIPENDENTI CESSATI
 		if (aceService.getPersonaByUsername(initiator.toString()).getDataCessazione() != null) {			
@@ -67,22 +68,28 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 			//direttoreAce = aceService.bossFirmatarioByUsername(initiator, dateRif);
 			responsabileStruttura = aceService.findResponsabileStruttura(initiator, dateRif, TipoAppartenenza.SEDE, "responsabile-struttura");
 
-			if (responsabileStruttura.getUtente()== null) {
-				throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + initiator + " <br>Si prega di contattare l'help desk in merito<br>");
-			} else {
-				direttoreAce = responsabileStruttura.getUtente();
-			}
-			if (responsabileStruttura.getEntitaOrganizzativa().getId()== null) {
-				throw new BpmnError("412", "l'utenza: " + initiator + " non risulta associata ad alcuna struttura<br>");
-			} else {
-				IdEntitaOrganizzativaDirettore = responsabileStruttura.getEntitaOrganizzativa().getId();
-				entitaOrganizzativaDirettore = aceService.entitaOrganizzativaById(IdEntitaOrganizzativaDirettore);
-				cdsuoAppartenenzaResponsabile = entitaOrganizzativaDirettore.getCdsuo();
-				idnsipAppartenenzaResponsabile = entitaOrganizzativaDirettore.getIdnsip();					}
-		} catch ( FeignException  e) {
-			throw new BpmnError("412", "Errore nell'avvio del flusso " + e.getMessage().toString());
-		}
 
+		} catch ( FeignException  e) {
+			if ((e.getMessage().indexOf("PERSONA_ASSEGNATA_SEDE_ESTERNA") >= 0)  && execution.getVariable("tipoAttivita").toString().equals("rendicontazione") ) {
+				dateRif = LocalDate.of(Integer.parseInt(execution.getVariable("anno").toString()), Integer.parseInt(execution.getVariable("meseNumerico").toString()), 1);
+				responsabileStruttura = aceService.findResponsabileStruttura(initiator, dateRif, TipoAppartenenza.SEDE, "responsabile-struttura");
+			} else {
+				throw new BpmnError("412", "Errore nell'avvio del flusso " + " <br>Si prega di contattare l'help desk in merito<br>");
+			}
+		}
+		if (responsabileStruttura.getUtente()== null) {
+			throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + initiator + " <br>Si prega di contattare l'help desk in merito<br>");
+		} else {
+			direttoreAce = responsabileStruttura.getUtente();
+		}
+		if (responsabileStruttura.getEntitaOrganizzativa().getId()== null) {
+			throw new BpmnError("412", "l'utenza: " + initiator + " non risulta associata ad alcuna struttura<br>");
+		} else {
+			IdEntitaOrganizzativaDirettore = responsabileStruttura.getEntitaOrganizzativa().getId();
+			entitaOrganizzativaDirettore = aceService.entitaOrganizzativaById(IdEntitaOrganizzativaDirettore);
+			cdsuoAppartenenzaResponsabile = entitaOrganizzativaDirettore.getCdsuo();
+			idnsipAppartenenzaResponsabile = entitaOrganizzativaDirettore.getIdnsip();	
+		}
 		LOGGER.info("L'utente {} ha  {} come responsabile-struttura [{}] per la struttura {} ({}} - id:{}", initiator.toString(), direttoreAce.getUsername(), responsabileStruttura.getRuolo().getDescr(), entitaOrganizzativaDirettore.getDenominazione(), entitaOrganizzativaDirettore.getSigla(), IdEntitaOrganizzativaDirettore);
 
 		String gruppoResponsabileProponente = "responsabile-struttura@" + IdEntitaOrganizzativaDirettore;
@@ -102,7 +109,7 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 		execution.setVariable("direttore", direttoreAce.getPersona().getNome() + " " +  direttoreAce.getPersona().getCognome());
 		execution.setVariable("denominazioneEO", denominazioneEO);
 		execution.setVariable("idSedeUtenteRichiedente", idSedeUtenteRichiedente);
-		
+
 
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileProponente, PROCESS_VISUALIZER);
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneScrivaniaDigitale, PROCESS_VISUALIZER);
