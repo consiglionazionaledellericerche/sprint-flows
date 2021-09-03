@@ -72,7 +72,7 @@ public class FlowsLookupResource {
             try {
                 return aceBridgeService.bossFirmatarioByUsername(username);
             } catch (FeignException  e) {
-                if (n++ < 36 && e.getMessage() != null && e.getMessage().indexOf("PERSONA_ASSEGNATA_SEDE_ESTERNA") >= 0 ) {
+                if (n++ < 6 && e.getMessage() != null && e.getMessage().indexOf("PERSONA_ASSEGNATA_SEDE_ESTERNA") >= 0 ) {
                     continue;
                 } else {
                     throw e;
