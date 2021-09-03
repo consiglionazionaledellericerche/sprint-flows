@@ -71,10 +71,9 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 
 		} catch ( FeignException  e) {
 			if ((e.getMessage().indexOf("PERSONA_ASSEGNATA_SEDE_ESTERNA") >= 0)  && execution.getVariable("tipoAttivita").toString().equals("rendicontazione") ) {
-				dateRif = LocalDate.of(Integer.parseInt(execution.getVariable("anno").toString()), Integer.parseInt(execution.getVariable("meseNumerico").toString()), 1);
-				responsabileStruttura = aceService.findResponsabileStruttura(initiator, dateRif, TipoAppartenenza.SEDE, "responsabile-struttura");
+				responsabileStruttura = aceService.findResponsabileStruttura(initiator, LocalDate.now().minusMonths(1), TipoAppartenenza.SEDE, "responsabile-struttura");
 			} else {
-				throw new BpmnError("412", "Errore nell'avvio del flusso " + " <br>Si prega di contattare l'help desk in merito<br>");
+				throw e;
 			}
 		}
 		if (responsabileStruttura.getUtente()== null) {
