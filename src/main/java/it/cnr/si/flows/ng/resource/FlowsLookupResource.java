@@ -62,19 +62,16 @@ public class FlowsLookupResource {
 	public ResponseEntity<Utils.SearchResult> getBossForCurrentUser() {
 		String username = SecurityUtils.getCurrentUserLogin();
 		try {
-
 			BossDto boss = aceBridgeService.bossFirmatarioByUsername(username);
 			String fullname = boss.getUtente().getPersona().getNome() +" "+ boss.getUtente().getPersona().getCognome();
 			return ResponseEntity.ok(new Utils.SearchResult(fullname, fullname));
-		} catch ( FeignException  e) {
-			e.getMessage();
-			BossDto responsabileStruttura;
-			if (e.getMessage().indexOf("PERSONA_ASSEGNATA_SEDE_ESTERNA") >= 0 ) {
-				responsabileStruttura = aceService.findResponsabileStruttura(username, LocalDate.now().minusMonths(1), TipoAppartenenza.SEDE, "responsabile-struttura");
+		} catch (FeignException  e) {
+			if (e.getMessage() != null && e.getMessage().indexOf("PERSONA_ASSEGNATA_SEDE_ESTERNA") >= 0 ) {
+			    BossDto responsabileStruttura = aceService.findResponsabileStruttura(username, LocalDate.now().minusMonths(1), TipoAppartenenza.SEDE, "responsabile-struttura");
 				String fullname = responsabileStruttura.getUtente().getPersona().getNome() +" "+ responsabileStruttura.getUtente().getPersona().getCognome();
 				return ResponseEntity.ok(new Utils.SearchResult(fullname, fullname));
 			} else {
-				throw new BpmnError("412", "Errore nell'avvio del flusso " + e.getMessage().toString());
+				throw e;
 			}
 		}
 	}
