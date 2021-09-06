@@ -6,9 +6,14 @@ import it.cnr.si.flows.ng.service.FlowsSiperService;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.service.AceService;
 import it.cnr.si.service.FlowsLdapAccountService;
+import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
+
+import org.activiti.engine.delegate.BpmnError;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -23,7 +28,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import feign.FeignException;
+
 import javax.inject.Inject;
+
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,15 +54,38 @@ public class FlowsLookupResource {
     private FlowsLdapAccountService flowsLdapAccountService;
     @Inject
     private FlowsSiperService flowsSiperService;
+    @Inject
+    private AceService aceService;
 
-    
     @RequestMapping(value = "/ace/boss", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Utils.SearchResult> getBossForCurrentUser() {
-    	String username = SecurityUtils.getCurrentUserLogin();
-    	BossDto boss = aceBridgeService.bossFirmatarioByUsername(username);
-    	String fullname = boss.getUtente().getPersona().getNome() +" "+ boss.getUtente().getPersona().getCognome();
+        String username = SecurityUtils.getCurrentUserLogin();
+        BossDto boss = getResponsabileStruttura(username);
+        String fullname = boss.getUtente().getPersona().getNome() +" "+ boss.getUtente().getPersona().getCognome();
         return ResponseEntity.ok(new Utils.SearchResult(fullname, fullname));
+    }
+
+    /**
+     * Questo metodo restituisce il firmatario attuale 
+     */
+    public BossDto getResponsabileStruttura(String username) {
+        int n = 0;
+        while( true ) {
+            try {
+                return aceService.findResponsabileStruttura(
+                        username,
+                        LocalDate.now().minusMonths(n),
+                        TipoAppartenenza.SEDE,
+                        "responsabile-struttura");
+            } catch (FeignException  e) {
+                if (n++ < 6 && e.getMessage() != null && e.getMessage().indexOf("PERSONA_ASSEGNATA_SEDE_ESTERNA") >= 0 ) {
+                    continue;
+                } else {
+                    throw e;
+                }
+            }
+        }
     }
 
     @RequestMapping(value = "/ace/user/{username:.+}", method = RequestMethod.GET)
@@ -97,12 +129,12 @@ public class FlowsLookupResource {
                     return aceBridgeService.getStrutturaById(id);
                 })
                 .map(eo -> new Utils.SearchResult(String.valueOf(eo.getId()),
-                                              eo.getIdnsip() +" - "+ eo.getDenominazione() +", "+ eo.getIndirizzoPrincipale().getComune()))
+                        eo.getIdnsip() +" - "+ eo.getDenominazione() +", "+ eo.getIndirizzoPrincipale().getComune()))
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(CDSUOs);
     }
-    
+
 
     @RequestMapping(value = "/ace/user/sedirichiedentefirma", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
@@ -117,7 +149,7 @@ public class FlowsLookupResource {
                     return aceBridgeService.getStrutturaById(id);
                 })
                 .map(eo -> new Utils.SearchResult(String.valueOf(eo.getId()),
-                                              eo.getIdnsip() +" - "+ eo.getDenominazione() +", "+ eo.getIndirizzoPrincipale().getComune()))
+                        eo.getIdnsip() +" - "+ eo.getDenominazione() +", "+ eo.getIndirizzoPrincipale().getComune()))
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(CDSUOs);
