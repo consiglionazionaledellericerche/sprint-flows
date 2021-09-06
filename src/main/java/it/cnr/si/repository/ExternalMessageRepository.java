@@ -26,6 +26,7 @@ public interface ExternalMessageRepository extends JpaRepository<ExternalMessage
             " and externalmessage.retries >= 6 and externalmessage.retries < 15")
     List<ExternalMessage> getFailedExternalMessages();
 
+
     @Query("SELECT em FROM ExternalMessage em " +
             "WHERE (:payload IS '' OR em.payload LIKE CONCAT('%',:payload,'%')) " +
             "AND (:status IS '' OR em.status LIKE CONCAT('%',:status,'%')) " +
