@@ -106,7 +106,8 @@ public class MembershipService {
 	                .orElse(Stream.empty())
 	                .collect(Collectors.toSet());
     	} catch (Exception e) {
-    		log.debug(e.getMessage(), e); // Succede se admin chiede i gruppi da ace
+    		if (!username.contentEquals("admin"))
+    				log.debug(e.getMessage(), e); // Succede se admin chiede i gruppi da ace
     		return new HashSet<String>();
     	}
     }
