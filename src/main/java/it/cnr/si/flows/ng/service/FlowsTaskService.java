@@ -247,7 +247,7 @@ public class FlowsTaskService {
 				Task task = i.next();
 				if (taskService.getIdentityLinksForTask(task.getId())
 						.stream()
-						.anyMatch(il -> authoritySenzaImporto.equals(il))) {
+						.anyMatch(il -> authoritySenzaImporto.equals(il.getGroupId()))) {
 					
 					double importo = taskService.getVariable(task.getId(), "importoTotaleLordo", Double.class);
 					if (importoLimite < importo) {
