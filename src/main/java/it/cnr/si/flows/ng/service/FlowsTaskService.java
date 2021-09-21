@@ -201,6 +201,7 @@ public class FlowsTaskService {
 		List<String> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
 				.map(GrantedAuthority::getAuthority)
 				.map(Utils::removeLeadingRole)
+				.map(Utils::removeImportoSpesa)
 				.collect(Collectors.toList());
 
 		TaskQuery taskQuery = taskService.createTaskQuery()
@@ -215,14 +216,49 @@ public class FlowsTaskService {
 
 		utils.orderTasks(order, taskQuery);
 
-		List<TaskResponse> list = restResponseFactory.createTaskResponseList(taskQuery.listPage(firstResult, maxResults));
-
+		List<Task> tasks = taskQuery.listPage(firstResult, maxResults);
+		int rimossi = rimuoviTaskImportoSpesa(tasks);
+		
+		List<TaskResponse> list = restResponseFactory.createTaskResponseList(tasks);
+		
 		DataResponse response = new DataResponse();
 		response.setStart(firstResult);
-		response.setSize(list.size());
-		response.setTotal(taskQuery.count());
+		response.setSize(list.size() - rimossi);
+		response.setTotal(taskQuery.count() - rimossi);
 		response.setData(list);
 		return response;
+	}
+
+	private int rimuoviTaskImportoSpesa(List<Task> list) {
+		
+		int removed = 0;
+		List<String> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+				.map(GrantedAuthority::getAuthority)
+				.map(Utils::removeLeadingRole)
+				.filter(role -> role.contains("$"))
+				.collect(Collectors.toList());
+		
+		for (String authority : authorities) {
+			String authoritySenzaImporto = Utils.removeImportoSpesa(authority);
+			double importoLimite = Utils.getImportoSpesa(authority);
+			
+			Iterator<Task> i = list.iterator();
+			while (i.hasNext()) {
+				Task task = i.next();
+				if (taskService.getIdentityLinksForTask(task.getId())
+						.stream()
+						.anyMatch(il -> authoritySenzaImporto.equals(il))) {
+					
+					double importo = taskService.getVariable(task.getId(), "importoTotaleLordo", Double.class);
+					if (importoLimite < importo) {
+						i.remove();
+						removed++;
+					}
+				}
+			}
+		}
+		
+		return removed;
 	}
 
 	public DataResponse taskAssignedInMyGroups(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
