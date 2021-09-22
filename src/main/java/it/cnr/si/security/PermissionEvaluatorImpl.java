@@ -270,7 +270,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
                 List<String> authorities = getAuthorities(username, flowsUserDetailsService);
 
-                isInCandidates = isCandidatoDiretto(taskId, authorities);
+                isInCandidates = isCandidatoDiretto(taskId, authorities) || canCompleteImportoSpesa(taskId, authorities);
 
             } catch (Exception e){
                 log.error("Errore nel recupero degli identity links della Task Id {} ", taskId);
