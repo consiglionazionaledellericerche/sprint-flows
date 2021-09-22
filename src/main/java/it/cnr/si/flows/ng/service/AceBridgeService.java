@@ -34,6 +34,7 @@ public class AceBridgeService {
 	@Inject
 	private AceService aceService;
 
+	@Cacheable("aceRolesForUser")
 	public Set<String> getAceRolesForUser(String username) {
 
 		Set<String> ruoli = new HashSet<>();
