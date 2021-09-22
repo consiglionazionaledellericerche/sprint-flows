@@ -232,34 +232,27 @@ public class FlowsTaskService {
 	private int rimuoviTaskImportoSpesa(List<Task> list) {
 		
 		int removed = 0;
-		List<String> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-				.map(GrantedAuthority::getAuthority)
-				.map(Utils::removeLeadingRole)
-				.filter(role -> role.contains("$"))
-				.collect(Collectors.toList());
-		
-		for (String authority : authorities) {
-			String authoritySenzaImporto = Utils.removeImportoSpesa(authority);
-			double importoLimite = Utils.getImportoSpesa(authority);
-			
-			Iterator<Task> i = list.iterator();
-			while (i.hasNext()) {
-				Task task = i.next();
-				if (taskService.getIdentityLinksForTask(task.getId())
-						.stream()
-						.anyMatch(il -> authoritySenzaImporto.equals(il.getGroupId()))) {
-					
-					double importo = taskService.getVariable(task.getId(), "importoTotaleLordo", Double.class);
-					if (importoLimite < importo) {
-						i.remove();
-						removed++;
-					}
-				}
+
+        List<String> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .map(Utils::removeLeadingRole)
+                .collect(Collectors.toList());
+        
+		Iterator<Task> i = list.iterator();
+		while (i.hasNext()) {
+			Task task = i.next();
+			if (!permissionEvaluator.isCandidatoDiretto(task.getId(), authorities) &&
+			        !permissionEvaluator.canCompleteImportoSpesa(task.getId(), authorities)) {
+				i.remove();
+				removed++;
 			}
 		}
 		
+		
 		return removed;
 	}
+
+
 
 	public DataResponse taskAssignedInMyGroups(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
 		String username = SecurityUtils.getCurrentUserLogin();
