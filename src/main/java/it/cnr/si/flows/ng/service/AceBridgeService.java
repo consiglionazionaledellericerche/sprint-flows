@@ -64,6 +64,7 @@ public class AceBridgeService {
 
 		String[] split = groupName.split("@");
 		String sigla = split[0];
+		sigla = sigla.split("\\$")[0];
 		if ("STRUTTURA".equals(split[1]))
 			return Collections.emptySet();
 		
