@@ -104,7 +104,7 @@
         $scope.loadAvailableTasks = function () {
             // variabili usate nella paginazione
             var firstResultAvailable, maxResultsAvailable;
-            vm.itemsPerPage = paginationConstants.itemsPerPage;
+            vm.itemsPerPage = 50;
             vm.availableTotalItems = vm.itemsPerPage * vm.availablePage;
             firstResultAvailable = vm.itemsPerPage * (vm.availablePage - 1);
             maxResultsAvailable = vm.itemsPerPage;
