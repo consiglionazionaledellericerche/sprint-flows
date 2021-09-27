@@ -64,11 +64,8 @@ public class AceBridgeService {
 
 		String[] split = groupName.split("@");
 		String sigla = split[0];
-<<<<<<< HEAD
 		sigla = sigla.split("\\$")[0]; // rimuovo l'importo se c'e'
-=======
-		sigla = sigla.split("\\$")[0];
->>>>>>> branch 'importo-spesa' of git@git.si.cnr.it:documentale/sprint-flows.git
+		
 		if ("STRUTTURA".equals(split[1]))
 			return Collections.emptySet();
 		
