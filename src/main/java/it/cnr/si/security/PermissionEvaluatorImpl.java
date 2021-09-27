@@ -75,7 +75,9 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
      */
     public boolean canVisualizeTask(String taskId, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
         Optional<String> username = Optional.of(SecurityUtils.getCurrentUserLogin());
-        List<String> authorities = getAuthorities(username.orElse(""), flowsUserDetailsService);
+        List<String> authorities = getAuthorities(username.orElse(""), flowsUserDetailsService).stream()
+                .map(Utils::removeImportoSpesa) // Non mi interessa filtrare per importo spesa
+                .collect(Collectors.toList());
 
         return taskService.getIdentityLinksForTask(taskId).stream()
                 .filter(link -> link.getType().equals(IdentityLinkType.CANDIDATE) || link.getType().equals("assignee"))
@@ -109,22 +111,46 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
         String assignee = taskService.createTaskQuery()
                 .taskId(taskId)
                 .singleResult().getAssignee();
-
-        // l'utente puo' completare il task se e' lui l'assegnatario
+        List<String> authorities =
+                getAuthorities(username, flowsUserDetailsService);
+        
+        // l'utente puo' completare il task se e' lui l'assegnatario 
+        // oppure se l'importo spesa della sua delega è superiore all'importo del flusso acquisti
         if (assignee != null) {
             return assignee.equals(username);
         } else {
-            // Se l'assegnatario non c'e', L'utente deve essere nei gruppi candidati
-            List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
-            List<String> authorities =
-                    getAuthorities(username, flowsUserDetailsService);
-
-            return identityLinks.stream()
-                    .filter(l -> l.getType().equals(IdentityLinkType.CANDIDATE))
-                    .anyMatch(l -> authorities.contains(l.getGroupId()));
+            return isCandidatoDiretto(taskId, authorities) || canCompleteImportoSpesa(taskId, authorities);
         }
     }
 
+    public boolean isCandidatoDiretto(String taskId, List<String> authorities) {
+        List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
+        return identityLinks.stream()
+                .filter(l -> l.getType().equals(IdentityLinkType.CANDIDATE))
+                .anyMatch(l -> authorities.contains(l.getGroupId()));
+    }
+
+    public boolean canCompleteImportoSpesa(String taskId, List<String> authorities) {
+
+        authorities = authorities.stream()
+                .filter(role -> role.contains("$"))
+                .collect(Collectors.toList());
+
+        for (String authority : authorities) {
+            String authoritySenzaImporto = Utils.removeImportoSpesa(authority);
+            double importoLimite = Utils.getImportoSpesa(authority);
+        
+            double importo = taskService.getVariable(taskId, "importoTotaleLordo", Double.class);
+            boolean isCandidateFirma = taskService.getIdentityLinksForTask(taskId)
+                    .stream()
+                    .anyMatch(il -> authoritySenzaImporto.equals(il.getGroupId()) && il.getType().equals(IdentityLinkType.CANDIDATE));
+            boolean importoSuperiore = importoLimite >= importo;
+            
+            if (isCandidateFirma && importoSuperiore)
+                return true; 
+        }
+        return false;
+    }
 
     /**
      * Verifica che l'utente abbia la visibilità sulla Process Instance.
@@ -244,9 +270,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
                 List<String> authorities = getAuthorities(username, flowsUserDetailsService);
 
-                isInCandidates = identityLinks.stream()
-                        .filter(l -> l.getType().equals(IdentityLinkType.CANDIDATE))
-                        .anyMatch(l -> authorities.contains(l.getGroupId()));
+                isInCandidates = isCandidatoDiretto(taskId, authorities) || canCompleteImportoSpesa(taskId, authorities);
 
             } catch (Exception e){
                 log.error("Errore nel recupero degli identity links della Task Id {} ", taskId);
