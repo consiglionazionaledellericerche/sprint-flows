@@ -34,6 +34,7 @@ public class AceBridgeService {
 	@Inject
 	private AceService aceService;
 
+	@Cacheable("aceRolesForUser")
 	public Set<String> getAceRolesForUser(String username) {
 
 		Set<String> ruoli = new HashSet<>();
@@ -63,6 +64,8 @@ public class AceBridgeService {
 
 		String[] split = groupName.split("@");
 		String sigla = split[0];
+		sigla = sigla.split("\\$")[0]; // rimuovo l'importo se c'e'
+		
 		if ("STRUTTURA".equals(split[1]))
 			return Collections.emptySet();
 		

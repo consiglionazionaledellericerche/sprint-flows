@@ -58,7 +58,18 @@ public class StartFirmaDocumentiSetGroupsAndVisibility {
 			String gruppoFirmatari = "firmatarioFirmaDocumenti@"+ struttura;
 			String gruppoRichiedente = "staffFirmaDocumenti@"+ struttura;
 			String gruppoProtocollo = "protocolloFirmaDocumenti@"+ struttura;
-
+			if (execution.getVariable("tipologiaDocumento").toString().equals("Privato")){
+				groups = membershipService.getAllRolesForUser(initiator).stream()
+						.filter(g -> g.startsWith("staffFirmaDocumentiPrivati@"))
+						.collect(Collectors.toList());
+				if (groups.isEmpty()) {
+					throw new BpmnError("403", "L'utente non e' abilitato ad avviare questo flusso");				
+				} 
+				else {
+					gruppoRichiedente = "staffFirmaDocumentiPrivati@"+ struttura;
+					gruppoProtocollo = "protocolloFirmaDocumentiPrivati@"+ struttura;
+				}
+			} 
 
 			LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoValidatori, gruppoFirmatari, gruppoRichiedente, gruppoProtocollo);
 
