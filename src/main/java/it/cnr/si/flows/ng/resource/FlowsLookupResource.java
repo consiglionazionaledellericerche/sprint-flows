@@ -150,6 +150,7 @@ public class FlowsLookupResource {
                 })
                 .map(eo -> new Utils.SearchResult(String.valueOf(eo.getId()),
                         eo.getIdnsip() +" - "+ eo.getDenominazione() +", "+ eo.getIndirizzoPrincipale().getComune()))
+                .distinct()
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(CDSUOs);
