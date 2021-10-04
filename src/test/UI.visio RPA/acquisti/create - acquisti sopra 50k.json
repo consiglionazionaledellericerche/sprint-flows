@@ -1,0 +1,630 @@
+{
+  "Name": "create - acquisti sopra 50k",
+  "CreationDate": "2021-9-30",
+  "Commands": [
+    {
+      "Command": "open",
+      "Target": "https://demoscrivaniadigitale-cnr.si.cnr.it/#/",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "id=username",
+      "Value": "admin",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "id=password",
+      "Value": "Sp@si@n0!",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "id=username",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "id=username",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "id=username",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "id=password",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "id=password",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "id=password",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "id=password",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div/div/div[3]/div/form/button",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"admin-menu\"]/span/span[2]",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"switchuser\"]/span[2]",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "id=username",
+      "Value": "anna.penna",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div/div/div/div[2]/div/div[3]/form/button",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"definitions-menu\"]/span/span[2]",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "linkText=Acquisti",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "select",
+      "Target": "id=sceltaUtente",
+      "Value": "label=Predisponi la Determina",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "id=sceltaUtente",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "id=titolo",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "id=titolo",
+      "Value": "acquisto sopra 50k",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "id=descrizione",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "id=descrizione",
+      "Value": "descrizione",
+      "Description": ""
+    },
+    {
+      "Command": "select",
+      "Target": "id=cdsuo",
+      "Value": "label=603240 - DG SPR RETI E SISTEMI INFORMATIVI, Roma",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "id=cdsuo",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/fileinput/div/fieldset/div/div/div[4]/div/button/span[3]",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/label/input",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "xpath=/html/body/label/input",
+      "Value": "/home/paolo/Scaricati/Abilitazione Rabito supervisore Flusso Monitoraggio COVID19 Scrivania Digitale (1).pdf",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/fileinput[2]/div/fieldset/div/div/div[5]/div/button",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/label[2]/input",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "xpath=/html/body/label[2]/input",
+      "Value": "/home/paolo/Scaricati/Abilitazione Rabito supervisore Flusso Monitoraggio COVID19 Scrivania Digitale (1).pdf",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"1\"]/i",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"11_anchor\"]/i",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//div[2]/cnr-tree/div/div/div[2]/ul/li/i",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"21_anchor\"]/i",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "linkText=Procedura ristretta",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "linkText=Procedura aperta",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "select",
+      "Target": "id=tipologiaProceduraSelettiva",
+      "Value": "label=Prezzo Piu Basso",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "id=tipologiaProceduraSelettiva",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "id=dataInizioPresentazioneDomande",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "id=dataInizioPresentazioneDomande",
+      "Value": "2021-09-28T12:18",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "id=dataScadenzaPresentazioneDomande",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "id=dataScadenzaPresentazioneDomande",
+      "Value": "2024-10-29T12:18",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div/ng-include/div/input",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div/ng-include/div/input",
+      "Value": "1",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "name=quantity",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "name=quantity",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "name=quantity",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "name=quantity",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "name=quantity",
+      "Value": "1",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div/ng-include/div[3]/input",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div/ng-include/div[3]/input",
+      "Value": "10000",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div/ng-include/div[4]/cnr-tree/div/div/div/input",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div/ng-include/div[4]/cnr-tree/div/div/div/input",
+      "Value": "111",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "linkText=13111 - Spese per funzionamento delle commissioni di gara",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "linkText=13111 - Spese per funzionamento delle commissioni di gara",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"uo\"]/input",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "xpath=//*[@id=\"uo\"]/input",
+      "Value": "iasi",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"uo\"]/input",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"uo\"]/input",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "xpath=//*[@id=\"uo\"]/input",
+      "Value": "iasi",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "linkText=003000 - ISTITUTO DI ANALISI DEI SISTEMI ED INFORMATICA \"ANTONIO RUBERTI\"",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div/ng-include/div[6]/input",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div/ng-include/div[6]/input",
+      "Value": "aaa",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div/ng-include/div[7]/input",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div/ng-include/div[6]/input",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div/ng-include/div[6]/input",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div/ng-include/div[6]/input",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div/ng-include/div[6]/input",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div/ng-include/div[6]/input",
+      "Value": "gae",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div/ng-include/div[7]/input",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div/ng-include/div[7]/input",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div/ng-include/div[7]/input",
+      "Value": "progetto 1",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div/ng-include/div[6]/input",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div/ng-include/div[6]/input",
+      "Value": "gae 1",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/legend/span[2]/button/span",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div[2]/ng-include/div/input",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div[2]/ng-include/div/input",
+      "Value": "2",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div[2]/ng-include/div[2]/input",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div[2]/ng-include/div[2]/input",
+      "Value": "2",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div[2]/ng-include/div[3]/input",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div[2]/ng-include/div[3]/input",
+      "Value": "40100",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div[2]/ng-include/div[4]/cnr-tree/div/div/div/input",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div[2]/ng-include/div[4]/cnr-tree/div/div/div/input",
+      "Value": "112",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "linkText=14002 - Trasferimenti correnti al Ministero dell'economia in attuazione di norme in materia di contenimento di spesa (DL 112/2008 e DL 78/2010)",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "linkText=14002 - Trasferimenti correnti al Ministero dell'economia in attuazione di norme in materia di contenimento di spesa (DL 112/2008 e DL 78/2010)",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "linkText=14002 - Trasferimenti correnti al Ministero dell'economia in attuazione di norme in materia di contenimento di spesa (DL 112/2008 e DL 78/2010)",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "linkText=14002 - Trasferimenti correnti al Ministero dell'economia in attuazione di norme in materia di contenimento di spesa (DL 112/2008 e DL 78/2010)",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//div[2]/ng-include/div[5]/typeaheadinput/input",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "xpath=//div[2]/ng-include/div[5]/typeaheadinput/input",
+      "Value": "iasi",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "linkText=003000 - ISTITUTO DI ANALISI DEI SISTEMI ED INFORMATICA \"ANTONIO RUBERTI\"",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div[2]/ng-include/div[6]/input",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div[2]/ng-include/div[6]/input",
+      "Value": "gae 2",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div[2]/ng-include/div[7]/input",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/ng-include/div[6]/subform/fieldset/div[2]/ng-include/div[7]/input",
+      "Value": "progetto 2",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"rup\"]/input",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "xpath=//*[@id=\"rup\"]/input",
+      "Value": "fraticelli",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "linkText=MASSIMO FRATICELLI",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "id=commento",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/form/div/div/div/div[2]/button",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/jhi-alert/div/div/div/button/span",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div[2]/nav/div[2]/ul/li[11]/a/span",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "comment",
+      "Target": "click // xpath=//*[@id=\"account-menu\"]/span/span[2]",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "comment",
+      "Target": "click // linkText=Esci",
+      "Value": "",
+      "Description": ""
+    }
+  ]
+}
