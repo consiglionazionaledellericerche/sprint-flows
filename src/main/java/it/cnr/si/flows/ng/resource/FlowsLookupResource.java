@@ -148,8 +148,16 @@ public class FlowsLookupResource {
                     Integer id = Integer.parseInt(idEo);
                     return aceBridgeService.getStrutturaById(id);
                 })
-                .map(eo -> new Utils.SearchResult(String.valueOf(eo.getId()),
-                        eo.getIdnsip() +" - "+ eo.getDenominazione() +", "+ eo.getIndirizzoPrincipale().getComune()))
+                .map(eo -> {
+                	if (eo.getIdnsip() != null) {
+                	return new Utils.SearchResult(String.valueOf(eo.getId()),
+                        eo.getIdnsip() +" - "+ eo.getDenominazione() +", "+ eo.getIndirizzoPrincipale().getComune()); 
+                } else {
+                	return new Utils.SearchResult(String.valueOf(eo.getId()),
+                            eo.getDenominazione());
+                	}
+                }
+                		)
                 .distinct()
                 .collect(Collectors.toList());
 
