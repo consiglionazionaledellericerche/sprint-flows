@@ -26,7 +26,7 @@
 		//in ogni caso questa chiamata viene cachata e non viene richiamata ad ogni caricamento della navbar
 		ProfileService.getProfileInfo().then(function(response) {
 
-			$rootScope.inDevelopment = (response.activeProfiles.includes('dev') ? 'true' : 'false');
+			$rootScope.inDevelopment = (response.activeProfiles.includes('dev') ? true : false);
 			//verifico qual è il profilo spring con cui è stata avviata l'app per caricare il corrispondente banner
 			if (response.activeProfiles.includes('cnr'))
 			    $rootScope.app = 'cnr';
