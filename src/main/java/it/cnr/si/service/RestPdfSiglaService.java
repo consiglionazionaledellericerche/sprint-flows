@@ -35,7 +35,7 @@ public class RestPdfSiglaService {
 
         try {
         	
-            logger.error("************** data: ", data);
+            logger.error("************** data: {}", data);
 
             URL url = new URL(printServerURL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
