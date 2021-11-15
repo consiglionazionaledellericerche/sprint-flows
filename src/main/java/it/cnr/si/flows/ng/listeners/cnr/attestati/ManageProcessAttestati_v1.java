@@ -57,13 +57,12 @@ public class ManageProcessAttestati_v1 implements ExecutionListener {
 	public void restToApplicazioneAttestati(DelegateExecution execution, StatoAttestatiEnum statoAttestato, String user) {
 
 
-		String idStruttura = execution.getVariable("idStruttura").toString();;
+		String idStruttura = execution.getVariable("idStruttura").toString();
 		String codiceSedeAttestato = execution.getVariable("codiceSedeAttestato").toString();
-		String meseAttestato = execution.getVariable("meseAttestato").toString();;
-		String annoAttestato = execution.getVariable("annoAttestato").toString();;
+		String meseAttestato = execution.getVariable("meseAttestato").toString();
+		String annoAttestato = execution.getVariable("annoAttestato").toString();
 		String tipologiaMissione = execution.getVariable("tipologiaMissione").toString();
 
-		String idSedeAttestatoFinal = idSedeAttestato;
 		Map<String, Object> missioniPayload = new HashMap<String, Object>()
 		{
 			{
