@@ -45,11 +45,11 @@ public class StartAttestatiSetGroupsAndVisibility {
 	public void configuraVariabiliStart(DelegateExecution execution)  throws IOException, ParseException  {
 
 		String initiator = (String) execution.getVariable(Enum.VariableEnum.initiator.name());
-		int idStruttura = Integer.parseInt(execution.getVariable("idStruttura").toString());
 		String utenteRichiedente = execution.getVariable("utenteRichiedente").toString();
 		String meseAttestato = execution.getVariable("meseAttestato").toString();
 		String annoAttestato = execution.getVariable("annoAttestato").toString();
-		String codiceSedeAttestato = aceService.entitaOrganizzativaById(idStruttura).getIdnsip();
+		String codiceSedeAttestato = execution.getVariable("codiceSedeAttestato").toString();
+		int idStruttura = Integer.parseInt(aceService.getSedeIdByIdNsip(codiceSedeAttestato).toString());
 		String codiceCdsuoAttestato = aceService.entitaOrganizzativaById(idStruttura).getCdsuo();
 
 		// LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable(Enum.VariableEnum.title.name()));
@@ -61,6 +61,7 @@ public class StartAttestatiSetGroupsAndVisibility {
 		execution.setVariable("gruppoValidatoriAttestati", gruppoValidatoriAttestati);
 		execution.setVariable("codiceSedeAttestato", codiceSedeAttestato);
 		execution.setVariable("codiceCdsuoAttestato", codiceCdsuoAttestato);
+		execution.setVariable("idStruttura", idStruttura);
 
 	}
 }
