@@ -49,11 +49,11 @@ public class StartAttestatiSetGroupsAndVisibility {
 		String meseAttestato = execution.getVariable("meseAttestato").toString();
 		String annoAttestato = execution.getVariable("annoAttestato").toString();
 		String codiceSedeAttestato = execution.getVariable("codiceSedeAttestato").toString();
-		int idStruttura = Integer.parseInt(aceService.getSedeIdByIdNsip(codiceSedeAttestato).toString());
-		String codiceCdsuoAttestato = aceService.entitaOrganizzativaById(idStruttura).getCdsuo();
+		String idStruttura = aceService.getSedeIdByIdNsip(codiceSedeAttestato).toString();
+		String codiceCdsuoAttestato = aceService.entitaOrganizzativaById(Integer.parseInt(idStruttura)).getCdsuo();
 
 		// LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable(Enum.VariableEnum.title.name()));
-		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {} per l'utente {} - mese:  {} - anno  {})", initiator, execution.getId(), execution.getVariable("title"), utenteRichiedente, meseAttestato, annoAttestato );
+		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {} per l'utente {} - mese:  {} - anno  {})", initiator, execution.getId(), execution.getVariable("titolo"), utenteRichiedente, meseAttestato, annoAttestato );
 
 		String gruppoValidatoriAttestati = "validatoreAttestati@" + idStruttura;
 
