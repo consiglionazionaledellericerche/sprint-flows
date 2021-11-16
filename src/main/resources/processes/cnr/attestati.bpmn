@@ -41,7 +41,7 @@
     <exclusiveGateway id="exclusivegateway6" name="Exclusive Gateway" default="flow17"></exclusiveGateway>
     <sequenceFlow id="flow15" sourceRef="validazione" targetRef="exclusivegateway6"></sequenceFlow>
     <sequenceFlow id="flow16" name="APPROVATO" sourceRef="exclusivegateway6" targetRef="endevent-firmato">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente != 'Respingi' && firmaSpesaFlag != 'si'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Approva'}]]></conditionExpression>
     </sequenceFlow>
     <userTask id="respinto" name="RESPINTO" activiti:assignee="${initiator}">
       <extensionElements>
