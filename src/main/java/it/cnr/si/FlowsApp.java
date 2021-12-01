@@ -6,8 +6,6 @@ import it.cnr.si.config.JHipsterProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.actuate.autoconfigure.MetricFilterAutoConfiguration;
-import org.springframework.boot.actuate.autoconfigure.MetricRepositoryAutoConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
@@ -29,8 +27,8 @@ import java.util.Collection;
 @EnableCaching
 @SpringBootApplication
 @EnableAutoConfiguration(exclude = {
-        MetricFilterAutoConfiguration.class,
-        MetricRepositoryAutoConfiguration.class,
+//        MetricFilterAutoConfiguration.class,
+//        MetricRepositoryAutoConfiguration.class,
         SprintApp.class
 })
 @EnableConfigurationProperties({ JHipsterProperties.class, LiquibaseProperties.class })

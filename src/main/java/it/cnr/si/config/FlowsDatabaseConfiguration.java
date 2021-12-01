@@ -28,7 +28,7 @@ public class FlowsDatabaseConfiguration {
         Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
 
         // Use liquibase.integration.spring.SpringLiquibase if you don't want Liquibase to start asynchronously
-        SpringLiquibase liquibase = new AsyncSpringLiquibase();
+        SpringLiquibase liquibase = new SpringLiquibase();
 
         if(activeProfiles.contains("oiv"))
             liquibase.setChangeLog("classpath:config/liquibase/oiv/master.xml");

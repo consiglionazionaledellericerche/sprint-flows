@@ -248,7 +248,7 @@ public class NotificationRuleResourceIntTest {
         int databaseSizeBeforeUpdate = notificationRuleRepository.findAll().size();
 
         // Update the notificationRule
-        NotificationRule updatedNotificationRule = notificationRuleRepository.findOne(notificationRule.getId());
+        NotificationRule updatedNotificationRule = notificationRuleRepository.getOne(notificationRule.getId());
         updatedNotificationRule
                 .processId(UPDATED_PROCESS_ID)
                 .taskName(UPDATED_TASK_NAME)

@@ -199,7 +199,7 @@ public class RelationshipResourceIntTest {
         int databaseSizeBeforeUpdate = relationshipRepository.findAll().size();
 
         // Update the relationship
-        Relationship updatedRelationship = relationshipRepository.findOne(relationship.getId());
+        Relationship updatedRelationship = relationshipRepository.getOne(relationship.getId());
         updatedRelationship
                 .groupName(UPDATED_GROUP_NAME)
                 .groupRelationship(UPDATED_GROUP_RELATIONSHIP)

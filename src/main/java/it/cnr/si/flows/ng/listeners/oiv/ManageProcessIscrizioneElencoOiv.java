@@ -13,7 +13,6 @@ import org.activiti.engine.history.HistoricVariableInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ByteArrayResource;
@@ -306,8 +305,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
     }
 
     private String iscriviInElenco(String id) {
-        final RelaxedPropertyResolver relaxedPropertyResolver = new RelaxedPropertyResolver(env, OIV);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(relaxedPropertyResolver.getProperty(ISCRIVI_INELENCO))
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(env.getProperty(OIV + ISCRIVI_INELENCO))
                 .queryParam(ID_DOMANDA, id);
         return Optional.ofNullable(oivRestTemplate.getForEntity(builder.buildAndExpand().toUri(), Map.class))
                 .filter(mapResponseEntity -> mapResponseEntity.getStatusCode() == HttpStatus.OK)
@@ -319,8 +317,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
     }
 
     private void soccorsoIstruttorio(String id, String fileName, byte[] bytes) {
-        final RelaxedPropertyResolver relaxedPropertyResolver = new RelaxedPropertyResolver(env, OIV);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(relaxedPropertyResolver.getProperty(SOCCORSO_ISTRUTTORIO))
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(env.getProperty(OIV + SOCCORSO_ISTRUTTORIO))
                 .queryParam(ID_DOMANDA, id).queryParam(FILE_NAME, fileName);
         LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
         map.add("file", new ByteArrayResource(bytes) {
@@ -336,8 +333,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
     }
 
     private void comunicazioni(String id, String fileName, byte[] bytes, String type) {
-        final RelaxedPropertyResolver relaxedPropertyResolver = new RelaxedPropertyResolver(env, OIV);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(relaxedPropertyResolver.getProperty(COMUNICAZIONI))
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(env.getProperty(OIV + COMUNICAZIONI))
                 .queryParam(ID_DOMANDA, id).queryParam(FILE_NAME, fileName).queryParam("type", type);
         LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
         map.add("file", new ByteArrayResource(bytes) {
@@ -354,8 +350,7 @@ public class ManageProcessIscrizioneElencoOiv implements ExecutionListener {
 
 
     private void preavvisoRigetto(String id, String fileName, byte[] bytes) {
-        final RelaxedPropertyResolver relaxedPropertyResolver = new RelaxedPropertyResolver(env, ManageProcessIscrizioneElencoOiv.OIV);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(relaxedPropertyResolver.getProperty(ManageProcessIscrizioneElencoOiv.PREAVVISO_RIGETTO))
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(env.getProperty(OIV + ManageProcessIscrizioneElencoOiv.PREAVVISO_RIGETTO))
                 .queryParam(ManageProcessIscrizioneElencoOiv.ID_DOMANDA, id).queryParam(ManageProcessIscrizioneElencoOiv.FILE_NAME, fileName);
         LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
         map.add("file", new ByteArrayResource(bytes) {

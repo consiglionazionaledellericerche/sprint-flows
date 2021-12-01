@@ -3,7 +3,6 @@ package it.cnr.si.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
@@ -29,8 +28,6 @@ public class SecurityConfigurationLDAP extends WebSecurityConfigurerAdapter {
 
     private final Logger log = LoggerFactory.getLogger(SecurityConfigurationLDAP.class);
 
-    private RelaxedPropertyResolver propertyResolver;
-
     @Inject
     private Environment env;
 
@@ -43,21 +40,20 @@ public class SecurityConfigurationLDAP extends WebSecurityConfigurerAdapter {
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         if (Arrays.asList(env.getActiveProfiles()).contains("cnr")) {
             log.info("security LDAP configure global");
-            this.propertyResolver = new RelaxedPropertyResolver(env, "spring.ldap.");
-            String url = propertyResolver.getProperty("url");
-            if (propertyResolver != null && url != null) {
+            String url = env.getProperty("spring.ldap.url");
+            if (url != null) {
                 log.info("ldap server: " + url);
 
                 auth.ldapAuthentication()
                         .userDetailsContextMapper(userDetailsContextMapper)
                         .ldapAuthoritiesPopulator(authPopulator)
-                        .userSearchBase(propertyResolver.getProperty("userSearchBase"))
-                        .userSearchFilter(propertyResolver.getProperty("userSearchFilter"))
+                        .userSearchBase(env.getProperty("spring.ldap.userSearchBase"))
+                        .userSearchFilter(env.getProperty("spring.ldap.userSearchFilter"))
                         .groupSearchBase(null)
                         .contextSource()
                         .url(url)
-                        .managerDn(propertyResolver.getProperty("managerDn"))
-                        .managerPassword(propertyResolver.getProperty("managerPassword"));
+                        .managerDn(env.getProperty("spring.ldap.managerDn"))
+                        .managerPassword(env.getProperty("spring.ldap.managerPassword"));
             } else {
                 log.warn("no ldap configuration found");
             }

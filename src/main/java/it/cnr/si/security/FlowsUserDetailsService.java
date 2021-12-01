@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -67,7 +69,7 @@ public class FlowsUserDetailsService implements org.springframework.security.cor
 				List<GrantedAuthority> grantedAuthorities = user.getAuthorities().stream()
 						.map(authority -> new SimpleGrantedAuthority(authority.getName()))
 						.collect(Collectors.toList());
-				grantedAuthorities.addAll(flowsUserService.getGroupsForUser(lowercaseLogin, new PageRequest(1, 100)).stream()
+				grantedAuthorities.addAll(flowsUserService.getGroupsForUser(lowercaseLogin, PageRequest.of(1, 100)).stream()
 				.map(group -> new SimpleGrantedAuthority(group.getCnrgroup().getName()))
 				.collect(Collectors.toList()));
 

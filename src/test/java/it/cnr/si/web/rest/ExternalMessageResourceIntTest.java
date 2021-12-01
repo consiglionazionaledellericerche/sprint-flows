@@ -305,7 +305,7 @@ public class ExternalMessageResourceIntTest {
         int databaseSizeBeforeUpdate = externalMessageRepository.findAll().size();
 
         // Update the externalMessage
-        ExternalMessage updatedExternalMessage = externalMessageRepository.findOne(externalMessage.getId());
+        ExternalMessage updatedExternalMessage = externalMessageRepository.getOne(externalMessage.getId());
         updatedExternalMessage
                 .url(UPDATED_URL)
                 .verb(UPDATED_VERB)

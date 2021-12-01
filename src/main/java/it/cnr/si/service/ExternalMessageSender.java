@@ -93,7 +93,10 @@ public class ExternalMessageSender {
 	private String labconPassword;
 	@Value("${cnr.labcon.loginPath}")
 	private String labconLoginPath;
-
+    @Value("${cnr.labcon.client_id}")
+    private String labconClientId;
+    @Value("${cnr.labcon.client_secret}")
+    private String labconSecret;
 
 
 	@Inject
@@ -307,21 +310,25 @@ public class ExternalMessageSender {
 
 			if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 
-				Map<String, String> auth = new HashMap<>();
-				auth.put("username", labconUsername);
-				auth.put("password", labconPassword);
-				HttpHeaders headers = new HttpHeaders();
-				headers.setContentType(MediaType.APPLICATION_JSON);
+                MultiValueMap<String, String> auth = new LinkedMultiValueMap();
+                auth.add("username", labconUsername);
+                auth.add("password", labconPassword);
+                auth.add("grant_type", "password");
+                
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+                String encoding = Base64.getEncoder().encodeToString((labconClientId + ":" + labconSecret).getBytes(StandardCharsets.UTF_8));
+                headers.set("Authorization", "Basic "+ encoding);
 
-				RequestEntity entity = new RequestEntity(
-						auth,
-						headers,
-						HttpMethod.POST,
-						URI.create(labconUrl + labconLoginPath));
+                RequestEntity entity = new RequestEntity(
+                        auth,
+                        headers,
+                        HttpMethod.POST,
+                        URI.create(ssoLoginUrl));
 
 				ResponseEntity<Map> resp = new RestTemplate().exchange(entity, Map.class);
 
-				this.id_token = (String) resp.getBody().get("id_token");
+				this.id_token = (String) resp.getBody().get("access_token");
 
 				request.getHeaders().set("Authorization", "Bearer "+ id_token);
 				request.getHeaders().setContentType(MediaType.APPLICATION_JSON);

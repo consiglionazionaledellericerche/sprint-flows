@@ -6,7 +6,6 @@ import it.cnr.si.flows.ng.utils.FileMessageResource;
 import it.cnr.si.flows.ng.utils.proxy.ResultProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
@@ -28,8 +27,6 @@ import java.util.Map;
 @Service
 public class ProxyService implements EnvironmentAware{
     private final Logger log = LoggerFactory.getLogger(ProxyService.class);
-
-    private RelaxedPropertyResolver propertyResolver;
 
     private Environment environment;
 
@@ -126,7 +123,7 @@ public class ProxyService implements EnvironmentAware{
     }
 
     public String impostaUrl(String app, String url, String queryString) {
-        String appUrl = propertyResolver.getProperty(app + ".url");
+        String appUrl = environment.getProperty("spring.proxy." + app + ".url");
         String proxyURL = null;
         if (appUrl == null) {
             log.error("Cannot find properties for app: " + app + " Current profile are: ", Arrays.toString(environment.getActiveProfiles()));
@@ -148,8 +145,8 @@ public class ProxyService implements EnvironmentAware{
 
     public HttpHeaders impostaAutenticazione(String app, String authorization) {
         HttpHeaders headers = new HttpHeaders();
-        String username = propertyResolver.getProperty(app + ".username"),
-                password = propertyResolver.getProperty(app + ".password");
+        String username = environment.getProperty("spring.proxy." + app + ".username"),
+                password = environment.getProperty("spring.proxy." + app + ".password");
         if (username != null && password != null) {
             String plainCreds = username.concat(":").concat(password);
             byte[] plainCredsBytes = plainCreds.getBytes();
@@ -172,7 +169,6 @@ public class ProxyService implements EnvironmentAware{
     @Override
     public void setEnvironment(Environment environment) {
         this.environment = environment;
-        this.propertyResolver = new RelaxedPropertyResolver(environment, "spring.proxy.");
         this.restTemplateMap = new HashMap<String, RestTemplate>();
     }
 }

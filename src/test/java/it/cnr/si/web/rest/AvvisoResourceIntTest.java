@@ -180,7 +180,7 @@ public class AvvisoResourceIntTest {
         int databaseSizeBeforeUpdate = avvisoRepository.findAll().size();
 
         // Update the avviso
-        Avviso updatedAvviso = avvisoRepository.findOne(avviso.getId());
+        Avviso updatedAvviso = avvisoRepository.getOne(avviso.getId());
         updatedAvviso
                 .contenuto(UPDATED_CONTENUTO)
                 .attivo(UPDATED_ATTIVO);

@@ -1,7 +1,6 @@
 package it.cnr.si.flows.ng.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -74,9 +73,8 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
     @Bean
     @Profile(value = {"cnr"})
     public LdapUserSearch getLdapUserSearch(Environment env, LdapContextSource ctx) {
-        PropertyResolver p = new RelaxedPropertyResolver(env, "spring.ldap.");
         String userSearchBase = ""; //p.getProperty("userSearchBase");
-        String userSearchFilter = p.getProperty("userSearchFilter");
+        String userSearchFilter = env.getProperty("spring.ldap.userSearchFilter");
 
         return new FilterBasedLdapUserSearch(userSearchBase, userSearchFilter, ctx);
     }
@@ -84,13 +82,12 @@ public class SwitchUserSecurityConfiguration extends WebSecurityConfigurerAdapte
     @Bean
     @Profile(value = {"cnr"})
     public LdapContextSource getLdapContextSource(Environment env) {
-        PropertyResolver p = new RelaxedPropertyResolver(env, "spring.ldap."); //
 
         LdapContextSource contextSource = new LdapContextSource();
-        contextSource.setUrl(p.getProperty("url"));
-        contextSource.setBase(p.getProperty("userSearchBase"));
-        contextSource.setUserDn(p.getProperty("managerDn"));
-        contextSource.setPassword(p.getProperty("managerPassword"));
+        contextSource.setUrl(env.getProperty("spring.ldap.url"));
+        contextSource.setBase(env.getProperty("spring.ldap.userSearchBase"));
+        contextSource.setUserDn(env.getProperty("spring.ldap.managerDn"));
+        contextSource.setPassword(env.getProperty("spring.ldap.managerPassword"));
         return contextSource;
     }
 

@@ -223,7 +223,7 @@ public class ViewResourceIntTest {
         int databaseSizeBeforeUpdate = viewRepository.findAll().size();
 
         // Update the view
-        View updatedView = viewRepository.findOne(view.getId());
+        View updatedView = viewRepository.getOne(view.getId());
         updatedView
                 .processId(UPDATED_PROCESS_ID)
                 .type(UPDATED_TYPE)

@@ -109,7 +109,7 @@ public class FlowsUserService {
             String langKey, String phone) {
 
         FlowsUser newUser = new FlowsUser();
-        Authority authority = authorityRepository.findOne(AuthoritiesConstants.USER);
+        Authority authority = authorityRepository.getOne(AuthoritiesConstants.USER);
         Set<Authority> authorities = new HashSet<>();
         String encryptedPassword = passwordEncoder.encode(password);
         newUser.setLogin(login);
@@ -146,7 +146,7 @@ public class FlowsUserService {
         if (flowsUseDto.getAuthorities() != null) {
             Set<Authority> authorities = new HashSet<>();
             flowsUseDto.getAuthorities().stream().forEach(
-                    authority -> authorities.add(authorityRepository.findOne(authority))
+                    authority -> authorities.add(authorityRepository.getOne(authority))
             );
             user.setAuthorities(authorities);
         }
@@ -178,7 +178,7 @@ public class FlowsUserService {
                     Set<Authority> managedAuthorities = u.getAuthorities();
                     managedAuthorities.clear();
                     authorities.stream().forEach(
-                            authority -> managedAuthorities.add(authorityRepository.findOne(authority))
+                            authority -> managedAuthorities.add(authorityRepository.getOne(authority))
                     );
                     u.setPhone(phone);
                     u.setGender(gender);
@@ -222,7 +222,7 @@ public class FlowsUserService {
 
     @Transactional(readOnly = true)
     public FlowsUser getUserWithAuthorities(Long id) {
-        FlowsUser user = flowsUserRepository.findOne(id);
+        FlowsUser user = flowsUserRepository.getOne(id);
         user.getAuthorities().size(); // eagerly load the association
         return user;
     }

@@ -32,7 +32,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.core.env.Environment;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -355,12 +354,12 @@ public class FlowsPdfService {
 	public byte[] makePdf(Enum.PdfType pdfType, JSONObject processvariables, String fileName, String utenteRichiedente, String processInstanceId) {
 		Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
 
-		String dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-cnr");
+		String dir = env.getProperty("jasper-report.dir-cnr");
 		if(activeProfiles.contains("oiv")) {
-			dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-oiv");
+			dir = env.getProperty("jasper-report.dir-oiv");
 		}
 		else if(activeProfiles.contains("cnr")) {
-			dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-cnr");
+			dir = env.getProperty("jasper-report.dir-cnr");
 		}
 		byte[] pdfByteArray = null;
 		HashMap<String, Object> parameters = new HashMap();
@@ -496,12 +495,12 @@ public class FlowsPdfService {
 		HashMap<String, Object> parameters = new HashMap();
 		InputStream jasperFile = null;
 		Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
-		String dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-cnr");
+		String dir = env.getProperty("jasper-report.dir-cnr");
 		if(activeProfiles.contains("oiv")) {
-			dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-oiv");
+			dir = env.getProperty("jasper-report.dir-oiv");
 		}
 		else if(activeProfiles.contains("cnr")) {
-			dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-cnr");
+			dir = env.getProperty("jasper-report.dir-cnr");
 		}
 		try {
 			//carico le variabili della process instance
