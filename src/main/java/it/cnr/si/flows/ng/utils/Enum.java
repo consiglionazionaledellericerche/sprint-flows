@@ -86,6 +86,12 @@ public class Enum {
         FIRMATO,
         ANNULLATO;
     }
+
+    public enum StatoAttestatiEnum {
+        RESPINTO,
+        APPROVATO,
+        ANNULLATO;
+    }
     
     public enum TipologieeMissioniEnum {
         ordine,

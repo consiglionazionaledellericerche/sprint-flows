@@ -83,7 +83,18 @@ public final class Utils {
     public static String removeLeadingRole(String in) {
         return in.startsWith(ROLE) ? in.substring(5) : in;
     }
+    
+    public static String removeImportoSpesa(String in) {
+    	if (!in.contains("$"))
+    		return in;
+    	
+    	return in.substring(0, in.indexOf('$')) + in.substring(in.indexOf('@'));
+    }
 
+    public static double getImportoSpesa(String in) {
+    	return Double.parseDouble(in.substring(in.indexOf('$')+1, in.indexOf('@')));
+    }
+    
     public static String addLeadingRole(String in) {
         return in.startsWith(ROLE) ? in : ROLE + in;
     }
