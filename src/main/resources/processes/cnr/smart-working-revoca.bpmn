@@ -38,7 +38,7 @@
         </activiti:executionListener>
       </extensionElements>
     </endEvent>
-    <sequenceFlow id="flow15" name="REVOCATA" sourceRef="presaVisione" targetRef="endevent-firmato"></sequenceFlow>
+    <sequenceFlow id="flow15" name="RECESSA" sourceRef="presaVisione" targetRef="endevent-firmato"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_smart-working-revoca">
     <bpmndi:BPMNPlane bpmnElement="smart-working-revoca" id="BPMNPlane_smart-working-revoca">
