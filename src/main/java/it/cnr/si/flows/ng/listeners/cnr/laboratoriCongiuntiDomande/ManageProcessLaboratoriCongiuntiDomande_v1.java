@@ -348,8 +348,9 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 						//START del flusso bando
 						String siglaDipartimento = aceBridgeService.getUoById(Integer.parseInt(execution.getVariable("dipartimentoId").toString())).getSigla();
 						Map<String, Object> data = new HashMap<>();
-						data.put(Enum.VariableEnum.titolo.name(), execution.getVariable("bando") + "-" + siglaDipartimento);
-						data.put(Enum.VariableEnum.descrizione.name(), execution.getVariable("shortTermMobilityName") + "-" + siglaDipartimento);
+						String titoloBando = "Verbale Graduatoria Bando " + execution.getVariable("idBando") + "-" + siglaDipartimento;
+						data.put(Enum.VariableEnum.titolo.name(), titoloBando);
+						data.put(Enum.VariableEnum.descrizione.name(), "Flusso per la gestione del " + titoloBando);
 						data.put(Enum.VariableEnum.initiator.name(), "app.scrivaniadigitale");
 						data.put("idBando", execution.getVariable("idBando"));
 						data.put("dipartimentoId", execution.getVariable("dipartimentoId"));
