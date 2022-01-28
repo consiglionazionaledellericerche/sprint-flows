@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="attestati" name="ATTESTATI" isExecutable="true">
+    <extensionElements>
+      <activiti:executionListener event="start" delegateExpression="${manageProcessAttestati_v1}">
+        <activiti:field name="faseEsecuzione">
+          <activiti:string><![CDATA[process-start]]></activiti:string>
+        </activiti:field>
+      </activiti:executionListener>
+      <activiti:executionListener event="end" delegateExpression="${manageProcessAttestati_v1}">
+        <activiti:field name="faseEsecuzione">
+          <activiti:string><![CDATA[process-end]]></activiti:string>
+        </activiti:field>
+      </activiti:executionListener>
+    </extensionElements>
+    <startEvent id="startevent1" name="Start"></startEvent>
+    <sequenceFlow id="flow1" name="START " sourceRef="startevent1" targetRef="validazione"></sequenceFlow>
+    <userTask id="validazione" name="VALIDAZIONE" activiti:candidateGroups="${gruppoValidatoriAttestati}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAttestati_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[validazione-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAttestati_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[validazione-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <endEvent id="endevent-firmato" name="End">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAttestati_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[endevent-approvato-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
+    <exclusiveGateway id="exclusivegateway6" name="Exclusive Gateway" default="flow17"></exclusiveGateway>
+    <sequenceFlow id="flow15" sourceRef="validazione" targetRef="exclusivegateway6"></sequenceFlow>
+    <sequenceFlow id="flow16" name="APPROVATO" sourceRef="exclusivegateway6" targetRef="endevent-firmato">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Approva'}]]></conditionExpression>
+    </sequenceFlow>
+    <userTask id="respinto" name="RESPINTO" activiti:assignee="${initiator}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAttestati_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[respinto-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAttestati_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[respinto-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow17" sourceRef="exclusivegateway6" targetRef="respinto"></sequenceFlow>
+    <sequenceFlow id="flow18" sourceRef="respinto" targetRef="exclusivegateway7"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway7" name="Exclusive Gateway" default="flow19"></exclusiveGateway>
+    <sequenceFlow id="flow19" sourceRef="exclusivegateway7" targetRef="validazione"></sequenceFlow>
+    <sequenceFlow id="flow27" name="ANNULLATO" sourceRef="exclusivegateway7" targetRef="endevent-annulla">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Annulla'}]]></conditionExpression>
+    </sequenceFlow>
+    <endEvent id="endevent-annulla" name="End">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAttestati_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[endevent-annulla]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_attestati">
+    <bpmndi:BPMNPlane bpmnElement="attestati" id="BPMNPlane_attestati">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="20.0" y="117.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="validazione" id="BPMNShape_validazione">
+        <omgdc:Bounds height="75.0" width="111.0" x="100.0" y="97.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent-firmato" id="BPMNShape_endevent-firmato">
+        <omgdc:Bounds height="35.0" width="35.0" x="410.0" y="117.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway6" id="BPMNShape_exclusivegateway6">
+        <omgdc:Bounds height="40.0" width="40.0" x="240.0" y="114.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="respinto" id="BPMNShape_respinto">
+        <omgdc:Bounds height="71.0" width="109.0" x="206.0" y="186.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway7" id="BPMNShape_exclusivegateway7">
+        <omgdc:Bounds height="40.0" width="40.0" x="349.0" y="201.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent-annulla" id="BPMNShape_endevent-annulla">
+        <omgdc:Bounds height="35.0" width="35.0" x="410.0" y="204.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="55.0" y="134.0"></omgdi:waypoint>
+        <omgdi:waypoint x="100.0" y="134.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="37.0" x="20.0" y="91.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow15" id="BPMNEdge_flow15">
+        <omgdi:waypoint x="211.0" y="134.0"></omgdi:waypoint>
+        <omgdi:waypoint x="240.0" y="134.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow16" id="BPMNEdge_flow16">
+        <omgdi:waypoint x="280.0" y="134.0"></omgdi:waypoint>
+        <omgdi:waypoint x="410.0" y="134.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="409.0" y="155.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow17" id="BPMNEdge_flow17">
+        <omgdi:waypoint x="260.0" y="154.0"></omgdi:waypoint>
+        <omgdi:waypoint x="260.0" y="186.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow18" id="BPMNEdge_flow18">
+        <omgdi:waypoint x="315.0" y="221.0"></omgdi:waypoint>
+        <omgdi:waypoint x="349.0" y="221.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow19" id="BPMNEdge_flow19">
+        <omgdi:waypoint x="369.0" y="241.0"></omgdi:waypoint>
+        <omgdi:waypoint x="368.0" y="272.0"></omgdi:waypoint>
+        <omgdi:waypoint x="155.0" y="272.0"></omgdi:waypoint>
+        <omgdi:waypoint x="155.0" y="172.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow27" id="BPMNEdge_flow27">
+        <omgdi:waypoint x="389.0" y="221.0"></omgdi:waypoint>
+        <omgdi:waypoint x="410.0" y="221.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="63.0" x="409.0" y="250.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

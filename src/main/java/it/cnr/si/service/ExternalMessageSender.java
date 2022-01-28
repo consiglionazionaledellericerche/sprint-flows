@@ -19,6 +19,8 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
@@ -39,16 +41,26 @@ public class ExternalMessageSender {
 
 	private final Logger log = LoggerFactory.getLogger(ExternalMessageSender.class);
 
-	@Value("${cnr.abil.url}")
-	private String abilUrl;
-	@Value("${cnr.abil.username}")
-	private String abilUsername;
-	@Value("${cnr.abil.password}")
-	private String abilPassword;
+    @Value("${cnr.ssoLoginUrl}")
+    private String ssoLoginUrl;
+    @Value("${cnr.abil.url}")
+    private String abilUrl;
+    @Value("${cnr.abil.client_id}")
+    private String abilClientId;
+    @Value("${cnr.abil.client_secret}")
+    private String abilSecret;
+    @Value("${cnr.abil.username}")
+    private String abilUsername;
+    @Value("${cnr.abil.password}")
+    private String abilPassword;
 	@Value("${cnr.abil.loginPath}")
 	private String abilLoginPath;
 	@Value("${cnr.stm.url}")
 	private String stmUrl;
+    @Value("${cnr.stm.client_id}")
+    private String stmClientId;
+    @Value("${cnr.stm.client_secret}")
+    private String stmSecret;
 	@Value("${cnr.stm.username}")
 	private String stmUsername;
 	@Value("${cnr.stm.password}")
@@ -81,7 +93,10 @@ public class ExternalMessageSender {
 	private String labconPassword;
 	@Value("${cnr.labcon.loginPath}")
 	private String labconLoginPath;
-
+    @Value("${cnr.labcon.client_id}")
+    private String labconClientId;
+    @Value("${cnr.labcon.client_secret}")
+    private String labconSecret;
 
 
 	@Inject
@@ -211,21 +226,25 @@ public class ExternalMessageSender {
 
 			if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 
-				Map<String, String> auth = new HashMap<>();
-				auth.put("username", abilUsername);
-				auth.put("password", abilPassword);
+			    MultiValueMap<String, String> auth = new LinkedMultiValueMap();
+				auth.add("username", abilUsername);
+                auth.add("password", abilPassword);
+                auth.add("grant_type", "password");
+                
 				HttpHeaders headers = new HttpHeaders();
-				headers.setContentType(MediaType.APPLICATION_JSON);
+				headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+	            String encoding = Base64.getEncoder().encodeToString((abilClientId + ":" + abilSecret).getBytes(StandardCharsets.UTF_8));
+	            headers.set("Authorization", "Basic "+ encoding);
 
 				RequestEntity entity = new RequestEntity(
 						auth,
 						headers,
 						HttpMethod.POST,
-						URI.create(abilUrl + abilLoginPath));
+						URI.create(ssoLoginUrl));
 
 				ResponseEntity<Map> resp = new RestTemplate().exchange(entity, Map.class);
 
-				this.id_token = (String) resp.getBody().get("id_token");
+				this.id_token = (String) resp.getBody().get("access_token");
 
 				request.getHeaders().set("Authorization", "Bearer "+ id_token);
 				request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
@@ -238,34 +257,38 @@ public class ExternalMessageSender {
 
 	private class StmRequestInterceptor implements ClientHttpRequestInterceptor {
 
-		private String id_token = null;
+		private String access_token = null;
 
 		@Override
 		public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 
-			request.getHeaders().set("Authorization", "Bearer "+ id_token);
+			request.getHeaders().set("Authorization", "Bearer "+ access_token);
 			request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 			ClientHttpResponse response = execution.execute(request, body);
 
 			if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 
-				Map<String, String> auth = new HashMap<>();
-				auth.put("username", stmUsername);
-				auth.put("password", stmPassword);
-				HttpHeaders headers = new HttpHeaders();
-				headers.setContentType(MediaType.APPLICATION_JSON);
+                MultiValueMap<String, String> auth = new LinkedMultiValueMap();
+                auth.add("username", stmUsername);
+                auth.add("password", stmPassword);
+                auth.add("grant_type", "password");
+                
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+                String encoding = Base64.getEncoder().encodeToString((stmClientId + ":" + stmSecret).getBytes(StandardCharsets.UTF_8));
+                headers.set("Authorization", "Basic "+ encoding);
 
-				RequestEntity entity = new RequestEntity(
-						auth,
-						headers,
-						HttpMethod.POST,
-						URI.create(stmUrl + stmLoginPath));
+                RequestEntity entity = new RequestEntity(
+                        auth,
+                        headers,
+                        HttpMethod.POST,
+                        URI.create(ssoLoginUrl));
 
-				ResponseEntity<Map> resp = new RestTemplate().exchange(entity, Map.class);
+                ResponseEntity<Map> resp = new RestTemplate().exchange(entity, Map.class);
 
-				this.id_token = (String) resp.getBody().get("id_token");
+                this.access_token = (String) resp.getBody().get("access_token");
 
-				request.getHeaders().set("Authorization", "Bearer "+ id_token);
+				request.getHeaders().set("Authorization", "Bearer "+ access_token);
 				request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 				response = execution.execute(request, body);
 			}
@@ -276,34 +299,38 @@ public class ExternalMessageSender {
 
 	private class LabconRequestInterceptor implements ClientHttpRequestInterceptor {
 
-		private String id_token = null;
+		private String access_token = null;
 
 		@Override
 		public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 
-			request.getHeaders().set("Authorization", "Bearer "+ id_token);
+			request.getHeaders().set("Authorization", "Bearer "+ access_token);
 			request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 			ClientHttpResponse response = execution.execute(request, body);
 
 			if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 
-				Map<String, String> auth = new HashMap<>();
-				auth.put("username", labconUsername);
-				auth.put("password", labconPassword);
-				HttpHeaders headers = new HttpHeaders();
-				headers.setContentType(MediaType.APPLICATION_JSON);
+                MultiValueMap<String, String> auth = new LinkedMultiValueMap();
+                auth.add("username", labconUsername);
+                auth.add("password", labconPassword);
+                auth.add("grant_type", "password");
+                
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+                String encoding = Base64.getEncoder().encodeToString((labconClientId + ":" + labconSecret).getBytes(StandardCharsets.UTF_8));
+                headers.set("Authorization", "Basic "+ encoding);
 
-				RequestEntity entity = new RequestEntity(
-						auth,
-						headers,
-						HttpMethod.POST,
-						URI.create(labconUrl + labconLoginPath));
+                RequestEntity entity = new RequestEntity(
+                        auth,
+                        headers,
+                        HttpMethod.POST,
+                        URI.create(ssoLoginUrl));
 
 				ResponseEntity<Map> resp = new RestTemplate().exchange(entity, Map.class);
 
-				this.id_token = (String) resp.getBody().get("id_token");
+				this.access_token = (String) resp.getBody().get("access_token");
 
-				request.getHeaders().set("Authorization", "Bearer "+ id_token);
+				request.getHeaders().set("Authorization", "Bearer "+ access_token);
 				request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 				response = execution.execute(request, body);
 			}

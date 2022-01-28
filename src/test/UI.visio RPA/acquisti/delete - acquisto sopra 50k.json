@@ -1,0 +1,90 @@
+{
+  "Name": "delete - acquisto sopra 50k",
+  "CreationDate": "2021-9-30",
+  "Commands": [
+    {
+      "Command": "open",
+      "Target": "https://demoscrivaniadigitale-cnr.si.cnr.it/#/available-tasks",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div[2]/nav/div[2]/ul/li[5]/a/span[2]",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"searchFields\"]/div[2]/input",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "xpath=//*[@id=\"searchFields\"]/div[2]/input",
+      "Value": "acquisto sopra 50k",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div[2]/div/button/span",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "linkText=dettagli",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div[3]/div[3]/div/div/div/div/div[2]/button",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "id=deleteReason",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "type",
+      "Target": "id=deleteReason",
+      "Value": "flusso di test ui",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=/html/body/div/div/div/div/button",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "",
+      "Target": "",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "open",
+      "Target": "https://demoscrivaniadigitale-cnr.si.cnr.it/#/available-tasks",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "xpath=//*[@id=\"account-menu\"]/span/span[2]",
+      "Value": "",
+      "Description": ""
+    },
+    {
+      "Command": "click",
+      "Target": "linkText=Esci",
+      "Value": "",
+      "Description": ""
+    }
+  ]
+}
