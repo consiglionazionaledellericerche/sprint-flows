@@ -14,18 +14,18 @@
       </activiti:executionListener>
     </extensionElements>
     <startEvent id="startevent1" name="Start"></startEvent>
-    <sequenceFlow id="flow1" name="START " sourceRef="startevent1" targetRef="subprocess1"></sequenceFlow>
+    <sequenceFlow id="flow1" name="START " sourceRef="startevent1" targetRef="validazioneResponsabile"></sequenceFlow>
     <endEvent id="endevent-firmato" name="End">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
           <activiti:field name="faseEsecuzione">
-            <activiti:string><![CDATA[endevent-approvato-start]]></activiti:string>
+            <activiti:string><![CDATA[endevent-validata-start]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
       </extensionElements>
     </endEvent>
     <sequenceFlow id="flow16" name="VALIDATA" sourceRef="exclusivegateway8" targetRef="endevent-firmato">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Approva'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaFinale == 'Valida'}]]></conditionExpression>
     </sequenceFlow>
     <endEvent id="endevent-annulla" name="End">
       <extensionElements>
@@ -36,45 +36,181 @@
         </activiti:executionListener>
       </extensionElements>
     </endEvent>
-    <endEvent id="endevent1" name="End"></endEvent>
-    <sequenceFlow id="flow29" name="RIFIUTATA" sourceRef="exclusivegateway8" targetRef="endevent1"></sequenceFlow>
-    <sequenceFlow id="flow30" name="ANNULLATA" sourceRef="exclusivegateway8" targetRef="endevent-annulla"></sequenceFlow>
-    <subProcess id="subprocess1" name="Sub Process">
+    <endEvent id="endevent1" name="End">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[endevent-rifiutata-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="flow29" name="RIFIUTATA" sourceRef="exclusivegateway8" targetRef="endevent1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaFinale == 'Respingi'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow30" name="ANNULLATA" sourceRef="exclusivegateway8" targetRef="endevent-annulla">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaFinale == 'Annulla'}]]></conditionExpression>
+    </sequenceFlow>
+    <subProcess id="validazioneResponsabile" name="VALIDAZIONE RESPONSABILE">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[validazioneResponsabile-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="validazioneDirigente">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[validazioneResponsabile-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
       <startEvent id="startevent2" name="Start"></startEvent>
-      <userTask id="validazione" name="VALIDAZIONE"></userTask>
+      <userTask id="validazione" name="VALIDAZIONE" activiti:candidateGroups="${gruppoDirigenteProponente}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[validazione-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[validazione-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
       <sequenceFlow id="flow31" sourceRef="startevent2" targetRef="validazione"></sequenceFlow>
-      <endEvent id="endevent2" name="End"></endEvent>
-      <scriptTask id="notifiche1" name="notifiche1" scriptFormat="javascript" activiti:autoStoreVariables="false"></scriptTask>
-      <exclusiveGateway id="exclusivegateway9" name="Exclusive Gateway"></exclusiveGateway>
+      <endEvent id="endevent2" name="End">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[endsubprocess-validata-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </endEvent>
+      <scriptTask id="notifiche1" name="notifiche1" scriptFormat="javascript" activiti:autoStoreVariables="false">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[notificatask-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[notificatask-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+        <script>execution.setVariable('notifica', true);</script>
+      </scriptTask>
+      <exclusiveGateway id="exclusivegateway9" name="Exclusive Gateway" default="flow38"></exclusiveGateway>
       <sequenceFlow id="flow33" sourceRef="validazione" targetRef="exclusivegateway9"></sequenceFlow>
-      <sequenceFlow id="flow36" name="VALIDATA" sourceRef="exclusivegateway9" targetRef="endevent2"></sequenceFlow>
-      <userTask id="modifica" name="MODIFICA"></userTask>
+      <sequenceFlow id="flow36" name="VALIDATA" sourceRef="exclusivegateway9" targetRef="endevent2">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Valida'}]]></conditionExpression>
+      </sequenceFlow>
+      <userTask id="modifica" name="MODIFICA" activiti:assignee="${applicazioneSiper}">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[modifica-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+          <activiti:executionListener event="end" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[modifica-end]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </userTask>
       <sequenceFlow id="flow38" sourceRef="exclusivegateway9" targetRef="modifica"></sequenceFlow>
-      <exclusiveGateway id="exclusivegateway10" name="Exclusive Gateway"></exclusiveGateway>
+      <exclusiveGateway id="exclusivegateway10" name="Exclusive Gateway" default="flow41"></exclusiveGateway>
       <sequenceFlow id="flow39" sourceRef="modifica" targetRef="exclusivegateway10"></sequenceFlow>
-      <sequenceFlow id="flow40" name="ANNULLATA" sourceRef="exclusivegateway10" targetRef="endevent4"></sequenceFlow>
+      <sequenceFlow id="flow40" name="ANNULLATA" sourceRef="exclusivegateway10" targetRef="endevent4">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Annulla'}]]></conditionExpression>
+      </sequenceFlow>
       <sequenceFlow id="flow41" sourceRef="exclusivegateway10" targetRef="validazione"></sequenceFlow>
-      <endEvent id="endevent3" name="End"></endEvent>
-      <endEvent id="endevent4" name="End"></endEvent>
-      <sequenceFlow id="flow43" name="RIFIUTATA" sourceRef="exclusivegateway9" targetRef="endevent3"></sequenceFlow>
-      <sequenceFlow id="flow44" name="PRESA VISIONE" sourceRef="exclusivegateway9" targetRef="endevent6"></sequenceFlow>
-      <endEvent id="endevent6" name="End"></endEvent>
+      <endEvent id="endevent3" name="End">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[endsubprocess-rifiutata-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </endEvent>
+      <endEvent id="endevent4" name="End">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[endsubprocess-annullata-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </endEvent>
+      <sequenceFlow id="flow43" name="RIFIUTATA" sourceRef="exclusivegateway9" targetRef="endevent3">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Respingi'}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="flow44" name="PRESA VISIONE" sourceRef="exclusivegateway9" targetRef="endevent6">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'PresaVisione'}]]></conditionExpression>
+      </sequenceFlow>
+      <endEvent id="endevent6" name="End">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[endsubprocess-presavisione-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </endEvent>
     </subProcess>
-    <exclusiveGateway id="exclusivegateway8" name="Exclusive Gateway"></exclusiveGateway>
-    <sequenceFlow id="flow32" sourceRef="subprocess1" targetRef="exclusivegateway8"></sequenceFlow>
-    <boundaryEvent id="boundarytimer1" name="Timer" attachedToRef="subprocess1" cancelActivity="true">
-      <timerEventDefinition></timerEventDefinition>
+    <exclusiveGateway id="exclusivegateway8" name="Exclusive Gateway" default="flow30"></exclusiveGateway>
+    <sequenceFlow id="flow32" sourceRef="validazioneResponsabile" targetRef="exclusivegateway8"></sequenceFlow>
+    <boundaryEvent id="boundarytimer1" name="Timer1" attachedToRef="validazioneResponsabile" cancelActivity="true">
+      <extensionElements>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[timer1-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+      <timerEventDefinition>
+        <timeCycle>R15/P2D</timeCycle>
+      </timerEventDefinition>
     </boundaryEvent>
-    <sequenceFlow id="flow35" sourceRef="boundarytimer1" targetRef="notifiche1"></sequenceFlow>
-    <boundaryEvent id="boundarytimer2" name="Timer" attachedToRef="subprocess1" cancelActivity="true">
-      <timerEventDefinition></timerEventDefinition>
+    <sequenceFlow id="flow35" name="T1" sourceRef="boundarytimer1" targetRef="notifiche1"></sequenceFlow>
+    <boundaryEvent id="boundarytimer2" name="Timer2" attachedToRef="validazioneResponsabile" cancelActivity="true">
+      <extensionElements>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[timer2-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+      <timerEventDefinition>
+        <timeDuration>P15D</timeDuration>
+      </timerEventDefinition>
     </boundaryEvent>
-    <sequenceFlow id="flow37" sourceRef="exclusivegateway11" targetRef="endevent-annulla"></sequenceFlow>
+    <sequenceFlow id="flow37" sourceRef="exclusivegateway11" targetRef="endevent-annulla">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaFinale == 'Annulla'}]]></conditionExpression>
+    </sequenceFlow>
     <exclusiveGateway id="exclusivegateway11" name="Exclusive Gateway"></exclusiveGateway>
-    <sequenceFlow id="flow45" sourceRef="boundarytimer2" targetRef="exclusivegateway11"></sequenceFlow>
-    <endEvent id="endevent5" name="End"></endEvent>
-    <sequenceFlow id="flow46" sourceRef="exclusivegateway11" targetRef="endevent5"></sequenceFlow>
-    <sequenceFlow id="flow47" name="PRESA VISIONE" sourceRef="exclusivegateway8" targetRef="endevent5"></sequenceFlow>
+    <sequenceFlow id="flow45" name="T2" sourceRef="boundarytimer2" targetRef="exclusivegateway11"></sequenceFlow>
+    <endEvent id="endevent5" name="End">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[endevent-presavisione-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="flow46" sourceRef="exclusivegateway11" targetRef="endevent5">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaFinale == 'PresaVisione'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow47" name="PRESA VISIONE" sourceRef="exclusivegateway8" targetRef="endevent5">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaFinale == 'PresaVisione'}]]></conditionExpression>
+    </sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_smart-working-domanda">
     <bpmndi:BPMNPlane bpmnElement="smart-working-domanda" id="BPMNPlane_smart-working-domanda">
@@ -90,7 +226,7 @@
       <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
         <omgdc:Bounds height="35.0" width="35.0" x="670.0" y="144.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="subprocess1" id="BPMNShape_subprocess1">
+      <bpmndi:BPMNShape bpmnElement="validazioneResponsabile" id="BPMNShape_validazioneResponsabile">
         <omgdc:Bounds height="378.0" width="471.0" x="93.0" y="10.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="startevent2" id="BPMNShape_startevent2">
@@ -150,7 +286,7 @@
         <omgdi:waypoint x="602.0" y="248.0"></omgdi:waypoint>
         <omgdi:waypoint x="670.0" y="248.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="53.0" x="667.0" y="212.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="100.0" x="667.0" y="212.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow29" id="BPMNEdge_flow29">
@@ -158,7 +294,7 @@
         <omgdi:waypoint x="602.0" y="161.0"></omgdi:waypoint>
         <omgdi:waypoint x="670.0" y="161.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="52.0" x="666.0" y="121.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="100.0" x="666.0" y="121.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow30" id="BPMNEdge_flow30">
@@ -166,7 +302,7 @@
         <omgdi:waypoint x="601.0" y="335.0"></omgdi:waypoint>
         <omgdi:waypoint x="676.0" y="335.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="63.0" x="662.0" y="289.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="100.0" x="662.0" y="289.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow31" id="BPMNEdge_flow31">
@@ -181,7 +317,7 @@
         <omgdi:waypoint x="353.0" y="246.0"></omgdi:waypoint>
         <omgdi:waypoint x="487.0" y="246.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="53.0" x="474.0" y="213.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="100.0" x="474.0" y="213.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow38" id="BPMNEdge_flow38">
@@ -196,7 +332,7 @@
         <omgdi:waypoint x="450.0" y="330.0"></omgdi:waypoint>
         <omgdi:waypoint x="487.0" y="330.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="63.0" x="467.0" y="289.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="100.0" x="467.0" y="289.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow41" id="BPMNEdge_flow41">
@@ -210,7 +346,7 @@
         <omgdi:waypoint x="333.0" y="161.0"></omgdi:waypoint>
         <omgdi:waypoint x="487.0" y="161.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="52.0" x="459.0" y="117.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="100.0" x="459.0" y="117.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow44" id="BPMNEdge_flow44">
@@ -228,6 +364,9 @@
       <bpmndi:BPMNEdge bpmnElement="flow35" id="BPMNEdge_flow35">
         <omgdi:waypoint x="223.0" y="202.0"></omgdi:waypoint>
         <omgdi:waypoint x="222.0" y="145.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="231.0" y="190.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow37" id="BPMNEdge_flow37">
         <omgdi:waypoint x="711.0" y="384.0"></omgdi:waypoint>
@@ -236,6 +375,9 @@
       <bpmndi:BPMNEdge bpmnElement="flow45" id="BPMNEdge_flow45">
         <omgdi:waypoint x="581.0" y="385.0"></omgdi:waypoint>
         <omgdi:waypoint x="671.0" y="384.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="581.0" y="358.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow46" id="BPMNEdge_flow46">
         <omgdi:waypoint x="711.0" y="384.0"></omgdi:waypoint>
