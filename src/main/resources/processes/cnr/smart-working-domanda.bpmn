@@ -25,7 +25,7 @@
       </extensionElements>
     </endEvent>
     <sequenceFlow id="flow16" name="VALIDATA" sourceRef="exclusivegateway8" targetRef="endevent-firmato">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaFinale == 'Valida'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${statoFinaleSwitch == 'Valida'}]]></conditionExpression>
     </sequenceFlow>
     <endEvent id="endevent-annulla" name="End">
       <extensionElements>
@@ -46,10 +46,10 @@
       </extensionElements>
     </endEvent>
     <sequenceFlow id="flow29" name="RIFIUTATA" sourceRef="exclusivegateway8" targetRef="endevent1">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaFinale == 'Respingi'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${statoFinaleSwitch == 'Respingi'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow30" name="ANNULLATA" sourceRef="exclusivegateway8" targetRef="endevent-annulla">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaFinale == 'Annulla'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${statoFinaleSwitch == 'Annulla'}]]></conditionExpression>
     </sequenceFlow>
     <subProcess id="validazioneResponsabile" name="VALIDAZIONE RESPONSABILE">
       <extensionElements>
@@ -107,7 +107,7 @@
       <exclusiveGateway id="exclusivegateway9" name="Exclusive Gateway" default="flow38"></exclusiveGateway>
       <sequenceFlow id="flow33" sourceRef="validazione" targetRef="exclusivegateway9"></sequenceFlow>
       <sequenceFlow id="flow36" name="VALIDATA" sourceRef="exclusivegateway9" targetRef="endevent2">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Valida'}]]></conditionExpression>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Valida' && profiloFlusso == 'IV-VIII'}]]></conditionExpression>
       </sequenceFlow>
       <userTask id="modifica" name="MODIFICA" activiti:assignee="${applicazioneSiper}">
         <extensionElements>
@@ -152,7 +152,7 @@
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Respingi'}]]></conditionExpression>
       </sequenceFlow>
       <sequenceFlow id="flow44" name="PRESA VISIONE" sourceRef="exclusivegateway9" targetRef="endevent6">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'PresaVisione'}]]></conditionExpression>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'PresaVisione' && profiloFlusso == 'PresaVisione'}]]></conditionExpression>
       </sequenceFlow>
       <endEvent id="endevent6" name="End">
         <extensionElements>
@@ -206,10 +206,10 @@
       </extensionElements>
     </endEvent>
     <sequenceFlow id="flow46" sourceRef="exclusivegateway11" targetRef="endevent5">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaFinale == 'PresaVisione'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${statoFinaleSwitch == 'PresaVisione'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow47" name="PRESA VISIONE" sourceRef="exclusivegateway8" targetRef="endevent5">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaFinale == 'PresaVisione'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${statoFinaleSwitch == 'PresaVisione'}]]></conditionExpression>
     </sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_smart-working-domanda">

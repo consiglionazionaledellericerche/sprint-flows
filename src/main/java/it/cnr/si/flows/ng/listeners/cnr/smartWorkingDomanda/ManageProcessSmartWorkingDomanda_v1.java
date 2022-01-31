@@ -109,6 +109,17 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 		if(execution.getVariable("sceltaUtente") != null) {
 			sceltaUtente =  (String) execution.getVariable("sceltaUtente");	
 		}
+		
+		//STATO INIZIALE statoFinaleSwitch
+		String statoFinaleSwitch;
+		if (execution.getVariable("profiloFlusso") != null && execution.getVariable("profiloFlusso").toString().equals("PresaVisione")) {
+			statoFinaleSwitch = "PresaVisione";
+		} 
+		if (execution.getVariable("profiloFlusso") != null && execution.getVariable("profiloFlusso").toString().equals("PresaVisione")) {
+			statoFinaleSwitch = "Annulla";
+		} 		
+		
+		
 		String faseEsecuzioneValue = "noValue";
 		// la variabile tipologiaRespinta tiene conto delle varie possibilità di come la domanda è staata respinta
 		faseEsecuzioneValue = faseEsecuzione.getValue(execution).toString();
