@@ -3,9 +3,11 @@ package it.cnr.si.flows.ng.listeners.cnr.smartWorkingDomanda;
 
 
 import it.cnr.si.flows.ng.repository.SetTimerDuedateCmd;
+import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.FlowsTimerService;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.service.AceService;
+import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
 import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
@@ -29,6 +31,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
@@ -43,9 +46,12 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 	@Inject
 	private RuntimeService runtimeService;
 	@Inject
+	private MembershipService membershipService;
+	@Inject
 	private AceService aceService;
 	@Inject
-
+	private AceBridgeService aceBridgeService;
+	@Inject
 	private ManagementService managementService;
 	@Inject
 	private FlowsTimerService flowsTimerService;	
@@ -67,13 +73,6 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 			newTimerDate =  Date.from(currentTimerDate.toInstant().plusSeconds(sec));
 			execution.setVariable("scadenzaPresentazioneDomande",  newTimerDate);
 		}
-		////SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  
-		//Date newTimerDate = formatter.parse(execution.getVariable("scadenzaPresentazioneDomande").toString().substring(0, 19));
-		//LocalDateTime newTimerLocalDate = LocalDateTime.parse( execution.getVariable("scadenzaPresentazioneDomande").toString() ) ;
-		//Date newTimerDate = Date.from(newTimerLocalDate.atZone(ZoneId.systemDefault()).toInstant());
-
-		//2011-03-11T12:13:14
-		//2019-09-21T01:12:00.000Z
 		String timerId = "timerChiusuraBando";
 
 		List<Job> jobTimerChiusuraBando = flowsTimerService.getTimer(execution.getProcessInstanceId(),timerId);
@@ -92,40 +91,64 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 		LocalDate dateRif = LocalDate.now();
 		BossDto responsabileStruttura = null;
 
-		// VERIFICA DIRETTORE
-		//direttoreAce = aceService.bossFirmatarioByUsername(userNameProponente, dateRif);
-		try {
-			responsabileStruttura = aceService.findResponsabileStruttura(userNameProponente, dateRif, TipoAppartenenza.SEDE, "responsabile-struttura");
-			if (responsabileStruttura.getUtente()== null) {
-				throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + userNameProponente + " <br>Si prega di contattare l'help desk in merito<br>");
-			} else {
-			}
-			if (responsabileStruttura.getEntitaOrganizzativa().getId()== null) {
-				throw new BpmnError("412", "l'utenza: " + userNameProponente + " non risulta associata ad alcuna struttura<br>");
-			} else {
-				IdEntitaOrganizzativaDirettore = responsabileStruttura.getEntitaOrganizzativa().getId();
-				entitaOrganizzativaDirettore = aceService.entitaOrganizzativaById(IdEntitaOrganizzativaDirettore);
-				cdsuoAppartenenzaUtente = entitaOrganizzativaDirettore.getCdsuo();
-			}
+		// VERIFICA PROFILO RICHIEDENTE
+		String profiloDomanda = "NON_AMMESSO";
+		String profiloRichiedente = aceService.getPersonaByUsername(userNameProponente).getLivello();
+		// PROFILO RICHIEDENTE IV-VIII
+		if(profiloRichiedente.contains("IV livello")
+				|| profiloRichiedente.contains("V livello")
+				|| profiloRichiedente.contains("VI livello")
+				|| profiloRichiedente.contains("VII livello")
+				|| profiloRichiedente.contains("VIII livello")
+				) {profiloDomanda = "IV-VIII";}
 
-		} catch ( FeignException  e) {
-			throw new BpmnError("412", "Errore nell'avvio del flusso " + e.getMessage().toString());
-		}
-		LOGGER.info("L'utente {} ha come responsabile-struttura [{}] (per SEDE) {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", userNameProponente, responsabileStruttura.getRuolo().getDescr(), responsabileStruttura.getUtente().getUsername(), entitaOrganizzativaDirettore.getDenominazione(), entitaOrganizzativaDirettore.getSigla(), entitaOrganizzativaDirettore.getId(), entitaOrganizzativaDirettore.getCdsuo(), entitaOrganizzativaDirettore.getIdnsip());
+		// PROFILO RICHIEDENTE I-III			
+		if(profiloRichiedente.contains("I livello")
+				|| profiloRichiedente.contains("II livello")
+				|| profiloRichiedente.contains("III livello")
+				) {profiloDomanda = "I-III";}
 
-		//CHECK CORRISPONDENZA EO TRA DICHIARATO UTENTE E ACE
-		String denominazioneEODirettore = entitaOrganizzativaDirettore.getDenominazione();
-		if (execution.getVariable("istitutoProponente") != null && !execution.getVariable("istitutoProponente").toString().equals("SEDE CENTRALE - DIPARTIMENTO")){
-			String denominazioneEOProponente = execution.getVariable("istitutoProponente").toString();
-			if (!denominazioneEODirettore.equalsIgnoreCase(denominazioneEOProponente)) {
-				throw new BpmnError("400", "La struttura dichiarata dall'utente: " + userNameProponente + ": <br>" 
-						+ denominazioneEOProponente
-						+ "<br>non coincide con quella di afferenza amministrativa"
-						+ "<br>presente in anagrafica:<br>" + denominazioneEODirettore
-						+ "<br>contattare l'help desk in merito<br>");
-			}
+		// PROFILO RICHIEDENTE RESPONSABILE			
+		Object[] ruoliRichiedente = membershipService.getAllRolesForUser(userNameProponente).toArray();
+		if (Arrays.asList(ruoliRichiedente).contains("responsabile-struttura")) {
+			profiloDomanda = "RESPONSABILE";
 		}
 
+		// DETERMINA PERCORSO FLUSSO
+		String profiloFlusso = "Indefinito";
+		if(profiloDomanda.equals("RESPONSABILE") || profiloDomanda.equals("I-III")) {
+			profiloFlusso = "PresaVisione";
+		} 
+		if(profiloDomanda.equals("IV-VIII") ) {
+			profiloFlusso = "Validazione";
+		} 		
+
+
+
+		// VERIFICA RESPONSABILE
+		if(profiloDomanda.equals("RESPONSABILE") ) {
+			String idSedeDirettoregenerale = aceService.getSedeIdByIdNsip("630000");
+			IdEntitaOrganizzativaDirettore = Integer.parseInt(idSedeDirettoregenerale);
+		} else {
+			try {
+				responsabileStruttura = aceService.findResponsabileStruttura(userNameProponente, dateRif, TipoAppartenenza.SEDE, "responsabile-struttura");
+				if (responsabileStruttura.getUtente()== null) {
+					throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + userNameProponente + " <br>Si prega di contattare l'help desk in merito<br>");
+				} else {
+				}
+				if (responsabileStruttura.getEntitaOrganizzativa().getId()== null) {
+					throw new BpmnError("412", "l'utenza: " + userNameProponente + " non risulta associata ad alcuna struttura<br>");
+				} else {
+					IdEntitaOrganizzativaDirettore = responsabileStruttura.getEntitaOrganizzativa().getId();
+					entitaOrganizzativaDirettore = aceService.entitaOrganizzativaById(IdEntitaOrganizzativaDirettore);
+					cdsuoAppartenenzaUtente = entitaOrganizzativaDirettore.getCdsuo();
+				}
+
+			} catch ( FeignException  e) {
+				throw new BpmnError("412", "Errore nell'avvio del flusso " + e.getMessage().toString());
+			}
+			LOGGER.info("L'utente {} ha come responsabile-struttura [{}] (per SEDE) {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", userNameProponente, responsabileStruttura.getRuolo().getDescr(), responsabileStruttura.getUtente().getUsername(), entitaOrganizzativaDirettore.getDenominazione(), entitaOrganizzativaDirettore.getSigla(), entitaOrganizzativaDirettore.getId(), entitaOrganizzativaDirettore.getCdsuo(), entitaOrganizzativaDirettore.getIdnsip());
+		}
 
 		String gruppoValidatoriLaboratoriCongiunti = "validatoriLaboratoriCongiunti@0000";
 		String gruppoUfficioProtocollo = "ufficioProtocolloLaboratoriCongiunti@0000";
