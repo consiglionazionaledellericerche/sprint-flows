@@ -123,8 +123,6 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 			profiloFlusso = "Validazione";
 		} 		
 
-
-
 		// VERIFICA RESPONSABILE
 		if(profiloDomanda.equals("RESPONSABILE") ) {
 			String idSedeDirettoregenerale = aceService.getSedeIdByIdNsip("630000");
