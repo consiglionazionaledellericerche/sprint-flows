@@ -126,10 +126,10 @@ public class MembershipService {
         Set<String> roles = new HashSet<>();
 
         roles.addAll( getAceRolessForUser(username) );
-//        roles.addAll( getLocalRolesForUser(username) );
-//        roles.add("USER");
+        roles.addAll( getLocalRolesForUser(username) );
+        roles.add("USER");
 
-//        roles.addAll( getAllChildRolesRecursively(roles, new HashSet<>()) );
+        roles.addAll( getAllChildRolesRecursively(roles, new HashSet<>()) );
 
         log.debug("Ruoli ace e locali per l'utente {}: {}", username, roles);
 
