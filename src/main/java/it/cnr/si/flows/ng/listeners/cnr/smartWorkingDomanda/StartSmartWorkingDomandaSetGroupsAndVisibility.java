@@ -84,8 +84,10 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 		}
 
 		String userNameProponente = execution.getVariable("userNameProponente", String.class);
+
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", userNameProponente, execution.getId(), execution.getVariable("title"));
-		String cdsuoAppartenenzaUtente = null;
+		String cdsuoDirettore = null;
+		String idnsipAppartenenzaUtente = null;
 		Integer IdEntitaOrganizzativaDirettore = 0;
 		SimpleEntitaOrganizzativaWebDto entitaOrganizzativaDirettore = null;
 		LocalDate dateRif = LocalDate.now();
@@ -94,6 +96,10 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 		// VERIFICA PROFILO RICHIEDENTE
 		String profiloDomanda = "NON_AMMESSO";
 		String profiloRichiedente = aceService.getPersonaByUsername(userNameProponente).getLivello();
+		String nomeProponente =  aceService.getPersonaByUsername(userNameProponente).getNome().toString();
+		String cognomeProponente =  aceService.getPersonaByUsername(userNameProponente).getCognome().toString();
+		execution.setVariable("nomeCognomeUtente", nomeProponente + " " + cognomeProponente);
+		
 		// PROFILO RICHIEDENTE IV-VIII
 		if(profiloRichiedente.contains("IV livello")
 				|| profiloRichiedente.contains("V livello")
@@ -138,8 +144,6 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 					throw new BpmnError("412", "l'utenza: " + userNameProponente + " non risulta associata ad alcuna struttura<br>");
 				} else {
 					IdEntitaOrganizzativaDirettore = responsabileStruttura.getEntitaOrganizzativa().getId();
-					entitaOrganizzativaDirettore = aceService.entitaOrganizzativaById(IdEntitaOrganizzativaDirettore);
-					cdsuoAppartenenzaUtente = entitaOrganizzativaDirettore.getCdsuo();
 				}
 
 			} catch ( FeignException  e) {
@@ -148,6 +152,10 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 			LOGGER.info("L'utente {} ha come responsabile-struttura [{}] (per SEDE) {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", userNameProponente, responsabileStruttura.getRuolo().getDescr(), responsabileStruttura.getUtente().getUsername(), entitaOrganizzativaDirettore.getDenominazione(), entitaOrganizzativaDirettore.getSigla(), entitaOrganizzativaDirettore.getId(), entitaOrganizzativaDirettore.getCdsuo(), entitaOrganizzativaDirettore.getIdnsip());
 		}
 
+		entitaOrganizzativaDirettore = aceService.entitaOrganizzativaById(IdEntitaOrganizzativaDirettore);
+		cdsuoDirettore = entitaOrganizzativaDirettore.getCdsuo();
+		idnsipAppartenenzaUtente = entitaOrganizzativaDirettore.getIdnsip();
+		
 		String gruppoValidatoriLaboratoriCongiunti = "validatoriLaboratoriCongiunti@0000";
 		String gruppoUfficioProtocollo = "ufficioProtocolloLaboratoriCongiunti@0000";
 		String gruppoValutatoreScientificoLABDipartimento = "valutatoreScientificoLABDipartimento@0000";
@@ -155,18 +163,11 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 		//DA CAMBIARE - ricavando il direttore della persona che afferisce alla sua struttura
 		String gruppoDirigenteProponente = "responsabile-struttura@" + IdEntitaOrganizzativaDirettore;
 
-		String applicazioneLaboratoriCongiunti = "app.siper";
+		String applicazioneSiper = "app.siper";
 		String applicazioneScrivaniaDigitale = "app.scrivaniadigitale";
 
-		LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}",  gruppoValidatoriLaboratoriCongiunti, gruppoResponsabileAccordiInternazionali, gruppoUfficioProtocollo);
-		LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}",  gruppoValidatoriLaboratoriCongiunti, gruppoResponsabileAccordiInternazionali, gruppoUfficioProtocollo);
-
-		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValidatoriLaboratoriCongiunti, PROCESS_VISUALIZER);
-		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileAccordiInternazionali, PROCESS_VISUALIZER);
-		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneLaboratoriCongiunti, PROCESS_VISUALIZER);
-		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoUfficioProtocollo, PROCESS_VISUALIZER);
+		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneSiper, PROCESS_VISUALIZER);
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoDirigenteProponente, PROCESS_VISUALIZER);
-		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValutatoreScientificoLABDipartimento, PROCESS_VISUALIZER);
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneScrivaniaDigitale, PROCESS_VISUALIZER);
 
 
@@ -175,14 +176,11 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 		execution.setVariable("profiloFlusso", profiloFlusso);
 		
 		execution.setVariable("strutturaValutazioneDirigente", IdEntitaOrganizzativaDirettore + "-" + entitaOrganizzativaDirettore.getDenominazione());
-		execution.setVariable("gruppoValidatoriLaboratoriCongiunti", gruppoValidatoriLaboratoriCongiunti);
-		execution.setVariable("gruppoResponsabileAccordiInternazionali", gruppoResponsabileAccordiInternazionali);
-		execution.setVariable("gruppoUfficioProtocollo", gruppoUfficioProtocollo);
-		execution.setVariable("applicazioneLaboratoriCongiunti", applicazioneLaboratoriCongiunti);
+		execution.setVariable("applicazioneSiper", applicazioneSiper);
 		execution.setVariable("gruppoDirigenteProponente", gruppoDirigenteProponente);
-		execution.setVariable("gruppoValutatoreScientificoLABDipartimento", gruppoValutatoreScientificoLABDipartimento);
+		execution.setVariable("idnsipAppartenenzaUtente", idnsipAppartenenzaUtente);
 		execution.setVariable("applicazioneScrivaniaDigitale", applicazioneScrivaniaDigitale);
-		execution.setVariable("cdsuoProponente", cdsuoAppartenenzaUtente);
+		execution.setVariable("cdsuoDirettore", cdsuoDirettore);
 		execution.setVariable("idStruttura", String.valueOf(IdEntitaOrganizzativaDirettore));
 	}
 }
