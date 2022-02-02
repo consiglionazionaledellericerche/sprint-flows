@@ -85,6 +85,9 @@
 							vm.authorities.includes("ROLE_responsabile#" + vm.data.entity.processDefinitionId.split(':')[0] + "@0000") ||
 							vm.authorities.includes("ROLE_responsabile#" + vm.data.entity.processDefinitionId.split(':')[0] + "@" + vm.data.entity.variabili.idStruttura) ||
 							vm.authorities.includes("ROLE_ADMIN"));
+                    
+                    $scope.isRevocabile = response.data.isRevocabile;
+                     
         		    //riattivo il bottone delle "azioni"
         		    $scope.button.disabled = false;
 				}
