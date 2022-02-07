@@ -95,7 +95,8 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 
 		// VERIFICA PROFILO RICHIEDENTE
 		String profiloDomanda = "NON_AMMESSO";
-		String profiloRichiedente = aceService.getPersonaByUsername(userNameProponente).getLivello();
+		String livelloRichiedente = aceService.getPersonaByUsername(userNameProponente).getLivello();
+		String profiloRichiedente = aceService.getPersonaByUsername(userNameProponente).getProfilo();
 		String nomeProponente =  aceService.getPersonaByUsername(userNameProponente).getNome().toString();
 		String cognomeProponente =  aceService.getPersonaByUsername(userNameProponente).getCognome().toString();
 		execution.setVariable("nomeCognomeUtente", nomeProponente + " " + cognomeProponente);
@@ -149,12 +150,12 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 			} catch ( FeignException  e) {
 				throw new BpmnError("412", "Errore nell'avvio del flusso " + e.getMessage().toString());
 			}
-			LOGGER.info("L'utente {} ha come responsabile-struttura [{}] (per SEDE) {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", userNameProponente, responsabileStruttura.getRuolo().getDescr(), responsabileStruttura.getUtente().getUsername(), entitaOrganizzativaDirettore.getDenominazione(), entitaOrganizzativaDirettore.getSigla(), entitaOrganizzativaDirettore.getId(), entitaOrganizzativaDirettore.getCdsuo(), entitaOrganizzativaDirettore.getIdnsip());
 		}
 
 		entitaOrganizzativaDirettore = aceService.entitaOrganizzativaById(IdEntitaOrganizzativaDirettore);
 		cdsuoDirettore = entitaOrganizzativaDirettore.getCdsuo();
 		idnsipAppartenenzaUtente = entitaOrganizzativaDirettore.getIdnsip();
+		LOGGER.info("L'utente {} ha come responsabile-struttura [{}] (per SEDE) {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", userNameProponente, responsabileStruttura.getRuolo().getDescr(), responsabileStruttura.getUtente().getUsername(), entitaOrganizzativaDirettore.getDenominazione(), entitaOrganizzativaDirettore.getSigla(), entitaOrganizzativaDirettore.getId(), entitaOrganizzativaDirettore.getCdsuo(), entitaOrganizzativaDirettore.getIdnsip());
 		
 		String gruppoValidatoriLaboratoriCongiunti = "validatoriLaboratoriCongiunti@0000";
 		String gruppoUfficioProtocollo = "ufficioProtocolloLaboratoriCongiunti@0000";

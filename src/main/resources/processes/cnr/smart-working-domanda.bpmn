@@ -164,7 +164,7 @@
     <sequenceFlow id="flow37" sourceRef="exclusivegateway11" targetRef="endevent-annulla">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaFinale == 'Annulla'}]]></conditionExpression>
     </sequenceFlow>
-    <exclusiveGateway id="exclusivegateway11" name="Exclusive Gateway"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway11" name="Exclusive Gateway" default="flow46"></exclusiveGateway>
     <sequenceFlow id="flow45" name="T2" sourceRef="boundarytimer2" targetRef="exclusivegateway11"></sequenceFlow>
     <endEvent id="endevent5" name="End">
       <extensionElements>
@@ -175,9 +175,7 @@
         </activiti:executionListener>
       </extensionElements>
     </endEvent>
-    <sequenceFlow id="flow46" sourceRef="exclusivegateway11" targetRef="endevent5">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${statoFinaleSwitch == 'PresaVisione'}]]></conditionExpression>
-    </sequenceFlow>
+    <sequenceFlow id="flow46" sourceRef="exclusivegateway11" targetRef="endevent5"></sequenceFlow>
     <sequenceFlow id="flow47" name="PRESA VISIONE" sourceRef="exclusivegateway8" targetRef="endevent5">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${statoFinaleSwitch == 'PresaVisione'}]]></conditionExpression>
     </sequenceFlow>
@@ -363,7 +361,7 @@
         <omgdi:waypoint x="581.0" y="385.0"></omgdi:waypoint>
         <omgdi:waypoint x="671.0" y="384.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="12.0" x="581.0" y="358.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="12.0" x="596.0" y="343.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow46" id="BPMNEdge_flow46">
@@ -384,7 +382,7 @@
         <omgdi:waypoint x="581.0" y="38.0"></omgdi:waypoint>
         <omgdi:waypoint x="635.0" y="37.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="581.0" y="11.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="12.0" x="596.0" y="-4.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>

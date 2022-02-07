@@ -132,6 +132,8 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 			// START
 			case "process-start": {
 				startSmartWorkingDomandaSetGroupsAndVisibility.configuraVariabiliStart(execution);
+				execution.setVariable("title", "Domanda Smart-Working " + execution.getVariable("nomeCognomeUtente"));
+
 			};break;    	
 			// START
 			case "validazione-start": {
