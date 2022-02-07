@@ -99,6 +99,19 @@
 			utils.downloadFile(url, filename, 'application/pdf');
 		};
 
+        $scope.avviaFlussoRevoca = function() {
+            $uibModal.open({
+                templateUrl: 'app/pages/details/revoca.modal.html',
+                controller: 'RevocaModalController',
+                controllerAs: 'vm',
+                size: 'md',
+                resolve: {
+                    processInstanceId: function() {
+                        return $scope.processInstanceId;
+                    }
+                }
+            })
+        };
 
 		$scope.editVariable = function(variableName, currentValue) {
 			$uibModal.open({

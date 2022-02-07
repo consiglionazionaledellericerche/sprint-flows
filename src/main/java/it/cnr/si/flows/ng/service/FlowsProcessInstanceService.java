@@ -52,8 +52,8 @@ import static it.cnr.si.flows.ng.utils.Utils.*;
 public class FlowsProcessInstanceService {
 
     public static final ArrayList<String> processiRevocabili = new ArrayList<String>() {{
-        add("smart-woking");
-//        add("covid19");
+        add("smart-woking"); // TODO: definire qui i flussi revocabili
+        add("covid19");
     }};
     
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsProcessInstanceService.class);
