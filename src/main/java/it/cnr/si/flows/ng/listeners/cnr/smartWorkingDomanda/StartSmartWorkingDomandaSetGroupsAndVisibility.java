@@ -101,19 +101,19 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 		String cognomeProponente =  aceService.getPersonaByUsername(userNameProponente).getCognome().toString();
 		execution.setVariable("nomeCognomeUtente", nomeProponente + " " + cognomeProponente);
 		
-		// PROFILO RICHIEDENTE IV-VIII
-		if(profiloRichiedente.contains("IV livello")
-				|| profiloRichiedente.contains("V livello")
-				|| profiloRichiedente.contains("VI livello")
-				|| profiloRichiedente.contains("VII livello")
-				|| profiloRichiedente.contains("VIII livello")
-				) {profiloDomanda = "IV-VIII";}
+		// PROFILO RICHIEDENTE collaboratore
+		if(livelloRichiedente.equals("04")
+				|| livelloRichiedente.equals("05")
+				|| livelloRichiedente.equals("06")
+				|| livelloRichiedente.equals("07")
+				|| livelloRichiedente.equals("08")
+				) {profiloDomanda = "collaboratore";}
 
-		// PROFILO RICHIEDENTE I-III			
-		if(profiloRichiedente.contains("I livello")
-				|| profiloRichiedente.contains("II livello")
-				|| profiloRichiedente.contains("III livello")
-				) {profiloDomanda = "I-III";}
+		// PROFILO RICHIEDENTE ricercatore-tecnologo			
+		if(livelloRichiedente.equals("01")
+				|| livelloRichiedente.equals("02")
+				|| livelloRichiedente.equals("03")
+				) {profiloDomanda = "ricercatore-tecnologo";}
 
 		// PROFILO RICHIEDENTE RESPONSABILE			
 		Object[] ruoliRichiedente = membershipService.getAllRolesForUser(userNameProponente).toArray();
@@ -123,10 +123,10 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 
 		// DETERMINA PERCORSO FLUSSO
 		String profiloFlusso = "Indefinito";
-		if(profiloDomanda.equals("RESPONSABILE") || profiloDomanda.equals("I-III")) {
+		if(profiloDomanda.equals("RESPONSABILE") || profiloDomanda.equals("ricercatore-tecnologo")) {
 			profiloFlusso = "PresaVisione";
 		} 
-		if(profiloDomanda.equals("IV-VIII") ) {
+		if(profiloDomanda.equals("collaboratore") ) {
 			profiloFlusso = "Validazione";
 		} 		
 
@@ -172,7 +172,7 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneScrivaniaDigitale, PROCESS_VISUALIZER);
 
 
-		execution.setVariable("profiloRichiedente", profiloRichiedente);
+		execution.setVariable("livelloRichiedente", livelloRichiedente);
 		execution.setVariable("profiloDomanda", profiloDomanda);
 		execution.setVariable("profiloFlusso", profiloFlusso);
 		
