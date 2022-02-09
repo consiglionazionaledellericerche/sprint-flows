@@ -166,6 +166,15 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 			};break; 
 
 
+			// FINE SUBPROCESS
+			case "validazioneResponsabile-start": {
+				LOGGER.info("**** inizio SUBPROCESS");
+			};break; 		
+			case "validazioneResponsabile-end": {
+				LOGGER.info("**** fine SUBPROCESS");
+			};break; 		
+
+			
 			// FINE FLUSSO
 			case "endevent-annullata-start": {
 				execution.setVariable("statoFinaleDomanda", Enum.StatoDomandeSmartWorkingEnum.ANNULLATA.toString());
