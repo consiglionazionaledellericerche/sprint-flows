@@ -15,40 +15,6 @@
     </extensionElements>
     <startEvent id="startevent1" name="Start"></startEvent>
     <sequenceFlow id="flow1" name="START " sourceRef="startevent1" targetRef="validazioneResponsabile"></sequenceFlow>
-    <endEvent id="endevent-firmato" name="End">
-      <extensionElements>
-        <activiti:executionListener event="start" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
-          <activiti:field name="faseEsecuzione">
-            <activiti:string><![CDATA[endevent-validata-start]]></activiti:string>
-          </activiti:field>
-        </activiti:executionListener>
-      </extensionElements>
-    </endEvent>
-    <sequenceFlow id="flow16" name="VALIDATA" sourceRef="exclusivegateway8" targetRef="endevent-firmato">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${statoFinaleSwitch == 'Valida'}]]></conditionExpression>
-    </sequenceFlow>
-    <endEvent id="endevent-annulla" name="End">
-      <extensionElements>
-        <activiti:executionListener event="start" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
-          <activiti:field name="faseEsecuzione">
-            <activiti:string><![CDATA[endevent-annulla]]></activiti:string>
-          </activiti:field>
-        </activiti:executionListener>
-      </extensionElements>
-    </endEvent>
-    <endEvent id="endevent1" name="End">
-      <extensionElements>
-        <activiti:executionListener event="start" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
-          <activiti:field name="faseEsecuzione">
-            <activiti:string><![CDATA[endevent-rifiutata-start]]></activiti:string>
-          </activiti:field>
-        </activiti:executionListener>
-      </extensionElements>
-    </endEvent>
-    <sequenceFlow id="flow29" name="RIFIUTATA" sourceRef="exclusivegateway8" targetRef="endevent1">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${statoFinaleSwitch == 'Respingi'}]]></conditionExpression>
-    </sequenceFlow>
-    <sequenceFlow id="flow30" name="ANNULLATA" sourceRef="exclusivegateway8" targetRef="endevent-annulla"></sequenceFlow>
     <subProcess id="validazioneResponsabile" name="VALIDAZIONE RESPONSABILE">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
@@ -90,7 +56,7 @@
       <exclusiveGateway id="exclusivegateway9" name="Exclusive Gateway" default="flow38"></exclusiveGateway>
       <sequenceFlow id="flow33" sourceRef="validazione" targetRef="exclusivegateway9"></sequenceFlow>
       <sequenceFlow id="flow36" name="VALIDATA" sourceRef="exclusivegateway9" targetRef="endevent2">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Valida' && profiloFlusso == 'IV-VIII'}]]></conditionExpression>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Valida' && profiloFlusso == 'Validazione'}]]></conditionExpression>
       </sequenceFlow>
       <userTask id="modifica" name="MODIFICA" activiti:assignee="${applicazioneSiper}">
         <extensionElements>
@@ -146,9 +112,25 @@
           </activiti:executionListener>
         </extensionElements>
       </endEvent>
+      <endEvent id="endevent5" name="End">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[endevent-presavisione-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </endEvent>
+      <endEvent id="endevent-annulla" name="End">
+        <extensionElements>
+          <activiti:executionListener event="start" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
+            <activiti:field name="faseEsecuzione">
+              <activiti:string><![CDATA[endevent-annullata-start]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      </endEvent>
     </subProcess>
-    <exclusiveGateway id="exclusivegateway8" name="Exclusive Gateway" default="flow30"></exclusiveGateway>
-    <sequenceFlow id="flow32" sourceRef="validazioneResponsabile" targetRef="exclusivegateway8"></sequenceFlow>
     <boundaryEvent id="boundarytimer2" name="Timer2" attachedToRef="validazioneResponsabile" cancelActivity="true">
       <extensionElements>
         <activiti:executionListener event="end" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
@@ -161,24 +143,6 @@
         <timeDuration>P15D</timeDuration>
       </timerEventDefinition>
     </boundaryEvent>
-    <sequenceFlow id="flow37" sourceRef="exclusivegateway11" targetRef="endevent-annulla">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaFinale == 'Annulla'}]]></conditionExpression>
-    </sequenceFlow>
-    <exclusiveGateway id="exclusivegateway11" name="Exclusive Gateway" default="flow46"></exclusiveGateway>
-    <sequenceFlow id="flow45" name="T2" sourceRef="boundarytimer2" targetRef="exclusivegateway11"></sequenceFlow>
-    <endEvent id="endevent5" name="End">
-      <extensionElements>
-        <activiti:executionListener event="start" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
-          <activiti:field name="faseEsecuzione">
-            <activiti:string><![CDATA[endevent-presavisione-start]]></activiti:string>
-          </activiti:field>
-        </activiti:executionListener>
-      </extensionElements>
-    </endEvent>
-    <sequenceFlow id="flow46" sourceRef="exclusivegateway11" targetRef="endevent5"></sequenceFlow>
-    <sequenceFlow id="flow47" name="PRESA VISIONE" sourceRef="exclusivegateway8" targetRef="endevent5">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${statoFinaleSwitch == 'PresaVisione'}]]></conditionExpression>
-    </sequenceFlow>
     <sequenceFlow id="flow48" name="T1" sourceRef="boundarytimer1" targetRef="notifiche1">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${statoValidazione == 'si'}]]></conditionExpression>
     </sequenceFlow>
@@ -202,20 +166,45 @@
       </extensionElements>
       <script>execution.setVariable('notifica', true);</script>
     </scriptTask>
+    <endEvent id="endevent7" name="End">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[end-process-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="flow49" name="END" sourceRef="validazioneResponsabile" targetRef="endevent7"></sequenceFlow>
+    <sequenceFlow id="flow50" name="T2" sourceRef="boundarytimer2" targetRef="exclusivegateway12"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway12" name="Exclusive Gateway" default="flow52"></exclusiveGateway>
+    <endEvent id="endevent8" name="End">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[endevent-presavisione-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
+    <endEvent id="endevent9" name="End">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[endevent-annullata-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="flow51" name="PRESA VISIONE" sourceRef="exclusivegateway12" targetRef="endevent8">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${profiloFlusso == 'Validazione'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow52" name="ANNULLATA" sourceRef="exclusivegateway12" targetRef="endevent9"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_smart-working-domanda">
     <bpmndi:BPMNPlane bpmnElement="smart-working-domanda" id="BPMNPlane_smart-working-domanda">
       <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
         <omgdc:Bounds height="35.0" width="35.0" x="11.0" y="181.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="endevent-firmato" id="BPMNShape_endevent-firmato">
-        <omgdc:Bounds height="35.0" width="35.0" x="670.0" y="231.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="endevent-annulla" id="BPMNShape_endevent-annulla">
-        <omgdc:Bounds height="35.0" width="35.0" x="676.0" y="316.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
-        <omgdc:Bounds height="35.0" width="35.0" x="670.0" y="144.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="validazioneResponsabile" id="BPMNShape_validazioneResponsabile">
         <omgdc:Bounds height="378.0" width="471.0" x="93.0" y="10.0"></omgdc:Bounds>
@@ -247,53 +236,38 @@
       <bpmndi:BPMNShape bpmnElement="endevent6" id="BPMNShape_endevent6">
         <omgdc:Bounds height="35.0" width="35.0" x="487.0" y="70.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent5" id="BPMNShape_endevent5">
+        <omgdc:Bounds height="35.0" width="35.0" x="666.0" y="253.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent-annulla" id="BPMNShape_endevent-annulla">
+        <omgdc:Bounds height="35.0" width="35.0" x="666.0" y="349.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="boundarytimer2" id="BPMNShape_boundarytimer2">
-        <omgdc:Bounds height="30.0" width="30.0" x="551.0" y="370.0"></omgdc:Bounds>
+        <omgdc:Bounds height="30.0" width="30.0" x="551.0" y="303.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="boundarytimer1" id="BPMNShape_boundarytimer1">
         <omgdc:Bounds height="30.0" width="30.0" x="551.0" y="23.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="exclusivegateway8" id="BPMNShape_exclusivegateway8">
-        <omgdc:Bounds height="40.0" width="40.0" x="582.0" y="184.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="exclusivegateway11" id="BPMNShape_exclusivegateway11">
-        <omgdc:Bounds height="40.0" width="40.0" x="676.0" y="364.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="endevent5" id="BPMNShape_endevent5">
-        <omgdc:Bounds height="35.0" width="35.0" x="670.0" y="70.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="notifiche1" id="BPMNShape_notifiche1">
-        <omgdc:Bounds height="55.0" width="105.0" x="635.0" y="10.0"></omgdc:Bounds>
+        <omgdc:Bounds height="55.0" width="105.0" x="630.0" y="10.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent7" id="BPMNShape_endevent7">
+        <omgdc:Bounds height="35.0" width="35.0" x="666.0" y="181.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway12" id="BPMNShape_exclusivegateway12">
+        <omgdc:Bounds height="40.0" width="40.0" x="620.0" y="297.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent8" id="BPMNShape_endevent8">
+        <omgdc:Bounds height="35.0" width="35.0" x="666.0" y="256.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent9" id="BPMNShape_endevent9">
+        <omgdc:Bounds height="35.0" width="35.0" x="665.0" y="353.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
         <omgdi:waypoint x="46.0" y="198.0"></omgdi:waypoint>
         <omgdi:waypoint x="93.0" y="199.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
           <omgdc:Bounds height="14.0" width="37.0" x="11.0" y="155.0"></omgdc:Bounds>
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow16" id="BPMNEdge_flow16">
-        <omgdi:waypoint x="602.0" y="224.0"></omgdi:waypoint>
-        <omgdi:waypoint x="602.0" y="248.0"></omgdi:waypoint>
-        <omgdi:waypoint x="670.0" y="248.0"></omgdi:waypoint>
-        <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="53.0" x="661.0" y="211.0"></omgdc:Bounds>
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow29" id="BPMNEdge_flow29">
-        <omgdi:waypoint x="602.0" y="184.0"></omgdi:waypoint>
-        <omgdi:waypoint x="602.0" y="161.0"></omgdi:waypoint>
-        <omgdi:waypoint x="670.0" y="161.0"></omgdi:waypoint>
-        <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="52.0" x="662.0" y="185.0"></omgdc:Bounds>
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow30" id="BPMNEdge_flow30">
-        <omgdi:waypoint x="602.0" y="224.0"></omgdi:waypoint>
-        <omgdi:waypoint x="601.0" y="333.0"></omgdi:waypoint>
-        <omgdi:waypoint x="676.0" y="333.0"></omgdi:waypoint>
-        <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="63.0" x="663.0" y="289.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow31" id="BPMNEdge_flow31">
@@ -309,7 +283,7 @@
         <omgdi:waypoint x="333.0" y="246.0"></omgdi:waypoint>
         <omgdi:waypoint x="487.0" y="246.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="53.0" x="458.0" y="222.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="100.0" x="458.0" y="219.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow38" id="BPMNEdge_flow38">
@@ -349,40 +323,41 @@
           <omgdc:Bounds height="14.0" width="77.0" x="447.0" y="111.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow32" id="BPMNEdge_flow32">
-        <omgdi:waypoint x="564.0" y="199.0"></omgdi:waypoint>
-        <omgdi:waypoint x="582.0" y="204.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow37" id="BPMNEdge_flow37">
-        <omgdi:waypoint x="696.0" y="364.0"></omgdi:waypoint>
-        <omgdi:waypoint x="693.0" y="351.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow45" id="BPMNEdge_flow45">
-        <omgdi:waypoint x="581.0" y="385.0"></omgdi:waypoint>
-        <omgdi:waypoint x="676.0" y="384.0"></omgdi:waypoint>
-        <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="12.0" x="611.0" y="328.0"></omgdc:Bounds>
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow46" id="BPMNEdge_flow46">
-        <omgdi:waypoint x="716.0" y="384.0"></omgdi:waypoint>
-        <omgdi:waypoint x="749.0" y="383.0"></omgdi:waypoint>
-        <omgdi:waypoint x="749.0" y="87.0"></omgdi:waypoint>
-        <omgdi:waypoint x="705.0" y="87.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow47" id="BPMNEdge_flow47">
-        <omgdi:waypoint x="602.0" y="184.0"></omgdi:waypoint>
-        <omgdi:waypoint x="602.0" y="87.0"></omgdi:waypoint>
-        <omgdi:waypoint x="670.0" y="87.0"></omgdi:waypoint>
-        <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="77.0" x="649.0" y="111.0"></omgdc:Bounds>
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow48" id="BPMNEdge_flow48">
         <omgdi:waypoint x="581.0" y="38.0"></omgdi:waypoint>
-        <omgdi:waypoint x="635.0" y="37.0"></omgdi:waypoint>
+        <omgdi:waypoint x="630.0" y="37.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="12.0" x="611.0" y="-19.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="12.0" x="595.0" y="-4.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow49" id="BPMNEdge_flow49">
+        <omgdi:waypoint x="564.0" y="199.0"></omgdi:waypoint>
+        <omgdi:waypoint x="666.0" y="198.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="20.0" x="669.0" y="156.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow50" id="BPMNEdge_flow50">
+        <omgdi:waypoint x="581.0" y="318.0"></omgdi:waypoint>
+        <omgdi:waypoint x="620.0" y="317.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="576.0" y="291.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow51" id="BPMNEdge_flow51">
+        <omgdi:waypoint x="640.0" y="297.0"></omgdi:waypoint>
+        <omgdi:waypoint x="640.0" y="273.0"></omgdi:waypoint>
+        <omgdi:waypoint x="666.0" y="273.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="660.0" y="241.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow52" id="BPMNEdge_flow52">
+        <omgdi:waypoint x="640.0" y="337.0"></omgdi:waypoint>
+        <omgdi:waypoint x="640.0" y="370.0"></omgdi:waypoint>
+        <omgdi:waypoint x="665.0" y="370.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="660.0" y="334.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>

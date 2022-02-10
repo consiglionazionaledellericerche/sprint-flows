@@ -153,16 +153,24 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 
 			// FINE SUBPROCESS
 			case "endsubprocess-annullata-start": {
-				execution.setVariable("statoFinaleSwitch", Enum.StatoDomandeSmartWorkingEnum.ANNULLATA.toString());
+				execution.setVariable("statoFinaleDomanda", Enum.StatoDomandeSmartWorkingEnum.ANNULLATA.toString());
+				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSmartWorkingEnum.ANNULLATA.toString());
+				restToApplicazioneSiper(execution, Enum.StatoDomandeSmartWorkingEnum.ANNULLATA);
 			};break; 
 			case "endsubprocess-validata-start": {
-				execution.setVariable("statoFinaleSwitch", Enum.StatoDomandeSmartWorkingEnum.VALIDATA.toString());
+				execution.setVariable("statoFinaleDomanda", Enum.StatoDomandeSmartWorkingEnum.VALIDATA.toString());
+				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSmartWorkingEnum.VALIDATA.toString());
+				restToApplicazioneSiper(execution, Enum.StatoDomandeSmartWorkingEnum.VALIDATA);
 			};break; 
 			case "endsubprocess-rifiutata-start": {
-				execution.setVariable("statoFinaleSwitch", Enum.StatoDomandeSmartWorkingEnum.RIFIUTATA.toString());
+				execution.setVariable("statoFinaleDomanda", Enum.StatoDomandeSmartWorkingEnum.RIFIUTATA.toString());
+				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSmartWorkingEnum.RIFIUTATA.toString());
+				restToApplicazioneSiper(execution, Enum.StatoDomandeSmartWorkingEnum.RIFIUTATA);
 			};break; 
 			case "endsubprocess-presavisione-start": {
-				execution.setVariable("statoFinaleSwitch", Enum.StatoDomandeSmartWorkingEnum.PRESA_VISIONE.toString());
+				execution.setVariable("statoFinaleDomanda", Enum.StatoDomandeSmartWorkingEnum.PRESA_VISIONE.toString());
+				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSmartWorkingEnum.PRESA_VISIONE.toString());
+				restToApplicazioneSiper(execution, Enum.StatoDomandeSmartWorkingEnum.PRESA_VISIONE);
 			};break; 
 
 
@@ -174,27 +182,24 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 				LOGGER.info("**** fine SUBPROCESS");
 			};break; 		
 
-			
+
 			// FINE FLUSSO
 			case "endevent-annullata-start": {
 				execution.setVariable("statoFinaleDomanda", Enum.StatoDomandeSmartWorkingEnum.ANNULLATA.toString());
 				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSmartWorkingEnum.ANNULLATA.toString());
 				restToApplicazioneSiper(execution, Enum.StatoDomandeSmartWorkingEnum.ANNULLATA);
 			};break; 		
-			case "endevent-validata-start": {
-				execution.setVariable("statoFinaleDomanda", Enum.StatoDomandeSmartWorkingEnum.VALIDATA.toString());
-				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSmartWorkingEnum.VALIDATA.toString());
-				restToApplicazioneSiper(execution, Enum.StatoDomandeSmartWorkingEnum.VALIDATA);
-			};break; 		
-			case "endevent-rifiutata-start": {
-				execution.setVariable("statoFinaleDomanda", Enum.StatoDomandeSmartWorkingEnum.RIFIUTATA.toString());
-				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSmartWorkingEnum.RIFIUTATA.toString());
-				restToApplicazioneSiper(execution, Enum.StatoDomandeSmartWorkingEnum.RIFIUTATA);
-			};break; 		
 			case "endevent-presavisione-start": {
 				execution.setVariable("statoFinaleDomanda", Enum.StatoDomandeSmartWorkingEnum.PRESA_VISIONE.toString());
 				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSmartWorkingEnum.PRESA_VISIONE.toString());
 				restToApplicazioneSiper(execution, Enum.StatoDomandeSmartWorkingEnum.PRESA_VISIONE);
+			};break; 			
+
+			case "end-process-start": {
+				LOGGER.info("**** end-process-start");
+			};break; 			
+			case "process-end": {
+				LOGGER.info("**** fine PROCESS");
 			};break; 			
 
 

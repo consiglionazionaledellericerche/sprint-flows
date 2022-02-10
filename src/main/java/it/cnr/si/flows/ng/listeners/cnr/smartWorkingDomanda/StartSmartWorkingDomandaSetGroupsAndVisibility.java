@@ -100,7 +100,7 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 		String nomeProponente =  aceService.getPersonaByUsername(userNameProponente).getNome().toString();
 		String cognomeProponente =  aceService.getPersonaByUsername(userNameProponente).getCognome().toString();
 		execution.setVariable("nomeCognomeUtente", nomeProponente + " " + cognomeProponente);
-		
+
 		// PROFILO RICHIEDENTE collaboratore
 		if(livelloRichiedente.equals("04")
 				|| livelloRichiedente.equals("05")
@@ -108,30 +108,35 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 				|| livelloRichiedente.equals("07")
 				|| livelloRichiedente.equals("08")
 				) {profiloDomanda = "collaboratore";}
+		else {
 
-		// PROFILO RICHIEDENTE ricercatore-tecnologo			
-		if(livelloRichiedente.equals("01")
-				|| livelloRichiedente.equals("02")
-				|| livelloRichiedente.equals("03")
-				) {profiloDomanda = "ricercatore-tecnologo";}
-
-		// PROFILO RICHIEDENTE RESPONSABILE			
-		Object[] ruoliRichiedente = membershipService.getAllRolesForUser(userNameProponente).toArray();
-		if (Arrays.asList(ruoliRichiedente).contains("responsabile-struttura")) {
-			profiloDomanda = "RESPONSABILE";
+			// PROFILO RICHIEDENTE ricercatore-tecnologo			
+			if(livelloRichiedente.equals("01")
+					|| livelloRichiedente.equals("02")
+					|| livelloRichiedente.equals("03")
+					) {profiloDomanda = "ricercatore-tecnologo";}
+			else {
+				profiloDomanda = "direttore-responsabile";
+			}
 		}
+
+		// PROFILO RICHIEDENTE direttore-responsabile			
+//		Object[] ruoliRichiedente = membershipService.getAllRolesForUser(userNameProponente).toArray();
+//		if (Arrays.asList(ruoliRichiedente).contains("responsabile-struttura")) {
+//			profiloDomanda = "direttore-responsabile";
+//		}
 
 		// DETERMINA PERCORSO FLUSSO
 		String profiloFlusso = "Indefinito";
-		if(profiloDomanda.equals("RESPONSABILE") || profiloDomanda.equals("ricercatore-tecnologo")) {
+		if(profiloDomanda.equals("direttore-responsabile") || profiloDomanda.equals("ricercatore-tecnologo")) {
 			profiloFlusso = "PresaVisione";
 		} 
 		if(profiloDomanda.equals("collaboratore") ) {
 			profiloFlusso = "Validazione";
 		} 		
 
-		// VERIFICA RESPONSABILE
-		if(profiloDomanda.equals("RESPONSABILE") ) {
+		// VERIFICA direttore-responsabile
+		if(profiloDomanda.equals("direttore-responsabile") ) {
 			String idSedeDirettoregenerale = aceService.getSedeIdByIdNsip("630000");
 			IdEntitaOrganizzativaDirettore = Integer.parseInt(idSedeDirettoregenerale);
 		} else {
@@ -156,7 +161,7 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 		cdsuoDirettore = entitaOrganizzativaDirettore.getCdsuo();
 		idnsipAppartenenzaUtente = entitaOrganizzativaDirettore.getIdnsip();
 		LOGGER.info("L'utente {} ha come responsabile-struttura [{}] (per SEDE) {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", userNameProponente, responsabileStruttura.getRuolo().getDescr(), responsabileStruttura.getUtente().getUsername(), entitaOrganizzativaDirettore.getDenominazione(), entitaOrganizzativaDirettore.getSigla(), entitaOrganizzativaDirettore.getId(), entitaOrganizzativaDirettore.getCdsuo(), entitaOrganizzativaDirettore.getIdnsip());
-		
+
 		String gruppoValidatoriLaboratoriCongiunti = "validatoriLaboratoriCongiunti@0000";
 		String gruppoUfficioProtocollo = "ufficioProtocolloLaboratoriCongiunti@0000";
 		String gruppoValutatoreScientificoLABDipartimento = "valutatoreScientificoLABDipartimento@0000";
@@ -175,7 +180,7 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 		execution.setVariable("livelloRichiedente", livelloRichiedente);
 		execution.setVariable("profiloDomanda", profiloDomanda);
 		execution.setVariable("profiloFlusso", profiloFlusso);
-		
+
 		execution.setVariable("strutturaValutazioneDirigente", IdEntitaOrganizzativaDirettore + "-" + entitaOrganizzativaDirettore.getDenominazione());
 		execution.setVariable("applicazioneSiper", applicazioneSiper);
 		execution.setVariable("gruppoDirigenteProponente", gruppoDirigenteProponente);
