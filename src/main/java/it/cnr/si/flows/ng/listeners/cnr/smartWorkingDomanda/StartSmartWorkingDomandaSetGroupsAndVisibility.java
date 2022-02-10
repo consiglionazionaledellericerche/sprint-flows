@@ -121,10 +121,10 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 		}
 
 		// PROFILO RICHIEDENTE direttore-responsabile			
-//		Object[] ruoliRichiedente = membershipService.getAllRolesForUser(userNameProponente).toArray();
-//		if (Arrays.asList(ruoliRichiedente).contains("responsabile-struttura")) {
-//			profiloDomanda = "direttore-responsabile";
-//		}
+		//		Object[] ruoliRichiedente = membershipService.getAllRolesForUser(userNameProponente).toArray();
+		//		if (Arrays.asList(ruoliRichiedente).contains("responsabile-struttura")) {
+		//			profiloDomanda = "direttore-responsabile";
+		//		}
 
 		// DETERMINA PERCORSO FLUSSO
 		String profiloFlusso = "Indefinito";
@@ -160,8 +160,11 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 		entitaOrganizzativaDirettore = aceService.entitaOrganizzativaById(IdEntitaOrganizzativaDirettore);
 		cdsuoDirettore = entitaOrganizzativaDirettore.getCdsuo();
 		idnsipAppartenenzaUtente = entitaOrganizzativaDirettore.getIdnsip();
-		LOGGER.info("L'utente {} ha come responsabile-struttura [{}] (per SEDE) {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", userNameProponente, responsabileStruttura.getRuolo().getDescr(), responsabileStruttura.getUtente().getUsername(), entitaOrganizzativaDirettore.getDenominazione(), entitaOrganizzativaDirettore.getSigla(), entitaOrganizzativaDirettore.getId(), entitaOrganizzativaDirettore.getCdsuo(), entitaOrganizzativaDirettore.getIdnsip());
-
+		if(profiloDomanda.equals("direttore-responsabile") ) {
+			LOGGER.info("L'utente {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", userNameProponente, entitaOrganizzativaDirettore.getDenominazione(), entitaOrganizzativaDirettore.getSigla(), entitaOrganizzativaDirettore.getId(), entitaOrganizzativaDirettore.getCdsuo(), entitaOrganizzativaDirettore.getIdnsip());
+		} else {
+			LOGGER.info("L'utente {} ha come responsabile-struttura [{}] (per SEDE) {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", userNameProponente, responsabileStruttura.getRuolo().getDescr(), responsabileStruttura.getUtente().getUsername(), entitaOrganizzativaDirettore.getDenominazione(), entitaOrganizzativaDirettore.getSigla(), entitaOrganizzativaDirettore.getId(), entitaOrganizzativaDirettore.getCdsuo(), entitaOrganizzativaDirettore.getIdnsip());
+		}
 		String gruppoValidatoriLaboratoriCongiunti = "validatoriLaboratoriCongiunti@0000";
 		String gruppoUfficioProtocollo = "ufficioProtocolloLaboratoriCongiunti@0000";
 		String gruppoValutatoreScientificoLABDipartimento = "valutatoreScientificoLABDipartimento@0000";
