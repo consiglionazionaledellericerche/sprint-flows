@@ -121,7 +121,10 @@
                 getHistoryForPi: function (processInstanceId) {
                     return $http.get('api/processInstances/getHistoryForPi?' +
                         'processInstanceId=' + processInstanceId);
-                }
+                },
+                revoca: function (processInstanceId) {
+                    return $http.post('api/processInstances/revoca?' +
+                        'processInstanceId=' + processInstanceId);                }
             },
             attachments: {
                 pubblicaDocumento: function (processInstanceId, attachmentName, flag) {

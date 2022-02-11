@@ -85,6 +85,9 @@
 							vm.authorities.includes("ROLE_responsabile#" + vm.data.entity.processDefinitionId.split(':')[0] + "@0000") ||
 							vm.authorities.includes("ROLE_responsabile#" + vm.data.entity.processDefinitionId.split(':')[0] + "@" + vm.data.entity.variabili.idStruttura) ||
 							vm.authorities.includes("ROLE_ADMIN"));
+                    
+                    $scope.isRevocabile = response.data.isRevocabile;
+                     
         		    //riattivo il bottone delle "azioni"
         		    $scope.button.disabled = false;
 				}
@@ -96,6 +99,19 @@
 			utils.downloadFile(url, filename, 'application/pdf');
 		};
 
+        $scope.avviaFlussoRevoca = function() {
+            $uibModal.open({
+                templateUrl: 'app/pages/details/revoca.modal.html',
+                controller: 'RevocaModalController',
+                controllerAs: 'vm',
+                size: 'md',
+                resolve: {
+                    processInstanceId: function() {
+                        return $scope.processInstanceId;
+                    }
+                }
+            })
+        };
 
 		$scope.editVariable = function(variableName, currentValue) {
 			$uibModal.open({
