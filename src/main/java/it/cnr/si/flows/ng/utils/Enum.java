@@ -158,6 +158,7 @@ public class Enum {
         PRESA_VISIONE,
         VALIDATA,
         RIFIUTATA,
+        COMUNICATA,
         ANNULLATA;
     }
 
