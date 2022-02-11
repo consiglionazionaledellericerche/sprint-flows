@@ -6,7 +6,7 @@
 	<property name="ireport.y" value="0"/>
 	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="355"/>
 	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="635"/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ValutazioneLaboratoriCongiunti"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="valutazioneLaboratoriCongiuntiTematici.json.xml"/>
 	<style name="SubTitle" forecolor="#736343" fontName="Arial" fontSize="18"/>
 	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
 	<style name="Detail" fontName="Arial" fontSize="12"/>
@@ -629,7 +629,7 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="obiettivi"/>
 		<fieldDescription><![CDATA[obiettivi]]></fieldDescription>
 	</field>
-	<field name="punteggio_totale" class="java.lang.String">
+	<field name="punteggio_totale" class="java.math.BigDecimal">
 		<property name="net.sf.jasperreports.json.field.expression" value="punteggio_totale"/>
 		<fieldDescription><![CDATA[punteggio_totale]]></fieldDescription>
 	</field>
@@ -737,23 +737,15 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="taskId"/>
 		<fieldDescription><![CDATA[taskId]]></fieldDescription>
 	</field>
-	<field name="punteggio_originalita_scientifica" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="punteggio_originalita_scientifica"/>
-		<fieldDescription><![CDATA[punteggio_originalita_scientifica]]></fieldDescription>
+	<field name="punteggio_rilevanza_scientifica" class="java.math.BigDecimal">
+		<property name="net.sf.jasperreports.json.field.expression" value="punteggio_rilevanza_scientifica"/>
+		<fieldDescription><![CDATA[punteggio_rilevanza_scientifica]]></fieldDescription>
 	</field>
-	<field name="commento_originalita_scientifica" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="commento_originalita_scientifica"/>
-		<fieldDescription><![CDATA[commento_originalita_scientifica]]></fieldDescription>
+	<field name="commento_rilevanza_scientifica" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="commento_rilevanza_scientifica"/>
+		<fieldDescription><![CDATA[commento_rilevanza_scientifica]]></fieldDescription>
 	</field>
-	<field name="punteggio_qualificazione_proponenti" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="punteggio_qualificazione_proponenti"/>
-		<fieldDescription><![CDATA[punteggio_qualificazione_proponenti]]></fieldDescription>
-	</field>
-	<field name="commento_qualificazione_proponenti" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="commento_qualificazione_proponenti"/>
-		<fieldDescription><![CDATA[commento_qualificazione_proponenti]]></fieldDescription>
-	</field>
-	<field name="punteggio_documentazione_presentazione_progetto" class="java.lang.String">
+	<field name="punteggio_documentazione_presentazione_progetto" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="punteggio_documentazione_presentazione_progetto"/>
 		<fieldDescription><![CDATA[punteggio_documentazione_presentazione_progetto]]></fieldDescription>
 	</field>
@@ -761,7 +753,7 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="commento_documentazione_presentazione_progetto"/>
 		<fieldDescription><![CDATA[commento_documentazione_presentazione_progetto]]></fieldDescription>
 	</field>
-	<field name="punteggio_utilita_necessita_collaborazione" class="java.lang.String">
+	<field name="punteggio_utilita_necessita_collaborazione" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="punteggio_utilita_necessita_collaborazione"/>
 		<fieldDescription><![CDATA[punteggio_utilita_necessita_collaborazione]]></fieldDescription>
 	</field>
@@ -769,7 +761,23 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="commento_utilita_necessita_collaborazione"/>
 		<fieldDescription><![CDATA[commento_utilita_necessita_collaborazione]]></fieldDescription>
 	</field>
-	<field name="punteggio_potenzialita_ricerca_sviluppo_CNR" class="java.lang.String">
+	<field name="punteggio_coinvolgimento_giovani_ricercatori" class="java.lang.Integer">
+		<property name="net.sf.jasperreports.json.field.expression" value="punteggio_coinvolgimento_giovani_ricercatori"/>
+		<fieldDescription><![CDATA[punteggio_coinvolgimento_giovani_ricercatori]]></fieldDescription>
+	</field>
+	<field name="commento_coinvolgimento_giovani_ricercatori" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="commento_coinvolgimento_giovani_ricercatori"/>
+		<fieldDescription><![CDATA[commento_coinvolgimento_giovani_ricercatori]]></fieldDescription>
+	</field>
+	<field name="punteggio_potenzialita_finanziamenti" class="java.lang.Integer">
+		<property name="net.sf.jasperreports.json.field.expression" value="punteggio_potenzialita_finanziamenti"/>
+		<fieldDescription><![CDATA[punteggio_potenzialita_finanziamenti]]></fieldDescription>
+	</field>
+	<field name="commento_potenzialita_finanziamenti" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="commento_potenzialita_finanziamenti"/>
+		<fieldDescription><![CDATA[commento_potenzialita_finanziamenti]]></fieldDescription>
+	</field>
+	<field name="punteggio_potenzialita_ricerca_sviluppo_CNR" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="punteggio_potenzialita_ricerca_sviluppo_CNR"/>
 		<fieldDescription><![CDATA[punteggio_potenzialita_ricerca_sviluppo_CNR]]></fieldDescription>
 	</field>
@@ -777,7 +785,7 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="commento_potenzialita_ricerca_sviluppo_CNR"/>
 		<fieldDescription><![CDATA[commento_potenzialita_ricerca_sviluppo_CNR]]></fieldDescription>
 	</field>
-	<field name="punteggio_potenzialita_investimenti_privati" class="java.lang.String">
+	<field name="punteggio_potenzialita_investimenti_privati" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="punteggio_potenzialita_investimenti_privati"/>
 		<fieldDescription><![CDATA[punteggio_potenzialita_investimenti_privati]]></fieldDescription>
 	</field>
@@ -785,7 +793,7 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="commento_potenzialita_investimenti_privati"/>
 		<fieldDescription><![CDATA[commento_potenzialita_investimenti_privati]]></fieldDescription>
 	</field>
-	<field name="punteggio_sfruttamento_diffusione_risultati" class="java.lang.String">
+	<field name="punteggio_sfruttamento_diffusione_risultati" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="punteggio_sfruttamento_diffusione_risultati"/>
 		<fieldDescription><![CDATA[punteggio_sfruttamento_diffusione_risultati]]></fieldDescription>
 	</field>
@@ -793,7 +801,15 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="commento_sfruttamento_diffusione_risultati"/>
 		<fieldDescription><![CDATA[commento_sfruttamento_diffusione_risultati]]></fieldDescription>
 	</field>
-	<field name="punteggio_congruita_economica_progetto" class="java.lang.String">
+	<field name="punteggio_esistenza_precedenti_accordi" class="java.lang.Integer">
+		<property name="net.sf.jasperreports.json.field.expression" value="punteggio_esistenza_precedenti_accordi"/>
+		<fieldDescription><![CDATA[punteggio_esistenza_precedenti_accordi]]></fieldDescription>
+	</field>
+	<field name="commento_esistenza_precedenti_accordi" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="commento_esistenza_precedenti_accordi"/>
+		<fieldDescription><![CDATA[commento_esistenza_precedenti_accordi]]></fieldDescription>
+	</field>
+	<field name="punteggio_congruita_economica_progetto" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="punteggio_congruita_economica_progetto"/>
 		<fieldDescription><![CDATA[punteggio_congruita_economica_progetto]]></fieldDescription>
 	</field>
@@ -835,6 +851,13 @@
 					</textElement>
 					<textFieldExpression><![CDATA["Dipartimento: " + $F{dipartimento}]]></textFieldExpression>
 				</textField>
+				<textField textAdjust="ScaleFont">
+					<reportElement x="0" y="43" width="549" height="20" uuid="e8f33161-c67f-4e87-8660-ef4465174cb5"/>
+					<textElement textAlignment="Center">
+						<font size="14" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["CRITERI DI VALUTAZIONE"]]></textFieldExpression>
+				</textField>
 			</band>
 		</groupHeader>
 	</group>
@@ -848,7 +871,7 @@
 				<textElement textAlignment="Center">
 					<font size="20" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["MODULO DI VALUTAZIONE \r\n LABORATORI CONGIUNTI ARCHEOLOGICI"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["MODULO DI VALUTAZIONE \r\n LABORATORI CONGIUNTI TEMATICI"]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight">
 				<reportElement x="-3" y="70" width="555" height="21" uuid="10119319-030e-4176-a69a-e86a174f58cc"/>
@@ -876,85 +899,105 @@
 				<textFieldExpression><![CDATA["Punteggio totale : "+ $F{punteggio_totale} +"\r\n"]]></textFieldExpression>
 			</textField>
 		</band>
-		<band height="28" splitType="Stretch">
+		<band height="17" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="11" width="555" height="17" uuid="7ac903fa-55d2-4e21-a610-fa7dda8d3df3"/>
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="555" height="17" uuid="7ac903fa-55d2-4e21-a610-fa7dda8d3df3"/>
 				<textElement textAlignment="Justified" markup="styled">
 					<font fontName="Times New Roman" size="11" isBold="true" isItalic="false"/>
 					<paragraph lineSpacing="1_1_2"/>
 				</textElement>
-				<textFieldExpression><![CDATA["1 - Originalità scientifica della proposta\r\nPunteggio (attribuire punteggio da 1 a 10)): : "  + $F{punteggio_originalita_scientifica} + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commento_originalita_scientifica} + "\r\n\r\n</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["1 - Rilevanza scientifica del progetto (grado di originalità e di innovazione)\r\nPunteggio (attribuire punteggio da 1 a 10)): : "  + $F{punteggio_rilevanza_scientifica} + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commento_rilevanza_scientifica} + "\r\n\r\n</style>"]]></textFieldExpression>
 			</textField>
 		</band>
-		<band height="27">
+		<band height="17">
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="10" width="555" height="17" uuid="ae569f93-4b65-45b7-8ff9-06ecb89dfdb5"/>
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="555" height="17" uuid="ae569f93-4b65-45b7-8ff9-06ecb89dfdb5"/>
 				<textElement textAlignment="Justified" markup="styled">
 					<font fontName="Times New Roman" size="11" isBold="true" isItalic="false"/>
 					<paragraph lineSpacing="1_1_2"/>
 				</textElement>
-				<textFieldExpression><![CDATA["2 - Qualificazione dei proponenti\r\nPunteggio (attribuire un punteggio da 1 a 10): "  +  $F{punteggio_qualificazione_proponenti}  + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commento_qualificazione_proponenti} + "\r\n\r\n</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["2 - Documentazione e presentazione del progetto (piano di lavoro e metodologia)\r\nPunteggio (attribuire un punteggio da 1 a 10): "  + $F{punteggio_documentazione_presentazione_progetto} + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commento_documentazione_presentazione_progetto} + "\r\n\r\n</style>"]]></textFieldExpression>
 			</textField>
 		</band>
-		<band height="27">
+		<band height="17">
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="10" width="555" height="17" uuid="490c5503-b865-4ce3-a6f6-9fc1e0a34273"/>
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="555" height="17" uuid="8ee5071a-874a-4189-8411-44783a8d6eae"/>
 				<textElement textAlignment="Justified" markup="styled">
 					<font fontName="Times New Roman" size="11" isBold="true" isItalic="false"/>
 					<paragraph lineSpacing="1_1_2"/>
 				</textElement>
-				<textFieldExpression><![CDATA["3 - Documentazione e presentazione del progetto (piano di lavoro e metodologia)\r\nPunteggio (attribuire un punteggio da 1 a 10): "  + $F{punteggio_documentazione_presentazione_progetto} + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commento_documentazione_presentazione_progetto} + "\r\n\r\n</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["3 - Utilità e necessità della collaborazione bilaterale\r\nPunteggio (attribuire un punteggio da 1 a 10): "  + $F{punteggio_utilita_necessita_collaborazione} + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commento_utilita_necessita_collaborazione} + "\r\n\r\n</style>"]]></textFieldExpression>
 			</textField>
 		</band>
-		<band height="27">
+		<band height="17">
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="10" width="555" height="17" uuid="8ee5071a-874a-4189-8411-44783a8d6eae"/>
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="555" height="17" uuid="490c5503-b865-4ce3-a6f6-9fc1e0a34273"/>
 				<textElement textAlignment="Justified" markup="styled">
 					<font fontName="Times New Roman" size="11" isBold="true" isItalic="false"/>
 					<paragraph lineSpacing="1_1_2"/>
 				</textElement>
-				<textFieldExpression><![CDATA["4 - Utilità e necessità della collaborazione bilaterale\r\nPunteggio (attribuire un punteggio da 1 a 10): "  + $F{punteggio_utilita_necessita_collaborazione} + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commento_utilita_necessita_collaborazione} + "\r\n\r\n</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["4 - Coinvolgimento di giovani ricercatori\r\nPunteggio (attribuire un punteggio da 1 a 10): "  + $F{punteggio_coinvolgimento_giovani_ricercatori} + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commento_coinvolgimento_giovani_ricercatori} + "\r\n\r\n</style>"]]></textFieldExpression>
 			</textField>
 		</band>
-		<band height="27">
+		<band height="18">
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="10" width="555" height="17" uuid="576a9aae-c724-49bf-88fd-7c878a7513eb"/>
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="555" height="17" uuid="25e33c64-5f43-4f75-b462-88482905a607"/>
 				<textElement textAlignment="Justified" markup="styled">
 					<font fontName="Times New Roman" size="11" isBold="true" isItalic="false"/>
 					<paragraph lineSpacing="1_1_2"/>
 				</textElement>
-				<textFieldExpression><![CDATA["5 - Potenzialità di creare ricerca e sviluppo per il CNR\r\nPunteggio (attribuire un punteggio da 1 a 10): "  + $F{punteggio_potenzialita_ricerca_sviluppo_CNR} + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commento_potenzialita_ricerca_sviluppo_CNR} + "\r\n\r\n</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["5 - Potenzialità di partecipare con successo ai finanziamenti dell’Unione Europea o altri finanziamenti internazionali\r\nPunteggio (attribuire un punteggio da 1 a 10): "  + $F{punteggio_potenzialita_finanziamenti} + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commento_potenzialita_finanziamenti} + "\r\n\r\n</style>"]]></textFieldExpression>
 			</textField>
 		</band>
-		<band height="27">
+		<band height="17">
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="10" width="555" height="17" uuid="50ae8835-3b1a-4443-89b0-5b771b3a358e"/>
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="555" height="17" uuid="576a9aae-c724-49bf-88fd-7c878a7513eb"/>
 				<textElement textAlignment="Justified" markup="styled">
 					<font fontName="Times New Roman" size="11" isBold="true" isItalic="false"/>
 					<paragraph lineSpacing="1_1_2"/>
 				</textElement>
-				<textFieldExpression><![CDATA["6 - Potenzialità di attrarre investimenti privati\r\nPunteggio (attribuire un punteggio da 1 a 10): "  + $F{punteggio_potenzialita_investimenti_privati} + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commento_potenzialita_investimenti_privati} + "\r\n\r\n</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["6 - Potenzialità di creare ricerca e sviluppo per il CNR\r\nPunteggio (attribuire un punteggio da 1 a 10): "  + $F{punteggio_potenzialita_ricerca_sviluppo_CNR} + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commento_potenzialita_ricerca_sviluppo_CNR} + "\r\n\r\n</style>"]]></textFieldExpression>
 			</textField>
 		</band>
-		<band height="27">
+		<band height="17">
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="10" width="555" height="17" uuid="d6228200-81e7-41b0-9fb5-dac17aac0d70"/>
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="555" height="17" uuid="50ae8835-3b1a-4443-89b0-5b771b3a358e"/>
 				<textElement textAlignment="Justified" markup="styled">
 					<font fontName="Times New Roman" size="11" isBold="true" isItalic="false"/>
 					<paragraph lineSpacing="1_1_2"/>
 				</textElement>
-				<textFieldExpression><![CDATA["7 - Sfruttamento e/o diffusione/pubblicazione dei risultati\r\nPunteggio (attribuire un punteggio da 1 a 10): "  + $F{punteggio_sfruttamento_diffusione_risultati} + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commento_sfruttamento_diffusione_risultati} + "\r\n\r\n</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["7 - Potenzialità di attrarre investimenti privati\r\nPunteggio (attribuire un punteggio da 1 a 10): "  + $F{punteggio_potenzialita_investimenti_privati} + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commento_potenzialita_investimenti_privati} + "\r\n\r\n</style>"]]></textFieldExpression>
 			</textField>
 		</band>
-		<band height="27">
+		<band height="17">
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="10" width="555" height="17" uuid="464a4527-2b2e-4b20-b74d-bbdd43e69ad7"/>
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="555" height="17" uuid="d6228200-81e7-41b0-9fb5-dac17aac0d70"/>
 				<textElement textAlignment="Justified" markup="styled">
 					<font fontName="Times New Roman" size="11" isBold="true" isItalic="false"/>
 					<paragraph lineSpacing="1_1_2"/>
 				</textElement>
-				<textFieldExpression><![CDATA["8 - Congruità economica del progetto\r\nPunteggio (attribuire un punteggio da 1 a 10): "  + $F{punteggio_congruita_economica_progetto} + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commento_congruita_economica_progetto} + "\r\n\r\n</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["8 - Sfruttamento e/o diffusione/pubblicazione dei risultati\r\nPunteggio (attribuire un punteggio da 1 a 10): "  + $F{punteggio_sfruttamento_diffusione_risultati} + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commento_sfruttamento_diffusione_risultati} + "\r\n\r\n</style>"]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="19">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="555" height="17" uuid="78dabeda-2827-469f-bc4b-d946c20f4dc0"/>
+				<textElement textAlignment="Justified" markup="styled">
+					<font fontName="Times New Roman" size="11" isBold="true" isItalic="false"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["9 - Esistenza di precedenti accordi e/o pubblicazioni congiunte\r\nPunteggio (attribuire un punteggio da 1 a 10): "  + $F{punteggio_esistenza_precedenti_accordi} + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commento_esistenza_precedenti_accordi} + "\r\n\r\n</style>"]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="17">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="555" height="17" uuid="464a4527-2b2e-4b20-b74d-bbdd43e69ad7"/>
+				<textElement textAlignment="Justified" markup="styled">
+					<font fontName="Times New Roman" size="11" isBold="true" isItalic="false"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["10 - Congruità economica del progetto\r\nPunteggio (attribuire un punteggio da 1 a 10): "  + $F{punteggio_congruita_economica_progetto} + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commento_congruita_economica_progetto} + "\r\n\r\n</style>"]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

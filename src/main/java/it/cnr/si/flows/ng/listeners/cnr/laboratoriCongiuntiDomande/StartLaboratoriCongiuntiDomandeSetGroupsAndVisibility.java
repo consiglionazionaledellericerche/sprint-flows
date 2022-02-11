@@ -126,37 +126,45 @@ public class StartLaboratoriCongiuntiDomandeSetGroupsAndVisibility {
 			}
 		}
 
+		if (execution.getVariable("dipartimentoId").toString().equals("514000")){
+			execution.setVariable("tipologiaLaboratori","Aecheologici");
+		} else {
+			execution.setVariable("tipologiaLaboratori","Tematici");
+		}
 
-		String gruppoValidatoriLaboratoriCongiunti = "validatoriLaboratoriCongiunti@0000";
-		String gruppoUfficioProtocollo = "ufficioProtocolloLaboratoriCongiunti@0000";
-		String gruppoValutatoreScientificoLABDipartimento = "valutatoreScientificoLABDipartimento@0000";
-		String gruppoResponsabileAccordiInternazionali = "responsabileAccordiInternazionali@0000";
-		//DA CAMBIARE - ricavando il direttore della persona che afferisce alla sua struttura
-		String gruppoDirigenteProponente = "responsabile-struttura@" + IdEntitaOrganizzativaDirettore;
+		if(execution.getVariable("tipologiaLaboratori").equals("Aecheologici")) {
 
-		String applicazioneLaboratoriCongiunti = "app.labcon";
-		String applicazioneScrivaniaDigitale = "app.scrivaniadigitale";
 
-		LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}",  gruppoValidatoriLaboratoriCongiunti, gruppoResponsabileAccordiInternazionali, gruppoUfficioProtocollo);
-		LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}",  gruppoValidatoriLaboratoriCongiunti, gruppoResponsabileAccordiInternazionali, gruppoUfficioProtocollo);
+			String gruppoValidatoriLaboratoriCongiunti = "validatoriLaboratoriCongiunti@0000";
+			String gruppoUfficioProtocollo = "ufficioProtocolloLaboratoriCongiunti@0000";
+			String gruppoValutatoreScientificoLABDipartimento = "valutatoreScientificoLABDipartimento@0000";
+			String gruppoResponsabileAccordiInternazionali = "responsabileAccordiInternazionali@0000";
+			//DA CAMBIARE - ricavando il direttore della persona che afferisce alla sua struttura
+			String gruppoDirigenteProponente = "responsabile-struttura@" + IdEntitaOrganizzativaDirettore;
 
-		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValidatoriLaboratoriCongiunti, PROCESS_VISUALIZER);
-		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileAccordiInternazionali, PROCESS_VISUALIZER);
-		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneLaboratoriCongiunti, PROCESS_VISUALIZER);
-		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoUfficioProtocollo, PROCESS_VISUALIZER);
-		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoDirigenteProponente, PROCESS_VISUALIZER);
-		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValutatoreScientificoLABDipartimento, PROCESS_VISUALIZER);
-		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneScrivaniaDigitale, PROCESS_VISUALIZER);
+			String applicazioneLaboratoriCongiunti = "app.labcon";
+			String applicazioneScrivaniaDigitale = "app.scrivaniadigitale";
 
-		execution.setVariable("strutturaValutazioneDirigente", IdEntitaOrganizzativaDirettore + "-" + entitaOrganizzativaDirettore.getDenominazione());
-		execution.setVariable("gruppoValidatoriLaboratoriCongiunti", gruppoValidatoriLaboratoriCongiunti);
-		execution.setVariable("gruppoResponsabileAccordiInternazionali", gruppoResponsabileAccordiInternazionali);
-		execution.setVariable("gruppoUfficioProtocollo", gruppoUfficioProtocollo);
-		execution.setVariable("applicazioneLaboratoriCongiunti", applicazioneLaboratoriCongiunti);
-		execution.setVariable("gruppoDirigenteProponente", gruppoDirigenteProponente);
-		execution.setVariable("gruppoValutatoreScientificoLABDipartimento", gruppoValutatoreScientificoLABDipartimento);
-		execution.setVariable("applicazioneScrivaniaDigitale", applicazioneScrivaniaDigitale);
-		execution.setVariable("cdsuoProponente", cdsuoAppartenenzaUtente);
-		execution.setVariable("idStruttura", String.valueOf(IdEntitaOrganizzativaDirettore));
+			LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}",  gruppoValidatoriLaboratoriCongiunti, gruppoResponsabileAccordiInternazionali, gruppoUfficioProtocollo);
+			LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}",  gruppoValidatoriLaboratoriCongiunti, gruppoResponsabileAccordiInternazionali, gruppoUfficioProtocollo);
+
+			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValidatoriLaboratoriCongiunti, PROCESS_VISUALIZER);
+			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileAccordiInternazionali, PROCESS_VISUALIZER);
+			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneLaboratoriCongiunti, PROCESS_VISUALIZER);
+			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoUfficioProtocollo, PROCESS_VISUALIZER);
+			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoDirigenteProponente, PROCESS_VISUALIZER);
+			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValutatoreScientificoLABDipartimento, PROCESS_VISUALIZER);
+			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneScrivaniaDigitale, PROCESS_VISUALIZER);
+
+			execution.setVariable("strutturaValutazioneDirigente", IdEntitaOrganizzativaDirettore + "-" + entitaOrganizzativaDirettore.getDenominazione());
+			execution.setVariable("gruppoValidatoriLaboratoriCongiunti", gruppoValidatoriLaboratoriCongiunti);
+			execution.setVariable("gruppoResponsabileAccordiInternazionali", gruppoResponsabileAccordiInternazionali);
+			execution.setVariable("gruppoUfficioProtocollo", gruppoUfficioProtocollo);
+			execution.setVariable("applicazioneLaboratoriCongiunti", applicazioneLaboratoriCongiunti);
+			execution.setVariable("gruppoDirigenteProponente", gruppoDirigenteProponente);
+			execution.setVariable("gruppoValutatoreScientificoLABDipartimento", gruppoValutatoreScientificoLABDipartimento);
+			execution.setVariable("applicazioneScrivaniaDigitale", applicazioneScrivaniaDigitale);
+			execution.setVariable("cdsuoProponente", cdsuoAppartenenzaUtente);
+			execution.setVariable("idStruttura", String.valueOf(IdEntitaOrganizzativaDirettore));
+		}
 	}
-}

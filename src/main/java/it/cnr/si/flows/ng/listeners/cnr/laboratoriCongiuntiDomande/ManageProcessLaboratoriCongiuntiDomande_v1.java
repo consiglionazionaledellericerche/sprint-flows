@@ -273,49 +273,103 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 					execution.setVariable("gruppoValutatoreScientificoLABDipartimento", gruppoValutatoreScientificoLABDipartimento);
 					LOGGER.debug("Imposto i gruppi dipartimento : {} - del flusso {}", idDipartimento, gruppoValutatoreScientificoLABDipartimento);
 				} else {
-					execution.setVariable("domandaCorrenteValutataFlag", "true");
-					execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.VALUTATA_SCIENTIFICAMENTE.toString());
-					//restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.VALUTATA_SCIENTIFICAMENTE);
-					utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeLABEnum.VALUTATA_SCIENTIFICAMENTE.toString());	
-					Double punteggioTotale= 
-							Double.parseDouble(execution.getVariable("punteggio_originalita_scientifica").toString().replaceAll(",", ".")) 
-							+ Double.parseDouble(execution.getVariable("punteggio_qualificazione_proponenti").toString().replaceAll(",", "."))
-							+ Double.parseDouble(execution.getVariable("punteggio_documentazione_presentazione_progetto").toString().replaceAll(",", "."))
-							+ Double.parseDouble(execution.getVariable("punteggio_utilita_necessita_collaborazione").toString().replaceAll(",", "."))
-							+ Double.parseDouble(execution.getVariable("punteggio_potenzialita_ricerca_sviluppo_CNR").toString().replaceAll(",", "."))
-							+ Double.parseDouble(execution.getVariable("punteggio_potenzialita_investimenti_privati").toString().replaceAll(",", "."))
-							+ Double.parseDouble(execution.getVariable("punteggio_sfruttamento_diffusione_risultati").toString().replaceAll(",", "."))
-							+ Double.parseDouble(execution.getVariable("punteggio_congruita_economica_progetto").toString().replaceAll(",", "."));
-					execution.setVariable("punteggio_totale", punteggioTotale.toString());
-					//CREAZIONE PDF VALUTAZIONE
-					//PARAMETRI GENERAZIONE PDF x SIGLA PRINT
-					String nomeFile="valutazioneLaboratoriCongiunti";
-					String labelFile="Scheda Valutazione Domanda";
-					String report = "/scrivaniadigitale/valutazioneLaboratoriCongiunti.jrxml";
-					//tipologiaDoc è la tipologia del file
-					String tipologiaDoc = Enum.PdfType.valueOf("valutazioneLaboratoriCongiunti").name();
-					String utenteFile = execution.getVariable("initiator").toString();
+					if(execution.getVariable("tipologiaLaboratori").equals("Aecheologici")) {
+						//LABORATORI ARCHEOLOGICI
+						execution.setVariable("domandaCorrenteValutataFlag", "true");
+						execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.VALUTATA_SCIENTIFICAMENTE.toString());
+						//restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.VALUTATA_SCIENTIFICAMENTE);
+						utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeLABEnum.VALUTATA_SCIENTIFICAMENTE.toString());	
+						Double punteggioTotale= 
+								Double.parseDouble(execution.getVariable("punteggio_originalita_scientifica").toString().replaceAll(",", ".")) 
+								+ Double.parseDouble(execution.getVariable("punteggio_qualificazione_proponenti").toString().replaceAll(",", "."))
+								+ Double.parseDouble(execution.getVariable("punteggio_documentazione_presentazione_progetto").toString().replaceAll(",", "."))
+								+ Double.parseDouble(execution.getVariable("punteggio_utilita_necessita_collaborazione").toString().replaceAll(",", "."))
+								+ Double.parseDouble(execution.getVariable("punteggio_potenzialita_ricerca_sviluppo_CNR").toString().replaceAll(",", "."))
+								+ Double.parseDouble(execution.getVariable("punteggio_potenzialita_investimenti_privati").toString().replaceAll(",", "."))
+								+ Double.parseDouble(execution.getVariable("punteggio_sfruttamento_diffusione_risultati").toString().replaceAll(",", "."))
+								+ Double.parseDouble(execution.getVariable("punteggio_congruita_economica_progetto").toString().replaceAll(",", "."));
+						execution.setVariable("punteggio_totale", punteggioTotale.toString());
+						//CREAZIONE PDF VALUTAZIONE
+						//PARAMETRI GENERAZIONE PDF x SIGLA PRINT
+						String nomeFile="valutazioneLaboratoriCongiunti";
+						String labelFile="Scheda Valutazione Domanda";
+						String report = "/scrivaniadigitale/valutazioneLaboratoriCongiunti.jrxml";
+						//tipologiaDoc è la tipologia del file
+						String tipologiaDoc = Enum.PdfType.valueOf("valutazioneLaboratoriCongiunti").name();
+						String utenteFile = execution.getVariable("initiator").toString();
 
-					// UPDATE VARIABILI FLUSSO
-					utils.updateJsonSearchTerms(executionId, processInstanceId, stato);
-					// GENERAZIONE PDF
-					List<String> listaVariabiliHtml = new ArrayList<String>();
-					listaVariabiliHtml.add("commento");
-					flowsPdfService.makePdfBySigla(tipologiaDoc, processInstanceId, listaVariabiliHtml, labelFile, report);
-					//flowsPdfService.makePdf(nomeFile, processInstanceId);
+						// UPDATE VARIABILI FLUSSO
+						utils.updateJsonSearchTerms(executionId, processInstanceId, stato);
+						// GENERAZIONE PDF
+						List<String> listaVariabiliHtml = new ArrayList<String>();
+						listaVariabiliHtml.add("commento");
+						flowsPdfService.makePdfBySigla(tipologiaDoc, processInstanceId, listaVariabiliHtml, labelFile, report);
+						//flowsPdfService.makePdf(nomeFile, processInstanceId);
 
-					FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
-					documentoGenerato.setLabel(labelFile);
-					flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
-					runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_originalita_scientifica", execution.getVariable("punteggio_originalita_scientifica"));
-					runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_qualificazione_proponenti", execution.getVariable("punteggio_qualificazione_proponenti"));
-					runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_documentazione_presentazione_progetto", execution.getVariable("punteggio_documentazione_presentazione_progetto"));
-					runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_utilita_necessita_collaborazione", execution.getVariable("punteggio_utilita_necessita_collaborazione"));
-					runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_potenzialita_ricerca_sviluppo_CNR", execution.getVariable("punteggio_potenzialita_ricerca_sviluppo_CNR"));
-					runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_potenzialita_investimenti_privati", execution.getVariable("punteggio_potenzialita_investimenti_privati"));
-					runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_sfruttamento_diffusione_risultati", execution.getVariable("punteggio_sfruttamento_diffusione_risultati"));
-					runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_congruita_economica_progetto", execution.getVariable("punteggio_congruita_economica_progetto"));
-				}
+						FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
+						documentoGenerato.setLabel(labelFile);
+						flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
+						runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_originalita_scientifica", execution.getVariable("punteggio_originalita_scientifica"));
+						runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_qualificazione_proponenti", execution.getVariable("punteggio_qualificazione_proponenti"));
+						runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_documentazione_presentazione_progetto", execution.getVariable("punteggio_documentazione_presentazione_progetto"));
+						runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_utilita_necessita_collaborazione", execution.getVariable("punteggio_utilita_necessita_collaborazione"));
+						runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_potenzialita_ricerca_sviluppo_CNR", execution.getVariable("punteggio_potenzialita_ricerca_sviluppo_CNR"));
+						runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_potenzialita_investimenti_privati", execution.getVariable("punteggio_potenzialita_investimenti_privati"));
+						runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_sfruttamento_diffusione_risultati", execution.getVariable("punteggio_sfruttamento_diffusione_risultati"));
+						runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_congruita_economica_progetto", execution.getVariable("punteggio_congruita_economica_progetto"));
+					} 
+					else {
+						//LABORATORI TEMATICI
+						execution.setVariable("domandaCorrenteValutataFlag", "true");
+						execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.VALUTATA_SCIENTIFICAMENTE.toString());
+						//restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.VALUTATA_SCIENTIFICAMENTE);
+						utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeLABEnum.VALUTATA_SCIENTIFICAMENTE.toString());	
+						Double punteggioTotale= 
+								Double.parseDouble(execution.getVariable("punteggio_rilevanza_scientifica").toString().replaceAll(",", ".")) 
+								+ Double.parseDouble(execution.getVariable("punteggio_documentazione_presentazione_progetto").toString().replaceAll(",", "."))
+								+ Double.parseDouble(execution.getVariable("punteggio_utilita_necessita_collaborazione").toString().replaceAll(",", "."))
+								+ Double.parseDouble(execution.getVariable("punteggio_coinvolgimento_giovani_ricercatori").toString().replaceAll(",", "."))
+								+ Double.parseDouble(execution.getVariable("punteggio_potenzialita_finanziamenti").toString().replaceAll(",", "."))
+								+ Double.parseDouble(execution.getVariable("punteggio_potenzialita_ricerca_sviluppo_CNR").toString().replaceAll(",", "."))
+								+ Double.parseDouble(execution.getVariable("punteggio_potenzialita_investimenti_privati").toString().replaceAll(",", "."))
+								+ Double.parseDouble(execution.getVariable("punteggio_sfruttamento_diffusione_risultati").toString().replaceAll(",", "."))
+								+ Double.parseDouble(execution.getVariable("punteggio_esistenza_precedenti_accordi").toString().replaceAll(",", "."))
+								+ Double.parseDouble(execution.getVariable("punteggio_congruita_economica_progetto").toString().replaceAll(",", "."));
+						execution.setVariable("punteggio_totale", punteggioTotale.toString());
+						//CREAZIONE PDF VALUTAZIONE
+						//PARAMETRI GENERAZIONE PDF x SIGLA PRINT
+						String nomeFile="valutazioneLaboratoriCongiuntiTematici";
+						String labelFile="Scheda Valutazione Domanda";
+						String report = "/scrivaniadigitale/valutazioneLaboratoriCongiuntiTematici.jrxml";
+						//tipologiaDoc è la tipologia del file
+						String tipologiaDoc = Enum.PdfType.valueOf("valutazioneLaboratoriCongiuntiTematici").name();
+						String utenteFile = execution.getVariable("initiator").toString();
+
+						// UPDATE VARIABILI FLUSSO
+						utils.updateJsonSearchTerms(executionId, processInstanceId, stato);
+						// GENERAZIONE PDF
+						List<String> listaVariabiliHtml = new ArrayList<String>();
+						listaVariabiliHtml.add("commento");
+						flowsPdfService.makePdfBySigla(tipologiaDoc, processInstanceId, listaVariabiliHtml, labelFile, report);
+						//flowsPdfService.makePdf(nomeFile, processInstanceId);
+
+						FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
+						documentoGenerato.setLabel(labelFile);
+						flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
+						runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_rilevanza_scientifica", execution.getVariable("punteggio_rilevanza_scientifica"));
+						runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_documentazione_presentazione_progetto", execution.getVariable("punteggio_documentazione_presentazione_progetto"));
+						runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_utilita_necessita_collaborazione", execution.getVariable("punteggio_utilita_necessita_collaborazione"));
+						runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_coinvolgimento_giovani_ricercatori", execution.getVariable("punteggio_coinvolgimento_giovani_ricercatori"));
+						runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_potenzialita_finanziamenti", execution.getVariable("punteggio_potenzialita_finanziamenti"));
+						runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_potenzialita_ricerca_sviluppo_CNR", execution.getVariable("punteggio_potenzialita_ricerca_sviluppo_CNR"));
+						runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_potenzialita_investimenti_privati", execution.getVariable("punteggio_potenzialita_investimenti_privati"));
+						runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_sfruttamento_diffusione_risultati", execution.getVariable("punteggio_sfruttamento_diffusione_risultati"));
+						runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_esistenza_precedenti_accordi", execution.getVariable("punteggio_esistenza_precedenti_accordi"));
+						runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_congruita_economica_progetto", execution.getVariable("punteggio_congruita_economica_progetto"));
+					}	
+
+				} 
+
 			};break;	
 
 			case "graduatoria-start": {
