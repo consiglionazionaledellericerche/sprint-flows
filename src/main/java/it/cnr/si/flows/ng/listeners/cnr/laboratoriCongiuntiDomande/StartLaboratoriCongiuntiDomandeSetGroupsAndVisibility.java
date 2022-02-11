@@ -168,3 +168,4 @@ public class StartLaboratoriCongiuntiDomandeSetGroupsAndVisibility {
 			execution.setVariable("idStruttura", String.valueOf(IdEntitaOrganizzativaDirettore));
 		}
 	}
+}
