@@ -29,7 +29,7 @@
         </activiti:executionListener>
       </extensionElements>
       <startEvent id="startevent2" name="Start"></startEvent>
-      <userTask id="validazione" name="VALIDAZIONE" activiti:candidateGroups="${gruppoDirigenteProponente}">
+      <userTask id="validazione" name="VALIDAZIONE" activiti:candidateGroups="${gruppoDirigenteProponente}" activiti:category="firma">
         <extensionElements>
           <activiti:executionListener event="start" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
             <activiti:field name="faseEsecuzione">
@@ -327,7 +327,7 @@
         <omgdi:waypoint x="581.0" y="38.0"></omgdi:waypoint>
         <omgdi:waypoint x="630.0" y="37.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="12.0" x="579.0" y="11.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="12.0" x="594.0" y="-4.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow49" id="BPMNEdge_flow49">
@@ -341,7 +341,7 @@
         <omgdi:waypoint x="581.0" y="318.0"></omgdi:waypoint>
         <omgdi:waypoint x="620.0" y="317.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="12.0" x="579.0" y="291.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="12.0" x="594.0" y="276.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow51" id="BPMNEdge_flow51">
@@ -349,7 +349,7 @@
         <omgdi:waypoint x="640.0" y="273.0"></omgdi:waypoint>
         <omgdi:waypoint x="666.0" y="273.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="650.0" y="241.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="68.0" x="650.0" y="241.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow52" id="BPMNEdge_flow52">
