@@ -273,7 +273,7 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 					execution.setVariable("gruppoValutatoreScientificoLABDipartimento", gruppoValutatoreScientificoLABDipartimento);
 					LOGGER.debug("Imposto i gruppi dipartimento : {} - del flusso {}", idDipartimento, gruppoValutatoreScientificoLABDipartimento);
 				} else {
-					if(execution.getVariable("tipologiaLaboratori").equals("Aecheologici")) {
+					if(execution.getVariable("tipologiaLaboratori").equals("Archeologici")) {
 						//LABORATORI ARCHEOLOGICI
 						execution.setVariable("domandaCorrenteValutataFlag", "true");
 						execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.VALUTATA_SCIENTIFICAMENTE.toString());
@@ -291,11 +291,11 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 						execution.setVariable("punteggio_totale", punteggioTotale.toString());
 						//CREAZIONE PDF VALUTAZIONE
 						//PARAMETRI GENERAZIONE PDF x SIGLA PRINT
-						String nomeFile="valutazioneLaboratoriCongiunti";
+						String nomeFile="valutazioneLaboratoriCongiuntiArcheologici";
 						String labelFile="Scheda Valutazione Domanda";
-						String report = "/scrivaniadigitale/valutazioneLaboratoriCongiunti.jrxml";
+						String report = "/scrivaniadigitale/valutazioneLaboratoriCongiuntiArcheologici.jrxml";
 						//tipologiaDoc è la tipologia del file
-						String tipologiaDoc = Enum.PdfType.valueOf("valutazioneLaboratoriCongiunti").name();
+						String tipologiaDoc = Enum.PdfType.valueOf("valutazioneLaboratoriCongiuntiArcheologici").name();
 						String utenteFile = execution.getVariable("initiator").toString();
 
 						// UPDATE VARIABILI FLUSSO

@@ -127,7 +127,7 @@ public class StartLaboratoriCongiuntiDomandeSetGroupsAndVisibility {
 		}
 
 		if (execution.getVariable("dipartimentoId").toString().equals("2135")){
-			execution.setVariable("tipologiaLaboratori","Aecheologici");
+			execution.setVariable("tipologiaLaboratori","Archeologici");
 		} else {
 			execution.setVariable("tipologiaLaboratori","Tematici");
 		}
