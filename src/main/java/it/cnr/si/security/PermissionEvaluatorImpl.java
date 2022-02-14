@@ -108,9 +108,12 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
     public boolean canCompleteTask(String taskId, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
         String username = SecurityUtils.getCurrentUserLogin();
-        String assignee = taskService.createTaskQuery()
+        Task task = taskService.createTaskQuery()
                 .taskId(taskId)
-                .singleResult().getAssignee();
+                .singleResult();
+        if (task == null)
+            return false;
+        String assignee = task.getAssignee();
         List<String> authorities =
                 getAuthorities(username, flowsUserDetailsService);
         

@@ -3,9 +3,14 @@ package it.cnr.si.flows.ng.service;
 import com.opencsv.CSVWriter;
 import it.cnr.si.domain.View;
 import it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery;
+import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
 import it.cnr.si.security.PermissionEvaluatorImpl;
+import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
+import it.cnr.si.service.dto.anagrafica.scritture.UtenteDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
+
 import org.activiti.engine.*;
 import org.activiti.engine.history.*;
 import org.activiti.engine.impl.RepositoryServiceImpl;
@@ -46,6 +51,11 @@ import static it.cnr.si.flows.ng.utils.Utils.*;
 @Service
 public class FlowsProcessInstanceService {
 
+    public static final ArrayList<String> processiRevocabili = new ArrayList<String>() {{
+        add("smart-woking"); // TODO: definire qui i flussi revocabili
+//        add("covid19");
+    }};
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsProcessInstanceService.class);
     @Inject
     private FlowsAttachmentService flowsAttachmentService;
@@ -73,7 +83,6 @@ public class FlowsProcessInstanceService {
     private Utils utils;
     @Inject
     private FlowsAttachmentService attachmentService;
-
 
 
     public HistoricTaskInstance getCurrentTaskOfProcessInstance(String processInstanceId) {
@@ -110,43 +119,32 @@ public class FlowsProcessInstanceService {
             entity.getVariables().forEach(v -> variabili.put(v.getName(), v));
             result.put("variabili", variabili); // Modifica per vedere piu' comodamente le variabili
 
-            HistoricVariableInstance links = historyService
-                    .createHistoricVariableInstanceQuery()
-                    .processInstanceId(processInstanceId)
-                    .variableName("linkToOtherWorkflows")
-                    .excludeTaskVariables()
-                    .singleResult();
+            List<String> values = getLinkedProcessIds(processInstanceId);
 
+            List<Map<String, Object>> linkedFlows = new ArrayList<>();
 
-            if (links != null) {
+            for (String linkedProcessId : values) {
+                if(permissionEvaluator.canVisualize(linkedProcessId, flowsUserDetailsService)) {
+                    HistoricProcessInstance linkedProcessInstance = historyService
+                            .createHistoricProcessInstanceQuery()
+                            .processInstanceId(linkedProcessId)
+                            .includeProcessVariables()
+                            .singleResult();
 
-                List<Map<String, Object>> linkedFlows = new ArrayList<>();
-                String value = (String) links.getValue();
-                String[] values = value.split(",");
+                    if (linkedProcessInstance != null) {
+                        String key = linkedProcessInstance.getBusinessKey();
 
-                for (String linkedProcessId : values) {
-                    if(permissionEvaluator.canVisualize(linkedProcessId, flowsUserDetailsService)) {
-                        HistoricProcessInstance linkedProcessInstance = historyService
-                                .createHistoricProcessInstanceQuery()
-                                .processInstanceId(linkedProcessId)
-                                .includeProcessVariables()
-                                .singleResult();
+                        Map<String, Object> linkedObject = new HashMap<>();
+                        linkedObject.put("id", linkedProcessId);
+                        linkedObject.put("key", key);
+                        linkedObject.put("titolo", linkedProcessInstance.getProcessVariables().get("titolo"));
 
-                        if (linkedProcessInstance != null) {
-                            String key = linkedProcessInstance.getBusinessKey();
-
-                            Map<String, Object> linkedObject = new HashMap<>();
-                            linkedObject.put("id", linkedProcessId);
-                            linkedObject.put("key", key);
-                            linkedObject.put("titolo", linkedProcessInstance.getProcessVariables().get("titolo"));
-
-                            linkedFlows.add(linkedObject);
-                        }
+                        linkedFlows.add(linkedObject);
                     }
                 }
-                if (!linkedFlows.isEmpty())
-                    result.put("linkedProcesses", linkedFlows);
             }
+            if (!linkedFlows.isEmpty())
+                result.put("linkedProcesses", linkedFlows);
         }
 
         // ProcessDefinition (static) metadata
@@ -162,7 +160,8 @@ public class FlowsProcessInstanceService {
         // permessi aggiuntivi
         result.put("canPublish", permissionEvaluator.canPublishAttachment(processInstanceId));
         result.put("canUpdateAttachments", permissionEvaluator.canUpdateAttachment(processInstanceId, flowsUserDetailsService));
-
+        result.put("isRevocabile", isRevocabile(processInstanceId));
+        
         if(whitTaskList){
             result.put("history", getHistoryForPi(processInstanceId));
         }
@@ -467,8 +466,91 @@ public class FlowsProcessInstanceService {
         return historicProcessInstanceQuery;
     }
 
+    /** 
+     * Una domanda accettata e' revocabile se
+     * 1. e' accettata (il flusso e' concluso)
+     * 2. il flusso e' di tipo revocabile
+     * 3. l'utente loggato e' il boss del richiedente
+     * 4. la domanda non e' stata gia' revocata
+     */
+    public boolean isRevocabile(String processInstanceId) {
+        HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .includeProcessVariables()
+                .singleResult();
+        
+        // 1. e' accettata (il flusso e' concluso)
+        if (processInstance.getEndTime() == null)
+            return false;
+        // 1a. TODO: e' conclusa con stato ACCETTATA o affini (non respinta, annullata, ...)
+        
+        // 2. il flusso e' di tipo revocabile
+        if (!processiRevocabili.contains(processInstance.getProcessDefinitionKey()))
+            return false;
+        
+        // 3. l'utente loggato e' il boss del richiedente
+        String initiator = String.valueOf(processInstance.getProcessVariables().get("initiator"));
+        String currentUser = SecurityUtils.getCurrentUserLogin();
+        
+        BossDto bossFirmatarioByUsername = aceBridgeService.bossFirmatarioByUsername(initiator);
+        String firmatario = Optional.ofNullable(aceBridgeService.bossFirmatarioByUsername(initiator))
+            .map(BossDto::getUtente)
+            .map(SimpleUtenteWebDto::getUsername)
+            .orElseGet(() -> "not found");
+        
+        if (!firmatario.equals(currentUser))
+            return false;
+        
+        // 4. la domanda non e' stata gia' revocata
+        for (String linkedProcessId : getLinkedProcessIds(processInstanceId)) {
+            // TODO dovrebbe essere possible senza recuperare le variabili
+            HistoricProcessInstance linkedProcessInstance = historyService
+                    .createHistoricProcessInstanceQuery()
+                    .processInstanceId(linkedProcessId)
+                    .includeProcessVariables()
+                    .singleResult();
 
+            if (linkedProcessInstance != null) {
+                String key = linkedProcessInstance.getBusinessKey();
+                String processDefinitionKey = linkedProcessInstance.getProcessDefinitionKey();
+                String statoFinale = (String) linkedProcessInstance.getProcessVariables().get("statoFinaleDomanda");
+                boolean isFlussoRevoca = processDefinitionKey == "smart-working-revoca";
+                boolean isStessoDipendente = initiator.equals(linkedProcessInstance.getProcessVariables().get("dipendente"));
+                boolean isInCorsoDiRevoca = statoFinale == null;
+                boolean isGiaRevocata = "REVOCATA".equals(statoFinale);
+                
+                if (isFlussoRevoca && isStessoDipendente && (isInCorsoDiRevoca || isGiaRevocata))
+                    return false;
+            }
+        }
 
+        // se nessuno dei controlli è fallito, il flusso è revocabile
+        return true;
+    }
+
+    
+    private List<String> getLinkedProcessIds(String processInstanceId) {
+        
+        HistoricVariableInstance links = historyService
+            .createHistoricVariableInstanceQuery()
+            .processInstanceId(processInstanceId)
+            .variableName("linkToOtherWorkflows")
+            .excludeTaskVariables()
+            .singleResult();
+        
+        if (links != null) {
+
+            List<Map<String, Object>> linkedFlows = new ArrayList<>();
+            String value = (String) links.getValue();
+            String[] values = value.split(",");
+            
+            return Arrays.asList(values);
+
+        } else {
+            return new ArrayList<String>();
+        }
+    }
+    
     private void processDate(HistoricProcessInstanceQuery processQuery, String key, String value) {
         // TODO remove deprecated api javax.xml
         Calendar calendar = javax.xml.bind.DatatypeConverter.parseDateTime(value);
