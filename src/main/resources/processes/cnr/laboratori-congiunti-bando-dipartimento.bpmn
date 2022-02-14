@@ -52,7 +52,7 @@
         </activiti:executionListener>
       </extensionElements>
     </endEvent>
-    <exclusiveGateway id="exclusivegateway6" name="Exclusive Gateway" default="flow16"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway6" name="Exclusive Gateway" default="flow22"></exclusiveGateway>
     <sequenceFlow id="flow15" sourceRef="firma-graduatoria" targetRef="exclusivegateway6"></sequenceFlow>
     <sequenceFlow id="flow16" sourceRef="exclusivegateway6" targetRef="protocollo-graduatoria">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Firma'}]]></conditionExpression>
