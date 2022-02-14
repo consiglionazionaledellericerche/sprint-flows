@@ -401,7 +401,8 @@ public class FlowsTaskResource {
 
         if ( ! taskIds.stream()
                 .allMatch(id -> permissionEvaluator.canCompleteTask(id, flowsUserDetailsService)) )
-            throw new FlowsPermissionException("Nel carrello sono presenti compiti per cui l'utente non ha i permessi necessari");
+            throw new FlowsPermissionException("Nel carrello sono presenti alcuni compiti per cui l'utente non ha i permessi necessari. "
+                    + "Svuotare il carrello prima di riprovare.");
 
 
     }
