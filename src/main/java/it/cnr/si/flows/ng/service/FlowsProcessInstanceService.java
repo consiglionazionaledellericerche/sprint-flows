@@ -492,7 +492,6 @@ public class FlowsProcessInstanceService {
         String initiator = String.valueOf(processInstance.getProcessVariables().get("initiator"));
         String currentUser = SecurityUtils.getCurrentUserLogin();
         
-        BossDto bossFirmatarioByUsername = aceBridgeService.bossFirmatarioByUsername(initiator);
         String firmatario = Optional.ofNullable(aceBridgeService.bossFirmatarioByUsername(initiator))
             .map(BossDto::getUtente)
             .map(SimpleUtenteWebDto::getUsername)
@@ -511,7 +510,6 @@ public class FlowsProcessInstanceService {
                     .singleResult();
 
             if (linkedProcessInstance != null) {
-                String key = linkedProcessInstance.getBusinessKey();
                 String processDefinitionKey = linkedProcessInstance.getProcessDefinitionKey();
                 String statoFinale = (String) linkedProcessInstance.getProcessVariables().get("statoFinaleDomanda");
                 boolean isFlussoRevoca = processDefinitionKey == "smart-working-revoca";
