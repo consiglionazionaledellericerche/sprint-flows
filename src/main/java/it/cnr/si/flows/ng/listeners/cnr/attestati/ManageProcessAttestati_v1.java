@@ -38,7 +38,7 @@ public class ManageProcessAttestati_v1 implements ExecutionListener {
 
 	@Value("${cnr.attestati.url}")
 	private String urlAttestati;
-	@Value("${cnr.missioni.attestatiPath}")
+	@Value("${cnr.attestati.domandePath}")
 	private String pathAttestati;
 
 
