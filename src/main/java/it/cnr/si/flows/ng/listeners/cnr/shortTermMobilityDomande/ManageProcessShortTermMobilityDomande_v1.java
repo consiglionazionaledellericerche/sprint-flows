@@ -80,7 +80,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 
 	private Expression faseEsecuzione;
 
-	public void restToApplicazioneSTM(DelegateExecution execution, StatoDomandeSTMEnum statoDomanda) {
+	public void restToApplicazioneSTM(DelegateExecution execution, StatoDomandeSTMEnum statoDomanda, String fase) {
 
 		// @Value("${cnr.accordi-bilaterali.url}")
 		// private String urlShortTermMobility;
@@ -95,6 +95,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 			{
 				put("idDomanda", idDomanda);
 				put("stato", statoDomanda.name().toString());
+				put("fase", fase);
 			}	
 		};
 
@@ -123,6 +124,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 			// START
 			case "process-start": {
 				startShortTermMobilityDomandeSetGroupsAndVisibility.configuraVariabiliStart(execution);
+				execution.setVariable("fase", "validazione-direttore");
 			};break;    	
 			// START
 			case "validazione-start": {
@@ -144,7 +146,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 				//				flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
 			};break;  	 
 			case "modifica-start": {
-				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.APERTA);
+				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.APERTA, execution.getVariable("fase").toString());
 			};break;
 
 			case "pre-accettazione-start": {
@@ -189,16 +191,17 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.RESPINTA.toString());
 				execution.setVariable("statoFinale", Enum.StatoDomandeSTMEnum.RESPINTA.toString());
 				utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
-				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.RESPINTA);
+				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.RESPINTA,execution.getVariable("fase").toString());
 			};break;					
 			case "endevent-autorizzata-start": {
 				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.AUTORIZZATA.toString());
 				execution.setVariable("statoFinale", Enum.StatoDomandeSTMEnum.AUTORIZZATA.toString());
 				utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
-				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.AUTORIZZATA);
+				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.AUTORIZZATA, execution.getVariable("fase").toString());
 			};break;						
 			case "accettazione-start": {
 				LOGGER.debug("**** accettazione-start");
+				execution.setVariable("fase", "accettazione");
 			};break; 			
 			case "accettazione-end": {
 				LOGGER.debug("**** accettazione-end");
@@ -246,6 +249,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 
 			case "valutazione-scientifica-start": {
 				LOGGER.debug("**** valutazione-scientifica-start");
+				execution.setVariable("fase", "valutazione-scientifica");
 			};break; 			
 
 			case "valutazione-scientifica-end": {
@@ -280,6 +284,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 
 			case "graduatoria-start": {
 				LOGGER.debug("**** graduatoria-start");
+				execution.setVariable("fase", "graduatoria");
 				// VERIFICA TUTTE LE DOMANDE DI FLUSSI ATTIVI PER QUEL BANDO e PER QUEL DIPARTIMENTO
 				List<ProcessInstance> processinstancesListaPerBandoDipartimento = runtimeService.createProcessInstanceQuery()
 						.processDefinitionKey("short-term-mobility-domande")
@@ -351,7 +356,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 					managementService.deleteJob(singoloTimer.getId());
 				}
 			});
-			restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.CANCELLATA);
+			restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.CANCELLATA, execution.getVariable("fase").toString());
 		}
 	}
 }
