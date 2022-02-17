@@ -55,7 +55,7 @@ public class StartAttestatiSetGroupsAndVisibility {
 		// LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable(Enum.VariableEnum.title.name()));
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {} per l'utente {} - mese:  {} - anno  {})", initiator, execution.getId(), execution.getVariable("titolo"), utenteRichiedente, meseAttestato, annoAttestato );
 
-		String gruppoValidatoriAttestati = "valida-attestati@" + idStruttura;
+		String gruppoValidatoriAttestati = "valida-attestati#attestati-app@" + idStruttura;
 
 		LOGGER.debug("Imposto i gruppi del flusso: gruppoValidatoriAttestati {} ",  gruppoValidatoriAttestati);
 		execution.setVariable("gruppoValidatoriAttestati", gruppoValidatoriAttestati);
