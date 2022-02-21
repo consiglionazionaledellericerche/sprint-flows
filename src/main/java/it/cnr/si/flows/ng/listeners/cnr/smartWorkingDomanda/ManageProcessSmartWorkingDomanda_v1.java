@@ -6,6 +6,7 @@ import it.cnr.si.domain.enumeration.ExternalMessageVerb;
 import it.cnr.si.firmadigitale.firma.arss.stub.PdfSignApparence;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.*;
+import it.cnr.si.flows.ng.utils.CNRPdfSignApparence;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Enum.StatoDomandeSmartWorkingEnum;
 import it.cnr.si.flows.ng.utils.Utils;
@@ -23,11 +24,14 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -79,8 +83,7 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 	private AceService aceService;
 	@Inject
 	private Utils utils;
-	@Inject
-	private PdfSignApparence domandaSmartWorking;
+
 
 	private Expression faseEsecuzione;
 
@@ -163,7 +166,7 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 			case "endsubprocess-validata-start": {
 				execution.setVariable("statoFinaleDomanda", Enum.StatoDomandeSmartWorkingEnum.VALIDATA.toString());
 				if (sceltaUtente != null && (sceltaUtente.equals("Firma-PresaVisione") || sceltaUtente.equals("Firma-Validazione"))) {
-					firmaDocumentoService.eseguiFirma(execution, Enum.PdfType.valueOf("domandaSmartWorking").name(), domandaSmartWorking);
+					firmaDocumentoService.eseguiFirma(execution, Enum.PdfType.valueOf("domandaSmartWorking").name(), null);
 				}
 				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSmartWorkingEnum.VALIDATA.toString());
 				restToApplicazioneSiper(execution, Enum.StatoDomandeSmartWorkingEnum.VALIDATA);
@@ -175,8 +178,8 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 			};break; 
 			case "endsubprocess-presavisione-start": {
 				execution.setVariable("statoFinaleDomanda", Enum.StatoDomandeSmartWorkingEnum.PRESA_VISIONE.toString());
-				if (sceltaUtente != null && (sceltaUtente.equals("Firma-PresaVisione") || sceltaUtente.equals("Firma-Validazione"))) {
-					firmaDocumentoService.eseguiFirma(execution, Enum.PdfType.valueOf("domandaSmartWorking").name(), domandaSmartWorking);
+				if (sceltaUtente != null && sceltaUtente.equals("Firma")) {
+					firmaDocumentoService.eseguiFirma(execution, Enum.PdfType.valueOf("domandaSmartWorking").name(), null);
 				}
 				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSmartWorkingEnum.PRESA_VISIONE.toString());
 				restToApplicazioneSiper(execution, Enum.StatoDomandeSmartWorkingEnum.PRESA_VISIONE);
@@ -215,8 +218,6 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 			// DEFAULT  
 			default:  {
 			};break;    
-
-
 
 			}
 		}
