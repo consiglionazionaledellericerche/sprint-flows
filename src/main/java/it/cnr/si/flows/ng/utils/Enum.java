@@ -225,7 +225,8 @@ public class Enum {
         valutazioneShortTermMobility,
         valutazioneLaboratoriCongiunti,
         preavvisoRigettoCambioFascia,
-        monitoraggioAttivitaCovid19;
+        monitoraggioAttivitaCovid19,
+        domandaSmartWorking;
 
         PdfType() {
         }

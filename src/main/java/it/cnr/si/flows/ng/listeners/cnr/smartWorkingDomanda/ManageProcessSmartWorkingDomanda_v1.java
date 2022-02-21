@@ -3,6 +3,7 @@ package it.cnr.si.flows.ng.listeners.cnr.smartWorkingDomanda;
 
 import it.cnr.si.domain.enumeration.ExternalApplication;
 import it.cnr.si.domain.enumeration.ExternalMessageVerb;
+import it.cnr.si.firmadigitale.firma.arss.stub.PdfSignApparence;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.*;
 import it.cnr.si.flows.ng.utils.Enum;
@@ -78,6 +79,8 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 	private AceService aceService;
 	@Inject
 	private Utils utils;
+	@Inject
+	private PdfSignApparence domandaSmartWorking;
 
 	private Expression faseEsecuzione;
 
@@ -159,6 +162,9 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 			};break; 
 			case "endsubprocess-validata-start": {
 				execution.setVariable("statoFinaleDomanda", Enum.StatoDomandeSmartWorkingEnum.VALIDATA.toString());
+				if (sceltaUtente != null && (sceltaUtente.equals("Firma-PresaVisione") || sceltaUtente.equals("Firma-Validazione"))) {
+					firmaDocumentoService.eseguiFirma(execution, Enum.PdfType.valueOf("domandaSmartWorking").name(), domandaSmartWorking);
+				}
 				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSmartWorkingEnum.VALIDATA.toString());
 				restToApplicazioneSiper(execution, Enum.StatoDomandeSmartWorkingEnum.VALIDATA);
 			};break; 
@@ -169,6 +175,9 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 			};break; 
 			case "endsubprocess-presavisione-start": {
 				execution.setVariable("statoFinaleDomanda", Enum.StatoDomandeSmartWorkingEnum.PRESA_VISIONE.toString());
+				if (sceltaUtente != null && (sceltaUtente.equals("Firma-PresaVisione") || sceltaUtente.equals("Firma-Validazione"))) {
+					firmaDocumentoService.eseguiFirma(execution, Enum.PdfType.valueOf("domandaSmartWorking").name(), domandaSmartWorking);
+				}
 				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSmartWorkingEnum.PRESA_VISIONE.toString());
 				restToApplicazioneSiper(execution, Enum.StatoDomandeSmartWorkingEnum.PRESA_VISIONE);
 			};break; 
