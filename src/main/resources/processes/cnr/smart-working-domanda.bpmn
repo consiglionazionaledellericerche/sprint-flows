@@ -128,7 +128,7 @@
     <sequenceFlow id="flow48" name="T1" sourceRef="boundarytimer1" targetRef="notifiche1">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${statoValidazione == 'si'}]]></conditionExpression>
     </sequenceFlow>
-    <boundaryEvent id="boundarytimer1" name="Timer1" attachedToRef="validazioneResponsabile" cancelActivity="true">
+    <boundaryEvent id="boundarytimer1" name="Timer1" attachedToRef="validazioneResponsabile" cancelActivity="false">
       <timerEventDefinition>
         <timeCycle>R15/P2D</timeCycle>
       </timerEventDefinition>
