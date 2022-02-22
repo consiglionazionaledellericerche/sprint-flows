@@ -112,24 +112,6 @@
           </activiti:executionListener>
         </extensionElements>
       </endEvent>
-      <endEvent id="endevent5" name="End">
-        <extensionElements>
-          <activiti:executionListener event="start" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
-            <activiti:field name="faseEsecuzione">
-              <activiti:string><![CDATA[endevent-presavisione-start]]></activiti:string>
-            </activiti:field>
-          </activiti:executionListener>
-        </extensionElements>
-      </endEvent>
-      <endEvent id="endevent-annulla" name="End">
-        <extensionElements>
-          <activiti:executionListener event="start" delegateExpression="${manageProcessSmartWorkingDomanda_v1}">
-            <activiti:field name="faseEsecuzione">
-              <activiti:string><![CDATA[endevent-annullata-start]]></activiti:string>
-            </activiti:field>
-          </activiti:executionListener>
-        </extensionElements>
-      </endEvent>
     </subProcess>
     <boundaryEvent id="boundarytimer2" name="Timer2" attachedToRef="validazioneResponsabile" cancelActivity="true">
       <extensionElements>
@@ -222,12 +204,6 @@
       <bpmndi:BPMNShape bpmnElement="endevent6" id="BPMNShape_endevent6">
         <omgdc:Bounds height="35.0" width="35.0" x="487.0" y="70.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="endevent5" id="BPMNShape_endevent5">
-        <omgdc:Bounds height="35.0" width="35.0" x="666.0" y="253.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="endevent-annulla" id="BPMNShape_endevent-annulla">
-        <omgdc:Bounds height="35.0" width="35.0" x="666.0" y="349.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="boundarytimer2" id="BPMNShape_boundarytimer2">
         <omgdc:Bounds height="30.0" width="30.0" x="551.0" y="303.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
@@ -235,7 +211,7 @@
         <omgdc:Bounds height="30.0" width="30.0" x="551.0" y="23.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="notifiche1" id="BPMNShape_notifiche1">
-        <omgdc:Bounds height="55.0" width="105.0" x="630.0" y="10.0"></omgdc:Bounds>
+        <omgdc:Bounds height="55.0" width="105.0" x="631.0" y="10.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="endevent7" id="BPMNShape_endevent7">
         <omgdc:Bounds height="35.0" width="35.0" x="666.0" y="181.0"></omgdc:Bounds>
@@ -254,7 +230,7 @@
         <omgdi:waypoint x="135.0" y="195.0"></omgdi:waypoint>
         <omgdi:waypoint x="177.0" y="195.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="580.0" y="286.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="12.0" x="580.0" y="286.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow33" id="BPMNEdge_flow33">
@@ -308,9 +284,9 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow48" id="BPMNEdge_flow48">
         <omgdi:waypoint x="581.0" y="38.0"></omgdi:waypoint>
-        <omgdi:waypoint x="630.0" y="37.0"></omgdi:waypoint>
+        <omgdi:waypoint x="631.0" y="37.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="12.0" x="580.0" y="1.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="12.0" x="595.0" y="-14.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow49" id="BPMNEdge_flow49">
@@ -324,7 +300,7 @@
         <omgdi:waypoint x="581.0" y="318.0"></omgdi:waypoint>
         <omgdi:waypoint x="666.0" y="317.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="649.0" y="275.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="63.0" x="664.0" y="260.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
