@@ -201,11 +201,11 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSmartWorkingEnum.ANNULLATA.toString());
 				restToApplicazioneSiper(execution, Enum.StatoDomandeSmartWorkingEnum.ANNULLATA);
 			};break; 		
-			case "endevent-comunicata-start": {
-				execution.setVariable("statoFinaleDomanda", Enum.StatoDomandeSmartWorkingEnum.COMUNICATA.toString());
-				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSmartWorkingEnum.COMUNICATA.toString());
-				restToApplicazioneSiper(execution, Enum.StatoDomandeSmartWorkingEnum.COMUNICATA);
-			};break; 			
+//			case "endevent-comunicata-start": {
+//				execution.setVariable("statoFinaleDomanda", Enum.StatoDomandeSmartWorkingEnum.COMUNICATA.toString());
+//				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSmartWorkingEnum.COMUNICATA.toString());
+//				restToApplicazioneSiper(execution, Enum.StatoDomandeSmartWorkingEnum.COMUNICATA);
+//			};break; 			
 
 			case "end-process-start": {
 				LOGGER.info("**** end-process-start");
