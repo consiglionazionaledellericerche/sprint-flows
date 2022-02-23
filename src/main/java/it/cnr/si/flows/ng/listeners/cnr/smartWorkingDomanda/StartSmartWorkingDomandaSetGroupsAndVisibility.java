@@ -12,6 +12,7 @@ import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
 import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
 
 import org.activiti.engine.ManagementService;
 import org.activiti.engine.RuntimeService;
@@ -95,10 +96,20 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 
 		// VERIFICA PROFILO RICHIEDENTE
 		String profiloDomanda = "NON_AMMESSO";
-		String livelloRichiedente = aceService.getPersonaByUsername(userNameProponente).getLivello();
-		String profiloRichiedente = aceService.getPersonaByUsername(userNameProponente).getProfilo();
-		String nomeProponente =  aceService.getPersonaByUsername(userNameProponente).getNome().toString();
-		String cognomeProponente =  aceService.getPersonaByUsername(userNameProponente).getCognome().toString();
+		SimplePersonaWebDto personaProponente = aceService.getPersonaByUsername(userNameProponente);
+		
+		String livelloRichiedente = personaProponente.getLivello();
+		String profiloRichiedente = personaProponente.getProfilo();
+		String nomeProponente =  personaProponente.getNome().toString();
+		String cognomeProponente =  personaProponente.getCognome().toString();
+		String matricolaRichiedente =  personaProponente.getMatricola().toString();
+		String idNsipRichiedente =  personaProponente.getSede().getIdnsip();
+		String sedeRichiedente =  idNsipRichiedente + " - " + personaProponente.getSede().getDenominazione();
+		execution.setVariable("livelloRichiedente", livelloRichiedente);
+		execution.setVariable("profiloRichiedente", profiloRichiedente);
+		execution.setVariable("matricolaRichiedente", matricolaRichiedente);
+		execution.setVariable("idNsipRichiedente", idNsipRichiedente);
+		execution.setVariable("sedeRichiedente", sedeRichiedente);
 		execution.setVariable("nomeCognomeUtente", nomeProponente + " " + cognomeProponente);
 
 		// PROFILO RICHIEDENTE collaboratore
