@@ -70,10 +70,10 @@
 										||
 										(processDefinition[0] == "laboratori-congiunti-bando-dipartimento" & stato == "PROVVEDIMENTO GRADUATORIA"))
 						) {
-							vm.showGerarchia = true;
 							if(processDefinition[0] == "laboratori-congiunti-bando-dipartimento"){
 								vm.searchParams.processDefinitionKey = "laboratori-congiunti-domande";
 							}
+							vm.showGerarchia = true;
 						}
 
 						if(response.data.variabili.idBando){
