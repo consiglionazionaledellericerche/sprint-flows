@@ -14,17 +14,17 @@
       </activiti:executionListener>
     </extensionElements>
     <startEvent id="startevent1" name="Start"></startEvent>
-    <sequenceFlow id="flow1" name="START " sourceRef="startevent1" targetRef="presaVisione"></sequenceFlow>
+    <sequenceFlow id="flow1" name="START " sourceRef="startevent1" targetRef="exclusivegateway1"></sequenceFlow>
     <userTask id="presaVisione" name="PRESA VISIONE" activiti:candidateGroups="${gruppoResponsabileStruttura}">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessSmartWorkingRevoca_v1}">
           <activiti:field name="faseEsecuzione">
-            <activiti:string><![CDATA[validazione-start]]></activiti:string>
+            <activiti:string><![CDATA[presa-visione-start]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
         <activiti:executionListener event="end" delegateExpression="${manageProcessSmartWorkingRevoca_v1}">
           <activiti:field name="faseEsecuzione">
-            <activiti:string><![CDATA[validazione-end]]></activiti:string>
+            <activiti:string><![CDATA[presa-visione-end]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
       </extensionElements>
@@ -39,6 +39,11 @@
       </extensionElements>
     </endEvent>
     <sequenceFlow id="flow15" name="RECESSA" sourceRef="presaVisione" targetRef="endevent-firmato"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway" default="flow16"></exclusiveGateway>
+    <sequenceFlow id="flow16" sourceRef="exclusivegateway1" targetRef="presaVisione"></sequenceFlow>
+    <sequenceFlow id="flow17" name="direttore" sourceRef="exclusivegateway1" targetRef="endevent-firmato">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${avvio == 'Direttore'}]]></conditionExpression>
+    </sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_smart-working-revoca">
     <bpmndi:BPMNPlane bpmnElement="smart-working-revoca" id="BPMNPlane_smart-working-revoca">
@@ -46,23 +51,39 @@
         <omgdc:Bounds height="35.0" width="35.0" x="20.0" y="117.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="presaVisione" id="BPMNShape_presaVisione">
-        <omgdc:Bounds height="75.0" width="111.0" x="150.0" y="97.0"></omgdc:Bounds>
+        <omgdc:Bounds height="75.0" width="111.0" x="170.0" y="97.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="endevent-firmato" id="BPMNShape_endevent-firmato">
         <omgdc:Bounds height="35.0" width="35.0" x="340.0" y="117.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="80.0" y="114.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
         <omgdi:waypoint x="55.0" y="134.0"></omgdi:waypoint>
-        <omgdi:waypoint x="150.0" y="134.0"></omgdi:waypoint>
+        <omgdi:waypoint x="80.0" y="134.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
           <omgdc:Bounds height="14.0" width="37.0" x="20.0" y="91.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow15" id="BPMNEdge_flow15">
-        <omgdi:waypoint x="261.0" y="134.0"></omgdi:waypoint>
+        <omgdi:waypoint x="281.0" y="134.0"></omgdi:waypoint>
         <omgdi:waypoint x="340.0" y="134.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="389.0" y="128.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="48.0" x="409.0" y="128.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow16" id="BPMNEdge_flow16">
+        <omgdi:waypoint x="120.0" y="134.0"></omgdi:waypoint>
+        <omgdi:waypoint x="170.0" y="134.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow17" id="BPMNEdge_flow17">
+        <omgdi:waypoint x="100.0" y="114.0"></omgdi:waypoint>
+        <omgdi:waypoint x="100.0" y="68.0"></omgdi:waypoint>
+        <omgdi:waypoint x="357.0" y="68.0"></omgdi:waypoint>
+        <omgdi:waypoint x="357.0" y="117.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="190.0" y="41.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
