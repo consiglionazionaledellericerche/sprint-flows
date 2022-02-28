@@ -118,12 +118,9 @@ public class ManageProcessSmartWorkingRevoca_v1 implements ExecutionListener {
 
 
 		//STATO INIZIALE statoFinaleSwitch
-		String statoFinaleSwitch = "noValue";
-		if (execution.getVariable("avvio") != null && execution.getVariable("avvio").toString().equals("Direttore")) {
-			LOGGER.info("ProcessInstanceId: " + processInstanceId + "-- avvio: " + execution.getVariable("avvio").toString() );
+		if (execution.getVariable("tipologiaRichiedente") != null) {
+			LOGGER.info("ProcessInstanceId: " + processInstanceId + "-- tipologiaRichiedente: " + execution.getVariable("tipologiaRichiedente").toString() );
 		} 
-
-
 
 
 		String faseEsecuzioneValue = "noValue";

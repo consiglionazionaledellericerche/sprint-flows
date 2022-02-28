@@ -176,10 +176,6 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 		} else {
 			LOGGER.info("L'utente {} ha come responsabile-struttura [{}] (per SEDE) {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", userNameProponente, responsabileStruttura.getRuolo().getDescr(), responsabileStruttura.getUtente().getUsername(), entitaOrganizzativaDirettore.getDenominazione(), entitaOrganizzativaDirettore.getSigla(), entitaOrganizzativaDirettore.getId(), entitaOrganizzativaDirettore.getCdsuo(), entitaOrganizzativaDirettore.getIdnsip());
 		}
-		String gruppoValidatoriLaboratoriCongiunti = "validatoriLaboratoriCongiunti@0000";
-		String gruppoUfficioProtocollo = "ufficioProtocolloLaboratoriCongiunti@0000";
-		String gruppoValutatoreScientificoLABDipartimento = "valutatoreScientificoLABDipartimento@0000";
-		String gruppoResponsabileAccordiInternazionali = "responsabileAccordiInternazionali@0000";
 		//DA CAMBIARE - ricavando il direttore della persona che afferisce alla sua struttura
 		String gruppoDirigenteProponente = "responsabile-struttura@" + IdEntitaOrganizzativaDirettore;
 
