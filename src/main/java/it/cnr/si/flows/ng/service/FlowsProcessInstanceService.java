@@ -488,10 +488,10 @@ public class FlowsProcessInstanceService {
             return false;
         
         // 3. l'utente loggato e' il boss del richiedente
-        String initiator = String.valueOf(processInstance.getProcessVariables().get("initiator"));
+        String userNameProponente = String.valueOf(processInstance.getProcessVariables().get("userNameProponente"));
         String currentUser = SecurityUtils.getCurrentUserLogin();
         
-        String firmatario = Optional.ofNullable(aceBridgeService.bossFirmatarioByUsername(initiator))
+        String firmatario = Optional.ofNullable(aceBridgeService.bossFirmatarioByUsername(userNameProponente))
             .map(BossDto::getUtente)
             .map(SimpleUtenteWebDto::getUsername)
             .orElseGet(() -> "not found");
@@ -512,7 +512,7 @@ public class FlowsProcessInstanceService {
                 String processDefinitionKey = linkedProcessInstance.getProcessDefinitionKey();
                 String statoFinale = (String) linkedProcessInstance.getProcessVariables().get("statoFinaleDomanda");
                 boolean isFlussoRevoca = processDefinitionKey == processiRevocabili.get(processInstance.getProcessDefinitionKey());
-                boolean isStessoDipendente = initiator.equals(linkedProcessInstance.getProcessVariables().get("dipendente"));
+                boolean isStessoDipendente = userNameProponente.equals(linkedProcessInstance.getProcessVariables().get("dipendente"));
                 boolean isInCorsoDiRevoca = statoFinale == null;
                 boolean isGiaRevocata = "REVOCATA".equals(statoFinale);
                 
