@@ -450,7 +450,7 @@ public class FlowsProcessInstanceResource {
 
 
 		Set<String> ruoliCurrentUser = membershipService.getAllRolesForUser(currentUser); 
-		if (ruoliCurrentUser.contains("segreteria@" + idStruttura)) {
+		if (ruoliCurrentUser.contains("rs@" + idStruttura)) {
 			data.put("tipologiaRichiedente", "segreteria");
 		}
 		if (ruoliCurrentUser.contains("responsabile-struttura@" + idStruttura)) {

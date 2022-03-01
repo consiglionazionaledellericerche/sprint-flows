@@ -167,7 +167,7 @@ public class StartSmartWorkingRevocaSetGroupsAndVisibility {
 		String gruppoPresaVisione = "responsabile-struttura@" + idAceStrutturaRichiedente;	
 		// DETERMINA PERCORSO FLUSSO
 		if(tipologiaRichiedente.equals("direttore-responsabile")) {
-			gruppoPresaVisione = "segreteria@" + idAceStrutturaRichiedente;	
+			gruppoPresaVisione = "rs@" + idAceStrutturaRichiedente;	
 		} 
 
 
