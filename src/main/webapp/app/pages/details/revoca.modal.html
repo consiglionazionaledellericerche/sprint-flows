@@ -1,0 +1,17 @@
+<div class="modal-header">
+  <h4 class="modal-title">
+    Avviare flusso di revoca?
+  </h4>
+  <p>
+</div>
+<div class="modal-body">
+  <div class="msg msg-danger" ng-if="vm.error">Si e' verificato un errore</div>
+  <div class="form-group">
+    Sarà avviato un flusso per la revoca del flusso visualizzato.<br />Procedere con la Revoca?
+  </div>
+  <button class="btn btn-danger" type="button" ng-click="vm.revoca()">Revoca</button>
+
+</div>
+<div class="modal-footer">
+  <button class="btn btn-primary" type="button" ng-click="$dismiss()">Chiudi</button>
+</div>

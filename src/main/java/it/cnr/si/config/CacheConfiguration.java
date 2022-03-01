@@ -71,6 +71,7 @@ public class CacheConfiguration {
         Integer hazelcastPort = env.getProperty("cache.hazelcast.port", Integer.class, 5701);
         Integer hazelcastMulticastPort = env.getProperty("cache.hazelcast.multicastPort", Integer.class);
         Integer hazelcastOutboundPort = env.getProperty("cache.hazelcast.outboundPort", Integer.class, 1488);
+        Integer hazelcastTimeToLiveSeconds = env.getProperty("cache.hazelcast.timeToLiveSeconds", Integer.class, 3600);
         String members = env.getProperty("cache.hazelcast.members");
 
         String publicIp = env.getProperty("cache.hazelcast.publicIp");
@@ -113,7 +114,9 @@ public class CacheConfiguration {
         }
 
         config.getMapConfigs().put("default", initializeDefaultMapConfig());
-
+        config.getMapConfig("default").setTimeToLiveSeconds(hazelcastTimeToLiveSeconds);
+        
+        jHipsterProperties.getCache().setTimeToLiveSeconds(hazelcastTimeToLiveSeconds);
         packages.stream().forEach(cachePackage -> {
             config.getMapConfigs().put(cachePackage, initializeDomainMapConfig(jHipsterProperties));
             log.info("package {} added to cache configuration", cachePackage);

@@ -223,7 +223,8 @@ public class Enum {
         valutazioneProgettoAccordiBilaterali,
         domandaAccordiBilaterali,
         valutazioneShortTermMobility,
-        valutazioneLaboratoriCongiunti,
+        valutazioneLaboratoriCongiuntiArcheologici,
+        valutazioneLaboratoriCongiuntiTematici,
         preavvisoRigettoCambioFascia,
         monitoraggioAttivitaCovid19,
         domandaSmartWorking;

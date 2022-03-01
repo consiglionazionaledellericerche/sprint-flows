@@ -15,6 +15,7 @@ import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.apache.commons.io.IOUtils;
+import org.jfree.util.Log;
 import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -107,6 +110,7 @@ public class FlowsAttachmentService {
 			att.setMimetype(getMimetype(filebytes));
 			att.setPath(path);
 		} else if (nodeRef != null) {
+		    verificaPath(nodeRef, path);
 			att.setAzione(linkDaAltraApplicazione);
 			att.setUrl(nodeRef);
 			att.setMimetype( (String) data.get(fileName + "_mimetype") );
@@ -123,7 +127,7 @@ public class FlowsAttachmentService {
 	}
 
 
-	private void setAttachmentProperties(FlowsAttachment att, String taskId, String taskName, String fileName, Map<String, Object> data) {
+    private void setAttachmentProperties(FlowsAttachment att, String taskId, String taskName, String fileName, Map<String, Object> data) {
 
 		att.setName(fileName);
 		att.setTime(new Date());
@@ -481,4 +485,17 @@ public class FlowsAttachmentService {
 		}
 	}
 
+	/**
+	 * 
+	 * @param nodeRef notNull
+	 * @param path NotNull
+	 * @throws IllegalArgumentException
+	 */
+    private void verificaPath(String nodeRef, String path) {
+        StorageObject so = storeService.getStorageObjectBykey(nodeRef);
+        if (so.getPath() != path) {
+            Log.error("Il path dell'allegato ("+ so.getPath() +") non coincide con quello trasmesso("+ path +")");
+            throw new IllegalArgumentException();
+        }   
+    }
 }
