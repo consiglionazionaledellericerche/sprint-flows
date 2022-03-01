@@ -51,9 +51,8 @@ import static it.cnr.si.flows.ng.utils.Utils.*;
 @Service
 public class FlowsProcessInstanceService {
 
-    public static final ArrayList<String> processiRevocabili = new ArrayList<String>() {{
-        add("smart-woking"); // TODO: definire qui i flussi revocabili
-//        add("covid19");
+    public static final Map<String, String> processiRevocabili = new HashMap<String, String>() {{
+        put("smart-working-domanda", "smart-working-revoca");
     }};
     
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsProcessInstanceService.class);
@@ -485,7 +484,7 @@ public class FlowsProcessInstanceService {
         // 1a. TODO: e' conclusa con stato ACCETTATA o affini (non respinta, annullata, ...)
         
         // 2. il flusso e' di tipo revocabile
-        if (!processiRevocabili.contains(processInstance.getProcessDefinitionKey()))
+        if (!processiRevocabili.containsKey(processInstance.getProcessDefinitionKey()))
             return false;
         
         // 3. l'utente loggato e' il boss del richiedente
@@ -512,7 +511,7 @@ public class FlowsProcessInstanceService {
             if (linkedProcessInstance != null) {
                 String processDefinitionKey = linkedProcessInstance.getProcessDefinitionKey();
                 String statoFinale = (String) linkedProcessInstance.getProcessVariables().get("statoFinaleDomanda");
-                boolean isFlussoRevoca = processDefinitionKey == "smart-working-revoca";
+                boolean isFlussoRevoca = processDefinitionKey == processiRevocabili.get(processInstance.getProcessDefinitionKey());
                 boolean isStessoDipendente = initiator.equals(linkedProcessInstance.getProcessVariables().get("dipendente"));
                 boolean isInCorsoDiRevoca = statoFinale == null;
                 boolean isGiaRevocata = "REVOCATA".equals(statoFinale);
