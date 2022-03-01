@@ -403,9 +403,10 @@ public class FlowsProcessInstanceResource {
 	}
 
 	/**
-	 * Deve esserci una process definition con la desidenza "-revoca" 
+	 * Deve esserci una process definition definita in 
+	 * FlowsProcessInstanceService.processiRevocabili
 	 * agganciata alla process definition del flusso che si sta revocando
-	 * (per esempio "smart-working-revoca")
+	 * (per esempio "smart-working-domanda"-"smart-working-revoca")
 	 * 
 	 * Inserire tutte le variabili necessarie al nuovo flusso nella mappa `data`
 	 * 
@@ -422,7 +423,7 @@ public class FlowsProcessInstanceResource {
             throw new IllegalArgumentException("Il processo non e' recovabile");
         
         Map<String, Object> data = new HashMap<>();
-        String definitionId = oldProcessInstance.getProcessDefinitionKey() + "-revoca";
+        String definitionId = FlowsProcessInstanceService.processiRevocabili.get(oldProcessInstance.getProcessDefinitionKey());
         data.put("processDefinitionId", definitionId);
         data.put("utente", oldProcessInstance.getProcessVariables().get("initiator"));
         
