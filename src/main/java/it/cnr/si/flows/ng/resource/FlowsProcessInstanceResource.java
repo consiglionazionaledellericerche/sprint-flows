@@ -15,6 +15,7 @@ import it.cnr.si.service.AceService;
 import it.cnr.si.service.MembershipService;
 
 import org.activiti.engine.HistoryService;
+import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
@@ -58,7 +59,8 @@ public class FlowsProcessInstanceResource {
 	public static final String EXPORT_TRASPARENZA = "export-trasparenza";
 	public static final String EXPORT_URP = "export-urp";
 
-
+    @Inject
+    private RepositoryService repositoryService;
 	@Inject
 	private RestResponseFactory restResponseFactory;
 	@Inject
@@ -434,7 +436,8 @@ public class FlowsProcessInstanceResource {
 			throw new IllegalArgumentException("Il processo non e' recovabile");
 
 		Map<String, Object> data = new HashMap<>();
-		String definitionId = FlowsProcessInstanceService.processiRevocabili.get(oldProcessInstance.getProcessDefinitionKey());
+		String definitionKey = FlowsProcessInstanceService.processiRevocabili.get(oldProcessInstance.getProcessDefinitionKey());
+		String definitionId = repositoryService.createProcessDefinitionQuery().processDefinitionKey(definitionKey).latestVersion().singleResult().getId();
 		data.put("processDefinitionId", definitionId);
 
 		//MAPPATURA VARIABILI
