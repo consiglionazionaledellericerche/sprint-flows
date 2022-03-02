@@ -133,9 +133,9 @@ public class ManageProcessSmartWorkingRevoca_v1 implements ExecutionListener {
 			// START
 			case "process-start": {
 				startSmartWorkingDomandaSetGroupsAndVisibility.configuraVariabiliStart(execution);
-				execution.setVariable("title", "Revoca Smart-Working " + execution.getVariable("nomeCognomeUtente"));
-				execution.setVariable("titolo", "Revoca Smart-Working " + execution.getVariable("nomeCognomeUtente"));
-				execution.setVariable("descrizione", "Revoca Smart-Working " + execution.getVariable("nomeCognomeUtente"));
+				execution.setVariable("title", "Revoca Smart-Working " + execution.getVariable("nomeCognomeUtente") + " domanda nr: " + execution.getVariable("idDomanda"));
+				execution.setVariable("titolo", "Revoca Smart-Working " + execution.getVariable("nomeCognomeUtente") + " domanda nr: " + execution.getVariable("idDomanda"));
+				execution.setVariable("descrizione", "Flusso di revoca Smart-Working " + execution.getVariable("nomeCognomeUtente") + " domanda nr: " + execution.getVariable("idDomanda"));
 			};break;    	
 			// START
 			case "presa-visione-start": {
