@@ -481,6 +481,8 @@ public class FlowsProcessInstanceService {
         // 1. e' accettata (il flusso e' concluso)
         if (processInstance.getEndTime() == null)
             return false;
+        if (!"VALIDATA".equals(processInstance.getProcessVariables().get("statoFinaleDomanda")))
+            return false;
         // 1a. TODO: e' conclusa con stato ACCETTATA o affini (non respinta, annullata, ...)
         
         // 2. il flusso e' di tipo revocabile
