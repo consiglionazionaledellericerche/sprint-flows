@@ -103,7 +103,8 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 		String nomeProponente =  personaProponente.getNome().toString();
 		String cognomeProponente =  personaProponente.getCognome().toString();
 		String matricolaRichiedente =  personaProponente.getMatricola().toString();
-		String idNsipRichiedente =  personaProponente.getSede().getIdnsip();
+		//String idNsipRichiedente =  personaProponente.getSede().getIdnsip();
+		String idNsipRichiedente =  execution.getVariable("idNsipRichiedente", String.class);;
 		String sedeRichiedente =  idNsipRichiedente + " - " + personaProponente.getSede().getDenominazione();
 		execution.setVariable("livelloRichiedente", livelloRichiedente);
 		execution.setVariable("profiloRichiedente", profiloRichiedente);
@@ -152,7 +153,8 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 			IdEntitaOrganizzativaDirettore = Integer.parseInt(idSedeDirettoregenerale);
 		} else {
 			try {
-				responsabileStruttura = aceService.findResponsabileStruttura(userNameProponente, dateRif, TipoAppartenenza.SEDE, "responsabile-struttura");
+				// responsabileStruttura = aceService.findResponsabileStruttura(userNameProponente, dateRif, TipoAppartenenza.SEDE, "responsabile-struttura");
+				responsabileStruttura = aceService.findResponsabileStrutturaByCodiceSede(idNsipRichiedente, dateRif, "responsabile-struttura");
 				if (responsabileStruttura.getUtente()== null) {
 					throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + userNameProponente + " <br>Si prega di contattare l'help desk in merito<br>");
 				} else {
