@@ -7,6 +7,7 @@ import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
 import it.cnr.si.security.PermissionEvaluatorImpl;
+import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import it.cnr.si.service.dto.anagrafica.scritture.UtenteDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
@@ -55,6 +56,10 @@ public class FlowsProcessInstanceService {
         put("smart-working-domanda", "smart-working-revoca");
     }};
     
+    public static final Map<String, List<String>> abilitatiAllaRevoca = new HashMap<String, List<String>>() {{
+        put("smart-working-domanda", Arrays.asList("rs", "responsabile-struttura"));
+    }};
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsProcessInstanceService.class);
     @Inject
     private FlowsAttachmentService flowsAttachmentService;
@@ -82,7 +87,8 @@ public class FlowsProcessInstanceService {
     private Utils utils;
     @Inject
     private FlowsAttachmentService attachmentService;
-
+    @Inject
+    private MembershipService membershipService;
 
     public HistoricTaskInstance getCurrentTaskOfProcessInstance(String processInstanceId) {
         return historyService.createHistoricTaskInstanceQuery()
@@ -483,44 +489,31 @@ public class FlowsProcessInstanceService {
             return false;
         if (!"VALIDATA".equals(processInstance.getProcessVariables().get("statoFinaleDomanda")))
             return false;
-        // 1a. TODO: e' conclusa con stato ACCETTATA o affini (non respinta, annullata, ...)
         
         // 2. il flusso e' di tipo revocabile
         if (!processiRevocabili.containsKey(processInstance.getProcessDefinitionKey()))
             return false;
         
-        // 3. l'utente loggato e' il boss del richiedente
-        String userNameProponente = String.valueOf(processInstance.getProcessVariables().get("userNameProponente"));
+        // 3. l'utente loggato e' abilitato alla Revoca
         String currentUser = SecurityUtils.getCurrentUserLogin();
-        
-        String firmatario = Optional.ofNullable(aceBridgeService.bossFirmatarioByUsername(userNameProponente))
-            .map(BossDto::getUtente)
-            .map(SimpleUtenteWebDto::getUsername)
-            .orElseGet(() -> "not found");
-        
-        if (!firmatario.equals(currentUser))
+        Set<String> allRolesForUser = membershipService.getAllRolesForUser(currentUser);
+        String idAceStrutturaDomandaRichiedente = String.valueOf(processInstance.getProcessVariables().get("idAceStrutturaDomandaRichiedente"));
+        if ( abilitatiAllaRevoca.get(processInstance.getProcessDefinitionKey()).stream()
+                .noneMatch(ruoloRevoca -> allRolesForUser.contains(ruoloRevoca + "@" + idAceStrutturaDomandaRichiedente)) )
             return false;
         
-        // 4. la domanda non e' stata gia' revocata
-        for (String linkedProcessId : getLinkedProcessIds(processInstanceId)) {
-            // TODO dovrebbe essere possible senza recuperare le variabili
-            HistoricProcessInstance linkedProcessInstance = historyService
-                    .createHistoricProcessInstanceQuery()
-                    .processInstanceId(linkedProcessId)
-                    .includeProcessVariables()
-                    .singleResult();
-
-            if (linkedProcessInstance != null) {
-                String processDefinitionKey = linkedProcessInstance.getProcessDefinitionKey();
-                String statoFinale = (String) linkedProcessInstance.getProcessVariables().get("statoFinaleDomanda");
-                boolean isFlussoRevoca = processDefinitionKey == processiRevocabili.get(processInstance.getProcessDefinitionKey());
-                boolean isStessoDipendente = userNameProponente.equals(linkedProcessInstance.getProcessVariables().get("dipendente"));
-                boolean isInCorsoDiRevoca = statoFinale == null;
-                boolean isGiaRevocata = "REVOCATA".equals(statoFinale);
-                
-                if (isFlussoRevoca && isStessoDipendente && (isInCorsoDiRevoca || isGiaRevocata))
-                    return false;
-            }
+        // 4. la domanda non e' stata gia' revocata e non è in corso di revoca
+        List<HistoricProcessInstance> revoche = historyService.createHistoricProcessInstanceQuery()
+                .processDefinitionKey(processiRevocabili.get(processInstance.getProcessDefinitionKey()))
+                .variableValueEquals("idDomanda", processInstance.getProcessVariables().get("idDomanda"))
+                .includeProcessVariables()
+                .list();
+        for (HistoricProcessInstance revoca : revoche) {
+            String statoFinale = (String) revoca.getProcessVariables().get("statoFinaleDomanda");
+            boolean isInCorsoDiRevoca = "APERTA".equals(statoFinale);
+            boolean isGiaRevocata = "REVOCATA".equals(statoFinale);
+            if (isInCorsoDiRevoca || isGiaRevocata)
+                return false;
         }
 
         // se nessuno dei controlli è fallito, il flusso è revocabile
