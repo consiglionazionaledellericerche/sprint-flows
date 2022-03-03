@@ -73,8 +73,9 @@ public class StartSmartWorkingRevocaSetGroupsAndVisibility {
 
 
 		String userNameDomanda = execution.getVariable("userNameDomanda", String.class);
+		// idnsipAppartenenzaUtente VARIABILE CHE CONTIENE L'IDNSIP DI APPARTENENZA DICHIARATO DALL'UTENTE
 		String idnsipAppartenenzaUtente = execution.getVariable("idnsipAppartenenzaUtente", String.class);
-		String idAceStrutturaRichiedente = aceService.getSedeIdByIdNsip(idnsipAppartenenzaUtente);
+		String idAceStrutturaAppartenenzaRichiedente = aceService.getSedeIdByIdNsip(idnsipAppartenenzaUtente);
 		String tipologiaRichiedente = execution.getVariable("tipologiaRichiedente", String.class);
 		String idDomanda = execution.getVariable("idDomanda", String.class);
 
@@ -132,10 +133,13 @@ public class StartSmartWorkingRevocaSetGroupsAndVisibility {
 			}
 		}
 
+		// idAceStrutturaDomandaRichiedente VARIABILE CHE CONTIENE L'ID EO DEL DIRETTORE E DELLA SEGRETERIA
+		String idAceStrutturaDomandaRichiedente;
+		
 		// VERIFICA direttore-responsabile
 		if(profiloDomanda.equals("direttore-responsabile") ) {
 			String idSedeDirettoregenerale = aceService.getSedeIdByIdNsip("630000");
-			idAceStrutturaRichiedente = idSedeDirettoregenerale;
+			idAceStrutturaDomandaRichiedente = idSedeDirettoregenerale;
 		} else {
 			try {
 				responsabileStruttura = aceService.findResponsabileStruttura(userNameDomanda, dateRif, TipoAppartenenza.SEDE, "responsabile-struttura");
@@ -146,7 +150,7 @@ public class StartSmartWorkingRevocaSetGroupsAndVisibility {
 				if (responsabileStruttura.getEntitaOrganizzativa().getId()== null) {
 					throw new BpmnError("412", "l'utenza: " + userNameDomanda + " non risulta associata ad alcuna struttura<br>");
 				} else {
-					idAceStrutturaRichiedente = responsabileStruttura.getEntitaOrganizzativa().getId().toString();
+					idAceStrutturaDomandaRichiedente = responsabileStruttura.getEntitaOrganizzativa().getId().toString();
 				}
 
 			} catch ( FeignException  e) {
@@ -154,18 +158,19 @@ public class StartSmartWorkingRevocaSetGroupsAndVisibility {
 			}
 		}
 
-		entitaOrganizzativaDirettore = aceService.entitaOrganizzativaById(Integer.parseInt(idAceStrutturaRichiedente));
+		entitaOrganizzativaDirettore = aceService.entitaOrganizzativaById(Integer.parseInt(idAceStrutturaDomandaRichiedente));
 		cdsuoDirettore = entitaOrganizzativaDirettore.getCdsuo();
+		String idnsipDirettore = entitaOrganizzativaDirettore.getIdnsip();
 		if(profiloDomanda.equals("direttore-responsabile") ) {
 			LOGGER.info("L'utente {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", userNameDomanda, entitaOrganizzativaDirettore.getDenominazione(), entitaOrganizzativaDirettore.getSigla(), entitaOrganizzativaDirettore.getId(), entitaOrganizzativaDirettore.getCdsuo(), entitaOrganizzativaDirettore.getIdnsip());
 		} else {
 			LOGGER.info("L'utente {} ha come responsabile-struttura [{}] (per SEDE) {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", userNameDomanda, responsabileStruttura.getRuolo().getDescr(), responsabileStruttura.getUtente().getUsername(), entitaOrganizzativaDirettore.getDenominazione(), entitaOrganizzativaDirettore.getSigla(), entitaOrganizzativaDirettore.getId(), entitaOrganizzativaDirettore.getCdsuo(), entitaOrganizzativaDirettore.getIdnsip());
 		}
 
-		String gruppoPresaVisione = "responsabile-struttura@" + idAceStrutturaRichiedente;	
+		String gruppoPresaVisione = "responsabile-struttura@" + idAceStrutturaDomandaRichiedente;	
 		// DETERMINA PERCORSO FLUSSO
 		if(tipologiaRichiedente.equals("direttore-responsabile")) {
-			gruppoPresaVisione = "rs@" + idAceStrutturaRichiedente;	
+			gruppoPresaVisione = "rs@" + idAceStrutturaDomandaRichiedente;	
 		} 
 
 
@@ -181,10 +186,10 @@ public class StartSmartWorkingRevocaSetGroupsAndVisibility {
 		execution.setVariable("profiloDomanda", profiloDomanda);
 		execution.setVariable("gruppoPresaVisione", gruppoPresaVisione);
 		execution.setVariable("applicazioneSiper", applicazioneSiper);
-		execution.setVariable("idAceStrutturaRichiedente", idAceStrutturaRichiedente);
+		execution.setVariable("idAceStrutturaDomandaRichiedente", idAceStrutturaDomandaRichiedente);
 		execution.setVariable("idnsipAppartenenzaUtente", idnsipAppartenenzaUtente);
 		execution.setVariable("applicazioneScrivaniaDigitale", applicazioneScrivaniaDigitale);
 		execution.setVariable("cdsuoDirettore", cdsuoDirettore);
-		execution.setVariable("idStruttura", String.valueOf(idAceStrutturaRichiedente));
+		execution.setVariable("idStruttura", String.valueOf(idAceStrutturaDomandaRichiedente));
 	}
 }

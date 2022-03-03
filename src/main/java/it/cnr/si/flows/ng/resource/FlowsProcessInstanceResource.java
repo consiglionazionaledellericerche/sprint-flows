@@ -443,18 +443,21 @@ public class FlowsProcessInstanceResource {
 		//MAPPATURA VARIABILI
 		String idStruttura = oldProcessInstance.getProcessVariables().get("idStruttura").toString();
 		data.put("idnsipAppartenenzaUtente", oldProcessInstance.getProcessVariables().get("idnsipAppartenenzaUtente"));
+		data.put("idAceStrutturaDomandaRichiedente", oldProcessInstance.getProcessVariables().get("idAceStrutturaDomandaRichiedente"));
 		data.put("userNameDomanda", oldProcessInstance.getProcessVariables().get("userNameProponente"));
 		data.put("idDomanda", oldProcessInstance.getProcessVariables().get("idDomanda"));
 		data.put("idStruttura", idStruttura);
 		String currentUser = SecurityUtils.getCurrentUserLogin();
-
+		String idAceStrutturaDomandaRichiedente = oldProcessInstance.getProcessVariables().get("idAceStrutturaDomandaRichiedente").toString();
 
 		Set<String> ruoliCurrentUser = membershipService.getAllRolesForUser(currentUser); 
-		if (ruoliCurrentUser.contains("rs@" + idStruttura)) {
-			data.put("tipologiaRichiedente", "segreteria");
-		}
-		if (ruoliCurrentUser.contains("responsabile-struttura@" + idStruttura)) {
+
+		// SE LA RICHIESTA VIENE DA UN DIRETTORE DEVE ESSERE PRESA IN VIASIONE DALLA SEGRETERIA
+		if (ruoliCurrentUser.contains("responsabile-struttura@" + idAceStrutturaDomandaRichiedente)) {
 			data.put("tipologiaRichiedente", "direttore-responsabile");
+		} else {
+			// SE LA RICHIESTA NON VIENE DA UN DIRETTORE (SEGRETERIA O APP.SIPER DEVE ESSERE PRESA IN VIASIONE DAL DIRETTORE
+			data.put("tipologiaRichiedente", "segreteria");
 		}
 		flowsTaskService.startProcessInstance(definitionId, data);
 
