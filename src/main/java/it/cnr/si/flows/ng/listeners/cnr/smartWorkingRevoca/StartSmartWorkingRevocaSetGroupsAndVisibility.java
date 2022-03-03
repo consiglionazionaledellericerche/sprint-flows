@@ -73,8 +73,8 @@ public class StartSmartWorkingRevocaSetGroupsAndVisibility {
 
 
 		String userNameDomanda = execution.getVariable("userNameDomanda", String.class);
-		String idNsipStrutturaRichiedente = execution.getVariable("idNsipStrutturaRichiedente", String.class);
-		String idAceStrutturaRichiedente = aceService.getSedeIdByIdNsip(idNsipStrutturaRichiedente);
+		String idnsipAppartenenzaUtente = execution.getVariable("idnsipAppartenenzaUtente", String.class);
+		String idAceStrutturaRichiedente = aceService.getSedeIdByIdNsip(idnsipAppartenenzaUtente);
 		String tipologiaRichiedente = execution.getVariable("tipologiaRichiedente", String.class);
 		String idDomanda = execution.getVariable("idDomanda", String.class);
 
@@ -93,7 +93,6 @@ public class StartSmartWorkingRevocaSetGroupsAndVisibility {
 
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", userNameDomanda, execution.getId(), execution.getVariable("title"));
 		String cdsuoDirettore = null;
-		String idnsipAppartenenzaUtente = null;
 		SimpleEntitaOrganizzativaWebDto entitaOrganizzativaDirettore = null;
 		LocalDate dateRif = LocalDate.now();
 		BossDto responsabileStruttura = null;
@@ -157,7 +156,6 @@ public class StartSmartWorkingRevocaSetGroupsAndVisibility {
 
 		entitaOrganizzativaDirettore = aceService.entitaOrganizzativaById(Integer.parseInt(idAceStrutturaRichiedente));
 		cdsuoDirettore = entitaOrganizzativaDirettore.getCdsuo();
-		idnsipAppartenenzaUtente = entitaOrganizzativaDirettore.getIdnsip();
 		if(profiloDomanda.equals("direttore-responsabile") ) {
 			LOGGER.info("L'utente {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", userNameDomanda, entitaOrganizzativaDirettore.getDenominazione(), entitaOrganizzativaDirettore.getSigla(), entitaOrganizzativaDirettore.getId(), entitaOrganizzativaDirettore.getCdsuo(), entitaOrganizzativaDirettore.getIdnsip());
 		} else {

@@ -442,7 +442,7 @@ public class FlowsProcessInstanceResource {
 
 		//MAPPATURA VARIABILI
 		String idStruttura = oldProcessInstance.getProcessVariables().get("idStruttura").toString();
-		data.put("idNsipStrutturaRichiedente", oldProcessInstance.getProcessVariables().get("idnsipAppartenenzaUtente"));
+		data.put("idnsipAppartenenzaUtente", oldProcessInstance.getProcessVariables().get("idnsipAppartenenzaUtente"));
 		data.put("userNameDomanda", oldProcessInstance.getProcessVariables().get("userNameProponente"));
 		data.put("idDomanda", oldProcessInstance.getProcessVariables().get("idDomanda"));
 		data.put("idStruttura", idStruttura);
