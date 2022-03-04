@@ -88,7 +88,6 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", userNameProponente, execution.getId(), execution.getVariable("title"));
 		String cdsuoDirettore = null;
-		String idnsipAppartenenzaUtente = null;
 		// idAceStrutturaDomandaRichiedente VARIABILE CHE CONTIENE L'ID EO DEL DIRETTORE E DELLA SEGRETERIA
 		Integer idAceStrutturaDomandaRichiedente = 0;
 		SimpleEntitaOrganizzativaWebDto entitaOrganizzativaDirettore = null;
@@ -107,6 +106,7 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 		//String idNsipRichiedente =  personaProponente.getSede().getIdnsip();
 		String idNsipRichiedente =  execution.getVariable("idNsipRichiedente", String.class);;
 		String sedeRichiedente =  idNsipRichiedente + " - " + personaProponente.getSede().getDenominazione();
+		Integer idAceStrutturaRichiedente = personaProponente.getSede().getId();
 		execution.setVariable("livelloRichiedente", livelloRichiedente);
 		execution.setVariable("profiloRichiedente", profiloRichiedente);
 		execution.setVariable("matricolaRichiedente", matricolaRichiedente);
@@ -173,7 +173,7 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 
 		entitaOrganizzativaDirettore = aceService.entitaOrganizzativaById(idAceStrutturaDomandaRichiedente);
 		cdsuoDirettore = entitaOrganizzativaDirettore.getCdsuo();
-		idnsipAppartenenzaUtente = entitaOrganizzativaDirettore.getIdnsip();
+		String idNsipStrutturaDomandaRichiedente = entitaOrganizzativaDirettore.getIdnsip();
 		if(profiloDomanda.equals("direttore-responsabile") ) {
 			LOGGER.info("L'utente {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", userNameProponente, entitaOrganizzativaDirettore.getDenominazione(), entitaOrganizzativaDirettore.getSigla(), entitaOrganizzativaDirettore.getId(), entitaOrganizzativaDirettore.getCdsuo(), entitaOrganizzativaDirettore.getIdnsip());
 		} else {
@@ -181,12 +181,14 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 		}
 		//DA CAMBIARE - ricavando il direttore della persona che afferisce alla sua struttura
 		String gruppoDirigenteProponente = "responsabile-struttura@" + idAceStrutturaDomandaRichiedente;
+		String gruppoResponsabileSegreteria = "rs@" + idAceStrutturaDomandaRichiedente;	
 
 		String applicazioneSiper = "app.siper";
 		String applicazioneScrivaniaDigitale = "app.scrivaniadigitale";
 
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneSiper, PROCESS_VISUALIZER);
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoDirigenteProponente, PROCESS_VISUALIZER);
+		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileSegreteria, PROCESS_VISUALIZER);
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneScrivaniaDigitale, PROCESS_VISUALIZER);
 
 
@@ -194,9 +196,10 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 		execution.setVariable("profiloDomanda", profiloDomanda);
 		execution.setVariable("profiloFlusso", profiloFlusso);
 
+		execution.setVariable("idNsipStrutturaDomandaRichiedente", idNsipStrutturaDomandaRichiedente + "-" + entitaOrganizzativaDirettore.getDenominazione());
 		execution.setVariable("strutturaValutazioneDirigente", idAceStrutturaDomandaRichiedente + "-" + entitaOrganizzativaDirettore.getDenominazione());
+		execution.setVariable("idAceStrutturaRichiedente", idAceStrutturaRichiedente);
 		execution.setVariable("idAceStrutturaDomandaRichiedente", idAceStrutturaDomandaRichiedente);
-		execution.setVariable("idnsipAppartenenzaUtente", idnsipAppartenenzaUtente);
 		execution.setVariable("applicazioneSiper", applicazioneSiper);
 		execution.setVariable("gruppoDirigenteProponente", gruppoDirigenteProponente);
 		execution.setVariable("applicazioneScrivaniaDigitale", applicazioneScrivaniaDigitale);

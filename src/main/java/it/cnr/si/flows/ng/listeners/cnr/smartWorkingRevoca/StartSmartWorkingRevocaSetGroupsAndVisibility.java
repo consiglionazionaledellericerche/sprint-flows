@@ -73,9 +73,9 @@ public class StartSmartWorkingRevocaSetGroupsAndVisibility {
 
 
 		String userNameDomanda = execution.getVariable("userNameDomanda", String.class);
-		// idnsipAppartenenzaUtente VARIABILE CHE CONTIENE L'IDNSIP DI APPARTENENZA DICHIARATO DALL'UTENTE
-		String idnsipAppartenenzaUtente = execution.getVariable("idnsipAppartenenzaUtente", String.class);
-		String idAceStrutturaAppartenenzaRichiedente = aceService.getSedeIdByIdNsip(idnsipAppartenenzaUtente);
+		// idNsipRichiedente VARIABILE CHE CONTIENE L'IDNSIP DI APPARTENENZA DICHIARATO DALL'UTENTE
+		String idNsipRichiedente = execution.getVariable("idNsipRichiedente", String.class);
+		String idAceStrutturaAppartenenzaRichiedente = aceService.getSedeIdByIdNsip(idNsipRichiedente);
 		String tipologiaRichiedente = execution.getVariable("tipologiaRichiedente", String.class);
 		String idDomanda = execution.getVariable("idDomanda", String.class);
 
@@ -168,6 +168,7 @@ public class StartSmartWorkingRevocaSetGroupsAndVisibility {
 		}
 
 		String gruppoPresaVisione = "responsabile-struttura@" + idAceStrutturaDomandaRichiedente;	
+		String gruppoResponsabileSegreteria = "rs@" + idAceStrutturaDomandaRichiedente;	
 		// DETERMINA PERCORSO FLUSSO
 		if(tipologiaRichiedente.equals("direttore-responsabile")) {
 			gruppoPresaVisione = "rs@" + idAceStrutturaDomandaRichiedente;	
@@ -179,6 +180,7 @@ public class StartSmartWorkingRevocaSetGroupsAndVisibility {
 
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneSiper, PROCESS_VISUALIZER);
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoPresaVisione, PROCESS_VISUALIZER);
+		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileSegreteria, PROCESS_VISUALIZER);
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneScrivaniaDigitale, PROCESS_VISUALIZER);
 
 
@@ -187,7 +189,7 @@ public class StartSmartWorkingRevocaSetGroupsAndVisibility {
 		execution.setVariable("gruppoPresaVisione", gruppoPresaVisione);
 		execution.setVariable("applicazioneSiper", applicazioneSiper);
 		execution.setVariable("idAceStrutturaDomandaRichiedente", idAceStrutturaDomandaRichiedente);
-		execution.setVariable("idnsipAppartenenzaUtente", idnsipAppartenenzaUtente);
+		execution.setVariable("idNsipRichiedente", idNsipRichiedente);
 		execution.setVariable("applicazioneScrivaniaDigitale", applicazioneScrivaniaDigitale);
 		execution.setVariable("cdsuoDirettore", cdsuoDirettore);
 		execution.setVariable("idStruttura", String.valueOf(idAceStrutturaDomandaRichiedente));
