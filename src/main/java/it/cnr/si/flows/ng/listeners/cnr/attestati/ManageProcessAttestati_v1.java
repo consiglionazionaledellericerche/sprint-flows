@@ -23,6 +23,7 @@ import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
 import it.cnr.si.domain.enumeration.ExternalApplication;
 import it.cnr.si.domain.enumeration.ExternalMessageVerb;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,7 +62,8 @@ public class ManageProcessAttestati_v1 implements ExecutionListener {
 		String codiceSedeAttestato = execution.getVariable("codiceSedeAttestato").toString();
 		String meseAttestato = execution.getVariable("meseAttestato").toString();
 		String annoAttestato = execution.getVariable("annoAttestato").toString();
-
+		LocalDate dataFirmaFlusso = LocalDate.now();
+		
 		Map<String, Object> missioniPayload = new HashMap<String, Object>()
 		{
 			{
@@ -69,7 +71,8 @@ public class ManageProcessAttestati_v1 implements ExecutionListener {
 				put("meseAttestato", meseAttestato);
 				put("annoAttestato", annoAttestato);
 				put("stato", statoAttestato.name().toString());
-				put("processInstanceId", execution.getProcessInstanceId().toString());
+				put("stato", statoAttestato.name().toString());
+				put("dataFirmaFlusso", dataFirmaFlusso);
 				put("user", user);
 				if(execution.getVariable("commento") != null) {
 					put("commento", execution.getVariable("commento").toString());
