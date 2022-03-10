@@ -71,8 +71,8 @@ public class ManageProcessAttestati_v1 implements ExecutionListener {
 				put("meseAttestato", meseAttestato);
 				put("annoAttestato", annoAttestato);
 				put("stato", statoAttestato.name().toString());
-				put("stato", statoAttestato.name().toString());
 				put("dataFirmaFlusso", dataFirmaFlusso);
+				put("processInstanceId", execution.getProcessInstanceId().toString());
 				put("user", user);
 				if(execution.getVariable("commento") != null) {
 					put("commento", execution.getVariable("commento").toString());
