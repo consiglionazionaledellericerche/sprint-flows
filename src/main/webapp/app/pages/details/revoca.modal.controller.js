@@ -5,9 +5,9 @@
         .controller('RevocaModalController', RevocaModalController);
 
 
-    RevocaModalController.$inject = ['$uibModalInstance', 'dataService', 'processInstanceId'];
+    RevocaModalController.$inject = ['$uibModalInstance', 'dataService', 'processInstanceId', 'AlertService', '$state'];
 
-    function RevocaModalController ($uibModalInstance, dataService, processInstanceId) {
+    function RevocaModalController ($uibModalInstance, dataService, processInstanceId, AlertService, $state) {
 
       var vm = this;
 
@@ -17,8 +17,11 @@
         dataService.processInstances.revoca(vm.processInstanceId)
         .then(function() {
           $uibModalInstance.dismiss('ok');
-        }, function() {
-          vm.error = true;
+          AlertService.success("Richiesta completata con successo");
+          $state.go('availableTasks');
+        }, function(err) {
+          console.log(err);
+          AlertService.error("Richiesta non riuscita<br>" + err.data.message);
         })
       }
 
