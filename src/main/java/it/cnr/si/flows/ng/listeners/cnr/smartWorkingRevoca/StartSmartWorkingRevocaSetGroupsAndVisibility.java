@@ -38,6 +38,8 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 
 @Component
@@ -46,6 +48,8 @@ import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 @Service
 public class StartSmartWorkingRevocaSetGroupsAndVisibility {
 	private static final Logger LOGGER = LoggerFactory.getLogger(StartSmartWorkingRevocaSetGroupsAndVisibility.class);
+
+	private static final String INITIATOR = null;
 
 	@Inject
 	private RuntimeService runtimeService;
@@ -76,8 +80,25 @@ public class StartSmartWorkingRevocaSetGroupsAndVisibility {
 		// idNsipRichiedente VARIABILE CHE CONTIENE L'IDNSIP DI APPARTENENZA DICHIARATO DALL'UTENTE
 		String idNsipRichiedente = execution.getVariable("idNsipRichiedente", String.class);
 		String idAceStrutturaAppartenenzaRichiedente = aceService.getSedeIdByIdNsip(idNsipRichiedente);
-		String tipologiaRichiedente = execution.getVariable("tipologiaRichiedente", String.class);
 		String idDomanda = execution.getVariable("idDomanda", String.class);
+
+		//String tipologiaRichiedente = execution.getVariable("tipologiaRichiedente", String.class);
+		String tipologiaRichiedente = "not-found";
+		String executionId =  execution.getId();
+		String initiator = null;
+		if (runtimeService.getVariable(execution.getId() , "initiator") != null)
+			initiator = runtimeService.getVariable(executionId , "initiator").toString();
+		Set<String> listaRuoliUtenteCorrente = membershipService.getAllRolesForUser(initiator);
+		if(listaRuoliUtenteCorrente.contains("rs@" + idAceStrutturaAppartenenzaRichiedente)) {
+			tipologiaRichiedente = "segreteria";
+		} else if(listaRuoliUtenteCorrente.contains("responsabile-struttura@" + idAceStrutturaAppartenenzaRichiedente)) {
+			tipologiaRichiedente = "responsabile-struttura";
+		} else if(listaRuoliUtenteCorrente.contains("abilitati#smart-working-revoca")) {
+			tipologiaRichiedente = "utente";
+		}
+		LOGGER.info("La tipologiaRichiedente e' {} per la struttura {} (id ace = {})", tipologiaRichiedente,  idNsipRichiedente, idAceStrutturaAppartenenzaRichiedente);
+		execution.getVariable("tipologiaRichiedente", String.class);
+
 
 		List<HistoricProcessInstance> processinstancesListaDomandeSmartWorking = historyService.createHistoricProcessInstanceQuery()
 				.includeProcessVariables()
@@ -135,7 +156,7 @@ public class StartSmartWorkingRevocaSetGroupsAndVisibility {
 
 		// idAceStrutturaDomandaRichiedente VARIABILE CHE CONTIENE L'ID EO DEL DIRETTORE E DELLA SEGRETERIA
 		String idAceStrutturaDomandaRichiedente;
-		
+
 		// VERIFICA direttore-responsabile
 		if(profiloDomanda.equals("direttore-responsabile") ) {
 			String idSedeDirettoregenerale = aceService.getSedeIdByIdNsip("630000");
@@ -184,6 +205,7 @@ public class StartSmartWorkingRevocaSetGroupsAndVisibility {
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneScrivaniaDigitale, PROCESS_VISUALIZER);
 
 
+		execution.setVariable("tipologiaRichiedente", tipologiaRichiedente);
 		execution.setVariable("livelloRichiedente", livelloRichiedente);
 		execution.setVariable("profiloDomanda", profiloDomanda);
 		execution.setVariable("gruppoPresaVisione", gruppoPresaVisione);
