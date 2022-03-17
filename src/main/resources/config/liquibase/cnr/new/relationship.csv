@@ -1,6 +1,7 @@
 ID;GROUP_NAME;GROUP_RELATIONSHIP;GROUP_ROLE
 1;staffAmministrativo@STRUTTURA;supervisore#acquisti@STRUTTURA;member
 3;staffAmministrativo@STRUTTURA;abilitati#acquisti@STRUTTURA;coordinator
+4;direttore@99999;delegatofirma@99999;coordinator
 15;direttore@STRUTTURA;responsabileFirmaAcquisti@STRUTTURA;member
 16;responsabileSede@STRUTTURA;responsabileFirmaAcquisti@STRUTTURA;member
 17;direttoreFF@STRUTTURA;responsabileFirmaAcquisti@STRUTTURA;member
@@ -20,3 +21,7 @@ ID;GROUP_NAME;GROUP_RELATIONSHIP;GROUP_ROLE
 45;dirigente@STRUTTURA;responsabile-struttura@STRUTTURA;member
 46;dirigenteAI@STRUTTURA;responsabile-struttura@STRUTTURA;member
 47;direttore@STRUTTURA;responsabile-struttura@STRUTTURA;member
+48;app.scrivaniadigitale;abilitati#firma-elenco-documenti@0000;member
+66;sfd@STRUTTURA;responsabileFirmaAcquisti$60000@STRUTTURA;member
+67;staffAmministrativo@STRUTTURA;responsabileFirmaAcquisti$52459@STRUTTURA;member
+162;app.siper;abilitati#smart-working-revoca@0000;member

@@ -21,6 +21,9 @@ import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.runtime.Job;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.rest.common.api.DataResponse;
+import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,14 +32,19 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import com.google.common.net.MediaType;
+
 import javax.inject.Inject;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static it.cnr.si.flows.ng.utils.Enum.Azione.GenerazioneDaSistema;
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.initiator;
 import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.statoFinaleDomanda;
 import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
@@ -102,7 +110,20 @@ public class ManageProcessSmartWorkingRevoca_v1 implements ExecutionListener {
 		externalMessageService.createExternalMessage(url, ExternalMessageVerb.POST, stmPayload, ExternalApplication.LABCON);
 	}
 
-
+	private void creaRevocaDomandaSmartWorkingPDF(DelegateExecution execution) throws IOException {
+		String processInstanceId = execution.getProcessInstanceId();
+		String executionId = execution.getId();
+		String nomeFile="revocaDomandaSmartWorking";
+		String labelFile = "Revoca Domanda SmartWorking";
+		String report = "/scrivaniadigitale/revocaDomandaSmartWorking.jrxml";
+		//tipologiaDoc è la tipologia del file
+		String tipologiaDoc = Enum.PdfType.valueOf("revocaDomandaSmartWorking").name();
+		String utenteFile = execution.getVariable("initiator").toString();
+		// GENERAZIONE PDF
+		List<String> listaVariabiliHtml = new ArrayList<String>();
+		listaVariabiliHtml.add("propostaDiRicerca");
+		flowsPdfService.makePdfBySigla(tipologiaDoc, processInstanceId, listaVariabiliHtml, labelFile, report);
+	}
 
 	@Override
 	public void notify(DelegateExecution execution) throws Exception {
@@ -141,6 +162,9 @@ public class ManageProcessSmartWorkingRevoca_v1 implements ExecutionListener {
 			case "presa-visione-start": {
 				LOGGER.info("**** presa-visione-start");
 				utils.updateJsonSearchTerms(executionId, processInstanceId, stato);
+				if (execution.getVariable("tipologiaRichiedente").equals("segreteria")){
+					creaRevocaDomandaSmartWorkingPDF(execution);
+				}
 			};break;  
 			case "presa-visione-end": {
 				LOGGER.info("**** presa-visione-end");

@@ -227,7 +227,8 @@ public class Enum {
         valutazioneLaboratoriCongiuntiTematici,
         preavvisoRigettoCambioFascia,
         monitoraggioAttivitaCovid19,
-        domandaSmartWorking;
+        domandaSmartWorking,
+        revocaDomandaSmartWorking;
 
         PdfType() {
         }
