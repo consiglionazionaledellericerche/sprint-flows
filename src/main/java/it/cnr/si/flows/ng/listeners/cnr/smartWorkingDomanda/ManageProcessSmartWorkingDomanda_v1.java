@@ -32,6 +32,7 @@ import org.springframework.stereotype.Component;
 import javax.inject.Inject;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -185,6 +186,12 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 				restToApplicazioneSiper(execution, Enum.StatoDomandeSmartWorkingEnum.PRESA_VISIONE);
 			};break; 
 
+			
+			// NOTIFICHE gruppoDirigenteProponente
+			case "notificatask-start": {
+				LocalDate dateRif = LocalDate.now();
+				LOGGER.info("**** notifica AL GRUPPO: " + execution.getVariable("gruppoDirigenteProponente").toString()   + " in data: " + dateRif);
+			};break; 			
 
 			// FINE SUBPROCESS
 			case "validazioneResponsabile-start": {
