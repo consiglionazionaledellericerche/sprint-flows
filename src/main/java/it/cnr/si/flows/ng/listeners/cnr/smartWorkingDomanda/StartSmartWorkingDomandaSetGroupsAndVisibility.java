@@ -143,7 +143,7 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 				if (responsabileStruttura.getUtente().getPersona().getSede()== null) {
 					throw new BpmnError("412", "l'utenza: " + userNameProponente + " non risulta associata ad alcuna struttura<br>");
 				} else {
-					idAceStrutturaDomandaRichiedente = responsabileStruttura.getUtente().getPersona().getSede().getId();
+					idAceStrutturaDomandaRichiedente = responsabileStruttura.getEntitaOrganizzativa().getId();
 				}
 
 			} catch ( FeignException  e) {
