@@ -140,7 +140,7 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 					throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + userNameProponente + " <br>Si prega di contattare l'help desk in merito<br>");
 				} else {
 				}
-				if (responsabileStruttura.getUtente().getPersona().getSede()== null) {
+				if (responsabileStruttura.getEntitaOrganizzativa().getId()== null) {
 					throw new BpmnError("412", "l'utenza: " + userNameProponente + " non risulta associata ad alcuna struttura<br>");
 				} else {
 					idAceStrutturaDomandaRichiedente = responsabileStruttura.getEntitaOrganizzativa().getId();
@@ -173,7 +173,7 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneScrivaniaDigitale, PROCESS_VISUALIZER);
 
 		execution.setVariable("idNsipStrutturaDomandaRichiedente", idNsipStrutturaDomandaRichiedente);
-		execution.setVariable("strutturaValutazioneDirigente", idNsipStrutturaDomandaRichiedente + "-" + entitaOrganizzativaDirettore.getDenominazione());
+		execution.setVariable("strutturaValutazioneDirigente", cdsuoStrutturaDomandaRichiedente + "-" + entitaOrganizzativaDirettore.getDenominazione());
 		execution.setVariable("idAceStrutturaDomandaRichiedente", idAceStrutturaDomandaRichiedente);
 		execution.setVariable("idStruttura", String.valueOf(idAceStrutturaDomandaRichiedente));
 		execution.setVariable("cdsuoStrutturaDomandaRichiedente", cdsuoStrutturaDomandaRichiedente);
