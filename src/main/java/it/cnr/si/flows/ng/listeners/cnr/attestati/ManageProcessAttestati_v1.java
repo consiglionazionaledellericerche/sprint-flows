@@ -23,8 +23,11 @@ import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
 import it.cnr.si.domain.enumeration.ExternalApplication;
 import it.cnr.si.domain.enumeration.ExternalMessageVerb;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +65,10 @@ public class ManageProcessAttestati_v1 implements ExecutionListener {
 		String codiceSedeAttestato = execution.getVariable("codiceSedeAttestato").toString();
 		String meseAttestato = execution.getVariable("meseAttestato").toString();
 		String annoAttestato = execution.getVariable("annoAttestato").toString();
-		LocalDate dataFirmaFlusso = LocalDate.now();
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Date dataFirma = new Date();
+		String dataFirmaFlusso = dateFormat.format(dataFirma);
+		//LocalDate dataFirmaFlusso = LocalDate.now();
 		
 		Map<String, Object> missioniPayload = new HashMap<String, Object>()
 		{
