@@ -128,9 +128,10 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
     public boolean isCandidatoDiretto(String taskId, List<String> authorities) {
         List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
+        String username = SecurityUtils.getCurrentUserLogin();
         return identityLinks.stream()
                 .filter(l -> l.getType().equals(IdentityLinkType.CANDIDATE))
-                .anyMatch(l -> authorities.contains(l.getGroupId()));
+                .anyMatch(l -> authorities.contains(l.getGroupId()) || username.equals(l.getUserId()));
     }
 
     public boolean canCompleteImportoSpesa(String taskId, List<String> authorities) {

@@ -137,7 +137,7 @@ public class ExternalMessageSender {
         interceptors.add(new AttestatiRequestInterceptor());
         attestatiTemplate.setInterceptors(interceptors);
 
-        ExternalApplication.ABIL.setTemplate(abilTemplate);
+        ExternalApplication.ATTESTATI.setTemplate(attestatiTemplate);
 
         // STM
 
