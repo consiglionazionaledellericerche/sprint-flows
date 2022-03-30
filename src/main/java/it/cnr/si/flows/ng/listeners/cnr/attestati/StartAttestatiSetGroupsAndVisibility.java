@@ -46,6 +46,7 @@ public class StartAttestatiSetGroupsAndVisibility {
 
 		String initiator = (String) execution.getVariable(Enum.VariableEnum.initiator.name());
 		String utenteRichiedente = execution.getVariable("utenteRichiedente").toString();
+		String usernameResponsabileAttestato = execution.getVariable("usernameResponsabileAttestato").toString();
 		String meseAttestato = execution.getVariable("meseAttestato").toString();
 		String annoAttestato = execution.getVariable("annoAttestato").toString();
 		String codiceSedeAttestato = execution.getVariable("codiceSedeAttestato").toString();
@@ -62,6 +63,7 @@ public class StartAttestatiSetGroupsAndVisibility {
 		execution.setVariable("codiceSedeAttestato", codiceSedeAttestato);
 		execution.setVariable("codiceCdsuoAttestato", codiceCdsuoAttestato);
 		execution.setVariable("idStruttura", idStruttura);
-
+		
+		//runtimeService.addUserIdentityLink(execution.getProcessInstanceId(), usernameResponsabileAttestato, PROCESS_VISUALIZER);
 	}
 }
