@@ -46,7 +46,7 @@ public class AceBridgeService {
 					ruoloUtente.getRuolo().getRuoliGruppoAssociati().stream().forEach(ruoloAssociato ->
 						ruoli.add(ruoloAssociato.getSigla() + "@" + idStruttura));
 				});
-		log.debug("Ruoli da ace per l'utente {}: {}", username, ruoli);
+		log.info("Ruoli da ace per l'utente {}: {}", username, ruoli);
 		return ruoli;
 	}
 
