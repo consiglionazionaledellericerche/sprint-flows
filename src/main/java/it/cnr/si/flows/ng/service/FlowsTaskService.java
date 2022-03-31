@@ -7,7 +7,6 @@ import it.cnr.si.domain.View;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.exception.UnexpectedResultException;
 import it.cnr.si.flows.ng.resource.FlowsAttachmentResource;
-import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
@@ -52,7 +51,8 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.initiator;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.startDate;
 import static it.cnr.si.flows.ng.utils.Utils.*;
 
 
@@ -266,51 +266,25 @@ public class FlowsTaskService {
 
 		utils.orderTasks(order, taskQuery);
 
-		//    INIZIO PARTE SBAGLIATA
-		List<TaskResponse> result = new ArrayList<>();
-		Set<String> usersInMyGroups = membershipService.getUsersInMyGroups(username);
-		//risulta avere prestazioni leggermente migliori questo approccio rispetto a quello commentato
-		// (test effettuati con 300 Pi e 30 Task assegnati ad altri utenti nei miei gruppi
-		//      prendo i task assegnati agli utenti trovati
-		for (String user : usersInMyGroups) {
-			List<Task> tasks = taskQuery.taskAssignee(user).list()
-					.stream()
-					.filter(t ->
-							taskService.getIdentityLinksForTask(t.getId()).stream().anyMatch(il ->
-									il.getType().equals(IdentityLinkType.CANDIDATE) && userAuthorities.contains(il.getGroupId()) )
-					).collect(Collectors.toList());
-
-			result.addAll(restResponseFactory.createTaskResponseList(tasks));
-		}
-		//		result = restResponseFactory.createTaskResponseList(taskQuery.list().stream()
-		//																	.filter(t -> usersInMyGroups.contains(t.getAssignee()) || taskService.getIdentityLinksForTask(t.getId()).stream().anyMatch(il -> il.getType().equals(IdentityLinkType.CANDIDATE) && userAuthorities.contains(il.getGroupId())))
-		//																	.collect(Collectors.toList()));
-		// FINE PARTE SBAGLIATA
-		
 		// INIZIO PARTE NUOVA
 	    TaskQuery taskQueryNuovo = (TaskQuery) utils.searchParams(searchParams, taskService.createTaskQuery().includeProcessVariables());
         if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
             taskQueryNuovo.processDefinitionKey(processDefinition);
         utils.orderTasks(order, taskQueryNuovo);
 	       
-        List<Task> tasksAssignedToOthers = taskQueryNuovo            
+        List<Task> result = taskQueryNuovo
                 .or()
                 .taskCandidateGroupIn(userAuthorities)
                 .taskCandidateUser(username)
                 .endOr()
                 .list()
                 .stream()
-                .filter(task -> !username.equals(task.getAssignee()))
+                .filter(task -> !username.equals(task.getAssignee()) && task.getAssignee() != null)
                 .collect(Collectors.toList());
-        
-        List<String> idVecchi = result.stream().map(TaskResponse::getId).collect(Collectors.toList());
-        List<String> idNuovi  = tasksAssignedToOthers.stream().map(Task::getId).collect(Collectors.toList());
-        
-        LOGGER.error("Id coincidono? "+ idNuovi.containsAll(idVecchi) + idVecchi.containsAll(idNuovi));
-        
+
         // FINE PARTE NUOVA
 		
-		List<TaskResponse> responseList = result.subList(firstResult <= result.size() ? firstResult : result.size(),
+		List<TaskResponse> responseList = restResponseFactory.createTaskResponseList(result).subList(firstResult <= result.size() ? firstResult : result.size(),
 				maxResults <= result.size() ? maxResults : result.size());
 		DataResponse response = new DataResponse();
 		response.setStart(firstResult);
