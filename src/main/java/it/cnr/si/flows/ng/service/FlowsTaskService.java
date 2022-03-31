@@ -266,10 +266,9 @@ public class FlowsTaskService {
 
 		utils.orderTasks(order, taskQuery);
 
+		//    INIZIO PARTE SBAGLIATA
 		List<TaskResponse> result = new ArrayList<>();
-
 		Set<String> usersInMyGroups = membershipService.getUsersInMyGroups(username);
-
 		//risulta avere prestazioni leggermente migliori questo approccio rispetto a quello commentato
 		// (test effettuati con 300 Pi e 30 Task assegnati ad altri utenti nei miei gruppi
 		//      prendo i task assegnati agli utenti trovati
@@ -286,7 +285,31 @@ public class FlowsTaskService {
 		//		result = restResponseFactory.createTaskResponseList(taskQuery.list().stream()
 		//																	.filter(t -> usersInMyGroups.contains(t.getAssignee()) || taskService.getIdentityLinksForTask(t.getId()).stream().anyMatch(il -> il.getType().equals(IdentityLinkType.CANDIDATE) && userAuthorities.contains(il.getGroupId())))
 		//																	.collect(Collectors.toList()));
-
+		// FINE PARTE SBAGLIATA
+		
+		// INIZIO PARTE NUOVA
+	    TaskQuery taskQueryNuovo = (TaskQuery) utils.searchParams(searchParams, taskService.createTaskQuery().includeProcessVariables());
+        if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
+            taskQueryNuovo.processDefinitionKey(processDefinition);
+        utils.orderTasks(order, taskQueryNuovo);
+	       
+        List<Task> tasksAssignedToOthers = taskQueryNuovo            
+                .or()
+                .taskCandidateGroupIn(userAuthorities)
+                .taskCandidateUser(username)
+                .endOr()
+                .list()
+                .stream()
+                .filter(task -> !username.equals(task.getAssignee()))
+                .collect(Collectors.toList());
+        
+        List<String> idVecchi = result.stream().map(TaskResponse::getId).collect(Collectors.toList());
+        List<String> idNuovi  = tasksAssignedToOthers.stream().map(Task::getId).collect(Collectors.toList());
+        
+        LOGGER.error("Id coincidono? "+ idNuovi.containsAll(idVecchi) + idVecchi.containsAll(idNuovi));
+        
+        // FINE PARTE NUOVA
+		
 		List<TaskResponse> responseList = result.subList(firstResult <= result.size() ? firstResult : result.size(),
 				maxResults <= result.size() ? maxResults : result.size());
 		DataResponse response = new DataResponse();
