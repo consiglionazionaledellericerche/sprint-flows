@@ -53,7 +53,7 @@ import static it.cnr.si.flows.ng.utils.Utils.*;
 public class FlowsProcessInstanceService {
 
     public static final Map<String, String> processiRevocabili = new HashMap<String, String>() {{
-        put("smart-working-domanda", "smart-working-revoca");
+       // put("smart-working-domanda", "smart-working-revoca");
     }};
     
     public static final Map<String, List<String>> abilitatiAllaRevoca = new HashMap<String, List<String>>() {{
