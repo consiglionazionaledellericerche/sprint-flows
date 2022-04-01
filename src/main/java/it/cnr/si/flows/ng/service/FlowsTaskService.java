@@ -295,10 +295,10 @@ public class FlowsTaskService {
 				.map(pi ->  getActiveTaskForProcessInstance(pi.getId()))
 				.collect(Collectors.toList());
 		
-		List<TaskResponse> responseList = null;
+		List<TaskResponse> responseList = new ArrayList();
+		
 
-		List<TaskResponse> taskList = restResponseFactory.createTaskResponseList(result).subList(firstResult <= result.size() ? firstResult : result.size(),
-																									 maxResults <= result.size() ? maxResults : result.size());
+		List<TaskResponse> taskList = restResponseFactory.createTaskResponseList(result);
 		boolean assigneeFlag = false;
 		boolean candidateFlag = false;
 		for (TaskResponse task : taskList) {
@@ -325,13 +325,12 @@ public class FlowsTaskService {
 			}
 		}
 
+		responseList.subList(firstResult <= result.size() ? firstResult : result.size(),
+				 maxResults <= result.size() ? maxResults : result.size());
+		
 		DataResponse response = new DataResponse();
 		response.setStart(firstResult);
-		if (responseList != null) {
-			response.setSize(responseList.size());
-		} else {
-			response.setSize(0);
-		}
+		response.setSize(0);
 		response.setTotal(result.size());
 		response.setData(responseList);
 		return response;
