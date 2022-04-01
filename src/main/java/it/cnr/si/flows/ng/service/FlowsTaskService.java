@@ -272,6 +272,7 @@ public class FlowsTaskService {
 		processQuery.setVisibleToUser(username);
 		processQuery.unfinished();
 
+		//trasformo i searchParams da JSONArray a Hashmap
 		Map<String, String> mapParams = new HashMap<>();
 		for (int i = 0; i < searchParams.length(); i++) {
 			JSONObject appo = (JSONObject) searchParams.get(i);
