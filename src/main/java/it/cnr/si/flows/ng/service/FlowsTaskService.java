@@ -263,28 +263,20 @@ public class FlowsTaskService {
 
 
 	public DataResponse taskAssignedInMyGroups(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
-		String username = SecurityUtils.getCurrentUserLogin();
 
+		String username = SecurityUtils.getCurrentUserLogin();
 		List<String> userAuthorities = SecurityUtils.getCurrentUserAuthorities();
 
 		FlowsHistoricProcessInstanceQuery processQuery = new FlowsHistoricProcessInstanceQuery(managementService);
 		processQuery.setVisibleToGroups(userAuthorities);
 		processQuery.setVisibleToUser(username);
 		processQuery.unfinished();
-//	todo: JSONObject -> map
-//		HashMap<String, String> mapParams = new org.codehaus.jackson.map.ObjectMapper().readValue(searchParams, HashMap.class);
 
-
-		ObjectMapper mapper = new ObjectMapper();
-		Map<String, String> mapParams = null;
-		////			todo: da implementare
-//		try {
-//			mapParams = mapper.readValue(searchParams.toString(), Map.class);
-			mapParams = new HashMap<>();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-
+		Map<String, String> mapParams = new HashMap<>();
+		for (int i = 0; i < searchParams.length(); i++) {
+			JSONObject appo = (JSONObject) searchParams.get(i);
+			mapParams.put(appo.getString("key"), appo.getString("value"));
+		}
 
 		flowsProcessInstanceService.setSearchTerms(mapParams, processQuery);
 		if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
@@ -293,15 +285,13 @@ public class FlowsTaskService {
 			processQuery.orderByProcessInstanceStartTime().asc();
 		else if (order.equals(DESC))
 			processQuery.orderByProcessInstanceStartTime().desc();
-		// FINE PARTE NUOVA
 
 		List<HistoricProcessInstance> pil = processQuery.list();
-//		per ogni Pi prendo il task attivo e costruisco il result
+
+		//per ogni Pi prendo il task attivo e costruisco la response
 		List<Task> result = pil.stream()
 				.map(pi ->  getActiveTaskForProcessInstance(pi.getId()))
 				.collect(Collectors.toList());
-
-
 
 		List<TaskResponse> responseList = restResponseFactory.createTaskResponseList(result).subList(firstResult <= result.size() ? firstResult : result.size(),
 																									 maxResults <= result.size() ? maxResults : result.size());
