@@ -292,7 +292,9 @@ public class FlowsTaskService {
 
 		//per ogni Pi prendo il task attivo e costruisco la response
 		List<Task> result = pil.stream()
-				.map(pi ->  getActiveTaskForProcessInstance(pi.getId()))
+				.map(pi ->  taskService.createTaskQuery().active().processInstanceId(pi.getId())
+						.includeProcessVariables()
+						.list().get(0))
 				.collect(Collectors.toList());
 		
 		List<TaskResponse> responseList = new ArrayList();
