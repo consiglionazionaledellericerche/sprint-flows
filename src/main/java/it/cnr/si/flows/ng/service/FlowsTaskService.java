@@ -266,6 +266,7 @@ public class FlowsTaskService {
 
 		String username = SecurityUtils.getCurrentUserLogin();
 		List<String> userAuthorities = SecurityUtils.getCurrentUserAuthorities();
+		Set<String> ruoliUtente = membershipService.getAllRolesForUser(username);
 
 		FlowsHistoricProcessInstanceQuery processQuery = new FlowsHistoricProcessInstanceQuery(managementService);
 		processQuery.setVisibleToGroups(userAuthorities);
@@ -293,12 +294,44 @@ public class FlowsTaskService {
 		List<Task> result = pil.stream()
 				.map(pi ->  getActiveTaskForProcessInstance(pi.getId()))
 				.collect(Collectors.toList());
+		
+		List<TaskResponse> responseList = null;
 
-		List<TaskResponse> responseList = restResponseFactory.createTaskResponseList(result).subList(firstResult <= result.size() ? firstResult : result.size(),
+		List<TaskResponse> taskList = restResponseFactory.createTaskResponseList(result).subList(firstResult <= result.size() ? firstResult : result.size(),
 																									 maxResults <= result.size() ? maxResults : result.size());
+		boolean assigneeFlag = false;
+		boolean candidateFlag = false;
+		for (TaskResponse task : taskList) {
+			List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForTask(task.getId());
+			assigneeFlag = false;
+			candidateFlag = false;
+
+			for (HistoricIdentityLink hil : identityLinks) {
+				if (hil.getType().equals("assignee")) {
+					if (!hil.getUserId().toString().equals(username))
+						assigneeFlag = true;
+				}
+				if (hil.getType().equals("candidate")) {
+					if (hil.getUserId() != null && hil.getUserId().toString().equals(username))
+						candidateFlag = true;
+				}
+				if (hil.getType().equals("candidate")) {
+					if (hil.getGroupId() != null && ruoliUtente.contains(hil.getGroupId().toString()))
+						candidateFlag = true;
+				}
+			}
+			if (candidateFlag && assigneeFlag) {
+				responseList.add(task);
+			}
+		}
+
 		DataResponse response = new DataResponse();
 		response.setStart(firstResult);
-		response.setSize(responseList.size());
+		if (responseList != null) {
+			response.setSize(responseList.size());
+		} else {
+			response.setSize(0);
+		}
 		response.setTotal(result.size());
 		response.setData(responseList);
 		return response;
