@@ -277,12 +277,12 @@ public class FlowsTaskService {
 
 		ObjectMapper mapper = new ObjectMapper();
 		Map<String, String> mapParams = null;
+		////			todo: da implementare
 //		try {
 //			mapParams = mapper.readValue(searchParams.toString(), Map.class);
 			mapParams = new HashMap<>();
 //		} catch (IOException e) {
 //			e.printStackTrace();
-////			todo: da gestire
 //		}
 
 
