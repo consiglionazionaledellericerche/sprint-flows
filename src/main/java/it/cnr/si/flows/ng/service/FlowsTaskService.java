@@ -6,6 +6,7 @@ import com.opencsv.CSVWriter;
 import it.cnr.si.domain.View;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.exception.UnexpectedResultException;
+import it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery;
 import it.cnr.si.flows.ng.resource.FlowsAttachmentResource;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.flows.ng.utils.Utils;
@@ -16,6 +17,7 @@ import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.RelationshipService;
 import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricIdentityLink;
+import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.impl.util.json.JSONArray;
@@ -99,6 +101,13 @@ public class FlowsTaskService {
 	private Environment env;
 	@Inject
 	private DraftService draftService;
+	@Inject
+	private ManagementService managementService;
+	@Inject
+	private FlowsProcessInstanceService flowsProcessInstanceService;
+
+
+
 
 	public DataResponse search(Map<String, String> params, String processInstanceId, boolean active, String order, int firstResult, int maxResults) {
 		HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery();
@@ -218,9 +227,9 @@ public class FlowsTaskService {
 
 		List<Task> tasks = taskQuery.listPage(firstResult, maxResults);
 		int rimossi = rimuoviTaskImportoSpesa(tasks);
-		
+
 		List<TaskResponse> list = restResponseFactory.createTaskResponseList(tasks);
-		
+
 		DataResponse response = new DataResponse();
 		response.setStart(firstResult);
 		response.setSize(list.size() - rimossi);
@@ -230,28 +239,27 @@ public class FlowsTaskService {
 	}
 
 	private int rimuoviTaskImportoSpesa(List<Task> list) {
-		
+
 		int removed = 0;
 
-        List<String> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .map(Utils::removeLeadingRole)
-                .collect(Collectors.toList());
-        
+		List<String> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+				.map(GrantedAuthority::getAuthority)
+				.map(Utils::removeLeadingRole)
+				.collect(Collectors.toList());
+
 		Iterator<Task> i = list.iterator();
 		while (i.hasNext()) {
 			Task task = i.next();
 			if (!permissionEvaluator.isCandidatoDiretto(task.getId(), authorities) &&
-			        !permissionEvaluator.canCompleteImportoSpesa(task.getId(), authorities)) {
+					!permissionEvaluator.canCompleteImportoSpesa(task.getId(), authorities)) {
 				i.remove();
 				removed++;
 			}
 		}
-		
-		
+
+
 		return removed;
 	}
-
 
 
 	public DataResponse taskAssignedInMyGroups(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
@@ -259,33 +267,44 @@ public class FlowsTaskService {
 
 		List<String> userAuthorities = SecurityUtils.getCurrentUserAuthorities();
 
-		TaskQuery taskQuery = (TaskQuery) utils.searchParams(searchParams, taskService.createTaskQuery().includeProcessVariables());
+		FlowsHistoricProcessInstanceQuery processQuery = new FlowsHistoricProcessInstanceQuery(managementService);
+		processQuery.setVisibleToGroups(userAuthorities);
+		processQuery.setVisibleToUser(username);
+		processQuery.unfinished();
+//	todo: JSONObject -> map
+//		HashMap<String, String> mapParams = new org.codehaus.jackson.map.ObjectMapper().readValue(searchParams, HashMap.class);
 
+
+		ObjectMapper mapper = new ObjectMapper();
+		Map<String, String> mapParams = null;
+//		try {
+//			mapParams = mapper.readValue(searchParams.toString(), Map.class);
+			mapParams = new HashMap<>();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+////			todo: da gestire
+//		}
+
+
+		flowsProcessInstanceService.setSearchTerms(mapParams, processQuery);
 		if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
-			taskQuery.processDefinitionKey(processDefinition);
+			processQuery.processDefinitionKey(processDefinition);
+		if (order.equals(ASC))
+			processQuery.orderByProcessInstanceStartTime().asc();
+		else if (order.equals(DESC))
+			processQuery.orderByProcessInstanceStartTime().desc();
+		// FINE PARTE NUOVA
 
-		utils.orderTasks(order, taskQuery);
+		List<HistoricProcessInstance> pil = processQuery.list();
+//		per ogni Pi prendo il task attivo e costruisco il result
+		List<Task> result = pil.stream()
+				.map(pi ->  getActiveTaskForProcessInstance(pi.getId()))
+				.collect(Collectors.toList());
 
-		// INIZIO PARTE NUOVA
-	    TaskQuery taskQueryNuovo = (TaskQuery) utils.searchParams(searchParams, taskService.createTaskQuery().includeProcessVariables());
-        if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
-            taskQueryNuovo.processDefinitionKey(processDefinition);
-        utils.orderTasks(order, taskQueryNuovo);
-	       
-        List<Task> result = taskQueryNuovo
-                .or()
-                .taskCandidateGroupIn(userAuthorities)
-                .taskCandidateUser(username)
-                .endOr()
-                .list()
-                .stream()
-                .filter(task -> !username.equals(task.getAssignee()) && task.getAssignee() != null)
-                .collect(Collectors.toList());
 
-        // FINE PARTE NUOVA
-		
+
 		List<TaskResponse> responseList = restResponseFactory.createTaskResponseList(result).subList(firstResult <= result.size() ? firstResult : result.size(),
-				maxResults <= result.size() ? maxResults : result.size());
+																									 maxResults <= result.size() ? maxResults : result.size());
 		DataResponse response = new DataResponse();
 		response.setStart(firstResult);
 		response.setSize(responseList.size());
@@ -519,8 +538,8 @@ public class FlowsTaskService {
 			isUnclaimableVariable.setName("isReleasable");
 			// if has candidate groups or users -> can release
 			isUnclaimableVariable.setValue(taskService.getIdentityLinksForTask(task.getId())
-					.stream()
-					.anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
+												   .stream()
+												   .anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
 			task.getVariables().add(isUnclaimableVariable);
 		}
 	}
