@@ -269,6 +269,7 @@ public class FlowsTaskService {
 		Set<String> ruoliUtente = membershipService.getAllRolesForUser(username);
 
 		FlowsHistoricProcessInstanceQuery processQuery = new FlowsHistoricProcessInstanceQuery(managementService);
+//		todo: è troppo selettivo, la query con questo parametro è vuota
 		processQuery.setVisibleToGroups(userAuthorities);
 		processQuery.setVisibleToUser(username);
 		processQuery.unfinished();
@@ -327,13 +328,13 @@ public class FlowsTaskService {
 			}
 		}
 
-		responseList.subList(firstResult <= result.size() ? firstResult : result.size(),
-				 maxResults <= result.size() ? maxResults : result.size());
+		responseList.subList(firstResult <= responseList.size() ? firstResult : responseList.size(),
+				 maxResults <= responseList.size() ? maxResults : responseList.size());
 		
 		DataResponse response = new DataResponse();
 		response.setStart(firstResult);
 		response.setSize(0);
-		response.setTotal(result.size());
+		response.setTotal(responseList.size());
 		response.setData(responseList);
 		return response;
 	}
