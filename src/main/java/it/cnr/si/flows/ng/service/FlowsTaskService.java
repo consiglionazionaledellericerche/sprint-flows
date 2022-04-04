@@ -269,7 +269,6 @@ public class FlowsTaskService {
 		Set<String> ruoliUtente = membershipService.getAllRolesForUser(username);
 
 		FlowsHistoricProcessInstanceQuery processQuery = new FlowsHistoricProcessInstanceQuery(managementService);
-//		todo: è troppo selettivo, la query con questo parametro è vuota
 		processQuery.setVisibleToGroups(userAuthorities);
 		processQuery.setVisibleToUser(username);
 		processQuery.unfinished();
@@ -294,43 +293,37 @@ public class FlowsTaskService {
 		//per ogni Pi prendo il task attivo e costruisco la response
 		List<Task> result = pil.stream()
 				.map(pi ->  taskService.createTaskQuery().active().processInstanceId(pi.getId())
-						.includeProcessVariables()
-						.list().get(0))
+						.includeProcessVariables().list().get(0))
 				.collect(Collectors.toList());
-		
-		List<TaskResponse> responseList = new ArrayList();
-		
 
+		List<TaskResponse> responseList = new ArrayList();
 		List<TaskResponse> taskList = restResponseFactory.createTaskResponseList(result);
-		boolean assigneeFlag = false;
-		boolean candidateFlag = false;
+
 		for (TaskResponse task : taskList) {
 			List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForTask(task.getId());
-			assigneeFlag = false;
-			candidateFlag = false;
+			boolean assigneeFlag = false;
+			boolean candidateFlag = false;
 
 			for (HistoricIdentityLink hil : identityLinks) {
 				if (hil.getType().equals("assignee")) {
-					if (!hil.getUserId().toString().equals(username))
+					if (!hil.getUserId().equals(username))
 						assigneeFlag = true;
 				}
 				if (hil.getType().equals("candidate")) {
-					if (hil.getUserId() != null && hil.getUserId().toString().equals(username))
+					if (hil.getUserId() != null && hil.getUserId().equals(username))
 						candidateFlag = true;
 				}
 				if (hil.getType().equals("candidate")) {
-					if (hil.getGroupId() != null && ruoliUtente.contains(hil.getGroupId().toString()))
+					if (hil.getGroupId() != null && ruoliUtente.contains(hil.getGroupId()))
 						candidateFlag = true;
 				}
 			}
-			if (candidateFlag && assigneeFlag) {
+			if (candidateFlag && assigneeFlag)
 				responseList.add(task);
-			}
 		}
-
 		responseList.subList(firstResult <= responseList.size() ? firstResult : responseList.size(),
-				 maxResults <= responseList.size() ? maxResults : responseList.size());
-		
+							 maxResults <= responseList.size() ? maxResults : responseList.size());
+
 		DataResponse response = new DataResponse();
 		response.setStart(firstResult);
 		response.setSize(0);
