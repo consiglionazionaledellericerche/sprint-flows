@@ -462,7 +462,7 @@
         </repository>
         <repository>
             <id>perJasper</id>
-            <url>https://jaspersoft.jfrog.io/ui/native/third-party-ce-artifacts</url>
+            <url>https://jaspersoft.jfrog.io/jaspersoft/third-party-ce-artifacts/</url>
         </repository>
     </repositories>
 
