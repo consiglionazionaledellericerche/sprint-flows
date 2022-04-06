@@ -460,6 +460,10 @@
             <id>mavencentral</id>
             <url>https://repo.maven.apache.org/maven2</url>
         </repository>
+        <repository>
+            <id>perJasper</id>
+            <url>https://jaspersoft.jfrog.io/ui/native/third-party-ce-artifacts</url>
+        </repository>
     </repositories>
 
     <build>
