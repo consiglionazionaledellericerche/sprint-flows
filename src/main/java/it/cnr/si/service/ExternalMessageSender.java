@@ -43,12 +43,12 @@ public class ExternalMessageSender {
 
     @Value("${cnr.ssoLoginUrl}")
     private String ssoLoginUrl;
+    @Value("${cnr.ssoClientId}")
+    private String ssoClientId;
+    @Value("${cnr.ssoClientSecret}")
+    private String ssoClientSecret;
     @Value("${cnr.abil.url}")
     private String abilUrl;
-    @Value("${cnr.abil.client_id}")
-    private String abilClientId;
-    @Value("${cnr.abil.client_secret}")
-    private String abilSecret;
     @Value("${cnr.abil.username}")
     private String abilUsername;
     @Value("${cnr.abil.password}")
@@ -61,10 +61,6 @@ public class ExternalMessageSender {
     private String ssoMissioniLoginUrl;
     @Value("${cnr.attestati.url}")
     private String attestatiUrl;
-    @Value("${cnr.attestati.client_id}")
-    private String attestatiClientId;
-    @Value("${cnr.attestati.client_secret}")
-    private String attestatiSecret;
     @Value("${cnr.attestati.username}")
     private String attestatiUsername;
     @Value("${cnr.attestati.password}")
@@ -91,10 +87,6 @@ public class ExternalMessageSender {
     private String missioniPassword;
     @Value("${cnr.missioni.loginPath}")
     private String missioniLoginPath;
-    @Value("${cnr.missioni.client_id}")
-    private String missioniClientId;
-    @Value("${cnr.missioni.client_secret}")
-    private String missioniClientSecret;
     @Value("${cnr.sigla.url}")
     private String siglaUrl;
     @Value("${cnr.sigla.usr}")
@@ -258,7 +250,7 @@ public class ExternalMessageSender {
 
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-                String encoding = Base64.getEncoder().encodeToString((abilClientId + ":" + abilSecret).getBytes(StandardCharsets.UTF_8));
+                String encoding = Base64.getEncoder().encodeToString((ssoClientId + ":" + ssoClientSecret).getBytes(StandardCharsets.UTF_8));
                 headers.set("Authorization", "Basic "+ encoding);
 
                 RequestEntity entity = new RequestEntity(
@@ -301,7 +293,7 @@ public class ExternalMessageSender {
 
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-                String encoding = Base64.getEncoder().encodeToString((attestatiClientId + ":" + attestatiSecret).getBytes(StandardCharsets.UTF_8));
+                String encoding = Base64.getEncoder().encodeToString((ssoClientId + ":" + ssoClientSecret).getBytes(StandardCharsets.UTF_8));
                 headers.set("Authorization", "Basic "+ encoding);
 
                 RequestEntity entity = new RequestEntity(
@@ -433,7 +425,7 @@ public class ExternalMessageSender {
 
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-                String encoding = Base64.getEncoder().encodeToString((missioniClientId + ":" + missioniClientSecret).getBytes(StandardCharsets.UTF_8));
+                String encoding = Base64.getEncoder().encodeToString((ssoClientId + ":" + ssoClientSecret).getBytes(StandardCharsets.UTF_8));
                 headers.set("Authorization", "Basic "+ encoding);
 
                 RequestEntity entity = new RequestEntity(
