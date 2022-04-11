@@ -117,14 +117,7 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 		//			profiloDomanda = "direttore-responsabile";
 		//		}
 
-		// DETERMINA PERCORSO FLUSSO
-		String profiloFlusso = "Indefinito";
-		if(profiloDomanda.equals("direttore-responsabile") || profiloDomanda.equals("ricercatore-tecnologo")) {
-			profiloFlusso = "PresaVisione";
-		} 
-		if(profiloDomanda.equals("collaboratore") ) {
-			profiloFlusso = "Validazione";
-		} 		
+
 
 		// VERIFICA direttore-responsabile
 		if(profiloDomanda.equals("direttore-responsabile") ) {
@@ -138,10 +131,15 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 				
 				if (responsabileStruttura.getUtente()== null) {
 					throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + userNameProponente + " <br>Si prega di contattare l'help desk in merito<br>");
-				} else {
-				}
+				} 
 				if (responsabileStruttura.getEntitaOrganizzativa().getId()== null) {
 					throw new BpmnError("412", "l'utenza: " + userNameProponente + " non risulta associata ad alcuna struttura<br>");
+				} 
+				
+				if (responsabileStruttura.getUtente().getUsername().equals(userNameProponente.toString())) {
+					profiloDomanda = "direttore-responsabile";
+					String idSedeDirettoregenerale = aceService.getSedeIdByIdNsip("630000");
+					idAceStrutturaDomandaRichiedente = Integer.parseInt(idSedeDirettoregenerale);
 				} else {
 					idAceStrutturaDomandaRichiedente = responsabileStruttura.getEntitaOrganizzativa().getId();
 				}
@@ -151,6 +149,15 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 			}
 		}
 
+		// DETERMINA PERCORSO FLUSSO
+		String profiloFlusso = "Indefinito";
+		if(profiloDomanda.equals("direttore-responsabile") || profiloDomanda.equals("ricercatore-tecnologo")) {
+			profiloFlusso = "PresaVisione";
+		} 
+		if(profiloDomanda.equals("collaboratore") ) {
+			profiloFlusso = "Validazione";
+		} 		
+		
 		//DATI STRUTTURA VALIDAZIONE
 		entitaOrganizzativaDirettore = aceService.entitaOrganizzativaById(idAceStrutturaDomandaRichiedente);
 		String cdsuoStrutturaDomandaRichiedente = entitaOrganizzativaDirettore.getCdsuo();
