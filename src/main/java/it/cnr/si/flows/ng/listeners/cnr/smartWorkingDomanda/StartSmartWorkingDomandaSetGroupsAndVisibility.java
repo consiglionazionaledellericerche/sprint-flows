@@ -69,7 +69,7 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 		SimpleEntitaOrganizzativaWebDto entitaOrganizzativaDirettore = null;
 		LocalDate dateRif = LocalDate.now();
 		BossDto responsabileStruttura = null;
-		
+
 		//DATI STRUTTURA DICHIARATA RICHIEDENTE
 		String idNsipRichiedente =  execution.getVariable("idNsipRichiedente", String.class);
 		String idAceStrutturaRichiedente = aceService.getSedeIdByIdNsip(idNsipRichiedente);
@@ -93,49 +93,47 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 		execution.setVariable("nomeCognomeUtente", nomeProponente + " " + cognomeProponente);
 
 		// PROFILO RICHIEDENTE collaboratore
-		if(livelloRichiedente.equals("04")
-				|| livelloRichiedente.equals("05")
-				|| livelloRichiedente.equals("06")
-				|| livelloRichiedente.equals("07")
-				|| livelloRichiedente.equals("08")
-				) {profiloDomanda = "collaboratore";}
-		else {
-
-			// PROFILO RICHIEDENTE ricercatore-tecnologo			
-			if(livelloRichiedente.equals("01")
-					|| livelloRichiedente.equals("02")
-					|| livelloRichiedente.equals("03")
-					) {profiloDomanda = "ricercatore-tecnologo";}
+		if(livelloRichiedente == null) {
+			throw new BpmnError("412", "Livello associato all'utenza: " + userNameProponente + " non riconosciuto <br>Si prega di contattare l'help desk in merito<br>");
+		} else {
+			if(livelloRichiedente.equals("04")
+					|| livelloRichiedente.equals("05")
+					|| livelloRichiedente.equals("06")
+					|| livelloRichiedente.equals("07")
+					|| livelloRichiedente.equals("08")
+					) {profiloDomanda = "collaboratore";}
 			else {
-				profiloDomanda = "direttore-responsabile";
+				// PROFILO RICHIEDENTE ricercatore-tecnologo			
+				if(livelloRichiedente.equals("01")
+						|| livelloRichiedente.equals("02")
+						|| livelloRichiedente.equals("03")
+						) {profiloDomanda = "ricercatore-tecnologo";}
+				else {
+					// PROFILO DIRIGENTE-DIRETTORE			
+					if(livelloRichiedente.equals("D")) {
+						profiloDomanda = "direttore-responsabile";
+						String idSedeDirettoregenerale = aceService.getSedeIdByIdNsip("630000");
+						idAceStrutturaDomandaRichiedente = Integer.parseInt(idSedeDirettoregenerale);				
+					}
+				}
 			}
 		}
 
-		// PROFILO RICHIEDENTE direttore-responsabile			
-		//		Object[] ruoliRichiedente = membershipService.getAllRolesForUser(userNameProponente).toArray();
-		//		if (Arrays.asList(ruoliRichiedente).contains("responsabile-struttura")) {
-		//			profiloDomanda = "direttore-responsabile";
-		//		}
-
-
 
 		// VERIFICA direttore-responsabile
-		if(profiloDomanda.equals("direttore-responsabile") ) {
-			String idSedeDirettoregenerale = aceService.getSedeIdByIdNsip("630000");
-			idAceStrutturaDomandaRichiedente = Integer.parseInt(idSedeDirettoregenerale);
-		} else {
+		if(!profiloDomanda.equals("direttore-responsabile") ) {
 			try {
 				// responsabileStruttura = aceService.findResponsabileStruttura(userNameProponente, dateRif, TipoAppartenenza.SEDE, "responsabile-struttura");
 				//responsabileStruttura = aceService.findResponsabileStrutturaByCodiceSede(idNsipRichiedente, dateRif, "responsabile-struttura");
 				responsabileStruttura = aceService.findResponsabileStrutturaByCodiceSede(idNsipRichiedente, dateRif, null);
-				
+
 				if (responsabileStruttura.getUtente()== null) {
 					throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + userNameProponente + " <br>Si prega di contattare l'help desk in merito<br>");
 				} 
 				if (responsabileStruttura.getEntitaOrganizzativa().getId()== null) {
 					throw new BpmnError("412", "l'utenza: " + userNameProponente + " non risulta associata ad alcuna struttura<br>");
 				} 
-				
+
 				if (responsabileStruttura.getUtente().getUsername().equals(userNameProponente.toString())) {
 					profiloDomanda = "direttore-responsabile";
 					String idSedeDirettoregenerale = aceService.getSedeIdByIdNsip("630000");
@@ -143,7 +141,6 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 				} else {
 					idAceStrutturaDomandaRichiedente = responsabileStruttura.getEntitaOrganizzativa().getId();
 				}
-
 			} catch ( FeignException  e) {
 				throw new BpmnError("412", "Errore nell'avvio del flusso " + e.getMessage().toString());
 			}
@@ -157,7 +154,7 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 		if(profiloDomanda.equals("collaboratore") ) {
 			profiloFlusso = "Validazione";
 		} 		
-		
+
 		//DATI STRUTTURA VALIDAZIONE
 		entitaOrganizzativaDirettore = aceService.entitaOrganizzativaById(idAceStrutturaDomandaRichiedente);
 		String cdsuoStrutturaDomandaRichiedente = entitaOrganizzativaDirettore.getCdsuo();
@@ -185,7 +182,7 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 		execution.setVariable("idStruttura", String.valueOf(idAceStrutturaDomandaRichiedente));
 		execution.setVariable("cdsuoStrutturaDomandaRichiedente", cdsuoStrutturaDomandaRichiedente);
 		execution.setVariable("livelloRichiedente", livelloRichiedente);
-		
+
 		execution.setVariable("profiloDomanda", profiloDomanda);
 		execution.setVariable("profiloFlusso", profiloFlusso);
 
