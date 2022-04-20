@@ -68,13 +68,15 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 		Integer idAceStrutturaDomandaRichiedente = 0;
 		SimpleEntitaOrganizzativaWebDto entitaOrganizzativaDirettore = null;
 		LocalDate dateRif = LocalDate.now();
-		BossDto responsabileStruttura = null;
+		String idSedeDirettoregenerale = aceService.getSedeIdByIdNsip("630000");
 
 		//DATI STRUTTURA DICHIARATA RICHIEDENTE
 		String idNsipRichiedente =  execution.getVariable("idNsipRichiedente", String.class);
 		String idAceStrutturaRichiedente = aceService.getSedeIdByIdNsip(idNsipRichiedente);
 		SimpleEntitaOrganizzativaWebDto sedeRichiedente = aceService.entitaOrganizzativaById(Integer.parseInt(idAceStrutturaRichiedente));
 		String cdsuoStrutturaRichiedente = sedeRichiedente.getCdsuo();
+		BossDto responsabileStruttura = aceService.findResponsabileStrutturaByCodiceSede(idNsipRichiedente, dateRif, null);;
+
 		execution.setVariable("idNsipRichiedente", idNsipRichiedente);
 		execution.setVariable("cdsuoStrutturaRichiedente", cdsuoStrutturaRichiedente);
 		execution.setVariable("idAceStrutturaRichiedente", idAceStrutturaRichiedente);
@@ -108,11 +110,18 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 						|| livelloRichiedente.equals("02")
 						|| livelloRichiedente.equals("03")
 						) {profiloDomanda = "ricercatore-tecnologo";}
-				else {
-					// PROFILO DIRIGENTE-DIRETTORE			
-					if(livelloRichiedente.equals("D")) {
+			}
+
+			// PROFILO DIRIGENTE-DIRETTORE			
+			if(livelloRichiedente.equals("D")) {
+				profiloDomanda = "direttore-responsabile";
+				idAceStrutturaDomandaRichiedente = Integer.parseInt(idSedeDirettoregenerale);				
+			}
+			else {
+				// PROFILO DIRETTORE DI DIPARIMENTO	
+				if(aceService.entitaOrganizzativaById(Integer.parseInt(idAceStrutturaRichiedente)).getTipo().getSigla().equals("DIP")) {
+					if (responsabileStruttura.getUtente().getUsername().equals(userNameProponente.toString())) {
 						profiloDomanda = "direttore-responsabile";
-						String idSedeDirettoregenerale = aceService.getSedeIdByIdNsip("630000");
 						idAceStrutturaDomandaRichiedente = Integer.parseInt(idSedeDirettoregenerale);				
 					}
 				}
@@ -125,8 +134,6 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 			try {
 				// responsabileStruttura = aceService.findResponsabileStruttura(userNameProponente, dateRif, TipoAppartenenza.SEDE, "responsabile-struttura");
 				//responsabileStruttura = aceService.findResponsabileStrutturaByCodiceSede(idNsipRichiedente, dateRif, "responsabile-struttura");
-				responsabileStruttura = aceService.findResponsabileStrutturaByCodiceSede(idNsipRichiedente, dateRif, null);
-
 				if (responsabileStruttura.getUtente()== null) {
 					throw new BpmnError("412", "Non risulta alcun Direttore / Dirigente associato all'utenza: " + userNameProponente + " <br>Si prega di contattare l'help desk in merito<br>");
 				} 
@@ -136,8 +143,10 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 
 				if (responsabileStruttura.getUtente().getUsername().equals(userNameProponente.toString())) {
 					profiloDomanda = "direttore-responsabile";
-					String idSedeDirettoregenerale = aceService.getSedeIdByIdNsip("630000");
-					idAceStrutturaDomandaRichiedente = Integer.parseInt(idSedeDirettoregenerale);
+					SimpleEntitaOrganizzativaWebDto AceStrutturaDomandaRichiedente = aceService.findResponsabileUtente(userNameProponente).getEntitaOrganizzativa();
+					idAceStrutturaDomandaRichiedente = AceStrutturaDomandaRichiedente.getId();
+					//String idSedeDirettoregenerale = aceService.getSedeIdByIdNsip("630000");
+					//idAceStrutturaDomandaRichiedente = Integer.parseInt(idSedeDirettoregenerale);
 				} else {
 					idAceStrutturaDomandaRichiedente = responsabileStruttura.getEntitaOrganizzativa().getId();
 				}
