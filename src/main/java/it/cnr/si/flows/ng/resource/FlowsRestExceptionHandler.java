@@ -177,6 +177,11 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
 
         long rif = Instant.now().toEpochMilli();
         LOGGER.error("(Riferimento " + rif + ") Errore non gestito con messaggio " + ex.getMessage(), ex);
+        Throwable e = ex;
+        while (e.getCause() != null) {
+            e = e.getCause();
+            LOGGER.error("(Riferimento " + rif + ") Errore interno " + e.getMessage(), e);
+        }
 
         Map<String, Object> res = Utils.mapOf("message", "Errore non gestito. Contattare gli amminstratori specificando il numero di riferimento: " + rif);
         return handleExceptionInternal(ex, res,
