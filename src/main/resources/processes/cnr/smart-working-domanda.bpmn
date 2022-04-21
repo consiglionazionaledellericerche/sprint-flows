@@ -56,7 +56,7 @@
       <exclusiveGateway id="exclusivegateway9" name="Exclusive Gateway" default="flow38"></exclusiveGateway>
       <sequenceFlow id="flow33" sourceRef="validazione" targetRef="exclusivegateway9"></sequenceFlow>
       <sequenceFlow id="flow36" name="VALIDATA" sourceRef="exclusivegateway9" targetRef="endevent2">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Firma' && profiloFlusso == 'Validazione'}]]></conditionExpression>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${(sceltaUtente == 'Firma' ||  sceltaUtente == 'Firma Multipla') && profiloFlusso == 'Validazione'}]]></conditionExpression>
       </sequenceFlow>
       <userTask id="modifica" name="MODIFICA" activiti:assignee="${applicazioneSiper}">
         <extensionElements>
@@ -101,7 +101,7 @@
         <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Respingi'}]]></conditionExpression>
       </sequenceFlow>
       <sequenceFlow id="flow44" name="PRESA VISIONE" sourceRef="exclusivegateway9" targetRef="endevent6">
-        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Firma' && profiloFlusso == 'PresaVisione'}]]></conditionExpression>
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${(sceltaUtente == 'Firma' ||  sceltaUtente == 'Firma Multipla') && profiloFlusso == 'PresaVisione'}]]></conditionExpression>
       </sequenceFlow>
       <endEvent id="endevent6" name="End">
         <extensionElements>
@@ -252,7 +252,7 @@
         <omgdi:waypoint x="333.0" y="246.0"></omgdi:waypoint>
         <omgdi:waypoint x="487.0" y="246.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="53.0" x="458.0" y="281.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="100.0" x="458.0" y="281.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow38" id="BPMNEdge_flow38">
@@ -289,7 +289,7 @@
         <omgdi:waypoint x="333.0" y="87.0"></omgdi:waypoint>
         <omgdi:waypoint x="487.0" y="87.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="77.0" x="447.0" y="111.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="100.0" x="447.0" y="111.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow48" id="BPMNEdge_flow48">
