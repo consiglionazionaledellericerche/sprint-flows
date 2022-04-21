@@ -43,12 +43,12 @@ public class ExternalMessageSender {
 
     @Value("${cnr.ssoLoginUrl}")
     private String ssoLoginUrl;
+    @Value("${cnr.ssoClientId}")
+    private String ssoClientId;
+    @Value("${cnr.ssoClientSecret}")
+    private String ssoClientSecret;
     @Value("${cnr.abil.url}")
     private String abilUrl;
-    @Value("${cnr.abil.client_id}")
-    private String abilClientId;
-    @Value("${cnr.abil.client_secret}")
-    private String abilSecret;
     @Value("${cnr.abil.username}")
     private String abilUsername;
     @Value("${cnr.abil.password}")
@@ -57,12 +57,10 @@ public class ExternalMessageSender {
     private String abilLoginPath;
     @Value("${cnr.ssoAttestatiLoginUrl}")
     private String ssoAttestatiLoginUrl;
+    @Value("${cnr.ssoMissioniLoginUrl}")
+    private String ssoMissioniLoginUrl;
     @Value("${cnr.attestati.url}")
     private String attestatiUrl;
-    @Value("${cnr.attestati.client_id}")
-    private String attestatiClientId;
-    @Value("${cnr.attestati.client_secret}")
-    private String attestatiSecret;
     @Value("${cnr.attestati.username}")
     private String attestatiUsername;
     @Value("${cnr.attestati.password}")
@@ -89,10 +87,6 @@ public class ExternalMessageSender {
     private String missioniPassword;
     @Value("${cnr.missioni.loginPath}")
     private String missioniLoginPath;
-    @Value("${cnr.missioni.client_id}")
-    private String missioniClientId;
-    @Value("${cnr.missioni.client_secret}")
-    private String missioniClientSecret;
     @Value("${cnr.sigla.url}")
     private String siglaUrl;
     @Value("${cnr.sigla.usr}")
@@ -137,7 +131,7 @@ public class ExternalMessageSender {
         interceptors.add(new AttestatiRequestInterceptor());
         attestatiTemplate.setInterceptors(interceptors);
 
-        ExternalApplication.ABIL.setTemplate(abilTemplate);
+        ExternalApplication.ATTESTATI.setTemplate(attestatiTemplate);
 
         // STM
 
@@ -256,7 +250,7 @@ public class ExternalMessageSender {
 
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-                String encoding = Base64.getEncoder().encodeToString((abilClientId + ":" + abilSecret).getBytes(StandardCharsets.UTF_8));
+                String encoding = Base64.getEncoder().encodeToString((ssoClientId + ":" + ssoClientSecret).getBytes(StandardCharsets.UTF_8));
                 headers.set("Authorization", "Basic "+ encoding);
 
                 RequestEntity entity = new RequestEntity(
@@ -299,7 +293,7 @@ public class ExternalMessageSender {
 
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-                String encoding = Base64.getEncoder().encodeToString((attestatiClientId + ":" + attestatiSecret).getBytes(StandardCharsets.UTF_8));
+                String encoding = Base64.getEncoder().encodeToString((ssoClientId + ":" + ssoClientSecret).getBytes(StandardCharsets.UTF_8));
                 headers.set("Authorization", "Basic "+ encoding);
 
                 RequestEntity entity = new RequestEntity(
@@ -413,43 +407,40 @@ public class ExternalMessageSender {
      */
     private class MissioniRequestInterceptor implements ClientHttpRequestInterceptor {
 
-        private String access_token = null;
+        private String id_token = null;
 
         @Override
         public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 
-            request.getHeaders().set("Authorization", "Bearer "+ access_token);
-            request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
-            ObjectMapper om = new ObjectMapper();
-            String stringRepresentation = new String(body, "UTF-8");
-            JsonNode jsonRepresentation = om.readTree(stringRepresentation);
-            byte[] byteRepresentation = jsonRepresentation.toString().getBytes(StandardCharsets.UTF_8);
-
-            ClientHttpResponse response = execution.execute(request, byteRepresentation);
-
+            request.getHeaders().set("Authorization", "Bearer "+ id_token);
+            request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+            ClientHttpResponse response = execution.execute(request, body);
 
             if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 
-                //                MultiValueMap<String, String> auth = new LinkedMultiValueMap<>();
-
-                Map<String, String> auth = new HashMap<>();
-                auth.put("username", missioniUsername);
-                auth.put("password", missioniPassword);
-                auth.put("rememberMe", "true");
+                MultiValueMap<String, String> auth = new LinkedMultiValueMap();
+                auth.add("username", missioniUsername);
+                auth.add("password", missioniPassword);
+                auth.add("grant_type", "password");
 
                 HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_JSON);
+                headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+                String encoding = Base64.getEncoder().encodeToString((ssoClientId + ":" + ssoClientSecret).getBytes(StandardCharsets.UTF_8));
+                headers.set("Authorization", "Basic "+ encoding);
 
                 RequestEntity entity = new RequestEntity(
                         auth,
                         headers,
                         HttpMethod.POST,
-                        URI.create(missioniUrl + missioniLoginPath));
+                        URI.create(ssoMissioniLoginUrl));
+
                 ResponseEntity<Map> resp = new RestTemplate().exchange(entity, Map.class);
-                this.access_token = (String) resp.getBody().get("id_token");
-                request.getHeaders().set("Authorization", "Bearer "+ access_token);
-                request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
-                response = execution.execute(request, byteRepresentation);
+
+                this.id_token = (String) resp.getBody().get("access_token");
+
+                request.getHeaders().set("Authorization", "Bearer "+ id_token);
+                request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+                response = execution.execute(request, body);
             }
 
             return response;

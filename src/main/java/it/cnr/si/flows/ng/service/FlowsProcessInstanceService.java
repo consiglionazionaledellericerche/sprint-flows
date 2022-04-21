@@ -9,9 +9,7 @@ import it.cnr.si.repository.ViewRepository;
 import it.cnr.si.security.PermissionEvaluatorImpl;
 import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
-import it.cnr.si.service.dto.anagrafica.scritture.UtenteDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
-
 import org.activiti.engine.*;
 import org.activiti.engine.history.*;
 import org.activiti.engine.impl.RepositoryServiceImpl;
@@ -292,7 +290,7 @@ public class FlowsProcessInstanceService {
     }
 
 
-    private void setSearchTerms(Map<String, String> params, FlowsHistoricProcessInstanceQuery processQuery) {
+    public void setSearchTerms(Map<String, String> params, FlowsHistoricProcessInstanceQuery processQuery) {
 
         String title = params.remove("title");
         String titolo = params.remove(TITOLO);
