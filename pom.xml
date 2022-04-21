@@ -822,7 +822,7 @@
                                 </configuration>
                             </execution>
                             <execution>
-                                <id>npm install</id>
+                                <id>npm install --prefer-offline --progress=false</id>
                                 <goals>
                                     <goal>npm</goal>
                                 </goals>

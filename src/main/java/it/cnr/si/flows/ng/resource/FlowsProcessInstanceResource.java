@@ -3,6 +3,7 @@ package it.cnr.si.flows.ng.resource;
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
+import it.cnr.si.flows.ng.service.FlowsTaskService;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
@@ -16,6 +17,7 @@ import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
+import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -63,8 +65,10 @@ public class FlowsProcessInstanceResource {
 	private FlowsProcessInstanceService flowsProcessInstanceService;
 	@Inject
 	private ViewRepository viewRepository;
-	@Inject
-	private UserDetailsService flowsUserDetailsService;
+    @Inject
+    private UserDetailsService flowsUserDetailsService;
+    @Inject
+    private FlowsTaskService flowsTaskService;
 	@Inject
 	private PermissionEvaluatorImpl permissionEvaluator;
 	@Inject
@@ -398,6 +402,35 @@ public class FlowsProcessInstanceResource {
 		return new ResponseEntity<>(historicProcessInstances, HttpStatus.OK);
 	}
 
+	/**
+	 * Deve esserci una process definition con la desidenza "-revoca" 
+	 * agganciata alla process definition del flusso che si sta revocando
+	 * (per esempio "smart-working-revoca")
+	 * 
+	 * Inserire tutte le variabili necessarie al nuovo flusso nella mappa `data`
+	 * 
+	 */
+    @PostMapping(value = "/revoca", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<Void> revoca(
+            @RequestParam("processInstanceId") String processInstanceId){
+
+        HistoricProcessInstance oldProcessInstance = flowsProcessInstanceService.getProcessInstance(processInstanceId);
+        if (oldProcessInstance == null)
+            throw new IllegalArgumentException("Il processo non e' stato trovato");
+        if (!flowsProcessInstanceService.isRevocabile(processInstanceId))
+            throw new IllegalArgumentException("Il processo non e' recovabile");
+        
+        Map<String, Object> data = new HashMap<>();
+        String definitionId = oldProcessInstance.getProcessDefinitionKey() + "-revoca";
+        data.put("processDefinitionId", definitionId);
+        data.put("utente", oldProcessInstance.getProcessVariables().get("initiator"));
+        
+        flowsTaskService.startProcessInstance(definitionId, data);
+        
+        return new ResponseEntity<>(HttpStatus.OK);
+    }	
+	
 
 	private List<Map<String, Object>> mappingPI(Enum.ProcessDefinitionEnum processDefinition, List<HistoricProcessInstance> historicProcessInstances, String typeView, boolean includeDocs) {
 		String view = viewRepository.getViewByProcessidType(processDefinition.getProcessDefinition(), typeView).getView();

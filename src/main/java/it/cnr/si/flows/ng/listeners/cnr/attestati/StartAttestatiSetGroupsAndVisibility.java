@@ -46,6 +46,7 @@ public class StartAttestatiSetGroupsAndVisibility {
 
 		String initiator = (String) execution.getVariable(Enum.VariableEnum.initiator.name());
 		String utenteRichiedente = execution.getVariable("utenteRichiedente").toString();
+		String usernameResponsabileAttestato = execution.getVariable("usernameResponsabileAttestato").toString();
 		String meseAttestato = execution.getVariable("meseAttestato").toString();
 		String annoAttestato = execution.getVariable("annoAttestato").toString();
 		String codiceSedeAttestato = execution.getVariable("codiceSedeAttestato").toString();
@@ -55,13 +56,14 @@ public class StartAttestatiSetGroupsAndVisibility {
 		// LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable(Enum.VariableEnum.title.name()));
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {} per l'utente {} - mese:  {} - anno  {})", initiator, execution.getId(), execution.getVariable("titolo"), utenteRichiedente, meseAttestato, annoAttestato );
 
-		String gruppoValidatoriAttestati = "validatoreAttestati@" + idStruttura;
+		String gruppoValidatoriAttestati = "valida-attestati#attestati-app@" + idStruttura;
 
 		LOGGER.debug("Imposto i gruppi del flusso: gruppoValidatoriAttestati {} ",  gruppoValidatoriAttestati);
 		execution.setVariable("gruppoValidatoriAttestati", gruppoValidatoriAttestati);
 		execution.setVariable("codiceSedeAttestato", codiceSedeAttestato);
 		execution.setVariable("codiceCdsuoAttestato", codiceCdsuoAttestato);
 		execution.setVariable("idStruttura", idStruttura);
-
+		
+		//runtimeService.addUserIdentityLink(execution.getProcessInstanceId(), usernameResponsabileAttestato, PROCESS_VISUALIZER);
 	}
 }
