@@ -91,16 +91,18 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 	public void restToApplicazioneSiper(DelegateExecution execution, StatoDomandeSmartWorkingEnum statoDomanda) {
 
 		String idDomanda = execution.getVariable("idDomanda").toString();
-		Map<String, Object> stmPayload = new HashMap<String, Object>()
+		String commento = execution.getVariable("commento").toString();
+		Map<String, Object> siperPayload = new HashMap<String, Object>()
 		{
 			{
 				put("idDomanda", idDomanda);
 				put("stato", statoDomanda.name().toString());
+				put("commento", commento);
 			}	
 		};
 
 		String url = urlSiper + pathDomandeSmartWorking;
-		externalMessageService.createExternalMessage(url, ExternalMessageVerb.POST, stmPayload, ExternalApplication.LABCON);
+		externalMessageService.createExternalMessage(url, ExternalMessageVerb.POST, siperPayload, ExternalApplication.SIPER);
 	}
 
 
