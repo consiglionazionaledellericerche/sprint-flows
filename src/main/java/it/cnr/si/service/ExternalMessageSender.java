@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -210,6 +211,7 @@ public class ExternalMessageSender {
         ResponseEntity<String> response = null;
         try {
 
+            msg.setLastSendDate(ZonedDateTime.now());
             RestTemplate template = msg.getApplication().getTemplate();
 
             response = template.exchange(

@@ -40,6 +40,9 @@
              relativeToChangelogFile="false"/>
     <include file="classpath:config/liquibase/cnr/changelog/20210505081107_added_entity_Blacklist.xml"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/cnr/changelog/20220402135500_addColumnExternalMessage.xml"
+             relativeToChangelogFile="false"/>
+             
 
 <!--esempio di mvn liquibase:update per cambiare tabella nel DB-->
 <!--    <include file="src/main/resources/config/liquibase/cnr/changelog/addColumnInDraft.xml"-->
