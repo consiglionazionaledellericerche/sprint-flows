@@ -53,11 +53,11 @@
         },
         {
             "fieldName": "creationDate",
-            "fieldType": "LocalDate"
+            "fieldType": "ZonedDateTime"
         },
         {
             "fieldName": "lastSendDate",
-            "fieldType": "LocalDate"
+            "fieldType": "ZonedDateTime"
         }
     ],
     "changelogDate": "20190320102314",

@@ -6,7 +6,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 
 import it.cnr.si.domain.enumeration.ExternalMessageVerb;
@@ -60,15 +60,14 @@ public class ExternalMessage implements Serializable {
     private ExternalApplication application;
 
     @Column(name = "creation_date")
-    private LocalDate creationDate;
+    private ZonedDateTime creationDate;
 
     @Column(name = "last_send_date")
-    private LocalDate lastSendDate;
+    private ZonedDateTime lastSendDate;
 
     public ExternalMessage() {
-        this.creationDate = LocalDate.now();
+        this.creationDate = ZonedDateTime.now();
     }
-    
     public Long getId() {
         return id;
     }
@@ -168,29 +167,29 @@ public class ExternalMessage implements Serializable {
         this.application = application;
     }
 
-    public LocalDate getCreationDate() {
+    public ZonedDateTime getCreationDate() {
         return creationDate;
     }
 
-    public ExternalMessage creationDate(LocalDate creationDate) {
+    public ExternalMessage creationDate(ZonedDateTime creationDate) {
         this.creationDate = creationDate;
         return this;
     }
 
-    public void setCreationDate(LocalDate creationDate) {
+    public void setCreationDate(ZonedDateTime creationDate) {
         this.creationDate = creationDate;
     }
 
-    public LocalDate getLastSendDate() {
+    public ZonedDateTime getLastSendDate() {
         return lastSendDate;
     }
 
-    public ExternalMessage lastSendDate(LocalDate lastSendDate) {
+    public ExternalMessage lastSendDate(ZonedDateTime lastSendDate) {
         this.lastSendDate = lastSendDate;
         return this;
     }
 
-    public void setLastSendDate(LocalDate lastSendDate) {
+    public void setLastSendDate(ZonedDateTime lastSendDate) {
         this.lastSendDate = lastSendDate;
     }
 

@@ -80,8 +80,8 @@
                     <td>{{externalMessage.retries}}</td>
                     <td class="ellipsis">{{externalMessage.lastErrorMessage}}</td>
                     <td translate="{{'sprintApp.ExternalApplication.' + externalMessage.application}}">{{externalMessage.application}}</td>
-                        <td>{{externalMessage.creationDate | date:'mediumDate'}}</td>
-                        <td>{{externalMessage.lastSendDate | date:'mediumDate'}}</td>
+                    <td>{{externalMessage.creationDate | date:'medium'}}</td>
+                    <td>{{externalMessage.lastSendDate | date:'medium'}}</td>
                     <td class="text-right">
                         <div class="btn-group flex-btn-group-container">
                             <button type="submit"

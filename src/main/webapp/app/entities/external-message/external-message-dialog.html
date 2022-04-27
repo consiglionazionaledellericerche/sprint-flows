@@ -113,8 +113,8 @@
         <div class="form-group">
             <label class="control-label" translate="sprintApp.externalMessage.creationDate" for="field_creationDate">Creation Date</label>
                 <div class="input-group">
-                    <input id="field_creationDate" type="text" class="form-control" name="creationDate" uib-datepicker-popup="{{dateformat}}" ng-model="vm.externalMessage.creationDate" is-open="vm.datePickerOpenStatus.creationDate"
-                    />
+                    <input id="field_creationDate" type="text" class="form-control" name="creationDate" datetime-picker="{{dateformat}}" ng-model="vm.externalMessage.creationDate" is-open="vm.datePickerOpenStatus.creationDate"
+                      />
                     <span class="input-group-btn">
                         <button type="button" class="btn btn-default" ng-click="vm.openCalendar('creationDate')"><i class="glyphicon glyphicon-calendar"></i></button>
                     </span>
@@ -123,8 +123,8 @@
         <div class="form-group">
             <label class="control-label" translate="sprintApp.externalMessage.lastSendDate" for="field_lastSendDate">Last Send Date</label>
                 <div class="input-group">
-                    <input id="field_lastSendDate" type="text" class="form-control" name="lastSendDate" uib-datepicker-popup="{{dateformat}}" ng-model="vm.externalMessage.lastSendDate" is-open="vm.datePickerOpenStatus.lastSendDate"
-                    />
+                    <input id="field_lastSendDate" type="text" class="form-control" name="lastSendDate" datetime-picker="{{dateformat}}" ng-model="vm.externalMessage.lastSendDate" is-open="vm.datePickerOpenStatus.lastSendDate"
+                      />
                     <span class="input-group-btn">
                         <button type="button" class="btn btn-default" ng-click="vm.openCalendar('lastSendDate')"><i class="glyphicon glyphicon-calendar"></i></button>
                     </span>

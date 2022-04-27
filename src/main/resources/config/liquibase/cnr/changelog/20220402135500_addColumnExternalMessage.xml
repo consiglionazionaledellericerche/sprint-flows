@@ -9,10 +9,11 @@
         <addColumn catalogName=""
                    schemaName="public"
                    tableName="external_message">
-            <column name="creation_date" type="date">
+            <column name="creation_date" type="timestamp">
                 <constraints nullable="true" />
             </column>
-            <column name="last_send_date" type="date">
+            
+            <column name="last_send_date" type="timestamp">
                 <constraints nullable="true" />
             </column>
         </addColumn>

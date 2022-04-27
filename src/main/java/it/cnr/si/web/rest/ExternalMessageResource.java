@@ -100,14 +100,13 @@ public class ExternalMessageResource {
             @RequestParam(name = "payload", required = false) String payload,
             @RequestParam(name = "status", required = false) String status,
             Pageable pageable) throws URISyntaxException {
-log.debug("REST request to get a page of ExternalMessages");
-//i parametri della query vuoti vengono trasformati in null per rendere true la clausola della query in ExternalMessageTepository
-Page<ExternalMessage> page = externalMessageService.findAllBySearchTerms(pageable,
-status, application, payload, lastErrorMessage);
-HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/external-messages");
-return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
-}
-
+        log.debug("REST request to get a page of ExternalMessages");
+        //i parametri della query vuoti vengono trasformati in null per rendere true la clausola della query in ExternalMessageTepository
+        Page<ExternalMessage> page = externalMessageService.findAllBySearchTerms(pageable,
+        status, application, payload, lastErrorMessage);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/external-messages");
+        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+    }
     /**
      * GET  /external-messages/:id : get the "id" externalMessage.
      *
