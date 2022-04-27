@@ -8,14 +8,17 @@ import it.cnr.si.domain.enumeration.ExternalMessageVerb;
 import it.cnr.si.flows.ng.TestUtil;
 import it.cnr.si.repository.ExternalMessageRepository;
 import it.cnr.si.service.ExternalMessageService;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import static org.hamcrest.Matchers.hasItem;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -27,12 +30,18 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import it.cnr.si.domain.enumeration.ExternalMessageVerb;
+import it.cnr.si.domain.enumeration.ExternalMessageStatus;
+import it.cnr.si.domain.enumeration.ExternalApplication;
 /**
  * Test class for the ExternalMessageResource REST controller.
  *
@@ -41,7 +50,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(profiles = "native,showcase,unittests")
 @EnableTransactionManagement
-@RunWith(SpringRunner.class)
 public class ExternalMessageResourceIntTest {
     private static final String DEFAULT_URL = "AAAAA";
     private static final String UPDATED_URL = "BBBBB";
@@ -61,6 +69,12 @@ public class ExternalMessageResourceIntTest {
 
     private static final ExternalApplication DEFAULT_APPLICATION = ExternalApplication.ABIL;
     private static final ExternalApplication UPDATED_APPLICATION = ExternalApplication.SIGLA;
+
+    private static final LocalDate DEFAULT_CREATION_DATE = LocalDate.ofEpochDay(0L);
+    private static final LocalDate UPDATED_CREATION_DATE = LocalDate.now(ZoneId.systemDefault());
+
+    private static final LocalDate DEFAULT_LAST_SEND_DATE = LocalDate.ofEpochDay(0L);
+    private static final LocalDate UPDATED_LAST_SEND_DATE = LocalDate.now(ZoneId.systemDefault());
 
     @Inject
     private ExternalMessageRepository externalMessageRepository;
@@ -106,7 +120,9 @@ public class ExternalMessageResourceIntTest {
                 .status(DEFAULT_STATUS)
                 .retries(DEFAULT_RETRIES)
                 .lastErrorMessage(DEFAULT_LAST_ERROR_MESSAGE)
-                .application(DEFAULT_APPLICATION);
+                .application(DEFAULT_APPLICATION)
+                .creationDate(DEFAULT_CREATION_DATE)
+                .lastSendDate(DEFAULT_LAST_SEND_DATE);
         return externalMessage;
     }
 
@@ -138,6 +154,8 @@ public class ExternalMessageResourceIntTest {
         assertThat(testExternalMessage.getRetries()).isEqualTo(DEFAULT_RETRIES);
         assertThat(testExternalMessage.getLastErrorMessage()).isEqualTo(DEFAULT_LAST_ERROR_MESSAGE);
         assertThat(testExternalMessage.getApplication()).isEqualTo(DEFAULT_APPLICATION);
+        assertThat(testExternalMessage.getCreationDate()).isEqualTo(DEFAULT_CREATION_DATE);
+        assertThat(testExternalMessage.getLastSendDate()).isEqualTo(DEFAULT_LAST_SEND_DATE);
     }
 
     @Test
@@ -265,7 +283,9 @@ public class ExternalMessageResourceIntTest {
                 .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS.toString())))
                 .andExpect(jsonPath("$.[*].retries").value(hasItem(DEFAULT_RETRIES)))
                 .andExpect(jsonPath("$.[*].lastErrorMessage").value(hasItem(DEFAULT_LAST_ERROR_MESSAGE.toString())))
-                .andExpect(jsonPath("$.[*].application").value(hasItem(DEFAULT_APPLICATION.toString())));
+                .andExpect(jsonPath("$.[*].application").value(hasItem(DEFAULT_APPLICATION.toString())))
+                .andExpect(jsonPath("$.[*].creationDate").value(hasItem(DEFAULT_CREATION_DATE.toString())))
+                .andExpect(jsonPath("$.[*].lastSendDate").value(hasItem(DEFAULT_LAST_SEND_DATE.toString())));
     }
 
     @Test
@@ -285,7 +305,9 @@ public class ExternalMessageResourceIntTest {
             .andExpect(jsonPath("$.status").value(DEFAULT_STATUS.toString()))
             .andExpect(jsonPath("$.retries").value(DEFAULT_RETRIES))
             .andExpect(jsonPath("$.lastErrorMessage").value(DEFAULT_LAST_ERROR_MESSAGE.toString()))
-            .andExpect(jsonPath("$.application").value(DEFAULT_APPLICATION.toString()));
+            .andExpect(jsonPath("$.application").value(DEFAULT_APPLICATION.toString()))
+            .andExpect(jsonPath("$.creationDate").value(DEFAULT_CREATION_DATE.toString()))
+            .andExpect(jsonPath("$.lastSendDate").value(DEFAULT_LAST_SEND_DATE.toString()));
     }
 
     @Test
@@ -313,7 +335,9 @@ public class ExternalMessageResourceIntTest {
                 .status(UPDATED_STATUS)
                 .retries(UPDATED_RETRIES)
                 .lastErrorMessage(UPDATED_LAST_ERROR_MESSAGE)
-                .application(UPDATED_APPLICATION);
+                .application(UPDATED_APPLICATION)
+                .creationDate(UPDATED_CREATION_DATE)
+                .lastSendDate(UPDATED_LAST_SEND_DATE);
 
         restExternalMessageMockMvc.perform(put("/api/external-messages")
                 .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -331,6 +355,8 @@ public class ExternalMessageResourceIntTest {
         assertThat(testExternalMessage.getRetries()).isEqualTo(UPDATED_RETRIES);
         assertThat(testExternalMessage.getLastErrorMessage()).isEqualTo(UPDATED_LAST_ERROR_MESSAGE);
         assertThat(testExternalMessage.getApplication()).isEqualTo(UPDATED_APPLICATION);
+        assertThat(testExternalMessage.getCreationDate()).isEqualTo(UPDATED_CREATION_DATE);
+        assertThat(testExternalMessage.getLastSendDate()).isEqualTo(UPDATED_LAST_SEND_DATE);
     }
 
     @Test

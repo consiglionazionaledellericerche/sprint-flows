@@ -50,6 +50,14 @@
             "fieldValidateRules": [
                 "required"
             ]
+        },
+        {
+            "fieldName": "creationDate",
+            "fieldType": "LocalDate"
+        },
+        {
+            "fieldName": "lastSendDate",
+            "fieldType": "LocalDate"
         }
     ],
     "changelogDate": "20190320102314",

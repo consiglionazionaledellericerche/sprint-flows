@@ -9,16 +9,16 @@
 
     function ExternalMessageController ($scope, $state, ExternalMessage, ParseLinks, AlertService, pagingParams, paginationConstants) {
         var vm = this;
-
-        vm.searchTerms = "";
-        vm.externalMessage = {};
+        
         vm.loadPage = loadPage;
         vm.predicate = pagingParams.predicate;
         vm.reverse = pagingParams.ascending;
         vm.transition = transition;
         vm.itemsPerPage = paginationConstants.itemsPerPage;
 
-        $scope.loadAll = function () {
+        loadAll();
+
+        function loadAll () {
             ExternalMessage.query({
                 page: pagingParams.page - 1,
                 size: vm.itemsPerPage,
@@ -59,7 +59,5 @@
                 search: vm.currentSearch
             });
         }
-
-        $scope.loadAll();
     }
 })();

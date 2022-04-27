@@ -6,6 +6,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Objects;
 
 import it.cnr.si.domain.enumeration.ExternalMessageVerb;
@@ -58,6 +59,16 @@ public class ExternalMessage implements Serializable {
     @Column(name = "application", nullable = false)
     private ExternalApplication application;
 
+    @Column(name = "creation_date")
+    private LocalDate creationDate;
+
+    @Column(name = "last_send_date")
+    private LocalDate lastSendDate;
+
+    public ExternalMessage() {
+        this.creationDate = LocalDate.now();
+    }
+    
     public Long getId() {
         return id;
     }
@@ -157,6 +168,32 @@ public class ExternalMessage implements Serializable {
         this.application = application;
     }
 
+    public LocalDate getCreationDate() {
+        return creationDate;
+    }
+
+    public ExternalMessage creationDate(LocalDate creationDate) {
+        this.creationDate = creationDate;
+        return this;
+    }
+
+    public void setCreationDate(LocalDate creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public LocalDate getLastSendDate() {
+        return lastSendDate;
+    }
+
+    public ExternalMessage lastSendDate(LocalDate lastSendDate) {
+        this.lastSendDate = lastSendDate;
+        return this;
+    }
+
+    public void setLastSendDate(LocalDate lastSendDate) {
+        this.lastSendDate = lastSendDate;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -188,6 +225,8 @@ public class ExternalMessage implements Serializable {
             ", retries='" + retries + "'" +
             ", lastErrorMessage='" + lastErrorMessage + "'" +
             ", application='" + application + "'" +
+            ", creationDate='" + creationDate + "'" +
+            ", lastSendDate='" + lastSendDate + "'" +
             '}';
     }
 }

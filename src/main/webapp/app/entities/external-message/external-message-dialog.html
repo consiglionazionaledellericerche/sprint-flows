@@ -94,13 +94,14 @@
             <label class="control-label" translate="sprintApp.externalMessage.application" for="field_application">Application</label>
             <select class="form-control" name="application" ng-model="vm.externalMessage.application" id="field_application" required>
                 <option value="ABIL" translate="sprintApp.ExternalApplication.ABIL">ABIL</option>
-                <option value="SIPER" translate="sprintApp.ExternalApplication.SIPER">SIPER</option>
                 <option value="SIGLA" translate="sprintApp.ExternalApplication.SIGLA">SIGLA</option>
                 <option value="ACE" translate="sprintApp.ExternalApplication.ACE">ACE</option>
                 <option value="MISSIONI" translate="sprintApp.ExternalApplication.MISSIONI">MISSIONI</option>
                 <option value="ATTESTATI" translate="sprintApp.ExternalApplication.ATTESTATI">ATTESTATI</option>
-                <option value="LABCON" translate="sprintApp.ExternalApplication.LABCON">LABCON</option>
                 <option value="GENERIC" translate="sprintApp.ExternalApplication.GENERIC">GENERIC</option>
+                <option value="STM" translate="sprintApp.ExternalApplication.STM">STM</option>
+                <option value="LABCON" translate="sprintApp.ExternalApplication.LABCON">LABCON</option>
+                <option value="SIPER" translate="sprintApp.ExternalApplication.SIPER">SIPER</option>
             </select>
             <div ng-show="editForm.application.$invalid">
                 <p class="help-block"
@@ -108,6 +109,26 @@
                     This field is required.
                 </p>
             </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="sprintApp.externalMessage.creationDate" for="field_creationDate">Creation Date</label>
+                <div class="input-group">
+                    <input id="field_creationDate" type="text" class="form-control" name="creationDate" uib-datepicker-popup="{{dateformat}}" ng-model="vm.externalMessage.creationDate" is-open="vm.datePickerOpenStatus.creationDate"
+                    />
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-click="vm.openCalendar('creationDate')"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span>
+                </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" translate="sprintApp.externalMessage.lastSendDate" for="field_lastSendDate">Last Send Date</label>
+                <div class="input-group">
+                    <input id="field_lastSendDate" type="text" class="form-control" name="lastSendDate" uib-datepicker-popup="{{dateformat}}" ng-model="vm.externalMessage.lastSendDate" is-open="vm.datePickerOpenStatus.lastSendDate"
+                    />
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-click="vm.openCalendar('lastSendDate')"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span>
+                </div>
         </div>
 
     </div>
