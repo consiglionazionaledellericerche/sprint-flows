@@ -211,21 +211,22 @@ public class FlowsMailService extends MailService {
             .processDefinitionKey("smart-working-domanda")
             .list();
         
-        ProcessInstance instance = activeInstances.get(0);
-        HistoricTaskInstance task = flowsProcessInstanceService.getCurrentTaskOfProcessInstance(instance.getId());
-        List<IdentityLink> identityLinksForProcessInstance = runtimeService.getIdentityLinksForProcessInstance(instance.getId());
-        identityLinksForProcessInstance.forEach(il -> {
-            if (il.getUserId() != null)
-                flussiPendentiPerUtente.getOrDefault(il.getUserId(), new ArrayList<String>()).add(il.getProcessInstanceId());
-            else if (il.getGroupId() != null) {
-                membershipService.getAllUsersInGroup(il.getGroupId()).forEach(user -> 
-                    flussiPendentiPerUtente.getOrDefault(user, new ArrayList<String>()).add(il.getProcessInstanceId()));
-            }
-        });
+        for (ProcessInstance activeInstance: activeInstances) {
+            HistoricTaskInstance task = flowsProcessInstanceService.getCurrentTaskOfProcessInstance(activeInstance.getId());
+            List<IdentityLink> identityLinksForProcessInstance = runtimeService.getIdentityLinksForProcessInstance(activeInstance.getId());
+            identityLinksForProcessInstance.forEach(il -> {
+                if (il.getUserId() != null)
+                    flussiPendentiPerUtente.getOrDefault(il.getUserId(), new ArrayList<String>()).add(il.getProcessInstanceId());
+                else if (il.getGroupId() != null) {
+                    membershipService.getAllUsersInGroup(il.getGroupId()).forEach(user -> 
+                        flussiPendentiPerUtente.getOrDefault(user, new ArrayList<String>()).add(il.getProcessInstanceId()));
+                }
+            });
         
-        flussiPendentiPerUtente.forEach((user, instances) -> {
-            sendReminerToUserForInstances(user, instances);
-        });
+            flussiPendentiPerUtente.forEach((user, instances) -> {
+                sendReminerToUserForInstances(user, instances);
+            });
+        }
     }
     
     private void sendReminerToUserForInstances(String user, List<String> instances) {
