@@ -1,20 +1,15 @@
 package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
-
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.service.FlowsTaskService;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
-
 import org.activiti.engine.HistoryService;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
-import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
 import org.apache.commons.io.FileUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,14 +22,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
-
-import static it.cnr.si.flows.ng.utils.Enum.Azione.GenerazioneDaSistema;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
+
+import static it.cnr.si.flows.ng.utils.Enum.Azione.GenerazioneDaSistema;
 
 @Controller
 @RequestMapping("api/search")
@@ -67,7 +61,7 @@ public class FlowsSearchResource {
 		boolean isTaskQuery = util.getBoolean(params, "isTaskQuery", false);
 		int page = util.getInteger(params, "page", 1);
 
-		Integer maxResults = util.getInteger(params, "maxResult", 20);
+		Integer maxResults = util.getInteger(params, "maxResult", 50);
 		Integer firstResult = maxResults * (page-1) ;
 
 		DataResponse result;
