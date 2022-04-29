@@ -124,6 +124,7 @@ public class FlowsSearchResource {
 		boolean isTaskQuery = util.getBoolean(params, IS_TASK_QUERY, false);
 		Integer firstResult = Integer.parseInt(util.getString(params, "firstResult", "0"));
 		Integer maxResults = Integer.parseInt(util.getString(params, "maxResults", "99999"));
+//		String pathFascicoloDocumenti = "";
 		DataResponse result;
 		if (isTaskQuery)
 			result = flowsTaskService.search(params, processDefinitionKey, active, order, firstResult, maxResults);
