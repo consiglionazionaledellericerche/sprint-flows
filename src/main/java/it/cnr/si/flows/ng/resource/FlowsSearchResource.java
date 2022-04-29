@@ -34,6 +34,9 @@ import static it.cnr.si.flows.ng.utils.Enum.Azione.GenerazioneDaSistema;
 @RequestMapping("api/search")
 public class FlowsSearchResource {
 
+	public static final String ORDER = "order";
+	public static final String ACTIVE = "active";
+	public static final String IS_TASK_QUERY = "isTaskQuery";
 	@Inject
 	private FlowsProcessInstanceService flowsProcessInstanceService;
 	@Inject
@@ -56,9 +59,9 @@ public class FlowsSearchResource {
 	public ResponseEntity<DataResponse> search(@RequestBody Map<String, String> params) {
 
 		String processDefinitionKey = util.getString(params, "processDefinitionKey", "all");
-		String order = util.getString(params, "order", "ASC");
-		boolean active = util.getBoolean(params, "active", true);
-		boolean isTaskQuery = util.getBoolean(params, "isTaskQuery", false);
+		String order = util.getString(params, ORDER, "ASC");
+		boolean active = util.getBoolean(params, ACTIVE, true);
+		boolean isTaskQuery = util.getBoolean(params, IS_TASK_QUERY, false);
 		int page = util.getInteger(params, "page", 1);
 
 		Integer maxResults = util.getInteger(params, "maxResult", 50);
@@ -90,9 +93,9 @@ public class FlowsSearchResource {
 			@PathVariable("processDefinitionKey") String processDefinitionKey,
 			@RequestBody Map<String, String> params) throws IOException {
 
-		String order = util.getString(params, "order", "ASC");
-		boolean active = Boolean.parseBoolean(util.getString(params, "active", "true"));
-		boolean isTaskQuery = util.getBoolean(params, "isTaskQuery", false);
+		String order = util.getString(params, ORDER, "ASC");
+		boolean active = Boolean.parseBoolean(util.getString(params, ACTIVE, "true"));
+		boolean isTaskQuery = util.getBoolean(params, IS_TASK_QUERY, false);
 		Integer firstResult = Integer.parseInt(util.getString(params, "firstResult", "0"));
 		Integer maxResults = Integer.parseInt(util.getString(params, "maxResults", "99999"));
 
@@ -116,12 +119,11 @@ public class FlowsSearchResource {
 			@PathVariable("processInstanceId") String processInstanceId,
 			@RequestBody Map<String, String> params) throws IOException {
 
-		String order = util.getString(params, "order", "ASC");
-		boolean active = Boolean.parseBoolean(util.getString(params, "active", "true"));
-		boolean isTaskQuery = util.getBoolean(params, "isTaskQuery", false);
+		String order = util.getString(params, ORDER, "ASC");
+		boolean active = Boolean.parseBoolean(util.getString(params, ACTIVE, "true"));
+		boolean isTaskQuery = util.getBoolean(params, IS_TASK_QUERY, false);
 		Integer firstResult = Integer.parseInt(util.getString(params, "firstResult", "0"));
 		Integer maxResults = Integer.parseInt(util.getString(params, "maxResults", "99999"));
-		String pathFascicoloDocumenti = "";
 		DataResponse result;
 		if (isTaskQuery)
 			result = flowsTaskService.search(params, processDefinitionKey, active, order, firstResult, maxResults);
