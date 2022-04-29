@@ -190,10 +190,10 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 
 			
 			// NOTIFICHE gruppoDirigenteProponente
-			case "notificatask-start": {
-				LocalDate dateRif = LocalDate.now();
-				LOGGER.info("**** notifica AL GRUPPO: " + execution.getVariable("gruppoDirigenteProponente").toString()   + " in data: " + dateRif);
-			};break; 			
+//			case "notificatask-start": {
+//				LocalDate dateRif = LocalDate.now();
+//				LOGGER.info("**** notifica AL GRUPPO: " + execution.getVariable("gruppoDirigenteProponente").toString()   + " in data: " + dateRif);
+//			};break; 			
 
 			// FINE SUBPROCESS
 			case "validazioneResponsabile-start": {

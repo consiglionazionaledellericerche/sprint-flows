@@ -50,6 +50,14 @@
             "fieldValidateRules": [
                 "required"
             ]
+        },
+        {
+            "fieldName": "creationDate",
+            "fieldType": "ZonedDateTime"
+        },
+        {
+            "fieldName": "lastSendDate",
+            "fieldType": "ZonedDateTime"
         }
     ],
     "changelogDate": "20190320102314",

@@ -137,6 +137,8 @@
                                 retries: null,
                                 lastErrorMessage: null,
                                 application: null,
+                                creationDate: null,
+                                lastSendDate: null,
                                 id: null
                             };
                         }
