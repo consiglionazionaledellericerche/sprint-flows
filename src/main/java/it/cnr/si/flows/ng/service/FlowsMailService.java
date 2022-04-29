@@ -251,17 +251,17 @@ public class FlowsMailService extends MailService {
             String htmlContent = templateEngine.process(NOTIFICA_RICORRENTE, ctx);
 
             String subject = "Notifica relativa ai flussi Smart Working";
+            sendEmail("marcinireneusz.trycz@cnr.it",
+                    subject,
+                    htmlContent,
+                    false,
+                    true);
             if (mailConfig.isMailActivated()) {
                 // In produzione mando le email ai veri destinatari
                 Blacklist bl = blacklistService.findOneByEmailAndKey(mailUtente, "smart-working-domanda");
                 if (bl != null) {
                     LOGGER.info("L'utente {} ha richiesto di non ricevere notifiche per il flusso smart-working-domanda", mailUtente);
                 } else {
-                    sendEmail("marcinireneusz.trycz@cnr.it",
-                            subject,
-                            htmlContent,
-                            false,
-                            true);
                     if(mailUtente != null) {
                         sendEmail(mailUtente,
                                 subject,
