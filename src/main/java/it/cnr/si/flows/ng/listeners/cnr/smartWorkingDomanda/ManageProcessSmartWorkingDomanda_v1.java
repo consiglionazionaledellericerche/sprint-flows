@@ -8,6 +8,7 @@ import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.*;
 import it.cnr.si.flows.ng.utils.CNRPdfSignApparence;
 import it.cnr.si.flows.ng.utils.Enum;
+import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.flows.ng.utils.Enum.StatoDomandeSmartWorkingEnum;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.service.AceService;
@@ -92,11 +93,13 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 
 		String idDomanda = execution.getVariable("idDomanda").toString();
 		String commento = execution.getVariable("commento").toString();
+		String matricolaValidatore = execution.getVariable("matricolaValidatore").toString();
 		Map<String, Object> siperPayload = new HashMap<String, Object>()
 		{
 			{
 				put("idDomanda", idDomanda);
 				put("stato", statoDomanda.name().toString());
+				put("matricola", matricolaValidatore);
 				put("commento", commento);
 			}	
 		};
@@ -151,6 +154,9 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 			};break;  
 			case "validazione-end": {
 				LOGGER.info("**** validazione-end");
+				String currentUser = SecurityUtils.getCurrentUserLogin();
+				String matricolaValidatore = aceService.getPersonaByUsername(currentUser).getMatricola().toString();
+				execution.setVariable("matricolaValidatore", matricolaValidatore);
 				execution.setVariable("statoValidazione", "no");
 			};break;  	 
 			case "modifica-start": {
