@@ -58,7 +58,7 @@ public class EventScheduler {
         }
     }
     
-    @Scheduled(cron = "7 * * * * MON-FRI")
+    @Scheduled(cron = "0 0 7 * * MON-FRI")
     public void scheduleEmailNotifications() {
         log.info("Invio notifiche ricorrenti"+ ZonedDateTime.now());
 
