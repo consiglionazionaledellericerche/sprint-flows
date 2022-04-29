@@ -9,7 +9,9 @@ import it.cnr.si.service.FlowsUserService;
 import it.cnr.si.service.MailService;
 import it.cnr.si.service.MembershipService;
 
+import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.impl.persistence.entity.IdentityLinkEntity;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -77,6 +79,8 @@ public class FlowsMailService extends MailService {
 	private FlowsProcessInstanceService flowsProcessInstanceService;
 	@Autowired
 	private MembershipService membershipService;
+	@Autowired
+	private HistoryService historyService;
 
 	@Async
 	public void sendFlowEventNotification(String notificationType, Map<String, Object> variables, String taskName, String username, final String groupName, boolean hasNotificationRule) {
@@ -213,15 +217,21 @@ public class FlowsMailService extends MailService {
         
         for (ProcessInstance activeInstance: activeInstances) {
             HistoricTaskInstance task = flowsProcessInstanceService.getCurrentTaskOfProcessInstance(activeInstance.getId());
-            List<IdentityLink> identityLinksForProcessInstance = runtimeService.getIdentityLinksForProcessInstance(activeInstance.getId());
-            identityLinksForProcessInstance.forEach(il -> {
-                if (il.getUserId() != null)
-                    flussiPendentiPerUtente.getOrDefault(il.getUserId(), new ArrayList<String>()).add(il.getProcessInstanceId());
-                else if (il.getGroupId() != null) {
-                    membershipService.getAllUsersInGroup(il.getGroupId()).forEach(user -> 
-                        flussiPendentiPerUtente.getOrDefault(user, new ArrayList<String>()).add(il.getProcessInstanceId()));
-                }
-            });
+            
+            List<HistoricIdentityLink> identityLinksForProcessInstance = historyService.getHistoricIdentityLinksForTask(task.getId());
+            identityLinksForProcessInstance.stream()
+                .filter(il -> il.getType().equals("candidate"))
+                .forEach(il -> {
+                    if (il.getUserId() != null) {
+                        flussiPendentiPerUtente.putIfAbsent(il.getUserId(), new ArrayList<String>());
+                        flussiPendentiPerUtente.get(il.getUserId()).add(activeInstance.getId());
+                    } else if (il.getGroupId() != null) {
+                        membershipService.getAllUsersInGroup(il.getGroupId()).forEach(user -> {
+                            flussiPendentiPerUtente.putIfAbsent(user, new ArrayList<String>());
+                            flussiPendentiPerUtente.get(user).add(activeInstance.getId());
+                        });
+                    }
+                });
         
             flussiPendentiPerUtente.forEach((user, instances) -> {
                 sendReminerToUserForInstances(user, instances);
