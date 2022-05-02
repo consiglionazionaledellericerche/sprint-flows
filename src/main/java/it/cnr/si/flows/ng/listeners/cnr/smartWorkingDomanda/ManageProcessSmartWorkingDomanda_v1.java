@@ -8,6 +8,7 @@ import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.*;
 import it.cnr.si.flows.ng.utils.CNRPdfSignApparence;
 import it.cnr.si.flows.ng.utils.Enum;
+import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.flows.ng.utils.Enum.StatoDomandeSmartWorkingEnum;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.service.AceService;
@@ -91,15 +92,21 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 	public void restToApplicazioneSiper(DelegateExecution execution, StatoDomandeSmartWorkingEnum statoDomanda) {
 
 		String idDomanda = execution.getVariable("idDomanda").toString();
-		String commento = execution.getVariable("commento").toString();
-		Map<String, Object> siperPayload = new HashMap<String, Object>()
-		{
-			{
-				put("idDomanda", idDomanda);
-				put("stato", statoDomanda.name().toString());
-				put("commento", commento);
-			}	
-		};
+		String commento = "";
+		String matricolaValidatore = "";
+		if (execution.getVariable("commento") != null) {
+			commento = execution.getVariable("commento").toString();
+		}
+		if (execution.getVariable("matricolaValidatore") != null) {
+			matricolaValidatore = execution.getVariable("matricolaValidatore").toString();
+		} 
+
+
+		Map<String, Object> siperPayload = new HashMap<String, Object>();
+		siperPayload.put("idDomanda", idDomanda);
+		siperPayload.put("stato", statoDomanda.name().toString());
+		siperPayload.put("commento", commento);
+		siperPayload.put("matricola", matricolaValidatore);
 
 		String url = urlSiper + pathDomandeSmartWorking;
 		externalMessageService.createExternalMessage(url, ExternalMessageVerb.POST, siperPayload, ExternalApplication.SIPER);
@@ -151,6 +158,9 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 			};break;  
 			case "validazione-end": {
 				LOGGER.info("**** validazione-end");
+				String currentUser = SecurityUtils.getCurrentUserLogin();
+				String matricolaValidatore = aceService.getPersonaByUsername(currentUser).getMatricola().toString();
+				execution.setVariable("matricolaValidatore", matricolaValidatore);
 				execution.setVariable("statoValidazione", "no");
 			};break;  	 
 			case "modifica-start": {
@@ -188,12 +198,12 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 				restToApplicazioneSiper(execution, Enum.StatoDomandeSmartWorkingEnum.PRESA_VISIONE);
 			};break; 
 
-			
+
 			// NOTIFICHE gruppoDirigenteProponente
-//			case "notificatask-start": {
-//				LocalDate dateRif = LocalDate.now();
-//				LOGGER.info("**** notifica AL GRUPPO: " + execution.getVariable("gruppoDirigenteProponente").toString()   + " in data: " + dateRif);
-//			};break; 			
+			//			case "notificatask-start": {
+			//				LocalDate dateRif = LocalDate.now();
+			//				LOGGER.info("**** notifica AL GRUPPO: " + execution.getVariable("gruppoDirigenteProponente").toString()   + " in data: " + dateRif);
+			//			};break; 			
 
 			// FINE SUBPROCESS
 			case "validazioneResponsabile-start": {
@@ -210,11 +220,11 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSmartWorkingEnum.ANNULLATA.toString());
 				restToApplicazioneSiper(execution, Enum.StatoDomandeSmartWorkingEnum.ANNULLATA);
 			};break; 		
-//			case "endevent-comunicata-start": {
-//				execution.setVariable("statoFinaleDomanda", Enum.StatoDomandeSmartWorkingEnum.COMUNICATA.toString());
-//				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSmartWorkingEnum.COMUNICATA.toString());
-//				restToApplicazioneSiper(execution, Enum.StatoDomandeSmartWorkingEnum.COMUNICATA);
-//			};break; 			
+			//			case "endevent-comunicata-start": {
+			//				execution.setVariable("statoFinaleDomanda", Enum.StatoDomandeSmartWorkingEnum.COMUNICATA.toString());
+			//				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSmartWorkingEnum.COMUNICATA.toString());
+			//				restToApplicazioneSiper(execution, Enum.StatoDomandeSmartWorkingEnum.COMUNICATA);
+			//			};break; 			
 
 			case "end-process-start": {
 				LOGGER.info("**** end-process-start");

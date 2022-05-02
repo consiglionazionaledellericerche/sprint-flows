@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Notifica Scrivania Digitale</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    </head>
+    <body>
+        <h1> Notifica relativa ai flussi Smart Working </h1>
+        <hr>
+        <p> 
+            Gentile <span th:text="${username}">nome.cognome</span><br>
+
+            Si notifica che i seguenti flussi Smart Working sono ancora in corso:
+            <ul>
+                <li th:each="instance: ${instances}">instance</li>
+            </ul>
+        
+        <hr>
+        
+        <footer th:if="${profile == 'cnr'}">
+          <p>Si prega di non rispondere alla presente mail generata automaticamente dal sistema.
+          <p>Accedere alla scrivania digitale utlizzando il seguente il link:<br>
+            https://nuovascrivaniadigitale.cnr.it
+          <p>Cordiali saluti,<br>CNR - Scrivania Digitale
+        </footer>
+    </body>
+</html>
