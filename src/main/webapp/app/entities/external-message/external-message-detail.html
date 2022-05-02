@@ -32,6 +32,14 @@
         <dd>
             <span translate="{{'sprintApp.ExternalApplication.' + vm.externalMessage.application}}">{{vm.externalMessage.application}}</span>
         </dd>
+        <dt><span translate="sprintApp.externalMessage.creationDate">Creation Date</span></dt>
+        <dd>
+            <span>{{vm.externalMessage.creationDate | date:'medium'}}</span>
+        </dd>
+        <dt><span translate="sprintApp.externalMessage.lastSendDate">Last Send Date</span></dt>
+        <dd>
+            <span>{{vm.externalMessage.lastSendDate | date:'medium'}}</span>
+        </dd>
     </dl>
 
     <button type="submit"

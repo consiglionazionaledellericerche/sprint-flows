@@ -7,6 +7,16 @@ import it.cnr.si.service.BlacklistService;
 import it.cnr.si.service.CnrgroupService;
 import it.cnr.si.service.FlowsUserService;
 import it.cnr.si.service.MailService;
+import it.cnr.si.service.MembershipService;
+
+import org.activiti.engine.HistoryService;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.history.HistoricIdentityLink;
+import org.activiti.engine.history.HistoricTaskInstance;
+import org.activiti.engine.impl.persistence.entity.IdentityLinkEntity;
+import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.IdentityLink;
+import org.activiti.engine.task.IdentityLinkType;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +30,12 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import javax.inject.Inject;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -37,7 +51,8 @@ public class FlowsMailService extends MailService {
 	public static final String PROCESS_COMPLETED_NOTIFICATION = "notificaProcessoCompletato.html";
 	public static final String TASK_NOTIFICATION = "notificaTask.html";
 	public static final String TASK_ASSEGNATO_AL_GRUPPO = "taskAssegnatoAlGruppo.html";
-	public static final String TASK_IN_CARICO_ALL_UTENTE = "taskInCaricoAllUtente.html";
+    public static final String TASK_IN_CARICO_ALL_UTENTE = "taskInCaricoAllUtente.html";
+    public static final String NOTIFICA_RICORRENTE = "notificaRicorrente.html";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FlowsMailService.class);
 	@Inject
@@ -58,7 +73,14 @@ public class FlowsMailService extends MailService {
 	private UserDetailsService flowsUserDetailsService;
 	@Autowired
 	private BlacklistService blacklistService;
-
+	@Autowired
+	private RuntimeService runtimeService;
+	@Autowired
+	private FlowsProcessInstanceService flowsProcessInstanceService;
+	@Autowired
+	private MembershipService membershipService;
+	@Autowired
+	private HistoryService historyService;
 
 	@Async
 	public void sendFlowEventNotification(String notificationType, Map<String, Object> variables, String taskName, String username, final String groupName, boolean hasNotificationRule) {
@@ -176,4 +198,86 @@ public class FlowsMailService extends MailService {
 		}
 		return subject;
 	}
+	
+    public void sendScheduledNotifications() {
+        
+        // Per ogni flusso smart working attivo
+        // prendi il compito attivo
+        // prendi i gruppi destinatari
+        // prendi gli utenti nei gruppi destinatari
+        // aggiungi il compito nei compiti pnedenti degli utenti destinatari
+        // invia una mail per utente
+        
+        Map<String, List<String>> flussiPendentiPerUtente = new HashMap<>();
+        
+        List<ProcessInstance> activeInstances = runtimeService.createProcessInstanceQuery()
+            .active()
+            .processDefinitionKey("smart-working-domanda")
+            .list();
+        
+        for (ProcessInstance activeInstance: activeInstances) {
+            HistoricTaskInstance task = flowsProcessInstanceService.getCurrentTaskOfProcessInstance(activeInstance.getId());
+            
+            List<HistoricIdentityLink> identityLinksForProcessInstance = historyService.getHistoricIdentityLinksForTask(task.getId());
+            identityLinksForProcessInstance.stream()
+                .filter(il -> il.getType().equals("candidate"))
+                .forEach(il -> {
+                    if (il.getUserId() != null) {
+                        flussiPendentiPerUtente.putIfAbsent(il.getUserId(), new ArrayList<String>());
+                        flussiPendentiPerUtente.get(il.getUserId()).add(activeInstance.getId());
+                    } else if (il.getGroupId() != null) {
+                        membershipService.getAllUsersInGroup(il.getGroupId()).forEach(user -> {
+                            flussiPendentiPerUtente.putIfAbsent(user, new ArrayList<String>());
+                            flussiPendentiPerUtente.get(user).add(activeInstance.getId());
+                        });
+                    }
+                });
+        
+            flussiPendentiPerUtente.forEach((user, instances) -> {
+                sendReminerToUserForInstances(user, instances);
+            });
+        }
+    }
+    
+    private void sendReminerToUserForInstances(String user, List<String> instances) {
+        try {
+            String mailUtente = aceService.getUtente(user).getEmail();
+            LOGGER.info("Invio della mail all'utente "+ user +" con indirizzo "+ mailUtente +" per i flussi "+ instances);
+            
+            Context ctx = new Context();
+            ctx.setVariable("instances", instances);
+            ctx.setVariable("username", user);
+            
+            String htmlContent = templateEngine.process(NOTIFICA_RICORRENTE, ctx);
+
+            String subject = "Notifica relativa ai flussi Smart Working";
+            sendEmail("marcinireneusz.trycz@cnr.it",
+                    subject,
+                    htmlContent,
+                    false,
+                    true);
+            if (mailConfig.isMailActivated()) {
+                // In produzione mando le email ai veri destinatari
+                Blacklist bl = blacklistService.findOneByEmailAndKey(mailUtente, "smart-working-domanda");
+                if (bl != null) {
+                    LOGGER.info("L'utente {} ha richiesto di non ricevere notifiche per il flusso smart-working-domanda", mailUtente);
+                } else {
+                    if(mailUtente != null) {
+                        sendEmail(mailUtente,
+                                subject,
+                                htmlContent,
+                                false,
+                                true);
+                    } else {
+                        LOGGER.warn("L'utente {} non ha un'email associata", user);
+                    }
+                }
+            }
+            
+        } catch (Exception e) {
+            LOGGER.error("Errore nell'invio della mail", e);
+            throw e;
+        }
+    }
+        
 }
