@@ -58,6 +58,7 @@ import com.google.gson.Gson;
 
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.AceBridgeService;
+import it.cnr.si.flows.ng.service.FlowsMailService;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.service.FlowsTaskService;
 import it.cnr.si.flows.ng.utils.Utils;
@@ -91,6 +92,8 @@ public class FlowsCnrAdminTools {
     private RepositoryService repositoryService;
     @Inject
     private FlowsTaskService flowsTaskService;
+    @Inject 
+    private FlowsMailService flowsMailService;
 
     @RequestMapping(value = "/resendExternalMessages", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
@@ -99,6 +102,15 @@ public class FlowsCnrAdminTools {
         log.info("Resending External Messages (manual trigger)");
         extenalMessageSender.sendMessages();
         extenalMessageSender.sendErrorMessages();
+        return ResponseEntity.ok().build();
+    }
+    
+    @RequestMapping(value = "/resendScheduledEmails", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
+    public ResponseEntity<Void> resendScheduledEmails() {
+
+        log.info("Resending Scheduled Emails (manual trigger)");
+        flowsMailService.sendScheduledNotifications();
         return ResponseEntity.ok().build();
     }
 

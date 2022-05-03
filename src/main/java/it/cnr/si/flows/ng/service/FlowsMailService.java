@@ -201,12 +201,6 @@ public class FlowsMailService extends MailService {
 	
     public void sendScheduledNotifications() {
         
-        // Per ogni flusso smart working attivo
-        // prendi il compito attivo
-        // prendi i gruppi destinatari
-        // prendi gli utenti nei gruppi destinatari
-        // aggiungi il compito nei compiti pnedenti degli utenti destinatari
-        // invia una mail per utente
         
         Map<String, List<String>> flussiPendentiPerUtente = new HashMap<>();
         
@@ -233,10 +227,11 @@ public class FlowsMailService extends MailService {
                     }
                 });
         
-            flussiPendentiPerUtente.forEach((user, instances) -> {
-                sendReminerToUserForInstances(user, instances);
-            });
         }
+        
+        flussiPendentiPerUtente.forEach((user, instances) -> {
+            sendReminerToUserForInstances(user, instances);
+        });
     }
     
     private void sendReminerToUserForInstances(String user, List<String> instances) {
