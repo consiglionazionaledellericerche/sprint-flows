@@ -38,8 +38,7 @@ public class EventScheduler {
         // prendendo il primo dei member e confrontando se e' il member corrente
         // https://github.com/hazelcast/hazelcast/issues/3760#issuecomment-57928166
         log.info("Numero di nodi in questo cluster: "+ hazelcastInstance.getCluster().getMembers().size());
-        Member master = hazelcastInstance.getCluster().getMembers().iterator().next();
-        if (master == hazelcastInstance.getCluster().getLocalMember()) {
+        if (isMaster()) {
             log.info("Sono il master, processo le rest ExternalMessage");
             externalMessageSender.sendMessages();
         } else {
@@ -60,9 +59,17 @@ public class EventScheduler {
     
     @Scheduled(cron = "0 0 7 * * MON-FRI")
     public void scheduleEmailNotifications() {
-        log.info("Invio notifiche ricorrenti"+ ZonedDateTime.now());
-
-        flowsMailService.sendScheduledNotifications();
+        
+        if (isMaster()) {
+            log.info("Invio notifiche ricorrenti"+ ZonedDateTime.now());
+            flowsMailService.sendScheduledNotifications();
+        } else {
+            log.debug("Non sono il master, non invio le notifiche ricorrenti");
+        }
     }
 
+    private boolean isMaster() {
+        Member master = hazelcastInstance.getCluster().getMembers().iterator().next();
+        return master == hazelcastInstance.getCluster().getLocalMember();
+    }
 }
