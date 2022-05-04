@@ -11,8 +11,8 @@
             Gentile <span th:text="${username}">nome.cognome</span><br>
 
             Si notifica che i seguenti flussi Smart Working sono ancora in corso:
-            <ul>
-                <li th:each="instance: ${instances}">instance</li>
+            <ul th:each="instance: ${instanceList}">
+                <li th:text="${instance}">instance</li>
             </ul>
         
         <hr>
