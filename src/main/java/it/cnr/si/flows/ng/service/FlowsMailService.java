@@ -2,6 +2,7 @@ package it.cnr.si.flows.ng.service;
 
 import it.cnr.si.domain.Blacklist;
 import it.cnr.si.flows.ng.config.MailConfguration;
+import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.BlacklistService;
 import it.cnr.si.service.CnrgroupService;
@@ -18,6 +19,7 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.IdentityLinkType;
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +83,8 @@ public class FlowsMailService extends MailService {
 	private MembershipService membershipService;
 	@Autowired
 	private HistoryService historyService;
+	@Autowired
+	private MailConfguration mailConfguration;
 
 	@Async
 	public void sendFlowEventNotification(String notificationType, Map<String, Object> variables, String taskName, String username, final String groupName, boolean hasNotificationRule) {
@@ -201,8 +205,7 @@ public class FlowsMailService extends MailService {
 	
     public void sendScheduledNotifications() {
         
-        
-        Map<String, List<String>> flussiPendentiPerUtente = new HashMap<>();
+        Map<String, List<ProcessInstance>> flussiPendentiPerUtente = new HashMap<>();
         
         List<ProcessInstance> activeInstances = runtimeService.createProcessInstanceQuery()
             .active()
@@ -217,12 +220,12 @@ public class FlowsMailService extends MailService {
                 .filter(il -> il.getType().equals("candidate"))
                 .forEach(il -> {
                     if (il.getUserId() != null) {
-                        flussiPendentiPerUtente.putIfAbsent(il.getUserId(), new ArrayList<String>());
-                        flussiPendentiPerUtente.get(il.getUserId()).add(activeInstance.getId());
+                        flussiPendentiPerUtente.putIfAbsent(il.getUserId(), new ArrayList<ProcessInstance>());
+                        flussiPendentiPerUtente.get(il.getUserId()).add(activeInstance);
                     } else if (il.getGroupId() != null) {
                         membershipService.getAllUsersInGroup(il.getGroupId()).forEach(user -> {
-                            flussiPendentiPerUtente.putIfAbsent(user, new ArrayList<String>());
-                            flussiPendentiPerUtente.get(user).add(activeInstance.getId());
+                            flussiPendentiPerUtente.putIfAbsent(user, new ArrayList<ProcessInstance>());
+                            flussiPendentiPerUtente.get(user).add(activeInstance);
                         });
                     }
                 });
@@ -234,7 +237,7 @@ public class FlowsMailService extends MailService {
         });
     }
     
-    private void sendReminerToUserForInstances(String user, List<String> instances) {
+    private void sendReminerToUserForInstances(String user, List<ProcessInstance> instances) {
         try {
             String mailUtente = aceService.getUtente(user).getEmail();
             LOGGER.info("Invio della mail all'utente "+ user +" con indirizzo "+ mailUtente +" per i flussi "+ instances);
@@ -242,15 +245,32 @@ public class FlowsMailService extends MailService {
             Context ctx = new Context();
             ctx.setVariable("instances", instances);
             ctx.setVariable("username", user);
+            // ${serverUrl}/#/details?processInstanceId=${processInstanceId}&amp;taskId=${nextTaskId}}
+            ctx.setVariable("serverUrl", mailConfguration.getMailUrl());
+            List<String> instanceList = new ArrayList<String>();
+            instances.forEach(i -> {
+                String result = new String();
+                JSONObject o = new JSONObject(i.getName());
+                result = i.getBusinessKey() +" - "+ o.getString(Utils.TITOLO);
+                instanceList.add(result);
+            });
+            ctx.setVariable("instanceList", instanceList);
             
             String htmlContent = templateEngine.process(NOTIFICA_RICORRENTE, ctx);
 
             String subject = "Notifica relativa ai flussi Smart Working";
-            sendEmail("marcinireneusz.trycz@cnr.it",
-                    subject,
-                    htmlContent,
-                    false,
-                    true);
+            
+            // Per le prove mando *tutte* le email agli indirizzi di prova (e non ai veri destinatari)
+            mailConfig.getMailRecipients().stream()
+                    .filter(s -> !s.isEmpty())
+                    .forEach(s -> {
+                        LOGGER.debug("Invio mail di notifica ricorrente relativa ai flussi Smart Working a {} con contenuto {}",
+                                s,
+                                StringUtils.abbreviate(htmlContent, 30));
+                        LOGGER.trace("Corpo email per intero: {}", htmlContent);
+                        sendEmail(s, subject, htmlContent, false, true);
+                    });
+            
             if (mailConfig.isMailActivated()) {
                 // In produzione mando le email ai veri destinatari
                 Blacklist bl = blacklistService.findOneByEmailAndKey(mailUtente, "smart-working-domanda");
