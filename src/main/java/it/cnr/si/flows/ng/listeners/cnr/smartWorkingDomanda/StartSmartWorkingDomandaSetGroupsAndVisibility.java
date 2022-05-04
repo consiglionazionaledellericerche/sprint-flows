@@ -19,6 +19,7 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.runtime.Job;
+import org.apache.chemistry.opencmis.commons.enums.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -29,9 +30,13 @@ import feign.FeignException;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -176,6 +181,13 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 		//DA CAMBIARE - ricavando il direttore della persona che afferisce alla sua struttura
 		String gruppoDirigenteProponente = "responsabile-struttura@" + idAceStrutturaDomandaRichiedente;
 		String gruppoResponsabileSegreteria = "rs@" + idAceStrutturaDomandaRichiedente;	
+		
+		
+		// RICAVO DELLA DATA CHIUSURA DOMANDA 15 GG
+		ZonedDateTime dataNow = ZonedDateTime.now();	
+		DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm:00") ;
+		String dataChiusuraDomanda = dataNow.plusDays(15).minusMinutes(1).format(dateFormat);
+		execution.setVariable("dataChiusuraDomanda", dataChiusuraDomanda);
 
 		String applicazioneSiper = "app.siper";
 		String applicazioneScrivaniaDigitale = "app.scrivaniadigitale";
