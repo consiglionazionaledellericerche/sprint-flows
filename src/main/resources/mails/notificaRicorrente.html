@@ -16,10 +16,10 @@
             </ul>
         
         <hr>        
-        <footer style="color: dark-gray; font-size: 0.8em;">
+        <footer th:if="${profile == 'cnr'}" style="color: dark-gray; font-size: 0.8em;">
           <p>Si prega di non rispondere alla presente mail generata automaticamente dal sistema.
           <p>Accedere alla scrivania digitale utlizzando il seguente il link:<br>
-            https://nuovascrivaniadigitale.cnr.it
+		  <a href="https://nuovascrivaniadigitale.cnr.it">Nuova Scrivania Digitale</a>           
           <p>Cordiali saluti,<br>CNR - Scrivania Digitale
         </footer>
     </body>
