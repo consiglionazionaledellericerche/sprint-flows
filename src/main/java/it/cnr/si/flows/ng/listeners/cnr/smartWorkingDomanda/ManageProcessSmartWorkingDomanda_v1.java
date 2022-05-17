@@ -217,6 +217,9 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 			// FINE FLUSSO
 			case "endevent-annullata-start": {
 				execution.setVariable("statoFinaleDomanda", Enum.StatoDomandeSmartWorkingEnum.ANNULLATA.toString());
+				if (!execution.getVariable("sceltaUtente").toString().equals("Annulla")) {
+					execution.setVariable("sceltaUtente", "scadenza tempi previsti dalla procedura");
+				} 
 				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSmartWorkingEnum.ANNULLATA.toString());
 				restToApplicazioneSiper(execution, Enum.StatoDomandeSmartWorkingEnum.ANNULLATA);
 			};break; 		
