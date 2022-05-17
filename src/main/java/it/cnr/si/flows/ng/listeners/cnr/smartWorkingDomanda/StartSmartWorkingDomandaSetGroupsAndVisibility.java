@@ -198,7 +198,13 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneScrivaniaDigitale, PROCESS_VISUALIZER);
 
 		execution.setVariable("idNsipStrutturaDomandaRichiedente", idNsipStrutturaDomandaRichiedente);
-		execution.setVariable("strutturaValutazioneDirigente", cdsuoStrutturaDomandaRichiedente + "-" + entitaOrganizzativaDirettore.getDenominazione());
+		if (cdsuoStrutturaDomandaRichiedente != null) {
+			execution.setVariable("strutturaValutazioneDirigente", cdsuoStrutturaDomandaRichiedente + "-" + entitaOrganizzativaDirettore.getDenominazione());
+		} else {
+			execution.setVariable("strutturaValutazioneDirigente", entitaOrganizzativaDirettore.getDenominazione());
+
+		}
+		
 		execution.setVariable("idAceStrutturaDomandaRichiedente", idAceStrutturaDomandaRichiedente);
 		execution.setVariable("idStruttura", String.valueOf(idAceStrutturaDomandaRichiedente));
 		execution.setVariable("cdsuoStrutturaDomandaRichiedente", cdsuoStrutturaDomandaRichiedente);
