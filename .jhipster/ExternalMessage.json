@@ -46,10 +46,18 @@
         {
             "fieldName": "application",
             "fieldType": "ExternalApplication",
-            "fieldValues": "ABIL,SIGLA,ACE,MISSIONI,ATTESTATI,GENERIC,STM,LABCON",
+            "fieldValues": "ABIL,SIGLA,ACE,MISSIONI,ATTESTATI,GENERIC,STM,LABCON,SIPER",
             "fieldValidateRules": [
                 "required"
             ]
+        },
+        {
+            "fieldName": "creationDate",
+            "fieldType": "ZonedDateTime"
+        },
+        {
+            "fieldName": "lastSendDate",
+            "fieldType": "ZonedDateTime"
         }
     ],
     "changelogDate": "20190320102314",

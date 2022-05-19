@@ -18,6 +18,7 @@ public enum ExternalApplication {
     STM,
     SIGLA,
     LABCON,
+    SIPER,
     ACE,
     MISSIONI,
     ATTESTATI,
