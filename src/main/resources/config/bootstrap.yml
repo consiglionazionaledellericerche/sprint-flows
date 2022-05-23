@@ -6,5 +6,8 @@ spring:
       server:
         bootstrap: true
         git:
-          uri: git@git.si.cnr.it:devops/configuration-repo.git
-          searchPaths: '{application}'
+         uri: http://git.si.cnr.it/devops/configuration-repo.git
+         skipSslValidation: true
+         username: flows
+         password: LcWF47Yncvr4LkExyqie
+         searchPaths: '{application}'

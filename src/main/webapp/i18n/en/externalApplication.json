@@ -7,8 +7,10 @@
             "ACE": "ACE",
             "MISSIONI": "MISSIONI",
             "ATTESTATI": "ATTESTATI",
+            "GENERIC": "GENERIC",
             "STM": "STM",
-            "GENERIC": "GENERIC"
+            "LABCON": "LABCON",
+            "SIPER": "SIPER"
         }
     }
 }

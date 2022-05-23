@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -105,6 +106,16 @@ public class ExternalMessageSender {
     private String labconClientId;
     @Value("${cnr.labcon.client_secret}")
     private String labconSecret;
+    
+    @Value("${cnr.siper.url}")
+    private String siperUrl;
+    @Value("${cnr.siper.username}")
+    private String siperUsername;
+    @Value("${cnr.siper.password}")
+    private String siperPassword;
+    @Value("${cnr.siper.loginPath}")
+    private String siperLoginPath;
+
 
 
     @Inject
@@ -166,6 +177,15 @@ public class ExternalMessageSender {
         labconTemplate.setInterceptors(interceptors);
         ExternalApplication.LABCON.setTemplate(labconTemplate);
 
+
+        // SIPER
+
+        RestTemplate siperTemplate = new RestTemplate();
+        interceptors = siperTemplate.getInterceptors();
+        interceptors.add(new SiperRequestInterceptor());
+        labconTemplate.setInterceptors(interceptors);
+        ExternalApplication.SIPER.setTemplate(siperTemplate);
+
         // GENERIC
 
         ExternalApplication.GENERIC.setTemplate(new RestTemplate());
@@ -191,6 +211,7 @@ public class ExternalMessageSender {
         ResponseEntity<String> response = null;
         try {
 
+            msg.setLastSendDate(ZonedDateTime.now());
             RestTemplate template = msg.getApplication().getTemplate();
 
             response = template.exchange(
@@ -496,6 +517,74 @@ public class ExternalMessageSender {
     }
      */
 
+//    private class SiperRequestInterceptor implements ClientHttpRequestInterceptor {
+//
+//        private String access_token = null;
+//
+//        @Override
+//        public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
+//
+//            request.getHeaders().set("Authorization", "Bearer "+ access_token);
+//            request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
+//            ObjectMapper om = new ObjectMapper();
+//            String stringRepresentation = new String(body, "UTF-8");
+//            JsonNode jsonRepresentation = om.readTree(stringRepresentation);
+//            byte[] byteRepresentation = jsonRepresentation.toString().getBytes(StandardCharsets.UTF_8);
+//
+//            ClientHttpResponse response = execution.execute(request, byteRepresentation);
+//
+//
+//            if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+//
+//                //                MultiValueMap<String, String> auth = new LinkedMultiValueMap<>();
+//
+//                Map<String, String> auth = new HashMap<>();
+//                auth.put("username", siperUsername);
+//                auth.put("password", siperPassword);
+//                auth.put("rememberMe", "true");
+//
+//                HttpHeaders headers = new HttpHeaders();
+//                headers.setContentType(MediaType.APPLICATION_JSON);
+//
+//                RequestEntity entity = new RequestEntity(
+//                        auth,
+//                        headers,
+//                        HttpMethod.POST,
+//                        URI.create(siperUrl + siperLoginPath));
+//                ResponseEntity<Map> resp = new RestTemplate().exchange(entity, Map.class);
+//                this.access_token = (String) resp.getBody().get("id_token");
+//                request.getHeaders().set("Authorization", "Bearer "+ access_token);
+//                request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
+//                response = execution.execute(request, byteRepresentation);
+//            }
+//
+//            return response;
+//        }
+//    }
+
+    private class SiperRequestInterceptor implements ClientHttpRequestInterceptor {
+
+        private String access_token = null;
+
+        @Override
+        public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
+
+            LocalDate dateRif = LocalDate.now();
+            String annoEsercizio = String.valueOf(dateRif.getYear());
+            String encoding = Base64.getEncoder().encodeToString((siperUsername + ":" + siperPassword).getBytes(StandardCharsets.UTF_8));
+            request.getHeaders().set("Authorization", "Basic "+ encoding);
+            request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
+            ObjectMapper om = new ObjectMapper();
+            String stringRepresentation = new String(body, "UTF-8");
+            JsonNode jsonRepresentation = om.readTree(stringRepresentation);
+            byte[] byteRepresentation = jsonRepresentation.toString().getBytes(StandardCharsets.UTF_8);
+
+            ClientHttpResponse response = execution.execute(request, byteRepresentation);
+            return response;
+        }
+    }
+
+    
     /**
      * Missioni, per la login, usa /oauth/token e una richiesta POST com FORM_DATA
      * Per questo ho delle peculiarita': devo usare una MultiValueMap
