@@ -9,7 +9,7 @@
 
     function ExternalMessageController ($scope, $state, ExternalMessage, ParseLinks, AlertService, pagingParams, paginationConstants) {
         var vm = this;
-        
+
         vm.searchTerms = "";
         vm.externalMessage = {};
         vm.loadPage = loadPage;
@@ -18,9 +18,7 @@
         vm.transition = transition;
         vm.itemsPerPage = paginationConstants.itemsPerPage;
 
-        loadAll();
-
-        function loadAll () {
+        $scope.loadAll = function () {
             ExternalMessage.query({
                 page: pagingParams.page - 1,
                 size: vm.itemsPerPage,
@@ -61,5 +59,7 @@
                 search: vm.currentSearch
             });
         }
+
+        $scope.loadAll();
     }
 })();

@@ -15,8 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Service Implementation for managing ExternalMessage.
@@ -40,8 +39,7 @@ public class ExternalMessageService {
      */
     public ExternalMessage save(ExternalMessage externalMessage) {
         log.debug("Request to save ExternalMessage : {}", externalMessage);
-        ExternalMessage result = externalMessageRepository.save(externalMessage);
-        return result;
+        return externalMessageRepository.save(externalMessage);
     }
 
     /**
@@ -70,8 +68,7 @@ public class ExternalMessageService {
     @Transactional(readOnly = true) 
     public ExternalMessage findOne(Long id) {
         log.debug("Request to get ExternalMessage : {}", id);
-        ExternalMessage externalMessage = externalMessageRepository.findOne(id);
-        return externalMessage;
+        return externalMessageRepository.findOne(id);
     }
 
     /**

@@ -4,9 +4,9 @@
         .module('sprintApp')
         .factory('ExternalMessage', ExternalMessage);
 
-    ExternalMessage.$inject = ['$resource', 'DateUtils'];
+    ExternalMessage.$inject = ['$resource'];
 
-    function ExternalMessage ($resource, DateUtils) {
+    function ExternalMessage ($resource) {
         var resourceUrl =  'api/external-messages/:id';
 
         return $resource(resourceUrl, {}, {
@@ -16,8 +16,6 @@
                 transformResponse: function (data) {
                     if (data) {
                         data = angular.fromJson(data);
-                        data.creationDate = DateUtils.convertDateTimeFromServer(data.creationDate);
-                        data.lastSendDate = DateUtils.convertDateTimeFromServer(data.lastSendDate);
                     }
                     return data;
                 }

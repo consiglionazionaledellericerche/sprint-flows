@@ -153,14 +153,6 @@ public class Enum {
         CANCELLATA;
     }
 
-    public enum StatoDomandeSmartWorkingEnum {
-        APERTA,
-        PRESA_VISIONE,
-        VALIDATA,
-        RIFIUTATA,
-        ANNULLATA;
-    }
-
     public enum ProcessDefinitionEnum {
         acquisti("acquisti","acquisti"),
         permessiFerie("permessi-ferie", "permessi-ferie"),
@@ -225,9 +217,7 @@ public class Enum {
         valutazioneLaboratoriCongiuntiArcheologici,
         valutazioneLaboratoriCongiuntiTematici,
         preavvisoRigettoCambioFascia,
-        monitoraggioAttivitaCovid19,
-        domandaSmartWorking,
-        revocaDomandaSmartWorking;
+        monitoraggioAttivitaCovid19;
 
         PdfType() {
         }
