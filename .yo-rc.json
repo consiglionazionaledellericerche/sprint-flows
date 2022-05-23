@@ -1,7 +1,7 @@
 {
   "generator-jhipster": {
     "jhipsterVersion": "3.6.1",
-    "baseName": "sprint",
+    "baseName": "flows",
     "packageName": "it.cnr.si",
     "packageFolder": "it/cnr/si",
     "serverPort": "8080",

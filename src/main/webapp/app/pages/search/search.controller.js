@@ -5,12 +5,11 @@
         .module("sprintApp")
         .controller("SearchController", SearchController);
 
-    SearchController.$inject = ["$scope", "dataService", "utils", "$log", "$location", "paginationConstants"];
+    SearchController.$inject = ["$scope", "dataService", "utils", "$log", "$location"];
 
-    function SearchController($scope, dataService, utils, $log, $location, paginationConstants) {
+    function SearchController($scope, dataService, utils, $log, $location) {
         var vm = this,
             oldUrl = $scope.formUrl;
-        vm.itemsPerPage = paginationConstants.itemsPerPage;
 
         $scope.reload = false;
         // "conservo" i parametri della ricerca  ...

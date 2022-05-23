@@ -22,9 +22,7 @@
             "status": "Status",
             "retries": "Retries",
             "lastErrorMessage": "Last Error Message",
-            "application": "Application",
-            "creationDate": "Creation Date",
-            "lastSendDate": "Last Send Date"
+            "application": "Application"
         }
     }
 }

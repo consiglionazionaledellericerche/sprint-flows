@@ -1,15 +1,20 @@
 package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
+
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.service.FlowsTaskService;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
+
 import org.activiti.engine.HistoryService;
+import org.activiti.engine.history.HistoricProcessInstance;
+import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.rest.common.api.DataResponse;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
+import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
 import org.apache.commons.io.FileUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,21 +27,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
+
+import static it.cnr.si.flows.ng.utils.Enum.Azione.GenerazioneDaSistema;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 
-import static it.cnr.si.flows.ng.utils.Enum.Azione.GenerazioneDaSistema;
-
 @Controller
 @RequestMapping("api/search")
 public class FlowsSearchResource {
 
-	public static final String ORDER = "order";
-	public static final String ACTIVE = "active";
-	public static final String IS_TASK_QUERY = "isTaskQuery";
 	@Inject
 	private FlowsProcessInstanceService flowsProcessInstanceService;
 	@Inject
@@ -59,12 +62,12 @@ public class FlowsSearchResource {
 	public ResponseEntity<DataResponse> search(@RequestBody Map<String, String> params) {
 
 		String processDefinitionKey = util.getString(params, "processDefinitionKey", "all");
-		String order = util.getString(params, ORDER, "ASC");
-		boolean active = util.getBoolean(params, ACTIVE, true);
-		boolean isTaskQuery = util.getBoolean(params, IS_TASK_QUERY, false);
+		String order = util.getString(params, "order", "ASC");
+		boolean active = util.getBoolean(params, "active", true);
+		boolean isTaskQuery = util.getBoolean(params, "isTaskQuery", false);
 		int page = util.getInteger(params, "page", 1);
 
-		Integer maxResults = util.getInteger(params, "maxResult", 50);
+		Integer maxResults = util.getInteger(params, "maxResult", 20);
 		Integer firstResult = maxResults * (page-1) ;
 
 		DataResponse result;
@@ -93,9 +96,9 @@ public class FlowsSearchResource {
 			@PathVariable("processDefinitionKey") String processDefinitionKey,
 			@RequestBody Map<String, String> params) throws IOException {
 
-		String order = util.getString(params, ORDER, "ASC");
-		boolean active = Boolean.parseBoolean(util.getString(params, ACTIVE, "true"));
-		boolean isTaskQuery = util.getBoolean(params, IS_TASK_QUERY, false);
+		String order = util.getString(params, "order", "ASC");
+		boolean active = Boolean.parseBoolean(util.getString(params, "active", "true"));
+		boolean isTaskQuery = util.getBoolean(params, "isTaskQuery", false);
 		Integer firstResult = Integer.parseInt(util.getString(params, "firstResult", "0"));
 		Integer maxResults = Integer.parseInt(util.getString(params, "maxResults", "99999"));
 
@@ -119,12 +122,12 @@ public class FlowsSearchResource {
 			@PathVariable("processInstanceId") String processInstanceId,
 			@RequestBody Map<String, String> params) throws IOException {
 
-		String order = util.getString(params, ORDER, "ASC");
-		boolean active = Boolean.parseBoolean(util.getString(params, ACTIVE, "true"));
-		boolean isTaskQuery = util.getBoolean(params, IS_TASK_QUERY, false);
+		String order = util.getString(params, "order", "ASC");
+		boolean active = Boolean.parseBoolean(util.getString(params, "active", "true"));
+		boolean isTaskQuery = util.getBoolean(params, "isTaskQuery", false);
 		Integer firstResult = Integer.parseInt(util.getString(params, "firstResult", "0"));
 		Integer maxResults = Integer.parseInt(util.getString(params, "maxResults", "99999"));
-//		String pathFascicoloDocumenti = "";
+		String pathFascicoloDocumenti = "";
 		DataResponse result;
 		if (isTaskQuery)
 			result = flowsTaskService.search(params, processDefinitionKey, active, order, firstResult, maxResults);
