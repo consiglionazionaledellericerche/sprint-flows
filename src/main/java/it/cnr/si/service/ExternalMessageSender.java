@@ -425,7 +425,7 @@ public class ExternalMessageSender {
     /**
      * Missioni, per la login, usa /oauth/token e una richiesta POST com FORM_DATA
      * Per questo ho delle peculiarita': devo usare una MultiValueMap
-     */
+     *
     private class MissioniRequestInterceptor implements ClientHttpRequestInterceptor {
 
         private String access_token = null;
@@ -470,10 +470,8 @@ public class ExternalMessageSender {
             return response;
         }
     }
+    */
 
-    /**
-     * Missioni, per la login, usa /oauth/token e una richiesta POST com FORM_DATA
-     * Per questo ho delle peculiarita': devo usare una MultiValueMap
     private class MissioniRequestInterceptor implements ClientHttpRequestInterceptor {
 
         private String id_token = null;
@@ -515,7 +513,6 @@ public class ExternalMessageSender {
             return response;
         }
     }
-     */
 
 //    private class SiperRequestInterceptor implements ClientHttpRequestInterceptor {
 //
