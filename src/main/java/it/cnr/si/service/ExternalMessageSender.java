@@ -21,6 +21,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
@@ -237,11 +238,9 @@ public class ExternalMessageSender {
 
             String exceptionMessage = e.getMessage();
             String responseMessage = "<no response>";
-            if (response != null) {
-                if (response.getBody() == null)
-                    responseMessage = String.valueOf(response.getStatusCodeValue());
-                else
-                    responseMessage = response.getBody();
+            if (e instanceof HttpServerErrorException) {
+                responseMessage = ((HttpServerErrorException) e).getResponseBodyAsString();
+                log.error("root cause", ((HttpServerErrorException) e).getRootCause());
             }
             
             log.error("Rest fallita con messaggio {} {} {} ", exceptionMessage, responseMessage, msg, e);
