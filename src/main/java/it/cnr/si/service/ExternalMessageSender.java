@@ -237,7 +237,7 @@ public class ExternalMessageSender {
 
             String exceptionMessage = e.getMessage();
             String responseMessage = "<no response>";
-            if (response == null) {
+            if (response != null) {
                 if (response.getBody() == null)
                     responseMessage = String.valueOf(response.getStatusCodeValue());
                 else
