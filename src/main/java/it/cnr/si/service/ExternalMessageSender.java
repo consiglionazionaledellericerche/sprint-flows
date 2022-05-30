@@ -499,7 +499,7 @@ public class ExternalMessageSender {
                         auth,
                         headers,
                         HttpMethod.POST,
-                        URI.create(ssoMissioniLoginUrl));
+                        URI.create(ssoLoginUrl));
 
                 ResponseEntity<Map> resp = new RestTemplate().exchange(entity, Map.class);
 
