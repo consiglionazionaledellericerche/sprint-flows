@@ -235,19 +235,20 @@ public class ExternalMessageSender {
 
         } catch (Exception e) {
 
-            String responseMessage;
-            if (response == null)
-                responseMessage = e.getMessage();
-            else if (response.getBody() == null)
-                responseMessage = String.valueOf(response.getStatusCodeValue());
-            else
-                responseMessage = response.getBody();
-
-            log.error("Rest fallita con messaggio {} {} ", responseMessage, msg, e);
+            String exceptionMessage = e.getMessage();
+            String responseMessage = "<no response>";
+            if (response == null) {
+                if (response.getBody() == null)
+                    responseMessage = String.valueOf(response.getStatusCodeValue());
+                else
+                    responseMessage = response.getBody();
+            }
+            
+            log.error("Rest fallita con messaggio {} {} {} ", exceptionMessage, responseMessage, msg, e);
 
             msg.setStatus(ExternalMessageStatus.ERROR);
             msg.setRetries(msg.getRetries() + 1);
-            msg.setLastErrorMessage(StringUtils.substring(responseMessage, 0, 254));
+            msg.setLastErrorMessage(StringUtils.substring(exceptionMessage +" "+responseMessage, 0, 254));
             externalMessageService.save(msg);
         }
     }
