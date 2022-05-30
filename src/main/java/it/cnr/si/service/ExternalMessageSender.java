@@ -60,6 +60,10 @@ public class ExternalMessageSender {
     private String ssoAttestatiLoginUrl;
     @Value("${cnr.ssoMissioniLoginUrl}")
     private String ssoMissioniLoginUrl;
+    @Value("${cnr.missioni.clientId}")
+    private String ssoMissioniClientId;
+    @Value("${cnr.missioni.clientSecret}")
+    private String ssoMissioniClientSecret;
     @Value("${cnr.attestati.url}")
     private String attestatiUrl;
     @Value("${cnr.attestati.username}")
@@ -492,7 +496,7 @@ public class ExternalMessageSender {
 
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-                String encoding = Base64.getEncoder().encodeToString((ssoClientId + ":" + ssoClientSecret).getBytes(StandardCharsets.UTF_8));
+                String encoding = Base64.getEncoder().encodeToString((ssoMissioniClientId + ":" + ssoMissioniClientSecret).getBytes(StandardCharsets.UTF_8));
                 headers.set("Authorization", "Basic "+ encoding);
 
                 RequestEntity entity = new RequestEntity(
