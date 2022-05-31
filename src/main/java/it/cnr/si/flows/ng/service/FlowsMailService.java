@@ -179,10 +179,17 @@ public class FlowsMailService extends MailService {
                         " di " + variables.get("nomeCognomeUtente");
                 break;
             case "missioni":
+                Object dataInizio = variables.get("dataInizioMissione");
+                String sDataInizio;
+                if (dataInizio instanceof Date) {
+                    sDataInizio = formatoDataUF.format(dataInizio);
+                } else {
+                    sDataInizio = String.valueOf(dataInizio);
+                }
 //Notifica FLUSSO MISSIONI - ORDINE missione di massimo fraticelli in data 21-4-2020
                 subject = "Notifica FLUSSO MISSIONI - " + ((String)variables.get("tipologiaMissione")).toUpperCase() +
-                        " missione di " + variables.get("userNameUtenteMissione") +
-                        " in data " + formatoDataUF.format((Date) variables.get("startDate"));
+                        " missione di " + variables.get("userNameUtenteMissione") + " "+
+                        (dataInizio != null ? " con inizio " + sDataInizio : "");
                 break;
             case "accordi-internazionali-domande":
                 if(hasNotificationRule)
