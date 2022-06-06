@@ -178,7 +178,7 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 			};break; 
 			case "endsubprocess-validata-start": {
 				execution.setVariable("statoFinaleDomanda", Enum.StatoDomandeSmartWorkingEnum.VALIDATA.toString());
-				if (sceltaUtente != null && (sceltaUtente.equals("Firma-PresaVisione") || sceltaUtente.equals("Firma-Validazione"))) {
+				if (sceltaUtente != null && sceltaUtente.equals("Firma")) {
 					firmaDocumentoService.eseguiFirma(execution, Enum.PdfType.valueOf("domandaSmartWorking").name(), null);
 				}
 				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSmartWorkingEnum.VALIDATA.toString());
