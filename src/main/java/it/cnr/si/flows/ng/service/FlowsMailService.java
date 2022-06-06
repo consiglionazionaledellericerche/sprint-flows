@@ -179,7 +179,7 @@ public class FlowsMailService extends MailService {
                         " di " + variables.get("nomeCognomeUtente");
                 break;
             case "missioni":
-                String destinazione = (String) variables.get("userNameUtenteMissione");
+                String destinazione = (String) variables.get("destinazione");
                 Object dataInizio = variables.get("dataInizioMissione");
                 String sDataInizio;
                 if (dataInizio instanceof Date) {
