@@ -263,7 +263,7 @@ public class ExternalMessageSender {
         public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 
             request.getHeaders().set("Authorization", "Bearer "+ id_token);
-            request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+            request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
             ClientHttpResponse response = execution.execute(request, body);
 
             if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
@@ -289,7 +289,7 @@ public class ExternalMessageSender {
                 this.id_token = (String) resp.getBody().get("access_token");
 
                 request.getHeaders().set("Authorization", "Bearer "+ id_token);
-                request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+                request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
                 response = execution.execute(request, body);
             }
 
@@ -306,7 +306,7 @@ public class ExternalMessageSender {
         public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 
             request.getHeaders().set("Authorization", "Bearer "+ id_token);
-            request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+            request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
             ClientHttpResponse response = execution.execute(request, body);
 
             if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
@@ -332,7 +332,7 @@ public class ExternalMessageSender {
                 this.id_token = (String) resp.getBody().get("access_token");
 
                 request.getHeaders().set("Authorization", "Bearer "+ id_token);
-                request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+                request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
                 response = execution.execute(request, body);
             }
 
@@ -349,7 +349,7 @@ public class ExternalMessageSender {
         public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 
             request.getHeaders().set("Authorization", "Bearer "+ access_token);
-            request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+            request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
             ClientHttpResponse response = execution.execute(request, body);
 
             if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
@@ -375,7 +375,7 @@ public class ExternalMessageSender {
                 this.access_token = (String) resp.getBody().get("access_token");
 
                 request.getHeaders().set("Authorization", "Bearer "+ access_token);
-                request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+                request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
                 response = execution.execute(request, body);
             }
 
@@ -391,7 +391,7 @@ public class ExternalMessageSender {
         public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 
             request.getHeaders().set("Authorization", "Bearer "+ access_token);
-            request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+            request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
             ClientHttpResponse response = execution.execute(request, body);
 
             if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
@@ -417,7 +417,7 @@ public class ExternalMessageSender {
                 this.access_token = (String) resp.getBody().get("access_token");
 
                 request.getHeaders().set("Authorization", "Bearer "+ access_token);
-                request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+                request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
                 response = execution.execute(request, body);
             }
 
@@ -457,7 +457,7 @@ public class ExternalMessageSender {
                 auth.put("rememberMe", "true");
 
                 HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_JSON);
+                headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
 
                 RequestEntity entity = new RequestEntity(
                         auth,
@@ -484,7 +484,7 @@ public class ExternalMessageSender {
         public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 
             request.getHeaders().set("Authorization", "Bearer "+ id_token);
-            request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+            request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
             ClientHttpResponse response = execution.execute(request, body);
 
             if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
@@ -510,7 +510,7 @@ public class ExternalMessageSender {
                 this.id_token = (String) resp.getBody().get("access_token");
 
                 request.getHeaders().set("Authorization", "Bearer "+ id_token);
-                request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+                request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
                 response = execution.execute(request, body);
             }
 
@@ -545,7 +545,7 @@ public class ExternalMessageSender {
 //                auth.put("rememberMe", "true");
 //
 //                HttpHeaders headers = new HttpHeaders();
-//                headers.setContentType(MediaType.APPLICATION_JSON);
+//                headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
 //
 //                RequestEntity entity = new RequestEntity(
 //                        auth,
