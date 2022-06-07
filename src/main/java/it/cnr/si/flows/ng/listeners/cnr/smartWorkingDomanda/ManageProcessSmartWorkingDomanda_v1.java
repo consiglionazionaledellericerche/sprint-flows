@@ -218,7 +218,6 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 			case "endevent-annullata-start": {
 				execution.setVariable("statoFinaleDomanda", Enum.StatoDomandeSmartWorkingEnum.ANNULLATA.toString());
 				if (execution.getVariable("sceltaUtente") == null || !execution.getVariable("sceltaUtente").toString().equals("Annulla")) {
-					execution.setVariable("scadenzaTempiProcedura", "scadenza tempi previsti dalla procedura");
 					execution.setVariable("commento", "scadenza tempi previsti dalla procedura");
 				} 
 				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSmartWorkingEnum.ANNULLATA.toString());
