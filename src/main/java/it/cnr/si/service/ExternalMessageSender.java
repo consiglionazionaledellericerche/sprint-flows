@@ -269,7 +269,7 @@ public class ExternalMessageSender {
 
             if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 
-                MultiValueMap<String, String> auth = new LinkedMultiValueMap();
+                MultiValueMap<String, String> auth = new LinkedMultiValueMap<>();
                 auth.add("username", abilUsername);
                 auth.add("password", abilPassword);
                 auth.add("grant_type", "password");
@@ -312,7 +312,7 @@ public class ExternalMessageSender {
 
             if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 
-                MultiValueMap<String, String> auth = new LinkedMultiValueMap();
+                MultiValueMap<String, String> auth = new LinkedMultiValueMap<>();
                 auth.add("username", attestatiUsername);
                 auth.add("password", attestatiPassword);
                 auth.add("grant_type", "password");
@@ -355,7 +355,7 @@ public class ExternalMessageSender {
 
             if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 
-                MultiValueMap<String, String> auth = new LinkedMultiValueMap();
+                MultiValueMap<String, String> auth = new LinkedMultiValueMap<>();
                 auth.add("username", stmUsername);
                 auth.add("password", stmPassword);
                 auth.add("grant_type", "password");
@@ -397,7 +397,7 @@ public class ExternalMessageSender {
 
             if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 
-                MultiValueMap<String, String> auth = new LinkedMultiValueMap();
+                MultiValueMap<String, String> auth = new LinkedMultiValueMap<>();
                 auth.add("username", labconUsername);
                 auth.add("password", labconPassword);
                 auth.add("grant_type", "password");
@@ -427,10 +427,6 @@ public class ExternalMessageSender {
     }
 
     
-    /**
-     * Missioni, per la login, usa /oauth/token e una richiesta POST com FORM_DATA
-     * Per questo ho delle peculiarita': devo usare una MultiValueMap
-     */
     private class MissioniRequestInterceptor implements ClientHttpRequestInterceptor {
 
         private String access_token = null;
@@ -449,8 +445,6 @@ public class ExternalMessageSender {
 
 
             if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-
-                //                MultiValueMap<String, String> auth = new LinkedMultiValueMap<>();
 
                 Map<String, String> auth = new HashMap<>();
                 auth.put("username", missioniUsername);
@@ -475,97 +469,6 @@ public class ExternalMessageSender {
             return response;
         }
     }
-
-    /**
-     * Missioni, per la login, usa /oauth/token e una richiesta POST com FORM_DATA
-     * Per questo ho delle peculiarita': devo usare una MultiValueMap
-    private class MissioniRequestInterceptor implements ClientHttpRequestInterceptor {
-
-        private String id_token = null;
-
-        @Override
-        public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
-
-            request.getHeaders().set("Authorization", "Bearer "+ id_token);
-            request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
-            ClientHttpResponse response = execution.execute(request, body);
-
-            if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-
-                MultiValueMap<String, String> auth = new LinkedMultiValueMap();
-                auth.add("username", missioniUsername);
-                auth.add("password", missioniPassword);
-                auth.add("grant_type", "password");
-
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-                String encoding = Base64.getEncoder().encodeToString((ssoClientId + ":" + ssoClientSecret).getBytes(StandardCharsets.UTF_8));
-                headers.set("Authorization", "Basic "+ encoding);
-
-                RequestEntity entity = new RequestEntity(
-                        auth,
-                        headers,
-                        HttpMethod.POST,
-                        URI.create(ssoMissioniLoginUrl));
-
-                ResponseEntity<Map> resp = new RestTemplate().exchange(entity, Map.class);
-
-                this.id_token = (String) resp.getBody().get("access_token");
-
-                request.getHeaders().set("Authorization", "Bearer "+ id_token);
-                request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
-                response = execution.execute(request, body);
-            }
-
-            return response;
-        }
-    }
-     */
-
-//    private class SiperRequestInterceptor implements ClientHttpRequestInterceptor {
-//
-//        private String access_token = null;
-//
-//        @Override
-//        public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
-//
-//            request.getHeaders().set("Authorization", "Bearer "+ access_token);
-//            request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
-//            ObjectMapper om = new ObjectMapper();
-//            String stringRepresentation = new String(body, "UTF-8");
-//            JsonNode jsonRepresentation = om.readTree(stringRepresentation);
-//            byte[] byteRepresentation = jsonRepresentation.toString().getBytes(StandardCharsets.UTF_8);
-//
-//            ClientHttpResponse response = execution.execute(request, byteRepresentation);
-//
-//
-//            if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-//
-//                //                MultiValueMap<String, String> auth = new LinkedMultiValueMap<>();
-//
-//                Map<String, String> auth = new HashMap<>();
-//                auth.put("username", siperUsername);
-//                auth.put("password", siperPassword);
-//                auth.put("rememberMe", "true");
-//
-//                HttpHeaders headers = new HttpHeaders();
-//                headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-//
-//                RequestEntity entity = new RequestEntity(
-//                        auth,
-//                        headers,
-//                        HttpMethod.POST,
-//                        URI.create(siperUrl + siperLoginPath));
-//                ResponseEntity<Map> resp = new RestTemplate().exchange(entity, Map.class);
-//                this.access_token = (String) resp.getBody().get("id_token");
-//                request.getHeaders().set("Authorization", "Bearer "+ access_token);
-//                request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
-//                response = execution.execute(request, byteRepresentation);
-//            }
-//
-//            return response;
-//        }
-//    }
 
 //    private class SiperRequestInterceptor implements ClientHttpRequestInterceptor {
 //
