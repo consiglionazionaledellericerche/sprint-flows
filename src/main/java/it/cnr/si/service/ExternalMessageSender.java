@@ -531,7 +531,7 @@ public class ExternalMessageSender {
 
                 request.getHeaders().set("Authorization", "Bearer "+ access_token);
                 request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
-                response = execution.execute(request, byteRepresentations);
+                response = execution.execute(request, byteRepresentation);
             }
 
             return response;
