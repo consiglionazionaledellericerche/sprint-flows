@@ -115,6 +115,11 @@ public class ExternalMessageSender {
     private String siperPassword;
     @Value("${cnr.siper.loginPath}")
     private String siperLoginPath;
+    @Value("${cnr.siper.client_id}")
+    private String siperClientId;
+    @Value("${cnr.siper.client_secret}")
+    private String siperClientSecret;
+    
 
 
 
@@ -562,6 +567,27 @@ public class ExternalMessageSender {
 //        }
 //    }
 
+//    private class SiperRequestInterceptor implements ClientHttpRequestInterceptor {
+//
+//        private String access_token = null;
+//
+//        @Override
+//        public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
+//
+//            LocalDate dateRif = LocalDate.now();
+//            String annoEsercizio = String.valueOf(dateRif.getYear());
+//            String encoding = Base64.getEncoder().encodeToString((siperUsername + ":" + siperPassword).getBytes(StandardCharsets.UTF_8));
+//            request.getHeaders().set("Authorization", "Basic "+ encoding);
+//            request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
+//            ObjectMapper om = new ObjectMapper();
+//            String stringRepresentation = new String(body, "UTF-8");
+//            JsonNode jsonRepresentation = om.readTree(stringRepresentation);
+//            byte[] byteRepresentation = jsonRepresentation.toString().getBytes(StandardCharsets.UTF_8);
+//
+//            ClientHttpResponse response = execution.execute(request, byteRepresentation);
+//            return response;
+//        }
+//    }
     private class SiperRequestInterceptor implements ClientHttpRequestInterceptor {
 
         private String access_token = null;
@@ -569,17 +595,42 @@ public class ExternalMessageSender {
         @Override
         public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 
-            LocalDate dateRif = LocalDate.now();
-            String annoEsercizio = String.valueOf(dateRif.getYear());
-            String encoding = Base64.getEncoder().encodeToString((siperUsername + ":" + siperPassword).getBytes(StandardCharsets.UTF_8));
-            request.getHeaders().set("Authorization", "Basic "+ encoding);
-            request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
             ObjectMapper om = new ObjectMapper();
             String stringRepresentation = new String(body, "UTF-8");
             JsonNode jsonRepresentation = om.readTree(stringRepresentation);
             byte[] byteRepresentation = jsonRepresentation.toString().getBytes(StandardCharsets.UTF_8);
 
+            request.getHeaders().set("Authorization", "Bearer "+ access_token);
+            request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
             ClientHttpResponse response = execution.execute(request, byteRepresentation);
+
+            if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+
+                MultiValueMap<String, String> auth = new LinkedMultiValueMap();
+                auth.add("username", siperUsername);
+                auth.add("password", siperPassword);
+                auth.add("grant_type", "password");
+
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+                String encoding = Base64.getEncoder().encodeToString((siperClientId + ":" + siperClientSecret).getBytes(StandardCharsets.UTF_8));
+                headers.set("Authorization", "Basic "+ encoding);
+
+                RequestEntity entity = new RequestEntity(
+                        auth,
+                        headers,
+                        HttpMethod.POST,
+                        URI.create(ssoLoginUrl));
+
+                ResponseEntity<Map> resp = new RestTemplate().exchange(entity, Map.class);
+
+                this.access_token = (String) resp.getBody().get("access_token");
+
+                request.getHeaders().set("Authorization", "Bearer "+ access_token);
+                request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
+                response = execution.execute(request, byteRepresentations);
+            }
+
             return response;
         }
     }
