@@ -21,6 +21,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -242,7 +243,10 @@ public class ExternalMessageSender {
                 responseMessage = ((HttpServerErrorException) e).getResponseBodyAsString();
                 log.error("root cause", ((HttpServerErrorException) e).getRootCause());
             }
-            
+            if (e instanceof HttpClientErrorException) {
+                responseMessage = ((HttpClientErrorException) e).getResponseBodyAsString();
+                log.error("root cause", ((HttpClientErrorException) e).getRootCause());
+            }
             log.error("Rest fallita con messaggio {} {} {} ", exceptionMessage, responseMessage, msg, e);
 
             msg.setStatus(ExternalMessageStatus.ERROR);
@@ -496,7 +500,7 @@ public class ExternalMessageSender {
 
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-                String encoding = Base64.getEncoder().encodeToString((ssoMissioniClientId + ":" + ssoMissioniClientSecret).getBytes(StandardCharsets.UTF_8));
+                String encoding = Base64.getEncoder().encodeToString((ssoClientId + ":" + ssoClientSecret).getBytes(StandardCharsets.UTF_8));
                 headers.set("Authorization", "Basic "+ encoding);
 
                 RequestEntity entity = new RequestEntity(
