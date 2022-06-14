@@ -494,7 +494,7 @@ public class FlowsAttachmentService {
     private void verificaPath(String nodeRef, String path) {
         StorageObject so = storeService.getStorageObjectBykey(nodeRef);
         if (so.getPath() != path) {
-            LOGGER.warn("Il path dell'allegato ("+ so.getPath() +") non coincide con quello trasmesso("+ path +")");
+            LOGGER.error("Il path dell'allegato ("+ so.getPath() +") non coincide con quello trasmesso("+ path +")");
             // throw new IllegalArgumentException();
         }   
     }
