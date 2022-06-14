@@ -487,9 +487,14 @@ public class ExternalMessageSender {
         @Override
         public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 
+            ObjectMapper om = new ObjectMapper();
+            String stringRepresentation = new String(body, "UTF-8");
+            JsonNode jsonRepresentation = om.readTree(stringRepresentation);
+            byte[] byteRepresentation = jsonRepresentation.toString().getBytes(StandardCharsets.UTF_8);
+            
             request.getHeaders().set("Authorization", "Bearer "+ id_token);
             request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
-            ClientHttpResponse response = execution.execute(request, body);
+            ClientHttpResponse response = execution.execute(request, byteRepresentation);
 
             if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 
@@ -515,7 +520,7 @@ public class ExternalMessageSender {
 
                 request.getHeaders().set("Authorization", "Bearer "+ id_token);
                 request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
-                response = execution.execute(request, body);
+                response = execution.execute(request, byteRepresentation);
             }
 
             return response;
