@@ -8,6 +8,8 @@ import org.activiti.engine.impl.util.json.JSONArray;
 import org.activiti.engine.impl.util.json.JSONObject;
 import org.activiti.engine.task.TaskInfoQuery;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
@@ -429,5 +431,9 @@ public final class Utils {
         }else {
             return "";
         }
+    }
+    
+    public static String sanitizeHtml(String in) {
+        return Jsoup.clean(in, Whitelist.basic());
     }
 }
