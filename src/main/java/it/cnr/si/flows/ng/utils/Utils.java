@@ -441,6 +441,6 @@ public final class Utils {
         inVal = inVal.replaceAll("strong>", "b>");
         inVal = inVal.replaceAll("em>", "i>");
         
-        return Jsoup.clean(inVal, Whitelist.basic());
+        return Jsoup.clean(inVal, Whitelist.relaxed());
     }
 }
