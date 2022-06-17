@@ -433,7 +433,14 @@ public final class Utils {
         }
     }
     
-    public static String sanitizeHtml(String in) {
-        return Jsoup.clean(in, Whitelist.basic());
+    public static String sanitizeHtml(Object in) {
+        if (in == null) return "";
+        if (!(in instanceof String)) return "";
+        
+        String inVal = (String) in;
+        inVal = inVal.replaceAll("strong>", "b>");
+        inVal = inVal.replaceAll("em>", "i>");
+        
+        return Jsoup.clean(inVal, Whitelist.basic());
     }
 }
