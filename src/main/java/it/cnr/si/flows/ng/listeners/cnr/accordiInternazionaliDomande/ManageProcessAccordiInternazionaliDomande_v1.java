@@ -119,7 +119,7 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 			case "process-start": {
 			    String propostaHtml = String.valueOf(execution.getVariable("proposta_di_ricerca"));
 			    String propostaPulita = Utils.sanitizeHtml(propostaHtml);
-			    execution.setVariable("pproposta_di_ricerca", propostaPulita);
+			    execution.setVariable("proposta_di_ricerca", propostaPulita);
 			    
 			    execution.setVariable(null, faseEsecuzioneValue);
 			    
