@@ -73,7 +73,7 @@ public class PdfSiglaServiceTest {
     @Test
     public void testSiglaPrintSanitized() throws IOException {
         JSONObject valoreParam = new JSONObject();
-        valoreParam.put("propostaDiRicerca", Utils.sanitizeHtml(STRINGA_DI_TEST));
+        valoreParam.put("propostaDiRicerca", Utils.sanitizeHtml(STRINGA_DI_TEST.replaceAll("\\\\/", "/")));
         
         JSONObject variabliStampa = new JSONObject();
 
