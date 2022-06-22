@@ -2,7 +2,7 @@ package it.cnr.si.flows.ng.resource;
 
 import com.codahale.metrics.annotation.Timed;
 
-import it.cnr.si.flows.ng.utils.SecurityUtils;
+
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.MembershipService;
@@ -118,7 +118,7 @@ public class FlowsProcessDefinitionResource {
 
     public boolean canStartProcesByDefinitionKey(String definitionKey) {
     	
-        return membershipService.getAllRolesForUser(SecurityUtils.getCurrentUserLogin())
+        return membershipService.getAllRolesForUser(securityService.getCurrentUserLogin())
                 .stream()
                 .map(Utils::removeLeadingRole)
                 .anyMatch(a -> a.startsWith("abilitati#" + definitionKey + "@") );

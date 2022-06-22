@@ -2,9 +2,10 @@ package it.cnr.si.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.domain.Draft;
-import it.cnr.si.flows.ng.utils.SecurityUtils;
+
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.DraftService;
+import it.cnr.si.service.SecurityService;
 import it.cnr.si.web.rest.util.HeaderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,8 @@ public class DraftResource {
 
     @Inject
     private DraftService draftService;
-
+    @Inject
+    private SecurityService securityService;
 
     /**
      * PUT  /drafts : Save or Updates an existing draft.
@@ -49,7 +51,7 @@ public class DraftResource {
         Draft dbDraft;
         String currentUserLogin = null;
         if(!isShared)
-          currentUserLogin = SecurityUtils.getCurrentUserLogin();
+          currentUserLogin = securityService.getCurrentUserLogin();
 
         if(taskId != null){
             dbDraft = draftService.findDraftByTaskId(taskId, currentUserLogin);
@@ -103,7 +105,7 @@ public class DraftResource {
     @Timed
     public ResponseEntity<Draft> getDraftById(@PathVariable Long id) {
         log.debug("REST request to get Draft : {}", id);
-        Draft draft = draftService.findOne(id);
+        Draft draft = draftService.findById(id).get();
         return Optional.ofNullable(draft)
                 .map(result -> new ResponseEntity<>(
                         result,
@@ -128,7 +130,7 @@ public class DraftResource {
         if(isShared)
             draft = draftService.findDraftByTaskId(taskId);
         else
-            draft = draftService.findDraftByTaskId(taskId, SecurityUtils.getCurrentUserLogin());
+            draft = draftService.findDraftByTaskId(taskId, securityService.getCurrentUserLogin());
 
 
         return Optional.ofNullable(draft)
@@ -152,7 +154,7 @@ public class DraftResource {
     public ResponseEntity<Draft> getDraftByProcessDefinitionId(@RequestParam("processDefinitionId") String processDefinitionId) {
         log.debug("REST request to get Draft by ProcessDefinition : {}", processDefinitionId);
 
-        Draft draft = draftService.findDraftByProcessDefinitionId(processDefinitionId, SecurityUtils.getCurrentUserLogin());
+        Draft draft = draftService.findDraftByProcessDefinitionId(processDefinitionId, securityService.getCurrentUserLogin());
 
         return Optional.ofNullable(draft)
                 .map(result -> new ResponseEntity<>(
@@ -173,7 +175,7 @@ public class DraftResource {
     @Timed
     public ResponseEntity<Void> deleteDraft(@PathVariable Long id) {
         log.debug("REST request to delete Draft : {}", id);
-        draftService.delete(id);
+        draftService.deleteById(id);
 
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("draft", id.toString())).build();
     }

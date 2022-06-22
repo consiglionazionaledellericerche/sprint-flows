@@ -2,6 +2,7 @@ package it.cnr.si.security;
 
 import it.cnr.si.flows.ng.resource.FlowsProcessDefinitionResource;
 import it.cnr.si.service.MembershipService;
+import it.cnr.si.service.SecurityService;
 import it.cnr.si.flows.ng.utils.Utils;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
@@ -62,7 +63,8 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
     RestResponseFactory restResponseFactory;
     @Autowired
     private MembershipService membershipService;
-
+    @Inject
+    private SecurityService securityService;
 
     /**
      * Determina se un utente ha i permessi per visualizzare un Task.
@@ -74,7 +76,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
      * @return risultato della verifica dei permessi (booleano)
      */
     public boolean canVisualizeTask(String taskId, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
-        Optional<String> username = Optional.of(SecurityUtils.getCurrentUserLogin());
+        Optional<String> username = Optional.of(securityService.getCurrentUserLogin());
         List<String> authorities = getAuthorities(username.orElse(""), flowsUserDetailsService).stream()
                 .map(Utils::removeImportoSpesa) // Non mi interessa filtrare per importo spesa
                 .collect(Collectors.toList());
@@ -107,7 +109,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
     }
 
     public boolean canCompleteTask(String taskId, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
-        String username = SecurityUtils.getCurrentUserLogin();
+        String username = securityService.getCurrentUserLogin();
         Task task = taskService.createTaskQuery()
                 .taskId(taskId)
                 .singleResult();
@@ -128,7 +130,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
     public boolean isCandidatoDiretto(String taskId, List<String> authorities) {
         List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
-        String username = SecurityUtils.getCurrentUserLogin();
+        String username = securityService.getCurrentUserLogin();
         return identityLinks.stream()
                 .filter(l -> l.getType().equals(IdentityLinkType.CANDIDATE))
                 .anyMatch(l -> authorities.contains(l.getGroupId()) || username.equals(l.getUserId()));
@@ -165,7 +167,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
      * @return risultato della verifica dei permessi (booleano)
      */
     public boolean canVisualize(String processInstanceId, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
-        String userName = SecurityUtils.getCurrentUserLogin();
+        String userName = securityService.getCurrentUserLogin();
         List<String> authorities = getAuthorities(userName, flowsUserDetailsService);
 
         HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
@@ -247,7 +249,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
      */
     public boolean canClaimTask(String taskId, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
         boolean result = false;
-        String username = SecurityUtils.getCurrentUserLogin();
+        String username = securityService.getCurrentUserLogin();
         Task task = taskService.createTaskQuery()
                 .taskId(taskId)
                 .singleResult();
@@ -291,7 +293,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
 
     public boolean isResponsabile(String taskId, String processInstanceId, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
-        String user = SecurityUtils.getCurrentUserLogin();
+        String user = securityService.getCurrentUserLogin();
         Set<String> groups = membershipService.getAllRolesForUser(user);
         Task task;
         if(!processInstanceId.isEmpty()){
@@ -319,7 +321,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
     public boolean canUpdateAttachment(String processInstanceId, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
 
-        if(SecurityUtils.isCurrentUserInRole("ROLE_ADMIN"))
+        if(securityService.isCurrentUserInRole("ROLE_ADMIN"))
             return true;
 
         HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery()
@@ -331,7 +333,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
         String processDefinitionKey = instance.getProcessDefinitionKey();
         String idStruttura = String.valueOf(instance.getProcessVariables().get(ID_STRUTTURA));
 
-        String username = SecurityUtils.getCurrentUserLogin();
+        String username = securityService.getCurrentUserLogin();
         List<String> authorities = getAuthorities(username, flowsUserDetailsService);
 
         boolean isResponsabile = authorities.stream()
@@ -356,14 +358,14 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
     public boolean canPublishAttachment(String processInstanceId) {
 
-        if(SecurityUtils.isCurrentUserInRole("ROLE_ADMIN"))
+        if(securityService.isCurrentUserInRole("ROLE_ADMIN"))
             return true;
 
         HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery()
                 .processInstanceId(processInstanceId)
                 .includeProcessVariables()
                 .singleResult();
-        String username = SecurityUtils.getCurrentUserLogin();
+        String username = securityService.getCurrentUserLogin();
 
         if (instance.getProcessDefinitionKey().equals(acquisti.getProcessDefinition())) {
 
@@ -371,11 +373,9 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
             if (username.equals(rup))
                 return true;
 
-            List<String> authorities = it.cnr.si.flows.ng.utils.SecurityUtils.getCurrentUserAuthorities();
             String idStruttura = String.valueOf(instance.getProcessVariables().get(ID_STRUTTURA));
             String nomeGruppoFirma = "responsabileFirmaAcquisti@" + idStruttura;
-
-            if (authorities.contains(nomeGruppoFirma))
+            if (securityService.isCurrentUserInRole(nomeGruppoFirma))
                 return true;
         }
 

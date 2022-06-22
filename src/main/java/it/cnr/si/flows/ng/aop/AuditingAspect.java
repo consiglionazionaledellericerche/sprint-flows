@@ -1,6 +1,6 @@
 package it.cnr.si.flows.ng.aop;
 
-import it.cnr.si.security.SecurityUtils;
+;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.slf4j.Logger;
@@ -72,7 +72,7 @@ public class AuditingAspect {
     @Before("inFlowsEndpoints() && @annotation(org.springframework.web.bind.annotation.RequestMapping)")
     public void auditFlowsEndointAction(JoinPoint joinPoint) {
 
-        String username = SecurityUtils.getCurrentUserLogin();
+        String username = securityService.getCurrentUserLogin();
         org.springframework.security.core.context.SecurityContext securityContext = org.springframework.security.core.context.SecurityContextHolder.getContext();
         Authentication authentication = securityContext.getAuthentication();
         if (authentication.getAuthorities().contains(SwitchUserFilter.ROLE_PREVIOUS_ADMINISTRATOR))

@@ -9,8 +9,9 @@ import it.cnr.si.flows.ng.service.FlowsMailService;
 import it.cnr.si.flows.ng.utils.Utils.SearchResult;
 import it.cnr.si.repository.FlowsUserRepository;
 import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.security.SecurityUtils;
+
 import it.cnr.si.service.FlowsUserService;
+import it.cnr.si.service.SecurityService;
 import it.cnr.si.web.rest.util.HeaderUtil;
 import it.cnr.si.web.rest.util.PaginationUtil;
 import org.activiti.rest.service.api.RestResponseFactory;
@@ -56,6 +57,8 @@ public class FlowsUserResource {
     private FlowsUserService flowsUserService;
     @Inject
     private RestResponseFactory restResponseFactory;
+    @Inject
+    private SecurityService securityService;
 
 
     /**
@@ -118,8 +121,8 @@ public class FlowsUserResource {
     @Profile(value = {"!cnr", "oiv"})
     public ResponseEntity<FlowsUserDto> updateUser(@RequestBody FlowsUserDto flowsUserDto) {
         //se l'utente ha ROLE_ADMIN può fare tutto
-        if (SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN)) {
-            log.debug("L'utente {} sta modificando i campi dell'utente {}", SecurityUtils.getCurrentUserLogin(), flowsUserDto.getLogin());
+        if (securityService.isCurrentUserInRole(AuthoritiesConstants.ADMIN)) {
+            log.debug("L'utente {} sta modificando i campi dell'utente {}", securityService.getCurrentUserLogin(), flowsUserDto.getLogin());
 
             Optional<FlowsUser> existingUser = flowsUserRepository.findOneByEmail(flowsUserDto.getEmail());
             if (existingUser.isPresent() && (!existingUser.get().getId().equals(flowsUserDto.getId()))) {
@@ -146,7 +149,7 @@ public class FlowsUserResource {
         } else {
             //ALTRIMENTI può modificare solo se stesso e solo alcuni campi (CAMPI IMMUTABILI: "id", "activate" e "authorities"
             // (sarà sempre "ROLE_USER" perchè solo gli utenti con questo ruolo eseguono questo ramo del codice))
-            String username = SecurityUtils.getCurrentUserLogin();
+            String username = securityService.getCurrentUserLogin();
             if (username.equals(flowsUserDto.getLogin())) {
                 log.debug("L'utente {} sta modificando i propri campi", flowsUserDto.getLogin());
                 Optional<FlowsUser> existingUser = flowsUserRepository.findOneByEmail(flowsUserDto.getEmail());

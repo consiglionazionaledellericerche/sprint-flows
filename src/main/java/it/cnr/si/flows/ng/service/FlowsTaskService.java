@@ -8,13 +8,15 @@ import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.exception.UnexpectedResultException;
 import it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery;
 import it.cnr.si.flows.ng.resource.FlowsAttachmentResource;
-import it.cnr.si.flows.ng.utils.SecurityUtils;
+
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
 import it.cnr.si.security.PermissionEvaluatorImpl;
 import it.cnr.si.service.DraftService;
 import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.RelationshipService;
+import it.cnr.si.service.SecurityService;
+
 import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricProcessInstance;
@@ -105,7 +107,8 @@ public class FlowsTaskService {
 	private ManagementService managementService;
 	@Inject
 	private FlowsProcessInstanceService flowsProcessInstanceService;
-
+    @Inject
+    private SecurityService securityService;
 
 
 
@@ -206,7 +209,7 @@ public class FlowsTaskService {
 	}
 
 	public DataResponse getAvailableTask(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
-		String username = SecurityUtils.getCurrentUserLogin();
+		String username = securityService.getCurrentUserLogin();
 		List<String> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
 				.map(GrantedAuthority::getAuthority)
 				.map(Utils::removeLeadingRole)
@@ -264,7 +267,7 @@ public class FlowsTaskService {
 
 	public DataResponse taskAssignedInMyGroups(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
 
-		String username = SecurityUtils.getCurrentUserLogin();
+		String username = securityService.getCurrentUserLogin();
 		List<String> userAuthorities = SecurityUtils.getCurrentUserAuthorities();
 		Set<String> ruoliUtente = membershipService.getAllRolesForUser(username);
 
@@ -335,7 +338,7 @@ public class FlowsTaskService {
 
 	public DataResponse getMyTasks(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
 		TaskQuery taskQuery = (TaskQuery) utils.searchParams(searchParams, taskService.createTaskQuery());
-		taskQuery.taskAssignee(SecurityUtils.getCurrentUserLogin())
+		taskQuery.taskAssignee(securityService.getCurrentUserLogin())
 				.includeProcessVariables();
 
 		if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
@@ -382,7 +385,7 @@ public class FlowsTaskService {
 		data.put("key", key);
 		//L`utenza reale (admin o ROLE_amministratori-supporto-tecnico@0000)
 		// non può avviare il flusso quindi ho bisogno dell`utenza "fittizia"/impersonata
-		data.put(initiator.name(), SecurityUtils.getCurrentUserLogin());
+		data.put(initiator.name(), securityService.getCurrentUserLogin());
 		data.put(startDate.name(), new Date());
 
 		ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
@@ -411,7 +414,7 @@ public class FlowsTaskService {
 		String key = counterId + "-" + counterService.getNext(counterId);
 		data.put("key", key);
 
-		String username = SecurityUtils.getCurrentUserLogin();
+		String username = securityService.getCurrentUserLogin();
 
 		data.put(applicationName, username);
 		data.put(startDate.name(), new Date());
@@ -439,7 +442,9 @@ public class FlowsTaskService {
 
 	public void completeTask(String taskId, Map<String, Object> data) {
 
-		String username = SecurityUtils.getRealUserLogged();
+		// TODO
+		// String username = SecurityUtils.getRealUserLogged();
+		String username = securityService.getCurrentUserLogin();
 
 		// aggiungo l'identityLink che indica l'utente che esegue il task
 		taskService.setVariablesLocal(taskId, data);
@@ -458,7 +463,7 @@ public class FlowsTaskService {
 	}
 
 	public DataResponse getTasksCompletedByMe(JSONArray searchParams, @RequestParam("processDefinition") String processDefinition, @RequestParam("firstResult") int firstResult, @RequestParam("maxResults") int maxResults, @RequestParam("order") String order) {
-		String username = SecurityUtils.getCurrentUserLogin();
+		String username = securityService.getCurrentUserLogin();
 
 		HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery().taskInvolvedUser(username)
 				.includeProcessVariables().includeTaskLocalVariables();

@@ -113,7 +113,7 @@ public class AvvisoResource {
     @Timed
     public ResponseEntity<Avviso> getAvviso(@PathVariable Long id) {
         log.debug("REST request to get Avviso : {}", id);
-        Avviso avviso = avvisoService.findOne(id);
+        Avviso avviso = avvisoService.findById(id).get();
         return Optional.ofNullable(avviso)
             .map(result -> new ResponseEntity<>(
                 result,
@@ -133,7 +133,7 @@ public class AvvisoResource {
     @Timed
     public ResponseEntity<Void> deleteAvviso(@PathVariable Long id) {
         log.debug("REST request to delete Avviso : {}", id);
-        avvisoService.delete(id);
+        avvisoService.deleteById(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("avviso", id.toString())).build();
     }
 

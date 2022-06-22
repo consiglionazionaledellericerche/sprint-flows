@@ -161,7 +161,7 @@ public class CnrgroupResourceIntTest {
         // Get all the cnrgroups
         restCnrgroupMockMvc.perform(get("/api/cnrgroups?sort=id,desc"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(cnrgroup.getId().intValue())))
                 .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
                 .andExpect(jsonPath("$.[*].displayName").value(hasItem(DEFAULT_DISPLAY_NAME.toString())));
@@ -176,7 +176,7 @@ public class CnrgroupResourceIntTest {
         // Get the cnrgroup
         restCnrgroupMockMvc.perform(get("/api/cnrgroups/{id}", cnrgroup.getId()))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.id").value(cnrgroup.getId().intValue()))
                 .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
                 .andExpect(jsonPath("$.displayName").value(DEFAULT_DISPLAY_NAME.toString()));

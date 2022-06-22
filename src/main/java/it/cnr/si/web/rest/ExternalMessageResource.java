@@ -119,7 +119,7 @@ public class ExternalMessageResource {
     @Timed
     public ResponseEntity<ExternalMessage> getExternalMessage(@PathVariable Long id) {
         log.debug("REST request to get ExternalMessage : {}", id);
-        ExternalMessage externalMessage = externalMessageService.findOne(id);
+        ExternalMessage externalMessage = externalMessageService.findById(id).get();
         return Optional.ofNullable(externalMessage)
             .map(result -> new ResponseEntity<>(
                 result,
@@ -139,7 +139,7 @@ public class ExternalMessageResource {
     @Timed
     public ResponseEntity<Void> deleteExternalMessage(@PathVariable Long id) {
         log.debug("REST request to delete ExternalMessage : {}", id);
-        externalMessageService.delete(id);
+        externalMessageService.deleteById(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("externalMessage", id.toString())).build();
     }
 

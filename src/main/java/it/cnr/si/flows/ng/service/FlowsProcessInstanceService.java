@@ -3,11 +3,12 @@ package it.cnr.si.flows.ng.service;
 import com.opencsv.CSVWriter;
 import it.cnr.si.domain.View;
 import it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery;
-import it.cnr.si.flows.ng.utils.SecurityUtils;
+
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
 import it.cnr.si.security.PermissionEvaluatorImpl;
 import it.cnr.si.service.MembershipService;
+import it.cnr.si.service.SecurityService;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
 import org.activiti.engine.*;
@@ -87,7 +88,10 @@ public class FlowsProcessInstanceService {
     private FlowsAttachmentService attachmentService;
     @Inject
     private MembershipService membershipService;
-
+    @Inject
+    private SecurityService securityService;
+    
+    
     public HistoricTaskInstance getCurrentTaskOfProcessInstance(String processInstanceId) {
         return historyService.createHistoricTaskInstanceQuery()
                 .processInstanceId(processInstanceId)
@@ -493,7 +497,7 @@ public class FlowsProcessInstanceService {
             return false;
         
         // 3. l'utente loggato e' abilitato alla Revoca
-        String currentUser = SecurityUtils.getCurrentUserLogin();
+        String currentUser = securityService.getCurrentUserLogin();
         Set<String> allRolesForUser = membershipService.getAllRolesForUser(currentUser);
         String idAceStrutturaDomandaRichiedente = String.valueOf(processInstance.getProcessVariables().get("idAceStrutturaDomandaRichiedente"));
         if ( abilitatiAllaRevoca.get(processInstance.getProcessDefinitionKey()).stream()

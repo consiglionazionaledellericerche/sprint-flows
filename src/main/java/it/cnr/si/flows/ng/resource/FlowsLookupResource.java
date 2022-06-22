@@ -3,7 +3,7 @@ package it.cnr.si.flows.ng.resource;
 import it.cnr.si.flows.ng.ldap.LdapPersonToSearchResultMapper;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.FlowsSiperService;
-import it.cnr.si.flows.ng.utils.SecurityUtils;
+
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.AceService;
@@ -60,7 +60,7 @@ public class FlowsLookupResource {
     @RequestMapping(value = "/ace/boss", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Utils.SearchResult> getBossForCurrentUser() {
-        String username = SecurityUtils.getCurrentUserLogin();
+        String username = securityService.getCurrentUserLogin();
         BossDto boss = getResponsabileStruttura(username);
         String fullname = boss.getUtente().getPersona().getNome() +" "+ boss.getUtente().getPersona().getCognome();
         return ResponseEntity.ok(new Utils.SearchResult(fullname, fullname));

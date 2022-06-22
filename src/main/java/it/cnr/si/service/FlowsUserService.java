@@ -9,10 +9,11 @@ import it.cnr.si.repository.AuthorityRepository;
 import it.cnr.si.repository.FlowsUserRepository;
 import it.cnr.si.repository.MembershipRepository;
 import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.security.SecurityUtils;
+;
 import it.cnr.si.service.util.RandomUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -58,7 +59,8 @@ public class FlowsUserService {
     @Inject
     private CnrgroupService cnrgroupService;
 
-
+    @Inject
+    private SecurityService securityService;
 
     public Optional<FlowsUser> activateRegistration(String key) {
         log.debug("Activating user for activation key {}", key);
@@ -198,7 +200,7 @@ public class FlowsUserService {
 
 
     public void changePassword(String password) {
-        flowsUserRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).ifPresent(u -> {
+        flowsUserRepository.findOneByLogin(securityService.getCurrentUserLogin()).ifPresent(u -> {
             String encryptedPassword = passwordEncoder.encode(password);
             u.setPassword(encryptedPassword);
             flowsUserRepository.save(u);
@@ -222,7 +224,7 @@ public class FlowsUserService {
 
     @Transactional(readOnly = true)
     public FlowsUser getUserWithAuthorities(Long id) {
-        FlowsUser user = flowsUserRepository.findOne(id);
+        FlowsUser user = flowsUserRepository.findById(id).get();
         user.getAuthorities().size(); // eagerly load the association
         return user;
     }
@@ -230,7 +232,7 @@ public class FlowsUserService {
 
     @Transactional(readOnly = true)
     public FlowsUser getUserWithAuthorities() {
-        FlowsUser user = flowsUserRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).orElse(null);
+        FlowsUser user = flowsUserRepository.findOneByLogin(securityService.getCurrentUserLogin()).orElse(null);
         if (user != null)
             user.getAuthorities().size(); // eagerly load the association
 

@@ -1,6 +1,6 @@
 package it.cnr.si.service;
 
-import it.cnr.si.config.ldap.CNRUser;
+import it.cnr.si.domain.CNRUser;
 import it.cnr.si.security.LdapSecurityUtils;
 import it.cnr.si.web.rest.dto.CNRUserDTO;
 import org.slf4j.Logger;

@@ -205,7 +205,7 @@ public class NotificationRuleResourceIntTest {
         // Get all the notificationRules
         restNotificationRuleMockMvc.perform(get("/api/notification-rules?sort=id,desc"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(notificationRule.getId().intValue())))
                 .andExpect(jsonPath("$.[*].processId").value(hasItem(DEFAULT_PROCESS_ID.toString())))
                 .andExpect(jsonPath("$.[*].taskName").value(hasItem(DEFAULT_TASK_NAME.toString())))
@@ -223,7 +223,7 @@ public class NotificationRuleResourceIntTest {
         // Get the notificationRule
         restNotificationRuleMockMvc.perform(get("/api/notification-rules/{id}", notificationRule.getId()))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(notificationRule.getId().intValue()))
             .andExpect(jsonPath("$.processId").value(DEFAULT_PROCESS_ID.toString()))
             .andExpect(jsonPath("$.taskName").value(DEFAULT_TASK_NAME.toString()))

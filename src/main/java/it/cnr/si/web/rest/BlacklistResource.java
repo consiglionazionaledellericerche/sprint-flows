@@ -111,7 +111,7 @@ public class BlacklistResource {
     @Timed
     public ResponseEntity<Blacklist> getBlacklist(@PathVariable Long id) {
         log.debug("REST request to get Blacklist : {}", id);
-        Blacklist blacklist = blacklistService.findOne(id);
+        Blacklist blacklist = blacklistService.findById(id).get();
         return Optional.ofNullable(blacklist)
             .map(result -> new ResponseEntity<>(
                 result,
@@ -131,7 +131,7 @@ public class BlacklistResource {
     @Timed
     public ResponseEntity<Void> deleteBlacklist(@PathVariable Long id) {
         log.debug("REST request to delete Blacklist : {}", id);
-        blacklistService.delete(id);
+        blacklistService.deleteById(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("blacklist", id.toString())).build();
     }
 

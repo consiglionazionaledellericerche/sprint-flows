@@ -3,8 +3,9 @@ package it.cnr.si.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.domain.User;
 import it.cnr.si.repository.UserRepository;
-import it.cnr.si.security.SecurityUtils;
+;
 import it.cnr.si.service.MailService;
+import it.cnr.si.service.SecurityService;
 import it.cnr.si.service.UserService;
 import it.cnr.si.service.dto.UserDTO;
 import it.cnr.si.web.rest.util.HeaderUtil;
@@ -36,12 +37,12 @@ public class AccountResource {
 
     @Inject
     private UserRepository userRepository;
-
     @Inject
     private UserService userService;
-
     @Inject
     private MailService mailService;
+    @Inject
+    private SecurityService securityService;
 
     /**
      * POST  /register : register the user. Url and service are Forbidden.
@@ -118,7 +119,7 @@ public class AccountResource {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert("user-management", "emailexists", "Email already in use")).body(null);
         }
         return userRepository
-                .findOneByLogin(SecurityUtils.getCurrentUserLogin())
+                .findOneByLogin(securityService.getCurrentUserLogin())
                 .map(u -> {
                     userService.updateUser(userDTO.getFirstName(), userDTO.getLastName(), userDTO.getEmail(),
                                            userDTO.getLangKey());
@@ -139,7 +140,7 @@ public class AccountResource {
     @Timed
     public ResponseEntity<Object> changePassword(@RequestBody String password) {
         return userRepository
-                .findOneByLogin(SecurityUtils.getCurrentUserLogin())
+                .findOneByLogin(securityService.getCurrentUserLogin())
                 .map(u -> {
                     userService.changePassword(password);
                     return new ResponseEntity<>(HttpStatus.OK);

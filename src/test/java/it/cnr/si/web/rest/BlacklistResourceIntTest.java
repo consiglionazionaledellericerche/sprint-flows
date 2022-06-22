@@ -156,7 +156,7 @@ public class BlacklistResourceIntTest {
         // Get all the blacklists
         restBlacklistMockMvc.perform(get("/api/blacklists?sort=id,desc"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(blacklist.getId().intValue())))
                 .andExpect(jsonPath("$.[*].email").value(hasItem(DEFAULT_EMAIL.toString())))
                 .andExpect(jsonPath("$.[*].processDefinitionKey").value(hasItem(DEFAULT_PROCESS_DEFINITION_KEY.toString())));
@@ -171,7 +171,7 @@ public class BlacklistResourceIntTest {
         // Get the blacklist
         restBlacklistMockMvc.perform(get("/api/blacklists/{id}", blacklist.getId()))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(blacklist.getId().intValue()))
             .andExpect(jsonPath("$.email").value(DEFAULT_EMAIL.toString()))
             .andExpect(jsonPath("$.processDefinitionKey").value(DEFAULT_PROCESS_DEFINITION_KEY.toString()));
