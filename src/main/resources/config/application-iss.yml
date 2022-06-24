@@ -1,0 +1,45 @@
+spring:
+  datasource:
+    platform: postgres
+    url: jdbc:postgresql://localhost:5432/activiti
+    username: postgres
+    password: admin
+    driverClassName: org.postgresql.Driver
+  jpa:    
+    database: POSTGRESQL
+    show-sql: false
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+      naming:
+        strategy: org.springframework.boot.orm.jpa.hibernate.SpringNamingStrategy
+    properties:
+      hibernate.cache.use_second_level_cache: true
+      hibernate.cache.use_query_cache: false
+      hibernate.generate_statistics: false
+      hibernate.cache.region.factory_class: it.cnr.si.config.hazelcast.HazelcastCacheRegionFactory
+      hibernate.cache.use_minimal_puts: true
+      hibernate.cache.hazelcast.use_lite_member: true
+
+server:
+  port: 8080
+
+ajp:
+  port: 8099
+  timeout: 120000
+
+jasper-report:
+  dir-iss: /src/main/resources/print/iss-print/
+
+cnr:
+  storage:
+    driver: filesystem
+    filesystem:
+      directory: /tmp/sprint-flows-showcase
+
+iss:
+  mail:
+    mail.port: 587
+    mail.user:
+    mail.password:
+

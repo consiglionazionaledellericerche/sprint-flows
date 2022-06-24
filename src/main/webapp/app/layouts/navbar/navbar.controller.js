@@ -32,6 +32,8 @@
 			    $rootScope.app = 'cnr';
 			else if (response.activeProfiles.includes('oiv'))
 			    $rootScope.app = 'oiv';
+			else if (response.activeProfiles.includes('iss'))
+                $rootScope.app = 'iss';
 			else if (response.activeProfiles.includes('showcase'))
 			    $rootScope.app = 'showcase';
 			else

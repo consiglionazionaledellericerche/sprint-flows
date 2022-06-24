@@ -435,6 +435,10 @@ wysiwyg.ng-touched.ng-invalid > trix-editor {
     background: url("../images/cnr-flows-banner.png") center no-repeat;
     background-size: contain;
 }
+.iss-banner {
+    background: url("../images/iss-flows-banner.png") center no-repeat;
+    background-size: contain;
+}
 
 .oiv-banner {
     background: url("../images/oiv-flows-banner.png") center no-repeat;

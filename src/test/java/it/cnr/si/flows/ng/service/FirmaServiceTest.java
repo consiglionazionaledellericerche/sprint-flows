@@ -25,7 +25,7 @@ import java.util.Optional;
 import static org.junit.Assert.fail;
 
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "native,unittests,cnr")
+@ActiveProfiles(profiles = "native,unittests,cnr,iss")
 @EnableTransactionManagement
 @RunWith(SpringRunner.class)
 @Ignore // TODO per ora testiamo solo Showcase, funzionalita' CNR da testare separatamente
