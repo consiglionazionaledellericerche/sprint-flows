@@ -132,24 +132,10 @@ public class ManageCovid19_v1 implements ExecutionListener {
 			valoreParamJson.put("direttore", execution.getVariable("direttore"));
 			valoreParamJson.put("mese", execution.getVariable("mese").toString());
 			valoreParamJson.put("anno", execution.getVariable("anno").toString());
-			valoreParamJson.put("attivita_svolta",
-					Optional.ofNullable(execution.getVariable("attivita"))
-					.filter(String.class::isInstance)
-					.map(String.class::cast)
-					.map(s -> s.replaceAll("strong>", "b>"))
-					.map(s -> s.replaceAll("em>", "i>"))
-					.orElse("")
-					);
+			valoreParamJson.put("attivita_svolta",Utils.sanitizeHtml(execution.getVariable("attivita")));
 			valoreParamJson.put("tipoAttivita", execution.getVariable("tipoAttivita").toString());
 			if (execution.getVariable("tipoAttivita").equals("programmazione")) {
-				valoreParamJson.put("modalita",
-						Optional.ofNullable(execution.getVariable("modalita"))
-						.filter(String.class::isInstance)
-						.map(String.class::cast)
-						.map(s -> s.replaceAll("strong>", "b>"))
-						.map(s -> s.replaceAll("em>", "i>"))
-						.orElse("")
-						);
+				valoreParamJson.put("modalita", Utils.sanitizeHtml(execution.getVariable("modalita")));
 				valoreParamJson.put("dataAvvioSmartWorking", execution.getVariable("dataAvvioSmartWorking"));
 			}
 

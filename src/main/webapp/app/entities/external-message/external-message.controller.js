@@ -9,7 +9,7 @@
 
     function ExternalMessageController ($scope, $state, ExternalMessage, ParseLinks, AlertService, pagingParams, paginationConstants) {
         var vm = this;
-
+        
         vm.searchTerms = "";
         vm.externalMessage = {};
         vm.loadPage = loadPage;
