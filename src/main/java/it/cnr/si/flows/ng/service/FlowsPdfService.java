@@ -91,8 +91,8 @@ public class FlowsPdfService {
 	private HistoryService historyService;
 	@Inject
 	private RuntimeService runtimeService;
-	@Inject
-	private FlowsPdfBySiglaRestService flowsPdfBySiglaRestService;
+	//@Inject
+	//private FlowsPdfBySiglaRestService flowsPdfBySiglaRestService;
 	@Inject
 	private RestPdfSiglaService restPdfSiglaService;
 	

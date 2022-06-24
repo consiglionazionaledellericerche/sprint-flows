@@ -44,7 +44,7 @@ import it.cnr.si.firmadigitale.firma.arss.stub.TypeTransport;
  * @author mtrycz
  *
  */
-@Profile("cnr")
+@Profile({"cnr","iss"})
 @Service
 public class FlowsFirmaService {
 

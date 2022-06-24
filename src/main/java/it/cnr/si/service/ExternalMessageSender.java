@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Base64;
 
 @EnableScheduling
-@Profile("cnr")
+@Profile({"cnr","iss"})
 @Configuration
 public class ExternalMessageSender {
 
