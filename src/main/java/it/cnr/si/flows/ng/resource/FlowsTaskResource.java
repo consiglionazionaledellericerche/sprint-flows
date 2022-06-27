@@ -9,7 +9,7 @@ import it.cnr.si.flows.ng.exception.FileFormatException;
 import it.cnr.si.flows.ng.exception.FlowsPermissionException;
 import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
 import it.cnr.si.flows.ng.service.*;
-
+import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.PermissionEvaluatorImpl;
 import it.cnr.si.service.DraftService;
@@ -85,6 +85,8 @@ public class FlowsTaskResource {
     private DraftService draftService;
     @Inject
     private SecurityService securityService;
+    @Inject
+    private SecurityUtils securityUtils;
 
     
     @PostMapping(value = "/mytasks", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -355,7 +357,7 @@ public class FlowsTaskResource {
         long sprintTasks = taskService.createTaskQuery()
                 .taskAssignee(username)
                 .or()
-                .taskCandidateGroupIn(SecurityUtils.getCurrentUserAuthorities())
+                .taskCandidateGroupIn(securityUtils.getCurrentUserAuthorities())
                 .count();
         result.put("acquisti", sprintTasks);
 

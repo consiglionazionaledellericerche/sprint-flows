@@ -199,7 +199,7 @@ public class CnrgroupResourceIntTest {
         int databaseSizeBeforeUpdate = cnrgroupRepository.findAll().size();
 
         // Update the cnrgroup
-        Cnrgroup updatedCnrgroup = cnrgroupRepository.findOne(cnrgroup.getId());
+        Cnrgroup updatedCnrgroup = cnrgroupRepository.findById(cnrgroup.getId()).get();
         updatedCnrgroup
                 .name(UPDATED_NAME)
                 .displayName(UPDATED_DISPLAY_NAME);

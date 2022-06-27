@@ -151,7 +151,7 @@ public class CounterResourceIntTest {
         int databaseSizeBeforeUpdate = counterRepository.findAll().size();
 
         // Update the counter
-        Counter updatedCounter = counterRepository.findOne(counter.getId());
+        Counter updatedCounter = counterRepository.findById(counter.getId()).get();
         updatedCounter
                 .name(UPDATED_NAME)
                 .value(UPDATED_VALUE);

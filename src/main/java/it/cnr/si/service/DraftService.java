@@ -101,7 +101,7 @@ public class DraftService {
     public void deleteDraftByTaskId(Long taskId) {
         Draft draft = draftRepository.getDraftByTaskId(taskId);
         if(draft != null)
-            draftRepository.delete(draft.getId());
+            draftRepository.deleteById(draft.getId());
     }
 
 
@@ -112,8 +112,6 @@ public class DraftService {
      * @param username the username
      */
     public void deleteDraftByProcessInstanceIdAndUsername(String processDefinitionId, String username) {
-        Draft draft = draftRepository.getDraftByProcessInstanceIdAndUsername(processDefinitionId, username);
-        if(draft != null)
-            draftRepository.delete(draft.getId());
+        draftRepository.delete(draftRepository.getDraftByProcessInstanceIdAndUsername(processDefinitionId, username));
     }
 }

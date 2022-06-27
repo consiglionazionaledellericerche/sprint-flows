@@ -194,7 +194,7 @@ public class BlacklistResourceIntTest {
         int databaseSizeBeforeUpdate = blacklistRepository.findAll().size();
 
         // Update the blacklist
-        Blacklist updatedBlacklist = blacklistRepository.findOne(blacklist.getId());
+        Blacklist updatedBlacklist = blacklistRepository.findById(blacklist.getId()).get();
         updatedBlacklist
                 .email(UPDATED_EMAIL)
                 .processDefinitionKey(UPDATED_PROCESS_DEFINITION_KEY);

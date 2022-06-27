@@ -11,12 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.ldap.search.LdapUserSearch;
-import org.springframework.security.ldap.userdetails.LdapUserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,10 +36,6 @@ public class FlowsUserDetailsService implements org.springframework.security.cor
 
 	@Inject
 	private UserRepository userRepository;
-	@Autowired(required = false)
-	private LdapUserDetailsService ldapUserDetailsService;
-	@Autowired(required = false)
-	private LdapUserSearch ldapUserSearch;
 	@Inject
 	private MembershipService membershipService;
 	@Inject
@@ -67,7 +62,7 @@ public class FlowsUserDetailsService implements org.springframework.security.cor
 				List<GrantedAuthority> grantedAuthorities = user.getAuthorities().stream()
 						.map(authority -> new SimpleGrantedAuthority(authority.getName()))
 						.collect(Collectors.toList());
-				grantedAuthorities.addAll(flowsUserService.getGroupsForUser(lowercaseLogin, new PageRequest(1, 100)).stream()
+				grantedAuthorities.addAll(flowsUserService.getGroupsForUser(lowercaseLogin, PageRequest.of(1, 100)).stream()
 				.map(group -> new SimpleGrantedAuthority(group.getCnrgroup().getName()))
 				.collect(Collectors.toList()));
 
@@ -76,9 +71,10 @@ public class FlowsUserDetailsService implements org.springframework.security.cor
 				                                                              grantedAuthorities);
 			}).orElseGet(null);
 		} else {
-			userDetails = Optional.ofNullable(ldapUserDetailsService)
-					.map(ldapUserDetailsService1 -> ldapUserDetailsService1.loadUserByUsername(login))
-					.orElse(null);
+			userDetails = null;
+//			Optional.ofNullable(ldapUserDetailsService)
+//					.map(ldapUserDetailsService1 -> ldapUserDetailsService1.loadUserByUsername(login))
+//					.orElse(null);
 		}
 //todo:sostituire orElse con orElseThrow
 		if (userDetails == null)
@@ -94,9 +90,7 @@ public class FlowsUserDetailsService implements org.springframework.security.cor
 		if(userFromDatabase.isPresent()) {
 			return userFromDatabase.get().getEmail();
 		} else {
-			return Optional.ofNullable(ldapUserSearch)
-					.map(s -> s.searchForUser(username).getStringAttribute("mail"))
-					.orElse(null);
+			return null;
 		}
 	}
 }

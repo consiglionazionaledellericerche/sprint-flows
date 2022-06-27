@@ -123,7 +123,7 @@ public class CnrgroupResource {
     @Timed
     public ResponseEntity<Cnrgroup> getCnrgroup(@PathVariable Long id) {
         log.debug("REST request to get Cnrgroup : {}", id);
-        Cnrgroup cnrgroup = cnrgroupService.findById(id).get();
+        Cnrgroup cnrgroup = cnrgroupService.findOne(id);
         return Optional.ofNullable(cnrgroup)
                 .map(result -> new ResponseEntity<>(
                         result,
@@ -144,7 +144,7 @@ public class CnrgroupResource {
     @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Void> deleteCnrgroup(@PathVariable Long id) {
         log.debug("REST request to delete Cnrgroup : {}", id);
-        cnrgroupService.deleteById(id);
+        cnrgroupService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(CNR_GROUP, id.toString())).build();
     }
 

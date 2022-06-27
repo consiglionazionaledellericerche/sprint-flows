@@ -217,7 +217,7 @@ public class FaqResourceIntTest {
         int databaseSizeBeforeUpdate = faqRepository.findAll().size();
 
         // Update the faq
-        Faq updatedFaq = faqRepository.findOne(faq.getId());
+        Faq updatedFaq = faqRepository.findById(faq.getId()).get();
         updatedFaq
                 .domanda(UPDATED_DOMANDA)
                 .risposta(UPDATED_RISPOSTA)

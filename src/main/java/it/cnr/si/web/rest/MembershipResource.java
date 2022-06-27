@@ -129,7 +129,7 @@ public class MembershipResource {
     @Timed
     public ResponseEntity<Membership> getMembership(@PathVariable Long id) {
         log.debug("REST request to get Membership : {}", id);
-        Membership membership = membershipService.findById(id).get();
+        Membership membership = membershipService.findOne(id);
         return Optional.ofNullable(membership)
                 .map(result -> new ResponseEntity<>(
                         result,
@@ -150,7 +150,7 @@ public class MembershipResource {
     @Timed
     public ResponseEntity<Void> deleteMembership(@PathVariable Long id) {
         log.debug("REST request to delete Membership : {}", id);
-        membershipService.deleteById(id);
+        membershipService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("membership", id.toString())).build();
     }
 

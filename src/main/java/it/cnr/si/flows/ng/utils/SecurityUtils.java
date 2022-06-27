@@ -1,17 +1,16 @@
 package it.cnr.si.flows.ng.utils;
 
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.switchuser.SwitchUserGrantedAuthority;
+import org.springframework.stereotype.Service;
 
 import it.cnr.si.service.SecurityService;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+@Service
 public class SecurityUtils {
 
     @Inject

@@ -241,7 +241,7 @@ public class FormResourceIntTest {
         int databaseSizeBeforeUpdate = formRepository.findAll().size();
 
         // Update the form
-        Form updatedForm = formRepository.findOne(form.getId());
+        Form updatedForm = formRepository.findById(form.getId()).get();
         updatedForm
                 .processDefinitionKey(UPDATED_PROCESS_DEFINITION_KEY)
                 .version(UPDATED_VERSION)

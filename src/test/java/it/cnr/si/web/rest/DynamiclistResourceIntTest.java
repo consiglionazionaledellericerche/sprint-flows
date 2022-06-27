@@ -193,7 +193,7 @@ public class DynamiclistResourceIntTest {
         int databaseSizeBeforeUpdate = dynamiclistRepository.findAll().size();
 
         // Update the dynamiclist
-        Dynamiclist updatedDynamiclist = dynamiclistRepository.findOne(dynamiclist.getId());
+        Dynamiclist updatedDynamiclist = dynamiclistRepository.findById(dynamiclist.getId()).get();
         updatedDynamiclist
                 .name(UPDATED_NAME)
                 .listjson(UPDATED_LISTJSON);

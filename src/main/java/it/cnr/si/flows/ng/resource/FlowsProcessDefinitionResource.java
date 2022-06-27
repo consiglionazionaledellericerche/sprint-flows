@@ -6,6 +6,7 @@ import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.MembershipService;
+import it.cnr.si.service.SecurityService;
 
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.repository.DeploymentBuilder;
@@ -34,7 +35,8 @@ public class FlowsProcessDefinitionResource {
     private RepositoryService repositoryService;
     @Inject
     private MembershipService membershipService;
-
+    @Inject
+    private SecurityService securityService;
 
     @Autowired
     private RestResponseFactory restResponseFactory;

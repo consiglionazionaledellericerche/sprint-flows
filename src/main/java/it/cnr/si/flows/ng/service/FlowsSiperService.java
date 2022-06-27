@@ -45,7 +45,7 @@ public class FlowsSiperService {
 
         String username = env.getProperty("cnr.siper.username");
         String password = env.getProperty("cnr.siper.password");
-        interceptors.add(new BasicAuthorizationInterceptor(username, password));
+        interceptors.add(new BasicAuthenticationInterceptor(username, password));
 
         this.siperRestTemplate.setInterceptors(interceptors);
     }

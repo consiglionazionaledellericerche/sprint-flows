@@ -105,7 +105,7 @@ public class DraftResource {
     @Timed
     public ResponseEntity<Draft> getDraftById(@PathVariable Long id) {
         log.debug("REST request to get Draft : {}", id);
-        Draft draft = draftService.findById(id).get();
+        Draft draft = draftService.findOne(id);
         return Optional.ofNullable(draft)
                 .map(result -> new ResponseEntity<>(
                         result,
@@ -175,7 +175,7 @@ public class DraftResource {
     @Timed
     public ResponseEntity<Void> deleteDraft(@PathVariable Long id) {
         log.debug("REST request to delete Draft : {}", id);
-        draftService.deleteById(id);
+        draftService.delete(id);
 
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("draft", id.toString())).build();
     }

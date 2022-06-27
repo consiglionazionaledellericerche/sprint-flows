@@ -8,7 +8,7 @@ import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.exception.UnexpectedResultException;
 import it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery;
 import it.cnr.si.flows.ng.resource.FlowsAttachmentResource;
-
+import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
 import it.cnr.si.security.PermissionEvaluatorImpl;
@@ -109,6 +109,8 @@ public class FlowsTaskService {
 	private FlowsProcessInstanceService flowsProcessInstanceService;
     @Inject
     private SecurityService securityService;
+	@Inject
+	private SecurityUtils securityUtils;
 
 
 
@@ -268,7 +270,7 @@ public class FlowsTaskService {
 	public DataResponse taskAssignedInMyGroups(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
 
 		String username = securityService.getCurrentUserLogin();
-		List<String> userAuthorities = SecurityUtils.getCurrentUserAuthorities();
+		List<String> userAuthorities = securityUtils.getCurrentUserAuthorities();
 		Set<String> ruoliUtente = membershipService.getAllRolesForUser(username);
 
 		FlowsHistoricProcessInstanceQuery processQuery = new FlowsHistoricProcessInstanceQuery(managementService);
