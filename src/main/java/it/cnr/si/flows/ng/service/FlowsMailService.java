@@ -118,6 +118,8 @@ public class FlowsMailService extends MailService {
                 ctx.setVariable("profile", "cnr");
             } else if (Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
                 ctx.setVariable("profile", "oiv");
+            } else if (Arrays.asList(env.getActiveProfiles()).contains("iss")) {
+                ctx.setVariable("profile", "iss");
             } else if (Arrays.asList(env.getActiveProfiles()).contains("showcase")) {
                 ctx.setVariable("profile", "showcase");
             }
