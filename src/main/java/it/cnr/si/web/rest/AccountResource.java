@@ -4,7 +4,6 @@ import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.domain.User;
 import it.cnr.si.repository.UserRepository;
 import it.cnr.si.security.SecurityUtils;
-import it.cnr.si.service.MailService;
 import it.cnr.si.service.UserService;
 import it.cnr.si.service.dto.UserDTO;
 import it.cnr.si.web.rest.util.HeaderUtil;
@@ -40,8 +39,8 @@ public class AccountResource {
     @Inject
     private UserService userService;
 
-    @Inject
-    private MailService mailService;
+    //@Inject
+    //private MailService mailService;
 
     /**
      * POST  /register : register the user. Url and service are Forbidden.

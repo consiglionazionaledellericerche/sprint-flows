@@ -22,7 +22,7 @@ import java.util.Arrays;
  */
 
 @Configuration
-@Profile(value = {"cnr", "!oiv"})
+@Profile("ldap")
 @EnableWebSecurity
 @Order(200)
 public class SecurityConfigurationLDAP extends WebSecurityConfigurerAdapter {

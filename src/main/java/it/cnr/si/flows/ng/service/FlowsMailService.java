@@ -44,9 +44,8 @@ import java.util.Optional;
 import static it.cnr.si.flows.ng.utils.Utils.formatoDataUF;
 
 
-@Service
-@Primary
-public class FlowsMailService extends MailService {
+
+public abstract class FlowsMailService extends MailService {
 
     public static final String FLOW_NOTIFICATION = "notificaFlow.html";
     public static final String PROCESS_NOTIFICATION = "notificaProcesso.html";
@@ -64,12 +63,6 @@ public class FlowsMailService extends MailService {
     @Inject
     private Environment env;
     @Inject
-    private CnrgroupService cnrgroupService;
-    @Autowired(required = false)
-    private AceBridgeService aceBridgeService;
-    @Autowired(required = false) //TODO
-    private AceService aceService;
-    @Inject
     private FlowsUserService flowsUserService;
     @Autowired
     private UserDetailsService flowsUserDetailsService;
@@ -86,6 +79,7 @@ public class FlowsMailService extends MailService {
     @Autowired
     private MailConfguration mailConfguration;
 
+    abstract public String getGroupDisplayName(String groupName);
     @Async
     public void sendFlowEventNotification(String notificationType, Map<String, Object> variables, String taskName, String username, final String groupName, boolean hasNotificationRule) {
         try {
@@ -102,17 +96,9 @@ public class FlowsMailService extends MailService {
 
             // ${serverUrl}/#/details?processInstanceId=${processInstanceId}&amp;taskId=${nextTaskId}}
 
-            if (groupName != null) {
-                if (Arrays.asList(env.getActiveProfiles()).contains("cnr")) {
-                    ctx.setVariable("groupname", Optional.ofNullable(aceBridgeService)
-                            .flatMap(aceBridgeService -> Optional.ofNullable(groupName))
-                            .map(s -> aceBridgeService.getExtendedGroupNome(s))
-                            .orElse(groupName));
-                } else {
-                    ctx.setVariable("profile", "oiv");
-                    ctx.setVariable("groupname", cnrgroupService.findDisplayName(groupName));
-                }
-            }
+            if (groupName != null)
+               ctx.setVariable("groupname",getGroupDisplayName(groupName));
+
             ctx.setVariable("taskName", taskName);
             if (Arrays.asList(env.getActiveProfiles()).contains("cnr")) {
                 ctx.setVariable("profile", "cnr");
@@ -127,7 +113,7 @@ public class FlowsMailService extends MailService {
             LOGGER.info("Recupero dell'email per l'utente "+ username);
 
             String htmlContent = templateEngine.process(notificationType, ctx);
-            String mailUtente = aceService.getUtente(username).getEmail();
+            String mailUtente = getEmaiByUser(username);
 
             LOGGER.info("Invio della mail all'utente "+ username +" con indirizzo "+ mailUtente);
 
@@ -249,10 +235,11 @@ public class FlowsMailService extends MailService {
             sendReminerToUserForInstances(user, instances);
         });
     }
-    
+    public abstract String getEmaiByUser(String user);
+
     private void sendReminerToUserForInstances(String user, List<ProcessInstance> instances) {
         try {
-            String mailUtente = aceService.getUtente(user).getEmail();
+            String mailUtente = getEmaiByUser(user);
             LOGGER.info("Invio della mail all'utente "+ user +" con indirizzo "+ mailUtente +" per i flussi "+ instances);
             
             Context ctx = new Context();

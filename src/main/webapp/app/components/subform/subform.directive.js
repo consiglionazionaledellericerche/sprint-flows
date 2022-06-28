@@ -39,7 +39,8 @@
                 subformName: '@',
                 min: '@?',
                 max: '@?',
-                autofill: '@?'
+                autofill: '@?',
+                buttonPosition: '@?'
             },
             link: function ($scope, element, attrs) {
                 $scope.min = $scope.min || 1;
@@ -49,7 +50,9 @@
                 $scope.processDefinitionKey = $scope.processDefinitionKey || $scope.$parent.processDefinitionKey;
                 $scope.processVersion = $scope.processVersion || $scope.$parent.processVersion;
                 $scope.formUrl = 'api/forms/'+ $scope.processDefinitionKey +"/"+ $scope.processVersion +"/"+ $scope.subformName;
-
+                if ( $scope.buttonPosition === undefined) {
+                       $scope.buttonPosition='top';
+                }
 //                if ($scope.json !== undefined)
 //                  $scope.ngModel = JSON.parse($scope.json);
                 if ('autofill' in attrs) {
@@ -62,9 +65,13 @@
                         $scope.ngModel.push({});
                     return false;
                 };
-                $scope.removeRow = function() {
-                    if ($scope.ngModel.length > $scope.min)
-                        $scope.ngModel.pop();
+                $scope.removeRow = function(index) {
+                    if ($scope.buttonPosition==='inner' ){
+                        $scope.ngModel.splice(index, 1);
+                    }else{
+                       if ($scope.ngModel.length > $scope.min)
+                         $scope.ngModel.pop();
+                    }
                     return false;
                 };
             }

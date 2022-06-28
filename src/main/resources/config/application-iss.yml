@@ -21,8 +21,10 @@ spring:
       hibernate.cache.use_minimal_puts: true
       hibernate.cache.hazelcast.use_lite_member: true
 
-server:
   port: 8080
+  mail:
+    url: http://test.iss.it:8080
+
 
 ajp:
   port: 8099
@@ -37,9 +39,12 @@ cnr:
     filesystem:
       directory: /tmp/sprint-flows-showcase
 
+
 iss:
   mail:
-    mail.port: 587
-    mail.user:
-    mail.password:
+    mail.host: smtp.iss.it
+    mail.protocol: smtp
+    mail.port: 25
+    mail.send.error.to: ciro.salvio@iss.it
+    mail.from: no-reply@scrivaniadigitale
 
