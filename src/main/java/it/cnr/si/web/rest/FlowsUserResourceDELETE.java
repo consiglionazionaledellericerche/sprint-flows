@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/api/flows")
-public class FlowsUserResource {
+public class FlowsUserResourceDELETE {
 
 	public static final String USER_MANAGEMENT = "userManagement";
 	public static final String USER_EXISTS = "userexists";

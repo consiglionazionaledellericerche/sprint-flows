@@ -28,11 +28,11 @@ import java.util.stream.Collectors;
 /**
  * Authenticate a user from the database.
  */
-@Component("flowsUserDetailsService")
-@Primary
-public class FlowsUserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
+//@Component("flowsUserDetailsService")
+//@Primary
+public class FlowsUserDetailsServiceDELETE implements org.springframework.security.core.userdetails.UserDetailsService {
 
-	private final Logger log = LoggerFactory.getLogger(FlowsUserDetailsService.class);
+	private final Logger log = LoggerFactory.getLogger(FlowsUserDetailsServiceDELETE.class);
 
 	@Inject
 	private UserRepository userRepository;

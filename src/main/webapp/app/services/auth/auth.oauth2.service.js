@@ -24,22 +24,12 @@
                     var expiredAt = new Date();
                     expiredAt.setSeconds(expiredAt.getSeconds() + response.expires_in);
                     response.expires_at = expiredAt.getTime();
-                    AccessToken.set(response);
+                    Principal.authenticate(response);
                     return response;
                 });
             },
-            logout: function() {
-                if (AccessToken.get()) {
-                    // logout from the server
-                    $http.post('api/logout').then(function() {
-                        AccessToken.remove();
-                    });
-                } else {
-                    location.href = '/sso/logout';
-                }
-            },
-            getToken: function () {
-                return AccessToken.get();
+            logout: function(){ 
+                location.href = "/sso/logout";
             },
             hasValidToken: function () {
                 var token = this.getToken();

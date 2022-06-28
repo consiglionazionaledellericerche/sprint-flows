@@ -5,9 +5,9 @@
 	.module('sprintApp')
 	.controller('NavbarController', NavbarController);
 
-	NavbarController.$inject = ['$rootScope', '$localStorage', '$scope', '$state', 'Auth', 'Principal', 'ProfileService', 'LoginService', 'SwitchUserService', 'dataService', '$log'];
+	NavbarController.$inject = ['$rootScope', '$localStorage', '$scope', '$state', 'Auth', 'Principal', 'ProfileService', 'LoginService', 'SwitchUserService', 'dataService', '$log', 'AuthServerProvider'];
 
-	function NavbarController($rootScope, $localStorage, $scope, $state, Auth, Principal, ProfileService, LoginService, SwitchUserService, dataService, $log) {
+	function NavbarController($rootScope, $localStorage, $scope, $state, Auth, Principal, ProfileService, LoginService, SwitchUserService, dataService, $log, AuthServerProvider) {
 		var vm = this;
 
 		vm.isNavbarCollapsed = true;
@@ -91,7 +91,7 @@
 				//popolo l'array delle process Definitions di cui l'utente loggato può vedere le statistiche
 				$rootScope.wfDefsStatistics = $localStorage.wfDefsAll.filter(function(processDefinition){
 					for (var i = 0; i < vm.account.authorities.length; i++){
-						var authority = vm.account.authorities[i];
+						var authority = vm.account.authorities[i].authority;
 						if(authority.includes('responsabile#') || authority.includes('supervisore#')){
 							if(authority.split(/[#@]/)[1] == processDefinition.key ){
 								return true;
@@ -115,25 +115,17 @@
 			return Principal.isAuthenticated();
 		}, function() {
 			Principal.identity().then(function(account) {
+                account.login = account.username;
 				vm.account = account;
+				CreateSsoCnrMenu.createUserMenu('#menu-user', {
+                  'placement': 'right',
+                  'login': account.username,
+                  'name': account.firstName+" "+account.lastName,
+                  'logoutCallback': (e) => {AuthServerProvider.logout()}
+                });
 			})
 		});
 		
-		// SSO
 		CreateSsoCnrMenu.createAppsMenu('#menu-apps', {'placement': 'right'});
-//        CreateSsoCnrMenu.createAppsMenuAndButton('.navbar', {'placement': 'right'});
-        CreateSsoCnrMenu.createUserMenu('#menu-user', {
-          'placement': 'right',
-          'login': 'consiglionazionale.dellericerche',
-          'name': 'Consiglio Nazionale delle Ricerche',
-          'logoutCallback': (e) => {alert('logout')}
-        });
-//        CreateSsoCnrMenu.createUserMenuAndButton('.navbar', {
-//          'placement': 'right',
-//          'login': 'gianluca.troiani',
-//          'name': 'Gianluca Troiani',
-//          'logoutCallback': (e) => {alert('logout')}
-//        });
-
 	}
 })();
