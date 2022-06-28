@@ -4,7 +4,7 @@ import it.cnr.si.domain.ExternalProblem;
 import it.cnr.si.flows.ng.exception.AwesomeException;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.flows.ng.utils.proxy.ResultProxy;
-;
+
 import it.cnr.si.service.dto.anagrafica.scritture.PersonaDto;
 import it.cnr.si.service.dto.anagrafica.scritture.UtenteDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;

@@ -118,5 +118,22 @@
 				vm.account = account;
 			})
 		});
+		
+		// SSO
+		CreateSsoCnrMenu.createAppsMenu('#menu-apps', {'placement': 'right'});
+//        CreateSsoCnrMenu.createAppsMenuAndButton('.navbar', {'placement': 'right'});
+        CreateSsoCnrMenu.createUserMenu('#menu-user', {
+          'placement': 'right',
+          'login': 'consiglionazionale.dellericerche',
+          'name': 'Consiglio Nazionale delle Ricerche',
+          'logoutCallback': (e) => {alert('logout')}
+        });
+//        CreateSsoCnrMenu.createUserMenuAndButton('.navbar', {
+//          'placement': 'right',
+//          'login': 'gianluca.troiani',
+//          'name': 'Gianluca Troiani',
+//          'logoutCallback': (e) => {alert('logout')}
+//        });
+
 	}
 })();
