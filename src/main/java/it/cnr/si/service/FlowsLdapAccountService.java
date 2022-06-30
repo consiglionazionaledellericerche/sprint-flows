@@ -1,7 +1,9 @@
 package it.cnr.si.service;
 
 import it.cnr.si.config.ldap.CNRUser;
+import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.security.LdapSecurityUtils;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
 import it.cnr.si.web.rest.dto.CNRUserDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,8 @@ public class FlowsLdapAccountService extends LdapAccountService {
 
     @Inject
     private LdapTemplate ldapTemplate;
+    @Inject
+    private AceService aceService;
 
     public CNRUserDTO getAccount() {
 
@@ -75,7 +79,17 @@ public class FlowsLdapAccountService extends LdapAccountService {
 
         log.info(roles.toString());
 
-        return new CNRUserDTO(username, null, matricola, firstName, lastName, email, null, roles, departmentNumber);
+        CNRUserDTO cnrUserDTO = new CNRUserDTO(username, null, matricola, firstName, lastName, email, null, roles, departmentNumber);
+        
+        try {
+            SimplePersonaWebDto persona = aceService.getPersonaByUsername(username);
+            cnrUserDTO.setLivello(persona.getLivello());
+        } catch (Exception e) {
+            if (!"admin".equals(username))
+                log.warn("Non riesco a recuperare la persona per username {}", username, e);
+        }
+        
+        return cnrUserDTO;
     }
 
     private static List<String> getRoles(Collection<? extends GrantedAuthority> authorities) {
