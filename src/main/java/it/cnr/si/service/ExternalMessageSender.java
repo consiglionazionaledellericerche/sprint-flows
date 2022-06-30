@@ -21,6 +21,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
@@ -60,6 +62,10 @@ public class ExternalMessageSender {
     private String ssoAttestatiLoginUrl;
     @Value("${cnr.ssoMissioniLoginUrl}")
     private String ssoMissioniLoginUrl;
+    @Value("${cnr.missioni.clientId}")
+    private String ssoMissioniClientId;
+    @Value("${cnr.missioni.clientSecret}")
+    private String ssoMissioniClientSecret;
     @Value("${cnr.attestati.url}")
     private String attestatiUrl;
     @Value("${cnr.attestati.username}")
@@ -183,7 +189,7 @@ public class ExternalMessageSender {
         RestTemplate siperTemplate = new RestTemplate();
         interceptors = siperTemplate.getInterceptors();
         interceptors.add(new SiperRequestInterceptor());
-        labconTemplate.setInterceptors(interceptors);
+        siperTemplate.setInterceptors(interceptors);
         ExternalApplication.SIPER.setTemplate(siperTemplate);
 
         // GENERIC
@@ -231,19 +237,21 @@ public class ExternalMessageSender {
 
         } catch (Exception e) {
 
-            String responseMessage;
-            if (response == null)
-                responseMessage = e.getMessage();
-            else if (response.getBody() == null)
-                responseMessage = String.valueOf(response.getStatusCodeValue());
-            else
-                responseMessage = response.getBody();
-
-            log.error("Rest fallita con messaggio {} {} ", responseMessage, msg, e);
+            String exceptionMessage = e.getMessage();
+            String responseMessage = "<no response>";
+            if (e instanceof HttpServerErrorException) {
+                responseMessage = ((HttpServerErrorException) e).getResponseBodyAsString();
+                log.error("root cause", ((HttpServerErrorException) e).getRootCause());
+            }
+            if (e instanceof HttpClientErrorException) {
+                responseMessage = ((HttpClientErrorException) e).getResponseBodyAsString();
+                log.error("root cause", ((HttpClientErrorException) e).getRootCause());
+            }
+            log.error("Rest fallita con messaggio {} {} {} ", exceptionMessage, responseMessage, msg, e);
 
             msg.setStatus(ExternalMessageStatus.ERROR);
             msg.setRetries(msg.getRetries() + 1);
-            msg.setLastErrorMessage(StringUtils.substring(responseMessage, 0, 254));
+            msg.setLastErrorMessage(StringUtils.substring(exceptionMessage +" "+responseMessage, 0, 254));
             externalMessageService.save(msg);
         }
     }
@@ -425,7 +433,7 @@ public class ExternalMessageSender {
     /**
      * Missioni, per la login, usa /oauth/token e una richiesta POST com FORM_DATA
      * Per questo ho delle peculiarita': devo usare una MultiValueMap
-     */
+     *
     private class MissioniRequestInterceptor implements ClientHttpRequestInterceptor {
 
         private String access_token = null;
@@ -470,10 +478,8 @@ public class ExternalMessageSender {
             return response;
         }
     }
+    */
 
-    /**
-     * Missioni, per la login, usa /oauth/token e una richiesta POST com FORM_DATA
-     * Per questo ho delle peculiarita': devo usare una MultiValueMap
     private class MissioniRequestInterceptor implements ClientHttpRequestInterceptor {
 
         private String id_token = null;
@@ -481,9 +487,14 @@ public class ExternalMessageSender {
         @Override
         public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 
+            ObjectMapper om = new ObjectMapper();
+            String stringRepresentation = new String(body, "UTF-8");
+            JsonNode jsonRepresentation = om.readTree(stringRepresentation);
+            byte[] byteRepresentation = jsonRepresentation.toString().getBytes(StandardCharsets.UTF_8);
+            
             request.getHeaders().set("Authorization", "Bearer "+ id_token);
             request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
-            ClientHttpResponse response = execution.execute(request, body);
+            ClientHttpResponse response = execution.execute(request, byteRepresentation);
 
             if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 
@@ -501,7 +512,7 @@ public class ExternalMessageSender {
                         auth,
                         headers,
                         HttpMethod.POST,
-                        URI.create(ssoMissioniLoginUrl));
+                        URI.create(ssoLoginUrl));
 
                 ResponseEntity<Map> resp = new RestTemplate().exchange(entity, Map.class);
 
@@ -509,13 +520,12 @@ public class ExternalMessageSender {
 
                 request.getHeaders().set("Authorization", "Bearer "+ id_token);
                 request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
-                response = execution.execute(request, body);
+                response = execution.execute(request, byteRepresentation);
             }
 
             return response;
         }
     }
-     */
 
 //    private class SiperRequestInterceptor implements ClientHttpRequestInterceptor {
 //
