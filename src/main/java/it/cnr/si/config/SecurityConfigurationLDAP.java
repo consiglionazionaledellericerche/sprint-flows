@@ -22,7 +22,7 @@ import java.util.Arrays;
  */
 
 @Configuration
-@Profile("ldap")
+@Profile("cnr")
 @EnableWebSecurity
 @Order(200)
 public class SecurityConfigurationLDAP extends WebSecurityConfigurerAdapter {
