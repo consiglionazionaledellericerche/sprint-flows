@@ -693,6 +693,7 @@ public class FlowsPdfService {
 		Map<String, VariableInstance> tutteVariabiliMap = runtimeService.getVariableInstances(processInstanceId);
 		for (Map.Entry<String, VariableInstance> entry : tutteVariabiliMap.entrySet()) {
 			String key = entry.getKey();
+			if (key == null) continue; // cerco di ovviare al bug di chiave nulla mtrycz 5/7/22
 			VariableInstance value = entry.getValue();
 			//le variabili di tipo serializable (file) non vanno inseriti nel json delle variabili che verranno inseriti nel pdf
 			//(ho testato valutazioni esperienze_Json fino a 11000 caratteri ed a questo livello appare come longString)
