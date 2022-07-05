@@ -189,7 +189,7 @@ public class ExternalMessageSender {
         RestTemplate siperTemplate = new RestTemplate();
         interceptors = siperTemplate.getInterceptors();
         interceptors.add(new SiperRequestInterceptor());
-        labconTemplate.setInterceptors(interceptors);
+        siperTemplate.setInterceptors(interceptors);
         ExternalApplication.SIPER.setTemplate(siperTemplate);
 
         // GENERIC

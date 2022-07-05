@@ -708,14 +708,7 @@ public class FlowsPdfService {
 					if (runtimeService.getVariable(processInstanceId,value.getName()) != null) {
 						String variabileCorrente = value.getName().toString();
 						if (listaVariabiliHtml.contains(variabileCorrente)) {
-							variableInstanceJson.put(variabileCorrente,
-									Optional.ofNullable(runtimeService.getVariable(processInstanceId, variabileCorrente))
-									.filter(String.class::isInstance)
-									.map(String.class::cast)
-									.map(s -> s.replaceAll("strong>", "b>"))
-									.map(s -> s.replaceAll("em>", "i>"))
-									.orElse("")
-									);
+							variableInstanceJson.put(variabileCorrente, Utils.sanitizeHtml(runtimeService.getVariable(processInstanceId, variabileCorrente)));
 
 						} else {
 							valueEscaped = Jsoup.parse(StringEscapeUtils.escapeHtml(runtimeService.getVariable(processInstanceId,value.getName()).toString().replaceAll("\t", "  "))).text();
