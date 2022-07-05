@@ -120,9 +120,7 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 			    String propostaHtml = String.valueOf(execution.getVariable("propostaDiRicerca"));
 			    String propostaPulita = Utils.sanitizeHtml(propostaHtml);
 			    execution.setVariable("propostaDiRicerca", propostaPulita);
-			    
-			    execution.setVariable(null, faseEsecuzioneValue);
-			    
+			    			    
 				startAccordiInternazionaliDomandeSetGroupsAndVisibility.configuraVariabiliStart(execution);
 				// GENERO LA DOMANDA ---OLD
 				//String nomeFile="domandaAccordiBilaterali";
