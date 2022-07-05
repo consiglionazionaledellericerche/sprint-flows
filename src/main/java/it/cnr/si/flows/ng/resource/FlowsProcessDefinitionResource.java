@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -120,9 +121,12 @@ public class FlowsProcessDefinitionResource {
 
     public boolean canStartProcesByDefinitionKey(String definitionKey) {
     	
-        return membershipService.getAllRolesForUser(securityService.getCurrentUserLogin())
+        if (definitionKey.equals("covid19"))
+            return true;
+        
+        return securityService.getUser().get().getAuthorities()
                 .stream()
-                .map(Utils::removeLeadingRole)
+                .map(GrantedAuthority::getAuthority)
                 .anyMatch(a -> a.startsWith("abilitati#" + definitionKey + "@") );
     }
 

@@ -112,6 +112,8 @@ public class DraftService {
      * @param username the username
      */
     public void deleteDraftByProcessInstanceIdAndUsername(String processDefinitionId, String username) {
-        draftRepository.delete(draftRepository.getDraftByProcessInstanceIdAndUsername(processDefinitionId, username));
+        Draft draft = draftRepository.getDraftByProcessInstanceIdAndUsername(processDefinitionId, username);
+        if (draft != null)
+            draftRepository.delete(draft);
     }
 }

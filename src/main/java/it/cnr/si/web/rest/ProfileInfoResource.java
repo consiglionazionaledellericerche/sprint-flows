@@ -25,6 +25,7 @@ import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.config.JHipsterProperties;
 import it.cnr.si.domain.Avviso;
 import it.cnr.si.domain.CNRUser;
+import it.cnr.si.model.UserInfoDto;
 import it.cnr.si.repository.AvvisoRepository;
 import it.cnr.si.service.SecurityService;
 import it.cnr.si.service.UserService;
@@ -77,11 +78,19 @@ public class ProfileInfoResource {
     @Timed
     public ResponseEntity<Optional<CNRUser>> getAccount() {
         
-        
         return ResponseEntity.ok(securityService.getUser());
         
     }
 
+    @RequestMapping(value = "/current-account2",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Timed
+    public ResponseEntity<Optional<UserInfoDto>> getAccount2() {
+        
+        return ResponseEntity.ok(securityService.getUserInfo());
+        
+    }
     
     @GetMapping("/avvisiattivi")
     @Timed

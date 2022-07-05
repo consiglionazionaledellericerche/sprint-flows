@@ -29,6 +29,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
@@ -248,8 +249,11 @@ public class FlowsProcessInstanceService {
         }
         setSearchTerms(searchParams, processQuery);
 
-        List<String> authorities = Utils.getCurrentUserAuthorities();
-
+        List<String> authorities = securityService.getUser().get().getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+        
         // solo l'admin e se sto facendo una query per "flussi avviati da me" IGNORO LE REGOLE DI VISIBILITÀ
         if (!authorities.contains("ADMIN") || searchParams.containsKey(Utils.INITIATOR) ) {
             processQuery.setVisibleToGroups(authorities);

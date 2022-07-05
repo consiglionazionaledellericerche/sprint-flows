@@ -212,12 +212,17 @@ public class FlowsTaskService {
 
 	public DataResponse getAvailableTask(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
 		String username = securityService.getCurrentUserLogin();
-		List<String> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-				.map(GrantedAuthority::getAuthority)
-				.map(Utils::removeLeadingRole)
-				.map(Utils::removeImportoSpesa)
-				.collect(Collectors.toList());
+//		List<String> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+//				.map(GrantedAuthority::getAuthority)
+//				.map(Utils::removeLeadingRole)
+//				.map(Utils::removeImportoSpesa)
+//				.collect(Collectors.toList());
 
+		List<String> authorities = securityService.getUser().get().getAuthorities()
+		        .stream()
+		        .map(GrantedAuthority::getAuthority)
+		        .collect(Collectors.toList());
+		
 		TaskQuery taskQuery = taskService.createTaskQuery()
 				.taskCandidateUser(username)
 				.taskCandidateGroupIn(authorities)
@@ -247,10 +252,10 @@ public class FlowsTaskService {
 
 		int removed = 0;
 
-		List<String> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-				.map(GrantedAuthority::getAuthority)
-				.map(Utils::removeLeadingRole)
-				.collect(Collectors.toList());
+        List<String> authorities = securityService.getUser().get().getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
 
 		Iterator<Task> i = list.iterator();
 		while (i.hasNext()) {
