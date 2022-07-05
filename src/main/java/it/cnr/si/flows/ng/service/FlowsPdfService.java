@@ -694,7 +694,7 @@ public class FlowsPdfService {
 		for (Map.Entry<String, VariableInstance> entry : tutteVariabiliMap.entrySet()) {
 			String key = entry.getKey();
 			if (key == null) {
-			    LOGGER.error("Il flusso non puo' avere stampe, le variabili sono sbagliate: {} {}", processInstanceId, listaVariabiliHtml);
+			    LOGGER.error("Il flusso non puo' avere stampe, le variabili sono sbagliate: {} {} {}", processInstanceId, listaVariabiliHtml, tutteVariabiliMap);
 			    continue; // cerco di ovviare al bug di chiave nulla mtrycz 5/7/22
 			}
 			VariableInstance value = entry.getValue();
