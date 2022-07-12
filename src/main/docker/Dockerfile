@@ -13,6 +13,6 @@ ADD ./target/app.war /opt/app.war
 
 EXPOSE 8080
 WORKDIR /opt/
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom", "-jar","/opt/app.war" ]
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom", "-Dmaven.wagon.http.ssl.insecure=true", "-Dmaven.wagon.http.ssl.allowall=true", "-jar","/opt/app.war" ]
 
 

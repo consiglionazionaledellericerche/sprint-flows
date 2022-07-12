@@ -16,4 +16,4 @@ EXPOSE 8899
 WORKDIR /opt/
 
 # https://spring.io/guides/gs/spring-boot-docker/#_containerize_it
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8899", "-Dmaven.wagon.http.ssl.insecure=true", "-Dmaven.wagon.http.ssl.allowall=true"-jar","/opt/app.war"]
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8899", "-Dmaven.wagon.http.ssl.insecure=true", "-Dmaven.wagon.http.ssl.allowall=true", "-jar","/opt/app.war"]
