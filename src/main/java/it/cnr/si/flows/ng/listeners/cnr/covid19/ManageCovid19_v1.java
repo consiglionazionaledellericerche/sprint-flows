@@ -100,7 +100,10 @@ public class ManageCovid19_v1 implements ExecutionListener {
 		break;
 		case "firma-start": {
 			
-			String profiloDomanda = execution.getVariable("profiloDomanda").toString();
+			String profiloDomanda = "indefinito";
+			if (execution.getVariable("profiloDomanda") != null) {
+				profiloDomanda = execution.getVariable("profiloDomanda").toString();
+			}
 			if (!profiloDomanda.equals("ricercatore-tecnologo")){
 				LOGGER.info("L'utente {} ha  {} come profilo [{}] ", execution.getVariable("nomeCognomeUtente").toString(),  profiloDomanda);
 				// TODO INSERIRE DOPO SETTEMBRE 
