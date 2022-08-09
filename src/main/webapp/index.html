@@ -45,7 +45,7 @@
      </div>
         
     <div class="row">
-        <div class="img-responsive banner {{app}}-banner" title="Scrivania Digitale CNR"></div>
+        <div class="img-responsive banner {{app}}-banner" title="Scrivania Digitale"></div>
     </div>
     <div class="maincontent" ui-view="content">
         <!-- Angular views -->
@@ -53,7 +53,12 @@
 
     <div class="footer" ng-cloak>
         <hr>
-        <p>copyright ©2015-2020 Consiglio Nazionale delle Ricerche v{{VERSION}}</p>
+        <div ng-show="app == 'cnr'">
+            <p>copyright ©2015-2020 Consiglio Nazionale delle Ricerche v{{VERSION}}</p>
+        </div>
+        <div ng-show="app == 'iss'">
+            <p>copyright ©2015-2022 Istituto Superiore di Sanità v{{VERSION}}</p>
+        </div>
     </div>
 </div>
 

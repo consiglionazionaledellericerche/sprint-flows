@@ -8,8 +8,14 @@
         </button>
         <div ng-show="app == 'cnr'">
             <a class="navbar-brand logo" href="#/" ng-click="vm.collapseNavbar()">
-                <img class="logo-img" src="content/images/logosiss.png"/>
+                <img class="logo-img" src="content/images/logosdcnr.png"/>
                 <span>Scrivania Digitale CNR</span> <!-- <span class="navbar-version">v{{VERSION}}</span> -->
+            </a>
+        </div>
+        <div ng-show="app == 'iss'">
+            <a class="navbar-brand logo" href="#/" ng-click="vm.collapseNavbar()">
+                <img class="logo-img" src="content/images/logosiss.png"/>
+                <span>Scrivania Digitale ISS</span> <!-- <span class="navbar-version">v{{VERSION}}</span> -->
             </a>
         </div>
         <div ng-show="app == 'oiv'">
@@ -47,7 +53,7 @@
                     </span>
                 </a>
                 <ul class="dropdown-menu" uib-dropdown-menu>
-                    <li ng-repeat="wfDef in wfDefsBootable | filter: { name: '!ALL' }">
+                    <li ng-repeat="wfDef in wfDefsBootable | filter: { name: '!ALL' }:true">
                         <a ui-sref="task({processDefinitionId: wfDef.id, taskName: 'start', taskId: undefined})"
                            ng-click="vm.collapseNavbar()">
                             {{wfDef.name}}
@@ -139,12 +145,14 @@
                     </span>
                 </a>
                 <ul class="dropdown-menu" uib-dropdown-menu>
+                    <!--
                     <li ui-sref-active="active" >
                         <a ui-sref="cnrauthority" ng-click="vm.collapseNavbar()">
                             <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
                             <span translate="global.menu.entities.cnrauthority">Cnrauthority</span>
                         </a>
                     </li>
+                    -->
                     <li ui-sref-active="active" >
                         <a ui-sref="form" ng-click="vm.collapseNavbar()">
                             <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
