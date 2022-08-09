@@ -392,9 +392,10 @@ public class FlowsTaskService {
 		if (taskService.createTaskQuery().processInstanceId(instance.getProcessInstanceId()).count() == 0) {
 			statoPI = utils.ellipsis("START", LENGTH_STATO);
 		} else {
+			//Da rivedere con loro
 			String taskName = taskService.createTaskQuery()
 					.processInstanceId(instance.getProcessInstanceId())
-					.singleResult().getName();
+					.list().get(0).getName();
 			statoPI = utils.ellipsis(taskName, LENGTH_STATO);
 		}
 		utils.updateJsonSearchTerms(null, instance.getProcessInstanceId(), statoPI);
