@@ -82,10 +82,6 @@
 			.then(function(response) {
 				//lista delle Process Definition che l'utente può avviare
 				$rootScope.wfDefsBootable = response.data.bootable;
-				$rootScope.wfDefsBootable.push({
-					key: "all",
-					name: "ALL"
-				});
 				//lista di TUTTE le Process Definition
 				$rootScope.wfDefsAll = response.data.all;
 				$localStorage.wfDefsAll = response.data.all;

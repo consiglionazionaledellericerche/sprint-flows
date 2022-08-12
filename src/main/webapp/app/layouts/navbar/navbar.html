@@ -53,7 +53,7 @@
                     </span>
                 </a>
                 <ul class="dropdown-menu" uib-dropdown-menu>
-                    <li ng-repeat="wfDef in wfDefsBootable | filter: { name: '!ALL' }:true">
+                    <li ng-repeat="wfDef in wfDefsBootable">
                         <a ui-sref="task({processDefinitionId: wfDef.id, taskName: 'start', taskId: undefined})"
                            ng-click="vm.collapseNavbar()">
                             {{wfDef.name}}
