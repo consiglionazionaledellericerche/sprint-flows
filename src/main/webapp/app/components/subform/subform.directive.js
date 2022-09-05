@@ -40,7 +40,7 @@
                 min: '@?',
                 max: '@?',
                 autofill: '@?',
-                buttonPosition: '@?'
+                buttonPosition: '@?'				
             },
             link: function ($scope, element, attrs) {
                 $scope.min = $scope.min || 1;
@@ -53,11 +53,15 @@
                 if ( $scope.buttonPosition === undefined) {
                        $scope.buttonPosition='top';
                 }
-//                if ($scope.json !== undefined)
-//                  $scope.ngModel = JSON.parse($scope.json);
-                if ('autofill' in attrs) {
+                
+                if ('autofill'in attrs) {
                     var jsonName = attrs.ngModel.split('.').pop() + "_json";
-                    $scope.ngModel = JSON.parse($scope.$parent.data.entity.variabili[jsonName]);
+					if ('localvariabiletask'in attrs) {
+						$scope.ngModel = JSON.parse($scope.$parent.data.entity.variabili.localTask[jsonName]);
+					}
+					else{
+						$scope.ngModel = JSON.parse($scope.$parent.data.entity.variabili[jsonName]);
+					}					
                 }
 
                 $scope.addRow = function() {

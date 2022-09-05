@@ -40,8 +40,8 @@
                     <span class="hidden-sm">I miei compiti</span>
                 </a>
             </li>
-            <!--nelle Process Definition in wfDefsBootable c'Ã¨ anche "ALL"-->
-            <li ui-sref-active="active" ng-switch-when="true" ng-show="wfDefsBootable.length > 1" uib-dropdown
+            <!--nelle Process Definition in wfDefsBootable non c'è più ALL quindi il numero dei processi deve essere >=1 per visualizzare il menu-->
+            <li ui-sref-active="active" ng-switch-when="true" ng-show="wfDefsBootable.length > 0" uib-dropdown
                 class="dropdown pointer">
                 <a class="dropdown-toggle" uib-dropdown-toggle href="" id="definitions-menu">
                     <span>

@@ -1,7 +1,7 @@
 spring:
   datasource:
     platform: postgres
-    url: jdbc:postgresql://localhost:5432/activiti
+    url: jdbc:postgresql://172.16.1.44:5432/activiti
     username: postgres
     password: admin
     driverClassName: org.postgresql.Driver
@@ -45,6 +45,6 @@ iss:
     mail.host: smtp.iss.it
     mail.protocol: smtp
     mail.port: 25
-    mail.send.error.to: ciro.salvio@iss.it
+    mail.send.error.to: manlio.mammoli@iss.it
     mail.from: no-reply@scrivaniadigitale
 
