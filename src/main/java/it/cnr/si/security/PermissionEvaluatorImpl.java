@@ -77,7 +77,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
      */
     public boolean canVisualizeTask(String taskId, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
         Optional<String> username = Optional.of(securityService.getCurrentUserLogin());
-        List<String> authorities = getAuthorities(username.orElse(""), flowsUserDetailsService).stream()
+        List<String> authorities = getAuthorities(username.orElse("")).stream()
                 .map(Utils::removeImportoSpesa) // Non mi interessa filtrare per importo spesa
                 .collect(Collectors.toList());
 
@@ -117,7 +117,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
             return false;
         String assignee = task.getAssignee();
         List<String> authorities =
-                getAuthorities(username, flowsUserDetailsService);
+                getAuthorities(username);
         
         // l'utente puo' completare il task se e' lui l'assegnatario 
         // oppure se l'importo spesa della sua delega è superiore all'importo del flusso acquisti
@@ -168,7 +168,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
      */
     public boolean canVisualize(String processInstanceId, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
         String userName = securityService.getCurrentUserLogin();
-        List<String> authorities = getAuthorities(userName, flowsUserDetailsService);
+        List<String> authorities = getAuthorities(userName);
 
         HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
                 .includeProcessVariables()
@@ -274,7 +274,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
             try {
                 List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
 
-                List<String> authorities = getAuthorities(username, flowsUserDetailsService);
+                List<String> authorities = getAuthorities(username);
 
                 isInCandidates = isCandidatoDiretto(taskId, authorities) || canCompleteImportoSpesa(taskId, authorities);
 
@@ -334,7 +334,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
         String idStruttura = String.valueOf(instance.getProcessVariables().get(ID_STRUTTURA));
 
         String username = securityService.getCurrentUserLogin();
-        List<String> authorities = getAuthorities(username, flowsUserDetailsService);
+        List<String> authorities = getAuthorities(username);
 
         boolean isResponsabile = authorities.stream()
                 .anyMatch(
@@ -394,10 +394,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
     }
 
 
-    private List<String> getAuthorities(String username, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
-        return flowsUserDetailsService.loadUserByUsername(username).getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .map(Utils::removeLeadingRole)
-                .collect(Collectors.toList());
+    private List<String> getAuthorities(String username) {
+        return securityService.getUser().get().getAuthorities().stream().map(String::valueOf).collect(Collectors.toList());
     }
 }

@@ -29,7 +29,7 @@ package it.cnr.si.flows.ng.config;
 //import java.util.Collection;
 //import java.util.List;
 
-public class OAuthCookieSwithUserFilter /*extends SwitchUserFilter*/ {
+public class OAuthCookieSwithUserFilterDELETE {
 //
 //    private static final String CNR_IMPERSONATE = "cnr_impersonate";
 ////    private String switchUserUrl = SwitchUserSecurityConfiguration.IMPERSONATE_START_URL;

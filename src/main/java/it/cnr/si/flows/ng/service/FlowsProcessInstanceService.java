@@ -257,7 +257,7 @@ public class FlowsProcessInstanceService {
         // solo l'admin e se sto facendo una query per "flussi avviati da me" IGNORO LE REGOLE DI VISIBILITÀ
         if (!authorities.contains("ADMIN") || searchParams.containsKey(Utils.INITIATOR) ) {
             processQuery.setVisibleToGroups(authorities);
-            processQuery.setVisibleToUser(SecurityContextHolder.getContext().getAuthentication().getName());
+            processQuery.setVisibleToUser(securityService.getCurrentUserLogin());
         }
 
         if (!processDefinitionKey.equals(ALL_PROCESS_INSTANCES))
