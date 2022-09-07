@@ -13,6 +13,11 @@ ADD ./target/app.war /opt/app.war
 
 EXPOSE 8080
 WORKDIR /opt/
+
+RUN apk add openssl
+RUN openssl s_client -showcerts -connect missioni.cnr.it:443 </dev/null 2>/dev/null|openssl x509 -outform PEM > missioni.cnr.it.crt
+RUN keytool -import -trustcacerts -keystore $JAVA_HOME/jre/lib/security/cacerts -storepass changeit -noprompt -alias missioni.cnr.it -file /opt/missioni.cnr.it.crt
+
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom", "-jar","/opt/app.war" ]
 
 

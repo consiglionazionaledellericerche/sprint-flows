@@ -171,6 +171,7 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 				restToApplicazioneSiper(execution, Enum.StatoDomandeSmartWorkingEnum.APERTA);
 			};break;  	 
 			case "modifica-end": {
+				startSmartWorkingDomandaSetGroupsAndVisibility.configuraVariabiliStart(execution);
 				LOGGER.info("**** modifica-end");
 			};break;
 
