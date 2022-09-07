@@ -99,6 +99,24 @@ public class ManageProcessFirmaDocumenti_v1 implements ExecutionListener {
 			}
 		};break; 
 
+		   
+
+				case "controfirma-start": {
+					//utils.updateJsonSearchTerms(executionId, processInstanceId, "FIRMA");
+				};break; 
+
+				case "controfirma-end": {
+					// FIRMA MULTIPLA TUTTI I DOCUMENTI DI UN CERTO TIPO
+					if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
+						List<String> nomiVariabiliFile = new ArrayList<String>();
+						List<FlowsAttachment> attachments = flowsAttachmentService.getAttachmentArray(processInstanceId, "documentoDaFirmare");
+						if (attachments.size() == 0)
+							throw new TaskFailedException("Attachment non opzionali mancanti: " + "allegati");               
+						attachments.forEach(att -> nomiVariabiliFile.add(att.getName()));
+						firmaDocumentoService.eseguiFirmaMultipla(execution, nomiVariabiliFile, null);
+					}
+				};break; 
+
 		case "modifica-end": {
 			//Check se il gruppo VALIDATORI ha membri
 			if(sceltaUtente != null && !sceltaUtente.equals("Annulla")) {
