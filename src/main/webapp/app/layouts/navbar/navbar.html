@@ -293,49 +293,59 @@
                     </li>
                 </ul>
             </li>
-            <li ng-class="{active: vm.$state.includes('account')}" uib-dropdown class="dropdown pointer">
-                <a class="dropdown-toggle" uib-dropdown-toggle href="" id="account-menu">
-                    <span>
-                        <span class="glyphicon glyphicon-user"></span>
-                        <span class="hidden-sm" translate="global.menu.account.main">
-                            Account
-                        </span>
-                        <b class="caret"></b>
-                    </span>
+<!--             <li ng-class="{active: vm.$state.includes('account')}" uib-dropdown class="dropdown pointer"> -->
+<!--                 <a class="dropdown-toggle" uib-dropdown-toggle href="" id="account-menu"> -->
+<!--                     <span> -->
+<!--                         <span class="glyphicon glyphicon-user"></span> -->
+<!--                         <span class="hidden-sm" translate="global.menu.account.main"> -->
+<!--                             Account -->
+<!--                         </span> -->
+<!--                         <b class="caret"></b> -->
+<!--                     </span> -->
+<!--                 </a> -->
+<!--                 <ul class="dropdown-menu" uib-dropdown-menu> -->
+<!--                     <li ui-sref-active="active" ng-if="app == 'oiv'" ng-switch-when="true"> -->
+<!--                         <a ui-sref="settings" ng-click="vm.collapseNavbar()"> -->
+<!--                             <span class="glyphicon glyphicon-wrench"></span>&nbsp; -->
+<!--                             <span translate="global.menu.account.settings">Settings</span> -->
+<!--                         </a> -->
+<!--                     </li> -->
+<!--                     <li ui-sref-active="active" ng-if="(app == 'oiv')||(app == 'cnr')"> -->
+<!--                         <a ui-sref="password" ng-click="vm.collapseNavbar()"> -->
+<!--                             <span class="glyphicon glyphicon-lock"></span>&nbsp; -->
+<!--                             <span translate="global.menu.account.password">Password</span> -->
+<!--                         </a> -->
+<!--                     </li> -->
+<!--                     <li ui-sref-active="active" ng-switch-when="true"> -->
+<!--                         <a href="" ng-click="vm.logout()" id="logout"> -->
+<!--                             <span class="glyphicon glyphicon-log-out"></span>&nbsp; -->
+<!--                             <span translate="global.menu.account.logout">Sign out</span> -->
+<!--                         </a> -->
+<!--                     </li> -->
+<!--                     <li ui-sref-active="active" ng-switch-when="false"> -->
+<!--                         <a href="" ng-click="vm.login()" id="login"> -->
+<!--                             <span class="glyphicon glyphicon-log-in"></span>&nbsp; -->
+<!--                             <span translate="global.menu.account.login">Sign in</span> -->
+<!--                         </a> -->
+<!--                     </li> -->
+<!--                 </ul> -->
+<!--             </li> -->
+<!--             <li ng-switch-when="true" has-authority="ROLE_PREVIOUS_ADMINISTRATOR"> -->
+<!--                 <a ui-sref="availableTasks" ng-click="vm.cancelSwitchUser()"> -->
+<!--                     <span class="label label-warning" > -->
+<!--                         <span class="glyphicon glyphicon-user"></span> -->
+<!--                         Impersonating: {{vm.account.login}} -->
+<!--                     </span> -->
+<!--                 </a> -->
+<!--             </li> -->
+            <li>
+                <a href="#" id="menu-apps">
+                    <span class="glyphicon glyphicon-th"></span>
                 </a>
-                <ul class="dropdown-menu" uib-dropdown-menu>
-                    <li ui-sref-active="active" ng-if="app == 'oiv'" ng-switch-when="true">
-                        <a ui-sref="settings" ng-click="vm.collapseNavbar()">
-                            <span class="glyphicon glyphicon-wrench"></span>&nbsp;
-                            <span translate="global.menu.account.settings">Settings</span>
-                        </a>
-                    </li>
-                    <!--<li ui-sref-active="active" ng-if="(app == 'oiv')||(app == 'cnr')">-->
-                        <!--<a ui-sref="password" ng-click="vm.collapseNavbar()">-->
-                            <!--<span class="glyphicon glyphicon-lock"></span>&nbsp;-->
-                            <!--<span translate="global.menu.account.password">Password</span>-->
-                        <!--</a>-->
-                    <!--</li>-->
-                    <li ui-sref-active="active" ng-switch-when="true">
-                        <a href="" ng-click="vm.logout()" id="logout">
-                            <span class="glyphicon glyphicon-log-out"></span>&nbsp;
-                            <span translate="global.menu.account.logout">Sign out</span>
-                        </a>
-                    </li>
-                    <li ui-sref-active="active" ng-switch-when="false">
-                        <a href="" ng-click="vm.login()" id="login">
-                            <span class="glyphicon glyphicon-log-in"></span>&nbsp;
-                            <span translate="global.menu.account.login">Sign in</span>
-                        </a>
-                    </li>
-                </ul>
             </li>
-            <li ng-switch-when="true" has-authority="ROLE_PREVIOUS_ADMINISTRATOR">
-                <a ui-sref="availableTasks" ng-click="vm.cancelSwitchUser()">
-                    <span class="label label-warning" >
-                        <span class="glyphicon glyphicon-user"></span>
-                        Impersonating: {{vm.account.login}}
-                    </span>
+            <li>    
+                <a href="#" id="menu-user">
+                    <span class="glyphicon glyphicon-user"></span>
                 </a>
             </li>
         </ul>

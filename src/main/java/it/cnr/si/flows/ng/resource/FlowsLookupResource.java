@@ -1,13 +1,12 @@
 package it.cnr.si.flows.ng.resource;
 
-import it.cnr.si.flows.ng.ldap.LdapPersonToSearchResultMapper;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.FlowsSiperService;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.AceService;
-import it.cnr.si.service.FlowsLdapAccountService;
+import it.cnr.si.service.SecurityService;
 import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
@@ -19,9 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ldap.core.LdapTemplate;
-import org.springframework.ldap.query.ContainerCriteria;
-import org.springframework.ldap.query.LdapQueryBuilder;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,21 +42,22 @@ public class FlowsLookupResource {
 
     private final Logger log = LoggerFactory.getLogger(FlowsLookupResource.class);
 
-    @Inject
-    private LdapTemplate ldapTemplate;
+
     @Inject
     private AceBridgeService aceBridgeService;
-    @Inject
-    private FlowsLdapAccountService flowsLdapAccountService;
     @Inject
     private FlowsSiperService flowsSiperService;
     @Inject
     private AceService aceService;
+    @Inject
+    private SecurityService securityService;
+    @Inject
+    private SecurityUtils securityUtils;
 
     @RequestMapping(value = "/ace/boss", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Utils.SearchResult> getBossForCurrentUser() {
-        String username = SecurityUtils.getCurrentUserLogin();
+        String username = securityService.getCurrentUserLogin();
         BossDto boss = getResponsabileStruttura(username);
         String fullname = boss.getUtente().getPersona().getNome() +" "+ boss.getUtente().getPersona().getCognome();
         return ResponseEntity.ok(new Utils.SearchResult(fullname, fullname));
@@ -120,7 +117,7 @@ public class FlowsLookupResource {
     @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<List<Utils.SearchResult>> getCdsUoAbilitate() {
 
-        List<Utils.SearchResult> CDSUOs = SecurityUtils.getCurrentUserAuthorities().stream()
+        List<Utils.SearchResult> CDSUOs = securityUtils.getCurrentUserAuthorities().stream()
                 .map(Utils::removeLeadingRole)
                 .filter(role -> role.startsWith("staffAmministrativo"))
                 .map(role -> role.split("@")[1])
@@ -140,7 +137,7 @@ public class FlowsLookupResource {
     @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<List<Utils.SearchResult>> getSediUtenteFirma() {
 
-        List<Utils.SearchResult> CDSUOs = SecurityUtils.getCurrentUserAuthorities().stream()
+        List<Utils.SearchResult> CDSUOs = securityUtils.getCurrentUserAuthorities().stream()
                 .map(Utils::removeLeadingRole)
                 .filter(role -> role.startsWith("staffFirmaDocumenti"))
                 .map(role -> role.split("@")[1])
@@ -167,20 +164,20 @@ public class FlowsLookupResource {
     @RequestMapping(value = "/ldap/user/{username:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Utils.SearchResult> getUserByUsername(@PathVariable String username) {
+//
+//        ContainerCriteria criteria = LdapQueryBuilder.query().where("uid").is(username);
+//        List<Utils.SearchResult> result = ldapTemplate.search( criteria, new LdapPersonToSearchResultMapper());
 
-        ContainerCriteria criteria = LdapQueryBuilder.query().where("uid").is(username);
-        List<Utils.SearchResult> result = ldapTemplate.search( criteria, new LdapPersonToSearchResultMapper());
-
-        return ResponseEntity.ok(result.get(0));
+        return ResponseEntity.ok(null);
     }
 
     @RequestMapping(value = "/ldap/userfull/{username:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.ADMIN)
     public ResponseEntity<Map<String, String>> getFullUserByUsername(@PathVariable String username) {
 
-        List<Map<String, String>> result = flowsLdapAccountService.getFulluser(username);
+//        List<Map<String, String>> result = flowsLdapAccountService.getFulluser(username);
 
-        return ResponseEntity.ok(result.get(0));
+        return ResponseEntity.ok(null);
     }
 
     @RequestMapping(value = "/siper/responsabilesede/{cdsuo:.+}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

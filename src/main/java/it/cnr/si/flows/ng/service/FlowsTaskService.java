@@ -15,6 +15,8 @@ import it.cnr.si.security.PermissionEvaluatorImpl;
 import it.cnr.si.service.DraftService;
 import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.RelationshipService;
+import it.cnr.si.service.SecurityService;
+
 import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricProcessInstance;
@@ -105,7 +107,10 @@ public class FlowsTaskService {
 	private ManagementService managementService;
 	@Inject
 	private FlowsProcessInstanceService flowsProcessInstanceService;
-
+    @Inject
+    private SecurityService securityService;
+	@Inject
+	private SecurityUtils securityUtils;
 
 
 
@@ -206,13 +211,18 @@ public class FlowsTaskService {
 	}
 
 	public DataResponse getAvailableTask(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
-		String username = SecurityUtils.getCurrentUserLogin();
-		List<String> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-				.map(GrantedAuthority::getAuthority)
-				.map(Utils::removeLeadingRole)
-				.map(Utils::removeImportoSpesa)
-				.collect(Collectors.toList());
+		String username = securityService.getCurrentUserLogin();
+//		List<String> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+//				.map(GrantedAuthority::getAuthority)
+//				.map(Utils::removeLeadingRole)
+//				.map(Utils::removeImportoSpesa)
+//				.collect(Collectors.toList());
 
+		List<String> authorities = securityService.getUser().get().getAuthorities()
+		        .stream()
+		        .map(GrantedAuthority::getAuthority)
+		        .collect(Collectors.toList());
+		
 		TaskQuery taskQuery = taskService.createTaskQuery()
 				.taskCandidateUser(username)
 				.taskCandidateGroupIn(authorities)
@@ -242,10 +252,10 @@ public class FlowsTaskService {
 
 		int removed = 0;
 
-		List<String> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-				.map(GrantedAuthority::getAuthority)
-				.map(Utils::removeLeadingRole)
-				.collect(Collectors.toList());
+        List<String> authorities = securityService.getUser().get().getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
 
 		Iterator<Task> i = list.iterator();
 		while (i.hasNext()) {
@@ -264,8 +274,8 @@ public class FlowsTaskService {
 
 	public DataResponse taskAssignedInMyGroups(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
 
-		String username = SecurityUtils.getCurrentUserLogin();
-		List<String> userAuthorities = SecurityUtils.getCurrentUserAuthorities();
+		String username = securityService.getCurrentUserLogin();
+		List<String> userAuthorities = securityUtils.getCurrentUserAuthorities();
 		Set<String> ruoliUtente = membershipService.getAllRolesForUser(username);
 
 		FlowsHistoricProcessInstanceQuery processQuery = new FlowsHistoricProcessInstanceQuery(managementService);
@@ -335,7 +345,7 @@ public class FlowsTaskService {
 
 	public DataResponse getMyTasks(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
 		TaskQuery taskQuery = (TaskQuery) utils.searchParams(searchParams, taskService.createTaskQuery());
-		taskQuery.taskAssignee(SecurityUtils.getCurrentUserLogin())
+		taskQuery.taskAssignee(securityService.getCurrentUserLogin())
 				.includeProcessVariables();
 
 		if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
@@ -382,7 +392,7 @@ public class FlowsTaskService {
 		data.put("key", key);
 		//L`utenza reale (admin o ROLE_amministratori-supporto-tecnico@0000)
 		// non può avviare il flusso quindi ho bisogno dell`utenza "fittizia"/impersonata
-		data.put(initiator.name(), SecurityUtils.getCurrentUserLogin());
+		data.put(initiator.name(), securityService.getCurrentUserLogin());
 		data.put(startDate.name(), new Date());
 
 		ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
@@ -411,7 +421,7 @@ public class FlowsTaskService {
 		String key = counterId + "-" + counterService.getNext(counterId);
 		data.put("key", key);
 
-		String username = SecurityUtils.getCurrentUserLogin();
+		String username = securityService.getCurrentUserLogin();
 
 		data.put(applicationName, username);
 		data.put(startDate.name(), new Date());
@@ -439,7 +449,9 @@ public class FlowsTaskService {
 
 	public void completeTask(String taskId, Map<String, Object> data) {
 
-		String username = SecurityUtils.getRealUserLogged();
+		// TODO
+		// String username = SecurityUtils.getRealUserLogged();
+		String username = securityService.getCurrentUserLogin();
 
 		// aggiungo l'identityLink che indica l'utente che esegue il task
 		taskService.setVariablesLocal(taskId, data);
@@ -458,7 +470,7 @@ public class FlowsTaskService {
 	}
 
 	public DataResponse getTasksCompletedByMe(JSONArray searchParams, @RequestParam("processDefinition") String processDefinition, @RequestParam("firstResult") int firstResult, @RequestParam("maxResults") int maxResults, @RequestParam("order") String order) {
-		String username = SecurityUtils.getCurrentUserLogin();
+		String username = securityService.getCurrentUserLogin();
 
 		HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery().taskInvolvedUser(username)
 				.includeProcessVariables().includeTaskLocalVariables();

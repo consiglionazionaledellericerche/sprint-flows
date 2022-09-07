@@ -7,7 +7,8 @@ import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
 import it.cnr.si.flows.ng.exception.ReportException;
 import it.cnr.si.flows.ng.service.FlowsFirmaService;
 import it.cnr.si.flows.ng.utils.Utils;
-import it.cnr.si.security.SecurityUtils;
+import it.cnr.si.service.SecurityService;
+
 import org.activiti.engine.delegate.BpmnError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import java.time.Instant;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 import static it.cnr.si.flows.ng.service.FlowsFirmaService.ERRORI_ARUBA;
 
@@ -45,6 +48,9 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsRestExceptionHandler.class);
     private static final String ERROR_MESSAGE = "message";
 
+    @Inject
+    private SecurityService securityService;
+
 
     @ExceptionHandler(NullPointerException.class)
     protected ResponseEntity<Object> HandleNull(RuntimeException ex, WebRequest request) {
@@ -66,7 +72,7 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     protected ResponseEntity<Object> HandleAccessDenied(AccessDeniedException ex, WebRequest request) {
-        String username = SecurityUtils.getCurrentUserLogin();
+        String username = securityService.getCurrentUserLogin();
         String contextPath = request.getContextPath();
         LOGGER.error(username +" ha cercato di accedere a una risorsa "+ contextPath +" ma non ha i permessi necessari", ex);
 
@@ -78,7 +84,7 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(BpmnError.class)
     protected ResponseEntity<Object> HandleUnknownException(BpmnError ex, WebRequest request) {
-        String username = SecurityUtils.getCurrentUserLogin();
+        String username = securityService.getCurrentUserLogin();
         String taskId = request.getParameter("taskId");
         String definitionId = request.getParameter("definitionId");
 
