@@ -49,15 +49,16 @@ public class CustomKeyCloakAuthenticationProvider extends KeycloakAuthentication
             grantedAuthorities.add(new KeycloakRole(role));
         }
 
-        if ("app.scrivaniadigitale".equals(authentication.getName())) {
-            grantedAuthorities.add(new KeycloakRole("ROLE_ADMIN"));
-        }
-        
         Optional<UserInfoDto> userInfo = getUserInfo();
         Optional<CNRUser> cnrUser = getUser(token.getAccount(), userInfo);
         Collection<? extends GrantedAuthority> mappedAuthorities = mapAuthorities(token.getAccount(), grantedAuthorities, userInfo);
         cnrUser.ifPresent(u -> u.setAuthorities(mappedAuthorities));
-        
+        cnrUser.ifPresent(u -> {
+            if ("app.scrivaniadigitale".equals(u.getUsername())) {
+                grantedAuthorities.add(new KeycloakRole("ROLE_ADMIN"));
+            }
+        });
+
         return new FlowsKeycloakAuthenticationToken(token.getAccount(),
                                                     token.isInteractive(),
                                                     mappedAuthorities,
