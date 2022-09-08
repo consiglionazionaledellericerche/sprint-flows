@@ -21,18 +21,19 @@
         function swap(entity) {
             var globalList = entity.variabili = {};
 			var localList=entity.variabili.localTask = {};
-			var listVariabili;
+            
             entity.variables.forEach(function (el) {
-				listVariabili=globalList;
-				if ( el.scope.toLowerCase().localeCompare("local")===0)
-				   globalList=localList;
+
                 if (el.valueUrl){
-                    globalList[el.name] = el.valueUrl				 
+                    globalList[el.name] = el.valueUrl;				 
 				}
                 else {
                     var date = moment(el.value, 'YYYY-MM-DDTHH:mm:ss.SSSZ', true);
                     globalList[el.name] = date.isValid() ? date.toDate() : el.value;
                 }
+				if ( el.scope.toLowerCase().localeCompare("local")===0){
+				   localList[el.name] = globalList[el.name];
+				}
             });
             return entity;
         }

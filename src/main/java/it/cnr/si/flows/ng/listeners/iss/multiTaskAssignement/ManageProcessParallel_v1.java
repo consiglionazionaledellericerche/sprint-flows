@@ -62,16 +62,18 @@ public class ManageProcessParallel_v1 implements ExecutionListener {
 	}
 
 	private List<String> assembleAssigneeList(String jsonList){
-		JSONArray assignees = new JSONArray(jsonList);
 		List<String> assigneeList= new ArrayList<String>();
-		for ( int i = 0; i < assignees.length(); i++) {
-            JSONObject assigne = assignees.getJSONObject(i);
-            try {
-            	assigneeList.add( assigne.getString("assegna"));			            	
-            } catch (JSONException e) {
-                LOGGER.error("Formato Non Valido");			               
-            }
-        }
+		if(jsonList != null) {
+			JSONArray assignees = new JSONArray(jsonList);
+			for ( int i = 0; i < assignees.length(); i++) {
+				JSONObject assigne = assignees.getJSONObject(i);
+				try {
+					assigneeList.add( assigne.getString("assegna"));			            	
+				} catch (JSONException e) {
+					LOGGER.error("Formato Non Valido");			               
+				}
+			}
+		}
 		return assigneeList;
 	}
 }
