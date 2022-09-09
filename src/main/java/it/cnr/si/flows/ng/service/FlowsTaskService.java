@@ -396,13 +396,11 @@ public class FlowsTaskService {
 
 		String statoPI;
 		if (taskService.createTaskQuery().processInstanceId(instance.getProcessInstanceId()).count() == 0) {
-			statoPI = utils.ellipsis("START", LENGTH_STATO);
+			statoPI = Utils.ellipsis("START", LENGTH_STATO);
 		} else {
-			//Da rivedere con loro
-			String taskName = taskService.createTaskQuery()
-					.processInstanceId(instance.getProcessInstanceId())
-					.list().get(0).getName();
-			statoPI = utils.ellipsis(taskName, LENGTH_STATO);
+			// LO Start di un processo prevede un solo TASK attivo che equivale al nome del task
+			String taskName = taskService.createTaskQuery().processInstanceId(instance.getProcessInstanceId()) .list().get(0).getName();
+			statoPI = Utils.ellipsis(taskName, LENGTH_STATO);
 		}
 		utils.updateJsonSearchTerms(null, instance.getProcessInstanceId(), statoPI);
 
@@ -443,7 +441,7 @@ public class FlowsTaskService {
 		return instance;
 	}
 
-	private Map<String, Object> filterProvessVarFromLocal(Map<String, Object> data){
+	private Map<String, Object> filterProcessVarFromLocal(Map<String, Object> data){
 		if ( MapUtils.isNotEmpty(data)) {
 			return   data.entrySet() 
 					.stream() 
@@ -461,7 +459,7 @@ public class FlowsTaskService {
 		taskService.addUserIdentityLink(taskId, username, TASK_EXECUTOR);
 		try {
 			//taskService.complete(taskId, data);
-			taskService.complete(taskId,filterProvessVarFromLocal( data));
+			taskService.complete(taskId,filterProcessVarFromLocal( data));
 
 			draftService.deleteDraftByTaskId(Long.valueOf(taskId));
 		} catch (Exception e) {

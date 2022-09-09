@@ -46,14 +46,24 @@
 						vm.data.history = response.data.history;
 						//aggiungo le variabili del task (servono quando si aggiunge il task al carrello firma)
 						activeTaskVariables = response.data.entity.variabili;
+                        
+						// manage info for parallel task in the same processInstance
+                        vm.activeTasks = [];	
+						var processInstanceStateMultiTask = "";					
 						vm.data.history.forEach(function(el) {
 							//recupero l'ultimo task (quello ancora da eseguire)...
 							if (el.historyTask.endTime === null) {
 								vm.activeTask = el.historyTask;
 								//...e gli metto le variabili
 								vm.activeTask.variabili = activeTaskVariables;
+								
+								// save all activeTasks for use it in a parallel task environment
+                                vm.activeTasks.push(el.historyTask);
+								processInstanceStateMultiTask =processInstanceStateMultiTask + '@' + el.historyTask.name;
 							}
 						})
+                        // manage state of the process -sum of the name of the active tasks-
+						vm.data.entity.processInstanceStateName = processInstanceStateMultiTask; 
 
 						var processDefinition = response.data.entity.processDefinitionId.split(":");
 //						var stato = response.data.history[0].historyTask.name;

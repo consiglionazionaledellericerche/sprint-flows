@@ -31,8 +31,10 @@
                     var date = moment(el.value, 'YYYY-MM-DDTHH:mm:ss.SSSZ', true);
                     globalList[el.name] = date.isValid() ? date.toDate() : el.value;
                 }
-				if ( el.scope.toLowerCase().localeCompare("local")===0){
-				   localList[el.name] = globalList[el.name];
+				if ( el.scope !== null){
+					if ( el.scope.toLowerCase().localeCompare("local")===0){
+				   		localList[el.name] = globalList[el.name];
+					}
 				}
             });
             return entity;

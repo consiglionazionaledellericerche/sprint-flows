@@ -3,20 +3,16 @@ package it.cnr.si.flows.ng.listeners.iss.multiTaskAssignement;
 
 import org.activiti.engine.delegate.DelegateTask;
 import org.activiti.engine.delegate.TaskListener;
-import org.activiti.engine.impl.persistence.entity.VariableInstance;
 import org.activiti.engine.task.IdentityLink;
-import org.activiti.engine.task.IdentityLinkType;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.Collection;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
-
 import javax.naming.directory.InvalidAttributesException;
-
 import org.activiti.engine.delegate.Expression;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -79,11 +75,16 @@ public class ManageParallelTask_v1 implements TaskListener {
 				} catch (InvalidAttributesException iae) {
 					LOGGER.error("Error during process JSON for proposes: structure malformed",iae.getMessage());
 				}
-	
+				
+
+				// create process variable expiryDateProposes for frontEnd use in details
+				Date dd = execution.getDueDate();
+				LocalDateTime myDateObj = Instant.ofEpochMilli(dd.getTime()).atZone(ZoneId.systemDefault()).toLocalDateTime();
+				DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+				execution.setVariable("expiryDateProposes",myDateObj.format(myFormatObj));	
 			}
 			break;
 			case "task-complete": {
-				
 				// OGNI VOLTA CHE COMPLETO UN TASK di inserimento proposte dedicato ad un dipartimento
 				// Recupero la lista full delle proposte, elimino quelle inserite precedentemente dallo stesso dipartimento
 				// Aggiungo quelle lavorate dal task relativo al dipartimento
@@ -123,8 +124,8 @@ public class ManageParallelTask_v1 implements TaskListener {
 		Set<IdentityLink> candidates = execution.getCandidates();
 		String currentTaskCandidate = null; 
 		for(IdentityLink s : candidates){
-			if ( s.getUserId()!=null) {
-            	currentTaskCandidate = s.getUserId(); 
+			if ( s.getGroupId()!=null) {
+            	currentTaskCandidate = s.getGroupId(); 
             	break;
             }
 		}
@@ -138,7 +139,7 @@ public class ManageParallelTask_v1 implements TaskListener {
 
 		if(fullProposes != null) {
 			JSONArray fullProposes_json = new JSONArray(fullProposes);
-			LOGGER.info(" fullProposes: ",fullProposes_json.toString());
+			LOGGER.info(" fullProposes: "+fullProposes_json.toString());
 			// per ogni proposta seleziono solo quella appartenente al dipartimento relativo al task in esame
 			for ( int i = 0; i < fullProposes_json.length(); i++) {
 				try {
@@ -149,7 +150,14 @@ public class ManageParallelTask_v1 implements TaskListener {
 						}						
 					}
 					if(check == _UNMATCH) {
-						if(!element.getString(SCOPE_TASK).equals(currentTaskCandidate)) {
+						String scope = "";
+						try {
+							scope = element.getString(SCOPE_TASK);
+						} catch (JSONException e) {
+							LOGGER.info("scope in proposes not exist in filter for unmatch check, add it");
+						}
+						
+						if(!scope.equals(currentTaskCandidate)) {
 							proposesList.put(element);
 						}												
 					}
