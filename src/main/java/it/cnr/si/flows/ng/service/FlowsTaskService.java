@@ -301,10 +301,13 @@ public class FlowsTaskService {
 		List<HistoricProcessInstance> pil = processQuery.list();
 
 		//per ogni Pi prendo il task attivo e costruisco la response
-		List<Task> result = pil.stream()
-				.map(pi ->  taskService.createTaskQuery().active().processInstanceId(pi.getId())
-						.includeProcessVariables().list().get(0))
-				.collect(Collectors.toList());
+		List<Task> result = new ArrayList<>();
+		for (HistoricProcessInstance pi : pil) {
+		    List<Task> tasks = taskService.createTaskQuery().active().processInstanceId(pi.getId())
+                .includeProcessVariables().list();
+		    if (tasks.size() > 0)
+		        result.add(tasks.get(0));
+		}
 
 		List<TaskResponse> responseList = new ArrayList();
 		List<TaskResponse> taskList = restResponseFactory.createTaskResponseList(result);
