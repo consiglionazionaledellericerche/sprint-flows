@@ -121,7 +121,7 @@
                   'placement': 'right',
                   'login': account.username,
                   'name': account.firstName+" "+account.lastName,
-                  'logoutCallback': (e) => {AuthServerProvider.logout()}
+                  'logoutCallback': function(e) {AuthServerProvider.logout()}
                 });
 			})
 		});
