@@ -1,19 +1,20 @@
 package it.cnr.si.flows.ng.config;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import javax.inject.Inject;
-
+import com.zaxxer.hikari.HikariDataSource;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
+import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.zaxxer.hikari.HikariDataSource;
+import javax.inject.Inject;
+import javax.sql.DataSource;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * Per poter creare un datasource secondario, non posso piu' affidarmi all'autoconfigurazione

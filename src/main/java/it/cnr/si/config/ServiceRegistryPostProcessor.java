@@ -28,7 +28,7 @@ public class ServiceRegistryPostProcessor implements BeanDefinitionRegistryPostP
         gbd.setDependencyCheck(0);
         gbd.setAutowireCandidate(true);
         gbd.setPrimary(false);
-        gbd.setFactoryBeanName("databaseConfiguration");
+        gbd.setFactoryBeanName("flowsDatabaseConfiguration");
         gbd.setFactoryMethodName("liquibase");
         gbd.setInitMethodName(null);
         gbd.setDestroyMethodName("(inferred)");

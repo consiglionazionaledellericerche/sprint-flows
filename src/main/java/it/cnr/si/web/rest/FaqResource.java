@@ -137,7 +137,7 @@ public class FaqResource {
     @Timed
     public ResponseEntity<Faq> getFaq(@PathVariable Long id) {
         log.debug("REST request to get Faq : {}", id);
-        Faq faq = faqRepository.findById(id).get();
+        Faq faq = faqRepository.findOne(id);
         return Optional.ofNullable(faq)
             .map(result -> new ResponseEntity<>(
                 result,
@@ -157,7 +157,7 @@ public class FaqResource {
     @Timed
     public ResponseEntity<Void> deleteFaq(@PathVariable Long id) {
         log.debug("REST request to delete Faq : {}", id);
-        faqRepository.deleteById(id);
+        faqRepository.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("faq", id.toString())).build();
     }
 

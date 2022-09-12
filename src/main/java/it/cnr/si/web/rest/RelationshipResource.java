@@ -111,7 +111,7 @@ public class RelationshipResource {
     @Timed
     public ResponseEntity<Relationship> getRelationship(@PathVariable Long id) {
         log.debug("REST request to get Relationship : {}", id);
-        Relationship relationship = relationshipRepository.findById(id).get();
+        Relationship relationship = relationshipRepository.findOne(id);
         return Optional.ofNullable(relationship)
                 .map(result -> new ResponseEntity<>(
                         result,
@@ -131,7 +131,7 @@ public class RelationshipResource {
     @Timed
     public ResponseEntity<Void> deleteRelationship(@PathVariable Long id) {
         log.debug("REST request to delete Relationship : {}", id);
-        relationshipRepository.deleteById(id);
+        relationshipRepository.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("relationship", id.toString())).build();
     }
 
