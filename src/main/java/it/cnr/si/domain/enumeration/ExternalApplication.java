@@ -1,14 +1,7 @@
 package it.cnr.si.domain.enumeration;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.client.DefaultOAuth2ClientContext;
-import org.springframework.security.oauth2.client.OAuth2RestTemplate;
-import org.springframework.security.oauth2.client.token.grant.password.ResourceOwnerPasswordResourceDetails;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * The ExternalApplication enumeration.

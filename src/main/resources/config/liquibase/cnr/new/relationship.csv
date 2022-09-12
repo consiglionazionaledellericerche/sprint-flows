@@ -9,8 +9,6 @@ ID;GROUP_NAME;GROUP_RELATIONSHIP;GROUP_ROLE
 19;direttoreGeneraleFF@STRUTTURA;responsabileFirmaAcquisti@STRUTTURA;member
 20;dirigente@STRUTTURA;responsabileFirmaAcquisti@STRUTTURA;member
 21;dirigenteAI@STRUTTURA;responsabileFirmaAcquisti@STRUTTURA;member
-30;delegato@34409;responsabileAccordiInternazionali@0000;member
-31;responsabile-struttura@34403;responsabileAccordiInternazionali@0000;member
 33;USER;abilitati#covid19@STRUTTURA;member
 34;staffFirmaDocumenti@STRUTTURA;abilitati#firma-documenti@STRUTTURA;member
 40;direttore@STRUTTURA;responsabile-struttura@STRUTTURA;member

@@ -14,6 +14,8 @@ import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.PermissionEvaluatorImpl;
 import it.cnr.si.service.DraftService;
 import it.cnr.si.service.RelationshipService;
+import it.cnr.si.service.SecurityService;
+
 import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
@@ -81,7 +83,12 @@ public class FlowsTaskResource {
     private UserDetailsService flowsUserDetailsService;
     @Inject
     private DraftService draftService;
+    @Inject
+    private SecurityService securityService;
+    @Inject
+    private SecurityUtils securityUtils;
 
+    
     @PostMapping(value = "/mytasks", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     @Timed
@@ -168,7 +175,7 @@ public class FlowsTaskResource {
     @Timed
     public ResponseEntity<Map<String, Object>> claimTask(@PathVariable("taskId") String taskId) {
 
-        String username = SecurityUtils.getCurrentUserLogin();
+        String username = securityService.getCurrentUserLogin();
         try {
             taskService.claim(taskId, username);
         } catch(ActivitiObjectNotFoundException notFoundException){
@@ -286,7 +293,7 @@ public class FlowsTaskResource {
         if (isEmpty(taskId)) {
             ProcessInstance instance = flowsTaskService.startProcessInstance(definitionId, data);
 
-            draftService.deleteDraftByProcessInstanceIdAndUsername(definitionId.split(":")[0], SecurityUtils.getCurrentUserLogin());
+            draftService.deleteDraftByProcessInstanceIdAndUsername(definitionId.split(":")[0], securityService.getCurrentUserLogin());
 
             return ResponseEntity.ok(restResponseFactory.createProcessInstanceResponse(instance));
         } else {
@@ -335,7 +342,7 @@ public class FlowsTaskResource {
     @Timed
     public ResponseEntity<Map<String, Long>> getCoolAvailableTasks() {
 
-        String username = SecurityUtils.getCurrentUserLogin();
+        String username = securityService.getCurrentUserLogin();
         Map<String, Long> result = new HashMap<String, Long>() {{
             put("acquisti", 0L);
             put("flussoApprovvigionamentiIT", 0L);
@@ -350,7 +357,7 @@ public class FlowsTaskResource {
         long sprintTasks = taskService.createTaskQuery()
                 .taskAssignee(username)
                 .or()
-                .taskCandidateGroupIn(SecurityUtils.getCurrentUserAuthorities())
+                .taskCandidateGroupIn(securityUtils.getCurrentUserAuthorities())
                 .count();
         result.put("acquisti", sprintTasks);
 
