@@ -80,7 +80,7 @@ public class DraftService {
      * @return the draft
      */
     public Draft findOne(Long id) {
-        return  draftRepository.findById(id).get();
+        return  draftRepository.findOne(id);
     }
 
     /**
@@ -89,7 +89,7 @@ public class DraftService {
      * @param id the id
      */
     public void delete(Long id) {
-        draftRepository.deleteById(id);
+        draftRepository.delete(id);
     }
 
 
@@ -101,7 +101,7 @@ public class DraftService {
     public void deleteDraftByTaskId(Long taskId) {
         Draft draft = draftRepository.getDraftByTaskId(taskId);
         if(draft != null)
-            draftRepository.deleteById(draft.getId());
+            draftRepository.delete(draft.getId());
     }
 
 
@@ -113,7 +113,7 @@ public class DraftService {
      */
     public void deleteDraftByProcessInstanceIdAndUsername(String processDefinitionId, String username) {
         Draft draft = draftRepository.getDraftByProcessInstanceIdAndUsername(processDefinitionId, username);
-        if (draft != null)
-            draftRepository.delete(draft);
+        if(draft != null)
+            draftRepository.delete(draft.getId());
     }
 }

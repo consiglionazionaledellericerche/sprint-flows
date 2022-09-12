@@ -1,12 +1,11 @@
 package it.cnr.si.flows.ng.resource;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import com.codahale.metrics.annotation.Timed;
 
-import javax.inject.Inject;
+import it.cnr.si.flows.ng.utils.SecurityUtils;
+import it.cnr.si.flows.ng.utils.Utils;
+import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.service.MembershipService;
 
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.repository.DeploymentBuilder;
@@ -19,18 +18,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.codahale.metrics.annotation.Timed;
-
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.service.SecurityService;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/processDefinitions")
@@ -39,7 +33,8 @@ public class FlowsProcessDefinitionResource {
     @Inject
     private RepositoryService repositoryService;
     @Inject
-    private SecurityService securityService;
+    private MembershipService membershipService;
+
 
     @Autowired
     private RestResponseFactory restResponseFactory;
@@ -123,13 +118,20 @@ public class FlowsProcessDefinitionResource {
 
     public boolean canStartProcesByDefinitionKey(String definitionKey) {
     	
-        if (definitionKey.equals("covid19"))
-            return true;
-        
-        return securityService.getUser().get().getAuthorities()
+        return membershipService.getAllRolesForUser(SecurityUtils.getCurrentUserLogin())
                 .stream()
-                .map(GrantedAuthority::getAuthority)
+                .map(Utils::removeLeadingRole)
                 .anyMatch(a -> a.startsWith("abilitati#" + definitionKey + "@") );
+    }
+
+
+    private List<ProcessDefinition> canStartProcesByDefinitionList(List<ProcessDefinition> processDefinitions) {
+        List<ProcessDefinition> response = new ArrayList<>();
+        for (ProcessDefinition processDefinition : processDefinitions) {
+            if (canStartProcesByDefinitionKey(processDefinition.getKey()))
+                response.add(processDefinition);
+        }
+        return response;
     }
     
 }
