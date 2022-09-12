@@ -6,9 +6,9 @@
         .factory('authExpiredInterceptor', authExpiredInterceptor);
 
     
-    authExpiredInterceptor.$inject = ['$rootScope', '$q', '$injector', '$localStorage', '$sessionStorage', '$cookies', '$location'];
+    authExpiredInterceptor.$inject = ['$rootScope', '$q', '$injector', '$localStorage', '$sessionStorage'];
 
-    function authExpiredInterceptor($rootScope, $q, $injector, $localStorage, $sessionStorage, $cookies, $location) {
+    function authExpiredInterceptor($rootScope, $q, $injector, $localStorage, $sessionStorage) {
         var service = {
             responseError: responseError
         };
@@ -19,13 +19,11 @@
             if (response.status === 401) {
                 delete $localStorage.authenticationToken;
                 delete $sessionStorage.authenticationToken;
-//                var Principal = $injector.get('Principal');
-//                if (Principal.isAuthenticated()) {
-//                    var Auth = $injector.get('Auth');
-//                    Auth.authorize(true);
-//                }
-                 $cookies['KC_REDIRECT'] = '/#' + $location.url();
-                 location.href = '/sso/login';            
+                var Principal = $injector.get('Principal');
+                if (Principal.isAuthenticated()) {
+                    var Auth = $injector.get('Auth');
+                    Auth.authorize(true);
+                }
             }
             return $q.reject(response);
         }
