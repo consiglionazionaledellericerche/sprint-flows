@@ -160,7 +160,7 @@ public class RelationshipResourceIntTest {
         // Get all the relationships
         restRelationshipMockMvc.perform(get("/api/relationships?sort=id,desc"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(relationship.getId().intValue())))
                 .andExpect(jsonPath("$.[*].groupName").value(hasItem(DEFAULT_GROUP_NAME.toString())))
                 .andExpect(jsonPath("$.[*].groupRelationship").value(hasItem(DEFAULT_GROUP_RELATIONSHIP.toString())))
@@ -176,7 +176,7 @@ public class RelationshipResourceIntTest {
         // Get the relationship
         restRelationshipMockMvc.perform(get("/api/relationships/{id}", relationship.getId()))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.id").value(relationship.getId().intValue()))
                 .andExpect(jsonPath("$.groupName").value(DEFAULT_GROUP_NAME.toString()))
                 .andExpect(jsonPath("$.groupRelationship").value(DEFAULT_GROUP_RELATIONSHIP.toString()))
@@ -199,7 +199,7 @@ public class RelationshipResourceIntTest {
         int databaseSizeBeforeUpdate = relationshipRepository.findAll().size();
 
         // Update the relationship
-        Relationship updatedRelationship = relationshipRepository.findOne(relationship.getId());
+        Relationship updatedRelationship = relationshipRepository.findById(relationship.getId()).get();
         updatedRelationship
                 .groupName(UPDATED_GROUP_NAME)
                 .groupRelationship(UPDATED_GROUP_RELATIONSHIP)

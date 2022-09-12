@@ -6,7 +6,6 @@ import org.activiti.engine.impl.util.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.http.*;
@@ -150,8 +149,7 @@ public class CalcolaPunteggioFascia {
     }
 
     private String calcolaFascia(String id) {
-        final RelaxedPropertyResolver relaxedPropertyResolver = new RelaxedPropertyResolver(env, "oiv.");
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(relaxedPropertyResolver.getProperty("ricalcola-fascia"))
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(env.getProperty("oiv.ricalcola-fascia"))
                 .queryParam("applicationId", id);
         return Optional.ofNullable(oivRestTemplate.getForEntity(builder.buildAndExpand().toUri(), Map.class))
                 .filter(mapResponseEntity -> mapResponseEntity.getStatusCode() == HttpStatus.OK)
@@ -162,7 +160,6 @@ public class CalcolaPunteggioFascia {
     }
 
     private void comunicaEsperienzaNonCoerente(String id, String motivazione) {
-        final RelaxedPropertyResolver relaxedPropertyResolver = new RelaxedPropertyResolver(env, "oiv.");
         MultiValueMap<String, Object> params = new LinkedMultiValueMap<String, Object>();
         params.add("cmis:objectId", id);
         params.add("jconon_attachment:esperienza_non_coerente_motivazione", motivazione);
@@ -171,7 +168,7 @@ public class CalcolaPunteggioFascia {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<MultiValueMap<String, Object>>(params, headers);
-        oivRestTemplate.exchange(relaxedPropertyResolver.getProperty("esperienza-noncoerente"), HttpMethod.POST, entity, String.class);
+        oivRestTemplate.exchange(env.getProperty("oiv.esperienza-noncoerente"), HttpMethod.POST, entity, String.class);
     }
 
     public void settaNoAllOggettoSoccrso(DelegateExecution execution) throws IOException, ParseException {
