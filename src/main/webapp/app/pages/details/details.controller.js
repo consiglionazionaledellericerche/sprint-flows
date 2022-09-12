@@ -59,7 +59,10 @@
 								
 								// save all activeTasks for use it in a parallel task environment
                                 vm.activeTasks.push(el.historyTask);
-								processInstanceStateMultiTask =processInstanceStateMultiTask + '@' + el.historyTask.name;
+
+								if(!processInstanceStateMultiTask.includes(el.historyTask.name)){
+								  processInstanceStateMultiTask = processInstanceStateMultiTask + '@' + el.historyTask.name;
+								}
 							}
 						})
                         // manage state of the process -sum of the name of the active tasks-
