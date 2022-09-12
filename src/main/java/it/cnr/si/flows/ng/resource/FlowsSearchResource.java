@@ -53,7 +53,7 @@ public class FlowsSearchResource {
 	 * @param params the params
 	 * @return le response entity frutto della ricerca
 	 */
-	@PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@Secured(AuthoritiesConstants.USER)
 	@Timed
 	public ResponseEntity<DataResponse> search(@RequestBody Map<String, String> params) {
@@ -85,7 +85,7 @@ public class FlowsSearchResource {
 	 * @param params               i "parametri della ricerca
 	 * @throws IOException the io exception
 	 */
-	@PostMapping(value = "/exportCsv/{processDefinitionKey}", headers = "Accept=application/vnd.ms-excel", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = "application/vnd.ms-excel")
+	@PostMapping(value = "/exportCsv/{processDefinitionKey}", headers = "Accept=application/vnd.ms-excel", consumes = MediaType.APPLICATION_JSON_VALUE, produces = "application/vnd.ms-excel")
 	@Secured(AuthoritiesConstants.USER)
 	@Timed
 	public void exportCsv(
@@ -110,7 +110,7 @@ public class FlowsSearchResource {
 				res.getWriter(), processDefinitionKey);
 	}
 
-	@PostMapping(value = "/exportCsvAndSaveInProcess/{processDefinitionKey}/{processInstanceId}", headers = "Accept=application/vnd.ms-excel", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = "application/vnd.ms-excel")
+	@PostMapping(value = "/exportCsvAndSaveInProcess/{processDefinitionKey}/{processInstanceId}", headers = "Accept=application/vnd.ms-excel", consumes = MediaType.APPLICATION_JSON_VALUE, produces = "application/vnd.ms-excel")
 	@Secured(AuthoritiesConstants.USER)
 	@Timed
 	public void exportCsvAndSaveInProcess(
