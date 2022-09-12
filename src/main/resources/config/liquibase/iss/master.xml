@@ -47,4 +47,8 @@
 
     <include file="classpath:config/liquibase/iss/changelog/20190723085228_added_entity_Faq.xml"
              relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/iss/changelog/20210505081107_added_entity_Blacklist.xml"
+             relativeToChangelogFile="false"/>
+    <include file="classpath:config/liquibase/cnr/changelog/20220402135500_addColumnExternalMessage.xml"
+       		 relativeToChangelogFile="false"/>
 </databaseChangeLog>
