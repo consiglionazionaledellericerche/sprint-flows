@@ -139,6 +139,8 @@ public class FlowsMailService extends MailService {
                 } else {
                     if(mailUtente != null) {
                         sendEmail(mailUtente,
+                                Optional.empty(),
+                                Optional.empty(),
                                 subject,
                                 htmlContent,
                                 false,
@@ -160,7 +162,7 @@ public class FlowsMailService extends MailService {
                                 variables.get("stato"),
                                 StringUtils.abbreviate(htmlContent, 30));
                         LOGGER.trace("Corpo email per intero: {}", htmlContent);
-                        sendEmail(s, subject, htmlContent, false, true);
+                        sendEmail(s, Optional.empty(), Optional.empty(), subject, htmlContent, false, true);
                     });
         } catch (Exception e) {
             LOGGER.error("Errore nell'invio della mail", e);
@@ -279,7 +281,7 @@ public class FlowsMailService extends MailService {
                                 s,
                                 StringUtils.abbreviate(htmlContent, 30));
                         LOGGER.trace("Corpo email per intero: {}", htmlContent);
-                        sendEmail(s, subject, htmlContent, false, true);
+                        sendEmail(s, Optional.empty(), Optional.empty(), subject, htmlContent, false, true);
                     });
             
             if (mailConfig.isMailActivated()) {
@@ -290,6 +292,8 @@ public class FlowsMailService extends MailService {
                 } else {
                     if(mailUtente != null) {
                         sendEmail(mailUtente,
+                                Optional.empty(),
+                                Optional.empty(),
                                 subject,
                                 htmlContent,
                                 false,
