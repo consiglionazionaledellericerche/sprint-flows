@@ -75,13 +75,6 @@ public final class Utils {
         return groupRelationship.replace("@STRUTTURA", struttura);
     }
 
-    public static List<String> getCurrentUserAuthorities() {
-        return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .map(Utils::removeLeadingRole)
-                .collect(Collectors.toList());
-    }
-
     public static String removeLeadingRole(String in) {
         return in.startsWith(ROLE) ? in.substring(5) : in;
     }
@@ -433,7 +426,14 @@ public final class Utils {
         }
     }
     
-    public static String sanitizeHtml(String in) {
-        return Jsoup.clean(in, Whitelist.basic());
+    public static String sanitizeHtml(Object in) {
+        if (in == null) return "";
+        if (!(in instanceof String)) return "";
+        
+        String inVal = (String) in;
+        inVal = inVal.replaceAll("strong>", "b>");
+        inVal = inVal.replaceAll("em>", "i>");
+        
+        return Jsoup.clean(inVal, Whitelist.relaxed());
     }
 }

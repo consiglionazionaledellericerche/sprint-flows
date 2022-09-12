@@ -124,7 +124,7 @@ public class NotificationRuleResource {
     @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<NotificationRule> getNotificationRule(@PathVariable Long id) {
         log.debug("REST request to get NotificationRule : {}", id);
-        NotificationRule notificationRule = notificationRuleRepository.findOne(id);
+        NotificationRule notificationRule = notificationRuleRepository.findById(id).get();
         return Optional.ofNullable(notificationRule)
             .map(result -> new ResponseEntity<>(
                 result,
@@ -145,7 +145,7 @@ public class NotificationRuleResource {
     @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Void> deleteNotificationRule(@PathVariable Long id) {
         log.debug("REST request to delete NotificationRule : {}", id);
-        notificationRuleRepository.delete(id);
+        notificationRuleRepository.deleteById(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("notificationRule", id.toString())).build();
     }
 

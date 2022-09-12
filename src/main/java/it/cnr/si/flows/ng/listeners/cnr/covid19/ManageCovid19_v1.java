@@ -99,6 +99,17 @@ public class ManageCovid19_v1 implements ExecutionListener {
 		}
 		break;
 		case "firma-start": {
+			
+			String profiloDomanda = "indefinito";
+			if (execution.getVariable("profiloDomanda") != null) {
+				profiloDomanda = execution.getVariable("profiloDomanda").toString();
+			}
+			if (!profiloDomanda.equals("ricercatore-tecnologo")){
+				LOGGER.info("L'utente {} ha  {} come profilo [{}] ", execution.getVariable("nomeCognomeUtente").toString(),  profiloDomanda);
+				// TODO INSERIRE DOPO SETTEMBRE 
+				//throw new BpmnError("412", "Livello ["+ execution.getVariable("livelloRichiedente").toString() +"] associato all'utenza: " + execution.getVariable("userNameUtente").toString() + " risulta non valido per l'inserimento del monitoraggio<br>");
+			}
+			
 			// INSERIMENTO VARIABILI FLUSSO
 			execution.setVariable("titolo", "Scheda " + execution.getVariable("tipoAttivita") + " - " + execution.getVariable("initiator"));
 			execution.setVariable("descrizione", "Scheda Attività - " + execution.getVariable("mese") + " " + execution.getVariable("anno"));
@@ -132,24 +143,10 @@ public class ManageCovid19_v1 implements ExecutionListener {
 			valoreParamJson.put("direttore", execution.getVariable("direttore"));
 			valoreParamJson.put("mese", execution.getVariable("mese").toString());
 			valoreParamJson.put("anno", execution.getVariable("anno").toString());
-			valoreParamJson.put("attivita_svolta",
-					Optional.ofNullable(execution.getVariable("attivita"))
-					.filter(String.class::isInstance)
-					.map(String.class::cast)
-					.map(s -> s.replaceAll("strong>", "b>"))
-					.map(s -> s.replaceAll("em>", "i>"))
-					.orElse("")
-					);
+			valoreParamJson.put("attivita_svolta",Utils.sanitizeHtml(execution.getVariable("attivita")));
 			valoreParamJson.put("tipoAttivita", execution.getVariable("tipoAttivita").toString());
 			if (execution.getVariable("tipoAttivita").equals("programmazione")) {
-				valoreParamJson.put("modalita",
-						Optional.ofNullable(execution.getVariable("modalita"))
-						.filter(String.class::isInstance)
-						.map(String.class::cast)
-						.map(s -> s.replaceAll("strong>", "b>"))
-						.map(s -> s.replaceAll("em>", "i>"))
-						.orElse("")
-						);
+				valoreParamJson.put("modalita", Utils.sanitizeHtml(execution.getVariable("modalita")));
 				valoreParamJson.put("dataAvvioSmartWorking", execution.getVariable("dataAvvioSmartWorking"));
 			}
 
@@ -268,6 +265,12 @@ public class ManageCovid19_v1 implements ExecutionListener {
 			break;
 		case "dicembre":
 			meseNumerico = "12";
+			break;
+		case "primo_semestre":
+				meseNumerico = "01";
+				break;
+		case "secondo_semestre":
+			meseNumerico = "07";
 			break;
 		default:
 			meseNumerico = "Invalid month";

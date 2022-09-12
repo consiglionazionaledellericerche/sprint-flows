@@ -8,6 +8,7 @@ import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import it.cnr.si.service.dto.anagrafica.scritture.UtenteDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.BpmnError;
@@ -92,6 +93,48 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 		}
 		LOGGER.info("L'utente {} ha  {} come responsabile-struttura [{}] per la struttura {} ({}} - id:{}", initiator.toString(), direttoreAce.getUsername(), responsabileStruttura.getRuolo().getDescr(), entitaOrganizzativaDirettore.getDenominazione(), entitaOrganizzativaDirettore.getSigla(), IdEntitaOrganizzativaDirettore);
 
+		
+		// PARTE MONITORAGGIO SEMESTRALE
+		// VERIFICA PROFILO RICHIEDENTE
+		String profiloDomanda = "NON_AMMESSO";
+		SimplePersonaWebDto personaProponente = aceService.getPersonaByUsername(initiator);
+		String livelloRichiedente = personaProponente.getLivello();
+		String profiloRichiedente = personaProponente.getProfilo();
+		String nomeProponente =  personaProponente.getNome().toString();
+		String cognomeProponente =  personaProponente.getCognome().toString();
+		//String matricolaRichiedente =  personaProponente.getMatricola().toString();
+		execution.setVariable("livelloRichiedente", livelloRichiedente);
+		execution.setVariable("profiloRichiedente", profiloRichiedente);
+		//execution.setVariable("matricolaRichiedente", matricolaRichiedente);
+		execution.setVariable("nomeCognomeUtente", nomeProponente + " " + cognomeProponente);
+
+		// PROFILO RICHIEDENTE collaboratore
+		if(livelloRichiedente == null) {
+			throw new BpmnError("412", "Livello associato all'utenza: " + initiator + " non riconosciuto <br>Si prega di contattare l'help desk in merito<br>");
+		} else {
+			if(livelloRichiedente.equals("04")
+					|| livelloRichiedente.equals("05")
+					|| livelloRichiedente.equals("06")
+					|| livelloRichiedente.equals("07")
+					|| livelloRichiedente.equals("08")
+					) {profiloDomanda = "collaboratore";}
+			else {
+				// PROFILO RICHIEDENTE ricercatore-tecnologo			
+				if(livelloRichiedente.equals("01")
+						|| livelloRichiedente.equals("02")
+						|| livelloRichiedente.equals("03")
+						) {profiloDomanda = "ricercatore-tecnologo";}
+			}
+
+			// PROFILO DIRIGENTE-DIRETTORE			
+			if(livelloRichiedente.equals("D")) {
+				profiloDomanda = "direttore-responsabile";
+			}
+		}		
+		
+		execution.setVariable("profiloDomanda", profiloDomanda);
+		// FINE MONITORAGGIO 2
+		
 		String gruppoResponsabileProponente = "responsabile-struttura@" + IdEntitaOrganizzativaDirettore;
 
 		String applicazioneScrivaniaDigitale = "app.scrivaniadigitale";
