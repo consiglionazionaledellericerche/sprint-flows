@@ -78,7 +78,7 @@
             function getAccountThen (account) {
                 _identity = account.data;
                 // Il formato delle authorities è un po' diverso in sprint3, lo devo mappare a mano (mtrycz 30/06/22)
-                _identity.authorities = _identity.authorities.map(a => a.authority);
+                _identity.authorities = _identity.authorities.map(function(a) {return a.authority});
                 _authenticated = true;
                 deferred.resolve(_identity);
             }
