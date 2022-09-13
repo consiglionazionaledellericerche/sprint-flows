@@ -58,7 +58,7 @@ public class AvvisoService {
     @Transactional(readOnly = true) 
     public Avviso findOne(Long id) {
         log.debug("Request to get Avviso : {}", id);
-        Avviso avviso = avvisoRepository.findOne(id);
+        Avviso avviso = avvisoRepository.findById(id).get();
         return avviso;
     }
 
@@ -69,6 +69,6 @@ public class AvvisoService {
      */
     public void delete(Long id) {
         log.debug("Request to delete Avviso : {}", id);
-        avvisoRepository.delete(id);
+        avvisoRepository.deleteById(id);
     }
 }

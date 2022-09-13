@@ -22,7 +22,8 @@ import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
 import it.cnr.si.firmadigitale.firma.arss.stub.PdfSignApparence;
 import it.cnr.si.firmadigitale.firma.arss.stub.SignReturnV2;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.utils.SecurityUtils;
+import it.cnr.si.service.SecurityService;
+
 
 
 @Service
@@ -33,11 +34,12 @@ public class FirmaDocumentoService {
 	private FlowsFirmaService flowsFirmaService;
 	@Inject
 	private FlowsAttachmentService flowsAttachmentService;
-
+    @Inject
+    private SecurityService securityService;
 
 	public void eseguiFirma(DelegateExecution execution, String nomeVariabileFile, PdfSignApparence apparence) {
 
-		String currentUser = SecurityUtils.getCurrentUserLogin();
+		String currentUser = securityService.getCurrentUserLogin();
 		LOGGER.info("L'utente {} sta firmando il file {}", currentUser, nomeVariabileFile);
 
 		List<String> nomiVariabiliFile = new ArrayList<String>();
@@ -74,7 +76,7 @@ public class FirmaDocumentoService {
 					att.setAzione(Firma);
 					att.addStato(Firmato);
 					//setto l`username dell`utente che sta eseguendo la firma e la data
-					att.setUsername(SecurityUtils.getCurrentUserLogin());
+					att.setUsername(securityService.getCurrentUserLogin());
 					att.setTime(new Date());
 
 					flowsAttachmentService.saveAttachment(execution, nomeVariabileFile, att, bytesfirmati);
@@ -149,7 +151,7 @@ public class FirmaDocumentoService {
 					att.get(i).setAzione(Firma);
 					att.get(i).addStato(Firmato);
 					//setto l`username dell`utente che sta eseguendo la firma e la data
-					att.get(i).setUsername(SecurityUtils.getCurrentUserLogin());
+					att.get(i).setUsername(securityService.getCurrentUserLogin());
 					att.get(i).setTime(new Date());
 
 					flowsAttachmentService.saveAttachment(execution, nomiVariabiliFile.get(i), att.get(i), bytesMultiplifirmati.get(i).getBinaryoutput());
