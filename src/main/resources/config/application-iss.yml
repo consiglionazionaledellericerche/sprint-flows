@@ -24,8 +24,13 @@ spring:
   port: 8080
   mail:
     url: http://test.iss.it:8080
+    recipients:  
+    activated: true
 
-
+jhipster:
+  mail:
+    from: noreplay@domain.it
+    
 ajp:
   port: 8099
   timeout: 120000
@@ -38,13 +43,18 @@ cnr:
     driver: filesystem
     filesystem:
       directory: /tmp/sprint-flows-showcase
-
-
-iss:
+iss:   
   mail:
-    mail.host: smtp.iss.it
+    mail.host: serverMail
+    mail.user: username
+    mail.password: password
     mail.protocol: smtp
-    mail.port: 25
-    mail.send.error.to: mail.@iss.it
-    mail.from: no-reply@scrivaniadigitale
-
+    mail.port: port
+    mail.send.error.to: error@mail.it
+    mail.from: noreplay@domain.it
+    mail.tls: true
+    mail.encoding: UTF-8
+    mail.test-connection: false
+    mail.smtp.auth: true
+    mail.smtp.starttls.enable: true
+    

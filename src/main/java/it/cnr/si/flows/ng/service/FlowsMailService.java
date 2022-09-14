@@ -2,6 +2,7 @@ package it.cnr.si.flows.ng.service;
 
 import it.cnr.si.domain.Blacklist;
 import it.cnr.si.flows.ng.config.MailConfguration;
+import it.cnr.si.flows.ng.resource.MailConfigurationResource;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.BlacklistService;
@@ -58,8 +59,6 @@ public abstract class FlowsMailService extends MailService {
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowsMailService.class);
     @Inject
     private TemplateEngine templateEngine;
-    @Inject
-    private MailConfguration mailConfig;
     @Inject
     private Environment env;
     @Inject
@@ -118,7 +117,7 @@ public abstract class FlowsMailService extends MailService {
             LOGGER.info("Invio della mail all'utente "+ username +" con indirizzo "+ mailUtente);
 
             String subject = getCustomSubject(variables, key, hasNotificationRule);
-            if (mailConfig.isMailActivated()) {
+            if (mailConfguration.isMailActivated()) {
                 // In produzione mando le email ai veri destinatari
                 String procDefId = variables.get("processDefinitionId").toString().split(":")[0];
                 Blacklist bl = blacklistService.findOneByEmailAndKey(mailUtente, procDefId);
@@ -138,7 +137,7 @@ public abstract class FlowsMailService extends MailService {
             }
 
             // Per le prove mando *tutte* le email agli indirizzi di prova (e non ai veri destinatari)
-            mailConfig.getMailRecipients().stream()
+            mailConfguration.getMailRecipients().stream()
                     .filter(s -> !s.isEmpty())
                     .forEach(s -> {
                         LOGGER.debug("Invio mail a {} con titolo Notifica relativa al flusso {} del tipo {} nello stato {} e con contenuto {}",
@@ -261,7 +260,7 @@ public abstract class FlowsMailService extends MailService {
             String subject = "Notifica relativa ai flussi Smart Working";
             
             // Per le prove mando *tutte* le email agli indirizzi di prova (e non ai veri destinatari)
-            mailConfig.getMailRecipients().stream()
+            mailConfguration.getMailRecipients().stream()
                     .filter(s -> !s.isEmpty())
                     .forEach(s -> {
                         LOGGER.debug("Invio mail di notifica ricorrente relativa ai flussi Smart Working a {} con contenuto {}",
@@ -271,7 +270,7 @@ public abstract class FlowsMailService extends MailService {
                         sendEmail(s, subject, htmlContent, false, true);
                     });
             
-            if (mailConfig.isMailActivated()) {
+            if (mailConfguration.isMailActivated()) {
                 // In produzione mando le email ai veri destinatari
                 Blacklist bl = blacklistService.findOneByEmailAndKey(mailUtente, "smart-working-domanda");
                 if (bl != null) {

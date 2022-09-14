@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-    <head>
+    <head style="background-color:blue">
+    	<h2 th:if="${profile == 'iss'}">Scrivania Digitale Istituto superiore di sanita'</h2> 
         <title>Notifica relativa ad un flusso</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     </head>
@@ -37,6 +38,13 @@
           <p>Accedere alla scrivania digitale utlizzando il seguente il link:<br>
             https://nuovascrivaniadigitale.cnr.it
           <p>Cordiali saluti,<br>CNR - Scrivania Digitale
+        </footer>
+        
+      	<footer th:if="${profile == 'iss'}" style="color: dark-gray; font-size: 0.8em;">
+          <p>Si prega di non rispondere alla presente mail generata automaticamente dal sistema.
+          <p>Accedere alla scrivania digitale utlizzando il seguente il link:<br>
+            https://scrivaniadigitale.iss.it
+          <p>Cordiali saluti,<br>ISS - Scrivania Digitale
         </footer>
     </body>
 </html>
