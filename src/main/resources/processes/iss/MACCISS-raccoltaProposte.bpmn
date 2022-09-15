@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/processdef">
   <process id="MACCISS-raccoltaProposte" name="MACCISS-raccoltaProposte" isExecutable="true">
-    <userTask id="inserisciProposte" name="PROPOSTE" activiti:candidateGroups="${assegna}" activiti:dueDate="PT${giorniScadenza}M">
+    <userTask id="inserisciProposte" name="PROPOSTE" activiti:candidateGroups="${assegna}" activiti:dueDate="P${giorniScadenza}D">
       <extensionElements>
         <activiti:taskListener event="assignment" delegateExpression="${manageParallelTask_v1}">
           <activiti:field name="faseEsecuzione">
@@ -55,11 +55,17 @@
     <sequenceFlow id="sid-2073DD9B-4F6C-45F3-8E6A-049D43A7898E" sourceRef="sid-8390ED1B-DC16-4996-82B1-B5A18C00C407" targetRef="assegnaFondi"></sequenceFlow>
     <sequenceFlow id="sid-301F7F09-9111-4856-A962-77D96615C649" sourceRef="sid-8390ED1B-DC16-4996-82B1-B5A18C00C407" targetRef="inserisciProposte"></sequenceFlow>
     <sequenceFlow id="sid-285D32A6-D186-4E8F-BB29-21A36D140F0A" sourceRef="sid-9E7632D5-51B5-4E1E-B5FA-587AF55080EF" targetRef="creaEnvironment"></sequenceFlow>
+    <boundaryEvent id="sid-773E19AB-D96B-44D7-AA01-EDF49787C445" attachedToRef="inserisciProposte" cancelActivity="true">
+      <timerEventDefinition>
+        <timeDuration>P${giorniScadenza}D</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="sid-E87079A4-79DB-4A33-9F23-749E2E880895" sourceRef="sid-773E19AB-D96B-44D7-AA01-EDF49787C445" targetRef="continuare"></sequenceFlow>
     <textAnnotation id="sid-56B5AC64-C97B-4252-BA1C-3F808B7E260B">
       <text>le proposte potranno essere aggiunte fino alla scadenza del tempo impostato in fase di avvio processo.</text>
     </textAnnotation>
     <textAnnotation id="sid-4BB255EF-1507-49D8-99AA-6E8E82E22CFA">
-      <text>E' possibile allungare il tempo di attesa, chiudere forzatamente il piano attuale per tempo scaduto, oppure approvare quanto inserito fino alla scadenza del tempo impostato</text>
+      <text>E' possibile aumentareil tempo di attesa, chiudere forzatamente il piano attuale per tempo scaduto, oppure approvare quanto inserito fino alla scadenza del tempo impostato</text>
     </textAnnotation>
     <textAnnotation id="sid-BCB1A57C-0534-4DE2-96F2-28B5F24E1FBF">
       <text>Si sceglie il nome del nuovo processo di gestione conto capitale e i giorni di attesa massima per il collezionamento delle proposte di acqusito da parte dei dipartimenti coinvolti</text>
@@ -75,11 +81,15 @@
     </textAnnotation>
     <association id="sid-E391DEF3-FB3D-497F-B3F3-9FE92255E768" sourceRef="sid-66199CCD-E63B-4CB7-879B-A7FBFF184158" targetRef="End" associationDirection="None"></association>
     <association id="sid-20F68161-6015-40C4-9603-A5BA0BD1AA59" sourceRef="sid-7A21DDB5-5147-471A-A71C-F2CD09973391" targetRef="requisitiMinimiNonSoddisfatti" associationDirection="None"></association>
+    <textAnnotation id="sid-1B6FDAAC-3C0F-40A7-9577-A1277C9C85B7">
+      <text>Allo scadere dei giorni prefissati per la raccolta delle proposte, il processo passa alla verifica di quanto fatto fino a quel momento.</text>
+    </textAnnotation>
+    <association id="sid-5A64F03A-FBC2-483E-8500-68523814DD9F" sourceRef="sid-773E19AB-D96B-44D7-AA01-EDF49787C445" targetRef="sid-1B6FDAAC-3C0F-40A7-9577-A1277C9C85B7" associationDirection="None"></association>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_MACCISS-raccoltaProposte">
     <bpmndi:BPMNPlane bpmnElement="MACCISS-raccoltaProposte" id="BPMNPlane_MACCISS-raccoltaProposte">
       <bpmndi:BPMNShape bpmnElement="inserisciProposte" id="BPMNShape_inserisciProposte">
-        <omgdc:Bounds height="94.0" width="280.0" x="300.0" y="100.0"></omgdc:Bounds>
+        <omgdc:Bounds height="94.0" width="280.0" x="305.0" y="100.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="creaEnvironment" id="BPMNShape_creaEnvironment">
         <omgdc:Bounds height="89.0" width="121.0" x="80.0" y="172.5"></omgdc:Bounds>
@@ -103,7 +113,7 @@
         <omgdc:Bounds height="40.0" width="40.0" x="234.75" y="197.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="sid-56B5AC64-C97B-4252-BA1C-3F808B7E260B" id="BPMNShape_sid-56B5AC64-C97B-4252-BA1C-3F808B7E260B">
-        <omgdc:Bounds height="52.0" width="263.0" x="345.0" y="15.0"></omgdc:Bounds>
+        <omgdc:Bounds height="52.0" width="263.0" x="225.0" y="15.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="sid-4BB255EF-1507-49D8-99AA-6E8E82E22CFA" id="BPMNShape_sid-4BB255EF-1507-49D8-99AA-6E8E82E22CFA">
         <omgdc:Bounds height="79.0" width="236.0" x="720.0" y="330.0"></omgdc:Bounds>
@@ -129,6 +139,15 @@
       <bpmndi:BPMNShape bpmnElement="sid-20F68161-6015-40C4-9603-A5BA0BD1AA59" id="BPMNShape_sid-20F68161-6015-40C4-9603-A5BA0BD1AA59">
         <omgdc:Bounds height="26.096592423365664" width="21.9168870878284" x="952.9321814560858" y="52.00732878831717"></omgdc:Bounds>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-773E19AB-D96B-44D7-AA01-EDF49787C445" id="BPMNShape_sid-773E19AB-D96B-44D7-AA01-EDF49787C445">
+        <omgdc:Bounds height="31.0" width="31.0" x="528.0538797475286" y="178.68344534792004"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-1B6FDAAC-3C0F-40A7-9577-A1277C9C85B7" id="BPMNShape_sid-1B6FDAAC-3C0F-40A7-9577-A1277C9C85B7">
+        <omgdc:Bounds height="52.0" width="218.0" x="555.0" y="16.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-5A64F03A-FBC2-483E-8500-68523814DD9F" id="BPMNShape_sid-5A64F03A-FBC2-483E-8500-68523814DD9F">
+        <omgdc:Bounds height="112.09887105618719" width="9.571885786969688" x="545.3695318151534" y="67.17662702137923"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="sid-A0E6C4F5-73FF-4CDC-9371-391A2442F4DD" id="BPMNEdge_sid-A0E6C4F5-73FF-4CDC-9371-391A2442F4DD">
         <omgdi:waypoint x="825.1992704089677" y="137.1992704089676"></omgdi:waypoint>
         <omgdi:waypoint x="904.2833251953125" y="87.76136363636363"></omgdi:waypoint>
@@ -137,8 +156,8 @@
       <bpmndi:BPMNEdge bpmnElement="sid-C15218F7-2AD9-499A-8913-B60A44FF36EB" id="BPMNEdge_sid-C15218F7-2AD9-499A-8913-B60A44FF36EB">
         <omgdi:waypoint x="815.5" y="127.5"></omgdi:waypoint>
         <omgdi:waypoint x="815.5" y="79.0"></omgdi:waypoint>
-        <omgdi:waypoint x="440.0" y="79.0"></omgdi:waypoint>
-        <omgdi:waypoint x="440.0" y="100.0"></omgdi:waypoint>
+        <omgdi:waypoint x="445.0" y="79.0"></omgdi:waypoint>
+        <omgdi:waypoint x="445.0" y="100.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sid-031E1991-B752-4C58-8BAC-111C422B0C75" id="BPMNEdge_sid-031E1991-B752-4C58-8BAC-111C422B0C75">
         <omgdi:waypoint x="834.5" y="147.5"></omgdi:waypoint>
@@ -152,7 +171,7 @@
       <bpmndi:BPMNEdge bpmnElement="sid-301F7F09-9111-4856-A962-77D96615C649" id="BPMNEdge_sid-301F7F09-9111-4856-A962-77D96615C649">
         <omgdi:waypoint x="255.25" y="197.5"></omgdi:waypoint>
         <omgdi:waypoint x="255.25" y="147.0"></omgdi:waypoint>
-        <omgdi:waypoint x="300.0" y="147.0"></omgdi:waypoint>
+        <omgdi:waypoint x="305.0" y="147.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sid-2073DD9B-4F6C-45F3-8E6A-049D43A7898E" id="BPMNEdge_sid-2073DD9B-4F6C-45F3-8E6A-049D43A7898E">
         <omgdi:waypoint x="255.25" y="236.5"></omgdi:waypoint>
@@ -171,13 +190,23 @@
         <omgdi:waypoint x="201.0" y="217.2636165577342"></omgdi:waypoint>
         <omgdi:waypoint x="235.1624726477024" y="217.4124726477024"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-5A64F03A-FBC2-483E-8500-68523814DD9F" id="BPMNEdge_sid-5A64F03A-FBC2-483E-8500-68523814DD9F">
+        <omgdi:waypoint x="545.4151324508184" y="178.7414570441423"></omgdi:waypoint>
+        <omgdi:waypoint x="555.0" y="66.49055315757633"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sid-EA93DA69-40F1-40F7-AEB3-22004C6373E4" id="BPMNEdge_sid-EA93DA69-40F1-40F7-AEB3-22004C6373E4">
         <omgdi:waypoint x="576.0" y="281.0"></omgdi:waypoint>
         <omgdi:waypoint x="929.0" y="281.0"></omgdi:waypoint>
         <omgdi:waypoint x="929.0" y="233.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-E87079A4-79DB-4A33-9F23-749E2E880895" id="BPMNEdge_sid-E87079A4-79DB-4A33-9F23-749E2E880895">
+        <omgdi:waypoint x="544.0538797475286" y="210.68344534792004"></omgdi:waypoint>
+        <omgdi:waypoint x="544.0538797475286" y="223.0"></omgdi:waypoint>
+        <omgdi:waypoint x="690.0" y="223.0"></omgdi:waypoint>
+        <omgdi:waypoint x="690.0" y="188.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sid-B094C33A-5209-4F13-B429-65991E9BE878" id="BPMNEdge_sid-B094C33A-5209-4F13-B429-65991E9BE878">
-        <omgdi:waypoint x="580.0" y="147.0"></omgdi:waypoint>
+        <omgdi:waypoint x="585.0" y="147.0"></omgdi:waypoint>
         <omgdi:waypoint x="616.0" y="147.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sid-E391DEF3-FB3D-497F-B3F3-9FE92255E768" id="BPMNEdge_sid-E391DEF3-FB3D-497F-B3F3-9FE92255E768">
