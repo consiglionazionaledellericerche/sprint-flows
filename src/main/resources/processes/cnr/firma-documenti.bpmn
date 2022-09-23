@@ -29,7 +29,7 @@
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow18" sourceRef="modifica" targetRef="exclusivegateway7"></sequenceFlow>
-    <exclusiveGateway id="exclusivegateway7" name="Exclusive Gateway"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway7" name="Exclusive Gateway" default="flow37"></exclusiveGateway>
     <userTask id="validazione" name="VALIDAZIONE" activiti:candidateGroups="${gruppoValidatori}">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessFirmaDocumenti_v1}">
@@ -205,7 +205,7 @@
         <omgdi:waypoint x="525.0" y="139.0"></omgdi:waypoint>
         <omgdi:waypoint x="550.0" y="139.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="689.0" y="166.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="45.0" x="689.0" y="166.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow34" id="BPMNEdge_flow34">
