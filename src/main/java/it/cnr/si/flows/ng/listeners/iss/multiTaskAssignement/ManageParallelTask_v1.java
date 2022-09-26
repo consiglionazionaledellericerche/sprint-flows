@@ -1,6 +1,7 @@
 package it.cnr.si.flows.ng.listeners.iss.multiTaskAssignement;
 
 
+import it.cnr.si.service.SecurityService;
 import org.activiti.engine.delegate.DelegateTask;
 import org.activiti.engine.delegate.TaskListener;
 import org.activiti.engine.task.IdentityLink;
@@ -12,6 +13,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Set;
+import javax.inject.Inject;
 import javax.naming.directory.InvalidAttributesException;
 import org.activiti.engine.delegate.Expression;
 import org.json.JSONArray;
@@ -38,10 +40,13 @@ public class ManageParallelTask_v1 implements TaskListener {
 
 	private Expression faseEsecuzione;
 
+	@Inject
+	private SecurityService securityService;
+
 	@Override
 	public void notify(DelegateTask execution) {
 		
-		String currentUser = SecurityUtils.getCurrentUserLogin();
+		String currentUser = securityService.getCurrentUserLogin();
 		String processInstanceId =  execution.getProcessInstanceId();
 		String executionId =  execution.getId();
 		String stato =  execution.getName();

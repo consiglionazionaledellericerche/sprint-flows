@@ -16,6 +16,7 @@ import it.cnr.si.service.DraftService;
 import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.RelationshipService;
 import it.cnr.si.service.SecurityService;
+
 import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricProcessInstance;
@@ -34,7 +35,6 @@ import org.activiti.rest.service.api.engine.variable.RestVariable;
 import org.activiti.rest.service.api.history.HistoricProcessInstanceResponse;
 import org.activiti.rest.service.api.history.HistoricTaskInstanceResponse;
 import org.activiti.rest.service.api.runtime.task.TaskResponse;
-import org.apache.commons.collections.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,7 +109,8 @@ public class FlowsTaskService {
 	private FlowsProcessInstanceService flowsProcessInstanceService;
 	@Inject
 	private SecurityService securityService;
-
+	@Inject
+	private SecurityUtils securityUtils;
 
 
 
@@ -174,21 +175,21 @@ public class FlowsTaskService {
 				else {
 					//wildcard ("%") di default ma non a TUTTI i campi
 					switch (type) {
-					case "textEqual":
-						taskQuery.taskVariableValueEquals(key, value);
-						break;
-					case "boolean":
-						// gestione variabili booleane
-						taskQuery.taskVariableValueEquals(key, Boolean.valueOf(value));
-						break;
-					case "date":
-						processDate(taskQuery, key, value);
-						break;
-					default:
-						//variabili con la wildcard  (%value%)
-						if (!value.isEmpty())
-							taskQuery.taskVariableValueLikeIgnoreCase(key, "%" + value + "%");
-						break;
+						case "textEqual":
+							taskQuery.taskVariableValueEquals(key, value);
+							break;
+						case "boolean":
+							// gestione variabili booleane
+							taskQuery.taskVariableValueEquals(key, Boolean.valueOf(value));
+							break;
+						case "date":
+							processDate(taskQuery, key, value);
+							break;
+						default:
+							//variabili con la wildcard  (%value%)
+							if (!value.isEmpty())
+								taskQuery.taskVariableValueLikeIgnoreCase(key, "%" + value + "%");
+							break;
 					}
 				}
 			}
@@ -211,10 +212,15 @@ public class FlowsTaskService {
 
 	public DataResponse getAvailableTask(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
 		String username = securityService.getCurrentUserLogin();
-		List<String> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+//		List<String> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+//				.map(GrantedAuthority::getAuthority)
+//				.map(Utils::removeLeadingRole)
+//				.map(Utils::removeImportoSpesa)
+//				.collect(Collectors.toList());
+
+		List<String> authorities = securityService.getUser().get().getAuthorities()
+				.stream()
 				.map(GrantedAuthority::getAuthority)
-				.map(Utils::removeLeadingRole)
-				.map(Utils::removeImportoSpesa)
 				.collect(Collectors.toList());
 
 		TaskQuery taskQuery = taskService.createTaskQuery()
@@ -246,9 +252,9 @@ public class FlowsTaskService {
 
 		int removed = 0;
 
-		List<String> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+		List<String> authorities = securityService.getUser().get().getAuthorities()
+				.stream()
 				.map(GrantedAuthority::getAuthority)
-				.map(Utils::removeLeadingRole)
 				.collect(Collectors.toList());
 
 		Iterator<Task> i = list.iterator();
@@ -269,7 +275,7 @@ public class FlowsTaskService {
 	public DataResponse taskAssignedInMyGroups(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
 
 		String username = securityService.getCurrentUserLogin();
-		List<String> userAuthorities = securityService.get;
+		List<String> userAuthorities = securityUtils.getCurrentUserAuthorities();
 		Set<String> ruoliUtente = membershipService.getAllRolesForUser(username);
 
 		FlowsHistoricProcessInstanceQuery processQuery = new FlowsHistoricProcessInstanceQuery(managementService);
@@ -295,10 +301,13 @@ public class FlowsTaskService {
 		List<HistoricProcessInstance> pil = processQuery.list();
 
 		//per ogni Pi prendo il task attivo e costruisco la response
-		List<Task> result = pil.stream()
-				.map(pi ->  taskService.createTaskQuery().active().processInstanceId(pi.getId())
-						.includeProcessVariables().list().get(0))
-				.collect(Collectors.toList());
+		List<Task> result = new ArrayList<>();
+		for (HistoricProcessInstance pi : pil) {
+			List<Task> tasks = taskService.createTaskQuery().active().processInstanceId(pi.getId())
+					.includeProcessVariables().list();
+			if (tasks.size() > 0)
+				result.add(tasks.get(0));
+		}
 
 		List<TaskResponse> responseList = new ArrayList();
 		List<TaskResponse> taskList = restResponseFactory.createTaskResponseList(result);
@@ -339,8 +348,8 @@ public class FlowsTaskService {
 
 	public DataResponse getMyTasks(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
 		TaskQuery taskQuery = (TaskQuery) utils.searchParams(searchParams, taskService.createTaskQuery());
-		taskQuery.taskAssignee(SecurityUtils.getCurrentUserLogin())
-		.includeProcessVariables();
+		taskQuery.taskAssignee(securityService.getCurrentUserLogin())
+				.includeProcessVariables();
 
 		if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
 			taskQuery.processDefinitionKey(processDefinition);
@@ -362,14 +371,9 @@ public class FlowsTaskService {
 	}
 
 
-
 	public Map<String, Object> getTask(@PathVariable("id") String taskId) {
 		Map<String, Object> response = new HashMap<>();
-
-		Task taskRaw = taskService.createTaskQuery().taskId(taskId)
-				.includeProcessVariables()
-				.includeTaskLocalVariables()
-				.singleResult();
+		Task taskRaw = taskService.createTaskQuery().taskId(taskId).includeProcessVariables().singleResult();
 
 		// task + variables
 		TaskResponse task = restResponseFactory.createTaskResponse(taskRaw);
@@ -391,7 +395,7 @@ public class FlowsTaskService {
 		data.put("key", key);
 		//L`utenza reale (admin o ROLE_amministratori-supporto-tecnico@0000)
 		// non può avviare il flusso quindi ho bisogno dell`utenza "fittizia"/impersonata
-		data.put(initiator.name(), SecurityUtils.getCurrentUserLogin());
+		data.put(initiator.name(), securityService.getCurrentUserLogin());
 		data.put(startDate.name(), new Date());
 
 		ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
@@ -399,11 +403,12 @@ public class FlowsTaskService {
 
 		String statoPI;
 		if (taskService.createTaskQuery().processInstanceId(instance.getProcessInstanceId()).count() == 0) {
-			statoPI = Utils.ellipsis("START", LENGTH_STATO);
+			statoPI = utils.ellipsis("START", LENGTH_STATO);
 		} else {
-			// LO Start di un processo prevede un solo TASK attivo che equivale al nome del task
-			String taskName = taskService.createTaskQuery().processInstanceId(instance.getProcessInstanceId()) .list().get(0).getName();
-			statoPI = Utils.ellipsis(taskName, LENGTH_STATO);
+			String taskName = taskService.createTaskQuery()
+					.processInstanceId(instance.getProcessInstanceId())
+					.singleResult().getName();
+			statoPI = utils.ellipsis(taskName, LENGTH_STATO);
 		}
 		utils.updateJsonSearchTerms(null, instance.getProcessInstanceId(), statoPI);
 
@@ -419,7 +424,7 @@ public class FlowsTaskService {
 		String key = counterId + "-" + counterService.getNext(counterId);
 		data.put("key", key);
 
-		String username = SecurityUtils.getCurrentUserLogin();
+		String username = securityService.getCurrentUserLogin();
 
 		data.put(applicationName, username);
 		data.put(startDate.name(), new Date());
@@ -427,7 +432,7 @@ public class FlowsTaskService {
 		ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
 		runtimeService.setVariable(instance.getId(), "processInstanceId", instance.getId());
 
-		//todo: da testare
+//todo: da testare
 		String statoPI;
 		if (taskService.createTaskQuery().processInstanceId(instance.getProcessInstanceId()).count() == 0) {
 			statoPI = utils.ellipsis("START", LENGTH_STATO);
@@ -444,25 +449,18 @@ public class FlowsTaskService {
 		return instance;
 	}
 
-	private Map<String, Object> filterProcessVarFromLocal(Map<String, Object> data){
-		if ( MapUtils.isNotEmpty(data)) {
-			return   data.entrySet() 
-					.stream() 
-					.filter(map -> !(map.getKey().contains("_onlyLocal_"))) 
-					.collect(Collectors.toMap(map -> map.getKey(), map -> map.getValue()));
-		}
-		return Collections.EMPTY_MAP;
-	}
+
 	public void completeTask(String taskId, Map<String, Object> data) {
 
-		String username = SecurityUtils.getRealUserLogged();
+		// TODO
+		// String username = SecurityUtils.getRealUserLogged();
+		String username = securityService.getCurrentUserLogin();
 
 		// aggiungo l'identityLink che indica l'utente che esegue il task
 		taskService.setVariablesLocal(taskId, data);
 		taskService.addUserIdentityLink(taskId, username, TASK_EXECUTOR);
 		try {
-			//taskService.complete(taskId, data);
-			taskService.complete(taskId,filterProcessVarFromLocal( data));
+			taskService.complete(taskId, data);
 
 			draftService.deleteDraftByTaskId(Long.valueOf(taskId));
 		} catch (Exception e) {
@@ -475,7 +473,7 @@ public class FlowsTaskService {
 	}
 
 	public DataResponse getTasksCompletedByMe(JSONArray searchParams, @RequestParam("processDefinition") String processDefinition, @RequestParam("firstResult") int firstResult, @RequestParam("maxResults") int maxResults, @RequestParam("order") String order) {
-		String username = SecurityUtils.getCurrentUserLogin();
+		String username = securityService.getCurrentUserLogin();
 
 		HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery().taskInvolvedUser(username)
 				.includeProcessVariables().includeTaskLocalVariables();

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import it.cnr.si.service.SecurityService;
 import org.activiti.engine.EngineServices;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.delegate.DelegateExecution;
@@ -22,6 +23,8 @@ import org.springframework.stereotype.Component;
 
 import it.cnr.si.flows.ng.utils.SecurityUtils;
 
+import javax.inject.Inject;
+
 @Component
 @Profile("iss")
 public class ManageProcessParallel_v1 implements ExecutionListener {
@@ -29,10 +32,13 @@ public class ManageProcessParallel_v1 implements ExecutionListener {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ManageProcessParallel_v1.class);
 	private Expression faseEsecuzione;
 
+	@Inject
+	private SecurityService securityService;
+
 	@Override
 	public void notify(DelegateExecution execution) throws Exception {
 		
-		String currentUser = SecurityUtils.getCurrentUserLogin();
+		String currentUser = securityService.getCurrentUserLogin();
 		String processInstanceId =  execution.getProcessInstanceId();
 		String executionId =  execution.getId();
 		String stato =  execution.getCurrentActivityName();

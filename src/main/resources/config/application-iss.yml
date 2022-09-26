@@ -1,9 +1,9 @@
 spring:
   datasource:
     platform: postgres
-    url: jdbc:postgresql://IP:PORT/DB_NAME
-    username: user
-    password: psw
+    url: jdbc:postgresql://localhost:5432/activiti
+    username: postgres
+    password: admin
     driverClassName: org.postgresql.Driver
   jpa:    
     database: POSTGRESQL
@@ -43,6 +43,11 @@ cnr:
     driver: filesystem
     filesystem:
       directory: /tmp/sprint-flows-showcase
+  cache:
+    hazelcast:
+      port: 5701
+      packages: it.cnr.si
+      timeToLiveSeconds: 10
 iss:   
   mail:
     mail.host: serverMail
@@ -57,4 +62,6 @@ iss:
     mail.test-connection: false
     mail.smtp.auth: true
     mail.smtp.starttls.enable: true
+
+
     
