@@ -40,7 +40,7 @@
                     <span class="hidden-sm">I miei compiti</span>
                 </a>
             </li>
-            <!--nelle Process Definition in wfDefsBootable non c'è più ALL quindi il numero dei processi deve essere >=1 per visualizzare il menu-->
+            <!--nelle Process Definition in wfDefsBootable non c'ï¿½ piï¿½ ALL quindi il numero dei processi deve essere >=1 per visualizzare il menu-->
             <li ui-sref-active="active" ng-switch-when="true" ng-show="wfDefsBootable.length > 0" uib-dropdown
                 class="dropdown pointer">
                 <a class="dropdown-toggle" uib-dropdown-toggle href="" id="definitions-menu">
@@ -85,21 +85,21 @@
             </li>
 
 
-<!--        NON VISUALIZZIAMO PIU' I COMPITI COMPLETATI
-            <li ui-sref-active="active" has-authority="ROLE_USER">
-                <a ui-sref="task-completed" ng-click="vm.collapseNavbar()">
-                    <span class=" glyphicon glyphicon-ok"></span>
-                    <span class="hidden-sm">Compiti Completati</span>
-                </a>
-            </li>-->
+            <!--        NON VISUALIZZIAMO PIU' I COMPITI COMPLETATI
+                        <li ui-sref-active="active" has-authority="ROLE_USER">
+                            <a ui-sref="task-completed" ng-click="vm.collapseNavbar()">
+                                <span class=" glyphicon glyphicon-ok"></span>
+                                <span class="hidden-sm">Compiti Completati</span>
+                            </a>
+                        </li>-->
 
 
             <!--NASCONDIAMO LA PAGINA "Flussi avviati da me" E SE LA DOVESSERO RICHIEDERE LA RIMETTIAMO (FUNZIONA)-->
             <!--<li ui-sref-active="active" has-authority="ROLE_USER">-->
-                <!--<a ui-sref="myProcessInstances" ng-click="vm.collapseNavbar()">-->
-                    <!--<span class="glyphicon glyphicon-pushpin"></span>-->
-                    <!--<span class="hidden-sm">Flussi avviati da me</span>-->
-                <!--</a>-->
+            <!--<a ui-sref="myProcessInstances" ng-click="vm.collapseNavbar()">-->
+            <!--<span class="glyphicon glyphicon-pushpin"></span>-->
+            <!--<span class="hidden-sm">Flussi avviati da me</span>-->
+            <!--</a>-->
             <!--</li>-->
 
 
@@ -196,29 +196,29 @@
                         </a>
                     </li>
                     <li ui-sref-active="active" >
-                            <a ui-sref="avviso" ng-click="vm.collapseNavbar()">
-                                <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
-                                <span translate="global.menu.entities.avviso">Avviso</span>
-                            </a>
-                        </li>
+                        <a ui-sref="avviso" ng-click="vm.collapseNavbar()">
+                            <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
+                            <span translate="global.menu.entities.avviso">Avviso</span>
+                        </a>
+                    </li>
                     <li ui-sref-active="active" >
-                            <a ui-sref="external-message" ng-click="vm.collapseNavbar()">
-                                <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
-                                <span translate="global.menu.entities.externalMessage">External Message</span>
-                            </a>
-                        </li>
+                        <a ui-sref="external-message" ng-click="vm.collapseNavbar()">
+                            <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
+                            <span translate="global.menu.entities.externalMessage">External Message</span>
+                        </a>
+                    </li>
                     <li ui-sref-active="active" >
-                            <a ui-sref="faq" ng-click="vm.collapseNavbar()">
-                                <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
-                                <span translate="global.menu.entities.faq">Faq</span>
-                            </a>
-                        </li>
+                        <a ui-sref="faq" ng-click="vm.collapseNavbar()">
+                            <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
+                            <span translate="global.menu.entities.faq">Faq</span>
+                        </a>
+                    </li>
                     <li ui-sref-active="active" >
-                            <a ui-sref="blacklist" ng-click="vm.collapseNavbar()">
-                                <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
-                                <span translate="global.menu.entities.blacklist">Blacklist</span>
-                            </a>
-                        </li>
+                        <a ui-sref="blacklist" ng-click="vm.collapseNavbar()">
+                            <span class="glyphicon glyphicon-asterisk"></span>&nbsp;
+                            <span translate="global.menu.entities.blacklist">Blacklist</span>
+                        </a>
+                    </li>
                     <!-- jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here -->
                 </ul>
             </li>
@@ -322,10 +322,10 @@
                         </a>
                     </li>
                     <!--<li ui-sref-active="active" ng-if="(app == 'oiv')||(app == 'cnr')">-->
-                        <!--<a ui-sref="password" ng-click="vm.collapseNavbar()">-->
-                            <!--<span class="glyphicon glyphicon-lock"></span>&nbsp;-->
-                            <!--<span translate="global.menu.account.password">Password</span>-->
-                        <!--</a>-->
+                    <!--<a ui-sref="password" ng-click="vm.collapseNavbar()">-->
+                    <!--<span class="glyphicon glyphicon-lock"></span>&nbsp;-->
+                    <!--<span translate="global.menu.account.password">Password</span>-->
+                    <!--</a>-->
                     <!--</li>-->
                     <li ui-sref-active="active" ng-switch-when="true">
                         <a href="" ng-click="vm.logout()" id="logout">
