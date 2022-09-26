@@ -15,6 +15,7 @@ import it.cnr.si.security.PermissionEvaluatorImpl;
 import it.cnr.si.service.DraftService;
 import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.RelationshipService;
+import it.cnr.si.service.SecurityService;
 import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricIdentityLink;
 import org.activiti.engine.history.HistoricProcessInstance;
@@ -106,6 +107,8 @@ public class FlowsTaskService {
 	private ManagementService managementService;
 	@Inject
 	private FlowsProcessInstanceService flowsProcessInstanceService;
+	@Inject
+	private SecurityService securityService;
 
 
 
@@ -207,7 +210,7 @@ public class FlowsTaskService {
 	}
 
 	public DataResponse getAvailableTask(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
-		String username = SecurityUtils.getCurrentUserLogin();
+		String username = securityService.getCurrentUserLogin();
 		List<String> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
 				.map(GrantedAuthority::getAuthority)
 				.map(Utils::removeLeadingRole)
@@ -265,8 +268,8 @@ public class FlowsTaskService {
 
 	public DataResponse taskAssignedInMyGroups(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
 
-		String username = SecurityUtils.getCurrentUserLogin();
-		List<String> userAuthorities = SecurityUtils.getCurrentUserAuthorities();
+		String username = securityService.getCurrentUserLogin();
+		List<String> userAuthorities = securityService.get;
 		Set<String> ruoliUtente = membershipService.getAllRolesForUser(username);
 
 		FlowsHistoricProcessInstanceQuery processQuery = new FlowsHistoricProcessInstanceQuery(managementService);
