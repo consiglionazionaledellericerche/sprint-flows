@@ -6,10 +6,12 @@ import it.cnr.si.config.JHipsterProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.actuate.autoconfigure.MetricFilterAutoConfiguration;
-import org.springframework.boot.actuate.autoconfigure.MetricRepositoryAutoConfiguration;
+import org.springframework.boot.actuate.autoconfigure.metrics.web.servlet.WebMvcMetricsAutoConfiguration;
+//import org.springframework.boot.actuate.autoconfigure.MetricFilterAutoConfiguration;
+//import org.springframework.boot.actuate.autoconfigure.MetricRepositoryAutoConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
@@ -29,9 +31,11 @@ import java.util.Collection;
 @EnableCaching
 @SpringBootApplication
 @EnableAutoConfiguration(exclude = {
-        MetricFilterAutoConfiguration.class,
-        MetricRepositoryAutoConfiguration.class,
-        SprintApp.class
+//        MetricFilterAutoConfiguration.class,
+//        MetricRepositoryAutoConfiguration.class,
+//        SprintApp.class
+        WebMvcMetricsAutoConfiguration.class,
+        LiquibaseAutoConfiguration.class
 })
 @EnableConfigurationProperties({ JHipsterProperties.class, LiquibaseProperties.class })
 @EnableAspectJAutoProxy(proxyTargetClass=true)

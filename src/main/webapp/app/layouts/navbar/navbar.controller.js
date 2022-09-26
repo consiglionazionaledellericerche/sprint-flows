@@ -5,9 +5,9 @@
 	.module('sprintApp')
 	.controller('NavbarController', NavbarController);
 
-	NavbarController.$inject = ['$rootScope', '$localStorage', '$scope', '$state', 'Auth', 'Principal', 'ProfileService', 'LoginService', 'SwitchUserService', 'dataService', '$log'];
+	NavbarController.$inject = ['$rootScope', '$localStorage', '$scope', '$state', 'Auth', 'Principal', 'ProfileService', 'LoginService', 'SwitchUserService', 'dataService', '$log', 'AuthServerProvider'];
 
-	function NavbarController($rootScope, $localStorage, $scope, $state, Auth, Principal, ProfileService, LoginService, SwitchUserService, dataService, $log) {
+	function NavbarController($rootScope, $localStorage, $scope, $state, Auth, Principal, ProfileService, LoginService, SwitchUserService, dataService, $log, AuthServerProvider) {
 		var vm = this;
 
 		vm.isNavbarCollapsed = true;
@@ -113,8 +113,17 @@
 			return Principal.isAuthenticated();
 		}, function() {
 			Principal.identity().then(function(account) {
+                account.login = account.username;
 				vm.account = account;
+				CreateSsoCnrMenu.createUserMenu('#menu-user', {
+                  'placement': 'right',
+                  'login': account.username,
+                  'name': account.firstName+" "+account.lastName,
+                  'logoutCallback': function(e) {AuthServerProvider.logout()}
+                });
 			})
 		});
+		
+		CreateSsoCnrMenu.createAppsMenu('#menu-apps', {'placement': 'right'});
 	}
 })();

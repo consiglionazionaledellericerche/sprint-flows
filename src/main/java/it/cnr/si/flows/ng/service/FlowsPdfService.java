@@ -32,7 +32,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.core.env.Environment;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -355,12 +354,12 @@ public class FlowsPdfService {
 	public byte[] makePdf(Enum.PdfType pdfType, JSONObject processvariables, String fileName, String utenteRichiedente, String processInstanceId) {
 		Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
 
-		String dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-cnr");
+		String dir = env.getProperty("jasper-report.dir-cnr");
 		if(activeProfiles.contains("oiv")) {
-			dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-oiv");
+			dir = env.getProperty("jasper-report.dir-oiv");
 		}
 		else if(activeProfiles.contains("cnr")) {
-			dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-cnr");
+			dir = env.getProperty("jasper-report.dir-cnr");
 		}
 		byte[] pdfByteArray = null;
 		HashMap<String, Object> parameters = new HashMap();
@@ -496,12 +495,12 @@ public class FlowsPdfService {
 		HashMap<String, Object> parameters = new HashMap();
 		InputStream jasperFile = null;
 		Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
-		String dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-cnr");
+		String dir = env.getProperty("jasper-report.dir-cnr");
 		if(activeProfiles.contains("oiv")) {
-			dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-oiv");
+			dir = env.getProperty("jasper-report.dir-oiv");
 		}
 		else if(activeProfiles.contains("cnr")) {
-			dir = new RelaxedPropertyResolver(env, "jasper-report.").getProperty("dir-cnr");
+			dir = env.getProperty("jasper-report.dir-cnr");
 		}
 		try {
 			//carico le variabili della process instance
@@ -689,58 +688,63 @@ public class FlowsPdfService {
 	public Pair<String, byte[]> makePdfBySigla(String tipologiaDoc, String processInstanceId, List<String> listaVariabiliHtml, String labelFile, String report) {
 			//Sotituisco la lista di variabili da quelle storiche (historicProcessInstance.getProcessVariables() )a quelle attuali (variableInstanceJson)
 		JSONObject variableInstanceJson = new JSONObject();
-
 		Map<String, VariableInstance> tutteVariabiliMap = runtimeService.getVariableInstances(processInstanceId);
-		for (Map.Entry<String, VariableInstance> entry : tutteVariabiliMap.entrySet()) {
-			String key = entry.getKey();
-			VariableInstance value = entry.getValue();
-			//le variabili di tipo serializable (file) non vanno inseriti nel json delle variabili che verranno inseriti nel pdf
-			//(ho testato valutazioni esperienze_Json fino a 11000 caratteri ed a questo livello appare come longString)
-			if((!(((VariableInstanceEntity) value).getType() instanceof SerializableType)) || (((VariableInstanceEntity) value).getType() instanceof LongStringType)){
-				if(key.toString().equals("startDate")) {
-					Date startDate = (Date)value.getValue();
-					SimpleDateFormat sdf = new  SimpleDateFormat("dd/MM/yyyy HH:mm");
-					sdf.setTimeZone(TimeZone.getTimeZone("Europe/Rome"));
-					variableInstanceJson.put(key, sdf.format(startDate));
-				} else {
-					String valueEscaped = "campo erroneamente compilato";
-					if (runtimeService.getVariable(processInstanceId,value.getName()) != null) {
-						String variabileCorrente = value.getName().toString();
-						if (listaVariabiliHtml.contains(variabileCorrente)) {
-							variableInstanceJson.put(variabileCorrente, Utils.sanitizeHtml(runtimeService.getVariable(processInstanceId, variabileCorrente)));
 
-						} else {
-							valueEscaped = Jsoup.parse(StringEscapeUtils.escapeHtml(runtimeService.getVariable(processInstanceId,value.getName()).toString().replaceAll("\t", "  "))).text();
-							valueEscaped = valueEscaped.replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;");
-							variableInstanceJson.put(key, valueEscaped);
-						}
-					}
-				}
-			}
-		}
-		LOGGER.info("variableInstanceJson: {}", variableInstanceJson);
-
-		//Sotituisco la lista di variabili da quelle storiche (historicProcessInstance.getProcessVariables() )a quelle attuali (variableInstanceJson)
-		JSONObject processVariables = mappingVariableBeforeStartPi(variableInstanceJson, processInstanceId);
-		//creo il pdf corrispondente
-		String utenteRichiedente = "sistema";
-		String fileName = tipologiaDoc + ".pdf";
-
-		if(processVariables.has("nomeRichiedente")) {
-			utenteRichiedente = processVariables.getString("nomeRichiedente");
-			fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
-		}
-
-		if(processVariables.has("userNameRichiedente")) {
-			utenteRichiedente = processVariables.getString("userNameRichiedente");
-			fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
+		try {
+    		for (Map.Entry<String, VariableInstance> entry : tutteVariabiliMap.entrySet()) {
+    			String key = entry.getKey();
+    			VariableInstance value = entry.getValue();
+    			//le variabili di tipo serializable (file) non vanno inseriti nel json delle variabili che verranno inseriti nel pdf
+    			//(ho testato valutazioni esperienze_Json fino a 11000 caratteri ed a questo livello appare come longString)
+    			if((!(((VariableInstanceEntity) value).getType() instanceof SerializableType)) || (((VariableInstanceEntity) value).getType() instanceof LongStringType)){
+    				if(key.toString().equals("startDate")) {
+    					Date startDate = (Date)value.getValue();
+    					SimpleDateFormat sdf = new  SimpleDateFormat("dd/MM/yyyy HH:mm");
+    					sdf.setTimeZone(TimeZone.getTimeZone("Europe/Rome"));
+    					variableInstanceJson.put(key, sdf.format(startDate));
+    				} else {
+    					String valueEscaped = "campo erroneamente compilato";
+    					if (runtimeService.getVariable(processInstanceId,value.getName()) != null) {
+    						String variabileCorrente = value.getName().toString();
+    						if (listaVariabiliHtml.contains(variabileCorrente)) {
+    							variableInstanceJson.put(variabileCorrente, Utils.sanitizeHtml(runtimeService.getVariable(processInstanceId, variabileCorrente)));
+    
+    						} else {
+    							valueEscaped = Jsoup.parse(StringEscapeUtils.escapeHtml(runtimeService.getVariable(processInstanceId,value.getName()).toString().replaceAll("\t", "  "))).text();
+    							valueEscaped = valueEscaped.replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;");
+    							variableInstanceJson.put(key, valueEscaped);
+    						}
+    					}
+    				}
+    			}
+    		}
+    		LOGGER.info("variableInstanceJson: {}", variableInstanceJson);
+    
+    		//Sotituisco la lista di variabili da quelle storiche (historicProcessInstance.getProcessVariables() )a quelle attuali (variableInstanceJson)
+    		JSONObject processVariables = mappingVariableBeforeStartPi(variableInstanceJson, processInstanceId);
+    		//creo il pdf corrispondente
+    		String utenteRichiedente = "sistema";
+    		String fileName = tipologiaDoc + ".pdf";
+    
+    		if(processVariables.has("nomeRichiedente")) {
+    			utenteRichiedente = processVariables.getString("nomeRichiedente");
+    			fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
+    		}
+    
+    		if(processVariables.has("userNameRichiedente")) {
+    			utenteRichiedente = processVariables.getString("userNameRichiedente");
+    			fileName = tipologiaDoc + "-" + utenteRichiedente + ".pdf";
+    		}
+    		
+    		
+    		//SOTITUZIONE FIRM ACON JASPER CON FIRMA SIGLA
+    		//return Pair.of(fileName, makePdf(Enum.PdfType.valueOf(tipologiaDoc), processVariables, fileName, utenteRichiedente, processInstanceId));
+    		return Pair.of(fileName, makeSiglaPdf(Enum.PdfType.valueOf(tipologiaDoc), processVariables, fileName, labelFile, report, utenteRichiedente, processInstanceId));
+		} catch (Exception e) {
+            LOGGER.error("Il flusso non puo' avere stampe, le variabili sono sbagliate: {} {} {}", processInstanceId, listaVariabiliHtml, tutteVariabiliMap);
+            throw e;
 		}
 		
-		
-		//SOTITUZIONE FIRM ACON JASPER CON FIRMA SIGLA
-		//return Pair.of(fileName, makePdf(Enum.PdfType.valueOf(tipologiaDoc), processVariables, fileName, utenteRichiedente, processInstanceId));
-		return Pair.of(fileName, makeSiglaPdf(Enum.PdfType.valueOf(tipologiaDoc), processVariables, fileName, labelFile, report, utenteRichiedente, processInstanceId));
-
 	}
 
 	//GESTIONE DEI PARAMETRI DA VISUALIZZARE

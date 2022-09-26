@@ -96,6 +96,11 @@ public class StartFirmaDocumentiSetGroupsAndVisibility {
 			execution.setVariable("gruppoRichiedente", gruppoRichiedente);
 			execution.setVariable("gruppoProtocollo", gruppoProtocollo);
 			execution.setVariable("userNameRichiedente", initiator);
+			
+			//VARIABILI PRESE DA FORM INPUT PER CONTROFIRMATARIO
+			// controFirmatario (USERNAME)
+			// controfirmaFlag (SI/NO)
+
 		}
 	}
 }

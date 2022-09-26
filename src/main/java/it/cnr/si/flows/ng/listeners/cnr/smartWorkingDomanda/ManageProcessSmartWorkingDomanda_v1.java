@@ -8,11 +8,13 @@ import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.*;
 import it.cnr.si.flows.ng.utils.CNRPdfSignApparence;
 import it.cnr.si.flows.ng.utils.Enum;
-import it.cnr.si.flows.ng.utils.SecurityUtils;
+
 import it.cnr.si.flows.ng.utils.Enum.StatoDomandeSmartWorkingEnum;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.ExternalMessageService;
+import it.cnr.si.service.SecurityService;
+
 import org.activiti.engine.ManagementService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
@@ -54,7 +56,9 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 	private String urlSiper;
 	@Value("${cnr.siper.domandePath}")
 	private String pathDomandeSmartWorking;
-
+    @Inject
+    private SecurityService securityService;
+	
 	@Inject
 	private FirmaDocumentoService firmaDocumentoService;
 	@Inject
@@ -158,7 +162,7 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 			};break;  
 			case "validazione-end": {
 				LOGGER.info("**** validazione-end");
-				String currentUser = SecurityUtils.getCurrentUserLogin();
+				String currentUser = securityService.getCurrentUserLogin();
 				String matricolaValidatore = aceService.getPersonaByUsername(currentUser).getMatricola().toString();
 				execution.setVariable("matricolaValidatore", matricolaValidatore);
 				execution.setVariable("statoValidazione", "no");
@@ -167,6 +171,7 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 				restToApplicazioneSiper(execution, Enum.StatoDomandeSmartWorkingEnum.APERTA);
 			};break;  	 
 			case "modifica-end": {
+				startSmartWorkingDomandaSetGroupsAndVisibility.configuraVariabiliStart(execution);
 				LOGGER.info("**** modifica-end");
 			};break;
 
