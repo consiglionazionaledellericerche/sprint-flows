@@ -107,8 +107,8 @@ public class FlowsTaskService {
 	private ManagementService managementService;
 	@Inject
 	private FlowsProcessInstanceService flowsProcessInstanceService;
-    @Inject
-    private SecurityService securityService;
+	@Inject
+	private SecurityService securityService;
 	@Inject
 	private SecurityUtils securityUtils;
 
@@ -219,10 +219,10 @@ public class FlowsTaskService {
 //				.collect(Collectors.toList());
 
 		List<String> authorities = securityService.getUser().get().getAuthorities()
-		        .stream()
-		        .map(GrantedAuthority::getAuthority)
-		        .collect(Collectors.toList());
-		
+				.stream()
+				.map(GrantedAuthority::getAuthority)
+				.collect(Collectors.toList());
+
 		TaskQuery taskQuery = taskService.createTaskQuery()
 				.taskCandidateUser(username)
 				.taskCandidateGroupIn(authorities)
@@ -252,10 +252,10 @@ public class FlowsTaskService {
 
 		int removed = 0;
 
-        List<String> authorities = securityService.getUser().get().getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
+		List<String> authorities = securityService.getUser().get().getAuthorities()
+				.stream()
+				.map(GrantedAuthority::getAuthority)
+				.collect(Collectors.toList());
 
 		Iterator<Task> i = list.iterator();
 		while (i.hasNext()) {
@@ -303,10 +303,10 @@ public class FlowsTaskService {
 		//per ogni Pi prendo il task attivo e costruisco la response
 		List<Task> result = new ArrayList<>();
 		for (HistoricProcessInstance pi : pil) {
-		    List<Task> tasks = taskService.createTaskQuery().active().processInstanceId(pi.getId())
-                .includeProcessVariables().list();
-		    if (tasks.size() > 0)
-		        result.add(tasks.get(0));
+			List<Task> tasks = taskService.createTaskQuery().active().processInstanceId(pi.getId())
+					.includeProcessVariables().list();
+			if (tasks.size() > 0)
+				result.add(tasks.get(0));
 		}
 
 		List<TaskResponse> responseList = new ArrayList();
@@ -335,7 +335,7 @@ public class FlowsTaskService {
 				responseList.add(task);
 		}
 		responseList.subList(firstResult <= responseList.size() ? firstResult : responseList.size(),
-							 maxResults <= responseList.size() ? maxResults : responseList.size());
+				maxResults <= responseList.size() ? maxResults : responseList.size());
 
 		DataResponse response = new DataResponse();
 		response.setStart(firstResult);
@@ -572,8 +572,8 @@ public class FlowsTaskService {
 			isUnclaimableVariable.setName("isReleasable");
 			// if has candidate groups or users -> can release
 			isUnclaimableVariable.setValue(taskService.getIdentityLinksForTask(task.getId())
-												   .stream()
-												   .anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
+					.stream()
+					.anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
 			task.getVariables().add(isUnclaimableVariable);
 		}
 	}

@@ -67,10 +67,10 @@ public class FlowsApp {
         }
 
         long profiles = activeProfiles.stream()
-                .filter(p -> p.equals("cnr") || p.equals("oiv") || p.equals("showcase"))
+                .filter(p -> p.equals("cnr") || p.equals("oiv") || p.equals("iss") || p.equals("showcase"))
                 .count();
         if (profiles != 1) {
-            log.error("Selezionare esattamente un profilo tra 'cnr', 'oiv' e 'showcase'");
+            log.error("Selezionare esattamente un profilo tra 'cnr', 'oiv', 'iss' e 'showcase'");
             System.exit(1);
         }
     }

@@ -1,0 +1,67 @@
+spring:
+  datasource:
+    platform: postgres
+    url: jdbc:postgresql://localhost:5432/activiti
+    username: postgres
+    password: admin
+    driverClassName: org.postgresql.Driver
+  jpa:    
+    database: POSTGRESQL
+    show-sql: false
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+      naming:
+        strategy: org.springframework.boot.orm.jpa.hibernate.SpringNamingStrategy
+    properties:
+      hibernate.cache.use_second_level_cache: true
+      hibernate.cache.use_query_cache: false
+      hibernate.generate_statistics: false
+      hibernate.cache.region.factory_class: it.cnr.si.config.hazelcast.HazelcastCacheRegionFactory
+      hibernate.cache.use_minimal_puts: true
+      hibernate.cache.hazelcast.use_lite_member: true
+
+  port: 8080
+  mail:
+    url: http://test.iss.it:8080
+    recipients:  
+    activated: true
+
+jhipster:
+  mail:
+    from: noreplay@domain.it
+    
+ajp:
+  port: 8099
+  timeout: 120000
+
+jasper-report:
+  dir-iss: /src/main/resources/print/iss-print/
+
+cnr:
+  storage:
+    driver: filesystem
+    filesystem:
+      directory: /tmp/sprint-flows-showcase
+  cache:
+    hazelcast:
+      port: 5701
+      packages: it.cnr.si
+      timeToLiveSeconds: 10
+iss:   
+  mail:
+    mail.host: serverMail
+    mail.user: username
+    mail.password: password
+    mail.protocol: smtp
+    mail.port: port
+    mail.send.error.to: error@mail.it
+    mail.from: noreplay@domain.it
+    mail.tls: true
+    mail.encoding: UTF-8
+    mail.test-connection: false
+    mail.smtp.auth: true
+    mail.smtp.starttls.enable: true
+
+
+    

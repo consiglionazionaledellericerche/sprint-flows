@@ -2,7 +2,10 @@
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
             <h1>Benvenuti</h1>
-            <p class="lead" >Benvenuti nella Scrivania Digitale CNR</p>
+            <div ng-show="app == 'iss'">
+                <p class="lead" >Scrivania Digitale ISS - gestione processi aziendali -</p>
+            </div>
+
             <hr>
 
             <div ng-show="vm.avvisi.length > 0">
@@ -111,4 +114,10 @@
 
         </div>
     </div>
+    <div class="row dev">
+		<hr>
+		<div class="col-md-12">
+			<pre ng-if="isDevelopment">{{vm | json}}</pre>
+		</div>
+	</div>
 </div>

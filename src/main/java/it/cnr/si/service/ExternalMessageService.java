@@ -29,8 +29,8 @@ public class ExternalMessageService {
     
     @Inject
     private ExternalMessageRepository externalMessageRepository;
-    @Inject
-    private ExternalMessageSender externalMessageSender;
+   // @Inject
+   // private ExternalMessageSender externalMessageSender;
 
     /**
      * Save a externalMessage.

@@ -27,7 +27,7 @@ import static it.cnr.si.flows.ng.utils.Enum.Azione.Aggiornamento;
 import static it.cnr.si.flows.ng.utils.Enum.Azione.Caricamento;
 
 @Service
-@Profile("cnr")
+@Profile({"cnr","iss"})
 public class FlowsPdfBySiglaRestService {
 
     public static final String TITLE = "title";

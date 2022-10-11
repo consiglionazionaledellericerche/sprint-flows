@@ -1,15 +1,24 @@
 <fieldset>
   <legend>{{label}}<span class="glyphicon glyphicon-question-sign" ng-show="item.placeholder" data-toggle="tooltip" data-placement="top" title="{{item.placeholder}}"></span>
-    <span class="pull-right" ng-if="multiple === 'true'">
+
+    <span class="pull-right" ng-if="multiple === 'true' && ( buttonPosition=== 'undefined' || buttonPosition==='top')">
       <button type="button" class="btn btn-success btn-xs" ng-click="addRow()" ng-disabled="ngModel.length >= max">
         <span class="glyphicon glyphicon-plus"></span>
       </button>
-      <button type="button" class="btn btn-danger btn-xs" ng-click="removeRow()" ng-disabled="ngModel.length <= min">
+      <button type="button" class="btn btn-danger btn-xs" ng-click="removeRow($index)" ng-disabled="ngModel.length <= min">
         <span class="glyphicon glyphicon-minus"></span>
       </button>
     </span>
   </legend>
   <div class="well" ng-repeat="row in ngModel track by $index">
+    <span class="pull-right" ng-if="multiple === 'true' && buttonPosition==='inner'">
+      <button type="button" class="btn btn-success btn-xs" ng-click="addRow()" ng-disabled="ngModel.length >= max">
+        <span class="glyphicon glyphicon-plus"></span>
+      </button>
+      <button type="button" class="btn btn-danger btn-xs" ng-click="removeRow($index)" ng-disabled="ngModel.length <= min">
+        <span class="glyphicon glyphicon-minus"></span>
+      </button>
+    </span>
     <ng-include src="formUrl" />
   </div>
 </fieldset>

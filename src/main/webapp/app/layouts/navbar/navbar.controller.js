@@ -5,9 +5,9 @@
 	.module('sprintApp')
 	.controller('NavbarController', NavbarController);
 
-	NavbarController.$inject = ['$rootScope', '$localStorage', '$scope', '$state', 'Auth', 'Principal', 'ProfileService', 'LoginService', 'SwitchUserService', 'dataService', '$log', 'AuthServerProvider'];
+	NavbarController.$inject = ['$rootScope', '$localStorage', '$scope', '$state', 'Auth', 'Principal', 'ProfileService', 'LoginService', 'SwitchUserService', 'dataService', '$log'];
 
-	function NavbarController($rootScope, $localStorage, $scope, $state, Auth, Principal, ProfileService, LoginService, SwitchUserService, dataService, $log, AuthServerProvider) {
+	function NavbarController($rootScope, $localStorage, $scope, $state, Auth, Principal, ProfileService, LoginService, SwitchUserService, dataService, $log) {
 		var vm = this;
 
 		vm.isNavbarCollapsed = true;
@@ -32,6 +32,8 @@
 			    $rootScope.app = 'cnr';
 			else if (response.activeProfiles.includes('oiv'))
 			    $rootScope.app = 'oiv';
+			else if (response.activeProfiles.includes('iss'))
+                $rootScope.app = 'iss';
 			else if (response.activeProfiles.includes('showcase'))
 			    $rootScope.app = 'showcase';
 			else
@@ -80,10 +82,6 @@
 			.then(function(response) {
 				//lista delle Process Definition che l'utente può avviare
 				$rootScope.wfDefsBootable = response.data.bootable;
-				$rootScope.wfDefsBootable.push({
-					key: "all",
-					name: "ALL"
-				});
 				//lista di TUTTE le Process Definition
 				$rootScope.wfDefsAll = response.data.all;
 				$localStorage.wfDefsAll = response.data.all;
@@ -115,17 +113,8 @@
 			return Principal.isAuthenticated();
 		}, function() {
 			Principal.identity().then(function(account) {
-                account.login = account.username;
 				vm.account = account;
-				CreateSsoCnrMenu.createUserMenu('#menu-user', {
-                  'placement': 'right',
-                  'login': account.username,
-                  'name': account.firstName+" "+account.lastName,
-                  'logoutCallback': function(e) {AuthServerProvider.logout()}
-                });
 			})
 		});
-		
-		CreateSsoCnrMenu.createAppsMenu('#menu-apps', {'placement': 'right'});
 	}
 })();

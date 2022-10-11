@@ -39,7 +39,8 @@
                 subformName: '@',
                 min: '@?',
                 max: '@?',
-                autofill: '@?'
+                autofill: '@?',
+                buttonPosition: '@?'				
             },
             link: function ($scope, element, attrs) {
                 $scope.min = $scope.min || 1;
@@ -49,12 +50,18 @@
                 $scope.processDefinitionKey = $scope.processDefinitionKey || $scope.$parent.processDefinitionKey;
                 $scope.processVersion = $scope.processVersion || $scope.$parent.processVersion;
                 $scope.formUrl = 'api/forms/'+ $scope.processDefinitionKey +"/"+ $scope.processVersion +"/"+ $scope.subformName;
-
-//                if ($scope.json !== undefined)
-//                  $scope.ngModel = JSON.parse($scope.json);
-                if ('autofill' in attrs) {
+                if ( $scope.buttonPosition === undefined) {
+                       $scope.buttonPosition='top';
+                }
+                
+                if ('autofill'in attrs) {
                     var jsonName = attrs.ngModel.split('.').pop() + "_json";
-                    $scope.ngModel = JSON.parse($scope.$parent.data.entity.variabili[jsonName]);
+					if ('localvariabiletask'in attrs) {
+						$scope.ngModel = JSON.parse($scope.$parent.data.entity.variabili.localTask[jsonName]);
+					}
+					else{
+						$scope.ngModel = JSON.parse($scope.$parent.data.entity.variabili[jsonName]);
+					}					
                 }
 
                 $scope.addRow = function() {
@@ -62,9 +69,13 @@
                         $scope.ngModel.push({});
                     return false;
                 };
-                $scope.removeRow = function() {
-                    if ($scope.ngModel.length > $scope.min)
-                        $scope.ngModel.pop();
+                $scope.removeRow = function(index) {
+                    if ($scope.buttonPosition==='inner' ){
+                        $scope.ngModel.splice(index, 1);
+                    }else{
+                       if ($scope.ngModel.length > $scope.min)
+                         $scope.ngModel.pop();
+                    }
                     return false;
                 };
             }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="liquibase-docs" id="addColumn-example">
+        <addColumn catalogName=""
+                   schemaName="public"
+                   tableName="jhi_user">
+            <column name="phone" type="varchar(255)"/>
+        </addColumn>
+        <addColumn catalogName=""
+                   schemaName="public"
+                   tableName="jhi_user">
+            <column name="gender" type="varchar(10)"/>
+        </addColumn>
+
+        <loadData encoding="UTF-8"
+                  file="config/liquibase/iss/users.csv"
+                  separator=";"
+                  tableName="jhi_user"/>
+    </changeSet>
+</databaseChangeLog>

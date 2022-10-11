@@ -70,6 +70,8 @@ public class DatabaseConfiguration {
             liquibase.setChangeLog("classpath:config/liquibase/oiv/master.xml");
         else if(activeProfiles.contains("cnr"))
             liquibase.setChangeLog("classpath:config/liquibase/cnr/master.xml");
+        else if(activeProfiles.contains("iss"))
+            liquibase.setChangeLog("classpath:config/liquibase/iss/master.xml");
         else if(activeProfiles.contains("showcase"))
             liquibase.setChangeLog("classpath:config/liquibase/showcase/master.xml");
 

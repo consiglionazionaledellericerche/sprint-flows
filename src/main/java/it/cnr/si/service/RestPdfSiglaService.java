@@ -19,7 +19,7 @@ import java.nio.charset.StandardCharsets;
 
 @Service
 @Transactional
-@Profile("cnr")
+@Profile({"cnr","iss"})
 public class RestPdfSiglaService {
 
     private final Logger logger = LoggerFactory.getLogger(RestPdfSiglaService.class);

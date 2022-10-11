@@ -2,6 +2,7 @@ package it.cnr.si.flows.ng.service;
 
 import it.cnr.si.domain.Blacklist;
 import it.cnr.si.flows.ng.config.MailConfguration;
+import it.cnr.si.flows.ng.resource.MailConfigurationResource;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.BlacklistService;
@@ -44,9 +45,8 @@ import java.util.Optional;
 import static it.cnr.si.flows.ng.utils.Utils.formatoDataUF;
 
 
-@Service
-@Primary
-public class FlowsMailService extends MailService {
+
+public abstract class FlowsMailService extends MailService {
 
     public static final String FLOW_NOTIFICATION = "notificaFlow.html";
     public static final String PROCESS_NOTIFICATION = "notificaProcesso.html";
@@ -60,15 +60,7 @@ public class FlowsMailService extends MailService {
     @Inject
     private TemplateEngine templateEngine;
     @Inject
-    private MailConfguration mailConfig;
-    @Inject
     private Environment env;
-    @Inject
-    private CnrgroupService cnrgroupService;
-    @Autowired(required = false)
-    private AceBridgeService aceBridgeService;
-    @Autowired(required = false) //TODO
-    private AceService aceService;
     @Inject
     private FlowsUserService flowsUserService;
     @Autowired
@@ -86,6 +78,7 @@ public class FlowsMailService extends MailService {
     @Autowired
     private MailConfguration mailConfguration;
 
+    abstract public String getGroupDisplayName(String groupName);
     @Async
     public void sendFlowEventNotification(String notificationType, Map<String, Object> variables, String taskName, String username, final String groupName, boolean hasNotificationRule) {
         try {
@@ -102,22 +95,16 @@ public class FlowsMailService extends MailService {
 
             // ${serverUrl}/#/details?processInstanceId=${processInstanceId}&amp;taskId=${nextTaskId}}
 
-            if (groupName != null) {
-                if (Arrays.asList(env.getActiveProfiles()).contains("cnr")) {
-                    ctx.setVariable("groupname", Optional.ofNullable(aceBridgeService)
-                            .flatMap(aceBridgeService -> Optional.ofNullable(groupName))
-                            .map(s -> aceBridgeService.getExtendedGroupNome(s))
-                            .orElse(groupName));
-                } else {
-                    ctx.setVariable("profile", "oiv");
-                    ctx.setVariable("groupname", cnrgroupService.findDisplayName(groupName));
-                }
-            }
+            if (groupName != null)
+               ctx.setVariable("groupname",getGroupDisplayName(groupName));
+
             ctx.setVariable("taskName", taskName);
             if (Arrays.asList(env.getActiveProfiles()).contains("cnr")) {
                 ctx.setVariable("profile", "cnr");
             } else if (Arrays.asList(env.getActiveProfiles()).contains("oiv")) {
                 ctx.setVariable("profile", "oiv");
+            } else if (Arrays.asList(env.getActiveProfiles()).contains("iss")) {
+                ctx.setVariable("profile", "iss");
             } else if (Arrays.asList(env.getActiveProfiles()).contains("showcase")) {
                 ctx.setVariable("profile", "showcase");
             }
@@ -125,12 +112,12 @@ public class FlowsMailService extends MailService {
             LOGGER.info("Recupero dell'email per l'utente "+ username);
 
             String htmlContent = templateEngine.process(notificationType, ctx);
-            String mailUtente = aceService.getUtente(username).getEmail();
+            String mailUtente = getEmaiByUser(username);
 
             LOGGER.info("Invio della mail all'utente "+ username +" con indirizzo "+ mailUtente);
 
             String subject = getCustomSubject(variables, key, hasNotificationRule);
-            if (mailConfig.isMailActivated()) {
+            if (mailConfguration.isMailActivated()) {
                 // In produzione mando le email ai veri destinatari
                 String procDefId = variables.get("processDefinitionId").toString().split(":")[0];
                 Blacklist bl = blacklistService.findOneByEmailAndKey(mailUtente, procDefId);
@@ -152,7 +139,7 @@ public class FlowsMailService extends MailService {
             }
 
             // Per le prove mando *tutte* le email agli indirizzi di prova (e non ai veri destinatari)
-            mailConfig.getMailRecipients().stream()
+            mailConfguration.getMailRecipients().stream()
                     .filter(s -> !s.isEmpty())
                     .forEach(s -> {
                         LOGGER.debug("Invio mail a {} con titolo Notifica relativa al flusso {} del tipo {} nello stato {} e con contenuto {}",
@@ -249,10 +236,11 @@ public class FlowsMailService extends MailService {
             sendReminerToUserForInstances(user, instances);
         });
     }
-    
+    public abstract String getEmaiByUser(String user);
+
     private void sendReminerToUserForInstances(String user, List<ProcessInstance> instances) {
         try {
-            String mailUtente = aceService.getUtente(user).getEmail();
+            String mailUtente = getEmaiByUser(user);
             LOGGER.info("Invio della mail all'utente "+ user +" con indirizzo "+ mailUtente +" per i flussi "+ instances);
             
             Context ctx = new Context();
@@ -274,7 +262,7 @@ public class FlowsMailService extends MailService {
             String subject = "Notifica relativa ai flussi Smart Working";
             
             // Per le prove mando *tutte* le email agli indirizzi di prova (e non ai veri destinatari)
-            mailConfig.getMailRecipients().stream()
+            mailConfguration.getMailRecipients().stream()
                     .filter(s -> !s.isEmpty())
                     .forEach(s -> {
                         LOGGER.debug("Invio mail di notifica ricorrente relativa ai flussi Smart Working a {} con contenuto {}",
@@ -284,7 +272,7 @@ public class FlowsMailService extends MailService {
                         sendEmail(s, Optional.empty(), Optional.empty(), subject, htmlContent, false, true);
                     });
             
-            if (mailConfig.isMailActivated()) {
+            if (mailConfguration.isMailActivated()) {
                 // In produzione mando le email ai veri destinatari
                 Blacklist bl = blacklistService.findOneByEmailAndKey(mailUtente, "smart-working-domanda");
                 if (bl != null) {

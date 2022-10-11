@@ -1,0 +1,5 @@
+ID;LOGIN;PASSWORD_HASH;FIRST_NAME;LAST_NAME;EMAIL;ACTIVATED;LANG_KEY;ACTIVATION_KEY;RESET_KEY;CREATED_BY;CREATED_DATE;RESET_DATE;LAST_MODIFIED_BY;LAST_MODIFIED_DATE;PHONE;GENDER
+5;utente1;$2a$10$q3pM4u.lKTXNjsJrZCZJJOX1boIYl8HHFvZNmc1ogJMoXX.REfM4S;utente1;utente1;utente1@cnr.it;true;en;null;null;system;09/04/2018 15:31;null;utente1;09/04/2018 15:31;1111;M
+6;utente2;$2a$10$0Gr1QYijv55v2NonqMOj5e5/l5FMUXP6eJx/smKT/rzsO6JmCPhEm;utente2;utente2;utente2@cnr.it;true;en;null;null;system;09/04/2018 15:31;null;utente2;09/04/2018 15:31;22222;M
+7;utente3;$2a$10$5MQw5h17V8JnabzEFIjD2OaEoU42fXOxG2oOImEGWpTI6/P706gem;utente3;utente3;utente3@cnr.it;true;en;null;null;system;09/04/2018 15:31;null;utente3;09/04/2018 15:31;3333;F
+8;direttore;$2a$10$TsqQ/AQ4aOpHqSWchwrE9OCNMK0YcZbEaRqXU9bTrwLis2Esf5slu;utente4;utente4;utente4@cnr.it;true;en;null;null;system;09/04/2018 15:31;null;utente4;09/04/2018 15:31;4444;F

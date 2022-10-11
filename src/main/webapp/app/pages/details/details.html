@@ -49,7 +49,10 @@
 			<div ng-hide="!vm.data.entity.variabili.completed">
 				<b>completato il:</b>{{vm.data.entity.variabili.endDate | data}}
 			</div>
-			<div ng-show="vm.data.entity.endTime == null">
+			<div ng-show="vm.data.entity.endTime == null && app == 'iss'">
+				<b>Stato: </b>{{vm.data.entity.processInstanceStateName}} 
+			</div>
+			<div ng-show="vm.data.entity.endTime == null && app != 'iss'">
 				<b>Stato: </b>{{vm.data.entity.name | get: 'stato'}} 
 			</div>
 			<div ng-show="vm.data.entity.endTime != null">
