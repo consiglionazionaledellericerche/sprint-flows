@@ -56,6 +56,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.gson.Gson;
 
+import it.cnr.si.flows.ng.config.CachingConfig;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.FlowsMailService;
@@ -94,6 +95,8 @@ public class FlowsCnrAdminTools {
     private FlowsTaskService flowsTaskService;
     @Inject 
     private FlowsMailService flowsMailService;
+    @Inject
+    private CachingConfig cachingConfig;
 
     @RequestMapping(value = "/resendExternalMessages", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
@@ -370,6 +373,12 @@ public class FlowsCnrAdminTools {
         AddIdentityLinkForHistoricProcessInstanceCmd cmd = new AddIdentityLinkForHistoricProcessInstanceCmd(procInstId, userId, groupId, Utils.PROCESS_VISUALIZER);
         processEngine.getManagementService().executeCommand(cmd);
 
+        return ResponseEntity.ok().build();
+    }
+    
+    @RequestMapping(value = "emptyAceRolesCashe", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> emptyAceRolesCache() {
+        cachingConfig.aceRolesForUserCacheEvict();
         return ResponseEntity.ok().build();
     }
     
