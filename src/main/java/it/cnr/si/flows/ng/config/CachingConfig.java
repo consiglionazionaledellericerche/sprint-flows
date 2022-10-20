@@ -36,6 +36,12 @@ public class CachingConfig {
         log.info("Flush Cache \"siglaDynamicList\" - " + formatoDataOra.format(new Date()));
     }
 
+    //metodo di rimozione della cache su aceRolesForUser
+    @CacheEvict(value = "aceRolesForUser", allEntries = true)
+    public void aceRolesForUserCacheEvict() {
+        log.info("Flush Cache \"aceRolesForUser\" - " + formatoDataOra.format(new Date()));
+    }
+
 //    @Scheduled(fixedDelay = 3000, initialDelay = 5000)
 //    public void tryCache() {
 //        log.info("chiamo getIdRuoloBySigla con sigla staffAmministrativo");
