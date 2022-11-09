@@ -376,7 +376,7 @@ public class FlowsCnrAdminTools {
         return ResponseEntity.ok().build();
     }
     
-    @RequestMapping(value = "emptyAceRolesCashe", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "emptyAceRolesCache", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> emptyAceRolesCache() {
         cachingConfig.aceRolesForUserCacheEvict();
         return ResponseEntity.ok().build();
