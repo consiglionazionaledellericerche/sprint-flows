@@ -70,7 +70,7 @@ function fonts() {
 }
 
 function jstree() {
-    return gulp.src(config.bower + 'bootstrap-jstree-theme/dist/themes/bootstrap/*.{png,gif}')
+    return gulp.src(config.bower + 'jstree/dist/themes/default/*.{png,gif}')
         .pipe(plumber({errorHandler: handleErrors}))
         .pipe(gulp.dest(config.dist + 'content/css/'));
 }
