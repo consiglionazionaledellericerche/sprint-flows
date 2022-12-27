@@ -128,7 +128,7 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 
 			// PROFILO DIRIGENTE-DIRETTORE			
 			if(livelloRichiedente.equals("D") 
-				|| livelloRichiedente.equals("0"))
+				|| livelloRichiedente.equals("00"))
 				{
 				profiloDomanda = "direttore-responsabile";
 			}
