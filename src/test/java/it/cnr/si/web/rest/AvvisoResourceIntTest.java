@@ -142,7 +142,7 @@ public class AvvisoResourceIntTest {
         // Get all the avvisos
         restAvvisoMockMvc.perform(get("/api/avvisos?sort=id,desc"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(avviso.getId().intValue())))
                 .andExpect(jsonPath("$.[*].contenuto").value(hasItem(DEFAULT_CONTENUTO.toString())))
                 .andExpect(jsonPath("$.[*].attivo").value(hasItem(DEFAULT_ATTIVO.booleanValue())));
@@ -157,7 +157,7 @@ public class AvvisoResourceIntTest {
         // Get the avviso
         restAvvisoMockMvc.perform(get("/api/avvisos/{id}", avviso.getId()))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.id").value(avviso.getId().intValue()))
                 .andExpect(jsonPath("$.contenuto").value(DEFAULT_CONTENUTO.toString()))
                 .andExpect(jsonPath("$.attivo").value(DEFAULT_ATTIVO.booleanValue()));
@@ -180,7 +180,7 @@ public class AvvisoResourceIntTest {
         int databaseSizeBeforeUpdate = avvisoRepository.findAll().size();
 
         // Update the avviso
-        Avviso updatedAvviso = avvisoRepository.findOne(avviso.getId());
+        Avviso updatedAvviso = avvisoRepository.findById(avviso.getId()).get();
         updatedAvviso
                 .contenuto(UPDATED_CONTENUTO)
                 .attivo(UPDATED_ATTIVO);

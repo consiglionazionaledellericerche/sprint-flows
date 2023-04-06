@@ -77,7 +77,7 @@ public class CnrgroupService {
      */
     public void delete(Long id) {
         log.debug("Request to delete Cnrgroup : {}", id);
-        cnrgroupRepository.delete(id);
+        cnrgroupRepository.deleteById(id);
     }
 
 
