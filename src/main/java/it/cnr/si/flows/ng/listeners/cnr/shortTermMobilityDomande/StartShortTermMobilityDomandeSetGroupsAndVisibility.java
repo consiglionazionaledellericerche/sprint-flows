@@ -120,7 +120,9 @@ public class StartShortTermMobilityDomandeSetGroupsAndVisibility {
 			String denominazioneEOProponente = execution.getVariable("istitutoProponente").toString().substring(9);
 			cdsuoAppartenenzaUtente = execution.getVariable("cdsuoAppartenenzaUtente").toString();
 			if (!denominazioneEODirettore.equalsIgnoreCase(denominazioneEOProponente)) {
-				if (!cdsuoAppartenenzaDirettore.equalsIgnoreCase(cdsuoAppartenenzaUtente)) {
+				String cdsAppartenenzaDirettore = cdsuoAppartenenzaDirettore.substring(0,3);
+				String cdsAppartenenzaUtente = cdsuoAppartenenzaUtente.substring(0,3);
+				if (!cdsAppartenenzaDirettore.equalsIgnoreCase(cdsAppartenenzaUtente)) {
 					throw new BpmnError("400", "La struttura dichiarata dall'utente: " + userNameProponente + ": <br>" 
 							+ denominazioneEOProponente
 							+ "<br>non coincide con quella di afferenza amministrativa"
