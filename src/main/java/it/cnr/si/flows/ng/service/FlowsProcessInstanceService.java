@@ -3,11 +3,12 @@ package it.cnr.si.flows.ng.service;
 import com.opencsv.CSVWriter;
 import it.cnr.si.domain.View;
 import it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery;
-import it.cnr.si.flows.ng.utils.SecurityUtils;
+
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
 import it.cnr.si.security.PermissionEvaluatorImpl;
 import it.cnr.si.service.MembershipService;
+import it.cnr.si.service.SecurityService;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
 import org.activiti.engine.*;
@@ -28,6 +29,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
@@ -87,7 +89,10 @@ public class FlowsProcessInstanceService {
     private FlowsAttachmentService attachmentService;
     @Inject
     private MembershipService membershipService;
-
+    @Inject
+    private SecurityService securityService;
+    
+    
     public HistoricTaskInstance getCurrentTaskOfProcessInstance(String processInstanceId) {
         return historyService.createHistoricTaskInstanceQuery()
                 .processInstanceId(processInstanceId)
@@ -244,12 +249,15 @@ public class FlowsProcessInstanceService {
         }
         setSearchTerms(searchParams, processQuery);
 
-        List<String> authorities = Utils.getCurrentUserAuthorities();
-
+        List<String> authorities = securityService.getUser().get().getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+        
         // solo l'admin e se sto facendo una query per "flussi avviati da me" IGNORO LE REGOLE DI VISIBILITÀ
         if (!authorities.contains("ADMIN") || searchParams.containsKey(Utils.INITIATOR) ) {
             processQuery.setVisibleToGroups(authorities);
-            processQuery.setVisibleToUser(SecurityContextHolder.getContext().getAuthentication().getName());
+            processQuery.setVisibleToUser(securityService.getCurrentUserLogin());
         }
 
         if (!processDefinitionKey.equals(ALL_PROCESS_INSTANCES))
@@ -493,7 +501,7 @@ public class FlowsProcessInstanceService {
             return false;
         
         // 3. l'utente loggato e' abilitato alla Revoca
-        String currentUser = SecurityUtils.getCurrentUserLogin();
+        String currentUser = securityService.getCurrentUserLogin();
         Set<String> allRolesForUser = membershipService.getAllRolesForUser(currentUser);
         String idAceStrutturaDomandaRichiedente = String.valueOf(processInstance.getProcessVariables().get("idAceStrutturaDomandaRichiedente"));
         if ( abilitatiAllaRevoca.get(processInstance.getProcessDefinitionKey()).stream()

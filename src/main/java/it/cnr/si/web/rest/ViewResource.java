@@ -120,7 +120,7 @@ public class ViewResource {
     @Timed
     public ResponseEntity<View> getView(@PathVariable Long id) {
         log.debug("REST request to get View : {}", id);
-        View view = viewRepository.findOne(id);
+        View view = viewRepository.findById(id).get();
         return Optional.ofNullable(view)
             .map(result -> new ResponseEntity<>(
                 result,
@@ -140,7 +140,7 @@ public class ViewResource {
     @Timed
     public ResponseEntity<Void> deleteView(@PathVariable Long id) {
         log.debug("REST request to delete View : {}", id);
-        viewRepository.delete(id);
+        viewRepository.deleteById(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("view", id.toString())).build();
     }
 
