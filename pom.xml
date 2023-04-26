@@ -918,6 +918,9 @@
                                     <goal>bower</goal>
                                 </goals>
                                 <configuration>
+                                    <environmentVariables>
+                                        <NODE_OPTIONS>--use-openssl-ca</NODE_OPTIONS>
+                                    </environmentVariables>
                                     <arguments>install --allow-root --no-color</arguments>
                                 </configuration>
                             </execution>
