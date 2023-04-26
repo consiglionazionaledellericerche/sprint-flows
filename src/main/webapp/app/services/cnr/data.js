@@ -189,14 +189,11 @@
                     } else {
                         processDefinitionKey = 'all';
                     }
-                    return $http({
-                        method: 'POST',
-                        url: 'api/search/exportCsv/' + processDefinitionKey,
-                        data: searchParams,
-                        headers: {
-                            "Accept": "text/csv; charset=utf-8, text/plain; charset=utf-8"
-                        }
-                    });
+                    return $http.post('api/search/exportCsv/' + processDefinitionKey +
+                        '?active=' + searchParams.active +
+                        '&order=' + searchParams.order +
+                        '&firstResult=' + firstResult +
+                        '&maxResults=' + maxResults, searchParams);
                 },
                 exportCsvAndSaveInProcess: function (searchParams, firstResult, maxResults) {
                     var processDefinitionKey;

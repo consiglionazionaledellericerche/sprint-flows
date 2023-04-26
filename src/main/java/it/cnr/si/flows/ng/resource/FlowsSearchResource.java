@@ -85,10 +85,7 @@ public class FlowsSearchResource {
 	 * @param params               i "parametri della ricerca
 	 * @throws IOException the io exception
 	 */
-	@PostMapping(value = "/exportCsv/{processDefinitionKey}", 
-	        headers = "Accept=application/vnd.ms-excel", 
-	        consumes = MediaType.APPLICATION_JSON_VALUE, 
-	        produces = "text/csv; charset=utf-8")
+	@PostMapping(value = "/exportCsv/{processDefinitionKey}", headers = "Accept=application/vnd.ms-excel", consumes = MediaType.APPLICATION_JSON_VALUE, produces = "application/vnd.ms-excel")
 	@Secured(AuthoritiesConstants.USER)
 	@Timed
 	public void exportCsv(
