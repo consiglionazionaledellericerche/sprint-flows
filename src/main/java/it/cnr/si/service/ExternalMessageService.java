@@ -70,7 +70,7 @@ public class ExternalMessageService {
     @Transactional(readOnly = true) 
     public ExternalMessage findOne(Long id) {
         log.debug("Request to get ExternalMessage : {}", id);
-        ExternalMessage externalMessage = externalMessageRepository.findById(id).get();
+        ExternalMessage externalMessage = externalMessageRepository.findOne(id);
         return externalMessage;
     }
 
@@ -81,7 +81,7 @@ public class ExternalMessageService {
      */
     public void delete(Long id) {
         log.debug("Request to delete ExternalMessage : {}", id);
-        externalMessageRepository.deleteById(id);
+        externalMessageRepository.delete(id);
     }
 
     public void createExternalMessage(String url, ExternalMessageVerb verb, Map<String, Object> payload, ExternalApplication app) {

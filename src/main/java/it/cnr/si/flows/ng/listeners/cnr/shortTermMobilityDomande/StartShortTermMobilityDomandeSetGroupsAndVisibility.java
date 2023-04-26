@@ -115,20 +115,14 @@ public class StartShortTermMobilityDomandeSetGroupsAndVisibility {
 
 		//CHECK CORRISPONDENZA EO TRA DICHIARATO UTENTE E ACE
 		String denominazioneEODirettore = entitaOrganizzativaDirettore.getDenominazione();
-		String cdsuoAppartenenzaDirettore = entitaOrganizzativaDirettore.getCdsuo();
 		if (execution.getVariable("istitutoProponente") != null && !execution.getVariable("istitutoProponente").toString().equals("SEDE CENTRALE - DIPARTIMENTO")){
 			String denominazioneEOProponente = execution.getVariable("istitutoProponente").toString().substring(9);
-			cdsuoAppartenenzaUtente = execution.getVariable("cdsuoAppartenenzaUtente").toString();
 			if (!denominazioneEODirettore.equalsIgnoreCase(denominazioneEOProponente)) {
-				String cdsAppartenenzaDirettore = cdsuoAppartenenzaDirettore.substring(0,3);
-				String cdsAppartenenzaUtente = cdsuoAppartenenzaUtente.substring(0,3);
-				if (!cdsAppartenenzaDirettore.equalsIgnoreCase(cdsAppartenenzaUtente)) {
-					throw new BpmnError("400", "La struttura dichiarata dall'utente: " + userNameProponente + ": <br>" 
-							+ denominazioneEOProponente
-							+ "<br>non coincide con quella di afferenza amministrativa"
-							+ "<br>presente in anagrafica:<br>" + denominazioneEODirettore
-							+ "<br>contattare l'help desk in merito<br>");
-				}
+				throw new BpmnError("400", "La struttura dichiarata dall'utente: " + userNameProponente + ": <br>" 
+						+ denominazioneEOProponente
+						+ "<br>non coincide con quella di afferenza amministrativa"
+						+ "<br>presente in anagrafica:<br>" + denominazioneEODirettore
+						+ "<br>contattare l'help desk in merito<br>");
 			}
 		}
 
