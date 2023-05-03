@@ -48,7 +48,7 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(NullPointerException.class)
     protected ResponseEntity<Object> HandleNull(RuntimeException ex, WebRequest request) {
-        String bodyOfResponse = "E' stato ricevuto un null pointer per la richiesta "+ request.getContextPath();
+        String bodyOfResponse = "E' stato ricevuto un null pointer per la richiesta "+ request.getDescription(true);
         LOGGER.error(bodyOfResponse, ex);
 
         return handleExceptionInternal(ex, bodyOfResponse,
@@ -67,7 +67,7 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     protected ResponseEntity<Object> HandleAccessDenied(AccessDeniedException ex, WebRequest request) {
         String username = SecurityUtils.getCurrentUserLogin();
-        String contextPath = request.getContextPath();
+        String contextPath = request.getDescription(true);
         LOGGER.error(username +" ha cercato di accedere a una risorsa "+ contextPath +" ma non ha i permessi necessari", ex);
 
         String bodyOfResponse = "L'utente non ha i permessi necessari per eseguire l'azione richiesta";
@@ -156,7 +156,7 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> HandleUnknownException(Exception ex, WebRequest request) {
 
         long rif = Instant.now().toEpochMilli();
-        LOGGER.error("(Riferimento " + rif + ") Errore non gestito per la richiesta "+ request.getContextPath() +" con messaggio " + ex.getMessage(), ex);
+        LOGGER.error("(Riferimento " + rif + ") Errore non gestito per la richiesta "+ request.getDescription(true) +" con messaggio " + ex.getMessage(), ex);
 
         Map<String, Object> res = Utils.mapOf("message", "Errore non gestito. Contattare gli amminstratori specificando il numero di riferimento: " + rif);
         return handleExceptionInternal(ex, res,
