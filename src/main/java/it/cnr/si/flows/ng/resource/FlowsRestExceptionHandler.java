@@ -54,7 +54,7 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(NullPointerException.class)
     protected ResponseEntity<Object> HandleNull(RuntimeException ex, WebRequest request) {
-        String bodyOfResponse = "E' stato ricevuto un null pointer per la richiesta "+ request.getContextPath();
+        String bodyOfResponse = "E' stato ricevuto un null pointer per la richiesta "+ request.getDescription(true);
         LOGGER.error(bodyOfResponse, ex);
 
         return handleExceptionInternal(ex, bodyOfResponse,
@@ -73,7 +73,7 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     protected ResponseEntity<Object> HandleAccessDenied(AccessDeniedException ex, WebRequest request) {
         String username = securityService.getCurrentUserLogin();
-        String contextPath = request.getContextPath();
+        String contextPath = request.getDescription(true);
         LOGGER.error(username +" ha cercato di accedere a una risorsa "+ contextPath +" ma non ha i permessi necessari", ex);
 
         String bodyOfResponse = "L'utente non ha i permessi necessari per eseguire l'azione richiesta";
@@ -139,6 +139,9 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(MultipartException.class)
     protected ResponseEntity<Object> handleMultipartException(MultipartException ex, WebRequest request) {
 
+        long rif = Instant.now().toEpochMilli();
+        LOGGER.error("(Riferimento " + rif + ") Errore non gestito con messaggio " + ex.getMessage(), ex);
+
         if (ex.getMessage().contains("SizeLimitExceededException")) {
 
             Map<String, Object> res = Utils.mapOf("message", "I file allegati superano il limite massimo di grandezza (50MB)");
@@ -146,9 +149,6 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
 //                    new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
         }
-
-        long rif = Instant.now().toEpochMilli();
-        LOGGER.error("(Riferimento " + rif + ") Errore non gestito con messaggio " + ex.getMessage(), ex);
 
         Map<String, Object> res = Utils.mapOf("message", "Errore non gestito. Contattare gli amminstratori specificando il numero di riferimento: " + rif);
         return handleExceptionInternal(ex, res,
@@ -162,7 +162,7 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> HandleUnknownException(Exception ex, WebRequest request) {
 
         long rif = Instant.now().toEpochMilli();
-        LOGGER.error("(Riferimento " + rif + ") Errore non gestito per la richiesta "+ request.getContextPath() +" con messaggio " + ex.getMessage(), ex);
+        LOGGER.error("(Riferimento " + rif + ") Errore non gestito per la richiesta "+ request.getDescription(true) +" con messaggio " + ex.getMessage(), ex);
 
         Map<String, Object> res = Utils.mapOf("message", "Errore non gestito. Contattare gli amminstratori specificando il numero di riferimento: " + rif);
         return handleExceptionInternal(ex, res,
