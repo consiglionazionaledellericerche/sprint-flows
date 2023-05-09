@@ -72,7 +72,7 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     protected ResponseEntity<Object> HandleAccessDenied(AccessDeniedException ex, WebRequest request) {
-        String username = SecurityUtils.getCurrentUserLogin();
+        String username = securityService.getCurrentUserLogin();
         String contextPath = request.getDescription(true);
         LOGGER.error(username +" ha cercato di accedere a una risorsa "+ contextPath +" ma non ha i permessi necessari", ex);
 
