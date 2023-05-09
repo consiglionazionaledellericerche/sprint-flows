@@ -20,9 +20,10 @@ import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Enum.StatoDomandeMissioniEnum;
 import it.cnr.si.flows.ng.utils.Enum.TipologieeMissioniEnum;
-import it.cnr.si.flows.ng.utils.SecurityUtils;
+
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.ExternalMessageService;
+import it.cnr.si.service.SecurityService;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
 import it.cnr.si.domain.enumeration.ExternalApplication;
@@ -55,7 +56,8 @@ public class ManageProcessFirmaDocumenti_v1 implements ExecutionListener {
 	private Utils utils;
 	@Inject
 	private FlowsAttachmentService flowsAttachmentService;	
-
+    @Inject
+    private SecurityService securityService;
 
 	private Expression faseEsecuzione;
 
@@ -63,7 +65,7 @@ public class ManageProcessFirmaDocumenti_v1 implements ExecutionListener {
 
 	@Override
 	public void notify(DelegateExecution execution) throws Exception {
-		String currentUser = SecurityUtils.getCurrentUserLogin();
+		String currentUser = securityService.getCurrentUserLogin();
 		String processInstanceId =  execution.getProcessInstanceId();
 		String executionId =  execution.getId();
 		String stato =  execution.getCurrentActivityName();
@@ -99,16 +101,28 @@ public class ManageProcessFirmaDocumenti_v1 implements ExecutionListener {
 			}
 		};break; 
 
+
+
+		case "controfirma-start": {
+			//utils.updateJsonSearchTerms(executionId, processInstanceId, "FIRMA");
+		};break; 
+
+		case "controfirma-end": {
+			// FIRMA MULTIPLA TUTTI I DOCUMENTI DI UN CERTO TIPO
+			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
+				List<String> nomiVariabiliFile = new ArrayList<String>();
+				List<FlowsAttachment> attachments = flowsAttachmentService.getAttachmentArray(processInstanceId, "documentoDaFirmare");
+				if (attachments.size() == 0)
+					throw new TaskFailedException("Attachment non opzionali mancanti: " + "allegati");               
+				attachments.forEach(att -> nomiVariabiliFile.add(att.getName()));
+				firmaDocumentoService.eseguiFirmaMultipla(execution, nomiVariabiliFile, null);
+			}
+		};break; 
+
 		case "modifica-end": {
 			//Check se il gruppo VALIDATORI ha membri
 			if(sceltaUtente != null && !sceltaUtente.equals("Annulla")) {
-
-				List<SimpleUtenteWebDto> members = aceService.getUtentiInRuoloEo("validatoreFirmaDocumenti", Integer.parseInt(execution.getVariable("idStruttura").toString()));
-				if (members.isEmpty()) {
-					execution.setVariable("organizzazioneStruttura", "Semplice");
-				} else {
-					execution.setVariable("organizzazioneStruttura", "Complessa");
-				}
+				startFirmaDocumentiSetGroupsAndVisibility.configuraVariabiliStart(execution);
 			}
 		};break;
 

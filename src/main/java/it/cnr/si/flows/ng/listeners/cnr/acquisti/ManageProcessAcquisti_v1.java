@@ -6,10 +6,11 @@ import it.cnr.si.domain.enumeration.ExternalMessageVerb;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.listeners.cnr.acquisti.service.AcquistiService;
 import it.cnr.si.flows.ng.service.*;
-import it.cnr.si.flows.ng.utils.SecurityUtils;
+
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.ExternalMessageService;
+import it.cnr.si.service.SecurityService;
 import it.cnr.si.service.dto.anagrafica.letture.PersonaWebDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
 import it.cnr.si.spring.storage.StorageObject;
@@ -78,6 +79,8 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 	AceService aceService;
 	@Inject
 	private StoreService storeService;
+	@Inject
+	private SecurityService securityService;
 	@Inject
 	private Utils utils;
     @Value("${cnr.sigla.url}")
@@ -667,7 +670,7 @@ public class ManageProcessAcquisti_v1 implements ExecutionListener {
 			case "firma-contratto-end": {
 				if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
 					firmaDocumentoService.eseguiFirma(execution, "contratto", null);
-					execution.setVariable("usernameFirmatarioContratto", SecurityUtils.getCurrentUserLogin());
+					execution.setVariable("usernameFirmatarioContratto", securityService.getCurrentUserLogin());
 					Date dataStipulaContratto = new Date();
 					execution.setVariable("dataStipulaContratto", dataStipulaContratto);	
 				}
