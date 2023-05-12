@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -166,7 +167,9 @@ public class FlowsLookupResource {
     @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<List<Utils.SearchResult>> getSediUtentiApprovvigionamenti() {
 
-        List<Utils.SearchResult> CDSUOs = SecurityUtils.getCurrentUserAuthorities().stream()
+        List<Utils.SearchResult> CDSUOs = securityService.getUser().get().getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
                 .map(Utils::removeLeadingRole)
                 .filter(role -> role.startsWith("staffSegreteria"))
                 .map(role -> role.split("@")[1])
