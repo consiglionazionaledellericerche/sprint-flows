@@ -65,9 +65,9 @@
         $scope.exportCsv = function () {
             dataService.search.exportCsv(vm.searchParams, -1, -1)
                 .success(function (response) {
-                    var filename = new Date().toISOString().slice(0, 10) + ".xls",
+                    var filename = new Date().toISOString().slice(0, 10) + ".csv",
                         file = new Blob([response], {
-                            type: "application/vnd.ms-excel"
+                            type: "text/plain;charset=utf-8"
                         });
                     $log.info(file, filename);
                     saveAs(file, filename);

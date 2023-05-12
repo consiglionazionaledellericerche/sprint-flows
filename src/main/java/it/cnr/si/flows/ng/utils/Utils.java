@@ -75,13 +75,6 @@ public final class Utils {
         return groupRelationship.replace("@STRUTTURA", struttura);
     }
 
-    public static List<String> getCurrentUserAuthorities() {
-        return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .map(Utils::removeLeadingRole)
-                .collect(Collectors.toList());
-    }
-
     public static String removeLeadingRole(String in) {
         return in.startsWith(ROLE) ? in.substring(5) : in;
     }

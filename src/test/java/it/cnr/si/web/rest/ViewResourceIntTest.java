@@ -182,7 +182,7 @@ public class ViewResourceIntTest {
         // Get all the views
         restViewMockMvc.perform(get("/api/views?sort=id,desc"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(view.getId().intValue())))
                 .andExpect(jsonPath("$.[*].processId").value(hasItem(DEFAULT_PROCESS_ID.toString())))
                 .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())))
@@ -199,7 +199,7 @@ public class ViewResourceIntTest {
         // Get the view
         restViewMockMvc.perform(get("/api/views/{id}", view.getId()))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(view.getId().intValue()))
             .andExpect(jsonPath("$.processId").value(DEFAULT_PROCESS_ID.toString()))
             .andExpect(jsonPath("$.type").value(DEFAULT_TYPE.toString()))
@@ -223,7 +223,7 @@ public class ViewResourceIntTest {
         int databaseSizeBeforeUpdate = viewRepository.findAll().size();
 
         // Update the view
-        View updatedView = viewRepository.findOne(view.getId());
+        View updatedView = viewRepository.findById(view.getId()).get();
         updatedView
                 .processId(UPDATED_PROCESS_ID)
                 .type(UPDATED_TYPE)

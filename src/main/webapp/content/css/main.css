@@ -1,6 +1,6 @@
 body {
     background: #ddd;
-    font-family: "Helvetica Neue", Helvetica, "Open Sans", "Droid Sans", "Roboto", "Segoe", "Arial", sans-serif;
+    font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, "Open Sans", "Droid Sans", "Roboto", "Segoe", "Arial", sans-serif;
     color: #222;
 }
 
@@ -98,7 +98,7 @@ Logo styles
 }
 
 .logo .logo-img {
-    height: 45px;
+    height: 40px;
     display: inline-block;
 }
 
