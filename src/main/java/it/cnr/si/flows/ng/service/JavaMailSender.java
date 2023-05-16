@@ -13,19 +13,19 @@ import java.util.Properties;
 public class JavaMailSender extends JavaMailSenderImpl {
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaMailSender.class);
 
-    @Value("cnr.mail.mail.host")
+    @Value("${cnr.mail.mail.host}")
     private String mailHost;
-    @Value("cnr.mail.mail.port")
+    @Value("${cnr.mail.mail.port}")
     private String mailPort;
-    @Value("cnr.mail.mail.protocol")
+    @Value("${cnr.mail.mail.protocol}")
     private String mailProtocol;
-    @Value("cnr.mail.mail.user")
+    @Value("${cnr.mail.mail.user}")
     private String mailUser;
-    @Value("cnr.mail.mail.user")
+    @Value("${cnr.mail.mail.user}")
     private String mailPassword;
-    @Value("cnr.mail.mail.send.error.to")
+    @Value("${cnr.mail.mail.send.error.to}")
     private String mailSendErrorTo;
-    @Value("cnr.mail.mail.from")
+    @Value("${cnr.mail.mail.from}")
     private String mailFrom;
 
     @PostConstruct
