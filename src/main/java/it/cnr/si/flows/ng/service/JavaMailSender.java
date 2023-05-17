@@ -19,9 +19,9 @@ public class JavaMailSender extends JavaMailSenderImpl {
     private String mailPort;
     @Value("${cnr.mail.mail.protocol}")
     private String mailProtocol;
-    @Value("${cnr.mail.mail.user}")
-    private String mailUser;
-    @Value("${cnr.mail.mail.user}")
+    @Value("${cnr.mail.mail.username}")
+    private String mailUsername;
+    @Value("${cnr.mail.mail.password}")
     private String mailPassword;
     @Value("${cnr.mail.mail.send.error.to}")
     private String mailSendErrorTo;
@@ -39,7 +39,7 @@ public class JavaMailSender extends JavaMailSenderImpl {
         } catch (Exception e) {}
         
         setProtocol(mailProtocol);
-        setUsername(mailUser);
+        setUsername(mailUsername);
         setPassword(mailPassword);
 
         Properties props = new Properties();
@@ -52,7 +52,7 @@ public class JavaMailSender extends JavaMailSenderImpl {
             mailHost,
             mailPort,
             mailProtocol,
-            mailUser,
+            mailUsername,
             "****",
             props);
     }
