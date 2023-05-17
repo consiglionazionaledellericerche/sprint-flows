@@ -17,7 +17,7 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
-@Profile("cnr")
+@Profile("cnr & scheduler")
 @EnableScheduling
 @Configuration
 public class EventScheduler {
