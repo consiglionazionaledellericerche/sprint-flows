@@ -13,6 +13,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -46,7 +47,7 @@ public class EventScheduler {
         }
     }
 
-    @Scheduled(fixedDelay = 21600000, initialDelay = 60000) // 6h
+    @Scheduled(fixedDelay = 3600000, initialDelay = 60000) // 6h
     public void scheduledSendErrorMessages() {
 
         Member master = hazelcastInstance.getCluster().getMembers().iterator().next();
@@ -69,7 +70,8 @@ public class EventScheduler {
     }
 
     private boolean isMaster() {
-        Member master = hazelcastInstance.getCluster().getMembers().iterator().next();
-        return master == hazelcastInstance.getCluster().getLocalMember();
+        Optional<String> masterId = hazelcastInstance.getCluster().getMembers().stream()
+                .map(Member::getUuid).sorted().findFirst();
+        return masterId.get().equals(hazelcastInstance.getCluster().getLocalMember().getUuid());
     }
 }
