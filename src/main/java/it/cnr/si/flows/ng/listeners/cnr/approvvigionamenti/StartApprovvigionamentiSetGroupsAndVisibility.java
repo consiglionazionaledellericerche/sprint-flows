@@ -47,48 +47,43 @@ public class StartApprovvigionamentiSetGroupsAndVisibility {
 		String initiator = (String) execution.getVariable(Enum.VariableEnum.initiator.name());
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
 		List<String> groups = membershipService.getAllRolesForUser(initiator).stream()
-				.filter(g -> g.startsWith("staffFirmaDocumenti@"))
+				.filter(g -> g.startsWith("staffApprovvigionamenti@"))
 				.collect(Collectors.toList());
 		if (groups.isEmpty())
 			throw new BpmnError("403", "L'utente non e' abilitato ad avviare questo flusso");
 		else {
 			String struttura = execution.getVariable(idStruttura.name()).toString();
-
-			String gruppoValidatori = "validatoreFirmaDocumenti@"+ struttura;
-			String gruppoFirmatari = "firmatarioFirmaDocumenti@"+ struttura;
-			String gruppoRichiedente = "staffFirmaDocumenti@"+ struttura;
-			String gruppoProtocollo = "protocolloFirmaDocumenti@"+ struttura;
-			if (execution.getVariable("tipologiaDocumento").toString().equals("Privato")){
-				groups = membershipService.getAllRolesForUser(initiator).stream()
-						.filter(g -> g.startsWith("staffFirmaDocumentiPrivati@"))
-						.collect(Collectors.toList());
-				if (groups.isEmpty()) {
-					throw new BpmnError("403", "L'utente non e' abilitato ad avviare questo flusso");				
-				} 
-				else {
-					gruppoRichiedente = "staffFirmaDocumentiPrivati@"+ struttura;
-					gruppoProtocollo = "protocolloFirmaDocumentiPrivati@"+ struttura;
-				}
+			String gruppoVerifica = "responsabileApprovvigionamenti@0000";
+			String gruppoLavorazione = "responsabileApprovvigionamenti@0000";
+			
+			if (execution.getVariable("tipologiaRichiesta").toString().startsWith("Telefonia-Fissa")){
+				gruppoLavorazione = "gruppoLavorazioneTelefoniaFissa@0000";
+			} 			
+			if (execution.getVariable("tipologiaRichiesta").toString().startsWith("Telefonia-Mobile")){
+				gruppoLavorazione = "gruppoLavorazioneTelefoniaMobile@0000";
+			} 			
+			if (execution.getVariable("tipologiaRichiesta").toString().startsWith("Cablaggio")){
+				gruppoLavorazione = "gruppoLavorazioneCablaggio@0000";
+			} 			
+			if (execution.getVariable("tipologiaRichiesta").toString().startsWith("Desktop")){
+				gruppoLavorazione = "gruppoLavorazioneDesktop@0000";
 			} 
 
-			LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoValidatori, gruppoFirmatari, gruppoRichiedente, gruppoProtocollo);
+			LOGGER.debug("Imposto i gruppi del flusso: gruppoVerifica: {} e gruppoLavorazione: {}", gruppoVerifica, gruppoLavorazione);
 
 
 			execution.setVariable("nomeStruttura", aceBridgeService.getNomeStruturaById(Integer.parseInt(struttura)));
 
-			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValidatori, PROCESS_VISUALIZER);
-			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoFirmatari, PROCESS_VISUALIZER);
-			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoRichiedente, PROCESS_VISUALIZER);
-			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoProtocollo, PROCESS_VISUALIZER);
-
+			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoVerifica, PROCESS_VISUALIZER);
+			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoLavorazione, PROCESS_VISUALIZER);
+			
 			SimpleEntitaOrganizzativaWebDto strutturaAcquisto = aceService.entitaOrganizzativaById(Integer.parseInt(struttura));
+			execution.setVariable("idStruttura", struttura);
 			execution.setVariable("cdsuo", strutturaAcquisto.getCdsuo());
 			execution.setVariable("idnsip", strutturaAcquisto.getIdnsip());
 			execution.setVariable("denominazione", strutturaAcquisto.getDenominazione());
-			execution.setVariable("gruppoValidatori", gruppoValidatori);
-			execution.setVariable("gruppoFirmatari", gruppoFirmatari);
-			execution.setVariable("gruppoRichiedente", gruppoRichiedente);
-			execution.setVariable("gruppoProtocollo", gruppoProtocollo);
+			execution.setVariable("gruppoVerifica", gruppoVerifica);
+			execution.setVariable("gruppoLavorazione", gruppoLavorazione);
 			execution.setVariable("userNameRichiedente", initiator);
 		}
 	}
