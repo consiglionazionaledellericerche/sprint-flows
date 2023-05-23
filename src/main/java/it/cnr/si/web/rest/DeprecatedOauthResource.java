@@ -37,7 +37,7 @@ public class DeprecatedOauthResource {
     @Deprecated
     @PostMapping(
             path = "oauth/token",
-            consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE},
+            consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE, MediaType.ALL_VALUE},
             produces = MediaType.APPLICATION_JSON_VALUE)
         public ResponseEntity<String> autorizeoauth(
                 @RequestHeader HttpHeaders inHeaders,
