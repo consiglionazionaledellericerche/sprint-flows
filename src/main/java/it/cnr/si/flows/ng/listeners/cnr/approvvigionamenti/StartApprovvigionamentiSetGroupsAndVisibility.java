@@ -53,19 +53,20 @@ public class StartApprovvigionamentiSetGroupsAndVisibility {
 			throw new BpmnError("403", "L'utente non e' abilitato ad avviare questo flusso");
 		else {
 			String struttura = execution.getVariable(idStruttura.name()).toString();
+			String staffApprovvigionamenti = "staffApprovvigionamenti@" + struttura;
 			String gruppoResponsabileApprovvigionamenti = "responsabileApprovvigionamenti@0000";
 			String gruppoLavorazione = "responsabileApprovvigionamenti@0000";
 			
-			if (execution.getVariable("tipologiaRichiesta").toString().startsWith("Telefonia-Fissa")){
+			if (execution.getVariable("tipologiaRichiesta").toString().startsWith("telefoniaFissa")){
 				gruppoLavorazione = "gruppoLavorazioneTelefoniaFissa@0000";
 			} 			
-			if (execution.getVariable("tipologiaRichiesta").toString().startsWith("Telefonia-Mobile")){
+			if (execution.getVariable("tipologiaRichiesta").toString().startsWith("telefoniaMobile")){
 				gruppoLavorazione = "gruppoLavorazioneTelefoniaMobile@0000";
 			} 			
-			if (execution.getVariable("tipologiaRichiesta").toString().startsWith("Cablaggio")){
+			if (execution.getVariable("tipologiaRichiesta").toString().startsWith("cablaggio")){
 				gruppoLavorazione = "gruppoLavorazioneCablaggio@0000";
 			} 			
-			if (execution.getVariable("tipologiaRichiesta").toString().startsWith("Desktop")){
+			if (execution.getVariable("tipologiaRichiesta").toString().startsWith("desktop")){
 				gruppoLavorazione = "gruppoLavorazioneDesktop@0000";
 			} 
 
@@ -84,6 +85,7 @@ public class StartApprovvigionamentiSetGroupsAndVisibility {
 			execution.setVariable("denominazione", strutturaAcquisto.getDenominazione());
 			execution.setVariable("gruppoResponsabileApprovvigionamenti", gruppoResponsabileApprovvigionamenti);
 			execution.setVariable("gruppoLavorazione", gruppoLavorazione);
+			execution.setVariable("staffApprovvigionamenti", staffApprovvigionamenti);
 			execution.setVariable("userNameRichiedente", initiator);
 		}
 	}
