@@ -53,7 +53,7 @@ public class StartApprovvigionamentiSetGroupsAndVisibility {
 			throw new BpmnError("403", "L'utente non e' abilitato ad avviare questo flusso");
 		else {
 			String struttura = execution.getVariable(idStruttura.name()).toString();
-			String gruppoVerifica = "responsabileApprovvigionamenti@0000";
+			String gruppoResponsabileApprovvigionamenti = "responsabileApprovvigionamenti@0000";
 			String gruppoLavorazione = "responsabileApprovvigionamenti@0000";
 			
 			if (execution.getVariable("tipologiaRichiesta").toString().startsWith("Telefonia-Fissa")){
@@ -69,12 +69,12 @@ public class StartApprovvigionamentiSetGroupsAndVisibility {
 				gruppoLavorazione = "gruppoLavorazioneDesktop@0000";
 			} 
 
-			LOGGER.debug("Imposto i gruppi del flusso: gruppoVerifica: {} e gruppoLavorazione: {}", gruppoVerifica, gruppoLavorazione);
+			LOGGER.debug("Imposto i gruppi del flusso: gruppoResponsabileApprovvigionamenti: {} e gruppoLavorazione: {}", gruppoResponsabileApprovvigionamenti, gruppoLavorazione);
 
 
 			execution.setVariable("nomeStruttura", aceBridgeService.getNomeStruturaById(Integer.parseInt(struttura)));
 
-			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoVerifica, PROCESS_VISUALIZER);
+			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileApprovvigionamenti, PROCESS_VISUALIZER);
 			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoLavorazione, PROCESS_VISUALIZER);
 			
 			SimpleEntitaOrganizzativaWebDto strutturaAcquisto = aceService.entitaOrganizzativaById(Integer.parseInt(struttura));
@@ -82,7 +82,7 @@ public class StartApprovvigionamentiSetGroupsAndVisibility {
 			execution.setVariable("cdsuo", strutturaAcquisto.getCdsuo());
 			execution.setVariable("idnsip", strutturaAcquisto.getIdnsip());
 			execution.setVariable("denominazione", strutturaAcquisto.getDenominazione());
-			execution.setVariable("gruppoVerifica", gruppoVerifica);
+			execution.setVariable("gruppoResponsabileApprovvigionamenti", gruppoResponsabileApprovvigionamenti);
 			execution.setVariable("gruppoLavorazione", gruppoLavorazione);
 			execution.setVariable("userNameRichiedente", initiator);
 		}

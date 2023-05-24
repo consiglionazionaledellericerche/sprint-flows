@@ -2,12 +2,12 @@
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
   <process id="approvvigionamenti" name="Approvvigionamenti IT" isExecutable="true">
     <extensionElements>
-      <activiti:executionListener event="start" delegateExpression="${approvvigionamenti_v1}">
+      <activiti:executionListener event="start" delegateExpression="${manageProcessApprovvigionamenti_v1}">
         <activiti:field name="faseEsecuzione">
           <activiti:string><![CDATA[process-start]]></activiti:string>
         </activiti:field>
       </activiti:executionListener>
-      <activiti:executionListener event="end" delegateExpression="${approvvigionamenti_v1}">
+      <activiti:executionListener event="end" delegateExpression="${manageProcessApprovvigionamenti_v1}">
         <activiti:field name="faseEsecuzione">
           <activiti:string><![CDATA[process-end]]></activiti:string>
         </activiti:field>
@@ -17,12 +17,12 @@
     <sequenceFlow id="flow1" name="START" sourceRef="startevent1" targetRef="verifica"></sequenceFlow>
     <userTask id="verifica" name="VERIFICA" activiti:candidateGroups="${gruppoResponsabileApprovvigionamenti}">
       <extensionElements>
-        <activiti:executionListener event="start" delegateExpression="${manageApprovvigionameni_v1}">
+        <activiti:executionListener event="start" delegateExpression="${manageProcessApprovvigionamenti_v1}">
           <activiti:field name="faseEsecuzione">
             <activiti:string><![CDATA[verifica-start]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
-        <activiti:executionListener event="end" delegateExpression="${manageApprovvigionameni_v1}">
+        <activiti:executionListener event="end" delegateExpression="${manageProcessApprovvigionamenti_v1}">
           <activiti:field name="faseEsecuzione">
             <activiti:string><![CDATA[verifica-end]]></activiti:string>
           </activiti:field>
@@ -31,7 +31,7 @@
     </userTask>
     <endEvent id="endevent3" name="End">
       <extensionElements>
-        <activiti:executionListener event="start" delegateExpression="${manageApprovvigionameni_v1}">
+        <activiti:executionListener event="start" delegateExpression="${manageProcessApprovvigionamenti_v1}">
           <activiti:field name="faseEsecuzione">
             <activiti:string><![CDATA[endevent-evasa-start]]></activiti:string>
           </activiti:field>
@@ -45,12 +45,12 @@
     </sequenceFlow>
     <userTask id="modifica" name="MODIFICA" activiti:assignee="${initiator}">
       <extensionElements>
-        <activiti:executionListener event="start" delegateExpression="${manageApprovvigionameni_v1}">
+        <activiti:executionListener event="start" delegateExpression="${manageProcessApprovvigionamenti_v1}">
           <activiti:field name="faseEsecuzione">
             <activiti:string><![CDATA[modifica-start]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
-        <activiti:executionListener event="end" delegateExpression="${manageApprovvigionameni_v1}">
+        <activiti:executionListener event="end" delegateExpression="${manageProcessApprovvigionamenti_v1}">
           <activiti:field name="faseEsecuzione">
             <activiti:string><![CDATA[modifica-end]]></activiti:string>
           </activiti:field>
@@ -60,12 +60,12 @@
     <sequenceFlow id="flow17" sourceRef="exclusivegateway6" targetRef="modifica"></sequenceFlow>
     <userTask id="lavorazione" name="LAVORAZIONE" activiti:candidateGroups="${gruppoEspertiApprovvigionamenti}">
       <extensionElements>
-        <activiti:executionListener event="start" delegateExpression="${manageApprovvigionameni_v1}">
+        <activiti:executionListener event="start" delegateExpression="${manageProcessApprovvigionamenti_v1}">
           <activiti:field name="faseEsecuzione">
             <activiti:string><![CDATA[lavorazione-start]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
-        <activiti:executionListener event="end" delegateExpression="${manageApprovvigionameni_v1}">
+        <activiti:executionListener event="end" delegateExpression="${manageProcessApprovvigionamenti_v1}">
           <activiti:field name="faseEsecuzione">
             <activiti:string><![CDATA[lavorazione-end]]></activiti:string>
           </activiti:field>
@@ -77,7 +77,7 @@
     <sequenceFlow id="flow20" name="EVASA" sourceRef="exclusivegateway7" targetRef="endevent3"></sequenceFlow>
     <endEvent id="endevent4" name="End">
       <extensionElements>
-        <activiti:executionListener event="start" delegateExpression="${manageApprovvigionameni_v1}">
+        <activiti:executionListener event="start" delegateExpression="${manageProcessApprovvigionamenti_v1}">
           <activiti:field name="faseEsecuzione">
             <activiti:string><![CDATA[endevent-inevasa-start]]></activiti:string>
           </activiti:field>
@@ -91,7 +91,7 @@
     <sequenceFlow id="flow25" sourceRef="modifica" targetRef="exclusivegateway9"></sequenceFlow>
     <endEvent id="endevent5" name="End">
       <extensionElements>
-        <activiti:executionListener event="start" delegateExpression="${manageApprovvigionameni_v1}">
+        <activiti:executionListener event="start" delegateExpression="${manageProcessApprovvigionamenti_v1}">
           <activiti:field name="faseEsecuzione">
             <activiti:string><![CDATA[endevent-annullata-start]]></activiti:string>
           </activiti:field>

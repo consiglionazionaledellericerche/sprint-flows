@@ -163,7 +163,7 @@ public class FlowsLookupResource {
     }
 
     
-    @RequestMapping(value = "/ace/user/sedirichiedenteApprovvigionamenti", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/ace/user/sediRichiedenteApprovvigionamenti", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<List<Utils.SearchResult>> getSediUtentiApprovvigionamenti() {
 
@@ -171,7 +171,7 @@ public class FlowsLookupResource {
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .map(Utils::removeLeadingRole)
-                .filter(role -> role.startsWith("staffSegreteria"))
+                .filter(role -> role.startsWith("staffApprovvigionamenti"))
                 .map(role -> role.split("@")[1])
                 .map(idEo -> {
                     Integer id = Integer.parseInt(idEo);

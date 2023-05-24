@@ -227,7 +227,7 @@
                     return $http.get('api/lookup/ace/user/sedirichiedentefirma');
                 },
                 mysediApprovvigionamenti: function () {
-                    return $http.get('api/lookup/ace/user/sedirichiedenteApprovvigionamenti');
+                    return $http.get('api/lookup/ace/user/sediRichiedenteApprovvigionamenti');
                 },
                 boss: function () {
                     return $http.get('api/lookup/ace/boss');

@@ -81,6 +81,9 @@ public class ManageProcessApprovvigionamenti_v1 implements ExecutionListener {
 
 		switch(faseEsecuzioneValue){  
 		// START
+		case "process-start": {
+			//code
+		};break; 
 		case "verifica-start": {
 			startApprovvigionamentiSetGroupsAndVisibility.configuraVariabiliStart(execution);
 		};break;    
