@@ -56,8 +56,8 @@ public class ManageProcessApprovvigionamenti_v1 implements ExecutionListener {
 	private Utils utils;
 	@Inject
 	private FlowsAttachmentService flowsAttachmentService;	
-    @Inject
-    private SecurityService securityService;
+	@Inject
+	private SecurityService securityService;
 
 	private Expression faseEsecuzione;
 
@@ -89,7 +89,22 @@ public class ManageProcessApprovvigionamenti_v1 implements ExecutionListener {
 		};break;    
 
 		case "verifica-end": {
-			//code
+			if(execution.getVariable("sceltaUtente") != null && execution.getVariable("sceltaUtente").equals("ModificaTipologia-Valida")) {
+				String gruppoLavorazione = "responsabileApprovvigionamenti@0000";
+				if (execution.getVariable("tipologiaRichiesta").toString().startsWith("telefoniaFissa")){
+					gruppoLavorazione = "gruppoLavorazioneTelefoniaFissa@0000";
+				} 			
+				if (execution.getVariable("tipologiaRichiesta").toString().startsWith("telefoniaMobile")){
+					gruppoLavorazione = "gruppoLavorazioneTelefoniaMobile@0000";
+				} 			
+				if (execution.getVariable("tipologiaRichiesta").toString().startsWith("cablaggio")){
+					gruppoLavorazione = "gruppoLavorazioneCablaggio@0000";
+				} 			
+				if (execution.getVariable("tipologiaRichiesta").toString().startsWith("desktop")){
+					gruppoLavorazione = "gruppoLavorazioneDesktop@0000";
+				}
+				execution.setVariable("gruppoLavorazione", gruppoLavorazione);
+			} 
 		};break; 
 
 		case "lavorazione-start": {
