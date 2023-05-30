@@ -252,6 +252,7 @@ public class CustomKeyCloakAuthenticationProvider extends KeycloakAuthentication
         if (isCNRUser(account)) {
             cnrUser.setMatricola(Optional.ofNullable(getMatricola(account))
                     .orElse(Optional.ofNullable(getUsernameCNR(account)).orElse(token.getPreferredUsername())));
+            cnrUser.setLivello(userInfo.map(UserInfoDto::getLivello_profilo).orElse(null));            
         }
         
         return Optional.of(cnrUser);
