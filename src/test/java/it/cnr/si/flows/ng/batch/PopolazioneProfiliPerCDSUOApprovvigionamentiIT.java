@@ -114,7 +114,7 @@ public class PopolazioneProfiliPerCDSUOApprovvigionamentiIT {
 		//		Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/singoloGruppoUtentiProceduraAcquisti.csv"));
 		//		Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/ProceduraAcquisti-Utenti-ICCOM.csv"));
 		//		Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/ProceduraAcquisti-Utenti-SISINFO.csv"));
-		Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/Approvvigionamenti-IT-Utenti.csv"));
+		Stream<String> lines = Files.lines(Paths.get("./src/test/resources/batch/Approvvigionamenti-IT-Utenti.csv"));
 
 
 		i = 0;
