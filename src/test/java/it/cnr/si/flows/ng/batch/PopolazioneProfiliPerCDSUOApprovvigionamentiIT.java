@@ -96,6 +96,7 @@ public class PopolazioneProfiliPerCDSUOApprovvigionamentiIT {
 					System.out.println("idRuolo: " + idRuolo + " (" + siglaRuolo + ")");
 					System.out.println("idPersona: " + idPersona + " (" + username + ")");
 					System.out.println("idSede: " + idSede + " (" + nrSede + ")");	
+					System.out.println("data: " + data );	
 
 					System.out.println("Associato ruolo " + idRuolo + " - idPersona " + idPersona + " - idSede " + idSede);
 					List<BossDto> listaRuoliUtente = aceService.ruoliEoAttivi(username);
@@ -107,7 +108,7 @@ public class PopolazioneProfiliPerCDSUOApprovvigionamentiIT {
 						} 
 					}
 					if (!utenteRuoloEoPresente) {
-						aceService.associaRuoloPersona(idRuolo, idPersona, idSede, java.time.LocalDate.now(),null,false,false,"","");
+						aceService.associaRuoloPersona(idRuolo, idPersona, idSede, java.time.LocalDate.parse(data),null,false,false,"","");
 						//aceService.associaRuoloPersona(idRuolo, idPersona, idSede, java.time.LocalDate.now(),java.time.LocalDate.parse("2025-10-23"),false,false,"","");
 					}
 				}
