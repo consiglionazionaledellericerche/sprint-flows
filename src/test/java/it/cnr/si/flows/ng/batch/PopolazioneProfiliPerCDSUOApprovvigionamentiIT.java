@@ -11,6 +11,7 @@ import it.cnr.si.service.AceService;
 import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.RelationshipService;
 import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
+import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
 
 import org.junit.Ignore;
@@ -53,7 +54,7 @@ public class PopolazioneProfiliPerCDSUOApprovvigionamentiIT {
 	int i = 0;
 
 	//@Test questa riga non va mai messa su git
-	//@Test
+	@Test
 	public void runBatch() throws IOException {
 		//String[][] persone = getPersoneDaFile();
 
@@ -73,9 +74,9 @@ public class PopolazioneProfiliPerCDSUOApprovvigionamentiIT {
 
 	private void inserisciRuolo(String username, String siglaRuolo, String NR_CDSUO, String data) {
 
-		siglaRuolo = "staffApprovvigionamenti";
-		username = "domenica.cava";
-		NR_CDSUO = "113000";
+		//siglaRuolo = "staffApprovvigionamenti";
+		//username = "domenica.cava";
+		//NR_CDSUO = "113000";
 		Integer idRuolo = aceService.getRuoloBySigla(siglaRuolo).getId();
 		Integer idPersona = aceService.getPersonaByUsername(username).getId();
 
@@ -86,24 +87,32 @@ public class PopolazioneProfiliPerCDSUOApprovvigionamentiIT {
 
 		for (int i = 0; i < listaSedi.size(); i++) {
 			nrSede = listaSedi.get(i).getIdnsip();
-			System.out.println(nrSede);
+			System.out.println("-------- nrSede: " + nrSede + " (cdsuo= " + NR_CDSUO + " ) ---------");
 			if(nrSede != null && listaSedi.get(i).getCdsuo().equals(NR_CDSUO) ) {
 				if(aceService.getSedeIdByIdNsip(nrSede) != null) {
 
 					Integer idSede = Integer.valueOf(aceService.getSedeIdByIdNsip(nrSede).toString());
 
-					System.out.println("idRuolo: " + idRuolo);
-					System.out.println("idPersona: " + idPersona);
-					System.out.println("idSede: " + idSede);	
+					System.out.println("idRuolo: " + idRuolo + " (" + siglaRuolo + ")");
+					System.out.println("idPersona: " + idPersona + " (" + username + ")");
+					System.out.println("idSede: " + idSede + " (" + nrSede + ")");	
 
-					System.out.println("Associato ruolo " + idRuolo + "idPersona " + idPersona + " idSede " + idSede);
-					aceService.associaRuoloPersona(idRuolo, idPersona, idSede, java.time.LocalDate.now(),java.time.LocalDate.parse("2025-10-23"),false,false,"","");
-
+					System.out.println("Associato ruolo " + idRuolo + " - idPersona " + idPersona + " - idSede " + idSede);
+					List<BossDto> listaRuoliUtente = aceService.ruoliEoAttivi(username);
+					boolean utenteRuoloEoPresente = false;
+					for (int j = 0; j < listaRuoliUtente.size(); j++) {
+						if((listaRuoliUtente.get(j).getEntitaOrganizzativa().getId().equals(idSede)) && (listaRuoliUtente.get(j).getRuolo().getId().equals(idRuolo))){
+							utenteRuoloEoPresente = true;
+							System.out.println("UTENTE " + username + " già associato al ruolo " + idRuolo + " - idPersona " + idPersona + " - idSede " + idSede);
+						} 
+					}
+					if (!utenteRuoloEoPresente) {
+						aceService.associaRuoloPersona(idRuolo, idPersona, idSede, java.time.LocalDate.now(),null,false,false,"","");
+						//aceService.associaRuoloPersona(idRuolo, idPersona, idSede, java.time.LocalDate.now(),java.time.LocalDate.parse("2025-10-23"),false,false,"","");
+					}
 				}
 			}
 		}
-
-
 	}
 
 	private Map<Integer, associazioneRuoloPersonaCDSUO> getPersoneDaFile() throws IOException {
