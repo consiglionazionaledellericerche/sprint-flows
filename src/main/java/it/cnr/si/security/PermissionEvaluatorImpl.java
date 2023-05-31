@@ -2,6 +2,7 @@ package it.cnr.si.security;
 
 import it.cnr.si.flows.ng.resource.FlowsProcessDefinitionResource;
 import it.cnr.si.service.MembershipService;
+import it.cnr.si.service.SecurityService;
 import it.cnr.si.flows.ng.utils.Utils;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RuntimeService;
@@ -62,20 +63,19 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
     RestResponseFactory restResponseFactory;
     @Autowired
     private MembershipService membershipService;
-
+    @Inject
+    private SecurityService securityService;
 
     /**
      * Determina se un utente ha i permessi per visualizzare un Task.
      * *
      *
      * @param taskId                  l'id del taskd
-     * @param flowsUserDetailsService flowsUserDetailService: non posso "iniettarlo" nella classe perchè altrimenti avrei
-     *                               una dipendenza ciclica visto che anche le classi che lo richiamano potrebbero averlo iniettato
      * @return risultato della verifica dei permessi (booleano)
      */
-    public boolean canVisualizeTask(String taskId, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
-        Optional<String> username = Optional.of(SecurityUtils.getCurrentUserLogin());
-        List<String> authorities = getAuthorities(username.orElse(""), flowsUserDetailsService).stream()
+    public boolean canVisualizeTask(String taskId) {
+        Optional<String> username = Optional.of(securityService.getCurrentUserLogin());
+        List<String> authorities = getAuthorities(username.orElse("")).stream()
                 .map(Utils::removeImportoSpesa) // Non mi interessa filtrare per importo spesa
                 .collect(Collectors.toList());
 
@@ -90,15 +90,13 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
      * o far partire un flusso.
      *
      * @param req                     La req da cui prendo i vari parametri (per comodità i parametri non sono specificati nella signature del metodo che richiama la verifica)
-     * @param flowsUserDetailsService flowsUserDetailService: non posso "iniettarlo" nella classe perchè altrimenti avrei
-     *                               una dipendenza ciclica visto che anche le classi che lo richiamano potrebbero averlo iniettato
      * @return risultato della verifica dei permessi (booleano)
      */
-    public boolean canCompleteTaskOrStartProcessInstance(MultipartHttpServletRequest req, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
+    public boolean canCompleteTaskOrStartProcessInstance(MultipartHttpServletRequest req) {
         String taskId = req.getParameter("taskId");
 
         if (taskId != null) {
-            return canCompleteTask(taskId, flowsUserDetailsService);
+            return canCompleteTask(taskId);
         } else {
             //Se non è valorizzato il taskId allora sto "avviando" un nuovo workflow e verifico di averne i permessi
             String definitionKey = req.getParameter("processDefinitionId").split(":")[0];
@@ -106,8 +104,8 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
         }
     }
 
-    public boolean canCompleteTask(String taskId, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
-        String username = SecurityUtils.getCurrentUserLogin();
+    public boolean canCompleteTask(String taskId) {
+        String username = securityService.getCurrentUserLogin();
         Task task = taskService.createTaskQuery()
                 .taskId(taskId)
                 .singleResult();
@@ -115,20 +113,29 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
             return false;
         String assignee = task.getAssignee();
         List<String> authorities =
-                getAuthorities(username, flowsUserDetailsService);
-        
+                getAuthorities(username);
+                
         // l'utente puo' completare il task se e' lui l'assegnatario 
         // oppure se l'importo spesa della sua delega è superiore all'importo del flusso acquisti
+        boolean result = false;
         if (assignee != null) {
-            return assignee.equals(username);
+            result = assignee.equals(username);
         } else {
-            return isCandidatoDiretto(taskId, authorities) || canCompleteImportoSpesa(taskId, authorities);
+            result = isCandidatoDiretto(taskId, authorities) || canCompleteImportoSpesa(taskId, authorities);
         }
+        
+        log.info("Verifica se l'utente {} con gruppi {} puo' eseguire il task {} ha dato il risultato {}",
+                username,
+                authorities,
+                taskId,
+                result);
+
+        return result;
     }
 
     public boolean isCandidatoDiretto(String taskId, List<String> authorities) {
         List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
-        String username = SecurityUtils.getCurrentUserLogin();
+        String username = securityService.getCurrentUserLogin();
         return identityLinks.stream()
                 .filter(l -> l.getType().equals(IdentityLinkType.CANDIDATE))
                 .anyMatch(l -> authorities.contains(l.getGroupId()) || username.equals(l.getUserId()));
@@ -160,13 +167,11 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
      * Verifica che l'utente abbia la visibilità sulla Process Instance.
      *
      * @param processInstanceId       Il process instance id
-     * @param flowsUserDetailsService flowsUserDetailService: non posso "iniettarlo" nella classe perchè altrimenti avrei una dipendenza
-     *                               ciclica visto che anche le classi che richiamano questo metodo potrebbero averlo iniettato
      * @return risultato della verifica dei permessi (booleano)
      */
-    public boolean canVisualize(String processInstanceId, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
-        String userName = SecurityUtils.getCurrentUserLogin();
-        List<String> authorities = getAuthorities(userName, flowsUserDetailsService);
+    public boolean canVisualize(String processInstanceId) {
+        String userName = securityService.getCurrentUserLogin();
+        List<String> authorities = getAuthorities(userName);
 
         HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
                 .includeProcessVariables()
@@ -241,13 +246,11 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
      * o che possa rilasciarlo (restituirlo al gruppo assegnatario del task).
      *
      * @param taskId                  Il task id
-     * @param flowsUserDetailsService flowsUserDetailService: non posso "iniettarlo" nella classe perchè altrimenti avrei
-     *                               una dipendenza ciclica visto che anche le classi che lo richiamano potrebbero averlo iniettato
      * @return risultato della verifica dei permessi (booleano)
      */
-    public boolean canClaimTask(String taskId, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
+    public boolean canClaimTask(String taskId) {
         boolean result = false;
-        String username = SecurityUtils.getCurrentUserLogin();
+        String username = securityService.getCurrentUserLogin();
         Task task = taskService.createTaskQuery()
                 .taskId(taskId)
                 .singleResult();
@@ -272,7 +275,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
             try {
                 List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
 
-                List<String> authorities = getAuthorities(username, flowsUserDetailsService);
+                List<String> authorities = getAuthorities(username);
 
                 isInCandidates = isCandidatoDiretto(taskId, authorities) || canCompleteImportoSpesa(taskId, authorities);
 
@@ -290,8 +293,8 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
 
 
-    public boolean isResponsabile(String taskId, String processInstanceId, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
-        String user = SecurityUtils.getCurrentUserLogin();
+    public boolean isResponsabile(String taskId, String processInstanceId) {
+        String user = securityService.getCurrentUserLogin();
         Set<String> groups = membershipService.getAllRolesForUser(user);
         Task task;
         if(!processInstanceId.isEmpty()){
@@ -317,9 +320,9 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
 
 
-    public boolean canUpdateAttachment(String processInstanceId, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
+    public boolean canUpdateAttachment(String processInstanceId) {
 
-        if(SecurityUtils.isCurrentUserInRole("ROLE_ADMIN"))
+        if(securityService.isCurrentUserInRole("ROLE_ADMIN"))
             return true;
 
         HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery()
@@ -331,8 +334,8 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
         String processDefinitionKey = instance.getProcessDefinitionKey();
         String idStruttura = String.valueOf(instance.getProcessVariables().get(ID_STRUTTURA));
 
-        String username = SecurityUtils.getCurrentUserLogin();
-        List<String> authorities = getAuthorities(username, flowsUserDetailsService);
+        String username = securityService.getCurrentUserLogin();
+        List<String> authorities = getAuthorities(username);
 
         boolean isResponsabile = authorities.stream()
                 .anyMatch(
@@ -356,14 +359,14 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
 
     public boolean canPublishAttachment(String processInstanceId) {
 
-        if(SecurityUtils.isCurrentUserInRole("ROLE_ADMIN"))
+        if(securityService.isCurrentUserInRole("ROLE_ADMIN"))
             return true;
 
         HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery()
                 .processInstanceId(processInstanceId)
                 .includeProcessVariables()
                 .singleResult();
-        String username = SecurityUtils.getCurrentUserLogin();
+        String username = securityService.getCurrentUserLogin();
 
         if (instance.getProcessDefinitionKey().equals(acquisti.getProcessDefinition())) {
 
@@ -371,11 +374,9 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
             if (username.equals(rup))
                 return true;
 
-            List<String> authorities = it.cnr.si.flows.ng.utils.SecurityUtils.getCurrentUserAuthorities();
             String idStruttura = String.valueOf(instance.getProcessVariables().get(ID_STRUTTURA));
             String nomeGruppoFirma = "responsabileFirmaAcquisti@" + idStruttura;
-
-            if (authorities.contains(nomeGruppoFirma))
+            if (securityService.isCurrentUserInRole(nomeGruppoFirma))
                 return true;
         }
 
@@ -394,10 +395,7 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
     }
 
 
-    private List<String> getAuthorities(String username, org.springframework.security.core.userdetails.UserDetailsService flowsUserDetailsService) {
-        return flowsUserDetailsService.loadUserByUsername(username).getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .map(Utils::removeLeadingRole)
-                .collect(Collectors.toList());
+    private List<String> getAuthorities(String username) {
+        return securityService.getUser().get().getAuthorities().stream().map(r -> r.getAuthority()).collect(Collectors.toList());
     }
 }

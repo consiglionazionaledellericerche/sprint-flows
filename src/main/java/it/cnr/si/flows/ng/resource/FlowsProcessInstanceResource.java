@@ -10,9 +10,10 @@ import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.security.PermissionEvaluatorImpl;
-import it.cnr.si.security.SecurityUtils;
+
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.MembershipService;
+import it.cnr.si.service.SecurityService;
 
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
@@ -83,6 +84,8 @@ public class FlowsProcessInstanceResource {
 	private MembershipService membershipService;
 	@Inject
 	private Environment env;
+	@Inject
+	private SecurityService securityService;
 
 
 
@@ -108,7 +111,7 @@ public class FlowsProcessInstanceResource {
 			@PathParam("processDefinitionKey") String processDefinitionKey,
 			@RequestBody Map<String, String> params) {
 
-		params.put("initiator", SecurityUtils.getCurrentUserLogin());
+		params.put("initiator", securityService.getCurrentUserLogin());
 		DataResponse response = flowsProcessInstanceService.search(params, processDefinitionKey, active, order, firstResult, maxResults, true);
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
@@ -118,7 +121,7 @@ public class FlowsProcessInstanceResource {
 	// TODO questo metodo restituisce ResponseEntity di due tipi diversi - HistoricProcessInstance e Map<String, Object>
 	@GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Secured(AuthoritiesConstants.USER)
-	@PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
+	@PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId)")
 	@Timed
 	public ResponseEntity getProcessInstanceById(
 			@RequestParam("processInstanceId") String processInstanceId,
@@ -134,7 +137,7 @@ public class FlowsProcessInstanceResource {
 
 	@GetMapping(value = "/currentTask", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Secured(AuthoritiesConstants.USER)
-	@PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
+	@PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId)")
 	@Timed
 	public ResponseEntity<HistoricTaskInstance> getCurrentTaskProcessInstanceById(@RequestParam("processInstanceId") String processInstanceId) {
 		HistoricTaskInstance result = flowsProcessInstanceService.getCurrentTaskOfProcessInstance(processInstanceId);
@@ -176,7 +179,7 @@ public class FlowsProcessInstanceResource {
 	// TODO oggi, 05/02/2020 lo commento
 	// TODO se entro 05/05/2020 non gli abbiamo trovato un uso, eliminarlo
 	//	@DeleteMapping(value = "suspendProcessInstance", produces = MediaType.APPLICATION_JSON_VALUE)
-	//	@PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.isResponsabile(#taskId, #processInstanceId, @flowsUserDetailsService)")
+	//	@PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.isResponsabile(#taskId, #processInstanceId)")
 	//	@Timed
 	//	public ProcessInstanceResponse suspend(
 	//			HttpServletRequest request,
@@ -447,7 +450,7 @@ public class FlowsProcessInstanceResource {
 		data.put("userNameDomanda", oldProcessInstance.getProcessVariables().get("userNameProponente"));
 		data.put("idDomanda", oldProcessInstance.getProcessVariables().get("idDomanda"));
 		data.put("idStruttura", idStruttura);
-		String currentUser = SecurityUtils.getCurrentUserLogin();
+		String currentUser = securityService.getCurrentUserLogin();
 		String idAceStrutturaDomandaRichiedente = oldProcessInstance.getProcessVariables().get("idAceStrutturaDomandaRichiedente").toString();
 
 		Set<String> ruoliCurrentUser = membershipService.getAllRolesForUser(currentUser); 

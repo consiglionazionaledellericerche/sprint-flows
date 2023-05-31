@@ -4,7 +4,7 @@ import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.listeners.AddFlowsAttachmentsListener;
 import it.cnr.si.flows.ng.utils.Enum.Stato;
 import it.cnr.si.flows.ng.utils.Utils;
-import it.cnr.si.security.SecurityUtils;
+import it.cnr.si.service.SecurityService;
 import it.cnr.si.spring.storage.*;
 import it.cnr.si.spring.storage.bulk.StorageFile;
 import org.activiti.engine.HistoryService;
@@ -72,6 +72,8 @@ public class FlowsAttachmentService {
 	private Environment env;
 	@Inject
 	private AddFlowsAttachmentsListener addFlowsAttachmentsListener;
+	@Inject
+	private SecurityService securityService;
 
 	/**
 	 *
@@ -133,7 +135,7 @@ public class FlowsAttachmentService {
 		att.setTime(new Date());
 		att.setTaskId(taskId);
 		att.setTaskName(taskName);
-		att.setUsername(SecurityUtils.getCurrentUserLogin());
+		att.setUsername(securityService.getCurrentUserLogin());
 
 		att.setLabel(                  String.valueOf(data.get(fileName+"_label")));
 		att.setPubblicazioneUrp(		"true".equals(data.get(fileName+"_pubblicazioneUrp")));
@@ -171,7 +173,7 @@ public class FlowsAttachmentService {
 	 */
 	public void saveAttachment(DelegateExecution execution, String variableName, FlowsAttachment att, byte[] content) {
 
-		att.setUsername(SecurityUtils.getCurrentUserLogin());
+		att.setUsername(securityService.getCurrentUserLogin());
 		att.setTime(new Date());
 		att.setTaskId((String) execution.getVariable("taskId"));
 		att.setTaskName(execution.getCurrentActivityName());
@@ -196,7 +198,7 @@ public class FlowsAttachmentService {
 	 */
 	public void saveAttachment(String taskId, String variableName, FlowsAttachment att, byte[] content) {
 
-		att.setUsername(SecurityUtils.getCurrentUserLogin());
+		att.setUsername(securityService.getCurrentUserLogin());
 		att.setTime(new Date());
 		att.setTaskId(taskId);
 		Task task = taskService.createTaskQuery().active().taskId(taskId).singleResult();
@@ -212,7 +214,7 @@ public class FlowsAttachmentService {
 
 	public void saveAttachmentFuoriTask(String executionId, String variableName, FlowsAttachment att, byte[] content) {
 
-		att.setUsername(SecurityUtils.getCurrentUserLogin());
+		att.setUsername(securityService.getCurrentUserLogin());
 		att.setTime(new Date());
 		att.setTaskName("Fuori task");
 		if(att.getPath() == null) {
