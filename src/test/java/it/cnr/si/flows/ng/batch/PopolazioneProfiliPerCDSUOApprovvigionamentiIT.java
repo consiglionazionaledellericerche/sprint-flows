@@ -98,18 +98,27 @@ public class PopolazioneProfiliPerCDSUOApprovvigionamentiIT {
 					System.out.println("idSede: " + idSede + " (" + nrSede + ")");	
 					System.out.println("data: " + data );	
 
-					System.out.println("Associato ruolo " + idRuolo + " - idPersona " + idPersona + " - idSede " + idSede);
 					List<BossDto> listaRuoliUtente = aceService.ruoliEoAttivi(username);
+
 					boolean utenteRuoloEoPresente = false;
 					for (int j = 0; j < listaRuoliUtente.size(); j++) {
-						if((listaRuoliUtente.get(j).getEntitaOrganizzativa().getId().equals(idSede)) && (listaRuoliUtente.get(j).getRuolo().getId().equals(idRuolo))){
-							utenteRuoloEoPresente = true;
-							System.out.println("UTENTE " + username + " già associato al ruolo " + idRuolo + " - idPersona " + idPersona + " - idSede " + idSede);
-						} 
-					}
-					if (!utenteRuoloEoPresente) {
-						aceService.associaRuoloPersona(idRuolo, idPersona, idSede, java.time.LocalDate.parse(data),null,false,false,"","");
-						//aceService.associaRuoloPersona(idRuolo, idPersona, idSede, java.time.LocalDate.now(),java.time.LocalDate.parse("2025-10-23"),false,false,"","");
+						if (listaRuoliUtente.get(j).getEntitaOrganizzativa() != null) {
+							if((listaRuoliUtente.get(j).getEntitaOrganizzativa().getId().equals(idSede)) && (listaRuoliUtente.get(j).getRuolo().getId().equals(idRuolo))){
+								utenteRuoloEoPresente = true;
+							} 
+
+							if (utenteRuoloEoPresente) {
+								System.out.println("UTENTE " + username + " già associato al ruolo " + idRuolo + " - idPersona " + idPersona + " - idSede " + idSede);
+							} else {
+								System.out.println("Associo ruolo " + idRuolo + " - idPersona " + idPersona + " - idSede " + idSede);
+
+								try {
+									aceService.associaRuoloPersona(idRuolo, idPersona, idSede, java.time.LocalDate.parse(data),null,false,false,"","");
+								} catch(UnexpectedResultException | FeignException | HttpClientErrorException error4) {
+									log.info("-------------- ERROR: UTENTE: " + username + " NON INSERITO");
+								}
+							}
+						}
 					}
 				}
 			}
