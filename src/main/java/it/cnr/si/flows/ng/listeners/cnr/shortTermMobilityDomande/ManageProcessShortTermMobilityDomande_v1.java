@@ -215,13 +215,6 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 					//restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.ACCETTATA);
 					utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.ACCETTATA.toString());
 				}
-				if(sceltaUtente.equals("Respingi")) {
-					//	domandaCorrenteAccettata = 1;
-					execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.RESPINTA.toString());
-					execution.setVariable("domandaCorrenteAccettataFlag", "true");
-					//restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.ACCETTATA);
-					utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.RESPINTA.toString());
-				}
 				List<ProcessInstance> processinstancesListaDomandeAccettatePerBando = runtimeService.createProcessInstanceQuery()
 						.processDefinitionKey("short-term-mobility-domande")
 						.variableValueEquals(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.ACCETTATA.toString())

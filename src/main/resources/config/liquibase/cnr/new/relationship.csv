@@ -22,4 +22,3 @@ ID;GROUP_NAME;GROUP_RELATIONSHIP;GROUP_ROLE
 48;app.scrivaniadigitale;abilitati#firma-elenco-documenti@0000;member
 66;sfd@STRUTTURA;responsabileFirmaAcquisti$60000@STRUTTURA;member
 67;staffAmministrativo@STRUTTURA;responsabileFirmaAcquisti$52459@STRUTTURA;member
-1004;staffApprovvigionamenti@STRUTTURA;abilitati#approvvigionamenti@STRUTTURA;member

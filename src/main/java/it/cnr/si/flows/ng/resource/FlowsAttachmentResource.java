@@ -62,7 +62,7 @@ public class FlowsAttachmentResource {
 
 	@RequestMapping(value = "{processInstanceId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	@PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId)")
+	@PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
 	@Timed
 	public ResponseEntity<Map<String, FlowsAttachment>> getAttachementsForProcessInstance(
 			@PathVariable("processInstanceId") String processInstanceId) {
@@ -88,7 +88,7 @@ public class FlowsAttachmentResource {
 
 	@RequestMapping(value = "task/{taskId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	@PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId)")
+	@PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId, @flowsUserDetailsService)")
 	@Timed
 	public ResponseEntity<Map<String, FlowsAttachment>> getAttachementsForTask(
 			@PathVariable("taskId") String taskId) {
@@ -99,7 +99,7 @@ public class FlowsAttachmentResource {
 
 	@RequestMapping(value = "/history/{processInstanceId}/{attachmentName}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	@PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId)")
+	@PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
 	@Timed
 	public ResponseEntity<List<FlowsAttachment>> getAttachementHistory(
 			@PathVariable("processInstanceId") String processInstanceId,
@@ -138,7 +138,7 @@ public class FlowsAttachmentResource {
 
 	@RequestMapping(value = "{processInstanceId}/{attachmentName}/data", method = RequestMethod.GET)
 	@ResponseBody
-	@PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId)")
+	@PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
 	@Timed
 	public void getAttachment(
 			HttpServletResponse response,
@@ -160,7 +160,7 @@ public class FlowsAttachmentResource {
 	@RequestMapping(value = "{processInstanceId}/{attachmentName}/data", method = RequestMethod.POST)
 	@ResponseBody
 	@Secured(AuthoritiesConstants.USER)
-	@PreAuthorize("@permissionEvaluator.canUpdateAttachment(#processInstanceId)")
+	@PreAuthorize("@permissionEvaluator.canUpdateAttachment(#processInstanceId, @flowsUserDetailsService)")
 	@Timed
 	public void updateAttachment(@PathVariable("processInstanceId") String processInstanceId,
 			@PathVariable("attachmentName") String attachmentName,
@@ -184,7 +184,7 @@ public class FlowsAttachmentResource {
 	@RequestMapping(value = "{processInstanceId}/data/new", method = RequestMethod.POST)
 	@ResponseBody
 	@Secured(AuthoritiesConstants.USER)
-	@PreAuthorize("@permissionEvaluator.canUpdateAttachment(#processInstanceId)")
+	@PreAuthorize("@permissionEvaluator.canUpdateAttachment(#processInstanceId, @flowsUserDetailsService)")
 	@Timed
 	public void uploadNewAttachment(@PathVariable("processInstanceId") String processInstanceId,
 			MultipartHttpServletRequest request) throws IOException {
@@ -209,7 +209,7 @@ public class FlowsAttachmentResource {
 
 	@RequestMapping(value = "{processInstanceId}/{attachmentName}/data/sostituzione", method = RequestMethod.POST)
 	@ResponseBody
-	@PreAuthorize("@permissionEvaluator.canUpdateAttachment(#processInstanceId)")
+	@PreAuthorize("@permissionEvaluator.canUpdateAttachment(#processInstanceId, @flowsUserDetailsService)")
 	@Timed
 	public void updateAttachmentSostituzioneProtocollo(@PathVariable("processInstanceId") String processInstanceId,
 			@PathVariable("attachmentName") String attachmentName,
@@ -235,7 +235,7 @@ public class FlowsAttachmentResource {
 
 	@RequestMapping(value = "{processInstanceId}/{attachmentName}/data/rettifica", method = RequestMethod.POST)
 	@ResponseBody
-	@PreAuthorize("@permissionEvaluator.canUpdateAttachment(#processInstanceId)")
+	@PreAuthorize("@permissionEvaluator.canUpdateAttachment(#processInstanceId, @flowsUserDetailsService)")
 	@Timed
 	public void updateAttachmentRettificaProtocollo(@PathVariable("processInstanceId") String processInstanceId,
 			@PathVariable("attachmentName") String attachmentName,
@@ -273,7 +273,7 @@ public class FlowsAttachmentResource {
 
 	@RequestMapping(value = "byAttachmentId/{processInstanceId}/{variableId}/data", method = RequestMethod.GET)
 	@ResponseBody
-	@PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId)")
+	@PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
 	@Timed
 	public void getHistoricAttachment(
 			HttpServletResponse response,
@@ -298,7 +298,7 @@ public class FlowsAttachmentResource {
 
 	@RequestMapping(value = "task/{taskId}/{attachmentName}/data", method = RequestMethod.GET)
 	@ResponseBody
-	@PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId)")
+	@PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId, @flowsUserDetailsService)")
 	@Timed
 	public void getAttachmentForTask(
 			HttpServletResponse response,

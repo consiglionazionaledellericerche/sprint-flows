@@ -132,7 +132,7 @@ public class FlowsProcessInstanceService {
             List<Map<String, Object>> linkedFlows = new ArrayList<>();
 
             for (String linkedProcessId : values) {
-                if(permissionEvaluator.canVisualize(linkedProcessId)) {
+                if(permissionEvaluator.canVisualize(linkedProcessId, flowsUserDetailsService)) {
                     HistoricProcessInstance linkedProcessInstance = historyService
                             .createHistoricProcessInstanceQuery()
                             .processInstanceId(linkedProcessId)
@@ -167,7 +167,7 @@ public class FlowsProcessInstanceService {
 
         // permessi aggiuntivi
         result.put("canPublish", permissionEvaluator.canPublishAttachment(processInstanceId));
-        result.put("canUpdateAttachments", permissionEvaluator.canUpdateAttachment(processInstanceId));
+        result.put("canUpdateAttachments", permissionEvaluator.canUpdateAttachment(processInstanceId, flowsUserDetailsService));
         result.put("isRevocabile", isRevocabile(processInstanceId));
         
         if(whitTaskList){

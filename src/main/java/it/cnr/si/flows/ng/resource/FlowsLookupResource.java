@@ -19,7 +19,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -141,37 +140,6 @@ public class FlowsLookupResource {
         List<Utils.SearchResult> CDSUOs = securityUtils.getCurrentUserAuthorities().stream()
                 .map(Utils::removeLeadingRole)
                 .filter(role -> role.startsWith("staffFirmaDocumenti"))
-                .map(role -> role.split("@")[1])
-                .map(idEo -> {
-                    Integer id = Integer.parseInt(idEo);
-                    return aceBridgeService.getStrutturaById(id);
-                })
-                .map(eo -> {
-                	if (eo.getIdnsip() != null) {
-                	return new Utils.SearchResult(String.valueOf(eo.getId()),
-                        eo.getIdnsip() +" - "+ eo.getDenominazione() +", "+ eo.getIndirizzoPrincipale().getComune()); 
-                } else {
-                	return new Utils.SearchResult(String.valueOf(eo.getId()),
-                            eo.getDenominazione());
-                	}
-                }
-                		)
-                .distinct()
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(CDSUOs);
-    }
-
-    
-    @RequestMapping(value = "/ace/user/sediRichiedenteApprovvigionamenti", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured(AuthoritiesConstants.USER)
-    public ResponseEntity<List<Utils.SearchResult>> getSediUtentiApprovvigionamenti() {
-
-        List<Utils.SearchResult> CDSUOs = securityService.getUser().get().getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .map(Utils::removeLeadingRole)
-                .filter(role -> role.startsWith("staffApprovvigionamenti"))
                 .map(role -> role.split("@")[1])
                 .map(idEo -> {
                     Integer id = Integer.parseInt(idEo);

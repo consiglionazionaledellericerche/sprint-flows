@@ -149,7 +149,7 @@ public class FlowsTaskResource {
 
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Map<String, Object>> getTask(@PathVariable("id") String taskId) {
 
@@ -160,7 +160,7 @@ public class FlowsTaskResource {
 
 
     @GetMapping(value = "/activeByProcessInstanceId/{processInstanceId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<TaskResponse> getActiveTaskByProcessInstanceId(@PathVariable("processInstanceId") String processInstanceId) {
 
@@ -171,7 +171,7 @@ public class FlowsTaskResource {
     }
 
     @PutMapping(value = "/claim/{taskId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.canClaimTask(#taskId)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.canClaimTask(#taskId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Map<String, Object>> claimTask(@PathVariable("taskId") String taskId) {
 
@@ -191,7 +191,7 @@ public class FlowsTaskResource {
 
 
     @PutMapping(value = "/reassign/", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.isResponsabile(#taskId, #processInstanceId)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.isResponsabile(#taskId, #processInstanceId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Map<String, Object>> reassignTask(
             @RequestParam(name = "processInstanceId", required=false) String processInstanceId,
@@ -270,7 +270,7 @@ public class FlowsTaskResource {
     
     
     @DeleteMapping(value = "/claim/{taskId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canClaimTask(#taskId)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canClaimTask(#taskId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Map<String, Object>> unclaimTask(@PathVariable("taskId") String taskId) {
         taskService.unclaim(taskId);
@@ -280,7 +280,7 @@ public class FlowsTaskResource {
 
 
     @PostMapping(value = "complete",consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canCompleteTaskOrStartProcessInstance(#req)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canCompleteTaskOrStartProcessInstance(#req, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<ProcessInstanceResponse> completeTask(MultipartHttpServletRequest req) {
 
@@ -407,7 +407,7 @@ public class FlowsTaskResource {
     private void verificaPrecondizioniFirmaMultipla(List<String> taskIds) throws FlowsPermissionException {
 
         if ( ! taskIds.stream()
-                .allMatch(id -> permissionEvaluator.canCompleteTask(id)) )
+                .allMatch(id -> permissionEvaluator.canCompleteTask(id, flowsUserDetailsService)) )
             throw new FlowsPermissionException("Nel carrello sono presenti alcuni compiti per cui l'utente non ha i permessi necessari. "
                     + "Svuotare il carrello prima di riprovare.");
 

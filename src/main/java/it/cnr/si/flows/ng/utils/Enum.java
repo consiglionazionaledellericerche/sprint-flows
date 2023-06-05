@@ -117,12 +117,6 @@ public class Enum {
         PREDISPOSTO;
     }
 
-    public enum StatoApprovvigionamentiEnum {
-        EVASA,
-        ANNULLATA,
-        INEVASA;
-    }
-
     public enum StatoDomandeSTMEnum {
         APERTA,
         CHIUSA,

@@ -44,7 +44,7 @@ public class FlowsTimerResource {
     private RestResponseFactory restResponseFactory;
 
     @RequestMapping(value = "/timer/{processId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<Object>  getProcessTimers(@PathVariable("processId") String processInstanceId) throws IOException, ParseException {
         List<Job> timerList = flowsTimerService.getTimers(processInstanceId);
@@ -56,7 +56,7 @@ public class FlowsTimerResource {
     }
 
     @RequestMapping(value = "/timer/{processId}/{timerId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId, @flowsUserDetailsService)")
     @Timed
     public ResponseEntity<DataResponse> getProcessSingleTimer(@PathVariable("processId") String processInstanceId,
                                                               @PathVariable("timerId") String timerId) throws IOException, ParseException {
@@ -70,7 +70,7 @@ public class FlowsTimerResource {
     }
 
     @RequestMapping(value = "/timer/setTimerValuesFromNow", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId, @flowsUserDetailsService)")
     @Timed
     public  ResponseEntity<TimerSettings> setTimerValuesFromNow(
             //HttpServletRequest req,
@@ -95,7 +95,7 @@ public class FlowsTimerResource {
 
 
     @RequestMapping(value = "/timer/setTimer", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualizeTask(#taskId, @flowsUserDetailsService)")
     @Timed
     public  ResponseEntity<TimerSettings> setTimer(
             //HttpServletRequest req,

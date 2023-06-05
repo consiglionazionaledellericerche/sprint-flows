@@ -121,7 +121,7 @@ public class FlowsProcessInstanceResource {
 	// TODO questo metodo restituisce ResponseEntity di due tipi diversi - HistoricProcessInstance e Map<String, Object>
 	@GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Secured(AuthoritiesConstants.USER)
-	@PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId)")
+	@PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
 	@Timed
 	public ResponseEntity getProcessInstanceById(
 			@RequestParam("processInstanceId") String processInstanceId,
@@ -137,7 +137,7 @@ public class FlowsProcessInstanceResource {
 
 	@GetMapping(value = "/currentTask", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Secured(AuthoritiesConstants.USER)
-	@PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId)")
+	@PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
 	@Timed
 	public ResponseEntity<HistoricTaskInstance> getCurrentTaskProcessInstanceById(@RequestParam("processInstanceId") String processInstanceId) {
 		HistoricTaskInstance result = flowsProcessInstanceService.getCurrentTaskOfProcessInstance(processInstanceId);
@@ -179,7 +179,7 @@ public class FlowsProcessInstanceResource {
 	// TODO oggi, 05/02/2020 lo commento
 	// TODO se entro 05/05/2020 non gli abbiamo trovato un uso, eliminarlo
 	//	@DeleteMapping(value = "suspendProcessInstance", produces = MediaType.APPLICATION_JSON_VALUE)
-	//	@PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.isResponsabile(#taskId, #processInstanceId)")
+	//	@PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.isResponsabile(#taskId, #processInstanceId, @flowsUserDetailsService)")
 	//	@Timed
 	//	public ProcessInstanceResponse suspend(
 	//			HttpServletRequest request,

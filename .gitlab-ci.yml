@@ -188,7 +188,6 @@ deploydockprod02:
     - sed -i "s/CMIS_PASSWORD/$CMIS_PASSWORD/g" ./src/main/docker/app-prod.yml
     - sed -i "s/CONFIG_REPO_TOKEN/$CONFIG_REPO_TOKEN/g" ./src/main/docker/app-prod.yml
     - sed -i "s/CACHE_HAZELCAST_PUBLICIP_SED/150.146.7.52/g" ./src/main/docker/app-prod.yml
-    - sed -i "s/SPRING_PROFILES_ACTIVE=keycloak,prod,cnr,swagger/SPRING_PROFILES_ACTIVE=keycloak,prod,cnr,swagger,scheduler/g" ./src/main/docker/app-prod.yml
     - echo "stopping service"
     - sshremote $SSH_CONNECT_DOCPROD02 "docker-compose -f /sites/docker-flows/app.yml down -v --remove-orphans || echo NOFILE"
     - sshremote $SSH_CONNECT_DOCPROD02 "rm -rf /sites/docker-flows/ && mkdir -p /sites/docker-flows/"
