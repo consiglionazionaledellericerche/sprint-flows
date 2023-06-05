@@ -1,23 +1,34 @@
 package it.cnr.si.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.Member;
-import it.cnr.si.domain.ExternalMessage;
-import it.cnr.si.domain.enumeration.ExternalApplication;
-import it.cnr.si.domain.enumeration.ExternalMessageStatus;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.Base64;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -25,17 +36,12 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Base64;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import it.cnr.si.domain.ExternalMessage;
+import it.cnr.si.domain.enumeration.ExternalApplication;
+import it.cnr.si.domain.enumeration.ExternalMessageStatus;
 
 @EnableScheduling
 @Profile("cnr")
@@ -50,32 +56,19 @@ public class ExternalMessageSender {
     private String ssoClientId;
     @Value("${cnr.ssoClientSecret}")
     private String ssoClientSecret;
-    @Value("${cnr.abil.url}")
-    private String abilUrl;
+
     @Value("${cnr.abil.username}")
     private String abilUsername;
     @Value("${cnr.abil.password}")
     private String abilPassword;
-    @Value("${cnr.abil.loginPath}")
-    private String abilLoginPath;
+    
     @Value("${cnr.ssoAttestatiLoginUrl}")
     private String ssoAttestatiLoginUrl;
-    @Value("${cnr.ssoMissioniLoginUrl}")
-    private String ssoMissioniLoginUrl;
-    @Value("${cnr.missioni.clientId}")
-    private String ssoMissioniClientId;
-    @Value("${cnr.missioni.clientSecret}")
-    private String ssoMissioniClientSecret;
-    @Value("${cnr.attestati.url}")
-    private String attestatiUrl;
     @Value("${cnr.attestati.username}")
     private String attestatiUsername;
     @Value("${cnr.attestati.password}")
     private String attestatiPassword;
-    @Value("${cnr.attestati.loginPath}")
-    private String attestatiLoginPath;	
-    @Value("${cnr.stm.url}")
-    private String stmUrl;
+    
     @Value("${cnr.stm.client_id}")
     private String stmClientId;
     @Value("${cnr.stm.client_secret}")
@@ -84,8 +77,7 @@ public class ExternalMessageSender {
     private String stmUsername;
     @Value("${cnr.stm.password}")
     private String stmPassword;
-    @Value("${cnr.stm.loginPath}")
-    private String stmLoginPath;
+    
     @Value("${cnr.missioni.url}")
     private String missioniUrl;
     @Value("${cnr.missioni.username}")
@@ -94,20 +86,16 @@ public class ExternalMessageSender {
     private String missioniPassword;
     @Value("${cnr.missioni.loginPath}")
     private String missioniLoginPath;
-    @Value("${cnr.sigla.url}")
-    private String siglaUrl;
+    
     @Value("${cnr.sigla.usr}")
     private String siglaUsername;
     @Value("${cnr.sigla.psw}")
     private String siglaPassword;
-    @Value("${cnr.labcon.url}")
-    private String labconUrl;
+    
     @Value("${cnr.labcon.username}")
     private String labconUsername;
     @Value("${cnr.labcon.password}")
     private String labconPassword;
-    @Value("${cnr.labcon.loginPath}")
-    private String labconLoginPath;
     @Value("${cnr.labcon.client_id}")
     private String labconClientId;
     @Value("${cnr.labcon.client_secret}")
@@ -122,12 +110,8 @@ public class ExternalMessageSender {
     @Value("${cnr.siper.loginPath}")
     private String siperLoginPath;
 
-
-
     @Inject
     private ExternalMessageService externalMessageService;
-    @Inject
-    private HazelcastInstance hazelcastInstance;
 
     @PostConstruct
     public void init() {
@@ -267,12 +251,12 @@ public class ExternalMessageSender {
         public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 
             request.getHeaders().set("Authorization", "Bearer "+ id_token);
-            request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
+            request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
             ClientHttpResponse response = execution.execute(request, body);
 
             if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 
-                MultiValueMap<String, String> auth = new LinkedMultiValueMap();
+                MultiValueMap<String, String> auth = new LinkedMultiValueMap<String, String>();
                 auth.add("username", abilUsername);
                 auth.add("password", abilPassword);
                 auth.add("grant_type", "password");
@@ -282,7 +266,7 @@ public class ExternalMessageSender {
                 String encoding = Base64.getEncoder().encodeToString((ssoClientId + ":" + ssoClientSecret).getBytes(StandardCharsets.UTF_8));
                 headers.set("Authorization", "Basic "+ encoding);
 
-                RequestEntity entity = new RequestEntity(
+                RequestEntity<MultiValueMap<String, String>> entity = new RequestEntity<>(
                         auth,
                         headers,
                         HttpMethod.POST,
@@ -293,7 +277,7 @@ public class ExternalMessageSender {
                 this.id_token = (String) resp.getBody().get("access_token");
 
                 request.getHeaders().set("Authorization", "Bearer "+ id_token);
-                request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
+                request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
                 response = execution.execute(request, body);
             }
 
@@ -310,12 +294,12 @@ public class ExternalMessageSender {
         public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 
             request.getHeaders().set("Authorization", "Bearer "+ id_token);
-            request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
+            request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
             ClientHttpResponse response = execution.execute(request, body);
 
             if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 
-                MultiValueMap<String, String> auth = new LinkedMultiValueMap();
+                MultiValueMap<String, String> auth = new LinkedMultiValueMap<>();
                 auth.add("username", attestatiUsername);
                 auth.add("password", attestatiPassword);
                 auth.add("grant_type", "password");
@@ -325,7 +309,7 @@ public class ExternalMessageSender {
                 String encoding = Base64.getEncoder().encodeToString((ssoClientId + ":" + ssoClientSecret).getBytes(StandardCharsets.UTF_8));
                 headers.set("Authorization", "Basic "+ encoding);
 
-                RequestEntity entity = new RequestEntity(
+                RequestEntity<MultiValueMap<String, String>> entity = new RequestEntity<>(
                         auth,
                         headers,
                         HttpMethod.POST,
@@ -336,7 +320,7 @@ public class ExternalMessageSender {
                 this.id_token = (String) resp.getBody().get("access_token");
 
                 request.getHeaders().set("Authorization", "Bearer "+ id_token);
-                request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
+                request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
                 response = execution.execute(request, body);
             }
 
@@ -353,12 +337,12 @@ public class ExternalMessageSender {
         public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 
             request.getHeaders().set("Authorization", "Bearer "+ access_token);
-            request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
+            request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
             ClientHttpResponse response = execution.execute(request, body);
 
             if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 
-                MultiValueMap<String, String> auth = new LinkedMultiValueMap();
+                MultiValueMap<String, String> auth = new LinkedMultiValueMap<>();
                 auth.add("username", stmUsername);
                 auth.add("password", stmPassword);
                 auth.add("grant_type", "password");
@@ -368,7 +352,7 @@ public class ExternalMessageSender {
                 String encoding = Base64.getEncoder().encodeToString((stmClientId + ":" + stmSecret).getBytes(StandardCharsets.UTF_8));
                 headers.set("Authorization", "Basic "+ encoding);
 
-                RequestEntity entity = new RequestEntity(
+                RequestEntity<MultiValueMap<String, String>> entity = new RequestEntity<>(
                         auth,
                         headers,
                         HttpMethod.POST,
@@ -379,7 +363,7 @@ public class ExternalMessageSender {
                 this.access_token = (String) resp.getBody().get("access_token");
 
                 request.getHeaders().set("Authorization", "Bearer "+ access_token);
-                request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
+                request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
                 response = execution.execute(request, body);
             }
 
@@ -395,12 +379,12 @@ public class ExternalMessageSender {
         public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 
             request.getHeaders().set("Authorization", "Bearer "+ access_token);
-            request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
+            request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
             ClientHttpResponse response = execution.execute(request, body);
 
             if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 
-                MultiValueMap<String, String> auth = new LinkedMultiValueMap();
+                MultiValueMap<String, String> auth = new LinkedMultiValueMap<>();
                 auth.add("username", labconUsername);
                 auth.add("password", labconPassword);
                 auth.add("grant_type", "password");
@@ -410,7 +394,7 @@ public class ExternalMessageSender {
                 String encoding = Base64.getEncoder().encodeToString((labconClientId + ":" + labconSecret).getBytes(StandardCharsets.UTF_8));
                 headers.set("Authorization", "Basic "+ encoding);
 
-                RequestEntity entity = new RequestEntity(
+                RequestEntity<MultiValueMap<String, String>> entity = new RequestEntity<>(
                         auth,
                         headers,
                         HttpMethod.POST,
@@ -421,7 +405,7 @@ public class ExternalMessageSender {
                 this.access_token = (String) resp.getBody().get("access_token");
 
                 request.getHeaders().set("Authorization", "Bearer "+ access_token);
-                request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
+                request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
                 response = execution.execute(request, body);
             }
 
@@ -442,7 +426,7 @@ public class ExternalMessageSender {
         public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 
             request.getHeaders().set("Authorization", "Bearer "+ access_token);
-            request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
+            request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
             ObjectMapper om = new ObjectMapper();
             String stringRepresentation = new String(body, "UTF-8");
             JsonNode jsonRepresentation = om.readTree(stringRepresentation);
@@ -461,7 +445,7 @@ public class ExternalMessageSender {
                 auth.put("rememberMe", "true");
 
                 HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+                headers.setContentType(MediaType.APPLICATION_JSON);
 
                 RequestEntity entity = new RequestEntity(
                         auth,
@@ -471,7 +455,7 @@ public class ExternalMessageSender {
                 ResponseEntity<Map> resp = new RestTemplate().exchange(entity, Map.class);
                 this.access_token = (String) resp.getBody().get("id_token");
                 request.getHeaders().set("Authorization", "Bearer "+ access_token);
-                request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
+                request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
                 response = execution.execute(request, byteRepresentation);
             }
 
@@ -493,12 +477,12 @@ public class ExternalMessageSender {
             byte[] byteRepresentation = jsonRepresentation.toString().getBytes(StandardCharsets.UTF_8);
             
             request.getHeaders().set("Authorization", "Bearer "+ id_token);
-            request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
+            request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
             ClientHttpResponse response = execution.execute(request, byteRepresentation);
 
             if ( response.getStatusCode() == HttpStatus.FORBIDDEN || response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 
-                MultiValueMap<String, String> auth = new LinkedMultiValueMap();
+                MultiValueMap<String, String> auth = new LinkedMultiValueMap<>();
                 auth.add("username", missioniUsername);
                 auth.add("password", missioniPassword);
                 auth.add("grant_type", "password");
@@ -508,7 +492,7 @@ public class ExternalMessageSender {
                 String encoding = Base64.getEncoder().encodeToString((ssoClientId + ":" + ssoClientSecret).getBytes(StandardCharsets.UTF_8));
                 headers.set("Authorization", "Basic "+ encoding);
 
-                RequestEntity entity = new RequestEntity(
+                RequestEntity entity = new RequestEntity<>(
                         auth,
                         headers,
                         HttpMethod.POST,
@@ -519,7 +503,7 @@ public class ExternalMessageSender {
                 this.id_token = (String) resp.getBody().get("access_token");
 
                 request.getHeaders().set("Authorization", "Bearer "+ id_token);
-                request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
+                request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
                 response = execution.execute(request, byteRepresentation);
             }
 
@@ -535,7 +519,7 @@ public class ExternalMessageSender {
 //        public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 //
 //            request.getHeaders().set("Authorization", "Bearer "+ access_token);
-//            request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
+//            request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 //            ObjectMapper om = new ObjectMapper();
 //            String stringRepresentation = new String(body, "UTF-8");
 //            JsonNode jsonRepresentation = om.readTree(stringRepresentation);
@@ -554,7 +538,7 @@ public class ExternalMessageSender {
 //                auth.put("rememberMe", "true");
 //
 //                HttpHeaders headers = new HttpHeaders();
-//                headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+//                headers.setContentType(MediaType.APPLICATION_JSON);
 //
 //                RequestEntity entity = new RequestEntity(
 //                        auth,
@@ -564,7 +548,7 @@ public class ExternalMessageSender {
 //                ResponseEntity<Map> resp = new RestTemplate().exchange(entity, Map.class);
 //                this.access_token = (String) resp.getBody().get("id_token");
 //                request.getHeaders().set("Authorization", "Bearer "+ access_token);
-//                request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
+//                request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 //                response = execution.execute(request, byteRepresentation);
 //            }
 //
@@ -574,16 +558,13 @@ public class ExternalMessageSender {
 
     private class SiperRequestInterceptor implements ClientHttpRequestInterceptor {
 
-        private String access_token = null;
-
         @Override
         public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 
             LocalDate dateRif = LocalDate.now();
-            String annoEsercizio = String.valueOf(dateRif.getYear());
             String encoding = Base64.getEncoder().encodeToString((siperUsername + ":" + siperPassword).getBytes(StandardCharsets.UTF_8));
             request.getHeaders().set("Authorization", "Basic "+ encoding);
-            request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
+            request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
             ObjectMapper om = new ObjectMapper();
             String stringRepresentation = new String(body, "UTF-8");
             JsonNode jsonRepresentation = om.readTree(stringRepresentation);
@@ -601,8 +582,6 @@ public class ExternalMessageSender {
      */
     private class SiglaRequestInterceptor implements ClientHttpRequestInterceptor {
 
-        private String access_token = null;
-
         @Override
         public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
 
@@ -610,7 +589,7 @@ public class ExternalMessageSender {
             String annoEsercizio = String.valueOf(dateRif.getYear());
             String encoding = Base64.getEncoder().encodeToString((siglaUsername + ":" + siglaPassword).getBytes(StandardCharsets.UTF_8));
             request.getHeaders().set("Authorization", "Basic "+ encoding);
-            request.getHeaders().setContentType(MediaType.APPLICATION_JSON_UTF8);
+            request.getHeaders().setContentType(MediaType.APPLICATION_JSON);
             request.getHeaders().set("X-sigla-cd-cdr", "999.000.000");
             request.getHeaders().set("X-sigla-cd-cds", "999");
             request.getHeaders().set("X-sigla-cd-unita-organizzativa", "999.000");
@@ -625,6 +604,3 @@ public class ExternalMessageSender {
         }
     }
 }
-
-
-
