@@ -304,6 +304,7 @@ public final class Utils {
         String ruolo;
         String persona;
         String cdsuo;
+        String data;
 
 
 
@@ -319,6 +320,10 @@ public final class Utils {
             return cdsuo;
         }
 
+        public String getData() {
+            return data;
+        }
+
         public void setRuolo(String ruolo) {
             this.ruolo = ruolo;
         }
@@ -329,6 +334,10 @@ public final class Utils {
 
         public void setPersona(String persona) {
             this.persona = persona;
+        }
+        
+        public void setData(String data) {
+            this.data = data;
         }
     }
 

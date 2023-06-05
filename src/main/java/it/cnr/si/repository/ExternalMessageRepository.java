@@ -23,7 +23,7 @@ public interface ExternalMessageRepository extends JpaRepository<ExternalMessage
 
     @Query("select externalmessage from ExternalMessage externalmessage" +
             " where externalmessage.status = 'ERROR' " +
-            " and externalmessage.retries >= 6 and externalmessage.retries < 15")
+            " and externalmessage.retries >= 6 and externalmessage.retries < 30")
     List<ExternalMessage> getFailedExternalMessages();
 
 
