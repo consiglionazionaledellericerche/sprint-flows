@@ -73,7 +73,7 @@ public class StartCovid19SetGroupsAndVisibility_v1 {
 		} catch ( FeignException  e) {
 			if ((e.getMessage().indexOf("PERSONA_ASSEGNATA_SEDE_ESTERNA") >= 0)  && execution.getVariable("tipoAttivita").toString().equals("rendicontazione") ) {
 				if (execution.getVariable("mese").toString().equals("primo-semestre")) {
-					dateRif = LocalDate.of(Integer.parseInt(execution.getVariable("anno").toString()), 05, 1);
+					dateRif = LocalDate.of(Integer.parseInt(execution.getVariable("anno").toString()), 06, 1);
 				} else {
 					dateRif = LocalDate.of(Integer.parseInt(execution.getVariable("anno").toString()), 12, 1);
 				}
