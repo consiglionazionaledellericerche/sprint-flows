@@ -59,7 +59,7 @@ public class PopolazioneProfiliPerCDSUOApprovvigionamentiIT {
 	}
 
 	//@Test questa riga non va mai messa su git
-	//@Test
+	@Test
 	public void runBatch() throws IOException {
 		//String[][] persone = getPersoneDaFile();
 
