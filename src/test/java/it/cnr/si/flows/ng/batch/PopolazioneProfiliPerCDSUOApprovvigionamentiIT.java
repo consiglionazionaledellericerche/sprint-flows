@@ -36,7 +36,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "dev,cnr,keycloak")
+@ActiveProfiles(profiles = "dev,cnr,batch,keycloak")
 @RunWith(SpringJUnit4ClassRunner.class)
 public class PopolazioneProfiliPerCDSUOApprovvigionamentiIT {
 
@@ -52,6 +52,11 @@ public class PopolazioneProfiliPerCDSUOApprovvigionamentiIT {
 	private final Map<String, String> errors = new HashMap<>();
 
 	int i = 0;
+	
+	@Test
+	public void initTest() {
+	    log.info(String.valueOf(aceService.getRuoloBySigla("staffApprovvigionamenti").getId()));
+	}
 
 	//@Test questa riga non va mai messa su git
 	//@Test
@@ -63,6 +68,7 @@ public class PopolazioneProfiliPerCDSUOApprovvigionamentiIT {
 
 
 		for (int i = 0; i < persone.size(); i++) {
+			System.out.println("********** " + persone.get(i).getPersona() + " : (" + i + "/" + persone.size() + ")");
 			inserisciRuolo(persone.get(i).getPersona(), persone.get(i).getRuolo(), persone.get(i).getCdsuo(),persone.get(i).getData());
 			// fruit is an element of the `fruits` array.
 		}
@@ -106,18 +112,18 @@ public class PopolazioneProfiliPerCDSUOApprovvigionamentiIT {
 							if((listaRuoliUtente.get(j).getEntitaOrganizzativa().getId().equals(idSede)) && (listaRuoliUtente.get(j).getRuolo().getId().equals(idRuolo))){
 								utenteRuoloEoPresente = true;
 							} 
+						}
+					}
+					if (utenteRuoloEoPresente) {
+						System.out.println("UTENTE " + username + " già associato al ruolo " + idRuolo + " - idPersona " + idPersona + " - idSede " + idSede);
+					} else {
+						System.out.println("Associo ruolo " + idRuolo + " - idPersona " + idPersona + " - idSede " + idSede);
 
-							if (utenteRuoloEoPresente) {
-								System.out.println("UTENTE " + username + " già associato al ruolo " + idRuolo + " - idPersona " + idPersona + " - idSede " + idSede);
-							} else {
-								System.out.println("Associo ruolo " + idRuolo + " - idPersona " + idPersona + " - idSede " + idSede);
-
-								try {
-									aceService.associaRuoloPersona(idRuolo, idPersona, idSede, java.time.LocalDate.parse(data),null,false,false,"","");
-								} catch(UnexpectedResultException | FeignException | HttpClientErrorException error4) {
-									log.info("-------------- ERROR: UTENTE: " + username + " NON INSERITO");
-								}
-							}
+						try {
+							//aceService.associaRuoloPersona(idRuolo, idPersona, idSede, java.time.LocalDate.parse(data),null,false,false,"","");
+						} catch(UnexpectedResultException | FeignException | HttpClientErrorException error4) {
+							log.info("-------------- ERROR: UTENTE: " + username + " NON INSERITO");
+							errors.put("Associo ruolo " + idRuolo + " - idPersona " + idPersona + " - idSede " + idSede, error4.getMessage());
 						}
 					}
 				}
@@ -134,8 +140,8 @@ public class PopolazioneProfiliPerCDSUOApprovvigionamentiIT {
 		//		Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/ProceduraAcquisti-Utenti-ICCOM.csv"));
 		//		Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/ProceduraAcquisti-Utenti-SISINFO.csv"));
 		Stream<String> lines = Files.lines(Paths.get("./src/test/resources/batch/Approvvigionamenti-IT-Utenti.csv"));
-
-
+		//      Stream<String> lines = Files.lines(Paths.get("./src/test/resources/batch/Missioni-SpecialUser.csv"));
+	
 		i = 0;
 
 		Map<Integer, associazioneRuoloPersonaCDSUO> associazioni = new HashMap<Integer, associazioneRuoloPersonaCDSUO>();
