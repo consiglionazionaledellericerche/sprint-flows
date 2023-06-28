@@ -49,6 +49,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -98,6 +99,14 @@ public class FlowsCnrAdminTools {
     @Inject
     private CachingConfig cachingConfig;
 
+    @GetMapping("/api/null")
+    @Secured(AuthoritiesConstants.USER)
+    public ResponseEntity<Void> sendNull() {
+        if(true)
+            throw new NullPointerException("pippo");
+        return ResponseEntity.ok().build();
+    }
+    
     @RequestMapping(value = "/resendExternalMessages", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Void> resendExternalMessages() {

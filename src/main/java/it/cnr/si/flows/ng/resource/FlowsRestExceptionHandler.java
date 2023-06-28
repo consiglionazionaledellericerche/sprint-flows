@@ -10,6 +10,7 @@ import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.service.SecurityService;
 
 import org.activiti.engine.delegate.BpmnError;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -55,7 +56,7 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(NullPointerException.class)
     protected ResponseEntity<Object> HandleNull(RuntimeException ex, WebRequest request) {
         String bodyOfResponse = "E' stato ricevuto un null pointer per la richiesta "+ request.getDescription(true);
-        LOGGER.error(bodyOfResponse, ex);
+        LOGGER.error(bodyOfResponse +" stacktrace {}", ExceptionUtils.getStackTrace(ex));
 
         return handleExceptionInternal(ex, bodyOfResponse,
                 new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
@@ -95,7 +96,12 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
             return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(Utils.mapOf(ERROR_MESSAGE, errorMessage));
         }
 
-        LOGGER.error("L'utente {} ha cercato di a completare il task {} / avviare il flusso {}, ma c'e' stato un errore: {}", username, taskId, definitionId, ex.getMessage());
+        LOGGER.error("L'utente {} ha cercato di a completare il task {} / avviare il flusso {}, ma c'e' stato un errore: {}, stacktrace {}", 
+                username, 
+                taskId, 
+                definitionId, 
+                ex.getMessage(), 
+                ExceptionUtils.getStackTrace(ex));
         return handleExceptionInternal(ex, Utils.mapOf("message", ex.getMessage()),
                 new HttpHeaders(), Utils.getStatus(ex.getErrorCode()), request);
     }
