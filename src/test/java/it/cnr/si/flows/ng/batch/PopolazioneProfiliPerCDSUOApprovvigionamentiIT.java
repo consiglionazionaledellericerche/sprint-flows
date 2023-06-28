@@ -36,7 +36,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 @SpringBootTest(classes = FlowsApp.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(profiles = "dev,cnr,keycloak")
+@ActiveProfiles(profiles = "dev,cnr,batch,keycloak")
 @RunWith(SpringJUnit4ClassRunner.class)
 public class PopolazioneProfiliPerCDSUOApprovvigionamentiIT {
 
@@ -52,6 +52,11 @@ public class PopolazioneProfiliPerCDSUOApprovvigionamentiIT {
 	private final Map<String, String> errors = new HashMap<>();
 
 	int i = 0;
+	
+	@Test
+	public void initTest() {
+	    log.info(String.valueOf(aceService.getRuoloBySigla("staffApprovvigionamenti").getId()));
+	}
 
 	//@Test questa riga non va mai messa su git
 	//@Test
@@ -115,7 +120,7 @@ public class PopolazioneProfiliPerCDSUOApprovvigionamentiIT {
 						System.out.println("Associo ruolo " + idRuolo + " - idPersona " + idPersona + " - idSede " + idSede);
 
 						try {
-							aceService.associaRuoloPersona(idRuolo, idPersona, idSede, java.time.LocalDate.parse(data),null,false,false,"","");
+							//aceService.associaRuoloPersona(idRuolo, idPersona, idSede, java.time.LocalDate.parse(data),null,false,false,"","");
 						} catch(UnexpectedResultException | FeignException | HttpClientErrorException error4) {
 							log.info("-------------- ERROR: UTENTE: " + username + " NON INSERITO");
 						}
