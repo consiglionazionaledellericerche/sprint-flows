@@ -170,8 +170,8 @@ public class ManageProcessShortTermMobilityBandoDipartimento_v1 implements Execu
 				}
 				
 				//SBLOCCA TUTTE LE DOMANDE ATTIVE DI QUEL BANDO
-				runtimeService.signal(processInstance.getId());
 				LOGGER.info("-- sblocco la processInstance: " + processInstance.getName() + " (" + processInstance.getId() + ") ");
+				runtimeService.signal(processInstance.getId());
 			});
 
 
