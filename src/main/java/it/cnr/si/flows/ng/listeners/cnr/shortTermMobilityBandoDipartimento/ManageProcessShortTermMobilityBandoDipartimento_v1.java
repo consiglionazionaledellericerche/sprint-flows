@@ -46,6 +46,7 @@ import java.nio.file.attribute.FileAttributeView;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
@@ -151,6 +152,7 @@ public class ManageProcessShortTermMobilityBandoDipartimento_v1 implements Execu
 					.list();
 
 			//AGGIUNGE IL LINK ALLE VARIE DOMANDA PER BANDO PER DIPARIMENTO
+			LOGGER.info("Sblocco le domande relative a questo bando: {}", processinstancesListaPerBandoDipartimento.stream().map(p -> p.getId()).collect(Collectors.joining(",")));
 			processinstancesListaPerBandoDipartimento.forEach((processInstance) -> {
 				if (runtimeService.getVariable(processInstance.getProcessInstanceId(), "linkToOtherWorkflows") != null) {
 					String linkToOtherWorkflows = runtimeService.getVariable(processInstance.getProcessInstanceId(), "linkToOtherWorkflows").toString();
