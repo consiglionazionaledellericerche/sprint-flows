@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
-  <process id="acquisti-ict" name="ACQUISTI-ICT" isExecutable="true">
+  <process id="acquistiICT" name="ACQUISTI-ICT" isExecutable="true">
     <extensionElements>
       <activiti:executionListener event="start" delegateExpression="${manageProcessMissioni_v1}">
         <activiti:field name="faseEsecuzione">
@@ -15,16 +15,16 @@
     </extensionElements>
     <startEvent id="startevent1" name="Start"></startEvent>
     <exclusiveGateway id="exclusivegateway6" name="Exclusive Gateway" default="flow45"></exclusiveGateway>
-    <userTask id="modifica-determina" name="MODIFICA DETERMINA" activiti:assignee="${initiator}">
+    <userTask id="modifica-determina" name="MODIFICA DETERMINA" activiti:candidateGroups="${gruppoResponsabileAcquisti}">
       <extensionElements>
-        <activiti:executionListener event="start" delegateExpression="${manageProcessMissioni_v1}">
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquistiICT_v1}">
           <activiti:field name="faseEsecuzione">
-            <activiti:string><![CDATA[respinto-uo-start]]></activiti:string>
+            <activiti:string><![CDATA[modifica-determina-start]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
-        <activiti:executionListener event="end" delegateExpression="${manageProcessMissioni_v1}">
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAcquistiICT_v1}">
           <activiti:field name="faseEsecuzione">
-            <activiti:string><![CDATA[respinto-uo-end]]></activiti:string>
+            <activiti:string><![CDATA[modifica-determina-end]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
       </extensionElements>
@@ -34,61 +34,256 @@
     <sequenceFlow id="flow27" sourceRef="exclusivegateway7" targetRef="endevent3">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Annulla'}]]></conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="flow31" sourceRef="exclusivegateway7" targetRef="usertask1"></sequenceFlow>
-    <userTask id="protocollo-determina" name="PROTOCOLLO DETERMINA" activiti:assignee="${initiator}"></userTask>
-    <userTask id="espletamento-procedura" name="ESPLETAMENTO PROCEDURA" activiti:assignee="${initiator}"></userTask>
+    <sequenceFlow id="flow31" sourceRef="exclusivegateway7" targetRef="firma-determina"></sequenceFlow>
+    <userTask id="protocollo-determina" name="PROTOCOLLO DETERMINA" activiti:candidateGroups="${gruppoResponsabileAcquisti}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[protocollo-determina-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[protocollo-determina-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="espletamento-procedura" name="ESPLETAMENTO PROCEDURA" activiti:candidateGroups="${gruppoRUP}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[espletamento-procedura-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[espletamento-procedura-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
     <sequenceFlow id="flow33" sourceRef="protocollo-determina" targetRef="espletamento-procedura"></sequenceFlow>
     <exclusiveGateway id="exclusivegateway10" name="Exclusive Gateway" default="flow35"></exclusiveGateway>
     <exclusiveGateway id="exclusivegateway11" name="Exclusive Gateway" default="flow38"></exclusiveGateway>
     <sequenceFlow id="flow34" sourceRef="espletamento-procedura" targetRef="exclusivegateway10"></sequenceFlow>
-    <sequenceFlow id="flow35" sourceRef="exclusivegateway10" targetRef="usertask3"></sequenceFlow>
-    <sequenceFlow id="flow36" sourceRef="usertask3" targetRef="usertask4"></sequenceFlow>
-    <userTask id="modifica-proposta-aggiudicazione" name="MODIFICA PROPOSTA AGGIUDICAZIONE" activiti:assignee="${initiator}"></userTask>
-    <sequenceFlow id="flow37" sourceRef="usertask4" targetRef="exclusivegateway11"></sequenceFlow>
+    <sequenceFlow id="flow35" sourceRef="exclusivegateway10" targetRef="predisposizione-proposta-aggiudicazione"></sequenceFlow>
+    <sequenceFlow id="flow36" sourceRef="predisposizione-proposta-aggiudicazione" targetRef="firma-proposta-aggiudicazione"></sequenceFlow>
+    <userTask id="modifica-proposta-aggiudicazione" name="MODIFICA PROPOSTA AGGIUDICAZIONE" activiti:candidateGroups="${gruppoResponsabileAcquisti}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[modifica-proposta-aggiudicazione-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[modifica-proposta-aggiudicazione-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow37" sourceRef="firma-proposta-aggiudicazione" targetRef="exclusivegateway11"></sequenceFlow>
     <sequenceFlow id="flow38" sourceRef="exclusivegateway11" targetRef="modifica-proposta-aggiudicazione"></sequenceFlow>
     <sequenceFlow id="flow39" name="ANNULLATO" sourceRef="exclusivegateway12" targetRef="endevent3"></sequenceFlow>
     <exclusiveGateway id="exclusivegateway12" name="Exclusive Gateway" default="flow41"></exclusiveGateway>
     <sequenceFlow id="flow40" sourceRef="modifica-proposta-aggiudicazione" targetRef="exclusivegateway12"></sequenceFlow>
-    <sequenceFlow id="flow41" sourceRef="exclusivegateway12" targetRef="usertask4"></sequenceFlow>
-    <userTask id="modifica-ordine" name="MODIFICA ORDINE" activiti:async="true" activiti:assignee="${initiator}"></userTask>
+    <sequenceFlow id="flow41" sourceRef="exclusivegateway12" targetRef="firma-proposta-aggiudicazione"></sequenceFlow>
+    <userTask id="modifica-ordine" name="MODIFICA ORDINE" activiti:async="true" activiti:candidateGroups="${gruppoResponsabileAcquisti}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[modifica-ordine-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[modifica-ordine-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
     <exclusiveGateway id="exclusivegateway13" name="Exclusive Gateway" default="flow53"></exclusiveGateway>
-    <userTask id="firma-ordine" name="FIRMA ORDINE"></userTask>
+    <userTask id="firma-ordine" name="FIRMA ORDINE" activiti:candidateGroups="${gruppoFirmatari}" activiti:category="firma">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[firma-ordine-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[firma-ordine-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
     <exclusiveGateway id="exclusivegateway14" name="Exclusive Gateway" default="flow50"></exclusiveGateway>
-    <userTask id="predisposizione-ordine" name="PREDISPOSIZIONE ORDINE"></userTask>
+    <userTask id="predisposizione-ordine" name="PREDISPOSIZIONE ORDINE" activiti:candidateGroups="${gruppoResponsabileAcquisti}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[predisposizione-ordine-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[predisposizione-ordine-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
     <sequenceFlow id="flow43" sourceRef="exclusivegateway10" targetRef="predisposizione-ordine"></sequenceFlow>
     <sequenceFlow id="flow44" sourceRef="predisposizione-ordine" targetRef="firma-ordine"></sequenceFlow>
     <sequenceFlow id="flow45" sourceRef="exclusivegateway6" targetRef="modifica-determina"></sequenceFlow>
-    <sequenceFlow id="flow46" sourceRef="exclusivegateway11" targetRef="usertask6"></sequenceFlow>
+    <sequenceFlow id="flow46" sourceRef="exclusivegateway11" targetRef="protocollo-proposta-aggiudicazione"></sequenceFlow>
     <sequenceFlow id="flow48" sourceRef="firma-ordine" targetRef="exclusivegateway14"></sequenceFlow>
     <sequenceFlow id="flow50" sourceRef="exclusivegateway14" targetRef="modifica-ordine"></sequenceFlow>
-    <userTask id="protocollo-ordine" name="PROTOCOLLO ORDINE" activiti:assignee="${initiator}"></userTask>
+    <userTask id="protocollo-ordine" name="PROTOCOLLO ORDINE" activiti:candidateGroups="${gruppoResponsabileAcquisti}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[protocollo-ordine-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[protocollo-ordine-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
     <sequenceFlow id="flow51" sourceRef="exclusivegateway14" targetRef="protocollo-ordine"></sequenceFlow>
     <sequenceFlow id="flow52" sourceRef="modifica-ordine" targetRef="exclusivegateway13"></sequenceFlow>
     <sequenceFlow id="flow53" sourceRef="exclusivegateway13" targetRef="firma-ordine"></sequenceFlow>
-    <userTask id="consuntivo" name="CONSUNTIVO"></userTask>
+    <userTask id="consuntivo" name="CONSUNTIVO" activiti:candidateGroups="${gruppoRUP}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[consuntivo-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[consuntivo-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
     <endEvent id="endevent3" name="End"></endEvent>
     <sequenceFlow id="flow55" sourceRef="protocollo-ordine" targetRef="consuntivo"></sequenceFlow>
-    <userTask id="carica-ordine-mepa" name="CARICA ORDINE MEPA"></userTask>
-    <userTask id="protocollo-ordine-mepa" name="PROTOCOLLO ORDINE MEPA"></userTask>
+    <userTask id="carica-ordine-mepa" name="CARICA ORDINE MEPA" activiti:candidateGroups="${gruppoFirmatari}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[carica-ordine-mepa-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[carica-ordine-mepa-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="protocollo-ordine-mepa" name="PROTOCOLLO ORDINE MEPA" activiti:candidateGroups="${gruppoResponsabileAcquisti}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[protocollo-ordine-mepa-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[protocollo-ordine-mepa-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
     <sequenceFlow id="flow57" sourceRef="carica-ordine-mepa" targetRef="protocollo-ordine-mepa"></sequenceFlow>
-    <sequenceFlow id="flow58" sourceRef="protocollo-ordine-mepa" targetRef="usertask2"></sequenceFlow>
-    <sequenceFlow id="flow59" sourceRef="usertask2" targetRef="consuntivo"></sequenceFlow>
+    <sequenceFlow id="flow58" sourceRef="protocollo-ordine-mepa" targetRef="invio-ordine-mepa"></sequenceFlow>
+    <sequenceFlow id="flow59" sourceRef="invio-ordine-mepa" targetRef="consuntivo"></sequenceFlow>
     <sequenceFlow id="flow61" sourceRef="exclusivegateway13" targetRef="endevent3"></sequenceFlow>
     <endEvent id="endevent4" name="End"></endEvent>
     <sequenceFlow id="flow62" name="ACQUISTATO" sourceRef="consuntivo" targetRef="endevent4"></sequenceFlow>
     <sequenceFlow id="flow64" sourceRef="modifica-determina" targetRef="exclusivegateway7"></sequenceFlow>
-    <userTask id="usertask1" name="FIRMA DETERMINA"></userTask>
-    <sequenceFlow id="flow65" sourceRef="usertask1" targetRef="exclusivegateway6"></sequenceFlow>
-    <sequenceFlow id="flow66" sourceRef="usertask6" targetRef="predisposizione-ordine"></sequenceFlow>
+    <userTask id="firma-determina" name="FIRMA DETERMINA" activiti:candidateGroups="${gruppoFirmatari}" activiti:category="firma">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[firma-determina-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[firma-determina-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow65" sourceRef="firma-determina" targetRef="exclusivegateway6"></sequenceFlow>
+    <sequenceFlow id="flow66" sourceRef="protocollo-proposta-aggiudicazione" targetRef="predisposizione-ordine"></sequenceFlow>
     <sequenceFlow id="flow67" sourceRef="exclusivegateway10" targetRef="carica-ordine-mepa"></sequenceFlow>
-    <userTask id="usertask2" name="INVIO ORDINE MEPA"></userTask>
-    <userTask id="usertask3" name="PREDISPOSIZIONE PROPOSTA AGGIUDICAZIONE" activiti:assignee="${initiator}"></userTask>
-    <userTask id="usertask4" name="FIRMA PROPOSTA AGGIUDICAZIONE" activiti:assignee="${initiator}"></userTask>
-    <userTask id="usertask6" name="PROTOCOLLO PROPOSTA AGGIUDICAZIONE" activiti:assignee="${initiator}"></userTask>
-    <sequenceFlow id="flow68" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
+    <userTask id="invio-ordine-mepa" name="INVIO ORDINE MEPA" activiti:candidateGroups="${gruppoFirmatari}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[invio-ordine-mepa-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[invio-ordine-mepa-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="predisposizione-proposta-aggiudicazione" name="PREDISPOSIZIONE PROPOSTA AGGIUDICAZIONE" activiti:candidateGroups="${gruppoResponsabileAcquisti}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[predisposizione-proposta-aggiudicazione-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[predisposizione-proposta-aggiudicazione-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="firma-proposta-aggiudicazione" name="FIRMA PROPOSTA AGGIUDICAZIONE" activiti:candidateGroups="${gruppoFirmatari}" activiti:category="firma">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[firma-proposta-aggiudicazione-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[firma-proposta-aggiudicazione-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="protocollo-proposta-aggiudicazione" name="PROTOCOLLO PROPOSTA AGGIUDICAZIONE" activiti:candidateGroups="${gruppoResponsabileAcquisti}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[protocollo-proposta-aggiudicazione-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[protocollo-proposta-aggiudicazione-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow68" sourceRef="startevent1" targetRef="firma-determina"></sequenceFlow>
   </process>
-  <bpmndi:BPMNDiagram id="BPMNDiagram_acquisti-ict">
-    <bpmndi:BPMNPlane bpmnElement="acquisti-ict" id="BPMNPlane_acquisti-ict">
+  <bpmndi:BPMNDiagram id="BPMNDiagram_acquistiICT">
+    <bpmndi:BPMNPlane bpmnElement="acquistiICT" id="BPMNPlane_acquistiICT">
       <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
         <omgdc:Bounds height="35.0" width="35.0" x="46.0" y="117.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
@@ -152,19 +347,19 @@
       <bpmndi:BPMNShape bpmnElement="endevent4" id="BPMNShape_endevent4">
         <omgdc:Bounds height="35.0" width="35.0" x="879.0" y="596.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+      <bpmndi:BPMNShape bpmnElement="firma-determina" id="BPMNShape_firma-determina">
         <omgdc:Bounds height="70.0" width="111.0" x="240.0" y="100.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
+      <bpmndi:BPMNShape bpmnElement="invio-ordine-mepa" id="BPMNShape_invio-ordine-mepa">
         <omgdc:Bounds height="75.0" width="111.0" x="560.0" y="687.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="usertask3" id="BPMNShape_usertask3">
+      <bpmndi:BPMNShape bpmnElement="predisposizione-proposta-aggiudicazione" id="BPMNShape_predisposizione-proposta-aggiudicazione">
         <omgdc:Bounds height="85.0" width="109.0" x="157.0" y="270.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="usertask4" id="BPMNShape_usertask4">
+      <bpmndi:BPMNShape bpmnElement="firma-proposta-aggiudicazione" id="BPMNShape_firma-proposta-aggiudicazione">
         <omgdc:Bounds height="85.0" width="109.0" x="312.0" y="270.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="usertask6" id="BPMNShape_usertask6">
+      <bpmndi:BPMNShape bpmnElement="protocollo-proposta-aggiudicazione" id="BPMNShape_protocollo-proposta-aggiudicazione">
         <omgdc:Bounds height="71.0" width="162.0" x="414.0" y="380.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow17" id="BPMNEdge_flow17">
