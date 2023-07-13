@@ -4,6 +4,7 @@ package it.cnr.si.flows.ng.listeners.cnr.acquistiICT;
 import it.cnr.si.domain.enumeration.ExternalApplication;
 import it.cnr.si.domain.enumeration.ExternalMessageVerb;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.exception.TaskFailedException;
 import it.cnr.si.flows.ng.service.*;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Enum.StatoDomandeAccordiInternazionaliEnum;
@@ -137,6 +138,20 @@ public class ManageProcessAcquistiICT_v1 implements ExecutionListener {
 				
 			};break;
 			case "modifica-determina-end": {
+				
+				// FIRMA MULTIPLA TUTTI I DOCUMENTI DI UN CERTO TIPO
+				if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
+					List<String> nomiVariabiliFile = new ArrayList<String>();
+					List<FlowsAttachment> attachments = flowsAttachmentService.getAttachmentArray(processInstanceId, "determina");
+					if (attachments.size() == 0)
+						throw new TaskFailedException("Attachment non opzionali mancanti: " + "determina");
+					attachments.forEach(att -> nomiVariabiliFile.add(att.getName()));
+					
+	                attachments = flowsAttachmentService.getAttachmentArray(processInstanceId, "allegato");
+	                attachments.forEach(att -> nomiVariabiliFile.add(att.getName()));
+					
+	                firmaDocumentoService.eseguiFirmaMultipla(execution, nomiVariabiliFile, null);
+				}
 				
 			};break;
 			

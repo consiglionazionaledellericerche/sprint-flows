@@ -51,7 +51,7 @@
         </activiti:executionListener>
       </extensionElements>
     </userTask>
-    <userTask id="espletamento-procedura" name="ESPLETAMENTO PROCEDURA" activiti:candidateGroups="${gruppoRUP}">
+    <userTask id="espletamento-procedura" name="ESPLETAMENTO PROCEDURA" activiti:assignee="${rup}">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessAcquistiICT_v1}">
           <activiti:field name="faseEsecuzione">
@@ -166,7 +166,7 @@
     </sequenceFlow>
     <sequenceFlow id="flow52" sourceRef="modifica-ordine" targetRef="exclusivegateway13"></sequenceFlow>
     <sequenceFlow id="flow53" sourceRef="exclusivegateway13" targetRef="firma-ordine"></sequenceFlow>
-    <userTask id="consuntivo" name="CONSUNTIVO" activiti:candidateGroups="${gruppoRUP}">
+    <userTask id="consuntivo" name="CONSUNTIVO" activiti:assignee="${rup}">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessAcquistiICT_v1}">
           <activiti:field name="faseEsecuzione">

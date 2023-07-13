@@ -7,6 +7,7 @@ import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
 import it.cnr.si.service.dto.anagrafica.letture.EntitaOrganizzativaWebDto;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
 
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.delegate.BpmnError;
@@ -86,18 +87,19 @@ public class StartAcquistiICTSetGroupsAndVisibility {
 		String applicazioneScrivaniaDigitale = "app.scrivaniadigitale";
 		String gruppoResponsabileAcquisti = "responsabileAcquistiICT@0000" + IdEntitaOrganizzativaDirettore;
 		String gruppoFirmatari = "responsabile-struttura@" + IdEntitaOrganizzativaDirettore;
-		String gruppoRUP = "gruppoRUP@" + IdEntitaOrganizzativaDirettore;
-
-		LOGGER.debug("Imposto i gruppi del flusso gruppoResponsabileAcquisti {}, gruppoFirmatari {}, gruppoRUP {}",  gruppoResponsabileAcquisti, gruppoFirmatari, gruppoRUP);
+		//String gruppoRUP = "gruppoRUP@" + IdEntitaOrganizzativaDirettore;
+		if(execution.getVariable("rup") != null){
+			SimplePersonaWebDto rupUser = aceService.getPersonaByUsername(execution.getVariable("rup").toString());
+		}
+		LOGGER.debug("Imposto i gruppi del flusso gruppoResponsabileAcquisti {}, gruppoFirmatari {}, gruppoRUP {}",  gruppoResponsabileAcquisti, gruppoFirmatari, execution.getVariable("rup").toString());
 
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileAcquisti, PROCESS_VISUALIZER);
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoFirmatari, PROCESS_VISUALIZER);
-		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoRUP, PROCESS_VISUALIZER);
+		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), execution.getVariable("rup").toString(), PROCESS_VISUALIZER);
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneScrivaniaDigitale, PROCESS_VISUALIZER);
 
 		execution.setVariable("gruppoResponsabileAcquisti", gruppoResponsabileAcquisti);
 		execution.setVariable("gruppoFirmatari", gruppoFirmatari);
-		execution.setVariable("gruppoRUP", gruppoRUP);
 		execution.setVariable("cdsuoRichiedente", cdsuoAppartenenzaUtente);
 		execution.setVariable("idStruttura", String.valueOf(IdEntitaOrganizzativaDirettore));
 
