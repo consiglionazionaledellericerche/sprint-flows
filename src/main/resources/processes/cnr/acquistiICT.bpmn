@@ -29,7 +29,9 @@
         </activiti:executionListener>
       </extensionElements>
     </userTask>
-    <sequenceFlow id="flow17" sourceRef="exclusivegateway6" targetRef="protocollo-determina"></sequenceFlow>
+    <sequenceFlow id="flow17" sourceRef="exclusivegateway6" targetRef="protocollo-determina">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Firma' ||  sceltaUtente == 'Firma Multipla'}]]></conditionExpression>
+    </sequenceFlow>
     <exclusiveGateway id="exclusivegateway7" name="Exclusive Gateway" default="flow31"></exclusiveGateway>
     <sequenceFlow id="flow27" sourceRef="exclusivegateway7" targetRef="endevent3">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Annulla'}]]></conditionExpression>
@@ -64,10 +66,12 @@
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow33" sourceRef="protocollo-determina" targetRef="espletamento-procedura"></sequenceFlow>
-    <exclusiveGateway id="exclusivegateway10" name="Exclusive Gateway" default="flow35"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway10" name="Exclusive Gateway" default="flow43"></exclusiveGateway>
     <exclusiveGateway id="exclusivegateway11" name="Exclusive Gateway" default="flow38"></exclusiveGateway>
     <sequenceFlow id="flow34" sourceRef="espletamento-procedura" targetRef="exclusivegateway10"></sequenceFlow>
-    <sequenceFlow id="flow35" sourceRef="exclusivegateway10" targetRef="predisposizione-proposta-aggiudicazione"></sequenceFlow>
+    <sequenceFlow id="flow35" sourceRef="exclusivegateway10" targetRef="predisposizione-proposta-aggiudicazione">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Aggiudicazione'}]]></conditionExpression>
+    </sequenceFlow>
     <sequenceFlow id="flow36" sourceRef="predisposizione-proposta-aggiudicazione" targetRef="firma-proposta-aggiudicazione"></sequenceFlow>
     <userTask id="modifica-proposta-aggiudicazione" name="MODIFICA PROPOSTA AGGIUDICAZIONE" activiti:candidateGroups="${gruppoResponsabileAcquisti}">
       <extensionElements>
@@ -85,7 +89,9 @@
     </userTask>
     <sequenceFlow id="flow37" sourceRef="firma-proposta-aggiudicazione" targetRef="exclusivegateway11"></sequenceFlow>
     <sequenceFlow id="flow38" sourceRef="exclusivegateway11" targetRef="modifica-proposta-aggiudicazione"></sequenceFlow>
-    <sequenceFlow id="flow39" name="ANNULLATO" sourceRef="exclusivegateway12" targetRef="endevent3"></sequenceFlow>
+    <sequenceFlow id="flow39" name="ANNULLATO" sourceRef="exclusivegateway12" targetRef="endevent3">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Annulla'}]]></conditionExpression>
+    </sequenceFlow>
     <exclusiveGateway id="exclusivegateway12" name="Exclusive Gateway" default="flow41"></exclusiveGateway>
     <sequenceFlow id="flow40" sourceRef="modifica-proposta-aggiudicazione" targetRef="exclusivegateway12"></sequenceFlow>
     <sequenceFlow id="flow41" sourceRef="exclusivegateway12" targetRef="firma-proposta-aggiudicazione"></sequenceFlow>
@@ -136,7 +142,9 @@
     <sequenceFlow id="flow43" sourceRef="exclusivegateway10" targetRef="predisposizione-ordine"></sequenceFlow>
     <sequenceFlow id="flow44" sourceRef="predisposizione-ordine" targetRef="firma-ordine"></sequenceFlow>
     <sequenceFlow id="flow45" sourceRef="exclusivegateway6" targetRef="modifica-determina"></sequenceFlow>
-    <sequenceFlow id="flow46" sourceRef="exclusivegateway11" targetRef="protocollo-proposta-aggiudicazione"></sequenceFlow>
+    <sequenceFlow id="flow46" sourceRef="exclusivegateway11" targetRef="protocollo-proposta-aggiudicazione">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Firma' ||  sceltaUtente == 'Firma Multipla'}]]></conditionExpression>
+    </sequenceFlow>
     <sequenceFlow id="flow48" sourceRef="firma-ordine" targetRef="exclusivegateway14"></sequenceFlow>
     <sequenceFlow id="flow50" sourceRef="exclusivegateway14" targetRef="modifica-ordine"></sequenceFlow>
     <userTask id="protocollo-ordine" name="PROTOCOLLO ORDINE" activiti:candidateGroups="${gruppoResponsabileAcquisti}">
@@ -153,7 +161,9 @@
         </activiti:executionListener>
       </extensionElements>
     </userTask>
-    <sequenceFlow id="flow51" sourceRef="exclusivegateway14" targetRef="protocollo-ordine"></sequenceFlow>
+    <sequenceFlow id="flow51" sourceRef="exclusivegateway14" targetRef="protocollo-ordine">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Firma' ||  sceltaUtente == 'Firma Multipla'}]]></conditionExpression>
+    </sequenceFlow>
     <sequenceFlow id="flow52" sourceRef="modifica-ordine" targetRef="exclusivegateway13"></sequenceFlow>
     <sequenceFlow id="flow53" sourceRef="exclusivegateway13" targetRef="firma-ordine"></sequenceFlow>
     <userTask id="consuntivo" name="CONSUNTIVO" activiti:candidateGroups="${gruppoRUP}">
@@ -170,7 +180,11 @@
         </activiti:executionListener>
       </extensionElements>
     </userTask>
-    <endEvent id="endevent3" name="End"></endEvent>
+    <endEvent id="endevent3" name="End">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="org.alfresco.repo.workflow.activiti.listener.ScriptExecutionListener"></activiti:executionListener>
+      </extensionElements>
+    </endEvent>
     <sequenceFlow id="flow55" sourceRef="protocollo-ordine" targetRef="consuntivo"></sequenceFlow>
     <userTask id="carica-ordine-mepa" name="CARICA ORDINE MEPA" activiti:candidateGroups="${gruppoFirmatari}">
       <extensionElements>
@@ -203,8 +217,18 @@
     <sequenceFlow id="flow57" sourceRef="carica-ordine-mepa" targetRef="protocollo-ordine-mepa"></sequenceFlow>
     <sequenceFlow id="flow58" sourceRef="protocollo-ordine-mepa" targetRef="invio-ordine-mepa"></sequenceFlow>
     <sequenceFlow id="flow59" sourceRef="invio-ordine-mepa" targetRef="consuntivo"></sequenceFlow>
-    <sequenceFlow id="flow61" sourceRef="exclusivegateway13" targetRef="endevent3"></sequenceFlow>
-    <endEvent id="endevent4" name="End"></endEvent>
+    <sequenceFlow id="flow61" sourceRef="exclusivegateway13" targetRef="endevent3">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Annulla'}]]></conditionExpression>
+    </sequenceFlow>
+    <endEvent id="endevent4" name="End">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[endevent-acquistato-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
     <sequenceFlow id="flow62" name="ACQUISTATO" sourceRef="consuntivo" targetRef="endevent4"></sequenceFlow>
     <sequenceFlow id="flow64" sourceRef="modifica-determina" targetRef="exclusivegateway7"></sequenceFlow>
     <userTask id="firma-determina" name="FIRMA DETERMINA" activiti:candidateGroups="${gruppoFirmatari}" activiti:category="firma">
@@ -223,7 +247,9 @@
     </userTask>
     <sequenceFlow id="flow65" sourceRef="firma-determina" targetRef="exclusivegateway6"></sequenceFlow>
     <sequenceFlow id="flow66" sourceRef="protocollo-proposta-aggiudicazione" targetRef="predisposizione-ordine"></sequenceFlow>
-    <sequenceFlow id="flow67" sourceRef="exclusivegateway10" targetRef="carica-ordine-mepa"></sequenceFlow>
+    <sequenceFlow id="flow67" sourceRef="exclusivegateway10" targetRef="carica-ordine-mepa">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'mepa'}]]></conditionExpression>
+    </sequenceFlow>
     <userTask id="invio-ordine-mepa" name="INVIO ORDINE MEPA" activiti:candidateGroups="${gruppoFirmatari}">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessAcquistiICT_v1}">
@@ -407,7 +433,7 @@
         <omgdi:waypoint x="733.0" y="319.0"></omgdi:waypoint>
         <omgdi:waypoint x="879.0" y="319.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="63.0" x="918.0" y="313.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="100.0" x="918.0" y="313.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow40" id="BPMNEdge_flow40">

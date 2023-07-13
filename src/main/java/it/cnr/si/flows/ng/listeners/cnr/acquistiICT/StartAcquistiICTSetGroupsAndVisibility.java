@@ -80,46 +80,24 @@ public class StartAcquistiICTSetGroupsAndVisibility {
 			throw new BpmnError("412", "Errore nell'avvio del flusso " + e.getMessage().toString());
 		}
 
-		//		Object insdipResponsabileUo = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("codice_sede");
-		//		String usernameDirettore = siperService.getDirettoreCDSUO(cdsuoAppartenenzaUtente).get(0).get("uid").toString();
-		//		EntitaOrganizzativaWebDto entitaOrganizzativaDirUo = aceService.entitaOrganizzativaFindByTerm(insdipResponsabileUo.toString()).get(0);
-		//		Integer idEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getId();
-		//		String siglaEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getSigla().toString();
-		//		String denominazioneEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getDenominazione().toString();
-		//		String cdsuoEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getCdsuo().toString();
-		//		String idnsipEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirUo.getIdnsip().toString();	
-
 		LOGGER.info("L'utente {} ha come responabile-struttura [{}] {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", userNameRichiedente, responsabileStruttura.getRuolo().getDescr(), responsabileStruttura.getUtente().getUsername(), denominazioneEntitaorganizzativaResponsabileUtente, entitaOrganizzativaDirettore.getSigla(), entitaOrganizzativaDirettore.getId(), entitaOrganizzativaDirettore.getCdsuo(), entitaOrganizzativaDirettore.getIdnsip());
 
-		String gruppoValidatoriAccordiInternazionali = "validatoriAccordiInternazionali@0000";
-		String gruppoUfficioProtocollo = "ufficioProtocolloAccordiInternazionali@0000";
-		String gruppoValutatoreScientificoDipartimento = "valutatoreScientificoDipartimento@0000";
-		String gruppoResponsabileAccordiInternazionali = "responsabileAccordiInternazionali@0000";
-		//DA CAMBIARE - ricavando il direttore della persona che afferisce alla sua struttura
-		String gruppoDirigenteRichiedente = "responsabile-struttura@" + IdEntitaOrganizzativaDirettore;
-
-		String applicazioneAccordiInternazionali = "app.abil";
+		
 		String applicazioneScrivaniaDigitale = "app.scrivaniadigitale";
+		String gruppoResponsabileAcquisti = "responsabileAcquistiICT@0000" + IdEntitaOrganizzativaDirettore;
+		String gruppoFirmatari = "responsabile-struttura@" + IdEntitaOrganizzativaDirettore;
+		String gruppoRUP = "gruppoRUP@" + IdEntitaOrganizzativaDirettore;
 
-		LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}",  gruppoValidatoriAccordiInternazionali, gruppoResponsabileAccordiInternazionali, gruppoUfficioProtocollo);
-		LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}",  gruppoValidatoriAccordiInternazionali, gruppoResponsabileAccordiInternazionali, gruppoUfficioProtocollo);
+		LOGGER.debug("Imposto i gruppi del flusso gruppoResponsabileAcquisti {}, gruppoFirmatari {}, gruppoRUP {}",  gruppoResponsabileAcquisti, gruppoFirmatari, gruppoRUP);
 
-		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValidatoriAccordiInternazionali, PROCESS_VISUALIZER);
-		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileAccordiInternazionali, PROCESS_VISUALIZER);
-		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneAccordiInternazionali, PROCESS_VISUALIZER);
-		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoUfficioProtocollo, PROCESS_VISUALIZER);
-		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoDirigenteRichiedente, PROCESS_VISUALIZER);
-		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValutatoreScientificoDipartimento, PROCESS_VISUALIZER);
+		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileAcquisti, PROCESS_VISUALIZER);
+		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoFirmatari, PROCESS_VISUALIZER);
+		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoRUP, PROCESS_VISUALIZER);
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneScrivaniaDigitale, PROCESS_VISUALIZER);
 
-		execution.setVariable("strutturaValutazioneDirigente", IdEntitaOrganizzativaDirettore + "-" + denominazioneEntitaorganizzativaResponsabileUtente);
-		execution.setVariable("gruppoValidatoriAccordiInternazionali", gruppoValidatoriAccordiInternazionali);
-		execution.setVariable("gruppoResponsabileAccordiInternazionali", gruppoResponsabileAccordiInternazionali);
-		execution.setVariable("gruppoUfficioProtocollo", gruppoUfficioProtocollo);
-		execution.setVariable("applicazioneAccordiInternazionali", applicazioneAccordiInternazionali);
-		execution.setVariable("gruppoDirigenteRichiedente", gruppoDirigenteRichiedente);
-		execution.setVariable("gruppoValutatoreScientificoDipartimento", gruppoValutatoreScientificoDipartimento);
-		execution.setVariable("applicazioneScrivaniaDigitale", applicazioneScrivaniaDigitale);
+		execution.setVariable("gruppoResponsabileAcquisti", gruppoResponsabileAcquisti);
+		execution.setVariable("gruppoFirmatari", gruppoFirmatari);
+		execution.setVariable("gruppoRUP", gruppoRUP);
 		execution.setVariable("cdsuoRichiedente", cdsuoAppartenenzaUtente);
 		execution.setVariable("idStruttura", String.valueOf(IdEntitaOrganizzativaDirettore));
 

@@ -53,7 +53,7 @@ public class ManageProcessAcquistiICT_v1 implements ExecutionListener {
 	@Inject
 	private FlowsProcessInstanceService flowsProcessInstanceService;
 	@Inject
-	private StartAcquistiICTSetGroupsAndVisibility startAccordiInternazionaliDomandeSetGroupsAndVisibility;
+	private StartAcquistiICTSetGroupsAndVisibility StartAcquistiICTSetGroupsAndVisibility;
 	@Inject
 	private RuntimeService runtimeService;
 	@Inject
@@ -117,33 +117,11 @@ public class ManageProcessAcquistiICT_v1 implements ExecutionListener {
 			switch(faseEsecuzioneValue){
 			// START
 			case "process-start": {
-			    String propostaHtml = String.valueOf(execution.getVariable("propostaDiRicerca"));
-			    String propostaPulita = Utils.sanitizeHtml(propostaHtml);
-			    execution.setVariable("propostaDiRicerca", propostaPulita);
+			    //String propostaHtml = String.valueOf(execution.getVariable("propostaDiRicerca"));
+			    //String propostaPulita = Utils.sanitizeHtml(propostaHtml);
+			    //execution.setVariable("propostaDiRicerca", propostaPulita);
 			    			    
-				startAccordiInternazionaliDomandeSetGroupsAndVisibility.configuraVariabiliStart(execution);
-				// GENERO LA DOMANDA ---OLD
-				//String nomeFile="domandaAcquistiICT";
-				//flowsPdfService.makePdfBeforeStartPi(nomeFile, processInstanceId);
-
-				//PARAMETRI GENERAZIONE PDF x SIGLA PRINT
-				String tipoAttivita = "rendicontazione";
-				if (execution.getVariable("tipoAttivita") != null) {
-					tipoAttivita = execution.getVariable("tipoAttivita").toString();
-				}
-				String nomeFile="domandaAcquistiICT";
-				String labelFile = "Domanda Accordi Bilaterali";
-				String report = "/scrivaniadigitale/domandaAcquistiICT.jrxml";
-				//tipologiaDoc è la tipologia del file
-				String tipologiaDoc = Enum.PdfType.valueOf("domandaAcquistiICT").name();
-				String utenteFile = execution.getVariable("initiator").toString();
-
-				// UPDATE VARIABILI FLUSSO
-				utils.updateJsonSearchTerms(executionId, processInstanceId, stato);
-				// GENERAZIONE PDF
-				List<String> listaVariabiliHtml = new ArrayList<String>();
-				listaVariabiliHtml.add("propostaDiRicerca");
-				flowsPdfService.makePdfBySigla(tipologiaDoc, processInstanceId, listaVariabiliHtml, labelFile, report);
+				StartAcquistiICTSetGroupsAndVisibility.configuraVariabiliStart(execution);
 
 			};break;
 			// START
@@ -257,13 +235,29 @@ public class ManageProcessAcquistiICT_v1 implements ExecutionListener {
 				
 			};break;
 
-			
+
 			case "invio-ordine-mepa-start": {
 				
 			};break;
 			case "invio-ordine-mepa-end": {
 				
 			};break;
+			
+
+			case "endevent-annullato-start": {
+				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoAcquistiICTEnum.ANNULLATO);
+				execution.setVariable("statoFinale", Enum.StatoAcquistiICTEnum.ANNULLATO);
+				utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
+			};break;
+			case "endevent-acquistato-start": {
+				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoAcquistiICTEnum.ACQUISTATO);
+				execution.setVariable("statoFinale", Enum.StatoAcquistiICTEnum.ACQUISTATO);
+				utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
+			};break;
+			
+			
+			
+			
 			
 			
 			
