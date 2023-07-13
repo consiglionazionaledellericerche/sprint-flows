@@ -2,12 +2,12 @@
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
   <process id="acquistiICT" name="ACQUISTI-ICT" isExecutable="true">
     <extensionElements>
-      <activiti:executionListener event="start" delegateExpression="${manageProcessMissioni_v1}">
+      <activiti:executionListener event="start" delegateExpression="${manageProcessAcquistiICT_v1}">
         <activiti:field name="faseEsecuzione">
           <activiti:string><![CDATA[process-start]]></activiti:string>
         </activiti:field>
       </activiti:executionListener>
-      <activiti:executionListener event="end" delegateExpression="${manageProcessMissioni_v1}">
+      <activiti:executionListener event="end" delegateExpression="${manageProcessAcquistiICT_v1}">
         <activiti:field name="faseEsecuzione">
           <activiti:string><![CDATA[process-end]]></activiti:string>
         </activiti:field>
@@ -433,7 +433,7 @@
         <omgdi:waypoint x="733.0" y="319.0"></omgdi:waypoint>
         <omgdi:waypoint x="879.0" y="319.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="918.0" y="313.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="63.0" x="918.0" y="313.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow40" id="BPMNEdge_flow40">

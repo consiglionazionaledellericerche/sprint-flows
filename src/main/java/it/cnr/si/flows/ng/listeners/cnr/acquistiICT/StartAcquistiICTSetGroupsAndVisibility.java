@@ -56,7 +56,7 @@ public class StartAcquistiICTSetGroupsAndVisibility {
 		BossDto responsabileStruttura = null;
 		String denominazioneEntitaorganizzativaResponsabileUtente = null;
 
-		String userNameRichiedente = execution.getVariable("userNameRichiedente", String.class);
+		String userNameRichiedente = initiator;
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", userNameRichiedente, execution.getId(), execution.getVariable("title"));
 
 		// VERIFICA RESPOSNABILE STRUTTURA AFFERENZA CDSUO
@@ -85,7 +85,7 @@ public class StartAcquistiICTSetGroupsAndVisibility {
 
 		
 		String applicazioneScrivaniaDigitale = "app.scrivaniadigitale";
-		String gruppoResponsabileAcquisti = "responsabileAcquistiICT@0000" + IdEntitaOrganizzativaDirettore;
+		String gruppoResponsabileAcquisti = "responsabileAcquistiICT@" + IdEntitaOrganizzativaDirettore;
 		String gruppoFirmatari = "responsabile-struttura@" + IdEntitaOrganizzativaDirettore;
 		//String gruppoRUP = "gruppoRUP@" + IdEntitaOrganizzativaDirettore;
 		if(execution.getVariable("rup") != null){
