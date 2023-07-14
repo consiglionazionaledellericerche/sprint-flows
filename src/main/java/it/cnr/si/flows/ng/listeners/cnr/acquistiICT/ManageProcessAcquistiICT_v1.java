@@ -16,10 +16,13 @@ import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
 import org.activiti.engine.ManagementService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.delegate.BpmnError;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
 import org.activiti.engine.runtime.Job;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +68,8 @@ public class ManageProcessAcquistiICT_v1 implements ExecutionListener {
 	@Inject
 	private FlowsAttachmentService flowsAttachmentService;
 	@Inject
+	private AceBridgeService aceBridgeService;
+	@Inject
 	private ExternalMessageService externalMessageService;
 	@Inject
 	private TaskService taskService;
@@ -103,6 +108,39 @@ public class ManageProcessAcquistiICT_v1 implements ExecutionListener {
 	}
 
 
+	public void CalcolaTotaleImpegni(DelegateExecution execution) {
+		double importoTotaleNetto = 0.0;
+		double importoTotaleLordo = 0.0;
+
+		String impegniString = (String) execution.getVariable("impegni_json");
+		JSONArray impegni = new JSONArray(impegniString);
+
+		for ( int i = 0; i < impegni.length(); i++) {
+
+			JSONObject impegno = impegni.getJSONObject(i);
+
+			try {
+				importoTotaleNetto += impegno.getDouble("importoNetto");
+			} catch (JSONException e) {
+				LOGGER.error("Formato Impegno Non Valido {} nel flusso {} - {}", impegno.getString("importoNetto"), execution.getId(), execution.getVariable("title"));
+				throw new BpmnError("400", "Formato Impegno Non Valido: " + impegno.getString("importoNetto"));
+			}
+			impegno.put("importoLordo", (double) Math.round(100*((impegno.getDouble("importoNetto")) * (1+(impegno.getDouble("percentualeIva"))/100)))/100);
+			try {
+				importoTotaleLordo += impegno.getDouble("importoLordo");
+			} catch (JSONException e) {
+				LOGGER.error("Formato Impegno Non Valido {} nel flusso {} - {}", impegno.getString("importoLordo"), execution.getId(), execution.getVariable("title"));
+				throw new BpmnError("400", "Formato Impegno Non Valido: " + impegno.getString("importoLordo"));
+			}
+
+			impegno.put("uo_label", aceBridgeService.getUoLike(impegno.getString("uo")).get(0).getDenominazione());
+			impegno.put("cdsuo", impegno.get("uo").toString());
+		}
+
+		execution.setVariable("impegni_json", impegni.toString());
+		execution.setVariable("importoTotaleNetto", importoTotaleNetto);
+		execution.setVariable("importoTotaleLordo", importoTotaleLordo);
+	}
 	@Override
 	public void notify(DelegateExecution execution) throws Exception {
 		//(OivPdfService oivPdfService = new OivPdfService();
@@ -145,6 +183,7 @@ public class ManageProcessAcquistiICT_v1 implements ExecutionListener {
 				}
 				LOGGER.debug("Il rup {}",   execution.getVariable("rup").toString());
 				runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), execution.getVariable("rup").toString(), PROCESS_VISUALIZER);
+				CalcolaTotaleImpegni(execution);
 			};break;
 
 
@@ -169,18 +208,6 @@ public class ManageProcessAcquistiICT_v1 implements ExecutionListener {
 
 			};break;
 
-			case "modifica-determina-start": {
-
-			};break;
-			case "modifica-determina-end": {
-				//String gruppoRUP = "gruppoRUP@" + IdEntitaOrganizzativaDirettore;
-				if(execution.getVariable("rup") != null){
-					SimplePersonaWebDto rupUser = aceService.getPersonaByUsername(execution.getVariable("rup").toString());
-				}
-				LOGGER.debug("Il rup {}",   execution.getVariable("rup").toString());
-				runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), execution.getVariable("rup").toString(), PROCESS_VISUALIZER);
-
-			};break;
 
 			case "protocollo-determina-start": {
 
@@ -209,13 +236,6 @@ public class ManageProcessAcquistiICT_v1 implements ExecutionListener {
 
 			};break;
 			case "firma-ordine-end": {
-
-			};break;
-
-			case "modifica-ordine-start": {
-
-			};break;
-			case "modifica-ordine-end": {
 
 			};break;
 
