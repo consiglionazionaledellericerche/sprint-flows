@@ -9,7 +9,10 @@ import it.cnr.si.flows.ng.service.*;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Enum.StatoDomandeAccordiInternazionaliEnum;
 import it.cnr.si.flows.ng.utils.Utils;
+import it.cnr.si.service.AceService;
 import it.cnr.si.service.ExternalMessageService;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
+
 import org.activiti.engine.ManagementService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
@@ -73,6 +76,10 @@ public class ManageProcessAcquistiICT_v1 implements ExecutionListener {
 	private FlowsPdfBySiglaRestService flowsPdfBySiglaRestService;
 
 	private Expression faseEsecuzione;
+	
+	@Inject
+	private AceService aceService;
+
 
 	public void restToApplicazioneAcquistiICT(DelegateExecution execution, StatoDomandeAccordiInternazionaliEnum statoDomanda) {
 
@@ -118,27 +125,34 @@ public class ManageProcessAcquistiICT_v1 implements ExecutionListener {
 			switch(faseEsecuzioneValue){
 			// START
 			case "process-start": {
-			    //String propostaHtml = String.valueOf(execution.getVariable("propostaDiRicerca"));
-			    //String propostaPulita = Utils.sanitizeHtml(propostaHtml);
-			    //execution.setVariable("propostaDiRicerca", propostaPulita);
-			    			    
+				//String propostaHtml = String.valueOf(execution.getVariable("propostaDiRicerca"));
+				//String propostaPulita = Utils.sanitizeHtml(propostaHtml);
+				//execution.setVariable("propostaDiRicerca", propostaPulita);
+
 				StartAcquistiICTSetGroupsAndVisibility.configuraVariabiliStart(execution);
 
 			};break;
 			// START
-			
+
+
+			case "predisposizione-determina-start": {
+
+			};break;
+			case "predisposizione-determina-end": {
+				//String gruppoRUP = "gruppoRUP@" + IdEntitaOrganizzativaDirettore;
+				if(execution.getVariable("rup") != null){
+					SimplePersonaWebDto rupUser = aceService.getPersonaByUsername(execution.getVariable("rup").toString());
+				}
+				LOGGER.debug("Il rup {}",   execution.getVariable("rup").toString());
+				runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), execution.getVariable("rup").toString(), PROCESS_VISUALIZER);
+			};break;
+
+
 			case "firma-determina-start": {
-			
+
 			};break;
 			case "firma-determina-end": {
-				
-			};break;
-			
-			case "modifica-determina-start": {
-				
-			};break;
-			case "modifica-determina-end": {
-				
+
 				// FIRMA MULTIPLA TUTTI I DOCUMENTI DI UN CERTO TIPO
 				if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
 					List<String> nomiVariabiliFile = new ArrayList<String>();
@@ -146,118 +160,105 @@ public class ManageProcessAcquistiICT_v1 implements ExecutionListener {
 					if (attachments.size() == 0)
 						throw new TaskFailedException("Attachment non opzionali mancanti: " + "determina");
 					attachments.forEach(att -> nomiVariabiliFile.add(att.getName()));
-					
-	                attachments = flowsAttachmentService.getAttachmentArray(processInstanceId, "allegato");
-	                attachments.forEach(att -> nomiVariabiliFile.add(att.getName()));
-					
-	                firmaDocumentoService.eseguiFirmaMultipla(execution, nomiVariabiliFile, null);
+
+					attachments = flowsAttachmentService.getAttachmentArray(processInstanceId, "allegato");
+					attachments.forEach(att -> nomiVariabiliFile.add(att.getName()));
+
+					firmaDocumentoService.eseguiFirmaMultipla(execution, nomiVariabiliFile, null);
 				}
-				
+
 			};break;
-			
+
+			case "modifica-determina-start": {
+
+			};break;
+			case "modifica-determina-end": {
+				//String gruppoRUP = "gruppoRUP@" + IdEntitaOrganizzativaDirettore;
+				if(execution.getVariable("rup") != null){
+					SimplePersonaWebDto rupUser = aceService.getPersonaByUsername(execution.getVariable("rup").toString());
+				}
+				LOGGER.debug("Il rup {}",   execution.getVariable("rup").toString());
+				runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), execution.getVariable("rup").toString(), PROCESS_VISUALIZER);
+
+			};break;
+
 			case "protocollo-determina-start": {
-				
+
 			};break;
 			case "protocollo-determina-end": {
-				
+
 			};break;
-			
-			case "predisposizione-proposta-aggiudicazione-start": {
-				
-			};break;
-			case "predisposizione-proposta-aggiudicazione-end": {
-				
-			};break;
-			
-			case "firma-proposta-aggiudicazione-start": {
-				
-			};break;
-			case "firma-proposta-aggiudicazione-end": {
-				
-			};break;
-			
-			case "modifica-proposta-aggiudicazione-start": {
-				
-			};break;
-			case "modifica-proposta-aggiudicazione-end": {
-				
-			};break;
-			
-			case "protocollo-proposta-aggiudicazione-start": {
-				
-			};break;
-			case "protocollo-proposta-aggiudicazione-end": {
-				
-			};break;
-			
+
+
+
 			case "espletamento-procedura-start": {
-				
+
 			};break;
 			case "espletamento-procedura-end": {
-				
+
 			};break;
-			
+
 			case "predisposizione-ordine-start": {
-				
+
 			};break;
 			case "predisposizione-ordine-end": {
-				
+
 			};break;
-			
+
 			case "firma-ordine-start": {
-				
+
 			};break;
 			case "firma-ordine-end": {
-				
+
 			};break;
-			
+
 			case "modifica-ordine-start": {
-				
+
 			};break;
 			case "modifica-ordine-end": {
-				
+
 			};break;
 
-			
+
 			case "protocollo-ordine-start": {
-				
+
 			};break;
 			case "protocollo-ordine-end": {
-				
+
 			};break;
 
-			
+
 			case "consuntivo-start": {
-				
+
 			};break;
 			case "consuntivo-end": {
-				
+
 			};break;
 
-			
+
 			case "carica-ordine-mepa-start": {
-				
+
 			};break;
 			case "carica-ordine-mepa-end": {
-				
+
 			};break;
 
-			
+
 			case "protocollo-ordine-mepa-start": {
-				
+
 			};break;
 			case "protocollo-ordine-mepa-end": {
-				
+
 			};break;
 
 
 			case "invio-ordine-mepa-start": {
-				
+
 			};break;
 			case "invio-ordine-mepa-end": {
-				
+
 			};break;
-			
+
 
 			case "endevent-annullato-start": {
 				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoAcquistiICTEnum.ANNULLATO);
@@ -269,14 +270,14 @@ public class ManageProcessAcquistiICT_v1 implements ExecutionListener {
 				execution.setVariable("statoFinale", Enum.StatoAcquistiICTEnum.ACQUISTATO);
 				utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
 			};break;
-			
-			
-			
-			
-			
-			
-			
-			
+
+
+
+
+
+
+
+
 			case "valutazione-scientifica-end": {
 				LOGGER.info("-- valutazione-scientifica: valutazione-scientifica");
 				if(execution.getVariable("sceltaUtente").equals("CambiaDipartimento")) {
@@ -377,14 +378,10 @@ public class ManageProcessAcquistiICT_v1 implements ExecutionListener {
 
 			}
 		} else {
-			restToApplicazioneAcquistiICT(execution, Enum.StatoDomandeAccordiInternazionaliEnum.CANCELLATA);
-			List<Job> timerAttivi = managementService.createJobQuery().timers().processInstanceId(processInstanceId).list();
-			timerAttivi.forEach(singoloTimer -> {
-				if (singoloTimer.getId() != null) {
-					LOGGER.debug("cancello il timer: {}", singoloTimer.getId());
-					managementService.deleteJob(singoloTimer.getId());
-				}
-			});
+			execution.setVariable(statoFinaleDomanda.name(), Enum.StatoAcquistiICTEnum.ELIMINATO);
+			execution.setVariable("statoFinale", Enum.StatoAcquistiICTEnum.ELIMINATO);
+			utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
+
 		}
 	}
 }

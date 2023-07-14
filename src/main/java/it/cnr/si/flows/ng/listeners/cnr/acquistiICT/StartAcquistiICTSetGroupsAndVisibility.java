@@ -87,15 +87,9 @@ public class StartAcquistiICTSetGroupsAndVisibility {
 		String applicazioneScrivaniaDigitale = "app.scrivaniadigitale";
 		String gruppoResponsabileAcquisti = "responsabileAcquistiICT@" + IdEntitaOrganizzativaDirettore;
 		String gruppoFirmatari = "responsabile-struttura@" + IdEntitaOrganizzativaDirettore;
-		//String gruppoRUP = "gruppoRUP@" + IdEntitaOrganizzativaDirettore;
-		if(execution.getVariable("rup") != null){
-			SimplePersonaWebDto rupUser = aceService.getPersonaByUsername(execution.getVariable("rup").toString());
-		}
-		LOGGER.debug("Imposto i gruppi del flusso gruppoResponsabileAcquisti {}, gruppoFirmatari {}, gruppoRUP {}",  gruppoResponsabileAcquisti, gruppoFirmatari, execution.getVariable("rup").toString());
 
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoResponsabileAcquisti, PROCESS_VISUALIZER);
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoFirmatari, PROCESS_VISUALIZER);
-		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), execution.getVariable("rup").toString(), PROCESS_VISUALIZER);
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), applicazioneScrivaniaDigitale, PROCESS_VISUALIZER);
 
 		execution.setVariable("gruppoResponsabileAcquisti", gruppoResponsabileAcquisti);
