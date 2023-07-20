@@ -28,9 +28,9 @@ exec:
   when: manual
   script:
     - echo "stopping service"
-    - ssh $SSH_CONNECT_DOCPROD02 "docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml down -v --remove-orphans || echo NOFILE"
+    - sshremote $SSH_CONNECT_DOCPROD02 "docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml down -v --remove-orphans || echo NOFILE"
     - echo "starting services"
-    - ssh $SSH_CONNECT_DOCPROD02 "docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml pull && docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml up -d"
+    - sshremote $SSH_CONNECT_DOCPROD02 "docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml pull && docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml up -d"
 
 
 #    - sshremote $SSH_CONNECT_DOCPROD02 "docker-compose -p $CI_PROJECT_NAME -f /sites/docker-flows/app.yml down -v --remove-orphans || echo NOFILE"
