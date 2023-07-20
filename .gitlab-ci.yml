@@ -23,7 +23,6 @@ stages:
 
 exec:
   stage: execute_prod_cmd
-  image: scolagreco/alpine-ssh:latest
   only: 
     - CI
   when: manual
