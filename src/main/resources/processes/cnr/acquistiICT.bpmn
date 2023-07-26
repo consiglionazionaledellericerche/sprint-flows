@@ -175,7 +175,7 @@
     </userTask>
     <sequenceFlow id="flow65" sourceRef="firma-determina" targetRef="exclusivegateway6"></sequenceFlow>
     <sequenceFlow id="flow67" sourceRef="exclusivegateway10" targetRef="carica-ordine-mepa">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${tipologiaAcquisto !== 'affidamentoDiretto'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${tipologiaAcquisto != 'affidamentoDiretto'}]]></conditionExpression>
     </sequenceFlow>
     <userTask id="invio-ordine-mepa" name="INVIO ORDINE MEPA" activiti:candidateGroups="${gruppoFirmatari}">
       <extensionElements>
@@ -354,7 +354,7 @@
         <omgdi:waypoint x="847.0" y="50.0"></omgdi:waypoint>
         <omgdi:waypoint x="847.0" y="116.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="771.0" y="151.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="63.0" x="771.0" y="151.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow71" id="BPMNEdge_flow71">
