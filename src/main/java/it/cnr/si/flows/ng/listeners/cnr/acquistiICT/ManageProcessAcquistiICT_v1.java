@@ -194,16 +194,7 @@ public class ManageProcessAcquistiICT_v1 implements ExecutionListener {
 
 				// FIRMA MULTIPLA TUTTI I DOCUMENTI DI UN CERTO TIPO
 				if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
-					List<String> nomiVariabiliFile = new ArrayList<String>();
-					List<FlowsAttachment> attachments = flowsAttachmentService.getAttachmentArray(processInstanceId, "determina");
-					if (attachments.size() == 0)
-						throw new TaskFailedException("Attachment non opzionali mancanti: " + "determina");
-					attachments.forEach(att -> nomiVariabiliFile.add(att.getName()));
-
-					attachments = flowsAttachmentService.getAttachmentArray(processInstanceId, "allegato");
-					attachments.forEach(att -> nomiVariabiliFile.add(att.getName()));
-
-					firmaDocumentoService.eseguiFirmaMultipla(execution, nomiVariabiliFile, null);
+					firmaDocumentoService.eseguiFirma(execution, "determina", null);
 				}
 
 			};break;
@@ -211,8 +202,10 @@ public class ManageProcessAcquistiICT_v1 implements ExecutionListener {
 
 			case "protocollo-determina-start": {
 
+
 			};break;
 			case "protocollo-determina-end": {
+				protocolloDocumentoService.protocolla(execution, "determina");
 
 			};break;
 
@@ -234,9 +227,14 @@ public class ManageProcessAcquistiICT_v1 implements ExecutionListener {
 
 			case "firma-ordine-start": {
 
+
 			};break;
 			case "firma-ordine-end": {
 
+				// FIRMA MULTIPLA TUTTI I DOCUMENTI DI UN CERTO TIPO
+				if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
+					firmaDocumentoService.eseguiFirma(execution, "contratto", null);
+				}
 			};break;
 
 
@@ -244,6 +242,7 @@ public class ManageProcessAcquistiICT_v1 implements ExecutionListener {
 
 			};break;
 			case "protocollo-ordine-end": {
+				protocolloDocumentoService.protocolla(execution, "contratto");
 
 			};break;
 

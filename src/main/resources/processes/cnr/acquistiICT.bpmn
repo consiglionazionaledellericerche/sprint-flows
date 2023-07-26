@@ -175,7 +175,7 @@
     </userTask>
     <sequenceFlow id="flow65" sourceRef="firma-determina" targetRef="exclusivegateway6"></sequenceFlow>
     <sequenceFlow id="flow67" sourceRef="exclusivegateway10" targetRef="carica-ordine-mepa">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'mepa'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${tipologiaAcquisto !== 'affidamentoDiretto'}]]></conditionExpression>
     </sequenceFlow>
     <userTask id="invio-ordine-mepa" name="INVIO ORDINE MEPA" activiti:candidateGroups="${gruppoFirmatari}">
       <extensionElements>
