@@ -101,6 +101,12 @@ public class Enum {
     
     
 
+    public enum StatoAcquistiICTEnum {
+
+        ELIMINATO,
+        ANNULLATO,
+        ACQUISTATO;
+    }
     public enum StatoDomandeAccordiInternazionaliEnum {
         APERTA,
         CHIUSA,
