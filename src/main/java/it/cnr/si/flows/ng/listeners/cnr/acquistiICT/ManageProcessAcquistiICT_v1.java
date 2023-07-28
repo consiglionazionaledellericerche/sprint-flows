@@ -81,7 +81,7 @@ public class ManageProcessAcquistiICT_v1 implements ExecutionListener {
 	private FlowsPdfBySiglaRestService flowsPdfBySiglaRestService;
 
 	private Expression faseEsecuzione;
-	
+
 	@Inject
 	private AceService aceService;
 
@@ -178,12 +178,15 @@ public class ManageProcessAcquistiICT_v1 implements ExecutionListener {
 			};break;
 			case "predisposizione-determina-end": {
 				//String gruppoRUP = "gruppoRUP@" + IdEntitaOrganizzativaDirettore;
-				if(execution.getVariable("rup") != null){
-					SimplePersonaWebDto rupUser = aceService.getPersonaByUsername(execution.getVariable("rup").toString());
+				if(execution.getVariable("sceltaUtente") != "Annulla") {
+
+					if(execution.getVariable("rup") != null){
+						SimplePersonaWebDto rupUser = aceService.getPersonaByUsername(execution.getVariable("rup").toString());
+					}
+					LOGGER.debug("Il rup {}",   execution.getVariable("rup").toString());
+					runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), execution.getVariable("rup").toString(), PROCESS_VISUALIZER);
+					CalcolaTotaleImpegni(execution);
 				}
-				LOGGER.debug("Il rup {}",   execution.getVariable("rup").toString());
-				runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), execution.getVariable("rup").toString(), PROCESS_VISUALIZER);
-				CalcolaTotaleImpegni(execution);
 			};break;
 
 

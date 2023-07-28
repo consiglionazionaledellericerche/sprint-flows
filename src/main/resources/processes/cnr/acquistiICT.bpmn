@@ -112,11 +112,6 @@
         </activiti:executionListener>
       </extensionElements>
     </userTask>
-    <endEvent id="endevent3" name="End">
-      <extensionElements>
-        <activiti:executionListener event="start" delegateExpression="org.alfresco.repo.workflow.activiti.listener.ScriptExecutionListener"></activiti:executionListener>
-      </extensionElements>
-    </endEvent>
     <sequenceFlow id="flow55" sourceRef="protocollo-ordine" targetRef="consuntivo"></sequenceFlow>
     <userTask id="carica-ordine-mepa" name="CARICA ORDINE MEPA" activiti:candidateGroups="${gruppoFirmatari}">
       <extensionElements>
@@ -208,25 +203,34 @@
     <sequenceFlow id="flow68" sourceRef="startevent1" targetRef="predisposizione-determina"></sequenceFlow>
     <sequenceFlow id="flow69" sourceRef="predisposizione-determina" targetRef="exclusivegateway15"></sequenceFlow>
     <exclusiveGateway id="exclusivegateway15" name="Exclusive Gateway" default="flow71"></exclusiveGateway>
-    <sequenceFlow id="flow70" name="ANNULLATO" sourceRef="exclusivegateway15" targetRef="endevent3">
+    <sequenceFlow id="flow70" name="ANNULLATO" sourceRef="exclusivegateway15" targetRef="endevent5">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Annulla'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow71" sourceRef="exclusivegateway15" targetRef="firma-determina"></sequenceFlow>
     <sequenceFlow id="flow72" sourceRef="exclusivegateway6" targetRef="predisposizione-determina"></sequenceFlow>
     <exclusiveGateway id="exclusivegateway16" name="Exclusive Gateway" default="flow73"></exclusiveGateway>
     <sequenceFlow id="flow73" sourceRef="exclusivegateway16" targetRef="firma-ordine"></sequenceFlow>
-    <sequenceFlow id="flow74" sourceRef="exclusivegateway16" targetRef="endevent3">
+    <sequenceFlow id="flow74" sourceRef="exclusivegateway16" targetRef="endevent5">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Annulla'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow75" sourceRef="exclusivegateway14" targetRef="predisposizione-ordine"></sequenceFlow>
     <exclusiveGateway id="exclusivegateway17" name="Exclusive Gateway"></exclusiveGateway>
-    <sequenceFlow id="flow76" sourceRef="exclusivegateway17" targetRef="endevent3">
+    <sequenceFlow id="flow76" sourceRef="exclusivegateway17" targetRef="endevent5">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Annulla'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow77" sourceRef="exclusivegateway17" targetRef="endevent4"></sequenceFlow>
-    <sequenceFlow id="flow78" sourceRef="exclusivegateway10" targetRef="endevent3">
+    <sequenceFlow id="flow78" sourceRef="exclusivegateway10" targetRef="endevent5">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Annulla'}]]></conditionExpression>
     </sequenceFlow>
+    <endEvent id="endevent5" name="End">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessAcquistiICT_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[endevent-acquistato-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_acquistiICT">
     <bpmndi:BPMNPlane bpmnElement="acquistiICT" id="BPMNPlane_acquistiICT">
@@ -260,9 +264,6 @@
       <bpmndi:BPMNShape bpmnElement="consuntivo" id="BPMNShape_consuntivo">
         <omgdc:Bounds height="75.0" width="111.0" x="636.0" y="337.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="endevent3" id="BPMNShape_endevent3">
-        <omgdc:Bounds height="35.0" width="35.0" x="830.0" y="116.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="carica-ordine-mepa" id="BPMNShape_carica-ordine-mepa">
         <omgdc:Bounds height="70.0" width="105.0" x="148.0" y="451.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
@@ -289,6 +290,9 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="exclusivegateway17" id="BPMNShape_exclusivegateway17">
         <omgdc:Bounds height="40.0" width="40.0" x="827.0" y="354.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent5" id="BPMNShape_endevent5">
+        <omgdc:Bounds height="35.0" width="35.0" x="830.0" y="116.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow17" id="BPMNEdge_flow17">
         <omgdi:waypoint x="560.0" y="106.0"></omgdi:waypoint>
@@ -340,7 +344,7 @@
         <omgdi:waypoint x="747.0" y="374.0"></omgdi:waypoint>
         <omgdi:waypoint x="827.0" y="374.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="67.0" x="813.0" y="472.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="67.0" x="813.0" y="479.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow65" id="BPMNEdge_flow65">
