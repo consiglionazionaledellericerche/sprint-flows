@@ -59,7 +59,7 @@ public class DeprecatedOauthResource {
         if("client_credentials".equals(grant_type)) {
             params.add("grant_type", "client_credentials");
             params.add("client_id", client_id);
-            params.add("client_secret", "client_secret");            
+            params.add("client_secret", client_secret);            
         } else {            
             params.add("username", username);
             params.add("password", password);
