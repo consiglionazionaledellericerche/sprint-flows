@@ -56,9 +56,15 @@ public class DeprecatedOauthResource {
         headers.set("authorization", "Basic "+basicAuth);
         
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("username", username);
-        params.add("password", password);
-        params.add("grant_type", "password");
+        if("client_credentials".equals(grant_type)) {
+            params.add("grant_type", "client_credentials");
+            params.add("client_id", client_id);
+            params.add("client_secret", "client_secret");            
+        } else {            
+            params.add("username", username);
+            params.add("password", password);
+            params.add("grant_type", "password");
+        }
         
         URI url = new URI(ssoUrl+"/realms/"+ ssoRealm +"/protocol/openid-connect/token");
         RequestEntity<MultiValueMap<String, String>> request = 
