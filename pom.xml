@@ -32,7 +32,6 @@
         <feign.version>9.7.0</feign.version>
         <firmadigitale.version>1.15</firmadigitale.version>
         <gatling-maven-plugin.version>2.1.7</gatling-maven-plugin.version>
-        <gelf.version>1.14.0</gelf.version>
         <jacoco-maven-plugin.version>0.7.7.201606060606</jacoco-maven-plugin.version>
         <janino.version>3.0.6</janino.version>
         <!--        <jasperreports.version>6.6.0</jasperreports.version>-->
@@ -195,11 +194,6 @@
     </dependencyManagement>
 
     <dependencies>
-        <dependency>
-            <groupId>biz.paluch.logging</groupId>
-            <artifactId>logstash-gelf</artifactId>
-            <version>${gelf.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>com.github.ralfstuckert.pdfbox-layout</groupId>
