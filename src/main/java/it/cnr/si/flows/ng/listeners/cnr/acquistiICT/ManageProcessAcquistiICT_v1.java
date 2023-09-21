@@ -193,10 +193,10 @@ public class ManageProcessAcquistiICT_v1 implements ExecutionListener {
 			case "firma-determina-start": {
 				if(execution.getVariable("tipologiaAcquisto") != null) {
 					execution.setVariable("tipologiaAcquistoView", "MEPA - AFFIDAMENTO DIRETTO");
-					if(execution.getVariable("tipologiaAcquisto") == "affidamentoDiretto") {
+					if(execution.getVariable("tipologiaAcquisto").toString().equals("affidamentoDiretto")) {
 						execution.setVariable("tipologiaAcquistoView", "FUORI MEPA - AFFIDAMENTO DIRETTO");
 					}
-					if(execution.getVariable("tipologiaAcquisto") == "MEPAproceduraSelettiva") {
+					if(execution.getVariable("tipologiaAcquisto").toString().equals("MEPAproceduraSelettiva")) {
 						execution.setVariable("tipologiaAcquistoView", "MEPA - PROCEDURA SELETTIVA");
 					}
 				}
