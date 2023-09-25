@@ -52,7 +52,7 @@
     <!-- commentare (o impostare a DEBUG) per avere dettagli del db di activiti -->
     <logger name="org.activiti.engine" level="INFO"/>
     <logger name="org.activiti.spring" level="INFO"/>
-    <logger name="org.springframework.security.access.vote" level="DEBUG" />
+    <!-- <logger name="org.springframework.security.access.vote" level="DEBUG" /> -->
     
 	<!-- <logger name="org.activiti.engine.impl.persistence.entity" level="DEBUG" /> -->
 
