@@ -984,7 +984,7 @@
             </build>
             <properties>
                 <!-- log configuration -->
-                <logback.loglevel>INFO</logback.loglevel>
+                <logback.loglevel>WARN</logback.loglevel>
                 <!-- default Spring profiles -->
                 <spring.profiles.active>prod${profile.swagger}${profile.no-liquibase}</spring.profiles.active>
             </properties>
