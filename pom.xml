@@ -191,11 +191,6 @@
                 <artifactId>jackson-databind</artifactId>
                 <version>2.12.1</version>
             </dependency>
-            <dependency>
-                <groupId>biz.paluch.logging</groupId>
-                <artifactId>logstash-gelf</artifactId>
-                <version>${gelf.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -504,7 +499,13 @@
         <dependency>
             <groupId>org.thymeleaf</groupId>
             <artifactId>thymeleaf-spring4</artifactId>
-            </dependency>
+        </dependency>
+        
+        <dependency>
+            <groupId>biz.paluch.logging</groupId>
+            <artifactId>logstash-gelf</artifactId>
+            <version>${gelf.version}</version>
+        </dependency>
 
     </dependencies>
 
