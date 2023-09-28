@@ -64,7 +64,7 @@
         <appender-ref ref="CONSOLE"/>
     </root>
 
-<!--
+
     <springProperty scope="context" name="graylog.host" source="graylog.host"/>
     <springProperty scope="context" name="graylog.port" source="graylog.port"/>
     <springProperty scope="context" name="graylog.loglevel" source="graylog.loglevel"/>
@@ -98,5 +98,5 @@
             </root>
         </then>
     </if>
--->
+
 </configuration>
