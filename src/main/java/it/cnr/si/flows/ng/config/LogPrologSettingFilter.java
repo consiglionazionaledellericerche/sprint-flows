@@ -27,9 +27,7 @@ import it.cnr.si.service.SecurityService;
 public class LogPrologSettingFilter extends GenericFilterBean {
 
     @Inject
-    private SecurityService securityService;
-    @Inject
-    private SecurityUtils securityUtils;
+    private SecurityService securityService;    
     
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
