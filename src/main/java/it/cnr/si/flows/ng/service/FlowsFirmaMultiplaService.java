@@ -95,6 +95,8 @@ public class FlowsFirmaMultiplaService {
                     String key = taskService.getVariable(taskId, "key", String.class);
                     String path = att.getPath();
                     String signedFileName = FirmaDocumentoService.getSignedFilename(att.getFilename());
+                    if(signResponse.getBinaryoutput() == null)
+                        LOGGER.error("bytearray nullo restituito per il file "+ nomeFile +" - "+ signedFileName +" della PI "+ key);
                     String uid = flowsAttachmentService.saveOrUpdateBytes(signResponse.getBinaryoutput(), nomeFile, signedFileName, key, path);
 
                     att.setUrl(uid); // qui bisogna gestire i files esterni
