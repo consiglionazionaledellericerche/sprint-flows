@@ -169,18 +169,22 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
      * @param processInstanceId       Il process instance id
      * @return risultato della verifica dei permessi (booleano)
      */
-    public boolean canVisualize(String processInstanceId) {
+    public boolean canVisualize(String processInstanceId, HistoricProcessInstance historicProcessInstance) {
         String userName = securityService.getCurrentUserLogin();
         List<String> authorities = getAuthorities(userName);
 
+        return canVisualize((String) historicProcessInstance.getProcessVariables().get(ID_STRUTTURA),
+                historicProcessInstance.getProcessDefinitionKey(),
+                processInstanceId, authorities, userName);
+    }
+
+    public boolean canVisualize(String processInstanceId) {
         HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
                 .includeProcessVariables()
                 .processInstanceId(processInstanceId)
                 .singleResult();
 
-        return canVisualize((String) historicProcessInstance.getProcessVariables().get(ID_STRUTTURA),
-                            historicProcessInstance.getProcessDefinitionKey(),
-                            processInstanceId, authorities, userName);
+        return canVisualize(processInstanceId, historicProcessInstance);
     }
 
 
@@ -319,16 +323,10 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
     }
 
 
-
-    public boolean canUpdateAttachment(String processInstanceId) {
-
+    public boolean canUpdateAttachment(String processInstanceId, HistoricProcessInstance instance) {
         if(securityService.isCurrentUserInRole("ROLE_ADMIN"))
             return true;
 
-        HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery()
-                .processInstanceId(processInstanceId)
-                .includeProcessVariables()
-                .singleResult();
         boolean isActive = instance.getEndTime() == null;
 
         String processDefinitionKey = instance.getProcessDefinitionKey();
@@ -357,15 +355,21 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
         return (isResponsabile || isRuoloFlusso) && isActive;
     }
 
-    public boolean canPublishAttachment(String processInstanceId) {
 
-        if(securityService.isCurrentUserInRole("ROLE_ADMIN"))
-            return true;
+    public boolean canUpdateAttachment(String processInstanceId) {
 
         HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery()
                 .processInstanceId(processInstanceId)
                 .includeProcessVariables()
                 .singleResult();
+
+        return canUpdateAttachment(processInstanceId, instance);
+    }
+    public boolean canPublishAttachment(String processInstanceId, HistoricProcessInstance instance) {
+
+        if(securityService.isCurrentUserInRole("ROLE_ADMIN"))
+            return true;
+
         String username = securityService.getCurrentUserLogin();
 
         if (instance.getProcessDefinitionKey().equals(acquisti.getProcessDefinition())) {
@@ -381,6 +385,15 @@ public class PermissionEvaluatorImpl implements PermissionEvaluator {
         }
 
         return false;
+    }
+
+    public boolean canPublishAttachment(String processInstanceId) {
+
+        HistoricProcessInstance instance = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .includeProcessVariables()
+                .singleResult();
+        return canPublishAttachment(processInstanceId, instance);
     }
 
     @Override

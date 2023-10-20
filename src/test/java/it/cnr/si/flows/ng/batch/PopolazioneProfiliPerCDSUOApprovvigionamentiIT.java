@@ -59,7 +59,7 @@ public class PopolazioneProfiliPerCDSUOApprovvigionamentiIT {
 	}
 
 	//@Test questa riga non va mai messa su git
-	@Test
+	//@Test
 	public void runBatch() throws IOException {
 		//String[][] persone = getPersoneDaFile();
 
@@ -123,6 +123,7 @@ public class PopolazioneProfiliPerCDSUOApprovvigionamentiIT {
 							//aceService.associaRuoloPersona(idRuolo, idPersona, idSede, java.time.LocalDate.parse(data),null,false,false,"","");
 						} catch(UnexpectedResultException | FeignException | HttpClientErrorException error4) {
 							log.info("-------------- ERROR: UTENTE: " + username + " NON INSERITO");
+							errors.put("Associo ruolo " + idRuolo + " - idPersona " + idPersona + " - idSede " + idSede, error4.getMessage());
 						}
 					}
 				}
@@ -138,8 +139,8 @@ public class PopolazioneProfiliPerCDSUOApprovvigionamentiIT {
 		//		Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/singoloGruppoUtentiProceduraAcquisti.csv"));
 		//		Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/ProceduraAcquisti-Utenti-ICCOM.csv"));
 		//		Stream<String> lines = Files.lines(Paths.get("./src/batch/resources/batch/ProceduraAcquisti-Utenti-SISINFO.csv"));
-		// 		Stream<String> lines = Files.lines(Paths.get("./src/test/resources/batch/Approvvigionamenti-IT-Utenti.csv"));
-		Stream<String> lines = Files.lines(Paths.get("./src/test/resources/batch/Missioni-SpecialUser.csv"));
+		Stream<String> lines = Files.lines(Paths.get("./src/test/resources/batch/Approvvigionamenti-IT-Utenti.csv"));
+		//      Stream<String> lines = Files.lines(Paths.get("./src/test/resources/batch/Missioni-SpecialUser.csv"));
 	
 		i = 0;
 
