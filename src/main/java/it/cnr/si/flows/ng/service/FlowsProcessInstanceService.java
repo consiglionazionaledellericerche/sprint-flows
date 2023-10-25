@@ -132,12 +132,12 @@ public class FlowsProcessInstanceService {
             List<Map<String, Object>> linkedFlows = new ArrayList<>();
 
             for (String linkedProcessId : values) {
-                HistoricProcessInstance linkedProcessInstance = historyService
-                        .createHistoricProcessInstanceQuery()
-                        .processInstanceId(linkedProcessId)
-                        .includeProcessVariables()
-                        .singleResult();
-                if(permissionEvaluator.canVisualize(linkedProcessId, linkedProcessInstance)) {
+                if(permissionEvaluator.canVisualize(linkedProcessId)) {
+                    HistoricProcessInstance linkedProcessInstance = historyService
+                            .createHistoricProcessInstanceQuery()
+                            .processInstanceId(linkedProcessId)
+                            .includeProcessVariables()
+                            .singleResult();
 
                     if (linkedProcessInstance != null) {
                         String key = linkedProcessInstance.getBusinessKey();
@@ -166,16 +166,22 @@ public class FlowsProcessInstanceService {
         result.put("identityLinks", identityLinks);
 
         // permessi aggiuntivi
-        result.put("canPublish", permissionEvaluator.canPublishAttachment(processInstanceId, processInstance));
-        result.put("canUpdateAttachments", permissionEvaluator.canUpdateAttachment(processInstanceId, processInstance));
-        result.put("isRevocabile", isRevocabile(processInstanceId, processInstance));
+        result.put("canPublish", permissionEvaluator.canPublishAttachment(processInstanceId));
+        result.put("canUpdateAttachments", permissionEvaluator.canUpdateAttachment(processInstanceId));
+        result.put("isRevocabile", isRevocabile(processInstanceId));
         
         if(whitTaskList){
-            result.put("history", getHistoryForPi(processInstanceId, processInstance));
+            result.put("history", getHistoryForPi(processInstanceId));
         }
         return result;
     }
-    public ArrayList<Map<String, Object>> getHistoryForPi(String processInstanceId, HistoricProcessInstance processInstance){
+
+
+    public ArrayList<Map<String, Object>> getHistoryForPi(String processInstanceId){
+        // PrecessInstance metadata
+        HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .singleResult();
 
         final Map<String, Object> identityLinks = new LinkedHashMap<>();
 
@@ -230,14 +236,6 @@ public class FlowsProcessInstanceService {
                         });
 
         return history;
-    }
-
-    public ArrayList<Map<String, Object>> getHistoryForPi(String processInstanceId){
-        // PrecessInstance metadata
-        HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery()
-                .processInstanceId(processInstanceId)
-                .singleResult();
-        return getHistoryForPi(processInstanceId, processInstance);
     }
 
 
@@ -486,17 +484,22 @@ public class FlowsProcessInstanceService {
      * 3. l'utente loggato e' il boss del richiedente
      * 4. la domanda non e' stata gia' revocata
      */
-    public boolean isRevocabile(String processInstanceId, HistoricProcessInstance processInstance) {
-// 1. e' accettata (il flusso e' concluso)
+    public boolean isRevocabile(String processInstanceId) {
+        HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .includeProcessVariables()
+                .singleResult();
+        
+        // 1. e' accettata (il flusso e' concluso)
         if (processInstance.getEndTime() == null)
             return false;
         if (!"VALIDATA".equals(processInstance.getProcessVariables().get("statoFinaleDomanda")) && !"PRESA_VISIONE".equals(processInstance.getProcessVariables().get("statoFinaleDomanda")))
             return false;
-
+        
         // 2. il flusso e' di tipo revocabile
         if (!processiRevocabili.containsKey(processInstance.getProcessDefinitionKey()))
             return false;
-
+        
         // 3. l'utente loggato e' abilitato alla Revoca
         String currentUser = securityService.getCurrentUserLogin();
         Set<String> allRolesForUser = membershipService.getAllRolesForUser(currentUser);
@@ -504,7 +507,7 @@ public class FlowsProcessInstanceService {
         if ( abilitatiAllaRevoca.get(processInstance.getProcessDefinitionKey()).stream()
                 .noneMatch(ruoloRevoca -> allRolesForUser.contains(ruoloRevoca + "@" + idAceStrutturaDomandaRichiedente)) )
             return false;
-
+        
         // 4. la domanda non e' stata gia' revocata e non è in corso di revoca
         List<HistoricProcessInstance> revoche = historyService.createHistoricProcessInstanceQuery()
                 .processDefinitionKey(processiRevocabili.get(processInstance.getProcessDefinitionKey()))
@@ -521,14 +524,6 @@ public class FlowsProcessInstanceService {
 
         // se nessuno dei controlli è fallito, il flusso è revocabile
         return true;
-    }
-
-    public boolean isRevocabile(String processInstanceId) {
-        HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery()
-                .processInstanceId(processInstanceId)
-                .includeProcessVariables()
-                .singleResult();
-        return isRevocabile(processInstanceId, processInstance);
     }
 
     
