@@ -32,11 +32,9 @@ import it.cnr.si.domain.NotificationRule;
 import it.cnr.si.flows.ng.config.MailConfguration;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.FlowsMailService;
-import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.NotificationRuleRepository;
 import it.cnr.si.service.MembershipService;
-import it.cnr.si.service.RelationshipService;
 
 @Component
 public class MailNotificationListener  implements ActivitiEventListener {
@@ -64,11 +62,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
 	@Inject
 	private MembershipService membershipService;
 	@Inject
-	private FlowsProcessInstanceService flowsProcessInstanceService;
-	@Inject
 	private MailConfguration mailConfguration;
-	@Inject
-	private RelationshipService relationshipService;
 
 
 	@Override
@@ -105,6 +99,8 @@ public class MailNotificationListener  implements ActivitiEventListener {
 			case PROCESS_COMPLETED:
 				variables.put("stato", ((ExecutionEntity)((ActivitiEntityEventImpl) event).getEntity()).getActivity().getProperty("name"));
 				break;
+            default:
+                break;
 		}
 
 		variables.put("serverUrl", mailConfguration.getMailUrl());
@@ -223,7 +219,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
 								.forEach(personVariableName -> {
 									LOGGER.debug("personVariableName: {}", personVariableName);
 									String person = (String) variables.get(personVariableName);
-									LOGGER.debug("Invio la mail {} all'utente {}", nt, person);
+									LOGGER.info("Invio la mail {} all'utente {}", nt, person);
 									mailService.sendFlowEventNotification(nt, variables, tn, person, null, true);
 								});
 					} else {
@@ -238,7 +234,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
 
 											Set<String> members = membershipService.getAllUsersInGroup(groupName);
 
-											LOGGER.debug("Invio la mail {} al gruppo {} con utenti {}", nt, groupName, members);
+											LOGGER.info("Invio la mail {} al gruppo {} con utenti {}", nt, groupName, members);
 											members.forEach(member -> {
 												mailService.sendFlowEventNotification(nt, variables, tn, member, groupName, true);
 											});
@@ -251,7 +247,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
 										LOGGER.debug("groupVariableName: {}", groupVariableName);
 										String groupName = (String) groupVariableName;
 										Set<String> members = membershipService.getAllUsersInGroup(groupName);
-										LOGGER.debug("Invio la mail {} al gruppo {} con utenti {}", nt, groupName, members);
+										LOGGER.info("Invio la mail {} al gruppo {} con utenti {}", nt, groupName, members);
 										members.forEach(member -> {
 											mailService.sendFlowEventNotification(nt, variables, tn, member, groupName, true);
 										});
