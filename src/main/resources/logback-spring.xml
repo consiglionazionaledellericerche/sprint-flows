@@ -22,7 +22,7 @@
     </appender>
 -->
 
-    <logger name="it.cnr.si" level="#logback.loglevel#"/>
+    <!-- <logger name="it.cnr.si" level="#logback.loglevel#"/> -->
 
     <logger name="javax.activation" level="WARN"/>
     <logger name="javax.mail" level="WARN"/>
