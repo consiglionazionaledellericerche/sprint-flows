@@ -166,7 +166,11 @@ public class FlowsMailService extends MailService {
                     });
         } catch (Exception e) {
             LOGGER.error("Errore nell'invio della mail", e);
-            throw e;
+            sendEmail("marcinireneusz.trycz@cnr.it",
+                    Optional.empty(), Optional.empty(), 
+                    "Errore nell'inivio della mail a "+username+" gruppo "+groupName+" per il task"+taskName, 
+                    templateEngine.process(notificationType, new Context()),
+                    false, true);
         }
     }
 
@@ -306,7 +310,11 @@ public class FlowsMailService extends MailService {
             
         } catch (Exception e) {
             LOGGER.error("Errore nell'invio della mail", e);
-            throw e;
+            sendEmail("marcinireneusz.trycz@cnr.it",
+                    Optional.empty(), Optional.empty(), 
+                    "Errore nell'inivio della mail ricorrente a "+user, 
+                    templateEngine.process(NOTIFICA_RICORRENTE, new Context()),
+                    false, true);
         }
     }
         
