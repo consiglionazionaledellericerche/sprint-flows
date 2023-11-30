@@ -22,14 +22,11 @@ import org.activiti.engine.delegate.event.impl.ActivitiSequenceFlowTakenEventImp
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.task.IdentityLink;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.thymeleaf.context.Context;
 
 import it.cnr.si.domain.NotificationRule;
 import it.cnr.si.flows.ng.config.MailConfguration;
@@ -119,42 +116,33 @@ public class MailNotificationListener  implements ActivitiEventListener {
      * @param event
      * @return
      */
-	@Async
     private void sendStandardNotification(ActivitiEvent event) {
-	    try {
-    		String executionId = event.getExecutionId();
-    		Map<String, Object> variables = runtimeService.getVariables(executionId);
-    
-    		//integro le variabili con quelle conservate nel name del processo
-    		Map<String, Object> integratedVariables = integrateVariables(event, variables);
-    		ActivitiEntityEvent taskEvent = (ActivitiEntityEvent) event;
-    		TaskEntity task = (TaskEntity) taskEvent.getEntity();
-    
-    		Set<IdentityLink> candidates = ((TaskEntity)taskEvent.getEntity()).getCandidates();
-    
-            candidates.forEach(c -> {
-                if (c.getGroupId() != null) {
-                    Set<String> members = membershipService.getAllUsersInGroup(c.getGroupId());
-                    LOGGER.info("Sto inviando mail standard a {} del gruppo {} per il task", members, c.getGroupId(), task.getName());
-                    members.forEach(m -> {
-                        mailService.sendFlowEventNotification(FlowsMailService.TASK_ASSEGNATO_AL_GRUPPO, integratedVariables, task.getName(), m, c.getGroupId(), false);
-                    });
-                }
-            });
-            
-            String assignee = ((TaskEntity)taskEvent.getEntity()).getAssignee();
-    
-            if (Utils.isNotEmpty(assignee)) {
-                LOGGER.info("Sto inviando mail standard all'assegnatario {} per il task",assignee, task.getName());
-                mailService.sendFlowEventNotification(FlowsMailService.TASK_IN_CARICO_ALL_UTENTE, integratedVariables, task.getName(), assignee, null, false);
+
+		String executionId = event.getExecutionId();
+		Map<String, Object> variables = runtimeService.getVariables(executionId);
+
+		//integro le variabili con quelle conservate nel name del processo
+		Map<String, Object> integratedVariables = integrateVariables(event, variables);
+		ActivitiEntityEvent taskEvent = (ActivitiEntityEvent) event;
+		TaskEntity task = (TaskEntity) taskEvent.getEntity();
+
+		Set<IdentityLink> candidates = ((TaskEntity)taskEvent.getEntity()).getCandidates();
+
+        candidates.forEach(c -> {
+            if (c.getGroupId() != null) {
+                Set<String> members = membershipService.getAllUsersInGroup(c.getGroupId());
+                LOGGER.info("Sto inviando mail standard a {} del gruppo {} per il task", members, c.getGroupId(), task.getName());
+                members.forEach(m -> {
+                    mailService.sendFlowEventNotification(FlowsMailService.TASK_ASSEGNATO_AL_GRUPPO, integratedVariables, task.getName(), m, c.getGroupId(), false);
+                });
             }
-        } catch (Exception e) {
-            LOGGER.error("Errore nell'invio della mail", e);
-            mailService.sendEmail("marcinireneusz.trycz@cnr.it",
-                    Optional.empty(), Optional.empty(), 
-                    "Errore nell'inivio della mail per l'evento "+event.getExecutionId()+" con messaggio "+ e.getMessage(), 
-                    ExceptionUtils.getStackTrace(e),
-                    false, true);
+        });
+        
+        String assignee = ((TaskEntity)taskEvent.getEntity()).getAssignee();
+
+        if (Utils.isNotEmpty(assignee)) {
+            LOGGER.info("Sto inviando mail standard all'assegnatario {} per il task",assignee, task.getName());
+            mailService.sendFlowEventNotification(FlowsMailService.TASK_IN_CARICO_ALL_UTENTE, integratedVariables, task.getName(), assignee, null, false);
         }
 	}
 
