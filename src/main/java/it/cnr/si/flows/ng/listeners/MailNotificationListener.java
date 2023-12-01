@@ -137,10 +137,10 @@ public class MailNotificationListener  implements ActivitiEventListener {
 					members.forEach(m -> {
 						mailService.sendFlowEventNotification(FlowsMailService.TASK_ASSEGNATO_AL_GRUPPO, integratedVariables, task.getName(), m, c.getGroupId(), false);
 					});
+				} else {
+					LOGGER.info("Non Sto inviando mail standard  del gruppo {} per il task perché non in GERARCHIA ACE",  c.getGroupId(), task.getName());
 				}
-			} else {
-                LOGGER.info("Non Sto inviando mail standard  del gruppo {} per il task perché non in GERARCHIA ACE",  c.getGroupId(), task.getName());
-			}
+			} 
 		});
 
 		String assignee = ((TaskEntity)taskEvent.getEntity()).getAssignee();
