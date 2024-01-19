@@ -128,6 +128,7 @@ public final class Utils {
         String ret = "";
         if (!list.isEmpty()) {
             ret = ret + list.get(0).getValue();
+            ret.replaceAll("\\n", " ");
         }
         return ret;
     }
