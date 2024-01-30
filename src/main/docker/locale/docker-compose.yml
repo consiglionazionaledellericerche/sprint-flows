@@ -10,7 +10,7 @@ services:
     sprint-flows-cnr:
         image: sprint-flows-locale
         environment:
-            - SPRING_PROFILES_ACTIVE=test,cnr,swagger
+            - SPRING_PROFILES_ACTIVE=prod,cnr,swagger
             - SPRING_DATASOURCE_URL=jdbc:postgresql://dockerwebtest01.si.cnr.it:1482/flows
             - SPRING_DATASOURCE_USERNAME=activiti
             - SPRING_DATASOURCE_PASSWORD=activitipw
@@ -19,8 +19,8 @@ services:
             - CACHE_HAZELCAST_MEMBERS=150.146.206.150:1485,150.146.206.152:1485
             - SPRING_CLOUD_CONFIG_SERVER_GIT_URI=http://git.si.cnr.it/devops/configuration-repo.git
             - SPRING_CLOUD_CONFIG_SERVER_GIT_USERNAME=flows
-            - SPRING_CLOUD_CONFIG_SERVER_GIT_PASSWORD=LcWF47Yncvr4LkExyqie
-            - ACE_PASSWORD=app.scrivaniadigitale
+            - SPRING_CLOUD_CONFIG_SERVER_GIT_PASSWORD=CONFIG_REPO_TOKEN
+            - ACE_PASSWORD=ACE_PASSWORD_SED
         ports:
             - 1481:8080
             - 1485:1485
