@@ -13,7 +13,7 @@ mvn clean install -Pprod -DskipTests   #comando eseguito da Jenckins
 
 echo -e "\n################################## Copio il war nella folder di docker #################################################\n"
 cd src/main/docker/locale
-#cp ../../../../target/app.war app.war
+cp ../../../../target/app.war app.war
 
 echo -e "\n################################## RIMUOVO sprint-flows-locale #################################################\n"
 docker rmi -f sprint-flows-locale
