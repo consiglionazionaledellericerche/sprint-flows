@@ -5,8 +5,8 @@
 #FROM amazoncorretto:8-alpine-jdk
 #FROM amazoncorretto:8-alpine3.18
 #FROM amazoncorretto:8-al2-jdk
-#FROM bellsoft/liberica-openjdk-alpine-musl:8
-FROM bellsoft/liberica-runtime-container:jdk-8-cds-slim-musl
+FROM bellsoft/liberica-openjdk-alpine-musl:8
+#FROM bellsoft/liberica-runtime-container:jdk-8-cds-slim-musl
 
 
 #RUN apk del openssl
@@ -29,5 +29,10 @@ EXPOSE 8080
 #EXPOSE 8080 8899
 
 WORKDIR /opt/
+
+RUN apk add openssl
+RUN openssl s_client -showcerts -connect missioni.cnr.it:443 </dev/null 2>/dev/null|openssl x509 -outform PEM > missioni.cnr.it.crt
+RUN keytool -import -trustcacerts -keystore $JAVA_HOME/jre/lib/security/cacerts -storepass changeit -noprompt -alias missioni.cnr.it -file /opt/missioni.cnr.it.crt
+
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom", "-jar", "/opt/app.war"]
 #ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8899", "-jar","/opt/app.war"]
