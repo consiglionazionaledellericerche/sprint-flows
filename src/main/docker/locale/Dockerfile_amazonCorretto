@@ -3,7 +3,10 @@
 #FROM eclipse-temurin:8-jdk
 #FROM openjdk:8-jdk-alpine
 #FROM amazoncorretto:8-alpine-jdk
-FROM amazoncorretto:8-alpine3.18
+
+#FROM amazoncorretto:8-alpine3.18
+FROM amazoncorretto:8-alpine
+
 #FROM amazoncorretto:8-al2-jdk
 #FROM bellsoft/liberica-openjdk-alpine-musl:8
 #FROM bellsoft/liberica-runtime-container:jdk-8-cds-slim-musl

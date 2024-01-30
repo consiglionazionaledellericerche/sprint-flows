@@ -9,8 +9,10 @@ x-logging:
 services:
     sprint-flows-cnr:
         image: sprint-flows-locale
+#        image: sprint-flows-locale_amazon_corretto
         environment:
-            - SPRING_PROFILES_ACTIVE=prod,cnr,swagger
+            - SPRING_PROFILES_ACTIVE=keycloak,prod,cnr,swagger
+#            - SPRING-BOOT_RUN_PROFILES=prod,cnr,swagger
             - SPRING_DATASOURCE_URL=jdbc:postgresql://dockerwebtest01.si.cnr.it:1482/flows
             - SPRING_DATASOURCE_USERNAME=activiti
             - SPRING_DATASOURCE_PASSWORD=activitipw

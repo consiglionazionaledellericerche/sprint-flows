@@ -13,7 +13,7 @@ FROM bellsoft/liberica-openjdk-alpine-musl:8
 VOLUME /tmp
 #
 #RUN apk add --no-cache tzdata
-#RUN #apk add --no-cache ttf-dejavu
+RUN apk add --no-cache ttf-dejavu
 #
 #RUN cp /usr/share/zoneinfo/Europe/Rome /etc/localtime
 #RUN echo "Europe/Rome" >  /etc/timezone

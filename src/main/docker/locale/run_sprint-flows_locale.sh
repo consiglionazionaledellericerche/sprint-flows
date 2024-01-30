@@ -19,14 +19,14 @@ echo -e "\n################################## RIMUOVO sprint-flows-locale ######
 docker rmi -f sprint-flows-locale
 
 echo -e "\n################################## BUILDING sprint-flows-locale #################################################\n"
-#docker build --no-cache -t sprint-flows-locale -f Dockerfile .
-docker build --no-cache -t sprint-flows-locale -f Dockerfile_amazonCorretto .
+docker build --no-cache -t sprint-flows-locale -f Dockerfile .
+#docker build --no-cache -t sprint-flows-locale_amazon_corretto -f Dockerfile_amazonCorretto .
 
 
 echo -e "\n################################## RUN sprint-flows-locale #################################################\n"
 
 #ricrea i container e rebuilda le immagini
-docker-compose up --force-recreate --build --remove-orphans
+docker-compose up --force-recreate --build --remove-orphans -V
 
 echo -e "\n########### IMPORTANTE PER ELIMINARE IL DB usare ${RED}docker-compose down -v${NC} ###############"
 echo -e "\n########### PER VEDERE LE LOG DEI CONTAINER, USARE ${RED}docker-compose logs -f ${NC} ###############\n"
