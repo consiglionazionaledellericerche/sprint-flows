@@ -58,7 +58,10 @@ public class FlowsLookupResource {
     @RequestMapping(value = "/ace/boss", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Utils.SearchResult> getBossForCurrentUser() {
-        String username = securityService.getCurrentUserLogin();
+        
+    	//TODO verificare con Martin perchè in generale si deve prendere lo username CNR e non quello derivante da login SPID o CIE
+    	//String username = securityService.getCurrentUserLogin();
+    	String username = securityService.getUserInfo().get().getUid();
         BossDto boss = getResponsabileStruttura(username);
         String fullname = boss.getUtente().getPersona().getNome() +" "+ boss.getUtente().getPersona().getCognome();
         return ResponseEntity.ok(new Utils.SearchResult(fullname, fullname));
