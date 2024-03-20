@@ -172,6 +172,13 @@ public class Enum {
         RIFIUTATA,
         ANNULLATA;
     }
+    
+
+    public enum StatoTelelavoroEnum {
+        RESPINTO,
+        APPROVATO,
+        ANNULLATO;
+    }
 
     public enum ProcessDefinitionEnum {
         acquisti("acquisti","acquisti"),
