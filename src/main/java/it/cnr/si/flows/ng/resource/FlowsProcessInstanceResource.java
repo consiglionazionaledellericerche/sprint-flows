@@ -487,6 +487,15 @@ public class FlowsProcessInstanceResource {
 	    return ResponseEntity.ok(name);
 	}
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping(value = "/signal", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> signal(@RequestParam("processInstanceId") String processInstanceId) {
+        
+        runtimeService.signal(processInstanceId);
+        
+        return ResponseEntity.ok(null);
+    }	
+	
 	private List<Map<String, Object>> mappingPI(Enum.ProcessDefinitionEnum processDefinition, List<HistoricProcessInstance> historicProcessInstances, String typeView, boolean includeDocs) {
 		String view = viewRepository.getViewByProcessidType(processDefinition.getProcessDefinition(), typeView).getView();
 		JSONArray jsonFieldsToExport = new JSONArray(view);
