@@ -1,19 +1,22 @@
 package it.cnr.si.flows.ng.resource;
 
-import com.codahale.metrics.annotation.Timed;
-import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.service.AceBridgeService;
-import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
-import it.cnr.si.flows.ng.service.FlowsTaskService;
-import it.cnr.si.flows.ng.utils.Enum;
-import it.cnr.si.flows.ng.utils.Utils;
-import it.cnr.si.repository.ViewRepository;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.security.PermissionEvaluatorImpl;
+import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.PubblicatoTrasparenza;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.PubblicatoUrp;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.statoFinaleDomanda;
 
-import it.cnr.si.service.AceService;
-import it.cnr.si.service.MembershipService;
-import it.cnr.si.service.SecurityService;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+import javax.websocket.server.PathParam;
 
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
@@ -23,9 +26,8 @@ import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
-import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.rest.common.api.DataResponse;
-import org.activiti.rest.service.api.RestResponseFactory;
+import org.apache.logging.log4j.util.Strings;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -38,19 +40,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.inject.Inject;
-import javax.websocket.server.PathParam;
-import java.io.IOException;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
+import com.codahale.metrics.annotation.Timed;
 
-import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
-import static it.cnr.si.flows.ng.utils.Enum.Stato.PubblicatoTrasparenza;
-import static it.cnr.si.flows.ng.utils.Enum.Stato.PubblicatoUrp;
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.statoFinaleDomanda;
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
+import it.cnr.si.flows.ng.service.FlowsTaskService;
+import it.cnr.si.flows.ng.utils.Enum;
+import it.cnr.si.flows.ng.utils.Utils;
+import it.cnr.si.repository.ViewRepository;
+import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.security.PermissionEvaluatorImpl;
+import it.cnr.si.service.MembershipService;
+import it.cnr.si.service.SecurityService;
 
 @RestController
 @RequestMapping("api/processInstances")
@@ -63,8 +72,6 @@ public class FlowsProcessInstanceResource {
     @Inject
     private RepositoryService repositoryService;
 	@Inject
-	private RestResponseFactory restResponseFactory;
-	@Inject
 	private HistoryService historyService;
 	@Inject
 	private RuntimeService runtimeService;
@@ -72,11 +79,11 @@ public class FlowsProcessInstanceResource {
 	private FlowsProcessInstanceService flowsProcessInstanceService;
 	@Inject
 	private ViewRepository viewRepository;
-	@Inject
+	@Inject @SuppressWarnings("unused") // used in expression
 	private UserDetailsService flowsUserDetailsService;
 	@Inject
 	private FlowsTaskService flowsTaskService;
-	@Inject
+	@Inject @SuppressWarnings("unused") // used in expression
 	private PermissionEvaluatorImpl permissionEvaluator;
 	@Inject
 	private Utils utils;
@@ -467,6 +474,18 @@ public class FlowsProcessInstanceResource {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}	
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PostMapping(value = "/aggiornaName", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> aggiornaName(@RequestParam("processInstanceId") String processInstanceId,
+	        @RequestParam("stato") Optional<String> stato) {
+	    
+	    utils.updateJsonSearchTerms(null, processInstanceId, stato.orElse("")); // "" significa "non aggiornare lo stato"
+	    
+	    HistoricProcessInstance processInstance = flowsProcessInstanceService.getProcessInstance(processInstanceId);
+	    String name = processInstance.getName();
+	    
+	    return ResponseEntity.ok(name);
+	}
 
 	private List<Map<String, Object>> mappingPI(Enum.ProcessDefinitionEnum processDefinition, List<HistoricProcessInstance> historicProcessInstances, String typeView, boolean includeDocs) {
 		String view = viewRepository.getViewByProcessidType(processDefinition.getProcessDefinition(), typeView).getView();
