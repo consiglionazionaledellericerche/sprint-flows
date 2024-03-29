@@ -84,11 +84,11 @@ public class ManageProcessApprovvigionamenti_v1 implements ExecutionListener {
 		case "process-start": {
 			//code
 		};break; 
-		case "verifica-start": {
+		case "valida-start": {
 			startApprovvigionamentiSetGroupsAndVisibility.configuraVariabiliStart(execution);
 		};break;    
 
-		case "verifica-end": {
+		case "valida-end": {
 			if(execution.getVariable("sceltaUtente") != null && execution.getVariable("sceltaUtente").equals("ModificaTipologia-Valida")) {
 				String gruppoLavorazione = "responsabileApprovvigionamenti@0000";
 				if (execution.getVariable("tipologiaRichiesta").toString().startsWith("telefoniaFissa")){
@@ -107,38 +107,30 @@ public class ManageProcessApprovvigionamenti_v1 implements ExecutionListener {
 			} 
 		};break; 
 
-		case "lavorazione-start": {
+		case "modifica-start": {
 			//code
 		};break; 
 
-		case "lavorazione-end": {
+		case "modifica-end": {
+			//code
+		};break;
+
+		case "finaizza-start": {
+			//code
+		};break; 
+
+		case "finaizza-end": {
 			//code
 		};break;
 
 
 
-		case "endevent-annullata-start": {
+		case "process-end": {
 			execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoApprovvigionamentiEnum.ANNULLATA);
 			execution.setVariable("statoFinale", Enum.StatoApprovvigionamentiEnum.ANNULLATA.toString());
 			utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoApprovvigionamentiEnum.ANNULLATA.toString());
 		};break;    	
 
-
-		case "endevent-evasa-start": {
-			execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoApprovvigionamentiEnum.EVASA);
-			execution.setVariable("statoFinale", Enum.StatoApprovvigionamentiEnum.EVASA.toString());
-			utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoApprovvigionamentiEnum.EVASA.toString());
-		};break;  
-
-		case "endevent-inevasa-start": {
-			execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoApprovvigionamentiEnum.INEVASA);
-			execution.setVariable("statoFinale", Enum.StatoApprovvigionamentiEnum.INEVASA.toString());
-			utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoApprovvigionamentiEnum.INEVASA.toString());
-		};break;  
-
-		case "process-end": {
-			//code
-		};break; 
 		// DEFAULT  
 		default: {
 		};break;

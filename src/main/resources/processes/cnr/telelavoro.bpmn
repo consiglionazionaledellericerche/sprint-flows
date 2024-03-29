@@ -19,12 +19,12 @@
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${telelavoro_v1}">
           <activiti:field name="faseEsecuzione">
-            <activiti:string><![CDATA[firma-start]]></activiti:string>
+            <activiti:string><![CDATA[valida-start]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
         <activiti:executionListener event="end" delegateExpression="${telelavoro_v1}">
           <activiti:field name="faseEsecuzione">
-            <activiti:string><![CDATA[firma-end]]></activiti:string>
+            <activiti:string><![CDATA[valida-end]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
       </extensionElements>
@@ -59,7 +59,20 @@
     </userTask>
     <sequenceFlow id="flow17" sourceRef="exclusivegateway6" targetRef="modifica"></sequenceFlow>
     <sequenceFlow id="flow18" sourceRef="modifica" targetRef="valida"></sequenceFlow>
-    <userTask id="finalizza" name="FINALIZZA" activiti:assignee="${initiator}"></userTask>
+    <userTask id="finalizza" name="FINALIZZA" activiti:assignee="${initiator}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${telelavoro_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[finalizza-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${telelavoro_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[finalizza-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
     <sequenceFlow id="flow19" sourceRef="finalizza" targetRef="endevent3"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_telelavoro">
