@@ -69,7 +69,7 @@
     <sequenceFlow id="flow59" name="controfirma" sourceRef="exclusivegateway10" targetRef="controfirma"></sequenceFlow>
     <sequenceFlow id="flow60" sourceRef="exclusivegateway9" targetRef="usertask1"></sequenceFlow>
     <endEvent id="endevent3" name="End"></endEvent>
-    <sequenceFlow id="flow61" name="FIRMATO" sourceRef="exclusivegateway7" targetRef="endevent3"></sequenceFlow>
+    <sequenceFlow id="flow61" name="FINALIZZATO" sourceRef="exclusivegateway7" targetRef="endevent3"></sequenceFlow>
     <sequenceFlow id="flow62" name="ANNULLATO" sourceRef="exclusivegateway7" targetRef="endevent1"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_progetti-pnrr">
@@ -131,7 +131,7 @@
         <omgdi:waypoint x="134.0" y="70.0"></omgdi:waypoint>
         <omgdi:waypoint x="134.0" y="105.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="55.0" x="253.0" y="80.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="55.0" x="170.0" y="81.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow52" id="BPMNEdge_flow52">
