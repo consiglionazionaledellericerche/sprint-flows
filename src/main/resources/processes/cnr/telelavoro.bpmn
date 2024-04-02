@@ -41,7 +41,7 @@
     <exclusiveGateway id="exclusivegateway6" name="Exclusive Gateway" default="flow17"></exclusiveGateway>
     <sequenceFlow id="flow15" sourceRef="valida" targetRef="exclusivegateway6"></sequenceFlow>
     <sequenceFlow id="flow16" name="END" sourceRef="exclusivegateway6" targetRef="finalizza">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Firma' ||  sceltaUtente == 'Firma Multipla'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Valida' }]]></conditionExpression>
     </sequenceFlow>
     <userTask id="modifica" name="MODIFICA" activiti:assignee="${initiator}">
       <extensionElements>
@@ -110,7 +110,7 @@
         <omgdi:waypoint x="290.0" y="63.0"></omgdi:waypoint>
         <omgdi:waypoint x="320.0" y="63.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="20.0" x="477.0" y="20.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="100.0" x="477.0" y="20.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow17" id="BPMNEdge_flow17">

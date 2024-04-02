@@ -72,7 +72,7 @@ public class ManageProcessTelelavoro_v1 implements ExecutionListener {
 		String dataFirmaFlusso = dateFormat.format(dataFirma);
 		//LocalDate dataFirmaFlusso = LocalDate.now();
 		
-		Map<String, Object> missioniPayload = new HashMap<String, Object>()
+		Map<String, Object> telelavoroPayload = new HashMap<String, Object>()
 		{
 			{
 				put("codiceSedeTelelavoro", codiceSedeTelelavoro);
@@ -91,7 +91,7 @@ public class ManageProcessTelelavoro_v1 implements ExecutionListener {
 		};
 
 		String url = urlTelelavoro + pathTelelavoro;
-		externalMessageService.createExternalMessage(url, ExternalMessageVerb.POST, missioniPayload, ExternalApplication.ATTESTATI);
+		externalMessageService.createExternalMessage(url, ExternalMessageVerb.POST, telelavoroPayload, ExternalApplication.SIPER);
 	}
 
 
@@ -118,29 +118,20 @@ public class ManageProcessTelelavoro_v1 implements ExecutionListener {
 		};break;    
 
 		// START
-		case "respinto-start": {
-			utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoTelelavoroEnum.RESPINTO.toString());
-			restToApplicazioneTelelavoro(execution, Enum.StatoTelelavoroEnum.RESPINTO, currentUser);		
+		case "validazione-start": {
+			
 		};break;
 		
-		//case "respinto-end": {
-		//case "validazione-start": {
-		//case "validazione-end": {
+		case "modifica-start": {
+			startTelelavoroSetGroupsAndVisibility.configuraVariabiliStart(execution);
+		};break;
 		
 
-		case "endevent-annulla": {
-			execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoTelelavoroEnum.ANNULLATO);
-			execution.setVariable("statoFinale", Enum.StatoTelelavoroEnum.ANNULLATO.toString());
-			utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoTelelavoroEnum.ANNULLATO.toString());
-			restToApplicazioneTelelavoro(execution, Enum.StatoTelelavoroEnum.ANNULLATO, currentUser);
-		};break;    	
-
-
-		case "endevent-approvato-start": {
-			execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoTelelavoroEnum.APPROVATO);
-			execution.setVariable("statoFinale", Enum.StatoTelelavoroEnum.APPROVATO.toString());
-			utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoTelelavoroEnum.APPROVATO.toString());
-			restToApplicazioneTelelavoro(execution, Enum.StatoTelelavoroEnum.APPROVATO, currentUser);
+		case "endevent-telelavoro-start": {
+			String statoFinaleSiper = execution.getVariable("statoFinaleSiper").toString();
+			execution.setVariable("STATO_FINALE_DOMANDA", statoFinaleSiper);
+			execution.setVariable("statoFinale",statoFinaleSiper);
+			utils.updateJsonSearchTerms(executionId, processInstanceId, statoFinaleSiper);
 		};break;  
 
 		case "process-end": {
