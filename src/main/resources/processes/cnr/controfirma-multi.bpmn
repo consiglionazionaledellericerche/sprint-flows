@@ -14,7 +14,7 @@
       </activiti:executionListener>
     </extensionElements>
     <startEvent id="startevent1" name="Start"></startEvent>
-    <exclusiveGateway id="exclusivegateway7" name="Exclusive Gateway"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway7" name="Exclusive Gateway" default="flow61"></exclusiveGateway>
     <userTask id="controfirma" name="CONTROFIRMA" activiti:candidateGroups="${gruppoFirmatari}" activiti:category="firma">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${ManageProcessControFirmaMulti_v1}">
@@ -29,7 +29,7 @@
         </activiti:executionListener>
       </extensionElements>
     </userTask>
-    <exclusiveGateway id="exclusivegateway9" name="Exclusive Gateway"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway9" name="Exclusive Gateway" default="flow46"></exclusiveGateway>
     <endEvent id="endevent1" name="End">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${ManageProcessControFirmaMulti_v1}">
@@ -68,7 +68,7 @@
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow46" sourceRef="exclusivegateway9" targetRef="modifica"></sequenceFlow>
-    <exclusiveGateway id="exclusivegateway10" name="Exclusive Gateway"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway10" name="Exclusive Gateway" default="flow59"></exclusiveGateway>
     <sequenceFlow id="flow47" sourceRef="modifica" targetRef="exclusivegateway10"></sequenceFlow>
     <sequenceFlow id="flow49" name="annulla" sourceRef="exclusivegateway10" targetRef="endevent1"></sequenceFlow>
     <sequenceFlow id="flow51" name="controfirma" sourceRef="exclusivegateway9" targetRef="controfirma"></sequenceFlow>
