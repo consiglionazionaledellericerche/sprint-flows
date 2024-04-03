@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="controfirma-multi" name="CONTROFIRMA MULTI" isExecutable="true">
+    <extensionElements>
+      <activiti:executionListener event="start" delegateExpression="${ManageProcessControFirmaMulti_v1}">
+        <activiti:field name="faseEsecuzione">
+          <activiti:string><![CDATA[process-start]]></activiti:string>
+        </activiti:field>
+      </activiti:executionListener>
+      <activiti:executionListener event="end" delegateExpression="${ManageProcessControFirmaMulti_v1}">
+        <activiti:field name="faseEsecuzione">
+          <activiti:string><![CDATA[process-end]]></activiti:string>
+        </activiti:field>
+      </activiti:executionListener>
+    </extensionElements>
+    <startEvent id="startevent1" name="Start"></startEvent>
+    <exclusiveGateway id="exclusivegateway7" name="Exclusive Gateway"></exclusiveGateway>
+    <userTask id="controfirma" name="CONTROFIRMA" activiti:candidateGroups="${gruppoFirmatari}" activiti:category="firma">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${ManageProcessControFirmaMulti_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[controfirma-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${ManageProcessControFirmaMulti_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[controfirma-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="exclusivegateway9" name="Exclusive Gateway"></exclusiveGateway>
+    <endEvent id="endevent1" name="End">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${ManageProcessControFirmaMulti_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[endevent-annullato-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
+    <userTask id="firma" name="FIRMA" activiti:assignee="${firmatario}" activiti:category="firma">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${ManageProcessControFirmaMulti_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[firma-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${ManageProcessControFirmaMulti_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[firma-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="modifica" name="MODIFICA" activiti:candidateGroups="${gruppoAmministrativo}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${ManageProcessControFirmaMulti_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[modifica-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${ManageProcessControFirmaMulti_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[modifica-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow46" sourceRef="exclusivegateway9" targetRef="modifica"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway10" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow47" sourceRef="modifica" targetRef="exclusivegateway10"></sequenceFlow>
+    <sequenceFlow id="flow49" name="annulla" sourceRef="exclusivegateway10" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow51" name="controfirma" sourceRef="exclusivegateway9" targetRef="controfirma"></sequenceFlow>
+    <sequenceFlow id="flow52" name="AVVIO" sourceRef="startevent1" targetRef="controfirma"></sequenceFlow>
+    <userTask id="finalizza" name="FINALIZZA" activiti:candidateGroups="${gruppoAmministrativo}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${ManageProcessControFirmaMulti_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[finalizza-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${ManageProcessControFirmaMulti_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[finalizza-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow56" name="firma" sourceRef="exclusivegateway7" targetRef="firma"></sequenceFlow>
+    <sequenceFlow id="flow57" name="annulla" sourceRef="finalizza" targetRef="exclusivegateway7"></sequenceFlow>
+    <sequenceFlow id="flow58" sourceRef="controfirma" targetRef="exclusivegateway9"></sequenceFlow>
+    <sequenceFlow id="flow59" name="controfirma" sourceRef="exclusivegateway10" targetRef="controfirma"></sequenceFlow>
+    <sequenceFlow id="flow60" sourceRef="exclusivegateway9" targetRef="finalizza"></sequenceFlow>
+    <endEvent id="endevent3" name="End">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${ManageProcessControFirmaMulti_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[endevent-finalizzatoto-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="flow61" name="FINALIZZATO" sourceRef="exclusivegateway7" targetRef="endevent3"></sequenceFlow>
+    <sequenceFlow id="flow62" name="ANNULLATO" sourceRef="exclusivegateway7" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow63" name="modifica/firma" sourceRef="firma" targetRef="finalizza"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_controfirma-multi">
+    <bpmndi:BPMNPlane bpmnElement="controfirma-multi" id="BPMNPlane_controfirma-multi">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="80.0" y="123.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway7" id="BPMNShape_exclusivegateway7">
+        <omgdc:Bounds height="40.0" width="40.0" x="487.0" y="120.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="controfirma" id="BPMNShape_controfirma">
+        <omgdc:Bounds height="71.0" width="109.0" x="133.0" y="105.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway9" id="BPMNShape_exclusivegateway9">
+        <omgdc:Bounds height="40.0" width="40.0" x="269.0" y="120.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="54.0" y="238.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="firma" id="BPMNShape_firma">
+        <omgdc:Bounds height="71.0" width="109.0" x="453.0" y="220.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="modifica" id="BPMNShape_modifica">
+        <omgdc:Bounds height="71.0" width="109.0" x="235.0" y="220.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway10" id="BPMNShape_exclusivegateway10">
+        <omgdc:Bounds height="40.0" width="40.0" x="167.0" y="235.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="finalizza" id="BPMNShape_finalizza">
+        <omgdc:Bounds height="71.0" width="109.0" x="343.0" y="105.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent3" id="BPMNShape_endevent3">
+        <omgdc:Bounds height="35.0" width="35.0" x="559.0" y="123.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow46" id="BPMNEdge_flow46">
+        <omgdi:waypoint x="289.0" y="160.0"></omgdi:waypoint>
+        <omgdi:waypoint x="289.0" y="220.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow47" id="BPMNEdge_flow47">
+        <omgdi:waypoint x="235.0" y="255.0"></omgdi:waypoint>
+        <omgdi:waypoint x="207.0" y="255.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow49" id="BPMNEdge_flow49">
+        <omgdi:waypoint x="167.0" y="255.0"></omgdi:waypoint>
+        <omgdi:waypoint x="89.0" y="255.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="34.0" x="123.0" y="264.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow51" id="BPMNEdge_flow51">
+        <omgdi:waypoint x="289.0" y="120.0"></omgdi:waypoint>
+        <omgdi:waypoint x="288.0" y="70.0"></omgdi:waypoint>
+        <omgdi:waypoint x="186.0" y="70.0"></omgdi:waypoint>
+        <omgdi:waypoint x="187.0" y="105.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="55.0" x="208.0" y="82.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow52" id="BPMNEdge_flow52">
+        <omgdi:waypoint x="115.0" y="140.0"></omgdi:waypoint>
+        <omgdi:waypoint x="133.0" y="140.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="34.0" x="80.0" y="94.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow56" id="BPMNEdge_flow56">
+        <omgdi:waypoint x="507.0" y="160.0"></omgdi:waypoint>
+        <omgdi:waypoint x="507.0" y="220.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="24.0" x="479.0" y="189.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow57" id="BPMNEdge_flow57">
+        <omgdi:waypoint x="452.0" y="140.0"></omgdi:waypoint>
+        <omgdi:waypoint x="487.0" y="140.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="34.0" x="469.0" y="94.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow58" id="BPMNEdge_flow58">
+        <omgdi:waypoint x="242.0" y="140.0"></omgdi:waypoint>
+        <omgdi:waypoint x="269.0" y="140.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow59" id="BPMNEdge_flow59">
+        <omgdi:waypoint x="187.0" y="235.0"></omgdi:waypoint>
+        <omgdi:waypoint x="187.0" y="176.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="55.0" x="122.0" y="191.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow60" id="BPMNEdge_flow60">
+        <omgdi:waypoint x="309.0" y="140.0"></omgdi:waypoint>
+        <omgdi:waypoint x="343.0" y="140.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow61" id="BPMNEdge_flow61">
+        <omgdi:waypoint x="527.0" y="140.0"></omgdi:waypoint>
+        <omgdi:waypoint x="559.0" y="140.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="67.0" x="542.0" y="105.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow62" id="BPMNEdge_flow62">
+        <omgdi:waypoint x="507.0" y="120.0"></omgdi:waypoint>
+        <omgdi:waypoint x="506.0" y="50.0"></omgdi:waypoint>
+        <omgdi:waypoint x="29.0" y="50.0"></omgdi:waypoint>
+        <omgdi:waypoint x="29.0" y="255.0"></omgdi:waypoint>
+        <omgdi:waypoint x="54.0" y="255.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="63.0" x="45.0" y="278.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow63" id="BPMNEdge_flow63">
+        <omgdi:waypoint x="453.0" y="255.0"></omgdi:waypoint>
+        <omgdi:waypoint x="397.0" y="255.0"></omgdi:waypoint>
+        <omgdi:waypoint x="397.0" y="176.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="67.0" x="381.0" y="264.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
