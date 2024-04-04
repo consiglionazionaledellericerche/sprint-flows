@@ -1,4 +1,4 @@
-package it.cnr.si.flows.ng.listeners.cnr.controFirmaMulti.copy;
+package it.cnr.si.flows.ng.listeners.cnr.controFirmaMulti;
 
 
 
