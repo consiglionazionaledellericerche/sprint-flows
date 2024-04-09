@@ -52,6 +52,7 @@ public class StartTelelavoroSetGroupsAndVisibility {
 		String codiceSedeTelelavoro = execution.getVariable("codiceSedeTelelavoro").toString();
 		String idStruttura = aceService.getSedeIdByIdNsip(codiceSedeTelelavoro).toString();
 		String codiceCdsuoTelelavoro = aceService.entitaOrganizzativaById(Integer.parseInt(idStruttura)).getCdsuo();
+		String gruppoResponsabileProponente = "responsabile-struttura@" + idStruttura.toString();
 
 		// LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable(Enum.VariableEnum.title.name()));
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {} per l'utente {} - mese:  {} - anno  {})", initiator, execution.getId(), execution.getVariable("titolo"), utenteRichiedente, meseTelelavoro, annoTelelavoro );
@@ -63,6 +64,7 @@ public class StartTelelavoroSetGroupsAndVisibility {
 		execution.setVariable("codiceSedeTelelavoro", codiceSedeTelelavoro);
 		execution.setVariable("codiceCdsuoTelelavoro", codiceCdsuoTelelavoro);
 		execution.setVariable("idStruttura", idStruttura);
+		execution.setVariable("gruppoResponsabileProponente", gruppoResponsabileProponente);
 		
 		//runtimeService.addUserIdentityLink(execution.getProcessInstanceId(), usernameResponsabileTelelavoro, PROCESS_VISUALIZER);
 	}

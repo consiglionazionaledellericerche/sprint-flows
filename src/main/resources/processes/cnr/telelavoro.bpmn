@@ -2,12 +2,12 @@
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
   <process id="telelavoro" name="Telelavoro" isExecutable="true">
     <extensionElements>
-      <activiti:executionListener event="start" delegateExpression="${telelavoro_v1}">
+      <activiti:executionListener event="start" delegateExpression="${manageProcessTelelavoro_v1}">
         <activiti:field name="faseEsecuzione">
           <activiti:string><![CDATA[process-start]]></activiti:string>
         </activiti:field>
       </activiti:executionListener>
-      <activiti:executionListener event="end" delegateExpression="${telelavoro_v1}">
+      <activiti:executionListener event="end" delegateExpression="${manageProcessTelelavoro_v1}">
         <activiti:field name="faseEsecuzione">
           <activiti:string><![CDATA[process-end]]></activiti:string>
         </activiti:field>
@@ -17,12 +17,12 @@
     <sequenceFlow id="flow1" name="START" sourceRef="startevent1" targetRef="valida"></sequenceFlow>
     <userTask id="valida" name="VALIDA" activiti:candidateGroups="${gruppoResponsabileProponente}" activiti:category="firma">
       <extensionElements>
-        <activiti:executionListener event="start" delegateExpression="${telelavoro_v1}">
+        <activiti:executionListener event="start" delegateExpression="${manageProcessTelelavoro_v1}">
           <activiti:field name="faseEsecuzione">
             <activiti:string><![CDATA[validazione-start]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
-        <activiti:executionListener event="end" delegateExpression="${telelavoro_v1}">
+        <activiti:executionListener event="end" delegateExpression="${manageProcessTelelavoro_v1}">
           <activiti:field name="faseEsecuzione">
             <activiti:string><![CDATA[validazione-end]]></activiti:string>
           </activiti:field>
@@ -31,7 +31,7 @@
     </userTask>
     <endEvent id="endevent3" name="End">
       <extensionElements>
-        <activiti:executionListener event="start" delegateExpression="${telelavoro_v1}">
+        <activiti:executionListener event="start" delegateExpression="${manageProcessTelelavoro_v1}">
           <activiti:field name="faseEsecuzione">
             <activiti:string><![CDATA[endevent-telelavoro-start]]></activiti:string>
           </activiti:field>
@@ -45,12 +45,12 @@
     </sequenceFlow>
     <userTask id="modifica" name="MODIFICA" activiti:assignee="${initiator}">
       <extensionElements>
-        <activiti:executionListener event="start" delegateExpression="${telelavoro_v1}">
+        <activiti:executionListener event="start" delegateExpression="${manageProcessTelelavoro_v1}">
           <activiti:field name="faseEsecuzione">
             <activiti:string><![CDATA[modifica-start]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
-        <activiti:executionListener event="end" delegateExpression="${telelavoro_v1}">
+        <activiti:executionListener event="end" delegateExpression="${manageProcessTelelavoro_v1}">
           <activiti:field name="faseEsecuzione">
             <activiti:string><![CDATA[modifica-end]]></activiti:string>
           </activiti:field>
@@ -61,12 +61,12 @@
     <sequenceFlow id="flow18" sourceRef="modifica" targetRef="valida"></sequenceFlow>
     <userTask id="finalizza" name="FINALIZZA" activiti:assignee="${initiator}">
       <extensionElements>
-        <activiti:executionListener event="start" delegateExpression="${telelavoro_v1}">
+        <activiti:executionListener event="start" delegateExpression="${manageProcessTelelavoro_v1}">
           <activiti:field name="faseEsecuzione">
             <activiti:string><![CDATA[finalizza-start]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
-        <activiti:executionListener event="end" delegateExpression="${telelavoro_v1}">
+        <activiti:executionListener event="end" delegateExpression="${manageProcessTelelavoro_v1}">
           <activiti:field name="faseEsecuzione">
             <activiti:string><![CDATA[finalizza-end]]></activiti:string>
           </activiti:field>
@@ -110,7 +110,7 @@
         <omgdi:waypoint x="290.0" y="63.0"></omgdi:waypoint>
         <omgdi:waypoint x="320.0" y="63.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="477.0" y="20.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="20.0" x="477.0" y="20.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow17" id="BPMNEdge_flow17">
