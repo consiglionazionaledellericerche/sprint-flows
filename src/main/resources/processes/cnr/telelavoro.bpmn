@@ -14,8 +14,8 @@
       </activiti:executionListener>
     </extensionElements>
     <startEvent id="startevent1" name="Start"></startEvent>
-    <sequenceFlow id="flow1" name="START" sourceRef="startevent1" targetRef="valida"></sequenceFlow>
-    <userTask id="valida" name="VALIDA" activiti:candidateGroups="${gruppoResponsabileProponente}" activiti:category="firma">
+    <sequenceFlow id="flow1" name="START" sourceRef="startevent1" targetRef="validazione"></sequenceFlow>
+    <userTask id="validazione" name="VALIDAZIONE" activiti:candidateGroups="${gruppoResponsabileProponente}" activiti:category="firma">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessTelelavoro_v1}">
           <activiti:field name="faseEsecuzione">
@@ -39,7 +39,7 @@
       </extensionElements>
     </endEvent>
     <exclusiveGateway id="exclusivegateway6" name="Exclusive Gateway" default="flow17"></exclusiveGateway>
-    <sequenceFlow id="flow15" sourceRef="valida" targetRef="exclusivegateway6"></sequenceFlow>
+    <sequenceFlow id="flow15" sourceRef="validazione" targetRef="exclusivegateway6"></sequenceFlow>
     <sequenceFlow id="flow16" name="END" sourceRef="exclusivegateway6" targetRef="finalizza">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Valida' }]]></conditionExpression>
     </sequenceFlow>
@@ -58,7 +58,7 @@
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow17" sourceRef="exclusivegateway6" targetRef="modifica"></sequenceFlow>
-    <sequenceFlow id="flow18" sourceRef="modifica" targetRef="valida"></sequenceFlow>
+    <sequenceFlow id="flow18" sourceRef="modifica" targetRef="validazione"></sequenceFlow>
     <userTask id="finalizza" name="FINALIZZA" activiti:assignee="${initiator}">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessTelelavoro_v1}">
@@ -80,7 +80,7 @@
       <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
         <omgdc:Bounds height="35.0" width="35.0" x="30.0" y="46.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="valida" id="BPMNShape_valida">
+      <bpmndi:BPMNShape bpmnElement="validazione" id="BPMNShape_validazione">
         <omgdc:Bounds height="75.0" width="111.0" x="110.0" y="26.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="endevent3" id="BPMNShape_endevent3">
