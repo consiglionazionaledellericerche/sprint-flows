@@ -15,7 +15,7 @@
     </extensionElements>
     <startEvent id="startevent1" name="Start"></startEvent>
     <sequenceFlow id="flow1" name="START" sourceRef="startevent1" targetRef="validazione"></sequenceFlow>
-    <userTask id="validazione" name="VALIDAZIONE" activiti:candidateGroups="${gruppoResponsabileProponente}" activiti:category="firma">
+    <userTask id="validazione" name="VALIDAZIONE" activiti:candidateGroups="${gruppoResponsabileProponente}">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessTelelavoro_v1}">
           <activiti:field name="faseEsecuzione">
