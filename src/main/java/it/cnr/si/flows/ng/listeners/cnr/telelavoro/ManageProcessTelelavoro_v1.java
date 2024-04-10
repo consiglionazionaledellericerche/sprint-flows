@@ -128,7 +128,7 @@ public class ManageProcessTelelavoro_v1 implements ExecutionListener {
 		
 
 		case "endevent-telelavoro-start": {
-			String statoFinaleSiper = execution.getVariable("statoFinaleSiper").toString();
+			String statoFinaleSiper = execution.getVariable("sceltaUtente").toString();
 			execution.setVariable("STATO_FINALE_DOMANDA", statoFinaleSiper);
 			execution.setVariable("statoFinale",statoFinaleSiper);
 			utils.updateJsonSearchTerms(executionId, processInstanceId, statoFinaleSiper);
