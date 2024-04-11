@@ -175,9 +175,13 @@ public class Enum {
     
 
     public enum StatoTelelavoroEnum {
-        RESPINTO,
-        APPROVATO,
-        ANNULLATO;
+    	RIFIUTATA,
+    	MODIFICA,
+    	FINALIZZAZIONE,
+    	VALIDATA,
+    	APPROVATA,
+    	NON_APPROVATA,
+    	ANNULLATA;
     }
 
     public enum ProcessDefinitionEnum {

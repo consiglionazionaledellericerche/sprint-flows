@@ -45,23 +45,19 @@ public class StartTelelavoroSetGroupsAndVisibility {
 	public void configuraVariabiliStart(DelegateExecution execution)  throws IOException, ParseException  {
 
 		String initiator = (String) execution.getVariable(Enum.VariableEnum.initiator.name());
-		String utenteRichiedente = execution.getVariable("utenteRichiedente").toString();
-		String usernameResponsabileTelelavoro = execution.getVariable("usernameResponsabileTelelavoro").toString();
-		String meseTelelavoro = execution.getVariable("meseTelelavoro").toString();
-		String annoTelelavoro = execution.getVariable("annoTelelavoro").toString();
+		String utenteRichiedente = execution.getVariable("userNameProponente").toString();
 		String codiceSedeTelelavoro = execution.getVariable("codiceSedeTelelavoro").toString();
 		String idStruttura = aceService.getSedeIdByIdNsip(codiceSedeTelelavoro).toString();
 		String codiceCdsuoTelelavoro = aceService.entitaOrganizzativaById(Integer.parseInt(idStruttura)).getCdsuo();
 		String gruppoResponsabileProponente = "responsabile-struttura@" + idStruttura.toString();
 
 		// LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable(Enum.VariableEnum.title.name()));
-		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {} per l'utente {} - mese:  {} - anno  {})", initiator, execution.getId(), execution.getVariable("titolo"), utenteRichiedente, meseTelelavoro, annoTelelavoro );
+		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {} per l'utente {} - codiceSedeTelelavoro:  {} - idStruttura  {})", initiator, execution.getId(), execution.getVariable("titolo"), utenteRichiedente, codiceSedeTelelavoro, idStruttura );
 
-		String gruppoValidatoriTelelavoro = "valida-attestati#attestati-app@" + idStruttura;
+		String gruppoValidatoriTelelavoro = "valida-telelavoro#telelavoro-app@" + idStruttura;
 
 		LOGGER.debug("Imposto i gruppi del flusso: gruppoValidatoriTelelavoro {} ",  gruppoValidatoriTelelavoro);
 		execution.setVariable("gruppoValidatoriTelelavoro", gruppoValidatoriTelelavoro);
-		execution.setVariable("codiceSedeTelelavoro", codiceSedeTelelavoro);
 		execution.setVariable("codiceCdsuoTelelavoro", codiceCdsuoTelelavoro);
 		execution.setVariable("idStruttura", idStruttura);
 		execution.setVariable("gruppoResponsabileProponente", gruppoResponsabileProponente);
