@@ -53,6 +53,7 @@
         <sprint.version>3.2.11</sprint.version>
         <start-class>it.cnr.si.FlowsApp</start-class>
         <storage-cloud.version>2.0.0</storage-cloud.version>
+        <gelf.version>1.14.0</gelf.version>
     </properties>
 
     <dependencyManagement>
@@ -498,7 +499,13 @@
         <dependency>
             <groupId>org.thymeleaf</groupId>
             <artifactId>thymeleaf-spring4</artifactId>
-            </dependency>
+        </dependency>
+        
+        <dependency>
+            <groupId>biz.paluch.logging</groupId>
+            <artifactId>logstash-gelf</artifactId>
+            <version>${gelf.version}</version>
+        </dependency>
 
     </dependencies>
 
@@ -984,7 +991,7 @@
             </build>
             <properties>
                 <!-- log configuration -->
-                <logback.loglevel>INFO</logback.loglevel>
+                <logback.loglevel>WARN</logback.loglevel>
                 <!-- default Spring profiles -->
                 <spring.profiles.active>prod${profile.swagger}${profile.no-liquibase}</spring.profiles.active>
             </properties>
