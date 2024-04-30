@@ -127,18 +127,6 @@ public class ManageProcessAttestati_v1 implements ExecutionListener {
 		//case "validazione-start": {
 		//case "validazione-end": {
 		
-		// START
-		case "modifica-start": {
-			utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoAttestatiEnum.MODIFICA.toString());
-			restToApplicazioneAttestati(execution, Enum.StatoAttestatiEnum.MODIFICA, currentUser);		
-		};break;
-	
-		case "finalizzazione-start": {
-			utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoAttestatiEnum.FINALIZZA.toString());
-			restToApplicazioneAttestati(execution, Enum.StatoAttestatiEnum.FINALIZZA, currentUser);		
-		};break;
-		
-		
 		
 		case "endevent-annulla": {
 			execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoAttestatiEnum.ANNULLATO);
