@@ -88,6 +88,8 @@ public class Enum {
     }
 
     public enum StatoAttestatiEnum {
+        MODIFICA,
+        FINALIZZA,
         RESPINTO,
         APPROVATO,
         ANNULLATO;
