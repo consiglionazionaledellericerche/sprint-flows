@@ -121,6 +121,12 @@ public class ManageProcessTelelavoro_v1 implements ExecutionListener {
 			startTelelavoroSetGroupsAndVisibility.configuraVariabiliStart(execution);			
 		};break;
 		
+		// MODIFICA
+		case "modifica-start": {
+			restToApplicazioneTelelavoro(execution, Enum.StatoTelelavoroEnum.MODIFICA);
+		};break;
+	
+	
 		case "endevent-annullata-start": {
 			restToApplicazioneTelelavoro(execution, Enum.StatoTelelavoroEnum.ANNULLATA);
 			execution.setVariable("statoFinale", Enum.StatoTelelavoroEnum.ANNULLATA);
@@ -134,7 +140,6 @@ public class ManageProcessTelelavoro_v1 implements ExecutionListener {
 			restToApplicazioneTelelavoro(execution, Enum.StatoTelelavoroEnum.RIFIUTATA);
 			execution.setVariable("statoFinale", Enum.StatoTelelavoroEnum.RIFIUTATA);
 			utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
-
 		};break;
 		
 
@@ -159,6 +164,5 @@ public class ManageProcessTelelavoro_v1 implements ExecutionListener {
 
 		} 
 	}
-
 
 }
