@@ -180,6 +180,7 @@ public class Enum {
     	FINALIZZAZIONE,
     	VALIDATA,
     	APPROVATA,
+    	SCADUTA,
     	NON_APPROVATA,
     	ANNULLATA;
     }
