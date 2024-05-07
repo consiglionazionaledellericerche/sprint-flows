@@ -102,15 +102,15 @@
         </activiti:executionListener>
       </extensionElements>
     </userTask>
-    <sequenceFlow id="flow27" sourceRef="startevent1" targetRef="validazione"></sequenceFlow>
+    <sequenceFlow id="flow27" name="SCADUTA" sourceRef="startevent1" targetRef="validazione"></sequenceFlow>
     <sequenceFlow id="flow28" sourceRef="validazione" targetRef="exclusivegateway6"></sequenceFlow>
     <sequenceFlow id="flow29" sourceRef="exclusivegateway7" targetRef="validazione"></sequenceFlow>
     <boundaryEvent id="boundarytimer1" name="Timer" attachedToRef="validazione" cancelActivity="true">
       <timerEventDefinition>
-        <timeDuration>P20D</timeDuration>
+        <timeDuration>P15D</timeDuration>
       </timerEventDefinition>
     </boundaryEvent>
-    <sequenceFlow id="flow30" name="T2" sourceRef="boundarytimer1" targetRef="endevent4"></sequenceFlow>
+    <sequenceFlow id="flow30" name="T2" sourceRef="boundarytimer1" targetRef="endevent6"></sequenceFlow>
     <scriptTask id="notificaMail" name="notifica Mail" isForCompensation="true" scriptFormat="javascript" activiti:autoStoreVariables="false">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessTelelavoro_v1}">
@@ -137,6 +137,15 @@
     <sequenceFlow id="flow32" sourceRef="exclusivegateway8" targetRef="endevent5">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Annulla' }]]></conditionExpression>
     </sequenceFlow>
+    <endEvent id="endevent6" name="End">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessTelelavoro_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[endevent-scaduta-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_telelavoro">
     <bpmndi:BPMNPlane bpmnElement="telelavoro" id="BPMNPlane_telelavoro">
@@ -171,13 +180,16 @@
         <omgdc:Bounds height="75.0" width="111.0" x="110.0" y="97.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="boundarytimer1" id="BPMNShape_boundarytimer1">
-        <omgdc:Bounds height="30.0" width="30.0" x="200.0" y="91.0"></omgdc:Bounds>
+        <omgdc:Bounds height="30.0" width="30.0" x="110.0" y="150.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="boundarytimer2" id="BPMNShape_boundarytimer2">
         <omgdc:Bounds height="30.0" width="30.0" x="150.0" y="81.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="notificaMail" id="BPMNShape_notificaMail">
         <omgdc:Bounds height="55.0" width="105.0" x="112.0" y="1.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent6" id="BPMNShape_endevent6">
+        <omgdc:Bounds height="35.0" width="35.0" x="75.0" y="207.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow16" id="BPMNEdge_flow16">
         <omgdi:waypoint x="290.0" y="134.0"></omgdi:waypoint>
@@ -202,14 +214,14 @@
         <omgdi:waypoint x="165.0" y="241.0"></omgdi:waypoint>
         <omgdi:waypoint x="164.0" y="271.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="63.0" x="81.0" y="281.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="63.0" x="86.0" y="281.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow24" id="BPMNEdge_flow24">
         <omgdi:waypoint x="501.0" y="134.0"></omgdi:waypoint>
         <omgdi:waypoint x="530.0" y="134.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="65.0" x="573.0" y="117.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="65.0" x="489.0" y="89.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow25" id="BPMNEdge_flow25">
@@ -225,12 +237,15 @@
         <omgdi:waypoint x="433.0" y="134.0"></omgdi:waypoint>
         <omgdi:waypoint x="461.0" y="134.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="90.0" x="573.0" y="141.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="90.0" x="489.0" y="169.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow27" id="BPMNEdge_flow27">
         <omgdi:waypoint x="66.0" y="134.0"></omgdi:waypoint>
         <omgdi:waypoint x="110.0" y="134.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="74.0" y="247.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow28" id="BPMNEdge_flow28">
         <omgdi:waypoint x="221.0" y="134.0"></omgdi:waypoint>
@@ -241,17 +256,17 @@
         <omgdi:waypoint x="165.0" y="172.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow30" id="BPMNEdge_flow30">
-        <omgdi:waypoint x="215.0" y="91.0"></omgdi:waypoint>
-        <omgdi:waypoint x="270.0" y="46.0"></omgdi:waypoint>
+        <omgdi:waypoint x="125.0" y="180.0"></omgdi:waypoint>
+        <omgdi:waypoint x="92.0" y="207.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="12.0" x="203.0" y="15.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="12.0" x="138.0" y="186.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow31" id="BPMNEdge_flow31">
         <omgdi:waypoint x="165.0" y="81.0"></omgdi:waypoint>
         <omgdi:waypoint x="164.0" y="56.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="12.0" x="146.0" y="9.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="100.0" x="146.0" y="-21.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow32" id="BPMNEdge_flow32">

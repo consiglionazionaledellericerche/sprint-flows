@@ -129,7 +129,7 @@ public class ManageProcessTelelavoro_v1 implements ExecutionListener {
 	
 		case "endevent-annullata-start": {
 			restToApplicazioneTelelavoro(execution, Enum.StatoTelelavoroEnum.ANNULLATA);
-			execution.setVariable("statoFinale", Enum.StatoTelelavoroEnum.ANNULLATA);
+			execution.setVariable("statoFinale", Enum.StatoTelelavoroEnum.ANNULLATA.toString());
 			utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
 		};break;
 		
@@ -138,11 +138,17 @@ public class ManageProcessTelelavoro_v1 implements ExecutionListener {
 				execution.setVariable("notaDomandaRespinta", "Scadenza termini temporali Valutazione Dirigente");
 			}
 			restToApplicazioneTelelavoro(execution, Enum.StatoTelelavoroEnum.RIFIUTATA);
-			execution.setVariable("statoFinale", Enum.StatoTelelavoroEnum.RIFIUTATA);
+			execution.setVariable("statoFinale", Enum.StatoTelelavoroEnum.RIFIUTATA.toString());
 			utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
 		};break;
 		
-
+		case "endevent-scaduta-start": {
+			restToApplicazioneTelelavoro(execution, Enum.StatoTelelavoroEnum.SCADUTA);
+			execution.setVariable("statoFinale", Enum.StatoTelelavoroEnum.SCADUTA.toString());
+			utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
+		};break;
+				
+		
 		case "endevent-telelavoro-start": {
 			String statoFinaleSiper = execution.getVariable("sceltaUtente").toString();
 			execution.setVariable("STATO_FINALE_DOMANDA", statoFinaleSiper);
