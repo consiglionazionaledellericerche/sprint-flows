@@ -80,6 +80,7 @@ public class ManageProcessTelelavoro_v1 implements ExecutionListener {
 				put("idDomanda", idDomanda);
 				put("stato", statoTelelavoro.name().toString());
 				put("dataAzioneFlusso", dataAzioneFlusso);
+				put("matricola", execution.getVariable("matricola").toString());
 				put("processInstanceId", execution.getProcessInstanceId().toString());
 				if(execution.getVariable("commento") != null) {
 					put("commento", execution.getVariable("commento").toString());
@@ -100,6 +101,7 @@ public class ManageProcessTelelavoro_v1 implements ExecutionListener {
 		String processInstanceId =  execution.getProcessInstanceId();
 		String executionId =  execution.getId();
 		String stato =  execution.getCurrentActivityName();
+		String matricola = execution.getVariable("matricola").toString();
 		String sceltaUtente = "start";
 		if(execution.getVariable("sceltaUtente") != null) {
 			sceltaUtente =  (String) execution.getVariable("sceltaUtente");	
