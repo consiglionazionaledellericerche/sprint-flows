@@ -212,6 +212,9 @@
                         '&firstResult=' + firstResult +
                         '&maxResults=' + maxResults, searchParams);
                 },
+                istituti: function(searchterm) {
+                    return $http.get('api/users/istituti/' + searchterm);
+                }
             },
             lookup: {
                 uo: function (id) {
