@@ -109,6 +109,12 @@
                     <span class="hidden-sm">Carrello Firma ({{vm.$localStorage.cart | numkeys}})</span>
                 </a>
             </li>
+            <li ui-sref-active="active" ng-show="isResponsabileStruttura">
+                <a href="https://ace.cnr.it/anagrafica/ruolopersona" target="_blank" ng-click="vm.collapseNavbar()">
+                    <span class="glyphicon glyphicon-education"></span>
+                    <span class="hidden-sm">Gestione Ruoli</span>
+                </a>
+            </li>
             <li ui-sref-active="active" has-authority="ROLE_USER">
                 <a ui-sref="helpdesk" ng-click="vm.collapseNavbar()">
                     <span class="glyphicon glyphicon-envelope"></span>
