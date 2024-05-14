@@ -155,7 +155,7 @@
             $location.processDefinitionKey = vm.processDefinitionKey;
             $location.order = vm.order;
             $location.active = vm.active;
-            // Se RICARICO la pagina aggiorno TUTTE le "viste" (i miei compiti, compiti di gruppo,
+            // Se RICARICO la pagina aggiorno TUTTE le "viste" (i miei compiti, compiti di ruolo,
             // compiti dei miei gruppi assegnati ad altri) e cancello i searchParams
             if (performance.navigation.type == performance.navigation.TYPE_RELOAD || performance.navigation.type == performance.navigation.TYPE_NAVIGATE) {
                 $scope.loadAllTasks();
