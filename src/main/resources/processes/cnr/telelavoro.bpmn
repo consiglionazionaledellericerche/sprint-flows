@@ -107,7 +107,7 @@
     <sequenceFlow id="flow29" sourceRef="exclusivegateway7" targetRef="validazione"></sequenceFlow>
     <boundaryEvent id="boundarytimer1" name="Timer" attachedToRef="validazione" cancelActivity="true">
       <timerEventDefinition>
-        <timeDuration>P15D</timeDuration>
+        <timeDuration>P20D</timeDuration>
       </timerEventDefinition>
     </boundaryEvent>
     <sequenceFlow id="flow30" name="T2" sourceRef="boundarytimer1" targetRef="endevent6"></sequenceFlow>
@@ -266,7 +266,7 @@
         <omgdi:waypoint x="165.0" y="81.0"></omgdi:waypoint>
         <omgdi:waypoint x="164.0" y="56.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="146.0" y="-21.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="100.0" x="174.0" y="61.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow32" id="BPMNEdge_flow32">
