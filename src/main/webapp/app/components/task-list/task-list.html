@@ -60,7 +60,7 @@
             <a class="btn btn-default" ng-class="{'btn-xs': !advanced}"
                ng-if="!inFirma && task.assignee !== null && task.variabili.isReleasable"
                ng-click="claimTask(task.id, false)">
-                <span class="glyphicon glyphicon-hand-down" aria-hidden="true"></span> Restituisci al gruppo
+                <span class="glyphicon glyphicon-hand-down" aria-hidden="true"></span> Restituisci al ruolo
             </a>
             <a class="btn btn-default" ng-class="{'btn-xs': !advanced}"
                ng-if="task.category == 'firma' && !inCart(task.id)"

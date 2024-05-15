@@ -24,12 +24,12 @@
             <task-details variables="task.historyTask.variables" title="task.historyTask.name"></task-details>
             <b>{{task.historyTask.name}} </b>
         </h5>
-        <!--identitylink (gruppo/utente assegnatario, esecutore del task-->
+        <!--identitylink (ruolo/utente assegnatario, esecutore del task-->
         <div ng-repeat="identityLink in task.historyIdentityLink">
             <div ng-switch="identityLink.type">
                 <div ng-switch-when="candidate">
                     <span ng-show="identityLink.userId !== null"> <b>Utente Assegnatario:</b> {{identityLink.userId}} </span><br>
-                    <span ng-show="identityLink.groupId !== null"> <b>Gruppo Assegnatario:</b> {{identityLink.groupId}} </span><br>
+                    <span ng-show="identityLink.groupId !== null"> <b>Ruolo Assegnatario:</b> {{identityLink.groupId}} </span><br>
                 </div>
                 <div ng-switch-when="esecutore">
                     <span ng-show="identityLink.userId !== null"> <b>Eseguito dall'Utente:</b> {{identityLink.userId}} </span><br>
