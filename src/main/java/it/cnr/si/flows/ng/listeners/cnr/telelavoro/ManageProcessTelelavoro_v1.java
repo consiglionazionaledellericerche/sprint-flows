@@ -158,7 +158,7 @@ public class ManageProcessTelelavoro_v1 implements ExecutionListener {
 			utils.updateJsonSearchTerms(executionId, processInstanceId, statoFinaleSiper);
 		};break;  
 		case "notificaMail-start": {
-			restToApplicazioneTelelavoro(execution, Enum.StatoTelelavoroEnum.MODIFICA);
+			//restToApplicazioneTelelavoro(execution, Enum.StatoTelelavoroEnum.MODIFICA);
 		};break;  
 		case "finalizzazione-start": {
 			restToApplicazioneTelelavoro(execution, Enum.StatoTelelavoroEnum.FINALIZZAZIONE);
