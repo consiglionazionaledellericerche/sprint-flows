@@ -82,6 +82,11 @@ public class ManageProcessTelelavoro_v1 implements ExecutionListener {
 				put("dataAzioneFlusso", dataAzioneFlusso);
 				put("matricola", execution.getVariable("matricola").toString());
 				put("processInstanceId", execution.getProcessInstanceId().toString());
+				if(execution.getVariable("notaValidazione") != null) {
+					put("notaValidazione", execution.getVariable("notaValidazione").toString());
+				} else {
+					put("notaValidazione", "");
+				}
 				if(execution.getVariable("commento") != null) {
 					put("commento", execution.getVariable("commento").toString());
 				} else {
