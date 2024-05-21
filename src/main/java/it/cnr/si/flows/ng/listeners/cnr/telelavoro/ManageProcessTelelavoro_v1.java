@@ -48,7 +48,8 @@ public class ManageProcessTelelavoro_v1 implements ExecutionListener {
 	@Value("${cnr.siper-telelavoro.domandePath}")
 	private String pathTelelavoro;
 
-
+	@Inject
+	private FirmaDocumentoService firmaDocumentoService;
 	@Inject
 	private StartTelelavoroSetGroupsAndVisibility startTelelavoroSetGroupsAndVisibility;
 	@Inject
@@ -127,6 +128,15 @@ public class ManageProcessTelelavoro_v1 implements ExecutionListener {
 		case "validazione-start": {
 			startTelelavoroSetGroupsAndVisibility.configuraVariabiliStart(execution);			
 		};break;
+		
+		// FIRMA
+		case "validazione-end": {
+			if (sceltaUtente != null && sceltaUtente.equals("Firma")) {
+				firmaDocumentoService.eseguiFirma(execution, Enum.PdfType.valueOf("domandaTeleLavoro").name(), null);
+			}
+		};break;
+				
+
 		
 		// MODIFICA
 		case "modifica-start": {

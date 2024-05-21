@@ -88,7 +88,7 @@
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Sospendi' }]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow26" name="NON APPROVATA" sourceRef="finalizzazione" targetRef="exclusivegateway8"></sequenceFlow>
-    <userTask id="validazione" name="VALIDAZIONE" activiti:candidateGroups="${gruppoResponsabileProponente}">
+    <userTask id="validazione" name="VALIDAZIONE" activiti:candidateGroups="${gruppoResponsabileProponente}" activiti:category="firma">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessTelelavoro_v1}">
           <activiti:field name="faseEsecuzione">
@@ -244,7 +244,7 @@
         <omgdi:waypoint x="66.0" y="134.0"></omgdi:waypoint>
         <omgdi:waypoint x="110.0" y="134.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="74.0" y="247.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="50.0" x="74.0" y="247.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow28" id="BPMNEdge_flow28">
@@ -266,7 +266,7 @@
         <omgdi:waypoint x="165.0" y="81.0"></omgdi:waypoint>
         <omgdi:waypoint x="164.0" y="56.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="174.0" y="61.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="12.0" x="174.0" y="31.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow32" id="BPMNEdge_flow32">
