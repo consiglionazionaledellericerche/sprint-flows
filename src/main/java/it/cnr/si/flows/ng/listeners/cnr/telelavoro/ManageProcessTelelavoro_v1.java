@@ -131,7 +131,7 @@ public class ManageProcessTelelavoro_v1 implements ExecutionListener {
 		
 		// FIRMA
 		case "validazione-end": {
-			if (sceltaUtente != null && sceltaUtente.equals("Firma")) {
+			if (sceltaUtente != null && sceltaUtente.equals("Valida")) {
 				firmaDocumentoService.eseguiFirma(execution, Enum.PdfType.valueOf("domandaTeleLavoro").name(), null);
 			}
 		};break;
