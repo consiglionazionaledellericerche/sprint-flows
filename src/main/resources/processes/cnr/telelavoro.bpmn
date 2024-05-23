@@ -25,7 +25,7 @@
     </endEvent>
     <exclusiveGateway id="exclusivegateway6" name="Exclusive Gateway" default="flow22"></exclusiveGateway>
     <sequenceFlow id="flow16" sourceRef="exclusivegateway6" targetRef="finalizzazione">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Valida' }]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Firma' }]]></conditionExpression>
     </sequenceFlow>
     <userTask id="modifica" name="MODIFICA" activiti:assignee="${initiator}">
       <extensionElements>
