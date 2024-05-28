@@ -33,7 +33,7 @@ public class SetStato implements ActivitiEventListener {
 
 		String stato;
 		if (event.getType() == ActivitiEventType.PROCESS_COMPLETED) {
-			stato = (String) runtimeService.getVariable(event.getProcessInstanceId(), "statoFinale");
+			stato = String.valueOf( runtimeService.getVariable(event.getProcessInstanceId(), "statoFinale"));
 
 			if(stato != null)
 				utils.updateJsonSearchTerms(event.getExecutionId(), event.getProcessInstanceId(), stato);

@@ -119,10 +119,10 @@ public class FlowsCnrAdminTools {
     
     @RequestMapping(value = "/resendScheduledEmails", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
-    public ResponseEntity<Void> resendScheduledEmails() {
+    public ResponseEntity<Void> resendScheduledEmails(@RequestParam(name = "processDefinitionKey") String processDefinitionKey) {
 
-        log.info("Resending Scheduled Emails (manual trigger)");
-        flowsMailService.sendScheduledNotifications();
+        log.info("Resending Scheduled Emails (manual trigger): "+processDefinitionKey);
+        flowsMailService.sendScheduledNotifications(processDefinitionKey);
         return ResponseEntity.ok().build();
     }
 

@@ -25,7 +25,7 @@
                         utils.refactoringVariables(vm.activeTask);
 
                         vm.data.fase = el.historyTask.name;
-                        //recupero il gruppo/l'utente assegnatario del task
+                        //recupero il ruolo/l'utente assegnatario del task
                         el.historyIdentityLink.forEach(function (il) {
                             if (il.type === "candidate") {
                                 if (il.groupId !== null) {

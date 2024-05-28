@@ -19,6 +19,7 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.IdentityLinkType;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -223,13 +224,16 @@ public class FlowsMailService extends MailService {
         return subject;
     }
     
-    public void sendScheduledNotifications() {
+    public void sendScheduledNotifications(String processDefinitionKey) {
+        
+        if (Strings.isEmpty(processDefinitionKey))
+            throw new IllegalArgumentException("processDefinitionKey can not be empty");
         
         Map<String, List<ProcessInstance>> flussiPendentiPerUtente = new HashMap<>();
         
         List<ProcessInstance> activeInstances = runtimeService.createProcessInstanceQuery()
             .active()
-            .processDefinitionKey("smart-working-domanda")
+            .processDefinitionKey(processDefinitionKey)
             .list();
         
         for (ProcessInstance activeInstance: activeInstances) {
@@ -253,16 +257,17 @@ public class FlowsMailService extends MailService {
         }
         
         flussiPendentiPerUtente.forEach((user, instances) -> {
-            sendReminerToUserForInstances(user, instances);
+            sendReminerToUserForInstances(user, instances, processDefinitionKey);
         });
     }
     
-    private void sendReminerToUserForInstances(String user, List<ProcessInstance> instances) {
+    private void sendReminerToUserForInstances(String user, List<ProcessInstance> instances, String processDefinitionKey) {
         try {
             String mailUtente = aceService.getUtente(user).getEmail();
-            LOGGER.info("Invio della mail all'utente "+ user +" con indirizzo "+ mailUtente +" per i flussi "+ instances);
+            LOGGER.info("Invio della mail all'utente "+ user +" con indirizzo "+ mailUtente +" per i flussi di tipo "+processDefinitionKey+", istanze:"+ instances);
             
             Context ctx = new Context();
+            ctx.setVariable("processDefinitionKey", processDefinitionKey);
             ctx.setVariable("instances", instances);
             ctx.setVariable("username", user);
             // ${serverUrl}/#/details?processInstanceId=${processInstanceId}&amp;taskId=${nextTaskId}}
@@ -278,13 +283,13 @@ public class FlowsMailService extends MailService {
             
             String htmlContent = templateEngine.process(NOTIFICA_RICORRENTE, ctx);
 
-            String subject = "Notifica relativa ai flussi Smart Working";
+            String subject = "Notifica relativa ai flussi "+ processDefinitionKey;
             
             // Per le prove mando *tutte* le email agli indirizzi di prova (e non ai veri destinatari)
             mailConfig.getMailRecipients().stream()
                     .filter(s -> !s.isEmpty())
                     .forEach(s -> {
-                        LOGGER.debug("Invio mail di notifica ricorrente relativa ai flussi Smart Working a {} con contenuto {}",
+                        LOGGER.debug("Invio mail di notifica ricorrente relativa ai flussi "+processDefinitionKey+" a {} con contenuto {}",
                                 s,
                                 StringUtils.abbreviate(htmlContent, 30));
                         LOGGER.trace("Corpo email per intero: {}", htmlContent);
@@ -293,9 +298,9 @@ public class FlowsMailService extends MailService {
             
             if (mailConfig.isMailActivated()) {
                 // In produzione mando le email ai veri destinatari
-                Blacklist bl = blacklistService.findOneByEmailAndKey(mailUtente, "smart-working-domanda");
+                Blacklist bl = blacklistService.findOneByEmailAndKey(mailUtente, processDefinitionKey); // TODO non serve?
                 if (bl != null) {
-                    LOGGER.info("L'utente {} ha richiesto di non ricevere notifiche per il flusso smart-working-domanda", mailUtente);
+                    LOGGER.info("L'utente {} ha richiesto di non ricevere notifiche per il flusso "+processDefinitionKey, mailUtente);
                 } else {
                     if(mailUtente != null) {
                         sendEmail(mailUtente,
