@@ -44,12 +44,6 @@
         
         /* --- */
 
-        function getTasksCount() {
-            dataService.tasks.coolAvailableTasks().then(function(response) {
-                vm.coolTasks = response.data;
-            });
-        }
-
         function getAccount() {
             var principalPromise = Principal.identity()
             var profilePromise   = ProfileService.getProfileInfo();
