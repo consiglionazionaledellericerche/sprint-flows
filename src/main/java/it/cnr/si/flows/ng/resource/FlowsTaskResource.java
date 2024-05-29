@@ -1,23 +1,18 @@
 package it.cnr.si.flows.ng.resource;
 
-import com.codahale.metrics.annotation.Timed;
-import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
-import it.cnr.si.firmadigitale.firma.arss.stub.PdfSignApparence;
-import it.cnr.si.firmadigitale.firma.arss.stub.SignReturnV2;
-import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.exception.FileFormatException;
-import it.cnr.si.flows.ng.exception.FlowsPermissionException;
-import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
-import it.cnr.si.flows.ng.service.*;
-import it.cnr.si.flows.ng.utils.SecurityUtils;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.security.PermissionEvaluatorImpl;
-import it.cnr.si.service.DraftService;
-import it.cnr.si.service.RelationshipService;
-import it.cnr.si.service.SecurityService;
+import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
+import static it.cnr.si.flows.ng.utils.Utils.isEmpty;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import javax.inject.Inject;
 
 import org.activiti.engine.ActivitiObjectNotFoundException;
-import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.util.json.JSONArray;
@@ -29,29 +24,37 @@ import org.activiti.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.activiti.rest.service.api.runtime.task.TaskResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.inject.Inject;
-import java.io.IOException;
-import java.util.*;
+import com.codahale.metrics.annotation.Timed;
 
-import static it.cnr.si.flows.ng.service.FlowsFirmaService.ERRORI_ARUBA;
-import static it.cnr.si.flows.ng.service.FlowsFirmaService.NOME_FILE_FIRMA;
-import static it.cnr.si.flows.ng.utils.Enum.Azione.Firma;
-import static it.cnr.si.flows.ng.utils.Enum.Stato.Firmato;
-import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
-import static it.cnr.si.flows.ng.utils.Utils.isEmpty;
+import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
+import it.cnr.si.flows.ng.exception.FileFormatException;
+import it.cnr.si.flows.ng.exception.FlowsPermissionException;
+import it.cnr.si.flows.ng.exception.ProcessDefinitionAndTaskIdEmptyException;
+import it.cnr.si.flows.ng.service.FlowsFirmaMultiplaService;
+import it.cnr.si.flows.ng.service.FlowsTaskService;
+import it.cnr.si.flows.ng.utils.SecurityUtils;
+import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.security.PermissionEvaluatorImpl;
+import it.cnr.si.service.DraftService;
+import it.cnr.si.service.SecurityService;
 
 /**
  * @author mtrycz
@@ -69,10 +72,6 @@ public class FlowsTaskResource {
     private FlowsTaskService flowsTaskService;
     @Inject
     private RestResponseFactory restResponseFactory;
-
-    @Autowired(required = false) @Deprecated
-    private CoolFlowsBridgeService coolBridgeService;
-
     @Inject
     private RuntimeService runtimeService;
     @Autowired(required = false)
@@ -332,44 +331,6 @@ public class FlowsTaskResource {
         verificaPrecondizioniFirmaMultipla(taskIds);
 
         return flowsFirmaMultiplaService.signMany(username, password, otp, taskIds);
-    }
-
-
-    @Profile("cnr")
-    @Deprecated
-    @GetMapping(value = "/coolAvailableTasks", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured(AuthoritiesConstants.USER)
-    @Timed
-    public ResponseEntity<Map<String, Long>> getCoolAvailableTasks() {
-
-        String username = securityService.getCurrentUserLogin();
-        Map<String, Long> result = new HashMap<String, Long>() {{
-            put("acquisti", 0L);
-            put("flussoApprovvigionamentiIT", 0L);
-            put("flussoAttestati", 0L);
-            put("flussoDetermineAcquisti", 0L);
-            put("flussoMissioniOrdine", 0L);
-            put("flussoMissioniRevoca", 0L);
-            put("flussoMissioniRimborso", 0L);
-            put("flussoRelazioniCDA", 0L);
-        }};
-
-        long sprintTasks = taskService.createTaskQuery()
-                .taskAssignee(username)
-                .or()
-                .taskCandidateGroupIn(securityUtils.getCurrentUserAuthorities())
-                .count();
-        result.put("acquisti", sprintTasks);
-
-        List<Map> coolTasks = coolBridgeService.getCoolAvailableAndAssignedTasks(username);
-
-        coolTasks.forEach(t -> {
-            Map<String, String> entry = (Map<String, String>) t.get("entry");
-            String procDefId = entry.get("processDefinitionId").split(":")[0];
-            result.compute(procDefId, (k,v) -> v+1);
-        });
-
-        return ResponseEntity.ok(result);
     }
 
     // TODO magari un giorno avremo degli array, ma per adesso ce lo facciamo andare bene cosi'
