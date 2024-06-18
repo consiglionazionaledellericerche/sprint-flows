@@ -13,7 +13,6 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -57,6 +56,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.gson.Gson;
 
+import it.cnr.si.domain.ExternalMessage;
 import it.cnr.si.flows.ng.config.CachingConfig;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.AceBridgeService;
@@ -67,6 +67,7 @@ import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.ExternalMessageSender;
+import it.cnr.si.service.ExternalMessageService;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
 
@@ -85,7 +86,9 @@ public class FlowsCnrAdminTools {
     @Inject
     private AceBridgeService aceBridgeService;
     @Inject
-    private ExternalMessageSender extenalMessageSender;
+    private ExternalMessageSender externalMessageSender;
+    @Inject
+    private ExternalMessageService externalMessageService;
     @Inject
     private ProcessEngine processEngine;
     @Inject
@@ -109,11 +112,17 @@ public class FlowsCnrAdminTools {
     
     @RequestMapping(value = "/resendExternalMessages", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
-    public ResponseEntity<Void> resendExternalMessages() {
-
-        log.info("Resending External Messages (manual trigger)");
-        extenalMessageSender.sendMessages();
-        extenalMessageSender.sendErrorMessages();
+    public ResponseEntity<Void> resendExternalMessages(@RequestParam Optional<Long> externalMessageId) {
+        
+        if(externalMessageId.isPresent()) {
+            ExternalMessage externalMessage = externalMessageService.findOne(externalMessageId.get());
+            externalMessageSender.send(externalMessage);
+        } else {
+            log.info("Resending External Messages (manual trigger)");
+            externalMessageSender.sendMessages();
+            externalMessageSender.sendErrorMessages();
+        }
+        
         return ResponseEntity.ok().build();
     }
     
