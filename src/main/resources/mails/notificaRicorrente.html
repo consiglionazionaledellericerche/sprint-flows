@@ -5,12 +5,12 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     </head>
     <body>
-        <h1> Notifica relativa ai flussi Smart Working </h1>
+        <h1> Notifica relativa ai flussi <span th:text="${processDefinitionKey}">tipo.flusso</span> </h1>
         <hr>
         <p> 
             Gentile <span th:text="${username}">nome.cognome</span><br>
 
-            Si notifica che i seguenti flussi Smart Working sono ancora in corso:
+            Si notifica che i seguenti flussi <span th:text="${processDefinitionKey}">tipo.flusso</span> sono ancora in corso:
             <ul th:each="instance: ${instanceList}">
                 <li th:text="${instance}">instance</li>
             </ul>

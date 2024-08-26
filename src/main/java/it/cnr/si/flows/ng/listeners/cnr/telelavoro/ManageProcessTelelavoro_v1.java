@@ -48,7 +48,8 @@ public class ManageProcessTelelavoro_v1 implements ExecutionListener {
 	@Value("${cnr.siper-telelavoro.domandePath}")
 	private String pathTelelavoro;
 
-
+	@Inject
+	private FirmaDocumentoService firmaDocumentoService;
 	@Inject
 	private StartTelelavoroSetGroupsAndVisibility startTelelavoroSetGroupsAndVisibility;
 	@Inject
@@ -80,7 +81,13 @@ public class ManageProcessTelelavoro_v1 implements ExecutionListener {
 				put("idDomanda", idDomanda);
 				put("stato", statoTelelavoro.name().toString());
 				put("dataAzioneFlusso", dataAzioneFlusso);
+				put("matricola", execution.getVariable("matricola").toString());
 				put("processInstanceId", execution.getProcessInstanceId().toString());
+				if(execution.getVariable("notaValidazione") != null) {
+					put("notaValidazione", execution.getVariable("notaValidazione").toString());
+				} else {
+					put("notaValidazione", "");
+				}
 				if(execution.getVariable("commento") != null) {
 					put("commento", execution.getVariable("commento").toString());
 				} else {
@@ -100,6 +107,7 @@ public class ManageProcessTelelavoro_v1 implements ExecutionListener {
 		String processInstanceId =  execution.getProcessInstanceId();
 		String executionId =  execution.getId();
 		String stato =  execution.getCurrentActivityName();
+		String matricola = execution.getVariable("matricola").toString();
 		String sceltaUtente = "start";
 		if(execution.getVariable("sceltaUtente") != null) {
 			sceltaUtente =  (String) execution.getVariable("sceltaUtente");	
@@ -120,6 +128,16 @@ public class ManageProcessTelelavoro_v1 implements ExecutionListener {
 		case "validazione-start": {
 			startTelelavoroSetGroupsAndVisibility.configuraVariabiliStart(execution);			
 		};break;
+		
+		// FIRMA
+		case "validazione-end": {
+			if (sceltaUtente != null && sceltaUtente.equals("Firma")) {
+				LOGGER.info("-- domandaTeleLavoro: " + Enum.PdfType.valueOf("domandaTeleLavoro").name() + " con sceltaUtente: " + sceltaUtente);
+				firmaDocumentoService.eseguiFirma(execution, Enum.PdfType.valueOf("domandaTeleLavoro").name(), null);
+			}
+		};break;
+				
+
 		
 		// MODIFICA
 		case "modifica-start": {
@@ -156,7 +174,7 @@ public class ManageProcessTelelavoro_v1 implements ExecutionListener {
 			utils.updateJsonSearchTerms(executionId, processInstanceId, statoFinaleSiper);
 		};break;  
 		case "notificaMail-start": {
-			restToApplicazioneTelelavoro(execution, Enum.StatoTelelavoroEnum.MODIFICA);
+			//restToApplicazioneTelelavoro(execution, Enum.StatoTelelavoroEnum.MODIFICA);
 		};break;  
 		case "finalizzazione-start": {
 			restToApplicazioneTelelavoro(execution, Enum.StatoTelelavoroEnum.FINALIZZAZIONE);

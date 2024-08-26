@@ -25,7 +25,7 @@
     </endEvent>
     <exclusiveGateway id="exclusivegateway6" name="Exclusive Gateway" default="flow22"></exclusiveGateway>
     <sequenceFlow id="flow16" sourceRef="exclusivegateway6" targetRef="finalizzazione">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Valida' }]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Firma' }]]></conditionExpression>
     </sequenceFlow>
     <userTask id="modifica" name="MODIFICA" activiti:assignee="${initiator}">
       <extensionElements>
@@ -88,7 +88,7 @@
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Sospendi' }]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow26" name="NON APPROVATA" sourceRef="finalizzazione" targetRef="exclusivegateway8"></sequenceFlow>
-    <userTask id="validazione" name="VALIDAZIONE" activiti:candidateGroups="${gruppoResponsabileProponente}">
+    <userTask id="validazione" name="VALIDAZIONE" activiti:candidateGroups="${gruppoResponsabileProponente}" activiti:category="firma">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessTelelavoro_v1}">
           <activiti:field name="faseEsecuzione">
@@ -107,7 +107,7 @@
     <sequenceFlow id="flow29" sourceRef="exclusivegateway7" targetRef="validazione"></sequenceFlow>
     <boundaryEvent id="boundarytimer1" name="Timer" attachedToRef="validazione" cancelActivity="true">
       <timerEventDefinition>
-        <timeDuration>P15D</timeDuration>
+        <timeDuration>P20D</timeDuration>
       </timerEventDefinition>
     </boundaryEvent>
     <sequenceFlow id="flow30" name="T2" sourceRef="boundarytimer1" targetRef="endevent6"></sequenceFlow>
@@ -244,7 +244,7 @@
         <omgdi:waypoint x="66.0" y="134.0"></omgdi:waypoint>
         <omgdi:waypoint x="110.0" y="134.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="74.0" y="247.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="50.0" x="74.0" y="247.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow28" id="BPMNEdge_flow28">
@@ -266,7 +266,7 @@
         <omgdi:waypoint x="165.0" y="81.0"></omgdi:waypoint>
         <omgdi:waypoint x="164.0" y="56.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="146.0" y="-21.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="12.0" x="174.0" y="31.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow32" id="BPMNEdge_flow32">

@@ -59,11 +59,22 @@ public class EventScheduler {
     }
     
     @Scheduled(cron = "0 0 7 * * MON-FRI")
-    public void scheduleEmailNotifications() {
+    public void scheduleEmailNotificationsSW() {
         
         if (isMaster()) {
             log.info("Invio notifiche ricorrenti"+ ZonedDateTime.now());
-            flowsMailService.sendScheduledNotifications();
+            flowsMailService.sendScheduledNotifications("smart-working-domanda");
+        } else {
+            log.debug("Non sono il master, non invio le notifiche ricorrenti");
+        }
+    }
+    
+    @Scheduled(cron = "0 0 7 * * *")
+    public void scheduleEmailNotificationsTelelavoro() {
+        
+        if (isMaster()) {
+            log.info("Invio notifiche ricorrenti"+ ZonedDateTime.now());
+            flowsMailService.sendScheduledNotifications("telelavoro");
         } else {
             log.debug("Non sono il master, non invio le notifiche ricorrenti");
         }

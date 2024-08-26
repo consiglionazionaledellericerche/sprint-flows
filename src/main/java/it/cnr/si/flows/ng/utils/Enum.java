@@ -244,6 +244,7 @@ public class Enum {
         soccorsoIstruttorio,
         preavvisoRigettoDef10Giorni,
         valutazioneProgettoAccordiBilaterali,
+        domandaTeleLavoro,
         domandaAccordiBilaterali,
         valutazioneShortTermMobility,
         valutazioneLaboratoriCongiuntiArcheologici,

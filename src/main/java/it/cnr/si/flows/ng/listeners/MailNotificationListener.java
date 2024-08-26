@@ -118,37 +118,42 @@ public class MailNotificationListener  implements ActivitiEventListener {
 	 */
 	private void sendStandardNotification(ActivitiEvent event) {
 
-		String executionId = event.getExecutionId();
-		Map<String, Object> variables = runtimeService.getVariables(executionId);
-
-		//integro le variabili con quelle conservate nel name del processo
-		Map<String, Object> integratedVariables = integrateVariables(event, variables);
-		ActivitiEntityEvent taskEvent = (ActivitiEntityEvent) event;
-		TaskEntity task = (TaskEntity) taskEvent.getEntity();
-
-		Set<IdentityLink> candidates = ((TaskEntity)taskEvent.getEntity()).getCandidates();
-
-		candidates.forEach(c -> {
-			if (c.getGroupId() != null) {
-				String[] idStruttura = c.getGroupId().split("@", 2);
-				if (!aceBridgeService.getStrutturaById(Integer.parseInt(idStruttura[1])).getCdsuo().equals("000999")) {
-					Set<String> members = membershipService.getAllUsersInGroup(c.getGroupId());
-					LOGGER.info("Sto inviando mail standard a {} del gruppo {} per il task", members, c.getGroupId(), task.getName());
-					members.forEach(m -> {
-						mailService.sendFlowEventNotification(FlowsMailService.TASK_ASSEGNATO_AL_GRUPPO, integratedVariables, task.getName(), m, c.getGroupId(), false);
-					});
-				} else {
-					LOGGER.info("Non Sto inviando mail standard  del gruppo {} per il task perché non in GERARCHIA ACE",  c.getGroupId(), task.getName());
-				}
-			} 
-		});
-
-		String assignee = ((TaskEntity)taskEvent.getEntity()).getAssignee();
-
-		if (Utils.isNotEmpty(assignee)) {
-			LOGGER.info("Sto inviando mail standard all'assegnatario {} per il task",assignee, task.getName());
-			mailService.sendFlowEventNotification(FlowsMailService.TASK_IN_CARICO_ALL_UTENTE, integratedVariables, task.getName(), assignee, null, false);
-		}
+	    try {
+    		String executionId = event.getExecutionId();
+    		Map<String, Object> variables = runtimeService.getVariables(executionId);
+    
+    		//integro le variabili con quelle conservate nel name del processo
+    		Map<String, Object> integratedVariables = integrateVariables(event, variables);
+    		ActivitiEntityEvent taskEvent = (ActivitiEntityEvent) event;
+    		TaskEntity task = (TaskEntity) taskEvent.getEntity();
+    
+    		Set<IdentityLink> candidates = ((TaskEntity)taskEvent.getEntity()).getCandidates();
+    
+    		candidates.forEach(c -> {
+    			if (c.getGroupId() != null) {
+    				String[] idStruttura = c.getGroupId().split("@", 2);
+    				if (!"000999".equals(aceBridgeService.getStrutturaById(Integer.parseInt(idStruttura[1])).getCdsuo())) {
+    					Set<String> members = membershipService.getAllUsersInGroup(c.getGroupId());
+    					LOGGER.info("Sto inviando mail standard a {} del gruppo {} per il task", members, c.getGroupId(), task.getName());
+    					members.forEach(m -> {
+    						mailService.sendFlowEventNotification(FlowsMailService.TASK_ASSEGNATO_AL_GRUPPO, integratedVariables, task.getName(), m, c.getGroupId(), false);
+    					});
+    				} else {
+    					LOGGER.info("Non Sto inviando mail standard del gruppo {} per il task perché non in GERARCHIA ACE",  c.getGroupId(), task.getName());
+    				}
+    			} 
+    		});
+    
+    		String assignee = ((TaskEntity)taskEvent.getEntity()).getAssignee();
+    
+    		if (Utils.isNotEmpty(assignee)) {
+    			LOGGER.info("Sto inviando mail standard all'assegnatario {} per il task",assignee, task.getName());
+    			mailService.sendFlowEventNotification(FlowsMailService.TASK_IN_CARICO_ALL_UTENTE, integratedVariables, task.getName(), assignee, null, false);
+    		}
+	    } catch (Exception e) {
+	        LOGGER.error("Errore durante l'invio di una mail per l'evento "+ event.getExecutionId(), e);
+	        throw e;
+	    }
 	}
 
 	private void sendRuleNotification(ActivitiEvent event) {
