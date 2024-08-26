@@ -193,7 +193,7 @@ public class ExternalMessageSender {
     }
 
     //	@Async
-    /* friendly */ void send(ExternalMessage msg) {
+    public void send(ExternalMessage msg) {
         // TODO refactor : il metodo send dovrebbe sendare, non sendare-e-salvare
 
         log.debug("Tentativo della rest {}", msg);

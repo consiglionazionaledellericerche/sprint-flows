@@ -123,7 +123,10 @@ public class FlowsMailService extends MailService {
                 ctx.setVariable("profile", "showcase");
             }
 
-            LOGGER.info("Recupero dell'email per l'utente "+ username);
+            LOGGER.info("Recupero dell'email per l'utente "+ username +
+                    " del gruppo "+ groupName +
+                    " per il task "+ taskName +
+                    " del tipo "+ notificationType);
 
             String htmlContent = templateEngine.process(notificationType, ctx);
             String mailUtente = aceService.getUtente(username).getEmail();
@@ -169,7 +172,7 @@ public class FlowsMailService extends MailService {
             LOGGER.error("Errore nell'invio della mail", e);
             sendEmail("marcinireneusz.trycz@cnr.it",
                     Optional.empty(), Optional.empty(), 
-                    "Errore nell'inivio della mail a "+username+" gruppo "+groupName+" per il task"+taskName, 
+                    "Errore nell'inivio della mail a "+username+" gruppo "+groupName+" per il task "+taskName, 
                     templateEngine.process(notificationType, new Context()),
                     false, true);
         }
