@@ -25,7 +25,8 @@
             'ngSanitize',
             'dc.inputAddOn',
             'angularTrix',
-            'pdf'
+            'pdf',
+            'angular-chat-widget-rasa'
         ])
         .run(run);
 
