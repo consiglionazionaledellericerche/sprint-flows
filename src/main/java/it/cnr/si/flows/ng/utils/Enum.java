@@ -184,6 +184,10 @@ public class Enum {
     	NON_APPROVATA,
     	ANNULLATA;
     }
+    
+    public enum StatoTelelavoroRinunciaEnum {
+    	NOTIFICATA;
+    }
 
     public enum ProcessDefinitionEnum {
         acquisti("acquisti","acquisti"),
