@@ -22,6 +22,10 @@ public class Enum {
 
     }
 
+    public enum VariabiliPredefinite {
+        /** Boolean */
+        IMPEDISCI_STAMPA_SUMMARY;
+    }
 
     public enum Role {
         responsabile("responsabile"),

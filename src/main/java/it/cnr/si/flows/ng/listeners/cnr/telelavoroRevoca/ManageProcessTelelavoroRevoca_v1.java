@@ -2,7 +2,14 @@ package it.cnr.si.flows.ng.listeners.cnr.telelavoroRevoca;
 
 
 
-import it.cnr.si.flows.ng.utils.Utils;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.Expression;
@@ -11,30 +18,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-import it.cnr.si.flows.ng.service.FirmaDocumentoService;
-import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
-import it.cnr.si.flows.ng.utils.Enum;
-import it.cnr.si.flows.ng.utils.Enum.StatoTelelavoroEnum;
-import it.cnr.si.flows.ng.utils.Enum.TipologieeMissioniEnum;
 
+import it.cnr.si.domain.enumeration.ExternalApplication;
+import it.cnr.si.domain.enumeration.ExternalMessageVerb;
+import it.cnr.si.flows.ng.service.FirmaDocumentoService;
+import it.cnr.si.flows.ng.utils.Enum;
+import it.cnr.si.flows.ng.utils.Enum.*;
+import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.ExternalMessageService;
 import it.cnr.si.service.SecurityService;
-import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
-import it.cnr.si.domain.enumeration.ExternalApplication;
-import it.cnr.si.domain.enumeration.ExternalMessageVerb;
-
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.statoFinaleDomanda;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.inject.Inject;
 
 @Component
 @Profile("cnr")
@@ -91,6 +84,7 @@ public class ManageProcessTelelavoroRevoca_v1 implements ExecutionListener {
 				} else {
 					put("commento", "");
 				}
+				put(VariabiliPredefinite.IMPEDISCI_STAMPA_SUMMARY.name(), Boolean.TRUE);
 			}	
 		};
 
