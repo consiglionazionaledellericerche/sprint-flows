@@ -84,7 +84,6 @@ public class ManageProcessTelelavoroRevoca_v1 implements ExecutionListener {
 				} else {
 					put("commento", "");
 				}
-				put(VariabiliPredefinite.IMPEDISCI_STAMPA_SUMMARY.name(), Boolean.TRUE);
 			}	
 		};
 
@@ -95,6 +94,9 @@ public class ManageProcessTelelavoroRevoca_v1 implements ExecutionListener {
 
 	@Override
 	public void notify(DelegateExecution execution) throws Exception {
+	    
+	    execution.setVariable(VariabiliPredefinite.IMPEDISCI_STAMPA_SUMMARY.name(), Boolean.TRUE);
+
 		String currentUser = securityService.getCurrentUserLogin();
 		String processInstanceId =  execution.getProcessInstanceId();
 		String executionId =  execution.getId();
