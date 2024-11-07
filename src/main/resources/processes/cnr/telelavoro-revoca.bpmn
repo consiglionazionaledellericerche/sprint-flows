@@ -14,20 +14,31 @@
       </activiti:executionListener>
     </extensionElements>
     <startEvent id="startevent1" name="Start"></startEvent>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="notifica-revoca"></sequenceFlow>
+    <scriptTask id="notifica-revoca" name="NOTIFICA REVOCA" scriptFormat="javascript" activiti:autoStoreVariables="false">
+      <script>print("invio notifica flusso telelavoro-revoca ");</script>
+    </scriptTask>
     <endEvent id="endevent1" name="End"></endEvent>
-    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="notifica-revoca" targetRef="endevent1"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_telelavoro-revoca">
     <bpmndi:BPMNPlane bpmnElement="telelavoro-revoca" id="BPMNPlane_telelavoro-revoca">
       <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
         <omgdc:Bounds height="35.0" width="35.0" x="10.0" y="40.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="notifica-revoca" id="BPMNShape_notifica-revoca">
+        <omgdc:Bounds height="86.0" width="181.0" x="100.0" y="15.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
-        <omgdc:Bounds height="35.0" width="35.0" x="230.0" y="30.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="310.0" y="40.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
         <omgdi:waypoint x="45.0" y="57.0"></omgdi:waypoint>
-        <omgdi:waypoint x="230.0" y="47.0"></omgdi:waypoint>
+        <omgdi:waypoint x="100.0" y="58.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="281.0" y="58.0"></omgdi:waypoint>
+        <omgdi:waypoint x="310.0" y="57.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
