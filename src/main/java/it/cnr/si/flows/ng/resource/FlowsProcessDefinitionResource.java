@@ -14,6 +14,8 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti.rest.service.api.RestResponseFactory;
 import org.activiti.rest.service.api.repository.ProcessDefinitionResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.codahale.metrics.annotation.Timed;
 
 import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.security.PermissionEvaluatorImpl;
 import it.cnr.si.service.SecurityService;
 
 @RestController
@@ -40,6 +43,8 @@ public class FlowsProcessDefinitionResource {
     private RepositoryService repositoryService;
     @Inject
     private SecurityService securityService;
+
+    private final Logger log = LoggerFactory.getLogger(FlowsProcessDefinitionResource.class);
 
     @Autowired
     private RestResponseFactory restResponseFactory;
@@ -122,6 +127,8 @@ public class FlowsProcessDefinitionResource {
 
 
     public boolean canStartProcesByDefinitionKey(String definitionKey) {
+        
+        log.debug("Verifico se puo' avviare il flusso "+ definitionKey);
     	
         if (definitionKey.equals("covid19"))
             return true;
