@@ -62,8 +62,9 @@
                ng-click="claimTask(task.id, false)">
                 <span class="glyphicon glyphicon-hand-down" aria-hidden="true"></span> Restituisci al ruolo
             </a>
+            <!-- TODO: Rimuovere il check tipo missione dopo febbraio 2025 -->
             <a class="btn btn-default" ng-class="{'btn-xs': !advanced}"
-               ng-if="task.category == 'firma' && !inCart(task.id)"
+               ng-if="task.category == 'firma' && !inCart(task.id) && task.variabili.tipologiaMissione !== 'rimborso'"
                ng-click="addToCart(task)">
                 <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Aggiungi al Carrello Firma
             </a>
