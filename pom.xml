@@ -10,7 +10,11 @@
 
     <groupId>it.cnr.si.flows</groupId>
     <artifactId>sprint-flows</artifactId>
+<<<<<<< HEAD
     <version>1.0.39-250606</version>
+=======
+    <version>1.0.38-250605-2</version>
+>>>>>>> branch 'prod' of git@git.si.cnr.it:documentale/sprint-flows.git
     <packaging>war</packaging>
 
     <name>sprint-flows</name>
