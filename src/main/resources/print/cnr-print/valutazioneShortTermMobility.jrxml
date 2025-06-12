@@ -4,9 +4,9 @@
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Nuovo Data Adapter "/>
 	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="355"/>
 	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="635"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Dati STM valutazione"/>
 	<style name="SubTitle" forecolor="#736343" fontName="Arial" fontSize="18"/>
 	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
 	<style name="Detail" fontName="Arial" fontSize="12"/>
@@ -499,7 +499,7 @@
 		</field>
 		<field name="nazioneResidenzaFruitore" class="java.lang.String">
 			<property name="net.sf.jasperreports.json.field.expression" value="nazioneResidenzaFruitore"/>
-			<fieldDescription><![CDATA[nazioneResidenzaFruitore]]></fieldDescription>
+			<fieldDescription><![CDATA[nazioneIstitutoOspitanteFruitore]]></fieldDescription>
 		</field>
 		<field name="dichiarazioneIstitutoOspitante" class="java.lang.String">
 			<property name="net.sf.jasperreports.json.field.expression" value="dichiarazioneIstitutoOspitante"/>
@@ -601,10 +601,6 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="initiator"/>
 		<fieldDescription><![CDATA[initiator]]></fieldDescription>
 	</field>
-	<field name="notaDomandaAccettata" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="notaDomandaAccettata"/>
-		<fieldDescription><![CDATA[notaDomandaAccettata]]></fieldDescription>
-	</field>
 	<field name="posizioneFruitore" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="posizioneFruitore"/>
 		<fieldDescription><![CDATA[posizioneFruitore]]></fieldDescription>
@@ -613,9 +609,17 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="nomeCognomeFruitore"/>
 		<fieldDescription><![CDATA[nomeCognomeFruitore]]></fieldDescription>
 	</field>
+	<field name="commentoValutazione" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="commentoValutazione"/>
+		<fieldDescription><![CDATA[commentoValutazione]]></fieldDescription>
+	</field>
 	<field name="nomeCognomeProponente" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="nomeCognomeProponente"/>
 		<fieldDescription><![CDATA[nomeCognomeProponente]]></fieldDescription>
+	</field>
+	<field name="statoFinale" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="statoFinale"/>
+		<fieldDescription><![CDATA[statoFinale]]></fieldDescription>
 	</field>
 	<field name="notaDomandaRespinta" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="notaDomandaRespinta"/>
@@ -633,10 +637,6 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="pathFascicoloDocumenti"/>
 		<fieldDescription><![CDATA[pathFascicoloDocumenti]]></fieldDescription>
 	</field>
-	<field name="curriculumProponente" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="curriculumProponente"/>
-		<fieldDescription><![CDATA[curriculumProponente]]></fieldDescription>
-	</field>
 	<field name="codiceFiscaleFruitore" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="codiceFiscaleFruitore"/>
 		<fieldDescription><![CDATA[codiceFiscaleFruitore]]></fieldDescription>
@@ -653,7 +653,7 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="dataPartenzaFruitore"/>
 		<fieldDescription><![CDATA[dataPartenzaFruitore]]></fieldDescription>
 	</field>
-	<field name="idBando" class="java.lang.String">
+	<field name="idBando" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="idBando"/>
 		<fieldDescription><![CDATA[idBando]]></fieldDescription>
 	</field>
@@ -669,7 +669,7 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="processDefinitionId"/>
 		<fieldDescription><![CDATA[processDefinitionId]]></fieldDescription>
 	</field>
-	<field name="processInstanceId" class="java.lang.String">
+	<field name="processInstanceId" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="processInstanceId"/>
 		<fieldDescription><![CDATA[processInstanceId]]></fieldDescription>
 	</field>
@@ -681,19 +681,15 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="tutteDomandeAccettateFlag"/>
 		<fieldDescription><![CDATA[tutteDomandeAccettateFlag]]></fieldDescription>
 	</field>
-	<field name="telefonoProponente" class="java.lang.String">
+	<field name="telefonoProponente" class="java.lang.Long">
 		<property name="net.sf.jasperreports.json.field.expression" value="telefonoProponente"/>
 		<fieldDescription><![CDATA[telefonoProponente]]></fieldDescription>
 	</field>
-	<field name="punteggio_programmaDiRicerca" class="java.lang.String">
+	<field name="punteggio_programmaDiRicerca" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="punteggio_programmaDiRicerca"/>
 		<fieldDescription><![CDATA[punteggio_programmaDiRicerca]]></fieldDescription>
 	</field>
-	<field name="valutazioneShortTermMobility" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="valutazioneShortTermMobility"/>
-		<fieldDescription><![CDATA[valutazioneShortTermMobility]]></fieldDescription>
-	</field>
-	<field name="matricolaProponente" class="java.lang.String">
+	<field name="matricolaProponente" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="matricolaProponente"/>
 		<fieldDescription><![CDATA[matricolaProponente]]></fieldDescription>
 	</field>
@@ -713,7 +709,7 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="nomecognomeReferenteIstitutoOspitanteFruitore"/>
 		<fieldDescription><![CDATA[nomecognomeReferenteIstitutoOspitanteFruitore]]></fieldDescription>
 	</field>
-	<field name="codiceTerzoFruitore" class="java.lang.String">
+	<field name="codiceTerzoFruitore" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="codiceTerzoFruitore"/>
 		<fieldDescription><![CDATA[codiceTerzoFruitore]]></fieldDescription>
 	</field>
@@ -729,7 +725,7 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="dipartimento"/>
 		<fieldDescription><![CDATA[dipartimento]]></fieldDescription>
 	</field>
-	<field name="telefonoFruitore" class="java.lang.String">
+	<field name="telefonoFruitore" class="java.lang.Long">
 		<property name="net.sf.jasperreports.json.field.expression" value="telefonoFruitore"/>
 		<fieldDescription><![CDATA[telefonoFruitore]]></fieldDescription>
 	</field>
@@ -737,11 +733,7 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="statoFinaleDomanda"/>
 		<fieldDescription><![CDATA[statoFinaleDomanda]]></fieldDescription>
 	</field>
-	<field name="modelloTrattamentoDatiPersonaliProponente" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="modelloTrattamentoDatiPersonaliProponente"/>
-		<fieldDescription><![CDATA[modelloTrattamentoDatiPersonaliProponente]]></fieldDescription>
-	</field>
-	<field name="numeroNotificheTimer2" class="java.lang.String">
+	<field name="numeroNotificheTimer2" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="numeroNotificheTimer2"/>
 		<fieldDescription><![CDATA[numeroNotificheTimer2]]></fieldDescription>
 	</field>
@@ -777,11 +769,11 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="codiceFiscaleProponente"/>
 		<fieldDescription><![CDATA[codiceFiscaleProponente]]></fieldDescription>
 	</field>
-	<field name="linkToOtherWorkflows" class="java.lang.String">
+	<field name="linkToOtherWorkflows" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="linkToOtherWorkflows"/>
 		<fieldDescription><![CDATA[linkToOtherWorkflows]]></fieldDescription>
 	</field>
-	<field name="dipartimentoId" class="java.lang.String">
+	<field name="dipartimentoId" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="dipartimentoId"/>
 		<fieldDescription><![CDATA[dipartimentoId]]></fieldDescription>
 	</field>
@@ -789,7 +781,7 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="applicazioneScrivaniaDigitale"/>
 		<fieldDescription><![CDATA[applicazioneScrivaniaDigitale]]></fieldDescription>
 	</field>
-	<field name="punteggio_curriculum" class="java.lang.String">
+	<field name="punteggio_curriculum" class="java.math.BigDecimal">
 		<property name="net.sf.jasperreports.json.field.expression" value="punteggio_curriculum"/>
 		<fieldDescription><![CDATA[punteggio_curriculum]]></fieldDescription>
 	</field>
@@ -797,53 +789,45 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="istitutoProvenienzaFruitore"/>
 		<fieldDescription><![CDATA[istitutoProvenienzaFruitore]]></fieldDescription>
 	</field>
-	<field name="dichiarazioneFinanziamento" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="dichiarazioneFinanziamento"/>
-		<fieldDescription><![CDATA[dichiarazioneFinanziamento]]></fieldDescription>
-	</field>
 	<field name="cittaIstitutoOspitanteFruitore" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="cittaIstitutoOspitanteFruitore"/>
 		<fieldDescription><![CDATA[cittaIstitutoOspitanteFruitore]]></fieldDescription>
 	</field>
-	<field name="punteggio_totale" class="java.lang.String">
+	<field name="punteggio_totale" class="java.math.BigDecimal">
 		<property name="net.sf.jasperreports.json.field.expression" value="punteggio_totale"/>
 		<fieldDescription><![CDATA[punteggio_totale]]></fieldDescription>
 	</field>
-	<field name="punteggio_patnerIstituzioneStraniera" class="java.lang.String">
+	<field name="punteggio_patnerIstituzioneStraniera" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="punteggio_patnerIstituzioneStraniera"/>
 		<fieldDescription><![CDATA[punteggio_patnerIstituzioneStraniera]]></fieldDescription>
 	</field>
-	<field name="idDomanda" class="java.lang.String">
+	<field name="idDomanda" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="idDomanda"/>
 		<fieldDescription><![CDATA[idDomanda]]></fieldDescription>
 	</field>
-	<field name="capIstitutoProvenienzaFruitore" class="java.lang.String">
+	<field name="capIstitutoProvenienzaFruitore" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="capIstitutoProvenienzaFruitore"/>
 		<fieldDescription><![CDATA[capIstitutoProvenienzaFruitore]]></fieldDescription>
+	</field>
+	<field name="idStruttura" class="java.lang.Integer">
+		<property name="net.sf.jasperreports.json.field.expression" value="idStruttura"/>
+		<fieldDescription><![CDATA[idStruttura]]></fieldDescription>
 	</field>
 	<field name="telefonoIstitutoOspitanteFruitore" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="telefonoIstitutoOspitanteFruitore"/>
 		<fieldDescription><![CDATA[telefonoIstitutoOspitanteFruitore]]></fieldDescription>
 	</field>
-	<field name="programmaRicercadasvolgere" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="programmaRicercadasvolgere"/>
-		<fieldDescription><![CDATA[programmaRicercadasvolgere]]></fieldDescription>
-	</field>
 	<field name="key" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="key"/>
 		<fieldDescription><![CDATA[key]]></fieldDescription>
-	</field>
-	<field name="curriculumFruitore" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="curriculumFruitore"/>
-		<fieldDescription><![CDATA[curriculumFruitore]]></fieldDescription>
 	</field>
 	<field name="nazioneIstitutoOspitanteFruitore" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="nazioneIstitutoOspitanteFruitore"/>
 		<fieldDescription><![CDATA[nazioneIstitutoOspitanteFruitore]]></fieldDescription>
 	</field>
-	<field name="dichiarazioneIstitutoOspitante" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="dichiarazioneIstitutoOspitante"/>
-		<fieldDescription><![CDATA[dichiarazioneIstitutoOspitante]]></fieldDescription>
+	<field name="fase" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="fase"/>
+		<fieldDescription><![CDATA[fase]]></fieldDescription>
 	</field>
 	<field name="applicazioneSTM" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="applicazioneSTM"/>
@@ -857,19 +841,19 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="gruppoValidatoriShortTermMobility"/>
 		<fieldDescription><![CDATA[gruppoValidatoriShortTermMobility]]></fieldDescription>
 	</field>
-	<field name="cdsuoProponente" class="java.lang.String">
+	<field name="cdsuoProponente" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="cdsuoProponente"/>
 		<fieldDescription><![CDATA[cdsuoProponente]]></fieldDescription>
 	</field>
-	<field name="matricolaFruitore" class="java.lang.String">
+	<field name="matricolaFruitore" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="matricolaFruitore"/>
 		<fieldDescription><![CDATA[matricolaFruitore]]></fieldDescription>
 	</field>
-	<field name="codiceTerzoProponente" class="java.lang.String">
+	<field name="codiceTerzoProponente" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="codiceTerzoProponente"/>
 		<fieldDescription><![CDATA[codiceTerzoProponente]]></fieldDescription>
 	</field>
-	<field name="cdsuoAppartenenzaUtente" class="java.lang.String">
+	<field name="cdsuoAppartenenzaUtente" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="cdsuoAppartenenzaUtente"/>
 		<fieldDescription><![CDATA[cdsuoAppartenenzaUtente]]></fieldDescription>
 	</field>
@@ -905,24 +889,13 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="commentoProgrammaDiRicerca"/>
 		<fieldDescription><![CDATA[commentoProgrammaDiRicerca]]></fieldDescription>
 	</field>
-	<field name="Summary_Short Term Mobility Domande-2020-96.pdf" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="Summary_Short Term Mobility Domande-2020-96.pdf"/>
-		<fieldDescription><![CDATA[Summary_Short Term Mobility Domande-2020-96.pdf]]></fieldDescription>
-	</field>
 	<field name="profiloProponente" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="profiloProponente"/>
 		<fieldDescription><![CDATA[profiloProponente]]></fieldDescription>
 	</field>
-	<field name="taskId" class="java.lang.String">
+	<field name="taskId" class="java.lang.Integer">
 		<property name="net.sf.jasperreports.json.field.expression" value="taskId"/>
 		<fieldDescription><![CDATA[taskId]]></fieldDescription>
-	</field>
-	<field name="commentoValutazione" class="java.lang.String">
-		<property name="net.sf.jasperreports.json.field.expression" value="commentoValutazione"/>
-		<fieldDescription><![CDATA[commentoValutazione]]></fieldDescription>
-	</field>
-	<field name="nazioneResidenzaFruitore" class="java.lang.String">
-		<fieldDescription><![CDATA[nazioneResidenzaFruitore]]></fieldDescription>
 	</field>
 	<group name="Group2" isStartNewColumn="true" footerPosition="StackAtBottom">
 		<groupExpression><![CDATA[(int)($V{REPORT_COUNT}/5)]]></groupExpression>
@@ -976,12 +949,12 @@
 				</textField>
 				<textField textAdjust="ScaleFont" isBlankWhenNull="false">
 					<reportElement x="0" y="40" width="549" height="23" isRemoveLineWhenBlank="true" printWhenGroupChanges="Group2" uuid="410d787a-4aca-46a3-b201-85c7d3f714b7">
-						<printWhenExpression><![CDATA[$F{nazioneResidenzaFruitore}!=null]]></printWhenExpression>
+						<printWhenExpression><![CDATA[$F{nazioneIstitutoOspitanteFruitore}!=null]]></printWhenExpression>
 					</reportElement>
 					<textElement>
 						<font size="14" isBold="true"/>
 					</textElement>
-					<textFieldExpression><![CDATA["Paese di destinazione/provenienza: " + $F{nazioneResidenzaFruitore}]]></textFieldExpression>
+					<textFieldExpression><![CDATA["Paese di destinazione/provenienza: " + $F{nazioneIstitutoOspitanteFruitore}]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupHeader>
@@ -1057,7 +1030,16 @@
 				<textFieldExpression><![CDATA["3 - Programma di ricerca\r\nPunteggio (attribuire un punteggio da 1 a 7): "  + $F{punteggio_programmaDiRicerca}  + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commentoProgrammaDiRicerca} +"\r\n\r\n</style>"]]></textFieldExpression>
 			</textField>
 		</band>
-		<band height="28" splitType="Stretch"/>
+		<band height="28" splitType="Stretch">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="1" width="555" height="17" uuid="87705bc5-ddb4-44f7-b42f-39a97b90316d"/>
+				<textElement textAlignment="Justified" markup="styled">
+					<font fontName="SansSerif" size="11" isBold="true" isItalic="false"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Commento Valutazione\r\n  " + "<style isBold=\"false\">" + $F{commentoValutazione} +"\r\n\r\n</style>"]]></textFieldExpression>
+			</textField>
+		</band>
 	</detail>
 	<columnFooter>
 		<band splitType="Stretch"/>
