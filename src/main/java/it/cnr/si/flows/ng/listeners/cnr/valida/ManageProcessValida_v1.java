@@ -47,7 +47,7 @@ public class ManageProcessValida_v1 implements ExecutionListener {
 	@Inject
 	private FlowsProcessInstanceService flowsProcessInstanceService;
 	@Inject
-	private StartValidaSetGroupsAndVisibility startFirmaDocumentiSetGroupsAndVisibility;
+	private StartValidaSetGroupsAndVisibility startValidaSetGroupsAndVisibility;
 	@Inject
 	private ExternalMessageService externalMessageService;	
 	@Inject
@@ -56,8 +56,8 @@ public class ManageProcessValida_v1 implements ExecutionListener {
 	private Utils utils;
 	@Inject
 	private FlowsAttachmentService flowsAttachmentService;	
-    @Inject
-    private SecurityService securityService;
+	@Inject
+	private SecurityService securityService;
 
 	private Expression faseEsecuzione;
 
@@ -80,73 +80,37 @@ public class ManageProcessValida_v1 implements ExecutionListener {
 		LOGGER.info("-- azioneScelta: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 
 		switch(faseEsecuzioneValue){  
-		// START
-		case "process-start": {
-			startValidaSetGroupsAndVisibility.configuraVariabiliStart(execution);
-		};break;    
+			// START
+			case "process-start": {
+				startValidaSetGroupsAndVisibility.configuraVariabiliStart(execution);
+			};break;    
 
-		case "firma-start": {
-			//utils.updateJsonSearchTerms(executionId, processInstanceId, "FIRMA");
-		};break; 
+			case "valida-start": {
+				//utils.updateJsonSearchTerms(executionId, processInstanceId, "FIRMA");
+			};break; 
 
-		case "firma-end": {
-			// FIRMA MULTIPLA TUTTI I DOCUMENTI DI UN CERTO TIPO
-			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
-				List<String> nomiVariabiliFile = new ArrayList<String>();
-				List<FlowsAttachment> attachments = flowsAttachmentService.getAttachmentArray(processInstanceId, "documentoDaFirmare");
-				if (attachments.size() == 0)
-					throw new TaskFailedException("Attachment non opzionali mancanti: " + "allegati");               
-				attachments.forEach(att -> nomiVariabiliFile.add(att.getName()));
-				firmaDocumentoService.eseguiFirmaMultipla(execution, nomiVariabiliFile, null);
-			}
-		};break; 
+			case "valida-end": {
+				// FIRMA MULTIPLA TUTTI I DOCUMENTI DI UN CERTO TIPO
+			};break; 
 
+			case "endevent-respinta-start": {
+				execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoDomandeValidaEnum.RESPINTA);
+				execution.setVariable("statoFinale", Enum.StatoDomandeValidaEnum.RESPINTA.toString());
+				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeValidaEnum.RESPINTA.toString());
+			};break;    	
 
+			case "endevent-validata-start": {
+				execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoDomandeValidaEnum.VALIDATA);
+				execution.setVariable("statoFinale", Enum.StatoDomandeValidaEnum.VALIDATA.toString());
+				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeValidaEnum.VALIDATA.toString());
+			};break;  
 
-		case "controfirma-start": {
-			//utils.updateJsonSearchTerms(executionId, processInstanceId, "FIRMA");
-		};break; 
-
-		case "controfirma-end": {
-			// FIRMA MULTIPLA TUTTI I DOCUMENTI DI UN CERTO TIPO
-			if(sceltaUtente != null && sceltaUtente.equals("Firma")) {
-				List<String> nomiVariabiliFile = new ArrayList<String>();
-				List<FlowsAttachment> attachments = flowsAttachmentService.getAttachmentArray(processInstanceId, "documentoDaFirmare");
-				if (attachments.size() == 0)
-					throw new TaskFailedException("Attachment non opzionali mancanti: " + "allegati");               
-				attachments.forEach(att -> nomiVariabiliFile.add(att.getName()));
-				firmaDocumentoService.eseguiFirmaMultipla(execution, nomiVariabiliFile, null);
-			}
-		};break; 
-
-		case "modifica-end": {
-			//Check se il gruppo VALIDATORI ha membri
-			if(sceltaUtente != null && !sceltaUtente.equals("Annulla")) {
-				startFirmaDocumentiSetGroupsAndVisibility.configuraVariabiliStart(execution);
-			}
-		};break;
-
-
-
-		case "endevent-annullato-start": {
-			execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoFirmaDocumentiEnum.ANNULLATO);
-			execution.setVariable("statoFinale", Enum.StatoFirmaDocumentiEnum.ANNULLATO.toString());
-			utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoFirmaDocumentiEnum.ANNULLATO.toString());
-		};break;    	
-
-
-		case "endevent-firmato-start": {
-			execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoFirmaDocumentiEnum.FIRMATO);
-			execution.setVariable("statoFinale", Enum.StatoFirmaDocumentiEnum.FIRMATO.toString());
-			utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoFirmaDocumentiEnum.FIRMATO.toString());
-		};break;  
-
-		case "process-end": {
-			//sbloccaDomandeBando(execution);
-		};break; 
-		// DEFAULT  
-		default: {
-		};break;
+			case "process-end": {
+				//sbloccaDomandeBando(execution);
+			};break; 
+			// DEFAULT  
+			default: {
+			};break;
 
 		} 
 	}

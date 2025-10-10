@@ -189,6 +189,13 @@ public class Enum {
     	ANNULLATA;
     }
     
+
+    public enum StatoDomandeValidaEnum {
+        VALIDATA,
+        RESPINTA,
+        APPROVATA;
+    }
+    
     public enum StatoTelelavoroRinunciaEnum {
     	NOTIFICATA;
     }

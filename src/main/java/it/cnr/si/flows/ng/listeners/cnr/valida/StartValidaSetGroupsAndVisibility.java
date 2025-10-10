@@ -42,65 +42,20 @@ public class StartValidaSetGroupsAndVisibility {
 	@Inject
 	private AceBridgeService aceBridgeService;	
 
-
 	public void configuraVariabiliStart(DelegateExecution execution)  throws IOException, ParseException  {
 		String initiator = (String) execution.getVariable(Enum.VariableEnum.initiator.name());
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
-		List<String> groups = membershipService.getAllRolesForUser(initiator).stream()
-				.filter(g -> g.startsWith("staffFirmaDocumenti@"))
-				.collect(Collectors.toList());
-		if (groups.isEmpty())
-			throw new BpmnError("403", "L'utente non e' abilitato ad avviare questo flusso");
-		else {
-			String struttura = execution.getVariable(idStruttura.name()).toString();
+		String struttura = execution.getVariable(idStruttura.name()).toString();
+		String gruppoValidatori = "{gruppoValidatori@"+ struttura;
 
-			String gruppoValidatori = "validatoreFirmaDocumenti@"+ struttura;
-			String gruppoFirmatari = "firmatarioFirmaDocumenti@"+ struttura;
-			String gruppoRichiedente = "staffFirmaDocumenti@"+ struttura;
-			String gruppoProtocollo = "protocolloFirmaDocumenti@"+ struttura;
-			if (execution.getVariable("tipologiaDocumento").toString().equals("Privato")){
-				groups = membershipService.getAllRolesForUser(initiator).stream()
-						.filter(g -> g.startsWith("staffFirmaDocumentiPrivati@"))
-						.collect(Collectors.toList());
-				if (groups.isEmpty()) {
-					throw new BpmnError("403", "L'utente non e' abilitato ad avviare questo flusso");				
-				} 
-				else {
-					gruppoRichiedente = "staffFirmaDocumentiPrivati@"+ struttura;
-					gruppoProtocollo = "protocolloFirmaDocumentiPrivati@"+ struttura;
-				}
-			} 
+		LOGGER.debug("Imposto il gruppo del flusso {}", gruppoValidatori);
 
-			LOGGER.debug("Imposto i gruppi del flusso {}, {}, {}, {}", gruppoValidatori, gruppoFirmatari, gruppoRichiedente, gruppoProtocollo);
+		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValidatori, PROCESS_VISUALIZER);
 
-			//Check se il gruppo SFD ha membri
-			List<SimpleUtenteWebDto> members = aceService.getUtentiInRuoloEo("validatoreFirmaDocumenti", Integer.parseInt(struttura));
-			if (members.isEmpty()) {
-				execution.setVariable("organizzazioneStruttura", "Semplice");
-			} else {
-				execution.setVariable("organizzazioneStruttura", "Complessa");
-			}
-			execution.setVariable("nomeStruttura", aceBridgeService.getNomeStruturaById(Integer.parseInt(struttura)));
-
-			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValidatori, PROCESS_VISUALIZER);
-			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoFirmatari, PROCESS_VISUALIZER);
-			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoRichiedente, PROCESS_VISUALIZER);
-			runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoProtocollo, PROCESS_VISUALIZER);
-
-			SimpleEntitaOrganizzativaWebDto strutturaAcquisto = aceService.entitaOrganizzativaById(Integer.parseInt(struttura));
-			execution.setVariable("cdsuo", strutturaAcquisto.getCdsuo());
-			execution.setVariable("idnsip", strutturaAcquisto.getIdnsip());
-			execution.setVariable("denominazione", strutturaAcquisto.getDenominazione());
-			execution.setVariable("gruppoValidatori", gruppoValidatori);
-			execution.setVariable("gruppoFirmatari", gruppoFirmatari);
-			execution.setVariable("gruppoRichiedente", gruppoRichiedente);
-			execution.setVariable("gruppoProtocollo", gruppoProtocollo);
-			execution.setVariable("userNameRichiedente", initiator);
-			
-			//VARIABILI PRESE DA FORM INPUT PER CONTROFIRMATARIO
-			// controFirmatario (USERNAME)
-			// controfirmaFlag (SI/NO)
-
-		}
+		SimpleEntitaOrganizzativaWebDto strutturaAcquisto = aceService.entitaOrganizzativaById(Integer.parseInt(struttura));
+		execution.setVariable("cdsuo", strutturaAcquisto.getCdsuo());
+		execution.setVariable("idnsip", strutturaAcquisto.getIdnsip());
+		execution.setVariable("denominazione", strutturaAcquisto.getDenominazione());
+		execution.setVariable("gruppoValidatori", gruppoValidatori);
 	}
 }
