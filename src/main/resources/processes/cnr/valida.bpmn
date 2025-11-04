@@ -2,7 +2,7 @@
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
   <process id="valida" name="VALIDA" isExecutable="true">
     <extensionElements>
-      <activiti:executionListener event="start" delegateExpression="${manageProcessAttestati_v1}">
+      <activiti:executionListener event="start" delegateExpression="${manageProcessValida_v1}">
         <activiti:field name="faseEsecuzione">
           <activiti:string><![CDATA[process-start]]></activiti:string>
         </activiti:field>
@@ -39,10 +39,7 @@
       </extensionElements>
     </endEvent>
     <sequenceFlow id="flow2" sourceRef="validazione" targetRef="exclusivegateway1"></sequenceFlow>
-    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway" default="flow4"></exclusiveGateway>
-    <sequenceFlow id="flow3" name="valida" sourceRef="exclusivegateway1" targetRef="validato">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${(sceltaUtente == 'Valida'}]]></conditionExpression>
-    </sequenceFlow>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway" default="sid-D7A87B62-96BD-423E-86A2-0B14601E83DA"></exclusiveGateway>
     <endEvent id="respinto" name="RESPINTO">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessValida_v1}">
@@ -52,47 +49,48 @@
         </activiti:executionListener>
       </extensionElements>
     </endEvent>
-    <sequenceFlow id="flow4" name="respingi" sourceRef="exclusivegateway1" targetRef="respinto"></sequenceFlow>
+    <sequenceFlow id="sid-D7A87B62-96BD-423E-86A2-0B14601E83DA" name="RESPINTO" sourceRef="exclusivegateway1" targetRef="respinto"></sequenceFlow>
+    <sequenceFlow id="sid-703C7903-2CA4-4FED-A165-B700DD7AFC69" name="VALIDATO" sourceRef="exclusivegateway1" targetRef="validato"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_valida">
     <bpmndi:BPMNPlane bpmnElement="valida" id="BPMNPlane_valida">
       <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
-        <omgdc:Bounds height="40.0" width="40.0" x="30.0" y="90.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="15.0" y="139.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="validazione" id="BPMNShape_validazione">
-        <omgdc:Bounds height="80.0" width="140.0" x="170.0" y="70.0"></omgdc:Bounds>
+        <omgdc:Bounds height="80.0" width="140.0" x="135.0" y="114.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="validato" id="BPMNShape_validato">
-        <omgdc:Bounds height="40.0" width="40.0" x="460.0" y="50.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="480.0" y="60.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
-        <omgdc:Bounds height="40.0" width="40.0" x="380.0" y="90.0"></omgdc:Bounds>
+        <omgdc:Bounds height="40.0" width="40.0" x="375.0" y="134.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="respinto" id="BPMNShape_respinto">
-        <omgdc:Bounds height="40.0" width="40.0" x="460.0" y="140.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="480.0" y="210.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
-        <omgdi:waypoint x="70.0" y="110.0"></omgdi:waypoint>
-        <omgdi:waypoint x="170.0" y="110.0"></omgdi:waypoint>
+        <omgdi:waypoint x="50.0" y="156.0"></omgdi:waypoint>
+        <omgdi:waypoint x="135.0" y="154.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
-        <omgdi:waypoint x="310.0" y="110.0"></omgdi:waypoint>
-        <omgdi:waypoint x="380.0" y="110.0"></omgdi:waypoint>
+        <omgdi:waypoint x="275.0" y="154.0"></omgdi:waypoint>
+        <omgdi:waypoint x="375.0" y="154.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
-        <omgdi:waypoint x="400.0" y="90.0"></omgdi:waypoint>
-        <omgdi:waypoint x="400.0" y="57.0"></omgdi:waypoint>
-        <omgdi:waypoint x="460.0" y="70.0"></omgdi:waypoint>
+      <bpmndi:BPMNEdge bpmnElement="sid-D7A87B62-96BD-423E-86A2-0B14601E83DA" id="BPMNEdge_sid-D7A87B62-96BD-423E-86A2-0B14601E83DA">
+        <omgdi:waypoint x="395.0" y="174.0"></omgdi:waypoint>
+        <omgdi:waypoint x="395.0" y="224.0"></omgdi:waypoint>
+        <omgdi:waypoint x="480.0" y="227.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="28.0" x="400.0" y="90.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="100.0" x="395.0" y="174.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
-        <omgdi:waypoint x="400.0" y="130.0"></omgdi:waypoint>
-        <omgdi:waypoint x="400.0" y="157.0"></omgdi:waypoint>
-        <omgdi:waypoint x="460.0" y="160.0"></omgdi:waypoint>
+      <bpmndi:BPMNEdge bpmnElement="sid-703C7903-2CA4-4FED-A165-B700DD7AFC69" id="BPMNEdge_sid-703C7903-2CA4-4FED-A165-B700DD7AFC69">
+        <omgdi:waypoint x="395.0" y="134.0"></omgdi:waypoint>
+        <omgdi:waypoint x="395.0" y="74.0"></omgdi:waypoint>
+        <omgdi:waypoint x="480.0" y="77.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="38.0" x="400.0" y="130.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="100.0" x="395.0" y="134.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
