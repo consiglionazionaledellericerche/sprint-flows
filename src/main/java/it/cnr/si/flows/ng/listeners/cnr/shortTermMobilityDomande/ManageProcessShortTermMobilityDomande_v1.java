@@ -46,6 +46,8 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 	private String urlShortTermMobility;
 	@Value("${cnr.stm.domandePath}")
 	private String pathDomandeShortTermMobility;
+	@Value("${cnr.stm.notifichePath}")
+	private String pathNotificheShortTermMobility;
 
 	@Inject
 	private FirmaDocumentoService firmaDocumentoService;
@@ -103,6 +105,28 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 		externalMessageService.createExternalMessage(url, ExternalMessageVerb.POST, stmPayload, ExternalApplication.STM);
 	}
 
+	public void restNotificheToSTM(DelegateExecution execution, StatoDomandeSTMEnum statoDomanda, String fase) {
+
+		// @Value("${cnr.accordi-bilaterali.url}")
+		// private String urlShortTermMobility;
+		// @Value("${cnr.accordi-bilaterali.usr}")
+		// private String usrAccordiBilaterali;	
+		// @Value("${cnr.accordi-bilaterali.psw}")
+		// private String pswAccordiBilaterali;
+		//Double idDomanda = Double.parseDouble(execution.getVariable("idDomanda").toString());
+		String idDomanda = execution.getVariable("idDomanda").toString();
+		Map<String, Object> stmPayload = new HashMap<String, Object>()
+		{
+			{
+				put("idDomanda", idDomanda);
+				put("stato", statoDomanda.name().toString());
+				put("fase", fase);
+			}	
+		};
+
+		String url = urlShortTermMobility + pathNotificheShortTermMobility;
+		externalMessageService.createExternalMessage(url, ExternalMessageVerb.POST, stmPayload, ExternalApplication.STM);
+	}
 
 	@Override
 	public void notify(DelegateExecution execution) throws Exception {
@@ -152,6 +176,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 			case "pre-accettazione-start": {
 				if(sceltaUtente.equals("Respingi")) {
 					execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.RESPINTA.toString());
+					restNotificheToSTM(execution, Enum.StatoDomandeSTMEnum.RESPINTA, execution.getVariable("fase").toString());
 					//restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.RESPINTA);
 					utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.RESPINTA.toString());
 				} else {
@@ -159,11 +184,13 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 						execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.ANNULLATA.toString());
 						//restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.ANNULLATA);
 						utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.ANNULLATA.toString());
+						restNotificheToSTM(execution, Enum.StatoDomandeSTMEnum.ANNULLATA, execution.getVariable("fase").toString());
 					}
 					else{
 						execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.VALIDATA.toString());
 						//restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.VALIDATA);
 						utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.VALIDATA.toString());
+						restNotificheToSTM(execution, Enum.StatoDomandeSTMEnum.VALIDATA, execution.getVariable("fase").toString());
 					}
 				}
 			};break; 			
