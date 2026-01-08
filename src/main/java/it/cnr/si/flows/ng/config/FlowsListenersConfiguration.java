@@ -67,7 +67,7 @@ public class FlowsListenersConfiguration {
 						.processDefinitionKey(resource.getFilename().split("[.]")[0])
 						.list();
 
-				if (processes.size() == 0) {
+				if (processes.size() != 0) {
 					DeploymentBuilder builder = repositoryService.createDeployment();
 					builder.addInputStream(resource.getFilename(), resource.getInputStream());
 					builder.deploy();
