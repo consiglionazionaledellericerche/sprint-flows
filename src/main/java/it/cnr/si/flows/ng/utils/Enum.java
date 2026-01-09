@@ -22,6 +22,10 @@ public class Enum {
 
     }
 
+    public enum VariabiliPredefinite {
+        /** Boolean */
+        IMPEDISCI_STAMPA_SUMMARY;
+    }
 
     public enum Role {
         responsabile("responsabile"),
@@ -172,6 +176,29 @@ public class Enum {
         RIFIUTATA,
         ANNULLATA;
     }
+    
+
+    public enum StatoTelelavoroEnum {
+    	RIFIUTATA,
+    	MODIFICA,
+    	FINALIZZAZIONE,
+    	VALIDATA,
+    	APPROVATA,
+    	SCADUTA,
+    	NON_APPROVATA,
+    	ANNULLATA;
+    }
+    
+
+    public enum StatoDomandeValidaEnum {
+        VALIDATA,
+        RESPINTA,
+        APPROVATA;
+    }
+    
+    public enum StatoTelelavoroRinunciaEnum {
+    	NOTIFICATA;
+    }
 
     public enum ProcessDefinitionEnum {
         acquisti("acquisti","acquisti"),
@@ -232,6 +259,7 @@ public class Enum {
         soccorsoIstruttorio,
         preavvisoRigettoDef10Giorni,
         valutazioneProgettoAccordiBilaterali,
+        domandaTeleLavoro,
         domandaAccordiBilaterali,
         valutazioneShortTermMobility,
         valutazioneLaboratoriCongiuntiArcheologici,

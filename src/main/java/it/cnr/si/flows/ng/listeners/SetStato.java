@@ -33,9 +33,9 @@ public class SetStato implements ActivitiEventListener {
 
 		String stato;
 		if (event.getType() == ActivitiEventType.PROCESS_COMPLETED) {
-			stato = (String) runtimeService.getVariable(event.getProcessInstanceId(), "statoFinale");
+			stato = String.valueOf( runtimeService.getVariable(event.getProcessInstanceId(), "statoFinale"));
 
-			if(stato != null)
+			if(stato != null || "null".equals(stato))
 				utils.updateJsonSearchTerms(event.getExecutionId(), event.getProcessInstanceId(), stato);
 			else
 				LOGGER.error("Errore nel recupero dello Stato Finale della Pi {} da mettere nel Json nel name al suo completamento", event.getProcessInstanceId());

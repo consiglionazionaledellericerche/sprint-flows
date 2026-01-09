@@ -1,18 +1,13 @@
 package it.cnr.si.flows.ng.resource;
 
-import it.cnr.si.flows.ng.service.AceBridgeService;
-import it.cnr.si.flows.ng.service.FlowsSiperService;
-import it.cnr.si.flows.ng.utils.SecurityUtils;
-import it.cnr.si.flows.ng.utils.Utils;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.service.AceService;
-import it.cnr.si.service.SecurityService;
-import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
-import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
-import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.activiti.engine.delegate.BpmnError;
-import org.json.JSONObject;
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -26,15 +21,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import feign.FeignException;
-
-import javax.inject.Inject;
-
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import it.cnr.si.flows.ng.service.AceBridgeService;
+import it.cnr.si.flows.ng.service.FlowsSiperService;
+import it.cnr.si.flows.ng.utils.SecurityUtils;
+import it.cnr.si.flows.ng.utils.Utils;
+import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.service.AceService;
+import it.cnr.si.service.SecurityService;
+import it.cnr.si.service.dto.anagrafica.enums.TipoAppartenenza;
+import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
+import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
 
 @RestController
 @RequestMapping("api/lookup")
@@ -42,7 +38,6 @@ import java.util.stream.Collectors;
 public class FlowsLookupResource {
 
     private final Logger log = LoggerFactory.getLogger(FlowsLookupResource.class);
-
 
     @Inject
     private AceBridgeService aceBridgeService;
@@ -58,12 +53,15 @@ public class FlowsLookupResource {
     @RequestMapping(value = "/ace/boss", method = RequestMethod.GET)
     @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Utils.SearchResult> getBossForCurrentUser() {
-        String username = securityService.getCurrentUserLogin();
+        
+    	//TODO verificare con Martin perchè in generale si deve prendere lo username CNR e non quello derivante da login SPID o CIE
+    	//String username = securityService.getCurrentUserLogin();
+    	String username = securityService.getUserInfo().get().getUid();
         BossDto boss = getResponsabileStruttura(username);
         String fullname = boss.getUtente().getPersona().getNome() +" "+ boss.getUtente().getPersona().getCognome();
         return ResponseEntity.ok(new Utils.SearchResult(fullname, fullname));
     }
-
+    
     /**
      * Questo metodo restituisce il firmatario attuale 
      */

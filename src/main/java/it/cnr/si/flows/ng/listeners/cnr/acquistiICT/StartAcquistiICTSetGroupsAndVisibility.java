@@ -78,7 +78,8 @@ public class StartAcquistiICTSetGroupsAndVisibility {
 				denominazioneEntitaorganizzativaResponsabileUtente = entitaOrganizzativaDirettore.getDenominazione();
 			}
 		} catch (Exception  e) {
-			throw new BpmnError("412", "Errore nell'avvio del flusso " + e.getMessage().toString());
+		    LOGGER.error("Errore nel recupero del responsabile struttura", e);
+			throw new BpmnError("412", "Errore nell'avvio del flusso " + e.getMessage());
 		}
 
 		LOGGER.info("L'utente {} ha come responabile-struttura [{}] {} della struttura {} ({}) [ID: {}] [CDSUO: {}] [IDNSIP: {}]", userNameRichiedente, responsabileStruttura.getRuolo().getDescr(), responsabileStruttura.getUtente().getUsername(), denominazioneEntitaorganizzativaResponsabileUtente, entitaOrganizzativaDirettore.getSigla(), entitaOrganizzativaDirettore.getId(), entitaOrganizzativaDirettore.getCdsuo(), entitaOrganizzativaDirettore.getIdnsip());

@@ -54,7 +54,8 @@
 //                  $scope.ngModel = JSON.parse($scope.json);
                 if ('autofill' in attrs) {
                     var jsonName = attrs.ngModel.split('.').pop() + "_json";
-                    $scope.ngModel = JSON.parse($scope.$parent.data.entity.variabili[jsonName]);
+                    if ($scope.$parent.data.entity.variabili[jsonName])
+                        $scope.ngModel = JSON.parse($scope.$parent.data.entity.variabili[jsonName]);
                 }
 
                 $scope.addRow = function() {

@@ -74,9 +74,6 @@
                 },
                 search: function (params) {
                     return $http.post('api/tasks/search/', params);
-                },
-                coolAvailableTasks: function () {
-                    return $http.get('api/tasks/coolAvailableTasks');
                 }
             },
             processInstances: {
@@ -212,6 +209,9 @@
                         '&firstResult=' + firstResult +
                         '&maxResults=' + maxResults, searchParams);
                 },
+                istituti: function(searchterm) {
+                    return $http.get('api/users/istituti/' + searchterm);
+                }
             },
             lookup: {
                 uo: function (id) {

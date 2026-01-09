@@ -10,7 +10,7 @@
 
     <groupId>it.cnr.si.flows</groupId>
     <artifactId>sprint-flows</artifactId>
-    <version>1.0.26-SNAPSHOT</version>
+    <version>1.0.50</version>
     <packaging>war</packaging>
 
     <name>sprint-flows</name>
@@ -26,13 +26,12 @@
     </scm>
 
     <properties>
-        <ace-client.version>4.1.7</ace-client.version>
+        <ace-client.version>4.2.6</ace-client.version>
         <activiti.version>5.22.0</activiti.version>
         <assertj-core.version>3.5.2</assertj-core.version>
         <feign.version>9.7.0</feign.version>
         <firmadigitale.version>1.15</firmadigitale.version>
         <gatling-maven-plugin.version>2.1.7</gatling-maven-plugin.version>
-        <gelf.version>1.14.0</gelf.version>
         <jacoco-maven-plugin.version>0.7.7.201606060606</jacoco-maven-plugin.version>
         <janino.version>3.0.6</janino.version>
         <!--        <jasperreports.version>6.6.0</jasperreports.version>-->
@@ -54,6 +53,7 @@
         <sprint.version>3.2.11</sprint.version>
         <start-class>it.cnr.si.FlowsApp</start-class>
         <storage-cloud.version>2.0.0</storage-cloud.version>
+        <gelf.version>1.14.0</gelf.version>
     </properties>
 
     <dependencyManagement>
@@ -195,11 +195,6 @@
     </dependencyManagement>
 
     <dependencies>
-        <dependency>
-            <groupId>biz.paluch.logging</groupId>
-            <artifactId>logstash-gelf</artifactId>
-            <version>${gelf.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>com.github.ralfstuckert.pdfbox-layout</groupId>
@@ -504,7 +499,13 @@
         <dependency>
             <groupId>org.thymeleaf</groupId>
             <artifactId>thymeleaf-spring4</artifactId>
-            </dependency>
+        </dependency>
+        
+        <dependency>
+            <groupId>biz.paluch.logging</groupId>
+            <artifactId>logstash-gelf</artifactId>
+            <version>${gelf.version}</version>
+        </dependency>
 
     </dependencies>
 
@@ -990,7 +991,7 @@
             </build>
             <properties>
                 <!-- log configuration -->
-                <logback.loglevel>INFO</logback.loglevel>
+                <logback.loglevel>WARN</logback.loglevel>
                 <!-- default Spring profiles -->
                 <spring.profiles.active>prod${profile.swagger}${profile.no-liquibase}</spring.profiles.active>
             </properties>

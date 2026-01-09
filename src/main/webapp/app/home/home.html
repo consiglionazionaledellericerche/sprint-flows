@@ -38,8 +38,8 @@
                             <li>direttore:utente4 che approva la richiesta</li>
                             <li>admin:admin che non ha funzioni nel flusso, ma può eseguire azioni speciali nel sistema</li>
                         </ul>
-                    <p>In particolare gli utenti del gruppo Segreteria possono entrambi eseguire il compito di inoltrare la richiesta. Se uno di loro decide di prenderlo in carico,
-                        l'altro non potrà eseguirlo, ma lo potrà visionare nella scheda "Compiti di gruppo in carico ad altri".
+                    <p>In particolare gli utenti del ruolo Segreteria possono entrambi eseguire il compito di inoltrare la richiesta. Se uno di loro decide di prenderlo in carico,
+                        l'altro non potrà eseguirlo, ma lo potrà visionare nella scheda "Compiti di ruolo in carico ad altri".
                     <p>Quando la richiesta passa al direttore (o all'utente1 che ha avviato il flusso), il compito è assegnato direttamente a quell'utente
                     <p>Nella schermata dei dettagli del flusso è possibile visionare tutti i metadati del flusso (compresi i documenti allegati) e
                         la loro storia, ed esportarne un docuemento di sintesi in formato pdf.
@@ -49,61 +49,9 @@
                 </div>
 
                 <div class="row" ng-switch-when="true" ng-if="app == 'cnr'">
-                    <div class="col-md-6 well">
+                    <div class="col-md-12 well">
                         <div>
                             <a class="btn btn-primary btn-block" style="margin: 10px;" href="https://scrivaniadigitale.cnr.it">Cliccare qui per autenticarsi con la<br/>versione precedente della Scrivania Digitale</a>
-                        </div>
-                        <div>
-                            Nella <strong>versione precedente</strong> della Scrivania Digitale sono presenti i seguenti compiti:
-                        </div>
-                        <div class="workflow-definition workflow-definition-0">
-                            <div class="workflow-definition-description">
-                                Flusso Approvvigionamenti IT: {{vm.coolTasks.flussoApprovvigionamentiIT}}
-                            </div>
-                        </div>
-                        <div class="workflow-definition workflow-definition-1">
-                            <div class="workflow-definition-description">
-                                Flusso Attestati: {{vm.coolTasks.flussoAttestati}}
-                            </div>
-                        </div>
-                        <div class="workflow-definition workflow-definition-2">
-                            <div class="workflow-definition-description">
-                                Flusso Determine Acquisti: {{vm.coolTasks.flussoDetermineAcquisti}}
-                            </div>
-                        </div>
-                        <div class="workflow-definition workflow-definition-3">
-                            <div class="workflow-definition-description">
-                                Flusso Missioni Ordine: {{vm.coolTasks.flussoMissioniOrdine}}
-                            </div>
-                        </div>
-                        <div class="workflow-definition workflow-definition-4">
-                            <div class="workflow-definition-description">
-                                Flusso Missioni Revoca: {{vm.coolTasks.flussoMissioniRevoca}}
-                            </div>
-                        </div>
-                        <div class="workflow-definition workflow-definition-5">
-                            <div class="workflow-definition-description">
-                                Flusso Missioni Rimborso: {{vm.coolTasks.flussoMissioniRimborso}}
-                            </div>
-                        </div>
-                        <div class="workflow-definition workflow-definition-6">
-                            <div class="workflow-definition-description">
-                                Flusso Relazioni CDA: {{vm.coolTasks.flussoRelazioniCDA}}
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="col-md-6 well">
-                        <div>
-                            <a class="btn btn-primary btn-block" style="margin: 10px" ui-sref="availableTasks">Cliccare qui per visualizzare i compiti sulla<br/>versione attuale della Scrivania Digitale</a>
-                        </div>
-                        <div>
-                            Nella <strong>versione attuale</strong> della Scrivania Digitale sono presenti i seguenti compiti:
-                        </div>
-                        <div class="workflow-definition workflow-definition-2">
-                            <div class="workflow-definition-description">
-                                Flusso Acquisti: {{vm.coolTasks.acquisti}}
-                            </div>
                         </div>
                     </div>
                 </div>

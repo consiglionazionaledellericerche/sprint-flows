@@ -127,7 +127,7 @@ public class ManageProcessAttestati_v1 implements ExecutionListener {
 		//case "validazione-start": {
 		//case "validazione-end": {
 		
-
+		
 		case "endevent-annulla": {
 			execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoAttestatiEnum.ANNULLATO);
 			execution.setVariable("statoFinale", Enum.StatoAttestatiEnum.ANNULLATO.toString());

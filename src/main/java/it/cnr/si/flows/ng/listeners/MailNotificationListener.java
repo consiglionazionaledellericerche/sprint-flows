@@ -32,11 +32,9 @@ import it.cnr.si.domain.NotificationRule;
 import it.cnr.si.flows.ng.config.MailConfguration;
 import it.cnr.si.flows.ng.service.AceBridgeService;
 import it.cnr.si.flows.ng.service.FlowsMailService;
-import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.NotificationRuleRepository;
 import it.cnr.si.service.MembershipService;
-import it.cnr.si.service.RelationshipService;
 
 @Component
 public class MailNotificationListener  implements ActivitiEventListener {
@@ -64,11 +62,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
 	@Inject
 	private MembershipService membershipService;
 	@Inject
-	private FlowsProcessInstanceService flowsProcessInstanceService;
-	@Inject
 	private MailConfguration mailConfguration;
-	@Inject
-	private RelationshipService relationshipService;
 
 
 	@Override
@@ -76,7 +70,7 @@ public class MailNotificationListener  implements ActivitiEventListener {
 		ActivitiEventType type = event.getType();
 
 		if (type == ActivitiEventType.TASK_CREATED )
-            sendStandardNotification(event);
+			sendStandardNotification(event);
 
 		if (ACCEPTED_EVENTS.contains(type) )
 			sendRuleNotification(event);
@@ -85,26 +79,28 @@ public class MailNotificationListener  implements ActivitiEventListener {
 
 	private Map<String, Object> integrateVariables(ActivitiEvent event,  Map<String, Object> variables) {
 		switch (event.getType()){
-			case PROCESS_STARTED:
-				variables.put("stato", ((ExecutionEntity) ((ActivitiEntityWithVariablesEvent) event).getEntity()).getCurrentActivityName());
-				break;
-			case SEQUENCEFLOW_TAKEN:
-				variables.put("stato", ((ActivitiSequenceFlowTakenEventImpl)event).getTargetActivityName());
-				variables.put("processInstanceId", ((ActivitiSequenceFlowTakenEventImpl)event).getProcessInstanceId());
-				break;
-			case TASK_COMPLETED:
-			case TASK_ASSIGNED:
-			case TASK_CREATED:
-				variables.put("stato", ((TaskEntity)((ActivitiEntityEvent)event).getEntity()).getName());
-				variables.put("nextTaskId", ((TaskEntity)((ActivitiEntityEvent)event).getEntity()).getId());
-				variables.put("processInstanceId", ((TaskEntity)((ActivitiEntityEvent)event).getEntity()).getProcessInstanceId());
-				break;
-			case PROCESS_CANCELLED:
-				variables.put("stato", ((ActivitiEventType)event.getType()).name()  + " - con causa: " + ((ActivitiProcessCancelledEventImpl) event).getCause());				
-				break;
-			case PROCESS_COMPLETED:
-				variables.put("stato", ((ExecutionEntity)((ActivitiEntityEventImpl) event).getEntity()).getActivity().getProperty("name"));
-				break;
+		case PROCESS_STARTED:
+			variables.put("stato", ((ExecutionEntity) ((ActivitiEntityWithVariablesEvent) event).getEntity()).getCurrentActivityName());
+			break;
+		case SEQUENCEFLOW_TAKEN:
+			variables.put("stato", ((ActivitiSequenceFlowTakenEventImpl)event).getTargetActivityName());
+			variables.put("processInstanceId", ((ActivitiSequenceFlowTakenEventImpl)event).getProcessInstanceId());
+			break;
+		case TASK_COMPLETED:
+		case TASK_ASSIGNED:
+		case TASK_CREATED:
+			variables.put("stato", ((TaskEntity)((ActivitiEntityEvent)event).getEntity()).getName());
+			variables.put("nextTaskId", ((TaskEntity)((ActivitiEntityEvent)event).getEntity()).getId());
+			variables.put("processInstanceId", ((TaskEntity)((ActivitiEntityEvent)event).getEntity()).getProcessInstanceId());
+			break;
+		case PROCESS_CANCELLED:
+			variables.put("stato", ((ActivitiEventType)event.getType()).name()  + " - con causa: " + ((ActivitiProcessCancelledEventImpl) event).getCause());				
+			break;
+		case PROCESS_COMPLETED:
+			variables.put("stato", ((ExecutionEntity)((ActivitiEntityEventImpl) event).getEntity()).getActivity().getProperty("name"));
+			break;
+		default:
+			break;
 		}
 
 		variables.put("serverUrl", mailConfguration.getMailUrl());
@@ -112,42 +108,52 @@ public class MailNotificationListener  implements ActivitiEventListener {
 		return variables;
 	}
 
-    /**
-     * Questo metodo esegue l'invio delle mail per eventi predefiniti:
-     * 1. E' stato creato un compito di gruppo per uno dei gruppi dell'utente
-     * 2. E' stato creato un compito assegnato direttamente all'utente
-     * 
-     * @param event
-     * @return
-     */
-    private void sendStandardNotification(ActivitiEvent event) {
+	/**
+	 * Questo metodo esegue l'invio delle mail per eventi predefiniti:
+	 * 1. E' stato creato un compito di gruppo per uno dei gruppi dell'utente
+	 * 2. E' stato creato un compito assegnato direttamente all'utente
+	 * 
+	 * @param event
+	 * @return
+	 */
+	private void sendStandardNotification(ActivitiEvent event) {
 
-		String executionId = event.getExecutionId();
-		Map<String, Object> variables = runtimeService.getVariables(executionId);
-
-		//integro le variabili con quelle conservate nel name del processo
-		Map<String, Object> integratedVariables = integrateVariables(event, variables);
-		ActivitiEntityEvent taskEvent = (ActivitiEntityEvent) event;
-		TaskEntity task = (TaskEntity) taskEvent.getEntity();
-
-		Set<IdentityLink> candidates = ((TaskEntity)taskEvent.getEntity()).getCandidates();
-
-        candidates.forEach(c -> {
-            if (c.getGroupId() != null) {
-                Set<String> members = membershipService.getAllUsersInGroup(c.getGroupId());
-                LOGGER.info("Sto inviando mail standard a {} del gruppo {} per il task", members, c.getGroupId(), task.getName());
-                members.forEach(m -> {
-                    mailService.sendFlowEventNotification(FlowsMailService.TASK_ASSEGNATO_AL_GRUPPO, integratedVariables, task.getName(), m, c.getGroupId(), false);
-                });
-            }
-        });
-        
-        String assignee = ((TaskEntity)taskEvent.getEntity()).getAssignee();
-
-        if (Utils.isNotEmpty(assignee)) {
-            LOGGER.info("Sto inviando mail standard all'assegnatario {} per il task",assignee, task.getName());
-            mailService.sendFlowEventNotification(FlowsMailService.TASK_IN_CARICO_ALL_UTENTE, integratedVariables, task.getName(), assignee, null, false);
-        }
+	    try {
+    		String executionId = event.getExecutionId();
+    		Map<String, Object> variables = runtimeService.getVariables(executionId);
+    
+    		//integro le variabili con quelle conservate nel name del processo
+    		Map<String, Object> integratedVariables = integrateVariables(event, variables);
+    		ActivitiEntityEvent taskEvent = (ActivitiEntityEvent) event;
+    		TaskEntity task = (TaskEntity) taskEvent.getEntity();
+    
+    		Set<IdentityLink> candidates = ((TaskEntity)taskEvent.getEntity()).getCandidates();
+    
+    		candidates.forEach(c -> {
+    			if (c.getGroupId() != null) {
+    				String[] idStruttura = c.getGroupId().split("@", 2);
+    				if (!"000999".equals(aceBridgeService.getStrutturaById(Integer.parseInt(idStruttura[1])).getCdsuo())) {
+    					Set<String> members = membershipService.getAllUsersInGroup(c.getGroupId());
+    					LOGGER.info("Sto inviando mail standard a {} del gruppo {} per il task", members, c.getGroupId(), task.getName());
+    					members.forEach(m -> {
+    						mailService.sendFlowEventNotification(FlowsMailService.TASK_ASSEGNATO_AL_GRUPPO, integratedVariables, task.getName(), m, c.getGroupId(), false);
+    					});
+    				} else {
+    					LOGGER.info("Non Sto inviando mail standard del gruppo {} per il task perché non in GERARCHIA ACE",  c.getGroupId(), task.getName());
+    				}
+    			} 
+    		});
+    
+    		String assignee = ((TaskEntity)taskEvent.getEntity()).getAssignee();
+    
+    		if (Utils.isNotEmpty(assignee)) {
+    			LOGGER.info("Sto inviando mail standard all'assegnatario {} per il task",assignee, task.getName());
+    			mailService.sendFlowEventNotification(FlowsMailService.TASK_IN_CARICO_ALL_UTENTE, integratedVariables, task.getName(), assignee, null, false);
+    		}
+	    } catch (Exception e) {
+	        LOGGER.error("Errore durante l'invio di una mail per l'evento "+ event.getExecutionId(), e);
+	        throw e;
+	    }
 	}
 
 	private void sendRuleNotification(ActivitiEvent event) {
@@ -168,35 +174,35 @@ public class MailNotificationListener  implements ActivitiEventListener {
 		String processDefinitionKey = processDefinitionId.split(":")[0];
 
 		switch (type) {
-			case TASK_CREATED:
-			case TASK_ASSIGNED:
-			case TASK_COMPLETED:
-				ActivitiEntityEvent taskEvent = (ActivitiEntityEvent) event;
-				TaskEntity task = (TaskEntity) taskEvent.getEntity();
-				notificationRules = notificationService.findRulesByProcessIdEventTypeTaskName(processDefinitionKey, type.toString(), task.getTaskDefinitionKey());
-				send(integratedVariables, notificationRules, FlowsMailService.TASK_NOTIFICATION, task.getName());
-				break;
+		case TASK_CREATED:
+		case TASK_ASSIGNED:
+		case TASK_COMPLETED:
+			ActivitiEntityEvent taskEvent = (ActivitiEntityEvent) event;
+			TaskEntity task = (TaskEntity) taskEvent.getEntity();
+			notificationRules = notificationService.findRulesByProcessIdEventTypeTaskName(processDefinitionKey, type.toString(), task.getTaskDefinitionKey());
+			send(integratedVariables, notificationRules, FlowsMailService.TASK_NOTIFICATION, task.getName());
+			break;
 
-			case SEQUENCEFLOW_TAKEN:
-                ActivitiSequenceFlowTakenEvent seqTaken = (ActivitiSequenceFlowTakenEvent) event;
-				notificationRules = notificationService.findRulesByProcessIdEventTypeTaskName(processDefinitionKey, type.toString(), seqTaken.getId());
-				send(integratedVariables, notificationRules, FlowsMailService.FLOW_NOTIFICATION, null);
-				break;
+		case SEQUENCEFLOW_TAKEN:
+			ActivitiSequenceFlowTakenEvent seqTaken = (ActivitiSequenceFlowTakenEvent) event;
+			notificationRules = notificationService.findRulesByProcessIdEventTypeTaskName(processDefinitionKey, type.toString(), seqTaken.getId());
+			send(integratedVariables, notificationRules, FlowsMailService.FLOW_NOTIFICATION, null);
+			break;
 
-			case PROCESS_STARTED:
-			case PROCESS_CANCELLED:
-				notificationRules = notificationService.findRulesByProcessIdEventType(processDefinitionKey, type.toString());
-				send(integratedVariables, notificationRules, FlowsMailService.PROCESS_NOTIFICATION, null);
-				break;
-				
-			case PROCESS_COMPLETED:
-			    notificationRules = notificationService.findRulesByProcessIdEventType(processDefinitionKey, type.toString());
-			    send(integratedVariables, notificationRules, FlowsMailService.PROCESS_COMPLETED_NOTIFICATION, null);
-			    break;
+		case PROCESS_STARTED:
+		case PROCESS_CANCELLED:
+			notificationRules = notificationService.findRulesByProcessIdEventType(processDefinitionKey, type.toString());
+			send(integratedVariables, notificationRules, FlowsMailService.PROCESS_NOTIFICATION, null);
+			break;
 
-			default:
-				// no action
-				break;
+		case PROCESS_COMPLETED:
+			notificationRules = notificationService.findRulesByProcessIdEventType(processDefinitionKey, type.toString());
+			send(integratedVariables, notificationRules, FlowsMailService.PROCESS_COMPLETED_NOTIFICATION, null);
+			break;
+
+		default:
+			// no action
+			break;
 		}
 
 	}
@@ -214,52 +220,52 @@ public class MailNotificationListener  implements ActivitiEventListener {
 
 		LOGGER.info("Sto inviando secondo le notification rule :{} ({}, {})", notificationRules, nt, tn);
 		notificationRules.stream()
-				.forEach(rule -> {
-					LOGGER.debug("rule.getRecipients(): {}", rule.getRecipients());
+		.forEach(rule -> {
+			LOGGER.debug("rule.getRecipients(): {}", rule.getRecipients());
 
-					if (rule.isPersona()) {
-						Stream.of(rule.getRecipients().split(","))
-								.map(s -> s.trim())
-								.forEach(personVariableName -> {
-									LOGGER.debug("personVariableName: {}", personVariableName);
-									String person = (String) variables.get(personVariableName);
-									LOGGER.debug("Invio la mail {} all'utente {}", nt, person);
-									mailService.sendFlowEventNotification(nt, variables, tn, person, null, true);
-								});
-					} else {
-						if (Arrays.asList(env.getActiveProfiles()).contains("cnr")) {
-
-							if (Optional.ofNullable(aceBridgeService).isPresent()) {
-								Stream.of(rule.getRecipients().split(","))
-										.map(s -> s.trim())
-										.forEach(groupVariableName -> {
-											LOGGER.debug("variables.get(groupVariableName): {}", variables.get(groupVariableName));
-											String groupName = (String) variables.get(groupVariableName);
-
-											Set<String> members = membershipService.getAllUsersInGroup(groupName);
-
-											LOGGER.debug("Invio la mail {} al gruppo {} con utenti {}", nt, groupName, members);
-											members.forEach(member -> {
-												mailService.sendFlowEventNotification(nt, variables, tn, member, groupName, true);
-											});
-										});
-							}
-						} else {
-							Stream.of(rule.getRecipients().split(","))
-									.map(s -> s.trim())
-									.forEach(groupVariableName -> {
-										LOGGER.debug("groupVariableName: {}", groupVariableName);
-										String groupName = (String) groupVariableName;
-										Set<String> members = membershipService.getAllUsersInGroup(groupName);
-										LOGGER.debug("Invio la mail {} al gruppo {} con utenti {}", nt, groupName, members);
-										members.forEach(member -> {
-											mailService.sendFlowEventNotification(nt, variables, tn, member, groupName, true);
-										});
-									});
-						}
-
-					}
+			if (rule.isPersona()) {
+				Stream.of(rule.getRecipients().split(","))
+				.map(s -> s.trim())
+				.forEach(personVariableName -> {
+					LOGGER.debug("personVariableName: {}", personVariableName);
+					String person = (String) variables.get(personVariableName);
+					LOGGER.info("Invio la mail {} all'utente {}", nt, person);
+					mailService.sendFlowEventNotification(nt, variables, tn, person, null, true);
 				});
+			} else {
+				if (Arrays.asList(env.getActiveProfiles()).contains("cnr")) {
+
+					if (Optional.ofNullable(aceBridgeService).isPresent()) {
+						Stream.of(rule.getRecipients().split(","))
+						.map(s -> s.trim())
+						.forEach(groupVariableName -> {
+							LOGGER.debug("variables.get(groupVariableName): {}", variables.get(groupVariableName));
+							String groupName = (String) variables.get(groupVariableName);
+
+							Set<String> members = membershipService.getAllUsersInGroup(groupName);
+
+							LOGGER.info("Invio la mail {} al gruppo {} con utenti {}", nt, groupName, members);
+							members.forEach(member -> {
+								mailService.sendFlowEventNotification(nt, variables, tn, member, groupName, true);
+							});
+						});
+					}
+				} else {
+					Stream.of(rule.getRecipients().split(","))
+					.map(s -> s.trim())
+					.forEach(groupVariableName -> {
+						LOGGER.debug("groupVariableName: {}", groupVariableName);
+						String groupName = (String) groupVariableName;
+						Set<String> members = membershipService.getAllUsersInGroup(groupName);
+						LOGGER.info("Invio la mail {} al gruppo {} con utenti {}", nt, groupName, members);
+						members.forEach(member -> {
+							mailService.sendFlowEventNotification(nt, variables, tn, member, groupName, true);
+						});
+					});
+				}
+
+			}
+		});
 	}
 
 

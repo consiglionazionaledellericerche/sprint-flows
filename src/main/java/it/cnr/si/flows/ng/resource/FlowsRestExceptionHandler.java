@@ -75,7 +75,11 @@ public class FlowsRestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> HandleAccessDenied(AccessDeniedException ex, WebRequest request) {
         String username = securityService.getCurrentUserLogin();
         String contextPath = request.getDescription(true);
-        LOGGER.error(username +" ha cercato di accedere a una risorsa "+ contextPath +" ma non ha i permessi necessari", ex);
+        LOGGER.error(" {} ha cercato di accedere a una risorsa {} ma non ha i permessi necessari: {}, stacktrace {}",
+                username, 
+                contextPath,
+                ex.getMessage(),
+                ExceptionUtils.getStackTrace(ex));
 
         String bodyOfResponse = "L'utente non ha i permessi necessari per eseguire l'azione richiesta";
         return handleExceptionInternal(ex, bodyOfResponse,
