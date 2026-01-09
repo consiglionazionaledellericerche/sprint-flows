@@ -16,6 +16,7 @@ cache:
     - node/
     - node/modules/
     - src/main/webapp/bower_components
+    - target/
 
 stages:
   - test
