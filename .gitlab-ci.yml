@@ -106,7 +106,7 @@ release_artifact:
 
 
 buildprodcontainer:
-  stage: build_prod_container
+  stage: build_container
   tags:
     - shared
   only:
