@@ -19,33 +19,30 @@ cache:
 
 stages:
   - test
-  - build
-  - deploy_snapshot
+  - build_java
+  - release
   - build_container
   - deploy_container
-  - release
-  - build_prod_container
-  - deploy_prod_container
 
 test:
   stage: test
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   script:
-    - mvn -B sonar:sonar -DskipTests -Dsonar.host.url=http://sonar.si.cnr.it test package -fae
+    - mvn -B sonar:sonar -Dsonar.host.url=http://sonar.si.cnr.it test package -fae
   allow_failure: true
 
 build_dev:
-  stage: build
-  only: 
-    - dev
+  stage: build_java
+  except: 
+    - prod
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   script:
-    - mvn -B deploy -DskipTests -U
+    - mvn -B install -DskipTests -U
 
 build:
-  stage: build
-  except: 
-    - dev
+  stage: build_java
+  only: 
+    - prod
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   script:
     - mvn -B deploy -DskipTests -Pprod -U
@@ -53,14 +50,6 @@ build:
     paths:
       - ./target/app.war
     expire_in: 2 days
-
-deploy_snapshot:
-  stage: deploy_snapshot
-  image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
-  only:
-    - master
-  script:
-    - mvn -B clean compile package deploy -DskipTests -Pprod -U
 
 buildcontainer:
   stage: build_container
@@ -98,13 +87,6 @@ deploydockertest01e02:
     name: dockertest01
     url: http://dockerwebtest01.si.cnr.it:1480
 
-
-#release_war:
-#  stage: release
-#  image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
-#  script:
-#    - mvn -Dresume=false release:prepare release:perform -Pprod -DskipTests -DpushChanges=false -DlocalCheckout=true -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -Darguments="-Dmaven.javadoc.skip=true -DskipTests -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
-
 release_artifact:
   stage: release
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
@@ -124,7 +106,7 @@ release_artifact:
 
 
 buildprodcontainer:
-  stage: build_prod_container
+  stage: build_container
   tags:
     - shared
   only:
@@ -141,7 +123,7 @@ buildprodcontainer:
 
 
 deploydockprod01:
-  stage: deploy_prod_container
+  stage: deploy_container
   image: scolagreco/alpine-ssh:latest
   only:
     - prod
@@ -171,7 +153,7 @@ deploydockprod01:
     url: http://dockprod01.cedrc.cnr.it:1480
 
 deploydockprod02:
-  stage: deploy_prod_container
+  stage: deploy_container
   image: scolagreco/alpine-ssh:latest
   only:
     - prod
