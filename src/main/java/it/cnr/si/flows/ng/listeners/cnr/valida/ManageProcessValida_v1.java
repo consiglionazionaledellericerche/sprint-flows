@@ -45,7 +45,7 @@ public class ManageProcessValida_v1 implements ExecutionListener {
 	@Value("${cnr.siper.url}")
 	private String urlSiper;
 	@Value("${cnr.siper.domandePath}")
-	private String pathDomandeSmartWorking;
+	private String pathValida;
 	@Inject
 	private FirmaDocumentoService firmaDocumentoService;
 	@Inject
@@ -80,7 +80,7 @@ public class ManageProcessValida_v1 implements ExecutionListener {
 		siperPayload.put("stato", statoDomanda.name().toString());
 		siperPayload.put("commento", commento);
 
-		String url = urlSiper + pathDomandeSmartWorking;
+		String url = urlSiper + pathValida;
 		externalMessageService.createExternalMessage(url, ExternalMessageVerb.POST, siperPayload, ExternalApplication.SIPER);
 	}
 
