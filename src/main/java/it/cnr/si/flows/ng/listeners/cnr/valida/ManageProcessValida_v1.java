@@ -19,6 +19,7 @@ import it.cnr.si.flows.ng.service.FlowsAttachmentService;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Enum.StatoDomandeMissioniEnum;
+import it.cnr.si.flows.ng.utils.Enum.StatoDomandeSmartWorkingEnum;
 import it.cnr.si.flows.ng.utils.Enum.TipologieeMissioniEnum;
 
 import it.cnr.si.service.AceService;
@@ -41,7 +42,10 @@ public class ManageProcessValida_v1 implements ExecutionListener {
 	private static final long serialVersionUID = 686169707042367215L;
 	private static final Logger LOGGER = LoggerFactory.getLogger(ManageProcessValida_v1.class);
 
-
+	@Value("${cnr.siper.url}")
+	private String urlSiper;
+	@Value("${cnr.siper.domandePath}")
+	private String pathDomandeSmartWorking;
 	@Inject
 	private FirmaDocumentoService firmaDocumentoService;
 	@Inject
@@ -62,6 +66,23 @@ public class ManageProcessValida_v1 implements ExecutionListener {
 	private Expression faseEsecuzione;
 
 
+	public void restToApplicazioneSiper(DelegateExecution execution, Enum.StatoDomandeValidaEnum statoDomanda) {
+
+		String idDomanda = execution.getVariable("idDomanda").toString();
+		String commento = "";
+		String matricolaValidatore = "";
+		if (execution.getVariable("commento") != null) {
+			commento = execution.getVariable("commento").toString();
+		}
+
+		Map<String, Object> siperPayload = new HashMap<String, Object>();
+		siperPayload.put("idDomanda", idDomanda);
+		siperPayload.put("stato", statoDomanda.name().toString());
+		siperPayload.put("commento", commento);
+
+		String url = urlSiper + pathDomandeSmartWorking;
+		externalMessageService.createExternalMessage(url, ExternalMessageVerb.POST, siperPayload, ExternalApplication.SIPER);
+	}
 
 	@Override
 	public void notify(DelegateExecution execution) throws Exception {
@@ -97,12 +118,14 @@ public class ManageProcessValida_v1 implements ExecutionListener {
 				execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoDomandeValidaEnum.RESPINTA);
 				execution.setVariable("statoFinale", Enum.StatoDomandeValidaEnum.RESPINTA.toString());
 				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeValidaEnum.RESPINTA.toString());
+				restToApplicazioneSiper(execution, Enum.StatoDomandeValidaEnum.RESPINTA);
 			};break;    	
 
 			case "endevent-validata-start": {
 				execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoDomandeValidaEnum.VALIDATA);
 				execution.setVariable("statoFinale", Enum.StatoDomandeValidaEnum.VALIDATA.toString());
 				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeValidaEnum.VALIDATA.toString());
+				restToApplicazioneSiper(execution, Enum.StatoDomandeValidaEnum.VALIDATA);
 			};break;  
 
 			case "process-end": {
