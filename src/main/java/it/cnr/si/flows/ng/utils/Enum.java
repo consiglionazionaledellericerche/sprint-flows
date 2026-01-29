@@ -193,7 +193,7 @@ public class Enum {
     public enum StatoDomandeValidaEnum {
         VALIDATA,
         RESPINTA,
-        APPROVATA;
+        IN_APPROVAZIONE;
     }
     
     public enum StatoTelelavoroRinunciaEnum {

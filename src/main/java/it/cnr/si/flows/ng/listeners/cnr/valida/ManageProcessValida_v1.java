@@ -110,6 +110,11 @@ public class ManageProcessValida_v1 implements ExecutionListener {
 				//utils.updateJsonSearchTerms(executionId, processInstanceId, "FIRMA");
 			};break; 
 
+			case "approvazione-start": {
+				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeValidaEnum.IN_APPROVAZIONE.toString());
+				restToApplicazioneSiper(execution, Enum.StatoDomandeValidaEnum.RESPINTA);
+			};break; 
+
 			case "valida-end": {
 				// FIRMA MULTIPLA TUTTI I DOCUMENTI DI UN CERTO TIPO
 			};break; 
