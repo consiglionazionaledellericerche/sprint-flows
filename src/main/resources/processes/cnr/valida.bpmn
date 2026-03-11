@@ -1,0 +1,131 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="valida" name="VALIDA" isExecutable="true">
+    <extensionElements>
+      <activiti:executionListener event="start" delegateExpression="${manageProcessValida_v1}">
+        <activiti:field name="faseEsecuzione">
+          <activiti:string><![CDATA[process-start]]></activiti:string>
+        </activiti:field>
+      </activiti:executionListener>
+      <activiti:executionListener event="end" delegateExpression="${manageProcessValida_v1}">
+        <activiti:field name="faseEsecuzione">
+          <activiti:string><![CDATA[process-end]]></activiti:string>
+        </activiti:field>
+      </activiti:executionListener>
+    </extensionElements>
+    <startEvent id="startevent1" name="Start"/>
+    <userTask id="validazione" name="VALIDAZIONE" activiti:candidateGroups="${gruppoValidatori}">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessValida_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[valida-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessValida_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[valida-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="validazione"/>
+    <endEvent id="validato" name="VALIDATO">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessValida_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[endevent-validata-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="flow2" sourceRef="validazione" targetRef="exclusivegateway1"/>
+    <exclusiveGateway id="exclusivegateway1" name="valida" default="flow12"/>
+    <endEvent id="respinto" name="RESPINTO">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessValida_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[endevent-respinta-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
+    <userTask id="approvazione" name="APPROVAZIONE" activiti:assignee="app.siper">
+      <extensionElements>
+        <activiti:executionListener event="start" delegateExpression="${manageProcessValida_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[approvazione-start]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <activiti:executionListener event="end" delegateExpression="${manageProcessValida_v1}">
+          <activiti:field name="faseEsecuzione">
+            <activiti:string><![CDATA[approvazione-end]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+        <modeler:initiator-can-complete xmlns:modeler="http://activiti.com/modeler"><![CDATA[false]]></modeler:initiator-can-complete>
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="exclusivegateway2" name="approva" default="flow5"/>
+    <sequenceFlow id="flow3" sourceRef="approvazione" targetRef="exclusivegateway2"/>
+    <sequenceFlow id="flow5" sourceRef="exclusivegateway2" targetRef="validazione"/>
+    <sequenceFlow id="flow12" sourceRef="exclusivegateway1" targetRef="approvazione"/>
+    <sequenceFlow id="flow11" sourceRef="exclusivegateway1" targetRef="validato">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Valida'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="exclusivegateway2" targetRef="respinto">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Respingi'}]]></conditionExpression>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_valida">
+    <bpmndi:BPMNPlane bpmnElement="valida" id="BPMNPlane_valida">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="30.0" width="30.0" x="45.0" y="45.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="validazione" id="BPMNShape_validazione">
+        <omgdc:Bounds height="60.0" width="140.0" x="180.0" y="30.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="validato" id="BPMNShape_validato">
+        <omgdc:Bounds height="28.0" width="28.0" x="585.0" y="46.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="435.0" y="40.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="respinto" id="BPMNShape_respinto">
+        <omgdc:Bounds height="28.0" width="28.0" x="236.0" y="255.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="approvazione" id="BPMNShape_approvazione">
+        <omgdc:Bounds height="55.0" width="105.0" x="402.5" y="165.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway2" id="BPMNShape_exclusivegateway2">
+        <omgdc:Bounds height="40.0" width="40.0" x="230.0" y="172.5"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="75.0" y="60.0"/>
+        <omgdi:waypoint x="180.0" y="60.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="320.0" y="60.0"/>
+        <omgdi:waypoint x="435.0" y="60.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="402.5" y="192.5"/>
+        <omgdi:waypoint x="270.0" y="192.5"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="250.0" y="212.5"/>
+        <omgdi:waypoint x="250.0" y="255.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="252.85464825053685" y="175.35464825053685"/>
+        <omgdi:waypoint x="250.7424013580286" y="90.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
+        <omgdi:waypoint x="475.0" y="60.0"/>
+        <omgdi:waypoint x="585.0" y="60.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow12" id="BPMNEdge_flow12">
+        <omgdi:waypoint x="455.0" y="80.0"/>
+        <omgdi:waypoint x="455.0" y="165.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
