@@ -54,8 +54,8 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 
 	@Value("${cnr.siper.url}")
 	private String urlSiper;
-	@Value("${cnr.siper.validaPath}")
-	private String validaPath;
+	@Value("${cnr.siper.domandePath}")
+	private String pathDomandeSmartWorking;
     @Inject
     private SecurityService securityService;
 	
@@ -112,7 +112,7 @@ public class ManageProcessSmartWorkingDomanda_v1 implements ExecutionListener {
 		siperPayload.put("commento", commento);
 		siperPayload.put("matricola", matricolaValidatore);
 
-		String url = urlSiper + validaPath;
+		String url = urlSiper + pathDomandeSmartWorking;
 		externalMessageService.createExternalMessage(url, ExternalMessageVerb.POST, siperPayload, ExternalApplication.SIPER);
 	}
 
