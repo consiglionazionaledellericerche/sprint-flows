@@ -67,8 +67,9 @@ import it.cnr.si.service.SecurityService;
 @RequestMapping("api/tasks")
 public class FlowsTaskResource {
 
-    public static final String OTP_FIELD = "flows_otp";
+	public static final String USERNAME_FIELD = "flows_username";
 	public static final String PASSWORD_FIELD = "flows_password";
+    public static final String OTP_FIELD = "flows_otp";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(FlowsTaskResource.class);
 
@@ -343,11 +344,13 @@ public class FlowsTaskResource {
     public static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
     	
     	List<String> variabiliSensibili = new ArrayList<String>() {{
+    		add("username");
     		add("password");
     		add("otp");
     	}};
 
     	RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+    	requestAttributes.setAttribute(PASSWORD_FIELD, req.getParameter("username"), RequestAttributes.SCOPE_REQUEST);
     	requestAttributes.setAttribute(PASSWORD_FIELD, req.getParameter("password"), RequestAttributes.SCOPE_REQUEST);
     	requestAttributes.setAttribute(OTP_FIELD, req.getParameter("otp"), RequestAttributes.SCOPE_REQUEST);
     	

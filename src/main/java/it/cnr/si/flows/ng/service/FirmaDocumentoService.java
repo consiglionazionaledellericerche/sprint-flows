@@ -62,7 +62,8 @@ public class FirmaDocumentoService {
 				"Firma".equals(execution.getVariable("sceltaUtente")) ) {
 
 			// TODO: validare presenza di queste tre variabili
-			String username = (String) execution.getVariable("username");
+			String username = (String) RequestContextHolder.getRequestAttributes()
+					.getAttribute(FlowsTaskResource.USERNAME_FIELD, RequestAttributes.SCOPE_REQUEST);
 			String password = (String) RequestContextHolder.getRequestAttributes()
 					.getAttribute(FlowsTaskResource.PASSWORD_FIELD, RequestAttributes.SCOPE_REQUEST);
 			String otp = (String) RequestContextHolder.getRequestAttributes().getAttribute(FlowsTaskResource.OTP_FIELD,
