@@ -79,13 +79,14 @@ public class FirmaDocumentoService {
 					att.setUsername(securityService.getCurrentUserLogin());
 					att.setTime(new Date());
 
-					flowsAttachmentService.saveAttachment(execution, nomeVariabileFile, att, bytesfirmati);
-
 					String taskId = execution.getVariable("taskId", String.class);
 					taskService.setVariable(taskId, "otp", stringaOscurante);
 					taskService.setVariable(taskId, "password", stringaOscurante);
 					execution.setVariable("otp", stringaOscurante);
 					execution.setVariable("password", stringaOscurante);
+					
+					flowsAttachmentService.saveAttachment(execution, nomeVariabileFile, att, bytesfirmati);
+					
 				} catch (ArubaSignServiceException e) {
 					LOGGER.error("FIRMA NON ESEGUITA", e);
 					if (e.getMessage().indexOf("error code 0001") != -1) {
@@ -103,6 +104,15 @@ public class FirmaDocumentoService {
 					} else {
 						textMessage = "errore generico<br>";
 					}
+					throw new BpmnError("500", "<b>FIRMA NON ESEGUITA<br>" + textMessage + "</b>");
+				} catch (Exception e) {
+					textMessage = "-- errore generico --"
+							+ "<br>- veirificare che l'estensione del file sia di tipo PDF"
+							+ "<br>- veirificare la corretta digitazione del codice OTP"
+							+ "<br>se il problema persiste"
+							+ "<br>provare a risincronizzare il dispositivo OTP"
+							+ "<br>seguendo le istruzioni presenti nella pagina"
+							+ "<br>Manualistica&Faq<br>";
 					throw new BpmnError("500", "<b>FIRMA NON ESEGUITA<br>" + textMessage + "</b>");
 				}
 			}

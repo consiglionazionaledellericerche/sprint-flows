@@ -47,17 +47,18 @@ public class StartValidaSetGroupsAndVisibility {
 		String initiator = (String) execution.getVariable(Enum.VariableEnum.initiator.name());
 		LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable("title"));
 		String userNameRichiedente = execution.getVariable("userNameRichiedente", String.class);
+		String idNsipStrutturaValidatore = execution.getVariable("idNsipStrutturaValidatore", String.class);
+		String idStrutturaValidatore = aceService.getSedeIdByIdNsip(idNsipStrutturaValidatore);
 		SimpleEntitaOrganizzativaWebDto strutturaRichiedente = aceService.getPersonaByUsername(userNameRichiedente).getSede();
 		idStruttura = strutturaRichiedente.getId();
-
-		String gruppoValidatori = "gruppoValidatori@"+ idStruttura;
+		
+		String gruppoValidatori = "validatoriFlussoValida@"+ idStrutturaValidatore;
 
 		LOGGER.debug("Imposto il gruppo del flusso {}", gruppoValidatori);
 
 		runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValidatori, PROCESS_VISUALIZER);
 
 		execution.setVariable("cdsuo", execution.getVariable("codiceUo"));
-		execution.setVariable("denominazione", execution.getVariable("userNameRichiedente"));
 		execution.setVariable("idnsip", strutturaRichiedente.getIdnsip());
 		execution.setVariable("denominazione", strutturaRichiedente.getDenominazione());
 		execution.setVariable("gruppoValidatori", gruppoValidatori);
