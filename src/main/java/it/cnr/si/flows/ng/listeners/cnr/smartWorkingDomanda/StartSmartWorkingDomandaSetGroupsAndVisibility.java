@@ -133,7 +133,7 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 				}
 		    }
 		}
-		LOGGER.info("L'utente {} della struttura {} ({}; livelloRichiedente: {} profiloDomanda: {}) ", userNameProponente, entitaOrganizzativaDirettore.getDenominazione(), entitaOrganizzativaDirettore.getSigla(), livelloRichiedente, profiloDomanda);
+		LOGGER.info("utente {}  livelloRichiedente: {} profiloDomanda: {}) ", userNameProponente, livelloRichiedente, profiloDomanda);
 
 
 		// VERIFICA direttore-responsabile
