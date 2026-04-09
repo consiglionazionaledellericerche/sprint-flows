@@ -109,12 +109,11 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 				profiloDomanda = "direttore-responsabile";
 				idAceStrutturaDomandaRichiedente = Integer.parseInt(idSedeDirettoregenerale);				
 			}
-			else if(aceService.entitaOrganizzativaById(Integer.parseInt(idAceStrutturaRichiedente)).getTipo().getSigla().equals("DIP")) {
-				// PROFILO DIRETTORE DI DIPARIMENTO
-					if (responsabileStruttura.getUtente().getUsername().equals(userNameProponente.toString())) {
+			else if(aceService.entitaOrganizzativaById(Integer.parseInt(idAceStrutturaRichiedente)).getTipo().getSigla().equals("DIP")
+					&& responsabileStruttura.getUtente().getUsername().equals(userNameProponente.toString())) {
 						profiloDomanda = "direttore-responsabile";
 						idAceStrutturaDomandaRichiedente = Integer.parseInt(idSedeDirettoregenerale);				
-					}
+
 		    } else {
 		    	
 		    	Integer livelloInt;
@@ -134,6 +133,7 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 				}
 		    }
 		}
+		LOGGER.info("L'utente {} della struttura {} ({}; livelloRichiedente: {} profiloDomanda: {}) ", userNameProponente, entitaOrganizzativaDirettore.getDenominazione(), entitaOrganizzativaDirettore.getSigla(), livelloRichiedente, profiloDomanda);
 
 
 		// VERIFICA direttore-responsabile
