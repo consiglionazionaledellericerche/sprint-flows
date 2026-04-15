@@ -103,35 +103,37 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 		if(livelloRichiedente == null) {
 			throw new BpmnError("412", "Livello associato all'utenza: " + userNameProponente + " non riconosciuto <br>Si prega di contattare l'help desk in merito<br>");
 		} else {
-			if(livelloRichiedente.equals("04")
-					|| livelloRichiedente.equals("05")
-					|| livelloRichiedente.equals("06")
-					|| livelloRichiedente.equals("07")
-					|| livelloRichiedente.equals("08")
-					) {profiloDomanda = "collaboratore";}
-			else {
-				// PROFILO RICHIEDENTE ricercatore-tecnologo			
-				if(livelloRichiedente.equals("01")
-						|| livelloRichiedente.equals("02")
-						|| livelloRichiedente.equals("03")
-						) {profiloDomanda = "ricercatore-tecnologo";}
-			}
-
-			// PROFILO DIRIGENTE-DIRETTORE			
+			
 			if(livelloRichiedente.equals("D")) {
+				// PROFILO DIRIGENTE-DIRETTORE			
 				profiloDomanda = "direttore-responsabile";
 				idAceStrutturaDomandaRichiedente = Integer.parseInt(idSedeDirettoregenerale);				
 			}
-			else {
-				// PROFILO DIRETTORE DI DIPARIMENTO	
-				if(aceService.entitaOrganizzativaById(Integer.parseInt(idAceStrutturaRichiedente)).getTipo().getSigla().equals("DIP")) {
-					if (responsabileStruttura.getUtente().getUsername().equals(userNameProponente.toString())) {
+			else if(aceService.entitaOrganizzativaById(Integer.parseInt(idAceStrutturaRichiedente)).getTipo().getSigla().equals("DIP")
+					&& responsabileStruttura.getUtente().getUsername().equals(userNameProponente.toString())) {
 						profiloDomanda = "direttore-responsabile";
 						idAceStrutturaDomandaRichiedente = Integer.parseInt(idSedeDirettoregenerale);				
-					}
+
+		    } else {
+		    	
+		    	Integer livelloInt;
+		    	try {
+		    		livelloInt = Integer.parseInt(livelloRichiedente);
+		    	} catch (NumberFormatException e) {
+					throw new BpmnError("412", "Livello associato all'utenza: " + userNameProponente + " ("+ livelloRichiedente +") non riconosciuto <br>Si prega di contattare l'help desk in merito<br>");
+		    	}
+		    	
+		    	if( 4 <= livelloInt && livelloInt <= 8) {
+		    		profiloDomanda = "collaboratore";
+		    	} else if( 1 <= livelloInt && livelloInt <= 3) {
+		    		// PROFILO RICHIEDENTE ricercatore-tecnologo			
+					profiloDomanda = "ricercatore-tecnologo";
+				} else {
+					throw new BpmnError("412", "Livello associato all'utenza: " + userNameProponente + " ("+ livelloRichiedente +") non riconosciuto <br>Si prega di contattare l'help desk in merito<br>");
 				}
-			}
+		    }
 		}
+		LOGGER.info("utente {}  livelloRichiedente: {} profiloDomanda: {}) ", userNameProponente, livelloRichiedente, profiloDomanda);
 
 
 		// VERIFICA direttore-responsabile
