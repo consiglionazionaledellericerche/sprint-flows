@@ -10,7 +10,7 @@
 
     <groupId>it.cnr.si.flows</groupId>
     <artifactId>sprint-flows</artifactId>
-    <version>1.1.67</version>
+    <version>1.1.69</version>
     <packaging>war</packaging>
 
     <name>sprint-flows</name>
