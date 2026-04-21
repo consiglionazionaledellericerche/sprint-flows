@@ -17,11 +17,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import it.cnr.si.firmadigitale.firma.arss.ArubaSignServiceException;
 import it.cnr.si.firmadigitale.firma.arss.stub.PdfSignApparence;
 import it.cnr.si.firmadigitale.firma.arss.stub.SignReturnV2;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.resource.FlowsTaskResource;
 import it.cnr.si.service.SecurityService;
 
 
@@ -58,11 +61,12 @@ public class FirmaDocumentoService {
 				!"Firma Multipla".equals(execution.getVariable("sceltaUtente")) &&
 				"Firma".equals(execution.getVariable("sceltaUtente")) ) {
 
-			String stringaOscurante = "******";
 			// TODO: validare presenza di queste tre variabili
 			String username = (String) execution.getVariable("username");
-			String password = (String) execution.getVariable("password");
-			String otp = (String) execution.getVariable("otp");
+			String password = (String) RequestContextHolder.getRequestAttributes()
+					.getAttribute(FlowsTaskResource.PASSWORD_FIELD, RequestAttributes.SCOPE_REQUEST);
+			String otp = (String) RequestContextHolder.getRequestAttributes().getAttribute(FlowsTaskResource.OTP_FIELD,
+					RequestAttributes.SCOPE_REQUEST);
 			String textMessage = "";
 
 			for (int i = 0; i < nomiVariabiliFile.size(); i++) {
@@ -78,14 +82,9 @@ public class FirmaDocumentoService {
 					//setto l`username dell`utente che sta eseguendo la firma e la data
 					att.setUsername(securityService.getCurrentUserLogin());
 					att.setTime(new Date());
-
+					
 					flowsAttachmentService.saveAttachment(execution, nomeVariabileFile, att, bytesfirmati);
-
-					String taskId = execution.getVariable("taskId", String.class);
-					taskService.setVariable(taskId, "otp", stringaOscurante);
-					taskService.setVariable(taskId, "password", stringaOscurante);
-					execution.setVariable("otp", stringaOscurante);
-					execution.setVariable("password", stringaOscurante);
+					
 				} catch (ArubaSignServiceException e) {
 					LOGGER.error("FIRMA NON ESEGUITA", e);
 					if (e.getMessage().indexOf("error code 0001") != -1) {
@@ -103,6 +102,16 @@ public class FirmaDocumentoService {
 					} else {
 						textMessage = "errore generico<br>";
 					}
+					throw new BpmnError("500", "<b>FIRMA NON ESEGUITA<br>" + textMessage + "</b>");
+				} catch (Exception e) {
+					LOGGER.error(e.getMessage(), e);
+					textMessage = "-- errore generico --"
+							+ "<br>- veirificare che l'estensione del file sia di tipo PDF"
+							+ "<br>- veirificare la corretta digitazione del codice OTP"
+							+ "<br>se il problema persiste"
+							+ "<br>provare a risincronizzare il dispositivo OTP"
+							+ "<br>seguendo le istruzioni presenti nella pagina"
+							+ "<br>Manualistica&Faq<br>";
 					throw new BpmnError("500", "<b>FIRMA NON ESEGUITA<br>" + textMessage + "</b>");
 				}
 			}

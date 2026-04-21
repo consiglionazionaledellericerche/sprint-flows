@@ -4,6 +4,7 @@ import static it.cnr.si.flows.ng.utils.Utils.PROCESS_VISUALIZER;
 import static it.cnr.si.flows.ng.utils.Utils.isEmpty;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +41,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.codahale.metrics.annotation.Timed;
@@ -64,7 +67,11 @@ import it.cnr.si.service.SecurityService;
 @RequestMapping("api/tasks")
 public class FlowsTaskResource {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FlowsTaskResource.class);
+	public static final String USERNAME_FIELD = "flows_username";
+	public static final String PASSWORD_FIELD = "flows_password";
+    public static final String OTP_FIELD = "flows_otp";
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(FlowsTaskResource.class);
 
     @Inject
     private TaskService taskService;
@@ -335,12 +342,22 @@ public class FlowsTaskResource {
 
     // TODO magari un giorno avremo degli array, ma per adesso ce lo facciamo andare bene cosi'
     public static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
+    	
+    	List<String> variabiliSensibili = new ArrayList<String>() {{
+    		add("password");
+    		add("otp");
+    	}};
 
+    	RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+    	requestAttributes.setAttribute(PASSWORD_FIELD, req.getParameter("password"), RequestAttributes.SCOPE_REQUEST);
+    	requestAttributes.setAttribute(OTP_FIELD, req.getParameter("otp"), RequestAttributes.SCOPE_REQUEST);
+    	
         Map<String, Object> data = new HashMap<>();
         List<String> parameterNames = Collections.list(req.getParameterNames());
         parameterNames.stream()
                 .filter(paramName -> !parameterNames.contains(paramName.split("\\[")[0] + "_json"))
                 .filter(paramName -> !paramName.equals("cacheBuster"))
+                .filter(paramName -> !variabiliSensibili.contains(paramName))
                 .forEach(paramName -> data.put(paramName, req.getParameter(paramName)));
 
         // aggiungo anche i files
