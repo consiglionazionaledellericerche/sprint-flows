@@ -83,7 +83,7 @@ public class ManageProcessAttestati_v1 implements ExecutionListener {
 				put("processInstanceId", execution.getProcessInstanceId().toString());
 				put("user", user);
 				if(execution.getVariable("commento") != null) {
-					put("commento", execution.getVariable("commento").toString());
+					put("commento", Utils.sanificaPerAttestati(execution.getVariable("commento").toString()) );
 				} else {
 					put("commento", "");
 				}

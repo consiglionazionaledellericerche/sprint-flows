@@ -8,6 +8,7 @@ import java.time.ZonedDateTime;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -42,6 +43,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.cnr.si.domain.ExternalMessage;
 import it.cnr.si.domain.enumeration.ExternalApplication;
 import it.cnr.si.domain.enumeration.ExternalMessageStatus;
+import it.cnr.si.flows.ng.service.FlowsMailService;
 
 @EnableScheduling
 @Profile("cnr")
@@ -112,6 +114,8 @@ public class ExternalMessageSender {
 
     @Inject
     private ExternalMessageService externalMessageService;
+    @Inject
+    private FlowsMailService mailService;
 
     @PostConstruct
     public void init() {
@@ -237,13 +241,17 @@ public class ExternalMessageSender {
             msg.setRetries(msg.getRetries() + 1);
             msg.setLastErrorMessage(StringUtils.substring(exceptionMessage +" "+responseMessage, 0, 254));
             externalMessageService.save(msg);
+            
+            if(msg.getRetries() >= 30) {
+            	notifyFailedExternalMessage(msg);
+            }
         }
     }
 
 
     /* ---------------- REST TEMPLATES ---------------- */
 
-    private class AbilRequestInterceptor implements ClientHttpRequestInterceptor {
+	private class AbilRequestInterceptor implements ClientHttpRequestInterceptor {
 
         private String id_token = null;
 
@@ -603,4 +611,17 @@ public class ExternalMessageSender {
             return response;
         }
     }
+    
+    /* ---------------------------- Utilita' ---------------------------*/
+    private void notifyFailedExternalMessage(ExternalMessage msg) {
+		mailService.sendEmail(
+				"marcinireneusz.trycz@cnr.it", 
+				Optional.of("massimo.fraticelli@cnr.it"), 
+				null, 
+				"[nuova scrivania digitale] l'invio di un External Message e' fallito 30 volte", 
+				"L'invio dell'External message con id "+ msg.getId()+" e' fallito 30 volte e non sara' ritentato. Il contenuto e' "+ msg.getPayload(), 
+				false, 
+				false);
+		
+	}
 }
