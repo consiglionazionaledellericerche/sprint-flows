@@ -62,8 +62,7 @@ public class FirmaDocumentoService {
 				"Firma".equals(execution.getVariable("sceltaUtente")) ) {
 
 			// TODO: validare presenza di queste tre variabili
-			String username = (String) RequestContextHolder.getRequestAttributes()
-					.getAttribute(FlowsTaskResource.USERNAME_FIELD, RequestAttributes.SCOPE_REQUEST);
+			String username = (String) execution.getVariable("username");
 			String password = (String) RequestContextHolder.getRequestAttributes()
 					.getAttribute(FlowsTaskResource.PASSWORD_FIELD, RequestAttributes.SCOPE_REQUEST);
 			String otp = (String) RequestContextHolder.getRequestAttributes().getAttribute(FlowsTaskResource.OTP_FIELD,
@@ -83,7 +82,7 @@ public class FirmaDocumentoService {
 					//setto l`username dell`utente che sta eseguendo la firma e la data
 					att.setUsername(securityService.getCurrentUserLogin());
 					att.setTime(new Date());
-
+					
 					flowsAttachmentService.saveAttachment(execution, nomeVariabileFile, att, bytesfirmati);
 					
 				} catch (ArubaSignServiceException e) {
@@ -103,6 +102,16 @@ public class FirmaDocumentoService {
 					} else {
 						textMessage = "errore generico<br>";
 					}
+					throw new BpmnError("500", "<b>FIRMA NON ESEGUITA<br>" + textMessage + "</b>");
+				} catch (Exception e) {
+					LOGGER.error(e.getMessage(), e);
+					textMessage = "-- errore generico --"
+							+ "<br>- veirificare che l'estensione del file sia di tipo PDF"
+							+ "<br>- veirificare la corretta digitazione del codice OTP"
+							+ "<br>se il problema persiste"
+							+ "<br>provare a risincronizzare il dispositivo OTP"
+							+ "<br>seguendo le istruzioni presenti nella pagina"
+							+ "<br>Manualistica&Faq<br>";
 					throw new BpmnError("500", "<b>FIRMA NON ESEGUITA<br>" + textMessage + "</b>");
 				}
 			}

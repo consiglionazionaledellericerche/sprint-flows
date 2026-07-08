@@ -190,6 +190,7 @@ public class Enum {
     }
     
 
+
     public enum StatoDomandeValidaEnum {
         VALIDATA,
         RESPINTA,

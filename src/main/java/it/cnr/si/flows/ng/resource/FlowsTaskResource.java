@@ -344,13 +344,11 @@ public class FlowsTaskResource {
     public static Map<String, Object> extractParameters(MultipartHttpServletRequest req) {
     	
     	List<String> variabiliSensibili = new ArrayList<String>() {{
-    		add("username");
     		add("password");
     		add("otp");
     	}};
 
     	RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-    	requestAttributes.setAttribute(PASSWORD_FIELD, req.getParameter("username"), RequestAttributes.SCOPE_REQUEST);
     	requestAttributes.setAttribute(PASSWORD_FIELD, req.getParameter("password"), RequestAttributes.SCOPE_REQUEST);
     	requestAttributes.setAttribute(OTP_FIELD, req.getParameter("otp"), RequestAttributes.SCOPE_REQUEST);
     	
