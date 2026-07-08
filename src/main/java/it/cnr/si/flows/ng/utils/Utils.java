@@ -446,4 +446,13 @@ public final class Utils {
         
         return Jsoup.clean(inVal, Whitelist.relaxed());
     }
+    
+    public static String sanificaPerAttestati(String in) {
+    	return in.replaceAll("à", "a")
+        		.replaceAll("è", "e")
+        		.replaceAll("é", "e")
+        		.replaceAll("ì", "i")
+        		.replaceAll("ò", "o")
+        		.replaceAll("ù", "u");
+    }
 }
