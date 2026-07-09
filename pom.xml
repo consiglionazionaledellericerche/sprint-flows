@@ -915,8 +915,8 @@
                                     <goal>install-node-and-npm</goal>
                                 </goals>
                                 <configuration>
-                                    <nodeVersion>v18.19.1</nodeVersion>
-                                    <npmVersion>9.2.0</npmVersion>
+                                    <nodeVersion>v16.20.2</nodeVersion>
+                                    <npmVersion>8.19.4</npmVersion>
                                 </configuration>
                             </execution>
                             <execution>
