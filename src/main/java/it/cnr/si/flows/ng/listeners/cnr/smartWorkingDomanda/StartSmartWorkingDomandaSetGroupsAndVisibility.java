@@ -128,6 +128,9 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 		    	} else if( 1 <= livelloInt && livelloInt <= 3) {
 		    		// PROFILO RICHIEDENTE ricercatore-tecnologo			
 					profiloDomanda = "ricercatore-tecnologo";
+				}  else if(livelloInt == 0) {
+		    		// PROFILO RICHIEDENTE direttore			
+					profiloDomanda = "direttore";
 				} else {
 					throw new BpmnError("412", "Livello associato all'utenza: " + userNameProponente + " ("+ livelloRichiedente +") non riconosciuto <br>Si prega di contattare l'help desk in merito<br>");
 				}
@@ -164,7 +167,7 @@ public class StartSmartWorkingDomandaSetGroupsAndVisibility {
 
 		// DETERMINA PERCORSO FLUSSO
 		String profiloFlusso = "Indefinito";
-		if(profiloDomanda.equals("direttore-responsabile") || profiloDomanda.equals("ricercatore-tecnologo")) {
+		if(profiloDomanda.equals("direttore-responsabile") || profiloDomanda.equals("ricercatore-tecnologo") || profiloDomanda.equals("direttore")) {
 			profiloFlusso = "PresaVisione";
 		} 
 		if(profiloDomanda.equals("collaboratore") ) {
