@@ -44,9 +44,12 @@ public class StartAttestatiSetGroupsAndVisibility {
 
 	public void configuraVariabiliStart(DelegateExecution execution)  throws IOException, ParseException  {
 
+		String usernameResponsabileAttestato = null;
 		String initiator = (String) execution.getVariable(Enum.VariableEnum.initiator.name());
 		String utenteRichiedente = execution.getVariable("utenteRichiedente").toString();
-		String usernameResponsabileAttestato = execution.getVariable("usernameResponsabileAttestato").toString();
+		if (execution.getVariable("usernameResponsabileAttestato") != null) {
+			usernameResponsabileAttestato = execution.getVariable("usernameResponsabileAttestato").toString();
+		}
 		String meseAttestato = execution.getVariable("meseAttestato").toString();
 		String annoAttestato = execution.getVariable("annoAttestato").toString();
 		String codiceSedeAttestato = execution.getVariable("codiceSedeAttestato").toString();

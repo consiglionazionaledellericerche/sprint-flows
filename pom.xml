@@ -10,7 +10,7 @@
 
     <groupId>it.cnr.si.flows</groupId>
     <artifactId>sprint-flows</artifactId>
-    <version>1.1.62</version>
+    <version>1.1.72</version>
     <packaging>war</packaging>
 
     <name>sprint-flows</name>
@@ -30,7 +30,7 @@
         <activiti.version>5.22.0</activiti.version>
         <assertj-core.version>3.5.2</assertj-core.version>
         <feign.version>9.7.0</feign.version>
-        <firmadigitale.version>1.15</firmadigitale.version>
+        <firmadigitale.version>2.1</firmadigitale.version>
         <gatling-maven-plugin.version>2.1.7</gatling-maven-plugin.version>
         <jacoco-maven-plugin.version>0.7.7.201606060606</jacoco-maven-plugin.version>
         <janino.version>3.0.6</janino.version>
@@ -915,8 +915,8 @@
                                     <goal>install-node-and-npm</goal>
                                 </goals>
                                 <configuration>
-                                    <nodeVersion>v8.17.0</nodeVersion>
-                                    <npmVersion>6.13.4</npmVersion>
+                                    <nodeVersion>v16.20.2</nodeVersion>
+                                    <npmVersion>8.19.4</npmVersion>
                                 </configuration>
                             </execution>
                             <execution>
@@ -925,7 +925,7 @@
                                     <goal>npm</goal>
                                 </goals>
                                 <configuration>
-                                    <arguments>install</arguments>
+                                    <arguments>install --legacy-peer-deps --prefer-offline --progress=false</arguments>
                                 </configuration>
                             </execution>
                             <execution>
