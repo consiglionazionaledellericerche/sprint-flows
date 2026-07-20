@@ -30,7 +30,7 @@ build_dev:
     - prod
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   script:
-    - mvn -B install -DskipTests -U
+    - mvn -B install -DskipTests -U -Pprod
   artifacts:
     paths:
       - ./target/app.war
