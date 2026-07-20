@@ -338,12 +338,13 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 									+ Double.parseDouble(execution.getVariable("punteggio_documentazione_presentazione_progetto").toString().replaceAll(",", "."))
 									+ Double.parseDouble(execution.getVariable("punteggio_utilita_necessita_collaborazione").toString().replaceAll(",", "."))
 									+ Double.parseDouble(execution.getVariable("punteggio_coinvolgimento_giovani_ricercatori").toString().replaceAll(",", "."))
-									+ Double.parseDouble(execution.getVariable("punteggio_potenzialita_finanziamenti").toString().replaceAll(",", "."))
+//									+ Double.parseDouble(execution.getVariable("punteggio_potenzialita_finanziamenti").toString().replaceAll(",", "."))
 									+ Double.parseDouble(execution.getVariable("punteggio_potenzialita_ricerca_sviluppo_CNR").toString().replaceAll(",", "."))
-									+ Double.parseDouble(execution.getVariable("punteggio_potenzialita_investimenti_privati").toString().replaceAll(",", "."))
+//									+ Double.parseDouble(execution.getVariable("punteggio_potenzialita_investimenti_privati").toString().replaceAll(",", "."))
+									+ Double.parseDouble(execution.getVariable("punteggio_potenzialita_fondi_pubblici_privati").toString().replaceAll(",", "."))									
 									+ Double.parseDouble(execution.getVariable("punteggio_sfruttamento_diffusione_risultati").toString().replaceAll(",", "."))
-									+ Double.parseDouble(execution.getVariable("punteggio_esistenza_precedenti_accordi").toString().replaceAll(",", "."))
-									+ Double.parseDouble(execution.getVariable("punteggio_congruita_economica_progetto").toString().replaceAll(",", "."));
+									+ Double.parseDouble(execution.getVariable("punteggio_esistenza_precedenti_accordi").toString().replaceAll(",", "."));
+//									+ Double.parseDouble(execution.getVariable("punteggio_congruita_economica_progetto").toString().replaceAll(",", "."));
 							execution.setVariable("punteggio_totale", punteggioTotale.toString());
 							//CREAZIONE PDF VALUTAZIONE
 							//PARAMETRI GENERAZIONE PDF x SIGLA PRINT
@@ -369,12 +370,13 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_documentazione_presentazione_progetto", execution.getVariable("punteggio_documentazione_presentazione_progetto"));
 							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_utilita_necessita_collaborazione", execution.getVariable("punteggio_utilita_necessita_collaborazione"));
 							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_coinvolgimento_giovani_ricercatori", execution.getVariable("punteggio_coinvolgimento_giovani_ricercatori"));
-							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_potenzialita_finanziamenti", execution.getVariable("punteggio_potenzialita_finanziamenti"));
+//							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_potenzialita_finanziamenti", execution.getVariable("punteggio_potenzialita_finanziamenti"));
 							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_potenzialita_ricerca_sviluppo_CNR", execution.getVariable("punteggio_potenzialita_ricerca_sviluppo_CNR"));
-							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_potenzialita_investimenti_privati", execution.getVariable("punteggio_potenzialita_investimenti_privati"));
+//							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_potenzialita_investimenti_privati", execution.getVariable("punteggio_potenzialita_investimenti_privati"));
+							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_potenzialita_fondi_pubblici_privati", execution.getVariable("punteggio_potenzialita_investimenti_privati"));
 							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_sfruttamento_diffusione_risultati", execution.getVariable("punteggio_sfruttamento_diffusione_risultati"));
 							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_esistenza_precedenti_accordi", execution.getVariable("punteggio_esistenza_precedenti_accordi"));
-							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_congruita_economica_progetto", execution.getVariable("punteggio_congruita_economica_progetto"));
+//							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_congruita_economica_progetto", execution.getVariable("punteggio_congruita_economica_progetto"));
 						}	
 
 					} 
