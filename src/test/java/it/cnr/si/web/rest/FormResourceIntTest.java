@@ -200,7 +200,7 @@ public class FormResourceIntTest {
         // Get all the forms
         restFormMockMvc.perform(get("/api/forms?sort=id,desc"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(form.getId().intValue())))
                 .andExpect(jsonPath("$.[*].processDefinitionKey").value(hasItem(DEFAULT_PROCESS_DEFINITION_KEY.toString())))
                 .andExpect(jsonPath("$.[*].version").value(hasItem(DEFAULT_VERSION.toString())))
@@ -217,7 +217,7 @@ public class FormResourceIntTest {
         // Get the form
         restFormMockMvc.perform(get("/api/forms/{id}", form.getId()))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(form.getId().intValue()))
             .andExpect(jsonPath("$.processDefinitionKey").value(DEFAULT_PROCESS_DEFINITION_KEY.toString()))
             .andExpect(jsonPath("$.version").value(DEFAULT_VERSION.toString()))
@@ -241,7 +241,7 @@ public class FormResourceIntTest {
         int databaseSizeBeforeUpdate = formRepository.findAll().size();
 
         // Update the form
-        Form updatedForm = formRepository.findOne(form.getId());
+        Form updatedForm = formRepository.findById(form.getId()).get();
         updatedForm
                 .processDefinitionKey(UPDATED_PROCESS_DEFINITION_KEY)
                 .version(UPDATED_VERSION)

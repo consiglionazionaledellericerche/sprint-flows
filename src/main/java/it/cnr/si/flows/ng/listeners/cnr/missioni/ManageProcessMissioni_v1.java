@@ -16,9 +16,10 @@ import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.Enum.StatoDomandeMissioniEnum;
 import it.cnr.si.flows.ng.utils.Enum.TipologieeMissioniEnum;
-import it.cnr.si.flows.ng.utils.SecurityUtils;
+
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.ExternalMessageService;
+import it.cnr.si.service.SecurityService;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleUtenteWebDto;
 import it.cnr.si.domain.enumeration.ExternalApplication;
 import it.cnr.si.domain.enumeration.ExternalMessageVerb;
@@ -53,6 +54,9 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 	private AceService aceService;
 	@Inject
 	private Utils utils;
+    @Inject
+    private SecurityService securityService;
+
 
 
 	private Expression faseEsecuzione;
@@ -94,7 +98,7 @@ public class ManageProcessMissioni_v1 implements ExecutionListener {
 	@Override
 	public void notify(DelegateExecution execution) throws Exception {
 		//(OivPdfService oivPdfService = new OivPdfService();
-		String currentUser = SecurityUtils.getCurrentUserLogin();
+		String currentUser = securityService.getCurrentUserLogin();
 		String processInstanceId =  execution.getProcessInstanceId();
 		String executionId =  execution.getId();
 		String stato =  execution.getCurrentActivityName();

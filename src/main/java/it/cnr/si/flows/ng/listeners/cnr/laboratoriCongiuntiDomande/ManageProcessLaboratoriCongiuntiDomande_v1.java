@@ -113,6 +113,8 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 		String executionId =  execution.getId();
 		String stato =  execution.getCurrentActivityName();
 		String sceltaUtente = "start";
+		int	domandaCorrente = 1;
+		boolean ultimaDomanda = false;
 		if(execution.getVariable("sceltaUtente") != null) {
 			sceltaUtente =  (String) execution.getVariable("sceltaUtente");	
 		}
@@ -123,264 +125,328 @@ public class ManageProcessLaboratoriCongiuntiDomande_v1 implements ExecutionList
 		//CHECK PER ANNULLO FLUSSO 
 		if (execution.getVariableInstance("motivazioneEliminazione") == null) {
 			switch(faseEsecuzioneValue){  
-			// START
-			case "process-start": {
-				startShortTermMobilityDomandeSetGroupsAndVisibility.configuraVariabiliStart(execution);
-			};break;    	
-			// START
-			case "validazione-start": {
-				utils.updateJsonSearchTerms(executionId, processInstanceId, stato);
-				execution.setVariable("tipologiaRespinta", "scadenzaTimer");
-			};break;  
-			case "validazione-end": {
-				//flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
-				String idDipartimento = execution.getVariable("dipartimentoId").toString();
-				String gruppoValutatoreScientificoLABDipartimento = "valutatoreScientificoLABDipartimento@" + idDipartimento;
-				runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValutatoreScientificoLABDipartimento, PROCESS_VISUALIZER);
-				execution.setVariable("gruppoValutatoreScientificoLABDipartimento", gruppoValutatoreScientificoLABDipartimento);
-				LOGGER.debug("Imposto i gruppi dipartimento : {} - del flusso {}", idDipartimento, gruppoValutatoreScientificoLABDipartimento);
-				// INPUT DEVE PREVEDERE LA DOMANDA PDF - NON GENERO LA DOMANDA
-				//				String nomeFile="domandaShortTermMobility";
-				//				String labelFile="Domanda";
-				//				flowsPdfService.makePdf(nomeFile, processInstanceId);
-				//				FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
-				//				documentoGenerato.setLabel(labelFile);
-				//				flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
-				if(sceltaUtente.equals("Respingi")) {
-					execution.setVariable("tipologiaRespinta", "respintaResponsabile");
-				}
-			};break;  	 
-			case "modifica-start": {
-				restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.APERTA);
-			};break;
-
-			case "pre-accettazione-start": {
-				if(sceltaUtente.equals("Respingi")) {
-					execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.RESPINTA.toString());
-					execution.setVariable("tipologiaRespinta", "respintaResponsabile");
-					//restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.RESPINTA);
-					utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeLABEnum.RESPINTA.toString());
-				} else {
-					if(sceltaUtente.equals("Annulla")) {
-						execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.ANNULLATA.toString());
-						//restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.ANNULLATA);
-						utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeLABEnum.ANNULLATA.toString());
-					}
-					else{
-						execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.VALIDATA.toString());
-						//restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.VALIDATA);
-						utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeLABEnum.VALIDATA.toString());
-					}
-				}
-			};break; 			
-
-			//			case "endevent-non-validata-start": {
-			//				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.RESPINTA);
-			//				restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.RESPINTA);
-			//				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeLABEnum.RESPINTA.toString());
-			//			};break;    	
-			//			case "endevent-validata-start": {
-			//				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.VALIDATA);
-			//				restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.VALIDATA);
-			//				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeLABEnum.VALIDATA.toString());
-			//			};break;  
-			//			case "endevent-annullata-start": {
-			//				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.ANNULLATA);
-			//				restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.ANNULLATA);
-			//				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeLABEnum.ANNULLATA.toString());
-			//			};break;
-			// SUBFLUSSO VALIDAZIONE DIRIGENTE
-			case "validazioneDirigente-end": {
-				LOGGER.debug("**** validazioneDirigente-end");
-			};break; 			
-			case "endevent-respinta-start": {
-				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.RESPINTA.toString());
-				restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.RESPINTA);
-				execution.setVariable("statoFinale", Enum.StatoDomandeLABEnum.RESPINTA.toString());
-				utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
-				if(execution.getVariable("tipologiaRespinta").toString().equals("scadenzaTimer")) {
-					execution.setVariable("notaDomandaRespinta", "La Domanda è stata respinta per scadenza termini temporali Valutazione Dirigente");
-				}
-				if(execution.getVariable("tipologiaRespinta").toString().equals("respintaResponsabile")) {
-					execution.setVariable("notaDomandaRespinta", "La Domanda è stata respinta dal Direttore");
-				}
-			};break;					
-			case "endevent-autorizzata-start": {
-				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.AUTORIZZATA.toString());
-				restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.AUTORIZZATA);
-				execution.setVariable("statoFinale", Enum.StatoDomandeLABEnum.AUTORIZZATA.toString());
-				utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
-			};break;						
-			case "accettazione-start": {
-				LOGGER.debug("**** accettazione-start");
-				execution.setVariable("tipologiaRespinta", "respintaFormale");
-			};break; 			
-			case "accettazione-end": {
-				LOGGER.debug("**** accettazione-end");
-				execution.setVariable("domandaCorrenteAccettataFlag", "false");
-				execution.setVariable("tutteDomandeAccettateFlag", "false");
-				//				int domandaCorrenteAccettata = 0;
-				if(!sceltaUtente.equals("Respingi")) {
-					//	domandaCorrenteAccettata = 1;
-					execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.ACCETTATA.toString());
-					execution.setVariable("domandaCorrenteAccettataFlag", "true");
-					//restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.ACCETTATA);
-					utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeLABEnum.ACCETTATA.toString());
-				}
-				List<ProcessInstance> processinstancesListaDomandeAccettatePerBando = runtimeService.createProcessInstanceQuery()
-						.processDefinitionKey("laboratori-congiunti-domande")
-						.variableValueEquals(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.ACCETTATA.toString())
-						.variableValueEquals("idBando", execution.getVariable("idBando"))
-						.list();
-				List<ProcessInstance> processinstancesListaDomandeAttivePerBando = runtimeService.createProcessInstanceQuery()
-						.processDefinitionKey("laboratori-congiunti-domande")
-						.variableValueEquals("idBando", execution.getVariable("idBando"))
-						.list();
-				LOGGER.debug("**** domande bando: {}, nr attive = {} - nr accettate= {} - domanda corrente accettata: {}", execution.getVariable("idBando"), processinstancesListaDomandeAttivePerBando.size(), processinstancesListaDomandeAccettatePerBando.size(), execution.getVariable("domandaCorrenteAccettataFlag").toString());
-
-				if ((processinstancesListaDomandeAttivePerBando.size()  == processinstancesListaDomandeAccettatePerBando.size() + 1) &&  (execution.getVariable("domandaCorrenteAccettataFlag").toString().equals("true"))) {
-					execution.setVariable("tutteDomandeAccettateFlag", "true");
-					processinstancesListaDomandeAccettatePerBando.forEach(( processInstance) -> {
-						if (flowsProcessInstanceService.getProcessInstance(processInstance.getId()).getName().contains(Enum.StatoDomandeLABEnum.ACCETTATA.toString())) {
-							runtimeService.signal(processInstance.getId());
-							LOGGER.info("-- sblocco la processInstance: " + processInstance.getName() + " (" + processInstance.getId() + ") ");			
-						}
-					});
-
-				}
-			};break; 
-
-
-			case "pre-valutazione-start": {
-				LOGGER.debug("**** pre-valutazione-start");
-				//				if(execution.getVariable("domandaCorrenteAccettataFlag").equals("true")) {
-				//					runtimeService.signal(execution.getProcessInstanceId());
-				//					LOGGER.info("-- sblocco la Corrente processInstance: " + execution.getProcessBusinessKey() + " (" + execution.getProcessInstanceId() + ") ");
-				//				}
-			};break; 
-
-			case "valutazione-scientifica-start": {
-				LOGGER.debug("**** valutazione-scientifica-start");
-			};break; 			
-
-			case "valutazione-scientifica-end": {
-				LOGGER.info("-- valutazione-scientifica: valutazione-scientifica");
-				execution.setVariable("domandaCorrenteValutataFlag", "false");
-				if(execution.getVariable("sceltaUtente").equals("CambiaDipartimento")) {
+				// START
+				case "process-start": {
+					startShortTermMobilityDomandeSetGroupsAndVisibility.configuraVariabiliStart(execution);
+				};break;    	
+				// START
+				case "validazione-start": {
+					utils.updateJsonSearchTerms(executionId, processInstanceId, stato);
+					execution.setVariable("tipologiaRespinta", "scadenzaTimer");
+				};break;  
+				case "validazione-end": {
+					//flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, stato);
 					String idDipartimento = execution.getVariable("dipartimentoId").toString();
 					String gruppoValutatoreScientificoLABDipartimento = "valutatoreScientificoLABDipartimento@" + idDipartimento;
 					runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValutatoreScientificoLABDipartimento, PROCESS_VISUALIZER);
 					execution.setVariable("gruppoValutatoreScientificoLABDipartimento", gruppoValutatoreScientificoLABDipartimento);
 					LOGGER.debug("Imposto i gruppi dipartimento : {} - del flusso {}", idDipartimento, gruppoValutatoreScientificoLABDipartimento);
-				} else {
-					execution.setVariable("domandaCorrenteValutataFlag", "true");
-					execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.VALUTATA_SCIENTIFICAMENTE.toString());
-					//restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.VALUTATA_SCIENTIFICAMENTE);
-					utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeLABEnum.VALUTATA_SCIENTIFICAMENTE.toString());	
-					Double punteggioTotale= 
-							Double.parseDouble(execution.getVariable("punteggio_originalita_scientifica").toString().replaceAll(",", ".")) 
-							+ Double.parseDouble(execution.getVariable("punteggio_qualificazione_proponenti").toString().replaceAll(",", "."))
-							+ Double.parseDouble(execution.getVariable("punteggio_documentazione_presentazione_progetto").toString().replaceAll(",", "."))
-							+ Double.parseDouble(execution.getVariable("punteggio_utilita_necessita_collaborazione").toString().replaceAll(",", "."))
-							+ Double.parseDouble(execution.getVariable("punteggio_potenzialita_ricerca_sviluppo_CNR").toString().replaceAll(",", "."))
-							+ Double.parseDouble(execution.getVariable("punteggio_potenzialita_investimenti_privati").toString().replaceAll(",", "."))
-							+ Double.parseDouble(execution.getVariable("punteggio_sfruttamento_diffusione_risultati").toString().replaceAll(",", "."))
-							+ Double.parseDouble(execution.getVariable("punteggio_congruita_economica_progetto").toString().replaceAll(",", "."));
-					execution.setVariable("punteggio_totale", punteggioTotale.toString());
-					//CREAZIONE PDF VALUTAZIONE
-					//PARAMETRI GENERAZIONE PDF x SIGLA PRINT
-					String nomeFile="valutazioneLaboratoriCongiunti";
-					String labelFile="Scheda Valutazione Domanda";
-					String report = "/scrivaniadigitale/valutazioneLaboratoriCongiunti.jrxml";
-					//tipologiaDoc è la tipologia del file
-					String tipologiaDoc = Enum.PdfType.valueOf("valutazioneLaboratoriCongiunti").name();
-					String utenteFile = execution.getVariable("initiator").toString();
+					// INPUT DEVE PREVEDERE LA DOMANDA PDF - NON GENERO LA DOMANDA
+					//				String nomeFile="domandaShortTermMobility";
+					//				String labelFile="Domanda";
+					//				flowsPdfService.makePdf(nomeFile, processInstanceId);
+					//				FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
+					//				documentoGenerato.setLabel(labelFile);
+					//				flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
+					if(sceltaUtente.equals("Respingi")) {
+						execution.setVariable("tipologiaRespinta", "respintaResponsabile");
+					}
+				};break;  	 
+				case "modifica-start": {
+					restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.APERTA);
+				};break;
 
-					// UPDATE VARIABILI FLUSSO
-					utils.updateJsonSearchTerms(executionId, processInstanceId, stato);
-					// GENERAZIONE PDF
-					List<String> listaVariabiliHtml = new ArrayList<String>();
-					listaVariabiliHtml.add("commento");
-					flowsPdfService.makePdfBySigla(tipologiaDoc, processInstanceId, listaVariabiliHtml, labelFile, report);
-					//flowsPdfService.makePdf(nomeFile, processInstanceId);
+				case "pre-accettazione-start": {
+					if(sceltaUtente.equals("Respingi")) {
+						execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.RESPINTA.toString());
+						execution.setVariable("tipologiaRespinta", "respintaResponsabile");
+						//restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.RESPINTA);
+						utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeLABEnum.RESPINTA.toString());
+					} else {
+						if(sceltaUtente.equals("Annulla")) {
+							execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.ANNULLATA.toString());
+							//restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.ANNULLATA);
+							utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeLABEnum.ANNULLATA.toString());
+						}
+						else{
+							execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.VALIDATA.toString());
+							//restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.VALIDATA);
+							utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeLABEnum.VALIDATA.toString());
+						}
+					}
+				};break; 			
 
-					FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
-					documentoGenerato.setLabel(labelFile);
-					flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
-					runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_originalita_scientifica", execution.getVariable("punteggio_originalita_scientifica"));
-					runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_qualificazione_proponenti", execution.getVariable("punteggio_qualificazione_proponenti"));
-					runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_documentazione_presentazione_progetto", execution.getVariable("punteggio_documentazione_presentazione_progetto"));
-					runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_utilita_necessita_collaborazione", execution.getVariable("punteggio_utilita_necessita_collaborazione"));
-					runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_potenzialita_ricerca_sviluppo_CNR", execution.getVariable("punteggio_potenzialita_ricerca_sviluppo_CNR"));
-					runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_potenzialita_investimenti_privati", execution.getVariable("punteggio_potenzialita_investimenti_privati"));
-					runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_sfruttamento_diffusione_risultati", execution.getVariable("punteggio_sfruttamento_diffusione_risultati"));
-					runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_congruita_economica_progetto", execution.getVariable("punteggio_congruita_economica_progetto"));
-				}
-			};break;	
+				//			case "endevent-non-validata-start": {
+				//				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.RESPINTA);
+				//				restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.RESPINTA);
+				//				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeLABEnum.RESPINTA.toString());
+				//			};break;    	
+				//			case "endevent-validata-start": {
+				//				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.VALIDATA);
+				//				restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.VALIDATA);
+				//				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeLABEnum.VALIDATA.toString());
+				//			};break;  
+				//			case "endevent-annullata-start": {
+				//				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.ANNULLATA);
+				//				restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.ANNULLATA);
+				//				flowsProcessInstanceService.updateSearchTerms(executionId, processInstanceId, Enum.StatoDomandeLABEnum.ANNULLATA.toString());
+				//			};break;
+				// SUBFLUSSO VALIDAZIONE DIRIGENTE
+				case "validazioneDirigente-end": {
+					LOGGER.debug("**** validazioneDirigente-end");
+				};break; 			
+				case "endevent-respinta-start": {
+					execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.RESPINTA.toString());
+					restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.RESPINTA);
+					execution.setVariable("statoFinale", Enum.StatoDomandeLABEnum.RESPINTA.toString());
+					utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
+					if(execution.getVariable("tipologiaRespinta").toString().equals("scadenzaTimer")) {
+						execution.setVariable("notaDomandaRespinta", "La Domanda è stata respinta per scadenza termini temporali Valutazione Dirigente");
+					}
+					if(execution.getVariable("tipologiaRespinta").toString().equals("respintaResponsabile")) {
+						execution.setVariable("notaDomandaRespinta", "La Domanda è stata respinta dal Direttore");
+					}
+				};break;					
+				case "endevent-autorizzata-start": {
+					execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.AUTORIZZATA.toString());
+					restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.AUTORIZZATA);
+					execution.setVariable("statoFinale", Enum.StatoDomandeLABEnum.AUTORIZZATA.toString());
+					utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
+				};break;						
+				case "accettazione-start": {
+					LOGGER.debug("**** accettazione-start");
+					execution.setVariable("tipologiaRespinta", "respintaFormale");
+				};break; 			
+				case "accettazione-end": {
+					LOGGER.debug("**** accettazione-end");
+					execution.setVariable("domandaCorrenteAccettataFlag", "false");
+					execution.setVariable("tutteDomandeAccettateFlag", "false");
+					//				int domandaCorrenteAccettata = 0;
+					if(!sceltaUtente.equals("Respingi")) {
+						//	domandaCorrenteAccettata = 1;
+						execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.ACCETTATA.toString());
+						execution.setVariable("domandaCorrenteAccettataFlag", "true");
+						//restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.ACCETTATA);
+						utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeLABEnum.ACCETTATA.toString());
+					}
+					List<ProcessInstance> processinstancesListaDomandeAccettatePerBando = runtimeService.createProcessInstanceQuery()
+							.processDefinitionKey("laboratori-congiunti-domande")
+							.variableValueEquals(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.ACCETTATA.toString())
+							.variableValueEquals("idBando", execution.getVariable("idBando"))
+							.list();
+					List<ProcessInstance> processinstancesListaDomandeAttivePerBando = runtimeService.createProcessInstanceQuery()
+							.processDefinitionKey("laboratori-congiunti-domande")
+							.variableValueEquals("idBando", execution.getVariable("idBando"))
+							.list();
+					LOGGER.debug("**** domande bando: {}, nr attive = {} - nr accettate= {} - domanda corrente accettata: {}", execution.getVariable("idBando"), processinstancesListaDomandeAttivePerBando.size(), processinstancesListaDomandeAccettatePerBando.size(), execution.getVariable("domandaCorrenteAccettataFlag").toString());
+					
+					if (sceltaUtente.equals("Respingi")){
+						domandaCorrente = 0;
+					}
+					if ((processinstancesListaDomandeAttivePerBando.size()  == processinstancesListaDomandeAccettatePerBando.size() + domandaCorrente) ) {
+						ultimaDomanda = true;
+					}
 
-			case "graduatoria-start": {
-				LOGGER.debug("**** graduatoria-start");
-				// VERIFICA TUTTE LE DOMANDE DI FLUSSI ATTIVI PER QUEL BANDO e PER QUEL DIPARTIMENTO
-				List<ProcessInstance> processinstancesListaPerBandoDipartimento = runtimeService.createProcessInstanceQuery()
-						.processDefinitionKey("laboratori-congiunti-domande")
-						.variableValueEquals("idBando", execution.getVariable("idBando"))
-						.variableValueEquals("dipartimentoId", execution.getVariable("dipartimentoId"))
-						.list();
-				List<ProcessInstance> processinstancesListaDomandeValutatePerBandoDipartimento = runtimeService.createProcessInstanceQuery()
-						.processDefinitionKey("laboratori-congiunti-domande")
-						.variableValueEquals("idBando", execution.getVariable("idBando"))
-						.variableValueEquals("dipartimentoId", execution.getVariable("dipartimentoId"))
-						.variableValueEquals(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.VALUTATA_SCIENTIFICAMENTE.toString())
-						.list();
+					if (ultimaDomanda) {
+						execution.setVariable("tutteDomandeAccettateFlag", "true");
+						processinstancesListaDomandeAccettatePerBando.forEach(( processInstance) -> {
+							if (flowsProcessInstanceService.getProcessInstance(processInstance.getId()).getName().contains(Enum.StatoDomandeLABEnum.ACCETTATA.toString())) {
+								runtimeService.signal(processInstance.getId());
+								LOGGER.info("-- sblocco la processInstance: " + processInstance.getName() + " (" + processInstance.getId() + ") ");			
+							}
+						});
 
-				if ((processinstancesListaPerBandoDipartimento.size() == processinstancesListaDomandeValutatePerBandoDipartimento.size() + 1) &&  (execution.getVariable("domandaCorrenteValutataFlag").toString().equals("true"))) {
-					//START FLUSSO BANDI
-					// Creazione flusso bando se non presente la presenza del flusso bando 
+					}
+				};break; 
 
-					List<ProcessInstance> processinstancesBandiPerBandoDipartimento = runtimeService.createProcessInstanceQuery()
-							.processDefinitionKey("laboratori-congiunti-bando-dipartimento")
+
+				case "pre-valutazione-start": {
+					LOGGER.debug("**** pre-valutazione-start");
+					//				if(execution.getVariable("domandaCorrenteAccettataFlag").equals("true")) {
+					//					runtimeService.signal(execution.getProcessInstanceId());
+					//					LOGGER.info("-- sblocco la Corrente processInstance: " + execution.getProcessBusinessKey() + " (" + execution.getProcessInstanceId() + ") ");
+					//				}
+				};break; 
+
+				case "valutazione-scientifica-start": {
+					LOGGER.debug("**** valutazione-scientifica-start");
+				};break; 			
+
+				case "valutazione-scientifica-end": {
+					LOGGER.info("-- valutazione-scientifica: valutazione-scientifica");
+					execution.setVariable("domandaCorrenteValutataFlag", "false");
+					if(execution.getVariable("sceltaUtente").equals("CambiaDipartimento")) {
+						String idDipartimento = execution.getVariable("dipartimentoId").toString();
+						String gruppoValutatoreScientificoLABDipartimento = "valutatoreScientificoLABDipartimento@" + idDipartimento;
+						runtimeService.addGroupIdentityLink(execution.getProcessInstanceId(), gruppoValutatoreScientificoLABDipartimento, PROCESS_VISUALIZER);
+						execution.setVariable("gruppoValutatoreScientificoLABDipartimento", gruppoValutatoreScientificoLABDipartimento);
+						LOGGER.debug("Imposto i gruppi dipartimento : {} - del flusso {}", idDipartimento, gruppoValutatoreScientificoLABDipartimento);
+					} else {
+						if(execution.getVariable("tipologiaLaboratori").equals("Archeologici")) {
+							//LABORATORI ARCHEOLOGICI
+							execution.setVariable("domandaCorrenteValutataFlag", "true");
+							execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.VALUTATA_SCIENTIFICAMENTE.toString());
+							//restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.VALUTATA_SCIENTIFICAMENTE);
+							utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeLABEnum.VALUTATA_SCIENTIFICAMENTE.toString());	
+							Double punteggioTotale= 
+									Double.parseDouble(execution.getVariable("punteggio_originalita_scientifica").toString().replaceAll(",", ".")) 
+									+ Double.parseDouble(execution.getVariable("punteggio_qualificazione_proponenti").toString().replaceAll(",", "."))
+									+ Double.parseDouble(execution.getVariable("punteggio_documentazione_presentazione_progetto").toString().replaceAll(",", "."))
+									+ Double.parseDouble(execution.getVariable("punteggio_utilita_necessita_collaborazione").toString().replaceAll(",", "."))
+									+ Double.parseDouble(execution.getVariable("punteggio_potenzialita_ricerca_sviluppo_CNR").toString().replaceAll(",", "."))
+									+ Double.parseDouble(execution.getVariable("punteggio_potenzialita_investimenti_privati").toString().replaceAll(",", "."))
+									+ Double.parseDouble(execution.getVariable("punteggio_sfruttamento_diffusione_risultati").toString().replaceAll(",", "."))
+									+ Double.parseDouble(execution.getVariable("punteggio_congruita_economica_progetto").toString().replaceAll(",", "."));
+							execution.setVariable("punteggio_totale", punteggioTotale.toString());
+							//CREAZIONE PDF VALUTAZIONE
+							//PARAMETRI GENERAZIONE PDF x SIGLA PRINT
+							String nomeFile="valutazioneLaboratoriCongiuntiArcheologici";
+							String labelFile="Scheda Valutazione Domanda";
+							String report = "/scrivaniadigitale/valutazioneLaboratoriCongiuntiArcheologici.jrxml";
+							//tipologiaDoc è la tipologia del file
+							String tipologiaDoc = Enum.PdfType.valueOf("valutazioneLaboratoriCongiuntiArcheologici").name();
+							String utenteFile = execution.getVariable("initiator").toString();
+
+							// UPDATE VARIABILI FLUSSO
+							utils.updateJsonSearchTerms(executionId, processInstanceId, stato);
+							// GENERAZIONE PDF
+							List<String> listaVariabiliHtml = new ArrayList<String>();
+							listaVariabiliHtml.add("commento");
+							flowsPdfService.makePdfBySigla(tipologiaDoc, processInstanceId, listaVariabiliHtml, labelFile, report);
+							//flowsPdfService.makePdf(nomeFile, processInstanceId);
+
+							FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
+							documentoGenerato.setLabel(labelFile);
+							flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
+							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_originalita_scientifica", execution.getVariable("punteggio_originalita_scientifica"));
+							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_qualificazione_proponenti", execution.getVariable("punteggio_qualificazione_proponenti"));
+							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_documentazione_presentazione_progetto", execution.getVariable("punteggio_documentazione_presentazione_progetto"));
+							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_utilita_necessita_collaborazione", execution.getVariable("punteggio_utilita_necessita_collaborazione"));
+							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_potenzialita_ricerca_sviluppo_CNR", execution.getVariable("punteggio_potenzialita_ricerca_sviluppo_CNR"));
+							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_potenzialita_investimenti_privati", execution.getVariable("punteggio_potenzialita_investimenti_privati"));
+							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_sfruttamento_diffusione_risultati", execution.getVariable("punteggio_sfruttamento_diffusione_risultati"));
+							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_congruita_economica_progetto", execution.getVariable("punteggio_congruita_economica_progetto"));
+						} 
+						else {
+							//LABORATORI TEMATICI
+							execution.setVariable("domandaCorrenteValutataFlag", "true");
+							execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.VALUTATA_SCIENTIFICAMENTE.toString());
+							//restToApplicazioneLabConn(execution, Enum.StatoDomandeLABEnum.VALUTATA_SCIENTIFICAMENTE);
+							utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeLABEnum.VALUTATA_SCIENTIFICAMENTE.toString());	
+							Double punteggioTotale= 
+									Double.parseDouble(execution.getVariable("punteggio_rilevanza_scientifica").toString().replaceAll(",", ".")) 
+									+ Double.parseDouble(execution.getVariable("punteggio_documentazione_presentazione_progetto").toString().replaceAll(",", "."))
+									+ Double.parseDouble(execution.getVariable("punteggio_utilita_necessita_collaborazione").toString().replaceAll(",", "."))
+									+ Double.parseDouble(execution.getVariable("punteggio_coinvolgimento_giovani_ricercatori").toString().replaceAll(",", "."))
+//									+ Double.parseDouble(execution.getVariable("punteggio_potenzialita_finanziamenti").toString().replaceAll(",", "."))
+									+ Double.parseDouble(execution.getVariable("punteggio_potenzialita_ricerca_sviluppo_CNR").toString().replaceAll(",", "."))
+//									+ Double.parseDouble(execution.getVariable("punteggio_potenzialita_investimenti_privati").toString().replaceAll(",", "."))
+									+ Double.parseDouble(execution.getVariable("punteggio_potenzialita_fondi_pubblici_privati").toString().replaceAll(",", "."))									
+									+ Double.parseDouble(execution.getVariable("punteggio_sfruttamento_diffusione_risultati").toString().replaceAll(",", "."))
+									+ Double.parseDouble(execution.getVariable("punteggio_esistenza_precedenti_accordi").toString().replaceAll(",", "."));
+//									+ Double.parseDouble(execution.getVariable("punteggio_congruita_economica_progetto").toString().replaceAll(",", "."));
+							execution.setVariable("punteggio_totale", punteggioTotale.toString());
+							//CREAZIONE PDF VALUTAZIONE
+							//PARAMETRI GENERAZIONE PDF x SIGLA PRINT
+							String nomeFile="valutazioneLaboratoriCongiuntiTematici";
+							String labelFile="Scheda Valutazione Domanda";
+							String report = "/scrivaniadigitale/valutazioneLaboratoriCongiuntiTematici.jrxml";
+							//tipologiaDoc è la tipologia del file
+							String tipologiaDoc = Enum.PdfType.valueOf("valutazioneLaboratoriCongiuntiTematici").name();
+							String utenteFile = execution.getVariable("initiator").toString();
+
+							// UPDATE VARIABILI FLUSSO
+							utils.updateJsonSearchTerms(executionId, processInstanceId, stato);
+							// GENERAZIONE PDF
+							List<String> listaVariabiliHtml = new ArrayList<String>();
+							listaVariabiliHtml.add("commento");
+							flowsPdfService.makePdfBySigla(tipologiaDoc, processInstanceId, listaVariabiliHtml, labelFile, report);
+							//flowsPdfService.makePdf(nomeFile, processInstanceId);
+
+							FlowsAttachment documentoGenerato = runtimeService.getVariable(processInstanceId, nomeFile, FlowsAttachment.class);
+							documentoGenerato.setLabel(labelFile);
+							flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
+							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_rilevanza_scientifica", execution.getVariable("punteggio_rilevanza_scientifica"));
+							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_documentazione_presentazione_progetto", execution.getVariable("punteggio_documentazione_presentazione_progetto"));
+							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_utilita_necessita_collaborazione", execution.getVariable("punteggio_utilita_necessita_collaborazione"));
+							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_coinvolgimento_giovani_ricercatori", execution.getVariable("punteggio_coinvolgimento_giovani_ricercatori"));
+//							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_potenzialita_finanziamenti", execution.getVariable("punteggio_potenzialita_finanziamenti"));
+							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_potenzialita_ricerca_sviluppo_CNR", execution.getVariable("punteggio_potenzialita_ricerca_sviluppo_CNR"));
+//							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_potenzialita_investimenti_privati", execution.getVariable("punteggio_potenzialita_investimenti_privati"));
+							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_potenzialita_fondi_pubblici_privati", execution.getVariable("punteggio_potenzialita_investimenti_privati"));
+							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_sfruttamento_diffusione_risultati", execution.getVariable("punteggio_sfruttamento_diffusione_risultati"));
+							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_esistenza_precedenti_accordi", execution.getVariable("punteggio_esistenza_precedenti_accordi"));
+//							runtimeService.setVariable(execution.getProcessInstanceId(), "punteggio_congruita_economica_progetto", execution.getVariable("punteggio_congruita_economica_progetto"));
+						}	
+
+					} 
+
+				};break;	
+
+				case "graduatoria-start": {
+					LOGGER.debug("**** graduatoria-start");
+					// VERIFICA TUTTE LE DOMANDE DI FLUSSI ATTIVI PER QUEL BANDO e PER QUEL DIPARTIMENTO
+					List<ProcessInstance> processinstancesListaPerBandoDipartimento = runtimeService.createProcessInstanceQuery()
+							.processDefinitionKey("laboratori-congiunti-domande")
 							.variableValueEquals("idBando", execution.getVariable("idBando"))
 							.variableValueEquals("dipartimentoId", execution.getVariable("dipartimentoId"))
 							.list();
-					if (processinstancesBandiPerBandoDipartimento.size() == 0)
-					{
-						String processDefinitionId = repositoryService.createProcessDefinitionQuery().processDefinitionKeyLike("laboratori-congiunti-bando-dipartimento").orderByProcessDefinitionVersion().desc().list().get(0).getId();
-						//START del flusso bando
-						String siglaDipartimento = aceBridgeService.getUoById(Integer.parseInt(execution.getVariable("dipartimentoId").toString())).getSigla();
-						Map<String, Object> data = new HashMap<>();
-						data.put(Enum.VariableEnum.titolo.name(), execution.getVariable("bando") + "-" + siglaDipartimento);
-						data.put(Enum.VariableEnum.descrizione.name(), execution.getVariable("shortTermMobilityName") + "-" + siglaDipartimento);
-						data.put(Enum.VariableEnum.initiator.name(), "app.scrivaniadigitale");
-						data.put("idBando", execution.getVariable("idBando"));
-						data.put("dipartimentoId", execution.getVariable("dipartimentoId"));
-						data.put("processDefinitionId", processDefinitionId);
-						data.put(initiator.name(), "app.scrivaniadigitale");
+					List<ProcessInstance> processinstancesListaDomandeValutatePerBandoDipartimento = runtimeService.createProcessInstanceQuery()
+							.processDefinitionKey("laboratori-congiunti-domande")
+							.variableValueEquals("idBando", execution.getVariable("idBando"))
+							.variableValueEquals("dipartimentoId", execution.getVariable("dipartimentoId"))
+							.variableValueEquals(statoFinaleDomanda.name(), Enum.StatoDomandeLABEnum.VALUTATA_SCIENTIFICAMENTE.toString())
+							.list();
 
-						LOGGER.info("-- EFFETTUO START FLUSSO laboratori-congiunti-bando-dipartimento CON titolo: " + data.get("titolo") + " descrizione" + data.get("descrizione")  + " initiator " + data.get("initiator")  + " idBando" + data.get("idBando") );
+					if ((processinstancesListaPerBandoDipartimento.size() == processinstancesListaDomandeValutatePerBandoDipartimento.size() + 1) &&  (execution.getVariable("domandaCorrenteValutataFlag").toString().equals("true"))) {
+						//START FLUSSO BANDI
+						// Creazione flusso bando se non presente la presenza del flusso bando 
 
-						//flowsTaskService.startProcessInstance(processDefinitionId, data);
-						flowsTaskService.startProcessInstanceAsApplication(processDefinitionId, data,"app.scrivaniadigitale");
-					} else {
-						// Aziona il receive task "elenco-domande"
-						LOGGER.info("-- Bando già avviato: " + processinstancesBandiPerBandoDipartimento.get(0).getBusinessKey() );
+						List<ProcessInstance> processinstancesBandiPerBandoDipartimento = runtimeService.createProcessInstanceQuery()
+								.processDefinitionKey("laboratori-congiunti-bando-dipartimento")
+								.variableValueEquals("idBando", execution.getVariable("idBando"))
+								.variableValueEquals("dipartimentoId", execution.getVariable("dipartimentoId"))
+								.list();
+						if (processinstancesBandiPerBandoDipartimento.size() == 0)
+						{
+							String processDefinitionId = repositoryService.createProcessDefinitionQuery().processDefinitionKeyLike("laboratori-congiunti-bando-dipartimento").orderByProcessDefinitionVersion().desc().list().get(0).getId();
+							//START del flusso bando
+							String siglaDipartimento = aceBridgeService.getUoById(Integer.parseInt(execution.getVariable("dipartimentoId").toString())).getSigla();
+							Map<String, Object> data = new HashMap<>();
+							String titoloBando = "Verbale Graduatoria Bando " + execution.getVariable("idBando") + "-" + siglaDipartimento;
+							data.put(Enum.VariableEnum.titolo.name(), titoloBando);
+							data.put(Enum.VariableEnum.descrizione.name(), "Flusso per la gestione del " + titoloBando);
+							data.put(Enum.VariableEnum.initiator.name(), "app.scrivaniadigitale");
+							data.put("idBando", execution.getVariable("idBando"));
+							data.put("dipartimentoId", execution.getVariable("dipartimentoId"));
+							data.put("processDefinitionId", processDefinitionId);
+							data.put(initiator.name(), "app.scrivaniadigitale");
+
+							LOGGER.info("-- EFFETTUO START FLUSSO laboratori-congiunti-bando-dipartimento CON titolo: " + data.get("titolo") + " descrizione" + data.get("descrizione")  + " initiator " + data.get("initiator")  + " idBando" + data.get("idBando") );
+
+							//flowsTaskService.startProcessInstance(processDefinitionId, data);
+							flowsTaskService.startProcessInstanceAsApplication(processDefinitionId, data,"app.scrivaniadigitale");
+						} else {
+							// Aziona il receive task "elenco-domande"
+							LOGGER.info("-- Bando già avviato: " + processinstancesBandiPerBandoDipartimento.get(0).getBusinessKey() );
+						}
 					}
-				}
 
-			};break; 			
+				};break; 			
 
-			//TIMERS
-			case "timer-chiusura-bando-end": {
-				int nrNotifiche = 1;
-				if(execution.getVariable("numeroNotificheTimer2") != null) {
-					nrNotifiche = (Integer.parseInt(execution.getVariable("numeroNotificheTimer2").toString()) + 1);
-				} 
-				execution.setVariable("numeroNotificheTimer2", nrNotifiche);
-				LOGGER.debug("Timer2 nrNotifiche: {}", nrNotifiche);
-			};break;  
+				//TIMERS
+				case "timer-chiusura-bando-end": {
+					int nrNotifiche = 1;
+					if(execution.getVariable("numeroNotificheTimer2") != null) {
+						nrNotifiche = (Integer.parseInt(execution.getVariable("numeroNotificheTimer2").toString()) + 1);
+					} 
+					execution.setVariable("numeroNotificheTimer2", nrNotifiche);
+					LOGGER.debug("Timer2 nrNotifiche: {}", nrNotifiche);
+				};break;  
 
-			// DEFAULT  
-			default:  {
-			};break;    
+				// DEFAULT  
+				default:  {
+				};break;    
 
 			} 
 		} else {

@@ -99,6 +99,10 @@ public class VisibilitySetter implements ActivitiEventListener {
         .forEach(l -> runtimeService.addGroupIdentityLink(processInstanceId, l.getGroupId(), Utils.PROCESS_VISUALIZER));
 
         taskService.getIdentityLinksForTask(taskId).stream()
+        .filter(l -> l.getType().equals(IdentityLinkType.CANDIDATE) && l.getUserId() != null)
+        .forEach(l -> runtimeService.addUserIdentityLink(processInstanceId, l.getUserId(), Utils.PROCESS_VISUALIZER));
+        
+        taskService.getIdentityLinksForTask(taskId).stream()
         .filter(l -> l.getType().equals(IdentityLinkType.ASSIGNEE))
         .forEach(l -> runtimeService.addUserIdentityLink(processInstanceId, l.getUserId(), Utils.PROCESS_VISUALIZER));
     }

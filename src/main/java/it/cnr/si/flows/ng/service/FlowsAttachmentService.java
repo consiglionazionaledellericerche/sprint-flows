@@ -4,7 +4,7 @@ import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.listeners.AddFlowsAttachmentsListener;
 import it.cnr.si.flows.ng.utils.Enum.Stato;
 import it.cnr.si.flows.ng.utils.Utils;
-import it.cnr.si.security.SecurityUtils;
+import it.cnr.si.service.SecurityService;
 import it.cnr.si.spring.storage.*;
 import it.cnr.si.spring.storage.bulk.StorageFile;
 import org.activiti.engine.HistoryService;
@@ -15,6 +15,7 @@ import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.apache.commons.io.IOUtils;
+import org.jfree.util.Log;
 import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,6 +72,8 @@ public class FlowsAttachmentService {
 	private Environment env;
 	@Inject
 	private AddFlowsAttachmentsListener addFlowsAttachmentsListener;
+	@Inject
+	private SecurityService securityService;
 
 	/**
 	 *
@@ -107,6 +112,7 @@ public class FlowsAttachmentService {
 			att.setMimetype(getMimetype(filebytes));
 			att.setPath(path);
 		} else if (nodeRef != null) {
+		    verificaPath(nodeRef, path);
 			att.setAzione(linkDaAltraApplicazione);
 			att.setUrl(nodeRef);
 			att.setMimetype( (String) data.get(fileName + "_mimetype") );
@@ -123,13 +129,13 @@ public class FlowsAttachmentService {
 	}
 
 
-	private void setAttachmentProperties(FlowsAttachment att, String taskId, String taskName, String fileName, Map<String, Object> data) {
+    private void setAttachmentProperties(FlowsAttachment att, String taskId, String taskName, String fileName, Map<String, Object> data) {
 
 		att.setName(fileName);
 		att.setTime(new Date());
 		att.setTaskId(taskId);
 		att.setTaskName(taskName);
-		att.setUsername(SecurityUtils.getCurrentUserLogin());
+		att.setUsername(securityService.getCurrentUserLogin());
 
 		att.setLabel(                  String.valueOf(data.get(fileName+"_label")));
 		att.setPubblicazioneUrp(		"true".equals(data.get(fileName+"_pubblicazioneUrp")));
@@ -167,7 +173,7 @@ public class FlowsAttachmentService {
 	 */
 	public void saveAttachment(DelegateExecution execution, String variableName, FlowsAttachment att, byte[] content) {
 
-		att.setUsername(SecurityUtils.getCurrentUserLogin());
+		att.setUsername(securityService.getCurrentUserLogin());
 		att.setTime(new Date());
 		att.setTaskId((String) execution.getVariable("taskId"));
 		att.setTaskName(execution.getCurrentActivityName());
@@ -192,7 +198,7 @@ public class FlowsAttachmentService {
 	 */
 	public void saveAttachment(String taskId, String variableName, FlowsAttachment att, byte[] content) {
 
-		att.setUsername(SecurityUtils.getCurrentUserLogin());
+		att.setUsername(securityService.getCurrentUserLogin());
 		att.setTime(new Date());
 		att.setTaskId(taskId);
 		Task task = taskService.createTaskQuery().active().taskId(taskId).singleResult();
@@ -208,7 +214,7 @@ public class FlowsAttachmentService {
 
 	public void saveAttachmentFuoriTask(String executionId, String variableName, FlowsAttachment att, byte[] content) {
 
-		att.setUsername(SecurityUtils.getCurrentUserLogin());
+		att.setUsername(securityService.getCurrentUserLogin());
 		att.setTime(new Date());
 		att.setTaskName("Fuori task");
 		if(att.getPath() == null) {
@@ -481,4 +487,17 @@ public class FlowsAttachmentService {
 		}
 	}
 
+	/**
+	 * 
+	 * @param nodeRef notNull
+	 * @param path NotNull
+	 * @throws IllegalArgumentException
+	 */
+    private void verificaPath(String nodeRef, String path) {
+        StorageObject so = storeService.getStorageObjectBykey(nodeRef);
+        if (!so.getPath().matches(path + "(/\\d\\d\\d\\d)*(/)?")) {
+            LOGGER.warn("Il path dell'allegato ("+ so.getPath() +") non matcha con quello trasmesso("+ path +")");
+            // throw new IllegalArgumentException();
+        }   
+    }
 }

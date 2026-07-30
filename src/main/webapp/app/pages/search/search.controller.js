@@ -5,11 +5,12 @@
         .module("sprintApp")
         .controller("SearchController", SearchController);
 
-    SearchController.$inject = ["$scope", "dataService", "utils", "$log", "$location"];
+    SearchController.$inject = ["$scope", "dataService", "utils", "$log", "$location", "paginationConstants"];
 
-    function SearchController($scope, dataService, utils, $log, $location) {
+    function SearchController($scope, dataService, utils, $log, $location, paginationConstants) {
         var vm = this,
             oldUrl = $scope.formUrl;
+        vm.itemsPerPage = paginationConstants.itemsPerPage;
 
         $scope.reload = false;
         // "conservo" i parametri della ricerca  ...
@@ -64,9 +65,9 @@
         $scope.exportCsv = function () {
             dataService.search.exportCsv(vm.searchParams, -1, -1)
                 .success(function (response) {
-                    var filename = new Date().toISOString().slice(0, 10) + ".xls",
+                    var filename = new Date().toISOString().slice(0, 10) + ".csv",
                         file = new Blob([response], {
-                            type: "application/vnd.ms-excel"
+                            type: "text/plain;charset=utf-8"
                         });
                     $log.info(file, filename);
                     saveAs(file, filename);

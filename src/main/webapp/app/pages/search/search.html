@@ -72,7 +72,7 @@
 			<!--Paginazione -->
 			<div class="row" ng-show="vm.totalItems > 0">
 				<div class="text-center col-md-12">
-					<jhi-item-count page="vm.searchParams.page" total="vm.totalItems" items-per-page="20"></jhi-item-count>
+					<jhi-item-count page="vm.searchParams.page" total="vm.totalItems" items-per-page="vm.itemsPerPage"></jhi-item-count>
 					<uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.searchParams.page" ng-change="search()"></uib-pagination>
 				</div>
 			</div>
@@ -89,7 +89,7 @@
 			<!--Paginazione -->
 			<div class="row">
 				<div class="text-center col-md-12" ng-show="vm.totalItems > 0">
-					<jhi-item-count page="vm.searchParams.page" total="vm.totalItems" items-per-page="20"></jhi-item-count>
+					<jhi-item-count page="vm.searchParams.page" total="vm.totalItems" items-per-page="vm.itemsPerPage"></jhi-item-count>
 					<uib-pagination class="pagination-sm" total-items="vm.totalItems" ng-model="vm.searchParams.page" ng-change="search()"></uib-pagination>
 				</div>
 			</div>

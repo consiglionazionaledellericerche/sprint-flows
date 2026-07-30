@@ -126,7 +126,7 @@ public class MembershipResourceIntTest {
         // Get all the memberships
         restMembershipMockMvc.perform(get("/api/memberships?sort=id,desc"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(membership.getId().intValue())))
                 .andExpect(jsonPath("$.[*].grouprole").value(hasItem(DEFAULT_GROUPROLE.toString())));
     }
@@ -140,7 +140,7 @@ public class MembershipResourceIntTest {
         // Get the membership
         restMembershipMockMvc.perform(get("/api/memberships/{id}", membership.getId()))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.id").value(membership.getId().intValue()))
             .andExpect(jsonPath("$.grouprole").value(DEFAULT_GROUPROLE.toString()));
     }

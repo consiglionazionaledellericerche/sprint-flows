@@ -126,6 +126,14 @@ public class StartLaboratoriCongiuntiDomandeSetGroupsAndVisibility {
 			}
 		}
 
+		//SETTAGGIO VARIABILE tipologiaLaboratori
+		if (execution.getVariable("tipologiaLaboratori") == null){
+			if (execution.getVariable("dipartimentoId").toString().equals("2135")){
+				execution.setVariable("tipologiaLaboratori","Archeologici");
+			} else {
+				execution.setVariable("tipologiaLaboratori","Tematici");
+			}
+		}
 
 		String gruppoValidatoriLaboratoriCongiunti = "validatoriLaboratoriCongiunti@0000";
 		String gruppoUfficioProtocollo = "ufficioProtocolloLaboratoriCongiunti@0000";

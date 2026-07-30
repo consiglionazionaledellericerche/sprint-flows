@@ -4,7 +4,7 @@ import it.cnr.si.domain.ExternalProblem;
 import it.cnr.si.flows.ng.exception.AwesomeException;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.flows.ng.utils.proxy.ResultProxy;
-import it.cnr.si.security.SecurityUtils;
+
 import it.cnr.si.service.dto.anagrafica.scritture.PersonaDto;
 import it.cnr.si.service.dto.anagrafica.scritture.UtenteDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimplePersonaWebDto;
@@ -37,12 +37,13 @@ public class HelpdeskService {
     private Utils utils;
     @Autowired(required = false)
     private AceService aceService;
-
+    @Inject
+    private SecurityService securityService;
 
     public Long newProblem(ExternalProblem hd, String browser) throws ServiceException {
 
-//    	PersonaWebDto flowsUser = aceService.getPersonaByUsername(SecurityUtils.getCurrentUserLogin());
-        SimpleUtenteWebDto flowsUser = aceService.getUtente(SecurityUtils.getCurrentUserLogin());
+//    	PersonaWebDto flowsUser = aceService.getPersonaByUsername(securityService.getCurrentUserLogin());
+        SimpleUtenteWebDto flowsUser = aceService.getUtente(securityService.getCurrentUserLogin());
         hd.setLogin(flowsUser.getUsername());
 
         SimplePersonaWebDto persona = flowsUser.getPersona();

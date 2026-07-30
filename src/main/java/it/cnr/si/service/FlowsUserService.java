@@ -9,15 +9,16 @@ import it.cnr.si.repository.AuthorityRepository;
 import it.cnr.si.repository.FlowsUserRepository;
 import it.cnr.si.repository.MembershipRepository;
 import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.security.SecurityUtils;
+
 import it.cnr.si.service.util.RandomUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
+//import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,9 +42,9 @@ import static it.cnr.si.flows.ng.utils.Enum.RoleOiv.member;
 public class FlowsUserService {
 
     private final Logger log = LoggerFactory.getLogger(UserService.class);
-    @Inject
-    public JdbcTokenStore jdbcTokenStore;
-    @Inject
+//    @Autowired(required = false)
+//    public JdbcTokenStore jdbcTokenStore;
+    @Autowired(required = false)
     private PasswordEncoder passwordEncoder;
     @Inject
     private FlowsUserRepository flowsUserRepository;
@@ -58,7 +59,8 @@ public class FlowsUserService {
     @Inject
     private CnrgroupService cnrgroupService;
 
-
+    @Inject
+    private SecurityService securityService;
 
     public Optional<FlowsUser> activateRegistration(String key) {
         log.debug("Activating user for activation key {}", key);
@@ -108,8 +110,10 @@ public class FlowsUserService {
             String login, String password, String firstName, String lastName, String email,
             String langKey, String phone) {
 
+
+        // TODO: Questo metodo non funziona, ma tanto non dobbiamo creare utenti locali
         FlowsUser newUser = new FlowsUser();
-        Authority authority = authorityRepository.findOne(AuthoritiesConstants.USER);
+        // Authority authority = authorityRepository.findOne(AuthoritiesConstants.USER).get();
         Set<Authority> authorities = new HashSet<>();
         String encryptedPassword = passwordEncoder.encode(password);
         newUser.setLogin(login);
@@ -123,7 +127,7 @@ public class FlowsUserService {
         newUser.setActivated(false);
         // new user gets registration key
         newUser.setActivationKey(RandomUtil.generateActivationKey());
-        authorities.add(authority);
+        // authorities.add(authority);
         newUser.setAuthorities(authorities);
         newUser.setPhone(phone);
         flowsUserRepository.save(newUser);
@@ -133,6 +137,7 @@ public class FlowsUserService {
 
 
     public FlowsUser createUser(FlowsUserDto flowsUseDto) {
+        // TODO: Questo metodo non funziona, ma tanto non dobbiamo creare utenti locali
         FlowsUser user = new FlowsUser();
         user.setLogin(flowsUseDto.getLogin());
         user.setFirstName(flowsUseDto.getFirstName());
@@ -145,9 +150,9 @@ public class FlowsUserService {
         }
         if (flowsUseDto.getAuthorities() != null) {
             Set<Authority> authorities = new HashSet<>();
-            flowsUseDto.getAuthorities().stream().forEach(
-                    authority -> authorities.add(authorityRepository.findOne(authority))
-            );
+            // flowsUseDto.getAuthorities().stream().forEach(
+            //         authority -> authorities.add(authorityRepository.findOne(authority))
+            // );
             user.setAuthorities(authorities);
         }
         String encryptedPassword = passwordEncoder.encode(RandomUtil.generatePassword());
@@ -166,6 +171,7 @@ public class FlowsUserService {
     public void updateUser(
             Long id, String login, String firstName, String lastName, String email,
             boolean activated, String langKey, Set<String> authorities, String phone, String gender) {
+        // TODO: Questo metodo non funziona, ma tanto non dobbiamo creare utenti locali
         flowsUserRepository
                 .findOneById(id)
                 .ifPresent(u -> {
@@ -177,9 +183,9 @@ public class FlowsUserService {
                     u.setLangKey(langKey);
                     Set<Authority> managedAuthorities = u.getAuthorities();
                     managedAuthorities.clear();
-                    authorities.stream().forEach(
-                            authority -> managedAuthorities.add(authorityRepository.findOne(authority))
-                    );
+                    // authorities.stream().forEach(
+                    //         authority -> managedAuthorities.add(authorityRepository.findOne(authority))
+                    // );
                     u.setPhone(phone);
                     u.setGender(gender);
                     log.debug("Changed Information for User: {}", u);
@@ -188,8 +194,8 @@ public class FlowsUserService {
 
 
     public void deleteUser(String login) {
-        jdbcTokenStore.findTokensByUserName(login).stream().forEach(token ->
-                                                                            jdbcTokenStore.removeAccessToken(token));
+//        jdbcTokenStore.findTokensByUserName(login).stream().forEach(token ->
+//                                                                        jdbcTokenStore.removeAccessToken(token));
         flowsUserRepository.findOneByLogin(login).ifPresent(u -> {
             flowsUserRepository.delete(u);
             log.debug("Deleted User: {}", u);
@@ -198,7 +204,7 @@ public class FlowsUserService {
 
 
     public void changePassword(String password) {
-        flowsUserRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).ifPresent(u -> {
+        flowsUserRepository.findOneByLogin(securityService.getCurrentUserLogin()).ifPresent(u -> {
             String encryptedPassword = passwordEncoder.encode(password);
             u.setPassword(encryptedPassword);
             flowsUserRepository.save(u);
@@ -222,7 +228,7 @@ public class FlowsUserService {
 
     @Transactional(readOnly = true)
     public FlowsUser getUserWithAuthorities(Long id) {
-        FlowsUser user = flowsUserRepository.findOne(id);
+        FlowsUser user = flowsUserRepository.findById(id).get();
         user.getAuthorities().size(); // eagerly load the association
         return user;
     }
@@ -230,7 +236,7 @@ public class FlowsUserService {
 
     @Transactional(readOnly = true)
     public FlowsUser getUserWithAuthorities() {
-        FlowsUser user = flowsUserRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin()).orElse(null);
+        FlowsUser user = flowsUserRepository.findOneByLogin(securityService.getCurrentUserLogin()).orElse(null);
         if (user != null)
             user.getAuthorities().size(); // eagerly load the association
 

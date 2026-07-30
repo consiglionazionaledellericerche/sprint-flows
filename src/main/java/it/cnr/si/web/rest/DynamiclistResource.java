@@ -122,8 +122,7 @@ public class DynamiclistResource {
     @Timed
     public ResponseEntity<Dynamiclist> getDynamiclist(@PathVariable Long id) {
         log.debug("REST request to get Dynamiclist : {}", id);
-        Dynamiclist dynamiclist = dynamiclistRepository.findOne(id);
-        return Optional.ofNullable(dynamiclist)
+        return dynamiclistRepository.findById(id)
                 .map(result -> new ResponseEntity<>(
                         result,
                         HttpStatus.OK))
@@ -180,7 +179,7 @@ public class DynamiclistResource {
     @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Void> deleteDynamiclist(@PathVariable Long id) {
         log.debug("REST request to delete Dynamiclist : {}", id);
-        dynamiclistRepository.delete(id);
+        dynamiclistRepository.deleteById(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("dynamiclist", id.toString())).build();
     }
 

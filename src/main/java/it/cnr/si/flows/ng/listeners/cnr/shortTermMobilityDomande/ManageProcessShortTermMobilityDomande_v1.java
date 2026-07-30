@@ -46,6 +46,8 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 	private String urlShortTermMobility;
 	@Value("${cnr.stm.domandePath}")
 	private String pathDomandeShortTermMobility;
+	@Value("${cnr.stm.notifichePath}")
+	private String pathNotificheShortTermMobility;
 
 	@Inject
 	private FirmaDocumentoService firmaDocumentoService;
@@ -80,7 +82,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 
 	private Expression faseEsecuzione;
 
-	public void restToApplicazioneSTM(DelegateExecution execution, StatoDomandeSTMEnum statoDomanda) {
+	public void restToApplicazioneSTM(DelegateExecution execution, StatoDomandeSTMEnum statoDomanda, String fase) {
 
 		// @Value("${cnr.accordi-bilaterali.url}")
 		// private String urlShortTermMobility;
@@ -95,6 +97,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 			{
 				put("idDomanda", idDomanda);
 				put("stato", statoDomanda.name().toString());
+				put("fase", fase);
 			}	
 		};
 
@@ -102,6 +105,28 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 		externalMessageService.createExternalMessage(url, ExternalMessageVerb.POST, stmPayload, ExternalApplication.STM);
 	}
 
+	public void restNotificheToSTM(DelegateExecution execution, StatoDomandeSTMEnum statoDomanda, String fase) {
+
+		// @Value("${cnr.accordi-bilaterali.url}")
+		// private String urlShortTermMobility;
+		// @Value("${cnr.accordi-bilaterali.usr}")
+		// private String usrAccordiBilaterali;	
+		// @Value("${cnr.accordi-bilaterali.psw}")
+		// private String pswAccordiBilaterali;
+		//Double idDomanda = Double.parseDouble(execution.getVariable("idDomanda").toString());
+		String idDomanda = execution.getVariable("idDomanda").toString();
+		Map<String, Object> stmPayload = new HashMap<String, Object>()
+		{
+			{
+				put("idDomanda", idDomanda);
+				put("stato", statoDomanda.name().toString());
+				put("fase", fase);
+			}	
+		};
+
+		String url = urlShortTermMobility + pathNotificheShortTermMobility;
+		externalMessageService.createExternalMessage(url, ExternalMessageVerb.POST, stmPayload, ExternalApplication.STM);
+	}
 
 	@Override
 	public void notify(DelegateExecution execution) throws Exception {
@@ -123,6 +148,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 			// START
 			case "process-start": {
 				startShortTermMobilityDomandeSetGroupsAndVisibility.configuraVariabiliStart(execution);
+				execution.setVariable("fase", "validazione-direttore");
 			};break;    	
 			// START
 			case "validazione-start": {
@@ -144,12 +170,13 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 				//				flowsAttachmentService.saveAttachmentFuoriTask(processInstanceId, nomeFile, documentoGenerato, null);
 			};break;  	 
 			case "modifica-start": {
-				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.APERTA);
+				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.APERTA, execution.getVariable("fase").toString());
 			};break;
 
 			case "pre-accettazione-start": {
 				if(sceltaUtente.equals("Respingi")) {
 					execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.RESPINTA.toString());
+					restNotificheToSTM(execution, Enum.StatoDomandeSTMEnum.RESPINTA, execution.getVariable("fase").toString());
 					//restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.RESPINTA);
 					utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.RESPINTA.toString());
 				} else {
@@ -157,11 +184,13 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 						execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.ANNULLATA.toString());
 						//restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.ANNULLATA);
 						utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.ANNULLATA.toString());
+						restNotificheToSTM(execution, Enum.StatoDomandeSTMEnum.ANNULLATA, execution.getVariable("fase").toString());
 					}
 					else{
 						execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.VALIDATA.toString());
 						//restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.VALIDATA);
 						utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.VALIDATA.toString());
+						restNotificheToSTM(execution, Enum.StatoDomandeSTMEnum.VALIDATA, execution.getVariable("fase").toString());
 					}
 				}
 			};break; 			
@@ -189,16 +218,17 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.RESPINTA.toString());
 				execution.setVariable("statoFinale", Enum.StatoDomandeSTMEnum.RESPINTA.toString());
 				utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
-				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.RESPINTA);
+				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.RESPINTA,execution.getVariable("fase").toString());
 			};break;					
 			case "endevent-autorizzata-start": {
 				execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.AUTORIZZATA.toString());
 				execution.setVariable("statoFinale", Enum.StatoDomandeSTMEnum.AUTORIZZATA.toString());
 				utils.updateJsonSearchTerms(executionId, processInstanceId, execution.getVariable("statoFinale").toString());
-				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.AUTORIZZATA);
+				restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.AUTORIZZATA, execution.getVariable("fase").toString());
 			};break;						
 			case "accettazione-start": {
 				LOGGER.debug("**** accettazione-start");
+				execution.setVariable("fase", "accettazione");
 			};break; 			
 			case "accettazione-end": {
 				LOGGER.debug("**** accettazione-end");
@@ -211,6 +241,13 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 					execution.setVariable("domandaCorrenteAccettataFlag", "true");
 					//restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.ACCETTATA);
 					utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.ACCETTATA.toString());
+				}
+				if(sceltaUtente.equals("Respingi")) {
+					//	domandaCorrenteAccettata = 1;
+					execution.setVariable(statoFinaleDomanda.name(), Enum.StatoDomandeSTMEnum.RESPINTA.toString());
+					execution.setVariable("domandaCorrenteAccettataFlag", "true");
+					//restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.ACCETTATA);
+					utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoDomandeSTMEnum.RESPINTA.toString());
 				}
 				List<ProcessInstance> processinstancesListaDomandeAccettatePerBando = runtimeService.createProcessInstanceQuery()
 						.processDefinitionKey("short-term-mobility-domande")
@@ -246,6 +283,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 
 			case "valutazione-scientifica-start": {
 				LOGGER.debug("**** valutazione-scientifica-start");
+				execution.setVariable("fase", "valutazione-scientifica");
 			};break; 			
 
 			case "valutazione-scientifica-end": {
@@ -280,6 +318,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 
 			case "graduatoria-start": {
 				LOGGER.debug("**** graduatoria-start");
+				execution.setVariable("fase", "graduatoria");
 				// VERIFICA TUTTE LE DOMANDE DI FLUSSI ATTIVI PER QUEL BANDO e PER QUEL DIPARTIMENTO
 				List<ProcessInstance> processinstancesListaPerBandoDipartimento = runtimeService.createProcessInstanceQuery()
 						.processDefinitionKey("short-term-mobility-domande")
@@ -351,7 +390,7 @@ public class ManageProcessShortTermMobilityDomande_v1 implements ExecutionListen
 					managementService.deleteJob(singoloTimer.getId());
 				}
 			});
-			restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.CANCELLATA);
+			restToApplicazioneSTM(execution, Enum.StatoDomandeSTMEnum.CANCELLATA, execution.getVariable("fase").toString());
 		}
 	}
 }

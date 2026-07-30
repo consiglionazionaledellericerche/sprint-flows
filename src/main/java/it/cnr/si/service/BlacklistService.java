@@ -58,7 +58,7 @@ public class BlacklistService {
     @Transactional(readOnly = true) 
     public Blacklist findOne(Long id) {
         log.debug("Request to get Blacklist : {}", id);
-        Blacklist blacklist = blacklistRepository.findOne(id);
+        Blacklist blacklist = blacklistRepository.findById(id).get();
         return blacklist;
     }
 
@@ -76,6 +76,6 @@ public class BlacklistService {
      */
     public void delete(Long id) {
         log.debug("Request to delete Blacklist : {}", id);
-        blacklistRepository.delete(id);
+        blacklistRepository.deleteById(id);
     }
 }

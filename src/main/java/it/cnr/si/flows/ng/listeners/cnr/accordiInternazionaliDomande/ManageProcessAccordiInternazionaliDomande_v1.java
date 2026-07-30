@@ -117,6 +117,10 @@ public class ManageProcessAccordiInternazionaliDomande_v1 implements ExecutionLi
 			switch(faseEsecuzioneValue){
 			// START
 			case "process-start": {
+			    String propostaHtml = String.valueOf(execution.getVariable("propostaDiRicerca"));
+			    String propostaPulita = Utils.sanitizeHtml(propostaHtml);
+			    execution.setVariable("propostaDiRicerca", propostaPulita);
+			    			    
 				startAccordiInternazionaliDomandeSetGroupsAndVisibility.configuraVariabiliStart(execution);
 				// GENERO LA DOMANDA ---OLD
 				//String nomeFile="domandaAccordiBilaterali";

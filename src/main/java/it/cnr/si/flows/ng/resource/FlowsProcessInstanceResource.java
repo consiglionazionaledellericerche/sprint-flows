@@ -1,15 +1,25 @@
 package it.cnr.si.flows.ng.resource;
 
-import com.codahale.metrics.annotation.Timed;
-import it.cnr.si.flows.ng.dto.FlowsAttachment;
-import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
-import it.cnr.si.flows.ng.utils.Enum;
-import it.cnr.si.flows.ng.utils.Utils;
-import it.cnr.si.repository.ViewRepository;
-import it.cnr.si.security.AuthoritiesConstants;
-import it.cnr.si.security.PermissionEvaluatorImpl;
-import it.cnr.si.security.SecurityUtils;
+import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.PubblicatoTrasparenza;
+import static it.cnr.si.flows.ng.utils.Enum.Stato.PubblicatoUrp;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.statoFinaleDomanda;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+import javax.websocket.server.PathParam;
+
 import org.activiti.engine.HistoryService;
+import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
@@ -17,7 +27,7 @@ import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.activiti.rest.common.api.DataResponse;
-import org.activiti.rest.service.api.RestResponseFactory;
+import org.apache.logging.log4j.util.Strings;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -30,19 +40,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.inject.Inject;
-import javax.websocket.server.PathParam;
-import java.io.IOException;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
+import com.codahale.metrics.annotation.Timed;
 
-import static it.cnr.si.flows.ng.utils.Enum.ProcessDefinitionEnum.acquisti;
-import static it.cnr.si.flows.ng.utils.Enum.Stato.PubblicatoTrasparenza;
-import static it.cnr.si.flows.ng.utils.Enum.Stato.PubblicatoUrp;
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.statoFinaleDomanda;
+import it.cnr.si.flows.ng.dto.FlowsAttachment;
+import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
+import it.cnr.si.flows.ng.service.FlowsTaskService;
+import it.cnr.si.flows.ng.utils.Enum;
+import it.cnr.si.flows.ng.utils.Utils;
+import it.cnr.si.repository.ViewRepository;
+import it.cnr.si.security.AuthoritiesConstants;
+import it.cnr.si.security.PermissionEvaluatorImpl;
+import it.cnr.si.service.MembershipService;
+import it.cnr.si.service.SecurityService;
 
 @RestController
 @RequestMapping("api/processInstances")
@@ -52,9 +69,8 @@ public class FlowsProcessInstanceResource {
 	public static final String EXPORT_TRASPARENZA = "export-trasparenza";
 	public static final String EXPORT_URP = "export-urp";
 
-
-	@Inject
-	private RestResponseFactory restResponseFactory;
+    @Inject
+    private RepositoryService repositoryService;
 	@Inject
 	private HistoryService historyService;
 	@Inject
@@ -63,14 +79,20 @@ public class FlowsProcessInstanceResource {
 	private FlowsProcessInstanceService flowsProcessInstanceService;
 	@Inject
 	private ViewRepository viewRepository;
-	@Inject
+	@Inject @SuppressWarnings("unused") // used in expression
 	private UserDetailsService flowsUserDetailsService;
 	@Inject
+	private FlowsTaskService flowsTaskService;
+	@Inject @SuppressWarnings("unused") // used in expression
 	private PermissionEvaluatorImpl permissionEvaluator;
 	@Inject
 	private Utils utils;
 	@Inject
+	private MembershipService membershipService;
+	@Inject
 	private Environment env;
+	@Inject
+	private SecurityService securityService;
 
 
 
@@ -96,7 +118,7 @@ public class FlowsProcessInstanceResource {
 			@PathParam("processDefinitionKey") String processDefinitionKey,
 			@RequestBody Map<String, String> params) {
 
-		params.put("initiator", SecurityUtils.getCurrentUserLogin());
+		params.put("initiator", securityService.getCurrentUserLogin());
 		DataResponse response = flowsProcessInstanceService.search(params, processDefinitionKey, active, order, firstResult, maxResults, true);
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
@@ -106,7 +128,7 @@ public class FlowsProcessInstanceResource {
 	// TODO questo metodo restituisce ResponseEntity di due tipi diversi - HistoricProcessInstance e Map<String, Object>
 	@GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Secured(AuthoritiesConstants.USER)
-	@PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
+	@PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId)")
 	@Timed
 	public ResponseEntity getProcessInstanceById(
 			@RequestParam("processInstanceId") String processInstanceId,
@@ -122,7 +144,7 @@ public class FlowsProcessInstanceResource {
 
 	@GetMapping(value = "/currentTask", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Secured(AuthoritiesConstants.USER)
-	@PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId, @flowsUserDetailsService)")
+	@PreAuthorize("hasRole('ROLE_ADMIN') OR @permissionEvaluator.canVisualize(#processInstanceId)")
 	@Timed
 	public ResponseEntity<HistoricTaskInstance> getCurrentTaskProcessInstanceById(@RequestParam("processInstanceId") String processInstanceId) {
 		HistoricTaskInstance result = flowsProcessInstanceService.getCurrentTaskOfProcessInstance(processInstanceId);
@@ -163,18 +185,18 @@ public class FlowsProcessInstanceResource {
 	// TODO questo metodo implmentato apparentemente senza motivo
 	// TODO oggi, 05/02/2020 lo commento
 	// TODO se entro 05/05/2020 non gli abbiamo trovato un uso, eliminarlo
-//	@DeleteMapping(value = "suspendProcessInstance", produces = MediaType.APPLICATION_JSON_VALUE)
-//	@PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.isResponsabile(#taskId, #processInstanceId, @flowsUserDetailsService)")
-//	@Timed
-//	public ProcessInstanceResponse suspend(
-//			HttpServletRequest request,
-//			@RequestParam(value = "processInstanceId", required = true) String processInstanceId) {
-//
-//		runtimeService.suspendProcessInstanceById(processInstanceId);
-//		ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).includeProcessVariables().singleResult();
-//		ProcessInstanceResponse response =  restResponseFactory.createProcessInstanceResponse(processInstance);
-//		return response;
-//	}
+	//	@DeleteMapping(value = "suspendProcessInstance", produces = MediaType.APPLICATION_JSON_VALUE)
+	//	@PreAuthorize("hasRole('ROLE_ADMIN') || @permissionEvaluator.isResponsabile(#taskId, #processInstanceId)")
+	//	@Timed
+	//	public ProcessInstanceResponse suspend(
+	//			HttpServletRequest request,
+	//			@RequestParam(value = "processInstanceId", required = true) String processInstanceId) {
+	//
+	//		runtimeService.suspendProcessInstanceById(processInstanceId);
+	//		ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).includeProcessVariables().singleResult();
+	//		ProcessInstanceResponse response =  restResponseFactory.createProcessInstanceResponse(processInstance);
+	//		return response;
+	//	}
 
 	@PostMapping(value = "/variable", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Timed
@@ -205,12 +227,12 @@ public class FlowsProcessInstanceResource {
 
 		return new ResponseEntity<>(
 				historyService.createHistoricVariableInstanceQuery()
-						.processInstanceId(processInstanceId)
-						.variableName(variableName)
-						.list()
-						.stream()
-						.sorted((a, b) -> b.getLastUpdatedTime().compareTo(a.getLastUpdatedTime()) )
-						.findFirst().orElse(null),
+				.processInstanceId(processInstanceId)
+				.variableName(variableName)
+				.list()
+				.stream()
+				.sorted((a, b) -> b.getLastUpdatedTime().compareTo(a.getLastUpdatedTime()) )
+				.findFirst().orElse(null),
 				HttpStatus.OK);
 	}
 
@@ -398,7 +420,82 @@ public class FlowsProcessInstanceResource {
 		return new ResponseEntity<>(historicProcessInstances, HttpStatus.OK);
 	}
 
+	/**
+	 * Deve esserci una process definition definita in 
+	 * FlowsProcessInstanceService.processiRevocabili
+	 * agganciata alla process definition del flusso che si sta revocando
+	 * (per esempio "smart-working-domanda"-"smart-working-revoca")
+	 * 
+	 * Inserire tutte le variabili necessarie al nuovo flusso nella mappa `data`
+	 * 
+	 */
+	@PostMapping(value = "/revoca", produces = MediaType.APPLICATION_JSON_VALUE)
+	@Timed
+	public ResponseEntity<Void> revoca(
+			@RequestParam("processInstanceId") String processInstanceId){
 
+		HistoricProcessInstance oldProcessInstance =  historyService.createHistoricProcessInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .includeProcessVariables()
+                .singleResult();
+		
+		
+		if (oldProcessInstance == null)
+			throw new IllegalArgumentException("Il processo non e' stato trovato");
+		if (!flowsProcessInstanceService.isRevocabile(processInstanceId))
+			throw new IllegalArgumentException("Il processo non e' recovabile");
+
+		Map<String, Object> data = new HashMap<>();
+		String definitionKey = FlowsProcessInstanceService.processiRevocabili.get(oldProcessInstance.getProcessDefinitionKey());
+		String definitionId = repositoryService.createProcessDefinitionQuery().processDefinitionKey(definitionKey).latestVersion().singleResult().getId();
+		data.put("processDefinitionId", definitionId);
+
+		//MAPPATURA VARIABILI
+		String idStruttura = oldProcessInstance.getProcessVariables().get("idStruttura").toString();
+		data.put("idNsipRichiedente", oldProcessInstance.getProcessVariables().get("idNsipRichiedente"));
+		data.put("idAceStrutturaDomandaRichiedente", oldProcessInstance.getProcessVariables().get("idAceStrutturaDomandaRichiedente"));
+		data.put("userNameDomanda", oldProcessInstance.getProcessVariables().get("userNameProponente"));
+		data.put("idDomanda", oldProcessInstance.getProcessVariables().get("idDomanda"));
+		data.put("idStruttura", idStruttura);
+		String currentUser = securityService.getCurrentUserLogin();
+		String idAceStrutturaDomandaRichiedente = oldProcessInstance.getProcessVariables().get("idAceStrutturaDomandaRichiedente").toString();
+
+		Set<String> ruoliCurrentUser = membershipService.getAllRolesForUser(currentUser); 
+
+		// SE LA RICHIESTA VIENE DA UN DIRETTORE DEVE ESSERE PRESA IN VIASIONE DALLA SEGRETERIA
+		if (ruoliCurrentUser.contains("responsabile-struttura@" + idAceStrutturaDomandaRichiedente)) {
+			data.put("tipologiaRichiedente", "direttore-responsabile");
+		} else {
+			// SE LA RICHIESTA NON VIENE DA UN DIRETTORE (SEGRETERIA O APP.SIPER DEVE ESSERE PRESA IN VIASIONE DAL DIRETTORE
+			data.put("tipologiaRichiedente", "segreteria");
+		}
+		flowsTaskService.startProcessInstance(definitionId, data);
+
+		return new ResponseEntity<>(HttpStatus.OK);
+	}	
+
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
+	@PostMapping(value = "/aggiornaName", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> aggiornaName(@RequestParam("processInstanceId") String processInstanceId,
+	        @RequestParam("stato") Optional<String> stato) {
+	    
+	    utils.updateJsonSearchTerms(null, processInstanceId, stato.orElse("")); // "" significa "non aggiornare lo stato"
+	    
+	    HistoricProcessInstance processInstance = flowsProcessInstanceService.getProcessInstance(processInstanceId);
+	    String name = processInstance.getName();
+	    
+	    return ResponseEntity.ok(name);
+	}
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping(value = "/signal", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> signal(@RequestParam("processInstanceId") String processInstanceId) {
+        
+        runtimeService.signal(processInstanceId);
+        
+        return ResponseEntity.ok(null);
+    }	
+	
 	private List<Map<String, Object>> mappingPI(Enum.ProcessDefinitionEnum processDefinition, List<HistoricProcessInstance> historicProcessInstances, String typeView, boolean includeDocs) {
 		String view = viewRepository.getViewByProcessidType(processDefinition.getProcessDefinition(), typeView).getView();
 		JSONArray jsonFieldsToExport = new JSONArray(view);
@@ -406,9 +503,9 @@ public class FlowsProcessInstanceResource {
 		List<Map<String, Object>> response = new ArrayList<>();
 
 		if(typeView != null) {
-				response = historicProcessInstances.stream()
-						.map(instance -> trasformaVariabili(instance, jsonFieldsToExport, typeView.equals(EXPORT_TRASPARENZA), includeDocs))
-						.collect(Collectors.toList());
+			response = historicProcessInstances.stream()
+					.map(instance -> trasformaVariabili(instance, jsonFieldsToExport, typeView.equals(EXPORT_TRASPARENZA), includeDocs))
+					.collect(Collectors.toList());
 		}
 		return response;
 	}
@@ -422,31 +519,31 @@ public class FlowsProcessInstanceResource {
 				mappedVariables.put("documentiPubblicabiliInTrasparenza", getDocumentiPubblicabiliTrasparenza(instance));
 			else
 				mappedVariables.put("documentiPubblicabiliInURP",
-                        getDocumentiPubblicabiliURP(instance));
+						getDocumentiPubblicabiliURP(instance));
 		}
 
 		viewExport.forEach(field -> {
 			Object variable = instance.getProcessVariables().get(field);
 			switch (field.toString()) {
-				case "businessKey":
-					mappedVariables.put(field.toString(), instance.getBusinessKey());
-					break;
-				case "stato":
-					mappedVariables.put(field.toString(), new JSONObject(instance.getName()).getString("stato"));
-					break;
-				case "terminata":
-					mappedVariables.put(field.toString(), (instance.getEndTime() != null));
-					break;
-				case "impegni_json":
-					try {
-						mappedVariables.put(field.toString(), new ObjectMapper().readValue(variable != null ? (String) variable : "", List.class));
-					} catch (IOException e) {
-						LOGGER.error("Errore nel mapping delle variabili di tipo \"impegni_json\"", e);
-					}
-					break;
-				default:
-					mappedVariables.put(field.toString(), variable != null ? variable.toString():"");
-					break;
+			case "businessKey":
+				mappedVariables.put(field.toString(), instance.getBusinessKey());
+				break;
+			case "stato":
+				mappedVariables.put(field.toString(), new JSONObject(instance.getName()).getString("stato"));
+				break;
+			case "terminata":
+				mappedVariables.put(field.toString(), (instance.getEndTime() != null));
+				break;
+			case "impegni_json":
+				try {
+					mappedVariables.put(field.toString(), new ObjectMapper().readValue(variable != null ? (String) variable : "", List.class));
+				} catch (IOException e) {
+					LOGGER.error("Errore nel mapping delle variabili di tipo \"impegni_json\"", e);
+				}
+				break;
+			default:
+				mappedVariables.put(field.toString(), variable != null ? variable.toString():"");
+				break;
 			}
 		});
 

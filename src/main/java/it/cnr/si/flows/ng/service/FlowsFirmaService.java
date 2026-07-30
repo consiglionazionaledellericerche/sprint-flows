@@ -11,7 +11,8 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.xml.namespace.QName;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
@@ -48,8 +49,8 @@ import it.cnr.si.firmadigitale.firma.arss.stub.TypeTransport;
 @Service
 public class FlowsFirmaService {
 
-    private static final Logger LOGGER = Logger
-            .getLogger(FlowsFirmaService.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(FlowsFirmaService.class);
+
     private static final String STATUS_OK = "OK";
     private static final String CERT_ID = "arubaRemoteSignService.certId";
     private static final String URL = "arubaRemoteSignService.url";
@@ -93,6 +94,8 @@ public class FlowsFirmaService {
         NOME_FILE_FIRMA.put("missioni#firma-spesa", Lists.newArrayList(new FileAllaFirma("missioni"), new FileAllaFirma("anticipoMissione", true)));
         NOME_FILE_FIRMA.put("firma-elenco-documenti#firma", Lists.newArrayList(new FileAllaFirma("missioni", true, true)));
         NOME_FILE_FIRMA.put("firma-documenti#firma", Lists.newArrayList(new FileAllaFirma("documentoDaFirmare", true, true)));
+        NOME_FILE_FIRMA.put("smart-working-domanda#validazione", Lists.newArrayList(new FileAllaFirma("domandaSmartWorking")));
+        NOME_FILE_FIRMA.put("telelavoro#validazione", Lists.newArrayList(new FileAllaFirma("domandaTeleLavoro")));
     }
 
     public static final Map<String, String> ERRORI_ARUBA = new HashMap<String, String>() {{
@@ -153,7 +156,7 @@ public class FlowsFirmaService {
                     .collect(Collectors.toList());
 
             SignReturnV2Multiple signReturnV2Multiple =
-					service.pdfsignatureV2Multiple(identity, requests, pdfSignApparence, PdfProfile.fromValue(RemotePdfprofile), null);
+					service.pdfsignatureV2Multiple(identity, requests, pdfSignApparence, null, PdfProfile.fromValue(RemotePdfprofile), null);
 
             if (signReturnV2Multiple.getStatus().equals("OK")) {
                 LOGGER.info("Firma multipla per "+  files.size() +" files completata");
@@ -179,7 +182,7 @@ public class FlowsFirmaService {
         try {
             SignRequestV2 req = getRequest(identity, bytes);
 
-            SignReturnV2 response = service.pdfsignatureV2(req, apparence,
+            SignReturnV2 response = service.pdfsignatureV2(req, apparence, null,
                     PdfProfile.fromValue(RemotePdfprofile), null, null);
 
             LOGGER.debug(response.getReturnCode() +" "+ response.getStatus() +" "+ response.getDescription());
@@ -206,7 +209,7 @@ public class FlowsFirmaService {
         URL url;
         try {
             url = new URL(props.getProperty(URL));
-            LOGGER.debug(url);
+            LOGGER.debug(String.valueOf(url));
         } catch (MalformedURLException e) {
             throw new ArubaSignServiceException("URL: " + URL, e);
         }

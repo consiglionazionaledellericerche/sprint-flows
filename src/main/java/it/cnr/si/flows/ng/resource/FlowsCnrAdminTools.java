@@ -13,7 +13,6 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,6 +48,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -56,14 +56,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.gson.Gson;
 
+import it.cnr.si.domain.ExternalMessage;
+import it.cnr.si.flows.ng.config.CachingConfig;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.service.AceBridgeService;
+import it.cnr.si.flows.ng.service.FlowsMailService;
 import it.cnr.si.flows.ng.service.FlowsProcessInstanceService;
 import it.cnr.si.flows.ng.service.FlowsTaskService;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.security.AuthoritiesConstants;
 import it.cnr.si.service.AceService;
 import it.cnr.si.service.ExternalMessageSender;
+import it.cnr.si.service.ExternalMessageService;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
 
@@ -82,7 +86,9 @@ public class FlowsCnrAdminTools {
     @Inject
     private AceBridgeService aceBridgeService;
     @Inject
-    private ExternalMessageSender extenalMessageSender;
+    private ExternalMessageSender externalMessageSender;
+    @Inject
+    private ExternalMessageService externalMessageService;
     @Inject
     private ProcessEngine processEngine;
     @Inject
@@ -91,14 +97,41 @@ public class FlowsCnrAdminTools {
     private RepositoryService repositoryService;
     @Inject
     private FlowsTaskService flowsTaskService;
+    @Inject 
+    private FlowsMailService flowsMailService;
+    @Inject
+    private CachingConfig cachingConfig;
 
+    @GetMapping("/api/null")
+    @Secured(AuthoritiesConstants.USER)
+    public ResponseEntity<Void> sendNull() {
+        if(true)
+            throw new NullPointerException("pippo");
+        return ResponseEntity.ok().build();
+    }
+    
     @RequestMapping(value = "/resendExternalMessages", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured(AuthoritiesConstants.USER)
-    public ResponseEntity<Void> resendExternalMessages() {
+    public ResponseEntity<Void> resendExternalMessages(@RequestParam Optional<Long> externalMessageId) {
+        
+        if(externalMessageId.isPresent()) {
+            ExternalMessage externalMessage = externalMessageService.findOne(externalMessageId.get());
+            externalMessageSender.send(externalMessage);
+        } else {
+            log.info("Resending External Messages (manual trigger)");
+            externalMessageSender.sendMessages();
+            externalMessageSender.sendErrorMessages();
+        }
+        
+        return ResponseEntity.ok().build();
+    }
+    
+    @RequestMapping(value = "/resendScheduledEmails", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured(AuthoritiesConstants.USER)
+    public ResponseEntity<Void> resendScheduledEmails(@RequestParam(name = "processDefinitionKey") String processDefinitionKey) {
 
-        log.info("Resending External Messages (manual trigger)");
-        extenalMessageSender.sendMessages();
-        extenalMessageSender.sendErrorMessages();
+        log.info("Resending Scheduled Emails (manual trigger): "+processDefinitionKey);
+        flowsMailService.sendScheduledNotifications(processDefinitionKey);
         return ResponseEntity.ok().build();
     }
 
@@ -358,6 +391,12 @@ public class FlowsCnrAdminTools {
         AddIdentityLinkForHistoricProcessInstanceCmd cmd = new AddIdentityLinkForHistoricProcessInstanceCmd(procInstId, userId, groupId, Utils.PROCESS_VISUALIZER);
         processEngine.getManagementService().executeCommand(cmd);
 
+        return ResponseEntity.ok().build();
+    }
+    
+    @RequestMapping(value = "emptyAceRolesCashe", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> emptyAceRolesCache() {
+        cachingConfig.aceRolesForUserCacheEvict();
         return ResponseEntity.ok().build();
     }
     

@@ -54,7 +54,7 @@ public class RelationshipService {
     @Transactional(readOnly = true)
     public Relationship findOne(Long id) {
         log.debug("Request to get Relationship : {}", id);
-        return relationshipRepository.findOne(id);
+        return relationshipRepository.findById(id).get();
     }
 
     /**
@@ -64,7 +64,7 @@ public class RelationshipService {
      */
     public void delete(Long id) {
         log.debug("Request to delete Relationship : {}", id);
-        relationshipRepository.delete(id);
+        relationshipRepository.deleteById(id);
     }
 
     public Set<Relationship> getAllRelationshipForGroup(String group) {

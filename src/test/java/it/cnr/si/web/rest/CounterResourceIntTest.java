@@ -118,7 +118,7 @@ public class CounterResourceIntTest {
         // Get all the counters
         restCounterMockMvc.perform(get("/api/counters?sort=id,desc"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(counter.getId().intValue())))
                 .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
                 .andExpect(jsonPath("$.[*].value").value(hasItem(DEFAULT_VALUE.intValue())));
@@ -151,7 +151,7 @@ public class CounterResourceIntTest {
         int databaseSizeBeforeUpdate = counterRepository.findAll().size();
 
         // Update the counter
-        Counter updatedCounter = counterRepository.findOne(counter.getId());
+        Counter updatedCounter = counterRepository.findById(counter.getId()).get();
         updatedCounter
                 .name(UPDATED_NAME)
                 .value(UPDATED_VALUE);

@@ -38,6 +38,11 @@
 		$scope.processDefinitionKey = $scope.data.processDefinitionId.split(":")[0];
 		$scope.processVersion = $scope.data.processDefinitionId.split(":")[1];
 		$scope.attachments = {};
+		$scope.account = {}
+		
+		Principal.identity().then(function(account) {
+                $scope.account = account;
+        })
 
 		// Ho bisogno di caricare piu' risorse contemporaneamente (form e data);
 		// quando sono finite entrambe, autofillo la form

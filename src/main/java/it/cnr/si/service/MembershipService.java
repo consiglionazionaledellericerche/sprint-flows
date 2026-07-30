@@ -56,7 +56,7 @@ public class MembershipService {
     @Transactional(readOnly = true)
     public Membership findOne(Long id) {
         log.debug("Request to get Membership : {}", id);
-        return membershipRepository.findOne(id);
+        return membershipRepository.findById(id).get();
     }
 
     /*
@@ -64,7 +64,7 @@ public class MembershipService {
      */
     public void delete(Long id) {
         log.debug("Request to delete Membership : {}", id);
-        membershipRepository.delete(id);
+        membershipRepository.deleteById(id);
     }
 
     /**

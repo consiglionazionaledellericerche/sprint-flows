@@ -7,7 +7,9 @@ import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.exception.FileFormatException;
 import it.cnr.si.flows.ng.exception.TaskFailedException;
 import it.cnr.si.flows.ng.service.FlowsFirmaService.FileAllaFirma;
-import it.cnr.si.flows.ng.utils.SecurityUtils;
+
+import it.cnr.si.service.SecurityService;
+
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.runtime.ProcessInstance;
@@ -43,6 +45,8 @@ public class FlowsFirmaMultiplaService {
     private FlowsFirmaService flowsFirmaService;
     @Inject
     private RuntimeService runtimeService;
+    @Inject
+    private SecurityService securityService;
 
 
     public ResponseEntity<Map<String, List<String>>> signMany(String username, String password, String otp, List<String> taskIds) 
@@ -91,13 +95,15 @@ public class FlowsFirmaMultiplaService {
                     String key = taskService.getVariable(taskId, "key", String.class);
                     String path = att.getPath();
                     String signedFileName = FirmaDocumentoService.getSignedFilename(att.getFilename());
+                    if(signResponse.getBinaryoutput() == null)
+                        LOGGER.error("bytearray nullo restituito per il file "+ nomeFile +" - "+ signedFileName +" della PI "+ key);
                     String uid = flowsAttachmentService.saveOrUpdateBytes(signResponse.getBinaryoutput(), nomeFile, signedFileName, key, path);
 
                     att.setUrl(uid); // qui bisogna gestire i files esterni
                     att.setFilename(signedFileName);
                     att.setAzione(Firma);
                     att.addStato(Firmato);
-                    att.setUsername(SecurityUtils.getCurrentUserLogin());
+                    att.setUsername(securityService.getCurrentUserLogin());
                     att.setTime(new Date());
                     att.setTaskId(taskId);
                     att.setTaskName(task.getName());

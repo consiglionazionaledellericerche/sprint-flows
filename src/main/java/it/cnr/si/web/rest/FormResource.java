@@ -125,7 +125,7 @@ public class FormResource {
     @Timed
     public ResponseEntity<Form> getForm(@PathVariable Long id) {
         log.debug("REST request to get Form : {}", id);
-        Form form = formRepository.findOne(id);
+        Form form = formRepository.findById(id).get();
         return Optional.ofNullable(form)
             .map(result -> new ResponseEntity<>(
                 result,
@@ -146,7 +146,7 @@ public class FormResource {
     @Secured(AuthoritiesConstants.USER)
     public ResponseEntity<Void> deleteForm(@PathVariable Long id) {
         log.debug("REST request to delete Form : {}", id);
-        formRepository.delete(id);
+        formRepository.deleteById(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert("form", id.toString())).build();
     }
 

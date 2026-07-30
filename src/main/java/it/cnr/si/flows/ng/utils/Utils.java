@@ -8,6 +8,8 @@ import org.activiti.engine.impl.util.json.JSONArray;
 import org.activiti.engine.impl.util.json.JSONObject;
 import org.activiti.engine.task.TaskInfoQuery;
 import org.activiti.rest.service.api.engine.variable.RestVariable;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
@@ -73,13 +75,6 @@ public final class Utils {
         return groupRelationship.replace("@STRUTTURA", struttura);
     }
 
-    public static List<String> getCurrentUserAuthorities() {
-        return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .map(Utils::removeLeadingRole)
-                .collect(Collectors.toList());
-    }
-
     public static String removeLeadingRole(String in) {
         return in.startsWith(ROLE) ? in.substring(5) : in;
     }
@@ -133,6 +128,7 @@ public final class Utils {
         String ret = "";
         if (!list.isEmpty()) {
             ret = ret + list.get(0).getValue();
+            ret = ret.replace("\n", " ").replace("\r", " ");
         }
         return ret;
     }
@@ -309,6 +305,7 @@ public final class Utils {
         String ruolo;
         String persona;
         String cdsuo;
+        String data;
 
 
 
@@ -324,6 +321,10 @@ public final class Utils {
             return cdsuo;
         }
 
+        public String getData() {
+            return data;
+        }
+
         public void setRuolo(String ruolo) {
             this.ruolo = ruolo;
         }
@@ -334,6 +335,10 @@ public final class Utils {
 
         public void setPersona(String persona) {
             this.persona = persona;
+        }
+        
+        public void setData(String data) {
+            this.data = data;
         }
     }
 
@@ -429,5 +434,25 @@ public final class Utils {
         }else {
             return "";
         }
+    }
+    
+    public static String sanitizeHtml(Object in) {
+        if (in == null) return "";
+        if (!(in instanceof String)) return "";
+        
+        String inVal = (String) in;
+        inVal = inVal.replaceAll("strong>", "b>");
+        inVal = inVal.replaceAll("em>", "i>");
+        
+        return Jsoup.clean(inVal, Whitelist.relaxed());
+    }
+    
+    public static String sanificaPerAttestati(String in) {
+    	return in.replaceAll("à", "a")
+        		.replaceAll("è", "e")
+        		.replaceAll("é", "e")
+        		.replaceAll("ì", "i")
+        		.replaceAll("ò", "o")
+        		.replaceAll("ù", "u");
     }
 }

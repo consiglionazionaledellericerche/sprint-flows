@@ -22,6 +22,10 @@ public class Enum {
 
     }
 
+    public enum VariabiliPredefinite {
+        /** Boolean */
+        IMPEDISCI_STAMPA_SUMMARY;
+    }
 
     public enum Role {
         responsabile("responsabile"),
@@ -101,6 +105,12 @@ public class Enum {
     
     
 
+    public enum StatoAcquistiICTEnum {
+
+        ELIMINATO,
+        ANNULLATO,
+        ACQUISTATO;
+    }
     public enum StatoDomandeAccordiInternazionaliEnum {
         APERTA,
         CHIUSA,
@@ -115,6 +125,12 @@ public class Enum {
         FIRMATO,
         ANNULLATO,
         PREDISPOSTO;
+    }
+
+    public enum StatoApprovvigionamentiEnum {
+        EVASA,
+        ANNULLATA,
+        INEVASA;
     }
 
     public enum StatoDomandeSTMEnum {
@@ -151,6 +167,38 @@ public class Enum {
         RESPINTO_UO,
         RESPINTO_UO_SPESA,
         CANCELLATA;
+    }
+
+    public enum StatoDomandeSmartWorkingEnum {
+        APERTA,
+        PRESA_VISIONE,
+        VALIDATA,
+        RIFIUTATA,
+        ANNULLATA;
+    }
+    
+
+    public enum StatoTelelavoroEnum {
+    	RIFIUTATA,
+    	MODIFICA,
+    	FINALIZZAZIONE,
+    	VALIDATA,
+    	APPROVATA,
+    	SCADUTA,
+    	NON_APPROVATA,
+    	ANNULLATA;
+    }
+    
+
+
+    public enum StatoDomandeValidaEnum {
+        VALIDATA,
+        RESPINTA,
+        IN_APPROVAZIONE;
+    }
+    
+    public enum StatoTelelavoroRinunciaEnum {
+    	NOTIFICATA;
     }
 
     public enum ProcessDefinitionEnum {
@@ -212,11 +260,15 @@ public class Enum {
         soccorsoIstruttorio,
         preavvisoRigettoDef10Giorni,
         valutazioneProgettoAccordiBilaterali,
+        domandaTeleLavoro,
         domandaAccordiBilaterali,
         valutazioneShortTermMobility,
-        valutazioneLaboratoriCongiunti,
+        valutazioneLaboratoriCongiuntiArcheologici,
+        valutazioneLaboratoriCongiuntiTematici,
         preavvisoRigettoCambioFascia,
-        monitoraggioAttivitaCovid19;
+        monitoraggioAttivitaCovid19,
+        domandaSmartWorking,
+        revocaDomandaSmartWorking;
 
         PdfType() {
         }

@@ -21,8 +21,15 @@
 							class="glyphicon glyphicon-remove-circle"></span> Elimina Flusso
 					</button>
 					<hr>
-				</div>
+				</div>			
 			</div>
+			<div class="btn-group" ng-show="isRevocabile">
+                <button class="btn btn-danger btn-xs"
+                        ng-click="avviaFlussoRevoca()"><span
+                        class="glyphicon glyphicon-remove-circle"></span> Revoca
+                </button>
+                <hr>
+            </div>  
 			<div ng-show="vm.data.linkedProcesses">
 				<b>Flussi collegati: </b>
 				<span ng-repeat="linkedProcess in vm.data.linkedProcesses">
@@ -51,9 +58,9 @@
 			<div ng-show="vm.data.entity.deleteReason != null">
 				<b>Motivazione Eliminazione: </b>{{vm.data.entity.deleteReason}} 
 			</div>
-			<!--gruppo/utente assegnatario del task in esecuzione-->
+			<!--ruolo/utente assegnatario del task in esecuzione-->
 			<div ng-show="vm.data.groupCandidate">
-				<b>Gruppo Assegnatario: </b>{{vm.data.groupCandidate}} 
+				<b>Ruolo Assegnatario: </b>{{vm.data.groupCandidate}} 
 			</div>
 			<div ng-show="vm.activeTask.assignee">
 				<b>Utente Assegnatario: </b>{{vm.activeTask.assignee}} 

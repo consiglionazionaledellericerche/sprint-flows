@@ -2,6 +2,8 @@ package it.cnr.si.config;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.Member;
+
+import it.cnr.si.flows.ng.service.FlowsMailService;
 import it.cnr.si.service.ExternalMessageSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,9 +12,12 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import java.time.ZonedDateTime;
+import java.util.Optional;
+
 import javax.inject.Inject;
 
-@Profile("cnr")
+@Profile("cnr & scheduler")
 @EnableScheduling
 @Configuration
 public class EventScheduler {
@@ -23,6 +28,8 @@ public class EventScheduler {
     private HazelcastInstance hazelcastInstance;
     @Inject
     private ExternalMessageSender externalMessageSender;
+    @Inject 
+    private FlowsMailService flowsMailService;
 
     @Scheduled(fixedDelay = 60000, initialDelay = 10000) // 1m
     public void scheduledSendMessages() {
@@ -32,8 +39,7 @@ public class EventScheduler {
         // prendendo il primo dei member e confrontando se e' il member corrente
         // https://github.com/hazelcast/hazelcast/issues/3760#issuecomment-57928166
         log.info("Numero di nodi in questo cluster: "+ hazelcastInstance.getCluster().getMembers().size());
-        Member master = hazelcastInstance.getCluster().getMembers().iterator().next();
-        if (master == hazelcastInstance.getCluster().getLocalMember()) {
+        if (isMaster()) {
             log.info("Sono il master, processo le rest ExternalMessage");
             externalMessageSender.sendMessages();
         } else {
@@ -41,7 +47,7 @@ public class EventScheduler {
         }
     }
 
-    @Scheduled(fixedDelay = 21600000, initialDelay = 60000) // 6h
+    @Scheduled(fixedDelay = 3600000, initialDelay = 60000) // 6h
     public void scheduledSendErrorMessages() {
 
         Member master = hazelcastInstance.getCluster().getMembers().iterator().next();
@@ -51,5 +57,32 @@ public class EventScheduler {
             log.debug("Non sono il master, non processo le rest ExternalMessage in errore");
         }
     }
+    
+    @Scheduled(cron = "0 0 7 * * MON-FRI")
+    public void scheduleEmailNotificationsSW() {
+        
+        if (isMaster()) {
+            log.info("Invio notifiche ricorrenti"+ ZonedDateTime.now());
+            flowsMailService.sendScheduledNotifications("smart-working-domanda");
+        } else {
+            log.debug("Non sono il master, non invio le notifiche ricorrenti");
+        }
+    }
+    
+    @Scheduled(cron = "0 0 7 * * *")
+    public void scheduleEmailNotificationsTelelavoro() {
+        
+        if (isMaster()) {
+            log.info("Invio notifiche ricorrenti"+ ZonedDateTime.now());
+            flowsMailService.sendScheduledNotifications("telelavoro");
+        } else {
+            log.debug("Non sono il master, non invio le notifiche ricorrenti");
+        }
+    }
 
+    private boolean isMaster() {
+        Optional<String> masterId = hazelcastInstance.getCluster().getMembers().stream()
+                .map(Member::getUuid).sorted().findFirst();
+        return masterId.get().equals(hazelcastInstance.getCluster().getLocalMember().getUuid());
+    }
 }

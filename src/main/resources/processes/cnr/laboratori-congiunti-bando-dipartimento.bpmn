@@ -52,9 +52,11 @@
         </activiti:executionListener>
       </extensionElements>
     </endEvent>
-    <exclusiveGateway id="exclusivegateway6" name="Exclusive Gateway" default="flow16"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway6" name="Exclusive Gateway" default="flow22"></exclusiveGateway>
     <sequenceFlow id="flow15" sourceRef="firma-graduatoria" targetRef="exclusivegateway6"></sequenceFlow>
-    <sequenceFlow id="flow16" sourceRef="exclusivegateway6" targetRef="protocollo-graduatoria"></sequenceFlow>
+    <sequenceFlow id="flow16" sourceRef="exclusivegateway6" targetRef="protocollo-graduatoria">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Firma'}]]></conditionExpression>
+    </sequenceFlow>
     <sequenceFlow id="flow17" name="END" sourceRef="protocollo-graduatoria" targetRef="endevent3"></sequenceFlow>
     <userTask id="provvedimento-graduatoria" name="PROVVEDIMENTO GRADUATORIA" activiti:candidateGroups="${gruppoValidatoriLaboratoriCongiunti}">
       <extensionElements>
@@ -71,9 +73,7 @@
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow21" sourceRef="provvedimento-graduatoria" targetRef="firma-graduatoria"></sequenceFlow>
-    <sequenceFlow id="flow22" sourceRef="exclusivegateway6" targetRef="provvedimento-graduatoria">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${sceltaUtente == 'Modifica'}]]></conditionExpression>
-    </sequenceFlow>
+    <sequenceFlow id="flow22" sourceRef="exclusivegateway6" targetRef="provvedimento-graduatoria"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_laboratori-congiunti-bando-dipartimento">
     <bpmndi:BPMNPlane bpmnElement="laboratori-congiunti-bando-dipartimento" id="BPMNPlane_laboratori-congiunti-bando-dipartimento">

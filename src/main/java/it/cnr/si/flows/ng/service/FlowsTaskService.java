@@ -6,8 +6,8 @@ import com.opencsv.CSVWriter;
 import it.cnr.si.domain.View;
 import it.cnr.si.flows.ng.dto.FlowsAttachment;
 import it.cnr.si.flows.ng.exception.UnexpectedResultException;
+import it.cnr.si.flows.ng.repository.FlowsHistoricProcessInstanceQuery;
 import it.cnr.si.flows.ng.resource.FlowsAttachmentResource;
-import it.cnr.si.flows.ng.utils.Enum;
 import it.cnr.si.flows.ng.utils.SecurityUtils;
 import it.cnr.si.flows.ng.utils.Utils;
 import it.cnr.si.repository.ViewRepository;
@@ -15,10 +15,14 @@ import it.cnr.si.security.PermissionEvaluatorImpl;
 import it.cnr.si.service.DraftService;
 import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.RelationshipService;
+import it.cnr.si.service.SecurityService;
+
 import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricIdentityLink;
+import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
+import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.util.json.JSONArray;
 import org.activiti.engine.impl.util.json.JSONObject;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -52,7 +56,8 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.*;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.initiator;
+import static it.cnr.si.flows.ng.utils.Enum.VariableEnum.startDate;
 import static it.cnr.si.flows.ng.utils.Utils.*;
 
 
@@ -99,6 +104,16 @@ public class FlowsTaskService {
 	private Environment env;
 	@Inject
 	private DraftService draftService;
+	@Inject
+	private ManagementService managementService;
+	@Inject
+	private FlowsProcessInstanceService flowsProcessInstanceService;
+    @Inject
+    private SecurityService securityService;
+	@Inject
+	private SecurityUtils securityUtils;
+
+
 
 	public DataResponse search(Map<String, String> params, String processInstanceId, boolean active, String order, int firstResult, int maxResults) {
 		HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery();
@@ -197,13 +212,18 @@ public class FlowsTaskService {
 	}
 
 	public DataResponse getAvailableTask(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
-		String username = SecurityUtils.getCurrentUserLogin();
-		List<String> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
-				.map(GrantedAuthority::getAuthority)
-				.map(Utils::removeLeadingRole)
-				.map(Utils::removeImportoSpesa)
-				.collect(Collectors.toList());
+		String username = securityService.getCurrentUserLogin();
+//		List<String> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+//				.map(GrantedAuthority::getAuthority)
+//				.map(Utils::removeLeadingRole)
+//				.map(Utils::removeImportoSpesa)
+//				.collect(Collectors.toList());
 
+		List<String> authorities = securityService.getUser().get().getAuthorities()
+		        .stream()
+		        .map(GrantedAuthority::getAuthority)
+		        .collect(Collectors.toList());
+		
 		TaskQuery taskQuery = taskService.createTaskQuery()
 				.taskCandidateUser(username)
 				.taskCandidateGroupIn(authorities)
@@ -218,9 +238,9 @@ public class FlowsTaskService {
 
 		List<Task> tasks = taskQuery.listPage(firstResult, maxResults);
 		int rimossi = rimuoviTaskImportoSpesa(tasks);
-		
+
 		List<TaskResponse> list = restResponseFactory.createTaskResponseList(tasks);
-		
+
 		DataResponse response = new DataResponse();
 		response.setStart(firstResult);
 		response.setSize(list.size() - rimossi);
@@ -230,69 +250,98 @@ public class FlowsTaskService {
 	}
 
 	private int rimuoviTaskImportoSpesa(List<Task> list) {
-		
+
 		int removed = 0;
 
-        List<String> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+        List<String> authorities = securityService.getUser().get().getAuthorities()
+                .stream()
                 .map(GrantedAuthority::getAuthority)
-                .map(Utils::removeLeadingRole)
                 .collect(Collectors.toList());
-        
+
 		Iterator<Task> i = list.iterator();
 		while (i.hasNext()) {
 			Task task = i.next();
 			if (!permissionEvaluator.isCandidatoDiretto(task.getId(), authorities) &&
-			        !permissionEvaluator.canCompleteImportoSpesa(task.getId(), authorities)) {
+					!permissionEvaluator.canCompleteImportoSpesa(task.getId(), authorities)) {
 				i.remove();
 				removed++;
 			}
 		}
-		
-		
+
+
 		return removed;
 	}
 
 
-
 	public DataResponse taskAssignedInMyGroups(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
-		String username = SecurityUtils.getCurrentUserLogin();
 
-		List<String> userAuthorities = SecurityUtils.getCurrentUserAuthorities();
+		String username = securityService.getCurrentUserLogin();
+		List<String> userAuthorities = securityUtils.getCurrentUserAuthorities();
+		Set<String> ruoliUtente = membershipService.getAllRolesForUser(username);
 
-		TaskQuery taskQuery = (TaskQuery) utils.searchParams(searchParams, taskService.createTaskQuery().includeProcessVariables());
+		FlowsHistoricProcessInstanceQuery processQuery = new FlowsHistoricProcessInstanceQuery(managementService);
+		processQuery.setVisibleToGroups(userAuthorities);
+		processQuery.setVisibleToUser(username);
+		processQuery.unfinished();
 
-		if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
-			taskQuery.processDefinitionKey(processDefinition);
-
-		utils.orderTasks(order, taskQuery);
-
-		List<TaskResponse> result = new ArrayList<>();
-
-		Set<String> usersInMyGroups = membershipService.getUsersInMyGroups(username);
-
-		//risulta avere prestazioni leggermente migliori questo approccio rispetto a quello commentato
-		// (test effettuati con 300 Pi e 30 Task assegnati ad altri utenti nei miei gruppi
-		//      prendo i task assegnati agli utenti trovati
-		for (String user : usersInMyGroups) {
-			List<Task> tasks = taskQuery.taskAssignee(user).list()
-					.stream()
-					.filter(t ->
-							taskService.getIdentityLinksForTask(t.getId()).stream().anyMatch(il ->
-									il.getType().equals(IdentityLinkType.CANDIDATE) && userAuthorities.contains(il.getGroupId()) )
-					).collect(Collectors.toList());
-
-			result.addAll(restResponseFactory.createTaskResponseList(tasks));
+		//trasformo i searchParams (da JSONArray a Hashmap) togliendo il "type"
+		Map<String, String> mapParams = new HashMap<>();
+		for (int i = 0; i < searchParams.length(); i++) {
+			JSONObject appo = (JSONObject) searchParams.get(i);
+			mapParams.put(appo.getString("key"), appo.getString("value"));
 		}
-		//		result = restResponseFactory.createTaskResponseList(taskQuery.list().stream()
-		//																	.filter(t -> usersInMyGroups.contains(t.getAssignee()) || taskService.getIdentityLinksForTask(t.getId()).stream().anyMatch(il -> il.getType().equals(IdentityLinkType.CANDIDATE) && userAuthorities.contains(il.getGroupId())))
-		//																	.collect(Collectors.toList()));
 
-		List<TaskResponse> responseList = result.subList(firstResult <= result.size() ? firstResult : result.size(),
-				maxResults <= result.size() ? maxResults : result.size());
+		flowsProcessInstanceService.setSearchTerms(mapParams, processQuery);
+		if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
+			processQuery.processDefinitionKey(processDefinition);
+		if (order.equals(ASC))
+			processQuery.orderByProcessInstanceStartTime().asc();
+		else if (order.equals(DESC))
+			processQuery.orderByProcessInstanceStartTime().desc();
+
+		List<HistoricProcessInstance> pil = processQuery.list();
+
+		//per ogni Pi prendo il task attivo e costruisco la response
+		List<Task> result = new ArrayList<>();
+		for (HistoricProcessInstance pi : pil) {
+		    List<Task> tasks = taskService.createTaskQuery().active().processInstanceId(pi.getId())
+                .includeProcessVariables().list();
+		    if (tasks.size() > 0)
+		        result.add(tasks.get(0));
+		}
+
+		List<TaskResponse> responseList = new ArrayList();
+		List<TaskResponse> taskList = restResponseFactory.createTaskResponseList(result);
+
+		for (TaskResponse task : taskList) {
+			List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForTask(task.getId());
+			boolean assigneeFlag = false;
+			boolean candidateFlag = false;
+
+			for (HistoricIdentityLink hil : identityLinks) {
+				if (hil.getType().equals("assignee")) {
+					if (!hil.getUserId().equals(username))
+						assigneeFlag = true;
+				}
+				if (hil.getType().equals("candidate")) {
+					if (hil.getUserId() != null && hil.getUserId().equals(username))
+						candidateFlag = true;
+				}
+				if (hil.getType().equals("candidate")) {
+					if (hil.getGroupId() != null && ruoliUtente.contains(hil.getGroupId()))
+						candidateFlag = true;
+				}
+			}
+			if (candidateFlag && assigneeFlag)
+				responseList.add(task);
+		}
+		responseList.subList(firstResult <= responseList.size() ? firstResult : responseList.size(),
+							 maxResults <= responseList.size() ? maxResults : responseList.size());
+
 		DataResponse response = new DataResponse();
 		response.setStart(firstResult);
-		response.setSize(responseList.size());
-		response.setTotal(result.size());
+		response.setSize(0);
+		response.setTotal(responseList.size());
 		response.setData(responseList);
 		return response;
 	}
@@ -300,7 +349,7 @@ public class FlowsTaskService {
 
 	public DataResponse getMyTasks(JSONArray searchParams, String processDefinition, int firstResult, int maxResults, String order) {
 		TaskQuery taskQuery = (TaskQuery) utils.searchParams(searchParams, taskService.createTaskQuery());
-		taskQuery.taskAssignee(SecurityUtils.getCurrentUserLogin())
+		taskQuery.taskAssignee(securityService.getCurrentUserLogin())
 				.includeProcessVariables();
 
 		if (!processDefinition.equals(ALL_PROCESS_INSTANCES))
@@ -347,11 +396,12 @@ public class FlowsTaskService {
 		data.put("key", key);
 		//L`utenza reale (admin o ROLE_amministratori-supporto-tecnico@0000)
 		// non può avviare il flusso quindi ho bisogno dell`utenza "fittizia"/impersonata
-		data.put(initiator.name(), SecurityUtils.getCurrentUserLogin());
+		data.put(initiator.name(), securityService.getCurrentUserLogin());
 		data.put(startDate.name(), new Date());
 
 		ProcessInstance instance = runtimeService.startProcessInstanceById(definitionId, key, data);
-		runtimeService.setVariable(instance.getId(), "processInstanceId", instance.getId());
+		if (!instance.isEnded())
+		    runtimeService.setVariable(instance.getId(), "processInstanceId", instance.getId());
 
 		String statoPI;
 		if (taskService.createTaskQuery().processInstanceId(instance.getProcessInstanceId()).count() == 0) {
@@ -376,7 +426,7 @@ public class FlowsTaskService {
 		String key = counterId + "-" + counterService.getNext(counterId);
 		data.put("key", key);
 
-		String username = SecurityUtils.getCurrentUserLogin();
+		String username = securityService.getCurrentUserLogin();
 
 		data.put(applicationName, username);
 		data.put(startDate.name(), new Date());
@@ -404,7 +454,9 @@ public class FlowsTaskService {
 
 	public void completeTask(String taskId, Map<String, Object> data) {
 
-		String username = SecurityUtils.getRealUserLogged();
+		// TODO
+		// String username = SecurityUtils.getRealUserLogged();
+		String username = securityService.getCurrentUserLogin();
 
 		// aggiungo l'identityLink che indica l'utente che esegue il task
 		taskService.setVariablesLocal(taskId, data);
@@ -423,7 +475,7 @@ public class FlowsTaskService {
 	}
 
 	public DataResponse getTasksCompletedByMe(JSONArray searchParams, @RequestParam("processDefinition") String processDefinition, @RequestParam("firstResult") int firstResult, @RequestParam("maxResults") int maxResults, @RequestParam("order") String order) {
-		String username = SecurityUtils.getCurrentUserLogin();
+		String username = securityService.getCurrentUserLogin();
 
 		HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery().taskInvolvedUser(username)
 				.includeProcessVariables().includeTaskLocalVariables();
@@ -522,8 +574,8 @@ public class FlowsTaskService {
 			isUnclaimableVariable.setName("isReleasable");
 			// if has candidate groups or users -> can release
 			isUnclaimableVariable.setValue(taskService.getIdentityLinksForTask(task.getId())
-					.stream()
-					.anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
+												   .stream()
+												   .anyMatch(l -> l.getType().equals(IdentityLinkType.CANDIDATE)));
 			task.getVariables().add(isUnclaimableVariable);
 		}
 	}

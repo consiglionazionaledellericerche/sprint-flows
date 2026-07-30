@@ -15,7 +15,7 @@
     </extensionElements>
     <startEvent id="startevent1" name="Start"></startEvent>
     <sequenceFlow id="flow1" name="START " sourceRef="startevent1" targetRef="validazione"></sequenceFlow>
-    <userTask id="validazione" name="VALIDAZIONE" activiti:candidateGroups="${gruppoValidatoriAttestati}">
+    <userTask id="validazione" name="VALIDAZIONE" activiti:candidateUsers="${usernameResponsabileAttestato}" activiti:candidateGroups="${gruppoValidatoriAttestati}">
       <extensionElements>
         <activiti:executionListener event="start" delegateExpression="${manageProcessAttestati_v1}">
           <activiti:field name="faseEsecuzione">
@@ -112,7 +112,7 @@
         <omgdi:waypoint x="280.0" y="134.0"></omgdi:waypoint>
         <omgdi:waypoint x="410.0" y="134.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="14.0" width="100.0" x="409.0" y="155.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="65.0" x="409.0" y="155.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow17" id="BPMNEdge_flow17">

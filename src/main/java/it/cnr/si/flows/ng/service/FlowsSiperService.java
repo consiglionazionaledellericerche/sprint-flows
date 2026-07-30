@@ -8,7 +8,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.client.support.BasicAuthorizationInterceptor;
+import org.springframework.http.client.support.BasicAuthenticationInterceptor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -45,7 +45,7 @@ public class FlowsSiperService {
 
         String username = env.getProperty("cnr.siper.username");
         String password = env.getProperty("cnr.siper.password");
-        interceptors.add(new BasicAuthorizationInterceptor(username, password));
+        interceptors.add(new BasicAuthenticationInterceptor(username, password));
 
         this.siperRestTemplate.setInterceptors(interceptors);
     }

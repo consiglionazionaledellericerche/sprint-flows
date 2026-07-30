@@ -801,6 +801,9 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="commento_congruita_economica_progetto"/>
 		<fieldDescription><![CDATA[commento_congruita_economica_progetto]]></fieldDescription>
 	</field>
+	<field name="giudizio_complessivo" class="java.lang.String">
+		<fieldDescription><![CDATA[giudizio_complessivo]]></fieldDescription>
+	</field>
 	<group name="Group2" isStartNewColumn="true" footerPosition="StackAtBottom">
 		<groupExpression><![CDATA[(int)($V{REPORT_COUNT}/5)]]></groupExpression>
 		<groupHeader>
@@ -827,15 +830,7 @@
 					<textFieldExpression><![CDATA["Istituto: " + $F{strutturaValutazioneDirigente}]]></textFieldExpression>
 				</textField>
 			</band>
-			<band height="75">
-				<textField textAdjust="ScaleFont">
-					<reportElement x="0" y="10" width="549" height="20" uuid="1dbe54a4-231e-4a32-a1f3-a093c4e155d9"/>
-					<textElement textAlignment="Left">
-						<font size="14" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA["Dipartimento: " + $F{dipartimento}]]></textFieldExpression>
-				</textField>
-			</band>
+			<band height="75"/>
 		</groupHeader>
 	</group>
 	<background>
@@ -846,9 +841,9 @@
 			<textField textAdjust="ScaleFont">
 				<reportElement x="0" y="4" width="556" height="59" uuid="1c38430f-18c4-4353-b5a3-4c46137ce2cb"/>
 				<textElement textAlignment="Center">
-					<font size="26" isBold="true"/>
+					<font size="20" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["MODULO DI VALUTAZIONE LABORATORI CONGIUNTI"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["MODULO DI VALUTAZIONE \r\n LABORATORI CONGIUNTI ARCHEOLOGICI"]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight">
 				<reportElement x="-3" y="70" width="555" height="21" uuid="10119319-030e-4176-a69a-e86a174f58cc"/>
@@ -944,7 +939,7 @@
 					<font fontName="Times New Roman" size="11" isBold="true" isItalic="false"/>
 					<paragraph lineSpacing="1_1_2"/>
 				</textElement>
-				<textFieldExpression><![CDATA["6 - Sfruttamento e/o diffusione/pubblicazione dei risultati\r\nPunteggio (attribuire un punteggio da 1 a 10): "  + $F{punteggio_sfruttamento_diffusione_risultati} + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commento_sfruttamento_diffusione_risultati} + "\r\n\r\n</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["7 - Sfruttamento e/o diffusione/pubblicazione dei risultati\r\nPunteggio (attribuire un punteggio da 1 a 10): "  + $F{punteggio_sfruttamento_diffusione_risultati} + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commento_sfruttamento_diffusione_risultati} + "\r\n\r\n</style>"]]></textFieldExpression>
 			</textField>
 		</band>
 		<band height="27">
@@ -954,7 +949,17 @@
 					<font fontName="Times New Roman" size="11" isBold="true" isItalic="false"/>
 					<paragraph lineSpacing="1_1_2"/>
 				</textElement>
-				<textFieldExpression><![CDATA["7 - Congruità economica del progetto\r\nPunteggio (attribuire un punteggio da 1 a 10): "  + $F{punteggio_congruita_economica_progetto} + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commento_congruita_economica_progetto} + "\r\n\r\n</style>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["8 - Congruità economica del progetto\r\nPunteggio (attribuire un punteggio da 1 a 10): "  + $F{punteggio_congruita_economica_progetto} + "\r\ncommento: " + "<style isBold=\"false\">" + $F{commento_congruita_economica_progetto} + "\r\n\r\n</style>"]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="50">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="8" width="555" height="17" uuid="054c0ed1-e4fb-419e-b43f-13e952c0797b"/>
+				<textElement textAlignment="Justified" markup="styled">
+					<font fontName="Times New Roman" size="11" isBold="true" isItalic="false"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Giudizio Complessivo\r\n"  + $F{giudizio_complessivo} ]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

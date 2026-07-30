@@ -74,9 +74,6 @@
                 },
                 search: function (params) {
                     return $http.post('api/tasks/search/', params);
-                },
-                coolAvailableTasks: function () {
-                    return $http.get('api/tasks/coolAvailableTasks');
                 }
             },
             processInstances: {
@@ -121,7 +118,10 @@
                 getHistoryForPi: function (processInstanceId) {
                     return $http.get('api/processInstances/getHistoryForPi?' +
                         'processInstanceId=' + processInstanceId);
-                }
+                },
+                revoca: function (processInstanceId) {
+                    return $http.post('api/processInstances/revoca?' +
+                        'processInstanceId=' + processInstanceId);                }
             },
             attachments: {
                 pubblicaDocumento: function (processInstanceId, attachmentName, flag) {
@@ -186,11 +186,14 @@
                     } else {
                         processDefinitionKey = 'all';
                     }
-                    return $http.post('api/search/exportCsv/' + processDefinitionKey +
-                        '?active=' + searchParams.active +
-                        '&order=' + searchParams.order +
-                        '&firstResult=' + firstResult +
-                        '&maxResults=' + maxResults, searchParams);
+                    return $http({
+                        method: 'POST',
+                        url: 'api/search/exportCsv/' + processDefinitionKey,
+                        data: searchParams,
+                        headers: {
+                            "Accept": "text/csv; charset=utf-8, text/plain; charset=utf-8"
+                        }
+                    });
                 },
                 exportCsvAndSaveInProcess: function (searchParams, firstResult, maxResults) {
                     var processDefinitionKey;
@@ -206,6 +209,9 @@
                         '&firstResult=' + firstResult +
                         '&maxResults=' + maxResults, searchParams);
                 },
+                istituti: function(searchterm) {
+                    return $http.get('api/users/istituti/' + searchterm);
+                }
             },
             lookup: {
                 uo: function (id) {
@@ -219,6 +225,9 @@
                 },
                 mysedifirma: function () {
                     return $http.get('api/lookup/ace/user/sedirichiedentefirma');
+                },
+                mysediApprovvigionamenti: function () {
+                    return $http.get('api/lookup/ace/user/sediRichiedenteApprovvigionamenti');
                 },
                 boss: function () {
                     return $http.get('api/lookup/ace/boss');

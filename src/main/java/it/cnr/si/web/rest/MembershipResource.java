@@ -3,11 +3,12 @@ package it.cnr.si.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import it.cnr.si.domain.Membership;
 import it.cnr.si.domain.Relationship;
-import it.cnr.si.security.SecurityUtils;
+
 import it.cnr.si.service.CnrgroupService;
 import it.cnr.si.service.FlowsUserService;
 import it.cnr.si.service.MembershipService;
 import it.cnr.si.service.RelationshipService;
+import it.cnr.si.service.SecurityService;
 import it.cnr.si.web.rest.util.HeaderUtil;
 import it.cnr.si.web.rest.util.PaginationUtil;
 import org.slf4j.Logger;
@@ -47,6 +48,8 @@ public class MembershipResource {
     private CnrgroupService cnrgroupService;
     @Inject
     private FlowsUserService flowsUserService;
+    @Inject
+    private SecurityService securityService;
 
 
 
@@ -165,7 +168,7 @@ public class MembershipResource {
     @Timed
     public ResponseEntity<List<Membership>> getGroupsForUser(Pageable pageable) throws URISyntaxException {
 
-        String user = SecurityUtils.getCurrentUserLogin();
+        String user = securityService.getCurrentUserLogin();
         log.debug("REST request dei gruppi di cui è coordinator l'utente {}", user);
 
         List<Membership> userGroup = flowsUserService.getGroupsForUser(user, pageable);

@@ -156,7 +156,7 @@ public class DynamiclistResourceIntTest {
         // Get all the dynamiclists
         restDynamiclistMockMvc.perform(get("/api/dynamiclists?sort=id,desc"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.[*].id").value(hasItem(dynamiclist.getId().intValue())))
                 .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
                 .andExpect(jsonPath("$.[*].listjson").value(hasItem(DEFAULT_LISTJSON.toString())));
@@ -171,7 +171,7 @@ public class DynamiclistResourceIntTest {
         // Get the dynamiclist
         restDynamiclistMockMvc.perform(get("/api/dynamiclists/{id}", dynamiclist.getId()))
             .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(dynamiclist.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
             .andExpect(jsonPath("$.listjson").value(DEFAULT_LISTJSON.toString()));
@@ -193,7 +193,7 @@ public class DynamiclistResourceIntTest {
         int databaseSizeBeforeUpdate = dynamiclistRepository.findAll().size();
 
         // Update the dynamiclist
-        Dynamiclist updatedDynamiclist = dynamiclistRepository.findOne(dynamiclist.getId());
+        Dynamiclist updatedDynamiclist = dynamiclistRepository.findById(dynamiclist.getId()).get();
         updatedDynamiclist
                 .name(UPDATED_NAME)
                 .listjson(UPDATED_LISTJSON);
