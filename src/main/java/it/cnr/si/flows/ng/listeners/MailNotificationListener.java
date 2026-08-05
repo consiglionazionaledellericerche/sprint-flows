@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -118,17 +119,18 @@ public class MailNotificationListener  implements ActivitiEventListener {
 	 */
 	private void sendStandardNotification(ActivitiEvent event) {
 
-	    try {
-    		String executionId = event.getExecutionId();
-    		Map<String, Object> variables = runtimeService.getVariables(executionId);
-    
-    		//integro le variabili con quelle conservate nel name del processo
-    		Map<String, Object> integratedVariables = integrateVariables(event, variables);
-    		ActivitiEntityEvent taskEvent = (ActivitiEntityEvent) event;
-    		TaskEntity task = (TaskEntity) taskEvent.getEntity();
-    
-    		Set<IdentityLink> candidates = ((TaskEntity)taskEvent.getEntity()).getCandidates();
-    
+		String executionId = event.getExecutionId();
+		Map<String, Object> variables = runtimeService.getVariables(executionId);
+		//integro le variabili con quelle conservate nel name del processo
+		Map<String, Object> integratedVariables = integrateVariables(event, variables);
+		ActivitiEntityEvent taskEvent = (ActivitiEntityEvent) event;
+		TaskEntity task = (TaskEntity) taskEvent.getEntity();
+		
+		Set<IdentityLink> candidates = ((TaskEntity)taskEvent.getEntity()).getCandidates();
+	
+		String assignee = ((TaskEntity)taskEvent.getEntity()).getAssignee();
+
+		try {
     		candidates.forEach(c -> {
     			if (c.getGroupId() != null) {
     				String[] idStruttura = c.getGroupId().split("@", 2);
@@ -144,7 +146,6 @@ public class MailNotificationListener  implements ActivitiEventListener {
     			} 
     		});
     
-    		String assignee = ((TaskEntity)taskEvent.getEntity()).getAssignee();
     
     		if (Utils.isNotEmpty(assignee)) {
     			LOGGER.info("Sto inviando mail standard all'assegnatario {} per il task",assignee, task.getName());
@@ -152,7 +153,17 @@ public class MailNotificationListener  implements ActivitiEventListener {
     		}
 	    } catch (Exception e) {
 	        LOGGER.error("Errore durante l'invio di una mail per l'evento "+ event.getExecutionId(), e);
-	        throw e;
+	        mailService.sendEmail("marcinireneusz.trycz@cnr.it",
+	        		Optional.of("massimo.fraticelli@cnr.it"),
+	        		Optional.empty(),
+	        		"[Scrivania] Errore invio email",
+	        		"ExedcutionId: " + executionId + "\n" +
+	    	        "Evento: " + taskEvent + "\n" +
+	        		"Candidates: "+  candidates + "\n" +
+	        		"Assignee: " + assignee + "\n\n\n" +
+	        		"Variables: "+ integratedVariables.entrySet().stream().map((entry) -> (entry.getKey() + ": "+ String.valueOf(entry.getValue()))).collect(Collectors.joining("\n")),
+	        		false,
+	        		false);
 	    }
 	}
 
