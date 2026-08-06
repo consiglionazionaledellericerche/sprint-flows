@@ -1,6 +1,8 @@
 package it.cnr.si.service;
 
 import com.codahale.metrics.annotation.Timed;
+
+import feign.FeignException;
 import it.cnr.si.domain.Membership;
 import it.cnr.si.domain.Relationship;
 import it.cnr.si.flows.ng.service.AceBridgeService;
@@ -151,6 +153,7 @@ public class MembershipService {
         return result;
     }
 
+    @Transactional(noRollbackFor = FeignException.class)
     public Set<String> getAllUsersInGroup(String groupName) {
 
         Set<String> groups = new HashSet<>();
