@@ -267,9 +267,11 @@ public class ManageCovid19_v1 implements ExecutionListener {
 			meseNumerico = "12";
 			break;
 		case "primo_semestre":
+		case "primo-semestre":
 				meseNumerico = "01";
 				break;
 		case "secondo_semestre":
+		case "secondo-semestre":
 			meseNumerico = "07";
 			break;
 		default:
