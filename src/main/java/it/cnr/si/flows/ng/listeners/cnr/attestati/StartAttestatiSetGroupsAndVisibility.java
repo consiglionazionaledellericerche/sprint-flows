@@ -23,6 +23,9 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
@@ -44,7 +47,7 @@ public class StartAttestatiSetGroupsAndVisibility {
 
 	public void configuraVariabiliStart(DelegateExecution execution)  throws IOException, ParseException  {
 
-		String usernameResponsabileAttestato = null;
+		String usernameResponsabileAttestato = "";
 		String initiator = (String) execution.getVariable(Enum.VariableEnum.initiator.name());
 		String utenteRichiedente = execution.getVariable("utenteRichiedente").toString();
 		if (execution.getVariable("usernameResponsabileAttestato") != null) {
@@ -52,8 +55,21 @@ public class StartAttestatiSetGroupsAndVisibility {
 		}
 		String meseAttestato = execution.getVariable("meseAttestato").toString();
 		String annoAttestato = execution.getVariable("annoAttestato").toString();
-		String codiceSedeAttestato = execution.getVariable("codiceSedeAttestato").toString();
-		String idStruttura = aceService.getSedeIdByIdNsip(codiceSedeAttestato).toString();
+        String codiceSedeAttestato = execution.getVariable("codiceSedeAttestato").toString();
+	
+		String idStruttura;
+		try {				
+			idStruttura = aceService.getSedeIdByIdNsip(codiceSedeAttestato).toString();
+		} catch (Exception e) {
+			String dataString = "15/" + meseAttestato + "/" + annoAttestato;
+			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+	        Date dataAttestato = sdf.parse(dataString);
+	        LocalDate localDataAttestato = Instant.ofEpochMilli(dataAttestato.getTime())
+	    	        .atZone(ZoneId.systemDefault())
+	    	        .toLocalDate();
+	        idStruttura = aceService.getSedeIdByIdNsip(codiceSedeAttestato, localDataAttestato).toString();
+		}
+		
 		String codiceCdsuoAttestato = aceService.entitaOrganizzativaById(Integer.parseInt(idStruttura)).getCdsuo();
 
 		// LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable(Enum.VariableEnum.title.name()));

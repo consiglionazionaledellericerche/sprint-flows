@@ -4,6 +4,9 @@ package it.cnr.si.flows.ng.listeners.cnr.telelavoroRevoca;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,8 +52,8 @@ public class ManageProcessTelelavoroRevoca_v1 implements ExecutionListener {
 	private AceService aceService;
 	@Inject
 	private Utils utils;
-    @Inject
-    private SecurityService securityService;
+	@Inject
+	private SecurityService securityService;
 
 	private Expression faseEsecuzione;
 
@@ -64,7 +67,7 @@ public class ManageProcessTelelavoroRevoca_v1 implements ExecutionListener {
 		Date dataFirma = new Date();
 		String dataAzioneFlusso = dateFormat.format(dataFirma);
 		//LocalDate dataFirmaFlusso = LocalDate.now();
-		
+
 		Map<String, Object> telelavoroPayload = new HashMap<String, Object>()
 		{
 			{
@@ -94,8 +97,8 @@ public class ManageProcessTelelavoroRevoca_v1 implements ExecutionListener {
 
 	@Override
 	public void notify(DelegateExecution execution) throws Exception {
-	    
-	    execution.setVariable(VariabiliPredefinite.IMPEDISCI_STAMPA_SUMMARY.name(), Boolean.TRUE);
+
+		execution.setVariable(VariabiliPredefinite.IMPEDISCI_STAMPA_SUMMARY.name(), Boolean.TRUE);
 
 		String currentUser = securityService.getCurrentUserLogin();
 		String processInstanceId =  execution.getProcessInstanceId();
@@ -113,32 +116,44 @@ public class ManageProcessTelelavoroRevoca_v1 implements ExecutionListener {
 		LOGGER.info("-- azioneScelta: " + faseEsecuzioneValue + " con sceltaUtente: " + sceltaUtente);
 
 		switch(faseEsecuzioneValue){  
-		// START
-		case "process-start": {
-			String initiator = (String) execution.getVariable(Enum.VariableEnum.initiator.name());
-			String utenteRichiedente = execution.getVariable("userNameProponente").toString();
-			String codiceSedeTelelavoro = execution.getVariable("codiceSedeTelelavoro").toString();
-			String idStruttura = aceService.getSedeIdByIdNsip(codiceSedeTelelavoro).toString();
-			String codiceCdsuoTelelavoro = aceService.entitaOrganizzativaById(Integer.parseInt(idStruttura)).getCdsuo();
-			String gruppoResponsabileProponente = "responsabile-struttura@" + idStruttura.toString();
+			// START
+			case "process-start": {
+				String initiator = (String) execution.getVariable(Enum.VariableEnum.initiator.name());
+				String utenteRichiedente = execution.getVariable("userNameProponente").toString();
+				String codiceSedeTelelavoro = execution.getVariable("codiceSedeTelelavoro").toString();
 
-			// LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable(Enum.VariableEnum.title.name()));
-			LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {} per l'utente {} - codiceSedeTelelavoro:  {} - idStruttura  {})", initiator, execution.getId(), execution.getVariable("titolo"), utenteRichiedente, codiceSedeTelelavoro, idStruttura );
+				String idStruttura;
+				try {				
+					idStruttura = aceService.getSedeIdByIdNsip(codiceSedeTelelavoro).toString();
+				} catch (Exception e) {
+					String dataString = (String) execution.getVariable("dataInizioTeleLavoro");
+					SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+					Date dataInizioTeleLavoro = sdf.parse(dataString);
+					LocalDate localDataTelelavoro = Instant.ofEpochMilli(dataInizioTeleLavoro.getTime())
+							.atZone(ZoneId.systemDefault())
+							.toLocalDate();
+					idStruttura = aceService.getSedeIdByIdNsip(codiceSedeTelelavoro,localDataTelelavoro).toString();
+				}
+				String codiceCdsuoTelelavoro = aceService.entitaOrganizzativaById(Integer.parseInt(idStruttura)).getCdsuo();
+				String gruppoResponsabileProponente = "responsabile-struttura@" + idStruttura.toString();
 
-			execution.setVariable("codiceCdsuoTelelavoro", codiceCdsuoTelelavoro);
-			execution.setVariable("idStruttura", idStruttura);
-			execution.setVariable("gruppoResponsabileProponente", gruppoResponsabileProponente);
-		};break;    
+				// LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {})", initiator, execution.getId(), execution.getVariable(Enum.VariableEnum.title.name()));
+				LOGGER.info("L'utente {} sta avviando il flusso {} (con titolo {} per l'utente {} - codiceSedeTelelavoro:  {} - idStruttura  {})", initiator, execution.getId(), execution.getVariable("titolo"), utenteRichiedente, codiceSedeTelelavoro, idStruttura );
+
+				execution.setVariable("codiceCdsuoTelelavoro", codiceCdsuoTelelavoro);
+				execution.setVariable("idStruttura", idStruttura);
+				execution.setVariable("gruppoResponsabileProponente", gruppoResponsabileProponente);
+			};break;    
 
 
-		case "process-end": {
-			execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoTelelavoroRinunciaEnum.NOTIFICATA.toString());
-			execution.setVariable("statoFinale", Enum.StatoTelelavoroRinunciaEnum.NOTIFICATA.toString());
-			utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoTelelavoroRinunciaEnum.NOTIFICATA.toString());
-		};break; 
-		// DEFAULT  
-		default: {
-		};break;
+			case "process-end": {
+				execution.setVariable("STATO_FINALE_DOMANDA", Enum.StatoTelelavoroRinunciaEnum.NOTIFICATA.toString());
+				execution.setVariable("statoFinale", Enum.StatoTelelavoroRinunciaEnum.NOTIFICATA.toString());
+				utils.updateJsonSearchTerms(executionId, processInstanceId, Enum.StatoTelelavoroRinunciaEnum.NOTIFICATA.toString());
+			};break; 
+			// DEFAULT  
+			default: {
+			};break;
 
 		} 
 	}

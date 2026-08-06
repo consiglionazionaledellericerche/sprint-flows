@@ -12,6 +12,9 @@ import static it.cnr.si.flows.ng.utils.Utils.ellipsis;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -70,6 +73,7 @@ import it.cnr.si.service.ExternalMessageSender;
 import it.cnr.si.service.ExternalMessageService;
 import it.cnr.si.service.dto.anagrafica.scritture.BossDto;
 import it.cnr.si.service.dto.anagrafica.simpleweb.SimpleEntitaOrganizzativaWebDto;
+
 
 @Controller
 @RequestMapping("api/admin")
@@ -400,7 +404,19 @@ public class FlowsCnrAdminTools {
         return ResponseEntity.ok().build();
     }
     
-    // mtrycz 06/01/21 - metodo disabilitato, ci era servito una volta.
+    @RequestMapping(value = "getSedeByIdNsipAndData", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Integer> getSedeByIdNsipAndData(
+    		@RequestParam String idnsip,
+    		@RequestParam String dataString) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = sdf.parse(dataString);
+        LocalDate localDate = Instant.ofEpochMilli(date.getTime())
+	        .atZone(ZoneId.systemDefault())
+	        .toLocalDate();
+        return ResponseEntity.ok(aceService.getSedeIdByIdNsip(idnsip, localDate));
+    }
+    
+    // mtrycz 06/01/21 - metodo disabilitato, ci er	a servito una volta.
     // @RequestMapping(value = "aggiornaName/{aggiorna}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> agiornaName(@PathVariable("aggiorna") Boolean aggiorna) {
         
