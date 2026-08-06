@@ -229,54 +229,68 @@ public class MailNotificationListener  implements ActivitiEventListener {
 	 */
 	private void send(Map<String, Object> variables, List<NotificationRule> notificationRules, String nt, String tn) {
 
-		LOGGER.info("Sto inviando secondo le notification rule :{} ({}, {})", notificationRules, nt, tn);
-		notificationRules.stream()
-		.forEach(rule -> {
-			LOGGER.debug("rule.getRecipients(): {}", rule.getRecipients());
+		try {
+			LOGGER.info("Sto inviando secondo le notification rule :{} ({}, {})", notificationRules, nt, tn);
+			notificationRules.stream()
+			.forEach(rule -> {
+				LOGGER.debug("rule.getRecipients(): {}", rule.getRecipients());
 
-			if (rule.isPersona()) {
-				Stream.of(rule.getRecipients().split(","))
-				.map(s -> s.trim())
-				.forEach(personVariableName -> {
-					LOGGER.debug("personVariableName: {}", personVariableName);
-					String person = (String) variables.get(personVariableName);
-					LOGGER.info("Invio la mail {} all'utente {}", nt, person);
-					mailService.sendFlowEventNotification(nt, variables, tn, person, null, true);
-				});
-			} else {
-				if (Arrays.asList(env.getActiveProfiles()).contains("cnr")) {
+				if (rule.isPersona()) {
+					Stream.of(rule.getRecipients().split(","))
+					.map(s -> s.trim())
+					.forEach(personVariableName -> {
+						LOGGER.debug("personVariableName: {}", personVariableName);
+						String person = (String) variables.get(personVariableName);
+						LOGGER.info("Invio la mail {} all'utente {}", nt, person);
+						mailService.sendFlowEventNotification(nt, variables, tn, person, null, true);
+					});
+				} else {
+					if (Arrays.asList(env.getActiveProfiles()).contains("cnr")) {
 
-					if (Optional.ofNullable(aceBridgeService).isPresent()) {
+						if (Optional.ofNullable(aceBridgeService).isPresent()) {
+							Stream.of(rule.getRecipients().split(","))
+							.map(s -> s.trim())
+							.forEach(groupVariableName -> {
+								LOGGER.debug("variables.get(groupVariableName): {}", variables.get(groupVariableName));
+								String groupName = (String) variables.get(groupVariableName);
+
+								Set<String> members = membershipService.getAllUsersInGroup(groupName);
+
+								LOGGER.info("Invio la mail {} al gruppo {} con utenti {}", nt, groupName, members);
+								members.forEach(member -> {
+									mailService.sendFlowEventNotification(nt, variables, tn, member, groupName, true);
+								});
+							});
+						}
+					} else {
 						Stream.of(rule.getRecipients().split(","))
 						.map(s -> s.trim())
 						.forEach(groupVariableName -> {
-							LOGGER.debug("variables.get(groupVariableName): {}", variables.get(groupVariableName));
-							String groupName = (String) variables.get(groupVariableName);
-
+							LOGGER.debug("groupVariableName: {}", groupVariableName);
+							String groupName = (String) groupVariableName;
 							Set<String> members = membershipService.getAllUsersInGroup(groupName);
-
 							LOGGER.info("Invio la mail {} al gruppo {} con utenti {}", nt, groupName, members);
 							members.forEach(member -> {
 								mailService.sendFlowEventNotification(nt, variables, tn, member, groupName, true);
 							});
 						});
 					}
-				} else {
-					Stream.of(rule.getRecipients().split(","))
-					.map(s -> s.trim())
-					.forEach(groupVariableName -> {
-						LOGGER.debug("groupVariableName: {}", groupVariableName);
-						String groupName = (String) groupVariableName;
-						Set<String> members = membershipService.getAllUsersInGroup(groupName);
-						LOGGER.info("Invio la mail {} al gruppo {} con utenti {}", nt, groupName, members);
-						members.forEach(member -> {
-							mailService.sendFlowEventNotification(nt, variables, tn, member, groupName, true);
-						});
-					});
-				}
 
-			}
-		});
+				}
+			});
+		} catch (Exception e) {
+			LOGGER.error("Errore durante l'invio di una mail per la notification rule "+ nt, e);
+			mailService.sendEmail("marcinireneusz.trycz@cnr.it",
+					Optional.of("massimo.fraticelli@cnr.it"),
+					Optional.empty(),
+					"[Scrivania] Errore invio email",
+					"notificationRules: " + notificationRules + "\n" +
+							"notificaiton: " + nt + "\n" +
+							"taskName: "+  tn + "\n" +
+							"Variables: "+ variables.entrySet().stream().map((entry) -> (entry.getKey() + ": "+ String.valueOf(entry.getValue()))).collect(Collectors.joining("\n")),
+							false,
+							false);
+		}
 	}
 
 
