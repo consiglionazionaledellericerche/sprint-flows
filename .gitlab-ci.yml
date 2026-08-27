@@ -21,13 +21,15 @@ test:
   script:
     - mvn -B sonar:sonar -Dsonar.host.url=http://sonar.si.cnr.it test package -fae -Pdev
   allow_failure: true
+  except:
+    - tags
 
 
 
 build_dev:
   stage: build_java
   except: 
-    - prod
+    - tags
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   script:
     - mvn -B install -DskipTests -U -Pprod
@@ -40,7 +42,7 @@ build_dev:
 build:
   stage: build_java
   only: 
-    - prod
+    - tags
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   script:
     - mvn -B deploy -DskipTests -Pprod -U
@@ -89,12 +91,12 @@ release_artifact:
   stage: release
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   only:
-    - master
+    - prod
   script:
     - git checkout -B "$CI_BUILD_REF_NAME"
     # mi metto in condizione del push per l'utente con la deploy key
     - git remote set-url --push origin git@git.si.cnr.it:documentale/sprint-flows.git
-    - mvn -B -Dresume=false release:prepare release:perform -Pprod -DpushChanges=false -DlocalCheckout=true -DskipTests -Darguments="-Dmaven.test.skip=true -DskipTests"
+    - mvn -B release:clean release:prepare release:perform -Pprod  -DskipTests -Darguments="-Dmaven.test.skip=true -DskipTests" -Dresume=false
     - git remote set-url --push origin git@git.si.cnr.it:documentale/sprint-flows.git
     - git push --tags
     - git commit --amend -m "[ci skip] prepare for next development iteration"
@@ -108,7 +110,7 @@ buildprodcontainer:
   tags:
     - shared
   only:
-    - prod
+    - tags
   script:
     - echo "Running build image and push image for release tag"
     - echo $CI_COMMIT_REF_NAME
@@ -124,7 +126,7 @@ deploydockprod01:
   stage: deploy_container
   image: scolagreco/alpine-ssh:latest
   only:
-    - prod
+    - tags
   tags:
     - shared
   when: manual
@@ -154,7 +156,7 @@ deploydockprod02:
   stage: deploy_container
   image: scolagreco/alpine-ssh:latest
   only:
-    - prod
+    - tags
   tags:
     - shared
   when: manual
