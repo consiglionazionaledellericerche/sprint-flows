@@ -30,9 +30,18 @@ build_dev:
   stage: build_java
   except: 
     - tags
+    - prod
   image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
   script:
     - mvn -B install -DskipTests -U -Pprod
+
+build_prod:
+  stage: build_java
+  only: 
+    - prod
+  image: docker.si.cnr.it/cnr-maven:$CNR_MAVEN_VERSION
+  script:
+    - mvn -B install deploy -DskipTests -U -Pprod
   artifacts:
     paths:
       - ./target/app.war
